@@ -14,25 +14,26 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <string>
-#include <string.h>
+#include <cstring>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <stdexcept>
 
 class ADSBin
 {
 public:
-   ADSBin(const std::string& host, int port);
+   ADSBin(const char* host, int port);
    virtual ~ADSBin();
 
    int connect();
    void close();
-   const std::string& getSrcHost() const;
+   int readLine();
+   const char* getSrcHost() const;
    const int getSrcPort() const;
 
-   int verbose;
-   std::string device;
    std::string response;
    std::string linebuffer;
+   char buffer[2048];
 
    struct hostent* host_info;
    struct sockaddr_in address;
@@ -40,7 +41,7 @@ public:
 
 
 private:
-   const std::string src_host;
+   const char* src_host;
    const int src_port;
 };
 

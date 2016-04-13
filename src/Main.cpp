@@ -9,8 +9,25 @@
  */
 
 #include <iostream>
+#include "ADSBin.h"
+#include "Aircraft.h"
+
+using namespace std;
 
 int main(int argc, char* argv[]) {
+   cout << "INIT connect to ads-b" << endl;
+   ADSBin ads("localhost", 30003);
+   ads.connect();
+   while (1) {
+      int error;
+      if ((error = ads.readLine()) < 0) {
+         cout << error << endl;
+         return -1;
+      }
+      //if (ads.response[4] == '3') {
+         cout << ads.response;
+      //}
 
+   }
    return 0;
 }
