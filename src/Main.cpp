@@ -29,8 +29,14 @@ int main(int argc, char* argv[]) {
       if (ads.response[4] == '3') {
          cout << ads.response;
          Aircraft ac;
-         parser.unpack(ac, ads.response);
-         cout << ac.toString() << endl;
+         if (parser.unpack(ac, ads.response) == 0) {
+            cout << "Aircraft " << ac.id << ", alt=" << std::to_string(ac.altitude);
+            cout << ", lat=" << std::to_string(ac.latitude) << ", long=" << std::to_string(ac.longitude);
+            cout << endl;
+            std::string str;
+            parser.process(ac, str, 49.665263, 9.003075, 110);
+            cout << str << endl;
+         }
       }
    }
    return 0;

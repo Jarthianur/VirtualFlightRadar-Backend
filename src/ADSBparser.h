@@ -8,20 +8,40 @@
 #ifndef ADSBPARSER_H_
 #define ADSBPARSER_H_
 
+#define PI 3.14159265359
+
 #include <string>
-#include <vector>
+#include <stdexcept>
 #include "Aircraft.h"
+#include <math.h>
+#include <sstream>
+#include <iomanip>
 
 class ADSBparser
 {
 public:
-   ADSBparser();
-   virtual ~ADSBparser();
+	ADSBparser();
+	virtual ~ADSBparser();
 
-   void unpack(Aircraft&, std::string&);
+	int unpack(Aircraft&, std::string&);
+	void process(Aircraft&, std::string&, double, double, int);
+	int checksum(std::string&);
 
 private:
+	double radian(double);
+	int degree(double);
 
+	double relNorth,
+	relEast,
+	relVert,
+	distance,
+	latdeg,
+	latmin,
+	longdeg,
+	longmin;
+	int relBearing;
+	//time utc
+	char latstr, longstr;
 };
 
 #endif /* ADSBPARSER_H_ */
