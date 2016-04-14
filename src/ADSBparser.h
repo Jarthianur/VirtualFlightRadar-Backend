@@ -9,6 +9,8 @@
 #define ADSBPARSER_H_
 
 #include <string>
+#include <vector>
+#include "Aircraft.h"
 
 class ADSBparser
 {
@@ -17,6 +19,9 @@ public:
    virtual ~ADSBparser();
 
    void unpack(Aircraft&, std::string&);
+
+private:
+
 };
 
 #endif /* ADSBPARSER_H_ */

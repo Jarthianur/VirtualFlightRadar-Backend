@@ -46,7 +46,7 @@ int ADSBin::readLine()
    try {
       response = linebuffer.substr(0,eol);
    } catch (const std::out_of_range& e) {
-      std::cout << e._M_msg;
+      std::cout << e.what();
    }
    linebuffer.clear();
    if (response.length() == 0) {

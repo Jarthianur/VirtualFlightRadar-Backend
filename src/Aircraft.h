@@ -13,22 +13,17 @@
 class Aircraft
 {
 public:
-   Aircraft(const std::string& id);
+   Aircraft();
    virtual ~Aircraft();
 
-   double getAltitude() const;
-   void setAltitude(double altitude);
-   const std::string& getId() const;
-   double getLatitude() const;
-   void setLatitude(double latitude);
-   double getLongitude() const;
-   void setLongitude(double longitude);
-
-private:
-   const std::string id;
+   std::string id;
    double latitude;
    double longitude;
-   double altitude;
+   int altitude;
+   const std::string& toString();
+
+private:
+
 };
 
 #endif /* AIRCRAFT_H_ */

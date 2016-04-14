@@ -11,12 +11,14 @@
 #include <iostream>
 #include "ADSBin.h"
 #include "Aircraft.h"
+#include "ADSBparser.h"
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
    cout << "INIT connect to ads-b" << endl;
    ADSBin ads("localhost", 30003);
+   ADSBparser parser;
    ads.connect();
    while (1) {
       int error;
@@ -24,10 +26,12 @@ int main(int argc, char* argv[]) {
          cout << error << endl;
          return -1;
       }
-      //if (ads.response[4] == '3') {
+      if (ads.response[4] == '3') {
          cout << ads.response;
-      //}
-
+         Aircraft ac;
+         parser.unpack(ac, ads.response);
+         cout << ac.toString() << endl;
+      }
    }
    return 0;
 }
