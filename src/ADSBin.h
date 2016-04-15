@@ -22,7 +22,7 @@
 class ADSBin
 {
 public:
-   ADSBin(const char*, int, const char*, int);
+   ADSBin(const char*, int, int);
    virtual ~ADSBin();
 
    int connect();
@@ -32,7 +32,6 @@ public:
 
    const char* getSrcHost() const;
    const int getSrcPort() const;
-   const char* getDstHost() const;
    const int getDstPort() const;
 
    std::string response;
@@ -40,17 +39,18 @@ public:
    char buffer[2048];
 
    struct hostent* host_info;
-   struct hostent* dsthost_info;
    struct sockaddr_in address;
    struct sockaddr_in dstaddress;
+   struct sockaddr_in host_adr;
    int sockfd;
    int dstsockfd;
+   int new_sockfd;
 
 private:
    const char* src_host;
    const int src_port;
-   const char* dst_host;
    const int dst_port;
+   int yes = 1;
 };
 
 #endif /* ADSBIN_H_ */

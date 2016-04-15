@@ -108,7 +108,7 @@ void ADSBparser::process(Aircraft& ac, std::string& dststr, double baselat,
    tm* utc = gmtime(&now);
    //$GPRMC,061748,A,5000.05,N,00815.75,E,0,0,050416,001.0,W*61
    snprintf(buff, 256, "$GPRMC,%02d%02d%02d,A,%02.0f%05.2f,%c,%03.0f%05.2f,%c,0,0,%02d%02d%02d,001.0,W*",
-         utc->tm_hour, utc->tm_min, utc->tm_sec, latdeg, latmin, latstr, longdeg, longmin, longstr, utc->tm_mday, utc->tm_mon, utc->tm_year-2000);
+         utc->tm_hour, utc->tm_min, utc->tm_sec, latdeg, latmin, latstr, longdeg, longmin, longstr, utc->tm_mday, utc->tm_mon+1, utc->tm_year-100);
       csum = checksum(buff);
       dststr.append(buff);
       snprintf(buff, 64, "%02x\r\n", csum);

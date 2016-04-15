@@ -7,12 +7,11 @@
 
 #include "ADSBin.h"
 
-ADSBin::ADSBin(const char* srchost, int srcport, const char* dsthost, int dstport)
+ADSBin::ADSBin(const char* srchost, int srcport, int dstport)
 : response(""),
   linebuffer(""),
   src_host(srchost),
   src_port(srcport),
-  dst_host(dsthost),
   dst_port(dstport)
 {
    memset(buffer,0,sizeof(buffer));
@@ -32,6 +31,7 @@ void ADSBin::close()
 {
    ::close(sockfd);
    ::close(dstsockfd);
+   ::close(new_sockfd);
 }
 
 int ADSBin::readLine()
@@ -95,17 +95,58 @@ int ADSBin::connect()
    // now try to accept connection from xcsoar
    std::cout << "connecting to xcsoar..." << std::endl;
 
+   if ((dstsockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+      std::cout << "Could not create socket!" << std::endl;
+      return -1;
+   }
+
+   if (setsockopt(dstsockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+      std::cout << "Could not set socketopt REUSEADDR!" << std::endl;
+      return -1;
+   }
+
+   memset(&host_adr, 0, sizeof(host_adr));
+   host_adr.sin_family = AF_INET;
+   host_adr.sin_port = htons(dst_port);
+   host_adr.sin_addr.s_addr = INADDR_ANY;
+
+   if (bind(dstsockfd, (struct sockaddr*)&host_adr, sizeof(struct sockaddr)) == -1) {
+      std::cout << "Could not bind socket!" << std::endl;
+      return -1;
+   }
+
+   if (listen(dstsockfd, 20) == -1) {
+      std::cout << "Could not listen to socket!" << std::endl;
+      return -1;
+   }
+   int con = 0;
+   //now wait for xcsoar to connect
+   while (con == 0) {
+      std::cout << "wait for xcsoar..."<< std::endl;
+      unsigned int sin_s = sizeof(struct sockaddr);
+      new_sockfd = accept(dstsockfd, (struct sockaddr*)&dstaddress, &sin_s);
+      if (new_sockfd == -1) {
+         std::cout << "Could not accept connection!" << std::endl;
+         return -1;
+      }
+      char* addr = inet_ntoa(dstaddress.sin_addr);
+      if (std::strcmp(addr, "127.0.0.1") != 0) {
+         std::cout << "Do not accept connection from " << addr << std::endl;
+         return -1;
+      }
+      std::cout<< "connection from " << addr <<std::endl;
+      con = 1;
+   }
+   std::cout << "connected to xcsoar"<< std::endl;
 
    return 0;
 }
 
-const char* ADSBin::getDstHost() const
-{
-   return dst_host;
-}
-
 int ADSBin::sendMsg(std::string& msg)
 {
+   if (send(new_sockfd, msg.c_str(), msg.length(), 0) > 0) {
+      std::cout << "sent msg" << std::endl;
+   }
    return 0;
 }
 

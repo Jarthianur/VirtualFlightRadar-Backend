@@ -13,12 +13,18 @@
 #include "Aircraft.h"
 #include "ADSBparser.h"
 
+#define PORT_XCSOAR 4353
+
 using namespace std;
 
 int main(int argc, char* argv[]) {
-   ADSBin ads("localhost", 30003, "localhost", 30004);
+   //if (argc > 1) {
+      ADSBin ads("localhost", 30003, std::atoi(argv[1]));
+   //} else {
+   //   ADSBin ads("localhost", 30003, PORT_XCSOAR);
+   //}
    ADSBparser parser;
-   ads.connect();
+   if (ads.connect() == -1) return 0;
    while (1) {
       int error;
       if ((error = ads.readLine()) < 0) {
