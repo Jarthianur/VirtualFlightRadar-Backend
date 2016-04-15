@@ -20,7 +20,6 @@ public:
    double latitude;
    double longitude;
    int altitude;
-   const std::string& toString();
 
 private:
 

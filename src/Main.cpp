@@ -9,21 +9,17 @@
  */
 
 #include <iostream>
-#include "ADSBin.h"
 #include "Aircraft.h"
-#include "ADSBparser.h"
+#include "ADSBParser.h"
+#include "ConnectorADSB.h"
 
 #define PORT_XCSOAR 4353
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
-   //if (argc > 1) {
-      ADSBin ads("localhost", 30003, std::atoi(argv[1]));
-   //} else {
-   //   ADSBin ads("localhost", 30003, PORT_XCSOAR);
-   //}
-   ADSBparser parser;
+   ConnectorADSB ads("localhost", 30003, std::atoi(argv[1]));
+   ParserADSB parser;
    if (ads.connect() == -1) return 0;
    while (1) {
       int error;

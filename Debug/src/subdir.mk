@@ -4,21 +4,24 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/ADSBin.cpp \
+../src/ADSBParser.cpp \
 ../src/ADSBparser.cpp \
 ../src/Aircraft.cpp \
+../src/ConnectorADSB.cpp \
 ../src/Main.cpp 
 
 OBJS += \
-./src/ADSBin.o \
+./src/ADSBParser.o \
 ./src/ADSBparser.o \
 ./src/Aircraft.o \
+./src/ConnectorADSB.o \
 ./src/Main.o 
 
 CPP_DEPS += \
-./src/ADSBin.d \
+./src/ADSBParser.d \
 ./src/ADSBparser.d \
 ./src/Aircraft.d \
+./src/ConnectorADSB.d \
 ./src/Main.d 
 
 

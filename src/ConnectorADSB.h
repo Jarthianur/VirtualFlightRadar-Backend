@@ -1,12 +1,5 @@
-/*
- * Connector.h
- *
- *  Created on: 10.04.2016
- *      Author: lula
- */
-
-#ifndef ADSBIN_H_
-#define ADSBIN_H_
+#ifndef CONNECTORADSB_H_
+#define CONNECTORADSB_H_
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -19,11 +12,11 @@
 #include <unistd.h>
 #include <stdexcept>
 
-class ADSBin
+class ConnectorADSB
 {
 public:
-   ADSBin(const char*, int, int);
-   virtual ~ADSBin();
+   ConnectorADSB(const char*, int, int);
+   virtual ~ConnectorADSB();
 
    int connect();
    void close();
@@ -38,19 +31,19 @@ public:
    std::string linebuffer;
    char buffer[2048];
 
-   struct hostent* host_info;
-   struct sockaddr_in address;
-   struct sockaddr_in dstaddress;
-   struct sockaddr_in host_adr;
-   int sockfd;
-   int dstsockfd;
-   int new_sockfd;
+   struct hostent* adsb_host_info;
+   struct sockaddr_in adsb_in_addr;
+   struct sockaddr_in xcs_cli_addr;
+   struct sockaddr_in nmea_out_addr;
+   int adsb_in_sock;
+   int nmea_out_sock;
+   int xcs_cli_sock;
 
 private:
-   const char* src_host;
-   const int src_port;
-   const int dst_port;
+   const char* adsb_in_host;
+   const int adsb_in_port;
+   const int nmea_out_port;
    int yes = 1;
 };
 
-#endif /* ADSBIN_H_ */
+#endif /* CONNECTORADSB_H_ */
