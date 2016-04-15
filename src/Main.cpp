@@ -5,7 +5,7 @@
  * GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*68
  *
  * //--GLL Latitude,N/S,Longitude,E/W,UTC,Status (A=Valid, V=Invalid),Checksum
- *
+ * XCSoar connects on port 4353
  */
 
 #include <iostream>
@@ -16,8 +16,7 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-   cout << "INIT connect to ads-b" << endl;
-   ADSBin ads("localhost", 30003);
+   ADSBin ads("localhost", 30003, "localhost", 30004);
    ADSBparser parser;
    ads.connect();
    while (1) {
@@ -36,6 +35,7 @@ int main(int argc, char* argv[]) {
             std::string str;
             parser.process(ac, str, 49.665263, 9.003075, 110);
             cout << str << endl;
+            ads.sendMsg(str);
          }
       }
    }

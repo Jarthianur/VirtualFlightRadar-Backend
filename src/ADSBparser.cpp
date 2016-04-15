@@ -82,18 +82,37 @@ void ADSBparser::process(Aircraft& ac, std::string& dststr, double baselat,
    relVert = ac.altitude / 3.2808 - basealt;
 
    dststr.clear();
-   std::stringstream strs;
-   strs << "$PFLAU,,,,1,0,";
-   strs << relBearing << ",0,";
-   strs << ((int) (relVert + 0.5)) << ',';
-   strs << ((int) (distance + 0.5)) << ',';
-   strs << ac.id << '*';
-   dststr = strs.str();
-   int csum = checksum(dststr);
-   strs << std::setfill('0') << std::setw(2) << std::hex << csum;
-   strs << "\r\n";
-   dststr = strs.str();
-
+   char buff[256];
+   //PFLAU
+   snprintf(buff, 256, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", relBearing,
+         dtoi(relVert), dtoi(distance), ac.id.c_str());
+   int csum = checksum(buff);
+   dststr.append(buff);
+   snprintf(buff, 64, "%02x\r\n", csum);
+   dststr.append(buff);
+   //PFLAA
+   snprintf(buff, 256, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", dtoi(relNorth),
+         dtoi(relEast), dtoi(relVert), ac.id.c_str());
+   csum = checksum(buff);
+   dststr.append(buff);
+   snprintf(buff, 64, "%02x\r\n", csum);
+   dststr.append(buff);
+   //GPRMC
+   latstr = (baselat < 0)? 'S' : 'N';
+   longstr = (baselong < 0)? 'W' : 'E';
+   latdeg = abs(floor(baselat));
+   latmin = abs(60 * (baselat - latdeg));
+   longdeg = abs(floor(baselong));
+   longmin = abs(60 * (baselong - longdeg));
+   time_t now = time(0);
+   tm* utc = gmtime(&now);
+   //$GPRMC,061748,A,5000.05,N,00815.75,E,0,0,050416,001.0,W*61
+   snprintf(buff, 256, "$GPRMC,%02d%02d%02d,A,%02.0f%05.2f,%c,%03.0f%05.2f,%c,0,0,%02d%02d%02d,001.0,W*",
+         utc->tm_hour, utc->tm_min, utc->tm_sec, latdeg, latmin, latstr, longdeg, longmin, longstr, utc->tm_mday, utc->tm_mon, utc->tm_year-2000);
+      csum = checksum(buff);
+      dststr.append(buff);
+      snprintf(buff, 64, "%02x\r\n", csum);
+      dststr.append(buff);
    return;
 }
 
@@ -107,13 +126,17 @@ int ADSBparser::degree(double rad)
    return (int)(((rad * 180) / PI) + 0.5);
 }
 
-int ADSBparser::checksum(std::string& sentence)
+int ADSBparser::checksum(char* sentence)
 {
    int csum = 0;
-   int tmp;
-   int end = ((tmp = sentence.find_last_of('*')) > -1) ? tmp : 0;
-   for (int i = 1; i < end; ++i) {
-      csum ^= (int) sentence[i];
+   int i=1;
+   while (sentence[i] != '\0') {
+      csum ^= (int) sentence[i++];
    }
    return csum;
+}
+
+int ADSBparser::dtoi(double d)
+{
+   return (int)(d + 0.5);
 }

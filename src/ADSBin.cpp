@@ -7,11 +7,13 @@
 
 #include "ADSBin.h"
 
-ADSBin::ADSBin(const char* host, int port)
+ADSBin::ADSBin(const char* srchost, int srcport, const char* dsthost, int dstport)
 : response(""),
   linebuffer(""),
-  src_host(host),
-  src_port(port)
+  src_host(srchost),
+  src_port(srcport),
+  dst_host(dsthost),
+  dst_port(dstport)
 {
    memset(buffer,0,sizeof(buffer));
 }
@@ -29,6 +31,7 @@ const char* ADSBin::getSrcHost() const
 void ADSBin::close()
 {
    ::close(sockfd);
+   ::close(dstsockfd);
 }
 
 int ADSBin::readLine()
@@ -68,13 +71,11 @@ int ADSBin::connect()
       return -1;
    }
 
-   std::cout << "host= "<< host_info << std::endl;
-   if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) == -1) {
+   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
       std::cout << "Could not create socket!" << std::endl;
       return -1;
    }
 
-   std::cout << "socket= " << sockfd << std::endl;
    memset(&address, 0, sizeof(address));
    address.sin_family = AF_INET;
    address.sin_port = htons(src_port);
@@ -82,13 +83,33 @@ int ADSBin::connect()
 
    std::cout << "address.fam= " << address.sin_family << std::endl;
    std::cout << "address.port= " << ntohs(address.sin_port) << std::endl;
-   std::cout << "address.addr= " << host_info->h_name << std::endl;
+   std::cout << "address.addr= " << inet_ntoa(dstaddress.sin_addr) << std::endl;
    if (::connect(sockfd, (struct sockaddr*) &address, sizeof(struct sockaddr)) == -1) {
       std::cout << "Could not connect to server!" << std::endl;
       close();
       return -1;
    }
 
-   std::cout << "connected" << std::endl;
+   std::cout << "connected to ADS-B" << std::endl;
+
+   // now try to accept connection from xcsoar
+   std::cout << "connecting to xcsoar..." << std::endl;
+
+
    return 0;
+}
+
+const char* ADSBin::getDstHost() const
+{
+   return dst_host;
+}
+
+int ADSBin::sendMsg(std::string& msg)
+{
+   return 0;
+}
+
+const int ADSBin::getDstPort() const
+{
+   return dst_port;
 }
