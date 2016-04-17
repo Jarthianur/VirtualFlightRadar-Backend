@@ -36,12 +36,12 @@ int ParserADSB::unpack(Aircraft& ac, const std::string& sentence) const
             break;
          case 14:
             if (msg.substr(0,delim).length() > 0)
-               ac.latitude = std::stod(msg.substr(0,delim), nullptr);
+               ac.latitude = std::stold(msg.substr(0,delim), nullptr);
             else return -1;
             break;
          case 15:
             if (msg.substr(0,delim).length() > 0)
-               ac.longitude = std::stod(msg.substr(0,delim), nullptr);
+               ac.longitude = std::stold(msg.substr(0,delim), nullptr);
             else return -1;
             break;
          default:
@@ -53,7 +53,7 @@ int ParserADSB::unpack(Aircraft& ac, const std::string& sentence) const
    return 0;
 }
 
-void ParserADSB::process(Aircraft& ac, std::string& dststr, long double baselat,
+void ParserADSB::process(Aircraft& ac, long double baselat,
       long double baselong, int basealt)
 {
    long_b = radian(baselong);
@@ -83,21 +83,21 @@ void ParserADSB::process(Aircraft& ac, std::string& dststr, long double baselat,
    //printf("relEast= %.17Lf\n",relEast);
    rel_V = ac.altitude / 3.2808L - basealt;
 
-   dststr.clear();
+   ac.nmea_str.clear();
    //PFLAU
    snprintf(buffer, BUFF_OUT_S, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", ldToI(bearing_rel),
          ldToI(rel_V), ldToI(dist), ac.id.c_str());
    int csum = checksum(buffer);
-   dststr.append(buffer);
+   ac.nmea_str.append(buffer);
    snprintf(buffer, 64, "%02x\r\n", csum);
-   dststr.append(buffer);
+   ac.nmea_str.append(buffer);
    //PFLAA
    snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", ldToI(rel_N),
          ldToI(rel_E), ldToI(rel_V), ac.id.c_str());
    csum = checksum(buffer);
-   dststr.append(buffer);
+   ac.nmea_str.append(buffer);
    snprintf(buffer, 64, "%02x\r\n", csum);
-   dststr.append(buffer);
+   ac.nmea_str.append(buffer);
    //GPRMC
    latstr = (baselat < 0)? 'S' : 'N';
    longstr = (baselong < 0)? 'W' : 'E';
@@ -111,8 +111,8 @@ void ParserADSB::process(Aircraft& ac, std::string& dststr, long double baselat,
    snprintf(buffer, BUFF_OUT_S, "$GPRMC,%02d%02d%02d,A,%02.0Lf%05.2Lf,%c,%03.0Lf%05.2Lf,%c,0,0,%02d%02d%02d,001.0,W*",
          utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg, long_min, longstr, utc->tm_mday, utc->tm_mon+1, utc->tm_year-100);
    csum = checksum(buffer);
-   dststr.append(buffer);
+   ac.nmea_str.append(buffer);
    snprintf(buffer, 64, "%02x\r\n", csum);
-   dststr.append(buffer);
+   ac.nmea_str.append(buffer);
    return;
 }

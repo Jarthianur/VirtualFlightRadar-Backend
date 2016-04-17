@@ -10,7 +10,7 @@ public:
 	virtual ~ParserADSB();
 
 	int unpack(Aircraft&, const std::string&) const;
-	void process(Aircraft&, std::string&, long double, long double, int);
+	void process(Aircraft&, long double, long double, int);
 
 private:
 	/**

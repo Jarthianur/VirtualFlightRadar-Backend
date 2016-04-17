@@ -27,22 +27,27 @@ public:
     * connect to input service/server
     */
    virtual int connectIn() = 0;
+
    /**
     * create output socket and wait for client to connect
     */
    int connectOut();
+
    /**
     * wait for client to connect
     */
    int connectClient();
+
    /**
     * close all sockets
     */
    virtual void close();
+
    /**
     * read line from input socket
     */
    int readLineIn(int);
+
    /**
     * send msg to client socket
     */
@@ -66,23 +71,28 @@ private:
     * client address
     */
    struct sockaddr_in xcs_cli_addr;
+
    /**
-    * nmea-out service
+    * nmea-out address
     */
    struct sockaddr_in nmea_out_addr;
+
    /**
     * client, output sockets
     */
    int nmea_out_sock;
    int xcs_cli_sock;
+
    /**
     * output port
     */
    const int nmea_out_port;
+
    /**
     * options
     */
    int yes = 1;
+   int no = 0;
 };
 
 #endif /* CONNECTOR_H_ */

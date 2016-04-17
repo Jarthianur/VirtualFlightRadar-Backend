@@ -18,16 +18,22 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
    int out = 0;
-   if (argc < 2) {
-      cout << "No otput port given!"<<endl;
+   long double lat, lon;
+   int anth;
+   if (argc > 4) {
+      lon = std::stold(argv[1], nullptr);
+      lat = std::stold(argv[2], nullptr);
+      anth = std::stoi(argv[3]);
+   } /*else {
+      cout << "usage: ./Flugleitertool lon lat antennaheight port -out"<<endl;
       return 0;
-   }
-   ConnectorADSB ads("localhost", 30003, std::atoi(argv[1]));
+   }*/
+   ConnectorADSB ads("localhost", 30003, std::stoi(argv[/*4*/1]));
    ParserADSB parser;
 
    if (ads.connectIn() == -1) return 0;
 
-   if (argc > 2 && (strcmp(argv[2], "-out")==0)) {
+   if (/*(argc == 6) && (strcmp(argv[5], "-out")==0)*/argc == 3 &&(strcmp(argv[2], "-out")==0)) {
       if (ads.connectOut() != 0) return 0;
       if (ads.connectClient() != 0) return 0;
       out = 1;
@@ -46,10 +52,10 @@ int main(int argc, char* argv[]) {
             //cout << "Aircraft " << ac.id << ", alt=" << std::to_string(ac.altitude);
             //cout << ", lat=" << std::to_string(ac.latitude) << ", long=" << std::to_string(ac.longitude);
             //cout << endl;
-            std::string str;
-            parser.process(ac, str, 49.665263L, 9.003075L, 110);
-            cout << str << endl;
-            if (out == 1) ads.sendMsgOut(str);
+            parser.process(ac, 49.665263L, 9.003075L, 110);
+            //parser.process(ac, str, lat, lon, anth);
+            cout << ac.nmea_str << endl;
+            if (out == 1) ads.sendMsgOut(ac.nmea_str);
          }
       }
    }

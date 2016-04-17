@@ -8,13 +8,17 @@
 #include "ExtendedAircraft.h"
 
 ExtendedAircraft::ExtendedAircraft()
+: track(0),
+  ground_speed(0),
+  comment(""),
+  address_type(0),
+  aircraft_type(0),
+  address(""),
+  climb_rate(0)
 {
-   // TODO Auto-generated constructor stub
-
 }
 
 ExtendedAircraft::~ExtendedAircraft()
 {
-   // TODO Auto-generated destructor stub
 }
 

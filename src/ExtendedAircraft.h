@@ -15,6 +15,14 @@ class ExtendedAircraft: public Aircraft
 public:
    ExtendedAircraft();
    virtual ~ExtendedAircraft();
+
+   int track;
+   int ground_speed;
+   std::string comment;
+   int address_type;
+   int aircraft_type;
+   std::string address;
+   int climb_rate;
 };
 
 #endif /* EXTENDEDAIRCRAFT_H_ */
