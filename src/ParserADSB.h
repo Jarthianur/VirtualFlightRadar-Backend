@@ -1,17 +1,9 @@
-#ifndef ADSBPARSER_H_
-#define ADSBPARSER_H_
+#ifndef PARSERADSB_H_
+#define PARSERADSB_H_
 
-#define BUFF_IN_S 1024
+#include "Parser.h"
 
-#include <string>
-#include <stdexcept>
-#include "Aircraft.h"
-#include <cmath>
-#include <cstdio>
-#include <ctime>
-#include <cstdlib>
-
-class ParserADSB
+class ParserADSB : public Parser
 {
 public:
 	ParserADSB();
@@ -19,13 +11,8 @@ public:
 
 	int unpack(Aircraft&, const std::string&) const;
 	void process(Aircraft&, std::string&, long double, long double, int);
-	int checksum(const char*) const;
 
 private:
-	long double radian(long double) const;
-	long double degree(long double) const;
-	int dtoi(long double) const;
-
 	/**
 	 * relative North, East, Vertical
 	 */
@@ -72,10 +59,6 @@ private:
     * Longitude: W - E
     */
 	char latstr, longstr;
-	/**
-	 * Number PI as precise as CPU can do
-	 */
-	long double PI = std::acos(-1.0L);
 };
 
-#endif /* ADSBPARSER_H_ */
+#endif /* PARSERADSB_H_ */

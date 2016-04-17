@@ -4,25 +4,31 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/ADSBParser.cpp \
 ../src/Aircraft.cpp \
 ../src/Connector.cpp \
 ../src/ConnectorADSB.cpp \
-../src/Main.cpp 
+../src/ExtendedAircraft.cpp \
+../src/Main.cpp \
+../src/Parser.cpp \
+../src/ParserADSB.cpp 
 
 OBJS += \
-./src/ADSBParser.o \
 ./src/Aircraft.o \
 ./src/Connector.o \
 ./src/ConnectorADSB.o \
-./src/Main.o 
+./src/ExtendedAircraft.o \
+./src/Main.o \
+./src/Parser.o \
+./src/ParserADSB.o 
 
 CPP_DEPS += \
-./src/ADSBParser.d \
 ./src/Aircraft.d \
 ./src/Connector.d \
 ./src/ConnectorADSB.d \
-./src/Main.d 
+./src/ExtendedAircraft.d \
+./src/Main.d \
+./src/Parser.d \
+./src/ParserADSB.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

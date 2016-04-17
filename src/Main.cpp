@@ -9,9 +9,10 @@
  */
 
 #include <iostream>
+#include <cstring>
 #include "Aircraft.h"
-#include "ADSBParser.h"
 #include "ConnectorADSB.h"
+#include "ParserADSB.h"
 
 using namespace std;
 
@@ -27,13 +28,14 @@ int main(int argc, char* argv[]) {
    if (ads.connectIn() == -1) return 0;
 
    if (argc > 2 && (strcmp(argv[2], "-out")==0)) {
-      if (ads.connectOut() == -1) return 0;
+      if (ads.connectOut() != 0) return 0;
+      if (ads.connectClient() != 0) return 0;
       out = 1;
    }
-
+   cout << "Scan for incoming msgs..." << endl;
    while (1) {
       int error;
-      if ((error = ads.readLineIn()) < 0) {
+      if ((error = ads.readLineIn(ads.getAdsbInSock())) < 0) {
          cout << error << endl;
          return -1;
       }
@@ -46,7 +48,7 @@ int main(int argc, char* argv[]) {
             //cout << endl;
             std::string str;
             parser.process(ac, str, 49.665263L, 9.003075L, 110);
-            //cout << str << endl;
+            cout << str << endl;
             if (out == 1) ads.sendMsgOut(str);
          }
       }

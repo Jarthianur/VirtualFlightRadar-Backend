@@ -17,40 +17,71 @@
 class Connector
 {
 public:
+   /**
+    * constructor with output port
+    */
    Connector(const int);
    virtual ~Connector();
 
-   //Connect to input service/server
+   /**
+    * connect to input service/server
+    */
    virtual int connectIn() = 0;
-   //Create output socket and wait for client to connect
-   virtual int connectOut();
-   //Close all Sockets
+   /**
+    * create output socket and wait for client to connect
+    */
+   int connectOut();
+   /**
+    * wait for client to connect
+    */
+   int connectClient();
+   /**
+    * close all sockets
+    */
    virtual void close();
-   //Read line from input socket
-   virtual int readLineIn() = 0;
-   //send msg to Client Socket
-   virtual int sendMsgOut(std::string&) const;
+   /**
+    * read line from input socket
+    */
+   int readLineIn(int);
+   /**
+    * send msg to client socket
+    */
+   int sendMsgOut(std::string&) const;
 
-   //Getters/Setters
+   /**
+    * getters/setters
+    */
    const std::string& getResponse() const;
 
 protected:
-   //Buffers
-      std::string response;
-      std::string linebuffer;
-      char buffer[BUFF_S];
+   /**
+    * buffers
+    */
+   std::string response;
+   std::string linebuffer;
+   char buffer[BUFF_S];
 
 private:
-   //Client
+   /**
+    * client address
+    */
    struct sockaddr_in xcs_cli_addr;
-   //nmea-out service
+   /**
+    * nmea-out service
+    */
    struct sockaddr_in nmea_out_addr;
-   //Sockets
+   /**
+    * client, output sockets
+    */
    int nmea_out_sock;
    int xcs_cli_sock;
-   //nmea out port
+   /**
+    * output port
+    */
    const int nmea_out_port;
-   //options
+   /**
+    * options
+    */
    int yes = 1;
 };
 

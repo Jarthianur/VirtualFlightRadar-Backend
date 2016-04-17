@@ -1,4 +1,8 @@
 #include "ConnectorADSB.h"
+#include <cstring>
+#include <iostream>
+#include <unistd.h>
+#include <arpa/inet.h>
 
 ConnectorADSB::ConnectorADSB(const char* adsb_host, int adsb_port, int out_port)
 : Connector(out_port),
@@ -16,32 +20,6 @@ void ConnectorADSB::close()
 {
    ::close(adsb_in_sock);
    Connector::close();
-}
-
-int ConnectorADSB::readLineIn()
-{
-#define EOL "\r\n"
-
-   int eol = linebuffer.find(EOL);
-   if (eol == -1) {
-      if (recv(adsb_in_sock, buffer, BUFF_S-1, 0) == -1) {
-         return -1;
-      }
-      linebuffer.append(buffer);
-      eol = linebuffer.find(EOL);
-   }
-   eol += 2;
-   try {
-      response = linebuffer.substr(0,eol);
-   } catch (const std::out_of_range& e) {
-      std::cout << e.what();
-      return -1;
-   }
-   linebuffer.clear();
-   if (response.length() == 0) {
-      return -1;
-   }
-   return response.length();
 }
 
 int ConnectorADSB::connectIn()
@@ -72,4 +50,9 @@ int ConnectorADSB::connectIn()
 
    std::cout << "connected to ADS-B" << std::endl;
    return 0;
+}
+
+int ConnectorADSB::getAdsbInSock() const
+{
+   return adsb_in_sock;
 }

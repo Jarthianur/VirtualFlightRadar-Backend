@@ -10,10 +10,13 @@
 #include <iostream>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <stdexcept>
 
 Connector::Connector(const int out_port)
 : response(""),
   linebuffer(""),
+  nmea_out_sock(0),
+  xcs_cli_sock(0),
   nmea_out_port(out_port)
 {
    memset(buffer,0,sizeof(buffer));
@@ -28,6 +31,32 @@ void Connector::close()
 {
    ::close(nmea_out_sock);
    ::close(xcs_cli_sock);
+}
+
+int Connector::readLineIn(int sock)
+{
+#define EOL "\r\n"
+
+   int eol = linebuffer.find(EOL);
+   if (eol == -1) {
+      if (recv(sock, buffer, BUFF_S-1, 0) == -1) {
+         return -1;
+      }
+      linebuffer.append(buffer);
+      eol = linebuffer.find(EOL);
+   }
+   eol += 2;
+   try {
+      response = linebuffer.substr(0,eol);
+   } catch (const std::out_of_range& e) {
+      std::cout << e.what();
+      return -1;
+   }
+   linebuffer.clear();
+   if (response.length() == 0) {
+      return -1;
+   }
+   return response.length();
 }
 
 int Connector::connectOut()
@@ -58,9 +87,13 @@ int Connector::connectOut()
       std::cout << "Can not listen to socket!" << std::endl;
       return -1;
    }
+   return 0;
+}
 
+int Connector::connectClient()
+{
    int con = 0;
-   //now wait for xcsoar-client to connect
+
    while (con == 0) {
       std::cout << "wait for client..."<< std::endl;
       unsigned int sin_s = sizeof(struct sockaddr);

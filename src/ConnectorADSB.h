@@ -1,17 +1,8 @@
 #ifndef CONNECTORADSB_H_
 #define CONNECTORADSB_H_
 
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <iostream>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <string>
-#include <cstring>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <stdexcept>
 #include "Connector.h"
+#include <netdb.h>
 
 class ConnectorADSB : public Connector
 {
@@ -19,12 +10,14 @@ public:
    ConnectorADSB(const char*, int, int);
    virtual ~ConnectorADSB();
 
-   virtual int connectIn();
-   virtual void close();
-   virtual int readLineIn();
+   int connectIn();
+   void close();
+   int getAdsbInSock() const;
 
 private:
-   //adsb input stuff
+   /**
+    * adsb input stuff
+    */
    struct hostent* adsb_host_info;
    struct sockaddr_in adsb_in_addr;
    int adsb_in_sock;

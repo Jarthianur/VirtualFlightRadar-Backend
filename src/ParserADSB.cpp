@@ -1,4 +1,7 @@
-#include "ADSBParser.h"
+#include <cmath>
+#include <cstdio>
+#include <ctime>
+#include "ParserADSB.h"
 
 ParserADSB::ParserADSB()
 {
@@ -81,21 +84,20 @@ void ParserADSB::process(Aircraft& ac, std::string& dststr, long double baselat,
    rel_V = ac.altitude / 3.2808L - basealt;
 
    dststr.clear();
-   char buff[BUFF_IN_S];
    //PFLAU
-   snprintf(buff, BUFF_IN_S, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", dtoi(bearing_rel),
-         dtoi(rel_V), dtoi(dist), ac.id.c_str());
-   int csum = checksum(buff);
-   dststr.append(buff);
-   snprintf(buff, 64, "%02x\r\n", csum);
-   dststr.append(buff);
+   snprintf(buffer, BUFF_OUT_S, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", ldToI(bearing_rel),
+         ldToI(rel_V), ldToI(dist), ac.id.c_str());
+   int csum = checksum(buffer);
+   dststr.append(buffer);
+   snprintf(buffer, 64, "%02x\r\n", csum);
+   dststr.append(buffer);
    //PFLAA
-   snprintf(buff, BUFF_IN_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", dtoi(rel_N),
-         dtoi(rel_E), dtoi(rel_V), ac.id.c_str());
-   csum = checksum(buff);
-   dststr.append(buff);
-   snprintf(buff, 64, "%02x\r\n", csum);
-   dststr.append(buff);
+   snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", ldToI(rel_N),
+         ldToI(rel_E), ldToI(rel_V), ac.id.c_str());
+   csum = checksum(buffer);
+   dststr.append(buffer);
+   snprintf(buffer, 64, "%02x\r\n", csum);
+   dststr.append(buffer);
    //GPRMC
    latstr = (baselat < 0)? 'S' : 'N';
    longstr = (baselong < 0)? 'W' : 'E';
@@ -106,36 +108,11 @@ void ParserADSB::process(Aircraft& ac, std::string& dststr, long double baselat,
    time_t now = time(0);
    tm* utc = gmtime(&now);
    //$GPRMC,061748,A,5000.05,N,00815.75,E,0,0,050416,001.0,W*61
-   snprintf(buff, BUFF_IN_S, "$GPRMC,%02d%02d%02d,A,%02.0Lf%05.2Lf,%c,%03.0Lf%05.2Lf,%c,0,0,%02d%02d%02d,001.0,W*",
+   snprintf(buffer, BUFF_OUT_S, "$GPRMC,%02d%02d%02d,A,%02.0Lf%05.2Lf,%c,%03.0Lf%05.2Lf,%c,0,0,%02d%02d%02d,001.0,W*",
          utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg, long_min, longstr, utc->tm_mday, utc->tm_mon+1, utc->tm_year-100);
-   csum = checksum(buff);
-   dststr.append(buff);
-   snprintf(buff, 64, "%02x\r\n", csum);
-   dststr.append(buff);
+   csum = checksum(buffer);
+   dststr.append(buffer);
+   snprintf(buffer, 64, "%02x\r\n", csum);
+   dststr.append(buffer);
    return;
-}
-
-long double ParserADSB::radian(long double deg) const
-{
-   return ((deg * PI) / 180.0L);
-}
-
-long double ParserADSB::degree(long double rad) const
-{
-   return (rad * 180.0L) / PI;
-}
-
-int ParserADSB::checksum(const char* sentence) const
-{
-   int csum = 0;
-   int i=1;
-   while (sentence[i] != '*') {
-      csum ^= (int) sentence[i++];
-   }
-   return csum;
-}
-
-int ParserADSB::dtoi(long double d) const
-{
-   return (int)(d + 0.5L);
 }
