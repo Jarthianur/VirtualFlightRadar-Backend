@@ -8,7 +8,7 @@ ParserADSB::~ParserADSB()
 {
 }
 
-int ParserADSB::unpack(Aircraft& ac, std::string& sentence)
+int ParserADSB::unpack(Aircraft& ac, const std::string& sentence) const
 {
    std::string msg = sentence;
    /*
@@ -50,39 +50,48 @@ int ParserADSB::unpack(Aircraft& ac, std::string& sentence)
    return 0;
 }
 
-void ParserADSB::process(Aircraft& ac, std::string& dststr, double baselat,
-      double baselong, int basealt)
+void ParserADSB::process(Aircraft& ac, std::string& dststr, long double baselat,
+      long double baselong, int basealt)
 {
-   double lon1 = radian(baselong);
-   double lon2 = radian(ac.longitude);
-   double lat1 = radian(baselat);
-   double lat2 = radian(ac.latitude);
-   double distlon = lon2 - lon1;
-   double distlat = lat2 -lat1;
-   double a = pow(sin(distlat/2),2) + cos(lat1) * cos(lat2) * pow(sin(distlon/2),2);
-   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-   distance = 6371000 * c;
+   long_b = radian(baselong);
+   long_ac = radian(ac.longitude);
+   lat_b = radian(baselat);
+   lat_ac = radian(ac.latitude);
+   //printf("\nlon1= %.17Lf, lat1= %.17Lf, lon2= %.17Lf, lat2= %.17Lf\n", lon1,lat1,lon2,lat2);
+   long_dist = long_ac - long_b;
+   lat_dist = lat_ac -lat_b;
+   a = std::pow(std::sin(lat_dist/2.0L),2.0L) + std::cos(lat_b) * std::cos(lat_ac) * std::pow(std::sin(long_dist/2.0L),2.0L);
+   //printf("a= %.17Lf\n", a);
+   c = 2.0L * std::atan2(std::sqrt(a), std::sqrt(1.0L - a));
+   //printf("c= %.17Lf\n",c);
+   dist = 6371000.0L * c;
+   //printf("distance= %.17Lf\n", distance);
 
-   double bearing = atan2(sin(lon2-lon1)*cos(lat2), cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(lon2-lon1));
-   relBearing = degree(bearing);
-   int absBearing = (relBearing + 360) % 360;
+   bearing = std::atan2(std::sin(long_ac-long_b)*std::cos(lat_ac), std::cos(lat_b)*std::sin(lat_ac)-std::sin(lat_b)*std::cos(lat_ac)*std::cos(long_ac-long_b));
+   //printf("bearing= %.17Lf\n",bearing);
+   bearing_rel = degree(bearing);
+   //printf("relBearing= %.17Lf\n",relBearing);
+   bearing_abs = std::fmod((bearing_rel + 360.0L), 360.0L);
+   //printf("absBearing= %.17Lf\n",absBearing);
 
-   relNorth = cos(radian(absBearing)) * distance;
-   relEast = sin(radian(absBearing)) * distance;
-   relVert = ac.altitude / 3.2808 - basealt;
+   rel_N = std::cos(radian(bearing_abs)) * dist;
+   //printf("relNorth= %.17Lf, rad(absBearing)= %.17Lf\n",relNorth, radian(absBearing));
+   rel_E = std::sin(radian(bearing_abs)) * dist;
+   //printf("relEast= %.17Lf\n",relEast);
+   rel_V = ac.altitude / 3.2808L - basealt;
 
    dststr.clear();
-   char buff[256];
+   char buff[BUFF_IN_S];
    //PFLAU
-   snprintf(buff, 256, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", relBearing,
-         dtoi(relVert), dtoi(distance), ac.id.c_str());
+   snprintf(buff, BUFF_IN_S, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", dtoi(bearing_rel),
+         dtoi(rel_V), dtoi(dist), ac.id.c_str());
    int csum = checksum(buff);
    dststr.append(buff);
    snprintf(buff, 64, "%02x\r\n", csum);
    dststr.append(buff);
    //PFLAA
-   snprintf(buff, 256, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", dtoi(relNorth),
-         dtoi(relEast), dtoi(relVert), ac.id.c_str());
+   snprintf(buff, BUFF_IN_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", dtoi(rel_N),
+         dtoi(rel_E), dtoi(rel_V), ac.id.c_str());
    csum = checksum(buff);
    dststr.append(buff);
    snprintf(buff, 64, "%02x\r\n", csum);
@@ -90,15 +99,15 @@ void ParserADSB::process(Aircraft& ac, std::string& dststr, double baselat,
    //GPRMC
    latstr = (baselat < 0)? 'S' : 'N';
    longstr = (baselong < 0)? 'W' : 'E';
-   latdeg = abs(floor(baselat));
-   latmin = abs(60 * (baselat - latdeg));
-   longdeg = abs(floor(baselong));
-   longmin = abs(60 * (baselong - longdeg));
+   lat_deg = std::abs(std::floor(baselat));
+   lat_min = std::abs(60.0L * (baselat - lat_deg));
+   long_deg = std::abs(std::floor(baselong));
+   long_min = std::abs(60.0L * (baselong - long_deg));
    time_t now = time(0);
    tm* utc = gmtime(&now);
    //$GPRMC,061748,A,5000.05,N,00815.75,E,0,0,050416,001.0,W*61
-   snprintf(buff, 256, "$GPRMC,%02d%02d%02d,A,%02.0f%05.2f,%c,%03.0f%05.2f,%c,0,0,%02d%02d%02d,001.0,W*",
-         utc->tm_hour, utc->tm_min, utc->tm_sec, latdeg, latmin, latstr, longdeg, longmin, longstr, utc->tm_mday, utc->tm_mon+1, utc->tm_year-100);
+   snprintf(buff, BUFF_IN_S, "$GPRMC,%02d%02d%02d,A,%02.0Lf%05.2Lf,%c,%03.0Lf%05.2Lf,%c,0,0,%02d%02d%02d,001.0,W*",
+         utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg, long_min, longstr, utc->tm_mday, utc->tm_mon+1, utc->tm_year-100);
    csum = checksum(buff);
    dststr.append(buff);
    snprintf(buff, 64, "%02x\r\n", csum);
@@ -106,27 +115,27 @@ void ParserADSB::process(Aircraft& ac, std::string& dststr, double baselat,
    return;
 }
 
-double ParserADSB::radian(double deg)
+long double ParserADSB::radian(long double deg) const
 {
-   return ((deg * PI) / 180);
+   return ((deg * PI) / 180.0L);
 }
 
-int ParserADSB::degree(double rad)
+long double ParserADSB::degree(long double rad) const
 {
-   return (int)(((rad * 180) / PI) + 0.5);
+   return (rad * 180.0L) / PI;
 }
 
-int ParserADSB::checksum(char* sentence)
+int ParserADSB::checksum(const char* sentence) const
 {
    int csum = 0;
    int i=1;
-   while (sentence[i] != '\0') {
+   while (sentence[i] != '*') {
       csum ^= (int) sentence[i++];
    }
    return csum;
 }
 
-int ParserADSB::dtoi(double d)
+int ParserADSB::dtoi(long double d) const
 {
-   return (int)(d + 0.5);
+   return (int)(d + 0.5L);
 }

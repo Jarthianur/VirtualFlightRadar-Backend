@@ -9,8 +9,8 @@
 
 Aircraft::Aircraft()
 : id(""),
-  latitude(0.0),
-  longitude(0.0),
+  latitude(0.0L),
+  longitude(0.0L),
   altitude(0)
 {
 }

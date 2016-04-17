@@ -13,31 +13,41 @@
 #include "ADSBParser.h"
 #include "ConnectorADSB.h"
 
-#define PORT_XCSOAR 4353
-
 using namespace std;
 
 int main(int argc, char* argv[]) {
+   int out = 0;
+   if (argc < 2) {
+      cout << "No otput port given!"<<endl;
+      return 0;
+   }
    ConnectorADSB ads("localhost", 30003, std::atoi(argv[1]));
    ParserADSB parser;
-   if (ads.connect() == -1) return 0;
+
+   if (ads.connectIn() == -1) return 0;
+
+   if (argc > 2 && (strcmp(argv[2], "-out")==0)) {
+      if (ads.connectOut() == -1) return 0;
+      out = 1;
+   }
+
    while (1) {
       int error;
-      if ((error = ads.readLine()) < 0) {
+      if ((error = ads.readLineIn()) < 0) {
          cout << error << endl;
          return -1;
       }
-      if (ads.response[4] == '3') {
-         cout << ads.response;
+      if (ads.getResponse()[4] == '3') {
+         //cout << ads.getResponse();
          Aircraft ac;
-         if (parser.unpack(ac, ads.response) == 0) {
-            cout << "Aircraft " << ac.id << ", alt=" << std::to_string(ac.altitude);
-            cout << ", lat=" << std::to_string(ac.latitude) << ", long=" << std::to_string(ac.longitude);
-            cout << endl;
+         if (parser.unpack(ac, ads.getResponse()) == 0) {
+            //cout << "Aircraft " << ac.id << ", alt=" << std::to_string(ac.altitude);
+            //cout << ", lat=" << std::to_string(ac.latitude) << ", long=" << std::to_string(ac.longitude);
+            //cout << endl;
             std::string str;
-            parser.process(ac, str, 49.665263, 9.003075, 110);
-            cout << str << endl;
-            ads.sendMsg(str);
+            parser.process(ac, str, 49.665263L, 9.003075L, 110);
+            //cout << str << endl;
+            if (out == 1) ads.sendMsgOut(str);
          }
       }
    }

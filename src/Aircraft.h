@@ -17,8 +17,8 @@ public:
    virtual ~Aircraft();
 
    std::string id;
-   double latitude;
-   double longitude;
+   long double latitude;
+   long double longitude;
    int altitude;
 
 private:
