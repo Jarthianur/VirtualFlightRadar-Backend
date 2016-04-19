@@ -1,65 +1,29 @@
 /*
- * Connector.cpp
+ * ConnectOut.cpp
  *
- *  Created on: 16.04.2016
+ *  Created on: 18.04.2016
  *      Author: lula
  */
 
-#include "Connector.h"
+#include "ConnectOutNMEA.h"
+
 #include <cstring>
 #include <iostream>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <stdexcept>
 
-Connector::Connector(const int out_port)
-: response(""),
-  linebuffer(""),
-  nmea_out_sock(0),
-  xcs_cli_sock(0),
-  nmea_out_port(out_port)
+ConnectOutNMEA::ConnectOutNMEA(const int out_port)
+: nmea_out_port(out_port)
 {
-   memset(buffer,0,sizeof(buffer));
 }
 
-Connector::~Connector()
+ConnectOutNMEA::~ConnectOutNMEA()
 {
    close();
 }
 
-void Connector::close()
-{
-   ::close(nmea_out_sock);
-   ::close(xcs_cli_sock);
-}
-
-int Connector::readLineIn(int sock)
-{
-#define EOL "\r\n"
-
-   int eol = linebuffer.find(EOL);
-   if (eol == -1) {
-      if (recv(sock, buffer, BUFF_S-1, 0) == -1) {
-         return -1;
-      }
-      linebuffer.append(buffer);
-      eol = linebuffer.find(EOL);
-   }
-   eol += 2;
-   try {
-      response = linebuffer.substr(0,eol);
-   } catch (const std::out_of_range& e) {
-      std::cout << e.what();
-      return -1;
-   }
-   linebuffer.clear();
-   if (response.length() == 0) {
-      return -1;
-   }
-   return response.length();
-}
-
-int Connector::connectOut()
+int ConnectOutNMEA::listenOut()
 {
    std::cout << "start nmea output socket..." << std::endl;
 
@@ -90,7 +54,7 @@ int Connector::connectOut()
    return 0;
 }
 
-int Connector::connectClient()
+int ConnectOutNMEA::connectClient()
 {
    int con = 0;
 
@@ -109,12 +73,14 @@ int Connector::connectClient()
    return 0;
 }
 
-int Connector::sendMsgOut(std::string& msg) const
+void ConnectOutNMEA::close()
 {
-   return send(xcs_cli_sock, msg.c_str(), msg.length(), 0);
+   ::close(xcs_cli_sock);
+   ::close(nmea_out_sock);
+   return;
 }
 
-const std::string& Connector::getResponse() const
+int ConnectOutNMEA::sendMsgOut(std::string& msg) const
 {
-   return response;
+   return send(xcs_cli_sock, msg.c_str(), msg.length(), 0);
 }

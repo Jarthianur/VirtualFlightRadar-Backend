@@ -16,7 +16,7 @@ public:
    ExtendedAircraft();
    virtual ~ExtendedAircraft();
 
-   int track;
+   float track;
    int ground_speed;
    std::string comment;
    int address_type;

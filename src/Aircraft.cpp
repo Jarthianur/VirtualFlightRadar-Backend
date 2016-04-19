@@ -11,8 +11,7 @@ Aircraft::Aircraft()
 : id(""),
   latitude(0.0L),
   longitude(0.0L),
-  altitude(0),
-  nmea_str("")
+  altitude(0)
 {
 }
 

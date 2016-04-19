@@ -21,8 +21,6 @@ public:
    long double longitude;
    int altitude;
 
-   std::string nmea_str;
-
 private:
 
 };
