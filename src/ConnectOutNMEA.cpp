@@ -64,7 +64,6 @@ int ConnectOutNMEA::connectClient()
       xcs_cli_sock = accept(nmea_out_sock, (struct sockaddr*)&xcs_cli_addr, &sin_s);
       if (xcs_cli_sock == -1) {
          std::cout << "Could not accept connection!" << std::endl;
-         //return -1;
       }
 
       std::cout<< "connection from " << inet_ntoa(xcs_cli_addr.sin_addr) <<std::endl;

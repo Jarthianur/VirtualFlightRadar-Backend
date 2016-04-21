@@ -16,7 +16,7 @@
 class Parser
 {
 public:
-   Parser();
+   Parser(long double, long double, int);
    virtual ~Parser();
 
    /**
@@ -27,7 +27,12 @@ public:
    /**
     * build nmea-msg from Aircraft to given string-reference
     */
-   virtual void process(Aircraft&, std::string&, long double, long double, int) = 0;
+   virtual void process(Aircraft&, std::string&) = 0;
+
+   /**
+    * parse GPRMC
+    */
+   void gprmc(std::string&);
 
 protected:
    /**
@@ -58,7 +63,7 @@ protected:
    /**
     * calculate nmea-data
     */
-   void calcPosInfo(Aircraft&, long double, long double, int);
+   void calcPosInfo(Aircraft&);
 
    /**
     * Number PI as precise as CPU can do
@@ -66,9 +71,14 @@ protected:
    const long double PI;
 
    /**
+    * base position info
+    */
+   long double baselat,
+   baselong,
+   /**
     * relative North, East, Vertical
     */
-   long double rel_N,
+   rel_N,
    rel_E,
    rel_V,
    /**
@@ -106,6 +116,10 @@ protected:
     * values to calculate distance
     */
    a, c;
+   /**
+    * (alt = height + antennaheight)
+    */
+   int basealt;
    /**
     * Latitude: S - N
     * Longitude: W - E

@@ -19,89 +19,114 @@
 #include "ConnectInOGN.h"
 #include "ConnectOutNMEA.h"
 #include <vector>
+#include <mutex>
+#include <chrono>
 
 using namespace std;
 
 vector<Aircraft> vec;
+mutex vec_lock;
 
+//runs correctly
 void do_adsb(/*host,port*/const char* out)
 {
-   ConnectInADSB adsb_con("localhost", 30003);
-   ParserADSB parser;
+    ConnectInADSB adsb_con("localhost", 30003);
+    ParserADSB parser(49.665263L, 9.003075L, 110);
 
-   if (adsb_con.connectIn() == -1) return;
+    if (adsb_con.connectIn() == -1) return;
 
-   cout << "Scan for incoming msgs..." << endl;
-   Aircraft ac;
-   string str;
-   while (1) {
-      int error;
-      if ((error = adsb_con.readLineIn(adsb_con.getAdsbInSock())) < 0) {
-         cout << error << endl;
-      }
-      //need msg3 only
-      if (adsb_con.getResponse()[4] == '3') {
-         if (parser.unpack(ac, adsb_con.getResponse()) == 0) {
-            //process here for now, later in output thread
-            parser.process(ac, str, 49.665263L, 9.003075L, 110);
-            if (strcmp(out, "-out")==0) {
-               cout << str << endl;
+    cout << "Scan for incoming msgs..." << endl;
+    Aircraft ac;
+    string str;
+    while (1) {
+        int error;
+        if ((error = adsb_con.readLineIn(adsb_con.getAdsbInSock())) < 0) {
+            cout << error << endl;
+        }
+        //need msg3 only
+        if (adsb_con.getResponse()[4] == '3') {
+            if (parser.unpack(ac, adsb_con.getResponse()) == 0) {
+                //process here for now, later in output thread
+                parser.process(ac, str);
+                if (strcmp(out, "-out")==0) {
+                    cout << str << endl;
+                }
+                vec_lock.lock();
+                vec.push_back(ac);
+                vec_lock.unlock();
             }
-         }
-      }
-   }
-   return;
+        }
+    }
+    return;
 }
 
-//later: rangefilters for ogn
+//needs to be unpacked
 void do_ogn(/*host,port*/const char* out)
 {
-   ConnectInOGN ogn_con("glidern1.glidernet.org", 14580, "D5234", "12772");
-   ParserOGN parser;
+    ConnectInOGN ogn_con("glidern1.glidernet.org", 14580, "D5234", "12772");
+    ParserOGN parser(49.665263L, 9.003075L, 110);
 
-   if (ogn_con.connectIn() == -1) return;
+    if (ogn_con.connectIn() == -1) return;
 
-   cout << "Scan for incoming msgs..." << endl;
-   ExtendedAircraft extAc;
-   string str;
-   while (1) {
-      int error;
-      if ((error = ogn_con.readLineIn(ogn_con.getOgnInSock())) < 0) {
-         cout << error << endl;
-      }
-      if (parser.unpack(extAc, ogn_con.getResponse()) == 0) {
-         //parser.process(ac, str, 49.665263L, 9.003075L, 110);
-         if (strcmp(out, "-out") == 0) {
-            //cout << str << endl;
-            cout << ogn_con.getResponse() << endl;
-         }
-      }
-   }
-   return;
+    cout << "Scan for incoming msgs..." << endl;
+    ExtendedAircraft extAc;
+    string str;
+    while (1) {
+        int error;
+        if ((error = ogn_con.readLineIn(ogn_con.getOgnInSock())) < 0) {
+            cout << "received from ogn : " << error << endl;
+        }
+        if (ogn_con.getResponse()[0] != '#' && parser.unpack(extAc, ogn_con.getResponse()) == 0) {
+            //parser.process(ac, str);
+            if (strcmp(out, "-out") == 0) {
+                //cout << str << endl;
+                cout << ogn_con.getResponse() << endl;
+            }
+            //vec_lock.lock();
+            //vec.push_back(extAc);
+            //vec_lock.unlock();
+        }
+    }
+    return;
 }
 
 void handle_connections(const int port)
 {
-   ConnectOutNMEA out_con(port);
-   return;
+    ConnectOutNMEA out_con(port);
+    //if (out_con.listenOut() == -1) return;
+    //out_con.connectClient();
+
+    ParserADSB parser(49.665263L, 9.003075L, 110);
+    string str;
+    while (1) {
+        cout << "vec size: " << vec.size() << endl;
+        for (Aircraft ac : vec) {
+            parser.process(ac, str);
+            cout << str << endl;
+        }
+        parser.gprmc(str);
+        cout << str << endl;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+    return;
 }
 
 
 int main(int argc, char* argv[]) {
 
-   string opt_outstr = "nop";
-   if (argc == 3) opt_outstr = argv[2];
-   const char* opt_out = opt_outstr.c_str();
-   int port = atoi(argv[1]);
+    string opt_outstr = "nop";
+    if (argc == 3) opt_outstr = argv[2];
+    const char* opt_out = opt_outstr.c_str();
+    int port = atoi(argv[1]);
 
-   thread t1(do_adsb, opt_out);
-   thread t2(do_ogn, opt_out);
-   thread t3(handle_connections, port);
-   t1.join();
-   t2.join();
-   t3.join();
+    thread t1(do_adsb, opt_out);
+    thread t2(do_ogn, opt_out);
+    thread t3(handle_connections, port);
+    t1.join();
+    t2.join();
+    t3.join();
 
-   /*ConnectorADSB ads("localhost", 30003, std::stoi(argv[/*4//1]));
+    /*ConnectorADSB ads("localhost", 30003, std::stoi(argv[/*4//1]));
    ParserADSB parser;
 
    if (ads.connectIn() == -1) return 0;
@@ -134,5 +159,5 @@ int main(int argc, char* argv[]) {
          }
       }
    }*/
-   return 0;
+    return 0;
 }

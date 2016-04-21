@@ -14,11 +14,11 @@
 class ParserOGN: public Parser
 {
 public:
-   ParserOGN();
+   ParserOGN(long double, long double, int);
    virtual ~ParserOGN();
 
    int unpack(Aircraft&, const std::string&) const;
-   void process(Aircraft&, std::string&, long double, long double, int);
+   void process(Aircraft&, std::string&);
 
 private:
    long double dmsToDeg(long double dms) const;
