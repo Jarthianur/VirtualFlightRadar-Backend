@@ -21,6 +21,9 @@ ParserOGN::~ParserOGN()
 
 int ParserOGN::unpack(Aircraft& extAc, const std::string& sentence) const
 {
+    if (sentence.at(0) == '#') {
+        return 1;
+    }
     //hard stuff to do
     return 0;
 }

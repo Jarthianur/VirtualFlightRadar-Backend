@@ -27,6 +27,27 @@ using namespace std;
 vector<Aircraft> vec;
 mutex vec_lock;
 
+int vecfind(Aircraft& ac)
+{
+    unsigned int i;
+    for (i = 0; i < vec.size(); ++i) {
+        if (vec.at(i).id.compare(ac.id) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void insertAircraft(Aircraft& ac)
+{
+    int i;
+    if ((i = vecfind(ac)) > -1) {
+        vec.erase(vec.begin() + i);
+    }
+    vec.push_back(ac);
+    return;
+}
+
 //runs correctly
 void do_adsb(/*host,port*/const char* out)
 {
@@ -35,7 +56,7 @@ void do_adsb(/*host,port*/const char* out)
 
     if (adsb_con.connectIn() == -1) return;
 
-    cout << "Scan for incoming msgs..." << endl;
+    cout << "Scan for incoming adsb-msgs..." << endl;
     Aircraft ac;
     string str;
     while (1) {
@@ -52,7 +73,7 @@ void do_adsb(/*host,port*/const char* out)
                     cout << str << endl;
                 }
                 vec_lock.lock();
-                vec.push_back(ac);
+                insertAircraft(ac);
                 vec_lock.unlock();
             }
         }
@@ -68,7 +89,7 @@ void do_ogn(/*host,port*/const char* out)
 
     if (ogn_con.connectIn() == -1) return;
 
-    cout << "Scan for incoming msgs..." << endl;
+    cout << "Scan for incoming ogn-msgs..." << endl;
     ExtendedAircraft extAc;
     string str;
     while (1) {
@@ -76,11 +97,12 @@ void do_ogn(/*host,port*/const char* out)
         if ((error = ogn_con.readLineIn(ogn_con.getOgnInSock())) < 0) {
             cout << "received from ogn : " << error << endl;
         }
-        if (ogn_con.getResponse()[0] != '#' && parser.unpack(extAc, ogn_con.getResponse()) == 0) {
+        if (parser.unpack(extAc, ogn_con.getResponse()) == 0) {
             //parser.process(ac, str);
+            cout << ogn_con.getResponse() << endl;
             if (strcmp(out, "-out") == 0) {
                 //cout << str << endl;
-                cout << ogn_con.getResponse() << endl;
+                //cout << ogn_con.getResponse() << endl;
             }
             //vec_lock.lock();
             //vec.push_back(extAc);

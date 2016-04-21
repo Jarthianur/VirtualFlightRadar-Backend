@@ -14,16 +14,26 @@ It also will provide some backend logic to support data processing and filtering
 
 This is currently in an early dev-version.
 
-Open issues:
-- parsing incoming aprs-sentences (regex)
-- fork client connects
-- implement threadsafe container for aircrafts
-- implement backend to manage listet aircrafts
-  - merge incoming objects
-  - remove duplicates
-  - invalidate deprecated aircrafts
-  
+
 Contributions are always welcome.
 
 I'm a not that experienced C++ developer, especially not in therms of multithreading, but always keep learning.
+
+
+Open issues:::
+
+high priority:
+
+- parse incoming aprs-sentences (regex)
+- implement threadsafety for aircrafts's container
+- implement backend to manage listet aircrafts
+  - process and parse depending on type (ExtendedAircraft / Aircraft) and handle duplicates (prefer Extended)
+  - invalidate deprecated aircrafts
+
+low priority:
+
+- fork client connects
+- implement faster container for aircrafts (kind of HashVector) -> key/value, key as unique integer, hashing and sizing
+
+ 
   
