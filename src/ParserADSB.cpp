@@ -12,7 +12,7 @@ ParserADSB::~ParserADSB()
 {
 }
 
-int ParserADSB::unpack(Aircraft& ac, const std::string& sentence) const
+int ParserADSB::unpack(Aircraft& ac, const std::string& sentence)
 {
     std::string msg = sentence;
     /*

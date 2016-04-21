@@ -9,7 +9,7 @@ public:
 	ParserADSB(long double, long double, int);
 	virtual ~ParserADSB();
 
-	int unpack(Aircraft&, const std::string&) const;
+	int unpack(Aircraft&, const std::string&);
 	void process(Aircraft&, std::string&);
 };
 

@@ -22,7 +22,7 @@ public:
    /**
     * unpack a msg into Aircraft
     */
-   virtual int unpack(Aircraft&, const std::string&) const = 0;
+   virtual int unpack(Aircraft&, const std::string&) = 0;
 
    /**
     * build nmea-msg from Aircraft to given string-reference

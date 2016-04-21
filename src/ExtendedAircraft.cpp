@@ -21,4 +21,3 @@ ExtendedAircraft::ExtendedAircraft()
 ExtendedAircraft::~ExtendedAircraft()
 {
 }
-

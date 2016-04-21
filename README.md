@@ -1,5 +1,5 @@
-# FLT
-FLT := FlugLeiterTool
+# VFR-B
+VFR-B := VirtualFlightRadar-Backend
 
 This project is intended to be an interface between OGN-/ADS-B-receivers and XCSoar and the airfield manager respectively.
 
@@ -8,7 +8,7 @@ That will make it easier for airfield managers to watch over the surrounding  tr
 etc...
 
 
-FLT parses APRS / OGN and ADS-B / SBS messages from SDRs as are OGN receiver and Dump1090, to finally send transcoded NMEA position reports to XCSoar.
+VFR-B parses APRS / OGN and ADS-B / SBS messages from SDRs as are OGN receiver and Dump1090, to finally send transcoded NMEA position reports to XCSoar.
 
 It also will provide some backend logic to support data processing and filtering for validating and further processing of received information.  Possible features include discarding bad or duplicate data, discarding far targets and estimating times and probability of arrival at airfield for security purposes.
 

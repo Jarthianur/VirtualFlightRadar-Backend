@@ -9,7 +9,7 @@
 #define PARSEROGN_H_
 
 #include "Parser.h"
-#include "ExtendedAircraft.h"
+#include <vector>
 
 class ParserOGN: public Parser
 {
@@ -17,10 +17,11 @@ public:
    ParserOGN(long double, long double, int);
    virtual ~ParserOGN();
 
-   int unpack(Aircraft&, const std::string&) const;
+   int unpack(Aircraft&, const std::string&);
    void process(Aircraft&, std::string&);
 
 private:
+   void splitToTokens(const std::string&);
    long double dmsToDeg(long double dms) const;
    //constants
    long double kts2kmh = 1.852L;
@@ -28,6 +29,8 @@ private:
    long double feet2m = 0.3048L;
    long double ms2fpm = 196.85L;
    long double fpm2ms = 0.00508L;
+   //comment tokens
+   std::vector<std::string> tokens;
 };
 
 #endif /* PARSEROGN_H_ */

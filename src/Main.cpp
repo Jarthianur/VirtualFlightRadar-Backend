@@ -58,7 +58,7 @@ void do_adsb(/*host,port*/const char* out)
 
     cout << "Scan for incoming adsb-msgs..." << endl;
     Aircraft ac;
-    string str;
+    //string str;
     while (1) {
         int error;
         if ((error = adsb_con.readLineIn(adsb_con.getAdsbInSock())) < 0) {
@@ -68,10 +68,10 @@ void do_adsb(/*host,port*/const char* out)
         if (adsb_con.getResponse()[4] == '3') {
             if (parser.unpack(ac, adsb_con.getResponse()) == 0) {
                 //process here for now, later in output thread
-                parser.process(ac, str);
-                if (strcmp(out, "-out")==0) {
-                    cout << str << endl;
-                }
+                //parser.process(ac, str);
+                //if (strcmp(out, "-out")==0) {
+                //    cout << str << endl;
+                //}
                 vec_lock.lock();
                 insertAircraft(ac);
                 vec_lock.unlock();
@@ -99,14 +99,14 @@ void do_ogn(/*host,port*/const char* out)
         }
         if (parser.unpack(extAc, ogn_con.getResponse()) == 0) {
             //parser.process(ac, str);
-            cout << ogn_con.getResponse() << endl;
-            if (strcmp(out, "-out") == 0) {
-                //cout << str << endl;
-                //cout << ogn_con.getResponse() << endl;
-            }
-            //vec_lock.lock();
-            //vec.push_back(extAc);
-            //vec_lock.unlock();
+            //cout << ogn_con.getResponse() << endl;
+            //if (strcmp(out, "-out") == 0) {
+            //    cout << str << endl;
+            //cout << ogn_con.getResponse() << endl;
+            //}
+            vec_lock.lock();
+            insertAircraft(extAc);
+            vec_lock.unlock();
         }
     }
     return;
@@ -114,19 +114,27 @@ void do_ogn(/*host,port*/const char* out)
 
 void handle_connections(const int port)
 {
-    ConnectOutNMEA out_con(port);
+    //ConnectOutNMEA out_con(port);
     //if (out_con.listenOut() == -1) return;
     //out_con.connectClient();
 
-    ParserADSB parser(49.665263L, 9.003075L, 110);
+    ParserADSB aparser(49.665263L, 9.003075L, 110);
+    ParserOGN oparser(49.665263L, 9.003075L, 110);
     string str;
     while (1) {
-        cout << "vec size: " << vec.size() << endl;
+        //cout << "vec size: " << vec.size() << endl;
         for (Aircraft ac : vec) {
-            parser.process(ac, str);
+            try {
+                dynamic_cast<ExtendedAircraft&> (ac);
+                oparser.process(ac, str);
+                cout << "from extended:" << endl;
+            } catch (std::bad_cast& e) {
+                aparser.process(ac, str);
+                cout << "from base:" << endl;
+            }
             cout << str << endl;
         }
-        parser.gprmc(str);
+        aparser.gprmc(str);
         cout << str << endl;
         this_thread::sleep_for(chrono::seconds(1));
     }

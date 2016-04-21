@@ -20,6 +20,8 @@ public:
    long double latitude;
    long double longitude;
    int altitude;
+   //0 = valid; +x(cycles) = invalid
+   int valid;
 
 private:
 
