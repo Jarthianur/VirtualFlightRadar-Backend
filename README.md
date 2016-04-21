@@ -22,7 +22,6 @@ Open issues:
   - merge incoming objects
   - remove duplicates
   - invalidate deprecated aircrafts
-  - filter out keepalive beacon
   
 Contributions are always welcome.
 
