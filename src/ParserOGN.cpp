@@ -37,7 +37,7 @@ Aircraft* ParserOGN::unpack(const std::string& sentence)
         //printf("^(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S)(\\\\|/)(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s(.*)$\n");
         printf("%s\n", sentence.c_str());
 
-        if (std::regex_search(sentence, match, aprs_re) && match.size() > 1) {
+        if (std::regex_search(sentence, match, aprs_re)) {
             printf("matched\n");
 
             /*//latitude
