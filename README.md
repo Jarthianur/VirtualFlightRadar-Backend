@@ -25,7 +25,7 @@ Open issues:::
 
 high priority:
 
-- parse incoming aprs-sentences (regex) //somehow g++-4.9 does not support regex !!!
+- parse incoming aprs-sentences (regex)
 - implement backend to manage listet aircrafts
   - process and parse depending on type (ExtendedAircraft / Aircraft) and handle duplicates (prefer Extended) //more or less done
 
