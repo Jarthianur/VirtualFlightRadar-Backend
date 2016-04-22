@@ -22,12 +22,12 @@ public:
    /**
     * unpack a msg into Aircraft
     */
-   virtual int unpack(Aircraft&, const std::string&) = 0;
+   virtual Aircraft* unpack(const std::string&) = 0;
 
    /**
     * build nmea-msg from Aircraft to given string-reference
     */
-   virtual void process(Aircraft&, std::string&) = 0;
+   virtual void process(Aircraft*, std::string&) = 0;
 
    /**
     * parse GPRMC
@@ -63,7 +63,7 @@ protected:
    /**
     * calculate nmea-data
     */
-   void calcPosInfo(Aircraft&);
+   void calcPosInfo(Aircraft*);
 
    /**
     * Number PI as precise as CPU can do

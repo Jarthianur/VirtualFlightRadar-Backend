@@ -24,27 +24,40 @@
 
 using namespace std;
 
-vector<Aircraft> vec;
+vector<Aircraft*> vec;
 mutex vec_lock;
 
-int vecfind(Aircraft& ac)
+int vecfind(Aircraft* ac)
 {
     unsigned int i;
     for (i = 0; i < vec.size(); ++i) {
-        if (vec.at(i).id.compare(ac.id) == 0) {
+        if ((*vec.at(i)).id.compare((*ac).id) == 0) {
             return i;
         }
     }
     return -1;
 }
 
-void insertAircraft(Aircraft& ac)
+void insertAircraft(Aircraft* ac)
 {
     int i;
     if ((i = vecfind(ac)) > -1) {
+        delete vec.at(i);
         vec.erase(vec.begin() + i);
     }
     vec.push_back(ac);
+    return;
+}
+
+void invalidateAircrafts() {
+    int i;
+    for (i = 0; i < vec.size(); ++i) {
+        (*vec.at(i)).valid++;
+        if ((*vec.at(i)).valid >= 4) {
+            delete vec.at(i);
+            vec.erase(vec.begin() + i);
+        }
+    }
     return;
 }
 
@@ -57,8 +70,7 @@ void do_adsb(/*host,port*/const char* out)
     if (adsb_con.connectIn() == -1) return;
 
     cout << "Scan for incoming adsb-msgs..." << endl;
-    Aircraft ac;
-    //string str;
+    Aircraft* ac;
     while (1) {
         int error;
         if ((error = adsb_con.readLineIn(adsb_con.getAdsbInSock())) < 0) {
@@ -66,12 +78,7 @@ void do_adsb(/*host,port*/const char* out)
         }
         //need msg3 only
         if (adsb_con.getResponse()[4] == '3') {
-            if (parser.unpack(ac, adsb_con.getResponse()) == 0) {
-                //process here for now, later in output thread
-                //parser.process(ac, str);
-                //if (strcmp(out, "-out")==0) {
-                //    cout << str << endl;
-                //}
+            if ((ac = parser.unpack(adsb_con.getResponse())) != nullptr) {
                 vec_lock.lock();
                 insertAircraft(ac);
                 vec_lock.unlock();
@@ -90,20 +97,14 @@ void do_ogn(/*host,port*/const char* out)
     if (ogn_con.connectIn() == -1) return;
 
     cout << "Scan for incoming ogn-msgs..." << endl;
-    ExtendedAircraft extAc;
-    string str;
+    Aircraft* ac;
     while (1) {
         int error;
         if ((error = ogn_con.readLineIn(ogn_con.getOgnInSock())) < 0) {
             cout << "received from ogn : " << error << endl;
         }
-        if (parser.unpack(extAc, ogn_con.getResponse()) == 0) {
-            //parser.process(ac, str);
-            //cout << ogn_con.getResponse() << endl;
-            //if (strcmp(out, "-out") == 0) {
-            //    cout << str << endl;
-            //cout << ogn_con.getResponse() << endl;
-            //}
+        if ((ac = parser.unpack(ogn_con.getResponse())) != nullptr) {
+            ExtendedAircraft* extAc = dynamic_cast<ExtendedAircraft*>(ac);
             vec_lock.lock();
             insertAircraft(extAc);
             vec_lock.unlock();
@@ -123,20 +124,23 @@ void handle_connections(const int port)
     string str;
     while (1) {
         //cout << "vec size: " << vec.size() << endl;
-        for (Aircraft ac : vec) {
-            try {
-                dynamic_cast<ExtendedAircraft&> (ac);
-                oparser.process(ac, str);
-                cout << "from extended:" << endl;
-            } catch (std::bad_cast& e) {
+        vec_lock.lock();
+        invalidateAircrafts();
+        vec_lock.unlock();
+        for (Aircraft* ac : vec) {
+            ExtendedAircraft* extac;
+            if ((extac = dynamic_cast<ExtendedAircraft*>(ac)) != NULL) {
+                oparser.process(extac, str);
+                //cout << "from ogn:" << endl;
+            } else {
                 aparser.process(ac, str);
-                cout << "from base:" << endl;
+                //cout << "from adsb:" << endl;
             }
-            cout << str << endl;
+            //cout << str << endl;
         }
         aparser.gprmc(str);
-        cout << str << endl;
-        this_thread::sleep_for(chrono::seconds(1));
+        //cout << str << endl;
+        this_thread::sleep_for(chrono::seconds(2));
     }
     return;
 }

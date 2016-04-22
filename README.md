@@ -1,5 +1,5 @@
-# VFR-B
-VFR-B := VirtualFlightRadar-Backend
+# VFR-Backend
+VFR-Backend := VirtualFlightRadar-Backend
 
 This project is intended to be an interface between OGN-/ADS-B-receivers and XCSoar and the airfield manager respectively.
 
@@ -13,6 +13,7 @@ VFR-B parses APRS / OGN and ADS-B / SBS messages from SDRs as are OGN receiver a
 It also will provide some backend logic to support data processing and filtering for validating and further processing of received information.  Possible features include discarding bad or duplicate data, discarding far targets and estimating times and probability of arrival at airfield for security purposes.
 
 This is currently in an early dev-version.
+Visit https://github.com/rueckwaertsflieger/AMVR for the super project. 
 
 
 Contributions are always welcome.
@@ -24,11 +25,9 @@ Open issues:::
 
 high priority:
 
-- parse incoming aprs-sentences (regex)
-- implement threadsafety for aircrafts's container
+- parse incoming aprs-sentences (regex) //somehow g++-4.9 does not support regex !!!
 - implement backend to manage listet aircrafts
-  - process and parse depending on type (ExtendedAircraft / Aircraft) and handle duplicates (prefer Extended)
-  - invalidate deprecated aircrafts
+  - process and parse depending on type (ExtendedAircraft / Aircraft) and handle duplicates (prefer Extended) //more or less done
 
 low priority:
 

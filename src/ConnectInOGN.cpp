@@ -73,6 +73,6 @@ int ConnectInOGN::sendLogin()
    login_str.append(" pass ");
    login_str.append(passwd);
    //global ogn connect (EDEW 30km)
-   login_str.append(" vers aprsc 2.0.18-ge7666c5 filter r/49.574325/9.395813/30\r\n");
+   login_str.append(" vers aprsc 2.0.18-ge7666c5 filter r/49.574325/9.395813/80\r\n");
    return send(in_sock, login_str.c_str(), login_str.length(), 0);
 }
