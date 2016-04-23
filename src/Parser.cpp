@@ -42,7 +42,7 @@ long double Parser::degree(long double rad) const
 
 int Parser::ldToI(long double ld) const
 {
-    return (int)(ld + 0.5L);
+    return (ld >= 0) ? (int)(ld + 0.5L) : (int)(ld - 0.5L);
 }
 
 void Parser::calcPosInfo(Aircraft* ac)

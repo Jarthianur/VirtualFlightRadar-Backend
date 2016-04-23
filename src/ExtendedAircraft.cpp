@@ -13,7 +13,6 @@ ExtendedAircraft::ExtendedAircraft()
   comment(""),
   address_type(0),
   aircraft_type(0),
-  address(""),
   climb_rate(0)
 {
 }

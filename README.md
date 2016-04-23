@@ -25,13 +25,14 @@ Open issues:::
 
 high priority:
 
-- parse incoming aprs-sentences (regex)
 - implement backend to manage listet aircrafts
-  - process and parse depending on type (ExtendedAircraft / Aircraft) and handle duplicates (prefer Extended) //more or less done
+  - handle duplicates (prefer Extended) //more or less done, duplicates replaced
 
 low priority:
 
 - fork client connects
+- Code optimization and reduction of memory usage
+- add comments
 - implement faster container for aircrafts (kind of HashVector) -> key/value, key as unique integer, hashing and sizing
 
  

@@ -13,7 +13,8 @@ CPP_SRCS += \
 ../src/Main.cpp \
 ../src/Parser.cpp \
 ../src/ParserADSB.cpp \
-../src/ParserOGN.cpp 
+../src/ParserOGN.cpp \
+../src/VFRB.cpp 
 
 OBJS += \
 ./src/Aircraft.o \
@@ -25,7 +26,8 @@ OBJS += \
 ./src/Main.o \
 ./src/Parser.o \
 ./src/ParserADSB.o \
-./src/ParserOGN.o 
+./src/ParserOGN.o \
+./src/VFRB.o 
 
 CPP_DEPS += \
 ./src/Aircraft.d \
@@ -37,7 +39,8 @@ CPP_DEPS += \
 ./src/Main.d \
 ./src/Parser.d \
 ./src/ParserADSB.d \
-./src/ParserOGN.d 
+./src/ParserOGN.d \
+./src/VFRB.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

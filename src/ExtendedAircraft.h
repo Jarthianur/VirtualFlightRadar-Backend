@@ -21,7 +21,6 @@ public:
    std::string comment;
    int address_type;
    int aircraft_type;
-   std::string address;
    int climb_rate;
 };
 
