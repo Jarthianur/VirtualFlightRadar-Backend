@@ -9,7 +9,6 @@ CPP_SRCS += \
 ../src/ConnectInADSB.cpp \
 ../src/ConnectInOGN.cpp \
 ../src/ConnectOutNMEA.cpp \
-../src/ExtendedAircraft.cpp \
 ../src/Main.cpp \
 ../src/Parser.cpp \
 ../src/ParserADSB.cpp \
@@ -22,7 +21,6 @@ OBJS += \
 ./src/ConnectInADSB.o \
 ./src/ConnectInOGN.o \
 ./src/ConnectOutNMEA.o \
-./src/ExtendedAircraft.o \
 ./src/Main.o \
 ./src/Parser.o \
 ./src/ParserADSB.o \
@@ -35,7 +33,6 @@ CPP_DEPS += \
 ./src/ConnectInADSB.d \
 ./src/ConnectInOGN.d \
 ./src/ConnectOutNMEA.d \
-./src/ExtendedAircraft.d \
 ./src/Main.d \
 ./src/Parser.d \
 ./src/ParserADSB.d \

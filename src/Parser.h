@@ -9,6 +9,7 @@
 #define PARSER_H_
 
 #define BUFF_OUT_S 4096
+#define LESS_BUFF_S 128
 
 #include <string>
 #include "Aircraft.h"
@@ -22,7 +23,7 @@ public:
    /**
     * unpack a msg into Aircraft
     */
-   virtual Aircraft* unpack(const std::string&) = 0;
+   virtual int unpack(const std::string&) = 0;
 
    /**
     * build nmea-msg from Aircraft to given string-reference

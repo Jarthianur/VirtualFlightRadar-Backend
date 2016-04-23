@@ -6,11 +6,15 @@
 class ParserADSB : public Parser
 {
 public:
-	ParserADSB(long double, long double, int);
-	virtual ~ParserADSB();
+    ParserADSB(long double, long double, int);
+    virtual ~ParserADSB();
 
-	Aircraft* unpack(const std::string&);
-	void process(Aircraft*, std::string&);
+    int unpack(const std::string&);
+    void process(Aircraft*, std::string&);
+private:
+    std::string id;
+    int alt = 0;
+    long double lat = 0.0L, lon = 0.0L;
 };
 
 #endif /* PARSERADSB_H_ */

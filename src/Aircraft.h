@@ -13,15 +13,21 @@
 class Aircraft
 {
 public:
-   Aircraft();
-   virtual ~Aircraft();
+    Aircraft();
+    virtual ~Aircraft();
 
-   std::string id;
-   long double latitude;
-   long double longitude;
-   int altitude;
-   //0 = valid; +x(cycles) = invalid
-   int valid;
+    std::string id;
+    long double latitude;
+    long double longitude;
+    int altitude;
+    float track;
+    int ground_speed;
+    int address_type;
+    //illegal ac_type == -1 used for check extended data
+    int aircraft_type;
+    int climb_rate;
+    //0 = valid; +x(cycles) = invalid
+    int valid;
 
 private:
 

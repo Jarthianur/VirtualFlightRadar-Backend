@@ -75,6 +75,6 @@ int ConnectInOGN::sendLogin()
    //local ogn connect
    login_str.append("\r\n");
    //global ogn connect
-   //login_str.append(" vers aprsc 2.0.18-ge7666c5 filter r/56.014620/8.995440/60\r\n");
+   //login_str.append(" vers aprsc 2.0.18-ge7666c5 filter r/-37.730669/144.423443/80\r\n");
    return send(in_sock, login_str.c_str(), login_str.length(), 0);
 }

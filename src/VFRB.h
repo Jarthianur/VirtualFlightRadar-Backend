@@ -13,19 +13,21 @@
 #include "ConnectOutNMEA.h"
 #include "Aircraft.h"
 
+#define INVALIDATE 10
+
 class VFRB {
 public:
     VFRB();
     virtual ~VFRB();
 
     static void run(long double,  long double,  int,  int,  int,  int, const char*, const char*, const char*, const char*);
+    static int vecfind(std::string&);
+    static void pushAircraft(Aircraft*);
+    static Aircraft* getAircraft(int i);
 
 protected:
     static std::vector<Aircraft*> vec;
     static std::mutex vec_lock;
-
-    static int vecfind(Aircraft*);
-    static void insertAircraft(Aircraft*);
     static void invalidateAircrafts();
 
     static void do_adsb(long double , long double, int, const char*, int);
