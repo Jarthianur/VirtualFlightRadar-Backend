@@ -20,20 +20,21 @@ Contributions are always welcome.
 
 I'm a not that experienced C++ developer, especially not in therms of multithreading, but always keep learning.
 
+Status quo:
+All minimal goals are reached. The project is ready to be demonstrated.
+
 
 Open issues:::
 
 high priority:
 
-- implement backend to manage listet aircrafts
-  - handle duplicates (prefer Extended) //more or less done, duplicates replaced
 
 low priority:
 
 - fork client connects
 - Code optimization and reduction of memory usage
 - add comments
-- implement faster container for aircrafts (kind of HashVector) -> key/value, key as unique integer, hashing and sizing
+- implement faster container for aircrafts (kind of HashMap) -> key/value, key as unique integer, hashing and sizing
 
  
   

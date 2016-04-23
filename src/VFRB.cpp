@@ -27,19 +27,19 @@ VFRB::~VFRB()
 {
 }
 
-void VFRB::run(long double longitude, long double latitude,
+void VFRB::run(long double latitude, long double longitude,
         int altitude, int out_port,  int ogn_port,  int adsb_port,
         const char* ogn_host, const char* adsb_host, const char* user, const char* pass)
 {
     ConnectOutNMEA out_con(out_port);
 
     try{
-        std::thread adsb_thread(do_adsb, longitude, latitude, altitude, adsb_host, adsb_port);
-        std::thread ogn_thread(do_ogn, longitude, latitude, altitude, ogn_host, ogn_port, user, pass);
+        std::thread adsb_thread(do_adsb, latitude, longitude, altitude, adsb_host, adsb_port);
+        std::thread ogn_thread(do_ogn, latitude, longitude, altitude, ogn_host, ogn_port, user, pass);
         std::thread conn_thread(handle_connections, &out_con);
 
-        ParserADSB aparser(longitude, latitude, altitude);
-        ParserOGN oparser(longitude, latitude, altitude);
+        ParserADSB aparser(latitude, longitude, altitude);
+        ParserOGN oparser(latitude, longitude, altitude);
         std::string str;
         while (1) {
             VFRB::vec_lock.lock();
@@ -79,7 +79,7 @@ int VFRB::vecfind(Aircraft* ac)
 {
     unsigned int i;
     for (i = 0; i < VFRB::vec.size(); ++i) {
-        if ((*VFRB::vec.at(i)).id.compare((*ac).id) == 0) {
+        if (VFRB::vec.at(i)->id.compare(ac->id) == 0) {
             return i;
         }
     }
@@ -101,9 +101,14 @@ void VFRB::invalidateAircrafts()
 {
     unsigned int i;
     for (i = 0; i < VFRB::vec.size(); ++i) {
-        (*VFRB::vec.at(i)).valid++;
-        if ((*VFRB::vec.at(i)).valid >= 4) {
-            delete VFRB::vec.at(i);
+        VFRB::vec.at(i)->valid++;
+        if (VFRB::vec.at(i)->valid >= 4) {
+            ExtendedAircraft* ext;
+            if ((ext = dynamic_cast<ExtendedAircraft*>(VFRB::vec.at(i))) != NULL) {
+                delete ext;
+            } else {
+                delete VFRB::vec.at(i);
+            }
             VFRB::vec.erase(VFRB::vec.begin() + i);
         }
     }
@@ -117,10 +122,10 @@ void VFRB::handle_connections(ConnectOutNMEA* out_con)
     return;
 }
 
-void VFRB::do_adsb(long double longitude, long double latitude, int altitude, const char* adsb_host, int adsb_port)
+void VFRB::do_adsb(long double latitude, long double longitude, int altitude, const char* adsb_host, int adsb_port)
 {
     ConnectInADSB adsb_con(adsb_host, adsb_port);
-    ParserADSB parser(longitude, latitude, altitude);
+    ParserADSB parser(latitude, longitude, altitude);
 
     if (adsb_con.connectIn() == -1) return;
 
@@ -144,10 +149,10 @@ void VFRB::do_adsb(long double longitude, long double latitude, int altitude, co
     return;
 }
 
-void VFRB::do_ogn(long double longitude, long double latitude, int altitude, const char* ogn_host, int ogn_port, const char* user, const char* pass)
+void VFRB::do_ogn(long double latitude, long double longitude, int altitude, const char* ogn_host, int ogn_port, const char* user, const char* pass)
 {//"glidern1.glidernet.org", 14580, "D5234", "12772"
     ConnectInOGN ogn_con(ogn_host, ogn_port, user, pass);
-    ParserOGN parser(longitude, latitude, altitude);
+    ParserOGN parser(latitude, longitude, altitude);
 
     if (ogn_con.connectIn() == -1) return;
 

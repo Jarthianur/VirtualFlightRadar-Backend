@@ -14,15 +14,15 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    //call: ./Flugleitertool 9.003075 49.665263 110 4353 14580 30003 glidern1.glidernet.org localhost D5234 12772
+    //call: ./Flugleitertool 49.665263 9.003075 110 4353 14580 30003 localhost localhost D5234 12772
 
     if (argc < 11) {
         cout << "usage: ./Flugleitertool long lat alt out_port ogn_port adsb_port ogn_host adsb_host user pass"<< endl;
         return 0;
     }
 
-    long double longitude = stold(argv[1]);
-    long double latitude = stold(argv[2]);
+    long double latitude = stold(argv[1]);
+    long double longitude = stold(argv[2]);
     int altitude = atoi(argv[3]);
     int out_port = atoi(argv[4]);
     int ogn_port = atoi(argv[5]);
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     const string user(argv[9]);
     const string pass(argv[10]);
 
-    VFRB::run(longitude, latitude, altitude, out_port, ogn_port, adsb_port, ogn_host.c_str(), adsb_host.c_str(), user.c_str(), pass.c_str());
+    VFRB::run(latitude, longitude, altitude, out_port, ogn_port, adsb_port, ogn_host.c_str(), adsb_host.c_str(), user.c_str(), pass.c_str());
 
     return 0;
 }

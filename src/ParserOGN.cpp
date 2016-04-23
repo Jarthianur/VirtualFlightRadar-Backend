@@ -39,52 +39,54 @@ Aircraft* ParserOGN::unpack(const std::string& sentence)
             //printf("matched\n");
 
             //latitude
-            (*extAc).latitude = dmsToDeg(std::stold(match.str(4)) / 100.0L);
-            if (match.str(5).compare("S") == 0) (*extAc).latitude = -(*extAc).latitude;
+            extAc->latitude = dmsToDeg(std::stold(match.str(4)) / 100.0L);
+            if (match.str(5).compare("S") == 0) extAc->latitude = -extAc->latitude;
             //longitue
-            (*extAc).longitude = dmsToDeg(std::stold(match.str(7)) / 100.0L);
-            if (match.str(8).compare("W") == 0) (*extAc).longitude = -(*extAc).longitude;
+            extAc->longitude = dmsToDeg(std::stold(match.str(7)) / 100.0L);
+            if (match.str(8).compare("W") == 0) extAc->longitude = -extAc->longitude;
             //printf("lat: %s ; lon: %s\n", match.str(4).c_str(), match.str(7).c_str());
 
             //track/gnd_speed
             //printf("track: %s ; gnd_spd: %s\n", match.str(10).c_str(), match.str(11).c_str());
             if (match.str(9).size() > 0) {
-                (*extAc).track = std::stoi(match.str(10));
-                (*extAc).ground_speed = ldToI(std::stold(match.str(11)) * kts2kmh);
+                extAc->track = std::stoi(match.str(10));
+                extAc->ground_speed = ldToI(std::stold(match.str(11)) * kts2kmh);
             } else {
-                (*extAc).track = 0;
-                (*extAc).ground_speed = 0;
+                extAc->track = 0;
+                extAc->ground_speed = 0;
             }
 
             //altitude
             //printf("alt: %s\n", match.str(12).c_str());
-            if (match.str(12).size() > 0) (*extAc).altitude = ldToI(std::stold(match.str(12)) * feet2m);
+            if (match.str(12).size() > 0) extAc->altitude = ldToI(std::stold(match.str(12)) * feet2m);
             //comment
             //printf("comm: %s\n", match.str(13).c_str());
-            if (match.str(13).size() > 0) (*extAc).comment = match.str(13);
+            if (match.str(13).size() > 0) extAc->comment = match.str(13);
 
             // climbrate / address
             std::regex addr_re("id(\\S{2})(\\S{6})");
             std::regex climb_re("([\\+|-]\\d+)fpm");
             //printf("splitting\n");
-            splitToTokens((*extAc).comment);
+            splitToTokens(extAc->comment);
             for (std::string part : tokens) {
                 std::smatch addr_match;
                 std::smatch climb_match;
                 if (std::regex_match(part, addr_match, addr_re)) {
-                    (*extAc).address_type = std::stoi(addr_match.str(1), nullptr, 16) & 0x03;
-                    (*extAc).aircraft_type = (std::stoi(addr_match.str(1), nullptr, 16) & 0x7C) >> 2;
-                    (*extAc).id = addr_match.str(2);
-                    //printf("addr_t= %s -> %d\n", addr_match.str(1).c_str(), (*extAc).address_type);
-                    //printf("airc_t= %s -> %d\n", addr_match.str(1).c_str(), (*extAc).aircraft_type);
+                    extAc->address_type = std::stoi(addr_match.str(1), nullptr, 16) & 0x03;
+                    extAc->aircraft_type = (std::stoi(addr_match.str(1), nullptr, 16) & 0x7C) >> 2;
+                    extAc->id = addr_match.str(2);
+                    //printf("addr_t= %s -> %d\n", addr_match.str(1).c_str(), extAc->address_type);
+                    //printf("airc_t= %s -> %d\n", addr_match.str(1).c_str(), extAc->aircraft_type);
                     //printf("addr= %s\n", addr_match.str(2).c_str());
                 } else if (std::regex_match(part, climb_match, climb_re)) {
-                    (*extAc).climb_rate = ldToI(std::stold(climb_match.str(1)) * fpm2ms);
-                    //printf("climb= %s -> %Lf -< %d\n", climb_match.str(1).c_str(), std::stold(climb_match.str(1)) * fpm2ms, (*extAc).climb_rate);
+                    extAc->climb_rate = ldToI(std::stold(climb_match.str(1)) * fpm2ms);
+                    //printf("climb= %s -> %Lf -< %d\n", climb_match.str(1).c_str(), std::stold(climb_match.str(1)) * fpm2ms, extAc->climb_rate);
                 }
             }
         } else {
             //printf("did not match!\n");
+            delete extAc;
+            return nullptr;
         }
     } catch (std::regex_error& e) {
         printf("ERROR %d\n", e.code());
@@ -103,7 +105,7 @@ void ParserOGN::process(Aircraft* ac, std::string& nmea_str)
 
     //PFLAU
     snprintf(buffer, BUFF_OUT_S, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", ldToI(bearing_rel),
-            ldToI(rel_V), ldToI(dist), (*extAc).id.c_str());
+            ldToI(rel_V), ldToI(dist), extAc->id.c_str());
     int csum = checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, 64, "%02x\r\n", csum);
@@ -111,7 +113,7 @@ void ParserOGN::process(Aircraft* ac, std::string& nmea_str)
     //PFLAA
     //$PFLAA,0,%d,%d,%d,%s,%s,%03.0f,,%s,%s,%s* ::: has to be modified when types are fixed
     snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,%d,%s,%03.0f,,%d,%d,%d*", ldToI(rel_N),
-            ldToI(rel_E), ldToI(rel_V), (*extAc).address_type, (*extAc).id.c_str(), (*extAc).track, (*extAc).ground_speed, (*extAc).climb_rate, (*extAc).aircraft_type);
+            ldToI(rel_E), ldToI(rel_V), extAc->address_type, extAc->id.c_str(), extAc->track, extAc->ground_speed, extAc->climb_rate, extAc->aircraft_type);
     csum = checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, 64, "%02x\r\n", csum);

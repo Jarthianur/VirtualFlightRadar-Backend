@@ -15,7 +15,9 @@ ParserADSB::~ParserADSB()
 Aircraft* ParserADSB::unpack(const std::string& sentence)
 {
     std::string msg = sentence;
-    Aircraft* ac = new Aircraft();
+    std::string id("");
+    int alt = 0;
+    long double lat = 0.0L, lon = 0.0L;
     /*
      * fields:
      * 4 : id
@@ -29,29 +31,26 @@ Aircraft* ParserADSB::unpack(const std::string& sentence)
     while((delim = msg.find(',')) > -1) {
         switch(index) {
         case 4:
-            (*ac).id = msg.substr(0,delim);
+            id = msg.substr(0,delim);
             break;
         case 11:
             if (msg.substr(0,delim).length() > 0)
-                (*ac).altitude = std::stoi(msg.substr(0,delim), nullptr);
+                alt = std::stoi(msg.substr(0,delim), nullptr);
             else  {
-                delete ac;
                 return nullptr;
             }
             break;
         case 14:
             if (msg.substr(0,delim).length() > 0)
-                (*ac).latitude = std::stold(msg.substr(0,delim), nullptr);
+                lat = std::stold(msg.substr(0,delim), nullptr);
             else {
-                delete ac;
                 return nullptr;
             }
             break;
         case 15:
             if (msg.substr(0,delim).length() > 0)
-                (*ac).longitude = std::stold(msg.substr(0,delim), nullptr);
+                lon = std::stold(msg.substr(0,delim), nullptr);
             else {
-                delete ac;
                 return nullptr;
             }
             break;
@@ -61,6 +60,11 @@ Aircraft* ParserADSB::unpack(const std::string& sentence)
         index++;
         msg.erase(0,delim+1);
     }
+    Aircraft* ac = new Aircraft();
+    ac->id = id;
+    ac->latitude = lat;
+    ac->longitude = lon;
+    ac->altitude = alt;
     return ac;
 }
 
