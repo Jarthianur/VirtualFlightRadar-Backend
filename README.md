@@ -1,5 +1,5 @@
 # VFR-Backend
-VFR-Backend := VirtualFlightRadar-Backend
+VFR-B := VirtualFlightRadar-Backend
 
 This project is intended to be an interface between OGN-/ADS-B-receivers and XCSoar and the airfield manager respectively.
 
@@ -12,8 +12,9 @@ VFR-B parses APRS / OGN and ADS-B / SBS messages from SDRs as are OGN receiver a
 
 It also will provide some backend logic to support data processing and filtering for validating and further processing of received information.  Possible features include discarding bad or duplicate data, discarding far targets and estimating times and probability of arrival at airfield for security purposes.
 
-This is currently in an early dev-version.
-Visit https://github.com/rueckwaertsflieger/AMVR for the super project. 
+This is currently in a 0.9-Beta version.
+Visit https://github.com/rueckwaertsflieger/AMVR for the super project and even more information.
+There you also get all recommended guides and software.
 
 
 Contributions are always welcome.
@@ -28,13 +29,15 @@ Open issues:::
 
 high priority:
 
+- unit-testing and analyzation with valgrind
+- connection-safety
 
 low priority:
 
 - fork client connects
 - Code optimization and reduction of memory usage
 - add comments
-- implement faster container for aircrafts (kind of HashMap) -> key/value, key as unique integer, hashing and sizing
+- implement faster container for aircrafts (kind of HashMap) -> key/value, hashing and sizing
 
  
   
