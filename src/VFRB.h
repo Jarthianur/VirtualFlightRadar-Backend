@@ -13,7 +13,7 @@
 #include "ConnectOutNMEA.h"
 #include "Aircraft.h"
 
-#define INVALIDATE 10
+#define INVALIDATE 4
 
 class VFRB {
 public:

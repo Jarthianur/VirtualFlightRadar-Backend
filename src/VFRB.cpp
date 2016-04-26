@@ -57,7 +57,7 @@ void VFRB::run(long double latitude, long double longitude,
                 out_con.sendMsgOut(str);
             }
             adsb_parser.gprmc(str);
-            //std::cout << str;
+            //std::cout << str << std::endl;
             out_con.sendMsgOut(str);
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
