@@ -11,61 +11,66 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string>
+#include <mutex>
 
 class ConnectOutNMEA
 {
 public:
-   ConnectOutNMEA(const int);
-   virtual ~ConnectOutNMEA();
+    ConnectOutNMEA(const int);
+    virtual ~ConnectOutNMEA();
 
-   /**
-    * create output socket and wait for client to connect
-    */
-   int listenOut();
+    /**
+     * create output socket and wait for client to connect
+     */
+    int listenOut();
 
-   /**
-    * wait for client to connect
-    */
-   int connectClient();
+    /**
+     * wait for client to connect
+     */
+    int connectClient();
 
-   /**
-    * close all sockets
-    */
-   void close();
+    /**
+     * close all sockets
+     */
+    void close();
 
-   /**
-    * send msg to client socket
-    */
-   int sendMsgOut(std::string&) const;
+    void closeClient();
+
+    /**
+     * send msg to client socket
+     */
+    int sendMsgOut(std::string&);
 
 private:
 
-   /**
-    * options
-    */
-   int yes = 1;
-   int no = 0;
+    std::mutex mutex;
 
-   /**
-    * client address
-    */
-   struct sockaddr_in xcs_cli_addr;
+    /**
+     * options
+     */
+    int yes = 1;
+    int no = 0;
 
-   /**
-    * nmea-out address
-    */
-   struct sockaddr_in nmea_out_addr;
+    /**
+     * client address
+     */
+    struct sockaddr_in xcs_cli_addr;
 
-   /**
-    * client, output sockets
-    */
-   int nmea_out_sock;
-   int xcs_cli_sock;
+    /**
+     * nmea-out address
+     */
+    struct sockaddr_in nmea_out_addr;
 
-   /**
-    * output port
-    */
-   const int nmea_out_port;
+    /**
+     * client, output sockets
+     */
+    int nmea_out_sock;
+    int xcs_cli_sock = -1;
+
+    /**
+     * output port
+     */
+    const int nmea_out_port;
 };
 
 #endif /* CONNECTOUTNMEA_H_ */

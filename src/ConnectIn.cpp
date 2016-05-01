@@ -33,7 +33,7 @@ int ConnectIn::readLineIn(int sock)
 
    int eol = linebuffer.find(EOL);
    if (eol == -1) {
-      if (recv(sock, buffer, BUFF_S-1, 0) == -1) {
+      if (recv(sock, buffer, BUFF_S-1, 0) <= 0) {
          return -1;
       }
       linebuffer.append(buffer);

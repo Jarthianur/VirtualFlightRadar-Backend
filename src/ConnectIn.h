@@ -18,49 +18,55 @@
 class ConnectIn
 {
 public:
-   /**
-    * constructor with host,port
-    */
-   ConnectIn(const char*, const int);
-   virtual ~ConnectIn();
+    /**
+     * constructor with host,port
+     */
+    ConnectIn(const char*, const int);
+    virtual ~ConnectIn();
 
-   /**
-    * connect to input service/server
-    * returns -1 on failure -> close application!
-    */
-   virtual int connectIn() = 0;
+    /**
+     * setup input socket
+     * returns -1 on failure -> close application!
+     */
+    virtual int setupConnectIn() = 0;
 
-   /**
-    * close all sockets
-    */
-   void close();
+    /**
+     * connect to input service/server
+     * returns -1 on failure -> close application!
+     */
+    virtual int connectIn() = 0;
 
-   /**
-    * read line from input socket
-    */
-   int readLineIn(int);
+    /**
+     * close all sockets
+     */
+    void close();
 
-   /**
-    * getters/setters
-    */
-   const std::string& getResponse() const;
+    /**
+     * read line from input socket
+     */
+    int readLineIn(int);
+
+    /**
+     * getters/setters
+     */
+    const std::string& getResponse() const;
 
 protected:
-   /**
-    * buffers
-    */
-   std::string response;
-   std::string linebuffer;
-   char buffer[BUFF_S];
+    /**
+     * buffers
+     */
+    std::string response;
+    std::string linebuffer;
+    char buffer[BUFF_S];
 
-   /**
-    * input connection stuff
-    */
-   struct hostent* in_host_info;
-   struct sockaddr_in in_addr;
-   int in_sock;
-   const char* in_hostname;
-   const int in_port;
+    /**
+     * input connection stuff
+     */
+    struct hostent* in_host_info;
+    struct sockaddr_in in_addr;
+    int in_sock;
+    const char* in_hostname;
+    const int in_port;
 
 };
 

@@ -9,6 +9,7 @@ public:
    ConnectInADSB(const char*, const int);
    virtual ~ConnectInADSB();
 
+   int setupConnectIn();
    int connectIn();
 
    int getAdsbInSock() const;

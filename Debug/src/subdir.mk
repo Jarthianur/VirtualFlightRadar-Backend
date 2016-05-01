@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/Aircraft.cpp \
+../src/AircraftContainer.cpp \
 ../src/ConnectIn.cpp \
 ../src/ConnectInADSB.cpp \
 ../src/ConnectInOGN.cpp \
@@ -17,6 +18,7 @@ CPP_SRCS += \
 
 OBJS += \
 ./src/Aircraft.o \
+./src/AircraftContainer.o \
 ./src/ConnectIn.o \
 ./src/ConnectInADSB.o \
 ./src/ConnectInOGN.o \
@@ -29,6 +31,7 @@ OBJS += \
 
 CPP_DEPS += \
 ./src/Aircraft.d \
+./src/AircraftContainer.d \
 ./src/ConnectIn.d \
 ./src/ConnectInADSB.d \
 ./src/ConnectInOGN.d \

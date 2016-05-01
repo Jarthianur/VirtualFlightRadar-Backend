@@ -8,12 +8,12 @@
 #ifndef VFRB_H_
 #define VFRB_H_
 
-#include <vector>
-#include <mutex>
+#include <condition_variable>
 #include "ConnectOutNMEA.h"
 #include "Aircraft.h"
-
-#define INVALIDATE 4
+#include "ConnectInADSB.h"
+#include "ConnectInOGN.h"
+#include "AircraftContainer.h"
 
 class VFRB {
 public:
@@ -21,18 +21,13 @@ public:
     virtual ~VFRB();
 
     static void run(long double,  long double,  int,  int,  int,  int, const char*, const char*, const char*, const char*);
-    static int vecfind(std::string&);
-    static void pushAircraft(Aircraft*);
-    static Aircraft* getAircraft(int i);
 
 protected:
-    static std::vector<Aircraft*> vec;
-    static std::mutex vec_lock;
-    static void invalidateAircrafts();
-
-    static void do_adsb(long double , long double, int, const char*, int);
-    static void do_ogn(long double, long double, int, const char*, int, const char*, const char*);
-    static void handle_connections(ConnectOutNMEA*);
+    static void handle_adsb_in(long double , long double, int, ConnectInADSB&, AircraftContainer&);
+    static void handle_ogn_in(long double, long double, int, ConnectInOGN&, AircraftContainer&);
+    static void handle_con_out(ConnectOutNMEA&);
+    static void handle_con_adsb(ConnectInADSB&);
+    static void handle_con_ogn(ConnectInOGN&);
 };
 
 #endif /* VFRB_H_ */

@@ -13,6 +13,7 @@
 
 #include <string>
 #include "Aircraft.h"
+#include "AircraftContainer.h"
 
 class Parser
 {
@@ -23,7 +24,7 @@ public:
    /**
     * unpack a msg into Aircraft
     */
-   virtual int unpack(const std::string&) = 0;
+   virtual int unpack(const std::string&, AircraftContainer&) = 0;
 
    /**
     * build nmea-msg from Aircraft to given string-reference

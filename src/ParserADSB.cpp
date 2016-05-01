@@ -13,7 +13,7 @@ ParserADSB::~ParserADSB()
 {
 }
 
-int ParserADSB::unpack(const std::string& sentence)
+int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
 {
     std::string msg = sentence;
     /*
@@ -59,17 +59,17 @@ int ParserADSB::unpack(const std::string& sentence)
         msg.erase(0,delim+1);
     }
     Aircraft* ac;
-    if ((i = VFRB::vecfind(id)) == -1) {
+    if ((i = ac_cont.vecfind(id)) == -1) {
         ac = new Aircraft();
         ac->id = id;
     } else {
-        ac = VFRB::getAircraft(i);
+        ac = ac_cont.getAircraft(i);
     }
     ac->latitude = lat;
     ac->longitude = lon;
     ac->altitude = alt;
     ac->aircraft_type = -1;
-    if (i == -1) VFRB::pushAircraft(ac);
+    if (i == -1) ac_cont.pushAircraft(ac);
     return 0;
 }
 

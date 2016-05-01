@@ -18,7 +18,7 @@ public:
     ParserOGN(long double, long double, int);
     virtual ~ParserOGN();
 
-    int unpack(const std::string&);
+    int unpack(const std::string&, AircraftContainer&);
     void process(Aircraft*, std::string&);
 
 private:

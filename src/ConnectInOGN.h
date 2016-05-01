@@ -16,6 +16,7 @@ public:
    ConnectInOGN(const char*, const int, const char*, const char*);
    virtual ~ConnectInOGN();
 
+   int setupConnectIn();
    int connectIn();
 
    int getOgnInSock() const;

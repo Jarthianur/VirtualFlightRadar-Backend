@@ -24,16 +24,15 @@ ParserOGN::~ParserOGN()
 {
 }
 
-int ParserOGN::unpack(const std::string& sentence)
+int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
 {
     if (sentence.at(0) == '#') {
         return -1;
     }
     int i;
     Aircraft* ac_ext = nullptr;
+
     try {
-        //(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S)(\\\\|/)(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s(.*)
-        //const std::regex aprs_re("(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S)(\\\\|/)(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s(.*)");
         std::smatch match;
 
         //printf("%s", sentence.c_str());
@@ -48,8 +47,6 @@ int ParserOGN::unpack(const std::string& sentence)
             else return -1;
 
             // climbrate / address
-            //std::regex addr_re("id(\\S{2})(\\S{6})");
-            //std::regex climb_re("([\\+|-]\\d+)fpm");
             //printf("splitting\n");
             splitToTokens(comment);
             for (std::string part : tokens) {
@@ -67,13 +64,13 @@ int ParserOGN::unpack(const std::string& sentence)
                     //printf("climb= %s -> %Lf -< %d\n", climb_match.str(1).c_str(), std::stold(climb_match.str(1)) * fpm2ms, extAc->climb_rate);
                 }
             }
-            if ((i = VFRB::vecfind(id)) == -1) {
+            if ((i = ac_cont.vecfind(id)) == -1) {
                 ac_ext = new Aircraft();
                 ac_ext->id = id;
                 ac_ext->address_type = addr_t;
                 ac_ext->aircraft_type = ac_t;
             } else {
-                ac_ext = VFRB::getAircraft(i);
+                ac_ext = ac_cont.getAircraft(i);
             }
 
             //latitude
@@ -98,7 +95,7 @@ int ParserOGN::unpack(const std::string& sentence)
             //printf("alt: %s\n", match.str(12).c_str());
             if (match.str(12).size() > 0) ac_ext->altitude = ldToI(std::stold(match.str(12)) * feet2m);
 
-            if (i == -1) VFRB::pushAircraft(ac_ext);
+            if (i == -1) ac_cont.pushAircraft(ac_ext);
         } else {
             //printf("did not match!\n");
             return -1;

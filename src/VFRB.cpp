@@ -10,13 +10,14 @@
 #include "ParserOGN.h"
 #include <chrono>
 #include <thread>
-#include "ConnectInADSB.h"
-#include "ConnectInOGN.h"
 #include <iostream>
 #include <cstring>
+#include <mutex>
 
-std::vector<Aircraft*> VFRB::vec;
-std::mutex VFRB::vec_lock;
+std::mutex mutex;
+
+std::condition_variable con_adsb_cond;
+std::condition_variable con_ogn_cond;
 
 VFRB::VFRB()
 {
@@ -31,131 +32,164 @@ void VFRB::run(long double latitude, long double longitude,
         const char* ogn_host, const char* adsb_host, const char* user, const char* pass)
 {
     ConnectOutNMEA out_con(out_port);
+    ConnectInADSB adsb_con(adsb_host, adsb_port);
+    ConnectInOGN ogn_con(ogn_host, ogn_port, user, pass);
+    AircraftContainer ac_cont;
 
     try{
-        std::thread adsb_thread(do_adsb, latitude, longitude, altitude, adsb_host, adsb_port);
-        std::thread ogn_thread(do_ogn, latitude, longitude, altitude, ogn_host, ogn_port, user, pass);
-        std::thread conn_thread(handle_connections, &out_con);
+        std::thread adsb_in_thread(handle_adsb_in, latitude, longitude, altitude, std::ref(adsb_con), std::ref(ac_cont));
+        std::thread ogn_in_thread(handle_ogn_in, latitude, longitude, altitude, std::ref(ogn_con), std::ref(ac_cont));
+
+        std::thread con_out_thread(handle_con_out, std::ref(out_con));
+        std::thread con_adsb_thread(handle_con_adsb, std::ref(adsb_con));
+        std::thread con_ogn_thread(handle_con_ogn, std::ref(ogn_con));
 
         ParserADSB adsb_parser(latitude, longitude, altitude);
         ParserOGN ogn_parser(latitude, longitude, altitude);
         std::string str;
-        while (1) {
-            VFRB::vec_lock.lock();
-            invalidateAircrafts();
-            VFRB::vec_lock.unlock();
 
-            for (Aircraft* ac : vec) {
+        while (1) {
+            ac_cont.invalidateAircrafts();
+
+            for (Aircraft* ac : ac_cont.getContainer()) {
                 if (ac->aircraft_type == -1) {
                     adsb_parser.process(ac, str);
-                    //std::cout << "from adsb:" << std::endl;
                 } else {
                     ogn_parser.process(ac, str);
-                    //std::cout << "from ogn:" << std::endl;
                 }
-                //std::cout << str;
-                out_con.sendMsgOut(str);
+                if (out_con.sendMsgOut(str) <= 0) {
+                    //std::cout << "client disconnected " << std::endl;
+                    out_con.closeClient();
+                }
             }
             adsb_parser.gprmc(str);
-            //std::cout << str << std::endl;
-            out_con.sendMsgOut(str);
+            if (out_con.sendMsgOut(str) <= 0) {
+                //std::cout << "client disconnected " << std::endl;
+                out_con.closeClient();
+            }
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
-        adsb_thread.join();
-        ogn_thread.join();
-        conn_thread.join();
+        adsb_in_thread.join();
+        ogn_in_thread.join();
+        con_out_thread.join();
+        con_adsb_thread.join();
+        con_ogn_thread.join();
 
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cout << "ERROR: " << e.what() << std::endl;
         return;
     }
     return;
 }
 
-int VFRB::vecfind(std::string& id)
+void VFRB::handle_con_out(ConnectOutNMEA& out_con)
 {
-    unsigned int i;
-    for (i = 0; i < VFRB::vec.size(); ++i) {
-        if (VFRB::vec.at(i)->id.compare(id) == 0) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-void VFRB::pushAircraft(Aircraft* ac)
-{
-    VFRB::vec.push_back(ac);
-    return;
-}
-
-void VFRB::invalidateAircrafts()
-{
-    unsigned int i;
-    for (i = 0; i < VFRB::vec.size(); ++i) {
-        VFRB::vec.at(i)->valid++;
-        if (VFRB::vec.at(i)->valid >= INVALIDATE) {
-            delete VFRB::vec.at(i);
-            VFRB::vec.erase(VFRB::vec.begin() + i);
-        }
+    if (out_con.listenOut() == -1) return;
+    while (1) {
+        //std::cout << "con out thread runs " << std::endl;
+        out_con.connectClient();
     }
     return;
 }
 
-Aircraft* VFRB::getAircraft(int i)
+void VFRB::handle_con_adsb(ConnectInADSB& adsb_con)
 {
-    return VFRB::vec.at(i);
-}
+    if (adsb_con.setupConnectIn() == -1) return;
 
-void VFRB::handle_connections(ConnectOutNMEA* out_con)
-{
-    if (out_con->listenOut() == -1) return;
-    out_con->connectClient();
-    return;
-}
-
-void VFRB::do_adsb(long double latitude, long double longitude, int altitude, const char* adsb_host, int adsb_port)
-{
-    ConnectInADSB adsb_con(adsb_host, adsb_port);
-    ParserADSB parser(latitude, longitude, altitude);
-
-    if (adsb_con.connectIn() == -1) return;
-
-    std::cout << "Scan for incoming adsb-msgs..." << std::endl;
+    while (adsb_con.connectIn() == -1) {
+        //std::cout << "waiting for adsb-server"<<std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
+    //std::cout << "con adsb thread called notify " << std::endl;
+    con_adsb_cond.notify_one();
 
     while (1) {
-        int error;
-        if ((error = adsb_con.readLineIn(adsb_con.getAdsbInSock())) < 0) {
-            continue;
+        std::unique_lock<std::mutex> lock(mutex);
+        con_adsb_cond.wait(lock);
+        lock.unlock();
+        while (adsb_con.connectIn() == -1) {
+            adsb_con.close();
+            adsb_con.setupConnectIn();
+            //std::cout << "waiting for adsb-server"<<std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        //std::cout << "con adsb thread called notify " << std::endl;
+        con_adsb_cond.notify_one();
+    }
+    return;
+}
+
+void VFRB::handle_con_ogn(ConnectInOGN& ogn_con)
+{
+    if (ogn_con.setupConnectIn() == -1) return;
+
+    while (ogn_con.connectIn() == -1) {
+        //std::cout << "waiting for ogn-server"<<std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
+    //std::cout << "con ogn thread called notify " << std::endl;
+    con_ogn_cond.notify_one();
+
+    while (1) {
+        std::unique_lock<std::mutex> lock(mutex);
+        con_ogn_cond.wait(lock);
+        lock.unlock();
+        while (ogn_con.connectIn() == -1) {
+            ogn_con.close();
+            ogn_con.setupConnectIn();
+            //std::cout << "waiting for adsb-server"<<std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        //std::cout << "con ogn thread called notify " << std::endl;
+        con_ogn_cond.notify_one();
+    }
+    return;
+}
+
+void VFRB::handle_adsb_in(long double latitude, long double longitude, int altitude, ConnectInADSB& adsb_con, AircraftContainer& ac_cont)
+{
+    ParserADSB parser(latitude, longitude, altitude);
+    std::unique_lock<std::mutex> lock(mutex);
+    con_adsb_cond.wait(lock);
+    lock.unlock();
+
+    //std::cout << "Scan for incoming adsb-msgs..." << std::endl;
+
+    while (1) {
+        if (adsb_con.readLineIn(adsb_con.getAdsbInSock()) <= 0) {
+            con_adsb_cond.notify_one();
+            std::unique_lock<std::mutex> lock(mutex);
+            con_adsb_cond.wait(lock);
+            //std::cout << "Scan for incoming adsb-msgs..." << std::endl;
+            lock.unlock();
         }
         //need msg3 only
         if (adsb_con.getResponse().at(4) == '3') {
-            VFRB::vec_lock.lock();
-            parser.unpack(adsb_con.getResponse());
-            VFRB::vec_lock.unlock();
+            parser.unpack(adsb_con.getResponse(), ac_cont);
         }
     }
     return;
 }
 
-void VFRB::do_ogn(long double latitude, long double longitude, int altitude, const char* ogn_host, int ogn_port, const char* user, const char* pass)
-{//"glidern1.glidernet.org", 14580, "D5234", "12772"
-    ConnectInOGN ogn_con(ogn_host, ogn_port, user, pass);
+void VFRB::handle_ogn_in(long double latitude, long double longitude, int altitude, ConnectInOGN& ogn_con, AircraftContainer& ac_cont)
+{
     ParserOGN parser(latitude, longitude, altitude);
+    std::unique_lock<std::mutex> lock(mutex);
+    con_ogn_cond.wait(lock);
+    lock.unlock();
 
-    if (ogn_con.connectIn() == -1) return;
-
-    std::cout << "Scan for incoming ogn-msgs..." << std::endl;
+    //std::cout << "Scan for incoming ogn-msgs..." << std::endl;
 
     while (1) {
-        int error;
-        if ((error = ogn_con.readLineIn(ogn_con.getOgnInSock())) < 0) {
-            continue;
+        if (ogn_con.readLineIn(ogn_con.getOgnInSock()) <= 0) {
+            con_ogn_cond.notify_one();
+            std::unique_lock<std::mutex> lock(mutex);
+            con_ogn_cond.wait(lock);
+            //std::cout << "Scan for incoming ogn-msgs..." << std::endl;
+            lock.unlock();
         }
-        VFRB::vec_lock.lock();//std::cout << ogn_con.getResponse() << std::endl;
-        parser.unpack(ogn_con.getResponse());
-        VFRB::vec_lock.unlock();
+        parser.unpack(ogn_con.getResponse(), ac_cont);
     }
     return;
 }
