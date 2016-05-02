@@ -29,6 +29,9 @@ Open issues::
 
 high priority:
 
+- improve threadsafety, termination handling
+- usefull log output
+
 low priority:
 
 - multi client support
