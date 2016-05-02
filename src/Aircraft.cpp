@@ -12,9 +12,9 @@ Aircraft::Aircraft()
   latitude(0.0L),
   longitude(0.0L),
   altitude(0),
-  track(0.0),
-  ground_speed(0),
-  address_type(0),
+  heading(0.0),
+  gnd_speed(0),
+  addr_type(0),
   aircraft_type(0),
   climb_rate(0),
   valid(0)

@@ -20,11 +20,42 @@ public:
     AircraftContainer();
     virtual ~AircraftContainer();
 
-    int vecfind(std::string&);
+    /**
+     * All methods in this class are threadsafe and exceptionsafe!
+     */
+
+    /**
+     * search aircraft in container by given id.
+     * if id is found returns index,
+     * else returns -1.
+     */
+    int find(std::string&);
+
+    /**
+     * insert aircraft in container
+     */
     void pushAircraft(Aircraft*);
-    Aircraft* getAircraft(int i);
+
+    /**
+     * returns pointer, to aircraft, at index i,
+     * if index i is valid, else nullpointer.
+     */
+    Aircraft* getAircraft(unsigned int i);
+
+    /**
+     * increments all aircrafts's valid counter in container.
+     * if valid counter is >= INVALIDATE, the aircraft is deleted from
+     * container and it's memory is deallocated.
+     *
+     * this method also guarantees that all aircrafts will be deallocated
+     * sooner or later.
+     */
     void invalidateAircrafts();
-    std::vector<Aircraft*>& getContainer();
+
+    /**
+     * return container's size
+     */
+    unsigned int getContSize();
 
 private:
     std::mutex mutex;

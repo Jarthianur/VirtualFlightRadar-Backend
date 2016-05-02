@@ -19,8 +19,6 @@ public:
    int setupConnectIn();
    int connectIn();
 
-   int getOgnInSock() const;
-
 private:
    /**
     * OGN specific login stuff

@@ -11,6 +11,7 @@ public:
 
     int unpack(const std::string&, AircraftContainer&);
     void process(Aircraft*, std::string&);
+
 private:
     std::string id;
     int alt = 0;

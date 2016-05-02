@@ -12,7 +12,6 @@ VFR-B parses APRS / OGN and ADS-B / SBS messages from SDRs as are OGN receiver a
 
 It also will provide some backend logic to support data processing and filtering for validating and further processing of received information.  Possible features include discarding bad or duplicate data, discarding far targets and estimating times and probability of arrival at airfield for security purposes.
 
-This is currently in a 1.0.0-Beta version.
 Visit https://github.com/rueckwaertsflieger/AMVR for the super project and even more information.
 There you also get all recommended guides and required software.
 
@@ -22,19 +21,18 @@ Contributions are always welcome.
 I'm a not that experienced C++ developer, especially not in therms of multithreading, but always keep learning.
 
 Status quo:
-All minimal goals are reached. The project is ready to be demonstrated.
+Version 1.0.0-Beta
+All minimal goals are reached. The project is ready to be demonstrated and tested live.
 
 
-Open issues:::
+Open issues::
 
 high priority:
 
 low priority:
 
-- fork client connects
-- Code optimization and reduction of memory usage
-- add comments
-- implement faster container for aircrafts (kind of HashMap) -> key/value, hashing and sizing
+- multi client support
+- implement faster container for aircrafts (kind of HashMap)
 
  
   

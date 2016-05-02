@@ -62,3 +62,8 @@ const std::string& ConnectIn::getResponse() const
 {
    return response;
 }
+
+int ConnectIn::getInSock() const
+{
+    return in_sock;
+}

@@ -24,7 +24,7 @@ int Parser::checksum(const char* sentence) const
 {
     int csum = 0;
     int i=1;
-    while (sentence[i] != '*') {
+    while (sentence[i] != '*' && sentence[i] != '\0') {
         csum ^= (int) sentence[i++];
     }
     return csum;

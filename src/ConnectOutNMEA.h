@@ -20,12 +20,17 @@ public:
     virtual ~ConnectOutNMEA();
 
     /**
+     * (all) methods are threadsafe.
+     */
+
+    /**
      * create output socket and wait for client to connect
      */
     int listenOut();
 
     /**
      * wait for client to connect
+     * not threadsafe!
      */
     int connectClient();
 
@@ -34,7 +39,7 @@ public:
      */
     void close();
 
-    void closeClient();
+    void closeClientIf();
 
     /**
      * send msg to client socket

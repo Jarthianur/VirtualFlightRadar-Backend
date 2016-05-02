@@ -22,7 +22,9 @@ public:
    virtual ~Parser();
 
    /**
-    * unpack a msg into Aircraft
+    * unpack a msg into Aircraft and insert in Container,
+    * if Aircraft does not exit already, else updates existing Aircraft.
+    * returns 0 on success, -1 on failure.
     */
    virtual int unpack(const std::string&, AircraftContainer&) = 0;
 

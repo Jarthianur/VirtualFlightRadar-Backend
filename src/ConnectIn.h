@@ -26,13 +26,13 @@ public:
 
     /**
      * setup input socket
-     * returns -1 on failure -> close application!
+     * returns 0 on success, -1 on failure.
      */
     virtual int setupConnectIn() = 0;
 
     /**
      * connect to input service/server
-     * returns -1 on failure -> close application!
+     * returns 0 on success, -1 on failure.
      */
     virtual int connectIn() = 0;
 
@@ -50,6 +50,8 @@ public:
      * getters/setters
      */
     const std::string& getResponse() const;
+
+    int getInSock() const;
 
 protected:
     /**

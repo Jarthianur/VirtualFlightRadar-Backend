@@ -12,8 +12,6 @@ public:
    int setupConnectIn();
    int connectIn();
 
-   int getAdsbInSock() const;
-
 };
 
 #endif /* CONNECTINADSB_H_ */

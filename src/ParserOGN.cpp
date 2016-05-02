@@ -64,10 +64,10 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                     //printf("climb= %s -> %Lf -< %d\n", climb_match.str(1).c_str(), std::stold(climb_match.str(1)) * fpm2ms, extAc->climb_rate);
                 }
             }
-            if ((i = ac_cont.vecfind(id)) == -1) {
+            if ((i = ac_cont.find(id)) == -1) {
                 ac_ext = new Aircraft();
                 ac_ext->id = id;
-                ac_ext->address_type = addr_t;
+                ac_ext->addr_type = addr_t;
                 ac_ext->aircraft_type = ac_t;
             } else {
                 ac_ext = ac_cont.getAircraft(i);
@@ -84,11 +84,11 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
             //track/gnd_speed
             //printf("track: %s ; gnd_spd: %s\n", match.str(10).c_str(), match.str(11).c_str());
             if (match.str(9).size() > 0) {
-                ac_ext->track = std::stoi(match.str(10));
-                ac_ext->ground_speed = ldToI(std::stold(match.str(11)) * kts2kmh);
+                ac_ext->heading = std::stoi(match.str(10));
+                ac_ext->gnd_speed = ldToI(std::stold(match.str(11)) * kts2kmh);
             } else {
-                ac_ext->track = 0;
-                ac_ext->ground_speed = 0;
+                ac_ext->heading = 0;
+                ac_ext->gnd_speed = 0;
             }
 
             //altitude initial 0, or not changed
@@ -124,7 +124,7 @@ void ParserOGN::process(Aircraft* ac_ext, std::string& nmea_str)
     //PFLAA
     //$PFLAA,0,%d,%d,%d,%s,%s,%03.0f,,%s,%s,%s* ::: has to be modified when types are fixed
     snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,%d,%s,%03.0f,,%d,%d,%d*", ldToI(rel_N),
-            ldToI(rel_E), ldToI(rel_V), ac_ext->address_type, ac_ext->id.c_str(), ac_ext->track, ac_ext->ground_speed, ac_ext->climb_rate, ac_ext->aircraft_type);
+            ldToI(rel_E), ldToI(rel_V), ac_ext->addr_type, ac_ext->id.c_str(), ac_ext->heading, ac_ext->gnd_speed, ac_ext->climb_rate, ac_ext->aircraft_type);
     csum = checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, LESS_BUFF_S, "%02x\r\n", csum);

@@ -59,7 +59,7 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
         msg.erase(0,delim+1);
     }
     Aircraft* ac;
-    if ((i = ac_cont.vecfind(id)) == -1) {
+    if ((i = ac_cont.find(id)) == -1) {
         ac = new Aircraft();
         ac->id = id;
     } else {
