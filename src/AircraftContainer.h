@@ -46,9 +46,6 @@ public:
      * increments all aircrafts's valid counter in container.
      * if valid counter is >= INVALIDATE, the aircraft is deleted from
      * container and it's memory is deallocated.
-     *
-     * this method also guarantees that all aircrafts will be deallocated
-     * sooner or later.
      */
     void invalidateAircrafts();
 
@@ -57,9 +54,14 @@ public:
      */
     unsigned int getContSize();
 
+    /**
+     * deallocate all aircrafts and clear container
+     */
+    void clear();
+
 private:
     std::mutex mutex;
-    std::vector<Aircraft*> vec;
+    std::vector<Aircraft*> cont;
 };
 
 #endif /* AIRCRAFTCONTAINER_H_ */

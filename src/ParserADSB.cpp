@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <ctime>
 #include "ParserADSB.h"
-#include "VFRB.h"
 
 ParserADSB::ParserADSB(long double b_lat, long double b_long, int b_alt)
 : Parser(b_lat, b_long, b_alt)
@@ -25,7 +24,6 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
      */
     msg.erase(0,6);
     int delim, i = 2;
-    //last param in msg is unprocessed
     while((delim = msg.find(',')) > -1) {
         switch(i) {
             case 4:
@@ -64,6 +62,7 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
         ac->id = id;
     } else {
         ac = ac_cont.getAircraft(i);
+        ac->valid = 0;
     }
     ac->latitude = lat;
     ac->longitude = lon;

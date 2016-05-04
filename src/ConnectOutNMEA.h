@@ -70,7 +70,7 @@ private:
      * client, output sockets
      */
     int nmea_out_sock;
-    int xcs_cli_sock = -1;
+    int xcs_cli_sock;
 
     /**
      * output port

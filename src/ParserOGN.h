@@ -25,11 +25,10 @@ private:
     void splitToTokens(const std::string&);
     long double dmsToDeg(long double dms) const;
     //constants
-    long double kts2kmh = 1.852L;
-    long double kmh2kts = 0.539957L;
-    long double feet2m = 0.3048L;
-    long double ms2fpm = 196.85L;
-    long double fpm2ms = 0.00508L;
+    const long double kts2kmh = 1.852L;
+    const long double kmh2kts = 0.539957L;
+    const long double ms2fpm = 196.85L;
+    const long double fpm2ms = 0.00508L;
     //regex
     const std::regex aprs_re;
     const std::regex addr_re;

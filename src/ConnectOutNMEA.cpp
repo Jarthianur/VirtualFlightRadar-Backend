@@ -14,7 +14,9 @@
 #include <stdexcept>
 
 ConnectOutNMEA::ConnectOutNMEA(const int out_port)
-: nmea_out_port(out_port)
+: nmea_out_sock(-1),
+  xcs_cli_sock(-1),
+  nmea_out_port(out_port)
 {
 }
 
@@ -26,15 +28,15 @@ ConnectOutNMEA::~ConnectOutNMEA()
 int ConnectOutNMEA::listenOut()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    //std::cout << "start nmea output socket..." << std::endl;
+    std::cout << "start nmea output socket..." << std::endl;
 
     if ((nmea_out_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        //std::cout << "Could not create socket!" << std::endl;
+        std::cout << "Could not create socket!" << std::endl;
         return -1;
     }
 
     if (setsockopt(nmea_out_sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-        //std::cout << "Could not set socketopt REUSEADDR!" << std::endl;
+        std::cout << "Could not set socketopt REUSEADDR!" << std::endl;
         return -1;
     }
 
@@ -44,12 +46,12 @@ int ConnectOutNMEA::listenOut()
     nmea_out_addr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(nmea_out_sock, (struct sockaddr*)&nmea_out_addr, sizeof(struct sockaddr)) == -1) {
-        //std::cout << "Could not bind socket!" << std::endl;
+        std::cout << "Could not bind socket!" << std::endl;
         return -1;
     }
 
     if (listen(nmea_out_sock, 2) == -1) {
-        //std::cout << "Can not listen to socket!" << std::endl;
+        std::cout << "Can not listen to socket!" << std::endl;
         return -1;
     }
     return 0;
@@ -57,22 +59,26 @@ int ConnectOutNMEA::listenOut()
 
 int ConnectOutNMEA::connectClient()
 {
-    //std::cout << "wait for client..."<< std::endl;
+    std::cout << "wait for client..."<< std::endl;
 
     unsigned int sin_s = sizeof(struct sockaddr);
     xcs_cli_sock = accept(nmea_out_sock, (struct sockaddr*)&xcs_cli_addr, &sin_s);
     if (xcs_cli_sock == -1) {
-        //std::cout << "Could not accept connection!" << std::endl;
+        std::cout << "Could not accept connection!" << std::endl;
     }
 
-    //std::cout<< "connection from " << inet_ntoa(xcs_cli_addr.sin_addr) <<std::endl;
+    std::cout<< "connection from " << inet_ntoa(xcs_cli_addr.sin_addr) <<std::endl;
     return 0;
 }
 
 void ConnectOutNMEA::close()
 {
     closeClientIf();
-    ::close(nmea_out_sock);
+    std::lock_guard<std::mutex> lock(this->mutex);
+    if (nmea_out_sock != -1) {
+        ::close(nmea_out_sock);
+        nmea_out_sock = -1;
+    }
     return;
 }
 

@@ -13,14 +13,15 @@ AircraftContainer::AircraftContainer()
 
 AircraftContainer::~AircraftContainer()
 {
+    clear();
 }
 
 int AircraftContainer::find(std::string& id)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     unsigned int i;
-    for (i = 0; i < vec.size(); ++i) {
-        if (vec.at(i)->id.compare(id) == 0) {
+    for (i = 0; i < cont.size(); ++i) {
+        if (cont.at(i)->id.compare(id) == 0) {
             return i;
         }
     }
@@ -30,7 +31,7 @@ int AircraftContainer::find(std::string& id)
 void AircraftContainer::pushAircraft(Aircraft* ac)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    vec.push_back(ac);
+    cont.push_back(ac);
     return;
 }
 
@@ -38,11 +39,11 @@ void AircraftContainer::invalidateAircrafts()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     unsigned int i;
-    for (i = 0; i < vec.size(); ++i) {
-        vec.at(i)->valid++;
-        if (vec.at(i)->valid >= INVALIDATE) {
-            delete vec.at(i);
-            vec.erase(vec.begin() + i);
+    for (i = 0; i < cont.size(); ++i) {
+        cont.at(i)->valid++;
+        if (cont.at(i)->valid >= INVALIDATE) {
+            delete cont.at(i);
+            cont.erase(cont.begin() + i);
         }
     }
     return;
@@ -51,15 +52,25 @@ void AircraftContainer::invalidateAircrafts()
 Aircraft* AircraftContainer::getAircraft(unsigned int i)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    if (i < 0 || i >= vec.size()) {
+    if (i < 0 || i >= cont.size()) {
         return nullptr;
     } else {
-        return vec.at(i);
+        return cont.at(i);
     }
 }
 
 unsigned int AircraftContainer::getContSize()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    return vec.size();
+    return cont.size();
+}
+
+void AircraftContainer::clear()
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    for (Aircraft* ac : cont) {
+        delete ac;
+    }
+    cont.clear();
+    return;
 }
