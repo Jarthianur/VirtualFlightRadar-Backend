@@ -45,12 +45,12 @@ int Parser::ldToI(long double ld) const
     return (ld >= 0) ? (int)(ld + 0.5L) : (int)(ld - 0.5L);
 }
 
-void Parser::calcPosInfo(Aircraft* ac)
+void Parser::calcPosInfo(Aircraft& ac)
 {
     long_b = radian(baselong);
-    long_ac = radian(ac->longitude);
+    long_ac = radian(ac.longitude);
     lat_b = radian(baselat);
-    lat_ac = radian(ac->latitude);
+    lat_ac = radian(ac.latitude);
     long_dist = long_ac - long_b;
     lat_dist = lat_ac -lat_b;
 
@@ -64,7 +64,7 @@ void Parser::calcPosInfo(Aircraft* ac)
 
     rel_N = std::cos(radian(bearing_abs)) * dist;
     rel_E = std::sin(radian(bearing_abs)) * dist;
-    rel_V = (ac->altitude * feet2m) - basealt;
+    rel_V = (ac.altitude * feet2m) - basealt;
     return;
 }
 

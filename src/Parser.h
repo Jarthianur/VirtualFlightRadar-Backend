@@ -19,7 +19,7 @@ class Parser
 {
 public:
     Parser(long double, long double, int);
-    virtual ~Parser();
+    virtual ~Parser() throw();
 
     /**
      * unpack a msg into Aircraft and insert in Container,
@@ -31,7 +31,7 @@ public:
     /**
      * build nmea-msg from Aircraft to given string-reference
      */
-    virtual void process(Aircraft*, std::string&) = 0;
+    virtual void process(Aircraft&, std::string&) = 0;
 
     /**
      * parse GPRMC
@@ -67,7 +67,7 @@ protected:
     /**
      * calculate nmea-data
      */
-    void calcPosInfo(Aircraft*);
+    void calcPosInfo(Aircraft&);
 
     /**
      * Number PI as precise as CPU can do

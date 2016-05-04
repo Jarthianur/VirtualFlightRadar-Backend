@@ -49,14 +49,13 @@ void VFRB::run(long double latitude, long double longitude,
 
         std::string str;
         unsigned int i;
-        Aircraft* ac;
 
         while (1) {
             ac_cont.invalidateAircrafts();
 
             for (i = 0; i < ac_cont.getContSize(); ++i) {
-                ac = ac_cont.getAircraft(i);
-                if (ac->aircraft_type == -1) {
+                Aircraft& ac = ac_cont.getAircraft(i);
+                if (ac.aircraft_type == -1) {
                     adsb_parser.process(ac, str);
                 } else {
                     ogn_parser.process(ac, str);
@@ -69,7 +68,7 @@ void VFRB::run(long double latitude, long double longitude,
             if (out_con.sendMsgOut(str) <= 0) {
                 out_con.closeClientIf();
             }
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
 
         adsb_in_thread.join();
@@ -100,7 +99,7 @@ void VFRB::handle_con_adsb(ConnectInADSB& adsb_con)
 
     while (adsb_con.connectIn() == -1) {
         std::cout << "waiting for adsb-server"<<std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
     }
     con_adsb_cond.notify_one();
 
@@ -112,7 +111,7 @@ void VFRB::handle_con_adsb(ConnectInADSB& adsb_con)
             adsb_con.close();
             adsb_con.setupConnectIn();
             std::cout << "waiting for adsb-server"<<std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
         con_adsb_cond.notify_one();
     }
@@ -125,7 +124,7 @@ void VFRB::handle_con_ogn(ConnectInOGN& ogn_con)
 
     while (ogn_con.connectIn() == -1) {
         std::cout << "waiting for ogn-server"<<std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
     }
     con_ogn_cond.notify_one();
 
@@ -136,8 +135,8 @@ void VFRB::handle_con_ogn(ConnectInOGN& ogn_con)
         while (ogn_con.connectIn() == -1) {
             ogn_con.close();
             ogn_con.setupConnectIn();
-            std::cout << "waiting for adsb-server"<<std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::cout << "waiting for ogn-server"<<std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
         con_ogn_cond.notify_one();
     }

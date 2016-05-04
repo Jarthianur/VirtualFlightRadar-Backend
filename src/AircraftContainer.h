@@ -18,29 +18,23 @@ class AircraftContainer
 {
 public:
     AircraftContainer();
-    virtual ~AircraftContainer();
+    virtual ~AircraftContainer() throw();
 
     /**
-     * All methods in this class are threadsafe and exceptionsafe!
+     * All methods in this class are threadsafe
      */
-
-    /**
-     * search aircraft in container by given id.
-     * if id is found returns index,
-     * else returns -1.
-     */
-    int find(std::string&);
 
     /**
      * insert aircraft in container
      */
-    void pushAircraft(Aircraft*);
+    void insertAircraft(long double, long double, int, std::string&);
+    void insertAircraft(long double, long double, int, std::string&, int, int, int, int, float);
 
     /**
      * returns pointer, to aircraft, at index i,
      * if index i is valid, else nullpointer.
      */
-    Aircraft* getAircraft(unsigned int i);
+    Aircraft& getAircraft(unsigned int i);
 
     /**
      * increments all aircrafts's valid counter in container.
@@ -60,8 +54,15 @@ public:
     void clear();
 
 private:
+    /**
+     * search aircraft in container by given id.
+     * if id is found returns index,
+     * else returns -1.
+     */
+    int find(std::string&);
+
     std::mutex mutex;
-    std::vector<Aircraft*> cont;
+    std::vector<Aircraft> cont;
 };
 
 #endif /* AIRCRAFTCONTAINER_H_ */

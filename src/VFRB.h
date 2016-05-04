@@ -13,10 +13,12 @@
 #include "ConnectInOGN.h"
 #include "AircraftContainer.h"
 
+#define SYNC_TIME 1
+
 class VFRB {
 public:
     VFRB();
-    virtual ~VFRB();
+    virtual ~VFRB() throw();
 
     /**
      * runs the tool

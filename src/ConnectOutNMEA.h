@@ -17,7 +17,7 @@ class ConnectOutNMEA
 {
 public:
     ConnectOutNMEA(const int);
-    virtual ~ConnectOutNMEA();
+    virtual ~ConnectOutNMEA() throw();
 
     /**
      * (all) methods are threadsafe.

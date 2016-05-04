@@ -16,10 +16,10 @@ class ParserOGN: public Parser
 {
 public:
     ParserOGN(long double, long double, int);
-    virtual ~ParserOGN();
+    virtual ~ParserOGN() throw();
 
     int unpack(const std::string&, AircraftContainer&);
-    void process(Aircraft*, std::string&);
+    void process(Aircraft&, std::string&);
 
 private:
     void splitToTokens(const std::string&);
@@ -37,7 +37,9 @@ private:
     std::vector<std::string> tokens;
     std::string comment;
     std::string id;
-    int addr_t, ac_t, climb_r;
+    int addr_t, ac_t, climb_r, alt, gnd_spd;
+    long double lat, lon;
+    float heading;
 };
 
 #endif /* PARSEROGN_H_ */

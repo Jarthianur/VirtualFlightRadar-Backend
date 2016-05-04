@@ -7,10 +7,10 @@ class ParserADSB : public Parser
 {
 public:
     ParserADSB(long double, long double, int);
-    virtual ~ParserADSB();
+    virtual ~ParserADSB() throw();
 
     int unpack(const std::string&, AircraftContainer&);
-    void process(Aircraft*, std::string&);
+    void process(Aircraft&, std::string&);
 
 private:
     std::string id;

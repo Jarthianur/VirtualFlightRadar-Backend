@@ -7,7 +7,7 @@ class ConnectInADSB : public ConnectIn
 {
 public:
    ConnectInADSB(const char*, const int);
-   virtual ~ConnectInADSB();
+   virtual ~ConnectInADSB() throw();
 
    int setupConnectIn();
    int connectIn();

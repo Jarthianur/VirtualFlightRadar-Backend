@@ -14,7 +14,7 @@ class ConnectInOGN: public ConnectIn
 {
 public:
    ConnectInOGN(const char*, const int, const char*, const char*);
-   virtual ~ConnectInOGN();
+   virtual ~ConnectInOGN() throw();
 
    int setupConnectIn();
    int connectIn();

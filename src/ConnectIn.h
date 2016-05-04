@@ -22,7 +22,7 @@ public:
      * constructor with host,port
      */
     ConnectIn(const char*, const int);
-    virtual ~ConnectIn();
+    virtual ~ConnectIn() throw();
 
     /**
      * setup input socket

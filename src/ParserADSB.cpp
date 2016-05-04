@@ -56,37 +56,25 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
         i++;
         msg.erase(0,delim+1);
     }
-    Aircraft* ac;
-    if ((i = ac_cont.find(id)) == -1) {
-        ac = new Aircraft();
-        ac->id = id;
-    } else {
-        ac = ac_cont.getAircraft(i);
-        ac->valid = 0;
-    }
-    ac->latitude = lat;
-    ac->longitude = lon;
-    ac->altitude = alt;
-    ac->aircraft_type = -1;
-    if (i == -1) ac_cont.pushAircraft(ac);
+    ac_cont.insertAircraft(lat, lon, alt, id);
     return 0;
 }
 
-void ParserADSB::process(Aircraft* ac, std::string& nmea_str)
+void ParserADSB::process(Aircraft& ac, std::string& nmea_str)
 {
     calcPosInfo(ac);
     nmea_str.clear();
 
     //PFLAU
     snprintf(buffer, BUFF_OUT_S, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", ldToI(bearing_rel),
-            ldToI(rel_V), ldToI(dist), ac->id.c_str());
+            ldToI(rel_V), ldToI(dist), ac.id.c_str());
     int csum = checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, LESS_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
     //PFLAA
     snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", ldToI(rel_N),
-            ldToI(rel_E), ldToI(rel_V), ac->id.c_str());
+            ldToI(rel_E), ldToI(rel_V), ac.id.c_str());
     csum = checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, LESS_BUFF_S, "%02x\r\n", csum);

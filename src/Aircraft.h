@@ -14,7 +14,9 @@ class Aircraft
 {
 public:
     Aircraft();
-    virtual ~Aircraft();
+    Aircraft(std::string&, long double, long double, int);
+    Aircraft(std::string&, long double, long double, int, float, int, int, int, int);
+    virtual ~Aircraft() throw();
 
     /**
      * self explanatory
