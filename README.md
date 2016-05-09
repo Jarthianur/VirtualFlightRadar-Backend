@@ -21,7 +21,7 @@ Contributions are always welcome.
 I'm a not that experienced C++ developer, especially not in therms of multithreading, but always keep learning.
 
 Status quo:
-Version 1.0.0-Beta
+Version 1.1.0-Beta
 All minimal goals are reached. The project is ready to be demonstrated and tested live.
 
 
@@ -29,13 +29,14 @@ Open issues::
 
 high priority:
 
-- improve threadsafety, termination handling
-- usefull log output
+- config file support
+- faster container for aircrafts
+- internal filters
 
 low priority:
 
-- multi client support
-- implement faster container for aircrafts (kind of HashMap)
+- multi client support/ client-lock
+
 
  
   
