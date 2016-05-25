@@ -66,7 +66,7 @@ protected:
      */
     struct hostent* in_host_info;
     struct sockaddr_in in_addr;
-    int in_sock;
+    int in_sock = 0;
     const char* in_hostname;
     const int in_port;
 

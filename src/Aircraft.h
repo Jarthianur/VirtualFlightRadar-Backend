@@ -13,7 +13,6 @@
 class Aircraft
 {
 public:
-    Aircraft();
     Aircraft(std::string&, long double, long double, int);
     Aircraft(std::string&, long double, long double, int, float, int, int, int, int);
     virtual ~Aircraft() throw();
@@ -25,14 +24,14 @@ public:
     long double latitude;
     long double longitude;
     int altitude;
-    float heading;
-    int gnd_speed;
-    int addr_type;
+    float heading = 0.0;
+    int gnd_speed = 0;
+    int addr_type = 0;
     //illegal ac_type == -1 used for check extended data
-    int aircraft_type;
-    int climb_rate;
+    int aircraft_type = -1;
+    int climb_rate = 0;
     //0 = valid; +x(cycles) = invalid
-    int valid;
+    int valid = 0;
 
 };
 

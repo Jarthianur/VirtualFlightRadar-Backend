@@ -14,9 +14,7 @@
 #include <stdexcept>
 
 ConnectIn::ConnectIn(const char* hostname, const int port)
-: response(""),
-  linebuffer(""),
-  in_hostname(hostname),
+: in_hostname(hostname),
   in_port(port)
 {
    memset(buffer,0,sizeof(buffer));
