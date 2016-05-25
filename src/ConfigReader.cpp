@@ -23,18 +23,17 @@ void ConfigReader::read()
    while (!src.eof()) {
       src >> key;
       src >> value;
-      std::cout << key << '=' << value << std::endl;
       config.insert({key, value});
    }
    src.close();
 }
 
-const char* ConfigReader::getProperty(const char* key, const char* defaultValue) const
+std::string ConfigReader::getProperty(const char* key, const char* defaultValue) const
 {
     auto it = config.find(key);
     if (it == config.end()) {
-        return defaultValue;
+        return std::string(defaultValue);
     } else {
-        return it->second.c_str();
+        return it->second;
     }
 }

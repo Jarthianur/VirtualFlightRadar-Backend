@@ -40,6 +40,7 @@ public:
 
     /**
      * parse GPGGA
+     * !! call this method only direct after a gprmc call !!
      */
     void gpgga(std::string&);
 

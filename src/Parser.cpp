@@ -93,22 +93,12 @@ void Parser::gprmc(std::string& nmea_str)
 }
 
 void Parser::gpgga(std::string& nmea_str)
-//GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*68
-{//$GPGGA,UTC,Lat,N/S,Lon,E/W,1,05,1,Alt(above MSL),M,Geoid separation,M,,*checksum
-   //$GPGGA,191410,4735.5634,N,00739.3538,E,1,04,4.4,351.5,M,48.0,M,,*45
+{
    nmea_str.clear();
    int csum;
-
-   latstr = (baselat < 0)? 'S' : 'N';
-   longstr = (baselong < 0)? 'W' : 'E';
-   lat_deg = std::abs(std::floor(baselat));
-   lat_min = std::abs(60.0L * (baselat - lat_deg));
-   long_deg = std::abs(std::floor(baselong));
-   long_min = std::abs(60.0L * (baselong - long_deg));
-
    time_t now = time(0);
    tm* utc = gmtime(&now);
-   snprintf(buffer, BUFF_OUT_S, "$GPGGA,%02d%02d%02d,%02.0Lf%05.4Lf,%c,%03.0Lf%05.4Lf,%c,1,05,1,%d,M,%.1f,M,,*",
+   snprintf(buffer, BUFF_OUT_S, "$GPGGA,%02d%02d%02d,%02.0Lf%06.4Lf,%c,%03.0Lf%07.4Lf,%c,1,05,1,%d,M,%.1f,M,,*",
          utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg, long_min, longstr, basealt, basegeoid);
    csum = checksum(buffer);
    nmea_str.append(buffer);

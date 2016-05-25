@@ -19,7 +19,7 @@ public:
    inline virtual ~ConfigReader() throw() {};
 
    void read();
-   const char* getProperty(const char*, const char*) const;
+   std::string getProperty(const char*, const char*) const;
 
 private:
    const char* file;

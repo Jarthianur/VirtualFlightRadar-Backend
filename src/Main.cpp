@@ -16,7 +16,6 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-   //call: ./Flugleitertool 49.665263 9.003075 110 4353 14580 30003 localhost localhost D5234 12772
 
    long double latitude;
    long double longitude;
@@ -25,10 +24,10 @@ int main(int argc, char* argv[]) {
    int out_port;
    int ogn_port;
    int adsb_port;
-   const char* ogn_host;
-   const char* adsb_host;
-   const char* user;
-   static const char* pass;
+   std::string ogn_host;
+   std::string adsb_host;
+   std::string user;
+   std::string pass;
 
    if (argc == 3) {
       ConfigReader cr(argv[2]);
@@ -62,8 +61,7 @@ int main(int argc, char* argv[]) {
       return 0;
    }
 
-   //VFRB::run(latitude, longitude, altitude, out_port, ogn_port, adsb_port, ogn_host.c_str(), adsb_host.c_str(), user.c_str(), pass.c_str());
-   VFRB::run();
+   VFRB::run(latitude, longitude, altitude, geoid, out_port, ogn_port, adsb_port, ogn_host.c_str(), adsb_host.c_str(), user.c_str(), pass.c_str());
 
    return 0;
 }
