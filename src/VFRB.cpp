@@ -27,9 +27,9 @@ VFRB::~VFRB()
 {
 }
 
-void VFRB::run(long double latitude, long double longitude,
+void VFRB::run(/*long double latitude, long double longitude,
         int altitude, int out_port,  int ogn_port,  int adsb_port,
-        const char* ogn_host, const char* adsb_host, const char* user, const char* pass)
+        const char* ogn_host, const char* adsb_host, const char* user, const char* pass*/)
 {
     ConnectOutNMEA out_con(out_port);
     ConnectInADSB adsb_con(adsb_host, adsb_port);
@@ -37,8 +37,8 @@ void VFRB::run(long double latitude, long double longitude,
     AircraftContainer ac_cont;
 
     try{
-        std::thread adsb_in_thread(handle_adsb_in, latitude, longitude, altitude, std::ref(adsb_con), std::ref(ac_cont));
-        std::thread ogn_in_thread(handle_ogn_in, latitude, longitude, altitude, std::ref(ogn_con), std::ref(ac_cont));
+        std::thread adsb_in_thread(handle_adsb_in, /*latitude, longitude, altitude,*/ std::ref(adsb_con), std::ref(ac_cont));
+        std::thread ogn_in_thread(handle_ogn_in, /*latitude, longitude, altitude,*/ std::ref(ogn_con), std::ref(ac_cont));
 
         std::thread con_out_thread(handle_con_out, std::ref(out_con));
         std::thread con_adsb_thread(handle_con_adsb, std::ref(adsb_con));
@@ -143,7 +143,7 @@ void VFRB::handle_con_ogn(ConnectInOGN& ogn_con)
     return;
 }
 
-void VFRB::handle_adsb_in(long double latitude, long double longitude, int altitude, ConnectInADSB& adsb_con, AircraftContainer& ac_cont)
+void VFRB::handle_adsb_in(/*long double latitude, long double longitude, int altitude,*/ ConnectInADSB& adsb_con, AircraftContainer& ac_cont)
 {
     ParserADSB parser(latitude, longitude, altitude);
     std::unique_lock<std::mutex> lock(mutex);
@@ -168,7 +168,7 @@ void VFRB::handle_adsb_in(long double latitude, long double longitude, int altit
     return;
 }
 
-void VFRB::handle_ogn_in(long double latitude, long double longitude, int altitude, ConnectInOGN& ogn_con, AircraftContainer& ac_cont)
+void VFRB::handle_ogn_in(/*long double latitude, long double longitude, int altitude,*/ ConnectInOGN& ogn_con, AircraftContainer& ac_cont)
 {
     ParserOGN parser(latitude, longitude, altitude);
     std::unique_lock<std::mutex> lock(mutex);
