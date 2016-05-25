@@ -6,7 +6,7 @@
 class ParserADSB : public Parser
 {
 public:
-    ParserADSB(long double, long double, int);
+    ParserADSB(long double, long double, int, float);
     virtual ~ParserADSB() throw();
 
     int unpack(const std::string&, AircraftContainer&);

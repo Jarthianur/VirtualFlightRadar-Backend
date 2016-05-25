@@ -15,7 +15,7 @@
 class ParserOGN: public Parser
 {
 public:
-    ParserOGN(long double, long double, int);
+    ParserOGN(long double, long double, int, float);
     virtual ~ParserOGN() throw();
 
     int unpack(const std::string&, AircraftContainer&);

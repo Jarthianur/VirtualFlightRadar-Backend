@@ -11,8 +11,8 @@
 #include <ctime>
 #include <sstream>
 
-ParserOGN::ParserOGN(long double b_lat, long double b_long, int b_alt)
-: Parser(b_lat, b_long, b_alt),
+ParserOGN::ParserOGN(long double b_lat, long double b_long, int b_alt, float geo)
+: Parser(b_lat, b_long, b_alt, geo),
   aprs_re("(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S)(\\\\|/)(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s(.*)"),
   addr_re("id(\\S{2})(\\S{6})"),
   climb_re("([\\+|-]\\d+)fpm")

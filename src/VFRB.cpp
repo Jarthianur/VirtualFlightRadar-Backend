@@ -44,8 +44,8 @@ void VFRB::run(/*long double latitude, long double longitude,
         std::thread con_adsb_thread(handle_con_adsb, std::ref(adsb_con));
         std::thread con_ogn_thread(handle_con_ogn, std::ref(ogn_con));
 
-        ParserADSB adsb_parser(latitude, longitude, altitude);
-        ParserOGN ogn_parser(latitude, longitude, altitude);
+        ParserADSB adsb_parser(latitude, longitude, altitude, geoid);
+        ParserOGN ogn_parser(latitude, longitude, altitude, geoid);
 
         std::string str;
         unsigned int i;
@@ -145,7 +145,7 @@ void VFRB::handle_con_ogn(ConnectInOGN& ogn_con)
 
 void VFRB::handle_adsb_in(/*long double latitude, long double longitude, int altitude,*/ ConnectInADSB& adsb_con, AircraftContainer& ac_cont)
 {
-    ParserADSB parser(latitude, longitude, altitude);
+    ParserADSB parser(latitude, longitude, altitude, geoid);
     std::unique_lock<std::mutex> lock(mutex);
     con_adsb_cond.wait(lock);
     lock.unlock();
@@ -170,7 +170,7 @@ void VFRB::handle_adsb_in(/*long double latitude, long double longitude, int alt
 
 void VFRB::handle_ogn_in(/*long double latitude, long double longitude, int altitude,*/ ConnectInOGN& ogn_con, AircraftContainer& ac_cont)
 {
-    ParserOGN parser(latitude, longitude, altitude);
+    ParserOGN parser(latitude, longitude, altitude, geoid);
     std::unique_lock<std::mutex> lock(mutex);
     con_ogn_cond.wait(lock);
     lock.unlock();

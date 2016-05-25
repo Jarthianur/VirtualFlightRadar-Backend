@@ -6,6 +6,7 @@
 CPP_SRCS += \
 ../src/Aircraft.cpp \
 ../src/AircraftContainer.cpp \
+../src/ConfigReader.cpp \
 ../src/ConnectIn.cpp \
 ../src/ConnectInADSB.cpp \
 ../src/ConnectInOGN.cpp \
@@ -19,6 +20,7 @@ CPP_SRCS += \
 OBJS += \
 ./src/Aircraft.o \
 ./src/AircraftContainer.o \
+./src/ConfigReader.o \
 ./src/ConnectIn.o \
 ./src/ConnectInADSB.o \
 ./src/ConnectInOGN.o \
@@ -32,6 +34,7 @@ OBJS += \
 CPP_DEPS += \
 ./src/Aircraft.d \
 ./src/AircraftContainer.d \
+./src/ConfigReader.d \
 ./src/ConnectIn.d \
 ./src/ConnectInADSB.d \
 ./src/ConnectInOGN.d \

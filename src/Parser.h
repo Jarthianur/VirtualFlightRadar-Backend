@@ -18,7 +18,7 @@
 class Parser
 {
 public:
-    Parser(long double, long double, int);
+    Parser(long double, long double, int, float);
     virtual ~Parser() throw();
 
     /**
@@ -37,6 +37,11 @@ public:
      * parse GPRMC
      */
     void gprmc(std::string&);
+
+    /**
+     * parse GPGGA
+     */
+    void gpgga(std::string&);
 
 protected:
     /**
@@ -134,7 +139,10 @@ protected:
      * Longitude: W - E
      */
     char latstr, longstr;
-
+    /**
+     * geoid separation
+     */
+    float basegeoid;
 };
 
 #endif /* PARSER_H_ */

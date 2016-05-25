@@ -3,8 +3,8 @@
 #include <ctime>
 #include "ParserADSB.h"
 
-ParserADSB::ParserADSB(long double b_lat, long double b_long, int b_alt)
-: Parser(b_lat, b_long, b_alt)
+ParserADSB::ParserADSB(long double b_lat, long double b_long, int b_alt, float geo)
+: Parser(b_lat, b_long, b_alt, geo)
 {
 }
 
