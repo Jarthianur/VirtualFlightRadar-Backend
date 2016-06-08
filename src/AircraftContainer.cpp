@@ -19,13 +19,12 @@ AircraftContainer::~AircraftContainer()
 
 int AircraftContainer::find(std::string& id)
 {
-    unsigned int i;
-    for (i = 0; i < cont.size(); ++i) {
-        if (cont.at(i).id.compare(id) == 0) {
-            return i;
-        }
+    const auto it = index_map.find(id);
+    if (it == index_map.end()) {
+        return -1;
+    } else {
+        return it->second;
     }
-    return -1;
 }
 
 void AircraftContainer::invalidateAircrafts()
@@ -35,6 +34,7 @@ void AircraftContainer::invalidateAircrafts()
     int size = cont.size();
     for (i = 0; i < size; ++i) {
         if (++(cont.at(i).valid) >= INVALIDATE) {
+            index_map.erase(index_map.find(cont.at(i).id));
             cont.erase(cont.begin() + i);
             size--;
         }
@@ -62,6 +62,7 @@ void AircraftContainer::insertAircraft(long double lat, long double lon,
         Aircraft ac(id, lat, lon, alt);
         ac.aircraft_type = -1;
         cont.push_back(ac);
+        index_map.insert({id,cont.size()-1});
     } else {
         Aircraft& ac = getAircraft(i);
         ac.latitude = lat;
@@ -82,6 +83,7 @@ void AircraftContainer::insertAircraft(long double lat, long double lon,
     if ((i = find(id)) == -1) {
         Aircraft ac(id, lat, lon, alt, heading, gnd_spd, addr_t, ac_t, climb_r);
         cont.push_back(ac);
+        index_map.insert({id,cont.size()-1});
     } else {
         Aircraft& ac = getAircraft(i);
         ac.latitude = lat;
@@ -101,5 +103,6 @@ void AircraftContainer::clear()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     cont.clear();
+    index_map.clear();
     return;
 }

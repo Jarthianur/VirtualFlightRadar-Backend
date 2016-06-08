@@ -11,6 +11,7 @@
 #include "Aircraft.h"
 #include <mutex>
 #include <vector>
+#include <unordered_map>
 
 #define INVALIDATE 4
 
@@ -39,7 +40,7 @@ public:
     /**
      * increments all aircrafts's valid counter in container.
      * if valid counter is >= INVALIDATE, the aircraft is deleted from
-     * container and it's memory is deallocated.
+     * container
      */
     void invalidateAircrafts();
 
@@ -62,7 +63,17 @@ private:
     int find(std::string&);
 
     std::mutex mutex;
+
+    /**
+     * Container that holds Aircrafts
+     */
     std::vector<Aircraft> cont;
+
+    /**
+     * Map to manage indices of Aircrafts.
+     * This makes find-method much more efficient.
+     */
+    std::unordered_map<std::string,int> index_map;
 };
 
 #endif /* AIRCRAFTCONTAINER_H_ */
