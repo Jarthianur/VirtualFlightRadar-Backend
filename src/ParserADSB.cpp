@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <ctime>
 #include "ParserADSB.h"
+#include "VFRB.h"
 
 ParserADSB::ParserADSB(long double b_lat, long double b_long, int b_alt, float geo)
 : Parser(b_lat, b_long, b_alt, geo)
@@ -32,6 +33,7 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
             case 11:
                 if (msg.substr(0,delim).length() > 0)
                     alt = std::stoi(msg.substr(0,delim), nullptr);
+                    if (alt > VFRB::filter_maxHeight) return -1;
                 else  {
                     return -1;
                 }

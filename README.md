@@ -18,25 +18,13 @@ There you also get all recommended guides and required software.
 
 Contributions are always welcome.
 
-I'm a not that experienced C++ developer, especially not in therms of multithreading, but always keep learning.
-
 Status quo:
 Version 1.1.0-Beta
 All minimal goals are reached. The project is ready to be demonstrated and tested live.
 
-
-Open issues::
-
-high priority:
-
-- config file support
-- faster container for aircrafts
-- internal filters
-
-low priority:
-
-- multi client support/ client-lock
+As an additional information, this project is configured as an eclipseCDT executable project.
 
 
- 
+
+
   

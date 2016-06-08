@@ -6,6 +6,7 @@
  */
 
 #include "ParserOGN.h"
+#include "VFRB.h"
 #include <cmath>
 #include <cstdio>
 #include <ctime>
@@ -36,6 +37,10 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
             if (match.str(13).size() > 0) comment = match.str(13);
             else return -1;
 
+            //altitude
+            if (match.str(12).size() > 0) alt = ldToI(std::stold(match.str(12)));
+            if (alt > VFRB::filter_maxHeight) return -1;
+
             // climbrate / address
             splitToTokens(comment);
             for (std::string part : tokens) {
@@ -65,9 +70,6 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 heading = 0;
                 gnd_spd = 0;
             }
-
-            //altitude initial 0, or not changed
-            if (match.str(12).size() > 0) alt = ldToI(std::stold(match.str(12)));
 
             ac_cont.insertAircraft(lat, lon, alt, id, addr_t, ac_t, climb_r, gnd_spd, heading);
         } else {

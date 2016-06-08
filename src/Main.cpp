@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
    std::string adsb_host;
    std::string user;
    std::string pass;
+   int maxHeight;
 
    if (argc == 3) {
       ConfigReader cr(argv[2]);
@@ -43,25 +44,25 @@ int main(int argc, char* argv[]) {
       adsb_host = cr.getProperty("adsbhost", "localhost");
       user = cr.getProperty("user", "xxxxx");
       pass = cr.getProperty("pass", "yyyyy");
-   } else if (argc == 12) {
-      latitude = stold(argv[1]);
-      longitude = stold(argv[2]);
-      altitude = stoi(argv[3]);
-      geoid = stod(argv[4]);
-      out_port = stoi(argv[5]);
-      ogn_port = stoi(argv[6]);
-      adsb_port = stoi(argv[7]);
-      ogn_host = argv[8];
-      adsb_host = argv[9];
-      user = argv[10];
-      pass = argv[11];
+      maxHeight = stoi(cr.getProperty("maxHeight", "9999999"));
    } else {
-      cout << "usage: ./VirtualFlightRadar-Backend lat long alt geoid out_port ogn_port adsb_port ogn_host adsb_host user pass"<< endl;
-      cout << "or: ./VirtualFlightRadar-Backend -c pathToConfigFile" << endl;
-      return 0;
+      cout << "usage: ./VirtualFlightRadar-Backend -c pathToConfigFile"<< endl;
+      return 1;
    }
 
-   VFRB::run(latitude, longitude, altitude, geoid, out_port, ogn_port, adsb_port, ogn_host.c_str(), adsb_host.c_str(), user.c_str(), pass.c_str());
+   VFRB::base_altitude = altitude;    cout<<VFRB::base_altitude<<endl;
+   VFRB::base_latitude = latitude;
+   VFRB::base_longitude = longitude;
+   VFRB::base_geoid = geoid;
+   VFRB::global_out_port = out_port;
+   VFRB::global_ogn_port = ogn_port;
+   VFRB::global_adsb_port = adsb_port;
+   VFRB::global_ogn_host = ogn_host;
+   VFRB::global_adsb_host = adsb_host;
+   VFRB::global_user = user;
+   VFRB::global_pass = pass;
+   VFRB::filter_maxHeight = maxHeight;
+   VFRB::run();
 
    return 0;
 }
