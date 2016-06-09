@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
       return 1;
    }
 
-   VFRB::base_altitude = altitude;    cout<<VFRB::base_altitude<<endl;
+   VFRB::base_altitude = altitude;
    VFRB::base_latitude = latitude;
    VFRB::base_longitude = longitude;
    VFRB::base_geoid = geoid;

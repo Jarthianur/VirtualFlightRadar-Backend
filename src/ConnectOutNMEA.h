@@ -8,10 +8,13 @@
 #ifndef CONNECTOUTNMEA_H_
 #define CONNECTOUTNMEA_H_
 
+#include "Connection.h"
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <string>
+#include <vector>
 #include <mutex>
+
+#define MAX_CLIENTS 4
 
 class ConnectOutNMEA
 {
@@ -24,12 +27,14 @@ public:
      */
 
     /**
-     * create output socket and wait for client to connect
+     * create output socket and listen to it
      */
     int listenOut();
 
     /**
-     * wait for client to connect
+     * wait for client to connect.
+     * if MAX_CLIENTS connections are open, return -1,
+     * else 0.
      * not threadsafe!
      */
     int connectClient();
@@ -39,10 +44,12 @@ public:
      */
     void close();
 
-    void closeClientIf();
+    void closeClient(Connection&);
 
     /**
-     * send msg to client socket
+     * broadcast msg to all clients.
+     * if a client is off, it will be removed and closed.
+     * returns number of active clients.
      */
     int sendMsgOut(std::string&);
 
@@ -57,20 +64,10 @@ private:
     int no = 0;
 
     /**
-     * client address
+     * client, output connection
      */
-    struct sockaddr_in xcs_cli_addr;
-
-    /**
-     * nmea-out address
-     */
-    struct sockaddr_in nmea_out_addr;
-
-    /**
-     * client, output sockets
-     */
-    int nmea_out_sock;
-    int xcs_cli_sock;
+    Connection nmea_out;
+    std::vector<Connection> clients;
 
     /**
      * output port

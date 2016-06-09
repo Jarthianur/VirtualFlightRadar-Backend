@@ -71,18 +71,13 @@ void VFRB::run()
                 } else {
                     ogn_parser.process(ac, str);
                 }
-                if (out_con.sendMsgOut(str) <= 0) {
-                    out_con.closeClientIf();
-                }
+                out_con.sendMsgOut(str);
             }
             adsb_parser.gprmc(str);
-            if (out_con.sendMsgOut(str) <= 0) {
-                out_con.closeClientIf();
-            }
+            int c = out_con.sendMsgOut(str);
             adsb_parser.gpgga(str);
-            if (out_con.sendMsgOut(str) <= 0) {
-                out_con.closeClientIf();
-            }
+            out_con.sendMsgOut(str);
+            //std::cout << "clients: " << c << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
 
@@ -93,7 +88,7 @@ void VFRB::run()
         con_ogn_thread.join();
 
     } catch (std::exception& e) {
-        std::cout << "ERROR: " << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
         return;
     }
     return;
