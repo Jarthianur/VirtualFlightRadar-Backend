@@ -12,6 +12,7 @@
 #include "ConnectInADSB.h"
 #include "ConnectInOGN.h"
 #include "AircraftContainer.h"
+#include "NMEAFeedW.h"
 
 #define SYNC_TIME 1
 
@@ -38,7 +39,10 @@ public:
     static std::string global_adsb_host;
     static std::string global_user;
     static std::string global_pass;
+    static std::string global_nmea_feed_host;
+    static int global_nmea_feed_port;
     static int filter_maxHeight;
+    //static int filter_maxDist;
 
 protected:
     /**
@@ -49,6 +53,7 @@ protected:
     static void handle_con_out(ConnectOutNMEA&);
     static void handle_con_adsb(ConnectInADSB&);
     static void handle_con_ogn(ConnectInOGN&);
+    static void handle_nmea_feed(NMEAFeedW&, ConnectInADSB&, bool);
 };
 
 #endif /* VFRB_H_ */

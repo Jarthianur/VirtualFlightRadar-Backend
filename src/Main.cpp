@@ -28,7 +28,10 @@ int main(int argc, char* argv[]) {
    std::string adsb_host;
    std::string user;
    std::string pass;
+   std::string nmea_feed_host;
+   int nmea_feed_port;
    int maxHeight;
+   //int maxDist;
 
    if (argc == 3) {
       ConfigReader cr(argv[2]);
@@ -44,7 +47,10 @@ int main(int argc, char* argv[]) {
       adsb_host = cr.getProperty("adsbhost", "localhost");
       user = cr.getProperty("user", "xxxxx");
       pass = cr.getProperty("pass", "yyyyy");
+      nmea_feed_host = cr.getProperty("nmeaFeedHost", "nA");
+      nmea_feed_port = stoi(cr.getProperty("nmeaFeedPort","0"));
       maxHeight = stoi(cr.getProperty("maxHeight", "9999999"));
+      //maxDist = stoi(cr.getProperty("maxDist", "40000"));
    } else {
       cout << "usage: ./VirtualFlightRadar-Backend -c pathToConfigFile"<< endl;
       return 1;
@@ -61,7 +67,10 @@ int main(int argc, char* argv[]) {
    VFRB::global_adsb_host = adsb_host;
    VFRB::global_user = user;
    VFRB::global_pass = pass;
+   VFRB::global_nmea_feed_host = nmea_feed_host;
+   VFRB::global_nmea_feed_port = nmea_feed_port;
    VFRB::filter_maxHeight = maxHeight;
+   //VFRB::filter_maxDist = maxDist;
    VFRB::run();
 
    return 0;

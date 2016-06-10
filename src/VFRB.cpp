@@ -30,7 +30,10 @@ std::string VFRB::global_ogn_host = "";
 std::string VFRB::global_adsb_host = "";
 std::string VFRB::global_user = "";
 std::string VFRB::global_pass = "";
+std::string VFRB::global_nmea_feed_host = "nA";
+int VFRB::global_nmea_feed_port = 0;
 int VFRB::filter_maxHeight = 0;
+//int VFRB::filter_maxDist = 0;
 
 VFRB::VFRB()
 {
@@ -46,6 +49,12 @@ void VFRB::run()
     ConnectInADSB adsb_con(global_adsb_host.c_str(), global_adsb_port);
     ConnectInOGN ogn_con(global_ogn_host.c_str(), global_ogn_port, global_user.c_str(), global_pass.c_str());
     AircraftContainer ac_cont;
+    NMEAFeedW add_nmea_str;
+    ConnectInADSB con_nmea_feed(global_nmea_feed_host.c_str(), global_nmea_feed_port);//temporary hack
+    bool nmea_feed_enabled = false;
+    if (global_nmea_feed_host.compare("nA") != 0) {
+        nmea_feed_enabled = true;
+    }
 
     try{
         std::thread adsb_in_thread(handle_adsb_in, std::ref(adsb_con), std::ref(ac_cont));
@@ -54,6 +63,12 @@ void VFRB::run()
         std::thread con_out_thread(handle_con_out, std::ref(out_con));
         std::thread con_adsb_thread(handle_con_adsb, std::ref(adsb_con));
         std::thread con_ogn_thread(handle_con_ogn, std::ref(ogn_con));
+
+        std::thread nmea_feed_thread(handle_nmea_feed, std::ref(add_nmea_str), std::ref(con_nmea_feed), nmea_feed_enabled);
+
+        if (nmea_feed_enabled) {
+            std::cout << "nmea feed given on " << global_nmea_feed_host << ":" << global_nmea_feed_port << std::endl;
+        } else std::cout << "no nmea feed given" << std::endl;
 
         ParserADSB adsb_parser(base_latitude, base_longitude, base_altitude, base_geoid);
         ParserOGN ogn_parser(base_latitude, base_longitude, base_altitude, base_geoid);
@@ -65,6 +80,7 @@ void VFRB::run()
             ac_cont.invalidateAircrafts();
 
             for (i = 0; i < ac_cont.getContSize(); ++i) {
+                //this is actually a no-go, but works all write-occurences lock the container
                 Aircraft& ac = ac_cont.getAircraft(i);
                 if (ac.aircraft_type == -1) {
                     adsb_parser.process(ac, str);
@@ -74,10 +90,12 @@ void VFRB::run()
                 out_con.sendMsgOut(str);
             }
             adsb_parser.gprmc(str);
-            int c = out_con.sendMsgOut(str);
+            out_con.sendMsgOut(str);
             adsb_parser.gpgga(str);
             out_con.sendMsgOut(str);
-            //std::cout << "clients: " << c << std::endl;
+            if (nmea_feed_enabled) {
+                out_con.sendMsgOut(add_nmea_str.getNMEA());
+            }
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
 
@@ -86,12 +104,34 @@ void VFRB::run()
         con_out_thread.join();
         con_adsb_thread.join();
         con_ogn_thread.join();
+        nmea_feed_thread.join();
 
     } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
-        return;
+        std::terminate();
     }
     return;
+}
+
+void VFRB::handle_nmea_feed(NMEAFeedW& nmea_str, ConnectInADSB& nmea_con, bool enabled)
+{
+    if (enabled) {
+        if (nmea_con.setupConnectIn() == -1) return;
+        if (nmea_con.connectIn() == -1) return;
+        while(1) {
+            if (nmea_con.readLineIn(nmea_con.getInSock()) <= 0) {
+                while (nmea_con.connectIn() == -1) {
+                    nmea_con.close();
+                    nmea_con.setupConnectIn();
+                    std::cout << "waiting for nmea feed"<<std::endl;
+                    std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
+                }
+            } else {
+                nmea_str.writeNMEA(std::ref(nmea_con.getResponse()));
+            }
+        }
+    } else
+        return;
 }
 
 void VFRB::handle_con_out(ConnectOutNMEA& out_con)
