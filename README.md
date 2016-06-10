@@ -19,7 +19,7 @@ There you also get all recommended guides and required software.
 Contributions are always welcome.
 
 Status quo:
-Version 1.1.0-Beta
+Version 1.2.0-SNAPSHOT
 All minimal goals are reached. The project is ready to be demonstrated and tested live.
 
 As an additional information, this project is configured as an eclipseCDT executable project.
