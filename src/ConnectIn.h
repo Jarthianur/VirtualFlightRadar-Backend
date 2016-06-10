@@ -9,9 +9,9 @@
 #define CONNECTIN_H_
 
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <netdb.h>
 #include <string>
+#include "Connection.h"
 
 #define BUFF_S 4096
 
@@ -28,13 +28,13 @@ public:
      * setup input socket
      * returns 0 on success, -1 on failure.
      */
-    virtual int setupConnectIn() = 0;
+    virtual int setupConnectIn();
 
     /**
      * connect to input service/server
      * returns 0 on success, -1 on failure.
      */
-    virtual int connectIn() = 0;
+    virtual int connectIn();
 
     /**
      * close all sockets
@@ -44,14 +44,12 @@ public:
     /**
      * read line from input socket
      */
-    int readLineIn(int);
+    int readLineIn();
 
     /**
      * getters/setters
      */
     const std::string& getResponse() const;
-
-    int getInSock() const;
 
 protected:
     /**
@@ -65,8 +63,7 @@ protected:
      * input connection stuff
      */
     struct hostent* in_host_info;
-    struct sockaddr_in in_addr;
-    int in_sock = 0;
+    Connection in_con;
     const char* in_hostname;
     const int in_port;
 

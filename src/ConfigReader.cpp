@@ -6,26 +6,38 @@
  */
 
 #include "ConfigReader.h"
-
 #include <iostream>
 
 ConfigReader::ConfigReader(const char* filename)
-: file(filename)
+: file(filename),
+  conf_re("(.+)=([\\+|-]?.+)")
 {
 }
 
 void ConfigReader::read()
 {
-   std::ifstream src;
-   src.open(file);
-   std::string key;
-   std::string value;
-   while (!src.eof()) {
-      src >> key;
-      src >> value;
-      config.insert({key, value});
-   }
-   src.close();
+    std::ifstream src(file);
+    std::string key;
+    std::string value;
+    while (std::getline(src, key)) {
+        try {
+            std::smatch match;
+            if (std::regex_match(key, match, conf_re)) {
+                value = match.str(2);
+                key = match.str(1);
+                key.shrink_to_fit();
+                value.shrink_to_fit();
+                std::cout << key.c_str() << "__"<< value.c_str() << std::endl;
+                config.insert({key, value});
+            } else {
+                std::cout << "malformed config file!" << std::endl;
+                break;
+            }
+        } catch (std::regex_error& e) {
+            std::cout << e.what() << std::endl;
+            break;
+        }
+    }
 }
 
 std::string ConfigReader::getProperty(const char* key, const char* defaultValue) const

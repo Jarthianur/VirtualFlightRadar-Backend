@@ -26,8 +26,7 @@ int main(int argc, char* argv[]) {
    int adsb_port;
    std::string ogn_host;
    std::string adsb_host;
-   std::string user;
-   std::string pass;
+   std::string login;
    std::string nmea_feed_host;
    int nmea_feed_port;
    int maxHeight;
@@ -45,8 +44,7 @@ int main(int argc, char* argv[]) {
       adsb_port = stoi(cr.getProperty("adsbport","0"));
       ogn_host = cr.getProperty("ognhost", "localhost");
       adsb_host = cr.getProperty("adsbhost", "localhost");
-      user = cr.getProperty("user", "xxxxx");
-      pass = cr.getProperty("pass", "yyyyy");
+      login = cr.getProperty("login", "xxxxx");
       nmea_feed_host = cr.getProperty("nmeaFeedHost", "nA");
       nmea_feed_port = stoi(cr.getProperty("nmeaFeedPort","0"));
       maxHeight = stoi(cr.getProperty("maxHeight", "9999999"));
@@ -65,8 +63,7 @@ int main(int argc, char* argv[]) {
    VFRB::global_adsb_port = adsb_port;
    VFRB::global_ogn_host = ogn_host;
    VFRB::global_adsb_host = adsb_host;
-   VFRB::global_user = user;
-   VFRB::global_pass = pass;
+   VFRB::global_login_str = login;
    VFRB::global_nmea_feed_host = nmea_feed_host;
    VFRB::global_nmea_feed_port = nmea_feed_port;
    VFRB::filter_maxHeight = maxHeight;

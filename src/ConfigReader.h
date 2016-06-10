@@ -11,6 +11,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <string>
+#include <regex>
 
 class ConfigReader
 {
@@ -24,6 +25,7 @@ public:
 private:
    const char* file;
    std::unordered_map<std::string, std::string> config;
+   const std::regex conf_re;
 };
 
 #endif /* CONFIGREADER_H_ */
