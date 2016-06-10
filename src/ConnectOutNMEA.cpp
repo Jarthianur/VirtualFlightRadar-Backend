@@ -56,19 +56,17 @@ int ConnectOutNMEA::listenOut()
 
 int ConnectOutNMEA::connectClient()
 {
-    /*if (clients.size() >= MAX_CLIENTS) {
-        std::cout << "too many clients..."<< std::endl;
-        return -1;
-    }*/
     std::cout << "wait for client..."<< std::endl;
     unsigned int sin_s = sizeof(struct sockaddr);
     Connection client;
     client.con_sock = accept(nmea_out.con_sock, (struct sockaddr*)&client.con_addr, &sin_s);
-    if (client.con_sock == -1) {
+    if (client.con_sock == -1 || clients.size() >= MAX_CLIENTS) {
         std::cout << "Could not accept connection!" << std::endl;
+        return -1;
+    } else {
+        std::cout<< "connection from " << inet_ntoa(client.con_addr.sin_addr) <<std::endl;
+        clients.push_back(client);
     }
-    std::cout<< "connection from " << inet_ntoa(client.con_addr.sin_addr) <<std::endl;
-    clients.push_back(client);
     return 0;
 }
 

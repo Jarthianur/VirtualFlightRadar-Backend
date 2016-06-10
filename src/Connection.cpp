@@ -6,6 +6,7 @@
  */
 
 #include "Connection.h"
+#include <unistd.h>
 
 Connection::Connection()
 {
@@ -13,5 +14,9 @@ Connection::Connection()
 
 Connection::~Connection()
 {
+    if (con_sock != -1) {
+        close(con_sock);
+        con_sock = -1;
+    }
 }
 

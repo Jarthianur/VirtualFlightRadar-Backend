@@ -14,7 +14,7 @@
 #include <vector>
 #include <mutex>
 
-#define MAX_CLIENTS 4
+#define MAX_CLIENTS 5
 
 class ConnectOutNMEA
 {
