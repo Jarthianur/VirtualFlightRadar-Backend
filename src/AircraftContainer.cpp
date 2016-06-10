@@ -32,7 +32,7 @@ int AircraftContainer::find(std::string& id)
 void AircraftContainer::invalidateAircrafts()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    int i = 0, x = 0;
+    int i = 0;
     int size = cont.size();
     bool del = false;
 

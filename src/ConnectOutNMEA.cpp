@@ -11,7 +11,6 @@
 #include <iostream>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <stdexcept>
 
 ConnectOutNMEA::ConnectOutNMEA(const int out_port)
 : nmea_out_port(out_port)

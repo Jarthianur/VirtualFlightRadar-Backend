@@ -11,7 +11,6 @@
 #define BUFF_OUT_S 4096
 #define LESS_BUFF_S 128
 
-#include <string>
 #include "Aircraft.h"
 #include "AircraftContainer.h"
 
