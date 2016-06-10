@@ -62,6 +62,7 @@ int ConnectOutNMEA::connectClient()
     client.con_sock = accept(nmea_out.con_sock, (struct sockaddr*)&client.con_addr, &sin_s);
     if (client.con_sock == -1 || clients.size() >= MAX_CLIENTS) {
         std::cout << "Could not accept connection!" << std::endl;
+        ::close(client.con_sock);
         return -1;
     } else {
         std::cout<< "connection from " << inet_ntoa(client.con_addr.sin_addr) <<std::endl;
