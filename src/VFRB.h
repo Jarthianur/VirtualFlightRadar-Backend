@@ -14,6 +14,7 @@
 #include "NMEAFeedW.h"
 
 #define SYNC_TIME 1
+#define WAIT_TIME 3
 
 class VFRB {
 public:
@@ -46,12 +47,10 @@ protected:
     /**
      * funtions for every single thread
      */
-    static void handle_adsb_in(ConnectIn&, AircraftContainer&);
-    static void handle_ogn_in(ConnectInExt&, AircraftContainer&);
+    static void handle_adsb_in(AircraftContainer&);
+    static void handle_ogn_in(AircraftContainer&);
     static void handle_con_out(ConnectOutNMEA&);
-    static void handle_con_adsb(ConnectIn&);
-    static void handle_con_ogn(ConnectInExt&);
-    static void handle_nmea_feed(NMEAFeedW&, ConnectIn&, bool);
+    static void handle_nmea_feed(NMEAFeedW&, bool);
 };
 
 #endif /* VFRB_H_ */

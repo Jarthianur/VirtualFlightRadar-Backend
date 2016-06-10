@@ -26,14 +26,10 @@ ConnectIn::~ConnectIn()
 
 int ConnectIn::connectIn()
 {
-    std::cout << "connect to ... " << in_con.con_sock << std::endl;
-
     if (::connect(in_con.con_sock, (struct sockaddr*) &in_con.con_addr, sizeof(struct sockaddr)) == -1) {
         std::cout << "Could not connect to server!" << std::endl;
         return -1;
     }
-
-    std::cout << "connected to " << in_con.con_sock << std::endl;
     return 0;
 }
 
@@ -54,8 +50,6 @@ int ConnectIn::setupConnectIn()
     in_con.con_addr.sin_port = htons(in_port);
     in_con.con_addr.sin_addr = *((struct in_addr*) in_host_info->h_addr);
 
-    std::cout << "adsb port= " << ntohs(in_con.con_addr.sin_port) << std::endl;
-    std::cout << "adsb addr= " << inet_ntoa(in_con.con_addr.sin_addr) << std::endl;
     return 0;
 }
 

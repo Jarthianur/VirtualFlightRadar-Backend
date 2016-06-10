@@ -24,18 +24,13 @@ ConnectInExt::~ConnectInExt()
 
 int ConnectInExt::connectIn()
 {
-    std::cout << "connect to ogn ..." << std::endl;
-
     if (::connect(in_con.con_sock, (struct sockaddr*) &in_con.con_addr, sizeof(struct sockaddr)) == -1) {
         std::cout << "Could not connect to server!" << std::endl;
         return -1;
     }
-
     if (sendLogin() <= 0) {
         return -1;
     }
-
-    std::cout << "connected to OGN" << std::endl;
     return 0;
 }
 
@@ -60,16 +55,13 @@ int ConnectInExt::setupConnectIn()
     in_con.con_addr.sin_family = AF_INET;
     in_con.con_addr.sin_port = htons(in_port);
     in_con.con_addr.sin_addr = *((struct in_addr*) in_host_info->h_addr);
-
-    std::cout << "ogn port= " << ntohs(in_con.con_addr.sin_port) << std::endl;
-    std::cout << "ogn addr= " << inet_ntoa(in_con.con_addr.sin_addr) << std::endl;
     return 0;
 }
 
 int ConnectInExt::sendLogin()
 {
     //global ogn connect
-    login_str.append(" vers aprsc 2.0.18-ge7666c5 filter r/49.574325/9.395813/100");std::cout << "!!! global connect !!!" << std::endl;
+    //login_str.append(" vers aprsc 2.0.18-ge7666c5 filter r/49.574325/9.395813/100");std::cout << "!!! global connect !!!" << std::endl;
     login_str.append("\r\n");
     return send(in_con.con_sock, login_str.c_str(), login_str.length(), 0);
 }

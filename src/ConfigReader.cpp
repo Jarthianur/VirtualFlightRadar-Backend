@@ -21,6 +21,7 @@ void ConfigReader::read()
     std::string value;
     while (std::getline(src, key)) {
         try {
+            if (key.at(0) == '#') continue;
             std::smatch match;
             if (std::regex_match(key, match, conf_re)) {
                 value = match.str(2);
@@ -30,12 +31,13 @@ void ConfigReader::read()
                 std::cout << key.c_str() << "__"<< value.c_str() << std::endl;
                 config.insert({key, value});
             } else {
-                std::cout << "malformed config file!" << std::endl;
-                break;
+                std::cout << "malformed parameter!" << std::endl;
             }
         } catch (std::regex_error& e) {
             std::cout << e.what() << std::endl;
             break;
+        } catch (std::out_of_range& e) {
+            continue;
         }
     }
 }
