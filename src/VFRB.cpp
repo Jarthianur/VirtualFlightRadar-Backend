@@ -19,13 +19,16 @@ float VFRB::base_geoid = 0.0;
 int VFRB::global_out_port = 0;
 int VFRB::global_ogn_port = 0;
 int VFRB::global_adsb_port = 0;
-std::string VFRB::global_ogn_host = "";
-std::string VFRB::global_adsb_host = "";
+std::string VFRB::global_ogn_host = "nA";
+std::string VFRB::global_adsb_host = "nA";
 std::string VFRB::global_login_str = "";
 std::string VFRB::global_nmea_feed_host = "nA";
 int VFRB::global_nmea_feed_port = 0;
 int VFRB::filter_maxHeight = 0;
 //int VFRB::filter_maxDist = 0;
+bool VFRB::global_nmea_feed_enabled = false;
+bool VFRB::global_ogn_enabled = false;
+bool VFRB::global_adsb_enabled = false;
 
 VFRB::VFRB()
 {
@@ -40,16 +43,21 @@ void VFRB::run()
     ConnectOutNMEA out_con(global_out_port);
     AircraftContainer ac_cont;
     NMEAFeedW add_nmea_str;
-    bool nmea_feed_enabled = false;
-    if (global_nmea_feed_host.compare("nA") != 0) {
-        nmea_feed_enabled = true;
-    }
+    if (global_ogn_host.compare("nA") != 0 || global_ogn_host.length() == 0) {
+        global_ogn_enabled = true;
+    } else std::cout << "ogn not enabled" << std::endl;
+    if (global_adsb_host.compare("nA") != 0 || global_adsb_host.length() == 0) {
+        global_adsb_enabled = true;
+    } else std::cout << "adsb not enabled" << std::endl;
+    if (global_nmea_feed_host.compare("nA") != 0 || global_nmea_feed_host.length() == 0) {
+        global_nmea_feed_enabled = true;
+    } else std::cout << "nmea feed not enabled" << std::endl;
 
     try{
         std::thread adsb_in_thread(handle_adsb_in, std::ref(ac_cont));
         std::thread ogn_in_thread(handle_ogn_in, std::ref(ac_cont));
         std::thread con_out_thread(handle_con_out, std::ref(out_con));
-        std::thread nmea_feed_thread(handle_nmea_feed, std::ref(add_nmea_str), nmea_feed_enabled);
+        std::thread nmea_feed_thread(handle_nmea_feed, std::ref(add_nmea_str));
 
         ParserADSB adsb_parser(base_latitude, base_longitude, base_altitude, base_geoid);
         ParserOGN ogn_parser(base_latitude, base_longitude, base_altitude, base_geoid);
@@ -74,7 +82,7 @@ void VFRB::run()
             out_con.sendMsgOut(str);
             adsb_parser.gpgga(str);
             out_con.sendMsgOut(str);
-            if (nmea_feed_enabled) {
+            if (global_nmea_feed_enabled) {
                 out_con.sendMsgOut(add_nmea_str.getNMEA());
             }
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
@@ -92,9 +100,9 @@ void VFRB::run()
     return;
 }
 
-void VFRB::handle_nmea_feed(NMEAFeedW& nmea_str, bool enabled)
+void VFRB::handle_nmea_feed(NMEAFeedW& nmea_str)
 {
-    if (enabled) {
+    if (global_nmea_feed_enabled) {
         ConnectIn nmea_con(global_nmea_feed_host.c_str(), global_nmea_feed_port);
         if (nmea_con.setupConnectIn() == -1) return;
         while (nmea_con.connectIn() == -1) {
@@ -111,8 +119,8 @@ void VFRB::handle_nmea_feed(NMEAFeedW& nmea_str, bool enabled)
                 nmea_str.writeNMEA(std::ref(nmea_con.getResponse()));
             }
         }
-    } else
-        return;
+    }
+    return;
 }
 
 void VFRB::handle_con_out(ConnectOutNMEA& out_con)
@@ -126,53 +134,57 @@ void VFRB::handle_con_out(ConnectOutNMEA& out_con)
 
 void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
 {
-    ParserADSB parser(base_latitude, base_longitude, base_altitude, base_geoid);
-    ConnectIn adsb_con(global_adsb_host.c_str(), global_adsb_port);
+    if (global_adsb_enabled) {
+        ParserADSB parser(base_latitude, base_longitude, base_altitude, base_geoid);
+        ConnectIn adsb_con(global_adsb_host.c_str(), global_adsb_port);
 
-    if (adsb_con.setupConnectIn() == -1) return;
-    while (adsb_con.connectIn() == -1) {
-        std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-    }
+        if (adsb_con.setupConnectIn() == -1) return;
+        while (adsb_con.connectIn() == -1) {
+            std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
+        }
 
-    std::cout << "Scan for incoming adsb-msgs..." << std::endl;
+        std::cout << "Scan for incoming adsb-msgs..." << std::endl;
 
-    while (1) {
-        if (adsb_con.readLineIn() <= 0) {
-            do {
-                adsb_con.close();
-                adsb_con.setupConnectIn();
-                std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-            } while (adsb_con.connectIn() == -1);
-        } else
-            //need msg3 only
-            if (adsb_con.getResponse().at(4) == '3') {
-                parser.unpack(adsb_con.getResponse(), std::ref(ac_cont));
-            }
+        while (1) {
+            if (adsb_con.readLineIn() <= 0) {
+                do {
+                    adsb_con.close();
+                    adsb_con.setupConnectIn();
+                    std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
+                } while (adsb_con.connectIn() == -1);
+            } else
+                //need msg3 only
+                if (adsb_con.getResponse().at(4) == '3') {
+                    parser.unpack(adsb_con.getResponse(), std::ref(ac_cont));
+                }
+        }
     }
     return;
 }
 
 void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
 {
-    ParserOGN parser(base_latitude, base_longitude, base_altitude, base_geoid);
-    ConnectInExt ogn_con(global_ogn_host.c_str(), global_ogn_port, std::ref(global_login_str));
+    if (global_ogn_enabled) {
+        ParserOGN parser(base_latitude, base_longitude, base_altitude, base_geoid);
+        ConnectInExt ogn_con(global_ogn_host.c_str(), global_ogn_port, std::ref(global_login_str));
 
-    if (ogn_con.setupConnectIn() == -1) return;
-    while (ogn_con.connectIn() == -1) {
-        std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-    }
+        if (ogn_con.setupConnectIn() == -1) return;
+        while (ogn_con.connectIn() == -1) {
+            std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
+        }
 
-    std::cout << "Scan for incoming ogn-msgs..." << std::endl;
+        std::cout << "Scan for incoming ogn-msgs..." << std::endl;
 
-    while (1) {
-        if (ogn_con.readLineIn() <= 0) {
-            do {
-                ogn_con.close();
-                ogn_con.setupConnectIn();
-                std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-            } while (ogn_con.connectIn() == -1);
-        } else {
-            parser.unpack(ogn_con.getResponse(), std::ref(ac_cont));
+        while (1) {
+            if (ogn_con.readLineIn() <= 0) {
+                do {
+                    ogn_con.close();
+                    ogn_con.setupConnectIn();
+                    std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
+                } while (ogn_con.connectIn() == -1);
+            } else /*if (ogn_con.getResponse().at(0) != '#')*/ {
+                parser.unpack(ogn_con.getResponse(), std::ref(ac_cont));
+            }
         }
     }
     return;

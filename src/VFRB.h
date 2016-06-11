@@ -42,6 +42,9 @@ public:
     static int global_nmea_feed_port;
     static int filter_maxHeight;
     //static int filter_maxDist;
+    static bool global_nmea_feed_enabled;
+    static bool global_ogn_enabled;
+    static bool global_adsb_enabled;
 
 protected:
     /**
@@ -50,7 +53,7 @@ protected:
     static void handle_adsb_in(AircraftContainer&);
     static void handle_ogn_in(AircraftContainer&);
     static void handle_con_out(ConnectOutNMEA&);
-    static void handle_nmea_feed(NMEAFeedW&, bool);
+    static void handle_nmea_feed(NMEAFeedW&);
 };
 
 #endif /* VFRB_H_ */

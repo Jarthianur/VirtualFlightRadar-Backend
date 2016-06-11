@@ -10,7 +10,7 @@
 
 ConfigReader::ConfigReader(const char* filename)
 : file(filename),
-  conf_re("(.+)=([\\+|-]?.+)")
+  conf_re("(\\S+)(\\s+)?=(\\s+)?([\\+|-]?.+)")
 {
 }
 
@@ -24,14 +24,14 @@ void ConfigReader::read()
             if (key.at(0) == '#') continue;
             std::smatch match;
             if (std::regex_match(key, match, conf_re)) {
-                value = match.str(2);
                 key = match.str(1);
+                value = match.str(4);
                 key.shrink_to_fit();
                 value.shrink_to_fit();
-                std::cout << key.c_str() << "__"<< value.c_str() << std::endl;
+                std::cout << key.c_str() << "__"<< value << "__" << std::endl;
                 config.insert({key, value});
             } else {
-                std::cout << "malformed parameter!" << std::endl;
+                std::cout << "malformed parameter! " << key << std::endl;
             }
         } catch (std::regex_error& e) {
             std::cout << e.what() << std::endl;

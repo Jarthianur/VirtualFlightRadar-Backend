@@ -42,8 +42,8 @@ int main(int argc, char* argv[]) {
       out_port = stoi(cr.getProperty("outport","0"));
       ogn_port = stoi(cr.getProperty("ognport","0"));
       adsb_port = stoi(cr.getProperty("adsbport","0"));
-      ogn_host = cr.getProperty("ognhost", "localhost");
-      adsb_host = cr.getProperty("adsbhost", "localhost");
+      ogn_host = cr.getProperty("ognhost", "nA");
+      adsb_host = cr.getProperty("adsbhost", "nA");
       login = cr.getProperty("login", "xxxxx");
       nmea_feed_host = cr.getProperty("nmeaFeedHost", "nA");
       nmea_feed_port = stoi(cr.getProperty("nmeaFeedPort","0"));
