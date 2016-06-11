@@ -16,6 +16,7 @@ ConnectInExt::ConnectInExt(const char* ogn_host, int ogn_port, std::string& logi
 : ConnectIn(ogn_host, ogn_port),
   login_str(login)
 {
+    login_str.append("\r\n");
 }
 
 ConnectInExt::~ConnectInExt()
@@ -28,7 +29,7 @@ int ConnectInExt::connectIn()
         std::cout << "Could not connect to server!" << std::endl;
         return -1;
     }
-    if (sendLogin() <= 0) {
+    if (send(in_con.con_sock, login_str.c_str(), login_str.length(), 0) <= 0) {
         return -1;
     }
     return 0;
@@ -56,12 +57,4 @@ int ConnectInExt::setupConnectIn()
     in_con.con_addr.sin_port = htons(in_port);
     in_con.con_addr.sin_addr = *((struct in_addr*) in_host_info->h_addr);
     return 0;
-}
-
-int ConnectInExt::sendLogin()
-{
-    //global ogn connect
-    //login_str.append(" vers aprsc 2.0.18-ge7666c5 filter r/49.574325/9.395813/100");std::cout << "!!! global connect !!!" << std::endl;
-    login_str.append("\r\n");
-    return send(in_con.con_sock, login_str.c_str(), login_str.length(), 0);
 }
