@@ -23,7 +23,6 @@ private:
    /**
     * login stuff
     */
-   int sendLogin();
    std::string login_str;
 
    /**

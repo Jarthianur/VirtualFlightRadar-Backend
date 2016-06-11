@@ -31,10 +31,10 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 id = msg.substr(0,delim);
                 break;
             case 11:
-                if (msg.substr(0,delim).length() > 0)
+                if (msg.substr(0,delim).length() > 0) {
                     alt = std::stoi(msg.substr(0,delim), nullptr);
                     if (alt > VFRB::filter_maxHeight) return -1;
-                else  {
+                } else {
                     return -1;
                 }
                 break;
