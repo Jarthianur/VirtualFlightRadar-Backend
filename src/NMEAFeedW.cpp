@@ -26,6 +26,8 @@ std::string& NMEAFeedW::getNMEA()
 void NMEAFeedW::writeNMEA(const std::string& str)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    nmea_str = str;
+    if (str.substr(0,6).compare("$WIMWV") == 0) {
+        nmea_str = str;
+    }
     return;
 }
