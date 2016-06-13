@@ -20,7 +20,7 @@ Contributions are always welcome.
 
 Status quo:
 
-Version 1.2.3-SNAPSHOT
+Version 1.2.2
 
 As an additional information, this project is configured as an eclipseCDT executable project.
 
