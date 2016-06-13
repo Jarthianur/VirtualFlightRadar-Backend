@@ -57,6 +57,7 @@ void VFRB::run()
     ConnectOutNMEA out_con(global_out_port);
     AircraftContainer ac_cont;
     NMEAFeedW add_nmea_str;
+
     if (global_ogn_host.compare("nA") != 0 || global_ogn_host.length() == 0) {
         global_ogn_enabled = true;
     } else std::cout << "ogn not enabled" << std::endl;
@@ -83,19 +84,19 @@ void VFRB::run()
             ac_cont.invalidateAircrafts();
 
             for (i = 0; i < ac_cont.getContSize(); ++i) {
-                //this is actually a no-go, but works because all write-occurences lock the container
+                //this is actually a no-go, but works somehow
                 Aircraft& ac = ac_cont.getAircraft(i);
                 if (ac.aircraft_type == -1) {
-                    adsb_parser.process(ac, str);
+                    adsb_parser.process(ac, std::ref(str));
                 } else {
-                    ogn_parser.process(ac, str);
+                    ogn_parser.process(ac, std::ref(str));
                 }
-                out_con.sendMsgOut(str);
+                out_con.sendMsgOut(std::ref(str));
             }
-            adsb_parser.gprmc(str);
-            out_con.sendMsgOut(str);
-            adsb_parser.gpgga(str);
-            out_con.sendMsgOut(str);
+            adsb_parser.gprmc(std::ref(str));
+            out_con.sendMsgOut(std::ref(str));
+            adsb_parser.gpgga(std::ref(str));
+            out_con.sendMsgOut(std::ref(str));
             if (global_nmea_feed_enabled) {
                 out_con.sendMsgOut(add_nmea_str.getNMEA());
             }
@@ -119,15 +120,17 @@ void VFRB::handle_nmea_feed(NMEAFeedW& nmea_str)
     if (global_nmea_feed_enabled) {
         ConnectIn nmea_con(global_nmea_feed_host.c_str(), global_nmea_feed_port);
         if (nmea_con.setupConnectIn() == -1) return;
-        do {
+        while (nmea_con.connectIn() == -1) {
+            nmea_con.close();
+            if (nmea_con.setupConnectIn() == -1) return;
             std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-        } while (nmea_con.connectIn() == -1);
+        }
         while(1) {
             if (nmea_con.readLineIn() <= 0) {
                 do {
                     nmea_con.close();
+                    if (nmea_con.setupConnectIn() == -1) return;
                     std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-                    nmea_con.setupConnectIn();
                 } while (nmea_con.connectIn() == -1);
             } else {
                 nmea_str.writeNMEA(std::ref(nmea_con.getResponse()));
@@ -154,6 +157,8 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
 
         if (adsb_con.setupConnectIn() == -1) return;
         while (adsb_con.connectIn() == -1) {
+            adsb_con.close();
+            if (adsb_con.setupConnectIn() == -1) return;
             std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
         }
 
@@ -163,13 +168,13 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
             if (adsb_con.readLineIn() <= 0) {
                 do {
                     adsb_con.close();
-                    adsb_con.setupConnectIn();
+                    if (adsb_con.setupConnectIn() == -1) return;
                     std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
                 } while (adsb_con.connectIn() == -1);
             } else
                 //need msg3 only
                 if (adsb_con.getResponse().at(4) == '3') {
-                    parser.unpack(adsb_con.getResponse(), std::ref(ac_cont));
+                    parser.unpack(std::ref(adsb_con.getResponse()), std::ref(ac_cont));
                 }
         }
     }
@@ -184,6 +189,8 @@ void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
 
         if (ogn_con.setupConnectIn() == -1) return;
         while (ogn_con.connectIn() == -1) {
+            ogn_con.close();
+            if (ogn_con.setupConnectIn() == -1) return;
             std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
         }
 
@@ -193,11 +200,11 @@ void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
             if (ogn_con.readLineIn() <= 0) {
                 do {
                     ogn_con.close();
-                    ogn_con.setupConnectIn();
+                    if (ogn_con.setupConnectIn() == -1) return;
                     std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
                 } while (ogn_con.connectIn() == -1);
             } else /*if (ogn_con.getResponse().at(0) != '#')*/ {
-                parser.unpack(ogn_con.getResponse(), std::ref(ac_cont));
+                parser.unpack(std::ref(ogn_con.getResponse()), std::ref(ac_cont));
             }
         }
     }
