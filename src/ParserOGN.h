@@ -17,7 +17,7 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
 #ifndef PARSEROGN_H_
 #define PARSEROGN_H_
@@ -29,20 +29,13 @@ Copyright_License {
 class ParserOGN: public Parser
 {
 public:
-    ParserOGN(long double, long double, int, float);
+    ParserOGN();
     virtual ~ParserOGN() throw();
 
     int unpack(const std::string&, AircraftContainer&);
-    void process(Aircraft&, std::string&);
 
 private:
     void splitToTokens(const std::string&);
-    long double dmsToDeg(long double dms) const;
-    //constants
-    const long double kts2kmh = 1.852L;
-    const long double kmh2kts = 0.539957L;
-    const long double ms2fpm = 196.85L;
-    const long double fpm2ms = 0.00508L;
     //regex
     const std::regex aprs_re;
     const std::regex addr_re;

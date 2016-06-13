@@ -22,7 +22,7 @@ Copyright_License {
 #ifndef AIRCRAFTCONTAINER_H_
 #define AIRCRAFTCONTAINER_H_
 
-#include "Aircraft.h"
+#include "AircraftProcessor.h"
 #include <mutex>
 #include <vector>
 #include <unordered_map>
@@ -46,10 +46,10 @@ public:
     void insertAircraft(long double, long double, int, std::string&, int, int, int, int, float);
 
     /**
-     * returns pointer, to aircraft, at index i,
-     * if index i is valid, else nullpointer.
+     * process aircraft at index i into target string,
+     * if index i is valid.
      */
-    Aircraft& getAircraft(unsigned int i);
+    void processAircraft(unsigned int, std::string&);
 
     /**
      * increments all aircrafts's valid counter in container.
@@ -77,6 +77,12 @@ private:
     int find(std::string&);
 
     std::mutex mutex;
+
+    /**
+     * Processor to process Aircrafts from
+     * within threadsafe context of container.
+     */
+    AircraftProcessor proc;
 
     /**
      * Container that holds Aircrafts

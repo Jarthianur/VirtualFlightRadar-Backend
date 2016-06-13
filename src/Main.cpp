@@ -17,7 +17,7 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
 #include "VFRB.h"
 #include "ConfigReader.h"
@@ -25,24 +25,24 @@ Copyright_License {
 
 using namespace std;
 
-#define VERSION "1.2.3-SNAPSHOT"
+#define VERSION "1.3.0-SNAPSHOT"
 
 int main(int argc, char* argv[]) {
 
-    long double latitude;
-    long double longitude;
-    int altitude;
-    float geoid;
-    int out_port;
-    int ogn_port;
-    int adsb_port;
-    std::string ogn_host;
-    std::string adsb_host;
+    long double latitude = 0.0L;
+    long double longitude = 0.0L;
+    int altitude = 0;
+    float geoid = 0.0;
+    int out_port = 0;
+    int ogn_port = 0;
+    int adsb_port = 0;
+    std::string ogn_host("nA");
+    std::string adsb_host("nA");
     std::string login;
-    std::string nmea_feed_host;
-    int nmea_feed_port;
-    int maxHeight;
-    int maxDist;
+    std::string nmea_feed_host("nA");
+    int nmea_feed_port = 0;
+    int maxHeight = 0;
+    int maxDist = 0;
 
     if (argc == 3) {
         cout << VERSION << endl;
@@ -57,11 +57,11 @@ int main(int argc, char* argv[]) {
         adsb_port = stoi(cr.getProperty("adsbport","0"));
         ogn_host = cr.getProperty("ognhost", "nA");
         adsb_host = cr.getProperty("adsbhost", "nA");
-        login = cr.getProperty("login", "xxxxx");
+        login = cr.getProperty("login", "");
         nmea_feed_host = cr.getProperty("nmeaFeedHost", "nA");
         nmea_feed_port = stoi(cr.getProperty("nmeaFeedPort","0"));
-        maxHeight = stoi(cr.getProperty("maxHeight", "9999999"));
-        maxDist = stoi(cr.getProperty("maxDist", "40000"));
+        maxHeight = stoi(cr.getProperty("maxHeight", "0"));
+        maxDist = stoi(cr.getProperty("maxDist", "0"));
     } else {
         cout << "usage: ./VirtualFlightRadar-Backend -c pathToConfigFile"<< endl;
         return 1;
@@ -81,6 +81,7 @@ int main(int argc, char* argv[]) {
     VFRB::global_nmea_feed_port = nmea_feed_port;
     VFRB::filter_maxHeight = maxHeight;
     VFRB::filter_maxDist = maxDist;
+
     VFRB::run();
 
     return 0;

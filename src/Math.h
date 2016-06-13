@@ -17,26 +17,44 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
-#ifndef NMEAFEEDW_H_
-#define NMEAFEEDW_H_
+#ifndef MATH_H_
+#define MATH_H_
 
-#include <string>
-#include <mutex>
-
-class NMEAFeedW
+class Math
 {
 public:
-    NMEAFeedW();
-    virtual ~NMEAFeedW();
+    Math();
+    virtual ~Math();
 
-    void getNMEA(std::string&);
-    void writeNMEA(const std::string&);
+    /**
+     * convert degree to radian
+     */
+    static long double radian(long double);
 
-private:
-    std::mutex mutex;
-    std::string nmea_str;
+    /**
+     * convert radian to degree
+     */
+    static long double degree(long double);
+
+    /**
+     * convert long double to int, round to nearest number
+     */
+    static int ldToI(long double);
+
+
+    static long double dmsToDeg(long double dms);
+
+    /**
+     * constants
+     */
+    static const long double kts2kmh;
+    static const long double kmh2kts;
+    static const long double ms2fpm;
+    static const long double fpm2ms;
+    static const long double feet2m;
+    static const long double PI;
 };
 
-#endif /* NMEAFEEDW_H_ */
+#endif /* MATH_H_ */

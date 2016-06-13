@@ -17,17 +17,17 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
 #include "ParserOGN.h"
-#include "VFRB.h"
-#include <cmath>
 #include <cstdio>
-#include <ctime>
 #include <sstream>
+#include "AircraftContainer.h"
+#include "Math.h"
+#include "VFRB.h"
 
-ParserOGN::ParserOGN(long double b_lat, long double b_long, int b_alt, float geo)
-: Parser(b_lat, b_long, b_alt, geo),
+ParserOGN::ParserOGN()
+: Parser(),
   aprs_re("(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S)(\\\\|/)(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s(.*)"),
   addr_re("id(\\S{2})(\\S{6})"),
   climb_re("([\\+|-]\\d+)fpm")
@@ -52,7 +52,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
             else return -1;
 
             //altitude
-            if (match.str(12).size() > 0) alt = ldToI(std::stold(match.str(12)));
+            if (match.str(12).size() > 0) alt = Math::ldToI(std::stold(match.str(12)));
             if (alt > VFRB::filter_maxHeight) return -1;
 
             // climbrate / address
@@ -65,21 +65,21 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                     addr_t = std::stoi(addr_match.str(1), nullptr, 16) & 0x03;
                     ac_t = (std::stoi(addr_match.str(1), nullptr, 16) & 0x7C) >> 2;
                 } else if (std::regex_match(part, climb_match, climb_re)) {
-                    climb_r = ldToI(std::stold(climb_match.str(1)) * fpm2ms);
+                    climb_r = Math::ldToI(std::stold(climb_match.str(1)) * Math::fpm2ms);
                 }
             }
 
             //latitude
-            lat = dmsToDeg(std::stold(match.str(4)) / 100.0L);
+            lat = Math::dmsToDeg(std::stold(match.str(4)) / 100.0L);
             if (match.str(5).compare("S") == 0) lat = -lat;
             //longitue
-            lon = dmsToDeg(std::stold(match.str(7)) / 100.0L);
+            lon = Math::dmsToDeg(std::stold(match.str(7)) / 100.0L);
             if (match.str(8).compare("W") == 0) lon = -lon;
 
             //track/gnd_speed
             if (match.str(9).size() > 0) {
                 heading = std::stoi(match.str(10));
-                gnd_spd = ldToI(std::stold(match.str(11)) * kts2kmh);
+                gnd_spd = Math::ldToI(std::stold(match.str(11)) * Math::kts2kmh);
             } else {
                 heading = 0;
                 gnd_spd = 0;
@@ -94,37 +94,6 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
         return -1;
     }
     return 0;
-}
-
-void ParserOGN::process(Aircraft& ac_ext, std::string& nmea_str)
-{
-
-    calcPosInfo(ac_ext);
-    nmea_str.clear();
-
-    //PFLAU
-    snprintf(buffer, BUFF_OUT_S, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", ldToI(bearing_rel),
-            ldToI(rel_V), ldToI(dist), ac_ext.id.c_str());
-    int csum = checksum(buffer);
-    nmea_str.append(buffer);
-    snprintf(buffer, LESS_BUFF_S, "%02x\r\n", csum);
-    nmea_str.append(buffer);
-    //PFLAA
-    snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,%d,%s,%03.0f,,%d,%d,%d*", ldToI(rel_N),
-            ldToI(rel_E), ldToI(rel_V), ac_ext.addr_type, ac_ext.id.c_str(), ac_ext.heading, ac_ext.gnd_speed, ac_ext.climb_rate, ac_ext.aircraft_type);
-    csum = checksum(buffer);
-    nmea_str.append(buffer);
-    snprintf(buffer, LESS_BUFF_S, "%02x\r\n", csum);
-    nmea_str.append(buffer);
-    return;
-}
-
-long double ParserOGN::dmsToDeg(long double dms) const
-{
-    long double absDms = std::abs(dms);
-    long double d = std::floor(absDms);
-    long double m = (absDms - d) * 100.0L / 60.0L;
-    return d + m;
 }
 
 void ParserOGN::splitToTokens(const std::string& str) {

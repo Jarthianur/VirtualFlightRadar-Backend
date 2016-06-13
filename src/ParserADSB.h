@@ -27,11 +27,10 @@ Copyright_License {
 class ParserADSB : public Parser
 {
 public:
-    ParserADSB(long double, long double, int, float);
+    ParserADSB();
     virtual ~ParserADSB() throw();
 
     int unpack(const std::string&, AircraftContainer&);
-    void process(Aircraft&, std::string&);
 
 private:
     std::string id;

@@ -28,13 +28,13 @@ NMEAFeedW::NMEAFeedW()
 
 NMEAFeedW::~NMEAFeedW()
 {
-    // TODO Auto-generated destructor stub
 }
 
-std::string& NMEAFeedW::getNMEA()
+void NMEAFeedW::getNMEA(std::string& dest_str)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    return std::ref(nmea_str);
+    dest_str = nmea_str;
+    return;
 }
 
 void NMEAFeedW::writeNMEA(const std::string& str)

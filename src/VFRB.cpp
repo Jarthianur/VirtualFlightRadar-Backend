@@ -20,6 +20,7 @@ Copyright_License {
 */
 
 #include "VFRB.h"
+#include "AircraftProcessor.h"
 #include "ParserADSB.h"
 #include "ParserOGN.h"
 #include <chrono>
@@ -56,7 +57,8 @@ void VFRB::run()
 {
     ConnectOutNMEA out_con(global_out_port);
     AircraftContainer ac_cont;
-    NMEAFeedW add_nmea_str;
+    NMEAFeedW nmea_feed_w;
+    AircraftProcessor ac_proc(base_latitude, base_longitude, base_altitude, base_geoid);
 
     if (global_ogn_host.compare("nA") != 0 || global_ogn_host.length() == 0) {
         global_ogn_enabled = true;
@@ -72,33 +74,24 @@ void VFRB::run()
         std::thread adsb_in_thread(handle_adsb_in, std::ref(ac_cont));
         std::thread ogn_in_thread(handle_ogn_in, std::ref(ac_cont));
         std::thread con_out_thread(handle_con_out, std::ref(out_con));
-        std::thread nmea_feed_thread(handle_nmea_feed, std::ref(add_nmea_str));
-
-        ParserADSB adsb_parser(base_latitude, base_longitude, base_altitude, base_geoid);
-        ParserOGN ogn_parser(base_latitude, base_longitude, base_altitude, base_geoid);
+        std::thread nmea_feed_thread(handle_nmea_feed, std::ref(nmea_feed_w));
 
         std::string str;
         unsigned int i;
 
         while (1) {
             ac_cont.invalidateAircrafts();
-
             for (i = 0; i < ac_cont.getContSize(); ++i) {
-                //this is actually a no-go, but works somehow
-                Aircraft& ac = ac_cont.getAircraft(i);
-                if (ac.aircraft_type == -1) {
-                    adsb_parser.process(ac, std::ref(str));
-                } else {
-                    ogn_parser.process(ac, std::ref(str));
-                }
+                ac_cont.processAircraft(i, std::ref(str));
                 out_con.sendMsgOut(std::ref(str));
             }
-            adsb_parser.gprmc(std::ref(str));
+            ac_proc.gprmc(std::ref(str));
             out_con.sendMsgOut(std::ref(str));
-            adsb_parser.gpgga(std::ref(str));
+            ac_proc.gpgga(std::ref(str));
             out_con.sendMsgOut(std::ref(str));
             if (global_nmea_feed_enabled) {
-                out_con.sendMsgOut(add_nmea_str.getNMEA());
+                nmea_feed_w.getNMEA(std::ref(str));
+                out_con.sendMsgOut(std::ref(str));
             }
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
@@ -152,7 +145,7 @@ void VFRB::handle_con_out(ConnectOutNMEA& out_con)
 void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
 {
     if (global_adsb_enabled) {
-        ParserADSB parser(base_latitude, base_longitude, base_altitude, base_geoid);
+        ParserADSB parser;
         ConnectIn adsb_con(global_adsb_host.c_str(), global_adsb_port);
 
         if (adsb_con.setupConnectIn() == -1) return;
@@ -184,7 +177,7 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
 void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
 {
     if (global_ogn_enabled) {
-        ParserOGN parser(base_latitude, base_longitude, base_altitude, base_geoid);
+        ParserOGN parser;
         ConnectInExt ogn_con(global_ogn_host.c_str(), global_ogn_port, std::ref(global_login_str));
 
         if (ogn_con.setupConnectIn() == -1) return;

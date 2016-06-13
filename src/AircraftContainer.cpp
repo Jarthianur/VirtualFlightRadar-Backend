@@ -17,12 +17,14 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
 #include "AircraftContainer.h"
+#include "VFRB.h"
 #include <iostream>
 
 AircraftContainer::AircraftContainer()
+: proc(VFRB::base_latitude, VFRB::base_longitude, VFRB::base_altitude, VFRB::base_geoid)
 {
 }
 
@@ -35,10 +37,8 @@ int AircraftContainer::find(std::string& id)
 {
     const auto it = index_map.find(id);
     if (it == index_map.end()) {
-        //std::cout << id << " not found" << std::endl;
         return -1;
     } else {
-        //std::cout << id << " found at " << it->second << std::endl;
         return it->second;
     }
 }
@@ -49,10 +49,6 @@ void AircraftContainer::invalidateAircrafts()
     int i = 0;
     int size = cont.size();
     bool del = false;
-
-    /*std::cout << "before invalidation" << std::endl;
-    for (Aircraft& ac : cont) std::cout << ac.id << " at " << x++ << " : " << ac.valid << " | ";std::cout << std::endl;x=0;
-    for (const auto& it : index_map) std::cout << it.first << " at " << it.second << " | ";std::cout << std::endl;*/
 
     while (i < size && size > 0) {
         try {
@@ -72,16 +68,15 @@ void AircraftContainer::invalidateAircrafts()
             std::terminate();
         }
     }
-    /*std::cout << "after invalidation" << std::endl;
-    for (Aircraft& ac : cont) std::cout << ac.id << " at " << x++ << " : " << ac.valid << " | ";std::cout << std::endl;x=0;
-    for (const auto& it : index_map) std::cout << it.first << " at " << it.second << " | ";std::cout << std::endl<< std::endl;*/
-
     return;
 }
 
-Aircraft& AircraftContainer::getAircraft(unsigned int i)
+void AircraftContainer::processAircraft(unsigned int i, std::string& dest_str)
 {
-    return std::ref(cont.at(i));
+    std::lock_guard<std::mutex> lock(this->mutex);
+    if (i >= cont.size()) return;
+    dest_str = proc.process(cont.at(i));
+    return;
 }
 
 unsigned int AircraftContainer::getContSize()
@@ -100,9 +95,8 @@ void AircraftContainer::insertAircraft(long double lat, long double lon,
         ac.aircraft_type = -1;
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
-        //std::cout << id << " inserted at " << cont.size()-1 << std::endl;
     } else {
-        Aircraft& ac = getAircraft(i);
+        Aircraft& ac = cont.at(i);
         ac.latitude = lat;
         ac.longitude = lon;
         ac.altitude = alt;
@@ -122,9 +116,8 @@ void AircraftContainer::insertAircraft(long double lat, long double lon,
         Aircraft ac(id, lat, lon, alt, heading, gnd_spd, addr_t, ac_t, climb_r);
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
-        //std::cout << id << " inserted at " << cont.size()-1 << std::endl;
     } else {
-        Aircraft& ac = getAircraft(i);
+        Aircraft& ac = cont.at(i);
         ac.latitude = lat;
         ac.longitude = lon;
         ac.altitude = alt;

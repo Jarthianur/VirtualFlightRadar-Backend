@@ -17,26 +17,45 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
-#ifndef NMEAFEEDW_H_
-#define NMEAFEEDW_H_
+#include "Math.h"
+#include <cmath>
 
-#include <string>
-#include <mutex>
+const long double Math::kts2kmh = 1.852L;
+const long double Math::kmh2kts = 0.539957L;
+const long double Math::ms2fpm = 196.85L;
+const long double Math::fpm2ms = 0.00508L;
+const long double Math::feet2m = 0.3048L;
+const long double Math::PI = std::acos(-1.0L);
 
-class NMEAFeedW
+Math::Math()
 {
-public:
-    NMEAFeedW();
-    virtual ~NMEAFeedW();
+}
 
-    void getNMEA(std::string&);
-    void writeNMEA(const std::string&);
+Math::~Math()
+{
+}
 
-private:
-    std::mutex mutex;
-    std::string nmea_str;
-};
+long double Math::radian(long double deg)
+{
+    return ((deg * PI) / 180.0L);
+}
 
-#endif /* NMEAFEEDW_H_ */
+long double Math::degree(long double rad)
+{
+    return (rad * 180.0L) / PI;
+}
+
+int Math::ldToI(long double ld)
+{
+    return (ld >= 0) ? (int)(ld + 0.5L) : (int)(ld - 0.5L);
+}
+
+long double Math::dmsToDeg(long double dms)
+{
+    long double absDms = std::abs(dms);
+    long double d = std::floor(absDms);
+    long double m = (absDms - d) * 100.0L / 60.0L;
+    return d + m;
+}
