@@ -1,9 +1,23 @@
 /*
- * VFRB.cpp
- *
- *  Created on: 23.04.2016
- *      Author: lula
- */
+Copyright_License {
+
+  Copyright (C) 2016 Virtual Flight Radar - Backend
+  A detailed list of copyright holders can be found in the file "AUTHORS".
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License version 3
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+}
+*/
 
 #include "VFRB.h"
 #include "ParserADSB.h"
@@ -25,7 +39,7 @@ std::string VFRB::global_login_str = "";
 std::string VFRB::global_nmea_feed_host = "nA";
 int VFRB::global_nmea_feed_port = 0;
 int VFRB::filter_maxHeight = 0;
-//int VFRB::filter_maxDist = 0;
+int VFRB::filter_maxDist = 0;
 bool VFRB::global_nmea_feed_enabled = false;
 bool VFRB::global_ogn_enabled = false;
 bool VFRB::global_adsb_enabled = false;
@@ -105,15 +119,15 @@ void VFRB::handle_nmea_feed(NMEAFeedW& nmea_str)
     if (global_nmea_feed_enabled) {
         ConnectIn nmea_con(global_nmea_feed_host.c_str(), global_nmea_feed_port);
         if (nmea_con.setupConnectIn() == -1) return;
-        while (nmea_con.connectIn() == -1) {
+        do {
             std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-        }
+        } while (nmea_con.connectIn() == -1);
         while(1) {
             if (nmea_con.readLineIn() <= 0) {
                 do {
                     nmea_con.close();
-                    nmea_con.setupConnectIn();
                     std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
+                    nmea_con.setupConnectIn();
                 } while (nmea_con.connectIn() == -1);
             } else {
                 nmea_str.writeNMEA(std::ref(nmea_con.getResponse()));

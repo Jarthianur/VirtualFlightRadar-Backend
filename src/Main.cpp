@@ -1,13 +1,23 @@
 /*
- * NMEA Protocol:
- * PFLAA,<AlarmLevel>,<RelativeNorth>,<RelativeEast>,<RelativeVertical>,<IDType>,<ID>,<Track>,<TurnRate>,<GroundSpeed>,<ClimbRate>,<AcftType>
- * PFLAU,<RX>,<TX>,<GPS>,<Power>,<AlarmLevel>,<RelativeBearing>,<AlarmType>,<RelativeVertical>,<RelativeDistance>(,<ID>)
- * GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*68
- * //--GLL Latitude,N/S,Longitude,E/W,UTC,Status (A=Valid, V=Invalid),Checksum
- * $GPGGA,UTC,Lat,N/S,Lon,E/W,1,05,1,Alt(above MSL),M,Geoid separation,M,,*checksum
- * $GPGGA,191410,4735.5634,N,00739.3538,E,1,04,4.4,351.5,M,48.0,M,,*45
- * XCSoar connects on port 4353
- */
+Copyright_License {
+
+  Copyright (C) 2016 Virtual Flight Radar - Backend
+  A detailed list of copyright holders can be found in the file "AUTHORS".
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License version 3
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+}
+*/
 
 #include "VFRB.h"
 #include "ConfigReader.h"
@@ -32,7 +42,7 @@ int main(int argc, char* argv[]) {
     std::string nmea_feed_host;
     int nmea_feed_port;
     int maxHeight;
-    //int maxDist;
+    int maxDist;
 
     if (argc == 3) {
         cout << VERSION << endl;
@@ -51,7 +61,7 @@ int main(int argc, char* argv[]) {
         nmea_feed_host = cr.getProperty("nmeaFeedHost", "nA");
         nmea_feed_port = stoi(cr.getProperty("nmeaFeedPort","0"));
         maxHeight = stoi(cr.getProperty("maxHeight", "9999999"));
-        //maxDist = stoi(cr.getProperty("maxDist", "40000"));
+        maxDist = stoi(cr.getProperty("maxDist", "40000"));
     } else {
         cout << "usage: ./VirtualFlightRadar-Backend -c pathToConfigFile"<< endl;
         return 1;
@@ -70,7 +80,7 @@ int main(int argc, char* argv[]) {
     VFRB::global_nmea_feed_host = nmea_feed_host;
     VFRB::global_nmea_feed_port = nmea_feed_port;
     VFRB::filter_maxHeight = maxHeight;
-    //VFRB::filter_maxDist = maxDist;
+    VFRB::filter_maxDist = maxDist;
     VFRB::run();
 
     return 0;
