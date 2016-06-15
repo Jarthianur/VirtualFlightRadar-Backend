@@ -22,39 +22,38 @@ Copyright_License {
 #ifndef MATH_H_
 #define MATH_H_
 
-class Math
+#include <cmath>
+
+namespace Math
 {
-public:
-    Math();
-    virtual ~Math();
+/**
+ * convert degree to radian
+ */
+long double radian(long double);
 
-    /**
-     * convert degree to radian
-     */
-    static long double radian(long double);
+/**
+ * convert radian to degree
+ */
+long double degree(long double);
 
-    /**
-     * convert radian to degree
-     */
-    static long double degree(long double);
-
-    /**
-     * convert long double to int, round to nearest number
-     */
-    static int ldToI(long double);
+/**
+ * convert long double to int, round to nearest number
+ */
+int ldToI(long double);
 
 
-    static long double dmsToDeg(long double dms);
+long double dmsToDeg(long double dms);
 
-    /**
-     * constants
-     */
-    static const long double kts2kmh;
-    static const long double kmh2kts;
-    static const long double ms2fpm;
-    static const long double fpm2ms;
-    static const long double feet2m;
-    static const long double PI;
-};
+/**
+ * constants
+ */
+const long double kts2kmh = 1.852L;
+const long double kmh2kts = 0.539957L;
+const long double ms2fpm = 196.85L;
+const long double fpm2ms = 0.00508L;
+const long double feet2m = 0.3048L;
+const long double PI = std::acos(-1.0L);
+
+}
 
 #endif /* MATH_H_ */

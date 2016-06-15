@@ -22,40 +22,29 @@ Copyright_License {
 #include "Math.h"
 #include <cmath>
 
-const long double Math::kts2kmh = 1.852L;
-const long double Math::kmh2kts = 0.539957L;
-const long double Math::ms2fpm = 196.85L;
-const long double Math::fpm2ms = 0.00508L;
-const long double Math::feet2m = 0.3048L;
-const long double Math::PI = std::acos(-1.0L);
-
-Math::Math()
+namespace Math
 {
-}
 
-Math::~Math()
-{
-}
-
-long double Math::radian(long double deg)
+long double radian(long double deg)
 {
     return ((deg * PI) / 180.0L);
 }
 
-long double Math::degree(long double rad)
+long double degree(long double rad)
 {
     return (rad * 180.0L) / PI;
 }
 
-int Math::ldToI(long double ld)
+int ldToI(long double ld)
 {
     return (ld >= 0) ? (int)(ld + 0.5L) : (int)(ld - 0.5L);
 }
 
-long double Math::dmsToDeg(long double dms)
+long double dmsToDeg(long double dms)
 {
     long double absDms = std::abs(dms);
     long double d = std::floor(absDms);
     long double m = (absDms - d) * 100.0L / 60.0L;
     return d + m;
+}
 }
