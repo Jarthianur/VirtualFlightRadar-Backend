@@ -20,7 +20,7 @@ Copyright_License {
 */
 
 #include "ParserADSB.h"
-#include "VFRB.h"
+#include "Configuration.h"
 
 ParserADSB::ParserADSB()
 : Parser()
@@ -51,7 +51,7 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
             case 11:
                 if (msg.substr(0,delim).length() > 0) {
                     alt = std::stoi(msg.substr(0,delim), nullptr);
-                    if (alt > VFRB::filter_maxHeight) return -1;
+                    if (alt > Configuration::filter_maxHeight) return -1;
                 } else {
                     return -1;
                 }

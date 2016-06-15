@@ -20,11 +20,11 @@ Copyright_License {
  */
 
 #include "AircraftContainer.h"
-#include "VFRB.h"
+#include "Configuration.h"
 #include <iostream>
 
 AircraftContainer::AircraftContainer()
-: proc(VFRB::base_latitude, VFRB::base_longitude, VFRB::base_altitude, VFRB::base_geoid)
+: proc(Configuration::base_latitude, Configuration::base_longitude, Configuration::base_altitude, Configuration::base_geoid)
 {
 }
 

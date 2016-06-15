@@ -23,24 +23,11 @@ Copyright_License {
 #include "AircraftProcessor.h"
 #include "ParserADSB.h"
 #include "ParserOGN.h"
+#include "Configuration.h"
 #include <chrono>
 #include <thread>
 #include <iostream>
 
-int VFRB::base_altitude = 0;
-long double VFRB::base_latitude = 0.0L;
-long double VFRB::base_longitude = 0.0L;
-float VFRB::base_geoid = 0.0;
-int VFRB::global_out_port = 0;
-int VFRB::global_ogn_port = 0;
-int VFRB::global_adsb_port = 0;
-std::string VFRB::global_ogn_host = "nA";
-std::string VFRB::global_adsb_host = "nA";
-std::string VFRB::global_login_str = "";
-std::string VFRB::global_nmea_feed_host = "nA";
-int VFRB::global_nmea_feed_port = 0;
-int VFRB::filter_maxHeight = 0;
-int VFRB::filter_maxDist = 0;
 bool VFRB::global_nmea_feed_enabled = false;
 bool VFRB::global_ogn_enabled = false;
 bool VFRB::global_adsb_enabled = false;
@@ -55,18 +42,18 @@ VFRB::~VFRB()
 
 void VFRB::run()
 {
-    ConnectOutNMEA out_con(global_out_port);
+    ConnectOutNMEA out_con(Configuration::global_out_port);
     AircraftContainer ac_cont;
     NMEAFeedW nmea_feed_w;
-    AircraftProcessor ac_proc(base_latitude, base_longitude, base_altitude, base_geoid);
+    AircraftProcessor ac_proc(Configuration::base_latitude, Configuration::base_longitude, Configuration::base_altitude, Configuration::base_geoid);
 
-    if (global_ogn_host.compare("nA") != 0 || global_ogn_host.length() == 0) {
+    if (Configuration::global_ogn_host.compare("nA") != 0 || Configuration::global_ogn_host.length() == 0) {
         global_ogn_enabled = true;
     } else std::cout << "ogn not enabled" << std::endl;
-    if (global_adsb_host.compare("nA") != 0 || global_adsb_host.length() == 0) {
+    if (Configuration::global_adsb_host.compare("nA") != 0 || Configuration::global_adsb_host.length() == 0) {
         global_adsb_enabled = true;
     } else std::cout << "adsb not enabled" << std::endl;
-    if (global_nmea_feed_host.compare("nA") != 0 || global_nmea_feed_host.length() == 0) {
+    if (Configuration::global_nmea_feed_host.compare("nA") != 0 || Configuration::global_nmea_feed_host.length() == 0) {
         global_nmea_feed_enabled = true;
     } else std::cout << "nmea feed not enabled" << std::endl;
 
@@ -111,7 +98,7 @@ void VFRB::run()
 void VFRB::handle_nmea_feed(NMEAFeedW& nmea_str)
 {
     if (global_nmea_feed_enabled) {
-        ConnectIn nmea_con(global_nmea_feed_host.c_str(), global_nmea_feed_port);
+        ConnectIn nmea_con(Configuration::global_nmea_feed_host.c_str(), Configuration::global_nmea_feed_port);
         if (nmea_con.setupConnectIn() == -1) return;
         while (nmea_con.connectIn() == -1) {
             nmea_con.close();
@@ -146,7 +133,7 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
 {
     if (global_adsb_enabled) {
         ParserADSB parser;
-        ConnectIn adsb_con(global_adsb_host.c_str(), global_adsb_port);
+        ConnectIn adsb_con(Configuration::global_adsb_host.c_str(), Configuration::global_adsb_port);
 
         if (adsb_con.setupConnectIn() == -1) return;
         while (adsb_con.connectIn() == -1) {
@@ -178,7 +165,7 @@ void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
 {
     if (global_ogn_enabled) {
         ParserOGN parser;
-        ConnectInExt ogn_con(global_ogn_host.c_str(), global_ogn_port, std::ref(global_login_str));
+        ConnectInExt ogn_con(Configuration::global_ogn_host.c_str(), Configuration::global_ogn_port, std::ref(Configuration::global_login_str));
 
         if (ogn_con.setupConnectIn() == -1) return;
         while (ogn_con.connectIn() == -1) {

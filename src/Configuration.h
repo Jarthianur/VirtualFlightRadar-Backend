@@ -17,44 +17,35 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
-#ifndef VFRB_H_
-#define VFRB_H_
+#ifndef CONFIGURATION_H_
+#define CONFIGURATION_H_
 
-#include "ConnectOutNMEA.h"
-#include "AircraftContainer.h"
-#include "ConnectInExt.h"
-#include "NMEAFeedW.h"
+#include <string>
 
-#define SYNC_TIME 1
-#define WAIT_TIME 3
-
-class VFRB {
+class Configuration
+{
 public:
-    VFRB();
-    virtual ~VFRB() throw();
 
-    /**
-     * runs the tool
-     */
-    static void run();
+    Configuration();
+    virtual ~Configuration() throw();
 
-    /**
-     * configuration
-     */
-    static bool global_nmea_feed_enabled;
-    static bool global_ogn_enabled;
-    static bool global_adsb_enabled;
+    static int base_altitude;
+    static long double base_latitude;
+    static long double base_longitude;
+    static float base_geoid;
+    static int global_out_port;
+    static int global_ogn_port;
+    static int global_adsb_port;
+    static std::string global_ogn_host;
+    static std::string global_adsb_host;
+    static std::string global_login_str;
+    static std::string global_nmea_feed_host;
+    static int global_nmea_feed_port;
+    static int filter_maxHeight;
+    static int filter_maxDist;
 
-protected:
-    /**
-     * funtions for every single thread
-     */
-    static void handle_adsb_in(AircraftContainer&);
-    static void handle_ogn_in(AircraftContainer&);
-    static void handle_con_out(ConnectOutNMEA&);
-    static void handle_nmea_feed(NMEAFeedW&);
 };
 
-#endif /* VFRB_H_ */
+#endif /* CONFIGURATION_H_ */

@@ -21,6 +21,7 @@ Copyright_License {
 
 #include "VFRB.h"
 #include "ConfigReader.h"
+#include "Configuration.h"
 #include <iostream>
 
 using namespace std;
@@ -67,20 +68,20 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    VFRB::base_altitude = altitude;
-    VFRB::base_latitude = latitude;
-    VFRB::base_longitude = longitude;
-    VFRB::base_geoid = geoid;
-    VFRB::global_out_port = out_port;
-    VFRB::global_ogn_port = ogn_port;
-    VFRB::global_adsb_port = adsb_port;
-    VFRB::global_ogn_host = ogn_host;
-    VFRB::global_adsb_host = adsb_host;
-    VFRB::global_login_str = login;
-    VFRB::global_nmea_feed_host = nmea_feed_host;
-    VFRB::global_nmea_feed_port = nmea_feed_port;
-    VFRB::filter_maxHeight = maxHeight;
-    VFRB::filter_maxDist = maxDist;
+    Configuration::base_altitude = altitude;
+    Configuration::base_latitude = latitude;
+    Configuration::base_longitude = longitude;
+    Configuration::base_geoid = geoid;
+    Configuration::global_out_port = out_port;
+    Configuration::global_ogn_port = ogn_port;
+    Configuration::global_adsb_port = adsb_port;
+    Configuration::global_ogn_host = ogn_host;
+    Configuration::global_adsb_host = adsb_host;
+    Configuration::global_login_str = login;
+    Configuration::global_nmea_feed_host = nmea_feed_host;
+    Configuration::global_nmea_feed_port = nmea_feed_port;
+    Configuration::filter_maxHeight = maxHeight;
+    Configuration::filter_maxDist = maxDist;
 
     VFRB::run();
 

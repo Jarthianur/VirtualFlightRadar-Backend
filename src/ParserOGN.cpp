@@ -24,7 +24,7 @@ Copyright_License {
 #include <sstream>
 #include "AircraftContainer.h"
 #include "Math.h"
-#include "VFRB.h"
+#include "Configuration.h"
 
 ParserOGN::ParserOGN()
 : Parser(),
@@ -53,7 +53,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
 
             //altitude
             if (match.str(12).size() > 0) alt = Math::ldToI(std::stold(match.str(12)));
-            if (alt > VFRB::filter_maxHeight) return -1;
+            if (alt > Configuration::filter_maxHeight) return -1;
 
             // climbrate / address
             splitToTokens(comment);

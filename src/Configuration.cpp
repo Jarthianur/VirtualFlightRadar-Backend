@@ -17,44 +17,29 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
-#ifndef VFRB_H_
-#define VFRB_H_
+#include "Configuration.h"
 
-#include "ConnectOutNMEA.h"
-#include "AircraftContainer.h"
-#include "ConnectInExt.h"
-#include "NMEAFeedW.h"
+Configuration::Configuration()
+{
+}
 
-#define SYNC_TIME 1
-#define WAIT_TIME 3
+Configuration::~Configuration()
+{
+}
 
-class VFRB {
-public:
-    VFRB();
-    virtual ~VFRB() throw();
-
-    /**
-     * runs the tool
-     */
-    static void run();
-
-    /**
-     * configuration
-     */
-    static bool global_nmea_feed_enabled;
-    static bool global_ogn_enabled;
-    static bool global_adsb_enabled;
-
-protected:
-    /**
-     * funtions for every single thread
-     */
-    static void handle_adsb_in(AircraftContainer&);
-    static void handle_ogn_in(AircraftContainer&);
-    static void handle_con_out(ConnectOutNMEA&);
-    static void handle_nmea_feed(NMEAFeedW&);
-};
-
-#endif /* VFRB_H_ */
+int Configuration::base_altitude = 0;
+long double Configuration::base_latitude = 0.0L;
+long double Configuration::base_longitude = 0.0L;
+float Configuration::base_geoid = 0.0;
+int Configuration::global_out_port = 0;
+int Configuration::global_ogn_port = 0;
+int Configuration::global_adsb_port = 0;
+std::string Configuration::global_ogn_host = "nA";
+std::string Configuration::global_adsb_host = "nA";
+std::string Configuration::global_login_str = "";
+std::string Configuration::global_nmea_feed_host = "nA";
+int Configuration::global_nmea_feed_port = 0;
+int Configuration::filter_maxHeight = 0;
+int Configuration::filter_maxDist = 0;
