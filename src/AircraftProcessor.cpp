@@ -20,6 +20,7 @@ Copyright_License {
  */
 
 #include "AircraftProcessor.h"
+#include "Configuration.h"
 #include <cmath>
 #include <cstdio>
 #include <ctime>
@@ -50,6 +51,11 @@ int AircraftProcessor::checksum(const char* sentence) const
 std::string AircraftProcessor::process(Aircraft& ac)
 {
     calcPosInfo(ac);
+
+    if (dist > Configuration::filter_maxDist) {
+        return "";
+    }
+
     std::string nmea_str;
 
     //PFLAU

@@ -17,7 +17,7 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
 #include "VFRB.h"
 #include "AircraftProcessor.h"
@@ -70,7 +70,9 @@ void VFRB::run()
             ac_cont.invalidateAircrafts();
             for (i = 0; i < ac_cont.getContSize(); ++i) {
                 ac_cont.processAircraft(i, std::ref(str));
-                out_con.sendMsgOut(std::ref(str));
+                if (str.length() > 0) {
+                    out_con.sendMsgOut(std::ref(str));
+                }
             }
             ac_proc.gprmc(std::ref(str));
             out_con.sendMsgOut(std::ref(str));

@@ -75,7 +75,7 @@ void AircraftContainer::processAircraft(unsigned int i, std::string& dest_str)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     if (i >= cont.size()) return;
-    dest_str = proc.process(cont.at(i));
+    dest_str = proc.process(std::ref(cont.at(i)));
     return;
 }
 
