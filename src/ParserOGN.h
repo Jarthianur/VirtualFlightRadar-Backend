@@ -23,7 +23,6 @@ Copyright_License {
 #define PARSEROGN_H_
 
 #include "Parser.h"
-#include <vector>
 #include <regex>
 
 class ParserOGN: public Parser
@@ -35,14 +34,10 @@ public:
     int unpack(const std::string&, AircraftContainer&);
 
 private:
-    void splitToTokens(const std::string&);
     //regex
     const std::regex aprs_re;
-    const std::regex addr_re;
-    const std::regex climb_re;
-    //comment tokens
-    std::vector<std::string> tokens;
-    std::string comment;
+    const std::regex comm_re;
+    // temps
     std::string id;
     int addr_t, ac_t, climb_r, alt, gnd_spd;
     long double lat, lon;
