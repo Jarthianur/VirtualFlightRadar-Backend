@@ -20,8 +20,6 @@ Copyright_License {
  */
 
 #include "ParserOGN.h"
-#include <cstdio>
-#include "AircraftContainer.h"
 #include "Math.h"
 #include "Configuration.h"
 
@@ -81,7 +79,6 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
             return -1;
         }
     } catch (std::regex_error& e) {
-        printf("ERROR %d\n", e.code());
         return -1;
     }
     return 0;
