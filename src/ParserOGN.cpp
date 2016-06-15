@@ -28,7 +28,7 @@ Copyright_License {
 
 ParserOGN::ParserOGN()
 : Parser(),
-  aprs_re("(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S)(\\\\|/)(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s(.*)"),
+  aprs_re("^(\\S+?)>APRS,\\S+(?:,\\S+)?:/(?:\\d{6}h)(\\d{4}\\.\\d{2})(N|S)\\S(\\d{5}\\.\\d{2})(E|W)\\S((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s([^]*)$"),
   addr_re("id(\\S{2})(\\S{6})"),
   climb_re("([\\+|-]\\d+)fpm")
 {
@@ -43,10 +43,14 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
     if (sentence.at(0) == '#') {
         return -1;
     }
+
     try {
         std::smatch match;
-        if (std::regex_search(sentence, match, aprs_re)) {
+        if (std::regex_search(sentence, match, aprs_re)) {//printf("%s\n",sentence.c_str());
             //comment
+            /*for (unsigned int x = 1; x < match.size(); ++x) {
+                printf("%d: %s\n", x, match.str(x).c_str());
+            }*/
             comment.clear();
             if (match.str(13).size() > 0) comment = match.str(13);
             else return -1;
