@@ -22,6 +22,8 @@ Status quo:
 
 Version 1.3.0-SNAPSHOT
 
+Read more in the FEATURES.
+
 As an additional information, this project is configured as an eclipseCDT executable project.
 
 

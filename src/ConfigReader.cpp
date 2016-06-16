@@ -24,7 +24,7 @@ Copyright_License {
 
 ConfigReader::ConfigReader(const char* filename)
 : file(filename),
-  conf_re("(\\S+)\\s*?=\\s*?([\\+|-]?[^]+)")
+  conf_re("^(\\S+)\\s*=\\s*(\\S+[^]*)$")
 {
 }
 
@@ -40,9 +40,7 @@ void ConfigReader::read()
             if (std::regex_match(key, match, conf_re)) {
                 key = match.str(1);
                 value = match.str(2);
-                key.shrink_to_fit();
-                value.shrink_to_fit();
-                std::cout << key.c_str() << "__"<< value << "__" << std::endl;
+                std::cout << match.str(1).c_str() << "__"<< match.str(2).c_str() << "__" << std::endl;
                 config.insert({key, value});
             } else {
                 std::cout << "malformed parameter! " << key << std::endl;

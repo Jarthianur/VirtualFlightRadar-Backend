@@ -19,24 +19,29 @@ Copyright_License {
 }
 */
 
-#ifndef NMEAFEEDW_H_
-#define NMEAFEEDW_H_
+#include "WindFeed.h"
 
-#include <string>
-#include <mutex>
-
-class NMEAFeedW
+WindFeed::WindFeed()
 {
-public:
-    NMEAFeedW();
-    virtual ~NMEAFeedW();
+    nmea_str = "\r\n";
+}
 
-    void getNMEA(std::string&);
-    void writeNMEA(const std::string&);
+WindFeed::~WindFeed()
+{
+}
 
-private:
-    std::mutex mutex;
-    std::string nmea_str;
-};
+void WindFeed::getNMEA(std::string& dest_str)
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    dest_str = nmea_str;
+    return;
+}
 
-#endif /* NMEAFEEDW_H_ */
+void WindFeed::writeNMEA(const std::string& str)
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    if (str.substr(0,6).compare("$WIMWV") == 0) {
+        nmea_str = str;
+    }
+    return;
+}

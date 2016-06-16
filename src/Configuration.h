@@ -41,8 +41,8 @@ public:
     static std::string global_ogn_host;
     static std::string global_adsb_host;
     static std::string global_login_str;
-    static std::string global_nmea_feed_host;
-    static int global_nmea_feed_port;
+    static std::string global_wind_feed_host;
+    static int global_wind_feed_port;
     static int filter_maxHeight;
     static int filter_maxDist;
 

@@ -40,8 +40,8 @@ int main(int argc, char* argv[]) {
     std::string ogn_host("nA");
     std::string adsb_host("nA");
     std::string login;
-    std::string nmea_feed_host("nA");
-    int nmea_feed_port = 0;
+    std::string wind_feed_host("nA");
+    int wind_feed_port = 0;
     int maxHeight = 0;
     int maxDist = 0;
 
@@ -59,8 +59,8 @@ int main(int argc, char* argv[]) {
         ogn_host = cr.getProperty("ognhost", "nA");
         adsb_host = cr.getProperty("adsbhost", "nA");
         login = cr.getProperty("login", "");
-        nmea_feed_host = cr.getProperty("nmeaFeedHost", "nA");
-        nmea_feed_port = stoi(cr.getProperty("nmeaFeedPort","0"));
+        wind_feed_host = cr.getProperty("windFeedHost", "nA");
+        wind_feed_port = stoi(cr.getProperty("windFeedPort","0"));
         maxHeight = stoi(cr.getProperty("maxHeight", "0"));
         maxDist = stoi(cr.getProperty("maxDist", "0"));
     } else {
@@ -78,8 +78,8 @@ int main(int argc, char* argv[]) {
     Configuration::global_ogn_host = ogn_host;
     Configuration::global_adsb_host = adsb_host;
     Configuration::global_login_str = login;
-    Configuration::global_nmea_feed_host = nmea_feed_host;
-    Configuration::global_nmea_feed_port = nmea_feed_port;
+    Configuration::global_wind_feed_host = wind_feed_host;
+    Configuration::global_wind_feed_port = wind_feed_port;
     Configuration::filter_maxHeight = maxHeight;
     Configuration::filter_maxDist = maxDist;
 

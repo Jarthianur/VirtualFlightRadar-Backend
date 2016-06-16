@@ -28,7 +28,7 @@ Copyright_License {
 #include <thread>
 #include <iostream>
 
-bool VFRB::global_nmea_feed_enabled = false;
+bool VFRB::global_wind_feed_enabled = false;
 bool VFRB::global_ogn_enabled = false;
 bool VFRB::global_adsb_enabled = false;
 
@@ -44,7 +44,7 @@ void VFRB::run()
 {
     ConnectOutNMEA out_con(Configuration::global_out_port);
     AircraftContainer ac_cont;
-    NMEAFeedW nmea_feed_w;
+    WindFeed wind_feed;
     AircraftProcessor ac_proc(Configuration::base_latitude, Configuration::base_longitude, Configuration::base_altitude, Configuration::base_geoid);
 
     if (Configuration::global_ogn_host.compare("nA") != 0 || Configuration::global_ogn_host.length() == 0) {
@@ -53,15 +53,15 @@ void VFRB::run()
     if (Configuration::global_adsb_host.compare("nA") != 0 || Configuration::global_adsb_host.length() == 0) {
         global_adsb_enabled = true;
     } else std::cout << "adsb not enabled" << std::endl;
-    if (Configuration::global_nmea_feed_host.compare("nA") != 0 || Configuration::global_nmea_feed_host.length() == 0) {
-        global_nmea_feed_enabled = true;
-    } else std::cout << "nmea feed not enabled" << std::endl;
+    if (Configuration::global_wind_feed_host.compare("nA") != 0 || Configuration::global_wind_feed_host.length() == 0) {
+        global_wind_feed_enabled = true;
+    } else std::cout << "wind feed not enabled" << std::endl;
 
     try{
         std::thread adsb_in_thread(handle_adsb_in, std::ref(ac_cont));
         std::thread ogn_in_thread(handle_ogn_in, std::ref(ac_cont));
         std::thread con_out_thread(handle_con_out, std::ref(out_con));
-        std::thread nmea_feed_thread(handle_nmea_feed, std::ref(nmea_feed_w));
+        std::thread wind_feed_thread(handle_wind_feed, std::ref(wind_feed));
 
         std::string str;
         unsigned int i;
@@ -78,8 +78,8 @@ void VFRB::run()
             out_con.sendMsgOut(std::ref(str));
             ac_proc.gpgga(std::ref(str));
             out_con.sendMsgOut(std::ref(str));
-            if (global_nmea_feed_enabled) {
-                nmea_feed_w.getNMEA(std::ref(str));
+            if (global_wind_feed_enabled) {
+                wind_feed.getNMEA(std::ref(str));
                 out_con.sendMsgOut(std::ref(str));
             }
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
@@ -88,7 +88,7 @@ void VFRB::run()
         adsb_in_thread.join();
         ogn_in_thread.join();
         con_out_thread.join();
-        nmea_feed_thread.join();
+        wind_feed_thread.join();
 
     } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
@@ -97,10 +97,10 @@ void VFRB::run()
     return;
 }
 
-void VFRB::handle_nmea_feed(NMEAFeedW& nmea_str)
+void VFRB::handle_wind_feed(WindFeed& nmea_str)
 {
-    if (global_nmea_feed_enabled) {
-        ConnectIn nmea_con(Configuration::global_nmea_feed_host.c_str(), Configuration::global_nmea_feed_port);
+    if (global_wind_feed_enabled) {
+        ConnectIn nmea_con(Configuration::global_wind_feed_host.c_str(), Configuration::global_wind_feed_port);
         if (nmea_con.setupConnectIn() == -1) return;
         while (nmea_con.connectIn() == -1) {
             nmea_con.close();
