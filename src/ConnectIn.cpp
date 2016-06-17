@@ -44,6 +44,7 @@ int ConnectIn::connectIn()
         std::cout << "Could not connect to server!" << std::endl;
         return -1;
     }
+    std::cout << "Connected to server" << std::endl;
     return 0;
 }
 

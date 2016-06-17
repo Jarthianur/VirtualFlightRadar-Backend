@@ -100,22 +100,22 @@ void VFRB::run()
 void VFRB::handle_wind_feed(WindFeed& nmea_str)
 {
     if (global_wind_feed_enabled) {
-        ConnectIn nmea_con(Configuration::global_wind_feed_host.c_str(), Configuration::global_wind_feed_port);
-        if (nmea_con.setupConnectIn() == -1) return;
-        while (nmea_con.connectIn() == -1) {
-            nmea_con.close();
-            if (nmea_con.setupConnectIn() == -1) return;
+        ConnectIn wind_con(Configuration::global_wind_feed_host.c_str(), Configuration::global_wind_feed_port);
+        if (wind_con.setupConnectIn() == -1) return;
+        while (wind_con.connectIn() == -1) {
+            wind_con.close();
+            if (wind_con.setupConnectIn() == -1) return;
             std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
         }
         while(1) {
-            if (nmea_con.readLineIn() <= 0) {
+            if (wind_con.readLineIn() <= 0) {
                 do {
-                    nmea_con.close();
-                    if (nmea_con.setupConnectIn() == -1) return;
+                    wind_con.close();
+                    if (wind_con.setupConnectIn() == -1) return;
                     std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-                } while (nmea_con.connectIn() == -1);
+                } while (wind_con.connectIn() == -1);
             } else {
-                nmea_str.writeNMEA(std::ref(nmea_con.getResponse()));
+                nmea_str.writeNMEA(std::ref(wind_con.getResponse()));
             }
         }
     }

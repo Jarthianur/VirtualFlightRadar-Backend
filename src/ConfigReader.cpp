@@ -24,7 +24,7 @@ Copyright_License {
 
 ConfigReader::ConfigReader(const char* filename)
 : file(filename),
-  conf_re("(\\S+)\\s*=\\s*(\\S+[^]*)")
+  conf_re("^(\\S+)\\s*=\\s*(\\S+[^]*)$")
 {
 }
 
@@ -33,11 +33,15 @@ void ConfigReader::read()
     std::ifstream src(file);
     std::string key;
     std::string value;
-    while (std::getline(src, key)) {
+    std::string line;
+    while (std::getline(src, line)) {
         try {
-            if (key.at(0) == '#') continue;
+            if (line.at(0) == '#') {
+                line.clear();
+                continue;
+            }
             std::smatch match;
-            if (std::regex_match(key, match, conf_re)) {
+            if (std::regex_match(line, match, conf_re)) {
                 key = match.str(1);
                 value = match.str(2);
                 std::cout << match.str(1).c_str() << "__"<< match.str(2).c_str() << "__" << std::endl;
@@ -45,6 +49,7 @@ void ConfigReader::read()
             } else {
                 std::cout << "malformed parameter! " << key << std::endl;
             }
+            line.clear();
         } catch (std::regex_error& e) {
             std::cout << e.what() << std::endl;
             break;
