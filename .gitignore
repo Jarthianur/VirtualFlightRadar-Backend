@@ -1,4 +1,8 @@
-Debug
-Release
+Debug/
+Release/
 TODO
 Test/
+.settings/
+.cproject
+.project
+
