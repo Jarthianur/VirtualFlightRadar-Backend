@@ -24,7 +24,7 @@ Copyright_License {
 
 ConfigReader::ConfigReader(const char* filename)
 : file(filename),
-  conf_re("^(\\S+)\\s*=\\s*(\\S+[^]*)$")
+  conf_re("(\\S+)\\s*=\\s*(\\S+[^]*)")
 {
 }
 
