@@ -21,7 +21,6 @@ Copyright_License {
 
 #include "AircraftProcessor.h"
 #include "Configuration.h"
-#include <cmath>
 #include <cstdio>
 #include <ctime>
 #include "Math.h"
@@ -66,12 +65,12 @@ std::string AircraftProcessor::process(Aircraft& ac)
     snprintf(buffer, LESS_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
     //PFLAA
-    if (ac.aircraft_type == -1) {
+    if (ac.aircraft_type == MIN_DATA) {
         snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", Math::ldToI(rel_N),
                 Math::ldToI(rel_E), Math::ldToI(rel_V), ac.id.c_str());
     } else {
-        snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,%d,%s,%03.0f,,%d,%d,%d*", Math::ldToI(rel_N),
-                Math::ldToI(rel_E), Math::ldToI(rel_V), ac.addr_type, ac.id.c_str(), ac.heading, ac.gnd_speed, ac.climb_rate, ac.aircraft_type);
+        snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03u,,%d,%3.1f,%1x*", Math::ldToI(rel_N),
+                Math::ldToI(rel_E), Math::ldToI(rel_V), ac.id_type, ac.id.c_str(), ac.heading, ac.gnd_speed, ac.climb_rate, ac.aircraft_type);
     }
     csum = checksum(buffer);
     nmea_str.append(buffer);
@@ -82,10 +81,11 @@ std::string AircraftProcessor::process(Aircraft& ac)
 
 void AircraftProcessor::calcPosInfo(Aircraft& ac)
 {
+    const Position& ac_pos = ac.getLastPosition();
     long_b = Math::radian(baselong);
-    long_ac = Math::radian(ac.longitude);
+    long_ac = Math::radian(ac_pos.longitude);
     lat_b = Math::radian(baselat);
-    lat_ac = Math::radian(ac.latitude);
+    lat_ac = Math::radian(ac_pos.latitude);
     long_dist = long_ac - long_b;
     lat_dist = lat_ac -lat_b;
 
@@ -99,7 +99,7 @@ void AircraftProcessor::calcPosInfo(Aircraft& ac)
 
     rel_N = std::cos(Math::radian(bearing_abs)) * dist;
     rel_E = std::sin(Math::radian(bearing_abs)) * dist;
-    rel_V = (ac.altitude * Math::feet2m) - basealt;
+    rel_V = (ac_pos.altitude * Math::feet2m) - basealt;
     return;
 }
 

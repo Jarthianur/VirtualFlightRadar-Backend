@@ -23,29 +23,40 @@ Copyright_License {
 #define AIRCRAFT_H_
 
 #include <string>
+#include "Position.h"
+
+#define UNKNOWN_T 0
+#define MIN_DATA -1
+#define HISTORY_S 3
 
 class Aircraft
 {
 public:
     Aircraft(std::string&, long double, long double, int);
-    Aircraft(std::string&, long double, long double, int, float, int, int, int, int);
+    Aircraft(std::string&, long double, long double, int, unsigned int, int, unsigned int, int, float);
     virtual ~Aircraft() throw();
 
     /**
      * self explanatory
      */
     std::string id;
-    long double latitude;
-    long double longitude;
-    int altitude;
-    float heading = 0.0;
+    unsigned int heading = 0;
     int gnd_speed = 0;
-    int addr_type = 0;
-    //illegal ac_type == -1 used for check extended data
-    int aircraft_type = -1;
-    int climb_rate = 0;
+    float climb_rate = 0.0;
+    unsigned int id_type = 0;
+    int aircraft_type = MIN_DATA;
     //0 = valid; +x(cycles) = invalid
     int valid = 0;
+
+    void addPosition(Position&);
+    const Position& getLastPosition();
+
+private:
+    Position positions[HISTORY_S];
+    void calcMoveData();
+
+    unsigned int last_pos = 0;
+    unsigned int nr_of_pos = 0;
 
 };
 
