@@ -67,7 +67,7 @@ void Aircraft::calcMoveData()
                                     std::cos(before.longitude - last.longitude))
                     ) + 360.0L, 360.0L)
     );
-
+    //climb_rate =
     if (aircraft_type == MIN_DATA) aircraft_type = UNKNOWN_T;
     return;
 }
