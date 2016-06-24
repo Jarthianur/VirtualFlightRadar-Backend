@@ -74,7 +74,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 gnd_spd = 0;
             }
 
-            ac_cont.insertAircraft(lat, lon, alt, id, addr_t, ac_t, climb_r, gnd_spd, heading);
+            ac_cont.insertAircraft(lat, lon, alt, id, addr_t, ac_t, climb_r, gnd_spd, heading, 0.0);//for now no turn rate
         } else {
             return -1;
         }

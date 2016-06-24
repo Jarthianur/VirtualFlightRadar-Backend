@@ -65,7 +65,6 @@ void AircraftContainer::invalidateAircrafts()
             }
         } catch (std::exception& e) {
             std::cout << e.what() << std::endl;
-            std::terminate();
         }
     }
     return;
@@ -106,13 +105,13 @@ void AircraftContainer::insertAircraft(long double lat, long double lon,
 }
 
 void AircraftContainer::insertAircraft(long double lat, long double lon,
-        int alt, std::string& id, int addr_t, int ac_t, int climb_r,
-        int gnd_spd, float heading)
+        int alt, std::string& id, unsigned int id_t, int ac_t, float climb_r,
+        int gnd_spd, unsigned int heading, float turn_r)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     int i;
     if ((i = find(id)) == -1) {
-        Aircraft ac(id, lat, lon, alt, heading, gnd_spd, addr_t, ac_t, climb_r);
+        Aircraft ac(id, lat, lon, alt, heading, gnd_spd, id_t, ac_t, climb_r, turn_r);
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
     } else {
@@ -123,7 +122,7 @@ void AircraftContainer::insertAircraft(long double lat, long double lon,
         ac.climb_rate = climb_r;
         ac.gnd_speed = gnd_spd;
         ac.heading = heading;
-        ac.id_type = addr_t;
+        ac.id_type = id_t;
         ac.valid = 0;
     }
     return;

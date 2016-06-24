@@ -49,7 +49,7 @@ int AircraftProcessor::checksum(const char* sentence) const
 
 std::string AircraftProcessor::process(Aircraft& ac)
 {
-    calcPosInfo(ac);
+    calcRelPosToBase(ac);
 
     if (dist > Configuration::filter_maxDist) {
         return "";
@@ -79,7 +79,7 @@ std::string AircraftProcessor::process(Aircraft& ac)
     return nmea_str;
 }
 
-void AircraftProcessor::calcPosInfo(Aircraft& ac)
+void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
 {
     const Position& ac_pos = ac.getLastPosition();
     long_b = Math::radian(baselong);
@@ -92,10 +92,12 @@ void AircraftProcessor::calcPosInfo(Aircraft& ac)
     a = std::pow(std::sin(lat_dist/2.0L),2.0L) + std::cos(lat_b) * std::cos(lat_ac) * std::pow(std::sin(long_dist/2.0L),2.0L);
     c = 2.0L * std::atan2(std::sqrt(a), std::sqrt(1.0L - a));
     dist = 6371000.0L * c;
+    ac_pos.distance = Math::ldToI(dist);
 
     bearing = std::atan2(std::sin(long_ac-long_b)*std::cos(lat_ac), std::cos(lat_b)*std::sin(lat_ac)-std::sin(lat_b)*std::cos(lat_ac)*std::cos(long_ac-long_b));
     bearing_rel = Math::degree(bearing);
     bearing_abs = std::fmod((bearing_rel + 360.0L), 360.0L);
+    ac.heading = bearing_abs;
 
     rel_N = std::cos(Math::radian(bearing_abs)) * dist;
     rel_E = std::sin(Math::radian(bearing_abs)) * dist;

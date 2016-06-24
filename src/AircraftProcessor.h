@@ -63,7 +63,7 @@ private:
     /**
      * calculate nmea-data
      */
-    void calcPosInfo(Aircraft&);
+    void calcRelPosToBase(Aircraft&);
 
     /**
      * base position info

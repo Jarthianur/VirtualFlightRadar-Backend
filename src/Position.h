@@ -32,6 +32,7 @@ public:
     long double latitude = 0.0L;
     long double longitude = 0.0L;
     int altitude = 0;
+    int distance = 0;
 };
 
 #endif /* SRC_POSITION_H_ */
