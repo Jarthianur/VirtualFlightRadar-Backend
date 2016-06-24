@@ -35,12 +35,13 @@ Aircraft::Aircraft(std::string& id, long double lat, long double lon, int alt, i
 
 Aircraft::Aircraft(std::string& id, long double lat,
         long double lon, int alt, int gnd_spd, unsigned int id_t,
-        int ac_t, float climb_r, float turn_r, int time)
+        int ac_t, float climb_r, float turn_r, int time, int heading)
 : Aircraft(id, lat, lon, alt, time)
 {
     Position& pos = this->positions[last_pos];
     pos.climb_rate = climb_r;
     pos.turn_rate = turn_r;
+    pos.heading = heading;
     this->gnd_speed = gnd_spd;
     this->id_type = id_t;
     this->aircraft_type = ac_t;

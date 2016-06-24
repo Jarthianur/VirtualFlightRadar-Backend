@@ -27,7 +27,7 @@ Copyright_License {
 #include "ConnectInExt.h"
 #include "WindFeed.h"
 
-#define SYNC_TIME 2
+#define SYNC_TIME 1
 #define WAIT_TIME 30
 
 class VFRB {

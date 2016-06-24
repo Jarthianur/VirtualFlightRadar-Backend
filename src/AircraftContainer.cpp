@@ -87,10 +87,8 @@ unsigned int AircraftContainer::getContSize()
 void AircraftContainer::insertAircraft(std::string& id, long double lat, long double lon, int alt, int time)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-
-
     int i;
-    if ((i = find(id)) == -1) {if (cont.size() == 1) return;
+    if ((i = find(id)) == -1) {
         Aircraft ac(id, lat, lon, alt, time);
         ac.aircraft_type = MIN_DATA;
         cont.push_back(ac);
@@ -108,24 +106,23 @@ void AircraftContainer::insertAircraft(std::string& id, long double lat, long do
 
 void AircraftContainer::insertAircraft(std::string& id, long double lat,
         long double lon, int alt, int gnd_spd, unsigned int id_t,
-        int ac_t, float climb_r, float turn_r, int time)
+        int ac_t, float climb_r, float turn_r, int time, int heading)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-
-
     int i, flags = 0;
     if (gnd_spd != VALUE_NA) flags |= SPEED_FLAG;
     if (climb_r != VALUE_NA) flags |= CLIMB_FLAG;
     if (turn_r != VALUE_NA) flags |= TURN_FLAG;
+    if (heading != VALUE_NA) flags |= HEADING_FLAG;
 
-    if ((i = find(id)) == -1) {if (cont.size() == 1) return;
-        Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, time);
+    if ((i = find(id)) == -1) {
+        Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, time, heading);
         ac.data_flags = flags;
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
     } else {
         Aircraft& ac = cont.at(i);
-        Position pos(lat, lon, alt, climb_r, turn_r, time);
+        Position pos(lat, lon, alt, time, climb_r, turn_r, heading);
         ac.addPosition(std::ref(pos));
         ac.aircraft_type = ac_t;
         ac.gnd_speed = gnd_spd;

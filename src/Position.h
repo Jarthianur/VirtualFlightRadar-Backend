@@ -27,7 +27,7 @@ class Position
 public:
     Position();
     Position(long double, long double, int, int);
-    Position(long double, long double, int, int, float, float);
+    Position(long double, long double, int, int, float, float, int);
     virtual ~Position();
 
     /**
@@ -36,7 +36,7 @@ public:
     long double latitude = 0.0L;
     long double longitude = 0.0L;
     int altitude = 0;
-    unsigned int heading = 0;
+    int heading = 0;
     /**
      * relative to base
      */

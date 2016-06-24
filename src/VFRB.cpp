@@ -74,10 +74,10 @@ void VFRB::run()
                     out_con.sendMsgOut(std::ref(str));
                 }
             }
-            /*ac_proc.gprmc(std::ref(str));
+            ac_proc.gprmc(std::ref(str));
             out_con.sendMsgOut(std::ref(str));
             ac_proc.gpgga(std::ref(str));
-            out_con.sendMsgOut(std::ref(str));*/
+            out_con.sendMsgOut(std::ref(str));
             if (global_wind_feed_enabled) {
                 wind_feed.getNMEA(std::ref(str));
                 out_con.sendMsgOut(std::ref(str));

@@ -33,11 +33,12 @@ Position::Position(long double lat, long double lon, int alt, int time)
 {
 }
 
-Position::Position(long double lat, long double lon, int alt, int time, float climb_r, float turn_r)
+Position::Position(long double lat, long double lon, int alt, int time, float climb_r, float turn_r, int heading)
 : Position(lat, lon, alt, time)
 {
     this->climb_rate = climb_r;
     this->turn_rate = turn_r;
+    this->heading = heading;
 }
 
 Position::~Position()

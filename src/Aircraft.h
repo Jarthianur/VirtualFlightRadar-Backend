@@ -38,7 +38,7 @@ class Aircraft
 {
 public:
     Aircraft(std::string&, long double, long double, int, int);
-    Aircraft(std::string&, long double, long double, int, int, unsigned int, int, float, float, int);
+    Aircraft(std::string&, long double, long double, int, int, unsigned int, int, float, float, int, int);
     virtual ~Aircraft() throw();
 
     /**
@@ -52,8 +52,6 @@ public:
     int valid = 0;
     /*
      * specify which fields are given from input; no need to calculate them
-     * bitflags:
-     * climb_r,speed,heading
      */
     int data_flags = 0;
 

@@ -49,8 +49,8 @@ int AircraftProcessor::checksum(const char* sentence) const
 
 std::string AircraftProcessor::process(Aircraft& ac)
 {
-    calcRelPosToBase(ac);
     calcMoveData(ac);
+    calcRelPosToBase(ac);
 
     if (dist > Configuration::filter_maxDist) {
         return "";
@@ -60,18 +60,18 @@ std::string AircraftProcessor::process(Aircraft& ac)
     Position& ac_pos = ac.getLastPosition();
 
     //PFLAU
-    snprintf(buffer, BUFF_OUT_S, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", Math::ldToI(bearing_rel),
+    snprintf(buffer, BUFF_OUT_S, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", Math::ldToI(bearing_rel),
             Math::ldToI(rel_V), ac_pos.distance, ac.id.c_str());
     int csum = checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, LESS_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
     //PFLAA
-    if (ac.aircraft_type == MIN_DATA) {
-        snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,1,%s,%03u,,,,8*", Math::ldToI(rel_N),
-                Math::ldToI(rel_E), Math::ldToI(rel_V), ac.id.c_str(), ac_pos.heading);
+    if (ac.aircraft_type == MIN_DATA || ac.data_flags != 15) {
+        snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", Math::ldToI(rel_N),
+                Math::ldToI(rel_E), Math::ldToI(rel_V), ac.id.c_str());
     } else {
-        snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03u,,%d,%3.1f,%1x*", Math::ldToI(rel_N),
+        snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1f,%1x*", Math::ldToI(rel_N),
                 Math::ldToI(rel_E), Math::ldToI(rel_V), ac.id_type, ac.id.c_str(), ac_pos.heading,
                 ac.gnd_speed, ac_pos.climb_rate, ac.aircraft_type);
     }
@@ -116,25 +116,40 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
     int time_diff = last.timestamp - before.timestamp;
     if (time_diff <= 0) return;
 
+    long_b = Math::radian(before.longitude);
+    long_ac = Math::radian(last.longitude);
+    lat_b = Math::radian(before.latitude);
+    lat_ac = Math::radian(last.latitude);
+    long_dist = long_ac - long_b;
+    lat_dist = lat_ac -lat_b;
+    a = std::pow(std::sin(lat_dist / 2.0L), 2.0L) + std::cos(lat_b) * std::cos(lat_ac) * std::pow(std::sin(long_dist / 2.0L), 2.0L);
+    dist = 6371000.0L * (2.0L * std::atan2(std::sqrt(a), std::sqrt(1.0L - a)));
+
     if ((ac.data_flags & SPEED_FLAG) == 0) {
         //calculate ground speed
-        long_b = Math::radian(before.longitude);
-        long_ac = Math::radian(last.longitude);
-        lat_b = Math::radian(before.latitude);
-        lat_ac = Math::radian(last.latitude);
-        long_dist = long_ac - long_b;
-        lat_dist = lat_ac -lat_b;
-        a = std::pow(std::sin(lat_dist / 2.0L), 2.0L) + std::cos(lat_b) * std::cos(lat_ac) * std::pow(std::sin(long_dist / 2.0L), 2.0L);
-        dist = 6371000.0L * (2.0L * std::atan2(std::sqrt(a), std::sqrt(1.0L - a)));
         ac.gnd_speed = Math::ldToI(dist / (time_diff));
+        ac.data_flags |= SPEED_FLAG;
     }
     if ((ac.data_flags & CLIMB_FLAG) == 0) {
         //calculate climb rate
         last.climb_rate = ((last.altitude - before.altitude) * Math::feet2m) / (time_diff);
+        ac.data_flags |= CLIMB_FLAG;
     }
     if ((ac.data_flags & TURN_FLAG) == 0) {
         //calculate turn rate
         last.turn_rate = 0.0;//todo
+        ac.data_flags |= TURN_FLAG;
+    }
+    if ((ac.data_flags & HEADING_FLAG) == 0) {
+        //calculate heading
+        last.heading = Math::ldToI(std::fmod(((
+                Math::degree(
+                        std::atan2(
+                                std::sin(long_ac - long_b) * std::cos(lat_ac),
+                                std::cos(lat_b) * std::sin(lat_ac) - std::sin(lat_b) *
+                                std::cos(lat_ac) * std::cos(long_ac - long_b))
+                )) + 360.0L), 360.0L));
+        ac.data_flags |= HEADING_FLAG;
     }
     if (ac.aircraft_type == MIN_DATA) ac.aircraft_type = UNKNOWN_T;
     return;
