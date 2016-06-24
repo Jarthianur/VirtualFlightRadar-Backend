@@ -56,10 +56,11 @@ std::string AircraftProcessor::process(Aircraft& ac)
     }
 
     std::string nmea_str;
+    Position& ac_pos = ac.getLastPosition();
 
     //PFLAU
     snprintf(buffer, BUFF_OUT_S, "$PFLAU,,,,1,0,%d,0,%d,%u,%s*", Math::ldToI(bearing_rel),
-            Math::ldToI(rel_V), Math::ldToI(dist), ac.id.c_str());
+            Math::ldToI(rel_V), ac_pos.distance, ac.id.c_str());
     int csum = checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, LESS_BUFF_S, "%02x\r\n", csum);
@@ -70,7 +71,8 @@ std::string AircraftProcessor::process(Aircraft& ac)
                 Math::ldToI(rel_E), Math::ldToI(rel_V), ac.id.c_str());
     } else {
         snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03u,,%d,%3.1f,%1x*", Math::ldToI(rel_N),
-                Math::ldToI(rel_E), Math::ldToI(rel_V), ac.id_type, ac.id.c_str(), ac.heading, ac.gnd_speed, ac.climb_rate, ac.aircraft_type);
+                Math::ldToI(rel_E), Math::ldToI(rel_V), ac.id_type, ac.id.c_str(), ac_pos.heading,
+                ac.gnd_speed, ac_pos.climb_rate, ac.aircraft_type);
     }
     csum = checksum(buffer);
     nmea_str.append(buffer);
@@ -81,7 +83,7 @@ std::string AircraftProcessor::process(Aircraft& ac)
 
 void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
 {
-    const Position& ac_pos = ac.getLastPosition();
+    Position& ac_pos = ac.getLastPosition();
     long_b = Math::radian(baselong);
     long_ac = Math::radian(ac_pos.longitude);
     lat_b = Math::radian(baselat);
@@ -90,18 +92,38 @@ void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
     lat_dist = lat_ac -lat_b;
 
     a = std::pow(std::sin(lat_dist/2.0L),2.0L) + std::cos(lat_b) * std::cos(lat_ac) * std::pow(std::sin(long_dist/2.0L),2.0L);
-    c = 2.0L * std::atan2(std::sqrt(a), std::sqrt(1.0L - a));
-    dist = 6371000.0L * c;
+    dist = 6371000.0L * (2.0L * std::atan2(std::sqrt(a), std::sqrt(1.0L - a)));
     ac_pos.distance = Math::ldToI(dist);
 
-    bearing = std::atan2(std::sin(long_ac-long_b)*std::cos(lat_ac), std::cos(lat_b)*std::sin(lat_ac)-std::sin(lat_b)*std::cos(lat_ac)*std::cos(long_ac-long_b));
-    bearing_rel = Math::degree(bearing);
+    bearing_rel = Math::degree(std::atan2(std::sin(long_ac-long_b) *
+            std::cos(lat_ac), std::cos(lat_b) * std::sin(lat_ac)-std::sin(lat_b) *
+            std::cos(lat_ac) * std::cos(long_ac-long_b)));
     bearing_abs = std::fmod((bearing_rel + 360.0L), 360.0L);
-    ac.heading = bearing_abs;
+    ac_pos.heading = Math::ldToI(bearing_abs);
 
     rel_N = std::cos(Math::radian(bearing_abs)) * dist;
     rel_E = std::sin(Math::radian(bearing_abs)) * dist;
     rel_V = (ac_pos.altitude * Math::feet2m) - basealt;
+    return;
+}
+
+void AircraftProcessor::calcMoveData(Aircraft& ac)
+{
+    if (ac.nr_of_pos < 2) return;
+    Position& before = ac.positions[(ac.last_pos-1) % HISTORY_S];
+    Position& last = ac.positions[ac.last_pos];
+
+    // assuming an aircraft sends its data every 1 second
+    if ((ac.data_flags & SPEED_FLAG) == 0) {
+
+    }
+    if ((ac.data_flags & CLIMB_FLAG) == 0) {
+
+    }
+    if ((ac.data_flags & TURN_FLAG) == 0) {
+
+    }
+    if (ac.aircraft_type == MIN_DATA) ac.aircraft_type = UNKNOWN_T;
     return;
 }
 

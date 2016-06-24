@@ -61,9 +61,14 @@ private:
     int checksum(const char*) const;
 
     /**
-     * calculate nmea-data
+     * calculate relative position to base and absolute heading
      */
     void calcRelPosToBase(Aircraft&);
+
+    /**
+     * calculate speed, climb-, turnratio
+     */
+    void calcMoveData(Aircraft&);
 
     /**
      * base position info
@@ -102,15 +107,14 @@ private:
     long_dist,
     lat_dist,
     /**
-     * bearing, relative bearing, absolute bearing
+     * relative bearing, absolute bearing
      */
-    bearing,
     bearing_rel,
     bearing_abs,
     /**
      * values to calculate distance
      */
-    a, c;
+    a;
     /**
      * (alt = height + antennaheight)
      */

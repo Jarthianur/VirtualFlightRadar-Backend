@@ -52,7 +52,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 std::smatch comm_match;
                 if (std::regex_match(match.str(9), comm_match, comm_re)) {
                     id = comm_match.str(2);
-                    addr_t = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
+                    id_t = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
                     ac_t = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C) >> 2;
                     climb_r = Math::ldToI(std::stold(comm_match.str(3)) * Math::fpm2ms);
                 } else return -1;
@@ -74,7 +74,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 gnd_spd = 0;
             }
 
-            ac_cont.insertAircraft(lat, lon, alt, id, addr_t, ac_t, climb_r, gnd_spd, heading, 0.0);//for now no turn rate
+            ac_cont.insertAircraft(id, lat, lon, alt, heading, gnd_spd, id_t, ac_t, climb_r, 0.0);//for now no turn rate
         } else {
             return -1;
         }

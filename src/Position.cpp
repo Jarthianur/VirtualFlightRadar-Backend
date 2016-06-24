@@ -32,7 +32,15 @@ Position::Position(long double lat, long double lon, int alt)
 {
 }
 
+Position::Position(long double lat, long double lon, int alt,
+        unsigned int track, float climb_r, float turn_r)
+: Position(lat, lon, alt)
+{
+    this->heading = track;
+    this->climb_rate = climb_r;
+    this->turn_rate = turn_r;
+}
+
 Position::~Position()
 {
 }
-

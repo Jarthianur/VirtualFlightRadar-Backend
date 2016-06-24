@@ -28,10 +28,9 @@ Copyright_License {
 #define UNKNOWN_T 0
 #define MIN_DATA -1
 #define HISTORY_S 2
-#define HEADING_FLAG 0x00000001
-#define SPEED_FLAG 0x00000010
-#define CLIMB_FLAG 0x00000100
-#define TURN_FLAG 0x00001000
+#define SPEED_FLAG 0x00000001
+#define CLIMB_FLAG 0x00000010
+#define TURN_FLAG  0x00000100
 
 class Aircraft
 {
@@ -44,27 +43,23 @@ public:
      * self explanatory
      */
     std::string id;
-    unsigned int heading = 0;
     int gnd_speed = 0;
-    float climb_rate = 0.0;
-    float turn_rate = 0.0;
     unsigned int id_type = 0;
     int aircraft_type = MIN_DATA;
     //0 = valid; +x(cycles) = invalid
     int valid = 0;
     /*
-     * specify which fields are from input; no need to calculate them
+     * specify which fields are given from input; no need to calculate them
      * bitflags:
      * climb_r,speed,heading
      */
     int data_flags = 0;
 
     void addPosition(Position&);
-    const Position& getLastPosition();
+    Position& getLastPosition();
 
 private:
     Position positions[HISTORY_S];
-    void calcMoveData();
 
     unsigned int last_pos = 0;
     unsigned int nr_of_pos = 0;

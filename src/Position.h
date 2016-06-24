@@ -27,12 +27,25 @@ class Position
 public:
     Position();
     Position(long double, long double, int);
+    Position(long double, long double, int, unsigned int, float, float);
     virtual ~Position();
 
+    /**
+     * absolue position
+     */
     long double latitude = 0.0L;
     long double longitude = 0.0L;
     int altitude = 0;
+    unsigned int heading = 0;
+    /**
+     * relative to base
+     */
     int distance = 0;
+    /**
+     * relative to last position
+     */
+    float climb_rate = 0.0;
+    float turn_rate = 0.0;
 };
 
 #endif /* SRC_POSITION_H_ */

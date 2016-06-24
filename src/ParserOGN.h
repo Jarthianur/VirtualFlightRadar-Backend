@@ -39,7 +39,7 @@ private:
     const std::regex comm_re;
     // temps
     std::string id;
-    int addr_t, ac_t, climb_r, alt, gnd_spd;
+    int id_t, ac_t, climb_r, alt, gnd_spd;
     long double lat, lon;
     float heading;
 };
