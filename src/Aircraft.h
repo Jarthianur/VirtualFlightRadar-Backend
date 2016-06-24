@@ -31,6 +31,7 @@ Copyright_License {
 #define SPEED_FLAG 1
 #define CLIMB_FLAG 2
 #define TURN_FLAG  4
+#define HEADING_FLAG 8
 #define VALUE_NA -1000
 
 class Aircraft

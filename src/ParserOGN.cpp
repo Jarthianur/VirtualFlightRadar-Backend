@@ -27,7 +27,7 @@ Copyright_License {
 
 ParserOGN::ParserOGN()
 : Parser(),
-  aprs_re("^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[^]+?(\\d{5}\\.\\d{2})([EW])[^]+?/?(\\d{3})?/A=(\\d{6})\\s+([^]+?)$", std::regex_constants::optimize),
+  aprs_re("^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[^]+?(\\d{5}\\.\\d{2})([EW])[^]+?((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+([^]+?)$", std::regex_constants::optimize),
   comm_re("^[^]+?id(\\S{2})(\\S{6})\\s+([\\+-]\\d+)fpm\\s+([\\+-]\\d+\\.\\d+)rot[^]+?$", std::regex_constants::optimize)
 {
 }
