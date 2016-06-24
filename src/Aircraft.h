@@ -28,15 +28,16 @@ Copyright_License {
 #define UNKNOWN_T 0
 #define MIN_DATA -1
 #define HISTORY_S 2
-#define SPEED_FLAG 0x00000001
-#define CLIMB_FLAG 0x00000010
-#define TURN_FLAG  0x00000100
+#define SPEED_FLAG 1
+#define CLIMB_FLAG 2
+#define TURN_FLAG  4
+#define VALUE_NA -1000
 
 class Aircraft
 {
 public:
-    Aircraft(std::string&, long double, long double, int);
-    Aircraft(std::string&, long double, long double, int, unsigned int, int, unsigned int, int, float, float);
+    Aircraft(std::string&, long double, long double, int, int);
+    Aircraft(std::string&, long double, long double, int, int, unsigned int, int, float, float, int);
     virtual ~Aircraft() throw();
 
     /**
@@ -57,6 +58,8 @@ public:
 
     void addPosition(Position&);
     Position& getLastPosition();
+    Position& getBeforeLastPosition();
+    bool isPosEvaluable();
 
 private:
     Position positions[HISTORY_S];

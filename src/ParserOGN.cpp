@@ -23,10 +23,12 @@ Copyright_License {
 #include "Math.h"
 #include "Configuration.h"
 
+//^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(?:\\d{6}h)(\\d{4}\\.\\d{2})(N|S)[^]+?(\\d{5}\\.\\d{2})(E|W)[^]+?((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+([^]+?)$
+
 ParserOGN::ParserOGN()
 : Parser(),
-  aprs_re("^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(?:\\d{6}h)(\\d{4}\\.\\d{2})(N|S)[^]+?(\\d{5}\\.\\d{2})(E|W)[^]+?((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+([^]+?)$", std::regex_constants::optimize),
-  comm_re("^[^]+?id(\\S{2})(\\S{6})\\s+([\\-|+]\\d+)fpm[^]+?$", std::regex_constants::optimize)
+  aprs_re("^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[^]+?(\\d{5}\\.\\d{2})([EW])[^]+?/?(\\d{3})?/A=(\\d{6})\\s+([^]+?)$", std::regex_constants::optimize),
+  comm_re("^[^]+?id(\\S{2})(\\S{6})\\s+([\\+-]\\d+)fpm\\s+([\\+-]\\d+\\.\\d+)rot[^]+?$", std::regex_constants::optimize)
 {
 }
 
@@ -43,38 +45,41 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
         std::smatch match;
         if (std::regex_match(sentence, match, aprs_re)) {
             //altitude
-            if (match.str(8).size() > 0) alt = Math::ldToI(std::stold(match.str(8)));
+            if (match.str(7).size() > 0) alt = Math::ldToI(std::stold(match.str(7)));
             if (alt > Configuration::filter_maxHeight) return -1;
 
             //comment
             // climbrate / address / id / type
-            if (match.str(9).size() > 0) {
+            if (match.str(8).size() > 0) {
                 std::smatch comm_match;
-                if (std::regex_match(match.str(9), comm_match, comm_re)) {
+                if (std::regex_match(match.str(8), comm_match, comm_re)) {
                     id = comm_match.str(2);
                     id_t = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
                     ac_t = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C) >> 2;
+                    //check if missing, if <- -x for flag
                     climb_r = Math::ldToI(std::stold(comm_match.str(3)) * Math::fpm2ms);
+                    turn_r = std::stof(comm_match.str(4)); // convert? 1rot = 0,5 circles / 2 mins
                 } else return -1;
             } else return -1;
 
+            //time
+            time = std::stoi(match.str(1));
+
             //latitude
-            lat = Math::dmsToDeg(std::stold(match.str(1)) / 100.0L);
-            if (match.str(2).compare("S") == 0) lat = -lat;
+            lat = Math::dmsToDeg(std::stold(match.str(2)) / 100.0L);
+            if (match.str(3).compare("S") == 0) lat = -lat;
             //longitue
-            lon = Math::dmsToDeg(std::stold(match.str(3)) / 100.0L);
-            if (match.str(4).compare("W") == 0) lon = -lon;
+            lon = Math::dmsToDeg(std::stold(match.str(4)) / 100.0L);
+            if (match.str(5).compare("W") == 0) lon = -lon;
 
             //track/gnd_speed
-            if (match.str(5).size() > 0) {
-                heading = std::stoi(match.str(6));
-                gnd_spd = Math::ldToI(std::stold(match.str(7)) * Math::kts2kmh);
+            if (match.str(6).size() > 0) {
+                gnd_spd = Math::ldToI(std::stold(match.str(6)) * Math::kts2kmh);
             } else {
-                heading = 0;
-                gnd_spd = 0;
+                gnd_spd = VALUE_NA;
             }
 
-            ac_cont.insertAircraft(id, lat, lon, alt, heading, gnd_spd, id_t, ac_t, climb_r, 0.0);//for now no turn rate
+            ac_cont.insertAircraft(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, time);
         } else {
             return -1;
         }

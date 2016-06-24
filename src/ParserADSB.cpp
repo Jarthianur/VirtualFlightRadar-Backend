@@ -48,6 +48,11 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
             case 4:
                 id = msg.substr(0,delim);
                 break;
+            case 7:
+                time = std::stoi(msg.substr(0,2)) * 10000;
+                time += std::stoi(msg.substr(3,2)) * 100;
+                time += std::stoi(msg.substr(6,2));
+                break;
             case 11:
                 if (msg.substr(0,delim).length() > 0) {
                     alt = std::stoi(msg.substr(0,delim), nullptr);
@@ -76,6 +81,6 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
         i++;
         msg.erase(0,delim+1);
     }
-    ac_cont.insertAircraft(id, lat, lon, alt);
+    ac_cont.insertAircraft(id, lat, lon, alt, time);
     return 0;
 }

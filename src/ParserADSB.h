@@ -34,7 +34,7 @@ public:
 
 private:
     std::string id;
-    int alt = 0;
+    int alt = 0, time = 0;
     long double lat = 0.0L, lon = 0.0L;
 };
 

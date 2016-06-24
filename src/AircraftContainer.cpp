@@ -84,43 +84,54 @@ unsigned int AircraftContainer::getContSize()
     return cont.size();
 }
 
-void AircraftContainer::insertAircraft(std::string& id, long double lat, long double lon, int alt)
+void AircraftContainer::insertAircraft(std::string& id, long double lat, long double lon, int alt, int time)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
+
+
     int i;
-    if ((i = find(id)) == -1) {
-        Aircraft ac(id, lat, lon, alt);
+    if ((i = find(id)) == -1) {if (cont.size() == 1) return;
+        Aircraft ac(id, lat, lon, alt, time);
         ac.aircraft_type = MIN_DATA;
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
     } else {
         Aircraft& ac = cont.at(i);
-        Position pos(lat, lon, alt);
+        Position pos(lat, lon, alt, time);
         ac.addPosition(std::ref(pos));
         ac.aircraft_type = MIN_DATA;
         ac.valid = 0;
+        ac.data_flags = 0;
     }
     return;
 }
 
 void AircraftContainer::insertAircraft(std::string& id, long double lat,
-        long double lon, int alt, unsigned int track, int gnd_spd, unsigned int id_t,
-        int ac_t, float climb_r, float turn_r)
+        long double lon, int alt, int gnd_spd, unsigned int id_t,
+        int ac_t, float climb_r, float turn_r, int time)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    int i;
-    if ((i = find(id)) == -1) {
-        Aircraft ac(id, lat, lon, alt, track, gnd_spd, id_t, ac_t, climb_r, turn_r);
+
+
+    int i, flags = 0;
+    if (gnd_spd != VALUE_NA) flags |= SPEED_FLAG;
+    if (climb_r != VALUE_NA) flags |= CLIMB_FLAG;
+    if (turn_r != VALUE_NA) flags |= TURN_FLAG;
+
+    if ((i = find(id)) == -1) {if (cont.size() == 1) return;
+        Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, time);
+        ac.data_flags = flags;
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
     } else {
         Aircraft& ac = cont.at(i);
-        Position pos(lat, lon, alt, track, climb_r, turn_r);
+        Position pos(lat, lon, alt, climb_r, turn_r, time);
         ac.addPosition(std::ref(pos));
         ac.aircraft_type = ac_t;
         ac.gnd_speed = gnd_spd;
         ac.id_type = id_t;
         ac.valid = 0;
+        ac.data_flags = flags;
     }
     return;
 }

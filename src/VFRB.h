@@ -28,7 +28,7 @@ Copyright_License {
 #include "WindFeed.h"
 
 #define SYNC_TIME 2
-#define WAIT_TIME 3
+#define WAIT_TIME 30
 
 class VFRB {
 public:

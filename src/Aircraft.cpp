@@ -26,20 +26,19 @@ Aircraft::~Aircraft()
 {
 }
 
-Aircraft::Aircraft(std::string& id, long double lat, long double lon, int alt)
+Aircraft::Aircraft(std::string& id, long double lat, long double lon, int alt, int time)
 : id(id)
 {
-    Position pos(lat, lon, alt);
+    Position pos(lat, lon, alt, time);
     this->addPosition(pos);
 }
 
 Aircraft::Aircraft(std::string& id, long double lat,
-        long double lon, int alt, unsigned int track, int gnd_spd, unsigned int id_t,
-        int ac_t, float climb_r, float turn_r)
-: Aircraft(id, lat, lon, alt)
+        long double lon, int alt, int gnd_spd, unsigned int id_t,
+        int ac_t, float climb_r, float turn_r, int time)
+: Aircraft(id, lat, lon, alt, time)
 {
     Position& pos = this->positions[last_pos];
-    pos.heading = track;
     pos.climb_rate = climb_r;
     pos.turn_rate = turn_r;
     this->gnd_speed = gnd_spd;
@@ -60,4 +59,14 @@ void Aircraft::addPosition(Position& pos)
 Position& Aircraft::getLastPosition()
 {
     return positions[last_pos];
+}
+
+Position& Aircraft::getBeforeLastPosition()
+{
+    return (nr_of_pos < 2) ? positions[last_pos] : positions[(last_pos + (HISTORY_S - 1)) % HISTORY_S];
+}
+
+bool Aircraft::isPosEvaluable()
+{
+    return (nr_of_pos > 1);
 }

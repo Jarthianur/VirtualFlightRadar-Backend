@@ -26,8 +26,8 @@ class Position
 {
 public:
     Position();
-    Position(long double, long double, int);
-    Position(long double, long double, int, unsigned int, float, float);
+    Position(long double, long double, int, int);
+    Position(long double, long double, int, int, float, float);
     virtual ~Position();
 
     /**
@@ -46,6 +46,8 @@ public:
      */
     float climb_rate = 0.0;
     float turn_rate = 0.0;
+
+    int timestamp = 0;
 };
 
 #endif /* SRC_POSITION_H_ */

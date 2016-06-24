@@ -39,9 +39,9 @@ private:
     const std::regex comm_re;
     // temps
     std::string id;
-    int id_t, ac_t, climb_r, alt, gnd_spd;
+    int id_t, ac_t, climb_r, alt, gnd_spd, time;
     long double lat, lon;
-    float heading;
+    float turn_r;
 };
 
 #endif /* PARSEROGN_H_ */
