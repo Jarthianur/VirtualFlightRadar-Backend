@@ -26,13 +26,15 @@ Copyright_License {
 #include "Position.h"
 
 #define UNKNOWN_T 0
+#define ADSB_T 8
 #define MIN_DATA -1
 #define HISTORY_S 2
+#define VALUE_NA -1000
+
 #define SPEED_FLAG 1
 #define CLIMB_FLAG 2
 #define TURN_FLAG  4
 #define HEADING_FLAG 8
-#define VALUE_NA -1000
 
 class Aircraft
 {
@@ -46,7 +48,7 @@ public:
      */
     std::string id;
     int gnd_speed = 0;
-    unsigned int id_type = 0;
+    unsigned int id_type = 1;
     int aircraft_type = MIN_DATA;
     //0 = valid; +x(cycles) = invalid
     int valid = 0;

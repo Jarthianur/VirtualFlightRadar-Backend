@@ -27,8 +27,8 @@ Copyright_License {
 
 ParserOGN::ParserOGN()
 : Parser(),
-  aprs_re("^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[^]+?(\\d{5}\\.\\d{2})([EW])[^]+?((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+([^]+?)$", std::regex_constants::optimize),
-  comm_re("^[^]+?id(\\S{2})(\\S{6})\\s+([\\+-]\\d+)fpm\\s+([\\+-]\\d+\\.\\d+)rot[^]+?$", std::regex_constants::optimize)
+  aprs_re("^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[^]+?(\\d{5}\\.\\d{2})([EW])[^]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+([^]+?)$", std::regex_constants::optimize),
+  comm_re("^[^]*id(\\S{2})(\\S{6})\\s+(?:([\\+-]\\d+)fpm\\s+)?(?:([\\+-]\\d+\\.\\d+)rot)?[^]*$", std::regex_constants::optimize)
 {
 }
 
@@ -44,40 +44,55 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
     try {
         std::smatch match;
         if (std::regex_match(sentence, match, aprs_re)) {
-            //altitude
-            if (match.str(9).size() > 0) alt = Math::ldToI(std::stold(match.str(9)));
-            if (alt > Configuration::filter_maxHeight) return -1;
+
+            try {
+                //time
+                time = std::stoi(match.str(1));
+
+                //latitude
+                lat = Math::dmsToDeg(std::stold(match.str(2)) / 100.0L);
+                if (match.str(3).compare("S") == 0) lat = -lat;
+                //longitue
+                lon = Math::dmsToDeg(std::stold(match.str(4)) / 100.0L);
+                if (match.str(5).compare("W") == 0) lon = -lon;
+
+                //altitude
+                alt = std::stoi(match.str(8));
+                if (alt > Configuration::filter_maxHeight) return -1;
+            } catch (std::logic_error& e) {
+                return -1;
+            }
 
             //comment
             // climbrate / address / id / type
-            if (match.str(10).size() > 0) {
+            if (match.str(9).size() > 0) {
                 std::smatch comm_match;
-                if (std::regex_match(match.str(10), comm_match, comm_re)) {
+                if (std::regex_match(match.str(9), comm_match, comm_re)) {
                     id = comm_match.str(2);
                     id_t = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
                     ac_t = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C) >> 2;
-                    //check if missing, if <- -x for flag
-                    climb_r = std::stold(comm_match.str(3)) * Math::fpm2ms;
-                    turn_r = std::stof(comm_match.str(4)); // convert? 1rot = 0,5 circles / 2 mins
+                    try {
+                        climb_r = std::stold(comm_match.str(3)) * Math::fpm2ms;
+                    } catch (std::logic_error& e) {
+                        climb_r = VALUE_NA;
+                    }
+                    try {
+                        turn_r = std::stof(comm_match.str(4)) * 3.0; // 1rot = 1 halfcircle / 1 min => 3° / 1s
+                    } catch (std::logic_error& e) {
+                        turn_r = VALUE_NA;
+                    }
                 } else return -1;
             } else return -1;
 
-            //time
-            time = std::stoi(match.str(1));
-
-            //latitude
-            lat = Math::dmsToDeg(std::stold(match.str(2)) / 100.0L);
-            if (match.str(3).compare("S") == 0) lat = -lat;
-            //longitue
-            lon = Math::dmsToDeg(std::stold(match.str(4)) / 100.0L);
-            if (match.str(5).compare("W") == 0) lon = -lon;
-
             //track/gnd_speed
-            if (match.str(6).size() > 0) {
-                heading = std::stoi(match.str(7));
-                gnd_spd = Math::ldToI(std::stold(match.str(8)) * Math::kts2kmh);
-            } else {
+            try {
+                heading = std::stoi(match.str(6));
+            } catch (std::logic_error& e) {
                 heading = VALUE_NA;
+            }
+            try {
+                gnd_spd = Math::ldToI(std::stold(match.str(7)) * Math::kts2kmh);
+            } catch (std::logic_error& e) {
                 gnd_spd = VALUE_NA;
             }
 

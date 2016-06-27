@@ -42,9 +42,8 @@ void ConfigReader::read()
             }
             std::smatch match;
             if (std::regex_match(line, match, conf_re)) {
-                key = match.str(1);
-                value = match.str(2);
-                std::cout << match.str(1).c_str() << "__"<< match.str(2).c_str() << "__" << std::endl;
+                key.assign(match.str(1));
+                value.assign(match.str(2));
                 config.insert({key, value});
             } else {
                 std::cout << "malformed parameter! " << key << std::endl;

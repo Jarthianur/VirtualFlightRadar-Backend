@@ -49,6 +49,7 @@ int AircraftProcessor::checksum(const char* sentence) const
 
 std::string AircraftProcessor::process(Aircraft& ac)
 {
+    // calculate movement before relative position !
     calcMoveData(ac);
     calcRelPosToBase(ac);
 
@@ -114,7 +115,7 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
     Position& last = ac.getLastPosition();
 
     int time_diff = last.timestamp - before.timestamp;
-    if (time_diff <= 0) return;
+    if (time_diff <= 0 || time_diff > 99) return;
 
     long_b = Math::radian(before.longitude);
     long_ac = Math::radian(last.longitude);
@@ -127,18 +128,13 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
 
     if ((ac.data_flags & SPEED_FLAG) == 0) {
         //calculate ground speed
-        ac.gnd_speed = Math::ldToI(dist / (time_diff));
+        ac.gnd_speed = Math::ldToI(dist / time_diff);
         ac.data_flags |= SPEED_FLAG;
     }
     if ((ac.data_flags & CLIMB_FLAG) == 0) {
         //calculate climb rate
-        last.climb_rate = ((last.altitude - before.altitude) * Math::feet2m) / (time_diff);
+        last.climb_rate = ((last.altitude - before.altitude) * Math::feet2m) / time_diff;
         ac.data_flags |= CLIMB_FLAG;
-    }
-    if ((ac.data_flags & TURN_FLAG) == 0) {
-        //calculate turn rate
-        last.turn_rate = 0.0;//todo
-        ac.data_flags |= TURN_FLAG;
     }
     if ((ac.data_flags & HEADING_FLAG) == 0) {
         //calculate heading
@@ -151,7 +147,18 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
                 )) + 360.0L), 360.0L));
         ac.data_flags |= HEADING_FLAG;
     }
-    if (ac.aircraft_type == MIN_DATA) ac.aircraft_type = UNKNOWN_T;
+    if ((ac.data_flags & TURN_FLAG) == 0) {
+        //calculate turn rate
+        if (before.heading != VALUE_NA) {
+            int head_l = (last.heading == 0) ? 360 : last.heading;
+            int head_b = (before.heading == 0) ? 360 : before.heading;
+            last.turn_rate = (head_l - head_b) / time_diff;
+            ac.data_flags |= TURN_FLAG;
+        } else {
+            last.turn_rate = VALUE_NA;
+        }
+    }
+    if (ac.aircraft_type == MIN_DATA) ac.aircraft_type = ADSB_T;
     return;
 }
 

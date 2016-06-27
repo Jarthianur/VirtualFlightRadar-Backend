@@ -45,6 +45,9 @@ int ConnectInExt::connectIn()
     if (send(in_con.con_sock, login_str.c_str(), login_str.length(), 0) <= 0) {
         return -1;
     }
+    //maybe verify correct login for ogn:
+    //logresp USER verified
+
     std::cout << "Connected to server" << std::endl;
     return 0;
 }

@@ -90,14 +90,12 @@ void AircraftContainer::insertAircraft(std::string& id, long double lat, long do
     int i;
     if ((i = find(id)) == -1) {
         Aircraft ac(id, lat, lon, alt, time);
-        ac.aircraft_type = MIN_DATA;
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
     } else {
         Aircraft& ac = cont.at(i);
         Position pos(lat, lon, alt, time);
         ac.addPosition(std::ref(pos));
-        ac.aircraft_type = MIN_DATA;
         ac.valid = 0;
         ac.data_flags = 0;
     }
