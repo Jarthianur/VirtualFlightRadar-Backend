@@ -49,9 +49,9 @@ int main(int argc, char* argv[]) {
         cout << VERSION << endl;
         ConfigReader cr(argv[2]);
         cr.read();
-        latitude = stold(cr.getProperty("latitude", "0.0"));
+        latitude = stod(cr.getProperty("latitude", "0.0"));
         cout << "latitude: " << latitude << endl;
-        longitude = stold(cr.getProperty("longitude","0.0"));
+        longitude = stod(cr.getProperty("longitude","0.0"));
         cout << "longitude: " << longitude << endl;
         altitude = stoi(cr.getProperty("altitude","0"));
         cout << "altitude: " << altitude << endl;

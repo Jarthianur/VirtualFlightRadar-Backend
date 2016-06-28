@@ -77,14 +77,14 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 break;
             case 14:
                 try {
-                    lat = std::stold(msg.substr(0,delim), nullptr);
+                    lat = std::stod(msg.substr(0,delim), nullptr);
                 } catch (std::logic_error& e) {
                     return -1;
                 }
                 break;
             case 15:
                 try {
-                    lon = std::stold(msg.substr(0,delim), nullptr);
+                    lon = std::stod(msg.substr(0,delim), nullptr);
                 } catch (std::logic_error& e) {
                     return -1;
                 }

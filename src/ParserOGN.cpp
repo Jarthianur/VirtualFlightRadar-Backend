@@ -50,10 +50,10 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 time = std::stoi(match.str(1));
 
                 //latitude
-                lat = Math::dmsToDeg(std::stold(match.str(2)) / 100.0);
+                lat = Math::dmsToDeg(std::stod(match.str(2)) / 100.0);
                 if (match.str(3).compare("S") == 0) lat = -lat;
                 //longitue
-                lon = Math::dmsToDeg(std::stold(match.str(4)) / 100.0);
+                lon = Math::dmsToDeg(std::stod(match.str(4)) / 100.0);
                 if (match.str(5).compare("W") == 0) lon = -lon;
 
                 //altitude
@@ -72,7 +72,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                     id_t = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
                     ac_t = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C) >> 2;
                     try {
-                        climb_r = std::stold(comm_match.str(3)) * Math::fpm2ms;
+                        climb_r = std::stod(comm_match.str(3)) * Math::fpm2ms;
                     } catch (std::logic_error& e) {
                         climb_r = VALUE_NA;
                     }
@@ -91,7 +91,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 heading = VALUE_NA;
             }
             try {
-                gnd_spd = Math::dToI(std::stold(match.str(7)) * Math::kts2kmh);
+                gnd_spd = Math::dToI(std::stod(match.str(7)) * Math::kts2kmh);
             } catch (std::logic_error& e) {
                 gnd_spd = VALUE_NA;
             }
