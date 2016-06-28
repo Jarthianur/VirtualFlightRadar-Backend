@@ -32,8 +32,8 @@ public:
     virtual ~Configuration() throw();
 
     static int base_altitude;
-    static long double base_latitude;
-    static long double base_longitude;
+    static double base_latitude;
+    static double base_longitude;
     static float base_geoid;
     static int global_out_port;
     static int global_ogn_port;

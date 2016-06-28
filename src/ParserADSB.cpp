@@ -21,6 +21,7 @@ Copyright_License {
 
 #include "ParserADSB.h"
 #include "Configuration.h"
+#include "Math.h"
 
 ParserADSB::ParserADSB()
 : Parser()
@@ -68,7 +69,7 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 break;
             case 11:
                 try {
-                    alt = std::stoi(msg.substr(0,delim), nullptr);
+                    alt = Math::fToI(std::stof(msg.substr(0,delim), nullptr) * Math::feet2m);
                     if (alt > Configuration::filter_maxHeight) return -1;
                 } catch (std::logic_error& e) {
                     return -1;

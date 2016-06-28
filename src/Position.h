@@ -26,27 +26,32 @@ class Position
 {
 public:
     Position();
-    Position(long double, long double, int, int);
-    Position(long double, long double, int, int, float, float, int);
+    Position(double, double, int, int);
+    Position(double, double, int, int, float, float, int);
     virtual ~Position();
 
     /**
      * absolue position
      */
-    long double latitude = 0.0L;
-    long double longitude = 0.0L;
+    double latitude = 0.0;
+    double longitude = 0.0;
+    // m
     int altitude = 0;
+    // deg [0-359]
     int heading = 0;
     /**
      * relative to base
      */
+    // m
     int distance = 0;
     /**
      * relative to last position
      */
+    // m/s
     float climb_rate = 0.0;
+    // deg/s
     float turn_rate = 0.0;
-
+    // 0...hhmmss
     int timestamp = 0;
 };
 

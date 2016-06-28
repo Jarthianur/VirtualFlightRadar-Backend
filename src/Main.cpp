@@ -30,8 +30,8 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
-    long double latitude = 0.0L;
-    long double longitude = 0.0L;
+    double latitude = 0.0;
+    double longitude = 0.0;
     int altitude = 0;
     float geoid = 0.0;
     int out_port = 0;
@@ -49,9 +49,9 @@ int main(int argc, char* argv[]) {
         cout << VERSION << endl;
         ConfigReader cr(argv[2]);
         cr.read();
-        latitude = stold(cr.getProperty("latitude", "0.0L"));
+        latitude = stold(cr.getProperty("latitude", "0.0"));
         cout << "latitude: " << latitude << endl;
-        longitude = stold(cr.getProperty("longitude","0.0L"));
+        longitude = stold(cr.getProperty("longitude","0.0"));
         cout << "longitude: " << longitude << endl;
         altitude = stoi(cr.getProperty("altitude","0"));
         cout << "altitude: " << altitude << endl;

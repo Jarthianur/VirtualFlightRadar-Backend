@@ -25,26 +25,31 @@ Copyright_License {
 namespace Math
 {
 
-long double radian(long double deg)
+double radian(double deg)
 {
-    return ((deg * PI) / 180.0L);
+    return ((deg * PI) / 180.0);
 }
 
-long double degree(long double rad)
+double degree(double rad)
 {
-    return (rad * 180.0L) / PI;
+    return (rad * 180.0) / PI;
 }
 
-int ldToI(long double ld)
+int dToI(double d)
 {
-    return (ld >= 0) ? (int)(ld + 0.5L) : (int)(ld - 0.5L);
+    return (d >= 0.0) ? (int)(d + 0.5) : (int)(d - 0.5);
 }
 
-long double dmsToDeg(long double dms)
+int fToI(float f)
 {
-    long double absDms = std::abs(dms);
-    long double d = std::floor(absDms);
-    long double m = (absDms - d) * 100.0L / 60.0L;
+    return (f >= 0.0) ? (int)(f + 0.5) : (int)(f - 0.5);
+}
+
+double dmsToDeg(double dms)
+{
+    double absDms = std::abs(dms);
+    double d = std::floor(absDms);
+    double m = (absDms - d) * 100.0 / 60.0;
     return d + m;
 }
 }

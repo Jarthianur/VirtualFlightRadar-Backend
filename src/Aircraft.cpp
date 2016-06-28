@@ -26,15 +26,15 @@ Aircraft::~Aircraft()
 {
 }
 
-Aircraft::Aircraft(std::string& id, long double lat, long double lon, int alt, int time)
+Aircraft::Aircraft(std::string& id, double lat, double lon, int alt, int time)
 : id(id)
 {
     Position pos(lat, lon, alt, time);
     this->addPosition(pos);
 }
 
-Aircraft::Aircraft(std::string& id, long double lat,
-        long double lon, int alt, int gnd_spd, unsigned int id_t,
+Aircraft::Aircraft(std::string& id, double lat,
+        double lon, int alt, int gnd_spd, unsigned int id_t,
         int ac_t, float climb_r, float turn_r, int time, int heading)
 : Aircraft(id, lat, lon, alt, time)
 {

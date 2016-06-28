@@ -84,7 +84,7 @@ unsigned int AircraftContainer::getContSize()
     return cont.size();
 }
 
-void AircraftContainer::insertAircraft(std::string& id, long double lat, long double lon, int alt, int time)
+void AircraftContainer::insertAircraft(std::string& id, double lat, double lon, int alt, int time)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     int i;
@@ -102,8 +102,8 @@ void AircraftContainer::insertAircraft(std::string& id, long double lat, long do
     return;
 }
 
-void AircraftContainer::insertAircraft(std::string& id, long double lat,
-        long double lon, int alt, int gnd_spd, unsigned int id_t,
+void AircraftContainer::insertAircraft(std::string& id, double lat,
+        double lon, int alt, int gnd_spd, unsigned int id_t,
         int ac_t, float climb_r, float turn_r, int time, int heading)
 {
     std::lock_guard<std::mutex> lock(this->mutex);

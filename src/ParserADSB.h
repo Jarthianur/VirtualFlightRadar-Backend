@@ -35,7 +35,7 @@ public:
 private:
     std::string id;
     int alt = 0, time = 0;
-    long double lat = 0.0L, lon = 0.0L;
+    double lat = 0.0, lon = 0.0;
 };
 
 #endif /* PARSERADSB_H_ */

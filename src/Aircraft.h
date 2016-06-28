@@ -35,18 +35,20 @@ Copyright_License {
 #define CLIMB_FLAG 2
 #define TURN_FLAG  4
 #define HEADING_FLAG 8
+#define FULL_DATA 15
 
 class Aircraft
 {
 public:
-    Aircraft(std::string&, long double, long double, int, int);
-    Aircraft(std::string&, long double, long double, int, int, unsigned int, int, float, float, int, int);
+    Aircraft(std::string&, double, double, int, int);
+    Aircraft(std::string&, double, double, int, int, unsigned int, int, float, float, int, int);
     virtual ~Aircraft() throw();
 
     /**
      * self explanatory
      */
     std::string id;
+    // km/h
     int gnd_speed = 0;
     unsigned int id_type = 1;
     int aircraft_type = MIN_DATA;

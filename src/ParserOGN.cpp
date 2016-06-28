@@ -50,14 +50,14 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 time = std::stoi(match.str(1));
 
                 //latitude
-                lat = Math::dmsToDeg(std::stold(match.str(2)) / 100.0L);
+                lat = Math::dmsToDeg(std::stold(match.str(2)) / 100.0);
                 if (match.str(3).compare("S") == 0) lat = -lat;
                 //longitue
-                lon = Math::dmsToDeg(std::stold(match.str(4)) / 100.0L);
+                lon = Math::dmsToDeg(std::stold(match.str(4)) / 100.0);
                 if (match.str(5).compare("W") == 0) lon = -lon;
 
                 //altitude
-                alt = std::stoi(match.str(8));
+                alt = Math::fToI(std::stof(match.str(8)) * Math::feet2m);
                 if (alt > Configuration::filter_maxHeight) return -1;
             } catch (std::logic_error& e) {
                 return -1;
@@ -91,7 +91,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 heading = VALUE_NA;
             }
             try {
-                gnd_spd = Math::ldToI(std::stold(match.str(7)) * Math::kts2kmh);
+                gnd_spd = Math::dToI(std::stold(match.str(7)) * Math::kts2kmh);
             } catch (std::logic_error& e) {
                 gnd_spd = VALUE_NA;
             }

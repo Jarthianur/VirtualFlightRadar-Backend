@@ -29,30 +29,33 @@ namespace Math
 /**
  * convert degree to radian
  */
-long double radian(long double);
+double radian(double);
 
 /**
  * convert radian to degree
  */
-long double degree(long double);
+double degree(double);
 
 /**
- * convert long double to int, round to nearest number
+ * convert to int, round to nearest number
  */
-int ldToI(long double);
+int dToI(double);
+int fToI(float);
 
 
-long double dmsToDeg(long double dms);
+double dmsToDeg(double dms);
 
 /**
  * constants
  */
-const long double kts2kmh = 1.852L;
-const long double kmh2kts = 0.539957L;
-const long double ms2fpm = 196.85L;
-const long double fpm2ms = 0.00508L;
-const long double feet2m = 0.3048L;
-const long double PI = std::acos(-1.0L);
+const float kts2kmh = 1.852;
+const float ms2fpm = 196.85;
+const float feet2m = 0.3048;
+const float ms2kmh = 3.6;
+const double kmh2ms = 0.277778;
+const double fpm2ms = 0.00508;
+const double kmh2kts = 0.539957;
+const double PI = std::acos(-1.0);
 
 }
 

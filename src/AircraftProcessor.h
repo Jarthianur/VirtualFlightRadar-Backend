@@ -30,7 +30,7 @@ Copyright_License {
 class AircraftProcessor
 {
 public:
-    AircraftProcessor(long double, long double, int, float);
+    AircraftProcessor(double, double, int, float);
     virtual ~AircraftProcessor();
 
     /**
@@ -71,9 +71,17 @@ private:
     void calcMoveData(Aircraft&);
 
     /**
+     * calculate probability of arrival to base,
+     * depending on the history of movement.
+     *
+     * return warninglevel
+     */
+    int calcPOA(Aircraft&);
+
+    /**
      * base position info
      */
-    long double baselat,
+    double baselat,
     baselong,
     /**
      * relative North, East, Vertical
