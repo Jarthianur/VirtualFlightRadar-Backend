@@ -173,7 +173,7 @@ int AircraftProcessor::calcPOA(Aircraft& ac)
     if (last.distance / (ac.gnd_speed * 3.6) <= 300) return 0;
 }
 
-void AircraftProcessor::gprmc(std::string& nmea_str)
+void AircraftProcessor::gpsfix(std::string& nmea_str)
 {
     nmea_str.clear();
     int csum;
@@ -187,21 +187,14 @@ void AircraftProcessor::gprmc(std::string& nmea_str)
 
     time_t now = time(0);
     tm* utc = gmtime(&now);
+    //gprmc
     snprintf(buffer, BUFF_OUT_S, "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
             utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg, long_min, longstr, utc->tm_mday, utc->tm_mon+1, utc->tm_year-100);
     csum = checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, 64, "%02x\r\n", csum);
     nmea_str.append(buffer);
-    return;
-}
-
-void AircraftProcessor::gpgga(std::string& nmea_str)
-{
-    nmea_str.clear();
-    int csum;
-    time_t now = time(0);
-    tm* utc = gmtime(&now);
+    //gpgga
     snprintf(buffer, BUFF_OUT_S, "$GPGGA,%02d%02d%02d,%02.0lf%06.4lf,%c,%03.0lf%07.4lf,%c,1,05,1,%d,M,%.1f,M,,*",
             utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg, long_min, longstr, basealt, basegeoid);
     csum = checksum(buffer);

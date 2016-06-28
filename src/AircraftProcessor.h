@@ -39,15 +39,9 @@ public:
     std::string process(Aircraft&);
 
     /**
-     * build GPRMC
+     * build GPRMC and GPGGA
      */
-    void gprmc(std::string&);
-
-    /**
-     * build GPGGA
-     * !! call this method only direct after a gprmc call !!
-     */
-    void gpgga(std::string&);
+    void gpsfix(std::string&);
 
 private:
     /**
