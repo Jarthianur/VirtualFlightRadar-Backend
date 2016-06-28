@@ -52,7 +52,7 @@ std::string AircraftProcessor::process(Aircraft& ac)
     // calculate movement before relative position !
     calcMoveData(ac);
     calcRelPosToBase(ac);
-    int poa = calcPOA(ac);
+    int poa = evaluatePOA(ac);
 
     if (dist > Configuration::filter_maxDist) {
         return "";
@@ -62,19 +62,19 @@ std::string AircraftProcessor::process(Aircraft& ac)
     Position& ac_pos = ac.getLastPosition();
 
     //PFLAU
-    snprintf(buffer, BUFF_OUT_S, "$PFLAU,,,,1,%d,%d,0,%d,%d,%s*", poa, Math::dToI(bearing_rel),
-            Math::dToI(rel_V), ac_pos.distance, ac.id.c_str());
+    snprintf(buffer, BUFF_OUT_S, "$PFLAU,,,,1,%d,%d,0,%d,%d,%s*",
+            poa, Math::dToI(bearing_rel), rel_V, ac_pos.distance, ac.id.c_str());
     int csum = checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, LESS_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
     //PFLAA
     if (ac.aircraft_type == MIN_DATA || ac.data_flags != FULL_DATA) {
-        snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", Math::dToI(rel_N),
-                Math::dToI(rel_E), Math::dToI(rel_V), ac.id.c_str());
+        snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*",
+                rel_N, rel_E, rel_V, ac.id.c_str());
     } else {
-        snprintf(buffer, BUFF_OUT_S, "$PFLAA,%d,%d,%d,%d,%u,%s,%03d,,%d,%3.1f,%1x*", poa, Math::dToI(rel_N),
-                Math::dToI(rel_E), Math::dToI(rel_V), ac.id_type, ac.id.c_str(), ac_pos.heading,
+        snprintf(buffer, BUFF_OUT_S, "$PFLAA,%d,%d,%d,%d,%u,%s,%03d,,%d,%3.1f,%1x*",
+                poa, rel_N, rel_E, rel_V, ac.id_type, ac.id.c_str(), ac_pos.heading,
                 ac.gnd_speed, ac_pos.climb_rate, ac.aircraft_type);
     }
     csum = checksum(buffer);
@@ -95,16 +95,16 @@ void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
     lat_dist = lat_ac -lat_b;
 
     a = std::pow(std::sin(lat_dist / 2.0), 2.0) + std::cos(lat_b) * std::cos(lat_ac) * std::pow(std::sin(long_dist / 2.0), 2.0);
-    dist = 6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a)));
-    ac_pos.distance = Math::dToI(dist);
+    dist = Math::dToI(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
+    ac_pos.distance = dist;
 
     bearing_rel = Math::degree(std::atan2(std::sin(long_ac - long_b) *
             std::cos(lat_ac), std::cos(lat_b) * std::sin(lat_ac) - std::sin(lat_b) *
             std::cos(lat_ac) * std::cos(long_ac - long_b)));
     bearing_abs = std::fmod((bearing_rel + 360.0), 360.0);
 
-    rel_N = std::cos(Math::radian(bearing_abs)) * dist;
-    rel_E = std::sin(Math::radian(bearing_abs)) * dist;
+    rel_N = Math::dToI(std::cos(Math::radian(bearing_abs))) * dist;
+    rel_E = Math::dToI(std::sin(Math::radian(bearing_abs))) * dist;
     rel_V = ac_pos.altitude - basealt;
     return;
 }
@@ -125,16 +125,16 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
     long_dist = long_ac - long_b;
     lat_dist = lat_ac -lat_b;
     a = std::pow(std::sin(lat_dist / 2.0), 2.0) + std::cos(lat_b) * std::cos(lat_ac) * std::pow(std::sin(long_dist / 2.0), 2.0);
-    dist = 6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a)));
+    dist = Math::dToI(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
 
     if ((ac.data_flags & SPEED_FLAG) == 0) {
         //calculate ground speed
-        ac.gnd_speed = Math::dToI((dist / time_diff) * Math::ms2kmh);
+        ac.gnd_speed = Math::fToI((dist / time_diff) * Math::ms2kmh);
         ac.data_flags |= SPEED_FLAG;
     }
     if ((ac.data_flags & CLIMB_FLAG) == 0) {
         //calculate climb rate
-        last.climb_rate = (last.altitude - before.altitude) / time_diff;
+        last.climb_rate = (float)(last.altitude - before.altitude) / (float)time_diff;
         ac.data_flags |= CLIMB_FLAG;
     }
     if ((ac.data_flags & HEADING_FLAG) == 0) {
@@ -153,7 +153,7 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
         if (before.heading != VALUE_NA) {
             int head_l = (last.heading == 0) ? 360 : last.heading;
             int head_b = (before.heading == 0) ? 360 : before.heading;
-            last.turn_rate = (head_l - head_b) / time_diff;
+            last.turn_rate = (float)(head_l - head_b) / (float)time_diff;
             ac.data_flags |= TURN_FLAG;
         } else {
             last.turn_rate = VALUE_NA;
@@ -163,14 +163,27 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
     return;
 }
 
-int AircraftProcessor::calcPOA(Aircraft& ac)
+void AircraftProcessor::calcPOA(Aircraft& ac)
 {
-    int poa = 0;
-    Position& last = ac.getLastPosition();
+    return;
+}
+
+int AircraftProcessor::evaluatePOA(Aircraft& ac)
+{
     //if there are not enough informations available, no calculation must be done
     if (ac.data_flags != FULL_DATA) return 0;
-    //check if ac is in range of 5 mins
-    if (last.distance / (ac.gnd_speed * 3.6) <= 300) return 0;
+
+    calcPOA(ac);
+    int level = 0;
+    Position& last = ac.getLastPosition();
+
+    //check wether ac is in range of 5 mins
+    if (last.distance / (ac.gnd_speed * Math::kmh2ms) <= 300.0) return 0;
+
+    //check wether interpolated heading is in direction of base
+    //check wether interpolated glidepath is in range of base and height is sufficient
+
+    return level;
 }
 
 void AircraftProcessor::gpsfix(std::string& nmea_str)

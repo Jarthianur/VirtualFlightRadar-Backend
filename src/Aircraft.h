@@ -24,6 +24,7 @@ Copyright_License {
 
 #include <string>
 #include "Position.h"
+#include "Interpolation.h"
 
 #define UNKNOWN_T 0
 #define ADSB_T 8
@@ -35,7 +36,8 @@ Copyright_License {
 #define CLIMB_FLAG 2
 #define TURN_FLAG  4
 #define HEADING_FLAG 8
-#define FULL_DATA 15
+// since turn rate is only used internally, its flag may not be set
+#define FULL_DATA 11
 
 class Aircraft
 {
@@ -58,6 +60,11 @@ public:
      * specify which fields are given from input; no need to calculate them
      */
     int data_flags = 0;
+    /**
+     * this stores movement values,
+     * calculated with position history.
+     */
+    Interpolation interpolation;
 
     void addPosition(Position&);
     Position& getLastPosition();

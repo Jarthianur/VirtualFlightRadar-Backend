@@ -19,44 +19,13 @@ Copyright_License {
 }
  */
 
-#ifndef MATH_H_
-#define MATH_H_
+#include "Interpolation.h"
 
-#include <cmath>
-
-namespace Math
+Interpolation::Interpolation()
 {
-/**
- * convert degree to radian
- */
-double radian(double);
-
-/**
- * convert radian to degree
- */
-double degree(double);
-
-/**
- * convert to int, round to nearest number
- */
-int dToI(double);
-int fToI(float);
-
-
-double dmsToDeg(double dms);
-
-/**
- * constants
- */
-const float kts2kmh = 1.852;
-const float ms2fpm = 196.85;
-const float feet2m = 0.3048;
-const float ms2kmh = 3.6;
-const float fpm2ms = 0.00508;
-const double kmh2ms = 0.277778;
-const double kmh2kts = 0.539957;
-const double PI = std::acos(-1.0);
-
 }
 
-#endif /* MATH_H_ */
+Interpolation::~Interpolation()
+{
+}
+

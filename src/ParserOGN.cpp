@@ -72,7 +72,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                     id_t = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
                     ac_t = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C) >> 2;
                     try {
-                        climb_r = std::stod(comm_match.str(3)) * Math::fpm2ms;
+                        climb_r = std::stof(comm_match.str(3)) * Math::fpm2ms;
                     } catch (std::logic_error& e) {
                         climb_r = VALUE_NA;
                     }
@@ -91,7 +91,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 heading = VALUE_NA;
             }
             try {
-                gnd_spd = Math::dToI(std::stod(match.str(7)) * Math::kts2kmh);
+                gnd_spd = Math::fToI(std::stof(match.str(7)) * Math::kts2kmh);
             } catch (std::logic_error& e) {
                 gnd_spd = VALUE_NA;
             }

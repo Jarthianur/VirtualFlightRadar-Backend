@@ -65,28 +65,23 @@ private:
     void calcMoveData(Aircraft&);
 
     /**
-     * calculate probability of arrival to base,
-     * depending on the history of movement.
+     * evaluate probability of arrival.
      *
      * return warninglevel
      */
-    int calcPOA(Aircraft&);
+    int evaluatePOA(Aircraft&);
+
+    /**
+     * calculate probability of arrival to base,
+     * depending on history.
+     */
+    void calcPOA(Aircraft&);
 
     /**
      * base position info
      */
     double baselat,
     baselong,
-    /**
-     * relative North, East, Vertical
-     */
-    rel_N,
-    rel_E,
-    rel_V,
-    /**
-     * distance from base position to Aircraft
-     */
-    dist,
     /**
      * Latitude degree, minutes
      * Longitude degree, minutes
@@ -120,7 +115,17 @@ private:
     /**
      * (alt = height + antennaheight)
      */
-    int basealt;
+    int basealt,
+    /**
+     * relative North, East, Vertical
+     */
+    rel_N,
+    rel_E,
+    rel_V,
+    /**
+     * distance from base position to Aircraft
+     */
+    dist;
     /**
      * Latitude: S - N
      * Longitude: W - E
