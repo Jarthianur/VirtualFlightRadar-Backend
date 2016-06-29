@@ -74,8 +74,8 @@ std::string AircraftProcessor::process(Aircraft& ac)
                 rel_N, rel_E, rel_V, ac.id.c_str());
     } else {
         snprintf(buffer, BUFF_OUT_S, "$PFLAA,%d,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
-                poa, rel_N, rel_E, rel_V, ac.id_type, ac.id.c_str(), ac_pos.heading,
-                ac.gnd_speed, ac_pos.climb_rate, ac.aircraft_type);
+                poa, rel_N, rel_E, rel_V, ac.id_type, ac.id.c_str(), Math::dToI(ac_pos.heading),
+                Math::dToI(ac.gnd_speed * Math::ms2kmh), ac_pos.climb_rate, ac.aircraft_type);
     }
     csum = checksum(buffer);
     nmea_str.append(buffer);
@@ -129,7 +129,7 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
 
     if ((ac.data_flags & SPEED_FLAG) == 0) {
         //calculate ground speed
-        ac.gnd_speed = Math::dToI((dist / time_diff) * Math::ms2kmh);
+        ac.gnd_speed = dist / time_diff;
         ac.data_flags |= SPEED_FLAG;
     }
     if ((ac.data_flags & CLIMB_FLAG) == 0) {
@@ -139,13 +139,12 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
     }
     if ((ac.data_flags & HEADING_FLAG) == 0) {
         //calculate heading
-        last.heading = Math::dToI(std::fmod(((
-                Math::degree(
-                        std::atan2(
-                                std::sin(long_ac - long_b) * std::cos(lat_ac),
-                                std::cos(lat_b) * std::sin(lat_ac) - std::sin(lat_b) *
-                                std::cos(lat_ac) * std::cos(long_ac - long_b))
-                )) + 360.0), 360.0));
+        last.heading = std::fmod(((Math::degree(
+                std::atan2(
+                        std::sin(long_ac - long_b) * std::cos(lat_ac),
+                        std::cos(lat_b) * std::sin(lat_ac) - std::sin(lat_b) *
+                        std::cos(lat_ac) * std::cos(long_ac - long_b))
+        )) + 360.0), 360.0);
         ac.data_flags |= HEADING_FLAG;
     }
     if ((ac.data_flags & TURN_FLAG) == 0) {
@@ -178,7 +177,7 @@ int AircraftProcessor::evaluatePOA(Aircraft& ac)
     Position& last = ac.getLastPosition();
 
     //check wether ac is in range of 5 mins
-    if (last.distance / (ac.gnd_speed * Math::kmh2ms) <= 300.0) return 0;
+    if (last.distance / ac.gnd_speed <= 300.0) return 0;
 
     //check wether interpolated heading is in direction of base
     //check wether interpolated glidepath is in range of base and height is sufficient
@@ -208,7 +207,7 @@ void AircraftProcessor::gpsfix(std::string& nmea_str)
     snprintf(buffer, 64, "%02x\r\n", csum);
     nmea_str.append(buffer);
     //gpgga
-    snprintf(buffer, BUFF_OUT_S, "$GPGGA,%02d%02d%02d,%02.0lf%06.4lf,%c,%03.0lf%07.4lf,%c,1,05,1,%d,M,%.1f,M,,*",
+    snprintf(buffer, BUFF_OUT_S, "$GPGGA,%02d%02d%02d,%02.0lf%06.4lf,%c,%03.0lf%07.4lf,%c,1,05,1,%d,M,%.1lf,M,,*",
             utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg, long_min, longstr, basealt, basegeoid);
     csum = checksum(buffer);
     nmea_str.append(buffer);

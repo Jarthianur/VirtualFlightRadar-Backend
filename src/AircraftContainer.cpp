@@ -103,8 +103,8 @@ void AircraftContainer::insertAircraft(std::string& id, double lat, double lon, 
 }
 
 void AircraftContainer::insertAircraft(std::string& id, double lat,
-        double lon, int alt, int gnd_spd, unsigned int id_t,
-        int ac_t, double climb_r, double turn_r, int time, int heading)
+        double lon, int alt, double gnd_spd, unsigned int id_t,
+        int ac_t, double climb_r, double turn_r, int time, double heading)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     int i, flags = 0;

@@ -30,7 +30,7 @@ Copyright_License {
 #define ADSB_T 8
 #define MIN_DATA -1
 #define HISTORY_S 2
-#define VALUE_NA -1000
+#define VALUE_NA -1000.0
 
 #define SPEED_FLAG 1
 #define CLIMB_FLAG 2
@@ -43,15 +43,15 @@ class Aircraft
 {
 public:
     Aircraft(std::string&, double, double, int, int);
-    Aircraft(std::string&, double, double, int, int, unsigned int, int, double, double, int, int);
+    Aircraft(std::string&, double, double, int, double, unsigned int, int, double, double, int, double);
     virtual ~Aircraft() throw();
 
     /**
      * self explanatory
      */
     std::string id;
-    // km/h
-    int gnd_speed = 0;
+    // m/s
+    double gnd_speed = 0;
     unsigned int id_type = 1;
     int aircraft_type = MIN_DATA;
     //0 = valid; +x(cycles) = invalid

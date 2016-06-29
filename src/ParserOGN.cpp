@@ -86,12 +86,12 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
 
             //track/gnd_speed
             try {
-                heading = std::stoi(match.str(6));
+                heading = std::stod(match.str(6));
             } catch (std::logic_error& e) {
                 heading = VALUE_NA;
             }
             try {
-                gnd_spd = Math::dToI(std::stod(match.str(7)) * Math::kts2kmh);
+                gnd_spd = std::stod(match.str(7)) * Math::kts2ms;
             } catch (std::logic_error& e) {
                 gnd_spd = VALUE_NA;
             }

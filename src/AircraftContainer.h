@@ -43,7 +43,7 @@ public:
      * insert aircraft in container
      */
     void insertAircraft(std::string&, double, double, int, int);
-    void insertAircraft(std::string&, double, double, int, int, unsigned int, int, double, double, int, int);
+    void insertAircraft(std::string&, double, double, int, double, unsigned int, int, double, double, int, double);
 
     /**
      * process aircraft at index i into target string,

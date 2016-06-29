@@ -47,12 +47,15 @@ double dmsToDeg(double dms);
  * constants
  */
 const double kts2kmh = 1.852;
-const double ms2fpm = 196.85;
-const double feet2m = 0.3048;
-const double ms2kmh = 3.6;
-const double fpm2ms = 0.00508;
-const double kmh2ms = 0.277778;
 const double kmh2kts = 0.539957;
+const double kts2ms = 0.514444;
+const double ms2kts = 1.94384;
+const double kmh2ms = 0.277778;
+const double ms2kmh = 3.6;
+const double ms2fpm = 196.85;
+const double fpm2ms = 0.00508;
+const double feet2m = 0.3048;
+const double m2feet = 3.28084;
 const double PI = std::acos(-1.0);
 
 }
