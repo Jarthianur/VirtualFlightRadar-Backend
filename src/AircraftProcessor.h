@@ -30,7 +30,7 @@ Copyright_License {
 class AircraftProcessor
 {
 public:
-    AircraftProcessor(double, double, int, float);
+    AircraftProcessor(double, double, int, double);
     virtual ~AircraftProcessor();
 
     /**
@@ -111,7 +111,11 @@ private:
     /**
      * values to calculate distance
      */
-    a;
+    a,
+    /**
+     * geoid separation
+     */
+    basegeoid;
     /**
      * (alt = height + antennaheight)
      */
@@ -131,10 +135,6 @@ private:
      * Longitude: W - E
      */
     char latstr, longstr;
-    /**
-     * geoid separation
-     */
-    float basegeoid;
 };
 
 #endif /* AIRCRAFTPROCESSOR_H_ */

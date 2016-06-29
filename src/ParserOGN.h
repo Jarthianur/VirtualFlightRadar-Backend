@@ -40,8 +40,7 @@ private:
     // temps
     std::string id;
     int id_t, ac_t, alt, gnd_spd, time, heading;
-    double lat, lon;
-    float turn_r, climb_r;
+    double lat, lon, turn_r, climb_r;
 };
 
 #endif /* PARSEROGN_H_ */

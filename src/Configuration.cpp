@@ -32,7 +32,7 @@ Configuration::~Configuration()
 int Configuration::base_altitude = 0;
 double Configuration::base_latitude = 0.0;
 double Configuration::base_longitude = 0.0;
-float Configuration::base_geoid = 0.0;
+double Configuration::base_geoid = 0.0;
 int Configuration::global_out_port = 0;
 int Configuration::global_ogn_port = 0;
 int Configuration::global_adsb_port = 0;

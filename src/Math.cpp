@@ -20,7 +20,6 @@ Copyright_License {
  */
 
 #include "Math.h"
-#include <cmath>
 
 namespace Math
 {
@@ -38,11 +37,6 @@ double degree(double rad)
 int dToI(double d)
 {
     return (d >= 0.0) ? (int)(d + 0.5) : (int)(d - 0.5);
-}
-
-int fToI(float f)
-{
-    return (f >= 0.0) ? (int)(f + 0.5) : (int)(f - 0.5);
 }
 
 double dmsToDeg(double dms)

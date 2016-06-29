@@ -34,7 +34,7 @@ public:
     static int base_altitude;
     static double base_latitude;
     static double base_longitude;
-    static float base_geoid;
+    static double base_geoid;
     static int global_out_port;
     static int global_ogn_port;
     static int global_adsb_port;

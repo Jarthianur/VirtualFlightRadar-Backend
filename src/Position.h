@@ -27,7 +27,7 @@ class Position
 public:
     Position();
     Position(double, double, int, int);
-    Position(double, double, int, int, float, float, int);
+    Position(double, double, int, int, double, double, int);
     virtual ~Position();
 
     /**
@@ -48,9 +48,9 @@ public:
      * relative to last position
      */
     // m/s
-    float climb_rate = 0.0;
+    double climb_rate = 0.0;
     // deg/s
-    float turn_rate = 0.0;
+    double turn_rate = 0.0;
     // 0...hhmmss
     int timestamp = 0;
 };

@@ -35,7 +35,7 @@ Aircraft::Aircraft(std::string& id, double lat, double lon, int alt, int time)
 
 Aircraft::Aircraft(std::string& id, double lat,
         double lon, int alt, int gnd_spd, unsigned int id_t,
-        int ac_t, float climb_r, float turn_r, int time, int heading)
+        int ac_t, double climb_r, double turn_r, int time, int heading)
 : Aircraft(id, lat, lon, alt, time)
 {
     Position& pos = this->positions[last_pos];

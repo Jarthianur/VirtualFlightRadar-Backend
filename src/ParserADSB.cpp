@@ -69,7 +69,7 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 break;
             case 11:
                 try {
-                    alt = Math::fToI(std::stof(msg.substr(0,delim), nullptr) * Math::feet2m);
+                    alt = Math::dToI(std::stod(msg.substr(0,delim), nullptr) * Math::feet2m);
                     if (alt > Configuration::filter_maxHeight) return -1;
                 } catch (std::logic_error& e) {
                     return -1;

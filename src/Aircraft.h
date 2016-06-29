@@ -43,7 +43,7 @@ class Aircraft
 {
 public:
     Aircraft(std::string&, double, double, int, int);
-    Aircraft(std::string&, double, double, int, int, unsigned int, int, float, float, int, int);
+    Aircraft(std::string&, double, double, int, int, unsigned int, int, double, double, int, int);
     virtual ~Aircraft() throw();
 
     /**

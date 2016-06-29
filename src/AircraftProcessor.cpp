@@ -25,7 +25,7 @@ Copyright_License {
 #include <ctime>
 #include "Math.h"
 
-AircraftProcessor::AircraftProcessor(double b_lat, double b_long, int b_alt, float geo)
+AircraftProcessor::AircraftProcessor(double b_lat, double b_long, int b_alt, double geo)
 : baselat(b_lat),
   baselong(b_long),
   basealt(b_alt),
@@ -73,7 +73,7 @@ std::string AircraftProcessor::process(Aircraft& ac)
         snprintf(buffer, BUFF_OUT_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*",
                 rel_N, rel_E, rel_V, ac.id.c_str());
     } else {
-        snprintf(buffer, BUFF_OUT_S, "$PFLAA,%d,%d,%d,%d,%u,%s,%03d,,%d,%3.1f,%1x*",
+        snprintf(buffer, BUFF_OUT_S, "$PFLAA,%d,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
                 poa, rel_N, rel_E, rel_V, ac.id_type, ac.id.c_str(), ac_pos.heading,
                 ac.gnd_speed, ac_pos.climb_rate, ac.aircraft_type);
     }
@@ -103,8 +103,8 @@ void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
             std::cos(lat_ac) * std::cos(long_ac - long_b)));
     bearing_abs = std::fmod((bearing_rel + 360.0), 360.0);
 
-    rel_N = Math::dToI(std::cos(Math::radian(bearing_abs))) * dist;
-    rel_E = Math::dToI(std::sin(Math::radian(bearing_abs))) * dist;
+    rel_N = Math::dToI(std::cos(Math::radian(bearing_abs)) * dist);
+    rel_E = Math::dToI(std::sin(Math::radian(bearing_abs)) * dist);
     rel_V = ac_pos.altitude - basealt;
     return;
 }
@@ -115,8 +115,8 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
     Position& before = ac.getBeforeLastPosition();
     Position& last = ac.getLastPosition();
 
-    int time_diff = last.timestamp - before.timestamp;
-    if (time_diff <= 0 || time_diff > 99) return;
+    double time_diff = last.timestamp - before.timestamp;
+    if (time_diff <= 0.0 || time_diff > 99.0) return;
 
     long_b = Math::radian(before.longitude);
     long_ac = Math::radian(last.longitude);
@@ -129,12 +129,12 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
 
     if ((ac.data_flags & SPEED_FLAG) == 0) {
         //calculate ground speed
-        ac.gnd_speed = Math::fToI((dist / time_diff) * Math::ms2kmh);
+        ac.gnd_speed = Math::dToI((dist / time_diff) * Math::ms2kmh);
         ac.data_flags |= SPEED_FLAG;
     }
     if ((ac.data_flags & CLIMB_FLAG) == 0) {
         //calculate climb rate
-        last.climb_rate = (float)(last.altitude - before.altitude) / (float)time_diff;
+        last.climb_rate = (last.altitude - before.altitude) / time_diff;
         ac.data_flags |= CLIMB_FLAG;
     }
     if ((ac.data_flags & HEADING_FLAG) == 0) {
@@ -153,7 +153,7 @@ void AircraftProcessor::calcMoveData(Aircraft& ac)
         if (before.heading != VALUE_NA) {
             int head_l = (last.heading == 0) ? 360 : last.heading;
             int head_b = (before.heading == 0) ? 360 : before.heading;
-            last.turn_rate = (float)(head_l - head_b) / (float)time_diff;
+            last.turn_rate = (head_l - head_b) / time_diff;
             ac.data_flags |= TURN_FLAG;
         } else {
             last.turn_rate = VALUE_NA;

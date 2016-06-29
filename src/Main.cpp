@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     double latitude = 0.0;
     double longitude = 0.0;
     int altitude = 0;
-    float geoid = 0.0;
+    double geoid = 0.0;
     int out_port = 0;
     int ogn_port = 0;
     int adsb_port = 0;
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
         cout << "longitude: " << longitude << endl;
         altitude = stoi(cr.getProperty("altitude","0"));
         cout << "altitude: " << altitude << endl;
-        geoid = stof(cr.getProperty("geoid","0.0"));
+        geoid = stod(cr.getProperty("geoid","0.0"));
         cout << "geoid: " << geoid << endl;
         out_port = stoi(cr.getProperty("outport","0"));
         cout << "outport: " << out_port << endl;

@@ -33,7 +33,7 @@ Position::Position(double lat, double lon, int alt, int time)
 {
 }
 
-Position::Position(double lat, double lon, int alt, int time, float climb_r, float turn_r, int heading)
+Position::Position(double lat, double lon, int alt, int time, double climb_r, double turn_r, int heading)
 : Position(lat, lon, alt, time)
 {
     this->climb_rate = climb_r;
