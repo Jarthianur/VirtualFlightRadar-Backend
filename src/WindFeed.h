@@ -36,10 +36,12 @@ public:
     void getNMEA(std::string&);
     void writeNMEA(const std::string&);
     bool isValid();
+    double getQNH();
 
 private:
     std::mutex mutex;
     std::string nmea_str;
+    // hpa
     double pressure = ICAO_STD;
     bool wind_valid = false;
 };

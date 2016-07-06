@@ -46,7 +46,7 @@ void WindFeed::writeNMEA(const std::string& str)
         wind_valid = true;
     } else if (str.substr(0,6).compare("$WIMDA") == 0) {
         try {
-            pressure = std::stod(str.substr(17,6));
+            pressure = std::stod(str.substr(17,6)) * 1000.0;
         } catch (std::invalid_argument& e) {
             return;
         }
@@ -58,4 +58,10 @@ bool WindFeed::isValid()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     return wind_valid;
+}
+
+double WindFeed::getQNH()
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    return pressure;
 }
