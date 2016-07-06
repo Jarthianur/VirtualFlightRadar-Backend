@@ -77,8 +77,10 @@ void VFRB::run()
             ac_proc.gpsfix(std::ref(str));
             out_con.sendMsgOut(std::ref(str));
             if (global_wind_feed_enabled) {
-                wind_feed.getNMEA(std::ref(str));
-                out_con.sendMsgOut(std::ref(str));
+                if (wind_feed.isValid()) {
+                    wind_feed.getNMEA(std::ref(str));
+                    out_con.sendMsgOut(std::ref(str));
+                }
             }
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
@@ -98,7 +100,7 @@ void VFRB::run()
 void VFRB::handle_wind_feed(WindFeed& nmea_str)
 {
     if (global_wind_feed_enabled) {
-        ConnectIn wind_con(Configuration::global_wind_feed_host.c_str(), Configuration::global_wind_feed_port);
+        ConnectIn wind_con(Configuration::global_wind_feed_host.c_str(), Configuration::global_wind_feed_port, 5);
         if (wind_con.setupConnectIn() == -1) return;
         while (wind_con.connectIn() == -1) {
             wind_con.close();

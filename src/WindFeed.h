@@ -25,6 +25,8 @@ Copyright_License {
 #include <string>
 #include <mutex>
 
+#define ICAO_STD 1013.25
+
 class WindFeed
 {
 public:
@@ -33,10 +35,13 @@ public:
 
     void getNMEA(std::string&);
     void writeNMEA(const std::string&);
+    bool isValid();
 
 private:
     std::mutex mutex;
     std::string nmea_str;
+    double pressure = ICAO_STD;
+    bool wind_valid = false;
 };
 
 #endif /* WINDFEED_H_ */

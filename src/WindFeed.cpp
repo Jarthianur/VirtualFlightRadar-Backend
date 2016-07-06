@@ -34,6 +34,7 @@ void WindFeed::getNMEA(std::string& dest_str)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     dest_str = nmea_str;
+    wind_valid = false;
     return;
 }
 
@@ -42,6 +43,19 @@ void WindFeed::writeNMEA(const std::string& str)
     std::lock_guard<std::mutex> lock(this->mutex);
     if (str.substr(0,6).compare("$WIMWV") == 0) {
         nmea_str = str;
+        wind_valid = true;
+    } else if (str.substr(0,6).compare("$WIMDA") == 0) {
+        try {
+            pressure = std::stod(str.substr(17,6));
+        } catch (std::invalid_argument& e) {
+            return;
+        }
     }
     return;
+}
+
+bool WindFeed::isValid()
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    return wind_valid;
 }
