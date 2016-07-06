@@ -27,6 +27,12 @@ class Interpolation
 public:
     Interpolation();
     virtual ~Interpolation() throw();
+
+private:
+    double avg_heading = 0.0,
+    avg_climb_r = 0.0,
+    avg_turn_r = 0.0;
+
 };
 
 #endif /* SRC_INTERPOLATION_H_ */
