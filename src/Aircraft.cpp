@@ -26,48 +26,23 @@ Aircraft::~Aircraft()
 {
 }
 
-Aircraft::Aircraft(std::string& id, double lat, double lon, int alt, int time)
-: id(id)
+Aircraft::Aircraft(std::string& id, double lat, double lon, int alt)
+: id(id),
+  latitude(lat),
+  longitude(lon),
+  altitude(alt)
 {
-    Position pos(lat, lon, alt, time);
-    this->addPosition(pos);
 }
 
 Aircraft::Aircraft(std::string& id, double lat,
         double lon, int alt, double gnd_spd, unsigned int id_t,
-        int ac_t, double climb_r, double turn_r, int time, double heading)
-: Aircraft(id, lat, lon, alt, time)
+        int ac_t, double climb_r, double turn_r, double heading)
+: Aircraft(id, lat, lon, alt)
 {
-    Position& pos = this->positions[last_pos];
-    pos.climb_rate = climb_r;
-    pos.turn_rate = turn_r;
-    pos.heading = heading;
+    this->climb_rate = climb_r;
+    this->turn_rate = turn_r;
+    this->heading = heading;
     this->gnd_speed = gnd_spd;
     this->id_type = id_t;
     this->aircraft_type = ac_t;
-}
-
-void Aircraft::addPosition(Position& pos)
-{
-    if (nr_of_pos != 0) {
-        last_pos = (last_pos+1) % HISTORY_S;
-    }
-    positions[last_pos] = pos;
-    nr_of_pos++;
-    return;
-}
-
-Position& Aircraft::getLastPosition()
-{
-    return positions[last_pos];
-}
-
-Position& Aircraft::getBeforeLastPosition()
-{
-    return (nr_of_pos < 2) ? positions[last_pos] : positions[(last_pos + (HISTORY_S - 1)) % HISTORY_S];
-}
-
-bool Aircraft::isPosEvaluable()
-{
-    return (nr_of_pos > 1);
 }

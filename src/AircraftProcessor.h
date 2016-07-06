@@ -60,24 +60,6 @@ private:
     void calcRelPosToBase(Aircraft&);
 
     /**
-     * calculate speed, climb-, turnratio
-     */
-    void calcMoveData(Aircraft&);
-
-    /**
-     * evaluate probability of arrival.
-     *
-     * return warninglevel
-     */
-    int evaluatePOA(Aircraft&);
-
-    /**
-     * calculate probability of arrival to base,
-     * depending on history.
-     */
-    void calcPOA(Aircraft&);
-
-    /**
      * base position info
      */
     double baselat,

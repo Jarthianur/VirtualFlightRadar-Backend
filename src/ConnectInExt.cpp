@@ -17,7 +17,7 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
 #include "ConnectInExt.h"
 #include <cstring>
@@ -25,8 +25,8 @@ Copyright_License {
 #include <unistd.h>
 #include <arpa/inet.h>
 
-ConnectInExt::ConnectInExt(const char* ogn_host, int ogn_port, std::string& login)
-: ConnectIn(ogn_host, ogn_port),
+ConnectInExt::ConnectInExt(const char* ogn_host, int ogn_port, std::string& login, unsigned int to)
+: ConnectIn(ogn_host, ogn_port, to),
   login_str(login)
 {
     login_str.append("\r\n");
@@ -67,6 +67,16 @@ int ConnectInExt::setupConnectIn()
     if (setsockopt(in_con.con_sock, SOL_SOCKET, SO_KEEPALIVE, &yes, sizeof(int)) == -1) {
         std::cout << "Could not set socketopt KEEPALIVE!" << std::endl;
         return -1;
+    }
+
+    if (timeout > 0) {
+        struct timeval tv;
+        tv.tv_sec = timeout;
+        tv.tv_usec = 0;
+        if (setsockopt(in_con.con_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval)) == -1) {
+            std::cout << "Could not set socketopt RCVTIMEO!" << std::endl;
+            return -1;
+        }
     }
 
     memset(&in_con.con_addr, 0, sizeof(in_con.con_addr));

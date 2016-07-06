@@ -20,7 +20,7 @@ Contributions are always welcome.
 
 Status quo:
 
-Version NONE; this will first be merged in Version 1.4
+Version 1.3.0
 
 Read more in the FEATURES.
 

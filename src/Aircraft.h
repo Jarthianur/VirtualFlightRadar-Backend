@@ -23,27 +23,17 @@ Copyright_License {
 #define AIRCRAFT_H_
 
 #include <string>
-#include "Position.h"
-#include "Interpolation.h"
 
 #define UNKNOWN_T 0
 #define ADSB_T 8
 #define MIN_DATA -1
-#define HISTORY_S 2
 #define VALUE_NA -1000.0
-
-#define SPEED_FLAG 1
-#define CLIMB_FLAG 2
-#define TURN_FLAG  4
-#define HEADING_FLAG 8
-// since turn rate is only used internally, its flag may not be set
-#define FULL_DATA 11
 
 class Aircraft
 {
 public:
-    Aircraft(std::string&, double, double, int, int);
-    Aircraft(std::string&, double, double, int, double, unsigned int, int, double, double, int, double);
+    Aircraft(std::string&, double, double, int);
+    Aircraft(std::string&, double, double, int, double, unsigned int, int, double, double, double);
     virtual ~Aircraft() throw();
 
     /**
@@ -54,28 +44,25 @@ public:
     double gnd_speed = 0;
     unsigned int id_type = 1;
     int aircraft_type = MIN_DATA;
+    /**
+     * absolue position
+     */
+    double latitude = 0.0;
+    double longitude = 0.0;
+    // m
+    int altitude = 0;
+    // deg [0-359]
+    double heading = 0;
+    /**
+     * relative to last position
+     */
+    // m/s
+    double climb_rate = 0.0;
+    // deg/s
+    double turn_rate = 0.0;
+
     //0 = valid; +x(cycles) = invalid
     int valid = 0;
-    /*
-     * specify which fields are given from input; no need to calculate them
-     */
-    int data_flags = 0;
-    /**
-     * this stores movement values,
-     * calculated with position history.
-     */
-    Interpolation interpolation;
-
-    void addPosition(Position&);
-    Position& getLastPosition();
-    Position& getBeforeLastPosition();
-    bool isPosEvaluable();
-
-private:
-    Position positions[HISTORY_S];
-
-    unsigned int last_pos = 0;
-    unsigned int nr_of_pos = 0;
 
 };
 

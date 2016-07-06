@@ -21,9 +21,9 @@ Copyright_License {
 
 #include "VFRB.h"
 #include "AircraftProcessor.h"
-#include "ParserADSB.h"
-#include "ParserOGN.h"
 #include "Configuration.h"
+#include "ParserAPRS.h"
+#include "ParserSBS.h"
 #include <chrono>
 #include <thread>
 #include <iostream>
@@ -132,7 +132,7 @@ void VFRB::handle_con_out(ConnectOutNMEA& out_con)
 void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
 {
     if (global_adsb_enabled) {
-        ParserADSB parser;
+        ParserSBS parser;
         ConnectIn adsb_con(Configuration::global_adsb_host.c_str(), Configuration::global_adsb_port);
 
         if (adsb_con.setupConnectIn() == -1) return;
@@ -164,7 +164,7 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
 void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
 {
     if (global_ogn_enabled) {
-        ParserOGN parser;
+        ParserAPRS parser;
         ConnectInExt ogn_con(Configuration::global_ogn_host.c_str(), Configuration::global_ogn_port, std::ref(Configuration::global_login_str));
 
         if (ogn_con.setupConnectIn() == -1) return;

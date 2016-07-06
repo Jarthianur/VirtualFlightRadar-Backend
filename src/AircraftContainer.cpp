@@ -84,49 +84,46 @@ unsigned int AircraftContainer::getContSize()
     return cont.size();
 }
 
-void AircraftContainer::insertAircraft(std::string& id, double lat, double lon, int alt, int time)
+void AircraftContainer::insertAircraft(std::string& id, double lat, double lon, int alt)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     int i;
     if ((i = find(id)) == -1) {
-        Aircraft ac(id, lat, lon, alt, time);
+        Aircraft ac(id, lat, lon, alt);
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
     } else {
         Aircraft& ac = cont.at(i);
-        Position pos(lat, lon, alt, time);
-        ac.addPosition(std::ref(pos));
         ac.valid = 0;
-        ac.data_flags = 0;
+        ac.latitude = lat;
+        ac.longitude = lon;
+        ac.altitude = alt;
     }
     return;
 }
 
 void AircraftContainer::insertAircraft(std::string& id, double lat,
         double lon, int alt, double gnd_spd, unsigned int id_t,
-        int ac_t, double climb_r, double turn_r, int time, double heading)
+        int ac_t, double climb_r, double turn_r, double heading)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    int i, flags = 0;
-    if (gnd_spd != VALUE_NA) flags |= SPEED_FLAG;
-    if (climb_r != VALUE_NA) flags |= CLIMB_FLAG;
-    if (turn_r != VALUE_NA) flags |= TURN_FLAG;
-    if (heading != VALUE_NA) flags |= HEADING_FLAG;
-
+    int i;
     if ((i = find(id)) == -1) {
-        Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, time, heading);
-        ac.data_flags = flags;
+        Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, heading);
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
     } else {
         Aircraft& ac = cont.at(i);
-        Position pos(lat, lon, alt, time, climb_r, turn_r, heading);
-        ac.addPosition(std::ref(pos));
         ac.aircraft_type = ac_t;
         ac.gnd_speed = gnd_spd;
         ac.id_type = id_t;
         ac.valid = 0;
-        ac.data_flags = flags;
+        ac.latitude = lat;
+        ac.longitude = lon;
+        ac.altitude = alt;
+        ac.climb_rate = climb_r;
+        ac.turn_rate = turn_r;
+        ac.heading = heading;
     }
     return;
 }

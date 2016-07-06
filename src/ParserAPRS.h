@@ -19,40 +19,28 @@ Copyright_License {
 }
  */
 
-#ifndef SRC_POSITION_H_
-#define SRC_POSITION_H_
+#ifndef PARSERAPRS_H_
+#define PARSERAPRS_H_
 
-class Position
+#include "Parser.h"
+#include <regex>
+
+class ParserAPRS: public Parser
 {
 public:
-    Position();
-    Position(double, double, int, int);
-    Position(double, double, int, int, double, double, double);
-    virtual ~Position();
+    ParserAPRS();
+    virtual ~ParserAPRS() throw();
 
-    /**
-     * absolue position
-     */
-    double latitude = 0.0;
-    double longitude = 0.0;
-    // m
-    int altitude = 0;
-    // deg [0-359]
-    double heading = 0;
-    /**
-     * relative to base
-     */
-    // m
-    int distance = 0;
-    /**
-     * relative to last position
-     */
-    // m/s
-    double climb_rate = 0.0;
-    // deg/s
-    double turn_rate = 0.0;
-    // 0...hhmmss
-    int timestamp = 0;
+    int unpack(const std::string&, AircraftContainer&);
+
+private:
+    //regex
+    const std::regex aprs_re;
+    const std::regex comm_re;
+    // temps
+    std::string id;
+    int id_t, ac_t, alt, time;
+    double lat, lon, turn_r, climb_r, gnd_spd, heading;
 };
 
-#endif /* SRC_POSITION_H_ */
+#endif /* PARSERAPRS_H_ */

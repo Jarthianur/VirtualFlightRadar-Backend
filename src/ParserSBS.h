@@ -17,30 +17,25 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
- */
+*/
 
-#ifndef PARSEROGN_H_
-#define PARSEROGN_H_
+#ifndef PARSERSBS_H_
+#define PARSERSBS_H_
 
 #include "Parser.h"
-#include <regex>
 
-class ParserOGN: public Parser
+class ParserSBS : public Parser
 {
 public:
-    ParserOGN();
-    virtual ~ParserOGN() throw();
+    ParserSBS();
+    virtual ~ParserSBS() throw();
 
     int unpack(const std::string&, AircraftContainer&);
 
 private:
-    //regex
-    const std::regex aprs_re;
-    const std::regex comm_re;
-    // temps
     std::string id;
-    int id_t, ac_t, alt, time;
-    double lat, lon, turn_r, climb_r, gnd_spd, heading;
+    int alt = 0, time = 0;
+    double lat = 0.0, lon = 0.0;
 };
 
-#endif /* PARSEROGN_H_ */
+#endif /* PARSERSBS_H_ */

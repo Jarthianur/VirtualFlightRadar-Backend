@@ -26,7 +26,7 @@ Copyright_License {
 
 using namespace std;
 
-#define VERSION "1.3.0-SNAPSHOT"
+#define VERSION "1.3.0"
 
 int main(int argc, char* argv[]) {
 
@@ -49,34 +49,39 @@ int main(int argc, char* argv[]) {
         cout << VERSION << endl;
         ConfigReader cr(argv[2]);
         cr.read();
-        latitude = stod(cr.getProperty("latitude", "0.0"));
-        cout << "latitude: " << latitude << endl;
-        longitude = stod(cr.getProperty("longitude","0.0"));
-        cout << "longitude: " << longitude << endl;
-        altitude = stoi(cr.getProperty("altitude","0"));
-        cout << "altitude: " << altitude << endl;
-        geoid = stod(cr.getProperty("geoid","0.0"));
-        cout << "geoid: " << geoid << endl;
-        out_port = stoi(cr.getProperty("outport","0"));
-        cout << "outport: " << out_port << endl;
-        ogn_port = stoi(cr.getProperty("ognport","0"));
-        cout << "ognport: " << ogn_port << endl;
-        adsb_port = stoi(cr.getProperty("adsbport","0"));
-        cout << "adsbport: " << adsb_port << endl;
-        ogn_host = cr.getProperty("ognhost", "nA");
-        cout << "ognhost: " << ogn_host << endl;
-        adsb_host = cr.getProperty("adsbhost", "nA");
-        cout << "adsbhost: " << adsb_host << endl;
-        login = cr.getProperty("login", "");
-        cout << "login: " << login << endl;
-        wind_feed_host = cr.getProperty("windFeedHost", "nA");
-        cout << "windFeedHost: " << wind_feed_host << endl;
-        wind_feed_port = stoi(cr.getProperty("windFeedPort","0"));
-        cout << "windFeedPort: " << wind_feed_port << endl;
-        maxHeight = stoi(cr.getProperty("maxHeight", "0"));
-        cout << "maxHeight: " << maxHeight << endl;
-        maxDist = stoi(cr.getProperty("maxDist", "0"));
-        cout << "maxDist: " << maxDist << endl;
+        try {
+            latitude = stod(cr.getProperty("latitude", "0.0"));
+            cout << "latitude: " << latitude << endl;
+            longitude = stod(cr.getProperty("longitude","0.0"));
+            cout << "longitude: " << longitude << endl;
+            altitude = stoi(cr.getProperty("altitude","0"));
+            cout << "altitude: " << altitude << endl;
+            geoid = stod(cr.getProperty("geoid","0.0"));
+            cout << "geoid: " << geoid << endl;
+            out_port = stoi(cr.getProperty("outport","0"));
+            cout << "outport: " << out_port << endl;
+            ogn_port = stoi(cr.getProperty("ognport","0"));
+            cout << "ognport: " << ogn_port << endl;
+            adsb_port = stoi(cr.getProperty("adsbport","0"));
+            cout << "adsbport: " << adsb_port << endl;
+            ogn_host = cr.getProperty("ognhost", "nA");
+            cout << "ognhost: " << ogn_host << endl;
+            adsb_host = cr.getProperty("adsbhost", "nA");
+            cout << "adsbhost: " << adsb_host << endl;
+            login = cr.getProperty("login", "");
+            cout << "login: " << login << endl;
+            wind_feed_host = cr.getProperty("windFeedHost", "nA");
+            cout << "windFeedHost: " << wind_feed_host << endl;
+            wind_feed_port = stoi(cr.getProperty("windFeedPort","0"));
+            cout << "windFeedPort: " << wind_feed_port << endl;
+            maxHeight = stoi(cr.getProperty("maxHeight", "0"));
+            cout << "maxHeight: " << maxHeight << endl;
+            maxDist = stoi(cr.getProperty("maxDist", "0"));
+            cout << "maxDist: " << maxDist << endl;
+        } catch (std::invalid_argument& e) {
+            cout << "malformed configuration\t->\texiting!" << endl;
+            return 1;
+        }
     } else {
         cout << "usage: ./VirtualFlightRadar-Backend -c pathToConfigFile"<< endl;
         return 1;

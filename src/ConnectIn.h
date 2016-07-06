@@ -35,7 +35,7 @@ public:
     /**
      * constructor with host,port
      */
-    ConnectIn(const char*, const int);
+    ConnectIn(const char*, const int, unsigned int = 0);
     virtual ~ConnectIn() throw();
 
     /**
@@ -80,7 +80,7 @@ protected:
     Connection in_con;
     const char* in_hostname;
     const int in_port;
-
+    unsigned int timeout;
 };
 
 #endif /* CONNECTIN_H_ */

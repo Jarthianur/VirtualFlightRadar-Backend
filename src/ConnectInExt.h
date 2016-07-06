@@ -27,7 +27,7 @@ Copyright_License {
 class ConnectInExt: public ConnectIn
 {
 public:
-   ConnectInExt(const char*, const int, std::string&);
+   ConnectInExt(const char*, const int, std::string&, unsigned int = 0);
    virtual ~ConnectInExt() throw();
 
    int setupConnectIn();

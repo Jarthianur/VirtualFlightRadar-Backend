@@ -19,20 +19,21 @@ Copyright_License {
 }
  */
 
-#include "ParserADSB.h"
+#include "ParserSBS.h"
+
 #include "Configuration.h"
 #include "Math.h"
 
-ParserADSB::ParserADSB()
+ParserSBS::ParserSBS()
 : Parser()
 {
 }
 
-ParserADSB::~ParserADSB()
+ParserSBS::~ParserSBS()
 {
 }
 
-int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
+int ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
 {
     std::string msg = sentence;
     /*
@@ -99,6 +100,6 @@ int ParserADSB::unpack(const std::string& sentence, AircraftContainer& ac_cont)
             return -1;
         }
     }
-    ac_cont.insertAircraft(id, lat, lon, alt, time);
+    ac_cont.insertAircraft(id, lat, lon, alt);
     return 0;
 }

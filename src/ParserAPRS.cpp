@@ -19,24 +19,25 @@ Copyright_License {
 }
  */
 
-#include "ParserOGN.h"
+#include "ParserAPRS.h"
+
 #include "Math.h"
 #include "Configuration.h"
 
 //^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(?:\\d{6}h)(\\d{4}\\.\\d{2})(N|S)[^]+?(\\d{5}\\.\\d{2})(E|W)[^]+?((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+([^]+?)$
 
-ParserOGN::ParserOGN()
+ParserAPRS::ParserAPRS()
 : Parser(),
   aprs_re("^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[^]+?(\\d{5}\\.\\d{2})([EW])[^]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+([^]+?)$", std::regex_constants::optimize),
   comm_re("^[^]*id(\\S{2})(\\S{6})\\s+(?:([\\+-]\\d+)fpm\\s+)?(?:([\\+-]\\d+\\.\\d+)rot)?[^]*$", std::regex_constants::optimize)
 {
 }
 
-ParserOGN::~ParserOGN()
+ParserAPRS::~ParserAPRS()
 {
 }
 
-int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
+int ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
 {
     if (sentence.at(0) == '#') {
         return -1;
@@ -96,7 +97,7 @@ int ParserOGN::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 gnd_spd = VALUE_NA;
             }
 
-            ac_cont.insertAircraft(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, time, heading);
+            ac_cont.insertAircraft(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, heading);
         } else {
             return -1;
         }
