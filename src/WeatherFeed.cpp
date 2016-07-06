@@ -19,18 +19,18 @@ Copyright_License {
 }
 */
 
-#include "WindFeed.h"
+#include "WeatherFeed.h"
 
-WindFeed::WindFeed()
+WeatherFeed::WeatherFeed()
 {
     nmea_str = "\r\n";
 }
 
-WindFeed::~WindFeed()
+WeatherFeed::~WeatherFeed()
 {
 }
 
-void WindFeed::getNMEA(std::string& dest_str)
+void WeatherFeed::getNMEA(std::string& dest_str)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     dest_str = nmea_str;
@@ -38,7 +38,7 @@ void WindFeed::getNMEA(std::string& dest_str)
     return;
 }
 
-void WindFeed::writeNMEA(const std::string& str)
+void WeatherFeed::writeNMEA(const std::string& str)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     if (str.substr(0,6).compare("$WIMWV") == 0) {
@@ -54,13 +54,13 @@ void WindFeed::writeNMEA(const std::string& str)
     return;
 }
 
-bool WindFeed::isValid()
+bool WeatherFeed::isValid()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     return wind_valid;
 }
 
-double WindFeed::getQNH()
+double WeatherFeed::getQNH()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     return pressure;

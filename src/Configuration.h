@@ -35,17 +35,17 @@ public:
     static double base_latitude;
     static double base_longitude;
     static double base_geoid;
+    static double base_qnh;
     static int global_out_port;
     static int global_ogn_port;
     static int global_adsb_port;
     static std::string global_ogn_host;
     static std::string global_adsb_host;
     static std::string global_login_str;
-    static std::string global_wind_feed_host;
-    static int global_wind_feed_port;
+    static std::string global_weather_feed_host;
+    static int global_weather_feed_port;
     static int filter_maxHeight;
     static int filter_maxDist;
-
 };
 
 #endif /* CONFIGURATION_H_ */

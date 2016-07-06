@@ -26,7 +26,7 @@ Copyright_License {
 
 using namespace std;
 
-#define VERSION "1.3.0"
+#define VERSION "1.3.0-SNAPSHOT"
 
 int main(int argc, char* argv[]) {
 
@@ -40,8 +40,8 @@ int main(int argc, char* argv[]) {
     std::string ogn_host("nA");
     std::string adsb_host("nA");
     std::string login;
-    std::string wind_feed_host("nA");
-    int wind_feed_port = 0;
+    std::string weather_feed_host("nA");
+    int weather_feed_port = 0;
     int maxHeight = 0;
     int maxDist = 0;
 
@@ -70,10 +70,10 @@ int main(int argc, char* argv[]) {
             cout << "adsbhost: " << adsb_host << endl;
             login = cr.getProperty("login", "");
             cout << "login: " << login << endl;
-            wind_feed_host = cr.getProperty("windFeedHost", "nA");
-            cout << "windFeedHost: " << wind_feed_host << endl;
-            wind_feed_port = stoi(cr.getProperty("windFeedPort","0"));
-            cout << "windFeedPort: " << wind_feed_port << endl;
+            weather_feed_host = cr.getProperty("weatherFeedHost", "nA");
+            cout << "weatherFeedHost: " << weather_feed_host << endl;
+            weather_feed_port = stoi(cr.getProperty("weatherFeedPort","0"));
+            cout << "weatherFeedPort: " << weather_feed_port << endl;
             maxHeight = stoi(cr.getProperty("maxHeight", "0"));
             cout << "maxHeight: " << maxHeight << endl;
             maxDist = stoi(cr.getProperty("maxDist", "0"));
@@ -97,8 +97,8 @@ int main(int argc, char* argv[]) {
     Configuration::global_ogn_host = ogn_host;
     Configuration::global_adsb_host = adsb_host;
     Configuration::global_login_str = login;
-    Configuration::global_wind_feed_host = wind_feed_host;
-    Configuration::global_wind_feed_port = wind_feed_port;
+    Configuration::global_weather_feed_host = weather_feed_host;
+    Configuration::global_weather_feed_port = weather_feed_port;
     Configuration::filter_maxHeight = maxHeight;
     Configuration::filter_maxDist = maxDist;
 

@@ -28,7 +28,7 @@ Copyright_License {
 #include <thread>
 #include <iostream>
 
-bool VFRB::global_wind_feed_enabled = false;
+bool VFRB::global_weather_feed_enabled = false;
 bool VFRB::global_ogn_enabled = false;
 bool VFRB::global_adsb_enabled = false;
 
@@ -44,7 +44,7 @@ void VFRB::run()
 {
     ConnectOutNMEA out_con(Configuration::global_out_port);
     AircraftContainer ac_cont;
-    WindFeed wind_feed;
+    WeatherFeed wind_feed;
     AircraftProcessor ac_proc(Configuration::base_latitude, Configuration::base_longitude, Configuration::base_altitude, Configuration::base_geoid);
 
     if (Configuration::global_ogn_host.compare("nA") != 0 || Configuration::global_ogn_host.length() == 0) {
@@ -53,15 +53,15 @@ void VFRB::run()
     if (Configuration::global_adsb_host.compare("nA") != 0 || Configuration::global_adsb_host.length() == 0) {
         global_adsb_enabled = true;
     } else std::cout << "adsb not enabled" << std::endl;
-    if (Configuration::global_wind_feed_host.compare("nA") != 0 || Configuration::global_wind_feed_host.length() == 0) {
-        global_wind_feed_enabled = true;
+    if (Configuration::global_weather_feed_host.compare("nA") != 0 || Configuration::global_weather_feed_host.length() == 0) {
+        global_weather_feed_enabled = true;
     } else std::cout << "wind feed not enabled" << std::endl;
 
     try{
         std::thread adsb_in_thread(handle_adsb_in, std::ref(ac_cont));
         std::thread ogn_in_thread(handle_ogn_in, std::ref(ac_cont));
         std::thread con_out_thread(handle_con_out, std::ref(out_con));
-        std::thread wind_feed_thread(handle_wind_feed, std::ref(wind_feed));
+        std::thread wind_feed_thread(handle_weather_feed, std::ref(wind_feed));
 
         std::string str;
         unsigned int i;
@@ -76,7 +76,8 @@ void VFRB::run()
             }
             ac_proc.gpsfix(std::ref(str));
             out_con.sendMsgOut(std::ref(str));
-            if (global_wind_feed_enabled) {
+            if (global_weather_feed_enabled) {
+                Configuration::base_qnh = wind_feed.getQNH();
                 if (wind_feed.isValid()) {
                     wind_feed.getNMEA(std::ref(str));
                     out_con.sendMsgOut(std::ref(str));
@@ -97,10 +98,10 @@ void VFRB::run()
     return;
 }
 
-void VFRB::handle_wind_feed(WindFeed& nmea_str)
+void VFRB::handle_weather_feed(WeatherFeed& nmea_str)
 {
-    if (global_wind_feed_enabled) {
-        ConnectIn wind_con(Configuration::global_wind_feed_host.c_str(), Configuration::global_wind_feed_port, 5);
+    if (global_weather_feed_enabled) {
+        ConnectIn wind_con(Configuration::global_weather_feed_host.c_str(), Configuration::global_weather_feed_port, 5);
         if (wind_con.setupConnectIn() == -1) return;
         while (wind_con.connectIn() == -1) {
             wind_con.close();

@@ -25,10 +25,10 @@ Copyright_License {
 #include "ConnectOutNMEA.h"
 #include "AircraftContainer.h"
 #include "ConnectInExt.h"
-#include "WindFeed.h"
+#include "WeatherFeed.h"
 
 #define SYNC_TIME 1
-#define WAIT_TIME 5
+#define WAIT_TIME 300
 
 class VFRB {
 public:
@@ -43,7 +43,7 @@ public:
     /**
      * configuration
      */
-    static bool global_wind_feed_enabled;
+    static bool global_weather_feed_enabled;
     static bool global_ogn_enabled;
     static bool global_adsb_enabled;
 
@@ -54,7 +54,7 @@ protected:
     static void handle_adsb_in(AircraftContainer&);
     static void handle_ogn_in(AircraftContainer&);
     static void handle_con_out(ConnectOutNMEA&);
-    static void handle_wind_feed(WindFeed&);
+    static void handle_weather_feed(WeatherFeed&);
 };
 
 #endif /* VFRB_H_ */

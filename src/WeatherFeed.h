@@ -27,11 +27,11 @@ Copyright_License {
 
 #define ICAO_STD 1013.25
 
-class WindFeed
+class WeatherFeed
 {
 public:
-    WindFeed();
-    virtual ~WindFeed();
+    WeatherFeed();
+    virtual ~WeatherFeed();
 
     void getNMEA(std::string&);
     void writeNMEA(const std::string&);
