@@ -48,7 +48,7 @@ double dmsToDeg(double dms)
 }
 }
 
-double Math::calcIcaoHeight(double qnh, double temp)
+double Math::calcIcaoHeight(double press, double temp)
 {
-    return (273.15 + temp) * (1 - std::pow((qnh / 1013.25), 0.190295)) / 0.0065;
+    return (273.15 + temp) * (1 - std::pow((press / 1013.25), 0.190295)) / 0.0065;
 }

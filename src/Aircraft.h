@@ -60,9 +60,10 @@ public:
     double climb_rate = 0.0;
     // deg/s
     double turn_rate = 0.0;
-
     //0 = valid; +x(cycles) = invalid
     int valid = 0;
+    //differ altitude (gps from aprsc, QNE from sbs)
+    bool qne = false;
 
 };
 

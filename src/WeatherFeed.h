@@ -38,7 +38,7 @@ public:
     void getNMEA(std::string&);
     void writeNMEA(const std::string&);
     bool isValid();
-    double getQNH();
+    double getPress();
     double getTemp();
 
 private:

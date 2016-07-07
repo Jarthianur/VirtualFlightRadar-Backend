@@ -44,7 +44,7 @@ int dToI(double);
 double dmsToDeg(double dms);
 
 /**
- * calculate height difference from QNE to QNH in meters
+ * calculate height difference from QNE to Pressure in meters
  * with ICAO height formula
  */
 double calcIcaoHeight(double, double = 15.0);

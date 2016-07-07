@@ -77,7 +77,7 @@ void VFRB::run()
             ac_proc.gpsfix(std::ref(str));
             out_con.sendMsgOut(std::ref(str));
             if (global_weather_feed_enabled) {
-                if (weather_feed.getQNH() != VALUE_NA) Configuration::base_qnh = weather_feed.getQNH();
+                if (weather_feed.getPress() != VALUE_NA) Configuration::base_pressure = weather_feed.getPress();
                 if (weather_feed.getTemp() != VALUE_NA) Configuration::base_temp = weather_feed.getTemp();
                 if (weather_feed.isValid()) {
                     weather_feed.getNMEA(std::ref(str));

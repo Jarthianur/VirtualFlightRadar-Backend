@@ -90,6 +90,7 @@ void AircraftContainer::insertAircraft(std::string& id, double lat, double lon, 
     int i;
     if ((i = find(id)) == -1) {
         Aircraft ac(id, lat, lon, alt);
+        ac.qne = true;
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
     } else {
@@ -98,6 +99,7 @@ void AircraftContainer::insertAircraft(std::string& id, double lat, double lon, 
         ac.latitude = lat;
         ac.longitude = lon;
         ac.altitude = alt;
+        ac.qne = true;
     }
     return;
 }
@@ -110,6 +112,7 @@ void AircraftContainer::insertAircraft(std::string& id, double lat,
     int i;
     if ((i = find(id)) == -1) {
         Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, heading);
+        ac.qne = false;
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
     } else {
@@ -124,6 +127,7 @@ void AircraftContainer::insertAircraft(std::string& id, double lat,
         ac.climb_rate = climb_r;
         ac.turn_rate = turn_r;
         ac.heading = heading;
+        ac.qne = false;
     }
     return;
 }

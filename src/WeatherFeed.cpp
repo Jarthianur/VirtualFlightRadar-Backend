@@ -70,7 +70,7 @@ bool WeatherFeed::isValid()
     return wind_valid;
 }
 
-double WeatherFeed::getQNH()
+double WeatherFeed::getPress()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     return pressure;

@@ -99,7 +99,8 @@ void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
 
     rel_N = Math::dToI(std::cos(Math::radian(bearing_abs)) * dist);
     rel_E = Math::dToI(std::sin(Math::radian(bearing_abs)) * dist);
-    rel_V = ac.altitude - basealt;
+    rel_V = ac.qne ? ac.altitude - Math::calcIcaoHeight(Configuration::base_pressure) :
+            ac.altitude - basealt;
     return;
 }
 

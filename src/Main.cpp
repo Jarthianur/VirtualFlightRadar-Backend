@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
     double longitude = 0.0;
     int altitude = 0;
     double geoid = 0.0;
-    double qnh = 0.0;
+    double pressure = 0.0;
     double temp = 0.0;
     int out_port = 0;
     int ogn_port = 0;
@@ -64,10 +64,10 @@ int main(int argc, char* argv[]) {
             geoid = stod(cr.getProperty("geoid","0.0"));
             cout << "geoid: " << geoid << endl;
 
-            qnh = stod(cr.getProperty("QNH", "1013.25"));
-            cout << "QNH: " << qnh << endl;
+            pressure = stod(cr.getProperty("pressure", "1013.25"));
+            cout << "Pressure: " << pressure << endl;
 
-            qnh = stod(cr.getProperty("temp", "15.0"));
+            pressure = stod(cr.getProperty("temp", "15.0"));
             cout << "Temp: " << temp << endl;
 
             out_port = stoi(cr.getProperty("outport","0"));
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
     Configuration::base_latitude = latitude;
     Configuration::base_longitude = longitude;
     Configuration::base_geoid = geoid;
-    Configuration::base_qnh = qnh;
+    Configuration::base_pressure = pressure;
     Configuration::base_temp = temp;
     Configuration::global_out_port = out_port;
     Configuration::global_ogn_port = ogn_port;
