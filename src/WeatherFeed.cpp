@@ -17,7 +17,7 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
 #include "WeatherFeed.h"
 
@@ -45,14 +45,19 @@ void WeatherFeed::writeNMEA(const std::string& str)
         nmea_str = str;
         wind_valid = true;
     } else if (str.substr(0,6).compare("$WIMDA") == 0) {
-        try {//todo critical read errors!
-            pressure = std::stod(str.substr(17,6)) * 1000.0;
-        } catch (std::invalid_argument& e) {
+        int b,s;
+        try {
+            b = str.find('B')-1;
+            s = str.substr(0,b).find_last_of(',')+1;
+            pressure = std::stod(str.substr(s,b-s)) * 1000.0;
+        } catch (std::logic_error& e) {
             pressure = VALUE_NA;
         }
         try {
-            temperature = std::stod(str.substr(26,4));
-        } catch (std::invalid_argument& e) {
+            b = str.find('C')-1;
+            s = str.substr(0,b).find_last_of(',')+1;
+            temperature = std::stod(str.substr(s,b-s));
+        } catch (std::logic_error& e) {
             temperature = VALUE_NA;
         }
     }
