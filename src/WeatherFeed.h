@@ -25,7 +25,9 @@ Copyright_License {
 #include <string>
 #include <mutex>
 
-#define ICAO_STD 1013.25
+#define ICAO_STD_A 1013.25
+#define ICAO_STD_T 15.0
+#define VALUE_NA -1000.0
 
 class WeatherFeed
 {
@@ -37,12 +39,15 @@ public:
     void writeNMEA(const std::string&);
     bool isValid();
     double getQNH();
+    double getTemp();
 
 private:
     std::mutex mutex;
     std::string nmea_str;
     // hpa
-    double pressure = ICAO_STD;
+    double pressure = ICAO_STD_A;
+    // celsius
+    double temperature = ICAO_STD_T;
     bool wind_valid = false;
 };
 

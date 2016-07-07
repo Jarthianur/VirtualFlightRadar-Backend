@@ -44,6 +44,12 @@ int dToI(double);
 double dmsToDeg(double dms);
 
 /**
+ * calculate height difference from QNE to QNH in meters
+ * with ICAO height formula
+ */
+double calcIcaoHeight(double, double = 15.0);
+
+/**
  * constants
  */
 const double kts2kmh = 1.852;

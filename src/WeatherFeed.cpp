@@ -45,10 +45,15 @@ void WeatherFeed::writeNMEA(const std::string& str)
         nmea_str = str;
         wind_valid = true;
     } else if (str.substr(0,6).compare("$WIMDA") == 0) {
-        try {
+        try {//todo critical read errors!
             pressure = std::stod(str.substr(17,6)) * 1000.0;
         } catch (std::invalid_argument& e) {
-            return;
+            pressure = VALUE_NA;
+        }
+        try {
+            temperature = std::stod(str.substr(26,4));
+        } catch (std::invalid_argument& e) {
+            temperature = VALUE_NA;
         }
     }
     return;
@@ -64,4 +69,10 @@ double WeatherFeed::getQNH()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     return pressure;
+}
+
+double WeatherFeed::getTemp()
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    return temperature;
 }

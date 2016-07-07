@@ -36,6 +36,7 @@ public:
     static double base_longitude;
     static double base_geoid;
     static double base_qnh;
+    static double base_temp;
     static int global_out_port;
     static int global_ogn_port;
     static int global_adsb_port;

@@ -34,6 +34,8 @@ int main(int argc, char* argv[]) {
     double longitude = 0.0;
     int altitude = 0;
     double geoid = 0.0;
+    double qnh = 0.0;
+    double temp = 0.0;
     int out_port = 0;
     int ogn_port = 0;
     int adsb_port = 0;
@@ -52,30 +54,49 @@ int main(int argc, char* argv[]) {
         try {
             latitude = stod(cr.getProperty("latitude", "0.0"));
             cout << "latitude: " << latitude << endl;
+
             longitude = stod(cr.getProperty("longitude","0.0"));
             cout << "longitude: " << longitude << endl;
+
             altitude = stoi(cr.getProperty("altitude","0"));
             cout << "altitude: " << altitude << endl;
+
             geoid = stod(cr.getProperty("geoid","0.0"));
             cout << "geoid: " << geoid << endl;
+
+            qnh = stod(cr.getProperty("QNH", "1013.25"));
+            cout << "QNH: " << qnh << endl;
+
+            qnh = stod(cr.getProperty("temp", "15.0"));
+            cout << "Temp: " << temp << endl;
+
             out_port = stoi(cr.getProperty("outport","0"));
             cout << "outport: " << out_port << endl;
+
             ogn_port = stoi(cr.getProperty("ognport","0"));
             cout << "ognport: " << ogn_port << endl;
+
             adsb_port = stoi(cr.getProperty("adsbport","0"));
             cout << "adsbport: " << adsb_port << endl;
+
             ogn_host = cr.getProperty("ognhost", "nA");
             cout << "ognhost: " << ogn_host << endl;
+
             adsb_host = cr.getProperty("adsbhost", "nA");
             cout << "adsbhost: " << adsb_host << endl;
+
             login = cr.getProperty("login", "");
             cout << "login: " << login << endl;
+
             weather_feed_host = cr.getProperty("weatherFeedHost", "nA");
             cout << "weatherFeedHost: " << weather_feed_host << endl;
+
             weather_feed_port = stoi(cr.getProperty("weatherFeedPort","0"));
             cout << "weatherFeedPort: " << weather_feed_port << endl;
+
             maxHeight = stoi(cr.getProperty("maxHeight", "0"));
             cout << "maxHeight: " << maxHeight << endl;
+
             maxDist = stoi(cr.getProperty("maxDist", "0"));
             cout << "maxDist: " << maxDist << endl;
         } catch (std::invalid_argument& e) {
@@ -91,6 +112,8 @@ int main(int argc, char* argv[]) {
     Configuration::base_latitude = latitude;
     Configuration::base_longitude = longitude;
     Configuration::base_geoid = geoid;
+    Configuration::base_qnh = qnh;
+    Configuration::base_temp = temp;
     Configuration::global_out_port = out_port;
     Configuration::global_ogn_port = ogn_port;
     Configuration::global_adsb_port = adsb_port;

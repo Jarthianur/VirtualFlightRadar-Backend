@@ -113,8 +113,8 @@ int ConnectOutNMEA::sendMsgOut(std::string& msg)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     for (unsigned int i = 0; i < clients.size(); ++i) {
-        //std::cout << "send to " << i << std::endl;
         if (send(clients.at(i).con_sock, msg.c_str(), msg.length(), MSG_NOSIGNAL) <= 0) {
+            std::cout << "lost connection to " << inet_ntoa(clients.at(i).con_addr.sin_addr) << std::endl;
             closeClient(std::ref(clients.at(i)));
             clients.erase(clients.begin() + i);
         }

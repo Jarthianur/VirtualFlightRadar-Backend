@@ -44,7 +44,7 @@ void VFRB::run()
 {
     ConnectOutNMEA out_con(Configuration::global_out_port);
     AircraftContainer ac_cont;
-    WeatherFeed wind_feed;
+    WeatherFeed weather_feed;
     AircraftProcessor ac_proc(Configuration::base_latitude, Configuration::base_longitude, Configuration::base_altitude, Configuration::base_geoid);
 
     if (Configuration::global_ogn_host.compare("nA") != 0 || Configuration::global_ogn_host.length() == 0) {
@@ -61,7 +61,7 @@ void VFRB::run()
         std::thread adsb_in_thread(handle_adsb_in, std::ref(ac_cont));
         std::thread ogn_in_thread(handle_ogn_in, std::ref(ac_cont));
         std::thread con_out_thread(handle_con_out, std::ref(out_con));
-        std::thread wind_feed_thread(handle_weather_feed, std::ref(wind_feed));
+        std::thread weather_feed_thread(handle_weather_feed, std::ref(weather_feed));
 
         std::string str;
         unsigned int i;
@@ -77,9 +77,10 @@ void VFRB::run()
             ac_proc.gpsfix(std::ref(str));
             out_con.sendMsgOut(std::ref(str));
             if (global_weather_feed_enabled) {
-                Configuration::base_qnh = wind_feed.getQNH();
-                if (wind_feed.isValid()) {
-                    wind_feed.getNMEA(std::ref(str));
+                if (weather_feed.getQNH() != VALUE_NA) Configuration::base_qnh = weather_feed.getQNH();
+                if (weather_feed.getTemp() != VALUE_NA) Configuration::base_temp = weather_feed.getTemp();
+                if (weather_feed.isValid()) {
+                    weather_feed.getNMEA(std::ref(str));
                     out_con.sendMsgOut(std::ref(str));
                 }
             }
@@ -89,7 +90,7 @@ void VFRB::run()
         adsb_in_thread.join();
         ogn_in_thread.join();
         con_out_thread.join();
-        wind_feed_thread.join();
+        weather_feed_thread.join();
 
     } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
@@ -98,7 +99,7 @@ void VFRB::run()
     return;
 }
 
-void VFRB::handle_weather_feed(WeatherFeed& nmea_str)
+void VFRB::handle_weather_feed(WeatherFeed& weather)
 {
     if (global_weather_feed_enabled) {
         ConnectIn wind_con(Configuration::global_weather_feed_host.c_str(), Configuration::global_weather_feed_port, 5);
@@ -116,7 +117,7 @@ void VFRB::handle_weather_feed(WeatherFeed& nmea_str)
                     std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
                 } while (wind_con.connectIn() == -1);
             } else {
-                nmea_str.writeNMEA(std::ref(wind_con.getResponse()));
+                weather.writeNMEA(std::ref(wind_con.getResponse()));
             }
         }
     }
