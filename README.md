@@ -24,10 +24,9 @@ Version 1.3.0
 
 Read more in the FEATURES.
 You can find an installation guide in the wiki.
+Note that this source is, at the moment, only made for Linux, as it is intended to run on a Raspberry Pi, or similar.
 
-To run the VFR-B,
-
-on Linux: (Terminal) 
+To run the VFR-B (in terminal): 
 >$ ./{path to binary} -c {path to config file} > {path to log file} &<br><br>
 >example:<br>
 >$ ./VFR-Backend -c properties.conf > vfrb.log &<br>
