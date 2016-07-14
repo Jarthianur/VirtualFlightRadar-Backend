@@ -1,6 +1,5 @@
 ################################################################################
-# Automatically-generated file. Do not edit,
-# unless You need to modify the compiler!
+# Automatically-generated file. Do not edit!
 ################################################################################
 
 -include ../makefile.init
@@ -45,7 +44,7 @@ all: VFR-Backend
 VFR-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	g++-4.9 -pthread -o "VFR-Backend" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(CXX) -pthread -o "VFR-Backend" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -2,6 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
+CXX := g++-4.9
 C_UPPER_SRCS := 
 CXX_SRCS := 
 C++_SRCS := 
