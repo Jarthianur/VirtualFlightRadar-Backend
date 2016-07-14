@@ -25,6 +25,15 @@ Version 1.3.0
 Read more in the FEATURES.
 You can find an installation guide in the wiki.
 
+To run the VFR-B,
+
+on Linux: (Terminal) 
+>$ ./{path to binary} -c {path to config file} > {path to log file} &<br><br>
+>example:<br>
+>$ ./VFR-Backend -c properties.conf > vfrb.log &<br>
+>// This runs the tool, logs all output to the log file and puts the process into background
+
+
 
 
 
