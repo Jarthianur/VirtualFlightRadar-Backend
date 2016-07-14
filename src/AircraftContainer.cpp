@@ -109,15 +109,22 @@ void AircraftContainer::insertAircraft(std::string& id, double lat,
         int ac_t, double climb_r, double turn_r, double heading)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    int i;
+    int i, act;
+    if (heading == VALUE_NA ||
+            gnd_spd == VALUE_NA ||
+            climb_r == VALUE_NA) {
+        act = MIN_DATA;
+    } else {
+        act = ac_t;
+    }
     if ((i = find(id)) == -1) {
-        Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, heading);
+        Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, act, climb_r, turn_r, heading);
         ac.qne = false;
         cont.push_back(ac);
         index_map.insert({id,cont.size()-1});
     } else {
         Aircraft& ac = cont.at(i);
-        ac.aircraft_type = ac_t;
+        ac.aircraft_type = act;
         ac.gnd_speed = gnd_spd;
         ac.id_type = id_t;
         ac.valid = 0;

@@ -24,8 +24,6 @@ Copyright_License {
 #include "Math.h"
 #include "Configuration.h"
 
-//^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(?:\\d{6}h)(\\d{4}\\.\\d{2})(N|S)[^]+?(\\d{5}\\.\\d{2})(E|W)[^]+?((\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+([^]+?)$
-
 ParserAPRS::ParserAPRS()
 : Parser(),
   aprs_re("^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[^]+?(\\d{5}\\.\\d{2})([EW])[^]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+([^]+?)$", std::regex_constants::optimize),

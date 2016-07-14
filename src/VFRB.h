@@ -28,7 +28,7 @@ Copyright_License {
 #include "WeatherFeed.h"
 
 #define SYNC_TIME 1
-#define WAIT_TIME 300
+#define WAIT_TIME 30
 
 class VFRB {
 public:

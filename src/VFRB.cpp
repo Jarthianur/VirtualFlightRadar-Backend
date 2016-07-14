@@ -55,7 +55,7 @@ void VFRB::run()
     } else std::cout << "adsb not enabled" << std::endl;
     if (Configuration::global_weather_feed_host.compare("nA") != 0 || Configuration::global_weather_feed_host.length() == 0) {
         global_weather_feed_enabled = true;
-    } else std::cout << "wind feed not enabled" << std::endl;
+    } else std::cout << "weather feed not enabled" << std::endl;
 
     try{
         std::thread adsb_in_thread(handle_adsb_in, std::ref(ac_cont));
