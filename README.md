@@ -14,6 +14,8 @@ It also will provide some backend logic to support data processing and filtering
 
 Visit https://github.com/rueckwaertsflieger/AMVR for the super project and even more information.
 There You also get all recommended guides and required software.
+Please consider, even that the VFR-B is released, the AMVR isn't. It is still under heavy development.
+Thus we are not able to provide an easy step-by-step guide, yet.
 
 
 Contributions are always welcome.
@@ -24,7 +26,7 @@ Version 1.3.0
 
 Read more in the FEATURES.
 You can find an installation guide in the wiki.
-Note that this source is, at the moment, only made for Linux, as it is intended to run on a Raspberry Pi, or similar.
+Note that this source is only made for Linux, as it is intended to run on a Raspberry Pi, or similar.
 
 To run the VFR-B (in terminal): 
 >$ ./{path to binary} -c {path to config file} > {path to log file} &<br><br>
