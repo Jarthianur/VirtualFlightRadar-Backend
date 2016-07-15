@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
             pressure = stod(cr.getProperty("pressure", "1013.25"));
             cout << "Pressure: " << pressure << endl;
 
-            pressure = stod(cr.getProperty("temp", "15.0"));
+            temp = stod(cr.getProperty("temp", "15.0"));
             cout << "Temp: " << temp << endl;
 
             out_port = stoi(cr.getProperty("outport","0"));
