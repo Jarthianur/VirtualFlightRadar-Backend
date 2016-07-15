@@ -36,7 +36,7 @@ Note that this source is only made for Linux, as it is intended to run on a Rasp
 To run the VFR-B (in terminal): 
 >$ ./{path to binary} -c {path to config file} > {path to log file} &<br><br>
 >example:<br>
->$ ./VFR-Backend -c properties.conf > vfrb.log &<br>
+>$ ./vfr-b -c properties.conf > vfrb.log &<br>
 >// This runs the tool, logs all output to the log file and puts the process into background
 
 
