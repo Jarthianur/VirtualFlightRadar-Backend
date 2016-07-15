@@ -1,5 +1,4 @@
-# VFR-Backend
-VFR-B := VirtualFlightRadar-Backend
+# VirtualFlightRadar-Backend
 
 This project is intended to be an interface between OGN-/ADS-B-receivers and XCSoar and the airfield manager respectively.
 
