@@ -1,5 +1,7 @@
 # VirtualFlightRadar-Backend
 
+VFR-B := VirtualFlightRadar-Backend
+
 This project is intended to be an interface between OGN-/ADS-B-receivers and XCSoar and the airfield manager respectively.
 
 The aim is to provide a nice and handy tool to display all aircrafts, broadcasting FLARM and ADS messages as objects on the manager's info screen. The well known glider-nav-tool XCSoar is commonly used as a presentation application.
@@ -11,13 +13,14 @@ VFR-B parses APRS / OGN and ADS-B / SBS messages from SDRs as are OGN receiver a
 
 It also will provide some backend logic to support data processing and filtering for validating and further processing of received information.  Possible features include discarding bad or duplicate data, discarding far targets and estimating times and probability of arrival at airfield for security purposes.
 
-Visit https://github.com/rueckwaertsflieger/AMVR for the super project and even more information.
-There You also get all recommended guides and required software.
-Please consider, even that the VFR-B is released, the AMVR isn't. It is still under heavy development.
-Thus we are not able to provide an easy step-by-step guide, yet.
+VFR-B is one of the subsystems of [AMVR](https://github.com/rueckwaertsflieger/AMVR).<br>
+<b>All necessary information, required software/hardware and a setup-guide can be found in its [wiki](https://github.com/rueckwaertsflieger/AMVR/wiki).</b><br>
+Please consider, even that the VFR-B is released, the AMVR isn't.<br>
+It is still under heavy development. Thus we are not able to provide an easy step-by-step guide, yet.
 
-This tool is intended to run almost locally, unless You want that, nothing will be sent to the internet.
-Of course, as the AMVR documentation says, You need an internet connection for syncronising time, global OGN connect (if needed), etc.
+
+The VFR-B runs completely without connection to the internet, unless You configured it to get data from any global host.<br>
+Also it does not send any data to the internet, unless You configured it to do so.
 
 
 Contributions are always welcome.
