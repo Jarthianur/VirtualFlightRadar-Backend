@@ -38,10 +38,10 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: vfr-b
+all: VirtualFlightRadar-Backend
 
 # Tool invocations
-VFR-Backend: $(OBJS) $(USER_OBJS)
+VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: G++ Linker'
 	$(CXX) -pthread -o "vfr-b" $(OBJS) $(USER_OBJS) $(LIBS)
