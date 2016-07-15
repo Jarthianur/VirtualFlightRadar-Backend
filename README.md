@@ -17,6 +17,9 @@ There You also get all recommended guides and required software.
 Please consider, even that the VFR-B is released, the AMVR isn't. It is still under heavy development.
 Thus we are not able to provide an easy step-by-step guide, yet.
 
+This tool is intended to run almost locally, unless You want that, nothing will be sent to the internet.
+Of course, as the AMVR documentation says, You need an internet connection for syncronising time, global OGN connect (if needed), etc.
+
 
 Contributions are always welcome.
 
