@@ -38,19 +38,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: VFR-Backend
+all: vfr-b
 
 # Tool invocations
 VFR-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: Cross G++ Linker'
-	$(CXX) -pthread -o "VFR-Backend" $(OBJS) $(USER_OBJS) $(LIBS)
+	@echo 'Invoking: G++ Linker'
+	$(CXX) -pthread -o "vfr-b" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(C_DEPS)$(CPP_DEPS) VFR-Backend
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(C_DEPS)$(CPP_DEPS) vfr-b
 	-@echo ' '
 
 .PHONY: all clean dependents
