@@ -24,7 +24,7 @@ Status quo:
 
 Version 1.3.0
 
-Read more in the FEATURES.
+Read more in the [FEATURES](https://github.com/Jarthianur/VFR-Backend/blob/master/FEATURES).
 You can find an installation guide in the wiki.
 Note that this source is only made for Linux, as it is intended to run on a Raspberry Pi, or similar.
 
