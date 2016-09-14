@@ -41,10 +41,10 @@ void WeatherFeed::getNMEA(std::string& dest_str)
 void WeatherFeed::writeNMEA(const std::string& str)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    if (str.substr(0,6).compare("$WIMWV") == 0) {
+    if (str.substr(1,5).compare("WIMWV") == 0) {
         nmea_str = str;
         wind_valid = true;
-    } else if (str.substr(0,6).compare("$WIMDA") == 0) {
+    } else if (str.substr(1,5).compare("WIMDA") == 0) {
         int b,s;
         try {
             b = str.find('B')-1;

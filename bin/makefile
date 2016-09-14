@@ -6,7 +6,7 @@
 
 RM := rm -rf
 NAME := vfrb
-VERSION := _v1-3-0
+VERSION := _v1-3-1-SNAPSHOT
 
 # All of the sources participating in the build are defined here
 -include sources.mk

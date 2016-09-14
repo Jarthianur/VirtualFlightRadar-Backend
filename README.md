@@ -27,7 +27,7 @@ Contributions are always welcome.
 
 Status quo:
 
-Version 1.3.0
+Version 1.3.1-SNAPSHOT
 
 Read more in the [FEATURES](https://github.com/Jarthianur/VFR-Backend/blob/master/FEATURES).
 You can find an installation guide in the wiki.
