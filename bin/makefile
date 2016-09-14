@@ -5,6 +5,8 @@
 -include ../makefile.init
 
 RM := rm -rf
+NAME := vfrb
+VERSION := _v1-3-0
 
 # All of the sources participating in the build are defined here
 -include sources.mk
@@ -44,13 +46,13 @@ all: VirtualFlightRadar-Backend
 VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: G++ Linker'
-	$(CXX) -pthread -o "vfr-b" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(CXX) -pthread -o $(NAME)$(VERSION) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(C_DEPS)$(CPP_DEPS) vfr-b
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(C_DEPS)$(CPP_DEPS) $(NAME)$(VERSION)
 	-@echo ' '
 
 .PHONY: all clean dependents

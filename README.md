@@ -20,7 +20,7 @@ It is still under heavy development. Thus we are not able to provide an easy ste
 
 
 The VFR-B runs completely without connection to the internet, unless You configured it to get data from any global host.<br>
-Also it does not send any data to the internet, unless You configured it to do so.
+Also the AMVR does not send any data to the internet, unless You configured it to do so.
 
 
 Contributions are always welcome.
