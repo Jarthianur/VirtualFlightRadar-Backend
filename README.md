@@ -20,11 +20,13 @@ It is still under heavy development. Thus we are not able to provide an easy ste
 
 
 The VFR-B runs completely without connection to the internet, unless You configured it to get data from any global host.<br>
-Also it does not send any data to the internet, unless You configured it to do so.
+Also the AMVR does not send any data to the internet, unless You configured it to do so.
 
 
 Contributions are always welcome.
 
+
+=================================<br>
 Status quo:
 
 Version 1.3.0
@@ -36,12 +38,6 @@ Note that this source is only made for Linux, as it is intended to run on a Rasp
 To run the VFR-B (in terminal): 
 >$ ./{path to binary} -c {path to config file} > {path to log file} &<br><br>
 >example:<br>
->$ ./vfr-b -c properties.conf > vfrb.log &<br>
+>$ ./vfrb_1-3-0 -c properties.conf > vfrb.log &<br>
 >// This runs the tool, logs all output to the log file and puts the process into background
 
-
-
-
-
-
-  
