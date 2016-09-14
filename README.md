@@ -25,6 +25,8 @@ Also the AMVR does not send any data to the internet, unless You configured it t
 
 Contributions are always welcome.
 
+
+=================================<br>
 Status quo:
 
 Version 1.3.1-SNAPSHOT
@@ -39,9 +41,3 @@ To run the VFR-B (in terminal):
 >$ ./vfr-b -c properties.conf > vfrb.log &<br>
 >// This runs the tool, logs all output to the log file and puts the process into background
 
-
-
-
-
-
-  
