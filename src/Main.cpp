@@ -26,7 +26,7 @@ Copyright_License {
 
 using namespace std;
 
-#define VERSION "1.3.0-SNAPSHOT"
+#define VERSION "1.4.0-SNAPSHOT"
 
 int main(int argc, char* argv[]) {
 
