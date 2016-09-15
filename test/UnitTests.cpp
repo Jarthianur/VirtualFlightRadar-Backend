@@ -19,39 +19,15 @@ Copyright_License {
 }
  */
 
-#ifndef LOGGER_H_
-#define LOGGER_H_
+#include <iostream>
+#include "../src/Math.h"
+#include "../src/Aircraft.h"
+#include "../src/AircraftContainer.h"
+#include "../src/AircraftProcessor.h"
+#include "../src/ParserAPRS.h"
+#include "../src/ParserSBS.h"
 
-#include <mutex>
+int main(int argc, char* argv[]) {
+    return 0;
+}
 
-class Logger
-{
-public:
-    Logger();
-    virtual ~Logger();
-
-    /**
-     * Log informations, like succeeding connections etc
-     * to stdout.
-     * Given a message and a subject.
-     */
-    static void info(const char*, const char*);
-    /**
-     * Log warnings and not-critical errors, like lost connections etc
-     * to stdout.
-     * Given a message and a subject.
-     */
-    static void warn(const char*, const char*);
-    /**
-     * Log fatal errors, like socket failures etc
-     * to stderr.
-     * Given a message and a subject.
-     */
-    static void error(const char*, const char*);
-
-private:
-
-    static std::mutex mutex;
-};
-
-#endif /* SRC_LOGGER_H_ */
