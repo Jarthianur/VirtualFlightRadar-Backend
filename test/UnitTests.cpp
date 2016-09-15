@@ -33,66 +33,66 @@ Copyright_License {
  * testing methods;
  * returning +1 on success, 0 on failure
  */
-int testParsSbsUnpack(std::ref(pars_sbs))
+int testParsSbsUnpack(ParserSBS& pars_sbs)
 {
     return 1;
 }
-int testParsAprsUnpack(std::ref(pars_aprs))
-{
-    return 1;
-}
-
-int testAcProcProcess(std::ref(ac_proc))
-{
-    return 1;
-}
-int testAcProcChecksum(std::ref(ac_proc))
-{
-    return 1;
-}
-int testAcProcGpsFix(std::ref(ac_proc))
+int testParsAprsUnpack(ParserAPRS& pars_aprs)
 {
     return 1;
 }
 
-int testAcContProcessAircraft(std::ref(ac_cont))
+int testAcProcProcess(AircraftProcessor& ac_proc)
 {
     return 1;
 }
-int testAcContInvalidateAircrafts(std::ref(ac_cont))
+int testAcProcChecksum(AircraftProcessor& ac_proc)
 {
     return 1;
 }
-int testAcContGetContSize(std::ref(ac_cont))
-{
-    return 1;
-}
-int testAcContClear(std::ref(ac_cont))
+int testAcProcGpsFix(AircraftProcessor& ac_proc)
 {
     return 1;
 }
 
-int testWFWriteNMEA(std::ref(w_feed))
+int testAcContProcessAircraft(AircraftContainer& ac_cont)
 {
     return 1;
 }
-int testWFIsValid(std::ref(w_feed))
+int testAcContInvalidateAircrafts(AircraftContainer& ac_cont)
 {
     return 1;
 }
-int testWFGetPress(std::ref(w_feed))
+int testAcContGetContSize(AircraftContainer& ac_cont)
 {
     return 1;
 }
-int testWFGetTemp(std::ref(w_feed))
+int testAcContClear(AircraftContainer& ac_cont)
 {
     return 1;
 }
-int testWFGetNMEA(std::ref(w_feed))
+
+int testWFWriteNMEA(WeatherFeed& w_feed)
 {
     return 1;
 }
-int testWFIsNotValidAfterGet(std::ref(w_feed))
+int testWFIsValid(WeatherFeed& w_feed)
+{
+    return 1;
+}
+int testWFGetPress(WeatherFeed& w_feed)
+{
+    return 1;
+}
+int testWFGetTemp(WeatherFeed& w_feed)
+{
+    return 1;
+}
+int testWFGetNMEA(WeatherFeed& w_feed)
+{
+    return 1;
+}
+int testWFIsNotValidAfterGet(WeatherFeed& w_feed)
 {
     return 1;
 }
