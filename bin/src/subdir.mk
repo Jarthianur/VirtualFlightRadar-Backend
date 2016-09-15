@@ -13,6 +13,7 @@ CPP_SRCS += \
 ../src/ConnectInExt.cpp \
 ../src/ConnectOutNMEA.cpp \
 ../src/Connection.cpp \
+../src/Logger.cpp \
 ../src/Main.cpp \
 ../src/Math.cpp \
 ../src/Parser.cpp \
@@ -31,6 +32,7 @@ OBJS += \
 ./src/ConnectInExt.o \
 ./src/ConnectOutNMEA.o \
 ./src/Connection.o \
+./src/Logger.o \
 ./src/Main.o \
 ./src/Math.o \
 ./src/Parser.o \
@@ -49,6 +51,7 @@ CPP_DEPS += \
 ./src/ConnectInExt.d \
 ./src/ConnectOutNMEA.d \
 ./src/Connection.d \
+./src/Logger.d \
 ./src/Main.d \
 ./src/Math.d \
 ./src/Parser.d \

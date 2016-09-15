@@ -20,8 +20,8 @@ Copyright_License {
  */
 
 #include "ConnectInExt.h"
+#include "Logger.h"
 #include <cstring>
-#include <iostream>
 #include <unistd.h>
 #include <arpa/inet.h>
 
@@ -39,49 +39,17 @@ ConnectInExt::~ConnectInExt()
 int ConnectInExt::connectIn()
 {
     if (::connect(in_con.con_sock, (struct sockaddr*) &in_con.con_addr, sizeof(struct sockaddr)) == -1) {
-        std::cout << "Could not connect to server!" << std::endl;
+        Logger::error("Connecting to ", this->in_hostname);
         return -1;
     }
+
     if (send(in_con.con_sock, login_str.c_str(), login_str.length(), 0) <= 0) {
+        Logger::error("Sending login to ", this->in_hostname);
         return -1;
     }
     //maybe verify correct login for ogn:
     //logresp USER verified
 
-    std::cout << "Connected to server" << std::endl;
-    return 0;
-}
-
-int ConnectInExt::setupConnectIn()
-{
-    if ((in_host_info = gethostbyname(in_hostname)) == NULL) {
-        std::cout << "Could not resolve Hostname!" << std::endl;
-        return -1;
-    }
-
-    if ((in_con.con_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        std::cout << "Could not create socket!" << std::endl;
-        return -1;
-    }
-
-    if (setsockopt(in_con.con_sock, SOL_SOCKET, SO_KEEPALIVE, &yes, sizeof(int)) == -1) {
-        std::cout << "Could not set socketopt KEEPALIVE!" << std::endl;
-        return -1;
-    }
-
-    if (timeout > 0) {
-        struct timeval tv;
-        tv.tv_sec = timeout;
-        tv.tv_usec = 0;
-        if (setsockopt(in_con.con_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval)) == -1) {
-            std::cout << "Could not set socketopt RCVTIMEO!" << std::endl;
-            return -1;
-        }
-    }
-
-    memset(&in_con.con_addr, 0, sizeof(in_con.con_addr));
-    in_con.con_addr.sin_family = AF_INET;
-    in_con.con_addr.sin_port = htons(in_port);
-    in_con.con_addr.sin_addr = *((struct in_addr*) in_host_info->h_addr);
+    Logger::info("Connected to ", this->in_hostname);
     return 0;
 }

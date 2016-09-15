@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
 
     if (argc == 3) {
         cout << VERSION << endl;
+        cout << "== Configuration ==" << endl;
         ConfigReader cr(argv[2]);
         cr.read();
         try {
@@ -125,6 +126,7 @@ int main(int argc, char* argv[]) {
     Configuration::filter_maxHeight = maxHeight;
     Configuration::filter_maxDist = maxDist;
 
+    cout << "Running program ..." << endl;
     VFRB::run();
 
     return 0;

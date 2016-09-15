@@ -17,7 +17,7 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
 #ifndef CONNECTIN_H_
 #define CONNECTIN_H_
@@ -81,6 +81,12 @@ protected:
     const char* in_hostname;
     const int in_port;
     unsigned int timeout;
+
+    /**
+     * options
+     */
+    int yes = 1;
+    int no = 0;
 };
 
 #endif /* CONNECTIN_H_ */

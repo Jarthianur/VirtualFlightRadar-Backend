@@ -17,27 +17,26 @@ Copyright_License {
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
 
-#ifndef CONNECTINEXT_H_
-#define CONNECTINEXT_H_
+#ifndef LOGGER_H_
+#define LOGGER_H_
 
-#include "ConnectIn.h"
+#include <mutex>
 
-class ConnectInExt: public ConnectIn
+class Logger
 {
 public:
-   ConnectInExt(const char*, const int, std::string&, unsigned int = 0);
-   virtual ~ConnectInExt() throw();
+    Logger();
+    virtual ~Logger();
 
-   int connectIn();
+    static void info(const char*, const char*);
+    static void warn(const char*, const char*);
+    static void error(const char*, const char*);
 
 private:
-   /**
-    * login stuff
-    */
-   std::string login_str;
 
+    static std::mutex mutex;
 };
 
-#endif /* CONNECTINEXT_H_ */
+#endif /* SRC_LOGGER_H_ */

@@ -20,8 +20,8 @@ Copyright_License {
  */
 
 #include "ConnectIn.h"
+#include "Logger.h"
 #include <cstring>
-#include <iostream>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <stdexcept>
@@ -42,22 +42,28 @@ ConnectIn::~ConnectIn()
 int ConnectIn::connectIn()
 {
     if (::connect(in_con.con_sock, (struct sockaddr*) &in_con.con_addr, sizeof(struct sockaddr)) == -1) {
-        std::cout << "Could not connect to server!" << std::endl;
+        Logger::error("Connecting to ", this->in_hostname);
         return -1;
     }
-    std::cout << "Connected to server" << std::endl;
+
+    Logger::info("Connected to ", this->in_hostname);
     return 0;
 }
 
 int ConnectIn::setupConnectIn()
 {
     if ((in_host_info = gethostbyname(in_hostname)) == NULL) {
-        std::cout << "Could not resolve Hostname!" << std::endl;
+        Logger::error("Resolving hostname = ", this->in_hostname);
         return -1;
     }
 
     if ((in_con.con_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        std::cout << "Could not create socket!" << std::endl;
+        Logger::error("Creating socket for connection to ", this->in_hostname);
+        return -1;
+    }
+
+    if (setsockopt(in_con.con_sock, SOL_SOCKET, SO_KEEPALIVE, &yes, sizeof(int)) == -1) {
+        Logger::error("Setting socketopt KEEPALIVE on connection to ", this->in_hostname);
         return -1;
     }
 
@@ -66,7 +72,7 @@ int ConnectIn::setupConnectIn()
         tv.tv_sec = timeout;
         tv.tv_usec = 0;
         if (setsockopt(in_con.con_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval)) == -1) {
-            std::cout << "Could not set socketopt RCVTIMEO!" << std::endl;
+            Logger::error("Setting socketopt RCVTIMEO on connection to ", this->in_hostname);
             return -1;
         }
     }
@@ -98,7 +104,7 @@ int ConnectIn::readLineIn()
         response = linebuffer.substr(0,eol);
         linebuffer.erase(0,eol);
     } catch (const std::out_of_range& e) {
-        std::cout << e.what();
+        Logger::warn("Error while receiving message :: ", e.what());
         return -1;
     }
     if (response.length() == 0) {

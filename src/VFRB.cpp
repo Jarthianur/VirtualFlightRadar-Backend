@@ -24,9 +24,9 @@ Copyright_License {
 #include "Configuration.h"
 #include "ParserAPRS.h"
 #include "ParserSBS.h"
+#include "Logger.h"
 #include <chrono>
 #include <thread>
-#include <iostream>
 
 bool VFRB::global_weather_feed_enabled = false;
 bool VFRB::global_ogn_enabled = false;
@@ -49,15 +49,20 @@ void VFRB::run()
 
     if (Configuration::global_ogn_host.compare("nA") != 0 || Configuration::global_ogn_host.length() == 0) {
         global_ogn_enabled = true;
-    } else std::cout << "ogn not enabled" << std::endl;
+    } else
+        Logger::warn("APRSC not enabled -> ", "no FLARM targets");
+
     if (Configuration::global_adsb_host.compare("nA") != 0 || Configuration::global_adsb_host.length() == 0) {
         global_adsb_enabled = true;
-    } else std::cout << "adsb not enabled" << std::endl;
+    } else
+        Logger::warn("ADSB receiver not enabled -> ", "no transponder targets");
+
     if (Configuration::global_weather_feed_host.compare("nA") != 0 || Configuration::global_weather_feed_host.length() == 0) {
         global_weather_feed_enabled = true;
-    } else std::cout << "weather feed not enabled" << std::endl;
+    } else
+        Logger::warn("Weather feed not enabled -> ", "no wind,pressure,temp");
 
-    try{
+    try {
         std::thread adsb_in_thread(handle_adsb_in, std::ref(ac_cont));
         std::thread ogn_in_thread(handle_ogn_in, std::ref(ac_cont));
         std::thread con_out_thread(handle_con_out, std::ref(out_con));
@@ -93,7 +98,7 @@ void VFRB::run()
         weather_feed_thread.join();
 
     } catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
+        Logger::error("Fatal error -> terminating program, because ", e.what());
         std::terminate();
     }
     return;
@@ -146,7 +151,7 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
             std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
         }
 
-        std::cout << "Scan for incoming adsb-msgs..." << std::endl;
+        Logger::info("Scan for incoming sbs-msgs from ", Configuration::global_adsb_host.c_str());
 
         while (1) {
             if (adsb_con.readLineIn() <= 0) {
@@ -178,7 +183,7 @@ void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
             std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
         }
 
-        std::cout << "Scan for incoming ogn-msgs..." << std::endl;
+        Logger::info("Scan for incoming aprs-msgs from ", Configuration::global_ogn_host.c_str());
 
         while (1) {
             if (ogn_con.readLineIn() <= 0) {
