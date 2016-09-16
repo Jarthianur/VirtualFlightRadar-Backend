@@ -10,6 +10,7 @@ VERSION := _v1-3-1-SNAPSHOT
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include test/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -39,8 +40,10 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 
+TEST_OBJS += $(filter-out ./src/Main.o,$(OBJS))
+
 # All Target
-all: VirtualFlightRadar-Backend
+all: VirtualFlightRadar-Backend tests
 
 # Tool invocations
 VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
@@ -49,12 +52,20 @@ VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	$(CXX) -pthread -o $(NAME)$(VERSION) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
+	
+# Test
+tests: $(TEST_OBJS) $(USER_OBJS)
+	-@echo 'Building target: $@'
+	-@echo 'Invoking: G++ Linker'
+	-$(CXX) -pthread -o $(NAME)$(VERSION)_TEST $(TEST_OBJS) $(USER_OBJS) $(LIBS)
+	-@echo 'Finished building target: $@'
+	-@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(C_DEPS)$(CPP_DEPS) $(NAME)$(VERSION)
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(C_DEPS)$(CPP_DEPS) ./test/UnitTests.o $(NAME)$(VERSION) $(NAME)$(VERSION)_TEST
 	-@echo ' '
-
+	
 .PHONY: all clean dependents
 .SECONDARY:
 
