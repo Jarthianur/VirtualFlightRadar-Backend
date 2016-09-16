@@ -20,7 +20,6 @@ Copyright_License {
  */
 
 #include "ParserAPRS.h"
-
 #include "Math.h"
 #include "Configuration.h"
 

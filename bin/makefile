@@ -40,10 +40,7 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 
-TEST_OBJS += $(filter-out ./src/Main.o,$(OBJS))
-
-# All Target
-all: VirtualFlightRadar-Backend tests
+TEST_OBJS += $(filter-out ./src/Main.o ./src/ConfigReader.o,$(OBJS))
 
 # Tool invocations
 VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
@@ -52,6 +49,9 @@ VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	$(CXX) -pthread -o $(NAME)$(VERSION) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
+	
+# All Target
+all: VirtualFlightRadar-Backend tests	
 	
 # Test
 tests: $(TEST_OBJS) $(USER_OBJS)

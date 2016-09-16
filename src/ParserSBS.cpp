@@ -20,7 +20,6 @@ Copyright_License {
  */
 
 #include "ParserSBS.h"
-
 #include "Configuration.h"
 #include "Math.h"
 
