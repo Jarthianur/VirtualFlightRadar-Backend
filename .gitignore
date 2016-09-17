@@ -4,5 +4,6 @@ TODO
 .settings/
 .cproject
 .project
-
-/Test/
+/bin/src/*.[od]
+/bin/test/*.[od]
+/bin/vfrb*

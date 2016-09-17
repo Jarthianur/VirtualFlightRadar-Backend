@@ -42,7 +42,8 @@ int ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
      * 14: latitude
      * 15: longitude
      */
-    int delim, i = 2, p = 6;
+    std::size_t delim;
+    int i = 2, p = 6;
     while((delim = sentence.find(',',p)) != std::string::npos && i < 16) {
         switch(i) {
             case 4:

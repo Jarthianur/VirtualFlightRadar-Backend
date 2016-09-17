@@ -21,7 +21,7 @@ Copyright_License {
 
 #include "AircraftContainer.h"
 #include "Configuration.h"
-#include <iostream>
+#include "Logger.h"
 
 AircraftContainer::AircraftContainer()
 : proc(Configuration::base_latitude, Configuration::base_longitude, Configuration::base_altitude, Configuration::base_geoid)
@@ -64,7 +64,7 @@ void AircraftContainer::invalidateAircrafts()
                 index_map.at(cont.at(i).id) = i;
             }
         } catch (std::exception& e) {
-            std::cout << e.what() << std::endl;
+            Logger::warn("Error while invalidating aircraft, because ", e.what());
         }
     }
     return;
