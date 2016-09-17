@@ -34,7 +34,6 @@ ParserSBS::~ParserSBS()
 
 int ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
 {
-    std::string msg = sentence;
     /*
      * fields:
      * 4 : id
@@ -43,33 +42,28 @@ int ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
      * 14: latitude
      * 15: longitude
      */
-    try {
-        msg.erase(0,6);
-    } catch (std::out_of_range& e) {
-        return -1;
-    }
-    int delim, i = 2;
-    while((delim = msg.find(',')) > -1) {
+    int delim, i = 2, p = 6;
+    while((delim = sentence.find(',',p)) != std::string::npos && i < 16) {
         switch(i) {
             case 4:
-                try {
-                    id = msg.substr(0,delim);
-                } catch (std::out_of_range& e) {
-                    return -1;
-                }
+                if (delim - p > 0) {
+                    id = sentence.substr(p,delim-p);
+                } else return -1;
                 break;
             case 7:
                 try {
-                    time = std::stoi(msg.substr(0,2), nullptr) * 10000;
-                    time += std::stoi(msg.substr(3,2), nullptr) * 100;
-                    time += std::stoi(msg.substr(6,2), nullptr);
+                    if (delim - p > 7) {
+                        time = std::stoi(sentence.substr(p,2)) * 10000;
+                        time += std::stoi(sentence.substr(p+3,2)) * 100;
+                        time += std::stoi(sentence.substr(p+6,2));
+                    } else return -1;
                 } catch (std::logic_error& e) {
                     return -1;
                 }
                 break;
             case 11:
                 try {
-                    alt = Math::dToI(std::stod(msg.substr(0,delim), nullptr) * Math::feet2m);
+                    alt = Math::dToI(std::stod(sentence.substr(p,delim-p)) * Math::feet2m);
                     if (alt > Configuration::filter_maxHeight) return -1;
                 } catch (std::logic_error& e) {
                     return -1;
@@ -77,14 +71,14 @@ int ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 break;
             case 14:
                 try {
-                    lat = std::stod(msg.substr(0,delim), nullptr);
+                    lat = std::stod(sentence.substr(p,delim-p));
                 } catch (std::logic_error& e) {
                     return -1;
                 }
                 break;
             case 15:
                 try {
-                    lon = std::stod(msg.substr(0,delim), nullptr);
+                    lon = std::stod(sentence.substr(p,delim-p));
                 } catch (std::logic_error& e) {
                     return -1;
                 }
@@ -93,11 +87,7 @@ int ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                 break;
         }
         i++;
-        try {
-            msg.erase(0,delim+1);
-        } catch (std::out_of_range& e) {
-            return -1;
-        }
+        p = delim+1;
     }
     ac_cont.insertAircraft(id, lat, lon, alt);
     return 0;
