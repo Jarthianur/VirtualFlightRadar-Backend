@@ -20,6 +20,7 @@ Copyright_License {
 */
 
 #include "Connection.h"
+#include <unistd.h>
 
 Connection::Connection()
 {
@@ -27,5 +28,6 @@ Connection::Connection()
 
 Connection::~Connection()
 {
+    close(con_sock);
 }
 

@@ -27,6 +27,7 @@ Copyright_License {
 #include <string>
 #include <vector>
 #include <mutex>
+#include <memory>
 
 #define MAX_CLIENTS 5
 
@@ -56,9 +57,7 @@ public:
     /**
      * close all sockets
      */
-    void close();
-
-    void closeClient(Connection&);
+    void closeAll();
 
     /**
      * broadcast msg to all clients.
@@ -80,8 +79,8 @@ private:
     /**
      * client, output connection
      */
-    Connection nmea_out;
-    std::vector<Connection> clients;
+    std::unique_ptr<Connection> nmea_out;
+    std::vector<std::shared_ptr<Connection>> clients;
 
     /**
      * output port

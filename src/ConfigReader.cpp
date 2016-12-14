@@ -20,7 +20,7 @@ Copyright_License {
 */
 
 #include "ConfigReader.h"
-#include <iostream>
+#include "Logger.h"
 
 ConfigReader::ConfigReader(const char* filename)
 : file(filename),
@@ -46,11 +46,11 @@ void ConfigReader::read()
                 value.assign(match.str(2));
                 config.insert({key, value});
             } else {
-                std::cout << "malformed parameter! " << key << std::endl;
+                Logger::error("malformed parameter! = ", key.c_str());
             }
             line.clear();
         } catch (std::regex_error& e) {
-            std::cout << e.what() << std::endl;
+            Logger::error("while reading config :: ", e.what());
             break;
         } catch (std::out_of_range& e) {
             continue;
