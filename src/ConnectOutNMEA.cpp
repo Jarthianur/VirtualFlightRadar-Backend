@@ -25,7 +25,8 @@ Copyright_License {
 #include <arpa/inet.h>
 
 ConnectOutNMEA::ConnectOutNMEA(const int out_port)
-: nmea_out_port(out_port)
+: nmea_out(new Connection),
+  nmea_out_port(out_port)
 {
 }
 
@@ -70,7 +71,7 @@ int ConnectOutNMEA::listenOut()
 int ConnectOutNMEA::connectClient()
 {
     unsigned int sin_s = sizeof(struct sockaddr);
-    std::shared_ptr<Connection> client;
+    auto client = std::make_shared<Connection>();
     client->con_sock = accept(nmea_out->con_sock, (struct sockaddr*)&client->con_addr, &sin_s);
     if (client->con_sock == -1 || clients.size() >= MAX_CLIENTS) {
         Logger::error("Accepting connection to ", inet_ntoa(client->con_addr.sin_addr));
