@@ -19,32 +19,28 @@
  }
  */
 
-#include "ConnectInExt.h"
-
+#include "InputConnection.h"
 #include <sys/socket.h>
 
-#include "ConnectionException.h"
 
-ConnectInExt::ConnectInExt(const std::string& hostname, int port,
-        const std::string& login, unsigned int to)
-        : ConnectIn(hostname, port, to),
-          login_str(login)
-{
-    login_str.append("\r\n");
-}
-
-ConnectInExt::~ConnectInExt()
+InputConnection::InputConnection(int family, int port)
+        : Connection(family, port)
 {
 }
 
-void ConnectInExt::connectIn() throw (ConnectionException)
+InputConnection::~InputConnection()
 {
-    in_con.connect(in_hostname);
+}
 
-    if (send(in_con.getConSock(), login_str.c_str(), login_str.length(), 0) <= 0)
+void InputConnection::fillAddr(in_addr& addr)
+{
+    con_addr.sin_addr = addr;
+}
+
+void InputConnection::connect(const std::string& host) throw (ConnectionException)
+{
+    if (::connect(con_sock, getSockAddrPtr(), sizeof(sockaddr)) == -1)
     {
-        throw ConnectionException(std::string("Failed to send login to ") + in_hostname);
+        throw ConnectionException(std::string("Cannot connect to ") + host);
     }
-    //maybe verify correct login for ogn:
-    //logresp USER verified
 }

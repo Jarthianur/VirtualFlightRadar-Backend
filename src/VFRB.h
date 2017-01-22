@@ -23,9 +23,9 @@ Copyright_License {
 #define VFRB_H_
 
 #include "ConnectOutNMEA.h"
-#include "AircraftContainer.h"
-#include "ConnectInExt.h"
-#include "WeatherFeed.h"
+
+class AircraftContainer;
+class WeatherFeed;
 
 #define SYNC_TIME 1
 #define WAIT_TIME 30
@@ -46,6 +46,7 @@ public:
     static bool global_weather_feed_enabled;
     static bool global_ogn_enabled;
     static bool global_adsb_enabled;
+    static bool global_run_status;
 
 protected:
     /**

@@ -22,10 +22,13 @@ Copyright_License {
 #ifndef AIRCRAFTPROCESSOR_H_
 #define AIRCRAFTPROCESSOR_H_
 
+#include <string>
+#include "Aircraft.h"
+class Aircraft;
+
 #define BUFF_OUT_S 4096
 #define LESS_BUFF_S 128
 
-#include "Aircraft.h"
 
 class AircraftProcessor
 {
@@ -68,32 +71,32 @@ private:
      * Latitude degree, minutes
      * Longitude degree, minutes
      */
-    lat_deg,
-    lat_min,
-    long_deg,
-    long_min,
+    lat_deg = 0.0,
+    lat_min = 0.0,
+    long_deg = 0.0,
+    long_min = 0.0,
     /**
      * Longitude base, Aircraft
      * Latitude base, Aircraft
      */
-    long_b,
-    long_ac,
-    lat_b,
-    lat_ac,
+    long_b = 0.0,
+    long_ac = 0.0,
+    lat_b = 0.0,
+    lat_ac = 0.0,
     /**
      * Longitude, Latitude distance
      */
-    long_dist,
-    lat_dist,
+    long_dist = 0.0,
+    lat_dist = 0.0,
     /**
      * relative bearing, absolute bearing
      */
-    bearing_rel,
-    bearing_abs,
+    bearing_rel = 0.0,
+    bearing_abs = 0.0,
     /**
      * values to calculate distance
      */
-    a,
+    a = 0.0,
     /**
      * geoid separation
      */
@@ -105,18 +108,18 @@ private:
     /**
      * relative North, East, Vertical
      */
-    rel_N,
-    rel_E,
-    rel_V,
+    rel_N = 0,
+    rel_E = 0,
+    rel_V = 0,
     /**
      * distance from base position to Aircraft
      */
-    dist;
+    dist = 0;
     /**
      * Latitude: S - N
      * Longitude: W - E
      */
-    char latstr, longstr;
+    char latstr = 'n', longstr = 'w';
 };
 
 #endif /* AIRCRAFTPROCESSOR_H_ */

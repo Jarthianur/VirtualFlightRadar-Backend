@@ -20,7 +20,7 @@ Copyright_License {
  */
 
 #include "Aircraft.h"
-#include "Math.h"
+
 
 Aircraft::~Aircraft()
 {

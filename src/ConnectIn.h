@@ -22,12 +22,14 @@ Copyright_License {
 #ifndef CONNECTIN_H_
 #define CONNECTIN_H_
 
-#include <sys/socket.h>
-#include <netdb.h>
 #include <string>
-#include "Connection.h"
+
+#include "InputConnection.h"
+
+struct hostent;
 
 #define BUFF_S 4096
+#define MSG_READ_ERR -1
 
 class ConnectIn
 {
@@ -35,30 +37,27 @@ public:
     /**
      * constructor with host,port
      */
-    ConnectIn(const char*, const int, unsigned int = 0);
+    ConnectIn(const std::string&, const int, unsigned int = 0);
     virtual ~ConnectIn() throw();
 
     /**
      * setup input socket
      * returns 0 on success, -1 on failure.
      */
-    virtual int setupConnectIn();
+    virtual void setupConnectIn() throw (ConnectionException);
 
     /**
      * connect to input service/server
      * returns 0 on success, -1 on failure.
      */
-    virtual int connectIn();
-
-    /**
-     * close all sockets
-     */
-    void close();
+    virtual void connectIn() throw (ConnectionException);
 
     /**
      * read line from input socket
      */
     int readLineIn();
+
+    void close();
 
     /**
      * getters/setters
@@ -76,10 +75,9 @@ protected:
     /**
      * input connection stuff
      */
-    struct hostent* in_host_info;
-    Connection in_con;
-    const char* in_hostname;
-    const int in_port;
+    hostent* in_host_info;
+    InputConnection in_con;
+    const std::string in_hostname;
     unsigned int timeout;
 
     /**

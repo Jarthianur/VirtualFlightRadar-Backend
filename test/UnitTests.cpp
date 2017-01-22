@@ -136,7 +136,7 @@ void testWFIsNotValidAfterGet(WeatherFeed& w_feed)
     return;
 }
 
-int main(int argc, char* argv[]) {
+int Tmain(int argc, char* argv[]) {
 
     //setup Configuration
     Configuration::base_latitude = 0.0;

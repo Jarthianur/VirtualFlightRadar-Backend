@@ -1,88 +1,72 @@
 /*
-Copyright_License {
+ Copyright_License {
 
-  Copyright (C) 2016 VirtualFlightRadar-Backend
-  A detailed list of copyright holders can be found in the file "AUTHORS".
+ Copyright (C) 2016 VirtualFlightRadar-Backend
+ A detailed list of copyright holders can be found in the file "AUTHORS".
 
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License version 3
-  as published by the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License version 3
+ as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-}
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ }
  */
 
 #include "ConnectIn.h"
-#include "Logger.h"
+
+#include <asm-generic/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/time.h>
 #include <cstring>
-#include <unistd.h>
-#include <arpa/inet.h>
 #include <stdexcept>
 
-ConnectIn::ConnectIn(const char* hostname, const int port, unsigned int to)
-: in_hostname(hostname),
-  in_port(port),
-  timeout(to)
+#include "ConnectionException.h"
+
+ConnectIn::ConnectIn(const std::string& hostname, const int port, unsigned int to)
+        : in_host_info(nullptr),
+          in_con(AF_INET, port),
+          in_hostname(hostname),
+          timeout(to)
+
 {
-    memset(buffer,0,sizeof(buffer));
+    memset(buffer, 0, sizeof(buffer));
 }
 
 ConnectIn::~ConnectIn()
 {
-    close();
 }
 
-int ConnectIn::connectIn()
+void ConnectIn::connectIn() throw (ConnectionException)
 {
-    if (::connect(in_con.con_sock, (struct sockaddr*) &in_con.con_addr, sizeof(struct sockaddr)) == -1) {
-        Logger::error("Connecting to ", this->in_hostname);
-        return -1;
-    }
-
-    Logger::info("Connected to ", this->in_hostname);
-    return 0;
+    in_con.connect(in_hostname);
 }
 
-int ConnectIn::setupConnectIn()
+void ConnectIn::setupConnectIn() throw (ConnectionException)
 {
-    if ((in_host_info = gethostbyname(in_hostname)) == NULL) {
-        Logger::error("Resolving hostname = ", this->in_hostname);
-        return -1;
+    if ((in_host_info = gethostbyname(in_hostname.c_str())) == NULL)
+    {
+        throw ConnectionException(std::string("Cannot resolve hostname: ") + in_hostname);
     }
+    in_con.createSocket(AF_INET, SOCK_STREAM, 0);
+    in_con.setSocketOpt(SOL_SOCKET, SO_KEEPALIVE, &yes, sizeof(int));
 
-    if ((in_con.con_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        Logger::error("Creating socket for connection to ", this->in_hostname);
-        return -1;
-    }
-
-    if (setsockopt(in_con.con_sock, SOL_SOCKET, SO_KEEPALIVE, &yes, sizeof(int)) == -1) {
-        Logger::error("Setting socketopt KEEPALIVE on connection to ", this->in_hostname);
-        return -1;
-    }
-
-    if (timeout > 0) {
+    if (timeout > 0)
+    {
         struct timeval tv;
         tv.tv_sec = timeout;
         tv.tv_usec = 0;
-        if (setsockopt(in_con.con_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval)) == -1) {
-            Logger::error("Setting socketopt RCVTIMEO on connection to ", this->in_hostname);
-            return -1;
-        }
+        in_con.setSocketOpt(SOL_SOCKET, SO_RCVTIMEO, (char *) &tv, sizeof(timeval));
     }
-
-    memset(&in_con.con_addr, 0, sizeof(in_con.con_addr));
-    in_con.con_addr.sin_family = AF_INET;
-    in_con.con_addr.sin_port = htons(in_port);
-    in_con.con_addr.sin_addr = *((struct in_addr*) in_host_info->h_addr);
-
-    return 0;
+    in_con.fillAddr(*((in_addr*) in_host_info->h_addr));
 }
 
 int ConnectIn::readLineIn()
@@ -91,8 +75,10 @@ int ConnectIn::readLineIn()
 
     int eol = linebuffer.find(EOL);
     int recv_l = 0;
-    while (eol == -1) {
-        if ((recv_l = recv(in_con.con_sock, buffer, BUFF_S-1, 0)) <= 0) {
+    while (eol == -1)
+    {
+        if ((recv_l = recv(in_con.getConSock(), buffer, BUFF_S - 1, 0)) <= 0)
+        {
             return -1;
         }
         buffer[recv_l] = 0;
@@ -100,25 +86,28 @@ int ConnectIn::readLineIn()
         eol = linebuffer.find(EOL);
     }
     eol += 2;
-    try {
-        response = linebuffer.substr(0,eol);
-        linebuffer.erase(0,eol);
-    } catch (const std::out_of_range& e) {
-        Logger::warn("Error while receiving message :: ", e.what());
-        return -1;
+    try
+    {
+        response = linebuffer.substr(0, eol);
+        linebuffer.erase(0, eol);
     }
-    if (response.length() == 0) {
-        return -1;
+    catch (const std::out_of_range& e)
+    {
+        return MSG_READ_ERR;
+    }
+    if (response.length() == 0)
+    {
+        return MSG_READ_ERR;
     }
     return response.length();
-}
-
-void ConnectIn::close()
-{
-    ::close(in_con.con_sock);
 }
 
 const std::string& ConnectIn::getResponse() const
 {
     return response;
+}
+
+void ConnectIn::close()
+{
+    in_con.close();
 }

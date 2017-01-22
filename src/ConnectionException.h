@@ -19,32 +19,18 @@
  }
  */
 
-#include "ConnectInExt.h"
+#ifndef CONNECTIONEXCEPTION_H_
+#define CONNECTIONEXCEPTION_H_
 
-#include <sys/socket.h>
+#include <stdexcept>
+#include <string>
 
-#include "ConnectionException.h"
-
-ConnectInExt::ConnectInExt(const std::string& hostname, int port,
-        const std::string& login, unsigned int to)
-        : ConnectIn(hostname, port, to),
-          login_str(login)
+class ConnectionException: public std::runtime_error
 {
-    login_str.append("\r\n");
-}
+public:
+    ConnectionException();
+    ConnectionException(const std::string&);
+    virtual ~ConnectionException() throw ();
+};
 
-ConnectInExt::~ConnectInExt()
-{
-}
-
-void ConnectInExt::connectIn() throw (ConnectionException)
-{
-    in_con.connect(in_hostname);
-
-    if (send(in_con.getConSock(), login_str.c_str(), login_str.length(), 0) <= 0)
-    {
-        throw ConnectionException(std::string("Failed to send login to ") + in_hostname);
-    }
-    //maybe verify correct login for ogn:
-    //logresp USER verified
-}
+#endif /* CONNECTIONEXCEPTION_H_ */

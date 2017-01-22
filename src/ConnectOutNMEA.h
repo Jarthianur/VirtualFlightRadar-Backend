@@ -22,12 +22,11 @@ Copyright_License {
 #ifndef CONNECTOUTNMEA_H_
 #define CONNECTOUTNMEA_H_
 
-#include "Connection.h"
-#include <sys/socket.h>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
-#include <memory>
+#include "OutputConnection.h"
 
 #define MAX_CLIENTS 5
 
@@ -38,26 +37,16 @@ public:
     virtual ~ConnectOutNMEA() throw();
 
     /**
-     * (all) methods are threadsafe.
-     */
-
-    /**
      * create output socket and listen to it
      */
-    int listenOut();
+    void listenOut() throw (ConnectionException);
 
     /**
      * wait for client to connect.
-     * if MAX_CLIENTS connections are open, return -1,
-     * else 0.
-     * not threadsafe!
+     * if MAX_CLIENTS connections are open, or any error occured
+     * throw Exception.
      */
-    int connectClient();
-
-    /**
-     * close all sockets
-     */
-    void closeAll();
+    void connectClient();
 
     /**
      * broadcast msg to all clients.
@@ -79,13 +68,13 @@ private:
     /**
      * client, output connection
      */
-    std::unique_ptr<Connection> nmea_out;
+    OutputConnection nmea_out;
     std::vector<std::shared_ptr<Connection>> clients;
 
     /**
-     * output port
+     * addr size
      */
-    const int nmea_out_port;
+    unsigned int sin_s;
 };
 
 #endif /* CONNECTOUTNMEA_H_ */

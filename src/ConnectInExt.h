@@ -22,15 +22,17 @@ Copyright_License {
 #ifndef CONNECTINEXT_H_
 #define CONNECTINEXT_H_
 
+#include <string>
+
 #include "ConnectIn.h"
 
 class ConnectInExt: public ConnectIn
 {
 public:
-   ConnectInExt(const char*, const int, std::string&, unsigned int = 0);
+   ConnectInExt(const std::string&, const int, const std::string&, unsigned int = 0);
    virtual ~ConnectInExt() throw();
 
-   int connectIn();
+   void connectIn() throw (ConnectionException);
 
 private:
    /**

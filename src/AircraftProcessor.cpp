@@ -20,16 +20,20 @@ Copyright_License {
  */
 
 #include "AircraftProcessor.h"
-#include "Configuration.h"
+
+#include <cmath>
 #include <cstdio>
 #include <ctime>
+#include <string>
+
+#include "Configuration.h"
 #include "Math.h"
 
 AircraftProcessor::AircraftProcessor(double b_lat, double b_long, int b_alt, double geo)
 : baselat(b_lat),
   baselong(b_long),
-  basealt(b_alt),
-  basegeoid(geo)
+  basegeoid(geo),
+  basealt(b_alt)
 {
 }
 
