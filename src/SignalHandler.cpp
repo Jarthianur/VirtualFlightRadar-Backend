@@ -19,36 +19,13 @@
  }
  */
 
-#ifndef WINDFEED_H_
-#define WINDFEED_H_
+#include "SignalHandler.h"
 
-#include <mutex>
-#include <string>
-
-#define ICAO_STD_A 1013.25
-#define ICAO_STD_T 15.0
-#define VALUE_NA -1000.0
-
-class WeatherFeed
+SignalHandler::SignalHandler()
 {
-public:
-    WeatherFeed();
-    virtual ~WeatherFeed();
+}
 
-    void getNMEA(std::string&);
-    void writeNMEA(const std::string&);
-    bool isValid();
-    double getPress();
-    double getTemp();
+SignalHandler::~SignalHandler()
+{
+}
 
-private:
-    std::mutex mutex;
-    std::string nmea_str;
-    // hpa
-    double pressure = ICAO_STD_A;
-    // celsius
-    double temperature = ICAO_STD_T;
-    bool wind_valid = false;
-};
-
-#endif /* WINDFEED_H_ */
