@@ -45,16 +45,16 @@ public:
      * configuration
      */
     static bool global_weather_feed_enabled;
-    static bool global_ogn_enabled;
-    static bool global_adsb_enabled;
+    static bool global_aprs_enabled;
+    static bool global_sbs_enabled;
     static bool global_run_status;
 
 protected:
     /**
      * funtions for every single thread
      */
-    static void handle_adsb_in(AircraftContainer&);
-    static void handle_ogn_in(AircraftContainer&);
+    static void handle_sbs_in(AircraftContainer&);
+    static void handle_aprs_in(AircraftContainer&);
     static void handle_con_out(ConnectOutNMEA&);
     static void handle_weather_feed(WeatherFeed&);
     static void exit_signal_handler(int sig);

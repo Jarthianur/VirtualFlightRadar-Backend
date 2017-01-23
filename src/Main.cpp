@@ -43,10 +43,10 @@ int main(int argc, char* argv[])
     double pressure = 0.0;
     double temp = 0.0;
     in_port_t out_port = 0;
-    in_port_t ogn_port = 0;
-    in_port_t adsb_port = 0;
-    std::string ogn_host("nA");
-    std::string adsb_host("nA");
+    in_port_t aprsc_port = 0;
+    in_port_t sbs_port = 0;
+    std::string aprsc_host("nA");
+    std::string sbs_host("nA");
     std::string login;
     std::string weather_feed_host("nA");
     in_port_t weather_feed_port = 0;
@@ -79,23 +79,23 @@ int main(int argc, char* argv[])
             temp = stod(cr.getProperty("temp", "15.0"));
             cout << "Temp: " << temp << endl;
 
-            out_port = stoi(cr.getProperty("outport", "0"));
-            cout << "outport: " << out_port << endl;
+            out_port = stoi(cr.getProperty("outPort", "0"));
+            cout << "outPort: " << out_port << endl;
 
-            ogn_port = stoi(cr.getProperty("ognport", "0"));
-            cout << "ognport: " << ogn_port << endl;
+            aprsc_port = stoi(cr.getProperty("aprscPort", "0"));
+            cout << "aprscPort: " << aprsc_port << endl;
 
-            adsb_port = stoi(cr.getProperty("adsbport", "0"));
-            cout << "adsbport: " << adsb_port << endl;
+            sbs_port = stoi(cr.getProperty("sbsPort", "0"));
+            cout << "sbsPort: " << sbs_port << endl;
 
-            ogn_host = cr.getProperty("ognhost", "nA");
-            cout << "ognhost: " << ogn_host << endl;
+            aprsc_host = cr.getProperty("aprscHost", "nA");
+            cout << "aprscHost: " << aprsc_host << endl;
 
-            adsb_host = cr.getProperty("adsbhost", "nA");
-            cout << "adsbhost: " << adsb_host << endl;
+            sbs_host = cr.getProperty("sbsHost", "nA");
+            cout << "sbsHost: " << sbs_host << endl;
 
-            login = cr.getProperty("login", "");
-            cout << "login: " << login << endl;
+            login = cr.getProperty("aprscLogin", "");
+            cout << "aprscLogin: " << login << endl;
 
             weather_feed_host = cr.getProperty("weatherFeedHost", "nA");
             cout << "weatherFeedHost: " << weather_feed_host << endl;
@@ -128,11 +128,11 @@ int main(int argc, char* argv[])
     Configuration::base_pressure = pressure;
     Configuration::base_temp = temp;
     Configuration::global_out_port = out_port;
-    Configuration::global_ogn_port = ogn_port;
-    Configuration::global_adsb_port = adsb_port;
-    Configuration::global_ogn_host = ogn_host;
-    Configuration::global_adsb_host = adsb_host;
-    Configuration::global_login_str = login;
+    Configuration::global_aprsc_port = aprsc_port;
+    Configuration::global_sbs_port = sbs_port;
+    Configuration::global_aprsc_host = aprsc_host;
+    Configuration::global_sbs_host = sbs_host;
+    Configuration::global_aprsc_login = login;
     Configuration::global_weather_feed_host = weather_feed_host;
     Configuration::global_weather_feed_port = weather_feed_port;
     Configuration::filter_maxHeight = maxHeight;

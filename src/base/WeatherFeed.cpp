@@ -33,11 +33,11 @@ WeatherFeed::~WeatherFeed()
 {
 }
 
-void WeatherFeed::getNMEA(std::string& dest_str)
+std::string WeatherFeed::getNMEA()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    dest_str = nmea_str;
     wind_valid = false;
+    return nmea_str;
 }
 
 void WeatherFeed::writeNMEA(const std::string& str)

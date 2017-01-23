@@ -53,14 +53,7 @@ public:
      * process aircraft at index i into target string,
      * if index i is valid.
      */
-    void processAircraft(size_t, std::string&);
-
-    /**
-     * increments all aircrafts's valid counter in container.
-     * if valid counter is >= INVALIDATE, the aircraft is deleted from
-     * container
-     */
-    void invalidateAircrafts();
+    std::string processAircrafts();
 
     /**
      * return container's size

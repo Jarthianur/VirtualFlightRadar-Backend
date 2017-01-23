@@ -53,9 +53,10 @@ ssize_t AircraftContainer::find(std::string& id)
     }
 }
 
-void AircraftContainer::invalidateAircrafts()
+std::string AircraftContainer::processAircrafts()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
+    std::string dest_str;
     size_t size = cont.size(), i = 0;
     bool del = false;
 
@@ -72,6 +73,7 @@ void AircraftContainer::invalidateAircrafts()
             }
             else
             {
+                dest_str += proc.process(std::ref(cont.at(i)));
                 i++;
             }
             if (del && size > 0 && i < size)
@@ -84,18 +86,7 @@ void AircraftContainer::invalidateAircrafts()
             Logger::warn("Error while invalidating aircraft: ", e.what());
         }
     }
-}
-
-void AircraftContainer::processAircraft(size_t i, std::string& dest_str)
-{
-    try
-    {
-        dest_str = proc.process(std::ref(cont.at(i)));
-    }
-    catch (const std::out_of_range& e)
-    {
-        Logger::warn("Error while processing aircraft: ", e.what());
-    }
+    return dest_str;
 }
 
 size_t AircraftContainer::getContSize()

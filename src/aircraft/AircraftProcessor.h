@@ -44,7 +44,7 @@ public:
     /**
      * build GPRMC and GPGGA
      */
-    void gpsfix(std::string&);
+    std::string gpsfix();
 
 private:
     /**

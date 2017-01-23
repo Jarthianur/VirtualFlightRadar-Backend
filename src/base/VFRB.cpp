@@ -41,8 +41,8 @@
 #include "WeatherFeed.h"
 
 bool VFRB::global_weather_feed_enabled = false;
-bool VFRB::global_ogn_enabled = false;
-bool VFRB::global_adsb_enabled = false;
+bool VFRB::global_aprs_enabled = false;
+bool VFRB::global_sbs_enabled = false;
 bool VFRB::global_run_status = true;
 
 VFRB::VFRB()
@@ -61,22 +61,34 @@ void VFRB::run()
     AircraftProcessor ac_proc(Configuration::base_latitude, Configuration::base_longitude,
                               Configuration::base_altitude, Configuration::base_geoid);
 
-    if (Configuration::global_ogn_host.compare("nA") != 0 || Configuration::global_ogn_host.length()
+    if (Configuration::global_aprsc_host.compare("nA") != 0 || Configuration::global_aprsc_host.length()
             == 0)
     {
-        global_ogn_enabled = true;
+        global_aprs_enabled = true;
+    }
+    else
+    {
+        Logger::warn("APRSC not enabled -> ", "no FLARM targets");
     }
 
-    if (Configuration::global_adsb_host.compare("nA") != 0 || Configuration::global_adsb_host.length()
+    if (Configuration::global_sbs_host.compare("nA") != 0 || Configuration::global_sbs_host.length()
             == 0)
     {
-        global_adsb_enabled = true;
+        global_sbs_enabled = true;
+    }
+    else
+    {
+        Logger::warn("ADSB receiver not enabled -> ", "no transponder targets");
     }
 
     if (Configuration::global_weather_feed_host.compare("nA") != 0 || Configuration::global_weather_feed_host.length()
             == 0)
     {
         global_weather_feed_enabled = true;
+    }
+    else
+    {
+        Logger::warn("Weather feed not enabled -> ", "no wind,pressure,temp");
     }
 
     if (signal((int) SIGINT, VFRB::exit_signal_handler) == SIG_ERR)
@@ -86,28 +98,22 @@ void VFRB::run()
         return;
     }
 
-    std::thread adsb_in_thread(handle_adsb_in, std::ref(ac_cont));
-    std::thread ogn_in_thread(handle_ogn_in, std::ref(ac_cont));
+    std::thread sbs_in_thread(handle_sbs_in, std::ref(ac_cont));
+    std::thread aprs_in_thread(handle_aprs_in, std::ref(ac_cont));
     std::thread con_out_thread(handle_con_out, std::ref(out_con));
     std::thread weather_feed_thread(handle_weather_feed, std::ref(weather_feed));
-
-    std::string str;
 
     while (global_run_status)
     {
         try
         {
-            ac_cont.invalidateAircrafts();
-            for (unsigned int i = 0; i < ac_cont.getContSize(); ++i)
+            std::string str = ac_cont.processAircrafts();
+            if (str.length() > 0)
             {
-                ac_cont.processAircraft(i, std::ref(str));
-                if (str.length() > 0)
-                {
-                    out_con.sendMsgOut(std::ref(str));
-                }
+                out_con.sendMsgOut(std::ref(str));
             }
 
-            ac_proc.gpsfix(std::ref(str));
+            str = ac_proc.gpsfix();
             out_con.sendMsgOut(std::ref(str));
 
             if (global_weather_feed_enabled)
@@ -122,7 +128,7 @@ void VFRB::run()
                 }
                 if (weather_feed.isValid())
                 {
-                    weather_feed.getNMEA(std::ref(str));
+                    str = weather_feed.getNMEA();
                     out_con.sendMsgOut(std::ref(str));
                 }
             }
@@ -138,8 +144,8 @@ void VFRB::run()
 
     try
     {
-        adsb_in_thread.join();
-        ogn_in_thread.join();
+        sbs_in_thread.join();
+        aprs_in_thread.join();
         con_out_thread.join();
         weather_feed_thread.join();
     }
@@ -173,7 +179,6 @@ void VFRB::handle_weather_feed(WeatherFeed& weather)
 {
     if (!global_weather_feed_enabled)
     {
-        Logger::warn("Weather feed not enabled -> ", "no wind,pressure,temp");
         return;
     }
     ConnectIn wind_con(std::ref(Configuration::global_weather_feed_host),
@@ -217,39 +222,38 @@ void VFRB::handle_weather_feed(WeatherFeed& weather)
     }
 }
 
-void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
+void VFRB::handle_sbs_in(AircraftContainer& ac_cont)
 {
-    if (!global_adsb_enabled)
+    if (!global_sbs_enabled)
     {
-        Logger::warn("ADSB receiver not enabled -> ", "no transponder targets");
         return;
     }
     ParserSBS parser;
-    ConnectIn adsb_con(std::ref(Configuration::global_adsb_host),
-                       Configuration::global_adsb_port);
+    ConnectIn sbs_con(std::ref(Configuration::global_sbs_host),
+                       Configuration::global_sbs_port);
     bool connected = false;
 
-    while (global_adsb_enabled && global_run_status)
+    while (global_sbs_enabled && global_run_status)
     {
         while (!connected && global_run_status)
         {
-            adsb_con.close();
+            sbs_con.close();
             try
             {
-                adsb_con.setupConnectIn();
+                sbs_con.setupConnectIn();
             }
             catch (const ConnectionException& ce)
             {
                 Logger::error("Failed to setup SBS input connection: ", ce.what());
-                global_adsb_enabled = false;
+                global_sbs_enabled = false;
                 return;
             }
             try
             {
-                adsb_con.connectIn();
+                sbs_con.connectIn();
                 connected = true;
                 Logger::info("Scan for incoming sbs-msgs from ",
-                             Configuration::global_adsb_host);
+                             Configuration::global_sbs_host);
             }
             catch (const ConnectionException& ce)
             {
@@ -257,52 +261,51 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
                 std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
             }
         }
-        if (adsb_con.readLineIn() == CI_MSG_READ_ERR)
+        if (sbs_con.readLineIn() == CI_MSG_READ_ERR)
         {
             connected = false;
         }
         //need msg3 only
-        else if (adsb_con.getResponse().at(4) == '3')
+        else if (sbs_con.getResponse().at(4) == '3')
         {
-            parser.unpack(std::ref(adsb_con.getResponse()), std::ref(ac_cont));
+            parser.unpack(std::ref(sbs_con.getResponse()), std::ref(ac_cont));
         }
     }
 }
 
-void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
+void VFRB::handle_aprs_in(AircraftContainer& ac_cont)
 {
-    if (!global_ogn_enabled)
+    if (!global_aprs_enabled)
     {
-        Logger::warn("APRSC not enabled -> ", "no FLARM targets");
         return;
     }
     ParserAPRS parser;
-    ConnectInExt ogn_con(std::ref(Configuration::global_ogn_host),
-                         Configuration::global_ogn_port,
-                         std::ref(Configuration::global_login_str));
+    ConnectInExt aprs_con(std::ref(Configuration::global_aprsc_host),
+                         Configuration::global_aprsc_port,
+                         std::ref(Configuration::global_aprsc_login));
     bool connected = false;
 
-    while (global_ogn_enabled && global_run_status)
+    while (global_aprs_enabled && global_run_status)
     {
         while (!connected && global_run_status)
         {
-            ogn_con.close();
+            aprs_con.close();
             try
             {
-                ogn_con.setupConnectIn();
+                aprs_con.setupConnectIn();
             }
             catch (const ConnectionException& ce)
             {
                 Logger::error("Failed to setup APRS input connection: ", ce.what());
-                global_ogn_enabled = false;
+                global_aprs_enabled = false;
                 return;
             }
             try
             {
-                ogn_con.connectIn();
+                aprs_con.connectIn();
                 connected = true;
                 Logger::info("Scan for incoming aprs-msgs from ",
-                             Configuration::global_ogn_host);
+                             Configuration::global_aprsc_host);
             }
             catch (const ConnectionException& ce)
             {
@@ -310,13 +313,13 @@ void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
                 std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
             }
         }
-        if (ogn_con.readLineIn() == CI_MSG_READ_ERR)
+        if (aprs_con.readLineIn() == CI_MSG_READ_ERR)
         {
             connected = false;
         }
         else
         {
-            parser.unpack(std::ref(ogn_con.getResponse()), std::ref(ac_cont));
+            parser.unpack(std::ref(aprs_con.getResponse()), std::ref(ac_cont));
         }
     }
 }
@@ -328,10 +331,13 @@ void VFRB::exit_signal_handler(int sig)
     try
     {
         shut.setupConnectIn();
+        Logger::info("Init shutdown-connection on localhost:",
+                     std::to_string(Configuration::global_out_port));
         shut.connectIn();
     }
     catch (const ConnectionException& ce)
     {
-        Logger::error("Cannot shutdown: ", "nmea out");
+        Logger::error("Cannot shutdown nmea out -> ", "hard termination...");
+        std::terminate();
     }
 }

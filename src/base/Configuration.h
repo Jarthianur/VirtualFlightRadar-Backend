@@ -40,11 +40,11 @@ public:
     static double base_pressure;
     static double base_temp;
     static in_port_t global_out_port;
-    static in_port_t global_ogn_port;
-    static in_port_t global_adsb_port;
-    static std::string global_ogn_host;
-    static std::string global_adsb_host;
-    static std::string global_login_str;
+    static in_port_t global_aprsc_port;
+    static in_port_t global_sbs_port;
+    static std::string global_aprsc_host;
+    static std::string global_sbs_host;
+    static std::string global_aprsc_login;
     static std::string global_weather_feed_host;
     static in_port_t global_weather_feed_port;
     static int32_t filter_maxHeight;

@@ -35,7 +35,7 @@ public:
     WeatherFeed();
     virtual ~WeatherFeed();
 
-    void getNMEA(std::string&);
+    std::string getNMEA();
     void writeNMEA(const std::string&);
     bool isValid();
     double getPress();

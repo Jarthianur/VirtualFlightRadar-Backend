@@ -119,9 +119,9 @@ void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
             ac.altitude - basealt;
 }
 
-void AircraftProcessor::gpsfix(std::string& nmea_str)
+std::string AircraftProcessor::gpsfix()
 {
-    nmea_str.clear();
+    std::string nmea_str;
     int32_t csum;
 
     latstr = (baselat < 0) ? 'S' : 'N';
@@ -155,4 +155,6 @@ void AircraftProcessor::gpsfix(std::string& nmea_str)
     nmea_str.append(buffer);
     snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
+
+    return nmea_str;
 }
