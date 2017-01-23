@@ -27,7 +27,7 @@
 
 #define ICAO_STD_A 1013.25
 #define ICAO_STD_T 15.0
-#define VALUE_NA -1000.0
+#define A_VALUE_NA -1000.0
 
 class WeatherFeed
 {

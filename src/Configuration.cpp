@@ -29,19 +29,19 @@ Configuration::~Configuration()
 {
 }
 
-int Configuration::base_altitude = 0;
+int32_t Configuration::base_altitude = 0;
 double Configuration::base_latitude = 0.0;
 double Configuration::base_longitude = 0.0;
 double Configuration::base_geoid = 0.0;
 double Configuration::base_pressure = 0.0;
 double Configuration::base_temp = 0.0;
-int Configuration::global_out_port = 0;
-int Configuration::global_ogn_port = 0;
-int Configuration::global_adsb_port = 0;
+in_port_t Configuration::global_out_port = 0;
+in_port_t Configuration::global_ogn_port = 0;
+in_port_t Configuration::global_adsb_port = 0;
 std::string Configuration::global_ogn_host = "nA";
 std::string Configuration::global_adsb_host = "nA";
 std::string Configuration::global_login_str = "";
 std::string Configuration::global_weather_feed_host = "nA";
-int Configuration::global_weather_feed_port = 0;
-int Configuration::filter_maxHeight = 0;
-int Configuration::filter_maxDist = 0;
+in_port_t Configuration::global_weather_feed_port = 0;
+int32_t Configuration::filter_maxHeight = 0;
+int32_t Configuration::filter_maxDist = 0;

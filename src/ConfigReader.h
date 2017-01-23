@@ -34,7 +34,7 @@ public:
    inline virtual ~ConfigReader() throw() {};
 
    void read();
-   std::string getProperty(const char*, const char*) const;
+   const std::string& getProperty(const std::string&, const std::string&) const;
 
 private:
    const char* file;

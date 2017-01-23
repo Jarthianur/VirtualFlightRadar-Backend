@@ -41,7 +41,7 @@ ParserAPRS::~ParserAPRS()
 {
 }
 
-int ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
+int32_t ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
 {
     if (sentence.at(0) == '#')
     {
@@ -100,7 +100,7 @@ int ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                     }
                     catch (const std::logic_error& e)
                     {
-                        climb_r = VALUE_NA;
+                        climb_r = A_VALUE_NA;
                     }
                     try
                     {
@@ -108,7 +108,7 @@ int ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
                     }
                     catch (const std::logic_error& e)
                     {
-                        turn_r = VALUE_NA;
+                        turn_r = A_VALUE_NA;
                     }
                 }
                 else
@@ -128,7 +128,7 @@ int ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
             }
             catch (const std::logic_error& e)
             {
-                heading = VALUE_NA;
+                heading = A_VALUE_NA;
             }
             try
             {
@@ -136,7 +136,7 @@ int ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
             }
             catch (const std::logic_error& e)
             {
-                gnd_spd = VALUE_NA;
+                gnd_spd = A_VALUE_NA;
             }
 
             ac_cont.insertAircraft(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r,

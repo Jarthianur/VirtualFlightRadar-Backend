@@ -45,6 +45,15 @@ void Logger::info(const std::string& msg, const std::string& subject)
     return;
 }
 
+void Logger::debug(const std::string& msg, const std::string& subject)
+{
+    std::lock_guard<std::mutex> lock(Logger::mutex);
+    std::time_t tt = std::chrono::system_clock::to_time_t(
+            std::chrono::system_clock::now());
+    std::cout << "[DEBUG] " << msg << subject << " @ " << ctime(&tt);
+    return;
+}
+
 void Logger::warn(const std::string& msg, const std::string& subject)
 {
     std::lock_guard<std::mutex> lock(Logger::mutex);

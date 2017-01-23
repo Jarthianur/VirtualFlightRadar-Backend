@@ -22,6 +22,7 @@
 #ifndef PARSERSBS_H_
 #define PARSERSBS_H_
 
+#include <cstdint>
 #include <string>
 
 #include "Parser.h"
@@ -32,11 +33,11 @@ public:
     ParserSBS();
     virtual ~ParserSBS() throw ();
 
-    int unpack(const std::string&, AircraftContainer&);
+    int32_t unpack(const std::string&, AircraftContainer&);
 
 private:
     std::string id;
-    int alt = 0, time = 0;
+    int32_t alt = 0, time = 0;
     double lat = 0.0, lon = 0.0;
 };
 

@@ -22,17 +22,18 @@
 #include "VFRB.h"
 
 #include <chrono>
+#include <csignal>
 #include <exception>
 #include <functional>
 #include <string>
 #include <system_error>
 #include <thread>
 
-#include "Aircraft.h"
 #include "AircraftContainer.h"
 #include "AircraftProcessor.h"
 #include "Configuration.h"
 #include "ConnectionException.h"
+#include "ConnectIn.h"
 #include "ConnectInExt.h"
 #include "Logger.h"
 #include "ParserAPRS.h"
@@ -65,19 +66,11 @@ void VFRB::run()
     {
         global_ogn_enabled = true;
     }
-    else
-    {
-        Logger::warn("APRSC not enabled -> ", "no FLARM targets");
-    }
 
     if (Configuration::global_adsb_host.compare("nA") != 0 || Configuration::global_adsb_host.length()
             == 0)
     {
         global_adsb_enabled = true;
-    }
-    else
-    {
-        Logger::warn("ADSB receiver not enabled -> ", "no transponder targets");
     }
 
     if (Configuration::global_weather_feed_host.compare("nA") != 0 || Configuration::global_weather_feed_host.length()
@@ -85,9 +78,12 @@ void VFRB::run()
     {
         global_weather_feed_enabled = true;
     }
-    else
+
+    if (signal((int) SIGINT, VFRB::exit_signal_handler) == SIG_ERR)
     {
-        Logger::warn("Weather feed not enabled -> ", "no wind,pressure,temp");
+        Logger::error("Failed to register signal: ", "SIGINT");
+        global_run_status = false;
+        return;
     }
 
     std::thread adsb_in_thread(handle_adsb_in, std::ref(ac_cont));
@@ -116,11 +112,11 @@ void VFRB::run()
 
             if (global_weather_feed_enabled)
             {
-                if (weather_feed.getPress() != VALUE_NA)
+                if (weather_feed.getPress() != A_VALUE_NA)
                 {
                     Configuration::base_pressure = weather_feed.getPress();
                 }
-                if (weather_feed.getTemp() != VALUE_NA)
+                if (weather_feed.getTemp() != A_VALUE_NA)
                 {
                     Configuration::base_temp = weather_feed.getTemp();
                 }
@@ -143,15 +139,20 @@ void VFRB::run()
     try
     {
         adsb_in_thread.join();
+        Logger::info("Thread joined: ", "adsb_in");
         ogn_in_thread.join();
+        Logger::info("Thread joined: ", "ogn_in");
         con_out_thread.join();
+        Logger::info("Thread joined: ", "con_out");
         weather_feed_thread.join();
+        Logger::info("Thread joined: ", "weather_feed");
     }
     catch (const std::system_error& se)
     {
         Logger::error("while joining threads: ", se.what());
         std::terminate();
     }
+    Logger::info("Successfully exited: ", "run()");
 }
 
 void VFRB::handle_con_out(ConnectOutNMEA& out_con)
@@ -170,12 +171,14 @@ void VFRB::handle_con_out(ConnectOutNMEA& out_con)
     {
         out_con.connectClient();
     }
+    Logger::info("Successfully exited: ", "handle_con_out()");
 }
 
 void VFRB::handle_weather_feed(WeatherFeed& weather)
 {
     if (!global_weather_feed_enabled)
     {
+        Logger::warn("Weather feed not enabled -> ", "no wind,pressure,temp");
         return;
     }
     ConnectIn wind_con(std::ref(Configuration::global_weather_feed_host),
@@ -184,7 +187,7 @@ void VFRB::handle_weather_feed(WeatherFeed& weather)
 
     while (global_weather_feed_enabled && global_run_status)
     {
-        while (!connected)
+        while (!connected && global_run_status)
         {
             wind_con.close();
             try
@@ -208,7 +211,7 @@ void VFRB::handle_weather_feed(WeatherFeed& weather)
                 std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
             }
         }
-        if (wind_con.readLineIn() == MSG_READ_ERR)
+        if (wind_con.readLineIn() == CI_MSG_READ_ERR)
         {
             connected = false;
         }
@@ -217,12 +220,14 @@ void VFRB::handle_weather_feed(WeatherFeed& weather)
             weather.writeNMEA(std::ref(wind_con.getResponse()));
         }
     }
+    Logger::info("Successfully exited: ", "handle_weather_feed()");
 }
 
 void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
 {
     if (!global_adsb_enabled)
     {
+        Logger::warn("ADSB receiver not enabled -> ", "no transponder targets");
         return;
     }
     ParserSBS parser;
@@ -232,7 +237,7 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
 
     while (global_adsb_enabled && global_run_status)
     {
-        while (!connected)
+        while (!connected && global_run_status)
         {
             adsb_con.close();
             try
@@ -258,7 +263,7 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
                 std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
             }
         }
-        if (adsb_con.readLineIn() == MSG_READ_ERR)
+        if (adsb_con.readLineIn() == CI_MSG_READ_ERR)
         {
             connected = false;
         }
@@ -268,12 +273,14 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
             parser.unpack(std::ref(adsb_con.getResponse()), std::ref(ac_cont));
         }
     }
+    Logger::info("Successfully exited: ", "handle_adsb_in()");
 }
 
 void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
 {
     if (!global_ogn_enabled)
     {
+        Logger::warn("APRSC not enabled -> ", "no FLARM targets");
         return;
     }
     ParserAPRS parser;
@@ -284,7 +291,7 @@ void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
 
     while (global_ogn_enabled && global_run_status)
     {
-        while (!connected)
+        while (!connected && global_run_status)
         {
             ogn_con.close();
             try
@@ -310,7 +317,7 @@ void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
                 std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
             }
         }
-        if (ogn_con.readLineIn() == MSG_READ_ERR)
+        if (ogn_con.readLineIn() == CI_MSG_READ_ERR)
         {
             connected = false;
         }
@@ -318,5 +325,22 @@ void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
         {
             parser.unpack(std::ref(ogn_con.getResponse()), std::ref(ac_cont));
         }
+    }
+    Logger::info("Successfully exited: ", "handle_ogn_in()");
+}
+
+void VFRB::exit_signal_handler(int sig)
+{
+    Logger::info("\nEXITING PROGRAM: ", std::to_string(sig));
+    global_run_status = false;
+    ConnectIn shut("localhost", Configuration::global_out_port);
+    try
+    {
+        shut.setupConnectIn();
+        shut.connectIn();
+    }
+    catch (const ConnectionException& ce)
+    {
+        Logger::error("Cannot shutdown: ", "nmea out");
     }
 }

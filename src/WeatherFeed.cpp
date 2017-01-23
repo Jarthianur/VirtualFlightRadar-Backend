@@ -21,6 +21,7 @@
 
 #include "WeatherFeed.h"
 
+#include <stddef.h>
 #include <stdexcept>
 
 WeatherFeed::WeatherFeed()
@@ -50,7 +51,7 @@ void WeatherFeed::writeNMEA(const std::string& str)
     }
     else if (str.substr(1, 5).compare("WIMDA") == 0)
     {
-        int b, s;
+        size_t b, s;
         try
         {
             b = str.find('B') - 1;
@@ -59,7 +60,7 @@ void WeatherFeed::writeNMEA(const std::string& str)
         }
         catch (std::logic_error& e)
         {
-            pressure = VALUE_NA;
+            pressure = A_VALUE_NA;
         }
         try
         {
@@ -69,7 +70,7 @@ void WeatherFeed::writeNMEA(const std::string& str)
         }
         catch (std::logic_error& e)
         {
-            temperature = VALUE_NA;
+            temperature = A_VALUE_NA;
         }
     }
     return;
@@ -77,18 +78,15 @@ void WeatherFeed::writeNMEA(const std::string& str)
 
 bool WeatherFeed::isValid()
 {
-    std::lock_guard<std::mutex> lock(this->mutex);
     return wind_valid;
 }
 
 double WeatherFeed::getPress()
 {
-    std::lock_guard<std::mutex> lock(this->mutex);
     return pressure;
 }
 
 double WeatherFeed::getTemp()
 {
-    std::lock_guard<std::mutex> lock(this->mutex);
     return temperature;
 }

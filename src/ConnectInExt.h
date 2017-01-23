@@ -1,27 +1,29 @@
 /*
-Copyright_License {
+ Copyright_License {
 
-  Copyright (C) 2017 VirtualFlightRadar-Backend
-  A detailed list of copyright holders can be found in the file "AUTHORS".
+ Copyright (C) 2017 VirtualFlightRadar-Backend
+ A detailed list of copyright holders can be found in the file "AUTHORS".
 
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License version 3
-  as published by the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License version 3
+ as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-}
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ }
+ */
 
 #ifndef CONNECTINEXT_H_
 #define CONNECTINEXT_H_
 
+#include <netinet/in.h>
+#include <ctime>
 #include <string>
 
 #include "ConnectIn.h"
@@ -29,16 +31,17 @@ Copyright_License {
 class ConnectInExt: public ConnectIn
 {
 public:
-   ConnectInExt(const std::string&, const int, const std::string&, unsigned int = 0);
-   virtual ~ConnectInExt() throw();
+    ConnectInExt(const std::string& host, in_port_t port, const std::string& login,
+            time_t to = 0);
+    virtual ~ConnectInExt() throw ();
 
-   void connectIn() throw (ConnectionException);
+    void connectIn();
 
 private:
-   /**
-    * login stuff
-    */
-   std::string login_str;
+    /**
+     * login stuff
+     */
+    std::string login_str;
 
 };
 

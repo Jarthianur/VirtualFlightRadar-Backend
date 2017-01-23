@@ -24,25 +24,30 @@
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include "ConnectionException.h"
+#include <sys/un.h>
+#include <cstdint>
+
+#define C_SO_NOSET -1
+#define C_SO_CREAT_ERR C_SO_NOSET
+#define C_SO_OPT_ERR C_SO_CREAT_ERR
 
 class Connection
 {
 public:
-    Connection(int, int);
+    Connection(sa_family_t family, in_port_t port);
     Connection();
     virtual ~Connection() throw ();
 
-    void createSocket(int, int, int) throw (ConnectionException);
-    void setSocketOpt(int, int, void*, socklen_t) throw (ConnectionException);
-    int getConSock();
+    void createSocket(sa_family_t family, int32_t style, int32_t protocol);
+    void setSocketOpt(int32_t level, int32_t optname, void* optval, socklen_t optlen);
+    int32_t getConSock();
     void close();
 
 protected:
-    void setConSock(int);
+    void setConSock(int32_t sock);
     sockaddr* getSockAddrPtr();
     sockaddr_in con_addr;
-    int con_sock = -1;
+    int32_t con_sock = C_SO_NOSET;
 
     friend class ConnectOutNMEA;
 };

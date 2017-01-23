@@ -23,6 +23,7 @@ Copyright_License {
 #define MATH_H_
 
 #include <cmath>
+#include <cstdint>
 
 namespace Math
 {
@@ -39,7 +40,7 @@ double degree(double);
 /**
  * convert to int, round to nearest number
  */
-int dToI(double);
+int32_t dToI(double);
 
 double dmsToDeg(double dms);
 

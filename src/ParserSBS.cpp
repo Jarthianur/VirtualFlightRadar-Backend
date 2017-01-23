@@ -21,6 +21,7 @@
 
 #include "ParserSBS.h"
 
+#include <sys/types.h>
 #include <cstddef>
 #include <stdexcept>
 
@@ -37,7 +38,7 @@ ParserSBS::~ParserSBS()
 {
 }
 
-int ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
+int32_t ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
 {
     /*
      * fields:
@@ -47,8 +48,9 @@ int ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
      * 14: latitude
      * 15: longitude
      */
-    std::size_t delim;
-    int i = 2, p = 6;
+    size_t delim;
+    uint32_t i = 2;
+    size_t p = 6;
     while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
     {
         switch (i)

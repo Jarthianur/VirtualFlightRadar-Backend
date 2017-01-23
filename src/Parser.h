@@ -22,6 +22,7 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
+#include <stdint.h>
 #include <string>
 
 class AircraftContainer;
@@ -41,7 +42,7 @@ public:
      * returns MSG_UNPACK_SUC on success, MSG_UNPACK_ERR on failure,
      * MSG_UNPACK_IGN when to ignore.
      */
-    virtual int unpack(const std::string&, AircraftContainer&) = 0;
+    virtual int32_t unpack(const std::string&, AircraftContainer&) = 0;
 
 };
 

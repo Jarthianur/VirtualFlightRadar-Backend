@@ -1,30 +1,37 @@
 /*
-Copyright_License {
+ Copyright_License {
 
-  Copyright (C) 2017 VirtualFlightRadar-Backend
-  A detailed list of copyright holders can be found in the file "AUTHORS".
+ Copyright (C) 2017 VirtualFlightRadar-Backend
+ A detailed list of copyright holders can be found in the file "AUTHORS".
 
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License version 3
-  as published by the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License version 3
+ as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-}
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ }
  */
 
 #include "AircraftContainer.h"
+
+#include <functional>
+#include <iterator>
+#include <stdexcept>
+#include <utility>
+
 #include "Configuration.h"
 #include "Logger.h"
 
 AircraftContainer::AircraftContainer()
-: proc(Configuration::base_latitude, Configuration::base_longitude, Configuration::base_altitude, Configuration::base_geoid)
+        : proc(Configuration::base_latitude, Configuration::base_longitude,
+               Configuration::base_altitude, Configuration::base_geoid)
 {
 }
 
@@ -33,12 +40,15 @@ AircraftContainer::~AircraftContainer()
     clear();
 }
 
-int AircraftContainer::find(std::string& id)
+ssize_t AircraftContainer::find(std::string& id)
 {
     const auto it = index_map.find(id);
-    if (it == index_map.end()) {
-        return -1;
-    } else {
+    if (it == index_map.end())
+    {
+        return AC_NOT_FOUND;
+    }
+    else
+    {
         return it->second;
     }
 }
@@ -46,54 +56,68 @@ int AircraftContainer::find(std::string& id)
 void AircraftContainer::invalidateAircrafts()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    int i = 0;
-    int size = cont.size();
+    size_t size = cont.size(), i = 0;
     bool del = false;
 
-    while (i < size && size > 0) {
-        try {
-            if (++(cont.at(i).valid) >= INVALIDATE) {
+    while (i < size && size > 0)
+    {
+        try
+        {
+            if (++(cont.at(i).valid) >= AC_INVALIDATE)
+            {
                 del = true;
                 index_map.erase(index_map.find(cont.at(i).id));
                 cont.erase(cont.begin() + i);
                 size--;
-            } else {
+            }
+            else
+            {
                 i++;
             }
-            if (del && size > 0 && i < size) {
+            if (del && size > 0 && i < size)
+            {
                 index_map.at(cont.at(i).id) = i;
             }
-        } catch (std::exception& e) {
-            Logger::warn("Error while invalidating aircraft, because ", e.what());
+        }
+        catch (std::exception& e)
+        {
+            Logger::warn("Error while invalidating aircraft: ", e.what());
         }
     }
-    return;
 }
 
-void AircraftContainer::processAircraft(unsigned int i, std::string& dest_str)
+void AircraftContainer::processAircraft(size_t i, std::string& dest_str)
 {
-    std::lock_guard<std::mutex> lock(this->mutex);
-    if (i >= cont.size()) return;
-    dest_str = proc.process(std::ref(cont.at(i)));
-    return;
+    try
+    {
+        dest_str = proc.process(std::ref(cont.at(i)));
+    }
+    catch (const std::out_of_range& e)
+    {
+        Logger::warn("Error while processing aircraft: ", e.what());
+    }
 }
 
-unsigned int AircraftContainer::getContSize()
+size_t AircraftContainer::getContSize()
 {
-    std::lock_guard<std::mutex> lock(this->mutex);
     return cont.size();
 }
 
-void AircraftContainer::insertAircraft(std::string& id, double lat, double lon, int alt)
+void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
+        int32_t alt)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    int i;
-    if ((i = find(id)) == -1) {
+    ssize_t i;
+    if ((i = find(id)) == AC_NOT_FOUND)
+    {
         Aircraft ac(id, lat, lon, alt);
         ac.qne = true;
         cont.push_back(ac);
-        index_map.insert({id,cont.size()-1});
-    } else {
+        index_map.insert(
+        { id, cont.size() - 1 });
+    }
+    else
+    {
         Aircraft& ac = cont.at(i);
         ac.valid = 0;
         ac.latitude = lat;
@@ -101,28 +125,33 @@ void AircraftContainer::insertAircraft(std::string& id, double lat, double lon, 
         ac.altitude = alt;
         ac.qne = true;
     }
-    return;
 }
 
-void AircraftContainer::insertAircraft(std::string& id, double lat,
-        double lon, int alt, double gnd_spd, unsigned int id_t,
-        int ac_t, double climb_r, double turn_r, double heading)
+void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
+        int32_t alt, double gnd_spd, uint32_t id_t, int32_t ac_t, double climb_r,
+        double turn_r, double heading)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    int i, act;
-    if (heading == VALUE_NA ||
-            gnd_spd == VALUE_NA ||
-            climb_r == VALUE_NA) {
-        act = MIN_DATA;
-    } else {
+    int32_t act;
+    ssize_t i;
+    if (heading == A_VALUE_NA || gnd_spd == A_VALUE_NA || climb_r == A_VALUE_NA)
+    {
+        act = A_MIN_DATA;
+    }
+    else
+    {
         act = ac_t;
     }
-    if ((i = find(id)) == -1) {
+    if ((i = find(id)) == -1)
+    {
         Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, act, climb_r, turn_r, heading);
         ac.qne = false;
         cont.push_back(ac);
-        index_map.insert({id,cont.size()-1});
-    } else {
+        index_map.insert(
+        { id, cont.size() - 1 });
+    }
+    else
+    {
         Aircraft& ac = cont.at(i);
         ac.aircraft_type = act;
         ac.gnd_speed = gnd_spd;
@@ -136,7 +165,6 @@ void AircraftContainer::insertAircraft(std::string& id, double lat,
         ac.heading = heading;
         ac.qne = false;
     }
-    return;
 }
 
 void AircraftContainer::clear()
@@ -144,5 +172,4 @@ void AircraftContainer::clear()
     std::lock_guard<std::mutex> lock(this->mutex);
     cont.clear();
     index_map.clear();
-    return;
 }

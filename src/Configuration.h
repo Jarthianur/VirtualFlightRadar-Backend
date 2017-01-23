@@ -22,6 +22,8 @@
 #ifndef CONFIGURATION_H_
 #define CONFIGURATION_H_
 
+#include <netinet/in.h>
+#include <cstdint>
 #include <string>
 
 class Configuration
@@ -31,22 +33,22 @@ public:
     Configuration();
     virtual ~Configuration() throw ();
 
-    static int base_altitude;
+    static int32_t base_altitude;
     static double base_latitude;
     static double base_longitude;
     static double base_geoid;
     static double base_pressure;
     static double base_temp;
-    static int global_out_port;
-    static int global_ogn_port;
-    static int global_adsb_port;
+    static in_port_t global_out_port;
+    static in_port_t global_ogn_port;
+    static in_port_t global_adsb_port;
     static std::string global_ogn_host;
     static std::string global_adsb_host;
     static std::string global_login_str;
     static std::string global_weather_feed_host;
-    static int global_weather_feed_port;
-    static int filter_maxHeight;
-    static int filter_maxDist;
+    static in_port_t global_weather_feed_port;
+    static int32_t filter_maxHeight;
+    static int32_t filter_maxDist;
 };
 
 #endif /* CONFIGURATION_H_ */

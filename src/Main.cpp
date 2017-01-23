@@ -19,6 +19,8 @@
  }
  */
 
+#include <netinet/in.h>
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -36,20 +38,20 @@ int main(int argc, char* argv[])
 
     double latitude = 0.0;
     double longitude = 0.0;
-    int altitude = 0;
+    int32_t altitude = 0;
     double geoid = 0.0;
     double pressure = 0.0;
     double temp = 0.0;
-    int out_port = 0;
-    int ogn_port = 0;
-    int adsb_port = 0;
+    in_port_t out_port = 0;
+    in_port_t ogn_port = 0;
+    in_port_t adsb_port = 0;
     std::string ogn_host("nA");
     std::string adsb_host("nA");
     std::string login;
     std::string weather_feed_host("nA");
-    int weather_feed_port = 0;
-    int maxHeight = 0;
-    int maxDist = 0;
+    in_port_t weather_feed_port = 0;
+    int32_t maxHeight = 0;
+    int32_t maxDist = 0;
 
     if (argc == 3)
     {
@@ -107,7 +109,7 @@ int main(int argc, char* argv[])
             maxDist = stoi(cr.getProperty("maxDist", "0"));
             cout << "maxDist: " << maxDist << endl;
         }
-        catch (std::invalid_argument& e)
+        catch (const std::invalid_argument& e)
         {
             cout << "malformed configuration\t->\texiting!" << endl;
             return 1;
@@ -116,7 +118,7 @@ int main(int argc, char* argv[])
     else
     {
         cout << "usage: ./VirtualFlightRadar-Backend -c pathToConfigFile" << endl;
-        return 1;
+        return -1;
     }
 
     Configuration::base_altitude = altitude;

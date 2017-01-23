@@ -34,9 +34,9 @@ double degree(double rad)
     return (rad * 180.0) / PI;
 }
 
-int dToI(double d)
+int32_t dToI(double d)
 {
-    return (d >= 0.0) ? (int)(d + 0.5) : (int)(d - 0.5);
+    return (d >= 0.0) ? (int32_t)(d + 0.5) : (int32_t)(d - 0.5);
 }
 
 double dmsToDeg(double dms)

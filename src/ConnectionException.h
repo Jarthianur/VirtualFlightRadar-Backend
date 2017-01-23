@@ -22,15 +22,19 @@
 #ifndef CONNECTIONEXCEPTION_H_
 #define CONNECTIONEXCEPTION_H_
 
-#include <stdexcept>
+#include <exception>
 #include <string>
 
-class ConnectionException: public std::runtime_error
+class ConnectionException: public std::exception
 {
 public:
     ConnectionException();
     ConnectionException(const std::string&);
     virtual ~ConnectionException() throw ();
+    virtual const char* what() const throw();
+
+private:
+    std::string msg;
 };
 
 #endif /* CONNECTIONEXCEPTION_H_ */

@@ -20,11 +20,14 @@
  */
 
 #include "Connection.h"
+
 #include <sys/socket.h>
 #include <unistd.h>
 #include <cstring>
 
-Connection::Connection(int family, int port)
+#include "ConnectionException.h"
+
+Connection::Connection(sa_family_t family, in_port_t port)
 {
     memset(&con_addr, 0, sizeof(con_addr));
     con_addr.sin_family = family;
@@ -34,9 +37,9 @@ Connection::Connection()
 {
 }
 
-void Connection::setConSock(int sock)
+void Connection::setConSock(int32_t sock)
 {
-    if (con_sock == -1)
+    if (con_sock == C_SO_NOSET)
     {
         con_sock = sock;
     }
@@ -47,28 +50,27 @@ Connection::~Connection()
     close();
 }
 
-void Connection::createSocket(int family, int style, int protocol)
-        throw (ConnectionException)
+void Connection::createSocket(sa_family_t family, int32_t style, int32_t protocol)
 {
-    if (con_sock == -1)
+    if (con_sock == C_SO_NOSET)
     {
-        if ((con_sock = socket(family, style, protocol)) == -1)
+        if ((con_sock = socket(family, style, protocol)) == C_SO_CREAT_ERR)
         {
             throw ConnectionException("Cannot create socket");
         }
     }
 }
 
-void Connection::setSocketOpt(int level, int optname, void* optval, socklen_t optlen)
-        throw (ConnectionException)
+void Connection::setSocketOpt(int32_t level, int32_t optname, void* optval,
+        socklen_t optlen)
 {
-    if (setsockopt(con_sock, level, optname, optval, optlen) == -1)
+    if (setsockopt(con_sock, level, optname, optval, optlen) == C_SO_OPT_ERR)
     {
         throw ConnectionException("Cannot set socket option");
     }
 }
 
-int Connection::getConSock()
+int32_t Connection::getConSock()
 {
     return con_sock;
 }
@@ -80,7 +82,7 @@ sockaddr* Connection::getSockAddrPtr()
 
 void Connection::close()
 {
-    if (con_sock != -1)
+    if (con_sock != C_SO_NOSET)
     {
         ::close(con_sock);
     }

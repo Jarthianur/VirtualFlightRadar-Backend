@@ -22,12 +22,14 @@
 #include "ConnectionException.h"
 
 ConnectionException::ConnectionException()
-        : std::runtime_error("Error with any connection")
+        : std::exception(),
+          msg("Error with any connection")
 {
 }
 
 ConnectionException::ConnectionException(const std::string& msg)
-        : std::runtime_error(msg)
+        : std::exception(),
+          msg(msg)
 {
 }
 
@@ -35,3 +37,7 @@ ConnectionException::~ConnectionException()
 {
 }
 
+const char* ConnectionException::what() const throw ()
+{
+    return msg.c_str();
+}

@@ -22,16 +22,20 @@
 #ifndef OUTPUTCONNECTION_H_
 #define OUTPUTCONNECTION_H_
 
+#include <netinet/in.h>
+#include <sys/un.h>
+#include <cstdint>
+
 #include "Connection.h"
 
 class OutputConnection: public Connection
 {
 public:
-    OutputConnection(int, int);
+    OutputConnection(sa_family_t family, in_port_t port);
     virtual ~OutputConnection() throw ();
 
     void fillAddr();
-    void listenToSocket(unsigned int) throw (ConnectionException);
+    void listenToSocket(uint32_t);
 };
 
 #endif /* OUTPUTCONNECTION_H_ */

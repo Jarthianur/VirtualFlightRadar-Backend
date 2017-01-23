@@ -22,17 +22,20 @@
 #ifndef INPUTCONNECTION_H_
 #define INPUTCONNECTION_H_
 
+#include <netinet/in.h>
+#include <sys/un.h>
 #include <string>
+
 #include "Connection.h"
 
 class InputConnection: public Connection
 {
 public:
-    InputConnection(int, int);
+    InputConnection(sa_family_t family, in_port_t port);
     virtual ~InputConnection() throw ();
 
     void fillAddr(in_addr&);
-    void connect(const std::string&) throw (ConnectionException);
+    void connect(const std::string&);
 };
 
 #endif /* INPUTCONNECTION_H_ */

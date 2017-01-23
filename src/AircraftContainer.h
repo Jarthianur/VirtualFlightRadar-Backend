@@ -1,55 +1,59 @@
 /*
-Copyright_License {
+ Copyright_License {
 
-  Copyright (C) 2017 VirtualFlightRadar-Backend
-  A detailed list of copyright holders can be found in the file "AUTHORS".
+ Copyright (C) 2017 VirtualFlightRadar-Backend
+ A detailed list of copyright holders can be found in the file "AUTHORS".
 
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License version 3
-  as published by the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License version 3
+ as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-}
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ }
+ */
 
 #ifndef AIRCRAFTCONTAINER_H_
 #define AIRCRAFTCONTAINER_H_
 
-#include "AircraftProcessor.h"
+#include <stddef.h>
+#include <sys/types.h>
+#include <cstdint>
 #include <mutex>
-#include <vector>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
-#define INVALIDATE 4
+#include "Aircraft.h"
+#include "AircraftProcessor.h"
+
+#define AC_INVALIDATE 4
+#define AC_NOT_FOUND -1
 
 class AircraftContainer
 {
 public:
     AircraftContainer();
-    virtual ~AircraftContainer() throw();
-
-    /**
-     * All methods in this class are threadsafe
-     */
+    virtual ~AircraftContainer() throw ();
 
     /**
      * insert aircraft in container
      */
-    void insertAircraft(std::string&, double, double, int);
-    void insertAircraft(std::string&, double, double, int, double, unsigned int, int, double, double, double);
+    void insertAircraft(std::string&, double, double, int32_t);
+    void insertAircraft(std::string&, double, double, int32_t, double, uint32_t, int32_t,
+            double, double, double);
 
     /**
      * process aircraft at index i into target string,
      * if index i is valid.
      */
-    void processAircraft(unsigned int, std::string&);
+    void processAircraft(size_t, std::string&);
 
     /**
      * increments all aircrafts's valid counter in container.
@@ -61,7 +65,7 @@ public:
     /**
      * return container's size
      */
-    unsigned int getContSize();
+    size_t getContSize();
 
     /**
      * deallocate all aircrafts and clear container
@@ -74,7 +78,7 @@ private:
      * if id is found returns index,
      * else returns -1.
      */
-    int find(std::string&);
+    ssize_t find(std::string&);
 
     std::mutex mutex;
 
@@ -93,7 +97,7 @@ private:
      * Map to manage indices of Aircrafts.
      * This makes find-method much more efficient.
      */
-    std::unordered_map<std::string,int> index_map;
+    std::unordered_map<std::string, size_t> index_map;
 };
 
 #endif /* AIRCRAFTCONTAINER_H_ */

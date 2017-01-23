@@ -21,12 +21,14 @@
 
 #include "OutputConnection.h"
 
-#include <netinet/in.h>
 #include <sys/socket.h>
 
 #include "ConnectionException.h"
 
-OutputConnection::OutputConnection(int family, int port)
+#define OC_SO_BIND_ERR -1
+#define OC_SO_LISTN_ERR OC_SO_BIND_ERR
+
+OutputConnection::OutputConnection(sa_family_t family, in_port_t port)
         : Connection(family, port)
 {
 }
@@ -40,9 +42,9 @@ void OutputConnection::fillAddr()
     con_addr.sin_addr.s_addr = INADDR_ANY;
 }
 
-void OutputConnection::listenToSocket(unsigned int max) throw (ConnectionException)
+void OutputConnection::listenToSocket(uint32_t max)
 {
-    if (bind(con_sock, (struct sockaddr*) &con_addr, sizeof(struct sockaddr)) == -1)
+    if (bind(con_sock, (sockaddr*) &con_addr, sizeof(sockaddr)) == -1)
     {
         throw ConnectionException("Cannot bind socket");
     }

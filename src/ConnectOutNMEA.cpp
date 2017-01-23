@@ -20,24 +20,28 @@
  */
 
 #include "ConnectOutNMEA.h"
+
 #include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
+#include <asm-generic/socket.h>
+#include <stddef.h>
 #include <functional>
 #include <iterator>
+
+#include "Connection.h"
 #include "Logger.h"
 
-ConnectOutNMEA::ConnectOutNMEA(const int out_port)
-        : nmea_out(AF_INET, out_port)
+ConnectOutNMEA::ConnectOutNMEA(in_port_t port)
+        : nmea_out(AF_INET, port)
 {
-    sin_s = sizeof(struct sockaddr);
+    sin_s = sizeof(sockaddr);
 }
 
 ConnectOutNMEA::~ConnectOutNMEA()
 {
+    clients.clear();
 }
 
-void ConnectOutNMEA::listenOut() throw (ConnectionException)
+void ConnectOutNMEA::listenOut()
 {
     nmea_out.createSocket(AF_INET, SOCK_STREAM, 0);
     nmea_out.setSocketOpt(SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
@@ -55,7 +59,7 @@ void ConnectOutNMEA::connectClient()
     {
         Logger::warn("Cannot accept more connections, refused: ", std::ref(ip));
     }
-    else if (client->getConSock() == -1)
+    else if (client->getConSock() == C_SO_NOSET)
     {
         Logger::error("Accept connection failed to ", std::ref(ip));
     }
@@ -69,7 +73,7 @@ void ConnectOutNMEA::connectClient()
 int ConnectOutNMEA::sendMsgOut(std::string& msg)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
-    for (unsigned int i = 0; i < clients.size(); ++i)
+    for (size_t i = 0; i < clients.size(); ++i)
     {
         if (send(clients.at(i)->con_sock, msg.c_str(), msg.length(), MSG_NOSIGNAL) <= 0)
         {

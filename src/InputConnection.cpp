@@ -20,10 +20,14 @@
  */
 
 #include "InputConnection.h"
+
 #include <sys/socket.h>
 
+#include "ConnectionException.h"
 
-InputConnection::InputConnection(int family, int port)
+#define IC_SO_CON_ERR -1
+
+InputConnection::InputConnection(sa_family_t family, in_port_t port)
         : Connection(family, port)
 {
 }
@@ -37,9 +41,9 @@ void InputConnection::fillAddr(in_addr& addr)
     con_addr.sin_addr = addr;
 }
 
-void InputConnection::connect(const std::string& host) throw (ConnectionException)
+void InputConnection::connect(const std::string& host)
 {
-    if (::connect(con_sock, getSockAddrPtr(), sizeof(sockaddr)) == -1)
+    if (::connect(con_sock, getSockAddrPtr(), sizeof(sockaddr)) == IC_SO_CON_ERR)
     {
         throw ConnectionException(std::string("Cannot connect to ") + host);
     }

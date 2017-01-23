@@ -23,7 +23,6 @@
 
 #include <asm-generic/socket.h>
 #include <netdb.h>
-#include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <cstring>
@@ -31,10 +30,10 @@
 
 #include "ConnectionException.h"
 
-ConnectIn::ConnectIn(const std::string& hostname, const int port, unsigned int to)
+ConnectIn::ConnectIn(const std::string& host, in_port_t port, time_t to)
         : in_host_info(nullptr),
           in_con(AF_INET, port),
-          in_hostname(hostname),
+          in_host(host),
           timeout(to)
 
 {
@@ -45,16 +44,16 @@ ConnectIn::~ConnectIn()
 {
 }
 
-void ConnectIn::connectIn() throw (ConnectionException)
+void ConnectIn::connectIn()
 {
-    in_con.connect(in_hostname);
+    in_con.connect(in_host);
 }
 
-void ConnectIn::setupConnectIn() throw (ConnectionException)
+void ConnectIn::setupConnectIn()
 {
-    if ((in_host_info = gethostbyname(in_hostname.c_str())) == NULL)
+    if ((in_host_info = gethostbyname(in_host.c_str())) == NULL)
     {
-        throw ConnectionException(std::string("Cannot resolve hostname: ") + in_hostname);
+        throw ConnectionException(std::string("Cannot resolve hostname: ") + in_host);
     }
     in_con.createSocket(AF_INET, SOCK_STREAM, 0);
     in_con.setSocketOpt(SOL_SOCKET, SO_KEEPALIVE, &yes, sizeof(int));
@@ -69,17 +68,17 @@ void ConnectIn::setupConnectIn() throw (ConnectionException)
     in_con.fillAddr(*((in_addr*) in_host_info->h_addr));
 }
 
-int ConnectIn::readLineIn()
+ssize_t ConnectIn::readLineIn()
 {
 #define EOL "\r\n"
 
-    int eol = linebuffer.find(EOL);
-    int recv_l = 0;
+    ssize_t eol = linebuffer.find(EOL);
+    ssize_t recv_l = 0;
     while (eol == -1)
     {
-        if ((recv_l = recv(in_con.getConSock(), buffer, BUFF_S - 1, 0)) <= 0)
+        if ((recv_l = recv(in_con.getConSock(), buffer, CI_BUFF_S - 1, 0)) <= 0)
         {
-            return -1;
+            return CI_MSG_READ_ERR;
         }
         buffer[recv_l] = 0;
         linebuffer.append(buffer);
@@ -93,11 +92,11 @@ int ConnectIn::readLineIn()
     }
     catch (const std::out_of_range& e)
     {
-        return MSG_READ_ERR;
+        return CI_MSG_READ_ERR;
     }
     if (response.length() == 0)
     {
-        return MSG_READ_ERR;
+        return CI_MSG_READ_ERR;
     }
     return response.length();
 }

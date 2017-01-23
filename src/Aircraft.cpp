@@ -26,7 +26,7 @@ Aircraft::~Aircraft()
 {
 }
 
-Aircraft::Aircraft(std::string& id, double lat, double lon, int alt)
+Aircraft::Aircraft(std::string& id, double lat, double lon, int32_t alt)
 : id(id),
   latitude(lat),
   longitude(lon),
@@ -35,8 +35,8 @@ Aircraft::Aircraft(std::string& id, double lat, double lon, int alt)
 }
 
 Aircraft::Aircraft(std::string& id, double lat,
-        double lon, int alt, double gnd_spd, unsigned int id_t,
-        int ac_t, double climb_r, double turn_r, double heading)
+        double lon, int32_t alt, double gnd_spd, uint32_t id_t,
+        int32_t ac_t, double climb_r, double turn_r, double heading)
 : Aircraft(id, lat, lon, alt)
 {
     this->climb_rate = climb_r;

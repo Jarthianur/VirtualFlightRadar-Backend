@@ -56,6 +56,7 @@ protected:
     static void handle_ogn_in(AircraftContainer&);
     static void handle_con_out(ConnectOutNMEA&);
     static void handle_weather_feed(WeatherFeed&);
+    static void exit_signal_handler(int sig);
 };
 
 #endif /* VFRB_H_ */
