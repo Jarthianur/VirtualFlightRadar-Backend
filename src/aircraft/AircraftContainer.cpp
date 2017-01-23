@@ -26,8 +26,8 @@
 #include <stdexcept>
 #include <utility>
 
-#include "Configuration.h"
-#include "Logger.h"
+#include "../base/Configuration.h"
+#include "../util/Logger.h"
 
 AircraftContainer::AircraftContainer()
         : proc(Configuration::base_latitude, Configuration::base_longitude,

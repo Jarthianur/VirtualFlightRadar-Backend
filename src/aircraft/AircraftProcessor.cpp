@@ -26,9 +26,9 @@
 #include <cstdio>
 #include <ctime>
 
+#include "../base/Configuration.h"
+#include "../util/Math.h"
 #include "Aircraft.h"
-#include "Configuration.h"
-#include "Math.h"
 
 AircraftProcessor::AircraftProcessor(double b_lat, double b_long, int32_t b_alt,
         double geo)

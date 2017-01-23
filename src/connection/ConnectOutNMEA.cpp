@@ -27,8 +27,8 @@
 #include <functional>
 #include <iterator>
 
+#include "../util/Logger.h"
 #include "Connection.h"
-#include "Logger.h"
 
 ConnectOutNMEA::ConnectOutNMEA(in_port_t port)
         : nmea_out(AF_INET, port)

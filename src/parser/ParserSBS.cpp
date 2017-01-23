@@ -21,13 +21,12 @@
 
 #include "ParserSBS.h"
 
-#include <sys/types.h>
 #include <cstddef>
 #include <stdexcept>
 
-#include "AircraftContainer.h"
-#include "Configuration.h"
-#include "Math.h"
+#include "../aircraft/AircraftContainer.h"
+#include "../base/Configuration.h"
+#include "../util/Math.h"
 
 ParserSBS::ParserSBS()
         : Parser()

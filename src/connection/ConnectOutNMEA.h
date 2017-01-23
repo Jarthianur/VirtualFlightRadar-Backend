@@ -24,6 +24,7 @@
 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <string>

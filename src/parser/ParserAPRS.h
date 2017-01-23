@@ -45,7 +45,8 @@ private:
     // temps
     std::string id;
     int32_t id_t = 0, ac_t = 0, alt = 0, time = 0;
-    double lat = 0.0, lon = 0.0, turn_r = 0.0, climb_r = 0.0, gnd_spd = 0.0, heading = 0.0;
+    double lat = 0.0, lon = 0.0, turn_r = 0.0, climb_r = 0.0, gnd_spd = 0.0,
+            heading = 0.0;
 };
 
 #endif /* PARSERAPRS_H_ */

@@ -25,9 +25,9 @@
 #include <stdexcept>
 #include <string>
 
-#include "ConfigReader.h"
-#include "Configuration.h"
-#include "VFRB.h"
+#include "base/Configuration.h"
+#include "base/VFRB.h"
+#include "util/ConfigReader.h"
 
 using namespace std;
 

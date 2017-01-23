@@ -23,10 +23,11 @@
 
 #include <stdexcept>
 
-#include "AircraftContainer.h"
-#include "Configuration.h"
-#include "Logger.h"
-#include "Math.h"
+#include "../aircraft/Aircraft.h"
+#include "../aircraft/AircraftContainer.h"
+#include "../base/Configuration.h"
+#include "../util/Logger.h"
+#include "../util/Math.h"
 
 ParserAPRS::ParserAPRS()
         : Parser(),

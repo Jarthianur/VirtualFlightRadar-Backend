@@ -29,15 +29,15 @@
 #include <system_error>
 #include <thread>
 
-#include "AircraftContainer.h"
-#include "AircraftProcessor.h"
+#include "../aircraft/AircraftContainer.h"
+#include "../aircraft/AircraftProcessor.h"
+#include "../connection/ConnectionException.h"
+#include "../connection/ConnectIn.h"
+#include "../connection/ConnectInExt.h"
+#include "../parser/ParserAPRS.h"
+#include "../parser/ParserSBS.h"
+#include "../util/Logger.h"
 #include "Configuration.h"
-#include "ConnectionException.h"
-#include "ConnectIn.h"
-#include "ConnectInExt.h"
-#include "Logger.h"
-#include "ParserAPRS.h"
-#include "ParserSBS.h"
 #include "WeatherFeed.h"
 
 bool VFRB::global_weather_feed_enabled = false;
@@ -139,20 +139,16 @@ void VFRB::run()
     try
     {
         adsb_in_thread.join();
-        Logger::info("Thread joined: ", "adsb_in");
         ogn_in_thread.join();
-        Logger::info("Thread joined: ", "ogn_in");
         con_out_thread.join();
-        Logger::info("Thread joined: ", "con_out");
         weather_feed_thread.join();
-        Logger::info("Thread joined: ", "weather_feed");
     }
     catch (const std::system_error& se)
     {
         Logger::error("while joining threads: ", se.what());
         std::terminate();
     }
-    Logger::info("Successfully exited: ", "run()");
+    Logger::info("EXITING PROGRAM", "");
 }
 
 void VFRB::handle_con_out(ConnectOutNMEA& out_con)
@@ -171,7 +167,6 @@ void VFRB::handle_con_out(ConnectOutNMEA& out_con)
     {
         out_con.connectClient();
     }
-    Logger::info("Successfully exited: ", "handle_con_out()");
 }
 
 void VFRB::handle_weather_feed(WeatherFeed& weather)
@@ -220,7 +215,6 @@ void VFRB::handle_weather_feed(WeatherFeed& weather)
             weather.writeNMEA(std::ref(wind_con.getResponse()));
         }
     }
-    Logger::info("Successfully exited: ", "handle_weather_feed()");
 }
 
 void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
@@ -273,7 +267,6 @@ void VFRB::handle_adsb_in(AircraftContainer& ac_cont)
             parser.unpack(std::ref(adsb_con.getResponse()), std::ref(ac_cont));
         }
     }
-    Logger::info("Successfully exited: ", "handle_adsb_in()");
 }
 
 void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
@@ -326,12 +319,10 @@ void VFRB::handle_ogn_in(AircraftContainer& ac_cont)
             parser.unpack(std::ref(ogn_con.getResponse()), std::ref(ac_cont));
         }
     }
-    Logger::info("Successfully exited: ", "handle_ogn_in()");
 }
 
 void VFRB::exit_signal_handler(int sig)
 {
-    Logger::info("\nEXITING PROGRAM: ", std::to_string(sig));
     global_run_status = false;
     ConnectIn shut("localhost", Configuration::global_out_port);
     try

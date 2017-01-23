@@ -31,7 +31,7 @@ public:
     ConnectionException();
     ConnectionException(const std::string&);
     virtual ~ConnectionException() throw ();
-    virtual const char* what() const throw();
+    virtual const char* what() const throw ();
 
 private:
     std::string msg;

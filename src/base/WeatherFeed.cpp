@@ -38,7 +38,6 @@ void WeatherFeed::getNMEA(std::string& dest_str)
     std::lock_guard<std::mutex> lock(this->mutex);
     dest_str = nmea_str;
     wind_valid = false;
-    return;
 }
 
 void WeatherFeed::writeNMEA(const std::string& str)
@@ -73,7 +72,6 @@ void WeatherFeed::writeNMEA(const std::string& str)
             temperature = A_VALUE_NA;
         }
     }
-    return;
 }
 
 bool WeatherFeed::isValid()

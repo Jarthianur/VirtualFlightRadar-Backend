@@ -20,6 +20,11 @@
  */
 
 #include "ConfigReader.h"
+
+#include <fstream>
+#include <stdexcept>
+#include <utility>
+
 #include "Logger.h"
 
 ConfigReader::ConfigReader(const char* filename)

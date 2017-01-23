@@ -20,14 +20,14 @@ Copyright_License {
  */
 
 #include <iostream>
-#include "../src/Math.h"
-#include "../src/Aircraft.h"
-#include "../src/AircraftContainer.h"
-#include "../src/AircraftProcessor.h"
-#include "../src/ParserAPRS.h"
-#include "../src/ParserSBS.h"
-#include "../src/Configuration.h"
-#include "../src/WeatherFeed.h"
+#include "../src/util/Math.h"
+#include "../src/aircraft/Aircraft.h"
+#include "../src/aircraft/AircraftContainer.h"
+#include "../src/aircraft/AircraftProcessor.h"
+#include "../src/parser/ParserAPRS.h"
+#include "../src/parser/ParserSBS.h"
+#include "../src/base/Configuration.h"
+#include "../src/base/WeatherFeed.h"
 
 
 int tests = 0;
