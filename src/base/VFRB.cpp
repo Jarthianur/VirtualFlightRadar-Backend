@@ -68,7 +68,7 @@ void VFRB::run()
     }
     else
     {
-        Logger::warn("APRSC not enabled -> ", "no FLARM targets");
+        Logger::warn("APRSC not enabled -> no FLARM targets");
     }
 
     if (Configuration::global_sbs_host.compare("nA") != 0 || Configuration::global_sbs_host.length()
@@ -78,7 +78,7 @@ void VFRB::run()
     }
     else
     {
-        Logger::warn("ADSB receiver not enabled -> ", "no transponder targets");
+        Logger::warn("ADSB receiver not enabled -> no transponder targets");
     }
 
     if (Configuration::global_weather_feed_host.compare("nA") != 0 || Configuration::global_weather_feed_host.length()
@@ -88,12 +88,12 @@ void VFRB::run()
     }
     else
     {
-        Logger::warn("Weather feed not enabled -> ", "no wind,pressure,temp");
+        Logger::warn("Weather feed not enabled -> no wind,pressure,temp");
     }
 
     if (signal((int) SIGINT, VFRB::exit_signal_handler) == SIG_ERR)
     {
-        Logger::error("Failed to register signal: ", "SIGINT");
+        Logger::error("Failed to register signal: SIGINT");
         global_run_status = false;
         return;
     }
@@ -154,7 +154,7 @@ void VFRB::run()
         Logger::error("while joining threads: ", se.what());
         std::terminate();
     }
-    Logger::info("EXITING PROGRAM", "");
+    Logger::info("EXITING PROGRAM");
 }
 
 void VFRB::handle_con_out(ConnectOutNMEA& out_con)
@@ -337,7 +337,7 @@ void VFRB::exit_signal_handler(int sig)
     }
     catch (const ConnectionException& ce)
     {
-        Logger::error("Cannot shutdown nmea out -> ", "hard termination...");
+        Logger::error("Cannot shutdown nmea-out -> terminate program");
         std::terminate();
     }
 }

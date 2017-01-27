@@ -40,24 +40,24 @@ public:
      * to stdout.
      * Given a message and a subject.
      */
-    static void info(const std::string&, const std::string&);
+    static void info(const std::string&, const std::string& = "");
     /**
      * Log debug informations to stdout.
      * Given a message and a subject.
      */
-    static void debug(const std::string&, const std::string&);
+    static void debug(const std::string&, const std::string& = "");
     /**
      * Log warnings and not-critical errors, like lost connections etc
      * to stdout.
      * Given a message and a subject.
      */
-    static void warn(const std::string&, const std::string&);
+    static void warn(const std::string&, const std::string& = "");
     /**
      * Log fatal errors, like socket failures etc
      * to stderr.
      * Given a message and a subject.
      */
-    static void error(const std::string&, const std::string&);
+    static void error(const std::string&, const std::string& = "");
 
 private:
 

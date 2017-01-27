@@ -41,7 +41,9 @@ void Logger::info(const std::string& msg, const std::string& subject)
     std::lock_guard<std::mutex> lock(Logger::mutex);
     std::time_t tt = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());
-    std::cout << "[INFO] " << msg << subject << " @ " << ctime(&tt);
+    std::string time(asctime(gmtime(&tt)));
+    time.pop_back();
+    std::cout << "[INFO]  " << time << ":: " << msg << subject << std::endl;
     return;
 }
 
@@ -50,7 +52,9 @@ void Logger::debug(const std::string& msg, const std::string& subject)
     std::lock_guard<std::mutex> lock(Logger::mutex);
     std::time_t tt = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());
-    std::cout << "[DEBUG] " << msg << subject << " @ " << ctime(&tt);
+    std::string time(asctime(gmtime(&tt)));
+    time.pop_back();
+    std::cout << "[DEBUG] " << time << ":: " << msg << subject << std::endl;
     return;
 }
 
@@ -59,7 +63,9 @@ void Logger::warn(const std::string& msg, const std::string& subject)
     std::lock_guard<std::mutex> lock(Logger::mutex);
     std::time_t tt = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());
-    std::cout << "[WARN] " << msg << subject << " @ " << ctime(&tt);
+    std::string time(asctime(gmtime(&tt)));
+    time.pop_back();
+    std::cout << "[WARN]  " << time << ":: " << msg << subject << std::endl;
     return;
 }
 
@@ -68,6 +74,8 @@ void Logger::error(const std::string& msg, const std::string& subject)
     std::lock_guard<std::mutex> lock(Logger::mutex);
     std::time_t tt = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());
-    std::cerr << "[ERROR] " << msg << subject << " @ " << ctime(&tt);
+    std::string time(asctime(gmtime(&tt)));
+    time.pop_back();
+    std::cerr << "[ERROR] " << time << ":: " << msg << subject << std::endl;
     return;
 }

@@ -28,10 +28,37 @@
 #include "base/Configuration.h"
 #include "base/VFRB.h"
 #include "util/ConfigReader.h"
+#include "util/Logger.h"
 
 using namespace std;
 
 #define VERSION "1.3.1-SNAPSHOT"
+
+int32_t strToInt(const string& str)
+{
+    try
+    {
+        return stoi(str);
+    }
+    catch (const invalid_argument& iae)
+    {
+        Logger::error("Invalid configuration: ", str);
+    }
+    return 0;
+}
+
+double strToDouble(const string& str)
+{
+    try
+    {
+        return stod(str);
+    }
+    catch (const invalid_argument& iae)
+    {
+        Logger::error("Invalid configuration: ", str);
+    }
+    return 0.0;
+}
 
 int main(int argc, char* argv[])
 {
@@ -55,69 +82,63 @@ int main(int argc, char* argv[])
 
     if (argc == 3)
     {
-        cout << VERSION << endl;
-        cout << "== Configuration ==" << endl;
+        Logger::info(VERSION);
+        Logger::info("== Configuration ==");
         ConfigReader cr(argv[2]);
         cr.read();
-        try
-        {
-            latitude = stod(cr.getProperty("latitude", "0.0"));
-            cout << "latitude: " << latitude << endl;
 
-            longitude = stod(cr.getProperty("longitude", "0.0"));
-            cout << "longitude: " << longitude << endl;
+        latitude = strToDouble(cr.getProperty("latitude", "0.0"));
+        Logger::info("latitude: ", to_string(latitude));
 
-            altitude = stoi(cr.getProperty("altitude", "0"));
-            cout << "altitude: " << altitude << endl;
+        longitude = strToDouble(cr.getProperty("longitude", "0.0"));
+        Logger::info("longitude: ", to_string(longitude));
 
-            geoid = stod(cr.getProperty("geoid", "0.0"));
-            cout << "geoid: " << geoid << endl;
+        altitude = strToInt(cr.getProperty("altitude", "0"));
+        Logger::info("altitude: ", to_string(altitude));
 
-            pressure = stod(cr.getProperty("pressure", "1013.25"));
-            cout << "Pressure: " << pressure << endl;
+        geoid = strToDouble(cr.getProperty("geoid", "0.0"));
+        Logger::info("geoid: ", to_string(geoid));
 
-            temp = stod(cr.getProperty("temp", "15.0"));
-            cout << "Temp: " << temp << endl;
+        pressure = strToDouble(cr.getProperty("pressure", "1013.25"));
+        Logger::info("Pressure: ", to_string(pressure));
 
-            out_port = stoi(cr.getProperty("outPort", "0"));
-            cout << "outPort: " << out_port << endl;
+        temp = strToDouble(cr.getProperty("temp", "15.0"));
+        Logger::info("Temp: ", to_string(temp));
 
-            aprsc_port = stoi(cr.getProperty("aprscPort", "0"));
-            cout << "aprscPort: " << aprsc_port << endl;
+        out_port = (in_port_t) strToInt(cr.getProperty("outPort", "0"));
+        Logger::info("outPort: ", to_string(out_port));
 
-            sbs_port = stoi(cr.getProperty("sbsPort", "0"));
-            cout << "sbsPort: " << sbs_port << endl;
+        aprsc_port = (in_port_t) strToInt(cr.getProperty("aprscPort", "0"));
+        Logger::info("aprscPort: ", to_string(aprsc_port));
 
-            aprsc_host = cr.getProperty("aprscHost", "nA");
-            cout << "aprscHost: " << aprsc_host << endl;
+        sbs_port = (in_port_t) strToInt(cr.getProperty("sbsPort", "0"));
+        Logger::info("sbsPort: ", to_string(sbs_port));
 
-            sbs_host = cr.getProperty("sbsHost", "nA");
-            cout << "sbsHost: " << sbs_host << endl;
+        aprsc_host = cr.getProperty("aprscHost", "nA");
+        Logger::info("aprscHost: ", aprsc_host);
 
-            login = cr.getProperty("aprscLogin", "");
-            cout << "aprscLogin: " << login << endl;
+        sbs_host = cr.getProperty("sbsHost", "nA");
+        Logger::info("sbsHost: ", sbs_host);
 
-            weather_feed_host = cr.getProperty("weatherFeedHost", "nA");
-            cout << "weatherFeedHost: " << weather_feed_host << endl;
+        login = cr.getProperty("aprscLogin", "");
+        Logger::info("aprscLogin: ", login);
 
-            weather_feed_port = stoi(cr.getProperty("weatherFeedPort", "0"));
-            cout << "weatherFeedPort: " << weather_feed_port << endl;
+        weather_feed_host = cr.getProperty("weatherFeedHost", "nA");
+        Logger::info("weatherFeedHost: ", weather_feed_host);
 
-            maxHeight = stoi(cr.getProperty("maxHeight", "0"));
-            cout << "maxHeight: " << maxHeight << endl;
+        weather_feed_port = (in_port_t) strToInt(cr.getProperty("weatherFeedPort", "0"));
+        Logger::info("weatherFeedPort: ", to_string(weather_feed_port));
 
-            maxDist = stoi(cr.getProperty("maxDist", "0"));
-            cout << "maxDist: " << maxDist << endl;
-        }
-        catch (const std::invalid_argument& e)
-        {
-            cout << "malformed configuration\t->\texiting!" << endl;
-            return 1;
-        }
+        maxHeight = strToInt(cr.getProperty("maxHeight", "0"));
+        Logger::info("maxHeight: ", to_string(maxHeight));
+
+        maxDist = strToInt(cr.getProperty("maxDist", "0"));
+        Logger::info("maxDist: ", to_string(maxDist));
+
     }
     else
     {
-        cout << "usage: ./VirtualFlightRadar-Backend -c pathToConfigFile" << endl;
+        Logger::info("usage: ./VirtualFlightRadar-Backend -c pathToConfigFile");
         return -1;
     }
 
@@ -138,7 +159,7 @@ int main(int argc, char* argv[])
     Configuration::filter_maxHeight = maxHeight;
     Configuration::filter_maxDist = maxDist;
 
-    cout << "Running program ..." << endl;
+    Logger::info("Running program ...");
     VFRB::run();
 
     return 0;
