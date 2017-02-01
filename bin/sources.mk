@@ -17,6 +17,7 @@ CC_DEPS :=
 C++_DEPS := 
 EXECUTABLES := 
 OBJS := 
+TEST_OBJS := 
 C_UPPER_DEPS := 
 CXX_DEPS := 
 C_DEPS := 
@@ -25,4 +26,5 @@ CPP_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 src \
+test \
 
