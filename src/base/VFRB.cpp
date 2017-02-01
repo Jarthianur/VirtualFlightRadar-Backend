@@ -91,7 +91,11 @@ void VFRB::run()
         Logger::warn("Weather feed not enabled -> no wind,pressure,temp");
     }
 
-    if (signal((int) SIGINT, VFRB::exit_signal_handler) == SIG_ERR)
+    struct sigaction sa;
+    sa.sa_handler = VFRB::exit_signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGINT, &sa, NULL) == -1)
     {
         Logger::error("Failed to register signal: SIGINT");
         global_run_status = false;
@@ -169,6 +173,8 @@ void VFRB::handle_con_out(ConnectOutNMEA& out_con)
         global_run_status = false;
         return;
     }
+    Logger::info("Serve NMEA output on localhost:",
+                 std::to_string(Configuration::global_out_port));
     while (global_run_status)
     {
         out_con.connectClient();
@@ -230,7 +236,7 @@ void VFRB::handle_sbs_in(AircraftContainer& ac_cont)
     }
     ParserSBS parser;
     ConnectIn sbs_con(std::ref(Configuration::global_sbs_host),
-                       Configuration::global_sbs_port);
+                      Configuration::global_sbs_port);
     bool connected = false;
 
     while (global_sbs_enabled && global_run_status)
@@ -281,8 +287,8 @@ void VFRB::handle_aprs_in(AircraftContainer& ac_cont)
     }
     ParserAPRS parser;
     ConnectInExt aprs_con(std::ref(Configuration::global_aprsc_host),
-                         Configuration::global_aprsc_port,
-                         std::ref(Configuration::global_aprsc_login));
+                          Configuration::global_aprsc_port,
+                          std::ref(Configuration::global_aprsc_login));
     bool connected = false;
 
     while (global_aprs_enabled && global_run_status)

@@ -44,7 +44,6 @@ void Logger::info(const std::string& msg, const std::string& subject)
     std::string time(asctime(gmtime(&tt)));
     time.pop_back();
     std::cout << "[INFO]  " << time << ":: " << msg << subject << std::endl;
-    return;
 }
 
 void Logger::debug(const std::string& msg, const std::string& subject)
@@ -55,7 +54,6 @@ void Logger::debug(const std::string& msg, const std::string& subject)
     std::string time(asctime(gmtime(&tt)));
     time.pop_back();
     std::cout << "[DEBUG] " << time << ":: " << msg << subject << std::endl;
-    return;
 }
 
 void Logger::warn(const std::string& msg, const std::string& subject)
@@ -66,7 +64,6 @@ void Logger::warn(const std::string& msg, const std::string& subject)
     std::string time(asctime(gmtime(&tt)));
     time.pop_back();
     std::cout << "[WARN]  " << time << ":: " << msg << subject << std::endl;
-    return;
 }
 
 void Logger::error(const std::string& msg, const std::string& subject)
@@ -77,5 +74,4 @@ void Logger::error(const std::string& msg, const std::string& subject)
     std::string time(asctime(gmtime(&tt)));
     time.pop_back();
     std::cerr << "[ERROR] " << time << ":: " << msg << subject << std::endl;
-    return;
 }
