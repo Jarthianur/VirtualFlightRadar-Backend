@@ -50,5 +50,5 @@ double dmsToDeg(double dms)
 
 double Math::calcIcaoHeight(double press, double temp)
 {
-    return (273.15 + temp) * (1 - std::pow((press / 1013.25), 0.190295)) / 0.0065;
+    return (273.15 + temp) * (1.0 - std::pow((press / 1013.25), 0.190295)) / 0.0065;
 }
