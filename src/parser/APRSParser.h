@@ -19,23 +19,34 @@
  }
  */
 
-#ifndef OUTPUTCONNECTION_H_
-#define OUTPUTCONNECTION_H_
+#ifndef PARSERAPRS_H_
+#define PARSERAPRS_H_
 
-#include <netinet/in.h>
-#include <sys/un.h>
+#include <boost/regex.hpp>
 #include <cstdint>
+#include <string>
 
-#include "Connection.h"
+#include "Parser.h"
 
-class OutputConnection: public Connection
+#define APRS_REGEX_ERR -3
+
+class APRSParser: public Parser
 {
 public:
-    OutputConnection(sa_family_t family, in_port_t port);
-    virtual ~OutputConnection() throw ();
+    APRSParser();
+    virtual ~APRSParser() throw ();
 
-    void fillAddr();
-    void listenToSocket(uint32_t);
+    int32_t unpack(const std::string&);
+
+private:
+    //regex
+    const boost::regex aprs_re;
+    const boost::regex comm_re;
+    // temps
+    std::string id;
+    int32_t id_t = 0, ac_t = 0, alt = 0, time = 0;
+    double lat = 0.0, lon = 0.0, turn_r = 0.0, climb_r = 0.0, gnd_spd = 0.0,
+            heading = 0.0;
 };
 
-#endif /* OUTPUTCONNECTION_H_ */
+#endif /* PARSERAPRS_H_ */

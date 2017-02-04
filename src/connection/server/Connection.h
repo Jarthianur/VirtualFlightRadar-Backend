@@ -19,30 +19,30 @@
  }
  */
 
-#ifndef CONNECTINEXT_H_
-#define CONNECTINEXT_H_
+#ifndef CONNECTION_H_
+#define CONNECTION_H_
 
-#include <netinet/in.h>
-#include <ctime>
-#include <string>
+#include <boost/asio.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
 
-#include "ConnectIn.h"
-
-class ConnectInExt: public ConnectIn
+class Connection: public boost::enable_shared_from_this<Connection>
 {
 public:
-    ConnectInExt(const std::string& host, in_port_t port, const std::string& login,
-            time_t to = 0);
-    virtual ~ConnectInExt() throw ();
+    Connection(const Connection&) = delete;
+    Connection& operator=(const Connection&) = delete;
 
-    void connectIn();
+    virtual ~Connection() throw ();
+
+    static boost::shared_ptr<Connection> start(boost::asio::ip::tcp::socket socket);
+    void stop();
+    boost::asio::ip::tcp::socket& socket();
+    const std::string& ip();
 
 private:
-    /**
-     * login stuff
-     */
-    std::string login_str;
-
+    Connection(boost::asio::ip::tcp::socket socket);
+    boost::asio::ip::tcp::socket socket_;
+    const std::string ip_;
 };
 
-#endif /* CONNECTINEXT_H_ */
+#endif /* CONNECTION_H_ */

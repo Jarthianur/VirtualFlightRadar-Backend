@@ -19,26 +19,44 @@
  }
  */
 
-#ifndef PARSERSBS_H_
-#define PARSERSBS_H_
+#ifndef NMEASERVER_H_
+#define NMEASERVER_H_
 
-#include <cstdint>
+#include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
+#include <netinet/in.h>
+#include <mutex>
 #include <string>
+#include <vector>
 
-#include "Parser.h"
+#include "Connection.h"
 
-class ParserSBS: public Parser
+#define MAX_CLIENTS 5
+
+class NMEAServer
 {
 public:
-    ParserSBS();
-    virtual ~ParserSBS() throw ();
+    NMEAServer(const NMEAServer&) = delete;
+    NMEAServer& operator=(const NMEAServer&) = delete;
 
-    int32_t unpack(const std::string&, AircraftContainer&);
+    NMEAServer(boost::asio::signal_set& s, in_port_t port);
+    virtual ~NMEAServer() throw ();
+
+    void run();
+    void writeToAll(const std::string& msg);
 
 private:
-    std::string id;
-    int32_t alt = 0, time = 0;
-    double lat = 0.0, lon = 0.0;
+    void accept();
+    void awaitStop();
+    void stopAll();
+
+    std::mutex mutex;
+
+    boost::asio::io_service io_service_;
+    boost::asio::signal_set& signals_;
+    boost::asio::ip::tcp::acceptor acceptor_;
+    boost::asio::ip::tcp::socket socket_;
+    std::vector<boost::shared_ptr<Connection>> clients;
 };
 
-#endif /* PARSERSBS_H_ */
+#endif /* NMEASERVER_H_ */

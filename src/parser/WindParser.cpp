@@ -19,25 +19,28 @@
  }
  */
 
-#include "ConnectionException.h"
+#include "WindParser.h"
 
-ConnectionException::ConnectionException()
-        : std::exception(),
-          msg("Error with any connection")
+#include <sys/types.h>
+#include <cstddef>
+#include <stdexcept>
+
+#include "../aircraft/AircraftContainer.h"
+#include "../base/Configuration.h"
+#include "../base/VFRB.h"
+#include "../util/Math.h"
+
+WindParser::WindParser()
+        : Parser()
 {
 }
 
-ConnectionException::ConnectionException(const std::string& msg)
-        : std::exception(),
-          msg(msg)
+WindParser::~WindParser()
 {
 }
 
-ConnectionException::~ConnectionException()
+int32_t WindParser::unpack(const std::string& sentence)
 {
-}
 
-const char* ConnectionException::what() const throw ()
-{
-    return msg.c_str();
+    return MSG_UNPACK_SUC;
 }

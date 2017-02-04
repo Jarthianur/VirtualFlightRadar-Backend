@@ -19,37 +19,30 @@
  }
  */
 
-#include "OutputConnection.h"
+#ifndef APRSCCLIENT_H_
+#define APRSCCLIENT_H_
 
-#include <sys/socket.h>
+#include <string>
 
-#include "ConnectionException.h"
+#include "../../parser/APRSParser.h"
+#include "Client.h"
 
-#define OC_SO_BIND_ERR -1
-#define OC_SO_LISTN_ERR OC_SO_BIND_ERR
-
-OutputConnection::OutputConnection(sa_family_t family, in_port_t port)
-        : Connection(family, port)
+class APRSCClient: public Client
 {
-}
+public:
+    APRSCClient(const APRSCClient&) = delete;
+    APRSCClient& operator=(const APRSCClient&) = delete;
 
-OutputConnection::~OutputConnection()
-{
-}
+    APRSCClient(boost::asio::signal_set& s, const std::string& host,
+            const std::string& port, const std::string& login);
+    virtual ~APRSCClient() throw ();
 
-void OutputConnection::fillAddr()
-{
-    con_addr.sin_addr.s_addr = INADDR_ANY;
-}
+private:
+    void read();
+    void connect();
 
-void OutputConnection::listenToSocket(uint32_t max)
-{
-    if (bind(con_sock, (sockaddr*) &con_addr, sizeof(sockaddr)) == -1)
-    {
-        throw ConnectionException("Cannot bind socket");
-    }
-    if (listen(con_sock, max) == -1)
-    {
-        throw ConnectionException("Cannot listen to socket");
-    }
-}
+    std::string login_str;
+    APRSParser parser;
+};
+
+#endif /* APRSCCLIENT_H_ */

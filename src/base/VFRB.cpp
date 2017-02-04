@@ -31,11 +31,11 @@
 
 #include "../aircraft/AircraftContainer.h"
 #include "../aircraft/AircraftProcessor.h"
+#include "../connection/APRSCClient.h"
 #include "../connection/ConnectionException.h"
-#include "../connection/ConnectIn.h"
-#include "../connection/ConnectInExt.h"
+#include "../connection/SimpleClient.h"
 #include "../parser/ParserAPRS.h"
-#include "../parser/ParserSBS.h"
+#include "../parser/SBSParser.h"
 #include "../util/Logger.h"
 #include "Configuration.h"
 #include "WeatherFeed.h"
@@ -55,7 +55,7 @@ VFRB::~VFRB()
 
 void VFRB::run()
 {
-    ConnectOutNMEA out_con(Configuration::global_out_port);
+    NMEAServer out_con(Configuration::global_out_port);
     AircraftContainer ac_cont;
     WeatherFeed weather_feed;
     AircraftProcessor ac_proc(Configuration::base_latitude, Configuration::base_longitude,
@@ -161,7 +161,7 @@ void VFRB::run()
     Logger::info("EXITING PROGRAM");
 }
 
-void VFRB::handle_con_out(ConnectOutNMEA& out_con)
+void VFRB::handle_con_out(NMEAServer& out_con)
 {
     try
     {
@@ -187,7 +187,7 @@ void VFRB::handle_weather_feed(WeatherFeed& weather)
     {
         return;
     }
-    ConnectIn wind_con(std::ref(Configuration::global_weather_feed_host),
+    Client wind_con(std::ref(Configuration::global_weather_feed_host),
                        Configuration::global_weather_feed_port, 5);
     bool connected = false;
 
@@ -234,8 +234,8 @@ void VFRB::handle_sbs_in(AircraftContainer& ac_cont)
     {
         return;
     }
-    ParserSBS parser;
-    ConnectIn sbs_con(std::ref(Configuration::global_sbs_host),
+    SBSParser parser;
+    Client sbs_con(std::ref(Configuration::global_sbs_host),
                       Configuration::global_sbs_port);
     bool connected = false;
 
@@ -285,8 +285,8 @@ void VFRB::handle_aprs_in(AircraftContainer& ac_cont)
     {
         return;
     }
-    ParserAPRS parser;
-    ConnectInExt aprs_con(std::ref(Configuration::global_aprsc_host),
+    APRSParser parser;
+    APRSCClient aprs_con(std::ref(Configuration::global_aprsc_host),
                           Configuration::global_aprsc_port,
                           std::ref(Configuration::global_aprsc_login));
     bool connected = false;
@@ -333,7 +333,7 @@ void VFRB::handle_aprs_in(AircraftContainer& ac_cont)
 void VFRB::exit_signal_handler(int sig)
 {
     global_run_status = false;
-    ConnectIn shut("localhost", Configuration::global_out_port);
+    Client shut("localhost", Configuration::global_out_port);
     try
     {
         shut.setupConnectIn();

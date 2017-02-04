@@ -19,25 +19,27 @@
  }
  */
 
-#include "ParserSBS.h"
+#include "SBSParser.h"
 
+#include <sys/types.h>
 #include <cstddef>
 #include <stdexcept>
 
 #include "../aircraft/AircraftContainer.h"
 #include "../base/Configuration.h"
+#include "../base/VFRB.h"
 #include "../util/Math.h"
 
-ParserSBS::ParserSBS()
+SBSParser::SBSParser()
         : Parser()
 {
 }
 
-ParserSBS::~ParserSBS()
+SBSParser::~SBSParser()
 {
 }
 
-int32_t ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
+int32_t SBSParser::unpack(const std::string& sentence)
 {
     /*
      * fields:
@@ -124,6 +126,6 @@ int32_t ParserSBS::unpack(const std::string& sentence, AircraftContainer& ac_con
         i++;
         p = delim + 1;
     }
-    ac_cont.insertAircraft(id, lat, lon, alt);
+    VFRB::ac_cont.insertAircraft(id, lat, lon, alt);
     return MSG_UNPACK_SUC;
 }

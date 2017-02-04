@@ -19,32 +19,26 @@
  }
  */
 
-#include "ConnectInExt.h"
+#ifndef PARSERWIND_H_
+#define PARSERWIND_H_
 
-#include <sys/socket.h>
+#include <cstdint>
+#include <string>
 
-#include "ConnectionException.h"
+#include "Parser.h"
 
-ConnectInExt::ConnectInExt(const std::string& host, in_port_t port,
-        const std::string& login, time_t to)
-        : ConnectIn(host, port, to),
-          login_str(login)
+class WindParser: public Parser
 {
-    login_str.append("\r\n");
-}
+public:
+    WindParser();
+    virtual ~WindParser() throw ();
 
-ConnectInExt::~ConnectInExt()
-{
-}
+    int32_t unpack(const std::string&);
 
-void ConnectInExt::connectIn()
-{
-    in_con.connect(in_host);
+private:
+    std::string id;
+    int32_t alt = 0, time = 0;
+    double lat = 0.0, lon = 0.0;
+};
 
-    if (send(in_con.getConSock(), login_str.c_str(), login_str.length(), 0) <= 0)
-    {
-        throw ConnectionException(std::string("Failed to send login to ") + in_host);
-    }
-    //maybe verify correct login for ogn:
-    //logresp USER verified
-}
+#endif /* PARSERWIND_H_ */

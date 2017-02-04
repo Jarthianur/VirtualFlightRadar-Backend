@@ -24,10 +24,10 @@ Copyright_License {
 #include "../src/aircraft/Aircraft.h"
 #include "../src/aircraft/AircraftContainer.h"
 #include "../src/aircraft/AircraftProcessor.h"
-#include "../src/parser/ParserAPRS.h"
-#include "../src/parser/ParserSBS.h"
 #include "../src/base/Configuration.h"
 #include "../src/base/WeatherFeed.h"
+#include "../src/parser/APRSParser.h"
+#include "../src/parser/SBSParser.h"
 
 
 int tests = 0;
@@ -43,7 +43,7 @@ void fail(const char* test) {
  * testing methods;
  */
 
-void testParsSbsUnpack(ParserSBS& pars_sbs, AircraftContainer& ac_cont)
+void testParsSbsUnpack(SBSParser& pars_sbs, AircraftContainer& ac_cont)
 {
     //correct msg
     std::string msg("MSG,3,0,0,AAAAAA,0,2016/01/01,10:00:00.000,2016/01/01,10:00:00.000,,1000,,,1.0,1.0,,,,,,0");
@@ -62,7 +62,7 @@ void testParsSbsUnpack(ParserSBS& pars_sbs, AircraftContainer& ac_cont)
 
     return;
 }
-void testParsAprsUnpack(ParserAPRS& pars_aprs, AircraftContainer& ac_cont)
+void testParsAprsUnpack(APRSParser& pars_aprs, AircraftContainer& ac_cont)
 {
     //correct msg
     std::string msg("ICAAAAAAA>APRS,qAS,EDDD:/100000h0001.00N/00001.00E'100/100/A=001000 !W58! id09AAAAAA -100fpm +1.0rot 17.8dB 0e -13.0kHz gps11x17");
@@ -151,8 +151,8 @@ int Tmain(int argc, char* argv[]) {
     AircraftProcessor ac_proc(Configuration::base_latitude,
             Configuration::base_longitude, Configuration::base_altitude,
             Configuration::base_geoid);
-    ParserSBS pars_sbs;
-    ParserAPRS pars_aprs;
+    SBSParser pars_sbs;
+    APRSParser pars_aprs;
     WeatherFeed w_feed;
 
     //run tests

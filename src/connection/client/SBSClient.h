@@ -19,32 +19,28 @@
  }
  */
 
-#include "InputConnection.h"
+#ifndef SBSCLIENT_H_
+#define SBSCLIENT_H_
 
-#include <sys/socket.h>
+#include <string>
 
-#include "ConnectionException.h"
+#include "../../parser/SBSParser.h"
+#include "Client.h"
 
-#define IC_SO_CON_ERR -1
-
-InputConnection::InputConnection(sa_family_t family, in_port_t port)
-        : Connection(family, port)
+class SBSClient: public Client
 {
-}
+public:
+    SBSClient(const SBSClient&) = delete;
+    SBSClient& operator=(const SBSClient&) = delete;
 
-InputConnection::~InputConnection()
-{
-}
+    SBSClient(boost::asio::signal_set& s, const std::string& host, const std::string& port);
+    virtual ~SBSClient() throw ();
 
-void InputConnection::fillAddr(in_addr& addr)
-{
-    con_addr.sin_addr = addr;
-}
+private:
+    void read();
+    void connect();
 
-void InputConnection::connect(const std::string& host)
-{
-    if (::connect(con_sock, getSockAddrPtr(), sizeof(sockaddr)) == IC_SO_CON_ERR)
-    {
-        throw ConnectionException(std::string("Cannot connect to ") + host);
-    }
-}
+    SBSParser parser;
+};
+
+#endif /* SBSCLIENT_H_ */

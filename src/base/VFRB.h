@@ -22,7 +22,7 @@
 #ifndef VFRB_H_
 #define VFRB_H_
 
-#include "../connection/ConnectOutNMEA.h"
+#include "../connection/NMEAServer.h"
 
 class AircraftContainer;
 class WeatherFeed;
@@ -49,13 +49,14 @@ public:
     static bool global_sbs_enabled;
     static bool global_run_status;
 
+    static AircraftContainer ac_cont;
 protected:
     /**
      * funtions for every single thread
      */
     static void handle_sbs_in(AircraftContainer&);
     static void handle_aprs_in(AircraftContainer&);
-    static void handle_con_out(ConnectOutNMEA&);
+    static void handle_con_out(NMEAServer&);
     static void handle_weather_feed(WeatherFeed&);
     static void exit_signal_handler(int sig);
 };

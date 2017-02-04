@@ -19,22 +19,26 @@
  }
  */
 
-#ifndef CONNECTIONEXCEPTION_H_
-#define CONNECTIONEXCEPTION_H_
+#ifndef PARSERSBS_H_
+#define PARSERSBS_H_
 
-#include <exception>
+#include <cstdint>
 #include <string>
 
-class ConnectionException: public std::exception
+#include "Parser.h"
+
+class SBSParser: public Parser
 {
 public:
-    ConnectionException();
-    ConnectionException(const std::string&);
-    virtual ~ConnectionException() throw ();
-    virtual const char* what() const throw ();
+    SBSParser();
+    virtual ~SBSParser() throw ();
+
+    int32_t unpack(const std::string&);
 
 private:
-    std::string msg;
+    std::string id;
+    int32_t alt = 0, time = 0;
+    double lat = 0.0, lon = 0.0;
 };
 
-#endif /* CONNECTIONEXCEPTION_H_ */
+#endif /* PARSERSBS_H_ */

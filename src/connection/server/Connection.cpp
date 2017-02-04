@@ -19,34 +19,41 @@
  }
  */
 
-#ifndef PARSERAPRS_H_
-#define PARSERAPRS_H_
+#include "Connection.h"
 
-#include <cstdint>
-#include <regex>
-#include <string>
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
+#include <algorithm>
 
-#include "Parser.h"
-
-#define APRS_REGEX_ERR -3
-
-class ParserAPRS: public Parser
+boost::shared_ptr<Connection> Connection::start(boost::asio::ip::tcp::socket socket)
 {
-public:
-    ParserAPRS();
-    virtual ~ParserAPRS() throw ();
+    return boost::shared_ptr<Connection>(new Connection(std::move(socket)));
+}
 
-    int32_t unpack(const std::string&, AircraftContainer&);
+Connection::Connection(boost::asio::ip::tcp::socket socket)
+        : socket_(std::move(socket)),
+          ip_(socket_.remote_endpoint().address().to_string())
+{
+}
 
-private:
-    //regex
-    const std::regex aprs_re;
-    const std::regex comm_re;
-    // temps
-    std::string id;
-    int32_t id_t = 0, ac_t = 0, alt = 0, time = 0;
-    double lat = 0.0, lon = 0.0, turn_r = 0.0, climb_r = 0.0, gnd_spd = 0.0,
-            heading = 0.0;
-};
+Connection::~Connection()
+{
+    stop();
+}
 
-#endif /* PARSERAPRS_H_ */
+void Connection::stop()
+{
+    boost::system::error_code ignored_ec;
+    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+    socket_.close();
+}
+
+boost::asio::ip::tcp::socket& Connection::socket()
+{
+    return socket_;
+}
+
+const std::string& Connection::ip()
+{
+    return ip_;
+}

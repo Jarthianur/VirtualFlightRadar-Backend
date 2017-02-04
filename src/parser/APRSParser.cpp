@@ -19,30 +19,36 @@
  }
  */
 
-#include "ParserAPRS.h"
+#include "APRSParser.h"
 
+#include <boost/regex/v4/match_results.hpp>
+#include <boost/regex/v4/regbase.hpp>
+#include <boost/regex/v4/regex.hpp>
+#include <boost/regex/v4/regex_match.hpp>
+#include <sys/types.h>
 #include <stdexcept>
 
 #include "../aircraft/Aircraft.h"
 #include "../aircraft/AircraftContainer.h"
 #include "../base/Configuration.h"
+#include "../base/VFRB.h"
 #include "../util/Logger.h"
 #include "../util/Math.h"
 
-ParserAPRS::ParserAPRS()
+APRSParser::APRSParser()
         : Parser(),
-          aprs_re("^(?:\\S+)>APRS,\\S+(?:,\\S+)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[^]+?(\\d{5}\\.\\d{2})([EW])[^]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+([^]+?)$",
-                  std::regex_constants::optimize),
-          comm_re("^[^]*id(\\S{2})(\\S{6})\\s+(?:([\\+-]\\d+)fpm\\s+)?(?:([\\+-]\\d+\\.\\d+)rot)?[^]*$",
-                  std::regex_constants::optimize)
+          aprs_re("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[^]+?(\\d{5}\\.\\d{2})([EW])[^]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([^]+?)$",
+                  boost::regex_constants::optimize, boost::regex_constants::ECMAScript),
+          comm_re("^[^]+?id(\\S{2})(\\S{6})\\s+?(?:([\\+-]\\d+?)fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?[^]+?$",
+                  boost::regex_constants::optimize, boost::regex_constants::ECMAScript)
 {
 }
 
-ParserAPRS::~ParserAPRS()
+APRSParser::~APRSParser()
 {
 }
 
-int32_t ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_cont)
+int32_t APRSParser::unpack(const std::string& sentence)
 {
     if (sentence.at(0) == '#')
     {
@@ -50,8 +56,8 @@ int32_t ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_co
     }
     try
     {
-        std::smatch match;
-        if (std::regex_match(sentence, match, aprs_re))
+        boost::smatch match;
+        if (boost::regex_match(sentence, match, aprs_re))
         {
 
             try
@@ -89,8 +95,8 @@ int32_t ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_co
             // climbrate / address / id / type
             if (match.str(9).size() > 0)
             {
-                std::smatch comm_match;
-                if (std::regex_match(match.str(9), comm_match, comm_re))
+                boost::smatch comm_match;
+                if (boost::regex_match(match.str(9), comm_match, comm_re))
                 {
                     id = comm_match.str(2);
                     id_t = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
@@ -140,15 +146,15 @@ int32_t ParserAPRS::unpack(const std::string& sentence, AircraftContainer& ac_co
                 gnd_spd = A_VALUE_NA;
             }
 
-            ac_cont.insertAircraft(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r,
-                                   turn_r, heading);
+            VFRB::ac_cont.insertAircraft(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r,
+                                         turn_r, heading);
         }
         else
         {
             return MSG_UNPACK_ERR;
         }
     }
-    catch (std::regex_error& e)
+    catch (const std::runtime_error& e)
     {
         Logger::error("while parsing APRS regex: ", e.what());
         return APRS_REGEX_ERR;

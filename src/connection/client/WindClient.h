@@ -19,23 +19,35 @@
  }
  */
 
-#ifndef INPUTCONNECTION_H_
-#define INPUTCONNECTION_H_
+#ifndef WINDCLIENT_H_
+#define WINDCLIENT_H_
 
-#include <netinet/in.h>
-#include <sys/un.h>
 #include <string>
 
-#include "Connection.h"
+#include "../../parser/WindParser.h"
+#include "Client.h"
 
-class InputConnection: public Connection
+#define WC_TIMEOUT 5
+
+class WindClient: public Client
 {
 public:
-    InputConnection(sa_family_t family, in_port_t port);
-    virtual ~InputConnection() throw ();
+    WindClient(const WindClient&) = delete;
+    WindClient& operator=(const WindClient&) = delete;
 
-    void fillAddr(in_addr&);
-    void connect(const std::string&);
+    WindClient(boost::asio::signal_set& s, const std::string& host, const std::string& port);
+    virtual ~WindClient() throw ();
+
+private:
+    void read();
+    void connect();
+    void checkDeadline();
+    void stop();
+    void awaitStop();
+
+    WindParser parser;
+    bool stopped_;
+    boost::asio::deadline_timer deadline_;
 };
 
-#endif /* INPUTCONNECTION_H_ */
+#endif /* WINDCLIENT_H_ */

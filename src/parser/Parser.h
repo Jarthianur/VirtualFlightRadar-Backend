@@ -25,8 +25,6 @@
 #include <stdint.h>
 #include <string>
 
-class AircraftContainer;
-
 #define MSG_UNPACK_SUC 0
 #define MSG_UNPACK_ERR -1
 #define MSG_UNPACK_IGN -2
@@ -42,7 +40,7 @@ public:
      * returns MSG_UNPACK_SUC on success, MSG_UNPACK_ERR on failure,
      * MSG_UNPACK_IGN when to ignore.
      */
-    virtual int32_t unpack(const std::string&, AircraftContainer&) = 0;
+    virtual int32_t unpack(const std::string&) = 0;
 
 };
 
