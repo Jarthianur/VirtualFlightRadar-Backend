@@ -27,13 +27,14 @@
 #include "../../util/Logger.h"
 
 Client::Client(boost::asio::signal_set& s, const std::string& host,
-        const std::string& port)
+        const std::string& port, const std::string& comp)
         : io_service_(),
           signals_(s),
           socket_(io_service_),
           resolver_(io_service_),
           host(host),
           port(port),
+          component(comp),
           deadline_(io_service_)
 
 {
@@ -53,25 +54,51 @@ void Client::awaitStop()
 {
     signals_.async_wait([this](const boost::system::error_code&, int)
     {
-        Logger::info("(Client) stopping...");
-        socket_.close();
+        stop();
     });
 }
 
-void Client::reconnect()
+void Client::timedConnect()
 {
-    socket_.close();
     deadline_.expires_from_now(boost::posix_time::seconds(WAIT_TIMEVAL));
     deadline_.async_wait([this](const boost::system::error_code& ec)
     {
         if (!ec)
         {
-            Logger::info("(Client) try to reconnect...");
+            Logger::info(component + " try connect to: ", host);
             connect();
         }
         else
         {
-            Logger::error("(Client) error while waiting: ", ec.message());
+            Logger::error(component + " cancel connect: ", ec.message());
         }
     });
+}
+
+void Client::stop()
+{
+    Logger::info(component + " stop connection to: ", host);
+    boost::system::error_code ec;
+    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    socket_.close();
+}
+
+void Client::read()
+{
+    boost::asio::async_read_until(
+                socket_, buffer, "\r\n",
+                [this](const boost::system::error_code& ec, std::size_t)
+                {
+                    if (!ec)
+                    {
+                        std::istream is(&buffer);
+                        std::getline(is, response);
+                        process();
+                        read();
+                    }
+                    else if (ec != boost::system::errc::bad_file_descriptor)
+                    {
+                        Logger::error(component + " read: ", ec.message());
+                    }
+                });
 }

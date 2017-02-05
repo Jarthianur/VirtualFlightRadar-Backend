@@ -30,7 +30,7 @@
 
 SBSClient::SBSClient(boost::asio::signal_set& s, const std::string& host,
         const std::string& port)
-        : Client(s, host, port),
+        : Client(s, host, port, "(SBSClient)"),
           parser()
 {
     connect();
@@ -38,27 +38,6 @@ SBSClient::SBSClient(boost::asio::signal_set& s, const std::string& host,
 
 SBSClient::~SBSClient() throw ()
 {
-}
-
-void SBSClient::read()
-{
-    boost::asio::async_read_until(
-            socket_, buffer, "\r\n",
-            [this](const boost::system::error_code& ec, std::size_t)
-            {
-                if (!ec)
-                {
-                    std::istream is(&buffer);
-                    std::getline(is, response);
-                    parser.unpack(response);
-                    read();
-                }
-                else if (ec != boost::system::errc::bad_file_descriptor &&
-                        ec != boost::system::errc::operation_canceled)
-                {
-                    Logger::error("(SBSClient) read error: ", ec.message());
-                }
-            });
 }
 
 void SBSClient::connect()
@@ -83,15 +62,22 @@ void SBSClient::connect()
                                 }
                                 else
                                 {
-                                    Logger::error("(SBSClient) failed to connect host: ", ec.message());
-                                    reconnect();
+                                    Logger::error("(SBSClient) connect: ", ec.message());
+                                    socket_.close();
+                                    timedConnect();
                                 }
                             });
                 }
                 else
                 {
-                    Logger::error("(SBSClient) failed to resolve host: ", ec.message());
-                    reconnect();
+                    Logger::error("(SBSClient) resolve host: ", ec.message());
+                    socket_.close();
+                    timedConnect();
                 }
             });
+}
+
+void SBSClient::process()
+{
+    parser.unpack(response);
 }

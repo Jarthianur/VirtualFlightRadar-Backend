@@ -33,7 +33,7 @@
 
 WindClient::WindClient(boost::asio::signal_set& s, const std::string& host,
         const std::string& port)
-        : Client(s, host, port),
+        : Client(s, host, port, "(WindClient)"),
           stopped_(false),
           deadline_(io_service_),
           parser()
@@ -49,23 +49,7 @@ WindClient::~WindClient() throw ()
 void WindClient::read()
 {
     deadline_.expires_from_now(boost::posix_time::seconds(WC_TIMEOUT));
-    boost::asio::async_read_until(
-            socket_, buffer, "\r\n",
-            [this](const boost::system::error_code& ec, std::size_t)
-            {
-                if (!ec)
-                {
-                    std::istream is(&buffer);
-                    std::getline(is, response);
-                    parser.unpack(response);
-                    read();
-                }
-                else if (ec != boost::system::errc::bad_file_descriptor &&
-                        ec != boost::system::errc::operation_canceled)
-                {
-                    Logger::error("(WindClient) read error: ", ec.message());
-                }
-            });
+    Client::read();
 }
 
 void WindClient::connect()
@@ -98,15 +82,17 @@ void WindClient::connect()
                                 }
                                 else
                                 {
-                                    Logger::error("(WindClient) failed to connect host: ", ec.message());
-                                    reconnect();
+                                    Logger::error("(WindClient) connect: ", ec.message());
+                                    socket_.close();
+                                    timedConnect();
                                 }
                             });
                 }
                 else
                 {
-                    Logger::error("(WindClient) failed to resolve host: ", ec.message());
-                    reconnect();
+                    Logger::error("(WindClient) resolve host: ", ec.message());
+                    socket_.close();
+                    timedConnect();
                 }
             });
 }
@@ -119,25 +105,21 @@ void WindClient::checkDeadline()
     }
     if (deadline_.expires_at() <= boost::asio::deadline_timer::traits_type::now())
     {
+        Logger::warn("(WindClient) timed out: reconnect...");
         socket_.close();
         deadline_.expires_at(boost::posix_time::pos_infin);
         connect();
-        Logger::warn("(WindClient) timed out: reconnect...");
     }
     deadline_.async_wait(boost::bind(&WindClient::checkDeadline, this));
 }
 
 void WindClient::stop()
 {
+    Client::stop();
     stopped_ = true;
 }
 
-void WindClient::awaitStop()
+void WindClient::process()
 {
-    signals_.async_wait([this](const boost::system::error_code&, int)
-    {
-        Logger::info("(WindClient) stopping...");
-        socket_.close();
-        stop();
-    });
+    parser.unpack(response);
 }

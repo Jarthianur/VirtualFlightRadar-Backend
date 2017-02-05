@@ -30,7 +30,7 @@
 
 APRSCClient::APRSCClient(boost::asio::signal_set& s, const std::string& host,
         const std::string& port, const std::string& login)
-        : Client(s, host, port),
+        : Client(s, host, port, "(APRSCClient)"),
           login_str(login),
           parser()
 {
@@ -40,27 +40,6 @@ APRSCClient::APRSCClient(boost::asio::signal_set& s, const std::string& host,
 
 APRSCClient::~APRSCClient()
 {
-}
-
-void APRSCClient::read()
-{
-    boost::asio::async_read_until(
-            socket_, buffer, "\r\n",
-            [this](const boost::system::error_code& ec, std::size_t)
-            {
-                if (!ec)
-                {
-                    std::istream is(&buffer);
-                    std::getline(is, response);
-                    parser.unpack(response);
-                    read();
-                }
-                else if (ec != boost::system::errc::bad_file_descriptor &&
-                        ec != boost::system::errc::operation_canceled)
-                {
-                    Logger::error("(APRSCClient) read error: ", ec.message());
-                }
-            });
 }
 
 void APRSCClient::connect()
@@ -91,21 +70,28 @@ void APRSCClient::connect()
                                                 }
                                                 else
                                                 {
-                                                    Logger::error("(SBSClient) failed to send login: ", ec.message());
+                                                    Logger::error("(APRSCClient) send login: ", ec.message());
                                                 }
                                             });
                                 }
                                 else
                                 {
-                                    Logger::error("(SBSClient) failed to connect host: ", ec.message());
-                                    reconnect();
+                                    Logger::error("(APRSCClient) connect: ", ec.message());
+                                    socket_.close();
+                                    timedConnect();
                                 }
                             });
                 }
                 else
                 {
-                    Logger::error("(SBSClient) failed to resolve host: ", ec.message());
-                    reconnect();
+                    Logger::error("(APRSCClient) resolve host: ", ec.message());
+                    socket_.close();
+                    timedConnect();
                 }
             });
+}
+
+void APRSCClient::process()
+{
+    parser.unpack(response);
 }

@@ -39,12 +39,15 @@ public:
     void run();
 
 protected:
-    Client(boost::asio::signal_set& s, const std::string& host, const std::string& port);
+    Client(boost::asio::signal_set& s, const std::string& host, const std::string& port,
+            const std::string& comp);
 
-    virtual void awaitStop();
+    void awaitStop();
+    void timedConnect();
+    virtual void stop();
+    virtual void read();
+    virtual void process() = 0;
     virtual void connect() = 0;
-    virtual void read() = 0;
-    void reconnect();
 
     boost::asio::io_service io_service_;
     boost::asio::signal_set& signals_;
@@ -55,6 +58,7 @@ protected:
     boost::asio::streambuf buffer;
     const std::string host;
     const std::string port;
+    const std::string component;
 
 private:
     boost::asio::deadline_timer deadline_;

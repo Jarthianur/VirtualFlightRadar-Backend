@@ -93,10 +93,9 @@ void NMEAServer::accept()
                         Logger::info("(NMEAServer) client count exceeded, refuse: ", client->ip());
                     }
                 }
-                else if (ec != boost::system::errc::operation_canceled &&
-                        ec != boost::system::errc::bad_file_descriptor)
+                else if (ec != boost::system::errc::bad_file_descriptor)
                 {
-                    Logger::warn("(NMEAServer) failed to accept connection: ", ec.message());
+                    Logger::warn("(NMEAServer) accept: ", ec.message());
                 }
                 accept();
             });

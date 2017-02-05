@@ -37,7 +37,7 @@ public:
     virtual ~SBSClient() throw ();
 
 private:
-    void read();
+    void process();
     void connect();
 
     SBSParser parser;

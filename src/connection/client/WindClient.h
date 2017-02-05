@@ -40,14 +40,14 @@ public:
 
 private:
     void read();
+    void process();
     void connect();
     void checkDeadline();
     void stop();
-    void awaitStop();
 
-    WindParser parser;
     bool stopped_;
     boost::asio::deadline_timer deadline_;
+    WindParser parser;
 };
 
 #endif /* WINDCLIENT_H_ */

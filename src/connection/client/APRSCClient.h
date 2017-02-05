@@ -38,7 +38,7 @@ public:
     virtual ~APRSCClient() throw ();
 
 private:
-    void read();
+    void process();
     void connect();
 
     std::string login_str;
