@@ -21,14 +21,10 @@
 
 #include "WindParser.h"
 
-#include <sys/types.h>
-#include <cstddef>
 #include <stdexcept>
 
-#include "../aircraft/AircraftContainer.h"
-#include "../base/Configuration.h"
-#include "../base/VFRB.h"
-#include "../util/Math.h"
+#include "../main/ClimateData.h"
+#include "../main/VFRB.h"
 
 WindParser::WindParser()
         : Parser()
@@ -41,6 +37,36 @@ WindParser::~WindParser()
 
 int32_t WindParser::unpack(const std::string& sentence)
 {
-
+    if (sentence.substr(1, 5).compare("WIMWV") == 0)
+    {
+        VFRB::climate_data.insertWV(sentence);
+    }
+    else if (sentence.substr(1, 5).compare("WIMDA") == 0)
+    {
+        try
+        {
+            b = sentence.find('B') - 1;
+            s = sentence.substr(0, b).find_last_of(',') + 1;
+            VFRB::climate_data.setPress(std::stod(sentence.substr(s, b - s)) * 1000.0);
+        }
+        catch (std::logic_error& e)
+        {
+            VFRB::climate_data.setPress();
+        }
+        try
+        {
+            b = sentence.find('C') - 1;
+            s = sentence.substr(0, b).find_last_of(',') + 1;
+            VFRB::climate_data.setTemp(std::stod(sentence.substr(s, b - s)));
+        }
+        catch (std::logic_error& e)
+        {
+            VFRB::climate_data.setTemp();
+        }
+    }
+    else
+    {
+        return MSG_UNPACK_IGN;
+    }
     return MSG_UNPACK_SUC;
 }

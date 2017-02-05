@@ -21,15 +21,17 @@
 
 #include "ConfigReader.h"
 
+#include <boost/regex.hpp>
 #include <fstream>
+#include <regex>
 #include <stdexcept>
 #include <utility>
 
 #include "Logger.h"
 
-ConfigReader::ConfigReader(const char* filename)
-        : file(filename),
-          conf_re("^(\\S+)\\s*=\\s*(\\S+[^]*)$")
+ConfigReader::ConfigReader(const std::string& file)
+        : file(file),
+          conf_re("^(\\S+?)(?:\\s+?)?=(?:\\s+?)?(\\S+?[\\s\\S]*?)$", boost::regex_constants::optimize)
 {
 }
 
@@ -45,29 +47,27 @@ void ConfigReader::read()
         {
             if (line.at(0) == '#')
             {
-                line.clear();
                 continue;
             }
-            std::smatch match;
-            if (std::regex_match(line, match, conf_re))
+            boost::smatch match;
+            if (boost::regex_match(line, match, conf_re))
             {
-                key.assign(match.str(1));
-                value.assign(match.str(2));
+                key = match.str(1);
+                value = match.str(2);
                 config.insert(
                 { key, value });
             }
             else
             {
-                Logger::error("malformed parameter! = ", key);
+                Logger::error("(ConfigReader) malformed param: ", line);
             }
-            line.clear();
         }
-        catch (std::regex_error& e)
+        catch (const boost::regex_error& e)
         {
-            Logger::error("while reading config :: ", e.what());
+            Logger::error("(ConfigReader) reading config: ", e.what());
             break;
         }
-        catch (std::out_of_range& e)
+        catch (const std::out_of_range& e)
         {
             continue;
         }

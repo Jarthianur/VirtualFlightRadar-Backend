@@ -27,28 +27,31 @@
 
 #define ICAO_STD_A 1013.25
 #define ICAO_STD_T 15.0
-#define A_VALUE_NA -1000.0
+#define CD_VALUE_NA -1000.0
 
-class WeatherFeed
+class ClimateData
 {
 public:
-    WeatherFeed();
-    virtual ~WeatherFeed();
+    ClimateData();
+    virtual ~ClimateData();
 
-    std::string getNMEA();
-    void writeNMEA(const std::string&);
+    std::string extractWV();
+    void insertWV(const std::string& wv);
+
     bool isValid();
     double getPress();
     double getTemp();
+    void setPress(double p = CD_VALUE_NA);
+    void setTemp(double t = CD_VALUE_NA);
 
 private:
     std::mutex mutex;
-    std::string nmea_str;
+    std::string wv_;
     // hpa
     double pressure = ICAO_STD_A;
     // celsius
     double temperature = ICAO_STD_T;
-    bool wind_valid = false;
+    bool wv_valid = false;
 };
 
 #endif /* WINDFEED_H_ */

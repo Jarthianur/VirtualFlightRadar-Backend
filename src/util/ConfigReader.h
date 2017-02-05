@@ -22,26 +22,23 @@
 #ifndef CONFIGREADER_H_
 #define CONFIGREADER_H_
 
-#include <regex>
+#include <boost/regex.hpp>
 #include <string>
 #include <unordered_map>
 
 class ConfigReader
 {
 public:
-    ConfigReader(const char*);
-    inline virtual ~ConfigReader() throw ()
-    {
-    }
-    ;
+    ConfigReader(const std::string& file);
+    virtual ~ConfigReader() throw ();
 
     void read();
     const std::string& getProperty(const std::string&, const std::string&) const;
 
 private:
-    const char* file;
+    const std::string file;
     std::unordered_map<std::string, std::string> config;
-    const std::regex conf_re;
+    const boost::regex conf_re;
 };
 
 #endif /* CONFIGREADER_H_ */

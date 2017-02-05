@@ -25,7 +25,7 @@
 #include "../connection/NMEAServer.h"
 
 class AircraftContainer;
-class WeatherFeed;
+class ClimateData;
 
 #define SYNC_TIME 1
 #define WAIT_TIME 30
@@ -50,6 +50,7 @@ public:
     static bool global_run_status;
 
     static AircraftContainer ac_cont;
+    static ClimateData climate_data;
 protected:
     /**
      * funtions for every single thread
@@ -57,7 +58,7 @@ protected:
     static void handle_sbs_in(AircraftContainer&);
     static void handle_aprs_in(AircraftContainer&);
     static void handle_con_out(NMEAServer&);
-    static void handle_weather_feed(WeatherFeed&);
+    static void handle_weather_feed(ClimateData&);
     static void exit_signal_handler(int sig);
 };
 

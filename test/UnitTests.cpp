@@ -111,32 +111,32 @@ void testAcContClear(AircraftContainer& ac_cont)
     return;
 }
 
-void testWFWriteNMEA(WeatherFeed& w_feed)
+void testWFWriteNMEA(ClimateData& w_feed)
 {
     return;
 }
-void testWFIsValid(WeatherFeed& w_feed)
+void testWFIsValid(ClimateData& w_feed)
 {
     return;
 }
-void testWFGetPress(WeatherFeed& w_feed)
+void testWFGetPress(ClimateData& w_feed)
 {
     return;
 }
-void testWFGetTemp(WeatherFeed& w_feed)
+void testWFGetTemp(ClimateData& w_feed)
 {
     return;
 }
-void testWFGetNMEA(WeatherFeed& w_feed)
+void testWFGetNMEA(ClimateData& w_feed)
 {
     return;
 }
-void testWFIsNotValidAfterGet(WeatherFeed& w_feed)
+void testWFIsNotValidAfterGet(ClimateData& w_feed)
 {
     return;
 }
 
-int Tmain(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 
     //setup Configuration
     Configuration::base_latitude = 0.0;
@@ -153,7 +153,7 @@ int Tmain(int argc, char* argv[]) {
             Configuration::base_geoid);
     SBSParser pars_sbs;
     APRSParser pars_aprs;
-    WeatherFeed w_feed;
+    ClimateData w_feed;
 
     //run tests
     std::cout << "=== RUNNING UNIT TESTS ===" << std::endl;

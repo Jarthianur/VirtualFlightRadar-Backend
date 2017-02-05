@@ -19,25 +19,53 @@
  }
  */
 
-#ifndef PARSERWIND_H_
-#define PARSERWIND_H_
+#include "ClimateData.h"
 
-#include <sys/types.h>
-#include <cstddef>
-#include <string>
+#include <stddef.h>
+#include <stdexcept>
 
-#include "Parser.h"
-
-class WindParser: public Parser
+ClimateData::ClimateData()
 {
-public:
-    WindParser();
-    virtual ~WindParser() throw ();
+}
 
-    int32_t unpack(const std::string&);
+ClimateData::~ClimateData()
+{
+}
 
-private:
-    size_t b = 0, s = 0;
-};
+std::string ClimateData::extractWV()
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    wv_valid = false;
+    return wv_+"\r\n";
+}
 
-#endif /* PARSERWIND_H_ */
+bool ClimateData::isValid()
+{
+    return wv_valid;
+}
+
+double ClimateData::getPress()
+{
+    return pressure;
+}
+
+void ClimateData::insertWV(const std::string& wv)
+{
+    wv_ = wv;
+    wv_valid = true;
+}
+
+void ClimateData::setPress(double p)
+{
+    pressure = p;
+}
+
+void ClimateData::setTemp(double t)
+{
+    temperature = t;
+}
+
+double ClimateData::getTemp()
+{
+    return temperature;
+}

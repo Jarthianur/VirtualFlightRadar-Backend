@@ -37,8 +37,8 @@
 #include "../parser/ParserAPRS.h"
 #include "../parser/SBSParser.h"
 #include "../util/Logger.h"
+#include "ClimateData.h"
 #include "Configuration.h"
-#include "WeatherFeed.h"
 
 bool VFRB::global_weather_feed_enabled = false;
 bool VFRB::global_aprs_enabled = false;
@@ -57,7 +57,7 @@ void VFRB::run()
 {
     NMEAServer out_con(Configuration::global_out_port);
     AircraftContainer ac_cont;
-    WeatherFeed weather_feed;
+    ClimateData weather_feed;
     AircraftProcessor ac_proc(Configuration::base_latitude, Configuration::base_longitude,
                               Configuration::base_altitude, Configuration::base_geoid);
 
@@ -132,7 +132,7 @@ void VFRB::run()
                 }
                 if (weather_feed.isValid())
                 {
-                    str = weather_feed.getNMEA();
+                    str = weather_feed.extractWV();
                     out_con.sendMsgOut(std::ref(str));
                 }
             }
@@ -181,7 +181,7 @@ void VFRB::handle_con_out(NMEAServer& out_con)
     }
 }
 
-void VFRB::handle_weather_feed(WeatherFeed& weather)
+void VFRB::handle_weather_feed(ClimateData& weather)
 {
     if (!global_weather_feed_enabled)
     {
