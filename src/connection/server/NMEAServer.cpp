@@ -22,6 +22,7 @@
 #include "NMEAServer.h"
 
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
 #include <boost/system/error_code.hpp>
 #include <algorithm>
 #include <csignal>
@@ -74,31 +75,8 @@ void NMEAServer::accept()
 {
     acceptor_.async_accept(
             socket_,
-            [this](const boost::system::error_code& ec)
-            {
-                if (!acceptor_.is_open())
-                {
-                    return;
-                }
-                if (!ec)
-                {
-                    auto client = Connection::start(std::move(socket_));
-                    if (clients.size() < MAX_CLIENTS)
-                    {
-                        clients.push_back(client);
-                        Logger::info("(NMEAServer) connection from: ", client->ip());
-                    }
-                    else
-                    {
-                        Logger::info("(NMEAServer) client count exceeded, refuse: ", client->ip());
-                    }
-                }
-                else if (ec != boost::system::errc::bad_file_descriptor)
-                {
-                    Logger::warn("(NMEAServer) accept: ", ec.message());
-                }
-                accept();
-            });
+            boost::bind(&NMEAServer::handleAccept, this,
+                        boost::asio::placeholders::error));
 }
 
 void NMEAServer::awaitStop()
@@ -116,3 +94,28 @@ void NMEAServer::stopAll()
     clients.clear();
 }
 
+void NMEAServer::handleAccept(const boost::system::error_code& ec)
+{
+    if (!acceptor_.is_open())
+    {
+        return;
+    }
+    if (!ec)
+    {
+        auto client = Connection::start(std::move(socket_));
+        if (clients.size() < MAX_CLIENTS)
+        {
+            clients.push_back(client);
+            Logger::info("(NMEAServer) connection from: ", client->ip());
+        }
+        else
+        {
+            Logger::info("(NMEAServer) client count exceeded, refuse: ", client->ip());
+        }
+    }
+    else if (ec != boost::system::errc::bad_file_descriptor)
+    {
+        Logger::warn("(NMEAServer) accept: ", ec.message());
+    }
+    accept();
+}

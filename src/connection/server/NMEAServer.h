@@ -50,6 +50,8 @@ private:
     void awaitStop();
     void stopAll();
 
+    void handleAccept(const boost::system::error_code& ec);
+
     std::mutex mutex;
 
     boost::asio::io_service io_service_;

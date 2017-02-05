@@ -22,6 +22,8 @@
 #ifndef WINDCLIENT_H_
 #define WINDCLIENT_H_
 
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
 #include <string>
 
 #include "../../parser/WindParser.h"
@@ -35,7 +37,8 @@ public:
     WindClient(const WindClient&) = delete;
     WindClient& operator=(const WindClient&) = delete;
 
-    WindClient(boost::asio::signal_set& s, const std::string& host, const std::string& port);
+    WindClient(boost::asio::signal_set& s, const std::string& host,
+            const std::string& port);
     virtual ~WindClient() throw ();
 
 private:
@@ -44,6 +47,11 @@ private:
     void connect();
     void checkDeadline();
     void stop();
+
+    void handleResolve(const boost::system::error_code& ec,
+            boost::asio::ip::tcp::resolver::iterator it);
+    void handleConnect(const boost::system::error_code& ec,
+            boost::asio::ip::tcp::resolver::iterator it);
 
     bool stopped_;
     boost::asio::deadline_timer deadline_;

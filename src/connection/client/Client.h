@@ -23,6 +23,8 @@
 #define CLIENT_H_
 
 #include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
+#include <cstddef>
 #include <string>
 
 // seconds to wait before reconnect
@@ -48,6 +50,13 @@ protected:
     virtual void read();
     virtual void process() = 0;
     virtual void connect() = 0;
+
+    void handleTimedConnect(const boost::system::error_code& ec);
+    void handleRead(const boost::system::error_code& ec, std::size_t s);
+    virtual void handleResolve(const boost::system::error_code& ec,
+            boost::asio::ip::tcp::resolver::iterator it) = 0;
+    virtual void handleConnect(const boost::system::error_code& ec,
+                    boost::asio::ip::tcp::resolver::iterator it) = 0;
 
     boost::asio::io_service io_service_;
     boost::asio::signal_set& signals_;

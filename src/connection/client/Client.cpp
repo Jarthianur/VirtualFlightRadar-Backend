@@ -22,6 +22,7 @@
 #include "Client.h"
 
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
 #include <boost/system/error_code.hpp>
 #include <csignal>
 #include "../../util/Logger.h"
@@ -61,18 +62,8 @@ void Client::awaitStop()
 void Client::timedConnect()
 {
     deadline_.expires_from_now(boost::posix_time::seconds(WAIT_TIMEVAL));
-    deadline_.async_wait([this](const boost::system::error_code& ec)
-    {
-        if (!ec)
-        {
-            Logger::info(component + " try connect to: ", host);
-            connect();
-        }
-        else
-        {
-            Logger::error(component + " cancel connect: ", ec.message());
-        }
-    });
+    deadline_.async_wait(
+            boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
 }
 
 void Client::stop()
@@ -86,19 +77,37 @@ void Client::stop()
 void Client::read()
 {
     boost::asio::async_read_until(
-                socket_, buffer, "\r\n",
-                [this](const boost::system::error_code& ec, std::size_t)
-                {
-                    if (!ec)
-                    {
-                        std::istream is(&buffer);
-                        std::getline(is, response);
-                        process();
-                        read();
-                    }
-                    else if (ec != boost::system::errc::bad_file_descriptor)
-                    {
-                        Logger::error(component + " read: ", ec.message());
-                    }
-                });
+            socket_,
+            buffer,
+            "\r\n",
+            boost::bind(&Client::handleRead, this, boost::asio::placeholders::error,
+                        boost::asio::placeholders::bytes_transferred));
+}
+
+void Client::handleTimedConnect(const boost::system::error_code& ec)
+{
+    if (!ec)
+    {
+        Logger::info(component + " try connect to: ", host);
+        connect();
+    }
+    else
+    {
+        Logger::error(component + " cancel connect: ", ec.message());
+    }
+}
+
+void Client::handleRead(const boost::system::error_code& ec, std::size_t s)
+{
+    if (!ec)
+    {
+        std::istream is(&buffer);
+        std::getline(is, response);
+        process();
+        read();
+    }
+    else if (ec != boost::system::errc::bad_file_descriptor)
+    {
+        Logger::error(component + " read: ", ec.message());
+    }
 }

@@ -22,6 +22,8 @@
 #ifndef SBSCLIENT_H_
 #define SBSCLIENT_H_
 
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
 #include <string>
 
 #include "../../parser/SBSParser.h"
@@ -39,6 +41,11 @@ public:
 private:
     void process();
     void connect();
+
+    void handleResolve(const boost::system::error_code& ec,
+            boost::asio::ip::tcp::resolver::iterator it);
+    void handleConnect(const boost::system::error_code& ec,
+            boost::asio::ip::tcp::resolver::iterator it);
 
     SBSParser parser;
 };

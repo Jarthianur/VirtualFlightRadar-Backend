@@ -22,6 +22,7 @@
 #include "SBSClient.h"
 
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <iostream>
@@ -46,38 +47,47 @@ void SBSClient::connect()
             host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
     resolver_.async_resolve(
             query,
-            [this](const boost::system::error_code& ec,
-                    boost::asio::ip::tcp::resolver::iterator it)
-            {
-                if (!ec)
-                {
-                    boost::asio::async_connect(socket_, it,
-                            [this](const boost::system::error_code& ec,
-                                    boost::asio::ip::tcp::resolver::iterator)
-                            {
-                                if (!ec)
-                                {
-                                    socket_.set_option(boost::asio::socket_base::keep_alive(true));
-                                    read();
-                                }
-                                else
-                                {
-                                    Logger::error("(SBSClient) connect: ", ec.message());
-                                    socket_.close();
-                                    timedConnect();
-                                }
-                            });
-                }
-                else
-                {
-                    Logger::error("(SBSClient) resolve host: ", ec.message());
-                    socket_.close();
-                    timedConnect();
-                }
-            });
+            boost::bind(&SBSClient::handleResolve, this, boost::asio::placeholders::error,
+                        boost::asio::placeholders::iterator));
 }
 
 void SBSClient::process()
 {
     parser.unpack(response);
+}
+
+void SBSClient::handleResolve(const boost::system::error_code& ec,
+        boost::asio::ip::tcp::resolver::iterator it)
+{
+    if (!ec)
+    {
+        boost::asio::async_connect(
+                socket_,
+                it,
+                boost::bind(&SBSClient::handleConnect, this,
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::iterator));
+    }
+    else
+    {
+        Logger::error("(SBSClient) resolve host: ", ec.message());
+        socket_.close();
+        timedConnect();
+    }
+}
+
+void SBSClient::handleConnect(const boost::system::error_code& ec,
+        boost::asio::ip::tcp::resolver::iterator it)
+{
+    if (!ec)
+    {
+        socket_.set_option(boost::asio::socket_base::keep_alive(true));
+        read();
+    }
+    else
+    {
+        Logger::error("(SBSClient) connect: ", ec.message());
+        socket_.close();
+        timedConnect();
+    }
 }

@@ -25,9 +25,6 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/operators.hpp>
-#include <boost/system/error_code.hpp>
-#include <cstddef>
-#include <iostream>
 
 #include "../../util/Logger.h"
 
@@ -58,43 +55,9 @@ void WindClient::connect()
             host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
     resolver_.async_resolve(
             query,
-            [this](const boost::system::error_code& ec,
-                    boost::asio::ip::tcp::resolver::iterator it)
-            {
-                if (stopped_)
-                {
-                    return;
-                }
-                if (!ec)
-                {
-                    boost::asio::async_connect(socket_, it,
-                            [this](const boost::system::error_code ec,
-                                    boost::asio::ip::tcp::resolver::iterator)
-                            {
-                                if (stopped_)
-                                {
-                                    return;
-                                }
-                                if (!ec)
-                                {
-                                    socket_.set_option(boost::asio::socket_base::keep_alive(true)); // necessary ?
-                                    read();
-                                }
-                                else
-                                {
-                                    Logger::error("(WindClient) connect: ", ec.message());
-                                    socket_.close();
-                                    timedConnect();
-                                }
-                            });
-                }
-                else
-                {
-                    Logger::error("(WindClient) resolve host: ", ec.message());
-                    socket_.close();
-                    timedConnect();
-                }
-            });
+            boost::bind(&WindClient::handleResolve, this,
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::iterator));
 }
 
 void WindClient::checkDeadline()
@@ -122,4 +85,48 @@ void WindClient::stop()
 void WindClient::process()
 {
     parser.unpack(response);
+}
+
+void WindClient::handleResolve(const boost::system::error_code& ec,
+        boost::asio::ip::tcp::resolver::iterator it)
+{
+    if (stopped_)
+    {
+        return;
+    }
+    if (!ec)
+    {
+        boost::asio::async_connect(
+                socket_,
+                it,
+                boost::bind(&WindClient::handleConnect, this,
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::iterator));
+    }
+    else
+    {
+        Logger::error("(WindClient) resolve host: ", ec.message());
+        socket_.close();
+        timedConnect();
+    }
+}
+
+void WindClient::handleConnect(const boost::system::error_code& ec,
+        boost::asio::ip::tcp::resolver::iterator it)
+{
+    if (stopped_)
+    {
+        return;
+    }
+    if (!ec)
+    {
+        socket_.set_option(boost::asio::socket_base::keep_alive(true));
+        read();
+    }
+    else
+    {
+        Logger::error("(WindClient) connect: ", ec.message());
+        socket_.close();
+        timedConnect();
+    }
 }

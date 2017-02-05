@@ -22,6 +22,7 @@
 #include "APRSCClient.h"
 
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <iostream>
@@ -48,50 +49,65 @@ void APRSCClient::connect()
             host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
     resolver_.async_resolve(
             query,
-            [this](const boost::system::error_code& ec,
-                    boost::asio::ip::tcp::resolver::iterator it)
-            {
-                if (!ec)
-                {
-                    boost::asio::async_connect(socket_, it,
-                            [this](const boost::system::error_code& ec,
-                                    boost::asio::ip::tcp::resolver::iterator)
-                            {
-                                if (!ec)
-                                {
-                                    socket_.set_option(boost::asio::socket_base::keep_alive(true));
-                                    boost::asio::async_write(socket_,
-                                            boost::asio::buffer(login_str),
-                                            [this](const boost::system::error_code& ec, std::size_t)
-                                            {
-                                                if (!ec)
-                                                {
-                                                    read();
-                                                }
-                                                else
-                                                {
-                                                    Logger::error("(APRSCClient) send login: ", ec.message());
-                                                }
-                                            });
-                                }
-                                else
-                                {
-                                    Logger::error("(APRSCClient) connect: ", ec.message());
-                                    socket_.close();
-                                    timedConnect();
-                                }
-                            });
-                }
-                else
-                {
-                    Logger::error("(APRSCClient) resolve host: ", ec.message());
-                    socket_.close();
-                    timedConnect();
-                }
-            });
+            boost::bind(&APRSCClient::handleResolve, this,
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::iterator));
 }
 
 void APRSCClient::process()
 {
     parser.unpack(response);
+}
+
+void APRSCClient::handleResolve(const boost::system::error_code& ec,
+        boost::asio::ip::tcp::resolver::iterator it)
+{
+    if (!ec)
+    {
+        boost::asio::async_connect(
+                socket_,
+                it,
+                boost::bind(&APRSCClient::handleConnect, this,
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::iterator));
+    }
+    else
+    {
+        Logger::error("(APRSCClient) resolve host: ", ec.message());
+        socket_.close();
+        timedConnect();
+    }
+}
+
+void APRSCClient::handleConnect(const boost::system::error_code& ec,
+        boost::asio::ip::tcp::resolver::iterator it)
+{
+    if (!ec)
+    {
+        socket_.set_option(boost::asio::socket_base::keep_alive(true));
+        boost::asio::async_write(
+                socket_,
+                boost::asio::buffer(login_str),
+                boost::bind(&APRSCClient::handleLogin, this,
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::bytes_transferred));
+    }
+    else
+    {
+        Logger::error("(APRSCClient) connect: ", ec.message());
+        socket_.close();
+        timedConnect();
+    }
+}
+
+void APRSCClient::handleLogin(const boost::system::error_code& ec, std::size_t s)
+{
+    if (!ec)
+    {
+        read();
+    }
+    else
+    {
+        Logger::error("(APRSCClient) send login: ", ec.message());
+    }
 }
