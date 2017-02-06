@@ -90,6 +90,7 @@ void NMEAServer::awaitStop()
 
 void NMEAServer::stopAll()
 {
+    std::lock_guard<std::mutex> lock(this->mutex);
     Logger::info("(NMEAServer) stopping all clients...");
     clients.clear();
 }
