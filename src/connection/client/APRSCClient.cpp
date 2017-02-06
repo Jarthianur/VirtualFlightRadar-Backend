@@ -74,7 +74,10 @@ void APRSCClient::handleResolve(const boost::system::error_code& ec,
     else
     {
         Logger::error("(APRSCClient) resolve host: ", ec.message());
-        socket_.close();
+        if (socket_.is_open())
+        {
+            socket_.close();
+        }
         timedConnect();
     }
 }
@@ -95,7 +98,10 @@ void APRSCClient::handleConnect(const boost::system::error_code& ec,
     else
     {
         Logger::error("(APRSCClient) connect: ", ec.message());
-        socket_.close();
+        if (socket_.is_open())
+        {
+            socket_.close();
+        }
         timedConnect();
     }
 }

@@ -63,7 +63,8 @@ void Client::timedConnect()
 {
     deadline_.expires_from_now(boost::posix_time::seconds(WAIT_TIMEVAL));
     deadline_.async_wait(
-            boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
+            boost::bind(&Client::handleTimedConnect, this,
+                        boost::asio::placeholders::error));
 }
 
 void Client::stop()
@@ -71,7 +72,10 @@ void Client::stop()
     Logger::info(component + " stop connection to: ", host);
     boost::system::error_code ec;
     socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-    socket_.close();
+    if (socket_.is_open())
+    {
+        socket_.close();
+    }
 }
 
 void Client::read()
@@ -79,7 +83,7 @@ void Client::read()
     boost::asio::async_read_until(
             socket_,
             buffer,
-            "\r\n",
+            "\n",
             boost::bind(&Client::handleRead, this, boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
 }
@@ -109,5 +113,9 @@ void Client::handleRead(const boost::system::error_code& ec, std::size_t s)
     else if (ec != boost::system::errc::bad_file_descriptor)
     {
         Logger::error(component + " read: ", ec.message());
+        if (ec != boost::asio::error::operation_aborted)
+        {
+            stop();
+        }
     }
 }

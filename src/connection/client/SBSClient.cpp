@@ -71,7 +71,10 @@ void SBSClient::handleResolve(const boost::system::error_code& ec,
     else
     {
         Logger::error("(SBSClient) resolve host: ", ec.message());
-        socket_.close();
+        if (socket_.is_open())
+        {
+            socket_.close();
+        }
         timedConnect();
     }
 }
@@ -87,7 +90,10 @@ void SBSClient::handleConnect(const boost::system::error_code& ec,
     else
     {
         Logger::error("(SBSClient) connect: ", ec.message());
-        socket_.close();
+        if (socket_.is_open())
+        {
+            socket_.close();
+        }
         timedConnect();
     }
 }

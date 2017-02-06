@@ -69,7 +69,10 @@ void WindClient::checkDeadline()
     if (deadline_.expires_at() <= boost::asio::deadline_timer::traits_type::now())
     {
         Logger::warn("(WindClient) timed out: reconnect...");
-        socket_.close();
+        if (socket_.is_open())
+        {
+            socket_.close();
+        }
         deadline_.expires_at(boost::posix_time::pos_infin);
         connect();
     }
@@ -106,7 +109,10 @@ void WindClient::handleResolve(const boost::system::error_code& ec,
     else
     {
         Logger::error("(WindClient) resolve host: ", ec.message());
-        socket_.close();
+        if (socket_.is_open())
+        {
+            socket_.close();
+        }
         timedConnect();
     }
 }
@@ -126,7 +132,10 @@ void WindClient::handleConnect(const boost::system::error_code& ec,
     else
     {
         Logger::error("(WindClient) connect: ", ec.message());
-        socket_.close();
+        if (socket_.is_open())
+        {
+            socket_.close();
+        }
         timedConnect();
     }
 }

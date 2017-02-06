@@ -28,7 +28,7 @@
 #include <string>
 
 // seconds to wait before reconnect
-#define WAIT_TIMEVAL 30
+#define WAIT_TIMEVAL 2
 
 class Client
 {
