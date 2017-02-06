@@ -21,13 +21,13 @@
 
 #include "SBSParser.h"
 
-#include <sys/types.h>
+#include <cstdint>
 #include <cstddef>
 #include <stdexcept>
 
 #include "../aircraft/AircraftContainer.h"
-#include "../base/Configuration.h"
-#include "../base/VFRB.h"
+#include "../main/Configuration.h"
+#include "../main/VFRB.h"
 #include "../util/Math.h"
 
 SBSParser::SBSParser()

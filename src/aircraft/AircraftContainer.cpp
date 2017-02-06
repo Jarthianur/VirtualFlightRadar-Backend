@@ -21,12 +21,11 @@
 
 #include "AircraftContainer.h"
 
-#include <functional>
+#include <cstdint>
+#include <exception>
 #include <iterator>
-#include <stdexcept>
 #include <utility>
-
-#include "../base/Configuration.h"
+#include "../main/Configuration.h"
 #include "../util/Logger.h"
 
 AircraftContainer::AircraftContainer()
@@ -37,7 +36,6 @@ AircraftContainer::AircraftContainer()
 
 AircraftContainer::~AircraftContainer()
 {
-    clear();
 }
 
 ssize_t AircraftContainer::find(std::string& id)
@@ -57,41 +55,37 @@ std::string AircraftContainer::processAircrafts()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     std::string dest_str;
-    size_t size = cont.size(), i = 0;
+    size_t index = 0;
     bool del = false;
+    auto it = cont.begin();
 
-    while (i < size && size > 0)
+    while (it != cont.end())
     {
         try
         {
-            if (++(cont.at(i).valid) >= AC_INVALIDATE)
+            if (++(it->valid) >= AC_INVALIDATE)
             {
                 del = true;
-                index_map.erase(index_map.find(cont.at(i).id));
-                cont.erase(cont.begin() + i);
-                size--;
+                index_map.erase(index_map.find(it->id));
+                cont.erase(it);
             }
             else
             {
-                dest_str += proc.process(std::ref(cont.at(i)));
-                i++;
+                dest_str += proc.process(*it);
+                ++it;
+                ++index;
             }
-            if (del && size > 0 && i < size)
+            if (del && it != cont.end())
             {
-                index_map.at(cont.at(i).id) = i;
+                index_map.at(it->id) = index;
             }
         }
         catch (std::exception& e)
         {
-            Logger::warn("Error while invalidating aircraft: ", e.what());
+            Logger::warn("(AircraftContainer) processAircrafts: ", e.what());
         }
     }
     return dest_str;
-}
-
-size_t AircraftContainer::getContSize()
-{
-    return cont.size();
 }
 
 void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
@@ -156,11 +150,4 @@ void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
         ac.heading = heading;
         ac.qne = false;
     }
-}
-
-void AircraftContainer::clear()
-{
-    std::lock_guard<std::mutex> lock(this->mutex);
-    cont.clear();
-    index_map.clear();
 }

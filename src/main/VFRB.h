@@ -22,17 +22,22 @@
 #ifndef VFRB_H_
 #define VFRB_H_
 
-#include "../connection/NMEAServer.h"
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
+
+class NMEAServer;
 
 class AircraftContainer;
 class ClimateData;
 
 #define SYNC_TIME 1
-#define WAIT_TIME 30
 
 class VFRB
 {
 public:
+    VFRB(const VFRB&) = delete;
+    VFRB& operator=(const VFRB&) = delete;
+
     VFRB();
     virtual ~VFRB() throw ();
 
@@ -44,22 +49,24 @@ public:
     /**
      * configuration
      */
-    static bool global_weather_feed_enabled;
-    static bool global_aprs_enabled;
+    static bool global_climate_enabled;
+    static bool global_aprsc_enabled;
     static bool global_sbs_enabled;
     static bool global_run_status;
 
     static AircraftContainer ac_cont;
     static ClimateData climate_data;
-protected:
+
+private:
     /**
      * funtions for every single thread
      */
-    static void handle_sbs_in(AircraftContainer&);
-    static void handle_aprs_in(AircraftContainer&);
-    static void handle_con_out(NMEAServer&);
-    static void handle_weather_feed(ClimateData&);
-    static void exit_signal_handler(int sig);
+    static void handleSBSInput(boost::asio::signal_set& sigset);
+    static void handleAPRSCInput(boost::asio::signal_set& sigset);
+    static void handleClimateInput(boost::asio::signal_set& sigset);
+    static void handleNMAEServer(NMEAServer& server);
+
+    static void handleSignals(const boost::system::error_code& ec, const int sig);
 };
 
 #endif /* VFRB_H_ */

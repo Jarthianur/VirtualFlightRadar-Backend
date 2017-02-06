@@ -21,25 +21,22 @@
 
 #include "APRSParser.h"
 
-#include <boost/regex/v4/match_results.hpp>
-#include <boost/regex/v4/regbase.hpp>
-#include <boost/regex/v4/regex.hpp>
-#include <boost/regex/v4/regex_match.hpp>
-#include <sys/types.h>
+#include <boost/regex.hpp>
+#include <cstdint>
 #include <stdexcept>
 
 #include "../aircraft/Aircraft.h"
 #include "../aircraft/AircraftContainer.h"
-#include "../base/Configuration.h"
-#include "../base/VFRB.h"
+#include "../main/Configuration.h"
+#include "../main/VFRB.h"
 #include "../util/Logger.h"
 #include "../util/Math.h"
 
 APRSParser::APRSParser()
         : Parser(),
-          aprs_re("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[^]+?(\\d{5}\\.\\d{2})([EW])[^]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([^]+?)$",
+          aprs_re("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
                   boost::regex_constants::optimize),
-          comm_re("^[^]+?id(\\S{2})(\\S{6})\\s+?(?:([\\+-]\\d+?)fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?[^]+?$",
+          comm_re("^[\\S\\s]+?id([0-9A-F]{2})([0-9A-F]{6})\\s+?(?:([\\+-]\\d+?)fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?[\\S\\s]+?$",
                   boost::regex_constants::optimize)
 {
 }
@@ -156,7 +153,7 @@ int32_t APRSParser::unpack(const std::string& sentence)
     }
     catch (const std::runtime_error& e)
     {
-        Logger::error("while parsing APRS regex: ", e.what());
+        Logger::error("(APRSParser) regex: ", e.what());
         return APRS_REGEX_ERR;
     }
     return MSG_UNPACK_SUC;

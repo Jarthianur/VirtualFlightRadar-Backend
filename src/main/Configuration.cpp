@@ -35,13 +35,18 @@ double Configuration::base_longitude = 0.0;
 double Configuration::base_geoid = 0.0;
 double Configuration::base_pressure = 0.0;
 double Configuration::base_temp = 0.0;
-in_port_t Configuration::global_out_port = 0;
-in_port_t Configuration::global_aprsc_port = 0;
-in_port_t Configuration::global_sbs_port = 0;
+
+in_port_t Configuration::global_server_port = 0;
+
 std::string Configuration::global_aprsc_host = "nA";
-std::string Configuration::global_sbs_host = "nA";
+std::string Configuration::global_aprsc_port = "0";
 std::string Configuration::global_aprsc_login = "";
-std::string Configuration::global_weather_feed_host = "nA";
-in_port_t Configuration::global_weather_feed_port = 0;
+
+std::string Configuration::global_sbs_host = "nA";
+std::string Configuration::global_sbs_port = "0";
+
+std::string Configuration::global_climate_host = "nA";
+std::string Configuration::global_climate_port = "0";
+
 int32_t Configuration::filter_maxHeight = 0;
 int32_t Configuration::filter_maxDist = 0;

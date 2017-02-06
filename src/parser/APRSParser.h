@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef PARSERAPRS_H_
-#define PARSERAPRS_H_
+#ifndef APRSPARSER_H_
+#define APRSPARSER_H_
 
 #include <boost/regex.hpp>
 #include <cstdint>
@@ -49,4 +49,4 @@ private:
             heading = 0.0;
 };
 
-#endif /* PARSERAPRS_H_ */
+#endif /* APRSPARSER_H_ */

@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef PARSERSBS_H_
-#define PARSERSBS_H_
+#ifndef SBSPARSER_H_
+#define SBSPARSER_H_
 
 #include <cstdint>
 #include <string>
@@ -41,4 +41,4 @@ private:
     double lat = 0.0, lon = 0.0;
 };
 
-#endif /* PARSERSBS_H_ */
+#endif /* SBSPARSER_H_ */

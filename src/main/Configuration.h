@@ -23,7 +23,7 @@
 #define CONFIGURATION_H_
 
 #include <netinet/in.h>
-#include <cstdint>
+#include <sys/types.h>
 #include <string>
 
 class Configuration
@@ -39,14 +39,19 @@ public:
     static double base_geoid;
     static double base_pressure;
     static double base_temp;
-    static in_port_t global_out_port;
-    static in_port_t global_aprsc_port;
-    static in_port_t global_sbs_port;
+
+    static in_port_t global_server_port;
+
     static std::string global_aprsc_host;
-    static std::string global_sbs_host;
+    static std::string global_aprsc_port;
     static std::string global_aprsc_login;
-    static std::string global_weather_feed_host;
-    static in_port_t global_weather_feed_port;
+
+    static std::string global_sbs_host;
+    static std::string global_sbs_port;
+
+    static std::string global_climate_host;
+    static std::string global_climate_port;
+
     static int32_t filter_maxHeight;
     static int32_t filter_maxDist;
 };

@@ -27,7 +27,7 @@
 
 class Aircraft;
 
-#define AP_BUFF_S 4096
+#define AP_BUFF_S 8192
 #define AP_L_BUFF_S 128
 
 class AircraftProcessor
@@ -37,7 +37,7 @@ public:
     virtual ~AircraftProcessor();
 
     /**
-     * build nmea-msg from Aircraft into target string-reference
+     * build nmea-msg from Aircraft
      */
     std::string process(Aircraft&);
 

@@ -23,7 +23,6 @@
 
 #include <boost/regex.hpp>
 #include <fstream>
-#include <regex>
 #include <stdexcept>
 #include <utility>
 
@@ -31,7 +30,12 @@
 
 ConfigReader::ConfigReader(const std::string& file)
         : file(file),
-          conf_re("^(\\S+?)(?:\\s+?)?=(?:\\s+?)?(\\S+?[\\s\\S]*?)$", boost::regex_constants::optimize)
+          conf_re("^(\\S+?)(?:\\s+?)?=(?:\\s+?)?(\\S+?[\\s\\S]*?)$",
+                  boost::regex_constants::optimize)
+{
+}
+
+ConfigReader::~ConfigReader()
 {
 }
 
@@ -64,7 +68,7 @@ void ConfigReader::read()
         }
         catch (const boost::regex_error& e)
         {
-            Logger::error("(ConfigReader) reading config: ", e.what());
+            Logger::error("(ConfigReader) read config: ", e.what());
             break;
         }
         catch (const std::out_of_range& e)

@@ -19,10 +19,10 @@
  }
  */
 
-#ifndef PARSERWIND_H_
-#define PARSERWIND_H_
+#ifndef WINDPARSER_H_
+#define WINDPARSER_H_
 
-#include <sys/types.h>
+#include <cstdint>
 #include <cstddef>
 #include <string>
 
@@ -40,4 +40,4 @@ private:
     size_t b = 0, s = 0;
 };
 
-#endif /* PARSERWIND_H_ */
+#endif /* WINDPARSER_H_ */

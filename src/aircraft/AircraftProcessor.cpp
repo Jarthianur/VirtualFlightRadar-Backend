@@ -22,11 +22,13 @@
 #include "AircraftProcessor.h"
 
 #include <stddef.h>
+#include <cstdint>
 #include <cmath>
 #include <cstdio>
 #include <ctime>
-
-#include "../base/Configuration.h"
+#include "../main/ClimateData.h"
+#include "../main/Configuration.h"
+#include "../main/VFRB.h"
 #include "../util/Math.h"
 #include "Aircraft.h"
 
@@ -70,7 +72,7 @@ std::string AircraftProcessor::process(Aircraft& ac)
              Math::dToI(bearing_rel), rel_V, dist, ac.id.c_str());
     int32_t csum = checksum(buffer);
     nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
+    snprintf(buffer, AP_L_BUFF_S - 1, "%02x\r\n", csum);
     nmea_str.append(buffer);
     //PFLAA
     if (ac.aircraft_type == A_MIN_DATA)
@@ -87,7 +89,7 @@ std::string AircraftProcessor::process(Aircraft& ac)
     }
     csum = checksum(buffer);
     nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
+    snprintf(buffer, AP_L_BUFF_S - 1, "%02x\r\n", csum);
     nmea_str.append(buffer);
     return nmea_str;
 }
@@ -115,7 +117,7 @@ void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
     rel_N = Math::dToI(std::cos(Math::radian(bearing_abs)) * dist);
     rel_E = Math::dToI(std::sin(Math::radian(bearing_abs)) * dist);
     rel_V = ac.qne ?
-            ac.altitude - Math::calcIcaoHeight(Configuration::base_pressure) :
+            ac.altitude - Math::calcIcaoHeight(VFRB::climate_data.getPress()) :
             ac.altitude - basealt;
 }
 
@@ -142,7 +144,7 @@ std::string AircraftProcessor::gpsfix()
             long_min, longstr, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
     csum = checksum(buffer);
     nmea_str.append(buffer);
-    snprintf(buffer, 64, "%02x\r\n", csum);
+    snprintf(buffer, AP_L_BUFF_S - 1, "%02x\r\n", csum);
     nmea_str.append(buffer);
     //gpgga
     snprintf(
@@ -153,7 +155,7 @@ std::string AircraftProcessor::gpsfix()
             long_min, longstr, basealt, basegeoid);
     csum = checksum(buffer);
     nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
+    snprintf(buffer, AP_L_BUFF_S - 1, "%02x\r\n", csum);
     nmea_str.append(buffer);
 
     return nmea_str;

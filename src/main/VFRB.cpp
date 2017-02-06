@@ -21,29 +21,30 @@
 
 #include "VFRB.h"
 
-#include <chrono>
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread.hpp>
+#include <boost/chrono.hpp>
 #include <csignal>
 #include <exception>
-#include <functional>
 #include <string>
-#include <system_error>
-#include <thread>
 
 #include "../aircraft/AircraftContainer.h"
 #include "../aircraft/AircraftProcessor.h"
-#include "../connection/APRSCClient.h"
-#include "../connection/ConnectionException.h"
-#include "../connection/SimpleClient.h"
-#include "../parser/ParserAPRS.h"
-#include "../parser/SBSParser.h"
+#include "../connection/client/APRSCClient.h"
+#include "../connection/client/SBSClient.h"
+#include "../connection/client/WindClient.h"
+#include "../connection/server/NMEAServer.h"
 #include "../util/Logger.h"
 #include "ClimateData.h"
 #include "Configuration.h"
 
-bool VFRB::global_weather_feed_enabled = false;
-bool VFRB::global_aprs_enabled = false;
+bool VFRB::global_climate_enabled = false;
+bool VFRB::global_aprsc_enabled = false;
 bool VFRB::global_sbs_enabled = false;
 bool VFRB::global_run_status = true;
+AircraftContainer  VFRB::ac_cont;
+ClimateData VFRB::climate_data;
 
 VFRB::VFRB()
 {
@@ -55,20 +56,19 @@ VFRB::~VFRB()
 
 void VFRB::run()
 {
-    NMEAServer out_con(Configuration::global_out_port);
-    AircraftContainer ac_cont;
-    ClimateData weather_feed;
-    AircraftProcessor ac_proc(Configuration::base_latitude, Configuration::base_longitude,
-                              Configuration::base_altitude, Configuration::base_geoid);
+    Logger::info("(VFRB) startup");
+    //store start time
+    boost::chrono::system_clock::time_point start = boost::chrono::system_clock::now();
 
+    // eval config
     if (Configuration::global_aprsc_host.compare("nA") != 0 || Configuration::global_aprsc_host.length()
             == 0)
     {
-        global_aprs_enabled = true;
+        global_aprsc_enabled = true;
     }
     else
     {
-        Logger::warn("APRSC not enabled -> no FLARM targets");
+        Logger::warn("(VFRB) APRSC not enabled: no FLARM targets");
     }
 
     if (Configuration::global_sbs_host.compare("nA") != 0 || Configuration::global_sbs_host.length()
@@ -78,272 +78,150 @@ void VFRB::run()
     }
     else
     {
-        Logger::warn("ADSB receiver not enabled -> no transponder targets");
+        Logger::warn("(VFRB) SBS input not enabled: no transponder targets");
     }
 
-    if (Configuration::global_weather_feed_host.compare("nA") != 0 || Configuration::global_weather_feed_host.length()
+    if (Configuration::global_climate_host.compare("nA") != 0 || Configuration::global_climate_host.length()
             == 0)
     {
-        global_weather_feed_enabled = true;
+        global_climate_enabled = true;
     }
     else
     {
-        Logger::warn("Weather feed not enabled -> no wind,pressure,temp");
+        Logger::warn("(VFRB) climate input not enabled: no wind,pressure,temp");
     }
 
-    struct sigaction sa;
-    sa.sa_handler = VFRB::exit_signal_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGINT, &sa, NULL) == -1)
-    {
-        Logger::error("Failed to register signal: SIGINT");
-        global_run_status = false;
-        return;
-    }
+    //create ac proc for gpsfix
+    AircraftProcessor ac_proc(Configuration::base_latitude, Configuration::base_longitude,
+                              Configuration::base_altitude, Configuration::base_geoid);
 
-    std::thread sbs_in_thread(handle_sbs_in, std::ref(ac_cont));
-    std::thread aprs_in_thread(handle_aprs_in, std::ref(ac_cont));
-    std::thread con_out_thread(handle_con_out, std::ref(out_con));
-    std::thread weather_feed_thread(handle_weather_feed, std::ref(weather_feed));
+    // register signals and run handler
+    boost::asio::io_service io_service;
+    boost::asio::signal_set signal_set(io_service);
+
+    signal_set.add(SIGINT);
+    signal_set.add(SIGTERM);
+#if defined(SIGQUIT)
+    signal_set.add(SIGQUIT);
+#endif // defined(SIGQUIT)
+
+    signal_set.async_wait(
+            boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
+                        boost::asio::placeholders::signal_number));
+
+    boost::thread signal_thread([&io_service]() {
+        io_service.run();
+    });
+
+    // init server and run handler
+    NMEAServer server(signal_set, Configuration::global_server_port);
+    boost::thread server_thread(boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
+
+    //init input threads
+    boost::thread sbs_input_thread(boost::bind(&VFRB::handleSBSInput, std::ref(signal_set)));
+    boost::thread aprs_input_thread(boost::bind(&VFRB::handleAPRSCInput, std::ref(signal_set)));
+    boost::thread climate_input_thread(boost::bind(&VFRB::handleClimateInput, std::ref(signal_set)));
 
     while (global_run_status)
     {
         try
         {
+            //write Aircrafts to clients
             std::string str = ac_cont.processAircrafts();
             if (str.length() > 0)
             {
-                out_con.sendMsgOut(std::ref(str));
+                server.writeToAll(str);
             }
 
+            //write GPS position to clients
             str = ac_proc.gpsfix();
-            out_con.sendMsgOut(std::ref(str));
+            server.writeToAll(str);
 
-            if (global_weather_feed_enabled)
+            //write wind to clients
+            if (global_climate_enabled && climate_data.isValid())
             {
-                if (weather_feed.getPress() != A_VALUE_NA)
-                {
-                    Configuration::base_pressure = weather_feed.getPress();
-                }
-                if (weather_feed.getTemp() != A_VALUE_NA)
-                {
-                    Configuration::base_temp = weather_feed.getTemp();
-                }
-                if (weather_feed.isValid())
-                {
-                    str = weather_feed.extractWV();
-                    out_con.sendMsgOut(std::ref(str));
-                }
+                str = climate_data.extractWV();
+                server.writeToAll(str);
             }
-            std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
+
+            //synchronise cycles to ~SYNC_TIME sec
+            boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
         }
         catch (const std::exception& e)
         {
-            Logger::error("Fatal error -> terminating program:  ", e.what());
+            Logger::error("(VFRB) error: ", e.what());
             global_run_status = false;
-            break;
         }
     }
 
-    try
-    {
-        sbs_in_thread.join();
-        aprs_in_thread.join();
-        con_out_thread.join();
-        weather_feed_thread.join();
-    }
-    catch (const std::system_error& se)
-    {
-        Logger::error("while joining threads: ", se.what());
-        std::terminate();
-    }
-    Logger::info("EXITING PROGRAM");
+    // exit sequence, join threads
+    server_thread.join();
+    sbs_input_thread.join();
+    aprs_input_thread.join();
+    climate_input_thread.join();
+    signal_thread.join();
+
+    //eval end time
+    boost::chrono::system_clock::time_point end = boost::chrono::system_clock::now();
+    boost::chrono::minutes runtime = boost::chrono::duration_cast < boost::chrono::minutes
+            > (end - start);
+    std::string time_str(std::to_string(runtime.count()/60/24));
+    time_str += " days, ";
+    time_str += std::to_string(runtime.count()/60);
+    time_str += " hours, ";
+    time_str += std::to_string(runtime.count() % 60);
+    time_str += " mins";
+
+    Logger::info("EXITING / runtime: ", time_str);
 }
 
-void VFRB::handle_con_out(NMEAServer& out_con)
+void VFRB::handleNMAEServer(NMEAServer& server)
 {
-    try
-    {
-        out_con.listenOut();
-    }
-    catch (const ConnectionException& ce)
-    {
-        Logger::error("while setup out-connection: ", ce.what());
-        global_run_status = false;
-        return;
-    }
-    Logger::info("Serve NMEA output on localhost:",
-                 std::to_string(Configuration::global_out_port));
-    while (global_run_status)
-    {
-        out_con.connectClient();
-    }
+    Logger::info("(NMEAServer) startup: localhost ",
+                 std::to_string(Configuration::global_server_port));
+    server.run();
+    global_run_status = false;
 }
 
-void VFRB::handle_weather_feed(ClimateData& weather)
+void VFRB::handleClimateInput(boost::asio::signal_set& sigset)
 {
-    if (!global_weather_feed_enabled)
+    if (!global_climate_enabled)
     {
         return;
     }
-    Client wind_con(std::ref(Configuration::global_weather_feed_host),
-                       Configuration::global_weather_feed_port, 5);
-    bool connected = false;
-
-    while (global_weather_feed_enabled && global_run_status)
-    {
-        while (!connected && global_run_status)
-        {
-            wind_con.close();
-            try
-            {
-                wind_con.setupConnectIn();
-            }
-            catch (const ConnectionException& ce)
-            {
-                Logger::error("Failed to setup weather input connection: ", ce.what());
-                global_weather_feed_enabled = false;
-                return;
-            }
-            try
-            {
-                wind_con.connectIn();
-                connected = true;
-            }
-            catch (const ConnectionException& ce)
-            {
-                Logger::error("Failed to connect to weather input: ", ce.what());
-                std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-            }
-        }
-        if (wind_con.readLineIn() == CI_MSG_READ_ERR)
-        {
-            connected = false;
-        }
-        else
-        {
-            weather.writeNMEA(std::ref(wind_con.getResponse()));
-        }
-    }
+    WindClient client(sigset, Configuration::global_climate_host,
+                      Configuration::global_climate_port);
+    Logger::info("(WindClient) start receive: ", Configuration::global_climate_host);
+    client.run();
 }
 
-void VFRB::handle_sbs_in(AircraftContainer& ac_cont)
+void VFRB::handleSBSInput(boost::asio::signal_set& sigset)
 {
     if (!global_sbs_enabled)
     {
         return;
     }
-    SBSParser parser;
-    Client sbs_con(std::ref(Configuration::global_sbs_host),
-                      Configuration::global_sbs_port);
-    bool connected = false;
-
-    while (global_sbs_enabled && global_run_status)
-    {
-        while (!connected && global_run_status)
-        {
-            sbs_con.close();
-            try
-            {
-                sbs_con.setupConnectIn();
-            }
-            catch (const ConnectionException& ce)
-            {
-                Logger::error("Failed to setup SBS input connection: ", ce.what());
-                global_sbs_enabled = false;
-                return;
-            }
-            try
-            {
-                sbs_con.connectIn();
-                connected = true;
-                Logger::info("Scan for incoming sbs-msgs from ",
-                             Configuration::global_sbs_host);
-            }
-            catch (const ConnectionException& ce)
-            {
-                Logger::error("Failed to connect to SBS input: ", ce.what());
-                std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-            }
-        }
-        if (sbs_con.readLineIn() == CI_MSG_READ_ERR)
-        {
-            connected = false;
-        }
-        //need msg3 only
-        else if (sbs_con.getResponse().at(4) == '3')
-        {
-            parser.unpack(std::ref(sbs_con.getResponse()), std::ref(ac_cont));
-        }
-    }
+    SBSClient client(sigset, Configuration::global_sbs_host,
+                     Configuration::global_sbs_port);
+    Logger::info("(SBSClient) start receive: ", Configuration::global_sbs_host);
+    client.run();
 }
 
-void VFRB::handle_aprs_in(AircraftContainer& ac_cont)
+void VFRB::handleAPRSCInput(boost::asio::signal_set& sigset)
 {
-    if (!global_aprs_enabled)
+    if (!global_aprsc_enabled)
     {
         return;
     }
-    APRSParser parser;
-    APRSCClient aprs_con(std::ref(Configuration::global_aprsc_host),
-                          Configuration::global_aprsc_port,
-                          std::ref(Configuration::global_aprsc_login));
-    bool connected = false;
-
-    while (global_aprs_enabled && global_run_status)
-    {
-        while (!connected && global_run_status)
-        {
-            aprs_con.close();
-            try
-            {
-                aprs_con.setupConnectIn();
-            }
-            catch (const ConnectionException& ce)
-            {
-                Logger::error("Failed to setup APRS input connection: ", ce.what());
-                global_aprs_enabled = false;
-                return;
-            }
-            try
-            {
-                aprs_con.connectIn();
-                connected = true;
-                Logger::info("Scan for incoming aprs-msgs from ",
-                             Configuration::global_aprsc_host);
-            }
-            catch (const ConnectionException& ce)
-            {
-                Logger::error("Failed to connect to APRS input: ", ce.what());
-                std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-            }
-        }
-        if (aprs_con.readLineIn() == CI_MSG_READ_ERR)
-        {
-            connected = false;
-        }
-        else
-        {
-            parser.unpack(std::ref(aprs_con.getResponse()), std::ref(ac_cont));
-        }
-    }
+    APRSCClient client(sigset, Configuration::global_aprsc_host,
+                       Configuration::global_aprsc_port,
+                       Configuration::global_aprsc_login);
+    Logger::info("(APRSCClient) start receive: ", Configuration::global_aprsc_host);
+    client.run();
 }
 
-void VFRB::exit_signal_handler(int sig)
+void VFRB::handleSignals(const boost::system::error_code& ec, const int sig)
 {
+    Logger::info("(VFRB) caught signal: ", "shutdown");
     global_run_status = false;
-    Client shut("localhost", Configuration::global_out_port);
-    try
-    {
-        shut.setupConnectIn();
-        Logger::info("Init shutdown-connection on localhost:",
-                     std::to_string(Configuration::global_out_port));
-        shut.connectIn();
-    }
-    catch (const ConnectionException& ce)
-    {
-        Logger::error("Cannot shutdown nmea-out -> terminate program");
-        std::terminate();
-    }
 }

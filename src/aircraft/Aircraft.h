@@ -64,7 +64,7 @@ public:
     double turn_rate = 0.0;
     //0 = valid; +x(cycles) = invalid
     uint32_t valid = 0;
-    //differ altitude (gps from aprsc, QNE from sbs)
+    //differ altitude (GPS from aprsc, QNE from sbs)
     bool qne = false;
 
 };

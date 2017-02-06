@@ -22,8 +22,8 @@
 #ifndef MATH_H_
 #define MATH_H_
 
-#include <cmath>
 #include <cstdint>
+#include <cmath>
 
 namespace Math
 {

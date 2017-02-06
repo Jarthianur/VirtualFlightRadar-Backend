@@ -22,8 +22,7 @@
 #ifndef AIRCRAFTCONTAINER_H_
 #define AIRCRAFTCONTAINER_H_
 
-#include <stddef.h>
-#include <sys/types.h>
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <string>
@@ -39,6 +38,9 @@
 class AircraftContainer
 {
 public:
+    AircraftContainer(const AircraftContainer&) = delete;
+    AircraftContainer& operator=(const AircraftContainer&) = delete;
+
     AircraftContainer();
     virtual ~AircraftContainer() throw ();
 
@@ -54,16 +56,6 @@ public:
      * if index i is valid.
      */
     std::string processAircrafts();
-
-    /**
-     * return container's size
-     */
-    size_t getContSize();
-
-    /**
-     * deallocate all aircrafts and clear container
-     */
-    void clear();
 
 private:
     /**

@@ -21,10 +21,11 @@
 
 #include "ClimateData.h"
 
-#include <stddef.h>
-#include <stdexcept>
+#include "Configuration.h"
 
 ClimateData::ClimateData()
+        : pressure(Configuration::base_pressure),
+          temperature(Configuration::base_temp)
 {
 }
 
@@ -36,7 +37,7 @@ std::string ClimateData::extractWV()
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     wv_valid = false;
-    return wv_+"\r\n";
+    return wv_ + "\r\n";
 }
 
 bool ClimateData::isValid()
@@ -51,6 +52,7 @@ double ClimateData::getPress()
 
 void ClimateData::insertWV(const std::string& wv)
 {
+    std::lock_guard<std::mutex> lock(this->mutex);
     wv_ = wv;
     wv_valid = true;
 }
