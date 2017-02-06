@@ -56,7 +56,6 @@ void APRSCClient::connect()
 
 void APRSCClient::process()
 {
-    Logger::debug(response);
     parser.unpack(response);
 }
 
