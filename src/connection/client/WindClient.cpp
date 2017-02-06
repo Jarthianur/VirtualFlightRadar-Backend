@@ -127,6 +127,7 @@ void WindClient::handleConnect(const boost::system::error_code& ec,
     if (!ec)
     {
         socket_.set_option(boost::asio::socket_base::keep_alive(true));
+        Logger::info("(WindClient) connected to: ", host);
         read();
     }
     else

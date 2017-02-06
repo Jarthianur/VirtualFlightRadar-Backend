@@ -39,7 +39,7 @@ int32_t strToInt(const string& str)
     {
         return stoi(str);
     }
-    catch (const invalid_argument& iae)
+    catch (const logic_error& iae)
     {
         Logger::error("(VFRB) invalid configuration: ", str);
     }
@@ -52,7 +52,7 @@ double strToDouble(const string& str)
     {
         return stod(str);
     }
-    catch (const invalid_argument& iae)
+    catch (const logic_error& iae)
     {
         Logger::error("(VFRB) invalid configuration: ", str);
     }
@@ -132,10 +132,26 @@ int main(int argc, char* argv[])
         climate_port = cr.getProperty("climateSensorPort", "0");
         Logger::info("(Config) climateSensorPort: ", climate_port);
 
-        maxHeight = strToInt(cr.getProperty("maxHeight", "0"));
+        std::string tmp = cr.getProperty("maxHeight", "-1");
+        if (tmp == "-1")
+        {
+            maxHeight = INT32_MAX;
+        }
+        else
+        {
+            maxHeight = strToInt(tmp);
+        }
         Logger::info("(Config) maxHeight: ", to_string(maxHeight));
 
-        maxDist = strToInt(cr.getProperty("maxDist", "0"));
+        tmp = cr.getProperty("maxDist", "-1");
+        if (tmp == "-1")
+        {
+            maxDist = INT32_MAX;
+        }
+        else
+        {
+            maxDist = strToInt(tmp);
+        }
         Logger::info("(Config) maxDist: ", to_string(maxDist));
 
     }

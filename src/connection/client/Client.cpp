@@ -70,6 +70,7 @@ void Client::timedConnect()
 void Client::stop()
 {
     Logger::info(component + " stop connection to: ", host);
+    deadline_.expires_at(boost::posix_time::pos_infin);
     boost::system::error_code ec;
     socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     if (socket_.is_open())
@@ -98,6 +99,10 @@ void Client::handleTimedConnect(const boost::system::error_code& ec)
     else
     {
         Logger::error(component + " cancel connect: ", ec.message());
+        if (ec != boost::asio::error::operation_aborted)
+        {
+            stop();
+        }
     }
 }
 
