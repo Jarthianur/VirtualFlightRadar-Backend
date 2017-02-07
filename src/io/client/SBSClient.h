@@ -19,41 +19,35 @@
  }
  */
 
-#ifndef CONFIGURATION_H_
-#define CONFIGURATION_H_
+#ifndef SBSCLIENT_H_
+#define SBSCLIENT_H_
 
-#include <netinet/in.h>
-#include <sys/types.h>
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
 #include <string>
 
-class Configuration
+#include "Client.h"
+#include "../../parser/SBSParser.h"
+
+class SBSClient: public Client
 {
 public:
+    SBSClient(const SBSClient&) = delete;
+    SBSClient& operator=(const SBSClient&) = delete;
 
-    Configuration();
-    virtual ~Configuration() throw ();
+    SBSClient(boost::asio::signal_set& s, const std::string& host, const std::string& port);
+    virtual ~SBSClient() throw ();
 
-    static int32_t base_altitude;
-    static double base_latitude;
-    static double base_longitude;
-    static double base_geoid;
-    static double base_pressure;
-    static double base_temp;
+private:
+    void process();
+    void connect();
 
-    static in_port_t global_server_port;
+    void handleResolve(const boost::system::error_code& ec,
+            boost::asio::ip::tcp::resolver::iterator it);
+    void handleConnect(const boost::system::error_code& ec,
+            boost::asio::ip::tcp::resolver::iterator it);
 
-    static std::string global_aprsc_host;
-    static std::string global_aprsc_port;
-    static std::string global_aprsc_login;
-
-    static std::string global_sbs_host;
-    static std::string global_sbs_port;
-
-    static std::string global_climate_host;
-    static std::string global_climate_port;
-
-    static int32_t filter_maxHeight;
-    static int32_t filter_maxDist;
+    SBSParser parser;
 };
 
-#endif /* CONFIGURATION_H_ */
+#endif /* SBSCLIENT_H_ */

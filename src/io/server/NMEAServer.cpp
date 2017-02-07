@@ -23,13 +23,13 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/system/error_code.hpp>
 #include <algorithm>
-#include <csignal>
-#include <cstddef>
 #include <iterator>
 
-#include "../../util/Logger.h"
+#include "../logger/Logger.h"
+
 
 NMEAServer::NMEAServer(boost::asio::signal_set& s, in_port_t port)
         : io_service_(),

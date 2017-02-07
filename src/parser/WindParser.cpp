@@ -21,10 +21,10 @@
 
 #include "WindParser.h"
 
+#include <cstdint>
 #include <stdexcept>
-
-#include "../main/ClimateData.h"
 #include "../main/VFRB.h"
+#include "../util/ClimateData.h"
 
 WindParser::WindParser()
         : Parser()

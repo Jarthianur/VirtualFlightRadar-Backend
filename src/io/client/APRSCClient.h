@@ -26,8 +26,8 @@
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "../../parser/APRSParser.h"
 #include "Client.h"
+#include "../../parser/APRSParser.h"
 
 class APRSCClient: public Client
 {

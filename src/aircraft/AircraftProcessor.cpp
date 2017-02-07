@@ -21,14 +21,15 @@
 
 #include "AircraftProcessor.h"
 
-#include <stddef.h>
+#include <cstddef>
 #include <cstdint>
 #include <cmath>
 #include <cstdio>
 #include <ctime>
-#include "../main/ClimateData.h"
-#include "../main/Configuration.h"
+
 #include "../main/VFRB.h"
+#include "../util/ClimateData.h"
+#include "../util/Configuration.h"
 #include "../util/Math.h"
 #include "Aircraft.h"
 

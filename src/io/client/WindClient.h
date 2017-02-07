@@ -19,35 +19,43 @@
  }
  */
 
-#ifndef SBSCLIENT_H_
-#define SBSCLIENT_H_
+#ifndef WINDCLIENT_H_
+#define WINDCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "../../parser/SBSParser.h"
 #include "Client.h"
+#include "../../parser/WindParser.h"
 
-class SBSClient: public Client
+#define WC_TIMEOUT 5
+
+class WindClient: public Client
 {
 public:
-    SBSClient(const SBSClient&) = delete;
-    SBSClient& operator=(const SBSClient&) = delete;
+    WindClient(const WindClient&) = delete;
+    WindClient& operator=(const WindClient&) = delete;
 
-    SBSClient(boost::asio::signal_set& s, const std::string& host, const std::string& port);
-    virtual ~SBSClient() throw ();
+    WindClient(boost::asio::signal_set& s, const std::string& host,
+            const std::string& port);
+    virtual ~WindClient() throw ();
 
 private:
+    void read();
     void process();
     void connect();
+    void checkDeadline();
+    void stop();
 
     void handleResolve(const boost::system::error_code& ec,
             boost::asio::ip::tcp::resolver::iterator it);
     void handleConnect(const boost::system::error_code& ec,
             boost::asio::ip::tcp::resolver::iterator it);
 
-    SBSParser parser;
+    bool stopped_;
+    boost::asio::deadline_timer deadline_;
+    WindParser parser;
 };
 
-#endif /* SBSCLIENT_H_ */
+#endif /* WINDCLIENT_H_ */

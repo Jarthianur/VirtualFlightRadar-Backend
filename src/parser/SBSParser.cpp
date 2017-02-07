@@ -26,8 +26,8 @@
 #include <stdexcept>
 
 #include "../aircraft/AircraftContainer.h"
-#include "../main/Configuration.h"
 #include "../main/VFRB.h"
+#include "../util/Configuration.h"
 #include "../util/Math.h"
 
 SBSParser::SBSParser()

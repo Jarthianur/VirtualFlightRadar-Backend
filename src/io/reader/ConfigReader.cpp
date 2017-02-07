@@ -26,7 +26,8 @@
 #include <stdexcept>
 #include <utility>
 
-#include "Logger.h"
+#include "../logger/Logger.h"
+
 
 ConfigReader::ConfigReader(const std::string& file)
         : file(file),

@@ -19,7 +19,7 @@
  }
  */
 
-#include "SBSClient.h"
+#include "APRSCClient.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -27,36 +27,39 @@
 #include <cstddef>
 #include <iostream>
 
-#include "../../util/Logger.h"
+#include "../logger/Logger.h"
 
-SBSClient::SBSClient(boost::asio::signal_set& s, const std::string& host,
-        const std::string& port)
-        : Client(s, host, port, "(SBSClient)"),
+APRSCClient::APRSCClient(boost::asio::signal_set& s, const std::string& host,
+        const std::string& port, const std::string& login)
+        : Client(s, host, port, "(APRSCClient)"),
+          login_str(login),
           parser()
 {
+    login_str.append("\r\n");
     connect();
 }
 
-SBSClient::~SBSClient() throw ()
+APRSCClient::~APRSCClient()
 {
 }
 
-void SBSClient::connect()
+void APRSCClient::connect()
 {
     boost::asio::ip::tcp::resolver::query query(
             host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
     resolver_.async_resolve(
             query,
-            boost::bind(&SBSClient::handleResolve, this, boost::asio::placeholders::error,
+            boost::bind(&APRSCClient::handleResolve, this,
+                        boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
 }
 
-void SBSClient::process()
+void APRSCClient::process()
 {
     parser.unpack(response);
 }
 
-void SBSClient::handleResolve(const boost::system::error_code& ec,
+void APRSCClient::handleResolve(const boost::system::error_code& ec,
         boost::asio::ip::tcp::resolver::iterator it)
 {
     if (!ec)
@@ -64,13 +67,13 @@ void SBSClient::handleResolve(const boost::system::error_code& ec,
         boost::asio::async_connect(
                 socket_,
                 it,
-                boost::bind(&SBSClient::handleConnect, this,
+                boost::bind(&APRSCClient::handleConnect, this,
                             boost::asio::placeholders::error,
                             boost::asio::placeholders::iterator));
     }
     else
     {
-        Logger::error("(SBSClient) resolve host: ", ec.message());
+        Logger::error("(APRSCClient) resolve host: ", ec.message());
         if (socket_.is_open())
         {
             socket_.close();
@@ -79,22 +82,39 @@ void SBSClient::handleResolve(const boost::system::error_code& ec,
     }
 }
 
-void SBSClient::handleConnect(const boost::system::error_code& ec,
+void APRSCClient::handleConnect(const boost::system::error_code& ec,
         boost::asio::ip::tcp::resolver::iterator it)
 {
     if (!ec)
     {
         socket_.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(SBSClient) connected to: ", host);
-        read();
+        boost::asio::async_write(
+                socket_,
+                boost::asio::buffer(login_str),
+                boost::bind(&APRSCClient::handleLogin, this,
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::bytes_transferred));
     }
     else
     {
-        Logger::error("(SBSClient) connect: ", ec.message());
+        Logger::error("(APRSCClient) connect: ", ec.message());
         if (socket_.is_open())
         {
             socket_.close();
         }
         timedConnect();
+    }
+}
+
+void APRSCClient::handleLogin(const boost::system::error_code& ec, std::size_t s)
+{
+    if (!ec)
+    {
+        Logger::info("(APRSCClient) connected to: ", host);
+        read();
+    }
+    else
+    {
+        Logger::error("(APRSCClient) send login: ", ec.message());
     }
 }

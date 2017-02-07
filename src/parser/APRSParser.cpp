@@ -27,9 +27,9 @@
 
 #include "../aircraft/Aircraft.h"
 #include "../aircraft/AircraftContainer.h"
-#include "../main/Configuration.h"
+#include "../io/logger/Logger.h"
 #include "../main/VFRB.h"
-#include "../util/Logger.h"
+#include "../util/Configuration.h"
 #include "../util/Math.h"
 
 APRSParser::APRSParser()

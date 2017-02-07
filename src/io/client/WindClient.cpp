@@ -19,61 +19,96 @@
  }
  */
 
-#include "APRSCClient.h"
+#include "WindClient.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/system/error_code.hpp>
-#include <cstddef>
-#include <iostream>
+#include <boost/date_time.hpp>
+#include <boost/operators.hpp>
 
-#include "../../util/Logger.h"
+#include "../logger/Logger.h"
 
-APRSCClient::APRSCClient(boost::asio::signal_set& s, const std::string& host,
-        const std::string& port, const std::string& login)
-        : Client(s, host, port, "(APRSCClient)"),
-          login_str(login),
+WindClient::WindClient(boost::asio::signal_set& s, const std::string& host,
+        const std::string& port)
+        : Client(s, host, port, "(WindClient)"),
+          stopped_(false),
+          deadline_(io_service_),
           parser()
 {
-    login_str.append("\r\n");
     connect();
+    deadline_.async_wait(boost::bind(&WindClient::checkDeadline, this));
 }
 
-APRSCClient::~APRSCClient()
+WindClient::~WindClient() throw ()
 {
 }
 
-void APRSCClient::connect()
+void WindClient::read()
+{
+    deadline_.expires_from_now(boost::posix_time::seconds(WC_TIMEOUT));
+    Client::read();
+}
+
+void WindClient::connect()
 {
     boost::asio::ip::tcp::resolver::query query(
             host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
     resolver_.async_resolve(
             query,
-            boost::bind(&APRSCClient::handleResolve, this,
+            boost::bind(&WindClient::handleResolve, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
 }
 
-void APRSCClient::process()
+void WindClient::checkDeadline()
+{
+    if (stopped_)
+    {
+        return;
+    }
+    if (deadline_.expires_at() <= boost::asio::deadline_timer::traits_type::now())
+    {
+        Logger::warn("(WindClient) timed out: reconnect...");
+        if (socket_.is_open())
+        {
+            socket_.close();
+        }
+        deadline_.expires_at(boost::posix_time::pos_infin);
+        connect();
+    }
+    deadline_.async_wait(boost::bind(&WindClient::checkDeadline, this));
+}
+
+void WindClient::stop()
+{
+    Client::stop();
+    stopped_ = true;
+}
+
+void WindClient::process()
 {
     parser.unpack(response);
 }
 
-void APRSCClient::handleResolve(const boost::system::error_code& ec,
+void WindClient::handleResolve(const boost::system::error_code& ec,
         boost::asio::ip::tcp::resolver::iterator it)
 {
+    if (stopped_)
+    {
+        return;
+    }
     if (!ec)
     {
         boost::asio::async_connect(
                 socket_,
                 it,
-                boost::bind(&APRSCClient::handleConnect, this,
+                boost::bind(&WindClient::handleConnect, this,
                             boost::asio::placeholders::error,
                             boost::asio::placeholders::iterator));
     }
     else
     {
-        Logger::error("(APRSCClient) resolve host: ", ec.message());
+        Logger::error("(WindClient) resolve host: ", ec.message());
         if (socket_.is_open())
         {
             socket_.close();
@@ -82,39 +117,26 @@ void APRSCClient::handleResolve(const boost::system::error_code& ec,
     }
 }
 
-void APRSCClient::handleConnect(const boost::system::error_code& ec,
+void WindClient::handleConnect(const boost::system::error_code& ec,
         boost::asio::ip::tcp::resolver::iterator it)
 {
+    if (stopped_)
+    {
+        return;
+    }
     if (!ec)
     {
         socket_.set_option(boost::asio::socket_base::keep_alive(true));
-        boost::asio::async_write(
-                socket_,
-                boost::asio::buffer(login_str),
-                boost::bind(&APRSCClient::handleLogin, this,
-                            boost::asio::placeholders::error,
-                            boost::asio::placeholders::bytes_transferred));
-    }
-    else
-    {
-        Logger::error("(APRSCClient) connect: ", ec.message());
-        if (socket_.is_open())
-        {
-            socket_.close();
-        }
-        timedConnect();
-    }
-}
-
-void APRSCClient::handleLogin(const boost::system::error_code& ec, std::size_t s)
-{
-    if (!ec)
-    {
-        Logger::info("(APRSCClient) connected to: ", host);
+        Logger::info("(WindClient) connected to: ", host);
         read();
     }
     else
     {
-        Logger::error("(APRSCClient) send login: ", ec.message());
+        Logger::error("(WindClient) connect: ", ec.message());
+        if (socket_.is_open())
+        {
+            socket_.close();
+        }
+        timedConnect();
     }
 }

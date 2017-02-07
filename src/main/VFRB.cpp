@@ -23,21 +23,22 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/thread.hpp>
 #include <boost/chrono.hpp>
+#include <boost/thread.hpp>
 #include <csignal>
 #include <exception>
+#include <functional>
 #include <string>
 
 #include "../aircraft/AircraftContainer.h"
 #include "../aircraft/AircraftProcessor.h"
-#include "../connection/client/APRSCClient.h"
-#include "../connection/client/SBSClient.h"
-#include "../connection/client/WindClient.h"
-#include "../connection/server/NMEAServer.h"
-#include "../util/Logger.h"
-#include "ClimateData.h"
-#include "Configuration.h"
+#include "../io/client/APRSCClient.h"
+#include "../io/client/SBSClient.h"
+#include "../io/client/WindClient.h"
+#include "../io/logger/Logger.h"
+#include "../io/server/NMEAServer.h"
+#include "../util/ClimateData.h"
+#include "../util/Configuration.h"
 
 bool VFRB::global_climate_enabled = false;
 bool VFRB::global_aprsc_enabled = false;

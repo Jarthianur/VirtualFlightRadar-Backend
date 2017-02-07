@@ -24,10 +24,10 @@
 #include <stdexcept>
 #include <string>
 
-#include "main/Configuration.h"
-#include "main/VFRB.h"
-#include "util/ConfigReader.h"
-#include "util/Logger.h"
+#include "../io/logger/Logger.h"
+#include "../io/reader/ConfigReader.h"
+#include "../util/Configuration.h"
+#include "VFRB.h"
 
 using namespace std;
 
