@@ -17,7 +17,7 @@ and is also available for most common platforms.
 + keep track of and manage detected aircrafts, normalizing measuring units
 + serve these information as NMEA sentences on the network
 
-APRSC := APRS server coupled with a SDR, e.g. utilized by [OGN](http://wiki.glidernet.org/ "Open Glider Network")
+APRSC := APRS server coupled with a SDR, e.g. utilized by [OGN](http://wiki.glidernet.org/ "Open Glider Network")  
 SDR := Software Defined Radio
 
 ## What are the benefits
@@ -33,7 +33,7 @@ may increase safety and prevent some or other dangerous situations.
 
 VFR-B is one of the subsystems of [AMVR](https://github.com/rueckwaertsflieger/AMVR).
 All necessary information, **required software/hardware and a setup-guide can be found in its [wiki](https://github.com/rueckwaertsflieger/AMVR/wiki)**.
-The system is kept modular, that means one can replace each component with whatever liked, unless it fits to te interfaces.
+The system is kept modular, that means one can replace each component with whatever liked, unless it fits to the interfaces.
 Please consider, even that the VFR-B is released, the AMVR isn't.
 It is still under heavy development. Thus we are not able to provide an easy step-by-step guide, yet.
 
@@ -43,10 +43,10 @@ One aim of VFR-B (AMVR) is to stay, as much as possible, independent from the ou
 This means no aircraft-, wind reports, or whatever is going to be sent to the internet directly.
 **But this depends on how one will use this service.**
 Of course, one can configure it to receive APRS from public OGN servers,
-but to keep track of local traffic, the traffic information first must be sent to OGN.
+but to keep track of local traffic, the traffic information must be sent to OGN first.
 Also the internal NMEA server will send its data to *localhost*, which means, everybody, inside the local network, is able to fetch it.
 It is also possible to make the machine, which runs the VFR-B, accessible to the public.
-Note that the VFR-B itself, may run completely without internetaccess, but some things, like a NTP-server,
+Note that the VFR-B itself, may run completely without internet access, but some things, like a NTP-server,
 may be required to run other sub components of the AMVR.
 
 ## What to configure
@@ -72,7 +72,7 @@ The configuration file looks like this
 There are base position parameters, connection parameters and climate fallback values, along with filters.
 To disable any input feed, just leave corresponding hostnames empty, or set them to *'nA'* .
 Same with the filters, to disable leave it empty, or set to *-1* .
-Additional information, like units, can be found in the *properties.conf* files comments.
+Additional information, like units, can be found in the *properties.conf* file's comments.
 Comments begin with a *#* , feel free to add comments containing whatever liked, e.g. available ports and hosts.
 
 ## Software requirements
@@ -122,5 +122,5 @@ Contributions are always welcome.
 ---
 Status quo:
 
-Version 2.0.0-SNAPSHOT
-Read more in the [CHANGELOG.md](https://github.com/Jarthianur/VFR-Backend/blob/master/CHANGELOG.md).
+Version 2.0.0-SNAPSHOT  
+Read more in the [CHANGELOG.md](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/CHANGELOG.md).
