@@ -6,7 +6,7 @@ This project is intended to be an interface between APRS-/ADS-B-receivers, wind-
 
 The aim is to provide a powerful backend-service, which receives position reports broadcasted by aircrafts via FLARM or ADS-B, alongside climate information,
 and finally sending NMEA reports to any client. These reports may be displayed by any aviation-purposed navigation application, supporting NMEA protocol.
-The well-known, free glider navigation tool [XCSoar](https://www.xcsoar.org/) is recommended as such, as it supports all CHANGELOG.md provided by the VFR-B
+The well-known, free glider navigation tool [XCSoar](https://www.xcsoar.org/) is recommended as such, as it supports all features provided by the VFR-B
 and is also available for most common platforms.
 
 ### The core functionalities of the VFR-B are:
