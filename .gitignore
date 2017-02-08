@@ -7,3 +7,4 @@ TODO
 /bin/src/*.[od]
 /bin/test/*.[od]
 /bin/vfrb*
+VirtualFlightRadarBackend.service

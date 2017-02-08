@@ -192,7 +192,7 @@ void VFRB::handleClimateInput(boost::asio::signal_set& sigset)
     }
     WindClient client(sigset, Configuration::global_climate_host,
                       Configuration::global_climate_port);
-    Logger::info("(WindClient) start receive: ", Configuration::global_climate_host);
+    Logger::info("(WindClient) startup: ", Configuration::global_climate_host);
     client.run();
 }
 
@@ -204,7 +204,7 @@ void VFRB::handleSBSInput(boost::asio::signal_set& sigset)
     }
     SBSClient client(sigset, Configuration::global_sbs_host,
                      Configuration::global_sbs_port);
-    Logger::info("(SBSClient) start receive: ", Configuration::global_sbs_host);
+    Logger::info("(SBSClient) startup: ", Configuration::global_sbs_host);
     client.run();
 }
 
@@ -217,7 +217,7 @@ void VFRB::handleAPRSCInput(boost::asio::signal_set& sigset)
     APRSCClient client(sigset, Configuration::global_aprsc_host,
                        Configuration::global_aprsc_port,
                        Configuration::global_aprsc_login);
-    Logger::info("(APRSCClient) start receive: ", Configuration::global_aprsc_host);
+    Logger::info("(APRSCClient) startup: ", Configuration::global_aprsc_host);
     client.run();
 }
 

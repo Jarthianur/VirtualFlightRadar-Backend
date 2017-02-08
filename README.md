@@ -2,42 +2,125 @@
 
 VFR-B := VirtualFlightRadar-Backend
 
-This project is intended to be an interface between OGN-/ADS-B-receivers and XCSoar and the airfield manager respectively.
+This project is intended to be an interface between APRS-/ADS-B-receivers, wind-sensors and XCSoar and the airfield manager respectively.
 
-The aim is to provide a nice and handy tool to display all aircrafts, broadcasting FLARM and ADS messages as objects on the manager's info screen. The well known glider-nav-tool XCSoar is commonly used as a presentation application.
-That will make it easier for airfield managers to watch over the surrounding  traffic and additional information as are thermal upwinds, usefull for pilots waiting for a good moment to start.
-etc...
+The aim is to provide a powerful backend-service, which receives position reports broadcasted by aircrafts via FLARM or ADS-B, alongside climate information,
+and finally sending NMEA reports to any client. These reports may be displayed by any aviation-purposed navigation application, supporting NMEA protocol.
+The well-known, free glider navigation tool [XCSoar](https://www.xcsoar.org/) is recommended as such, as it supports all CHANGELOG.md provided by the VFR-B
+and is also available for most common platforms.
 
+### The core functionalities of the VFR-B are:
 
-VFR-B parses APRS / OGN and ADS-B / SBS messages from SDRs as are OGN receiver and Dump1090, to finally send transcoded NMEA position reports to XCSoar.
++ receive and parse APRS messages from APRSC (FLARM reports)
++ receive and parse ADS-B messages, transcoded into SBS, from any SDR (e.g. [Dump1090](https://github.com/antirez/dump1090))
++ receive and parse NMEA messages from any wind-sensor, integrated in the network (WIMWV, WIMDA)
++ keep track of and manage detected aircrafts, normalizing measuring units
++ serve these information as NMEA sentences on the network
 
-It also will provide some backend logic to support data processing and filtering for validating and further processing of received information.  Possible features include discarding bad or duplicate data, discarding far targets and estimating times and probability of arrival at airfield for security purposes.
+APRSC := APRS server coupled with a SDR, e.g. utilized by [OGN](http://wiki.glidernet.org/ "Open Glider Network")
+SDR := Software Defined Radio
 
-VFR-B is one of the subsystems of [AMVR](https://github.com/rueckwaertsflieger/AMVR).<br>
-<b>All necessary information, required software/hardware and a setup-guide can be found in its [wiki](https://github.com/rueckwaertsflieger/AMVR/wiki).</b><br>
-Please consider, even that the VFR-B is released, the AMVR isn't.<br>
+## What are the benefits
+
+The greatest benefit may be, that it assists an airfield manager to survey surrounding traffic.
+Also having real-time wind information, much more accurate than a windsock, is a great benefit too.
+But it is also useful for pilots waiting, on the ground, for a good moment to start, or to observe their comrades.
+Although, **this system is no replacement for airspace surveilance!**
+Nevertheless detecting (E-)planes before they cross a winch-start in low altitude, or any other imaginable scenario,
+may increase safety and prevent some or other dangerous situations.
+
+## The whole system
+
+VFR-B is one of the subsystems of [AMVR](https://github.com/rueckwaertsflieger/AMVR).
+All necessary information, **required software/hardware and a setup-guide can be found in its [wiki](https://github.com/rueckwaertsflieger/AMVR/wiki)**.
+The system is kept modular, that means one can replace each component with whatever liked, unless it fits to te interfaces.
+Please consider, even that the VFR-B is released, the AMVR isn't.
 It is still under heavy development. Thus we are not able to provide an easy step-by-step guide, yet.
 
+## What about privacy
 
-The VFR-B runs completely without connection to the internet, unless You configured it to get data from any global host.<br>
-Also the AMVR does not send any data to the internet, unless You configured it to do so.
+One aim of VFR-B (AMVR) is to stay, as much as possible, independent from the outside world/internet.
+This means no aircraft-, wind reports, or whatever is going to be sent to the internet directly.
+**But this depends on how one will use this service.**
+Of course, one can configure it to receive APRS from public OGN servers,
+but to keep track of local traffic, the traffic information first must be sent to OGN.
+Also the internal NMEA server will send its data to *localhost*, which means, everybody, inside the local network, is able to fetch it.
+It is also possible to make the machine, which runs the VFR-B, accessible to the public.
+Note that the VFR-B itself, may run completely without internetaccess, but some things, like a NTP-server,
+may be required to run other sub components of the AMVR.
 
+## What to configure
+
+The configuration file looks like this
+>latitude=49.000000  
+>longitude=8.000000  
+>altitude=400  
+>geoid=47.0  
+>pressure=1013.25  
+>temp=15.0  
+>serverPort=1234  
+>aprscHost=localhost  
+>aprscPort=14580  
+>aprscLogin=user x pass x  
+>sbsHost=  
+>sbsPort=x  
+>climateSensorHost=nA  
+>climateSensorPort=0  
+>maxHeight=-1  
+>maxDist=40000
+
+There are base position parameters, connection parameters and climate fallback values, along with filters.
+To disable any input feed, just leave corresponding hostnames empty, or set them to *'nA'* .
+Same with the filters, to disable leave it empty, or set to *-1* .
+Additional information, like units, can be found in the *properties.conf* files comments.
+Comments begin with a *#* , feel free to add comments containing whatever liked, e.g. available ports and hosts.
+
+## Software requirements
+
++ GNU compiler g++ (at least 4.9)
++ GNU make
++ boost library (1.63.0)
+  + *(explicit built:)*
+  + thread
+  + system
+  + regex
+  + chrono
+  + signals
+
+-> [How to install boost](http://www.boost.org/doc/libs/1_63_0/more/getting_started/index.html)
+
+## Installation
+
+A step-by-step guide can be found [here](https://github.com/Jarthianur/VirtualFlightRadar-Backend/wiki/Installation-Guide "wiki").
+If all requirements are met, simply `cd` into projects *bin/* directory and run `make`.
+Note that the build is currently configured just for Unix like systems, yet...
+
+## How to run
+
+```bash
+$ ./{path to binary} -c {path to config file} > {path to log file}  2>&1 &
+```
+
+example:
+
+```bash
+$ ./vfrb_2-0-0-SNAPSHOT -c properties.conf > vfrb.log 2>&1 &
+```
+
+## Future plans
+
++ setup build for all common platforms, like Windows, Mac ...
++ enable run as systemd service
++ change pressure fallback value to QNH
++ service to change configuration on-the-fly
++ probability-of-arrival evaluation, displayed via warning levels
++ read *gpsd*
++ compute missing aircraft data
 
 Contributions are always welcome.
 
-
-=================================<br>
+---
 Status quo:
 
-Version 1.3.1-SNAPSHOT
-
-Read more in the [FEATURES](https://github.com/Jarthianur/VFR-Backend/blob/master/FEATURES).
-You can find an installation guide in the wiki.
-Note that this source is only made for Linux, as it is intended to run on a Raspberry Pi, or similar.
-
-To run the VFR-B (in terminal): 
->$ ./{path to binary} -c {path to config file} > {path to log file} &<br><br>
->example:<br>
->$ ./vfrb_1-3-1-SNAPSHOT -c properties.conf > vfrb.log &<br>
->// This runs the tool, logs all output to the log file and puts the process into background
-
+Version 2.0.0-SNAPSHOT
+Read more in the [CHANGELOG.md](https://github.com/Jarthianur/VFR-Backend/blob/master/CHANGELOG.md).
