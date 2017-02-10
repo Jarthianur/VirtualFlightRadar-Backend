@@ -104,7 +104,7 @@ void NMEAServer::handleAccept(const boost::system::error_code& ec)
     if (!ec)
     {
         auto client = Connection::start(std::move(socket_));
-        if (clients.size() < MAX_CLIENTS)
+        if (clients.size() < S_MAX_CLIENTS)
         {
             clients.push_back(client);
             Logger::info("(NMEAServer) connection from: ", client->ip());

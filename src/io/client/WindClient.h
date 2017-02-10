@@ -28,8 +28,7 @@
 
 #include "Client.h"
 #include "../../parser/WindParser.h"
-
-#define WC_TIMEOUT 5
+#include "../../util/Parameters.h"
 
 class WindClient: public Client
 {
@@ -54,7 +53,7 @@ private:
             boost::asio::ip::tcp::resolver::iterator it);
 
     bool stopped_;
-    boost::asio::deadline_timer deadline_;
+    boost::asio::deadline_timer timeout_;
     WindParser parser;
 };
 

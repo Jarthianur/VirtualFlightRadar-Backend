@@ -36,7 +36,7 @@ Client::Client(boost::asio::signal_set& s, const std::string& host,
           host(host),
           port(port),
           component(comp),
-          deadline_(io_service_)
+          connect_timer(io_service_)
 
 {
     awaitStop();
@@ -61,8 +61,8 @@ void Client::awaitStop()
 
 void Client::timedConnect()
 {
-    deadline_.expires_from_now(boost::posix_time::seconds(WAIT_TIMEVAL));
-    deadline_.async_wait(
+    connect_timer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
+    connect_timer.async_wait(
             boost::bind(&Client::handleTimedConnect, this,
                         boost::asio::placeholders::error));
 }
@@ -70,7 +70,8 @@ void Client::timedConnect()
 void Client::stop()
 {
     Logger::info(component + " stop connection to: ", host);
-    deadline_.expires_at(boost::posix_time::pos_infin);
+    connect_timer.expires_at(boost::posix_time::pos_infin);
+    connect_timer.cancel();
     boost::system::error_code ec;
     socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     if (socket_.is_open())

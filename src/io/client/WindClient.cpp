@@ -32,11 +32,11 @@ WindClient::WindClient(boost::asio::signal_set& s, const std::string& host,
         const std::string& port)
         : Client(s, host, port, "(WindClient)"),
           stopped_(false),
-          deadline_(io_service_),
+          timeout_(io_service_),
           parser()
 {
     connect();
-    deadline_.async_wait(boost::bind(&WindClient::checkDeadline, this));
+    timeout_.async_wait(boost::bind(&WindClient::checkDeadline, this));
 }
 
 WindClient::~WindClient() throw ()
@@ -45,7 +45,7 @@ WindClient::~WindClient() throw ()
 
 void WindClient::read()
 {
-    deadline_.expires_from_now(boost::posix_time::seconds(WC_TIMEOUT));
+    timeout_.expires_from_now(boost::posix_time::seconds(WC_RCV_TIMEOUT));
     Client::read();
 }
 
@@ -66,23 +66,25 @@ void WindClient::checkDeadline()
     {
         return;
     }
-    if (deadline_.expires_at() <= boost::asio::deadline_timer::traits_type::now())
+    if (timeout_.expires_at() <= boost::asio::deadline_timer::traits_type::now())
     {
         Logger::warn("(WindClient) timed out: reconnect...");
         if (socket_.is_open())
         {
             socket_.close();
         }
-        deadline_.expires_at(boost::posix_time::pos_infin);
+        timeout_.expires_at(boost::posix_time::pos_infin);
         connect();
     }
-    deadline_.async_wait(boost::bind(&WindClient::checkDeadline, this));
+    timeout_.async_wait(boost::bind(&WindClient::checkDeadline, this));
 }
 
 void WindClient::stop()
 {
     Client::stop();
     stopped_ = true;
+    timeout_.expires_at(boost::posix_time::pos_infin);
+    timeout_.cancel();
 }
 
 void WindClient::process()

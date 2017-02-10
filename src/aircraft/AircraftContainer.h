@@ -31,8 +31,8 @@
 
 #include "Aircraft.h"
 #include "AircraftProcessor.h"
+#include "../util/Parameters.h"
 
-#define AC_INVALIDATE 4
 #define AC_NOT_FOUND -1
 
 class AircraftContainer

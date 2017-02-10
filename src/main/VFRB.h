@@ -24,13 +24,11 @@
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-
+#include "../util/Parameters.h"
 class NMEAServer;
 
 class AircraftContainer;
 class ClimateData;
-
-#define SYNC_TIME 1
 
 class VFRB
 {

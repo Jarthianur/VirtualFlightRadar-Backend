@@ -26,9 +26,7 @@
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <string>
-
-// seconds to wait before reconnect
-#define WAIT_TIMEVAL 2
+#include "../../util/Parameters.h"
 
 class Client
 {
@@ -70,7 +68,7 @@ protected:
     const std::string component;
 
 private:
-    boost::asio::deadline_timer deadline_;
+    boost::asio::deadline_timer connect_timer;
 };
 
 #endif /* CLIENT_H_ */

@@ -30,8 +30,7 @@
 #include <vector>
 
 #include "Connection.h"
-
-#define MAX_CLIENTS 5
+#include "../../util/Parameters.h"
 
 class NMEAServer
 {

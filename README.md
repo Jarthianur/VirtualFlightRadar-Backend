@@ -75,6 +75,11 @@ Same with the filters, to disable leave it empty, or set to *-1* .
 Additional information, like units, can be found in the *properties.conf* file's comments.
 Comments begin with a *#* , feel free to add comments containing whatever liked, e.g. available ports and hosts.
 
+Before installing the program, one should adjust the values in
+[Parameters.h](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/src/util/Parameters.h).
+These parameters have to stay fixed, so they can not be changed after compilation.
+Please read the comments carefully, as these values change the programs behavior, or may even break it.
+
 ## Software requirements
 
 + GNU compiler g++ (at least 4.9)
