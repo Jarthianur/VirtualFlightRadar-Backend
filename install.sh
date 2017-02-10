@@ -86,6 +86,7 @@ sed "s|%VERSION%|$VFRB_VERSION|" <$VFRB_ROOT/vfrb.properties >$VFRB_PROP_PATH/$V
 echo "$VFRB_PROP.properties copied to $VFRB_PROP_PATH"
 
 echo "... SETUP SERVICE ..."
+mkdir -p $VFRB_ROOT/target/service
 mkdir -p $VFRB_ROOT/target/service/$VFRB_NAME.service.d
 pushd $VFRB_ROOT/target/service/$VFRB_NAME.service.d
 sed "s|%BOOST_LIBS_PATH%|$BOOST_ROOT/stage/lib:|" <$VFRB_ROOT/service/vfrb.service.d/vfrb.conf >$VFRB_NAME.conf

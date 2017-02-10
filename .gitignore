@@ -6,5 +6,4 @@ TODO
 .project
 target/src/*.[od]
 target/test/*.[od]
-target/service/*
 test/
