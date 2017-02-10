@@ -1,0 +1,9 @@
+[Unit]
+Description=vfrb
+
+[Service]
+Type=simple
+ExecStart=%VFRB_EXEC_PATH% -c %VFRB_PROP_PATH%
+
+[Install]
+WantedBy=multi-user.target

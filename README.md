@@ -102,6 +102,8 @@ Note that the build is currently configured just for Unix like systems, yet...
 
 ## How to run
 
+### manually
+
 ```bash
 $ ./{path to binary} -c {path to config file} > {path to log file}  2>&1 &
 ```
@@ -112,10 +114,13 @@ example:
 $ ./vfrb_2-0-0-SNAPSHOT -c properties.conf > vfrb.log 2>&1 &
 ```
 
+### as service
+
+hja
+
 ## Future plans
 
 + setup build for all common platforms, like Windows, Mac ...
-+ enable run as systemd service
 + change pressure fallback value to QNH
 + service to change configuration on-the-fly
 + probability-of-arrival evaluation, displayed via warning levels
