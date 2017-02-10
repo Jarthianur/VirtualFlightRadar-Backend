@@ -1,5 +1,5 @@
 [Unit]
-Description=vfrb
+Description=%VFRB_NAME%
 
 [Service]
 Type=simple

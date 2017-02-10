@@ -26,7 +26,7 @@
 #include <stdexcept>
 
 #include "../aircraft/AircraftContainer.h"
-#include "../main/VFRB.h"
+#include "../vfrb/VFRB.h"
 #include "../util/Configuration.h"
 #include "../util/Math.h"
 

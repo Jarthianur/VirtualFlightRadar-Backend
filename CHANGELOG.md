@@ -8,6 +8,7 @@
 + signal handling
 + disable filters via properties
 + systemd service
++ installation script
 
 #### 1.3.0
 

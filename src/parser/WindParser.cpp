@@ -23,7 +23,7 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include "../main/VFRB.h"
+#include "../vfrb/VFRB.h"
 #include "../util/ClimateData.h"
 
 WindParser::WindParser()

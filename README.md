@@ -49,9 +49,46 @@ It is also possible to make the machine, which runs the VFR-B, accessible to the
 Note that the VFR-B itself, may run completely without internet access, but some things, like a NTP-server,
 may be required to run other sub components of the AMVR.
 
+## Software requirements
+
++ GNU compiler g++ (at least 4.9)
++ GNU make
++ boost library (1.63.0)
+  + *(explicit built:)*
+  + thread
+  + system
+  + regex
+  + chrono
+  + signals
+
+-> [How to install boost](http://www.boost.org/doc/libs/1_63_0/more/getting_started/index.html)
+
+## Installation
+
+Before installing the program, one should adjust the values in
+[Parameters.h](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/src/util/Parameters.h).
+These parameters have to stay fixed, so they can not be changed after compilation.
+Please read the comments carefully, as these values change the programs behavior, or may even break it.
+
+From inside the projects root directory follow these steps.
+
+Edit the *bootstrap.sh* according to Your needs.
+There are just a few variables, which need to be set as stated in their comments.
+Next run `./install.sh` and look at its output. If all requirements are met, the VFR-B was
+successfully built, stored where specified and a systemd service was properly configured.
+To add the systemd service run
+
+```bash
+$ sudo cp -r target/service/* /etc/systemd/system/
+$ sudo systemctl daemon-reload
+```
+
+Now the configuration must be done in the target *.properties* file.
+This properties file was also stored according to the path in bootstrap.sh .
+
 ## What to configure
 
-The configuration file looks like this
+The properties file looks like this
 >latitude=49.000000  
 >longitude=8.000000  
 >altitude=400  
@@ -72,51 +109,54 @@ The configuration file looks like this
 There are base position parameters, connection parameters and climate fallback values, along with filters.
 To disable any input feed, just leave corresponding hostnames empty, or set them to *'nA'* .
 Same with the filters, to disable leave it empty, or set to *-1* .
-Additional information, like units, can be found in the *properties.conf* file's comments.
+Additional information, like units, can be found in the comments.
 Comments begin with a *#* , feel free to add comments containing whatever liked, e.g. available ports and hosts.
-
-Before installing the program, one should adjust the values in
-[Parameters.h](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/src/util/Parameters.h).
-These parameters have to stay fixed, so they can not be changed after compilation.
-Please read the comments carefully, as these values change the programs behavior, or may even break it.
-
-## Software requirements
-
-+ GNU compiler g++ (at least 4.9)
-+ GNU make
-+ boost library (1.63.0)
-  + *(explicit built:)*
-  + thread
-  + system
-  + regex
-  + chrono
-  + signals
-
--> [How to install boost](http://www.boost.org/doc/libs/1_63_0/more/getting_started/index.html)
-
-## Installation
-
-A step-by-step guide can be found [here](https://github.com/Jarthianur/VirtualFlightRadar-Backend/wiki/Installation-Guide "wiki").
-If all requirements are met, simply `cd` into projects *bin/* directory and run `make`.
-Note that the build is currently configured just for Unix like systems, yet...
 
 ## How to run
 
 ### manually
 
 ```bash
-$ ./{path to binary} -c {path to config file} > {path to log file}  2>&1 &
+$ {path to binary} -c {path to config file} > {path to log file}  2>&1 &
 ```
 
 example:
 
 ```bash
-$ ./vfrb_2-0-0-SNAPSHOT -c properties.conf > vfrb.log 2>&1 &
+$ ./vfrb -c properties.conf > vfrb.log 2>&1 &
 ```
+
+The log will be in the specified file.
 
 ### as service
 
-hja
+To enable the service, the installation steps have to be completed.
+The services name will be the same as *VFRB_NAME_B* from bootstrap.sh .
+Run the service once
+
+```bash
+$ sudo service {servicename} start
+```
+
+Run the service after boot
+
+```bash
+$ sudo systemctl enable {servicename}.service
+```
+
+Examples:
+
+```bash
+$ sudo service vfrb start
+# ------
+$ sudo systemctl enable vfrb.service
+```
+
+Watch the log with
+
+```bash
+$ journalctl -u {servicename}.service
+```
 
 ## Future plans
 

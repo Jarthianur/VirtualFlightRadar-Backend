@@ -27,7 +27,7 @@
 #include <cstdio>
 #include <ctime>
 
-#include "../main/VFRB.h"
+#include "../vfrb/VFRB.h"
 #include "../util/ClimateData.h"
 #include "../util/Configuration.h"
 #include "../util/Math.h"

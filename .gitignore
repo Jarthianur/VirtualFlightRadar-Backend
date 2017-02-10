@@ -4,7 +4,7 @@ TODO
 .settings/
 .cproject
 .project
-/bin/src/*.[od]
-/bin/test/*.[od]
-/bin/vfrb*
-VirtualFlightRadarBackend.service
+target/src/*.[od]
+target/test/*.[od]
+target/service/*
+test/

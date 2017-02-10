@@ -2,66 +2,98 @@
 
 # setup vars
 source bootstrap.sh
-NAME=${NAME:-vfrb}
-VERSION=$(cat version.txt)
-COMPILER=${COMPILER:-g++}
-BOOST_LIBS_PATH=${BOOST_LIBS_PATH:-}
-VFRB_EXEC_PATH=${EXEC_PATH:-bin/$NAME}
-VFRB_PROP_PATH=${PROP_PATH:-vfrb.properties}
+export VFRB_NAME=${VFRB_NAME_B:-vfrb}
+export VFRB_PROP=${VFRB_PROP_B:-vfrb}
+export VFRB_VERSION=$(cat version.txt)
+export VFRB_COMPILER=${VFRB_COMPILER_B:-g++}
+export BOOST_ROOT=${BOOST_ROOT_B:-}
+export VFRB_EXEC_PATH=${VFRB_EXEC_PATH_B:-$PWD/target/}
+export VFRB_PROP_PATH=${VFRB_PROP_PATH_B:-$PWD/target/}
+export VFRB_TARGET=$VFRB_NAME-$VFRB_VERSION
+export VFRB_ROOT=$PWD
 
 ##########################################
-echo "BOOTSTRAP VFRB"
-# error level
-# 1: failure
-# 2: boost libs at default
-error=0
+echo "... INSTALL VFRB ..."
+echo ""
 
-if [ -z ${NAME+x} ]; then
-    echo "NAME not set, using default:"
+echo "... CECK VARIABLES ..."
+echo "WORKDIR = $VFRB_ROOT"
+if [ -z "$VFRB_NAME_B" ]; then
+    echo "VFRB_NAME not set, using default: $VFRB_NAME"
 else
-    echo "NAME:"
+    echo "VFRB_NAME:" $VFRB_NAME
 fi
-echo $NAME
+if [ -z "$VFRB_PROP_B" ]; then
+    echo "VFRB_PROP not set, using default: $VFRB_PROP"
+else
+    echo "VFRB_PROP: $VFRB_PROP"
+fi
+if [ -z "$VFRB_VERSION" ]; then
+    echo "VFRB_VERSION not set"
+else
+    echo "VFRB_VERSION: $VFRB_VERSION"
+fi
+if [ -z "$VFRB_COMPILER_B" ]; then
+    echo "VFRB_COMPILER not set, using default: $VFRB_COMPILER"
+else
+    echo "VFRB_COMPILER: $VFRB_COMPILER"
+fi
+if [ -z "$BOOST_ROOT_B" ]; then
+    echo "BOOST_ROOT not set, assuming default"
+else
+    echo "BOOST_ROOT: $BOOST_ROOT"
+    export BOOST_LIBS_L="-L$BOOST_ROOT/stage/lib"
+    export BOOST_ROOT_I="-I$BOOST_ROOT"
+fi
+if [ -z "$VFRB_EXEC_PATH_B" ]; then
+    echo "VFRB_EXEC_PATH not set, using default: $VFRB_EXEC_PATH"
+else
+    echo "VFRB_EXEC_PATH: $VFRB_EXEC_PATH"
+fi
+if [ -z "$VFRB_PROP_PATH_B" ]; then
+    echo "VFRB_PROP_PATH not set, using default: $VFRB_PROP_PATH"
+else
+    echo "VFRB_PROP_PATH: $VFRB_PROP_PATH"
+fi
+unset VFRB_NAME_B
+unset VFRB_PROP_B
+unset VFRB_COMPILER_B
+unset BOOST_ROOT_B
+unset VFRB_EXEC_PATH_B
+unset VFRB_PROP_PATH_B
 
-if [ -z ${VERSION+x} ]; then
-    echo "VERSION not set:"
-    exit(1)
-else
-    echo "VERSION:"
-fi
-echo $VERSION
-
-if [ -z ${COMPILER+x} ]; then
-    echo "COMPILER not set, using default:"
-else
-    echo "COMPILER:"
-fi
-echo $COMPILER
-
-if [ -z ${BOOST_LIBS_PATH+x} ]; then
-    echo "BOOST_LIBS_PATH not set, assuming default"
-    error=2
-else
-    echo "BOOST_LIBS_PATH:"
-    echo $BOOST_LIBS_PATH
+echo "... RUN MAKE ..."
+pushd $VFRB_ROOT/target/
+make clean && make
+error=$?
+unset BOOST_LIBS_L
+unset BOOST_ROOT_I
+popd
+if [ $error -ne 0 ]; then
+    echo "ERROR: make failed $error"
+    exit $error
 fi
 
-echo $VFRB_EXEC_PATH
-echo $VFRB_PROP_PATH
+echo "... COPY TARGETS ..."
+if [ -x "$VFRB_ROOT/target/$VFRB_TARGET" ]; then
+    cp $VFRB_ROOT/target/$VFRB_TARGET $VFRB_EXEC_PATH/$VFRB_TARGET
+    echo "$VFRB_TARGET copied to $VFRB_EXEC_PATH"
+else
+    echo "ERROR: $VFRB_TARGET does not exist"
+    exit 1
+fi
+sed "s|%VERSION%|$VFRB_VERSION|" <$VFRB_ROOT/vfrb.properties >$VFRB_PROP_PATH/$VFRB_PROP.properties
+echo "$VFRB_PROP.properties copied to $VFRB_PROP_PATH"
 
-if [ -z ${+x} ]; then
-    
-else
-    
-fi
-if [ -z ${+x} ]; then
-    
-else
-    
-fi
-if [ -z ${+x} ]; then
-    
-else
-    
-fi
-
+echo "... SETUP SERVICE ..."
+mkdir -p $VFRB_ROOT/target/service/$VFRB_NAME.service.d
+pushd $VFRB_ROOT/target/service/$VFRB_NAME.service.d
+sed "s|%BOOST_LIBS_PATH%|$BOOST_ROOT/stage/lib:|" <$VFRB_ROOT/service/vfrb.service.d/vfrb.conf >$VFRB_NAME.conf
+cd ..
+sed -e "s|%VFRB_NAME%|$VFRB_NAME|" \
+    -e "s|%VFRB_EXEC_PATH%|$VFRB_EXEC_PATH/$VFRB_TARGET|" \
+    -e "s|%VFRB_PROP_PATH%|$VFRB_PROP_PATH/$VFRB_PROP.properties|" \
+    <$VFRB_ROOT/service/vfrb.service >$VFRB_NAME.service
+echo "$VFRB_NAME.service created in $VFRB_ROOT/target/service/"
+popd
+echo "... FINISHED ..."
