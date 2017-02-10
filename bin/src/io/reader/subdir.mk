@@ -4,17 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/Main.cpp 
+../src/io/reader/ConfigReader.cpp 
 
 OBJS += \
-./src/Main.o 
+./src/io/reader/ConfigReader.o 
 
 CPP_DEPS += \
-./src/Main.d 
+./src/io/reader/ConfigReader.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/%.o: ../src/%.cpp
+src/io/reader/%.o: ../src/io/reader/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	g++ -std=c++0x -I/home/julian/opt/boost_1_63_0 -O0 -g3 -Wall -c -fmessage-length=0 -pthread -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"

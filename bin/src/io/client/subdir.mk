@@ -4,17 +4,26 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/Main.cpp 
+../src/io/client/APRSCClient.cpp \
+../src/io/client/Client.cpp \
+../src/io/client/SBSClient.cpp \
+../src/io/client/WindClient.cpp 
 
 OBJS += \
-./src/Main.o 
+./src/io/client/APRSCClient.o \
+./src/io/client/Client.o \
+./src/io/client/SBSClient.o \
+./src/io/client/WindClient.o 
 
 CPP_DEPS += \
-./src/Main.d 
+./src/io/client/APRSCClient.d \
+./src/io/client/Client.d \
+./src/io/client/SBSClient.d \
+./src/io/client/WindClient.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/%.o: ../src/%.cpp
+src/io/client/%.o: ../src/io/client/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	g++ -std=c++0x -I/home/julian/opt/boost_1_63_0 -O0 -g3 -Wall -c -fmessage-length=0 -pthread -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
