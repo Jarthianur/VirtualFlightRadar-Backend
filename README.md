@@ -31,23 +31,21 @@ may increase safety and prevent some or other dangerous situations.
 
 ## The whole system
 
-VFR-B is one of the subsystems of [AMVR](https://github.com/rueckwaertsflieger/AMVR).
-All necessary information, **required software/hardware and a setup-guide can be found in its [wiki](https://github.com/rueckwaertsflieger/AMVR/wiki)**.
-The system is kept modular, that means one can replace each component with whatever liked, unless it fits to the interfaces.
-Please consider, even that the VFR-B is released, the AMVR isn't.
-It is still under heavy development. Thus we are not able to provide an easy step-by-step guide, yet.
+**VFR-B is a standalone backend module. To make it to be of use, working installations of, or access to any APRS server,
+ASDB-to-SBS decoder and network serving wind-sensor are required.**
+Module means one can replace each component with whatever liked, unless it fits to the interfaces.
+
+VFR-B is, for example, used in [AMVR](https://github.com/rueckwaertsflieger/AMVR).
 
 ## What about privacy
 
-One aim of VFR-B (AMVR) is to stay, as much as possible, independent from the outside world/internet.
+One aim of VFR-B is to stay, as much as possible, independent from the outside world/internet.
 This means no aircraft-, wind reports, or whatever is going to be sent to the internet directly.
 **But this depends on how one will use this service.**
 Of course, one can configure it to receive APRS from public OGN servers,
 but to keep track of local traffic, the traffic information must be sent to OGN first.
 Also the internal NMEA server will send its data to *localhost*, which means, everybody, inside the local network, is able to fetch it.
 It is also possible to make the machine, which runs the VFR-B, accessible to the public.
-Note that the VFR-B itself, may run completely without internet access, but some things, like a NTP-server,
-may be required to run other sub components of the AMVR.
 
 ## Software requirements
 
@@ -121,6 +119,8 @@ To disable any input feed, just leave corresponding hostnames empty, or set them
 Same with the filters, to disable leave it empty, or set to *-1* .
 Additional information, like units, can be found in the comments.
 Comments begin with a *#* , feel free to add comments containing whatever liked, e.g. available ports and hosts.
+**GPS devices serve an altitude = height above ellipsoid + geoid separation.**
+To get proper values from the VFR-B one must determine the local geoid separation and split the GPS height into both values.
 
 ## How to run
 

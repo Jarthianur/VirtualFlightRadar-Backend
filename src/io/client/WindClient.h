@@ -30,6 +30,8 @@
 #include "../../parser/WindParser.h"
 #include "../../util/Parameters.h"
 
+#define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
+
 class WindClient: public Client
 {
 public:

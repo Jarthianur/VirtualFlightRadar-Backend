@@ -28,6 +28,8 @@
 #include <string>
 #include "../../util/Parameters.h"
 
+#define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
+
 class Client
 {
 public:

@@ -34,6 +34,7 @@
 #include "../util/Parameters.h"
 
 #define AC_NOT_FOUND -1
+#define AC_INVALIDATE AIRCRAFT_INVALIDATE
 
 class AircraftContainer
 {

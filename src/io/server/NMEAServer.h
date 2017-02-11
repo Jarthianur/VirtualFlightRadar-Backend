@@ -32,6 +32,8 @@
 #include "Connection.h"
 #include "../../util/Parameters.h"
 
+#define S_MAX_CLIENTS SERVER_MAX_CLIENTS
+
 class NMEAServer
 {
 public:

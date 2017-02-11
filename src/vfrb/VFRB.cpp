@@ -146,7 +146,7 @@ void VFRB::run()
             }
 
             //synchronise cycles to ~VFRB_SYNC_TIME sec
-            boost::this_thread::sleep_for(boost::chrono::seconds(VFRB_SYNC_TIME));
+            boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
         }
         catch (const std::exception& e)
         {

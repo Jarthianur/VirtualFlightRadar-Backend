@@ -51,7 +51,7 @@
  * than processing it, hence values < 4 are discouraged.
  * An aircraft has about 70 Bytes in size.
  */
-#define AC_INVALIDATE 4
+#define AIRCRAFT_INVALIDATE 4
 
 /**
  * C_CON_WAIT_TIMEVAL:
@@ -64,7 +64,7 @@
  * every second. As well as waiting 1 hour if all receivers are up
  * after 2 minutes.
  */
-#define C_CON_WAIT_TIMEVAL 60
+#define CLIENT_CONNECT_WAIT_TIMEVAL 120
 
 /**
  * WC_RCV_TIMEOUT:
@@ -74,7 +74,7 @@
  * A good way is to set this value to 1.5 * Y, where
  * Y is the time the wind-sensor sends its data.
  */
-#define WC_RCV_TIMEOUT 5
+#define WINDCLIENT_RECEIVE_TIMEOUT 5
 
 /**
  * S_MAX_CLIENTS:
@@ -85,7 +85,7 @@
  * Consider someone else wants surrounding traffic displayed from
  * somewhere else, like pilots and flight instructors.
  */
-#define S_MAX_CLIENTS 5
+#define SERVER_MAX_CLIENTS 5
 
 
 #endif /* PARAMETERS_H_ */

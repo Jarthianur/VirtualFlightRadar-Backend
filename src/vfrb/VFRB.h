@@ -30,6 +30,8 @@ class NMEAServer;
 class AircraftContainer;
 class ClimateData;
 
+#define SYNC_TIME VFRB_SYNC_TIME
+
 class VFRB
 {
 public:
