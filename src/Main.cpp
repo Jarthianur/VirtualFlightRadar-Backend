@@ -29,6 +29,10 @@
 #include "util/Configuration.h"
 #include "vfrb/VFRB.h"
 
+#ifndef VERSION
+#define VERSION "DEMO"
+#endif
+
 using namespace std;
 
 int32_t strToInt(const string& str)
