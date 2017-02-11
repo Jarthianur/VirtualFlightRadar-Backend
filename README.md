@@ -55,13 +55,22 @@ may be required to run other sub components of the AMVR.
 + GNU make
 + boost library (1.63.0)
   + *(explicit built:)*
-  + thread
-  + system
-  + regex
-  + chrono
-  + signals
+    + thread
+    + system
+    + regex
+    + chrono
+    + signals
 
--> [How to install boost](http://www.boost.org/doc/libs/1_63_0/more/getting_started/index.html)
+Boost can be installed via package manager
+
+```bash
+$ sudo apt-get update
+$ sudo apt-get install libboost-dev libboost-all-dev
+```
+
+or manually. -> [How to install boost](http://www.boost.org/doc/libs/1_63_0/more/getting_started/index.html)
+
+Note that the boost version from package manager may be too old. *( >= 1.58.0 veriyfied to work also)*
 
 ## Installation
 
@@ -72,10 +81,11 @@ Please read the comments carefully, as these values change the programs behavior
 
 From inside the projects root directory follow these steps.
 
-Edit the *bootstrap.sh* according to Your needs.
-There are just a few variables, which need to be set as stated in their comments.
+Either adjust the *vfrb.properties* file right now to deploy it ready-to-use, or later.  
+Edit the *bootstrap.sh* according to Your needs.  
+There are just a few variables, which need to be set as stated in their comments.  
 Next run `./install.sh` and look at its output. If all requirements are met, the VFR-B was
-successfully built, stored where specified and a systemd service was properly configured.
+successfully built, stored where specified and a systemd service was properly configured.  
 To add the systemd service run
 
 ```bash
@@ -83,7 +93,7 @@ $ sudo cp -r target/service/* /etc/systemd/system/
 $ sudo systemctl daemon-reload
 ```
 
-Now the configuration must be done in the target *.properties* file.
+If not already done, now the runtime configuration must be specified in the target *.properties* file.
 This properties file was also stored according to the path in bootstrap.sh .
 
 ## What to configure

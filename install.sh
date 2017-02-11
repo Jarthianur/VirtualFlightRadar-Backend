@@ -64,7 +64,7 @@ unset VFRB_PROP_PATH_B
 
 echo "... RUN MAKE ..."
 pushd $VFRB_ROOT/target/
-make clean && make
+make
 error=$?
 unset BOOST_LIBS_L
 unset BOOST_ROOT_I
@@ -76,7 +76,7 @@ fi
 
 echo "... COPY TARGETS ..."
 if [ -x "$VFRB_ROOT/target/$VFRB_TARGET" ]; then
-    cp $VFRB_ROOT/target/$VFRB_TARGET $VFRB_EXEC_PATH/$VFRB_TARGET
+    mv $VFRB_ROOT/target/$VFRB_TARGET $VFRB_EXEC_PATH/$VFRB_TARGET
     echo "$VFRB_TARGET copied to $VFRB_EXEC_PATH"
 else
     echo "ERROR: $VFRB_TARGET does not exist"

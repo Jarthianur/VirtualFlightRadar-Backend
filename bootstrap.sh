@@ -18,9 +18,9 @@ export VFRB_COMPILER_B=
 export BOOST_ROOT_B=
 
 # path to executable after installation (default: target/)
-# example: /home/user/bin/
+# example: /home/user/bin/ , ~/bin/
 export VFRB_EXEC_PATH_B=
 
 # path to .properties file (default: target/)
-# example: /home/user/
+# example: /home/user/ , ~/
 export VFRB_PROP_PATH_B=
