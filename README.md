@@ -79,8 +79,9 @@ Please read the comments carefully, as these values change the programs behavior
 
 From inside the projects root directory follow these steps.
 
-Either adjust the *vfrb.properties* file right now to deploy it ready-to-use, or later.  
-Edit the *bootstrap.sh* according to Your needs.  
+Either adjust the [vfrb.properties](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/vfrb.properties)
+file right now to deploy it ready-to-use, or later.  
+Edit the [bootstrap.sh](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/bootstrap.sh) according to Your needs.  
 There are just a few variables, which need to be set as stated in their comments.  
 Next run `./install.sh` and look at its output. If all requirements are met, the VFR-B was
 successfully built, stored where specified and a systemd service was properly configured.  
@@ -98,21 +99,21 @@ This properties file was also stored according to the path in bootstrap.sh .
 
 The properties file looks like this
 >latitude=49.000000  
->longitude=8.000000  
->altitude=400  
->geoid=47.0  
->pressure=1013.25  
->temp=15.0  
->serverPort=1234  
->aprscHost=localhost  
->aprscPort=14580  
->aprscLogin=user x pass x  
->sbsHost=  
->sbsPort=x  
->climateSensorHost=nA  
->climateSensorPort=0  
->maxHeight=-1  
->maxDist=40000
+longitude=8.000000  
+altitude=400  
+geoid=47.0  
+pressure=1013.25  
+temp=15.0  
+serverPort=1234  
+aprscHost=localhost  
+aprscPort=14580  
+aprscLogin=user x pass x  
+sbsHost=  
+sbsPort=x  
+climateSensorHost=nA  
+climateSensorPort=0  
+maxHeight=-1  
+maxDist=40000
 
 There are base position parameters, connection parameters and climate fallback values, along with filters.
 To disable any input feed, just leave corresponding hostnames empty, or set them to *'nA'* .
@@ -154,18 +155,20 @@ Run the service after boot
 $ sudo systemctl enable {servicename}.service
 ```
 
+Watch the log with
+
+```bash
+$ journalctl -u {servicename}.service
+```
+
 Examples:
 
 ```bash
 $ sudo service vfrb start
 # ------
 $ sudo systemctl enable vfrb.service
-```
-
-Watch the log with
-
-```bash
-$ journalctl -u {servicename}.service
+# ------
+$ journalctl -u vfrb.service
 ```
 
 ## Future plans
