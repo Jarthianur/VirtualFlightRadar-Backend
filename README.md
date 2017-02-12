@@ -172,7 +172,6 @@ $ journalctl -u {servicename}.service
 
 + setup build for all common platforms, like Windows, Mac ...
 + change pressure fallback value to QNH
-+ service to change configuration on-the-fly
 + probability-of-arrival evaluation, displayed via warning levels
 + read *gpsd*
 + compute missing aircraft data
