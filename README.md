@@ -68,7 +68,7 @@ $ sudo apt-get install libboost-dev libboost-all-dev
 
 or manually. -> [How to install boost](http://www.boost.org/doc/libs/1_63_0/more/getting_started/index.html)
 
-Note that the boost version from package manager may be too old. *( >= 1.58.0 veriyfied to work also)*
+Note that the boost version from package manager may be too old. *( >= 1.58.0 verified to work also)*
 
 ## Installation
 
