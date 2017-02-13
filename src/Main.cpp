@@ -19,7 +19,6 @@
  }
  */
 
-#include <netinet/in.h>
 #include <cstdint>
 #include <stdexcept>
 #include <string>
@@ -71,7 +70,7 @@ int main(int argc, char* argv[])
     double pressure = 0.0;
     double temp = 0.0;
 
-    in_port_t server_port = 0;
+    uint16_t server_port = 0;
 
     std::string aprsc_host;
     std::string aprsc_port;
@@ -110,7 +109,7 @@ int main(int argc, char* argv[])
         temp = strToDouble(cr.getProperty("temp", "15.0"));
         Logger::info("(Config) temp: ", to_string(temp));
 
-        server_port = (in_port_t) strToInt(cr.getProperty("serverPort", "0"));
+        server_port = (uint16_t) strToInt(cr.getProperty("serverPort", "0"));
         Logger::info("(Config) serverPort: ", to_string(server_port));
 
         aprsc_port = cr.getProperty("aprscPort", "0");

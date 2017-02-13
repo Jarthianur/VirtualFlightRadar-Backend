@@ -24,7 +24,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
-#include <netinet/in.h>
+#include <cstdint>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -40,7 +40,7 @@ public:
     NMEAServer(const NMEAServer&) = delete;
     NMEAServer& operator=(const NMEAServer&) = delete;
 
-    NMEAServer(boost::asio::signal_set& s, in_port_t port);
+    NMEAServer(boost::asio::signal_set& s, uint16_t port);
     virtual ~NMEAServer() throw ();
 
     void run();

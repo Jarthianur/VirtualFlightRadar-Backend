@@ -22,7 +22,6 @@
 #ifndef CONFIGURATION_H_
 #define CONFIGURATION_H_
 
-#include <netinet/in.h>
 #include <cstdint>
 #include <string>
 
@@ -40,7 +39,7 @@ public:
     static double base_pressure;
     static double base_temp;
 
-    static in_port_t global_server_port;
+    static uint16_t global_server_port;
 
     static std::string global_aprsc_host;
     static std::string global_aprsc_port;

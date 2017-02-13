@@ -36,7 +36,7 @@ double Configuration::base_geoid = 0.0;
 double Configuration::base_pressure = 0.0;
 double Configuration::base_temp = 0.0;
 
-in_port_t Configuration::global_server_port = 0;
+uint16_t Configuration::global_server_port = 0;
 
 std::string Configuration::global_aprsc_host = "nA";
 std::string Configuration::global_aprsc_port = "0";
