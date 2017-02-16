@@ -63,15 +63,35 @@ Boost can be installed via package manager
 
 ```bash
 $ sudo apt-get update
-$ sudo apt-get install libboost-dev libboost-all-dev
+$ sudo apt-get install libboost-dev \
+libboost-system-dev \
+libboost-thread-dev \
+libboost-regex-dev \
+libboost-chrono-dev \
+libboost-signals-dev
 ```
 
-or manually. -> [How to install boost](http://www.boost.org/doc/libs/1_63_0/more/getting_started/index.html)
+or manually:
+
+Download the boost_1_63_0.tar.gz from [here](http://www.boost.org/users/history/version_1_63_0.html).
+From Downloads directory unpack it into ~/boost and run its install scripts
+
+```bash
+# if not already existing
+$ mkdir -p ~/boost/
+$ tar xf boost_1_63_0.tar.gz -C ~/boost/
+$ cd ~/boost/boost_1_63_0
+$ ./bootstrap.sh --prefix=/home/$USER/boost/
+$ ./b2 --build-dir=/home/$USER/boost/ --with-system --with-chrono --with-regex --with-signals --with-thread
+```
+
+Now *~/boost/boost_1_63_0/* is the boost root directory.
 
 Note that the boost version from package manager may be too old. *( >= 1.58.0 verified to work also)*
 
 ## Installation
 
+Clone or download this repository.  
 Before installing the program, one should adjust the values in
 [Parameters.h](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/src/util/Parameters.h).
 These parameters have to stay fixed, so they can not be changed after compilation.
@@ -159,6 +179,8 @@ Watch the log with
 
 ```bash
 $ journalctl -u {servicename}.service
+# or
+$ sudo cat /var/log/{servicename}.log
 ```
 
 Examples:
@@ -169,6 +191,8 @@ $ sudo service vfrb start
 $ sudo systemctl enable vfrb.service
 # ------
 $ journalctl -u vfrb.service
+# ------
+$ sudo cat /var/log/vfrb.log
 ```
 
 ## Future plans

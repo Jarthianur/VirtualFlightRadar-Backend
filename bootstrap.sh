@@ -24,3 +24,4 @@ export VFRB_EXEC_PATH_B=
 # path to .properties file (default: target/)
 # example: /home/user/ , ~/
 export VFRB_PROP_PATH_B=
+

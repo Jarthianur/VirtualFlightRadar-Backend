@@ -10,7 +10,8 @@ export BOOST_ROOT=${BOOST_ROOT_B:-}
 export VFRB_EXEC_PATH=${VFRB_EXEC_PATH_B:-$PWD/target/}
 export VFRB_PROP_PATH=${VFRB_PROP_PATH_B:-$PWD/target/}
 export VFRB_TARGET=$VFRB_NAME-$VFRB_VERSION
-export VFRB_ROOT=$PWD
+VFRB_ROOT=$PWD
+BOOST_MAN=0
 
 ##########################################
 echo "... INSTALL VFRB ..."
@@ -45,6 +46,7 @@ else
     echo "BOOST_ROOT: $BOOST_ROOT"
     export BOOST_LIBS_L="-L$BOOST_ROOT/stage/lib"
     export BOOST_ROOT_I="-I$BOOST_ROOT"
+    BOOST_MAN=1
 fi
 if [ -z "$VFRB_EXEC_PATH_B" ]; then
     echo "VFRB_EXEC_PATH not set, using default: $VFRB_EXEC_PATH"
@@ -95,13 +97,16 @@ echo ""
 echo "... SETUP SERVICE ..."
 echo ""
 mkdir -p $VFRB_ROOT/target/service
-mkdir -p $VFRB_ROOT/target/service/$VFRB_NAME.service.d
-pushd $VFRB_ROOT/target/service/$VFRB_NAME.service.d
-sed "s|%BOOST_LIBS_PATH%|$BOOST_ROOT/stage/lib:|" <$VFRB_ROOT/service/vfrb.service.d/vfrb.conf >$VFRB_NAME.conf
-cd ..
+if [ $BOOST_MAN -eq 1 ]; then
+    mkdir -p $VFRB_ROOT/target/service/$VFRB_NAME.service.d
+    pushd $VFRB_ROOT/target/service/$VFRB_NAME.service.d
+    sed -e "s|%BOOST_LIBS_PATH%|$BOOST_ROOT/stage/lib:|" <$VFRB_ROOT/service/vfrb.service.d/vfrb.conf >$VFRB_NAME.conf
+    cd ..
+fi
 sed -e "s|%VFRB_NAME%|$VFRB_NAME|" \
     -e "s|%VFRB_EXEC_PATH%|$VFRB_EXEC_PATH/$VFRB_TARGET|" \
     -e "s|%VFRB_PROP_PATH%|$VFRB_PROP_PATH/$VFRB_PROP.properties|" \
+    -e "s|%VFRB_LOG_PATH%|$VFRB_NAME.log|g" \
     <$VFRB_ROOT/service/vfrb.service >$VFRB_NAME.service
 echo ""
 echo "$VFRB_NAME.service created in $VFRB_ROOT/target/service/"

@@ -3,6 +3,8 @@ Description=%VFRB_NAME%
 
 [Service]
 Type=simple
+StandardOutput=/var/log/%VFRB_LOG_PATH%
+StandardError=/var/log/%VFRB_LOG_PATH%
 ExecStart=%VFRB_EXEC_PATH% -c %VFRB_PROP_PATH%
 
 [Install]
