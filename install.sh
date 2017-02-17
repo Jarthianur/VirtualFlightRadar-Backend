@@ -104,8 +104,10 @@ if [ $BOOST_MAN -eq 1 ]; then
     mkdir -p $VFRB_ROOT/target/service/$VFRB_NAME.service.d
     pushd $VFRB_ROOT/target/service/$VFRB_NAME.service.d
     sed -e "s|%BOOST_LIBS_PATH%|$BOOST_ROOT/stage/lib:|" <$VFRB_ROOT/service/vfrb.service.d/vfrb.conf >$VFRB_NAME.conf
-    cd ..
+    popd
 fi
+pushd $VFRB_ROOT/target/service/
+echo ""
 sed -e "s|%VFRB_NAME%|$VFRB_NAME|" \
     -e "s|%VFRB_EXEC_PATH%|$VFRB_EXEC_PATH/$VFRB_TARGET|" \
     -e "s|%VFRB_PROP_PATH%|$VFRB_PROP_PATH/$VFRB_PROP.properties|" \
