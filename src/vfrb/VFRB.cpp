@@ -19,26 +19,25 @@
  }
  */
 
-#include "../vfrb/VFRB.h"
+#include "VFRB.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
 #include <boost/thread.hpp>
-#include <csignal>
 #include <exception>
 #include <functional>
 #include <string>
 
-#include "../aircraft/AircraftContainer.h"
-#include "../aircraft/AircraftProcessor.h"
-#include "../io/client/APRSCClient.h"
-#include "../io/client/SBSClient.h"
-#include "../io/client/WindClient.h"
-#include "../io/logger/Logger.h"
-#include "../io/server/NMEAServer.h"
-#include "../util/ClimateData.h"
-#include "../util/Configuration.h"
+#include "../config/Configuration.h"
+#include "../data/AircraftContainer.h"
+#include "../data/ClimateData.h"
+#include "../tcp/client/APRSCClient.h"
+#include "../tcp/client/SBSClient.h"
+#include "../tcp/client/WindClient.h"
+#include "../tcp/server/NMEAServer.h"
+#include "../util/GPSmodule.h"
+#include "../util/Logger.h"
 
 bool VFRB::global_climate_enabled = false;
 bool VFRB::global_aprsc_enabled = false;
@@ -60,6 +59,14 @@ void VFRB::run()
     Logger::info("(VFRB) startup");
     //store start time
     boost::chrono::system_clock::time_point start = boost::chrono::system_clock::now();
+
+    // set climate fallbacks
+    climate_data.setPress();
+    climate_data.setTemp();
+
+    // init containers processor
+    ac_cont.initProcessor(Configuration::base_latitude, Configuration::base_longitude,
+                              Configuration::base_altitude, Configuration::base_geoid);
 
     // eval config
     if (Configuration::global_aprsc_host.compare("nA") != 0 || Configuration::global_aprsc_host.length()
@@ -93,7 +100,7 @@ void VFRB::run()
     }
 
     //create ac proc for gpsfix
-    AircraftProcessor ac_proc(Configuration::base_latitude, Configuration::base_longitude,
+    GPSmodule gpsm(Configuration::base_latitude, Configuration::base_longitude,
                               Configuration::base_altitude, Configuration::base_geoid);
 
     // register signals and run handler
@@ -135,7 +142,7 @@ void VFRB::run()
             }
 
             //write GPS position to clients
-            str = ac_proc.gpsfix();
+            str = gpsm.gpsfix();
             server.writeToAll(str);
 
             //write wind to clients

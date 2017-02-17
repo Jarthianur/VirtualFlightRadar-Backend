@@ -26,7 +26,7 @@
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <string>
-#include "../../util/Parameters.h"
+#include "../../config/Parameters.h"
 
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
 

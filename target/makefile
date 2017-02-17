@@ -13,13 +13,13 @@ BOOST_I := ${BOOST_ROOT_I}
 # All of the sources participating in the build are defined here
 -include sources.mk
 #-include test/subdir.mk
--include src/util/subdir.mk
--include src/parser/subdir.mk
 -include src/vfrb/subdir.mk
--include src/io/server/subdir.mk
--include src/io/reader/subdir.mk
--include src/io/logger/subdir.mk
--include src/io/client/subdir.mk
+-include src/util/subdir.mk
+-include src/tcp/server/subdir.mk
+-include src/tcp/client/subdir.mk
+-include src/parser/subdir.mk
+-include src/data/subdir.mk
+-include src/config/subdir.mk
 -include src/aircraft/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
@@ -56,7 +56,7 @@ endif
 VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: G++ Linker'
-	$(CXX) $(BOOST_L) -pthread -o $(TARGET) $(OBJS) $(USER_OBJS) $(LIBS)
+	$(CXX) $(BOOST_L) -o $(TARGET) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	

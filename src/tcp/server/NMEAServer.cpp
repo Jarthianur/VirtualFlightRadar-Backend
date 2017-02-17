@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include "../logger/Logger.h"
+#include "../../util/Logger.h"
 
 
 NMEAServer::NMEAServer(boost::asio::signal_set& s, uint16_t port)

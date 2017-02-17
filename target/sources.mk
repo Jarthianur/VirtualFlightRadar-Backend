@@ -23,12 +23,12 @@ C_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+src \
 src/aircraft \
-src/io/client \
-src/io/logger \
-src/io/reader \
-src/io/server \
-src/main \
+src/config \
+src/data \
 src/parser \
+src/tcp/client \
+src/tcp/server \
 src/util \
-
+src/vfrb \

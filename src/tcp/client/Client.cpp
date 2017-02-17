@@ -19,13 +19,13 @@
  }
  */
 
-#include "Client.h"
+#include "../../tcp/client/Client.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/system/error_code.hpp>
 #include <csignal>
-#include "../logger/Logger.h"
+#include "../../util/Logger.h"
 
 Client::Client(boost::asio::signal_set& s, const std::string& host,
         const std::string& port, const std::string& comp)

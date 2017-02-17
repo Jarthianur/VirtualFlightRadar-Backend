@@ -24,19 +24,24 @@
 #include <cstdint>
 #include <exception>
 #include <iterator>
-#include <utility>
 
-#include "../io/logger/Logger.h"
-#include "../util/Configuration.h"
+#include "../util/Logger.h"
+
 
 AircraftContainer::AircraftContainer()
-        : proc(Configuration::base_latitude, Configuration::base_longitude,
-               Configuration::base_altitude, Configuration::base_geoid)
+        : proc(),
+          cont()
 {
+    cont.reserve(20);
 }
 
 AircraftContainer::~AircraftContainer()
 {
+}
+
+void AircraftContainer::initProcessor(double proc_lat, double proc_lon, int32_t proc_alt, double proc_geoid)
+{
+    proc.init(proc_lat, proc_lon, proc_alt, proc_geoid);
 }
 
 ssize_t AircraftContainer::find(std::string& id)

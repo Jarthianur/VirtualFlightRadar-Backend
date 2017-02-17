@@ -19,55 +19,35 @@
  }
  */
 
-#include "ClimateData.h"
+#ifndef SBSCLIENT_H_
+#define SBSCLIENT_H_
 
-#include "Configuration.h"
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
+#include <string>
 
-ClimateData::ClimateData()
-        : pressure(Configuration::base_pressure),
-          temperature(Configuration::base_temp)
+#include "../../parser/SBSParser.h"
+#include "Client.h"
+
+class SBSClient: public Client
 {
-}
+public:
+    SBSClient(const SBSClient&) = delete;
+    SBSClient& operator=(const SBSClient&) = delete;
 
-ClimateData::~ClimateData()
-{
-}
+    SBSClient(boost::asio::signal_set& s, const std::string& host, const std::string& port);
+    virtual ~SBSClient() throw ();
 
-std::string ClimateData::extractWV()
-{
-    std::lock_guard<std::mutex> lock(this->mutex);
-    wv_valid = false;
-    return wv_ + "\r\n";
-}
+private:
+    void process();
+    void connect();
 
-bool ClimateData::isValid()
-{
-    return wv_valid;
-}
+    void handleResolve(const boost::system::error_code& ec,
+            boost::asio::ip::tcp::resolver::iterator it);
+    void handleConnect(const boost::system::error_code& ec,
+            boost::asio::ip::tcp::resolver::iterator it);
 
-double ClimateData::getPress()
-{
-    return pressure;
-}
+    SBSParser parser;
+};
 
-void ClimateData::insertWV(const std::string& wv)
-{
-    std::lock_guard<std::mutex> lock(this->mutex);
-    wv_ = wv;
-    wv_valid = true;
-}
-
-void ClimateData::setPress(double p)
-{
-    pressure = p;
-}
-
-void ClimateData::setTemp(double t)
-{
-    temperature = t;
-}
-
-double ClimateData::getTemp()
-{
-    return temperature;
-}
+#endif /* SBSCLIENT_H_ */

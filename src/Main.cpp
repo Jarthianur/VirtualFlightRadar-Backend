@@ -23,10 +23,11 @@
 #include <stdexcept>
 #include <string>
 
-#include "io/logger/Logger.h"
-#include "io/reader/ConfigReader.h"
-#include "util/Configuration.h"
+#include "config/ConfigReader.h"
+#include "config/Configuration.h"
+#include "util/Logger.h"
 #include "vfrb/VFRB.h"
+
 
 #ifndef VERSION
 #define VERSION "DEMO"

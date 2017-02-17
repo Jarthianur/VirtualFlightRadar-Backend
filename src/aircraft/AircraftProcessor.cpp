@@ -21,20 +21,27 @@
 
 #include "AircraftProcessor.h"
 
-#include <cstddef>
-#include <cstdint>
 #include <cmath>
+#include <complex>
 #include <cstdio>
-#include <ctime>
 
-#include "../vfrb/VFRB.h"
-#include "../util/ClimateData.h"
-#include "../util/Configuration.h"
+#include "../config/Configuration.h"
+#include "../data/ClimateData.h"
 #include "../util/Math.h"
+#include "../vfrb/VFRB.h"
 #include "Aircraft.h"
 
+
+AircraftProcessor::AircraftProcessor()
+        : baselat(0.0),
+          baselong(0.0),
+          basegeoid(0.0),
+          basealt(0)
+{
+}
+
 AircraftProcessor::AircraftProcessor(double b_lat, double b_long, int32_t b_alt,
-        double geo)
+                                     double geo)
         : baselat(b_lat),
           baselong(b_long),
           basegeoid(geo),
@@ -46,15 +53,12 @@ AircraftProcessor::~AircraftProcessor()
 {
 }
 
-int AircraftProcessor::checksum(const char* sentence) const
+void AircraftProcessor::init(double lat, double lon, int32_t alt, double geoid)
 {
-    int32_t csum = 0;
-    size_t i = 1;
-    while (sentence[i] != '*' && sentence[i] != '\0')
-    {
-        csum ^= (int) sentence[i++];
-    }
-    return csum;
+    baselat = lat;
+    baselong = lon;
+    basealt = alt;
+    basegeoid = geoid;
 }
 
 std::string AircraftProcessor::process(Aircraft& ac)
@@ -71,7 +75,7 @@ std::string AircraftProcessor::process(Aircraft& ac)
     //PFLAU
     snprintf(buffer, AP_BUFF_S - 1, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
              Math::dToI(bearing_rel), rel_V, dist, ac.id.c_str());
-    int32_t csum = checksum(buffer);
+    int32_t csum = Math::checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, AP_L_BUFF_S - 1, "%02x\r\n", csum);
     nmea_str.append(buffer);
@@ -88,7 +92,7 @@ std::string AircraftProcessor::process(Aircraft& ac)
                  Math::dToI(ac.gnd_speed * Math::ms2kmh), ac.climb_rate,
                  ac.aircraft_type);
     }
-    csum = checksum(buffer);
+    csum = Math::checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, AP_L_BUFF_S - 1, "%02x\r\n", csum);
     nmea_str.append(buffer);
@@ -118,46 +122,7 @@ void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
     rel_N = Math::dToI(std::cos(Math::radian(bearing_abs)) * dist);
     rel_E = Math::dToI(std::sin(Math::radian(bearing_abs)) * dist);
     rel_V = ac.qne ?
-            ac.altitude - Math::calcIcaoHeight(VFRB::climate_data.getPress()) :
+            ac.altitude - Math::calcIcaoHeight(VFRB::climate_data.getPress(),
+                                               VFRB::climate_data.getTemp()) :
             ac.altitude - basealt;
-}
-
-std::string AircraftProcessor::gpsfix()
-{
-    std::string nmea_str;
-    int32_t csum;
-
-    latstr = (baselat < 0) ? 'S' : 'N';
-    longstr = (baselong < 0) ? 'W' : 'E';
-    lat_deg = std::abs(std::floor(baselat));
-    lat_min = std::abs(60.0 * (baselat - lat_deg));
-    long_deg = std::abs(std::floor(baselong));
-    long_min = std::abs(60.0 * (baselong - long_deg));
-
-    time_t now = time(0);
-    tm* utc = gmtime(&now);
-    //gprmc
-    snprintf(
-            buffer,
-            AP_BUFF_S - 1,
-            "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
-            utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg,
-            long_min, longstr, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
-    csum = checksum(buffer);
-    nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S - 1, "%02x\r\n", csum);
-    nmea_str.append(buffer);
-    //gpgga
-    snprintf(
-            buffer,
-            AP_BUFF_S - 1,
-            "$GPGGA,%02d%02d%02d,%02.0lf%06.4lf,%c,%03.0lf%07.4lf,%c,1,05,1,%d,M,%.1lf,M,,*",
-            utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg,
-            long_min, longstr, basealt, basegeoid);
-    csum = checksum(buffer);
-    nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S - 1, "%02x\r\n", csum);
-    nmea_str.append(buffer);
-
-    return nmea_str;
 }

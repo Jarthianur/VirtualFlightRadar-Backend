@@ -84,16 +84,19 @@ if [ -x "$VFRB_ROOT/target/$VFRB_TARGET" ]; then
     mv $VFRB_ROOT/target/$VFRB_TARGET $VFRB_EXEC_PATH/$VFRB_TARGET
     echo ""
     echo "$VFRB_TARGET copied to $VFRB_EXEC_PATH"
-    echo ""
 else
     echo ""
     echo "ERROR: $VFRB_TARGET does not exist"
     exit 1
 fi
 sed "s|%VERSION%|$VFRB_VERSION|" <$VFRB_ROOT/vfrb.properties >$VFRB_PROP_PATH/$VFRB_PROP.properties
-echo ""
 echo "$VFRB_PROP.properties copied to $VFRB_PROP_PATH"
 echo ""
+if [ $BOOST_MAN -eq 1 ]; then
+    echo "... ADD TO LD_LIBRARY_PATH ..."
+    echo "export LD_LIBRARY_PATH=$BOOST_ROOT/stage/lib/:\$LD_LIBRARY_PATH" >> ~/.bashrc
+    echo "export LD_LIBRARY_PATH=$BOOST_ROOT/stage/lib/:\$LD_LIBRARY_PATH"
+fi
 echo "... SETUP SERVICE ..."
 echo ""
 mkdir -p $VFRB_ROOT/target/service
@@ -108,7 +111,6 @@ sed -e "s|%VFRB_NAME%|$VFRB_NAME|" \
     -e "s|%VFRB_PROP_PATH%|$VFRB_PROP_PATH/$VFRB_PROP.properties|" \
     -e "s|%VFRB_LOG_PATH%|$VFRB_NAME.log|g" \
     <$VFRB_ROOT/service/vfrb.service >$VFRB_NAME.service
-echo ""
 echo "$VFRB_NAME.service created in $VFRB_ROOT/target/service/"
 echo ""
 popd

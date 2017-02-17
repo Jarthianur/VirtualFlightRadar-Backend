@@ -22,15 +22,14 @@
 #include "APRSParser.h"
 
 #include <boost/regex.hpp>
-#include <cstdint>
 #include <stdexcept>
 
-#include "../aircraft/Aircraft.h"
-#include "../aircraft/AircraftContainer.h"
-#include "../io/logger/Logger.h"
-#include "../vfrb/VFRB.h"
-#include "../util/Configuration.h"
+#include "../config/Configuration.h"
+#include "../data/AircraftContainer.h"
+#include "../util/Logger.h"
 #include "../util/Math.h"
+#include "../vfrb/VFRB.h"
+
 
 APRSParser::APRSParser()
         : Parser(),

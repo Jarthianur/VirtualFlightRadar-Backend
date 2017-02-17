@@ -30,7 +30,7 @@
 #include <vector>
 
 #include "Connection.h"
-#include "../../util/Parameters.h"
+#include "../../config/Parameters.h"
 
 #define S_MAX_CLIENTS SERVER_MAX_CLIENTS
 

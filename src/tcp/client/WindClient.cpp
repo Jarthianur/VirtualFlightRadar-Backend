@@ -19,58 +19,98 @@
  }
  */
 
-#include "SBSClient.h"
+#include "WindClient.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/system/error_code.hpp>
-#include <cstddef>
-#include <iostream>
+#include <boost/date_time.hpp>
+#include <boost/operators.hpp>
 
-#include "../logger/Logger.h"
+#include "../../util/Logger.h"
 
-SBSClient::SBSClient(boost::asio::signal_set& s, const std::string& host,
+WindClient::WindClient(boost::asio::signal_set& s, const std::string& host,
         const std::string& port)
-        : Client(s, host, port, "(SBSClient)"),
+        : Client(s, host, port, "(WindClient)"),
+          stopped_(false),
+          timeout_(io_service_),
           parser()
 {
     connect();
+    timeout_.async_wait(boost::bind(&WindClient::checkDeadline, this));
 }
 
-SBSClient::~SBSClient() throw ()
+WindClient::~WindClient() throw ()
 {
 }
 
-void SBSClient::connect()
+void WindClient::read()
+{
+    timeout_.expires_from_now(boost::posix_time::seconds(WC_RCV_TIMEOUT));
+    Client::read();
+}
+
+void WindClient::connect()
 {
     boost::asio::ip::tcp::resolver::query query(
             host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
     resolver_.async_resolve(
             query,
-            boost::bind(&SBSClient::handleResolve, this, boost::asio::placeholders::error,
+            boost::bind(&WindClient::handleResolve, this,
+                        boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
 }
 
-void SBSClient::process()
+void WindClient::checkDeadline()
+{
+    if (stopped_)
+    {
+        return;
+    }
+    if (timeout_.expires_at() <= boost::asio::deadline_timer::traits_type::now())
+    {
+        Logger::warn("(WindClient) timed out: reconnect...");
+        if (socket_.is_open())
+        {
+            socket_.close();
+        }
+        timeout_.expires_at(boost::posix_time::pos_infin);
+        connect();
+    }
+    timeout_.async_wait(boost::bind(&WindClient::checkDeadline, this));
+}
+
+void WindClient::stop()
+{
+    Client::stop();
+    stopped_ = true;
+    timeout_.expires_at(boost::posix_time::pos_infin);
+    timeout_.cancel();
+}
+
+void WindClient::process()
 {
     parser.unpack(response);
 }
 
-void SBSClient::handleResolve(const boost::system::error_code& ec,
+void WindClient::handleResolve(const boost::system::error_code& ec,
         boost::asio::ip::tcp::resolver::iterator it)
 {
+    if (stopped_)
+    {
+        return;
+    }
     if (!ec)
     {
         boost::asio::async_connect(
                 socket_,
                 it,
-                boost::bind(&SBSClient::handleConnect, this,
+                boost::bind(&WindClient::handleConnect, this,
                             boost::asio::placeholders::error,
                             boost::asio::placeholders::iterator));
     }
     else
     {
-        Logger::error("(SBSClient) resolve host: ", ec.message());
+        Logger::error("(WindClient) resolve host: ", ec.message());
         if (socket_.is_open())
         {
             socket_.close();
@@ -79,18 +119,22 @@ void SBSClient::handleResolve(const boost::system::error_code& ec,
     }
 }
 
-void SBSClient::handleConnect(const boost::system::error_code& ec,
+void WindClient::handleConnect(const boost::system::error_code& ec,
         boost::asio::ip::tcp::resolver::iterator it)
 {
+    if (stopped_)
+    {
+        return;
+    }
     if (!ec)
     {
         socket_.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(SBSClient) connected to: ", host);
+        Logger::info("(WindClient) connected to: ", host);
         read();
     }
     else
     {
-        Logger::error("(SBSClient) connect: ", ec.message());
+        Logger::error("(WindClient) connect: ", ec.message());
         if (socket_.is_open())
         {
             socket_.close();

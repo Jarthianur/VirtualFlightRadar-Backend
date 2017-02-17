@@ -27,7 +27,7 @@
 #include <cstddef>
 #include <iostream>
 
-#include "../logger/Logger.h"
+#include "../../util/Logger.h"
 
 APRSCClient::APRSCClient(boost::asio::signal_set& s, const std::string& host,
         const std::string& port, const std::string& login)

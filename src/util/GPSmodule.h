@@ -19,49 +19,46 @@
  }
  */
 
-#include "Math.h"
-#include <cstddef>
+#ifndef GPSMODULE_H_
+#define GPSMODULE_H_
 
-namespace Math
+#include <cstdint>
+#include <string>
+
+#define GPSM_BUFF_S 8192
+#define GPSM_L_BUFF_S 128
+
+class GPSmodule
 {
+public:
+    GPSmodule(double, double, int32_t, double);
+    virtual ~GPSmodule();
 
-double radian(double deg)
-{
-    return ((deg * PI) / 180.0);
-}
+    /**
+     * build GPRMC and GPGGA
+     */
+    std::string gpsfix();
 
-double degree(double rad)
-{
-    return (rad * 180.0) / PI;
-}
+private:
+    double baselat, baselong, basegeoid,
+    /**
+     * Latitude degree, minutes
+     * Longitude degree, minutes
+     */
+    lat_deg = 0.0, lat_min = 0.0, long_deg = 0.0, long_min = 0.0;
+    int32_t basealt;
 
-int32_t dToI(double d)
-{
-    return (d >= 0.0) ? (int32_t) (d + 0.5) : (int32_t) (d - 0.5);
-}
+    /**
+     * Latitude: S - N
+     * Longitude: W - E
+     */
+    char latstr = 'n', longstr = 'w';
 
-double dmsToDeg(double dms)
-{
-    double absDms = std::abs(dms);
-    double d = std::floor(absDms);
-    double m = (absDms - d) * 100.0 / 60.0;
-    return d + m;
-}
+    /**
+     * format string buffer
+     */
+    char buffer[GPSM_BUFF_S];
 
-double calcIcaoHeight(double press, double temp)
-{
-    return (273.15 + temp) * (1.0 - std::pow((press / 1013.25), 0.190295)) / 0.0065;
-}
+};
 
-int32_t checksum(const char* sentence)
-{
-    int32_t csum = 0;
-    size_t i = 1;
-    while (sentence[i] != '*' && sentence[i] != '\0')
-    {
-        csum ^= (int32_t) sentence[i++];
-    }
-    return csum;
-}
-
-}
+#endif /* GPSMODULE_H_ */

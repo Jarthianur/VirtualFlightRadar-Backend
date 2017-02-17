@@ -19,44 +19,38 @@
  }
  */
 
-#ifndef WINDCLIENT_H_
-#define WINDCLIENT_H_
+#ifndef APRSCCLIENT_H_
+#define APRSCCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <string>
 
+#include "../../parser/APRSParser.h"
 #include "Client.h"
-#include "../../parser/WindParser.h"
-#include "../../util/Parameters.h"
 
-#define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
-
-class WindClient: public Client
+class APRSCClient: public Client
 {
 public:
-    WindClient(const WindClient&) = delete;
-    WindClient& operator=(const WindClient&) = delete;
+    APRSCClient(const APRSCClient&) = delete;
+    APRSCClient& operator=(const APRSCClient&) = delete;
 
-    WindClient(boost::asio::signal_set& s, const std::string& host,
-            const std::string& port);
-    virtual ~WindClient() throw ();
+    APRSCClient(boost::asio::signal_set& s, const std::string& host,
+            const std::string& port, const std::string& login);
+    virtual ~APRSCClient() throw ();
 
 private:
-    void read();
     void process();
     void connect();
-    void checkDeadline();
-    void stop();
 
     void handleResolve(const boost::system::error_code& ec,
             boost::asio::ip::tcp::resolver::iterator it);
     void handleConnect(const boost::system::error_code& ec,
             boost::asio::ip::tcp::resolver::iterator it);
+    void handleLogin(const boost::system::error_code& ec, std::size_t s);
 
-    bool stopped_;
-    boost::asio::deadline_timer timeout_;
-    WindParser parser;
+    std::string login_str;
+    APRSParser parser;
 };
 
-#endif /* WINDCLIENT_H_ */
+#endif /* APRSCCLIENT_H_ */

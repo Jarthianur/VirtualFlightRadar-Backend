@@ -19,39 +19,53 @@
  }
  */
 
-#ifndef WINDFEED_H_
-#define WINDFEED_H_
+#include "ClimateData.h"
 
-#include <mutex>
-#include <string>
-
-#define ICAO_STD_A 1013.25
-#define ICAO_STD_T 15.0
-#define CD_VALUE_NA -1000.0
-
-class ClimateData
+ClimateData::ClimateData()
+        : pressure(ICAO_STD_A),
+          temperature(ICAO_STD_T)
 {
-public:
-    ClimateData();
-    virtual ~ClimateData();
+}
 
-    std::string extractWV();
-    void insertWV(const std::string& wv);
+ClimateData::~ClimateData()
+{
+}
 
-    bool isValid();
-    double getPress();
-    double getTemp();
-    void setPress(double p = CD_VALUE_NA);
-    void setTemp(double t = CD_VALUE_NA);
+std::string ClimateData::extractWV()
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    wv_valid = false;
+    return wv_ + "\r\n";
+}
 
-private:
-    std::mutex mutex;
-    std::string wv_;
-    // hpa
-    double pressure = ICAO_STD_A;
-    // celsius
-    double temperature = ICAO_STD_T;
-    bool wv_valid = false;
-};
+bool ClimateData::isValid()
+{
+    return wv_valid;
+}
 
-#endif /* WINDFEED_H_ */
+double ClimateData::getPress()
+{
+    return pressure;
+}
+
+void ClimateData::insertWV(const std::string& wv)
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    wv_ = wv;
+    wv_valid = true;
+}
+
+void ClimateData::setPress(double p)
+{
+    pressure = p;
+}
+
+void ClimateData::setTemp(double t)
+{
+    temperature = t;
+}
+
+double ClimateData::getTemp()
+{
+    return temperature;
+}

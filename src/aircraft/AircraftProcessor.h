@@ -33,6 +33,7 @@ class Aircraft;
 class AircraftProcessor
 {
 public:
+    AircraftProcessor();
     AircraftProcessor(double, double, int32_t, double);
     virtual ~AircraftProcessor();
 
@@ -41,21 +42,13 @@ public:
      */
     std::string process(Aircraft&);
 
-    /**
-     * build GPRMC and GPGGA
-     */
-    std::string gpsfix();
+    void init(double, double, int32_t, double);
 
 private:
     /**
      * format string buffer
      */
     char buffer[AP_BUFF_S];
-
-    /**
-     * compute checksum of nmea string
-     */
-    int32_t checksum(const char*) const;
 
     /**
      * calculate relative position to base and absolute heading
@@ -65,12 +58,7 @@ private:
     /**
      * base position info
      */
-    double baselat, baselong,
-    /**
-     * Latitude degree, minutes
-     * Longitude degree, minutes
-     */
-    lat_deg = 0.0, lat_min = 0.0, long_deg = 0.0, long_min = 0.0,
+    double baselat, baselong, basegeoid,
     /**
      * Longitude base, Aircraft
      * Latitude base, Aircraft
@@ -87,11 +75,7 @@ private:
     /**
      * values to calculate distance
      */
-    a = 0.0,
-    /**
-     * geoid separation
-     */
-    basegeoid;
+    a = 0.0;
     /**
      * (alt = height + antennaheight)
      */
@@ -104,11 +88,7 @@ private:
      * distance from base position to Aircraft
      */
     dist = 0;
-    /**
-     * Latitude: S - N
-     * Longitude: W - E
-     */
-    char latstr = 'n', longstr = 'w';
+
 };
 
 #endif /* AIRCRAFTPROCESSOR_H_ */

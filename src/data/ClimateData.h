@@ -19,35 +19,41 @@
  }
  */
 
-#ifndef SBSCLIENT_H_
-#define SBSCLIENT_H_
+#ifndef WINDFEED_H_
+#define WINDFEED_H_
 
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
+#include <mutex>
 #include <string>
 
-#include "Client.h"
-#include "../../parser/SBSParser.h"
+#include "../config/Configuration.h"
 
-class SBSClient: public Client
+
+#define ICAO_STD_A 1013.25
+#define ICAO_STD_T 15.0
+
+class ClimateData
 {
 public:
-    SBSClient(const SBSClient&) = delete;
-    SBSClient& operator=(const SBSClient&) = delete;
+    ClimateData();
+    virtual ~ClimateData();
 
-    SBSClient(boost::asio::signal_set& s, const std::string& host, const std::string& port);
-    virtual ~SBSClient() throw ();
+    std::string extractWV();
+    void insertWV(const std::string& wv);
+
+    bool isValid();
+    double getPress();
+    double getTemp();
+    void setPress(double p = Configuration::base_pressure);
+    void setTemp(double t = Configuration::base_temp);
 
 private:
-    void process();
-    void connect();
-
-    void handleResolve(const boost::system::error_code& ec,
-            boost::asio::ip::tcp::resolver::iterator it);
-    void handleConnect(const boost::system::error_code& ec,
-            boost::asio::ip::tcp::resolver::iterator it);
-
-    SBSParser parser;
+    std::mutex mutex;
+    std::string wv_;
+    // hpa
+    double pressure;
+    // celsius
+    double temperature;
+    bool wv_valid = false;
 };
 
-#endif /* SBSCLIENT_H_ */
+#endif /* WINDFEED_H_ */

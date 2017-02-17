@@ -51,6 +51,11 @@ double dmsToDeg(double dms);
 double calcIcaoHeight(double, double = 15.0);
 
 /**
+ * compute checksum of nmea string
+ */
+int32_t checksum(const char*);
+
+/**
  * constants
  */
 const double kts2kmh = 1.852;

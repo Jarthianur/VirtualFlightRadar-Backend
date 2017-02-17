@@ -22,7 +22,7 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 #define MSG_UNPACK_SUC 0

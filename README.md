@@ -104,7 +104,8 @@ file right now to deploy it ready-to-use, or later.
 Edit the [bootstrap.sh](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/bootstrap.sh) according to Your needs.  
 There are just a few variables, which need to be set as stated in their comments.  
 Next run `./install.sh` and look at its output. If all requirements are met, the VFR-B was
-successfully built, stored where specified and a systemd service was properly configured.  
+successfully built, stored where specified and a systemd service was properly configured.
+
 To add the systemd service run
 
 ```bash
