@@ -4,7 +4,7 @@ TODO
 .settings/
 .cproject
 .project
-target/
+target/**/.[od]
 !target/**/*.mk
 !target/makefile
 test/
