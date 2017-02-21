@@ -61,7 +61,8 @@ VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	@echo ' '
 	
 # All Target
-all: VirtualFlightRadar-Backend #tests	
+all: VirtualFlightRadar-Backend
+#tests	
 	
 # Test
 #tests: $(TEST_OBJS) $(USER_OBJS)

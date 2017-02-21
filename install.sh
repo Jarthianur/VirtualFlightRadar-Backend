@@ -68,7 +68,7 @@ echo ""
 echo "... RUN MAKE ..."
 echo ""
 pushd $VFRB_ROOT/target/
-make
+make all
 error=$?
 unset BOOST_LIBS_L
 unset BOOST_ROOT_I
@@ -92,10 +92,13 @@ fi
 sed "s|%VERSION%|$VFRB_VERSION|" <$VFRB_ROOT/vfrb.properties >$VFRB_PROP_PATH/$VFRB_PROP.properties
 echo "$VFRB_PROP.properties copied to $VFRB_PROP_PATH"
 echo ""
-if [ $BOOST_MAN -eq 1 ]; then
+BASH_LD=$(cat ~/.bashrc | grep "export LD_LIBRARY_PATH=$BOOST_ROOT/stage/lib/:\$LD_LIBRARY_PATH")
+if [ $BOOST_MAN -eq 1 ] && [ "$BASH_LD" == "" ]; then
     echo "... ADD TO LD_LIBRARY_PATH ..."
+    echo ""
     echo "export LD_LIBRARY_PATH=$BOOST_ROOT/stage/lib/:\$LD_LIBRARY_PATH" >> ~/.bashrc
     echo "export LD_LIBRARY_PATH=$BOOST_ROOT/stage/lib/:\$LD_LIBRARY_PATH"
+    echo ""
 fi
 echo "... SETUP SERVICE ..."
 echo ""
