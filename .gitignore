@@ -5,3 +5,8 @@ TODO
 .cproject
 .project
 /test/
+/target/**
+!/target/**/
+/target/service/
+!/target/**/*.mk
+!/target/makefile
