@@ -34,7 +34,7 @@ class AircraftProcessor
 {
 public:
     AircraftProcessor();
-    AircraftProcessor(double, double, int32_t, double);
+    AircraftProcessor(double, double, int32_t);
     virtual ~AircraftProcessor();
 
     /**
@@ -42,7 +42,7 @@ public:
      */
     std::string process(Aircraft&);
 
-    void init(double, double, int32_t, double);
+    void init(double, double, int32_t);
 
 private:
     /**
@@ -58,7 +58,7 @@ private:
     /**
      * base position info
      */
-    double baselat, baselong, basegeoid,
+    double baselat, baselong,
     /**
      * Longitude base, Aircraft
      * Latitude base, Aircraft

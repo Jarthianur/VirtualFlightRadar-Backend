@@ -39,9 +39,9 @@ AircraftContainer::~AircraftContainer()
 {
 }
 
-void AircraftContainer::initProcessor(double proc_lat, double proc_lon, int32_t proc_alt, double proc_geoid)
+void AircraftContainer::initProcessor(double proc_lat, double proc_lon, int32_t proc_alt)
 {
-    proc.init(proc_lat, proc_lon, proc_alt, proc_geoid);
+    proc.init(proc_lat, proc_lon, proc_alt);
 }
 
 ssize_t AircraftContainer::find(std::string& id)

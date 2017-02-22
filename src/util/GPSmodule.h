@@ -45,14 +45,14 @@ private:
      * Latitude degree, minutes
      * Longitude degree, minutes
      */
-    lat_deg = 0.0, lat_min = 0.0, long_deg = 0.0, long_min = 0.0;
+    lat_deg, lat_min, long_deg, long_min;
     int32_t basealt;
 
     /**
      * Latitude: S - N
      * Longitude: W - E
      */
-    char latstr = 'n', longstr = 'w';
+    char latstr, longstr;
 
     /**
      * format string buffer

@@ -60,14 +60,6 @@ void VFRB::run()
     //store start time
     boost::chrono::system_clock::time_point start = boost::chrono::system_clock::now();
 
-    // set climate fallbacks
-    climate_data.setPress();
-    climate_data.setTemp();
-
-    // init containers processor
-    ac_cont.initProcessor(Configuration::base_latitude, Configuration::base_longitude,
-                              Configuration::base_altitude, Configuration::base_geoid);
-
     // eval config
     if (Configuration::global_aprsc_host.compare("nA") != 0 || Configuration::global_aprsc_host.length()
             == 0)

@@ -35,6 +35,12 @@ GPSmodule::GPSmodule(double b_lat, double b_lon, int32_t b_alt, double geoid)
           basegeoid(geoid),
           basealt(b_alt)
 {
+    latstr = (baselat < 0) ? 'S' : 'N';
+    longstr = (baselong < 0) ? 'W' : 'E';
+    lat_deg = std::abs(std::floor(baselat));
+    lat_min = std::abs(60.0 * (baselat - lat_deg));
+    long_deg = std::abs(std::floor(baselong));
+    long_min = std::abs(60.0 * (baselong - long_deg));
 }
 
 GPSmodule::~GPSmodule()
@@ -45,13 +51,6 @@ std::string GPSmodule::gpsfix()
 {
     std::string nmea_str;
     int32_t csum;
-
-    latstr = (baselat < 0) ? 'S' : 'N';
-    longstr = (baselong < 0) ? 'W' : 'E';
-    lat_deg = std::abs(std::floor(baselat));
-    lat_min = std::abs(60.0 * (baselat - lat_deg));
-    long_deg = std::abs(std::floor(baselong));
-    long_min = std::abs(60.0 * (baselong - long_deg));
 
     time_t now = time(0);
     tm* utc = gmtime(&now);

@@ -46,7 +46,7 @@ public:
     AircraftContainer();
     virtual ~AircraftContainer() throw ();
 
-    void initProcessor(double, double, int32_t, double);
+    void initProcessor(double, double, int32_t);
 
     /**
      * insert aircraft in container

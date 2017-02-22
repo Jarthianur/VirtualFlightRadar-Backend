@@ -32,19 +32,16 @@
 #include "Aircraft.h"
 
 AircraftProcessor::AircraftProcessor()
-    : baselat(0.0),
-      baselong(0.0),
-      basegeoid(0.0),
-      basealt(0)
+        : baselat(0.0),
+          baselong(0.0),
+          basealt(0)
 {
 }
 
-AircraftProcessor::AircraftProcessor(double b_lat, double b_long, int32_t b_alt,
-                                     double geo)
-    : baselat(b_lat),
-      baselong(b_long),
-      basegeoid(geo),
-      basealt(b_alt)
+AircraftProcessor::AircraftProcessor(double b_lat, double b_long, int32_t b_alt)
+        : baselat(b_lat),
+          baselong(b_long),
+          basealt(b_alt)
 {
 }
 
@@ -52,12 +49,13 @@ AircraftProcessor::~AircraftProcessor()
 {
 }
 
-void AircraftProcessor::init(double lat, double lon, int32_t alt, double geoid)
+void AircraftProcessor::init(double lat, double lon, int32_t alt)
 {
     baselat = lat;
     baselong = lon;
     basealt = alt;
-    basegeoid = geoid;
+    long_b = Math::radian(baselong);
+    lat_b = Math::radian(baselat);
 }
 
 std::string AircraftProcessor::process(Aircraft &ac)
@@ -100,25 +98,26 @@ std::string AircraftProcessor::process(Aircraft &ac)
 
 void AircraftProcessor::calcRelPosToBase(Aircraft &ac)
 {
-    long_b = Math::radian(baselong);
     long_ac = Math::radian(ac.longitude);
-    lat_b = Math::radian(baselat);
     lat_ac = Math::radian(ac.latitude);
     long_dist = long_ac - long_b;
     lat_dist = lat_ac - lat_b;
 
-    a = std::pow(std::sin(lat_dist / 2.0), 2.0) + std::cos(lat_b) * std::cos(lat_ac) * std::pow(std::sin(long_dist / 2.0), 2.0);
+    a = std::pow(std::sin(lat_dist / 2.0), 2.0) + std::cos(lat_b)
+            * std::cos(lat_ac) * std::pow(std::sin(long_dist / 2.0), 2.0);
     dist = Math::dToI(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
 
     bearing_rel = Math::degree(
-        std::atan2(
-            std::sin(long_ac - long_b) * std::cos(lat_ac),
-            std::cos(lat_b) * std::sin(lat_ac) - std::sin(lat_b) * std::cos(lat_ac) * std::cos(long_ac - long_b)));
+            std::atan2(
+                    std::sin(long_ac - long_b) * std::cos(lat_ac),
+                    std::cos(lat_b) * std::sin(lat_ac) - std::sin(lat_b)
+                            * std::cos(lat_ac) * std::cos(long_ac - long_b)));
     bearing_abs = std::fmod((bearing_rel + 360.0), 360.0);
 
     rel_N = Math::dToI(std::cos(Math::radian(bearing_abs)) * dist);
     rel_E = Math::dToI(std::sin(Math::radian(bearing_abs)) * dist);
     rel_V = ac.qne ?
-        ac.altitude - Math::calcIcaoHeight(VFRB::climate_data.getPress(), VFRB::climate_data.getTemp()) - basealt
-        : ac.altitude - basealt;
+            ac.altitude - Math::calcIcaoHeight(VFRB::climate_data.getPress(),
+                                               VFRB::climate_data.getTemp()) :
+            ac.altitude - basealt;
 }

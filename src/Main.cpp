@@ -28,7 +28,6 @@
 #include "util/Logger.h"
 #include "vfrb/VFRB.h"
 
-
 #ifndef VERSION
 #define VERSION "DEMO"
 #endif
@@ -180,6 +179,14 @@ int main(int argc, char* argv[])
     Configuration::filter_maxHeight = maxHeight;
     Configuration::filter_maxDist = maxDist;
 
+    // set climate fallbacks
+    VFRB::climate_data.setPress();
+    VFRB::climate_data.setTemp();
+
+    // init containers processor
+    VFRB::ac_cont.initProcessor(Configuration::base_latitude,
+                                Configuration::base_longitude,
+                                Configuration::base_altitude);
     VFRB::run();
 
     return 0;
