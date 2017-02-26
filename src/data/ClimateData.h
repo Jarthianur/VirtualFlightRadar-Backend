@@ -22,7 +22,7 @@
 #ifndef WINDFEED_H_
 #define WINDFEED_H_
 
-#include <mutex>
+#include <boost/thread/mutex.hpp>
 #include <string>
 
 #include "../config/Configuration.h"
@@ -47,7 +47,7 @@ public:
     void setTemp(double t = Configuration::base_temp);
 
 private:
-    std::mutex mutex;
+    boost::mutex mutex;
     std::string wv_;
     // hpa
     double pressure;

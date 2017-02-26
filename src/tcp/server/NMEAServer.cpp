@@ -27,6 +27,7 @@
 #include <boost/system/error_code.hpp>
 #include <algorithm>
 #include <iterator>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../../util/Logger.h"
 
@@ -54,7 +55,7 @@ void NMEAServer::run()
 
 void NMEAServer::writeToAll(const std::string& msg)
 {
-    std::lock_guard<std::mutex> lock(this->mutex);
+    boost::lock_guard<boost::mutex> lock(this->mutex);
     boost::system::error_code ec;
     for (auto it = clients.begin(); it != clients.end();)
     {
@@ -90,7 +91,7 @@ void NMEAServer::awaitStop()
 
 void NMEAServer::stopAll()
 {
-    std::lock_guard<std::mutex> lock(this->mutex);
+    boost::lock_guard<boost::mutex> lock(this->mutex);
     Logger::info("(NMEAServer) stopping all clients...");
     clients.clear();
 }

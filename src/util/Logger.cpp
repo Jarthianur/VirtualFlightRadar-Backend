@@ -24,7 +24,7 @@
 #include <chrono>
 #include <ctime>
 #include <iostream>
-#include <mutex>
+#include <boost/thread/lock_guard.hpp>
 
 Logger::Logger()
 {
@@ -34,11 +34,11 @@ Logger::~Logger()
 {
 }
 
-std::mutex Logger::mutex;
+boost::mutex Logger::mutex;
 
 void Logger::info(const std::string& msg, const std::string& subject)
 {
-    std::lock_guard<std::mutex> lock(Logger::mutex);
+    boost::lock_guard<boost::mutex> lock(Logger::mutex);
     std::time_t tt = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());
     std::string time(asctime(gmtime(&tt)));
@@ -48,7 +48,7 @@ void Logger::info(const std::string& msg, const std::string& subject)
 
 void Logger::debug(const std::string& msg, const std::string& subject)
 {
-    std::lock_guard<std::mutex> lock(Logger::mutex);
+    boost::lock_guard<boost::mutex> lock(Logger::mutex);
     std::time_t tt = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());
     std::string time(asctime(gmtime(&tt)));
@@ -58,7 +58,7 @@ void Logger::debug(const std::string& msg, const std::string& subject)
 
 void Logger::warn(const std::string& msg, const std::string& subject)
 {
-    std::lock_guard<std::mutex> lock(Logger::mutex);
+    boost::lock_guard<boost::mutex> lock(Logger::mutex);
     std::time_t tt = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());
     std::string time(asctime(gmtime(&tt)));
@@ -68,7 +68,7 @@ void Logger::warn(const std::string& msg, const std::string& subject)
 
 void Logger::error(const std::string& msg, const std::string& subject)
 {
-    std::lock_guard<std::mutex> lock(Logger::mutex);
+    boost::lock_guard<boost::mutex> lock(Logger::mutex);
     std::time_t tt = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());
     std::string time(asctime(gmtime(&tt)));

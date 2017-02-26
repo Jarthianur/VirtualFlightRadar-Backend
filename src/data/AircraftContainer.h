@@ -24,7 +24,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <mutex>
+#include <boost/thread/mutex.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -69,7 +69,7 @@ private:
      */
     ssize_t find(std::string&);
 
-    std::mutex mutex;
+    boost::mutex mutex;
 
     /**
      * Processor to process Aircrafts from

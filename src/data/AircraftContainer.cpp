@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <exception>
 #include <iterator>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../util/Logger.h"
 
@@ -59,7 +60,7 @@ ssize_t AircraftContainer::find(std::string& id)
 
 std::string AircraftContainer::processAircrafts()
 {
-    std::lock_guard<std::mutex> lock(this->mutex);
+    boost::lock_guard<boost::mutex> lock(this->mutex);
     std::string dest_str;
     size_t index = 0;
     bool del = false;
@@ -97,7 +98,7 @@ std::string AircraftContainer::processAircrafts()
 void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
         int32_t alt)
 {
-    std::lock_guard<std::mutex> lock(this->mutex);
+    boost::lock_guard<boost::mutex> lock(this->mutex);
     ssize_t i;
     if ((i = find(id)) == AC_NOT_FOUND)
     {
@@ -122,7 +123,7 @@ void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
         int32_t alt, double gnd_spd, uint32_t id_t, int32_t ac_t, double climb_r,
         double turn_r, double heading)
 {
-    std::lock_guard<std::mutex> lock(this->mutex);
+    boost::lock_guard<boost::mutex> lock(this->mutex);
     int32_t act;
     ssize_t i;
     if (heading == A_VALUE_NA || gnd_spd == A_VALUE_NA || climb_r == A_VALUE_NA)

@@ -23,11 +23,7 @@
 #define LOGGER_H_
 
 #include <string>
-
-namespace std
-{
-class mutex;
-} /* namespace std */
+#include <boost/thread/mutex.hpp>
 
 class Logger
 {
@@ -61,7 +57,7 @@ public:
 
 private:
 
-    static std::mutex mutex;
+    static boost::mutex mutex;
 };
 
 #endif /* SRC_LOGGER_H_ */

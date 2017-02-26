@@ -27,6 +27,8 @@
 #include "config/Configuration.h"
 #include "util/Logger.h"
 #include "vfrb/VFRB.h"
+#include "data/ClimateData.h"
+#include "data/AircraftContainer.h"
 
 #ifndef VERSION
 #define VERSION "DEMO"

@@ -25,7 +25,7 @@
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <cstdint>
-#include <mutex>
+#include <boost/thread/mutex.hpp>
 #include <string>
 #include <vector>
 
@@ -53,7 +53,7 @@ private:
 
     void handleAccept(const boost::system::error_code& ec);
 
-    std::mutex mutex;
+    boost::mutex mutex;
 
     boost::asio::io_service io_service_;
     boost::asio::signal_set& signals_;
