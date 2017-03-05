@@ -70,28 +70,28 @@ std::string AircraftProcessor::process(Aircraft &ac)
     std::string nmea_str;
 
     //PFLAU
-    snprintf(buffer, AP_BUFF_S - 1, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
+    snprintf(buffer, AP_BUFF_S, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
              Math::dToI(bearing_rel), rel_V, dist, ac.id.c_str());
     int32_t csum = Math::checksum(buffer);
     nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S - 1, "%02x\r\n", csum);
+    snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
     //PFLAA
-    if (ac.aircraft_type == A_MIN_DATA)
+    if (!ac.full_info)
     {
-        snprintf(buffer, AP_BUFF_S - 1, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", rel_N, rel_E,
-                 rel_V, ac.id.c_str());
+        snprintf(buffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", rel_N, rel_E,
+                 rel_V, ac.id.c_str(), ac.aircraft_type);
     }
     else
     {
-        snprintf(buffer, AP_BUFF_S - 1, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
+        snprintf(buffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
                  rel_N, rel_E, rel_V, ac.id_type, ac.id.c_str(), Math::dToI(ac.heading),
                  Math::dToI(ac.gnd_speed * Math::ms2kmh), ac.climb_rate,
                  ac.aircraft_type);
     }
     csum = Math::checksum(buffer);
     nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S - 1, "%02x\r\n", csum);
+    snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
     return nmea_str;
 }
@@ -117,7 +117,6 @@ void AircraftProcessor::calcRelPosToBase(Aircraft &ac)
     rel_N = Math::dToI(std::cos(Math::radian(bearing_abs)) * dist);
     rel_E = Math::dToI(std::sin(Math::radian(bearing_abs)) * dist);
     rel_V = ac.qne ?
-            ac.altitude - Math::calcIcaoHeight(VFRB::climate_data.getPress(),
-                                               VFRB::climate_data.getTemp()) :
+            ac.altitude - Math::calcIcaoHeight(VFRB::climate_data.getPress()) :
             ac.altitude - basealt;
 }

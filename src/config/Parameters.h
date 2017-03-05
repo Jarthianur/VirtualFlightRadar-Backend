@@ -43,13 +43,11 @@
 #define VFRB_SYNC_TIME 1
 
 /**
- * AC_INVALIDATE:
+ * AIRCRAFT_INVALIDATE:
  * Number of cycles without updates until an aircraft
- * is outdated and deleted.
+ * is outdated. This aircraft is kept registered but no report
+ * will be sent.
  * [4 <= x]
- * Invalidating an aircraft is much more expensive
- * than processing it, hence values < 4 are discouraged.
- * An aircraft has about 70 Bytes in size.
  */
 #define AIRCRAFT_INVALIDATE 4
 

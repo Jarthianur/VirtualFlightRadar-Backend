@@ -68,7 +68,7 @@ int32_t APRSParser::unpack(const std::string& sentence)
                     lat = -lat;
                 }
 
-                //longitue
+                //longitude
                 lon = Math::dmsToDeg(std::stod(match.str(4)) / 100.0);
                 if (match.str(5).compare("W") == 0)
                 {

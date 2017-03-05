@@ -28,7 +28,6 @@
 
 #include "../util/Logger.h"
 
-
 AircraftContainer::AircraftContainer()
         : proc(),
           cont()
@@ -70,7 +69,11 @@ std::string AircraftContainer::processAircrafts()
     {
         try
         {
-            if (++(it->valid) >= AC_INVALIDATE)
+            if (++(it->valid) >= AC_NO_FLARM_THRESHOLD)
+            {
+                it->flarm_target = false;
+            }
+            if (it->valid >= AC_DELETE_THRESHOLD)
             {
                 del = true;
                 index_map.erase(index_map.find(it->id));
@@ -78,7 +81,10 @@ std::string AircraftContainer::processAircrafts()
             }
             else
             {
-                dest_str += proc.process(*it);
+                if (it->valid < AC_INVALIDATE)
+                {
+                    dest_str += proc.process(*it);
+                }
                 ++it;
                 ++index;
             }
@@ -96,7 +102,7 @@ std::string AircraftContainer::processAircrafts()
 }
 
 void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
-        int32_t alt)
+                                       int32_t alt)
 {
     boost::lock_guard<boost::mutex> lock(this->mutex);
     ssize_t i;
@@ -104,48 +110,50 @@ void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
     {
         Aircraft ac(id, lat, lon, alt);
         ac.qne = true;
+        ac.flarm_target = false;
         cont.push_back(ac);
-        index_map.insert(
-        { id, cont.size() - 1 });
+        index_map.insert( { id, cont.size() - 1 });
     }
     else
     {
         Aircraft& ac = cont.at(i);
-        ac.valid = 0;
-        ac.latitude = lat;
-        ac.longitude = lon;
-        ac.altitude = alt;
-        ac.qne = true;
+        if (!ac.flarm_target)
+        {
+            ac.valid = 0;
+            ac.latitude = lat;
+            ac.longitude = lon;
+            ac.altitude = alt;
+            ac.qne = true;
+            ac.full_info = false;
+        }
     }
 }
 
 void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
-        int32_t alt, double gnd_spd, uint32_t id_t, int32_t ac_t, double climb_r,
-        double turn_r, double heading)
+                                       int32_t alt, double gnd_spd, uint32_t id_t,
+                                       int32_t ac_t, double climb_r, double turn_r,
+                                       double heading)
 {
     boost::lock_guard<boost::mutex> lock(this->mutex);
-    int32_t act;
     ssize_t i;
-    if (heading == A_VALUE_NA || gnd_spd == A_VALUE_NA || climb_r == A_VALUE_NA)
-    {
-        act = A_MIN_DATA;
-    }
-    else
-    {
-        act = ac_t;
-    }
     if ((i = find(id)) == -1)
     {
-        Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, act, climb_r, turn_r, heading);
-        ac.qne = false;
+        Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, heading);
         cont.push_back(ac);
-        index_map.insert(
-        { id, cont.size() - 1 });
+        index_map.insert( { id, cont.size() - 1 });
     }
     else
     {
         Aircraft& ac = cont.at(i);
-        ac.aircraft_type = act;
+        if (heading == A_VALUE_NA || gnd_spd == A_VALUE_NA || climb_r == A_VALUE_NA)
+        {
+            ac.full_info = false;
+        }
+        else
+        {
+            ac.full_info = true;
+        }
+        ac.aircraft_type = ac_t;
         ac.gnd_speed = gnd_spd;
         ac.id_type = id_t;
         ac.valid = 0;
@@ -156,5 +164,6 @@ void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
         ac.turn_rate = turn_r;
         ac.heading = heading;
         ac.qne = false;
+        ac.flarm_target = true;
     }
 }

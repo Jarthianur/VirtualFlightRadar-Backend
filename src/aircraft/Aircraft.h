@@ -25,9 +25,7 @@
 #include <cstdint>
 #include <string>
 
-#define A_UKNWN_T 0
 #define A_ADSB_T 8
-#define A_MIN_DATA -1
 #define A_VALUE_NA -1000.0
 
 class Aircraft
@@ -38,35 +36,39 @@ public:
             uint32_t id_t, int32_t ac_t, double climb_r, double turn_r, double heading);
     virtual ~Aircraft() throw ();
 
-    /**
-     * self explanatory
-     */
+    // id
     std::string id;
     // m/s
-    double gnd_speed = 0;
+    double gnd_speed = A_VALUE_NA;
     uint32_t id_type = 1;
-    int32_t aircraft_type = A_MIN_DATA;
+    int32_t aircraft_type = A_ADSB_T;
     /**
-     * absolue position
+     * absolute position
      */
-    double latitude = 0.0;
-    double longitude = 0.0;
+    double latitude = A_VALUE_NA;
+    double longitude = A_VALUE_NA;
     // m
     int32_t altitude = 0;
     // deg [0-359]
-    double heading = 0;
+    double heading = A_VALUE_NA;
     /**
      * relative to last position
      */
     // m/s
-    double climb_rate = 0.0;
+    double climb_rate = A_VALUE_NA;
     // deg/s
-    double turn_rate = 0.0;
+    double turn_rate = A_VALUE_NA;
+    /**
+     * info
+     */
+    // full info available
+    bool full_info = false;
     //0 = valid; +x(cycles) = invalid
     uint32_t valid = 0;
-    //differ altitude (GPS from aprsc, QNE from sbs)
+    //differ altitude (GPS from aprs, QNE from sbs)
     bool qne = false;
-
+    // as long as FLARM input (GPS height) is available prefer
+    bool flarm_target = true;
 };
 
 #endif /* AIRCRAFT_H_ */

@@ -48,7 +48,7 @@ double dmsToDeg(double dms);
  * calculate height difference from QNE to Pressure in meters
  * with ICAO height formula
  */
-double calcIcaoHeight(double, double = 15.0);
+double calcIcaoHeight(double);
 
 /**
  * compute checksum of nmea string

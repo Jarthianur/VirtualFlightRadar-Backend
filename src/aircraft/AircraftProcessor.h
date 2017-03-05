@@ -27,7 +27,7 @@
 
 class Aircraft;
 
-#define AP_BUFF_S 8192
+#define AP_BUFF_S 8191
 #define AP_L_BUFF_S 128
 
 class AircraftProcessor
@@ -48,7 +48,7 @@ private:
     /**
      * format string buffer
      */
-    char buffer[AP_BUFF_S];
+    char buffer[AP_BUFF_S + 1];
 
     /**
      * calculate relative position to base and absolute heading
