@@ -4,10 +4,10 @@
 # example: VFRB
 export VFRB_NAME_B=
 
-# name of .properties file (default: vfrb.properties)
+# name of INI file (default: vfrb.ini)
 # file extension will be appended automatically
 # example: VFRB
-export VFRB_PROP_B=
+export VFRB_INI_B=
 
 # compiler to use (default: g++)
 # may be set to path to cross compiler
@@ -21,7 +21,7 @@ export BOOST_ROOT_B=
 # example: /home/user/bin/ , ~/bin/
 export VFRB_EXEC_PATH_B=
 
-# path to .properties file (default: target/)
+# path to INI file (default: target/)
 # example: /home/user/ , ~/
-export VFRB_PROP_PATH_B=
+export VFRB_INI_PATH_B=
 

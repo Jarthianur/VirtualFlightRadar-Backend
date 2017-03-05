@@ -50,7 +50,7 @@ void ConfigReader::read()
     {
         try
         {
-            if (line.at(0) == '#')
+            if (line.at(0) == ';' || line.at(0) == '[')
             {
                 continue;
             }

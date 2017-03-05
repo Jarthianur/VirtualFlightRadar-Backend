@@ -3,12 +3,12 @@
 # setup vars
 source bootstrap.sh
 export VFRB_NAME=${VFRB_NAME_B:-vfrb}
-export VFRB_PROP=${VFRB_PROP_B:-vfrb}
+export VFRB_INI=${VFRB_INI_B:-vfrb}
 export VFRB_VERSION=$(cat version.txt)
 export VFRB_COMPILER=${VFRB_COMPILER_B:-g++}
 export BOOST_ROOT=${BOOST_ROOT_B:-}
 export VFRB_EXEC_PATH=${VFRB_EXEC_PATH_B:-$PWD/target/}
-export VFRB_PROP_PATH=${VFRB_PROP_PATH_B:-$PWD/target/}
+export VFRB_INI_PATH=${VFRB_INI_PATH_B:-$PWD/target/}
 export VFRB_TARGET=$VFRB_NAME-$VFRB_VERSION
 VFRB_ROOT=$PWD
 BOOST_MAN=0
@@ -25,10 +25,10 @@ if [ -z "$VFRB_NAME_B" ]; then
 else
     echo "VFRB_NAME:" $VFRB_NAME
 fi
-if [ -z "$VFRB_PROP_B" ]; then
-    echo "VFRB_PROP not set, using default: $VFRB_PROP"
+if [ -z "$VFRB_INI_B" ]; then
+    echo "VFRB_INI not set, using default: $VFRB_INI"
 else
-    echo "VFRB_PROP: $VFRB_PROP"
+    echo "VFRB_INI: $VFRB_INI"
 fi
 if [ -z "$VFRB_VERSION" ]; then
     echo "VFRB_VERSION not set"
@@ -53,17 +53,17 @@ if [ -z "$VFRB_EXEC_PATH_B" ]; then
 else
     echo "VFRB_EXEC_PATH: $VFRB_EXEC_PATH"
 fi
-if [ -z "$VFRB_PROP_PATH_B" ]; then
-    echo "VFRB_PROP_PATH not set, using default: $VFRB_PROP_PATH"
+if [ -z "$VFRB_INI_PATH_B" ]; then
+    echo "VFRB_INI_PATH not set, using default: $VFRB_INI_PATH"
 else
-    echo "VFRB_PROP_PATH: $VFRB_PROP_PATH"
+    echo "VFRB_INI_PATH: $VFRB_INI_PATH"
 fi
 unset VFRB_NAME_B
-unset VFRB_PROP_B
+unset VFRB_INI_B
 unset VFRB_COMPILER_B
 unset BOOST_ROOT_B
 unset VFRB_EXEC_PATH_B
-unset VFRB_PROP_PATH_B
+unset VFRB_INI_PATH_B
 echo ""
 echo "... RUN MAKE ..."
 echo ""
@@ -89,8 +89,8 @@ else
     echo "ERROR: $VFRB_TARGET does not exist"
     exit 1
 fi
-sed "s|%VERSION%|$VFRB_VERSION|" <$VFRB_ROOT/vfrb.properties >$VFRB_PROP_PATH/$VFRB_PROP.properties
-echo "$VFRB_PROP.properties copied to $VFRB_PROP_PATH"
+sed "s|%VERSION%|$VFRB_VERSION|" <$VFRB_ROOT/vfrb.ini >$VFRB_INI_PATH/$VFRB_INI.ini
+echo "$VFRB_INI.ini copied to $VFRB_INI_PATH"
 echo ""
 BASH_LD=$(cat ~/.bashrc | grep "export LD_LIBRARY_PATH=$BOOST_ROOT/stage/lib/:\$LD_LIBRARY_PATH")
 if [ $BOOST_MAN -eq 1 ] && [ "$BASH_LD" == "" ]; then
@@ -113,7 +113,7 @@ pushd $VFRB_ROOT/target/service/
 echo ""
 sed -e "s|%VFRB_NAME%|$VFRB_NAME|" \
     -e "s|%VFRB_EXEC_PATH%|$VFRB_EXEC_PATH/$VFRB_TARGET|" \
-    -e "s|%VFRB_PROP_PATH%|$VFRB_PROP_PATH/$VFRB_PROP.properties|" \
+    -e "s|%VFRB_INI_PATH%|$VFRB_INI_PATH/$VFRB_INI.ini|" \
     -e "s|%VFRB_LOG_PATH%|$VFRB_NAME.log|g" \
     <$VFRB_ROOT/service/vfrb.service >$VFRB_NAME.service
 echo "$VFRB_NAME.service created in $VFRB_ROOT/target/service/"

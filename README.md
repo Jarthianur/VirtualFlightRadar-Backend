@@ -99,7 +99,7 @@ Please read the comments carefully, as these values change the programs behavior
 
 From inside the projects root directory follow these steps.
 
-Either adjust the [vfrb.properties](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/vfrb.properties)
+Either adjust the [vfrb.ini](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/vfrb.ini)
 file right now to deploy it ready-to-use, or later.  
 Edit the [bootstrap.sh](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/bootstrap.sh) according to Your needs.  
 There are just a few variables, which need to be set as stated in their comments.  
@@ -113,12 +113,12 @@ $ sudo cp -r target/service/* /etc/systemd/system/
 $ sudo systemctl daemon-reload
 ```
 
-If not already done, now the runtime configuration must be specified in the target *.properties* file.
-This properties file was also stored according to the path in bootstrap.sh .
+If not already done, now the runtime configuration must be specified in the target INI file.
+This INI file was also stored according to the path in bootstrap.sh .
 
 ## What to configure
 
-The properties file looks like this
+The INI file has entries like this
 >latitude=49.000000  
 longitude=8.000000  
 altitude=400  
@@ -140,9 +140,7 @@ There are base position parameters, connection parameters and climate fallback v
 To disable any input feed, just leave corresponding hostnames empty, or set them to *'nA'* .
 Same with the filters, to disable leave it empty, or set to *-1* .
 Additional information, like units, can be found in the comments.
-Comments begin with a *#* , feel free to add comments containing whatever liked, e.g. available ports and hosts.
-**GPS devices serve an altitude = height above ellipsoid + geoid separation.**
-To get proper values from the VFR-B one must determine the local geoid separation and split the GPS height into both values.
+Comments begin with a *;* , feel free to add comments containing whatever liked, e.g. available ports and hosts.
 
 ## How to run
 
@@ -160,7 +158,7 @@ $ {path to binary} -c {path to config file} > {path to log file}  2>&1 &
 example:
 
 ```bash
-$ ./vfrb -c properties.conf > vfrb.log 2>&1 &
+$ ./vfrb -c vfrb.ini > vfrb.log 2>&1 &
 ```
 
 The log will be in the specified file.
@@ -203,7 +201,7 @@ $ sudo cat /var/log/vfrb.log
 
 ## Future plans
 
-+ setup build for all common platforms, like Windows, Mac ...
++ setup cross platform build for RaspPi
 + change pressure fallback value to QNH
 + probability-of-arrival evaluation, displayed via warning levels
 + read *gpsd*
