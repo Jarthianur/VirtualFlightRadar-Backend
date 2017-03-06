@@ -34,7 +34,7 @@ class AircraftProcessor
 {
 public:
     AircraftProcessor();
-    AircraftProcessor(double, double, int32_t);
+    AircraftProcessor(double, double, std::int32_t);
     virtual ~AircraftProcessor();
 
     /**
@@ -42,7 +42,7 @@ public:
      */
     std::string process(Aircraft&);
 
-    void init(double, double, int32_t);
+    void init(double, double, std::int32_t);
 
 private:
     /**
@@ -79,7 +79,7 @@ private:
     /**
      * (alt = height + antennaheight)
      */
-    int32_t basealt,
+    std::int32_t basealt,
     /**
      * relative North, East, Vertical
      */

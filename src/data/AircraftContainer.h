@@ -48,13 +48,13 @@ public:
     AircraftContainer();
     virtual ~AircraftContainer() throw ();
 
-    void initProcessor(double, double, int32_t);
+    void initProcessor(double, double, std::int32_t);
 
     /**
      * insert aircraft in container
      */
-    void insertAircraft(std::string&, double, double, int32_t);
-    void insertAircraft(std::string&, double, double, int32_t, double, uint32_t, int32_t,
+    void insertAircraft(std::string&, double, double, std::int32_t);
+    void insertAircraft(std::string&, double, double, std::int32_t, double, std::uint32_t, std::int32_t,
             double, double, double);
 
     /**

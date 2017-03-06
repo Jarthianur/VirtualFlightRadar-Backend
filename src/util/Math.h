@@ -40,7 +40,7 @@ double degree(double);
 /**
  * convert to int, round to nearest number
  */
-int32_t dToI(double);
+std::int32_t dToI(double);
 
 double dmsToDeg(double dms);
 
@@ -53,7 +53,7 @@ double calcIcaoHeight(double);
 /**
  * compute checksum of nmea string
  */
-int32_t checksum(const char*);
+std::int32_t checksum(const char*);
 
 /**
  * constants

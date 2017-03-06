@@ -44,7 +44,7 @@ APRSParser::~APRSParser()
 {
 }
 
-int32_t APRSParser::unpack(const std::string& sentence)
+std::int32_t APRSParser::unpack(const std::string& sentence)
 {
     if (sentence.at(0) == '#')
     {

@@ -39,7 +39,7 @@ SBSParser::~SBSParser()
 {
 }
 
-int32_t SBSParser::unpack(const std::string& sentence)
+std::int32_t SBSParser::unpack(const std::string& sentence)
 {
     /*
      * fields:
@@ -49,9 +49,9 @@ int32_t SBSParser::unpack(const std::string& sentence)
      * 14: latitude
      * 15: longitude
      */
-    size_t delim;
-    uint32_t i = 2;
-    size_t p = 6;
+    std::size_t delim;
+    std::uint32_t i = 2;
+    std::size_t p = 6;
     while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
     {
         switch (i)

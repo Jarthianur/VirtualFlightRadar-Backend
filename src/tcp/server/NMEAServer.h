@@ -40,7 +40,7 @@ public:
     NMEAServer(const NMEAServer&) = delete;
     NMEAServer& operator=(const NMEAServer&) = delete;
 
-    NMEAServer(boost::asio::signal_set& s, uint16_t port);
+    NMEAServer(boost::asio::signal_set& s, std::uint16_t port);
     virtual ~NMEAServer() throw ();
 
     void run();

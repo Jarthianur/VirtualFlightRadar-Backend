@@ -39,7 +39,7 @@ AircraftContainer::~AircraftContainer()
 {
 }
 
-void AircraftContainer::initProcessor(double proc_lat, double proc_lon, int32_t proc_alt)
+void AircraftContainer::initProcessor(double proc_lat, double proc_lon, std::int32_t proc_alt)
 {
     proc.init(proc_lat, proc_lon, proc_alt);
 }
@@ -61,7 +61,7 @@ std::string AircraftContainer::processAircrafts()
 {
     boost::lock_guard<boost::mutex> lock(this->mutex);
     std::string dest_str;
-    size_t index = 0;
+    std::size_t index = 0;
     bool del = false;
     auto it = cont.begin();
 
@@ -69,9 +69,10 @@ std::string AircraftContainer::processAircrafts()
     {
         try
         {
+            // if no FLARM msg received after x, assume target has Transponder
             if (++(it->valid) >= AC_NO_FLARM_THRESHOLD)
             {
-                it->flarm_target = false;
+                it->target_type = Aircraft::TargetType::TRANSPONDER;
             }
             if (it->valid >= AC_DELETE_THRESHOLD)
             {
@@ -102,36 +103,36 @@ std::string AircraftContainer::processAircrafts()
 }
 
 void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
-                                       int32_t alt)
+                                       std::int32_t alt)
 {
     boost::lock_guard<boost::mutex> lock(this->mutex);
     ssize_t i;
     if ((i = find(id)) == AC_NOT_FOUND)
     {
         Aircraft ac(id, lat, lon, alt);
-        ac.qne = true;
-        ac.flarm_target = false;
+        ac.qne_altitude = true;
+        ac.target_type = Aircraft::TargetType::TRANSPONDER;
         cont.push_back(ac);
         index_map.insert( { id, cont.size() - 1 });
     }
     else
     {
         Aircraft& ac = cont.at(i);
-        if (!ac.flarm_target)
+        if (ac.target_type == Aircraft::TargetType::TRANSPONDER)
         {
             ac.valid = 0;
             ac.latitude = lat;
             ac.longitude = lon;
             ac.altitude = alt;
-            ac.qne = true;
+            ac.qne_altitude = true;
             ac.full_info = false;
         }
     }
 }
 
 void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
-                                       int32_t alt, double gnd_spd, uint32_t id_t,
-                                       int32_t ac_t, double climb_r, double turn_r,
+                                       std::int32_t alt, double gnd_spd, std::uint32_t id_t,
+                                       std::int32_t ac_t, double climb_r, double turn_r,
                                        double heading)
 {
     boost::lock_guard<boost::mutex> lock(this->mutex);
@@ -139,6 +140,14 @@ void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
     if ((i = find(id)) == -1)
     {
         Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, heading);
+        if (heading == A_VALUE_NA || gnd_spd == A_VALUE_NA || climb_r == A_VALUE_NA)
+        {
+            ac.full_info = false;
+        }
+        else
+        {
+            ac.full_info = true;
+        }
         cont.push_back(ac);
         index_map.insert( { id, cont.size() - 1 });
     }
@@ -163,7 +172,7 @@ void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
         ac.climb_rate = climb_r;
         ac.turn_rate = turn_r;
         ac.heading = heading;
-        ac.qne = false;
-        ac.flarm_target = true;
+        ac.qne_altitude = false;
+        ac.target_type = Aircraft::TargetType::FLARM;
     }
 }

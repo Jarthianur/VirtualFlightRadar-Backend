@@ -40,7 +40,7 @@ public:
      * returns MSG_UNPACK_SUC on success, MSG_UNPACK_ERR on failure,
      * MSG_UNPACK_IGN when to ignore.
      */
-    virtual int32_t unpack(const std::string&) = 0;
+    virtual std::int32_t unpack(const std::string&) = 0;
 
 };
 

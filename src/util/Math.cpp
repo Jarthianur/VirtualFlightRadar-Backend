@@ -35,9 +35,9 @@ double degree(double rad)
     return (rad * 180.0) / PI;
 }
 
-int32_t dToI(double d)
+std::int32_t dToI(double d)
 {
-    return (d >= 0.0) ? (int32_t) (d + 0.5) : (int32_t) (d - 0.5);
+    return (d >= 0.0) ? (std::int32_t) (d + 0.5) : (std::int32_t) (d - 0.5);
 }
 
 double dmsToDeg(double dms)
@@ -53,13 +53,13 @@ double calcIcaoHeight(double press)
     return 288.15 * (1.0 - std::pow((press / 1013.25), 0.190295)) / 0.0065;
 }
 
-int32_t checksum(const char* sentence)
+std::int32_t checksum(const char* sentence)
 {
-    int32_t csum = 0;
-    size_t i = 1;
+    std::int32_t csum = 0;
+    std::size_t i = 1;
     while (sentence[i] != '*' && sentence[i] != '\0')
     {
-        csum ^= (int32_t) sentence[i++];
+        csum ^= (std::int32_t) sentence[i++];
     }
     return csum;
 }

@@ -26,49 +26,65 @@
 #include <string>
 
 #define A_ADSB_T 8
-#define A_VALUE_NA -1000.0
+#define A_VALUE_NA -1024.0
 
 class Aircraft
 {
 public:
-    Aircraft(std::string& id, double lat, double lon, int32_t alt);
-    Aircraft(std::string& id, double lat, double lon, int32_t alt, double gnd_spd,
-            uint32_t id_t, int32_t ac_t, double climb_r, double turn_r, double heading);
+    Aircraft(std::string& id, double lat, double lon, std::int32_t alt);
+    Aircraft(std::string& id, double lat, double lon, std::int32_t alt, double gnd_spd,
+             std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r, double heading);
     virtual ~Aircraft() throw ();
 
+    enum class TargetType
+        : std::uint32_t
+        {
+            FLARM, TRANSPONDER
+    };
+
+    /**
+     * information
+     */
     // id
     std::string id;
-    // m/s
-    double gnd_speed = A_VALUE_NA;
-    uint32_t id_type = 1;
-    int32_t aircraft_type = A_ADSB_T;
+
+    std::uint32_t id_type = 1;
+    std::int32_t aircraft_type = A_ADSB_T;
+    TargetType target_type = TargetType::FLARM;
+
+    // full info available
+    bool full_info;
+
+    //0 = valid; +x(cycles) = invalid
+    std::uint32_t valid = 0;
+
+    //differ altitude (GPS from FLARM, QNE from TRANSPONDER)
+    bool qne_altitude = false;
+
     /**
-     * absolute position
+     * position
      */
+    // deg
     double latitude = A_VALUE_NA;
     double longitude = A_VALUE_NA;
     // m
-    int32_t altitude = 0;
-    // deg [0-359]
-    double heading = A_VALUE_NA;
+    std::int32_t altitude = 0;
+
     /**
-     * relative to last position
+     * movement
      */
     // m/s
+    double gnd_speed = A_VALUE_NA;
+
+    // deg [0-359]
+    double heading = A_VALUE_NA;
+
+    // m/s
     double climb_rate = A_VALUE_NA;
+
+    // currently unused
     // deg/s
     double turn_rate = A_VALUE_NA;
-    /**
-     * info
-     */
-    // full info available
-    bool full_info = false;
-    //0 = valid; +x(cycles) = invalid
-    uint32_t valid = 0;
-    //differ altitude (GPS from aprs, QNE from sbs)
-    bool qne = false;
-    // as long as FLARM input (GPS height) is available prefer
-    bool flarm_target = true;
 };
 
 #endif /* AIRCRAFT_H_ */

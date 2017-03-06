@@ -38,7 +38,7 @@ AircraftProcessor::AircraftProcessor()
 {
 }
 
-AircraftProcessor::AircraftProcessor(double b_lat, double b_long, int32_t b_alt)
+AircraftProcessor::AircraftProcessor(double b_lat, double b_long, std::int32_t b_alt)
         : baselat(b_lat),
           baselong(b_long),
           basealt(b_alt)
@@ -49,7 +49,7 @@ AircraftProcessor::~AircraftProcessor()
 {
 }
 
-void AircraftProcessor::init(double lat, double lon, int32_t alt)
+void AircraftProcessor::init(double lat, double lon, std::int32_t alt)
 {
     baselat = lat;
     baselong = lon;
@@ -72,10 +72,11 @@ std::string AircraftProcessor::process(Aircraft &ac)
     //PFLAU
     snprintf(buffer, AP_BUFF_S, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
              Math::dToI(bearing_rel), rel_V, dist, ac.id.c_str());
-    int32_t csum = Math::checksum(buffer);
+    std::int32_t csum = Math::checksum(buffer);
     nmea_str.append(buffer);
     snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
+
     //PFLAA
     if (!ac.full_info)
     {
@@ -93,6 +94,7 @@ std::string AircraftProcessor::process(Aircraft &ac)
     nmea_str.append(buffer);
     snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
+
     return nmea_str;
 }
 
@@ -116,7 +118,7 @@ void AircraftProcessor::calcRelPosToBase(Aircraft &ac)
 
     rel_N = Math::dToI(std::cos(Math::radian(bearing_abs)) * dist);
     rel_E = Math::dToI(std::sin(Math::radian(bearing_abs)) * dist);
-    rel_V = ac.qne ?
+    rel_V = ac.qne_altitude ?
             ac.altitude - Math::calcIcaoHeight(VFRB::climate_data.getPress()) :
             ac.altitude - basealt;
 }

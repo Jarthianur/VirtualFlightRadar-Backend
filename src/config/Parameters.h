@@ -52,7 +52,7 @@
 #define AIRCRAFT_INVALIDATE 4
 
 /**
- * C_CON_WAIT_TIMEVAL:
+ * CLIENT_CONNECT_WAIT_TIMEVAL:
  * Input-clients wait for this duration, in seconds, until
  * attempting a connect (reconnect).
  * [1 <= x]
@@ -65,7 +65,7 @@
 #define CLIENT_CONNECT_WAIT_TIMEVAL 120
 
 /**
- * WC_RCV_TIMEOUT:
+ * WINDCLIENT_RECEIVE_TIMEOUT:
  * Due to unstable hardware/drivers, it became apparent that
  * it is necessary to timeout the wind-sensors input.
  * [1 <= x]
@@ -75,7 +75,7 @@
 #define WINDCLIENT_RECEIVE_TIMEOUT 5
 
 /**
- * S_MAX_CLIENTS:
+ * SERVER_MAX_CLIENTS:
  * Maximal amount of clients, which can connect to the VFR-B's
  * internal NMEA-server.
  * [1 <= x]

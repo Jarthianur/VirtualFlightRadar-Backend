@@ -32,7 +32,7 @@
 #include "../../util/Logger.h"
 
 
-NMEAServer::NMEAServer(boost::asio::signal_set& s, uint16_t port)
+NMEAServer::NMEAServer(boost::asio::signal_set& s, std::uint16_t port)
         : io_service_(),
           signals_(s),
           acceptor_(io_service_,

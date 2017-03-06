@@ -34,28 +34,26 @@
 #define VERSION "DEMO"
 #endif
 
-using namespace std;
-
-int32_t strToInt(const string& str)
+std::int32_t strToInt(const std::string& str)
 {
     try
     {
         return stoi(str);
     }
-    catch (const logic_error& iae)
+    catch (const std::logic_error& iae)
     {
         Logger::error("(VFRB) invalid configuration: ", str);
     }
     return 0;
 }
 
-double strToDouble(const string& str)
+double strToDouble(const std::string& str)
 {
     try
     {
         return stod(str);
     }
-    catch (const logic_error& iae)
+    catch (const std::logic_error& iae)
     {
         Logger::error("(VFRB) invalid configuration: ", str);
     }
@@ -67,12 +65,12 @@ int main(int argc, char* argv[])
 
     double latitude = 0.0;
     double longitude = 0.0;
-    int32_t altitude = 0;
+    std::int32_t altitude = 0;
     double geoid = 0.0;
     double pressure = 0.0;
     double temp = 0.0;
 
-    uint16_t server_port = 0;
+    std::uint16_t server_port = 0;
 
     std::string aprsc_host;
     std::string aprsc_port;
@@ -84,8 +82,8 @@ int main(int argc, char* argv[])
     std::string climate_host;
     std::string climate_port;
 
-    int32_t maxHeight = 0;
-    int32_t maxDist = 0;
+    std::int32_t maxHeight = 0;
+    std::int32_t maxDist = 0;
 
     if (argc == 3)
     {
@@ -94,30 +92,30 @@ int main(int argc, char* argv[])
         cr.read();
 
         latitude = strToDouble(cr.getProperty("latitude", "0.0"));
-        Logger::info("(Config) latitude: ", to_string(latitude));
+        Logger::info("(Config) latitude: ", std::to_string(latitude));
 
         longitude = strToDouble(cr.getProperty("longitude", "0.0"));
-        Logger::info("(Config) longitude: ", to_string(longitude));
+        Logger::info("(Config) longitude: ", std::to_string(longitude));
 
         altitude = strToInt(cr.getProperty("altitude", "0"));
-        Logger::info("(Config) altitude: ", to_string(altitude));
+        Logger::info("(Config) altitude: ", std::to_string(altitude));
 
         geoid = strToDouble(cr.getProperty("geoid", "0.0"));
-        Logger::info("(Config) geoid: ", to_string(geoid));
+        Logger::info("(Config) geoid: ", std::to_string(geoid));
 
         pressure = strToDouble(cr.getProperty("pressure", "1013.25"));
-        Logger::info("(Config) pressure: ", to_string(pressure));
+        Logger::info("(Config) pressure: ", std::to_string(pressure));
 
         temp = strToDouble(cr.getProperty("temp", "15.0"));
-        Logger::info("(Config) temp: ", to_string(temp));
+        Logger::info("(Config) temp: ", std::to_string(temp));
 
-        server_port = (uint16_t) strToInt(cr.getProperty("serverPort", "0"));
-        Logger::info("(Config) serverPort: ", to_string(server_port));
+        server_port = (uint16_t) strToInt(cr.getProperty("serverPort", "9999"));
+        Logger::info("(Config) serverPort: ", std::to_string(server_port));
 
-        aprsc_port = cr.getProperty("aprscPort", "0");
+        aprsc_port = cr.getProperty("aprscPort", "9998");
         Logger::info("(Config) aprscPort: ", aprsc_port);
 
-        sbs_port = cr.getProperty("sbsPort", "0");
+        sbs_port = cr.getProperty("sbsPort", "9997");
         Logger::info("(Config) sbsPort: ", sbs_port);
 
         aprsc_host = cr.getProperty("aprscHost", "nA");
@@ -144,7 +142,7 @@ int main(int argc, char* argv[])
         {
             maxHeight = strToInt(tmp);
         }
-        Logger::info("(Config) maxHeight: ", to_string(maxHeight));
+        Logger::info("(Config) maxHeight: ", std::to_string(maxHeight));
 
         tmp = cr.getProperty("maxDist", "-1");
         if (tmp == "-1")
@@ -155,7 +153,7 @@ int main(int argc, char* argv[])
         {
             maxDist = strToInt(tmp);
         }
-        Logger::info("(Config) maxDist: ", to_string(maxDist));
+        Logger::info("(Config) maxDist: ", std::to_string(maxDist));
 
     }
     else

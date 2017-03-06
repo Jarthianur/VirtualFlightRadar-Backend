@@ -33,11 +33,11 @@ public:
     SBSParser();
     virtual ~SBSParser() throw ();
 
-    int32_t unpack(const std::string&);
+    std::int32_t unpack(const std::string&);
 
 private:
     std::string id;
-    int32_t alt = 0, time = 0;
+    std::int32_t alt = 0, time = 0;
     double lat = 0.0, lon = 0.0;
 };
 

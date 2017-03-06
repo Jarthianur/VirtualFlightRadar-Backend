@@ -34,10 +34,10 @@ public:
     WindParser();
     virtual ~WindParser() throw ();
 
-    int32_t unpack(const std::string&);
+    std::int32_t unpack(const std::string&);
 
 private:
-    size_t b = 0, s = 0;
+    std::size_t b = 0, s = 0;
 };
 
 #endif /* WINDPARSER_H_ */

@@ -32,14 +32,14 @@ public:
     Configuration();
     virtual ~Configuration() throw ();
 
-    static int32_t base_altitude;
+    static std::int32_t base_altitude;
     static double base_latitude;
     static double base_longitude;
     static double base_geoid;
     static double base_pressure;
     static double base_temp;
 
-    static uint16_t global_server_port;
+    static std::uint16_t global_server_port;
 
     static std::string global_aprsc_host;
     static std::string global_aprsc_port;
@@ -51,8 +51,8 @@ public:
     static std::string global_climate_host;
     static std::string global_climate_port;
 
-    static int32_t filter_maxHeight;
-    static int32_t filter_maxDist;
+    static std::int32_t filter_maxHeight;
+    static std::int32_t filter_maxDist;
 };
 
 #endif /* CONFIGURATION_H_ */

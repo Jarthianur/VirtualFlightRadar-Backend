@@ -25,13 +25,13 @@
 #include <cstdint>
 #include <string>
 
-#define GPSM_BUFF_S 8192
+#define GPSM_BUFF_S 8191
 #define GPSM_L_BUFF_S 128
 
 class GPSmodule
 {
 public:
-    GPSmodule(double, double, int32_t, double);
+    GPSmodule(double, double, std::int32_t, double);
     virtual ~GPSmodule();
 
     /**
@@ -46,7 +46,7 @@ private:
      * Longitude degree, minutes
      */
     lat_deg, lat_min, long_deg, long_min;
-    int32_t basealt;
+    std::int32_t basealt;
 
     /**
      * Latitude: S - N
@@ -57,7 +57,7 @@ private:
     /**
      * format string buffer
      */
-    char buffer[GPSM_BUFF_S];
+    char buffer[GPSM_BUFF_S + 1];
 
 };
 

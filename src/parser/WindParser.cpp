@@ -36,7 +36,7 @@ WindParser::~WindParser()
 {
 }
 
-int32_t WindParser::unpack(const std::string& sentence)
+std::int32_t WindParser::unpack(const std::string& sentence)
 {
     if (sentence.substr(1, 5).compare("WIMWV") == 0)
     {

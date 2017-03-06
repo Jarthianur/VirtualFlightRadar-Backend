@@ -29,14 +29,14 @@ Configuration::~Configuration()
 {
 }
 
-int32_t Configuration::base_altitude = 0;
+std::int32_t Configuration::base_altitude = 0;
 double Configuration::base_latitude = 0.0;
 double Configuration::base_longitude = 0.0;
 double Configuration::base_geoid = 0.0;
 double Configuration::base_pressure = 0.0;
 double Configuration::base_temp = 0.0;
 
-uint16_t Configuration::global_server_port = 0;
+std::uint16_t Configuration::global_server_port = 0;
 
 std::string Configuration::global_aprsc_host = "nA";
 std::string Configuration::global_aprsc_port = "0";
@@ -48,5 +48,5 @@ std::string Configuration::global_sbs_port = "0";
 std::string Configuration::global_climate_host = "nA";
 std::string Configuration::global_climate_port = "0";
 
-int32_t Configuration::filter_maxHeight = 0;
-int32_t Configuration::filter_maxDist = 0;
+std::int32_t Configuration::filter_maxHeight = 0;
+std::int32_t Configuration::filter_maxDist = 0;
