@@ -5,6 +5,9 @@
 -include ../makefile.init
 
 RM := rm -rf
+OPT_LVL := 1
+# -g3
+DBG :=
 TARGET := ${VFRB_TARGET}
 CXX := ${VFRB_COMPILER}
 BOOST_L := ${BOOST_LIBS_L}
