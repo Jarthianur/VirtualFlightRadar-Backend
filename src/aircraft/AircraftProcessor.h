@@ -51,7 +51,7 @@ private:
     char buffer[AP_BUFF_S + 1];
 
     /**
-     * calculate relative position to base and absolute heading
+     * calculate relative position to base
      */
     void calcRelPosToBase(Aircraft&);
 

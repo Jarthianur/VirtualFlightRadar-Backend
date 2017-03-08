@@ -36,6 +36,8 @@ public:
              std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r, double heading);
     virtual ~Aircraft() throw ();
 
+    bool operator==(const Aircraft&) const;
+
     enum class TargetType
         : std::uint32_t
         {

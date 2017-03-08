@@ -45,3 +45,8 @@ Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt, do
     this->id_type = id_t;
     this->aircraft_type = ac_t;
 }
+
+bool Aircraft::operator==(const Aircraft& other) const
+{
+    return this->id == other.id;
+}

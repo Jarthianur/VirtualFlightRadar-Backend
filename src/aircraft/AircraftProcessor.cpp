@@ -43,6 +43,8 @@ AircraftProcessor::AircraftProcessor(double b_lat, double b_long, std::int32_t b
           baselong(b_long),
           basealt(b_alt)
 {
+    long_b = Math::radian(baselong);
+    lat_b = Math::radian(baselat);
 }
 
 AircraftProcessor::~AircraftProcessor()
@@ -70,29 +72,29 @@ std::string AircraftProcessor::process(Aircraft &ac)
     std::string nmea_str;
 
     //PFLAU
-    snprintf(buffer, AP_BUFF_S, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
-             Math::dToI(bearing_rel), rel_V, dist, ac.id.c_str());
+    std::snprintf(buffer, AP_BUFF_S, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
+                  Math::dToI(bearing_rel), rel_V, dist, ac.id.c_str());
     std::int32_t csum = Math::checksum(buffer);
     nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
+    std::snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
 
     //PFLAA
     if (!ac.full_info)
     {
-        snprintf(buffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", rel_N, rel_E,
-                 rel_V, ac.id.c_str(), ac.aircraft_type);
+        std::snprintf(buffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", rel_N, rel_E,
+                      rel_V, ac.id.c_str(), ac.aircraft_type);
     }
     else
     {
-        snprintf(buffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
-                 rel_N, rel_E, rel_V, ac.id_type, ac.id.c_str(), Math::dToI(ac.heading),
-                 Math::dToI(ac.gnd_speed * Math::ms2kmh), ac.climb_rate,
-                 ac.aircraft_type);
+        std::snprintf(buffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
+                      rel_N, rel_E, rel_V, ac.id_type, ac.id.c_str(),
+                      Math::dToI(ac.heading), Math::dToI(ac.gnd_speed * Math::ms2kmh),
+                      ac.climb_rate, ac.aircraft_type);
     }
     csum = Math::checksum(buffer);
     nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
+    std::snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
 
     return nmea_str;

@@ -9,3 +9,4 @@ TODO
 /target/service/
 !/target/**/*.mk
 !/target/makefile
+/Test/
