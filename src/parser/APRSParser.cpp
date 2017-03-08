@@ -116,12 +116,12 @@ std::int32_t APRSParser::unpack(const std::string& sentence)
                 }
                 else
                 {
-                    return MSG_UNPACK_ERR;
+                    return MSG_UNPACK_IGN;
                 }
             }
             else
             {
-                return MSG_UNPACK_ERR;
+                return MSG_UNPACK_IGN;
             }
 
             //track/gnd_speed

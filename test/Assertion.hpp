@@ -1,23 +1,13 @@
-#include <iostream>
-#include <string>
 #include <cstdint>
+#include <functional>
+#include <iostream>
 
 namespace assertion
 {
 
-#define ASSERT_LESS_THEN(V, E)  \
-        ( \
-         (C_ASSERT_LT((V), (E), (__FUNCTION__))), \
-         (void)0 \
-        )
-#define ASSERT_GREATER_THEN(V, E)  \
-        ( \
-         (C_ASSERT_GT((V), (E), (__FUNCTION__))), \
-         (void)0 \
-        )
 #define ASSERT_EQUAL(V, E, I...)  \
         ( \
-         (C_ASSERT_EQUAL((V), (E), (__FUNCTION__), I)), \
+         (C_ASSERT((V), (E), (__FUNCTION__), I)), \
          (void)0 \
         )
 #define ASSERT(V, E, I...) (ASSERT_EQUAL((V), (E), I))
@@ -57,7 +47,7 @@ template<typename T, typename ... I>
 inline void C_TEST(const char* caller, const T& t, const I ... input)
 {
     NUM_OF_TESTS++;
-    OUT<< ANSI_CYAN << "Run [" << caller << "] with ( ";
+    OUT<< ANSI_CYAN << "Run [" << caller << "] with ( " << ANSI_RESET;
     auto args = { input... };
     for (auto arg = args.begin(); arg != args.end(); arg++)
     {
@@ -67,45 +57,15 @@ inline void C_TEST(const char* caller, const T& t, const I ... input)
             OUT << " , ";
         }
     }
-    OUT<< " ); result = " << t << ANSI_RESET << LF;
+    OUT<< ANSI_CYAN << " ); result = " << t << ANSI_RESET << LF;
 }
 
 template<typename T, typename ... I>
-inline void C_ASSERT_EQUAL(const T& result, const T& expected, const char* caller,
+inline void C_ASSERT(const T& result, const T& expected, const char* caller,
                            const I ... input)
 {
     C_TEST(caller, result, input...);
     if (result == expected)
-    {
-        C_PASS(caller);
-    }
-    else
-    {
-        C_FAIL(caller, expected);
-    }
-}
-
-template<typename I, typename T>
-inline void C_ASSERT_LT(const I& input, const T& result, const T& expected,
-                        const char* caller)
-{
-    C_TEST(caller, input, result);
-    if (result < expected)
-    {
-        C_PASS(caller);
-    }
-    else
-    {
-        C_FAIL(caller, expected);
-    }
-}
-
-template<typename I, typename T>
-inline void C_ASSERT_GT(const I& input, const T& result, const T& expected,
-                        const char* caller)
-{
-    C_TEST(caller, input, result);
-    if (result > expected)
     {
         C_PASS(caller);
     }
