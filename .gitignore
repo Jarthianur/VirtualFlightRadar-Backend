@@ -4,7 +4,6 @@ TODO
 .settings/
 .cproject
 .project
-/test/
 /target/**
 !/target/**/
 /target/service/
