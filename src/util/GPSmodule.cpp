@@ -27,7 +27,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "Math.h"
+#include "Math.hpp"
 
 GPSmodule::GPSmodule(double b_lat, double b_lon, std::int32_t b_alt, double geoid)
         : baselat(b_lat),

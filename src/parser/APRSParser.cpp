@@ -27,7 +27,7 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftContainer.h"
 #include "../util/Logger.h"
-#include "../util/Math.h"
+#include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
 
 

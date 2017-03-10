@@ -19,28 +19,61 @@
  }
  */
 
-#include "Math.h"
+#ifndef MATH_H_
+#define MATH_H_
+
+#include <cstdint>
+#include <cmath>
 #include <cstddef>
 
 namespace Math
 {
 
-double radian(double deg)
+/**
+ * constants
+ */
+const double kts2kmh = 1.852;
+const double kmh2kts = 0.539957;
+const double kts2ms = 0.514444;
+const double ms2kts = 1.94384;
+const double kmh2ms = 0.277778;
+const double ms2kmh = 3.6;
+const double ms2fpm = 196.85;
+const double fpm2ms = 0.00508;
+const double feet2m = 0.3048;
+const double m2feet = 3.28084;
+const double PI = std::acos(-1.0);
+
+/**
+ * convert degree to radian
+ */
+inline double radian(double deg)
 {
     return ((deg * PI) / 180.0);
 }
 
-double degree(double rad)
+/**
+ * convert radian to degree
+ */
+inline double degree(double rad)
 {
     return (rad * 180.0) / PI;
 }
 
-std::int32_t dToI(double d)
+/**
+ * convert to int, round to nearest number
+ */
+inline std::int32_t dToI(double d)
 {
     return (d >= 0.0) ? (std::int32_t) (d + 0.5) : (std::int32_t) (d - 0.5);
 }
 
-double dmsToDeg(double dms)
+/**
+ * convert
+ * ( degree, minute, second )
+ * to degree
+ */
+inline double dmsToDeg(double dms)
 {
     double absDms = std::abs(dms);
     double d = std::floor(absDms);
@@ -48,12 +81,19 @@ double dmsToDeg(double dms)
     return d + m;
 }
 
-double calcIcaoHeight(double press)
+/**
+ * calculate height difference from QNE to Pressure in meters
+ * with ICAO height formula
+ */
+inline double calcIcaoHeight(double press)
 {
     return 288.15 * (1.0 - std::pow((press / 1013.25), 0.190295)) / 0.0065;
 }
 
-std::int32_t checksum(const char* sentence)
+/**
+ * compute checksum of nmea string
+ */
+inline std::int32_t checksum(const char* sentence)
 {
     std::int32_t csum = 0;
     std::size_t i = 1;
@@ -65,3 +105,5 @@ std::int32_t checksum(const char* sentence)
 }
 
 }
+
+#endif /* MATH_H_ */
