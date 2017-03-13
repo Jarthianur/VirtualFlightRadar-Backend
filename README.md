@@ -1,5 +1,7 @@
 # VirtualFlightRadar-Backend
 
+[![Build Status](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend.svg?branch=dev2)](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend)
+
 VFR-B := VirtualFlightRadar-Backend
 
 This project is intended to be an interface between APRS-/ADS-B-receivers, wind-sensors and XCSoar and the airfield manager respectively.
