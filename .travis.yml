@@ -6,6 +6,9 @@ compiler:
 branches:
     only:
         - dev-2
+        
+git:
+    submodules: false
 
 before_install:
     - sudo apt-get update -qq
