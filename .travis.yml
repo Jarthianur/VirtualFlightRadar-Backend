@@ -1,6 +1,18 @@
 language: cpp
+
+addons:
+  apt:
+    sources:
+    - boost-latest
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-4.9
+    - g++-4.9
+    - libboost1.63-all-dev
+    - libboost1.63-dev
+
 compiler:
-    - gcc
+    - g++
 
 # whitelist
 branches:
@@ -15,15 +27,6 @@ before_install:
     - sudo apt-get install -qq
 
 install:
-    # installation of C++ compiler that does support c++11
-    - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-    - sudo apt-get update
-    - sudo apt-get install g++-4.9
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 90
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 90
-    - sudo apt-get install libstdc++-4.9-dev
-    # installation of boost
-    - sudo apt-get install libboost-dev libboost-system-dev libboost-thread-dev libboost-regex-dev libboost-chrono-dev libboost-signals-dev
 
 before_script:
 
