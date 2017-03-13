@@ -5,18 +5,15 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/util/GPSmodule.cpp \
-../src/util/Logger.cpp \
-../src/util/Math.cpp 
+../src/util/Logger.cpp
 
 OBJS += \
 ./src/util/GPSmodule.o \
-./src/util/Logger.o \
-./src/util/Math.o 
+./src/util/Logger.o
 
 CPP_DEPS += \
 ./src/util/GPSmodule.d \
-./src/util/Logger.d \
-./src/util/Math.d 
+./src/util/Logger.d
 
 
 # Each subdirectory must supply rules for building sources it contributes
