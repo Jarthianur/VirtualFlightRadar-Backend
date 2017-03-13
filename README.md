@@ -1,6 +1,6 @@
 # VirtualFlightRadar-Backend
 
-[![Build Status](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend.svg?branch=dev2)](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend)
+[![Build Status](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend.svg?branch=dev-2)](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend)
 
 VFR-B := VirtualFlightRadar-Backend
 
