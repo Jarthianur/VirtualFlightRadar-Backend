@@ -1,3 +1,3 @@
 [submodule "test/framework"]
 	path = test/framework
-	url = git@github.com:Jarthianur/simple-cpp-test-framework.git
+	url = https://github.com/Jarthianur/simple-cpp-test-framework.git
