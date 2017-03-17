@@ -25,6 +25,7 @@
 #include <ctime>
 #include <iostream>
 #include <boost/thread/lock_guard.hpp>
+#include <boost/chrono.hpp>
 
 Logger::Logger()
 {
@@ -36,42 +37,35 @@ Logger::~Logger()
 
 boost::mutex Logger::mutex;
 
+const std::string Logger::getTime()
+{
+    std::time_t tt = boost::chrono::system_clock::to_time_t(
+            boost::chrono::system_clock::now());
+    std::string time(asctime(gmtime(&tt)));
+    time.pop_back();
+    return time;
+}
+
 void Logger::info(const std::string& msg, const std::string& subject)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mutex);
-    std::time_t tt = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now());
-    std::string time(asctime(gmtime(&tt)));
-    time.pop_back();
-    std::cout << "[INFO]  " << time << ":: " << msg << subject << std::endl;
+    std::cout << "[INFO]  " << getTime() << ":: " << msg << subject << std::endl;
 }
 
 void Logger::debug(const std::string& msg, const std::string& subject)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mutex);
-    std::time_t tt = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now());
-    std::string time(asctime(gmtime(&tt)));
-    time.pop_back();
-    std::cout << "[DEBUG] " << time << ":: " << msg << subject << std::endl;
+    std::cout << "[DEBUG] " << getTime() << ":: " << msg << subject << std::endl;
 }
 
 void Logger::warn(const std::string& msg, const std::string& subject)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mutex);
-    std::time_t tt = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now());
-    std::string time(asctime(gmtime(&tt)));
-    time.pop_back();
-    std::cout << "[WARN]  " << time << ":: " << msg << subject << std::endl;
+    std::cout << "[WARN]  " << getTime() << ":: " << msg << subject << std::endl;
 }
 
 void Logger::error(const std::string& msg, const std::string& subject)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mutex);
-    std::time_t tt = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now());
-    std::string time(asctime(gmtime(&tt)));
-    time.pop_back();
-    std::cerr << "[ERROR] " << time << ":: " << msg << subject << std::endl;
+    std::cerr << "[ERROR] " << getTime() << ":: " << msg << subject << std::endl;
 }

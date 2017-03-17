@@ -88,8 +88,6 @@ int main(int argc, char* argv[])
      *
      * - vfrb multi input (run)
      *
-     * - math methods
-     *
      * - gps fix
      */
 
