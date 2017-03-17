@@ -123,7 +123,9 @@ int main(int argc, char* argv[])
         assert(Math::calcIcaoHeight(980.0),280.578763,eqd);
     })->test("checksum", [&eqi]()
     {
-
+        assert(Math::checksum("",sizeof("")),0,eqi);
+        assert(Math::checksum("\0", sizeof("\0")),0,eqi);
+        assert(Math::checksum("$abc*", sizeof("$abc*")),96,eqi);
     });
 
     describe<SBSParser>("SBSParser - unpack", runner)->test(

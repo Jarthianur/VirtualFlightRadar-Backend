@@ -74,7 +74,7 @@ std::string AircraftProcessor::process(Aircraft &ac)
     //PFLAU
     std::snprintf(buffer, AP_BUFF_S, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
                   Math::dToI(bearing_rel), rel_V, dist, ac.id.c_str());
-    std::int32_t csum = Math::checksum(buffer);
+    std::int32_t csum = Math::checksum(buffer, sizeof(buffer));
     nmea_str.append(buffer);
     std::snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
@@ -92,7 +92,7 @@ std::string AircraftProcessor::process(Aircraft &ac)
                       Math::dToI(ac.heading), Math::dToI(ac.gnd_speed * Math::ms2kmh),
                       ac.climb_rate, ac.aircraft_type);
     }
-    csum = Math::checksum(buffer);
+    csum = Math::checksum(buffer, sizeof(buffer));
     nmea_str.append(buffer);
     std::snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);

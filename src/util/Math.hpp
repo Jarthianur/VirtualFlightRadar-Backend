@@ -97,11 +97,11 @@ inline double calcIcaoHeight(double press)
 /**
  * compute checksum of nmea string
  */
-inline std::int32_t checksum(const char* sentence)
+inline std::int32_t checksum(const char* sentence, std::size_t size)
 {
     std::int32_t csum = 0;
-    std::size_t i = 1;
-    while (sentence[i] != '*' && sentence[i] != '\0')
+    std::size_t i = 1;// $ in nmea str not included
+    while (sentence[i] != '*' && sentence[i] != '\0' && i < size)
     {
         csum ^= (std::int32_t) sentence[i++];
     }

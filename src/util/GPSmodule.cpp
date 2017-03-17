@@ -61,7 +61,7 @@ std::string GPSmodule::gpsfix()
             "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
             utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg,
             long_min, longstr, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
-    csum = Math::checksum(buffer);
+    csum = Math::checksum(buffer, sizeof(buffer));
     nmea_str.append(buffer);
     std::snprintf(buffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
@@ -73,7 +73,7 @@ std::string GPSmodule::gpsfix()
             "$GPGGA,%02d%02d%02d,%02.0lf%06.4lf,%c,%03.0lf%07.4lf,%c,1,05,1,%d,M,%.1lf,M,,*",
             utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg,
             long_min, longstr, basealt, basegeoid);
-    csum = Math::checksum(buffer);
+    csum = Math::checksum(buffer, sizeof(buffer));
     nmea_str.append(buffer);
     std::snprintf(buffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(buffer);
