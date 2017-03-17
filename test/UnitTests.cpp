@@ -19,34 +19,103 @@
  }
  */
 
-#include <iostream>
+#include <cstdint>
 #include <string>
 
+#include "../src/config/Configuration.h"
+#include "../src/data/AircraftContainer.h"
+#include "../src/data/ClimateData.h"
+#include "../src/parser/APRSParser.h"
 #include "../src/parser/SBSParser.h"
-#include "framework/src/framework.h"
 #include "../src/vfrb/VFRB.h"
+#include "framework/src/comparator/Comparators.hpp"
+#include "framework/src/reporter/AbstractReporter.hpp"
+#include "framework/src/reporter/Reporters.hpp"
+#include "framework/src/testsuite/TestSuite.hpp"
+#include "framework/src/testsuite/TestSuitesRunner.hpp"
+#include "framework/src/util/assert.hpp"
 
 using namespace testsuite;
+using namespace comparator;
 
 #ifdef assert
 #undef assert
 #endif
 
+/**
+ * after that, inserted aircraft is not reported until update
+ */
+void helper_clearAcCont()
+{
+    for (int i = 0; i < 4; ++i)
+    {
+        VFRB::ac_cont.processAircrafts();
+    }
+}
+
 int main(int argc, char* argv[])
 {
-    auto rep = reporter::createXmlReporter(std::cout);
+    auto rep = reporter::createXmlReporter();
+    TestSuitesRunner runner;
 
     SBSParser pars_sbs;
+    APRSParser pars_aprs;
 
-    std::string msg1(
-            "MSG,3,0,0,AAAAAA,0,2016/01/01,10:00:00.000,2016/01/01,10:00:00.000,,1000,,,1.0,1.0,,,,,,0");
-    std::string msg2(
-            "MSG,3,0,0,AAAAAA,0,2016/01/01,10:00:00.000,2016/01/01,10:00:00.000,,1000,,,,,,,,,,0");
-    std::string msg3(
-            "MSG,3,0,0,AA,AAA,A,0,2016/01sdsd/01,10:00:00.000343,20asx16/01/01,10:0,0:00,.000,,1000,,,1.0,1.0,,,,,,0");
+    VFRB::ac_cont.initProcessor(0.0, 0.0, 0);
+    VFRB::climate_data.setPress();
+    VFRB::climate_data.setTemp();
 
-    test("SBS parser - unpack", rep)->assert("valid msg", &SBSParser::unpack, pars_sbs, 0, comparator::EQUALS<int>(), msg1);
+    Configuration::filter_maxHeight = INT32_MAX;
+    Configuration::filter_maxDist = INT32_MAX;
 
-    return rep->report();
+    /**
+     * Testplan:
+     *
+     * - read valid config
+     * - read malformed config
+     *
+     * - unpack sbs ...
+     * - unpack aprs ...
+     *
+     * - unpack wimda/wimwv
+     *
+     * - prefer flarms
+     *
+     * - filter height/dist
+     *
+     * - vfrb multi input (run)
+     *
+     * - math methods
+     *
+     * - gps fix
+     */
+
+    describe("SBSParser - unpack", runner)->test<SBSParser>(
+            "valid msg",
+            [&]()
+            {
+                std::string msg1(
+                        "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0");
+                auto res = pars_sbs.unpack(msg1);
+                assert(res,0,EQUALS<int>());
+            })->test<SBSParser>(
+            "invalid msg",
+            [&]()
+            {
+                std::string msg1("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0");
+                auto res = pars_sbs.unpack(msg1);
+                assert(res,0,LESS<int>());
+            })->test<SBSParser>(
+            "filter height",
+            [&]()
+            {
+                Configuration::filter_maxHeight = 0;
+                std::string msg1(
+                        "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0");
+                auto res = pars_sbs.unpack(msg1);
+                assert(res,-2,EQUALS<int>());
+            });
+
+    return rep->report(runner);
 }
 

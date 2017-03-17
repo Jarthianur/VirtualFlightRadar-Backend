@@ -30,7 +30,7 @@
 #include "../../util/Logger.h"
 
 SBSClient::SBSClient(boost::asio::signal_set& s, const std::string& host,
-        const std::string& port)
+                     const std::string& port)
         : Client(s, host, port, "(SBSClient)"),
           parser()
 {
@@ -53,11 +53,14 @@ void SBSClient::connect()
 
 void SBSClient::process()
 {
-    parser.unpack(response);
+    if (response.at(4) == '3')
+    {
+        parser.unpack(response);
+    }
 }
 
 void SBSClient::handleResolve(const boost::system::error_code& ec,
-        boost::asio::ip::tcp::resolver::iterator it)
+                              boost::asio::ip::tcp::resolver::iterator it)
 {
     if (!ec)
     {
@@ -80,7 +83,7 @@ void SBSClient::handleResolve(const boost::system::error_code& ec,
 }
 
 void SBSClient::handleConnect(const boost::system::error_code& ec,
-        boost::asio::ip::tcp::resolver::iterator it)
+                              boost::asio::ip::tcp::resolver::iterator it)
 {
     if (!ec)
     {
