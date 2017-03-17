@@ -72,13 +72,17 @@ inline std::int32_t dToI(double d)
  * convert
  * ( degree, minute, second )
  * to degree
+ * Used for APRS.
+ * Sign is determined otherwise for this protocol.
  */
 inline double dmsToDeg(double dms)
 {
     double absDms = std::abs(dms);
     double d = std::floor(absDms);
-    double m = (absDms - d) * 100.0 / 60.0;
-    return d + m;
+    double t = (absDms - d) * 100.0;
+    double m = std::floor(t);
+    // deg + min/60 + sec/3600
+    return d + (m / 60.0) + ((t - m) * 100.0) / 3600.0;
 }
 
 /**

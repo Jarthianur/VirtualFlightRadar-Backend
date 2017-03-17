@@ -28,6 +28,7 @@
 #include "../src/parser/APRSParser.h"
 #include "../src/parser/SBSParser.h"
 #include "../src/vfrb/VFRB.h"
+#include "../src/util/Math.hpp"
 #include "framework/src/comparator/Comparators.hpp"
 #include "framework/src/reporter/AbstractReporter.hpp"
 #include "framework/src/reporter/Reporters.hpp"
@@ -57,6 +58,8 @@ int main(int argc, char* argv[])
 {
     auto rep = reporter::createXmlReporter();
     TestSuitesRunner runner;
+    Comparator<int> eqi = EQUALS<int>();
+    Comparator<double> eqd = EQUALS<double>();
 
     SBSParser pars_sbs;
     APRSParser pars_aprs;
@@ -90,22 +93,55 @@ int main(int argc, char* argv[])
      * - gps fix
      */
 
-    describe("SBSParser - unpack", runner)->test<SBSParser>(
+    describe("Math utils", runner, "Math")->test("radian", [&eqd]()
+    {
+        assert(Math::radian(45.0),0.785398,eqd);
+        assert(Math::radian(0.0),0.0,eqd);
+        assert(Math::radian(360.0),6.28319,eqd);
+    })->test("degree", [&eqd]()
+    {
+        assert(Math::degree(0.785398),45.0,eqd);
+        assert(Math::degree(0.0),0.0,eqd);
+        assert(Math::degree(6.28319),360.0,eqd);
+    })->test("dToI", [&eqi]()
+    {
+        assert(Math::dToI(0.0),0,eqi);
+        assert(Math::dToI(1.4),1,eqi);
+        assert(Math::dToI(1.5),2,eqi);
+        assert(Math::dToI(-1.4),-1,eqi);
+        assert(Math::dToI(-1.5),-2,eqi);
+    })->test("dmsToDeg", [&eqd]()
+    {
+        assert(Math::dmsToDeg(0.0),0.0,eqd);
+        assert(Math::dmsToDeg(90.303000),90.50833,eqd);
+        assert(Math::dmsToDeg(180.0),180.0,eqd);
+        assert(Math::dmsToDeg(-45.123456),45.2096,eqd);
+    })->test("calcIcaoHeight", [&eqd]()
+    {
+        assert(Math::calcIcaoHeight(0.0),44330.769231,eqd);
+        assert(Math::calcIcaoHeight(1013.25),0.0,eqd);
+        assert(Math::calcIcaoHeight(980.0),280.578763,eqd);
+    })->test("checksum", [&eqi]()
+    {
+
+    });
+
+    describe<SBSParser>("SBSParser - unpack", runner)->test(
             "valid msg",
             [&]()
             {
                 std::string msg1(
                         "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0");
                 auto res = pars_sbs.unpack(msg1);
-                assert(res,0,EQUALS<int>());
-            })->test<SBSParser>(
+                assert(res,MSG_UNPACK_SUC,eqi);
+            })->test(
             "invalid msg",
             [&]()
             {
                 std::string msg1("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0");
                 auto res = pars_sbs.unpack(msg1);
-                assert(res,0,LESS<int>());
-            })->test<SBSParser>(
+                assert(res,MSG_UNPACK_ERR,eqi);
+            })->test(
             "filter height",
             [&]()
             {
@@ -113,8 +149,18 @@ int main(int argc, char* argv[])
                 std::string msg1(
                         "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0");
                 auto res = pars_sbs.unpack(msg1);
-                assert(res,-2,EQUALS<int>());
+                assert(res,MSG_UNPACK_IGN,eqi);
+                Configuration::filter_maxHeight = INT32_MAX;
+            })->test(
+            "broken msg",
+            [&]()
+            {
+                std::string msg1("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0");
+                auto res = pars_sbs.unpack(msg1);
+                assert(res,MSG_UNPACK_ERR,eqi);
             });
+
+    helper_clearAcCont();
 
     return rep->report(runner);
 }
