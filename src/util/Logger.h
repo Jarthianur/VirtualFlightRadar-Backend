@@ -58,7 +58,7 @@ public:
 private:
     static boost::mutex mutex;
 
-    const std::string getTime();
+    static const std::string getTime();
 };
 
 #endif /* SRC_LOGGER_H_ */
