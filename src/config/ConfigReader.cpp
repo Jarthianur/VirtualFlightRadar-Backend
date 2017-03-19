@@ -29,20 +29,20 @@
 #include "../util/Logger.h"
 
 
-ConfigReader::ConfigReader(const std::string& file)
-        : file(file),
-          conf_re("^(\\S+?)(?:\\s+?)?=(?:\\s+?)?(\\S+?[\\s\\S]*?)$",
+ConfigReader::ConfigReader(const std::string& fname)
+        : mFile(fname),
+          mConfRE("^(\\S+?)(?:\\s+?)?=(?:\\s+?)?(\\S+?[\\s\\S]*?)$",
                   boost::regex_constants::optimize)
 {
 }
 
-ConfigReader::~ConfigReader()
+ConfigReader::~ConfigReader() noexcept
 {
 }
 
 void ConfigReader::read()
 {
-    std::ifstream src(file);
+    std::ifstream src(mFile);
     std::string key;
     std::string value;
     std::string line;
@@ -55,11 +55,11 @@ void ConfigReader::read()
                 continue;
             }
             boost::smatch match;
-            if (boost::regex_match(line, match, conf_re))
+            if (boost::regex_match(line, match, mConfRE))
             {
                 key = match.str(1);
                 value = match.str(2);
-                config.insert(
+                mConfig.insert(
                 { key, value });
             }
             else
@@ -80,12 +80,12 @@ void ConfigReader::read()
 }
 
 const std::string& ConfigReader::getProperty(const std::string& key,
-        const std::string& defaultValue) const
+        const std::string& def_val) const
 {
-    auto it = config.find(key);
-    if (it == config.end())
+    auto it = mConfig.find(key);
+    if (it == mConfig.end())
     {
-        return defaultValue;
+        return def_val;
     }
     else
     {

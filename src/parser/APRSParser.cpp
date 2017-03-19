@@ -33,51 +33,51 @@
 
 APRSParser::APRSParser()
         : Parser(),
-          aprs_re("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
+          mAprsRE("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
                   boost::regex_constants::optimize),
-          comm_re("^[\\S\\s]+?id([0-9A-F]{2})([0-9A-F]{6})\\s+?(?:([\\+-]\\d+?)fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?[\\S\\s]+?$",
+          mCommRE("^[\\S\\s]+?id([0-9A-F]{2})([0-9A-F]{6})\\s+?(?:([\\+-]\\d+?)fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?[\\S\\s]+?$",
                   boost::regex_constants::optimize)
 {
 }
 
-APRSParser::~APRSParser()
+APRSParser::~APRSParser() noexcept
 {
 }
 
-std::int32_t APRSParser::unpack(const std::string& sentence)
+std::int32_t APRSParser::unpack(const std::string& msg) noexcept
 {
-    if (sentence.at(0) == '#')
+    if (msg.at(0) == '#')
     {
         return MSG_UNPACK_IGN;
     }
     try
     {
         boost::smatch match;
-        if (boost::regex_match(sentence, match, aprs_re))
+        if (boost::regex_match(msg, match, mAprsRE))
         {
 
             try
             {
                 //time
-                time = std::stoi(match.str(1));
+                mtTime = std::stoi(match.str(1));
 
                 //latitude
-                lat = Math::dmsToDeg(std::stod(match.str(2)) / 100.0);
+                mtLat = Math::dmsToDeg(std::stod(match.str(2)) / 100.0);
                 if (match.str(3).compare("S") == 0)
                 {
-                    lat = -lat;
+                    mtLat = -mtLat;
                 }
 
                 //longitude
-                lon = Math::dmsToDeg(std::stod(match.str(4)) / 100.0);
+                mtLong = Math::dmsToDeg(std::stod(match.str(4)) / 100.0);
                 if (match.str(5).compare("W") == 0)
                 {
-                    lon = -lon;
+                    mtLong = -mtLong;
                 }
 
                 //altitude
-                alt = Math::dToI(std::stod(match.str(8)) * Math::feet2m);
-                if (alt > Configuration::filter_maxHeight)
+                mtAlt = Math::dToI(std::stod(match.str(8)) * Math::feet2m);
+                if (mtAlt > Configuration::filter_maxHeight)
                 {
                     return MSG_UNPACK_IGN;
                 }
@@ -92,26 +92,26 @@ std::int32_t APRSParser::unpack(const std::string& sentence)
             if (match.str(9).size() > 0)
             {
                 boost::smatch comm_match;
-                if (boost::regex_match(match.str(9), comm_match, comm_re))
+                if (boost::regex_match(match.str(9), comm_match, mCommRE))
                 {
-                    id = comm_match.str(2);
-                    id_t = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
-                    ac_t = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C) >> 2;
+                    mtID = comm_match.str(2);
+                    mtIDtype = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
+                    mtAcType = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C) >> 2;
                     try
                     {
-                        climb_r = std::stod(comm_match.str(3)) * Math::fpm2ms;
+                        mtClimbRate = std::stod(comm_match.str(3)) * Math::fpm2ms;
                     }
                     catch (const std::logic_error& e)
                     {
-                        climb_r = A_VALUE_NA;
+                        mtClimbRate = A_VALUE_NA;
                     }
                     try
                     {
-                        turn_r = std::stod(comm_match.str(4)) * 3.0; // 1rot = 1 halfcircle / 1 min => 3° / 1s
+                        mtTurnRate = std::stod(comm_match.str(4)) * 3.0; // 1rot = 1 halfcircle / 1 min => 3° / 1s
                     }
                     catch (const std::logic_error& e)
                     {
-                        turn_r = A_VALUE_NA;
+                        mtTurnRate = A_VALUE_NA;
                     }
                 }
                 else
@@ -127,23 +127,23 @@ std::int32_t APRSParser::unpack(const std::string& sentence)
             //track/gnd_speed
             try
             {
-                heading = std::stod(match.str(6));
+                mtHeading = std::stod(match.str(6));
             }
             catch (const std::logic_error& e)
             {
-                heading = A_VALUE_NA;
+                mtHeading = A_VALUE_NA;
             }
             try
             {
-                gnd_spd = std::stod(match.str(7)) * Math::kts2ms;
+                mtGndSpeed = std::stod(match.str(7)) * Math::kts2ms;
             }
             catch (const std::logic_error& e)
             {
-                gnd_spd = A_VALUE_NA;
+                mtGndSpeed = A_VALUE_NA;
             }
 
-            VFRB::ac_cont.insertAircraft(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r,
-                                         turn_r, heading);
+            VFRB::msAcCont.insertAircraft(mtID, mtLat, mtLong, mtAlt, mtGndSpeed, mtIDtype, mtAcType, mtClimbRate,
+                                         mtTurnRate, mtHeading);
         }
         else
         {

@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef WINDCLIENT_H_
-#define WINDCLIENT_H_
+#ifndef SRC_TCP_CLIENT_WINDCLIENT_H_
+#define SRC_TCP_CLIENT_WINDCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
@@ -38,25 +38,25 @@ public:
     WindClient(const WindClient&) = delete;
     WindClient& operator=(const WindClient&) = delete;
 
-    WindClient(boost::asio::signal_set& s, const std::string& host,
-            const std::string& port);
-    virtual ~WindClient() throw ();
+    WindClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
+               const std::string& /*port*/);
+    virtual ~WindClient() noexcept;
 
 private:
-    void read();
-    void process();
-    void connect();
-    void checkDeadline();
-    void stop();
+    void read() noexcept override;
+    void process() noexcept override;
+    void connect() noexcept override;
+    void checkDeadline() noexcept;
+    void stop() noexcept override;
 
-    void handleResolve(const boost::system::error_code& ec,
-            boost::asio::ip::tcp::resolver::iterator it);
-    void handleConnect(const boost::system::error_code& ec,
-            boost::asio::ip::tcp::resolver::iterator it);
+    void handleResolve(const boost::system::error_code& /*ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
+    void handleConnect(const boost::system::error_code& /*ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
 
-    bool stopped_;
-    boost::asio::deadline_timer timeout_;
-    WindParser parser;
+    bool mStopped;
+    boost::asio::deadline_timer mTimeout;
+    WindParser mParser;
 };
 
-#endif /* WINDCLIENT_H_ */
+#endif /* SRC_TCP_CLIENT_WINDCLIENT_H_ */

@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef AIRCRAFT_H_
-#define AIRCRAFT_H_
+#ifndef SRC_AIRCRAFT_AIRCRAFT_H_
+#define SRC_AIRCRAFT_AIRCRAFT_H_
 
 #include <cstdint>
 #include <string>
@@ -31,62 +31,67 @@
 class Aircraft
 {
 public:
-    Aircraft(std::string& id, double lat, double lon, std::int32_t alt);
-    Aircraft(std::string& id, double lat, double lon, std::int32_t alt, double gnd_spd,
-             std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r, double heading);
-    virtual ~Aircraft() throw ();
+    Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/);
+    Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/,
+             double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
+             double /*climb_r*/, double /*turn_r*/, double /*heading*/);
+    virtual ~Aircraft() noexcept;
 
     bool operator==(const Aircraft&) const;
 
     enum class TargetType
         : std::uint32_t
         {
-            FLARM, TRANSPONDER
+            FLARM,
+        TRANSPONDER
     };
+
+    const std::string& getID() const;
 
     /**
      * information
      */
-    // id
-    std::string id;
-
-    std::uint32_t id_type = 1;
-    std::int32_t aircraft_type = A_ADSB_T;
-    TargetType target_type = TargetType::FLARM;
+    std::uint32_t mIDtype = 1;
+    std::int32_t mAircraftType = A_ADSB_T;
+    TargetType mTargetType = TargetType::FLARM;
 
     // full info available
-    bool full_info;
+    bool mFullInfo = false;
 
     //0 = valid; +x(cycles) = invalid
-    std::uint32_t valid = 0;
+    std::uint32_t mValid = 0;
 
     //differ altitude (GPS from FLARM, QNE from TRANSPONDER)
-    bool qne_altitude = false;
+    bool mAltAsQNE = false;
 
     /**
      * position
      */
     // deg
-    double latitude = A_VALUE_NA;
-    double longitude = A_VALUE_NA;
+    double mLatitude = A_VALUE_NA;
+    double mLongitude = A_VALUE_NA;
     // m
-    std::int32_t altitude = 0;
+    std::int32_t mAltitude = 0;
 
     /**
      * movement
      */
     // m/s
-    double gnd_speed = A_VALUE_NA;
+    double mGndSpeed = A_VALUE_NA;
 
     // deg [0-359]
-    double heading = A_VALUE_NA;
+    double mHeading = A_VALUE_NA;
 
     // m/s
-    double climb_rate = A_VALUE_NA;
+    double mClimbRate = A_VALUE_NA;
 
     // currently unused
     // deg/s
-    double turn_rate = A_VALUE_NA;
+    double mTurnRate = A_VALUE_NA;
+
+private:
+    // id
+    std::string mID;
 };
 
-#endif /* AIRCRAFT_H_ */
+#endif /* SRC_AIRCRAFT_AIRCRAFT_H_ */

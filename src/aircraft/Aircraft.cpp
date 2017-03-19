@@ -21,32 +21,40 @@
 
 #include "Aircraft.h"
 
-Aircraft::~Aircraft()
+Aircraft::~Aircraft() noexcept
 {
 }
 
 Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt)
-        : id(id),
-          full_info(false),
-          latitude(lat),
-          longitude(lon),
-          altitude(alt)
+        : mID(id),
+          mLatitude(lat),
+          mLongitude(lon),
+          mAltitude(alt)
 {
 }
 
 Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt, double gnd_spd,
                    std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r, double heading)
-        : Aircraft(id, lat, lon, alt)
+        : mID(id),
+          mIDtype(id_t),
+          mAircraftType(ac_t),
+          mLatitude(lat),
+          mLongitude(lon),
+          mAltitude(alt),
+          mGndSpeed(gnd_spd),
+          mHeading(heading),
+          mClimbRate(climb_r),
+          mTurnRate(turn_r)
+
 {
-    this->climb_rate = climb_r;
-    this->turn_rate = turn_r;
-    this->heading = heading;
-    this->gnd_speed = gnd_spd;
-    this->id_type = id_t;
-    this->aircraft_type = ac_t;
 }
 
 bool Aircraft::operator==(const Aircraft& other) const
 {
-    return this->id == other.id;
+    return this->mID == other.mID;
+}
+
+const std::string& Aircraft::getID() const
+{
+    return mID;
 }

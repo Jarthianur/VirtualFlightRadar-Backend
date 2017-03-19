@@ -43,18 +43,18 @@ bool VFRB::global_climate_enabled = false;
 bool VFRB::global_aprsc_enabled = false;
 bool VFRB::global_sbs_enabled = false;
 bool VFRB::global_run_status = true;
-AircraftContainer  VFRB::ac_cont;
-ClimateData VFRB::climate_data;
+AircraftContainer  VFRB::msAcCont;
+ClimateData VFRB::msClimateData;
 
 VFRB::VFRB()
 {
 }
 
-VFRB::~VFRB()
+VFRB::~VFRB() noexcept
 {
 }
 
-void VFRB::run()
+void VFRB::run() noexcept
 {
     Logger::info("(VFRB) startup");
     //store start time
@@ -127,7 +127,7 @@ void VFRB::run()
         try
         {
             //write Aircrafts to clients
-            std::string str = ac_cont.processAircrafts();
+            std::string str = msAcCont.processAircrafts();
             if (str.length() > 0)
             {
                 server.writeToAll(str);
@@ -138,9 +138,9 @@ void VFRB::run()
             server.writeToAll(str);
 
             //write wind to clients
-            if (global_climate_enabled && climate_data.isValid())
+            if (global_climate_enabled && msClimateData.isValid())
             {
-                str = climate_data.extractWV();
+                str = msClimateData.extractWV();
                 server.writeToAll(str);
             }
 

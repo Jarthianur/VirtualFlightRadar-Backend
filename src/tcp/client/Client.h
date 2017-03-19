@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef CLIENT_H_
-#define CLIENT_H_
+#ifndef SRC_TCP_CLIENT_CLIENT_H_
+#define SRC_TCP_CLIENT_CLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
@@ -36,41 +36,44 @@ public:
     Client(const Client&) = delete;
     Client& operator=(const Client&) = delete;
 
-    virtual ~Client() throw ();
+    virtual ~Client() noexcept;
 
     void run();
 
 protected:
-    Client(boost::asio::signal_set& s, const std::string& host, const std::string& port,
-            const std::string& comp);
+    Client(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
+           const std::string& /*port*/, const std::string& /*comp*/);
 
     void awaitStop();
-    void timedConnect();
-    virtual void stop();
-    virtual void read();
-    virtual void process() = 0;
-    virtual void connect() = 0;
+    void timedConnect() noexcept;
+    virtual void stop() noexcept;
+    virtual void read() noexcept;
+    virtual void process() noexcept = 0;
+    virtual void connect() noexcept = 0;
 
-    void handleTimedConnect(const boost::system::error_code& ec);
-    void handleRead(const boost::system::error_code& ec, std::size_t s);
-    virtual void handleResolve(const boost::system::error_code& ec,
-            boost::asio::ip::tcp::resolver::iterator it) = 0;
-    virtual void handleConnect(const boost::system::error_code& ec,
-                    boost::asio::ip::tcp::resolver::iterator it) = 0;
+    void handleTimedConnect(const boost::system::error_code& /*ec*/) noexcept;
+    void handleRead(const boost::system::error_code& /*ec*/, std::size_t /*s*/) noexcept;
 
-    boost::asio::io_service io_service_;
-    boost::asio::signal_set& signals_;
-    boost::asio::ip::tcp::socket socket_;
-    boost::asio::ip::tcp::resolver resolver_;
+    virtual void handleResolve(const boost::system::error_code& /*ec*/,
+                               boost::asio::ip::tcp::resolver::iterator /*it*/)
+                                       noexcept = 0;
+    virtual void handleConnect(const boost::system::error_code& /*ec*/,
+                               boost::asio::ip::tcp::resolver::iterator /*it*/)
+                                       noexcept = 0;
 
-    std::string response;
-    boost::asio::streambuf buffer;
-    const std::string host;
-    const std::string port;
-    const std::string component;
+    boost::asio::io_service mIOservice;
+    boost::asio::signal_set& mrSigSet;
+    boost::asio::ip::tcp::socket mSocket;
+    boost::asio::ip::tcp::resolver mResolver;
+
+    std::string mResponse;
+    boost::asio::streambuf mBuffer;
+    const std::string mHost;
+    const std::string mPort;
+    const std::string mComponent;
 
 private:
-    boost::asio::deadline_timer connect_timer;
+    boost::asio::deadline_timer mConnectTimer;
 };
 
-#endif /* CLIENT_H_ */
+#endif /* SRC_TCP_CLIENT_CLIENT_H_ */

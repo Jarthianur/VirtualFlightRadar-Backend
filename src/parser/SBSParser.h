@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SBSPARSER_H_
-#define SBSPARSER_H_
+#ifndef SRC_PARSER_SBSPARSER_H_
+#define SRC_PARSER_SBSPARSER_H_
 
 #include <cstdint>
 #include <string>
@@ -31,14 +31,14 @@ class SBSParser: public Parser
 {
 public:
     SBSParser();
-    virtual ~SBSParser() throw ();
+    virtual ~SBSParser() noexcept;
 
-    std::int32_t unpack(const std::string&);
+    std::int32_t unpack(const std::string& /*msg*/) noexcept override;
 
 private:
-    std::string id;
-    std::int32_t alt = 0, time = 0;
-    double lat = 0.0, lon = 0.0;
+    std::string mtID;
+    std::int32_t mtAlt = 0, mtTime = 0;
+    double mtLat = 0.0, mtLong = 0.0;
 };
 
-#endif /* SBSPARSER_H_ */
+#endif /* SRC_PARSER_SBSPARSER_H_ */

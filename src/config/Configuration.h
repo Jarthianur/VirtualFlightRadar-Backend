@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef CONFIGURATION_H_
-#define CONFIGURATION_H_
+#ifndef SRC_CONFIG_CONFIGURATION_H_
+#define SRC_CONFIG_CONFIGURATION_H_
 
 #include <cstdint>
 #include <string>
@@ -30,7 +30,7 @@ class Configuration
 public:
 
     Configuration();
-    virtual ~Configuration() throw ();
+    virtual ~Configuration() noexcept;
 
     static std::int32_t base_altitude;
     static double base_latitude;
@@ -55,4 +55,4 @@ public:
     static std::int32_t filter_maxDist;
 };
 
-#endif /* CONFIGURATION_H_ */
+#endif /* SRC_CONFIG_CONFIGURATION_H_ */

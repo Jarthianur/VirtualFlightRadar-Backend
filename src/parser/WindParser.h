@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef WINDPARSER_H_
-#define WINDPARSER_H_
+#ifndef SRC_PARSER_WINDPARSER_H_
+#define SRC_PARSER_WINDPARSER_H_
 
 #include <cstdint>
 #include <cstddef>
@@ -32,12 +32,12 @@ class WindParser: public Parser
 {
 public:
     WindParser();
-    virtual ~WindParser() throw ();
+    virtual ~WindParser() noexcept;
 
-    std::int32_t unpack(const std::string&);
+    std::int32_t unpack(const std::string& /*msg*/) noexcept override;
 
 private:
-    std::size_t b = 0, s = 0;
+    std::size_t mtB = 0, mtS = 0;
 };
 
-#endif /* WINDPARSER_H_ */
+#endif /* SRC_PARSER_WINDPARSER_H_ */

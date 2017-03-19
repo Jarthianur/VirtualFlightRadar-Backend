@@ -35,11 +35,11 @@ SBSParser::SBSParser()
 {
 }
 
-SBSParser::~SBSParser()
+SBSParser::~SBSParser() noexcept
 {
 }
 
-std::int32_t SBSParser::unpack(const std::string& sentence)
+std::int32_t SBSParser::unpack(const std::string& msg) noexcept
 {
     /*
      * fields:
@@ -52,14 +52,14 @@ std::int32_t SBSParser::unpack(const std::string& sentence)
     std::size_t delim;
     std::uint32_t i = 2;
     std::size_t p = 6;
-    while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
+    while ((delim = msg.find(',', p)) != std::string::npos && i < 16)
     {
         switch (i)
         {
             case 4:
                 if (delim - p > 0)
                 {
-                    id = sentence.substr(p, delim - p);
+                    mtID = msg.substr(p, delim - p);
                 }
                 else
                 {
@@ -71,9 +71,9 @@ std::int32_t SBSParser::unpack(const std::string& sentence)
                 {
                     if (delim - p > 7)
                     {
-                        time = std::stoi(sentence.substr(p, 2)) * 10000;
-                        time += std::stoi(sentence.substr(p + 3, 2)) * 100;
-                        time += std::stoi(sentence.substr(p + 6, 2));
+                        mtTime = std::stoi(msg.substr(p, 2)) * 10000;
+                        mtTime += std::stoi(msg.substr(p + 3, 2)) * 100;
+                        mtTime += std::stoi(msg.substr(p + 6, 2));
                     }
                     else
                     {
@@ -88,9 +88,9 @@ std::int32_t SBSParser::unpack(const std::string& sentence)
             case 11:
                 try
                 {
-                    alt = Math::dToI(
-                            std::stod(sentence.substr(p, delim - p)) * Math::feet2m);
-                    if (alt > Configuration::filter_maxHeight)
+                    mtAlt = Math::dToI(
+                            std::stod(msg.substr(p, delim - p)) * Math::feet2m);
+                    if (mtAlt > Configuration::filter_maxHeight)
                     {
                         return MSG_UNPACK_IGN;
                     }
@@ -103,7 +103,7 @@ std::int32_t SBSParser::unpack(const std::string& sentence)
             case 14:
                 try
                 {
-                    lat = std::stod(sentence.substr(p, delim - p));
+                    mtLat = std::stod(msg.substr(p, delim - p));
                 }
                 catch (const std::logic_error& e)
                 {
@@ -113,7 +113,7 @@ std::int32_t SBSParser::unpack(const std::string& sentence)
             case 15:
                 try
                 {
-                    lon = std::stod(sentence.substr(p, delim - p));
+                    mtLong = std::stod(msg.substr(p, delim - p));
                 }
                 catch (const std::logic_error& e)
                 {
@@ -126,6 +126,6 @@ std::int32_t SBSParser::unpack(const std::string& sentence)
         i++;
         p = delim + 1;
     }
-    VFRB::ac_cont.insertAircraft(id, lat, lon, alt);
+    VFRB::msAcCont.insertAircraft(mtID, mtLat, mtLong, mtAlt);
     return MSG_UNPACK_SUC;
 }

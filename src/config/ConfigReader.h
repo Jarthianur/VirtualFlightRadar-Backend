@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef CONFIGREADER_H_
-#define CONFIGREADER_H_
+#ifndef SRC_CONFIG_CONFIGREADER_H_
+#define SRC_CONFIG_CONFIGREADER_H_
 
 #include <boost/regex.hpp>
 #include <string>
@@ -29,16 +29,25 @@
 class ConfigReader
 {
 public:
-    ConfigReader(const std::string& file);
-    virtual ~ConfigReader() throw ();
+    ConfigReader(const std::string& /*fname*/);
+    virtual ~ConfigReader() noexcept;
 
+    /**
+     * Read given file.
+     * Store recognized key/value properties into map.
+     */
     void read();
-    const std::string& getProperty(const std::string&, const std::string&) const;
+
+    /**
+     * Get value to given key from config map.
+     * If key not found return given default.
+     */
+    const std::string& getProperty(const std::string& /*key*/, const std::string& /*def_val*/ = "") const;
 
 private:
-    const std::string file;
-    std::unordered_map<std::string, std::string> config;
-    const boost::regex conf_re;
+    const std::string mFile;
+    std::unordered_map<std::string, std::string> mConfig;
+    const boost::regex mConfRE;
 };
 
-#endif /* CONFIGREADER_H_ */
+#endif /* SRC_CONFIG_CONFIGREADER_H_ */

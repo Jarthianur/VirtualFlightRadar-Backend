@@ -34,7 +34,7 @@
 #define VERSION "DEMO"
 #endif
 
-std::int32_t strToInt(const std::string& str)
+std::int32_t strToInt(const std::string& str) noexcept
 {
     try
     {
@@ -47,7 +47,7 @@ std::int32_t strToInt(const std::string& str)
     return 0;
 }
 
-double strToDouble(const std::string& str)
+double strToDouble(const std::string& str) noexcept
 {
     try
     {
@@ -180,11 +180,11 @@ int main(int argc, char* argv[])
     Configuration::filter_maxDist = maxDist;
 
     // set climate fallbacks
-    VFRB::climate_data.setPress();
-    VFRB::climate_data.setTemp();
+    VFRB::msClimateData.setPress();
+    VFRB::msClimateData.setTemp();
 
     // init containers processor
-    VFRB::ac_cont.initProcessor(Configuration::base_latitude,
+    VFRB::msAcCont.initProcessor(Configuration::base_latitude,
                                 Configuration::base_longitude,
                                 Configuration::base_altitude);
     VFRB::run();

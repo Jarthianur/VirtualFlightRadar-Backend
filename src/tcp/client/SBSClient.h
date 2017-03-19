@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SBSCLIENT_H_
-#define SBSCLIENT_H_
+#ifndef SRC_TCP_CLIENT_SBSCLIENT_H_
+#define SRC_TCP_CLIENT_SBSCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
@@ -35,19 +35,20 @@ public:
     SBSClient(const SBSClient&) = delete;
     SBSClient& operator=(const SBSClient&) = delete;
 
-    SBSClient(boost::asio::signal_set& s, const std::string& host, const std::string& port);
-    virtual ~SBSClient() throw ();
+    SBSClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
+              const std::string& /*port*/);
+    virtual ~SBSClient() noexcept;
 
 private:
-    void process();
-    void connect();
+    void process() noexcept override;
+    void connect() noexcept override;
 
-    void handleResolve(const boost::system::error_code& ec,
-            boost::asio::ip::tcp::resolver::iterator it);
-    void handleConnect(const boost::system::error_code& ec,
-            boost::asio::ip::tcp::resolver::iterator it);
+    void handleResolve(const boost::system::error_code& /*ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
+    void handleConnect(const boost::system::error_code& /*ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
 
-    SBSParser parser;
+    SBSParser mParser;
 };
 
-#endif /* SBSCLIENT_H_ */
+#endif /* SRC_TCP_CLIENT_SBSCLIENT_H_ */

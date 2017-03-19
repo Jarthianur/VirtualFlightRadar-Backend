@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef APRSCCLIENT_H_
-#define APRSCCLIENT_H_
+#ifndef SRC_TCP_CLIENT_APRSCCLIENT_H_
+#define SRC_TCP_CLIENT_APRSCCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
@@ -35,22 +35,22 @@ public:
     APRSCClient(const APRSCClient&) = delete;
     APRSCClient& operator=(const APRSCClient&) = delete;
 
-    APRSCClient(boost::asio::signal_set& s, const std::string& host,
-            const std::string& port, const std::string& login);
-    virtual ~APRSCClient() throw ();
+    APRSCClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
+                const std::string& /*port*/, const std::string& /*login*/);
+    virtual ~APRSCClient() noexcept;
 
 private:
-    void process();
-    void connect();
+    void process() noexcept override;
+    void connect() noexcept override;
 
-    void handleResolve(const boost::system::error_code& ec,
-            boost::asio::ip::tcp::resolver::iterator it);
-    void handleConnect(const boost::system::error_code& ec,
-            boost::asio::ip::tcp::resolver::iterator it);
-    void handleLogin(const boost::system::error_code& ec, std::size_t s);
+    void handleResolve(const boost::system::error_code& /*ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
+    void handleConnect(const boost::system::error_code& /*ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
+    void handleLogin(const boost::system::error_code& /*ec*/, std::size_t /*s*/) noexcept;
 
-    std::string login_str;
-    APRSParser parser;
+    std::string mLoginStr;
+    APRSParser mParser;
 };
 
-#endif /* APRSCCLIENT_H_ */
+#endif /* SRC_TCP_CLIENT_APRSCCLIENT_H_ */

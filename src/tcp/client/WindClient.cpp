@@ -28,81 +28,81 @@
 
 #include "../../util/Logger.h"
 
-WindClient::WindClient(boost::asio::signal_set& s, const std::string& host,
-        const std::string& port)
-        : Client(s, host, port, "(WindClient)"),
-          stopped_(false),
-          timeout_(io_service_),
-          parser()
+WindClient::WindClient(boost::asio::signal_set& sigset, const std::string& host,
+                       const std::string& port)
+        : Client(sigset, host, port, "(WindClient)"),
+          mStopped(false),
+          mTimeout(mIOservice),
+          mParser()
 {
     connect();
-    timeout_.async_wait(boost::bind(&WindClient::checkDeadline, this));
+    mTimeout.async_wait(boost::bind(&WindClient::checkDeadline, this));
 }
 
-WindClient::~WindClient() throw ()
+WindClient::~WindClient() noexcept
 {
 }
 
-void WindClient::read()
+void WindClient::read() noexcept
 {
-    timeout_.expires_from_now(boost::posix_time::seconds(WC_RCV_TIMEOUT));
+    mTimeout.expires_from_now(boost::posix_time::seconds(WC_RCV_TIMEOUT));
     Client::read();
 }
 
-void WindClient::connect()
+void WindClient::connect() noexcept
 {
     boost::asio::ip::tcp::resolver::query query(
-            host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
-    resolver_.async_resolve(
+            mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(
             query,
             boost::bind(&WindClient::handleResolve, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
 }
 
-void WindClient::checkDeadline()
+void WindClient::checkDeadline() noexcept
 {
-    if (stopped_)
+    if (mStopped)
     {
         return;
     }
-    if (timeout_.expires_at() <= boost::asio::deadline_timer::traits_type::now())
+    if (mTimeout.expires_at() <= boost::asio::deadline_timer::traits_type::now())
     {
         Logger::warn("(WindClient) timed out: reconnect...");
-        if (socket_.is_open())
+        if (mSocket.is_open())
         {
-            socket_.close();
+            mSocket.close();
         }
-        timeout_.expires_at(boost::posix_time::pos_infin);
+        mTimeout.expires_at(boost::posix_time::pos_infin);
         connect();
     }
-    timeout_.async_wait(boost::bind(&WindClient::checkDeadline, this));
+    mTimeout.async_wait(boost::bind(&WindClient::checkDeadline, this));
 }
 
-void WindClient::stop()
+void WindClient::stop() noexcept
 {
     Client::stop();
-    stopped_ = true;
-    timeout_.expires_at(boost::posix_time::pos_infin);
-    timeout_.cancel();
+    mStopped = true;
+    mTimeout.expires_at(boost::posix_time::pos_infin);
+    mTimeout.cancel();
 }
 
-void WindClient::process()
+void WindClient::process() noexcept
 {
-    parser.unpack(response);
+    mParser.unpack(mResponse);
 }
 
 void WindClient::handleResolve(const boost::system::error_code& ec,
-        boost::asio::ip::tcp::resolver::iterator it)
+                               boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
-    if (stopped_)
+    if (mStopped)
     {
         return;
     }
     if (!ec)
     {
         boost::asio::async_connect(
-                socket_,
+                mSocket,
                 it,
                 boost::bind(&WindClient::handleConnect, this,
                             boost::asio::placeholders::error,
@@ -111,33 +111,33 @@ void WindClient::handleResolve(const boost::system::error_code& ec,
     else
     {
         Logger::error("(WindClient) resolve host: ", ec.message());
-        if (socket_.is_open())
+        if (mSocket.is_open())
         {
-            socket_.close();
+            mSocket.close();
         }
         timedConnect();
     }
 }
 
 void WindClient::handleConnect(const boost::system::error_code& ec,
-        boost::asio::ip::tcp::resolver::iterator it)
+                               boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
-    if (stopped_)
+    if (mStopped)
     {
         return;
     }
     if (!ec)
     {
-        socket_.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(WindClient) connected to: ", host);
+        mSocket.set_option(boost::asio::socket_base::keep_alive(true));
+        Logger::info("(WindClient) connected to: ", mHost);
         read();
     }
     else
     {
         Logger::error("(WindClient) connect: ", ec.message());
-        if (socket_.is_open())
+        if (mSocket.is_open())
         {
-            socket_.close();
+            mSocket.close();
         }
         timedConnect();
     }

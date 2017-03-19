@@ -31,32 +31,32 @@ boost::shared_ptr<Connection> Connection::start(boost::asio::ip::tcp::socket soc
 }
 
 Connection::Connection(boost::asio::ip::tcp::socket socket)
-        : socket_(std::move(socket)),
-          ip_(socket_.remote_endpoint().address().to_string())
+        : mSocket(std::move(socket)),
+          mIP(mSocket.remote_endpoint().address().to_string())
 {
 }
 
-Connection::~Connection()
+Connection::~Connection() noexcept
 {
     stop();
 }
 
-void Connection::stop()
+void Connection::stop() noexcept
 {
     boost::system::error_code ignored_ec;
-    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
-    if (socket_.is_open())
+    mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+    if (mSocket.is_open())
     {
-        socket_.close();
+        mSocket.close();
     }
 }
 
-boost::asio::ip::tcp::socket& Connection::socket()
+boost::asio::ip::tcp::socket& Connection::getSocket()
 {
-    return socket_;
+    return mSocket;
 }
 
-const std::string& Connection::ip()
+const std::string& Connection::getIP()
 {
-    return ip_;
+    return mIP;
 }

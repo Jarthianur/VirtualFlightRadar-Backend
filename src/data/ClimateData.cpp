@@ -23,50 +23,50 @@
 #include <boost/thread/lock_guard.hpp>
 
 ClimateData::ClimateData()
-        : pressure(ICAO_STD_A),
-          temperature(ICAO_STD_T)
+        : mPress(ICAO_STD_A),
+          mTemp(ICAO_STD_T)
 {
 }
 
-ClimateData::~ClimateData()
+ClimateData::~ClimateData() noexcept
 {
 }
 
 std::string ClimateData::extractWV()
 {
-    boost::lock_guard<boost::mutex> lock(this->mutex);
-    wv_valid = false;
-    return wv_ + "\r\n";
+    boost::lock_guard<boost::mutex> lock(this->mMutex);
+    mWVvalid = false;
+    return mWV + "\r\n";
 }
 
 bool ClimateData::isValid()
 {
-    return wv_valid;
+    return mWVvalid;
 }
 
 double ClimateData::getPress()
 {
-    return pressure;
+    return mPress;
 }
 
 void ClimateData::insertWV(const std::string& wv)
 {
-    boost::lock_guard<boost::mutex> lock(this->mutex);
-    wv_ = wv;
-    wv_valid = true;
+    boost::lock_guard<boost::mutex> lock(this->mMutex);
+    mWV = wv;
+    mWVvalid = true;
 }
 
 void ClimateData::setPress(double p)
 {
-    pressure = p;
+    mPress = p;
 }
 
 void ClimateData::setTemp(double t)
 {
-    temperature = t;
+    mTemp = t;
 }
 
 double ClimateData::getTemp()
 {
-    return temperature;
+    return mTemp;
 }

@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef PARSER_H_
-#define PARSER_H_
+#ifndef SRC_PARSER_PARSER_H_
+#define SRC_PARSER_PARSER_H_
 
 #include <cstdint>
 #include <string>
@@ -33,15 +33,15 @@ class Parser
 {
 public:
     Parser();
-    virtual ~Parser() throw ();
+    virtual ~Parser() noexcept;
 
     /**
      * unpack a msg into Aircraft and insert in Container.
      * returns MSG_UNPACK_SUC on success, MSG_UNPACK_ERR on failure,
      * MSG_UNPACK_IGN when to ignore.
      */
-    virtual std::int32_t unpack(const std::string&) = 0;
+    virtual std::int32_t unpack(const std::string& /*msg*/) noexcept = 0;
 
 };
 
-#endif /* PARSER_H_ */
+#endif /* SRC_PARSER_PARSER_H_ */

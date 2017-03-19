@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef MATH_H_
-#define MATH_H_
+#ifndef SRC_UTIL_MATH_H_
+#define SRC_UTIL_MATH_H_
 
 #include <cstdint>
 #include <cmath>
@@ -110,4 +110,4 @@ inline std::int32_t checksum(const char* sentence, std::size_t size)
 
 }
 
-#endif /* MATH_H_ */
+#endif /* SRC_UTIL_MATH_H_ */

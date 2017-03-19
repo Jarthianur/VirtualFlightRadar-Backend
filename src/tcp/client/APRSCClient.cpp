@@ -29,43 +29,43 @@
 
 #include "../../util/Logger.h"
 
-APRSCClient::APRSCClient(boost::asio::signal_set& s, const std::string& host,
-        const std::string& port, const std::string& login)
-        : Client(s, host, port, "(APRSCClient)"),
-          login_str(login),
-          parser()
+APRSCClient::APRSCClient(boost::asio::signal_set& sigset, const std::string& host,
+                         const std::string& port, const std::string& login)
+        : Client(sigset, host, port, "(APRSCClient)"),
+          mLoginStr(login),
+          mParser()
 {
-    login_str.append("\r\n");
+    mLoginStr.append("\r\n");
     connect();
 }
 
-APRSCClient::~APRSCClient()
+APRSCClient::~APRSCClient() noexcept
 {
 }
 
-void APRSCClient::connect()
+void APRSCClient::connect() noexcept
 {
     boost::asio::ip::tcp::resolver::query query(
-            host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
-    resolver_.async_resolve(
+            mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(
             query,
             boost::bind(&APRSCClient::handleResolve, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
 }
 
-void APRSCClient::process()
+void APRSCClient::process() noexcept
 {
-    parser.unpack(response);
+    mParser.unpack(mResponse);
 }
 
 void APRSCClient::handleResolve(const boost::system::error_code& ec,
-        boost::asio::ip::tcp::resolver::iterator it)
+                                boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
     if (!ec)
     {
         boost::asio::async_connect(
-                socket_,
+                mSocket,
                 it,
                 boost::bind(&APRSCClient::handleConnect, this,
                             boost::asio::placeholders::error,
@@ -74,23 +74,23 @@ void APRSCClient::handleResolve(const boost::system::error_code& ec,
     else
     {
         Logger::error("(APRSCClient) resolve host: ", ec.message());
-        if (socket_.is_open())
+        if (mSocket.is_open())
         {
-            socket_.close();
+            mSocket.close();
         }
         timedConnect();
     }
 }
 
 void APRSCClient::handleConnect(const boost::system::error_code& ec,
-        boost::asio::ip::tcp::resolver::iterator it)
+                                boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
     if (!ec)
     {
-        socket_.set_option(boost::asio::socket_base::keep_alive(true));
+        mSocket.set_option(boost::asio::socket_base::keep_alive(true));
         boost::asio::async_write(
-                socket_,
-                boost::asio::buffer(login_str),
+                mSocket,
+                boost::asio::buffer(mLoginStr),
                 boost::bind(&APRSCClient::handleLogin, this,
                             boost::asio::placeholders::error,
                             boost::asio::placeholders::bytes_transferred));
@@ -98,19 +98,19 @@ void APRSCClient::handleConnect(const boost::system::error_code& ec,
     else
     {
         Logger::error("(APRSCClient) connect: ", ec.message());
-        if (socket_.is_open())
+        if (mSocket.is_open())
         {
-            socket_.close();
+            mSocket.close();
         }
         timedConnect();
     }
 }
 
-void APRSCClient::handleLogin(const boost::system::error_code& ec, std::size_t s)
+void APRSCClient::handleLogin(const boost::system::error_code& ec, std::size_t s) noexcept
 {
     if (!ec)
     {
-        Logger::info("(APRSCClient) connected to: ", host);
+        Logger::info("(APRSCClient) connected to: ", mHost);
         read();
     }
     else

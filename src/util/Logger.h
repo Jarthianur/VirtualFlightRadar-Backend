@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef LOGGER_H_
-#define LOGGER_H_
+#ifndef SRC_UTIL_LOGGER_H_
+#define SRC_UTIL_LOGGER_H_
 
 #include <string>
 #include <boost/thread/mutex.hpp>
@@ -29,7 +29,7 @@ class Logger
 {
 public:
     Logger();
-    virtual ~Logger() throw ();
+    virtual ~Logger() noexcept;
 
     /**
      * Log informations, like succeeding connections etc
@@ -56,9 +56,9 @@ public:
     static void error(const std::string&, const std::string& = "");
 
 private:
-    static boost::mutex mutex;
+    static boost::mutex mMutex;
 
     static const std::string getTime();
 };
 
-#endif /* SRC_LOGGER_H_ */
+#endif /* SRC_UTIL_LOGGER_H_ */

@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef VFRB_H_
-#define VFRB_H_
+#ifndef SRC_VFRB_VFRB_H_
+#define SRC_VFRB_VFRB_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
@@ -39,12 +39,12 @@ public:
     VFRB& operator=(const VFRB&) = delete;
 
     VFRB();
-    virtual ~VFRB() throw ();
+    virtual ~VFRB() noexcept;
 
     /**
      * runs the tool
      */
-    static void run();
+    static void run() noexcept;
 
     /**
      * configuration
@@ -54,19 +54,19 @@ public:
     static bool global_sbs_enabled;
     static bool global_run_status;
 
-    static AircraftContainer ac_cont;
-    static ClimateData climate_data;
+    static AircraftContainer msAcCont;
+    static ClimateData msClimateData;
 
 private:
     /**
-     * funtions for every single thread
+     * funtions for every thread
      */
-    static void handleSBSInput(boost::asio::signal_set& sigset);
-    static void handleAPRSCInput(boost::asio::signal_set& sigset);
-    static void handleClimateInput(boost::asio::signal_set& sigset);
+    static void handleSBSInput(boost::asio::signal_set& /*sigset*/);
+    static void handleAPRSCInput(boost::asio::signal_set& /*sigset*/);
+    static void handleClimateInput(boost::asio::signal_set& /*sigset*/);
     static void handleNMAEServer(NMEAServer& server);
 
-    static void handleSignals(const boost::system::error_code& ec, const int sig);
+    static void handleSignals(const boost::system::error_code& /*ec*/, const int /*sig*/);
 };
 
-#endif /* VFRB_H_ */
+#endif /* SRC_VFRB_VFRB_H_ */

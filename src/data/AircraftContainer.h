@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef AIRCRAFTCONTAINER_H_
-#define AIRCRAFTCONTAINER_H_
+#ifndef SRC_DATA_AIRCRAFTCONTAINER_H_
+#define SRC_DATA_AIRCRAFTCONTAINER_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -32,7 +32,6 @@
 #include "../aircraft/Aircraft.h"
 #include "../aircraft/AircraftProcessor.h"
 #include "../config/Parameters.h"
-
 
 #define AC_NOT_FOUND -1
 #define AC_INVALIDATE AIRCRAFT_INVALIDATE
@@ -46,16 +45,20 @@ public:
     AircraftContainer& operator=(const AircraftContainer&) = delete;
 
     AircraftContainer();
-    virtual ~AircraftContainer() throw ();
+    virtual ~AircraftContainer() noexcept;
 
-    void initProcessor(double, double, std::int32_t);
+    void initProcessor(double /*proc_lat*/, double /*proc_lon*/,
+                       std::int32_t /*proc_alt*/);
 
     /**
      * insert aircraft in container
      */
-    void insertAircraft(std::string&, double, double, std::int32_t);
-    void insertAircraft(std::string&, double, double, std::int32_t, double, std::uint32_t, std::int32_t,
-            double, double, double);
+    void insertAircraft(std::string& /*id*/, double /*lat*/, double /*lon*/,
+                        std::int32_t /*alt*/);
+    void insertAircraft(std::string& /*id*/, double /*lat*/, double /*lon*/,
+                        std::int32_t /*alt*/, double /*gnd_spd*/, std::uint32_t /*id_t*/,
+                        std::int32_t /*ac_t*/, double /*climb_r*/, double /*turn_r*/,
+                        double /*heading*/);
 
     /**
      * process aircraft at index i into target string,
@@ -69,26 +72,26 @@ private:
      * if id is found returns index,
      * else returns -1.
      */
-    ssize_t find(std::string&);
+    ssize_t find(std::string& /*id*/);
 
-    boost::mutex mutex;
+    boost::mutex mMutex;
 
     /**
      * Processor to process Aircrafts from
      * within threadsafe context of container.
      */
-    AircraftProcessor proc;
+    AircraftProcessor mAcProc;
 
     /**
      * Container that holds Aircrafts
      */
-    std::vector<Aircraft> cont;
+    std::vector<Aircraft> mCont;
 
     /**
      * Map to manage indices of Aircrafts.
      * This makes find-method much more efficient.
      */
-    std::unordered_map<std::string, size_t> index_map;
+    std::unordered_map<std::string, size_t> mIndexMap;
 };
 
-#endif /* AIRCRAFTCONTAINER_H_ */
+#endif /* SRC_DATA_AIRCRAFTCONTAINER_H_ */

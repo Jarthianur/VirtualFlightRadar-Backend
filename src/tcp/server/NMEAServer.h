@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef NMEASERVER_H_
-#define NMEASERVER_H_
+#ifndef SRC_TCP_SERVER_NMEASERVER_H_
+#define SRC_TCP_SERVER_NMEASERVER_H_
 
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
@@ -40,26 +40,33 @@ public:
     NMEAServer(const NMEAServer&) = delete;
     NMEAServer& operator=(const NMEAServer&) = delete;
 
-    NMEAServer(boost::asio::signal_set& s, std::uint16_t port);
-    virtual ~NMEAServer() throw ();
+    NMEAServer(boost::asio::signal_set& /*sigset*/, std::uint16_t /*port*/);
+    virtual ~NMEAServer() noexcept;
 
+    /**
+     * Run IO service.
+     */
     void run();
-    void writeToAll(const std::string& msg);
+
+    /**
+     * Write message to all clients.
+     */
+    void writeToAll(const std::string& /*msg*/) noexcept;
 
 private:
-    void accept();
+    void accept() noexcept;
     void awaitStop();
     void stopAll();
 
-    void handleAccept(const boost::system::error_code& ec);
+    void handleAccept(const boost::system::error_code& /*ec*/) noexcept;
 
-    boost::mutex mutex;
+    boost::mutex mMutex;
 
-    boost::asio::io_service io_service_;
-    boost::asio::signal_set& signals_;
-    boost::asio::ip::tcp::acceptor acceptor_;
-    boost::asio::ip::tcp::socket socket_;
-    std::vector<boost::shared_ptr<Connection>> clients;
+    boost::asio::io_service mIOservice;
+    boost::asio::signal_set& mrSigSet;
+    boost::asio::ip::tcp::acceptor mAcceptor;
+    boost::asio::ip::tcp::socket mSocket;
+    std::vector<boost::shared_ptr<Connection>> mClients;
 };
 
-#endif /* NMEASERVER_H_ */
+#endif /* SRC_TCP_SERVER_NMEASERVER_H_ */

@@ -32,37 +32,37 @@ WindParser::WindParser()
 {
 }
 
-WindParser::~WindParser()
+WindParser::~WindParser() noexcept
 {
 }
 
-std::int32_t WindParser::unpack(const std::string& sentence)
+std::int32_t WindParser::unpack(const std::string& msg) noexcept
 {
-    if (sentence.substr(1, 5).compare("WIMWV") == 0)
+    if (msg.substr(1, 5).compare("WIMWV") == 0)
     {
-        VFRB::climate_data.insertWV(sentence);
+        VFRB::msClimateData.insertWV(msg);
     }
-    else if (sentence.substr(1, 5).compare("WIMDA") == 0)
+    else if (msg.substr(1, 5).compare("WIMDA") == 0)
     {
         try
         {
-            b = sentence.find('B') - 1;
-            s = sentence.substr(0, b).find_last_of(',') + 1;
-            VFRB::climate_data.setPress(std::stod(sentence.substr(s, b - s)) * 1000.0);
+            mtB = msg.find('B') - 1;
+            mtS = msg.substr(0, mtB).find_last_of(',') + 1;
+            VFRB::msClimateData.setPress(std::stod(msg.substr(mtS, mtB - mtS)) * 1000.0);
         }
         catch (std::logic_error& e)
         {
-            VFRB::climate_data.setPress();
+            VFRB::msClimateData.setPress();
         }
         try
         {
-            b = sentence.find('C') - 1;
-            s = sentence.substr(0, b).find_last_of(',') + 1;
-            VFRB::climate_data.setTemp(std::stod(sentence.substr(s, b - s)));
+            mtB = msg.find('C') - 1;
+            mtS = msg.substr(0, mtB).find_last_of(',') + 1;
+            VFRB::msClimateData.setTemp(std::stod(msg.substr(mtS, mtB - mtS)));
         }
         catch (std::logic_error& e)
         {
-            VFRB::climate_data.setTemp();
+            VFRB::msClimateData.setTemp();
         }
     }
     else

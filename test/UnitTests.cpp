@@ -50,7 +50,7 @@ void helper_clearAcCont()
 {
     for (int i = 0; i < 4; ++i)
     {
-        VFRB::ac_cont.processAircrafts();
+        VFRB::msAcCont.processAircrafts();
     }
 }
 
@@ -64,9 +64,9 @@ int main(int argc, char* argv[])
     SBSParser pars_sbs;
     APRSParser pars_aprs;
 
-    VFRB::ac_cont.initProcessor(0.0, 0.0, 0);
-    VFRB::climate_data.setPress();
-    VFRB::climate_data.setTemp();
+    VFRB::msAcCont.initProcessor(0.0, 0.0, 0);
+    VFRB::msClimateData.setPress();
+    VFRB::msClimateData.setTemp();
 
     Configuration::filter_maxHeight = INT32_MAX;
     Configuration::filter_maxDist = INT32_MAX;
@@ -87,8 +87,6 @@ int main(int argc, char* argv[])
      * - filter height/dist
      *
      * - vfrb multi input (run)
-     *
-     * - gps fix
      */
 
     describe("Math utils", runner, "Math")->test("radian", [&eqd]()
@@ -130,34 +128,25 @@ int main(int argc, char* argv[])
             "valid msg",
             [&]()
             {
-                std::string msg1(
-                        "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0");
-                auto res = pars_sbs.unpack(msg1);
-                assert(res,MSG_UNPACK_SUC,eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0"),MSG_UNPACK_SUC,eqi);
             })->test(
             "invalid msg",
             [&]()
             {
-                std::string msg1("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0");
-                auto res = pars_sbs.unpack(msg1);
-                assert(res,MSG_UNPACK_ERR,eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0"),MSG_UNPACK_ERR,eqi);
             })->test(
             "filter height",
             [&]()
             {
                 Configuration::filter_maxHeight = 0;
-                std::string msg1(
-                        "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0");
-                auto res = pars_sbs.unpack(msg1);
-                assert(res,MSG_UNPACK_IGN,eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0"),MSG_UNPACK_IGN,eqi);
                 Configuration::filter_maxHeight = INT32_MAX;
             })->test(
             "broken msg",
             [&]()
             {
-                std::string msg1("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0");
-                auto res = pars_sbs.unpack(msg1);
-                assert(res,MSG_UNPACK_ERR,eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0"),MSG_UNPACK_ERR,eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0"),MSG_UNPACK_ERR,eqi);
             });
 
     helper_clearAcCont();

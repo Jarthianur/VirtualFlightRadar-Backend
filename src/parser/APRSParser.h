@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef APRSPARSER_H_
-#define APRSPARSER_H_
+#ifndef SRC_PARSER_APRSPARSER_H_
+#define SRC_PARSER_APRSPARSER_H_
 
 #include <boost/regex.hpp>
 #include <cstdint>
@@ -34,19 +34,19 @@ class APRSParser: public Parser
 {
 public:
     APRSParser();
-    virtual ~APRSParser() throw ();
+    virtual ~APRSParser() noexcept;
 
-    std::int32_t unpack(const std::string&);
+    std::int32_t unpack(const std::string& /*msg*/) noexcept override;
 
 private:
     //regex
-    const boost::regex aprs_re;
-    const boost::regex comm_re;
+    const boost::regex mAprsRE;
+    const boost::regex mCommRE;
     // temps
-    std::string id;
-    std::int32_t id_t = 0, ac_t = 0, alt = 0, time = 0;
-    double lat = 0.0, lon = 0.0, turn_r = 0.0, climb_r = 0.0, gnd_spd = 0.0,
-            heading = 0.0;
+    std::string mtID;
+    std::int32_t mtIDtype = 0, mtAcType = 0, mtAlt = 0, mtTime = 0;
+    double mtLat = 0.0, mtLong = 0.0, mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0,
+            mtHeading = 0.0;
 };
 
-#endif /* APRSPARSER_H_ */
+#endif /* SRC_PARSER_APRSPARSER_H_ */

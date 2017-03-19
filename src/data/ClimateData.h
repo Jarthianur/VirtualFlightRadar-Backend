@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef WINDFEED_H_
-#define WINDFEED_H_
+#ifndef SRC_DATA_CLIMATEDATA_H_
+#define SRC_DATA_CLIMATEDATA_H_
 
 #include <boost/thread/mutex.hpp>
 #include <string>
@@ -35,25 +35,34 @@ class ClimateData
 {
 public:
     ClimateData();
-    virtual ~ClimateData();
+    virtual ~ClimateData() noexcept;
 
+    /**
+     * Get WIMWV sentence.
+     * Set valid to false.
+     */
     std::string extractWV();
-    void insertWV(const std::string& wv);
+
+    /**
+     * Set WIMWV sentence.
+     * Set valid to true.
+     */
+    void insertWV(const std::string& /*wv*/);
 
     bool isValid();
     double getPress();
     double getTemp();
-    void setPress(double p = Configuration::base_pressure);
-    void setTemp(double t = Configuration::base_temp);
+    void setPress(double /*p*/ = Configuration::base_pressure);
+    void setTemp(double /*t*/ = Configuration::base_temp);
 
 private:
-    boost::mutex mutex;
-    std::string wv_;
+    boost::mutex mMutex;
+    std::string mWV;
     // hpa
-    double pressure;
+    double mPress;
     // celsius
-    double temperature;
-    bool wv_valid = false;
+    double mTemp;
+    bool mWVvalid = false;
 };
 
-#endif /* WINDFEED_H_ */
+#endif /* SRC_DATA_CLIMATEDATA_H_ */

@@ -30,20 +30,20 @@
 #include "Math.hpp"
 
 GPSmodule::GPSmodule(double b_lat, double b_lon, std::int32_t b_alt, double geoid)
-        : baselat(b_lat),
-          baselong(b_lon),
-          basegeoid(geoid),
-          basealt(b_alt)
+        : mBaseLat(b_lat),
+          mBaseLong(b_lon),
+          mBaseGeoid(geoid),
+          mBaseAlt(b_alt)
 {
-    latstr = (baselat < 0) ? 'S' : 'N';
-    longstr = (baselong < 0) ? 'W' : 'E';
-    lat_deg = std::abs(std::floor(baselat));
-    lat_min = std::abs(60.0 * (baselat - lat_deg));
-    long_deg = std::abs(std::floor(baselong));
-    long_min = std::abs(60.0 * (baselong - long_deg));
+    mLatStr = (mBaseLat < 0) ? 'S' : 'N';
+    mLongStr = (mBaseLong < 0) ? 'W' : 'E';
+    mLatDeg = std::abs(std::floor(mBaseLat));
+    mLatMin = std::abs(60.0 * (mBaseLat - mLatDeg));
+    mLongDeg = std::abs(std::floor(mBaseLong));
+    mLongMin = std::abs(60.0 * (mBaseLong - mLongDeg));
 }
 
-GPSmodule::~GPSmodule()
+GPSmodule::~GPSmodule() noexcept
 {
 }
 
@@ -56,27 +56,27 @@ std::string GPSmodule::gpsfix()
 
     //gprmc
     std::snprintf(
-            buffer,
+            mBuffer,
             GPSM_BUFF_S,
             "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
-            utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg,
-            long_min, longstr, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
-    csum = Math::checksum(buffer, sizeof(buffer));
-    nmea_str.append(buffer);
-    std::snprintf(buffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
-    nmea_str.append(buffer);
+            utc->tm_hour, utc->tm_min, utc->tm_sec, mLatDeg, mLatMin, mLatStr, mLongDeg,
+            mLongMin, mLongStr, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
+    csum = Math::checksum(mBuffer, sizeof(mBuffer));
+    nmea_str.append(mBuffer);
+    std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
+    nmea_str.append(mBuffer);
 
     //gpgga
     std::snprintf(
-            buffer,
+            mBuffer,
             GPSM_BUFF_S,
             "$GPGGA,%02d%02d%02d,%02.0lf%06.4lf,%c,%03.0lf%07.4lf,%c,1,05,1,%d,M,%.1lf,M,,*",
-            utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg,
-            long_min, longstr, basealt, basegeoid);
-    csum = Math::checksum(buffer, sizeof(buffer));
-    nmea_str.append(buffer);
-    std::snprintf(buffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
-    nmea_str.append(buffer);
+            utc->tm_hour, utc->tm_min, utc->tm_sec, mLatDeg, mLatMin, mLatStr, mLongDeg,
+            mLongMin, mLongStr, mBaseAlt, mBaseGeoid);
+    csum = Math::checksum(mBuffer, sizeof(mBuffer));
+    nmea_str.append(mBuffer);
+    std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
+    nmea_str.append(mBuffer);
 
     return nmea_str;
 }

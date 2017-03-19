@@ -31,11 +31,11 @@ Logger::Logger()
 {
 }
 
-Logger::~Logger()
+Logger::~Logger() noexcept
 {
 }
 
-boost::mutex Logger::mutex;
+boost::mutex Logger::mMutex;
 
 const std::string Logger::getTime()
 {
@@ -48,24 +48,24 @@ const std::string Logger::getTime()
 
 void Logger::info(const std::string& msg, const std::string& subject)
 {
-    boost::lock_guard<boost::mutex> lock(Logger::mutex);
+    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
     std::cout << "[INFO]  " << getTime() << ":: " << msg << subject << std::endl;
 }
 
 void Logger::debug(const std::string& msg, const std::string& subject)
 {
-    boost::lock_guard<boost::mutex> lock(Logger::mutex);
+    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
     std::cout << "[DEBUG] " << getTime() << ":: " << msg << subject << std::endl;
 }
 
 void Logger::warn(const std::string& msg, const std::string& subject)
 {
-    boost::lock_guard<boost::mutex> lock(Logger::mutex);
+    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
     std::cout << "[WARN]  " << getTime() << ":: " << msg << subject << std::endl;
 }
 
 void Logger::error(const std::string& msg, const std::string& subject)
 {
-    boost::lock_guard<boost::mutex> lock(Logger::mutex);
+    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
     std::cerr << "[ERROR] " << getTime() << ":: " << msg << subject << std::endl;
 }

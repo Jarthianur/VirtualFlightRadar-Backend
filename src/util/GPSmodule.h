@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef GPSMODULE_H_
-#define GPSMODULE_H_
+#ifndef SRC_UTIL_GPSMODULE_H_
+#define SRC_UTIL_GPSMODULE_H_
 
 #include <cstdint>
 #include <string>
@@ -31,8 +31,8 @@
 class GPSmodule
 {
 public:
-    GPSmodule(double, double, std::int32_t, double);
-    virtual ~GPSmodule();
+    GPSmodule(double /*b_lat*/, double /*b_lon*/, std::int32_t /*b_alt*/, double /*geoid*/);
+    virtual ~GPSmodule() noexcept;
 
     /**
      * build GPRMC and GPGGA
@@ -40,25 +40,25 @@ public:
     std::string gpsfix();
 
 private:
-    double baselat, baselong, basegeoid,
+    double mBaseLat, mBaseLong, mBaseGeoid,
     /**
      * Latitude degree, minutes
      * Longitude degree, minutes
      */
-    lat_deg, lat_min, long_deg, long_min;
-    std::int32_t basealt;
+    mLatDeg, mLatMin, mLongDeg, mLongMin;
+    std::int32_t mBaseAlt;
 
     /**
      * Latitude: S - N
      * Longitude: W - E
      */
-    char latstr, longstr;
+    char mLatStr, mLongStr;
 
     /**
-     * format string buffer
+     * format string mBuffer
      */
-    char buffer[GPSM_BUFF_S + 1];
+    char mBuffer[GPSM_BUFF_S + 1];
 
 };
 
-#endif /* GPSMODULE_H_ */
+#endif /* SRC_UTIL_GPSMODULE_H_ */

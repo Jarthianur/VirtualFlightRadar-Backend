@@ -25,6 +25,6 @@ Parser::Parser()
 {
 }
 
-Parser::~Parser()
+Parser::~Parser() noexcept
 {
 }
