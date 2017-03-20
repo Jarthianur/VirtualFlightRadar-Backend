@@ -147,6 +147,31 @@ int main(int argc, char* argv[])
             {
                 assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0"),MSG_UNPACK_ERR,eqi);
                 assert(pars_sbs.unpack("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0"),MSG_UNPACK_ERR,eqi);
+                assert(pars_sbs.unpack(""),MSG_UNPACK_IGN,eqi);
+            });
+
+    describe<APRSParser>("APRSParser - unpack", runner)->test(
+            "valid msg",
+            [&]()
+            {
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=001955 !W19! id06AAAAAA"),MSG_UNPACK_SUC,eqi);
+                assert(pars_aprs.unpack("ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000495 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4"),MSG_UNPACK_SUC,eqi);
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4427.24N\\00602.18E^276/014/A=001965 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4"),MSG_UNPACK_SUC,eqi);
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz"),MSG_UNPACK_SUC,eqi);
+            })->test(
+            "ignores",
+            [&]()
+            {
+                assert(pars_aprs.unpack("Valhalla>APRS,TCPIP*,qAC,GLIDERN2:/074555h4900.00NI00800.00E&/A=000000 CPU:4.0 RAM:242.7/458.8MB NTP:0.8ms/-28.6ppm +56.2C RF:+38+2.4ppm/+1.7dB"),MSG_UNPACK_IGN,eqi);
+                assert(pars_aprs.unpack("# aprsc 2.0.14-g28c5a6a 29 Jun 2014 07:46:15 GMT SERVER1 00.000.00.000:14580"),MSG_UNPACK_IGN,eqi);
+                assert(pars_aprs.unpack(""),MSG_UNPACK_IGN,eqi);
+            })->test(
+            "filter height",
+            [&]()
+            {
+                Configuration::filter_maxHeight = 0;
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz"),MSG_UNPACK_IGN,eqi);
+                Configuration::filter_maxHeight = INT32_MAX;
             });
 
     helper_clearAcCont();

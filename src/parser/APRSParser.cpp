@@ -34,7 +34,7 @@ APRSParser::APRSParser()
         : Parser(),
           mAprsRE("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
                   boost::regex_constants::optimize),
-          mCommRE("^[\\S\\s]+?id([0-9A-F]{2})([0-9A-F]{6})\\s+?(?:([\\+-]\\d+?)fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?[\\S\\s]+?$",
+          mCommRE("^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
                   boost::regex_constants::optimize)
 {
 }
@@ -45,7 +45,7 @@ APRSParser::~APRSParser() noexcept
 
 std::int32_t APRSParser::unpack(const std::string& msg) noexcept
 {
-    if (msg.at(0) == '#')
+    if (msg.size() > 0 && msg.at(0) == '#')
     {
         return MSG_UNPACK_IGN;
     }
@@ -54,7 +54,6 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
         boost::smatch match;
         if (boost::regex_match(msg, match, mAprsRE))
         {
-
             try
             {
                 //time
@@ -85,17 +84,25 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
             {
                 return MSG_UNPACK_ERR;
             }
-
             //comment
             // climbrate / address / id / type
             if (match.str(9).size() > 0)
             {
+                std::string comm = match.str(9); // regex bug ! cannot work inplace, so need to copy submatch.
                 boost::smatch comm_match;
-                if (boost::regex_match(match.str(9), comm_match, mCommRE))
+                if (boost::regex_match(comm, comm_match, mCommRE))
                 {
                     mtID = comm_match.str(2);
-                    mtIDtype = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
-                    mtAcType = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C) >> 2;
+                    try
+                    {
+                        mtIDtype = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
+                        mtAcType = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C)
+                                >> 2;
+                    }
+                    catch (const std::logic_error& e)
+                    {
+                        return MSG_UNPACK_ERR;
+                    }
                     try
                     {
                         mtClimbRate = std::stod(comm_match.str(3)) * Math::fpm2ms;
@@ -153,7 +160,7 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
         }
         else
         {
-            return MSG_UNPACK_ERR;
+            return MSG_UNPACK_IGN;
         }
     }
     catch (const std::runtime_error& e)

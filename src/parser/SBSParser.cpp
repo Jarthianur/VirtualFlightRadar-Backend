@@ -51,6 +51,11 @@ std::int32_t SBSParser::unpack(const std::string& msg) noexcept
     std::size_t delim;
     std::uint32_t i = 2;
     std::size_t p = 6;
+
+    if (msg.find(',', p) == std::string::npos)
+    {
+        return MSG_UNPACK_IGN;
+    }
     while ((delim = msg.find(',', p)) != std::string::npos && i < 16)
     {
         switch (i)
