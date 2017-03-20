@@ -39,12 +39,13 @@ AircraftContainer::~AircraftContainer() noexcept
 {
 }
 
-void AircraftContainer::initProcessor(double proc_lat, double proc_lon, std::int32_t proc_alt)
+void AircraftContainer::initProcessor(double proc_lat, double proc_lon,
+                                      std::int32_t proc_alt)
 {
     mAcProc.init(proc_lat, proc_lon, proc_alt);
 }
 
-ssize_t AircraftContainer::find(std::string& id)
+ssize_t AircraftContainer::find(const std::string& id)
 {
     const auto it = mIndexMap.find(id);
     if (it == mIndexMap.cend())
@@ -69,12 +70,13 @@ std::string AircraftContainer::processAircrafts()
     {
         try
         {
+            it->incValid();
             // if no FLARM msg received after x, assume target has Transponder
-            if (++(it->mValid) >= AC_NO_FLARM_THRESHOLD)
+            if (it->getValid() >= AC_NO_FLARM_THRESHOLD)
             {
-                it->mTargetType = Aircraft::TargetType::TRANSPONDER;
+                it->setTargetT(Aircraft::TargetType::TRANSPONDER);
             }
-            if (it->mValid >= AC_DELETE_THRESHOLD)
+            if (it->getValid() >= AC_DELETE_THRESHOLD)
             {
                 del = true;
                 mIndexMap.erase(mIndexMap.find(it->getID()));
@@ -82,7 +84,7 @@ std::string AircraftContainer::processAircrafts()
             }
             else
             {
-                if (it->mValid < AC_INVALIDATE)
+                if (it->getValid() < AC_INVALIDATE)
                 {
                     dest_str += mAcProc.process(*it);
                 }
@@ -102,77 +104,22 @@ std::string AircraftContainer::processAircrafts()
     return dest_str;
 }
 
-void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
-                                       std::int32_t alt)
+void AircraftContainer::insertAircraft(const Aircraft& update)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     ssize_t i;
-    if ((i = find(id)) == AC_NOT_FOUND)
+    if ((i = find(update.getID())) == AC_NOT_FOUND)
     {
-        Aircraft ac(id, lat, lon, alt);
-        ac.mAltAsQNE = true;
-        ac.mTargetType = Aircraft::TargetType::TRANSPONDER;
-        mCont.push_back(ac);
-        mIndexMap.insert( { id, mCont.size() - 1 });
+        mCont.push_back(update);
+        mIndexMap.insert( { update.getID(), mCont.size() - 1 });
     }
     else
     {
-        Aircraft& ac = mCont.at(i);
-        if (ac.mTargetType == Aircraft::TargetType::TRANSPONDER)
+        Aircraft& known_ac = mCont.at(i);
+        if (known_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER || update.getTargetT()
+                == Aircraft::TargetType::FLARM)
         {
-            ac.mValid = 0;
-            ac.mLatitude = lat;
-            ac.mLongitude = lon;
-            ac.mAltitude = alt;
-            ac.mAltAsQNE = true;
-            ac.mFullInfo = false;
+            known_ac.update(update);
         }
-    }
-}
-
-void AircraftContainer::insertAircraft(std::string& id, double lat, double lon,
-                                       std::int32_t alt, double gnd_spd, std::uint32_t id_t,
-                                       std::int32_t ac_t, double climb_r, double turn_r,
-                                       double heading)
-{
-    boost::lock_guard<boost::mutex> lock(this->mMutex);
-    ssize_t i;
-    if ((i = find(id)) == -1)
-    {
-        Aircraft ac(id, lat, lon, alt, gnd_spd, id_t, ac_t, climb_r, turn_r, heading);
-        if (heading == A_VALUE_NA || gnd_spd == A_VALUE_NA || climb_r == A_VALUE_NA)
-        {
-            ac.mFullInfo = false;
-        }
-        else
-        {
-            ac.mFullInfo = true;
-        }
-        mCont.push_back(ac);
-        mIndexMap.insert( { id, mCont.size() - 1 });
-    }
-    else
-    {
-        Aircraft& ac = mCont.at(i);
-        if (heading == A_VALUE_NA || gnd_spd == A_VALUE_NA || climb_r == A_VALUE_NA)
-        {
-            ac.mFullInfo = false;
-        }
-        else
-        {
-            ac.mFullInfo = true;
-        }
-        ac.mAircraftType = ac_t;
-        ac.mGndSpeed = gnd_spd;
-        ac.mIDtype = id_t;
-        ac.mValid = 0;
-        ac.mLatitude = lat;
-        ac.mLongitude = lon;
-        ac.mAltitude = alt;
-        ac.mClimbRate = climb_r;
-        ac.mTurnRate = turn_r;
-        ac.mHeading = heading;
-        ac.mAltAsQNE = false;
-        ac.mTargetType = Aircraft::TargetType::FLARM;
     }
 }

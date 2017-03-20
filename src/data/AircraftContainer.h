@@ -51,14 +51,9 @@ public:
                        std::int32_t /*proc_alt*/);
 
     /**
-     * insert aircraft in container
+     * Insert aircraft in container, prefer FLARM.
      */
-    void insertAircraft(std::string& /*id*/, double /*lat*/, double /*lon*/,
-                        std::int32_t /*alt*/);
-    void insertAircraft(std::string& /*id*/, double /*lat*/, double /*lon*/,
-                        std::int32_t /*alt*/, double /*gnd_spd*/, std::uint32_t /*id_t*/,
-                        std::int32_t /*ac_t*/, double /*climb_r*/, double /*turn_r*/,
-                        double /*heading*/);
+    void insertAircraft(const Aircraft& /*update*/);
 
     /**
      * process aircraft at index i into target string,
@@ -72,7 +67,7 @@ private:
      * if id is found returns index,
      * else returns -1.
      */
-    ssize_t find(std::string& /*id*/);
+    ssize_t find(const std::string& /*id*/);
 
     boost::mutex mMutex;
 

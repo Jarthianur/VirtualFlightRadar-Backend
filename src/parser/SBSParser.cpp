@@ -29,7 +29,6 @@
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
 
-
 SBSParser::SBSParser()
         : Parser()
 {
@@ -126,6 +125,11 @@ std::int32_t SBSParser::unpack(const std::string& msg) noexcept
         i++;
         p = delim + 1;
     }
-    VFRB::msAcCont.insertAircraft(mtID, mtLat, mtLong, mtAlt);
+    Aircraft ac(mtID, mtLat, mtLong, mtAlt);
+    ac.setAltQNE();
+    ac.setFullInfo(false);
+    ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+    VFRB::msAcCont.insertAircraft(ac);
+
     return MSG_UNPACK_SUC;
 }

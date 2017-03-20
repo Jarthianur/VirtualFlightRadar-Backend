@@ -33,8 +33,9 @@ Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt)
 {
 }
 
-Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt, double gnd_spd,
-                   std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r, double heading)
+Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt,
+                   double gnd_spd, std::uint32_t id_t, std::int32_t ac_t, double climb_r,
+                   double turn_r, double heading)
         : mID(id),
           mIDtype(id_t),
           mAircraftType(ac_t),
@@ -45,7 +46,6 @@ Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt, do
           mHeading(heading),
           mClimbRate(climb_r),
           mTurnRate(turn_r)
-
 {
 }
 
@@ -54,7 +54,20 @@ bool Aircraft::operator==(const Aircraft& other) const
     return this->mID == other.mID;
 }
 
-const std::string& Aircraft::getID() const
+void Aircraft::update(const Aircraft& ac)
 {
-    return mID;
+    // no update for ID
+    this->mIDtype = ac.mIDtype;
+    this->mAircraftType = ac.mAircraftType;
+    this->mLatitude = ac.mLatitude;
+    this->mLongitude = ac.mLongitude;
+    this->mAltitude = ac.mAltitude;
+    this->mGndSpeed = ac.mGndSpeed;
+    this->mHeading = ac.mHeading;
+    this->mClimbRate = ac.mClimbRate;
+    this->mTurnRate = ac.mTurnRate;
+    this->mFullInfo = ac.mFullInfo;
+    this->mAltAsQNE = ac.mAltAsQNE;
+    this->mTargetType = ac.mTargetType;
+    this->mValid = 0;
 }

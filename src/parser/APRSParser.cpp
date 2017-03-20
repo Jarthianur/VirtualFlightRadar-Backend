@@ -30,7 +30,6 @@
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
 
-
 APRSParser::APRSParser()
         : Parser(),
           mAprsRE("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
@@ -104,6 +103,7 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
                     catch (const std::logic_error& e)
                     {
                         mtClimbRate = A_VALUE_NA;
+                        mtFullInfo = false;
                     }
                     try
                     {
@@ -112,6 +112,7 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
                     catch (const std::logic_error& e)
                     {
                         mtTurnRate = A_VALUE_NA;
+                        mtFullInfo = false;
                     }
                 }
                 else
@@ -132,6 +133,7 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
             catch (const std::logic_error& e)
             {
                 mtHeading = A_VALUE_NA;
+                mtFullInfo = false;
             }
             try
             {
@@ -140,10 +142,14 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
             catch (const std::logic_error& e)
             {
                 mtGndSpeed = A_VALUE_NA;
+                mtFullInfo = false;
             }
-
-            VFRB::msAcCont.insertAircraft(mtID, mtLat, mtLong, mtAlt, mtGndSpeed, mtIDtype, mtAcType, mtClimbRate,
-                                         mtTurnRate, mtHeading);
+            Aircraft ac(mtID, mtLat, mtLong, mtAlt, mtGndSpeed, mtIDtype, mtAcType,
+                        mtClimbRate, mtTurnRate, mtHeading);
+            ac.setAltQNE(false);
+            ac.setFullInfo(mtFullInfo);
+            ac.setTargetT(Aircraft::TargetType::FLARM);
+            VFRB::msAcCont.insertAircraft(ac);
         }
         else
         {

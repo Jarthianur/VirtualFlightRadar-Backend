@@ -35,10 +35,17 @@ public:
     Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/,
              double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
              double /*climb_r*/, double /*turn_r*/, double /*heading*/);
+
     virtual ~Aircraft() noexcept;
 
+    /**
+     * Compare Aircrafts by their ID.
+     */
     bool operator==(const Aircraft&) const;
 
+    /**
+     * Got data from ...
+     */
     enum class TargetType
         : std::uint32_t
         {
@@ -46,12 +53,97 @@ public:
         TRANSPONDER
     };
 
-    const std::string& getID() const;
+    /**
+     * Update values from given Aircraft reference.
+     * Set valid to 0.
+     */
+    void update(const Aircraft& /*ac*/);
 
+    /**
+     * Getter
+     */
+    inline const std::string& getID() const
+    {
+        return mID;
+    }
+    inline const std::uint32_t getIDtype() const
+    {
+        return mIDtype;
+    }
+    inline const TargetType getTargetT() const
+    {
+        return mTargetType;
+    }
+    inline const std::int32_t getAircraftT() const
+    {
+        return mAircraftType;
+    }
+    inline const bool isFullInfo() const
+    {
+        return mFullInfo;
+    }
+    inline const std::uint32_t getValid() const
+    {
+        return mValid;
+    }
+    inline const bool isAltQNE() const
+    {
+        return mAltAsQNE;
+    }
+    inline const double getLatitude() const
+    {
+        return mLatitude;
+    }
+    inline const double getLongitude() const
+    {
+        return mLongitude;
+    }
+    inline const std::int32_t getAltitude() const
+    {
+        return mAltitude;
+    }
+    inline const double getGndSpeed() const
+    {
+        return mGndSpeed;
+    }
+    inline const double getHeading() const
+    {
+        return mHeading;
+    }
+    inline const double getClimbR() const
+    {
+        return mClimbRate;
+    }
+    //const double getTurnR() const;
+
+    /**
+     * Setter
+     */
+    inline void incValid()
+    {
+        ++mValid;
+    }
+    inline void setTargetT(TargetType tt)
+    {
+        mTargetType = tt;
+    }
+    inline void setAltQNE(bool qne = true)
+    {
+        mAltAsQNE = qne;
+    }
+    inline void setFullInfo(bool info = true)
+    {
+        mFullInfo = info;
+    }
+
+private:
     /**
      * information
      */
+    // id
+    std::string mID;
     std::uint32_t mIDtype = 1;
+
     std::int32_t mAircraftType = A_ADSB_T;
     TargetType mTargetType = TargetType::FLARM;
 
@@ -88,10 +180,6 @@ public:
     // currently unused
     // deg/s
     double mTurnRate = A_VALUE_NA;
-
-private:
-    // id
-    std::string mID;
 };
 
 #endif /* SRC_AIRCRAFT_AIRCRAFT_H_ */

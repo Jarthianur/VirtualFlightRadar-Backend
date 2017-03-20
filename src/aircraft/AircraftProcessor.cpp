@@ -80,17 +80,18 @@ std::string AircraftProcessor::process(Aircraft& ac)
     nmea_str.append(mBuffer);
 
     //PFLAA
-    if (!ac.mFullInfo)
+    if (ac.isFullInfo())
     {
-        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", mtRelN,
-                      mtRelE, mtRelV, ac.getID().c_str(), ac.mAircraftType);
+        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
+                      mtRelN, mtRelE, mtRelV, ac.getIDtype(), ac.getID().c_str(),
+                      Math::dToI(ac.getHeading()),
+                      Math::dToI(ac.getGndSpeed() * Math::ms2kmh), ac.getClimbR(),
+                      ac.getAircraftT());
     }
     else
     {
-        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
-                      mtRelN, mtRelE, mtRelV, ac.mIDtype, ac.getID().c_str(),
-                      Math::dToI(ac.mHeading), Math::dToI(ac.mGndSpeed * Math::ms2kmh),
-                      ac.mClimbRate, ac.mAircraftType);
+        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", mtRelN,
+                      mtRelE, mtRelV, ac.getID().c_str(), ac.getAircraftT());
     }
     csum = Math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
@@ -102,8 +103,8 @@ std::string AircraftProcessor::process(Aircraft& ac)
 
 void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
 {
-    mtRadLongAc = Math::radian(ac.mLongitude);
-    mtRadLatAc = Math::radian(ac.mLatitude);
+    mtRadLongAc = Math::radian(ac.getLongitude());
+    mtRadLatAc = Math::radian(ac.getLatitude());
     mtLongDist = mtRadLongAc - mRadLongB;
     mtLatDist = mtRadLatAc - mRadLatB;
 
@@ -123,7 +124,7 @@ void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
     mtRelN = Math::dToI(std::cos(Math::radian(mtBearingAbs)) * mtDist);
     mtRelE = Math::dToI(std::sin(Math::radian(mtBearingAbs)) * mtDist);
     mtRelV =
-            ac.mAltAsQNE ?
-                    ac.mAltitude - Math::calcIcaoHeight(VFRB::msClimateData.getPress()) :
-                    ac.mAltitude - mBaseAlt;
+            ac.isAltQNE() ?
+                    ac.getAltitude() - Math::calcIcaoHeight(
+                            VFRB::msClimateData.getPress()) : ac.getAltitude() - mBaseAlt;
 }
