@@ -10,3 +10,5 @@ TODO
 !/target/**/*.mk
 !/target/makefile
 /Test/
+/test/reports/coverage/
+/test/reports/*.info

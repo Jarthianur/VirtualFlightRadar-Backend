@@ -11,6 +11,6 @@ Run program.
 ```bash
 lcov --directory Debug/ --capture --output-file test/reports/all.info
 cd test/reports
-lcov -e all.info "$VFRB_ROOT/src/*" -o test/reports/vfrb.info
+lcov -e all.info "$VFRB_ROOT/src/*" -o vfrb.info
 genhtml vfrb.info -o coverage/
 ```
