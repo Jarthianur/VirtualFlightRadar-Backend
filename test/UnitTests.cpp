@@ -33,6 +33,7 @@
 #include "../src/parser/WindParser.h"
 #include "../src/util/Math.hpp"
 #include "../src/vfrb/VFRB.h"
+#include "../src/util/GPSmodule.h"
 #include "framework/src/comparator/Comparators.hpp"
 #include "framework/src/comparator/ComparatorStrategy.hpp"
 #include "framework/src/reporter/AbstractReporter.hpp"
@@ -66,6 +67,7 @@ int main(int argc, char *argv[])
     Comparator<int> eqi = EQUALS<int>();
     Comparator<double> eqd = EQUALS<double>();
     Comparator<std::string> eqs = EQUALS<std::string>();
+    Comparator<bool> eqb = EQUALS<bool>();
 
     boost::regex pflauRE("\\$PFLAU,,,,1,0,([-]?\\d+?)," // rel bear #1
             "0,(\\d+?),"// rel vert #2
@@ -204,6 +206,12 @@ int main(int argc, char *argv[])
                 assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0#091,B,14.8,C,,,,,,,,,,,,,,*3E"), MSG_UNPACK_ERR, eqi);
                 assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,1#4.8,C,,,,,,,,,,,,,,*3E"), MSG_UNPACK_ERR, eqi);
                 assert(pars_wind.unpack(""), MSG_UNPACK_IGN, eqi);
+            })->test<ClimateData>(
+            "extract WIMWV",
+            [&eqs,&eqb]()
+            {
+                assert(VFRB::msClimateData.extractWV(),std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"),eqs);
+                assert(VFRB::msClimateData.isValid(),false,eqb);
             });
 
     describe<AircraftProcessor>("Process Aircrafts in N/E", runner)->test("setup", [&]()
@@ -225,7 +233,7 @@ int main(int argc, char *argv[])
                 std::string proc = VFRB::msAcCont.processAircrafts();
 
                 bool matched = boost::regex_search(proc, match, pflauRE);
-                assert(matched, true, EQUALS<bool>());
+                assert(matched, true, eqb);
 
                 assert(match.str(1), std::string("0"), eqs);
                 assert(match.str(2), std::string("1000"), eqs);
@@ -233,7 +241,7 @@ int main(int argc, char *argv[])
                 assert(match.str(4), std::string("BBBBBB"), eqs);
 
                 matched = boost::regex_search(proc, match, pflaaRE);
-                assert(matched, true, EQUALS<bool>());
+                assert(matched, true, eqb);
 
                 assert(match.str(1), std::string("0"), eqs);
                 assert(match.str(2), std::string("0"), eqs);
@@ -248,7 +256,15 @@ int main(int argc, char *argv[])
                 std::string proc = VFRB::msAcCont.processAircrafts();
 
                 bool matched = boost::regex_search(proc, match, pflauRE);
-                assert(matched, true, EQUALS<bool>());
+                assert(matched, true, eqb);
+            })->test(
+            "filter distance",
+            [&]()
+            {
+                Configuration::filter_maxDist = 10000;
+                pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.100000,8.100000,,,,,,0");
+                assert(VFRB::msAcCont.processAircrafts(),std::string(""),eqs);
+                Configuration::filter_maxDist = INT32_MAX;
             });
 
     describe<AircraftContainer>("Container Functions", runner)->test(
@@ -257,12 +273,13 @@ int main(int argc, char *argv[])
                 helper_clearAcCont();
                 assert(VFRB::msAcCont.processAircrafts(),std::string(""),eqs);
             })->test("delete aircraft", [&]()
-    {  //must be verified in coverage report...
-                         for (int i=0; i<30; ++i)
-                         {
-                             helper_clearAcCont();
-                         }
-                     })->test(
+    {
+        //must be verified in coverage report...
+                     for (int i=0; i<30; ++i)
+                     {
+                         helper_clearAcCont();
+                     }
+                 })->test(
             "prefer FLARM, accept again if no input",
             [&]()
             {
@@ -282,7 +299,7 @@ int main(int argc, char *argv[])
                 pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0");
                 std::string proc = VFRB::msAcCont.processAircrafts();
                 bool matched = boost::regex_search(proc, match, pflauRE);
-                assert(matched, true, EQUALS<bool>());
+                assert(matched, true, eqb);
 
                 assert(match.str(2),std::string("610"),eqs);
 
@@ -290,10 +307,24 @@ int main(int argc, char *argv[])
                 pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0");
                 proc = VFRB::msAcCont.processAircrafts();
                 matched = boost::regex_search(proc, match, pflauRE);
-                assert(matched, true, EQUALS<bool>());
+                assert(matched, true, eqb);
 
                 assert(match.str(2),std::string("1000"),eqs);
             });
+
+    describe<GPSmodule>("GPSModule - gpsfix", runner)->test(
+            "",
+            [&eqb]()
+            {
+                GPSmodule gpsm(0.0, 0.0, 0, 0.0);
+                boost::regex re("\\$GPRMC,\\d{6},A,0000\\.00,N,00000\\.00,E,0,0,\\d{6},001\\.0,W\\*[0-9a-f]{2}\\s+?"
+                        "\\$GPGGA,\\d{6},000\\.0000,N,00000\\.0000,E,1,05,1,0,M,0\\.0,M,,\\*[0-9a-f]{2}");
+                boost::smatch match;
+                bool matched = boost::regex_search(gpsm.gpsfix(), match, re);
+                assert(matched, true, eqb);
+            });
+
+    describe<VFRB>("VFRB - run", runner);
 
     return rep->report(runner);
 }
