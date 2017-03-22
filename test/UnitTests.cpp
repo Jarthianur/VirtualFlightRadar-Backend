@@ -59,7 +59,7 @@ void helper_clearAcCont()
     }
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     auto rep = reporter::createColoredReporter();
     TestSuitesRunner runner;
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
             "(\\d+?),"// dist #3
             "(\\S{6})\\*(?:\\S{2})",// id #4
             boost::regex_constants::optimize);
-    boost::regex pflaaRE("\\$PFLAA,0,([-]?\\d+?)," // rel N #1
+    boost::regex pflaaRE("\\$PFLAA,0,([-]?\\d+?),"  // rel N #1
             "([-]?\\d+?),"// rel E #2
             "([-]?\\d+?),"// rel vert #3
             "(\\d+?),"// id type #4
@@ -93,92 +93,92 @@ int main(int argc, char* argv[])
 
     describe("Math utils", runner, "Math")->test("radian", [&eqd]()
     {
-        assert(Math::radian(45.0),0.785398,eqd);
-        assert(Math::radian(0.0),0.0,eqd);
-        assert(Math::radian(360.0),6.28319,eqd);
+        assert(Math::radian(45.0), 0.785398, eqd);
+        assert(Math::radian(0.0), 0.0, eqd);
+        assert(Math::radian(360.0), 6.28319, eqd);
     })->test("degree", [&eqd]()
     {
-        assert(Math::degree(0.785398),45.0,eqd);
-        assert(Math::degree(0.0),0.0,eqd);
-        assert(Math::degree(6.28319),360.0,eqd);
+        assert(Math::degree(0.785398), 45.0, eqd);
+        assert(Math::degree(0.0), 0.0, eqd);
+        assert(Math::degree(6.28319), 360.0, eqd);
     })->test("dToI", [&eqi]()
     {
-        assert(Math::dToI(0.0),0,eqi);
-        assert(Math::dToI(1.4),1,eqi);
-        assert(Math::dToI(1.5),2,eqi);
-        assert(Math::dToI(-1.4),-1,eqi);
-        assert(Math::dToI(-1.5),-2,eqi);
+        assert(Math::dToI(0.0), 0, eqi);
+        assert(Math::dToI(1.4), 1, eqi);
+        assert(Math::dToI(1.5), 2, eqi);
+        assert(Math::dToI(-1.4), -1, eqi);
+        assert(Math::dToI(-1.5), -2, eqi);
     })->test("dmsToDeg", [&eqd]()
     {
-        assert(Math::dmsToDeg(0.0),0.0,eqd);
-        assert(Math::dmsToDeg(90.303000),90.50833,eqd);
-        assert(Math::dmsToDeg(180.0),180.0,eqd);
-        assert(Math::dmsToDeg(-45.123456),45.2096,eqd);
+        assert(Math::dmsToDeg(0.0), 0.0, eqd);
+        assert(Math::dmsToDeg(90.303000), 90.50833, eqd);
+        assert(Math::dmsToDeg(180.0), 180.0, eqd);
+        assert(Math::dmsToDeg(-45.123456), 45.2096, eqd);
     })->test("calcIcaoHeight", [&eqd]()
     {
-        assert(Math::calcIcaoHeight(0.0),44330.769231,eqd);
-        assert(Math::calcIcaoHeight(1013.25),0.0,eqd);
-        assert(Math::calcIcaoHeight(980.0),280.578763,eqd);
+        assert(Math::calcIcaoHeight(0.0), 44330.769231, eqd);
+        assert(Math::calcIcaoHeight(1013.25), 0.0, eqd);
+        assert(Math::calcIcaoHeight(980.0), 280.578763, eqd);
     })->test("checksum", [&eqi]()
     {
-        assert(Math::checksum("",sizeof("")),0,eqi);
-        assert(Math::checksum("\0", sizeof("\0")),0,eqi);
-        assert(Math::checksum("$abc*", sizeof("$abc*")),96,eqi);
+        assert(Math::checksum("", sizeof("")), 0, eqi);
+        assert(Math::checksum("\0", sizeof("\0")), 0, eqi);
+        assert(Math::checksum("$abc*", sizeof("$abc*")), 96, eqi);
     });
 
     describe<SBSParser>("SBSParser - unpack", runner)->test(
             "valid msg",
             [&]()
             {
-                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0"),MSG_UNPACK_SUC,eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0"), MSG_UNPACK_SUC, eqi);
             })->test(
             "invalid msg",
             [&]()
             {
-                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0"),MSG_UNPACK_ERR,eqi);
-                assert(pars_sbs.unpack("MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0"),MSG_UNPACK_IGN,eqi);
-                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0"),MSG_UNPACK_IGN,eqi);
-                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0"),MSG_UNPACK_ERR,eqi);
-                assert(pars_sbs.unpack("MSG,someCrap in, here"),MSG_UNPACK_IGN,eqi);
-                assert(pars_sbs.unpack("MSG,4,0,,,,,,"),MSG_UNPACK_IGN,eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0"), MSG_UNPACK_ERR, eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0"), MSG_UNPACK_IGN, eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0"), MSG_UNPACK_IGN, eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0"), MSG_UNPACK_ERR, eqi);
+                assert(pars_sbs.unpack("MSG,someCrap in, here"), MSG_UNPACK_IGN, eqi);
+                assert(pars_sbs.unpack("MSG,4,0,,,,,,"), MSG_UNPACK_IGN, eqi);
             })->test(
             "filter height",
             [&]()
             {
                 Configuration::filter_maxHeight = 0;
-                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0"),MSG_UNPACK_IGN,eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0"), MSG_UNPACK_IGN, eqi);
                 Configuration::filter_maxHeight = INT32_MAX;
             })->test(
             "broken msg",
             [&]()
             {
-                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0"),MSG_UNPACK_ERR,eqi);
-                assert(pars_sbs.unpack("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0"),MSG_UNPACK_ERR,eqi);
-                assert(pars_sbs.unpack(""),MSG_UNPACK_IGN,eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0"), MSG_UNPACK_ERR, eqi);
+                assert(pars_sbs.unpack("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0"), MSG_UNPACK_ERR, eqi);
+                assert(pars_sbs.unpack(""), MSG_UNPACK_IGN, eqi);
             });
 
     describe<APRSParser>("APRSParser - unpack", runner)->test(
             "valid msg",
             [&]()
             {
-                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA"),MSG_UNPACK_SUC,eqi);
-                assert(pars_aprs.unpack("ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4"),MSG_UNPACK_SUC,eqi);
-                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4"),MSG_UNPACK_SUC,eqi);
-                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz"),MSG_UNPACK_SUC,eqi);
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA"), MSG_UNPACK_SUC, eqi);
+                assert(pars_aprs.unpack("ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4"), MSG_UNPACK_SUC, eqi);
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4"), MSG_UNPACK_SUC, eqi);
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz"), MSG_UNPACK_SUC, eqi);
             })->test(
             "ignores",
             [&]()
             {
-                assert(pars_aprs.unpack("Valhalla>APRS,TCPIP*,qAC,GLIDERN2:/074555h4900.00NI00800.00E&/A=000000 CPU:4.0 RAM:242.7/458.8MB NTP:0.8ms/-28.6ppm +56.2C RF:+38+2.4ppm/+1.7dB"),MSG_UNPACK_IGN,eqi);
-                assert(pars_aprs.unpack("# aprsc 2.0.14-g28c5a6a 29 Jun 2014 07:46:15 GMT SERVER1 00.000.00.000:14580"),MSG_UNPACK_IGN,eqi);
-                assert(pars_aprs.unpack(""),MSG_UNPACK_IGN,eqi);
-                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 "),MSG_UNPACK_IGN,eqi);
+                assert(pars_aprs.unpack("Valhalla>APRS,TCPIP*,qAC,GLIDERN2:/074555h4900.00NI00800.00E&/A=000000 CPU:4.0 RAM:242.7/458.8MB NTP:0.8ms/-28.6ppm +56.2C RF:+38+2.4ppm/+1.7dB"), MSG_UNPACK_IGN, eqi);
+                assert(pars_aprs.unpack("# aprsc 2.0.14-g28c5a6a 29 Jun 2014 07:46:15 GMT SERVER1 00.000.00.000:14580"), MSG_UNPACK_IGN, eqi);
+                assert(pars_aprs.unpack(""), MSG_UNPACK_IGN, eqi);
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 "), MSG_UNPACK_IGN, eqi);
             })->test(
             "filter height",
             [&]()
             {
                 Configuration::filter_maxHeight = 0;
-                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz"),MSG_UNPACK_IGN,eqi);
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz"), MSG_UNPACK_IGN, eqi);
                 Configuration::filter_maxHeight = INT32_MAX;
             });
 
@@ -186,24 +186,24 @@ int main(int argc, char* argv[])
             "valid msg",
             [&]()
             {
-                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E"),MSG_UNPACK_SUC,eqi);
-                assert(pars_wind.unpack("$WIMWV,242.8,R,6.9,N,A*20"),MSG_UNPACK_SUC,eqi);
+                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E"), MSG_UNPACK_SUC, eqi);
+                assert(pars_wind.unpack("$WIMWV,242.8,R,6.9,N,A*20"), MSG_UNPACK_SUC, eqi);
             })->test(
             "invalid msg",
             [&]()
             {
-                assert(pars_wind.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75"),MSG_UNPACK_IGN,eqi);
-                assert(pars_wind.unpack("Someone sent other stuff"),MSG_UNPACK_IGN,eqi);
+                assert(pars_wind.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75"), MSG_UNPACK_IGN, eqi);
+                assert(pars_wind.unpack("Someone sent other stuff"), MSG_UNPACK_IGN, eqi);
             })->test(
             "broken msg",
             [&]()
             {
-                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3E"),MSG_UNPACK_ERR,eqi);
-                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,,,,,,,,,,,,,,*3E"),MSG_UNPACK_ERR,eqi);
-                assert(pars_wind.unpack("$WIMDA,"),MSG_UNPACK_ERR,eqi);
-                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0#091,B,14.8,C,,,,,,,,,,,,,,*3E"),MSG_UNPACK_ERR,eqi);
-                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,1#4.8,C,,,,,,,,,,,,,,*3E"),MSG_UNPACK_ERR,eqi);
-                assert(pars_wind.unpack(""),MSG_UNPACK_IGN,eqi);
+                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3E"), MSG_UNPACK_ERR, eqi);
+                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,,,,,,,,,,,,,,*3E"), MSG_UNPACK_ERR, eqi);
+                assert(pars_wind.unpack("$WIMDA,"), MSG_UNPACK_ERR, eqi);
+                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0#091,B,14.8,C,,,,,,,,,,,,,,*3E"), MSG_UNPACK_ERR, eqi);
+                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,1#4.8,C,,,,,,,,,,,,,,*3E"), MSG_UNPACK_ERR, eqi);
+                assert(pars_wind.unpack(""), MSG_UNPACK_IGN, eqi);
             });
 
     describe<AircraftProcessor>("Process Aircrafts in N/E", runner)->test("setup", [&]()
@@ -223,24 +223,23 @@ int main(int argc, char* argv[])
             {
                 pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0");
                 std::string proc = VFRB::msAcCont.processAircrafts();
-                std::cout<<proc<<std::endl;
 
                 bool matched = boost::regex_search(proc, match, pflauRE);
-                assert(matched,true,EQUALS<bool>());
+                assert(matched, true, EQUALS<bool>());
 
-                assert(match.str(1),std::string("0"),eqs);
-                assert(match.str(2),std::string("1000"),eqs);
-                assert(match.str(3),std::string("0"),eqs);
-                assert(match.str(4),std::string("BBBBBB"),eqs);
+                assert(match.str(1), std::string("0"), eqs);
+                assert(match.str(2), std::string("1000"), eqs);
+                assert(match.str(3), std::string("0"), eqs);
+                assert(match.str(4), std::string("BBBBBB"), eqs);
 
                 matched = boost::regex_search(proc, match, pflaaRE);
-                assert(matched,true,EQUALS<bool>());
+                assert(matched, true, EQUALS<bool>());
 
-                assert(match.str(1),std::string("0"),eqs);
-                assert(match.str(2),std::string("0"),eqs);
-                assert(match.str(3),std::string("1000"),eqs);
-                assert(match.str(5),std::string("BBBBBB"),eqs);
-                assert(match.str(9),std::string("8"),eqs);
+                assert(match.str(1), std::string("0"), eqs);
+                assert(match.str(2), std::string("0"), eqs);
+                assert(match.str(3), std::string("1000"), eqs);
+                assert(match.str(5), std::string("BBBBBB"), eqs);
+                assert(match.str(9), std::string("8"), eqs);
             })->test(
             "Aircraft in distance",
             [&]()
@@ -249,9 +248,52 @@ int main(int argc, char* argv[])
                 std::string proc = VFRB::msAcCont.processAircrafts();
 
                 bool matched = boost::regex_search(proc, match, pflauRE);
-                assert(matched,true,EQUALS<bool>());
+                assert(matched, true, EQUALS<bool>());
+            });
+
+    describe<AircraftContainer>("Container Functions", runner)->test(
+            "invalidate aircraft", [&]()
+            {
+                helper_clearAcCont();
+                assert(VFRB::msAcCont.processAircrafts(),std::string(""),eqs);
+            })->test("delete aircraft", [&]()
+    {  //must be verified in coverage report...
+                         for (int i=0; i<30; ++i)
+                         {
+                             helper_clearAcCont();
+                         }
+                     })->test(
+            "prefer FLARM, accept again if no input",
+            [&]()
+            {
+                Configuration::base_altitude = 0;
+                Configuration::base_latitude = 49.000000;
+                Configuration::base_longitude = 8.000000;
+                Configuration::base_pressure = 1013.25;
+                VFRB::msClimateData.setPress();
+                VFRB::msAcCont.initProcessor(Configuration::base_latitude,
+                        Configuration::base_longitude,
+                        Configuration::base_altitude);
+
+                pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0");
+                VFRB::msAcCont.processAircrafts();
+                pars_aprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot");
+                VFRB::msAcCont.processAircrafts();
+                pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0");
+                std::string proc = VFRB::msAcCont.processAircrafts();
+                bool matched = boost::regex_search(proc, match, pflauRE);
+                assert(matched, true, EQUALS<bool>());
+
+                assert(match.str(2),std::string("610"),eqs);
+
+                helper_clearAcCont();
+                pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0");
+                proc = VFRB::msAcCont.processAircrafts();
+                matched = boost::regex_search(proc, match, pflauRE);
+                assert(matched, true, EQUALS<bool>());
+
+                assert(match.str(2),std::string("1000"),eqs);
             });
 
     return rep->report(runner);
 }
-

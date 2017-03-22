@@ -61,6 +61,7 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
     }
     try
     {
+        mtFullInfo = true;
         boost::smatch match;
         if (boost::regex_match(msg, match, mAprsRE))
         {
