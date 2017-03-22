@@ -26,10 +26,13 @@
 #include "../src/data/AircraftContainer.h"
 #include "../src/data/ClimateData.h"
 #include "../src/parser/APRSParser.h"
+#include "../src/parser/Parser.h"
 #include "../src/parser/SBSParser.h"
-#include "../src/vfrb/VFRB.h"
+#include "../src/parser/WindParser.h"
 #include "../src/util/Math.hpp"
+#include "../src/vfrb/VFRB.h"
 #include "framework/src/comparator/Comparators.hpp"
+#include "framework/src/comparator/ComparatorStrategy.hpp"
 #include "framework/src/reporter/AbstractReporter.hpp"
 #include "framework/src/reporter/Reporters.hpp"
 #include "framework/src/testsuite/TestSuite.hpp"
@@ -56,13 +59,15 @@ void helper_clearAcCont()
 
 int main(int argc, char* argv[])
 {
-    auto rep = reporter::createXmlReporter();
+    auto rep = reporter::createColoredReporter();
     TestSuitesRunner runner;
     Comparator<int> eqi = EQUALS<int>();
     Comparator<double> eqd = EQUALS<double>();
+    Comparator<std::string> eqs = EQUALS<std::string>();
 
     SBSParser pars_sbs;
     APRSParser pars_aprs;
+    WindParser pars_wind;
 
     VFRB::msAcCont.initProcessor(0.0, 0.0, 0);
     VFRB::msClimateData.setPress();
@@ -134,6 +139,8 @@ int main(int argc, char* argv[])
             [&]()
             {
                 assert(pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0"),MSG_UNPACK_ERR,eqi);
+                assert(pars_sbs.unpack("MSG,someCrap in, here"),MSG_UNPACK_IGN,eqi);
+                assert(pars_sbs.unpack("MSG,4,0,,,,,,"),MSG_UNPACK_IGN,eqi);
             })->test(
             "filter height",
             [&]()
@@ -172,6 +179,28 @@ int main(int argc, char* argv[])
                 Configuration::filter_maxHeight = 0;
                 assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz"),MSG_UNPACK_IGN,eqi);
                 Configuration::filter_maxHeight = INT32_MAX;
+            });
+
+    describe<WindParser>("WindParser - unpack", runner)->test(
+            "valid msg",
+            [&]()
+            {
+                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E"),MSG_UNPACK_SUC,eqi);
+                assert(pars_wind.unpack("$WIMWV,242.8,R,6.9,N,A*20"),MSG_UNPACK_SUC,eqi);
+            })->test(
+            "invalid msg",
+            [&]()
+            {
+                assert(pars_wind.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75"),MSG_UNPACK_IGN,eqi);
+                assert(pars_wind.unpack("Someone sent other stuff"),MSG_UNPACK_IGN,eqi);
+            })->test(
+            "broken msg",
+            [&]()
+            {
+                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3E"),MSG_UNPACK_ERR,eqi);
+                assert(pars_wind.unpack("$WIMDA,"),MSG_UNPACK_ERR,eqi);
+                assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0#091,B,1#4.8,C,,,,,,,,,,,,,,*3E"),MSG_UNPACK_ERR,eqi);
+                assert(pars_wind.unpack(""),MSG_UNPACK_IGN,eqi);
             });
 
     helper_clearAcCont();

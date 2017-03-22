@@ -37,7 +37,8 @@ public:
     std::int32_t unpack(const std::string& /*msg*/) noexcept override;
 
 private:
-    std::size_t mtB = 0, mtS = 0;
+    std::size_t mtB = 0, mtS = 0, mtSubLen = 0, mtNumIdx = 0;
+    double mtPress = 0.0, mtTemp = 0.0;
 };
 
 #endif /* SRC_PARSER_WINDPARSER_H_ */

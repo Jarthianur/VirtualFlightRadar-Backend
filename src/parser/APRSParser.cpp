@@ -88,7 +88,7 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
             // climbrate / address / id / type
             if (match.str(9).size() > 0)
             {
-                std::string comm = match.str(9); // regex bug ! cannot work inplace, so need to copy submatch.
+                std::string comm = match.str(9); // regex bug ! cannot work inplace, need to copy submatch.
                 boost::smatch comm_match;
                 if (boost::regex_match(comm, comm_match, mCommRE))
                 {

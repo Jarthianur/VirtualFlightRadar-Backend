@@ -26,7 +26,6 @@
 #include "../data/ClimateData.h"
 #include "../vfrb/VFRB.h"
 
-
 WindParser::WindParser()
         : Parser()
 {
@@ -38,31 +37,49 @@ WindParser::~WindParser() noexcept
 
 std::int32_t WindParser::unpack(const std::string& msg) noexcept
 {
-    if (msg.substr(1, 5).compare("WIMWV") == 0)
+    if (msg.find("WIMWV") != std::string::npos)
     {
         VFRB::msClimateData.insertWV(msg);
     }
-    else if (msg.substr(1, 5).compare("WIMDA") == 0)
+    else if (msg.find("WIMDA") != std::string::npos)
     {
         try
         {
             mtB = msg.find('B') - 1;
             mtS = msg.substr(0, mtB).find_last_of(',') + 1;
-            VFRB::msClimateData.setPress(std::stod(msg.substr(mtS, mtB - mtS)) * 1000.0);
+            mtSubLen = mtB - mtS;
+            mtPress = std::stod(msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
+            if (mtNumIdx == mtSubLen)
+            {
+                VFRB::msClimateData.setPress(mtPress);
+            }
+            else
+            {
+                return MSG_UNPACK_ERR;
+            }
         }
         catch (std::logic_error& e)
         {
-            VFRB::msClimateData.setPress();
+            return MSG_UNPACK_ERR;
         }
         try
         {
             mtB = msg.find('C') - 1;
             mtS = msg.substr(0, mtB).find_last_of(',') + 1;
-            VFRB::msClimateData.setTemp(std::stod(msg.substr(mtS, mtB - mtS)));
+            mtSubLen = mtB - mtS;
+            mtTemp = std::stod(msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
+            if (mtNumIdx == mtSubLen)
+            {
+                VFRB::msClimateData.setTemp(mtTemp);
+            }
+            else
+            {
+                return MSG_UNPACK_ERR;
+            }
         }
         catch (std::logic_error& e)
         {
-            VFRB::msClimateData.setTemp();
+            return MSG_UNPACK_ERR;
         }
     }
     else

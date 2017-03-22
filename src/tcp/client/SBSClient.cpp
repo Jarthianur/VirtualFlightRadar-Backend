@@ -53,10 +53,7 @@ void SBSClient::connect() noexcept
 
 void SBSClient::process() noexcept
 {
-    if (mResponse.at(4) == '3')
-    {
-        mParser.unpack(mResponse);
-    }
+    mParser.unpack(mResponse);
 }
 
 void SBSClient::handleResolve(const boost::system::error_code& ec,

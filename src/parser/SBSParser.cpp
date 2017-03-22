@@ -52,7 +52,7 @@ std::int32_t SBSParser::unpack(const std::string& msg) noexcept
     std::uint32_t i = 2;
     std::size_t p = 6;
 
-    if (msg.find(',', p) == std::string::npos)
+    if (msg.find(',', p) == std::string::npos || !(msg.size() > 4 && msg.at(4) == '3'))
     {
         return MSG_UNPACK_IGN;
     }
