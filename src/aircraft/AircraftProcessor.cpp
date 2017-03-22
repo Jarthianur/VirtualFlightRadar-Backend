@@ -22,7 +22,6 @@
 #include "AircraftProcessor.h"
 
 #include <cmath>
-#include <complex>
 #include <cstdio>
 
 #include "../config/Configuration.h"

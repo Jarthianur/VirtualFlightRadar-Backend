@@ -72,10 +72,11 @@ std::string AircraftContainer::processAircrafts()
         {
             it->incValid();
             // if no FLARM msg received after x, assume target has Transponder
-            if (it->getValid() >= AC_NO_FLARM_THRESHOLD)
+            if (it->getValid() == AC_NO_FLARM_THRESHOLD)
             {
                 it->setTargetT(Aircraft::TargetType::TRANSPONDER);
             }
+
             if (it->getValid() >= AC_DELETE_THRESHOLD)
             {
                 del = true;
@@ -91,6 +92,7 @@ std::string AircraftContainer::processAircrafts()
                 ++it;
                 ++index;
             }
+
             if (del && it != mCont.end())
             {
                 mIndexMap.at(it->getID()) = index;
@@ -108,6 +110,7 @@ void AircraftContainer::insertAircraft(const Aircraft& update)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     ssize_t i;
+
     if ((i = find(update.getID())) == AC_NOT_FOUND)
     {
         mCont.push_back(update);

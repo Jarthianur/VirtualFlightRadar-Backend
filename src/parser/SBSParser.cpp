@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <stdexcept>
 
+#include "../aircraft/Aircraft.h"
 #include "../config/Configuration.h"
 #include "../data/AircraftContainer.h"
 #include "../util/Math.hpp"

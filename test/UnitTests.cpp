@@ -21,7 +21,9 @@
 
 #include <cstdint>
 #include <string>
+#include <boost/regex.hpp>
 
+#include "../src/aircraft/AircraftProcessor.h"
 #include "../src/config/Configuration.h"
 #include "../src/data/AircraftContainer.h"
 #include "../src/data/ClimateData.h"
@@ -51,7 +53,7 @@ using namespace comparator;
  */
 void helper_clearAcCont()
 {
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i <= AC_INVALIDATE; ++i)
     {
         VFRB::msAcCont.processAircrafts();
     }
@@ -64,6 +66,12 @@ int main(int argc, char* argv[])
     Comparator<int> eqi = EQUALS<int>();
     Comparator<double> eqd = EQUALS<double>();
     Comparator<std::string> eqs = EQUALS<std::string>();
+
+    boost::regex pflauRE(
+            "\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})",
+            boost::regex_constants::optimize);
+    boost::regex pflaaRE("", boost::regex_constants::optimize);
+    boost::smatch match;
 
     SBSParser pars_sbs;
     APRSParser pars_aprs;
@@ -81,11 +89,6 @@ int main(int argc, char* argv[])
      *
      * - read valid config
      * - read malformed config
-     *
-     * - unpack sbs ...
-     * - unpack aprs ...
-     *
-     * - unpack wimda/wimwv
      *
      * - prefer flarms
      *
@@ -161,9 +164,9 @@ int main(int argc, char* argv[])
             "valid msg",
             [&]()
             {
-                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=001955 !W19! id06AAAAAA"),MSG_UNPACK_SUC,eqi);
-                assert(pars_aprs.unpack("ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000495 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4"),MSG_UNPACK_SUC,eqi);
-                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4427.24N\\00602.18E^276/014/A=001965 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4"),MSG_UNPACK_SUC,eqi);
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA"),MSG_UNPACK_SUC,eqi);
+                assert(pars_aprs.unpack("ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4"),MSG_UNPACK_SUC,eqi);
+                assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4"),MSG_UNPACK_SUC,eqi);
                 assert(pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz"),MSG_UNPACK_SUC,eqi);
             })->test(
             "ignores",
@@ -203,7 +206,32 @@ int main(int argc, char* argv[])
                 assert(pars_wind.unpack(""),MSG_UNPACK_IGN,eqi);
             });
 
-    helper_clearAcCont();
+    describe<AircraftProcessor>("Process Aircrafts", runner)->test(
+            "setup",
+            [&]()
+            {
+                helper_clearAcCont();
+                Configuration::base_altitude = 0;
+                Configuration::base_latitude = 49.000000;
+                Configuration::base_longitude = 8.000000;
+                Configuration::base_pressure = 1013.25;
+                VFRB::msClimateData.setPress();
+                VFRB::msAcCont.initProcessor(Configuration::base_latitude,
+                        Configuration::base_longitude,
+                        Configuration::base_altitude);
+                pars_sbs.unpack(
+                        "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0");
+            })->test("Aircraft at,above base pos", [&]()
+    {
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        std::cout<<proc<<std::endl;
+        bool matched = boost::regex_search(proc, match, pflauRE);
+        assert(matched,true,EQUALS<bool>());
+        assert(match.str(1),std::string("0"),eqs);
+        assert(match.str(2),std::string("1000"),eqs);
+        assert(match.str(3),std::string("0"),eqs);
+        assert(match.str(4),std::string("BBBBBB"),eqs);
+    });
 
     return rep->report(runner);
 }
