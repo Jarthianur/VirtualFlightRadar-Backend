@@ -34,7 +34,8 @@ before_script:
 
 script: 
     - ./install.sh
-    - pushd test/build
+    - cd test
+    - pushd build
     - make
     - popd
     - build/VFR-Test
