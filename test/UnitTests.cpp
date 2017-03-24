@@ -625,7 +625,7 @@ int main(int argc, char *argv[])
 
     describe<ConfigReader>("read config", runner)
         ->test("read", [&eqs]() {
-            ConfigReader cr("test/test.ini"); // depends on $PWD
+            ConfigReader cr("test.ini"); // depends on $PWD
             cr.read();
             assert(cr.getProperty("latitude", "invalid"), std::string("0.000000"), eqs);
             assert(cr.getProperty("longitude", "invalid"), std::string("invalid"), eqs);
