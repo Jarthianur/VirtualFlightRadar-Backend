@@ -4,11 +4,4 @@ TODO
 .settings/
 .cproject
 .project
-/target/**
-!/target/**/
-/target/service/
-!/target/**/*.mk
-!/target/makefile
 /Test/
-/test/reports/coverage/
-/test/reports/*.info

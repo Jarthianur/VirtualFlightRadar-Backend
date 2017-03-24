@@ -1,0 +1,6 @@
+/**
+!/**/
+/service/
+!/**/*.mk
+!/makefile
+!/.gitignore

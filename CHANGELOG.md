@@ -5,10 +5,12 @@
 + integrate boost (1.63.0)
 + major refactoring, packaging
 + changed logging format
++ changed config format
 + signal handling
 + disable filters via properties
 + systemd service
 + installation script
++ unit tests
 
 #### 1.3.0
 
