@@ -20,7 +20,7 @@ branches:
         - dev-2
         
 git:
-    submodules: false
+    submodules: true
 
 before_install:
     - sudo apt-get update -qq
@@ -32,7 +32,13 @@ install:
 
 before_script:
 
-script: ./install.sh
+script: 
+    - ./install.sh
+    - pushd test/build
+    - make
+    - popd
+    - build/VFR-Test
+
 
 notifications:
     email:
