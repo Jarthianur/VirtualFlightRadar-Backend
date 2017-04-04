@@ -5,7 +5,7 @@ Description=%VFRB_NAME%
 Type=simple
 StandardOutput=/var/log/%VFRB_LOG_PATH%
 StandardError=/var/log/%VFRB_LOG_PATH%
-ExecStart=%VFRB_EXEC_PATH% -c %VFRB_PROP_PATH%
+ExecStart=%VFRB_EXEC_PATH% -c %VFRB_INI_PATH%
 
 [Install]
 WantedBy=multi-user.target

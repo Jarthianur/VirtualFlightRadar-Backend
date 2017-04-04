@@ -1,6 +1,6 @@
 # VirtualFlightRadar-Backend
 
-[![Build Status](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend.svg?branch=dev-2)](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend)
+[![Build Status](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend.svg?branch=master)](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend)
 
 VFR-B := VirtualFlightRadar-Backend
 
@@ -46,14 +46,15 @@ This means no aircraft-, wind reports, or whatever is going to be sent to the in
 **But this depends on how one will use this service.**
 Of course, one can configure it to receive APRS from public OGN servers,
 but to keep track of local traffic, the traffic information must be sent to OGN first.
-Also the internal NMEA server will send its data to *localhost*, which means, everybody, inside the local network, is able to fetch it.
+Also the internal NMEA server will serve its data from *localhost*, which means, everybody, inside the local network,
+is able to fetch it, but no-one outside.
 It is also possible to make the machine, which runs the VFR-B, accessible to the public.
 
 ## Software requirements
 
 + GNU compiler g++ (at least 4.9)
 + GNU make
-+ boost library (1.63.0)
++ boost library (>= 1.55.0)
   + *(explicit built:)*
     + thread
     + system
@@ -61,7 +62,7 @@ It is also possible to make the machine, which runs the VFR-B, accessible to the
     + chrono
     + signals
 
-Boost can be installed via package manager
+**Boost can be installed via package manager**
 
 ```bash
 $ sudo apt-get update
@@ -73,7 +74,13 @@ libboost-chrono-dev \
 libboost-signals-dev
 ```
 
-or manually:
+**or later, along with the *install.sh*:**
+
+```bash
+./install.sh deps
+```
+
+**or manually:**
 
 Download the boost_1_63_0.tar.gz from [here](http://www.boost.org/users/history/version_1_63_0.html).
 From Downloads directory unpack it into ~/boost and run its install scripts
@@ -89,31 +96,24 @@ $ ./b2 --build-dir=/home/$USER/boost/ --with-system --with-chrono --with-regex -
 
 Now *~/boost/boost_1_63_0/* is the boost root directory.
 
-Note that the boost version from package manager may be too old. *( >= 1.58.0 verified to work also)*
+Note that the boost version from package manager may be too old. *( >= 1.55.0 verified to work also)*
 
 ## Installation
 
 Clone or download this repository.  
 Before installing the program, one should adjust the values in
-[Parameters.h](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/src/util/Parameters.h).
+[Parameters.h](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/master/src/util/Parameters.h).
 These parameters have to stay fixed, so they can not be changed after compilation.
 Please read the comments carefully, as these values change the programs behavior, or may even break it.
 
 From inside the projects root directory follow these steps.
 
-Either adjust the [vfrb.ini](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/vfrb.ini)
+Either adjust the [vfrb.ini](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/master/vfrb.ini)
 file right now to deploy it ready-to-use, or later.  
-Edit the [bootstrap.sh](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/bootstrap.sh) according to Your needs.  
+Edit the [bootstrap.sh](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/master/bootstrap.sh) according to Your needs.  
 There are just a few variables, which need to be set as stated in their comments.  
-Next run `./install.sh` and look at its output. If all requirements are met, the VFR-B was
-successfully built, stored where specified and a systemd service was properly configured.
-
-To add the systemd service run
-
-```bash
-$ sudo cp -r target/service/* /etc/systemd/system/
-$ sudo systemctl daemon-reload
-```
+Next run `./install.sh` and look at its output, or run `./install.sh service` if You want it as a systemd service.  
+If all requirements are met, the VFR-B was successfully built, stored where specified and a systemd service was properly configured.
 
 If not already done, now the runtime configuration must be specified in the target INI file.
 This INI file was also stored according to the path in bootstrap.sh .
@@ -157,7 +157,7 @@ To apply this change reboot the system.
 $ {path to binary} -c {path to config file} > {path to log file}  2>&1 &
 ```
 
-example:
+**example:**
 
 ```bash
 $ ./vfrb -c vfrb.ini > vfrb.log 2>&1 &
@@ -167,21 +167,20 @@ The log will be in the specified file.
 
 ### as service
 
-To enable the service, the installation steps have to be completed.
-The services name will be the same as *VFRB_NAME_B* from bootstrap.sh .
-Run the service once
+By invoking `./install.sh service`, the systemd service for VFR-B was automatically configured to start after boot.  
+To disable it call, where *servicename* is like *VFRB_NAME_B* from bootstrap.sh.
+
+```bash
+$ sudo systemctl disable {servicename}.service
+```
+
+**Run the service once by**
 
 ```bash
 $ sudo service {servicename} start
 ```
 
-Run the service after boot
-
-```bash
-$ sudo systemctl enable {servicename}.service
-```
-
-Watch the log with
+**Watch the log with**
 
 ```bash
 $ journalctl -u {servicename}.service
@@ -189,12 +188,12 @@ $ journalctl -u {servicename}.service
 $ sudo cat /var/log/{servicename}.log
 ```
 
-Examples:
+**Examples:**
 
 ```bash
 $ sudo service vfrb start
 # ------
-$ sudo systemctl enable vfrb.service
+$ sudo systemctl disable vfrb.service
 # ------
 $ journalctl -u vfrb.service
 # ------
@@ -204,9 +203,9 @@ $ sudo cat /var/log/vfrb.log
 ## Future plans
 
 + setup cross platform build for RaspPi
-+ change pressure fallback value to QNH
 + probability-of-arrival evaluation, displayed via warning levels
 + read *gpsd*
++ read pressure sensor
 + compute missing aircraft data
 
 Contributions are always welcome.
@@ -214,5 +213,5 @@ Contributions are always welcome.
 ---
 Status quo:
 
-Version 2.0.0-SNAPSHOT  
-Read more in the [CHANGELOG.md](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/dev-2/CHANGELOG.md).
+Version 2.0.0  
+Read more in the [CHANGELOG.md](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/master/CHANGELOG.md).

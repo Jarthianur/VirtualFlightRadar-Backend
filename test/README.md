@@ -5,11 +5,19 @@ This directory contains a C++11 unit-test framework as git submodule. In the rep
 These unit-tests are part of the travis build process. Thus a passing build includes running tests without any failures or errors.
 Some components can not be tested inside a testsuite, hence the coverage for those stays low. But every component is at least tested live in a real, and simulated, environment.
 
+## include test framework
+
+Run `git submodule update --remote`.
+
 ## Build with coverage
 
-Compile with flags `-fprofile-arcs -ftest-coverage`.
-Link with `-coverage`.
-Run program.
+```bash
+#Compile with flags `-fprofile-arcs -ftest-coverage`.
+#Link with `-coverage`.
+cd build
+make all
+./VFR-Test
+```
 
 ```bash
 lcov --directory Debug/ --capture --output-file test/reports/all.info

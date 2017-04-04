@@ -2,7 +2,7 @@
 
 #### 2.0.0
 
-+ integrate boost (1.63.0)
++ integrate boost
 + major refactoring, packaging
 + changed logging format
 + changed config format

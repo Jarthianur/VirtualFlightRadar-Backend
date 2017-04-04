@@ -15,7 +15,6 @@ BOOST_I := ${BOOST_ROOT_I}
 
 # All of the sources participating in the build are defined here
 -include sources.mk
-#-include test/subdir.mk
 -include src/vfrb/subdir.mk
 -include src/util/subdir.mk
 -include src/tcp/server/subdir.mk
@@ -51,10 +50,6 @@ endif
 
 -include ../makefile.defs
 
-# Add inputs and outputs from these tool invocations to the build variables 
-
-#TEST_OBJS += $(filter-out ./src/Main.o ./src/ConfigReader.o,$(OBJS))
-
 # Tool invocations
 VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
@@ -65,17 +60,7 @@ VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	
 # All Target
 all: VirtualFlightRadar-Backend
-#tests	
-	
-# Test
-#tests: $(TEST_OBJS) $(USER_OBJS)
-	#-@echo 'Building target: $@'
-	#-@echo 'Invoking: G++ Linker'
-	#-$(CXX) -pthread -o $(NAME)$(VERSION)_TEST $(TEST_OBJS) $(USER_OBJS) $(LIBS)
-	#-@echo 'Finished building target: $@'
-	#-@echo ' '
 
-# Other Targets ./test/UnitTests.o $(NAME)$(VERSION)_TEST
 clean:
 	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(C_DEPS)$(CPP_DEPS)
 	-@echo ' '

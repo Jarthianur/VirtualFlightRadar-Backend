@@ -17,7 +17,7 @@ compiler:
 # whitelist
 branches:
     only:
-        - dev-2
+        - master
         
 git:
     submodules: true

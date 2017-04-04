@@ -12,8 +12,38 @@ export VFRB_INI_PATH=${VFRB_INI_PATH_B:-$PWD/target/}
 export VFRB_TARGET=$VFRB_NAME-$VFRB_VERSION
 VFRB_ROOT=$PWD
 BOOST_MAN=0
+INST_SERVICE=0
+INST_DEPS=0
+
+for arg in $*; do
+    case "$arg" in
+        [sS][eE][rR][vV][iI][cC][eE])
+            INST_SERVICE=1
+        ;;
+        [dD][eE][pP][sS])
+            INST_DEPS=1
+        ;;
+        [hH] | [hH][eE][lL][pP])
+            echo "This is the VFR-B install script."
+            echo "Usage: ./install.sh [help] [service] [deps]"
+            echo "Given 'help','h' will display this message."
+            echo "Given 'service' will install the VFR-B systemd service (requires 'root')."
+            echo "Given 'deps' will install all dependencies like boost,... (requires 'root')."
+            exit 1
+        ;;
+        *)
+        ;;
+    esac
+done
 
 ##########################################
+if [ $INST_DEPS -eq 1 ]; then
+    echo "... INSTALL DEPENDENCIES ..."
+    sudo apt-get update
+    sudo apt-get install libboost-dev libboost-system-dev libboost-thread-dev \
+        libboost-regex-dev libboost-chrono-dev libboost-signals-dev
+    echo ""
+fi
 echo "... INSTALL VFRB ..."
 echo ""
 
@@ -44,8 +74,8 @@ if [ -z "$BOOST_ROOT_B" ]; then
     echo "BOOST_ROOT not set, assuming default"
 else
     echo "BOOST_ROOT: $BOOST_ROOT"
-    export BOOST_LIBS_L="-L$BOOST_ROOT/stage/lib"
-    export BOOST_ROOT_I="-I$BOOST_ROOT"
+    export BOOST_LIBS_L="-L${BOOST_ROOT}/stage/lib"
+    export BOOST_ROOT_I="-I${BOOST_ROOT}"
     BOOST_MAN=1
 fi
 if [ -z "$VFRB_EXEC_PATH_B" ]; then
@@ -67,21 +97,21 @@ unset VFRB_INI_PATH_B
 echo ""
 echo "... RUN MAKE ..."
 echo ""
-pushd $VFRB_ROOT/target/
+pushd ${VFRB_ROOT}/target/
 make all
 error=$?
 unset BOOST_LIBS_L
 unset BOOST_ROOT_I
 popd
 if [ $error -ne 0 ]; then
-    echo "ERROR: make failed $error"
+    echo "ERROR: make failed with $error"
     exit $error
 fi
 echo ""
 echo "... COPY TARGETS ..."
 echo ""
-if [ -x "$VFRB_ROOT/target/$VFRB_TARGET" ]; then
-    mv $VFRB_ROOT/target/$VFRB_TARGET $VFRB_EXEC_PATH/$VFRB_TARGET
+if [ -x "${VFRB_ROOT}/target/${VFRB_TARGET}" ]; then
+    mv ${VFRB_ROOT}/target/${VFRB_TARGET} ${VFRB_EXEC_PATH}/${VFRB_TARGET}
     echo ""
     echo "$VFRB_TARGET copied to $VFRB_EXEC_PATH"
 else
@@ -89,35 +119,38 @@ else
     echo "ERROR: $VFRB_TARGET does not exist"
     exit 1
 fi
-sed "s|%VERSION%|$VFRB_VERSION|" <$VFRB_ROOT/vfrb.ini >$VFRB_INI_PATH/$VFRB_INI.ini
-echo "$VFRB_INI.ini copied to $VFRB_INI_PATH"
+sed "s|%VERSION%|${VFRB_VERSION}|" <${VFRB_ROOT}/vfrb.ini >${VFRB_INI_PATH}/${VFRB_INI}.ini
+echo "${VFRB_INI}.ini copied to $VFRB_INI_PATH"
 echo ""
-BASH_LD=$(cat ~/.bashrc | grep "export LD_LIBRARY_PATH=$BOOST_ROOT/stage/lib/:\$LD_LIBRARY_PATH")
+BASH_LD=$(cat ~/.bashrc | grep "export LD_LIBRARY_PATH=${BOOST_ROOT}/stage/lib/:\$LD_LIBRARY_PATH")
 if [ $BOOST_MAN -eq 1 ] && [ "$BASH_LD" == "" ]; then
     echo "... ADD TO LD_LIBRARY_PATH ..."
     echo ""
-    echo "export LD_LIBRARY_PATH=$BOOST_ROOT/stage/lib/:\$LD_LIBRARY_PATH" >> ~/.bashrc
-    echo "export LD_LIBRARY_PATH=$BOOST_ROOT/stage/lib/:\$LD_LIBRARY_PATH"
+    echo "export LD_LIBRARY_PATH=${BOOST_ROOT}/stage/lib/:\$LD_LIBRARY_PATH" >> ~/.bashrc
+    echo "export LD_LIBRARY_PATH=${BOOST_ROOT}/stage/lib/:\$LD_LIBRARY_PATH"
     echo ""
 fi
-echo "... SETUP SERVICE ..."
-echo ""
-mkdir -p $VFRB_ROOT/target/service
-if [ $BOOST_MAN -eq 1 ]; then
-    mkdir -p $VFRB_ROOT/target/service/$VFRB_NAME.service.d
-    pushd $VFRB_ROOT/target/service/$VFRB_NAME.service.d
-    sed -e "s|%BOOST_LIBS_PATH%|$BOOST_ROOT/stage/lib:|" <$VFRB_ROOT/service/vfrb.service.d/vfrb.conf >$VFRB_NAME.conf
+if [ $INST_SERVICE -eq 1 ]; then
+    echo "... SETUP SERVICE ..."
+    echo ""
+    SYSD_PATH="/etc/systemd/system"
+    if [ $BOOST_MAN -eq 1 ]; then
+        sudo mkdir ${SYSD_PATH}/${VFRB_NAME}.service.d
+        pushd ${SYSD_PATH}/${VFRB_NAME}.service.d
+        sudo sed -e "s|%BOOST_LIBS_PATH%|${BOOST_ROOT}/stage/lib:|" <${VFRB_ROOT}/service/vfrb.service.d/vfrb.conf >${VFRB_NAME}.conf
+        popd
+    fi
+    pushd $SYSD_PATH
+    echo ""
+    sudo sh -c "sed -e 's|%VFRB_NAME%|${VFRB_NAME}|' \
+        -e 's|%VFRB_EXEC_PATH%|${VFRB_EXEC_PATH}/${VFRB_TARGET}|' \
+        -e 's|%VFRB_INI_PATH%|${VFRB_INI_PATH}/${VFRB_INI}.ini|' \
+        -e 's|%VFRB_LOG_PATH%|${VFRB_NAME}.log|g' \
+        <${VFRB_ROOT}/service/vfrb.service >${VFRB_NAME}.service"
+    echo "${VFRB_NAME}.service created in $SYSD_PATH"
+    sudo systemctl enable ${VFRB_NAME}.service
+    echo ""
     popd
+    echo ""
 fi
-pushd $VFRB_ROOT/target/service/
-echo ""
-sed -e "s|%VFRB_NAME%|$VFRB_NAME|" \
-    -e "s|%VFRB_EXEC_PATH%|$VFRB_EXEC_PATH/$VFRB_TARGET|" \
-    -e "s|%VFRB_INI_PATH%|$VFRB_INI_PATH/$VFRB_INI.ini|" \
-    -e "s|%VFRB_LOG_PATH%|$VFRB_NAME.log|g" \
-    <$VFRB_ROOT/service/vfrb.service >$VFRB_NAME.service
-echo "$VFRB_NAME.service created in $VFRB_ROOT/target/service/"
-echo ""
-popd
-echo ""
 echo "... FINISHED ..."
