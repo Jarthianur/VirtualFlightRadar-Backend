@@ -1,0 +1,5 @@
+/reports/*.info
+/build/**
+!/build/**/
+!/build/**/*.mk
+!/build/makefile

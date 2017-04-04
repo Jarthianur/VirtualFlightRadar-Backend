@@ -1,8 +1,7 @@
 Debug/
 Release/
 TODO
-Test/
 .settings/
 .cproject
 .project
-
+/Test/
