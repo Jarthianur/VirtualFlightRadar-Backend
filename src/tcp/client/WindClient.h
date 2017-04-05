@@ -46,6 +46,9 @@ private:
     void read() noexcept override;
     void process() noexcept override;
     void connect() noexcept override;
+    /**
+     * Check read timed out.
+     */
     void checkDeadline() noexcept;
     void stop() noexcept override;
 
@@ -54,8 +57,17 @@ private:
     void handleConnect(const boost::system::error_code& /*ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
 
+    /**
+     * Client stopped
+     */
     bool mStopped;
+    /**
+     * read timer
+     */
     boost::asio::deadline_timer mTimeout;
+    /**
+     * Parser
+     */
     WindParser mParser;
 };
 

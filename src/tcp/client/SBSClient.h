@@ -48,6 +48,9 @@ private:
     void handleConnect(const boost::system::error_code& /*ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
 
+    /**
+     * Parser
+     */
     SBSParser mParser;
 };
 

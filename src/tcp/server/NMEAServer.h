@@ -44,7 +44,7 @@ public:
     virtual ~NMEAServer() noexcept;
 
     /**
-     * Run IO service.
+     * Run server.
      */
     void run();
 
@@ -54,18 +54,48 @@ public:
     void writeToAll(const std::string& /*msg*/) noexcept;
 
 private:
+    /**
+     * Accept connections
+     */
     void accept() noexcept;
+    /**
+     * Register stop-handler to signals
+     */
     void awaitStop();
+    /**
+     * Stop all connections.
+     */
     void stopAll();
 
+    /**
+     * Accept - handler
+     */
     void handleAccept(const boost::system::error_code& /*ec*/) noexcept;
 
+    /**
+     * Mutex - threadsafety
+     */
     boost::mutex mMutex;
 
+    /**
+     * Internal IO-service
+     */
     boost::asio::io_service mIOservice;
+    /**
+     * Signals reference
+     */
     boost::asio::signal_set& mrSigSet;
+    /**
+     * Acceptor
+     */
     boost::asio::ip::tcp::acceptor mAcceptor;
+    /**
+     * Socket
+     */
     boost::asio::ip::tcp::socket mSocket;
+    /**
+     * Container for connections.
+     */
     std::vector<boost::shared_ptr<Connection>> mClients;
 };
 

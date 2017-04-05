@@ -47,9 +47,18 @@ private:
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
     void handleConnect(const boost::system::error_code& /*ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
+    /**
+     * Send login string - handler
+     */
     void handleLogin(const boost::system::error_code& /*ec*/, std::size_t /*s*/) noexcept;
 
+    /**
+     * Login string
+     */
     std::string mLoginStr;
+    /**
+     * Parser
+     */
     APRSParser mParser;
 };
 

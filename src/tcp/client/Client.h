@@ -38,41 +38,105 @@ public:
 
     virtual ~Client() noexcept;
 
+    /**
+     * Run this client.
+     */
     void run();
 
 protected:
     Client(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
            const std::string& /*port*/, const std::string& /*comp*/);
 
+    /**
+     * Register stop-handler to signals.
+     */
     void awaitStop();
+    /**
+     * Connect with timeout.
+     */
     void timedConnect() noexcept;
+    /**
+     * Stop this client,
+     * close connection.
+     */
     virtual void stop() noexcept;
+    /**
+     * Read data.
+     */
     virtual void read() noexcept;
+    /**
+     * Process read data.
+     */
     virtual void process() noexcept = 0;
+    /**
+     * Connect to host.
+     */
     virtual void connect() noexcept = 0;
 
+    /**
+     * Timed connect - handler
+     */
     void handleTimedConnect(const boost::system::error_code& /*ec*/) noexcept;
+    /**
+     * Read - handler
+     */
     void handleRead(const boost::system::error_code& /*ec*/, std::size_t /*s*/) noexcept;
 
+    /**
+     * Resolve host - handler
+     */
     virtual void handleResolve(const boost::system::error_code& /*ec*/,
                                boost::asio::ip::tcp::resolver::iterator /*it*/)
                                        noexcept = 0;
+    /**
+     * Connect - handler
+     */
     virtual void handleConnect(const boost::system::error_code& /*ec*/,
                                boost::asio::ip::tcp::resolver::iterator /*it*/)
                                        noexcept = 0;
 
+    /**
+     * Internal IO-service
+     */
     boost::asio::io_service mIOservice;
+    /**
+     * Signals reference
+     */
     boost::asio::signal_set& mrSigSet;
+    /**
+     * Socket
+     */
     boost::asio::ip::tcp::socket mSocket;
+    /**
+     * Resolver
+     */
     boost::asio::ip::tcp::resolver mResolver;
 
+    /**
+     * String holding complete sentence.
+     */
     std::string mResponse;
+    /**
+     * Read buffer
+     */
     boost::asio::streambuf mBuffer;
+    /**
+     * Hostname
+     */
     const std::string mHost;
+    /**
+     * Port
+     */
     const std::string mPort;
+    /**
+     * Component string for logging.
+     */
     const std::string mComponent;
 
 private:
+    /**
+     * Connection timer
+     */
     boost::asio::deadline_timer mConnectTimer;
 };
 

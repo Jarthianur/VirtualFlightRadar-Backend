@@ -54,12 +54,18 @@ public:
     static bool global_sbs_enabled;
     static bool global_run_status;
 
+    /**
+     * Container for aircrafts
+     */
     static AircraftContainer msAcCont;
+    /**
+     * Container for climate information
+     */
     static ClimateData msClimateData;
 
 private:
     /**
-     * funtions for every thread
+     * handlers for every thread
      */
     static void handleSBSInput(boost::asio::signal_set& /*sigset*/);
     static void handleAPRSCInput(boost::asio::signal_set& /*sigset*/);

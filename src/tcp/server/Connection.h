@@ -45,12 +45,24 @@ public:
      */
     void stop() noexcept;
 
+    /**
+     * Getters
+     */
     boost::asio::ip::tcp::socket& getSocket();
     const std::string& getIP();
 
 private:
+    /**
+     * c'tor
+     */
     Connection(boost::asio::ip::tcp::socket /*socket*/);
+    /**
+     * Socket
+     */
     boost::asio::ip::tcp::socket mSocket;
+    /**
+     * IP address
+     */
     const std::string mIP;
 };
 
