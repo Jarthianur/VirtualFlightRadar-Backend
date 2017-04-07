@@ -14,7 +14,7 @@ and is also available for most common platforms.
 ### The core functionalities of the VFR-B are:
 
 + receive and parse APRS messages from APRSC (FLARM reports)
-+ receive and parse ADS-B messages, transcoded into SBS, from any SDR (e.g. [Dump1090](https://github.com/antirez/dump1090))
++ receive and parse ADS-B messages, transcoded into SBS, from any SDR (e.g. [Dump1090mutability](https://github.com/mutability/dump1090))
 + receive and parse NMEA messages from any wind-sensor, integrated in the network (WIMWV, WIMDA)
 + keep track of and manage detected aircrafts, normalizing measuring units
 + serve these information as NMEA sentences on the network
