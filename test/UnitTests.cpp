@@ -188,17 +188,17 @@ int main(int argc, char *argv[])
 
     describe<WindParser>("WindParser - unpack", runner)
         ->test("valid msg", [&]() {
-            assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E"), MSG_UNPACK_SUC, eqi);
+            assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"), MSG_UNPACK_SUC, eqi);
             assert(pars_wind.unpack("$WIMWV,242.8,R,6.9,N,A*20"), MSG_UNPACK_SUC, eqi);
         })
         ->test("invalid msg", [&]() {
             assert(pars_wind.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75"), MSG_UNPACK_IGN, eqi);
-            assert(pars_wind.unpack("Someone sent other stuff"), MSG_UNPACK_IGN, eqi);
+            assert(pars_wind.unpack("Someone sent other stuff"), MSG_UNPACK_ERR, eqi);
         })
         ->test("broken msg", [&]() {
             assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3F"), MSG_UNPACK_ERR, eqi);
             assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,,,,,,,,,,,,,,*51"), MSG_UNPACK_ERR, eqi);
-            assert(pars_wind.unpack("$WIMDA,"), MSG_UNPACK_IGN, eqi);
+            assert(pars_wind.unpack("$WIMDA,"), MSG_UNPACK_ERR, eqi);
             assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0#091,B,14.8,C,,,,,,,,,,,,,,*1d"), MSG_UNPACK_ERR, eqi);
             assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,1#4.8,C,,,,,,,,,,,,,,*1d"), MSG_UNPACK_ERR, eqi);
             assert(pars_wind.unpack(""), MSG_UNPACK_ERR, eqi);
