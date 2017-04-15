@@ -26,14 +26,15 @@
 #include <boost/date_time.hpp>
 #include <boost/operators.hpp>
 
+#include "../../parser/WindParser.h"
 #include "../../util/Logger.h"
 
 WindClient::WindClient(boost::asio::signal_set& sigset, const std::string& host,
                        const std::string& port)
-        : Client(sigset, host, port, "(WindClient)"),
+        : Client(sigset, host, port, "(WindClient)",
+                 std::unique_ptr<Parser>(new WindParser())),
           mStopped(false),
-          mTimeout(mIOservice),
-          mParser()
+          mTimeout(mIOservice)
 {
     connect();
     mTimeout.async_wait(boost::bind(&WindClient::checkDeadline, this));
@@ -89,7 +90,7 @@ void WindClient::stop() noexcept
 
 void WindClient::process() noexcept
 {
-    mParser.unpack(mResponse);
+    mParser->unpack(mResponse);
 }
 
 void WindClient::handleResolve(const boost::system::error_code& ec,

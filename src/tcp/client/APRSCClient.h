@@ -26,7 +26,6 @@
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "../../parser/APRSParser.h"
 #include "Client.h"
 
 class APRSCClient: public Client
@@ -56,10 +55,6 @@ private:
      * Login string
      */
     std::string mLoginStr;
-    /**
-     * Parser
-     */
-    APRSParser mParser;
 };
 
 #endif /* SRC_TCP_CLIENT_APRSCCLIENT_H_ */

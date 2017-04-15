@@ -26,7 +26,9 @@
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <string>
+#include <memory>
 #include "../../config/Parameters.h"
+#include "../../parser/Parser.h"
 
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
 
@@ -45,7 +47,8 @@ public:
 
 protected:
     Client(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-           const std::string& /*port*/, const std::string& /*comp*/);
+           const std::string& /*port*/, const std::string& /*comp*/,
+           std::unique_ptr<Parser> /*parser*/);
 
     /**
      * Register stop-handler to signals.
@@ -132,6 +135,10 @@ protected:
      * Component string for logging.
      */
     const std::string mComponent;
+    /**
+     * Parser
+     */
+    std::unique_ptr<Parser> mParser;
 
 private:
     /**

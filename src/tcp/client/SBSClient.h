@@ -26,7 +26,6 @@
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "../../parser/SBSParser.h"
 #include "Client.h"
 
 class SBSClient: public Client
@@ -47,11 +46,6 @@ private:
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
     void handleConnect(const boost::system::error_code& /*ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
-
-    /**
-     * Parser
-     */
-    SBSParser mParser;
 };
 
 #endif /* SRC_TCP_CLIENT_SBSCLIENT_H_ */

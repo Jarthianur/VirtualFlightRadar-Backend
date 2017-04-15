@@ -27,13 +27,14 @@
 #include <cstddef>
 #include <iostream>
 
+#include "../../parser/APRSParser.h"
 #include "../../util/Logger.h"
 
 APRSCClient::APRSCClient(boost::asio::signal_set& sigset, const std::string& host,
                          const std::string& port, const std::string& login)
-        : Client(sigset, host, port, "(APRSCClient)"),
-          mLoginStr(login),
-          mParser()
+        : Client(sigset, host, port, "(APRSCClient)",
+                 std::unique_ptr<Parser>(new APRSParser())),
+          mLoginStr(login)
 {
     mLoginStr.append("\r\n");
     connect();
@@ -56,7 +57,7 @@ void APRSCClient::connect() noexcept
 
 void APRSCClient::process() noexcept
 {
-    mParser.unpack(mResponse);
+    mParser->unpack(mResponse);
 }
 
 void APRSCClient::handleResolve(const boost::system::error_code& ec,

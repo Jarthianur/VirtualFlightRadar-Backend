@@ -26,7 +26,6 @@
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "../../parser/GPSParser.h"
 #include "Client.h"
 
 class GPSDClient: public Client
@@ -52,11 +51,6 @@ private:
      * Send watch string - handler
      */
     void handleWatch(const boost::system::error_code& /*ec*/, std::size_t /*s*/) noexcept;
-
-    /**
-     * Parser
-     */
-    GPSParser mParser;
 };
 
 #endif /* SRC_TCP_CLIENT_GPSDCLIENT_H_ */

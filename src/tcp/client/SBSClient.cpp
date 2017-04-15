@@ -27,12 +27,13 @@
 #include <cstddef>
 #include <iostream>
 
+#include "../../parser/SBSParser.h"
 #include "../../util/Logger.h"
 
 SBSClient::SBSClient(boost::asio::signal_set& sigset, const std::string& host,
                      const std::string& port)
-        : Client(sigset, host, port, "(SBSClient)"),
-          mParser()
+        : Client(sigset, host, port, "(SBSClient)",
+                 std::unique_ptr<Parser>(new SBSParser()))
 {
     connect();
 }
@@ -53,7 +54,7 @@ void SBSClient::connect() noexcept
 
 void SBSClient::process() noexcept
 {
-    mParser.unpack(mResponse);
+    mParser->unpack(mResponse);
 }
 
 void SBSClient::handleResolve(const boost::system::error_code& ec,

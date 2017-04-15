@@ -27,12 +27,13 @@
 #include <cstddef>
 #include <iostream>
 
+#include "../../parser/GPSParser.h"
 #include "../../util/Logger.h"
 
 GPSDClient::GPSDClient(boost::asio::signal_set& sigset, const std::string& host,
                        const std::string& port)
-        : Client(sigset, host, port, "(GPSDClient)"),
-          mParser()
+        : Client(sigset, host, port, "(GPSDClient)",
+                 std::unique_ptr<Parser>(new GPSParser()))
 {
     connect();
 }
@@ -54,7 +55,7 @@ void GPSDClient::connect() noexcept
 
 void GPSDClient::process() noexcept
 {
-    mParser.unpack(mResponse);
+    mParser->unpack(mResponse);
 }
 
 void GPSDClient::handleResolve(const boost::system::error_code& ec,
@@ -108,7 +109,7 @@ void GPSDClient::stop() noexcept
 {
     boost::asio::async_write(
             mSocket, boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
-            [this](boost::system::error_code& ec, std::size_t s)
+            [this](const boost::system::error_code& ec, std::size_t s)
             {
                 if (!ec)
                 {

@@ -26,7 +26,6 @@
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "../../parser/WindParser.h"
 #include "Client.h"
 #include "../../config/Parameters.h"
 
@@ -65,10 +64,6 @@ private:
      * read timer
      */
     boost::asio::deadline_timer mTimeout;
-    /**
-     * Parser
-     */
-    WindParser mParser;
 };
 
 #endif /* SRC_TCP_CLIENT_WINDCLIENT_H_ */
