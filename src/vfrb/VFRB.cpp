@@ -43,7 +43,7 @@ bool VFRB::global_climate_enabled = false;
 bool VFRB::global_aprsc_enabled = false;
 bool VFRB::global_sbs_enabled = false;
 bool VFRB::global_run_status = true;
-AircraftContainer  VFRB::msAcCont;
+AircraftContainer VFRB::msAcCont;
 ClimateData VFRB::msClimateData;
 
 VFRB::VFRB()
@@ -58,7 +58,7 @@ void VFRB::run() noexcept
 {
     Logger::info("(VFRB) startup");
     //store start time
-    boost::chrono::system_clock::time_point start = boost::chrono::system_clock::now();
+    boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
 
     // eval config
     if (Configuration::global_aprsc_host.compare("nA") != 0 || Configuration::global_aprsc_host.length()
@@ -93,7 +93,7 @@ void VFRB::run() noexcept
 
     //create ac proc for gpsfix
     GPSmodule gpsm(Configuration::base_latitude, Configuration::base_longitude,
-                              Configuration::base_altitude, Configuration::base_geoid);
+                   Configuration::base_altitude, Configuration::base_geoid);
 
     // register signals and run handler
     boost::asio::io_service io_service;
@@ -109,7 +109,8 @@ void VFRB::run() noexcept
             boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
                         boost::asio::placeholders::signal_number));
 
-    boost::thread signal_thread([&io_service]() {
+    boost::thread signal_thread([&io_service]()
+    {
         io_service.run();
     });
 
@@ -118,9 +119,12 @@ void VFRB::run() noexcept
     boost::thread server_thread(boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
 
     //init input threads
-    boost::thread sbs_input_thread(boost::bind(&VFRB::handleSBSInput, std::ref(signal_set)));
-    boost::thread aprs_input_thread(boost::bind(&VFRB::handleAPRSCInput, std::ref(signal_set)));
-    boost::thread climate_input_thread(boost::bind(&VFRB::handleClimateInput, std::ref(signal_set)));
+    boost::thread sbs_input_thread(
+            boost::bind(&VFRB::handleSBSInput, std::ref(signal_set)));
+    boost::thread aprs_input_thread(
+            boost::bind(&VFRB::handleAPRSCInput, std::ref(signal_set)));
+    boost::thread climate_input_thread(
+            boost::bind(&VFRB::handleClimateInput, std::ref(signal_set)));
 
     while (global_run_status)
     {
@@ -162,12 +166,12 @@ void VFRB::run() noexcept
     signal_thread.join();
 
     //eval end time
-    boost::chrono::system_clock::time_point end = boost::chrono::system_clock::now();
-    boost::chrono::minutes runtime = boost::chrono::duration_cast < boost::chrono::minutes
-            > (end - start);
-    std::string time_str(std::to_string(runtime.count()/60/24));
+    boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
+    boost::chrono::minutes runtime = boost::chrono::duration_cast<boost::chrono::minutes>(
+            end - start);
+    std::string time_str(std::to_string(runtime.count() / 60 / 24));
     time_str += " days, ";
-    time_str += std::to_string(runtime.count()/60);
+    time_str += std::to_string(runtime.count() / 60);
     time_str += " hours, ";
     time_str += std::to_string(runtime.count() % 60);
     time_str += " mins";

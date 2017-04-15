@@ -24,6 +24,7 @@
 #include <stdexcept>
 
 #include "../data/ClimateData.h"
+#include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
 
 WindParser::WindParser()
@@ -37,6 +38,20 @@ WindParser::~WindParser() noexcept
 
 std::int32_t WindParser::unpack(const std::string& msg) noexcept
 {
+    try
+    {
+        std::int32_t csum = std::stoi(msg.substr(msg.length() - 3, 2), nullptr, 16);
+        if (csum != Math::checksum(msg.c_str(), msg.length()))
+        {
+
+            return MSG_UNPACK_IGN;
+        }
+    }
+    catch (const std::logic_error& e)
+    {
+        return MSG_UNPACK_ERR;
+    }
+
     if (msg.find("WIMWV") != std::string::npos)
     {
         VFRB::msClimateData.insertWV(msg);
