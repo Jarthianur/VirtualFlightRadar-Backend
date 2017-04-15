@@ -25,9 +25,8 @@
 #include <fstream>
 #include <stdexcept>
 #include <utility>
-
+#include <initializer_list>
 #include "../util/Logger.h"
-
 
 ConfigReader::ConfigReader(const std::string& fname)
         : mFile(fname),
@@ -46,25 +45,36 @@ void ConfigReader::read()
     std::string key;
     std::string value;
     std::string line;
+    std::string section;
     while (std::getline(src, line))
     {
         try
         {
-            if (line.at(0) == ';' || line.at(0) == '[')
+            if (line.length() == 0 || line.at(0) == ';')
             {
                 continue;
+            }
+            if (line.at(0) == '[')
+            {
+                section = line.substr(1, line.rfind(']', line.length() - 1) - 1);
+                if (!mConfig.emplace(
+                        std::make_pair(section,
+                                       std::unordered_map<std::string, std::string>())).second)
+                {
+                    Logger::debug("COULD NOT CREATE SECTION");
+                }
             }
             boost::smatch match;
             if (boost::regex_match(line, match, mConfRE))
             {
                 key = match.str(1);
                 value = match.str(2);
-                mConfig.insert(
-                { key, value });
+                mConfig[section].emplace(std::make_pair(key, value));
+                Logger::debug(section + "." + key + " = ", value);
             }
             else
             {
-                Logger::error("(ConfigReader) malformed param: ", line);
+                //Logger::error("(ConfigReader) malformed param: ", line);
             }
         }
         catch (const boost::regex_error& e)
@@ -79,16 +89,25 @@ void ConfigReader::read()
     }
 }
 
-const std::string& ConfigReader::getProperty(const std::string& key,
-        const std::string& def_val) const
+const std::string& ConfigReader::getProperty(const std::string& section,
+                                             const std::string& key,
+                                             const std::string& def_val) const
 {
-    auto it = mConfig.find(key);
-    if (it == mConfig.end())
+    auto s_it = mConfig.find(section);
+    if (s_it != mConfig.end())
     {
-        return def_val;
+        auto it = s_it->second.find(key);
+        if (it != s_it->second.end())
+        {
+            return it->second;
+        }
+        else
+        {
+            return def_val;
+        }
     }
     else
     {
-        return it->second;
+        return def_val;
     }
 }
