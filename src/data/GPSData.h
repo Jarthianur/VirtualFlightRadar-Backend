@@ -22,11 +22,31 @@
 #ifndef SRC_DATA_GPSDATA_H_
 #define SRC_DATA_GPSDATA_H_
 
+#include <cstdint>
+
 class GPSData
 {
 public:
     GPSData();
     virtual ~GPSData();
+
+    void insertRMC();
+    void insertGGA();
+    std::string extractRMC();
+    std::string extractGGA();
+
+    std::int32_t getBaseAlt();
+    double getBaseLat();
+    double getBaseLong();
+
+private:
+    std::int32_t mBaseAlt = 0, mNrSats = 0, mFixQa = 0;
+    /**
+     * Base position in degree
+     */
+    double mBaseLat = 0.0, mBaseLong = 0.0;
+
+    std::string mGPGGAstr, mGPRMCstr;
 };
 
 #endif /* SRC_DATA_GPSDATA_H_ */
