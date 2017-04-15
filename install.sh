@@ -145,8 +145,7 @@ if [ $INST_SERVICE -eq 1 ]; then
     sudo sh -c "sed -e 's|%VFRB_NAME%|${VFRB_NAME}|' \
         -e 's|%VFRB_EXEC_PATH%|${VFRB_EXEC_PATH}/${VFRB_TARGET}|' \
         -e 's|%VFRB_INI_PATH%|${VFRB_INI_PATH}/${VFRB_INI}.ini|' \
-        -e 's|%VFRB_LOG_PATH%|${VFRB_NAME}.log|g' \
-        <${VFRB_ROOT}/service/vfrb.service >${VFRB_NAME}.service"
+        < ${VFRB_ROOT}/service/vfrb.service >${VFRB_NAME}.service"
     echo "${VFRB_NAME}.service created in $SYSD_PATH"
     sudo systemctl enable ${VFRB_NAME}.service
     echo ""

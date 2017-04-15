@@ -41,12 +41,8 @@ std::string ClimateData::extractWV()
 
 bool ClimateData::isValid()
 {
+    boost::lock_guard<boost::mutex> lock(this->mMutex);
     return mWVvalid;
-}
-
-double ClimateData::getPress()
-{
-    return mPress;
 }
 
 void ClimateData::insertWV(const std::string& wv)
@@ -56,17 +52,35 @@ void ClimateData::insertWV(const std::string& wv)
     mWVvalid = true;
 }
 
+/**
+ * Note:
+ * Assuming that climate input is received every (few) second(s),
+ * there is no need to enforce threadsafety and reduce performance by locks.
+ * These single operations are atomic, hence no undefined value may occure.
+ * Worst case is, that the reader gets an old value which is acceptable with
+ * this frequency of updates.
+ */
+
+double ClimateData::getPress()
+{
+    //boost::lock_guard<boost::mutex> lock(this->mMutex);
+    return mPress;
+}
+
 void ClimateData::setPress(double p)
 {
+    //boost::lock_guard<boost::mutex> lock(this->mMutex);
     mPress = p;
 }
 
 void ClimateData::setTemp(double t)
 {
+    //boost::lock_guard<boost::mutex> lock(this->mMutex);
     mTemp = t;
 }
 
 double ClimateData::getTemp()
 {
+    //boost::lock_guard<boost::mutex> lock(this->mMutex);
     return mTemp;
 }

@@ -184,8 +184,6 @@ $ sudo service {servicename} start
 
 ```bash
 $ journalctl -u {servicename}.service
-# or
-$ sudo cat /var/log/{servicename}.log
 ```
 
 **Examples:**
@@ -196,8 +194,6 @@ $ sudo service vfrb start
 $ sudo systemctl disable vfrb.service
 # ------
 $ journalctl -u vfrb.service
-# ------
-$ sudo cat /var/log/vfrb.log
 ```
 
 ## Future plans
