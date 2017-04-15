@@ -70,7 +70,7 @@ std::string GPSmodule::gpsfix()
     std::snprintf(
             mBuffer,
             GPSM_BUFF_S,
-            "$GPGGA,%02d%02d%02d,%02.0lf%06.4lf,%c,%03.0lf%07.4lf,%c,1,05,1,%d,M,%.1lf,M,,*",
+            "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,05,1,%d,M,%.1lf,M,,*",
             utc->tm_hour, utc->tm_min, utc->tm_sec, mLatDeg, mLatMin, mLatStr, mLongDeg,
             mLongMin, mLongStr, mBaseAlt, mBaseGeoid);
     csum = Math::checksum(mBuffer, sizeof(mBuffer));

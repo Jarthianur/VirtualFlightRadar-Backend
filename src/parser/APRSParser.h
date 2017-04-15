@@ -28,8 +28,6 @@
 
 #include "Parser.h"
 
-#define APRS_REGEX_ERR -3
-
 class APRSParser: public Parser
 {
 public:

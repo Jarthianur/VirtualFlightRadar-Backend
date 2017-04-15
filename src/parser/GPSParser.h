@@ -23,9 +23,12 @@
 #define SRC_PARSER_GPSPARSER_H_
 
 #include <cstdint>
+#include <boost/regex.hpp>
 #include <string>
 
 #include "Parser.h"
+
+#define GPS_REGEX_ERR -3
 
 class GPSParser: public Parser
 {
@@ -36,8 +39,11 @@ public:
     std::int32_t unpack(const std::string& /*msg*/) noexcept override;
 
 private:
-    std::int32_t mtAlt = 0;
-    double mtLat = 0.0, mtLong = 0.0;
+    //regex
+    const boost::regex mGpggaRE;
+    //tmps
+    std::int32_t mtAlt = 0, mtNrSats = 0, mtFixQa = 0;
+    double mtLat = 0.0, mtLong = 0.0, mtGeoid = 0.0;
 };
 
 #endif /* SRC_PARSER_GPSPARSER_H_ */

@@ -128,10 +128,10 @@ int main(int argc, char *argv[])
             assert(Math::dToI(-1.5), -2, eqi);
         })
         ->test("dmsToDeg", [&eqd]() {
-            assert(Math::dmsToDeg(0.0), 0.0, eqd);
-            assert(Math::dmsToDeg(90.303000), 90.50833, eqd);
-            assert(Math::dmsToDeg(180.0), 180.0, eqd);
-            assert(Math::dmsToDeg(-45.123456), 45.2096, eqd);
+            assert(Math::dmToDeg(0.0), 0.0, eqd);
+            assert(Math::dmToDeg(90.303000), 90.50833, eqd);
+            assert(Math::dmToDeg(180.0), 180.0, eqd);
+            assert(Math::dmToDeg(-45.123456), 45.2096, eqd);
         })
         ->test("calcIcaoHeight", [&eqd]() {
             assert(Math::calcIcaoHeight(0.0), 44330.769231, eqd);

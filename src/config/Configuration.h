@@ -33,8 +33,12 @@ public:
     virtual ~Configuration() noexcept;
 
     static std::int32_t base_altitude;
+    /**
+     * Base position in degree as decimal format.
+     */
     static double base_latitude;
     static double base_longitude;
+
     static double base_geoid;
     static double base_pressure;
     static double base_temp;

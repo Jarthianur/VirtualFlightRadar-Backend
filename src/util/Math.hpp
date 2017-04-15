@@ -69,20 +69,17 @@ inline std::int32_t dToI(double d)
 }
 
 /**
- * convert
- * ( degree, minute, second )
+ * convert : ddmm.hh ; h = 1/100 m
+ * ( degree, minute-as-decimal )
  * to degree
- * Used for APRS.
  * Sign is determined otherwise for this protocol.
  */
-inline double dmsToDeg(double dms)
+inline double dmToDeg(double dm)
 {
-    double absDms = std::abs(dms);
-    double d = std::floor(absDms);
-    double t = (absDms - d) * 100.0;
-    double m = std::floor(t);
-    // deg + min/60 + sec/3600
-    return d + (m / 60.0) + ((t - m) * 100.0) / 3600.0;
+    double absDm = std::abs(dm / 100.0);
+    double d = std::floor(absDm);
+    double m = (absDm - d) * 100.0 / 60.0;
+    return d + m;
 }
 
 /**
@@ -100,7 +97,7 @@ inline double calcIcaoHeight(double press)
 inline std::int32_t checksum(const char* sentence, std::size_t size)
 {
     std::int32_t csum = 0;
-    std::size_t i = 1;// $ in nmea str not included
+    std::size_t i = 1; // $ in nmea str not included
     while (sentence[i] != '*' && sentence[i] != '\0' && i < size)
     {
         csum ^= (std::int32_t) sentence[i++];

@@ -59,125 +59,118 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
     {
         return MSG_UNPACK_IGN;
     }
-    try
+
+    mtFullInfo = true;
+    boost::smatch match;
+    if (boost::regex_match(msg, match, mAprsRE))
     {
-        mtFullInfo = true;
-        boost::smatch match;
-        if (boost::regex_match(msg, match, mAprsRE))
+        try
         {
-            try
+            //time
+            mtTime = std::stoi(match.str(1));
+
+            //latitude
+            mtLat = Math::dmToDeg(std::stod(match.str(2)));
+            if (match.str(3).compare("S") == 0)
             {
-                //time
-                mtTime = std::stoi(match.str(1));
-
-                //latitude
-                mtLat = Math::dmsToDeg(std::stod(match.str(2)) / 100.0);
-                if (match.str(3).compare("S") == 0)
-                {
-                    mtLat = -mtLat;
-                }
-
-                //longitude
-                mtLong = Math::dmsToDeg(std::stod(match.str(4)) / 100.0);
-                if (match.str(5).compare("W") == 0)
-                {
-                    mtLong = -mtLong;
-                }
-
-                //altitude
-                mtAlt = Math::dToI(std::stod(match.str(8)) * Math::feet2m);
-                if (mtAlt > Configuration::filter_maxHeight)
-                {
-                    return MSG_UNPACK_IGN;
-                }
+                mtLat = -mtLat;
             }
-            catch (const std::logic_error& e)
+
+            //longitude
+            mtLong = Math::dmToDeg(std::stod(match.str(4)));
+            if (match.str(5).compare("W") == 0)
             {
-                return MSG_UNPACK_ERR;
+                mtLong = -mtLong;
             }
-            //comment
-            // climbrate / address / id / type
-            if (match.str(9).size() > 0)
+
+            //altitude
+            mtAlt = Math::dToI(std::stod(match.str(8)) * Math::feet2m);
+            if (mtAlt > Configuration::filter_maxHeight)
             {
-                std::string comm = match.str(9); // regex bug ! cannot work inplace, need to copy submatch.
-                boost::smatch comm_match;
-                if (boost::regex_match(comm, comm_match, mCommRE))
+                return MSG_UNPACK_IGN;
+            }
+        }
+        catch (const std::logic_error& e)
+        {
+            return MSG_UNPACK_ERR;
+        }
+        //comment
+        // climbrate / address / id / type
+        if (match.str(9).size() > 0)
+        {
+            std::string comm = match.str(9); // regex bug ! cannot work inplace, need to copy submatch.
+            boost::smatch comm_match;
+            if (boost::regex_match(comm, comm_match, mCommRE))
+            {
+                mtID = comm_match.str(2);
+                try
                 {
-                    mtID = comm_match.str(2);
-                    try
-                    {
-                        mtIDtype = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
-                        mtAcType = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C)
-                                >> 2;
-                    }
-                    catch (const std::logic_error& e)
-                    {
-                        return MSG_UNPACK_ERR;
-                    }
-                    try
-                    {
-                        mtClimbRate = std::stod(comm_match.str(3)) * Math::fpm2ms;
-                    }
-                    catch (const std::logic_error& e)
-                    {
-                        mtClimbRate = A_VALUE_NA;
-                        mtFullInfo = false;
-                    }
-                    try
-                    {
-                        mtTurnRate = std::stod(comm_match.str(4)) * 3.0; // 1rot = 1 halfcircle / 1 min => 3° / 1s
-                    }
-                    catch (const std::logic_error& e)
-                    {
-                        mtTurnRate = A_VALUE_NA;
-                        mtFullInfo = false;
-                    }
+                    mtIDtype = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
+                    mtAcType = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C) >> 2;
                 }
-                else
+                catch (const std::logic_error& e)
                 {
-                    return MSG_UNPACK_IGN;
+                    return MSG_UNPACK_ERR;
+                }
+                try
+                {
+                    mtClimbRate = std::stod(comm_match.str(3)) * Math::fpm2ms;
+                }
+                catch (const std::logic_error& e)
+                {
+                    mtClimbRate = A_VALUE_NA;
+                    mtFullInfo = false;
+                }
+                try
+                {
+                    mtTurnRate = std::stod(comm_match.str(4)) * 3.0; // 1rot = 1 halfcircle / 1 min => 3° / 1s
+                }
+                catch (const std::logic_error& e)
+                {
+                    mtTurnRate = A_VALUE_NA;
+                    mtFullInfo = false;
                 }
             }
             else
             {
                 return MSG_UNPACK_IGN;
             }
-
-            //track/gnd_speed
-            try
-            {
-                mtHeading = std::stod(match.str(6));
-            }
-            catch (const std::logic_error& e)
-            {
-                mtHeading = A_VALUE_NA;
-                mtFullInfo = false;
-            }
-            try
-            {
-                mtGndSpeed = std::stod(match.str(7)) * Math::kts2ms;
-            }
-            catch (const std::logic_error& e)
-            {
-                mtGndSpeed = A_VALUE_NA;
-                mtFullInfo = false;
-            }
-            Aircraft ac(mtID, mtLat, mtLong, mtAlt, mtGndSpeed, mtIDtype, mtAcType,
-                        mtClimbRate, mtTurnRate, mtHeading);
-            ac.setAltQNE(false);
-            ac.setFullInfo(mtFullInfo);
-            ac.setTargetT(Aircraft::TargetType::FLARM);
-            VFRB::msAcCont.insertAircraft(ac);
         }
         else
         {
             return MSG_UNPACK_IGN;
         }
+
+        //track/gnd_speed
+        try
+        {
+            mtHeading = std::stod(match.str(6));
+        }
+        catch (const std::logic_error& e)
+        {
+            mtHeading = A_VALUE_NA;
+            mtFullInfo = false;
+        }
+        try
+        {
+            mtGndSpeed = std::stod(match.str(7)) * Math::kts2ms;
+        }
+        catch (const std::logic_error& e)
+        {
+            mtGndSpeed = A_VALUE_NA;
+            mtFullInfo = false;
+        }
+        Aircraft ac(mtID, mtLat, mtLong, mtAlt, mtGndSpeed, mtIDtype, mtAcType,
+                    mtClimbRate, mtTurnRate, mtHeading);
+        ac.setAltQNE(false);
+        ac.setFullInfo(mtFullInfo);
+        ac.setTargetT(Aircraft::TargetType::FLARM);
+        VFRB::msAcCont.insertAircraft(ac);
     }
-    catch (const std::runtime_error& e)
+    else
     {
-        Logger::error("(APRSParser) regex: ", e.what());
-        return APRS_REGEX_ERR;
+        return MSG_UNPACK_IGN;
     }
+
     return MSG_UNPACK_SUC;
 }
