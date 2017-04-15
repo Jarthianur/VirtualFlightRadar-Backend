@@ -196,12 +196,12 @@ int main(int argc, char *argv[])
             assert(pars_wind.unpack("Someone sent other stuff"), MSG_UNPACK_IGN, eqi);
         })
         ->test("broken msg", [&]() {
-            assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3E"), MSG_UNPACK_ERR, eqi);
-            assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,,,,,,,,,,,,,,*3E"), MSG_UNPACK_ERR, eqi);
-            assert(pars_wind.unpack("$WIMDA,"), MSG_UNPACK_ERR, eqi);
-            assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0#091,B,14.8,C,,,,,,,,,,,,,,*3E"), MSG_UNPACK_ERR, eqi);
-            assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,1#4.8,C,,,,,,,,,,,,,,*3E"), MSG_UNPACK_ERR, eqi);
-            assert(pars_wind.unpack(""), MSG_UNPACK_IGN, eqi);
+            assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3F"), MSG_UNPACK_ERR, eqi);
+            assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,,,,,,,,,,,,,,*51"), MSG_UNPACK_ERR, eqi);
+            assert(pars_wind.unpack("$WIMDA,"), MSG_UNPACK_IGN, eqi);
+            assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0#091,B,14.8,C,,,,,,,,,,,,,,*1d"), MSG_UNPACK_ERR, eqi);
+            assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,1#4.8,C,,,,,,,,,,,,,,*1d"), MSG_UNPACK_ERR, eqi);
+            assert(pars_wind.unpack(""), MSG_UNPACK_ERR, eqi);
         })
         ->test<ClimateData>("extract WIMWV", [&eqs, &eqb]() {
             assert(VFRB::msClimateData.extractWV(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), eqs);
