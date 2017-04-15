@@ -45,7 +45,7 @@ std::int32_t GPSParser::unpack(const std::string& msg) noexcept
 {
     try
     {
-        std::int32_t csum = std::stoi(msg.substr(msg.length() - 3, 2), nullptr, 16);
+        std::int32_t csum = std::stoi(msg.substr(msg.length() - 2, 2), nullptr, 16);
         if (csum != Math::checksum(msg.c_str(), msg.length()))
         {
             return MSG_UNPACK_IGN;
