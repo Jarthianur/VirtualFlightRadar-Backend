@@ -86,10 +86,6 @@ public:
     {
         return mValid;
     }
-    inline const bool isAltQNE() const
-    {
-        return mAltAsQNE;
-    }
     inline const double getLatitude() const
     {
         return mLatitude;
@@ -127,10 +123,6 @@ public:
     {
         mTargetType = tt;
     }
-    inline void setAltQNE(bool qne = true)
-    {
-        mAltAsQNE = qne;
-    }
     inline void setFullInfo(bool info = true)
     {
         mFullInfo = info;
@@ -152,9 +144,6 @@ private:
 
     //0 = valid; +x(cycles) = invalid
     std::uint32_t mValid = 0;
-
-    //differ altitude (GPS from FLARM, QNE from TRANSPONDER)
-    bool mAltAsQNE = false;
 
     /**
      * position

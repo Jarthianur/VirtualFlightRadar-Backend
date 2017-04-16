@@ -164,7 +164,6 @@ std::int32_t APRSParser::unpack(const std::string& msg) noexcept
             }
             Aircraft ac(mtID, mtLat, mtLong, mtAlt, mtGndSpeed, mtIDtype, mtAcType,
                         mtClimbRate, mtTurnRate, mtHeading);
-            ac.setAltQNE(false);
             ac.setFullInfo(mtFullInfo);
             ac.setTargetT(Aircraft::TargetType::FLARM);
             VFRB::msAcCont.insertAircraft(ac);

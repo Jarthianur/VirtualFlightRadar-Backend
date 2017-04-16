@@ -132,7 +132,6 @@ std::int32_t SBSParser::unpack(const std::string& msg) noexcept
         p = delim + 1;
     }
     Aircraft ac(mtID, mtLat, mtLong, mtAlt);
-    ac.setAltQNE();
     ac.setFullInfo(false);
     ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
     VFRB::msAcCont.insertAircraft(ac);

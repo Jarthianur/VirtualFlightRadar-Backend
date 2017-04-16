@@ -67,7 +67,6 @@ void Aircraft::update(const Aircraft& ac)
     this->mClimbRate = ac.mClimbRate;
     this->mTurnRate = ac.mTurnRate;
     this->mFullInfo = ac.mFullInfo;
-    this->mAltAsQNE = ac.mAltAsQNE;
     this->mTargetType = ac.mTargetType;
     this->mValid = 0;
 }

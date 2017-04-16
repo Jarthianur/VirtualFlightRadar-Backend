@@ -123,7 +123,7 @@ void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
     mtRelN = Math::dToI(std::cos(Math::radian(mtBearingAbs)) * mtDist);
     mtRelE = Math::dToI(std::sin(Math::radian(mtBearingAbs)) * mtDist);
     mtRelV =
-            ac.isAltQNE() ?
+            ac.getTargetT() == Aircraft::TargetType::TRANSPONDER ?
                     ac.getAltitude() - Math::calcIcaoHeight(
                             VFRB::msClimateData.getPress()) : ac.getAltitude() - mBaseAlt;
 }
