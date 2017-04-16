@@ -24,7 +24,9 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
+#include "../vfrb/Feed.h"
 
 class Configuration
 {

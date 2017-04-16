@@ -26,6 +26,28 @@
 #include "../util/Logger.h"
 #include "ConfigReader.h"
 
+#define SECT_KEY_FALLBACK  "fallback"
+#define SECT_KEY_GENERAL   "general"
+#define SECT_KEY_FILTER    "filter"
+#define SECT_KEY_APRSC     "aprsc"
+#define SECT_KEY_SBS       "sbs"
+#define SECT_KEY_GPS       "gps"
+#define SECT_KEY_SENS      "sens"
+#define KV_KEY_FEEDS       "feeds"
+#define KV_KEY_LATITUDE    "latitude"
+#define KV_KEY_LONGITUDE   "longitude"
+#define KV_KEY_ALTITUDE    "altitude"
+#define KV_KEY_GEOID       "geoid"
+#define KV_KEY_PRESSURE    "pressure"
+#define KV_KEY_TEMPERATURE "temperature"
+#define KV_KEY_MAX_DIST    "maxDist"
+#define KV_KEY_MAX_HEIGHT  "maxHeight"
+#define KV_KEY_SERVER_PORT "serverPort"
+#define KV_KEY_HOST        "host"
+#define KV_KEY_PORT        "port"
+#define KV_KEY_PRIORITY    "priority"
+#define KV_KEY_LOGIN       "login"
+
 Configuration::Configuration(const char* file)
 {
     if (!readConfig(file))
@@ -50,7 +72,6 @@ std::uint16_t Configuration::global_server_port = 1;
 
 std::string Configuration::global_feeds;
 
-
 bool Configuration::readConfig(const char* file)
 {
     ConfigReader cr(file);
@@ -69,72 +90,62 @@ bool Configuration::readConfig(const char* file)
         return false;
     }
 
-    Configuration::base_latitude = strToDouble(cr.getProperty("latitude", "0.0"));
-    Logger::info("(Config) latitude: ", std::to_string(Configuration::base_latitude));
+    // get fallbacks
+    base_latitude = strToDouble(
+            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0"));
+    Logger::info("(Config) "KV_KEY_LATITUDE": ", std::to_string(base_latitude));
 
-    Configuration::base_longitude = strToDouble(cr.getProperty("longitude", "0.0"));
-    Logger::info("(Config) longitude: ", std::to_string(Configuration::base_longitude));
+    base_longitude = strToDouble(
+            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0"));
+    Logger::info("(Config) "KV_KEY_LONGITUDE": ", std::to_string(base_longitude));
 
-    Configuration::base_altitude = strToInt(cr.getProperty("altitude", "0"));
-    Logger::info("(Config) altitude: ", std::to_string(Configuration::base_altitude));
+    base_altitude = strToInt(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
+    Logger::info("(Config) "KV_KEY_ALTITUDE": ", std::to_string(base_altitude));
 
-    Configuration::base_geoid = strToDouble(cr.getProperty("geoid", "0.0"));
-    Logger::info("(Config) geoid: ", std::to_string(Configuration::base_geoid));
+    base_geoid = strToDouble(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
+    Logger::info("(Config) "KV_KEY_GEOID": ", std::to_string(base_geoid));
 
-    Configuration::base_pressure = strToDouble(cr.getProperty("pressure", "1013.25"));
-    Logger::info("(Config) pressure: ", std::to_string(Configuration::base_pressure));
+    base_pressure = strToDouble(
+            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25"));
+    Logger::info("(Config) "KV_KEY_PRESSURE": ", std::to_string(base_pressure));
 
-    Configuration::base_temp = strToDouble(cr.getProperty("temp", "15.0"));
-    Logger::info("(Config) temp: ", std::to_string(Configuration::base_temp));
+    base_temp = strToDouble(
+            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_TEMPERATURE, "15.0"));
+    Logger::info("(Config) "KV_KEY_TEMPERATURE": ", std::to_string(base_temp));
 
-    Configuration::global_server_port = (uint16_t) strToInt(
-            cr.getProperty("serverPort", "9999"));
-    Logger::info("(Config) serverPort: ",
-                 std::to_string(Configuration::global_server_port));
-    Logger::debug(cr.getProperty("serverPort", "9999"));
-
-    Configuration::global_aprsc_port = cr.getProperty("aprscPort", "9998");
-    Logger::info("(Config) aprscPort: ", Configuration::global_aprsc_port);
-
-    Configuration::global_sbs_port = cr.getProperty("sbsPort", "9997");
-    Logger::info("(Config) sbsPort: ", Configuration::global_sbs_port);
-
-    Configuration::global_aprsc_host = cr.getProperty("aprscHost", "nA");
-    Logger::info("(Config) aprscHost: ", Configuration::global_aprsc_host);
-
-    Configuration::global_sbs_host = cr.getProperty("sbsHost", "nA");
-    Logger::info("(Config) sbsHost: ", Configuration::global_sbs_host);
-
-    Configuration::global_aprsc_login = cr.getProperty("aprscLogin", "");
-    Logger::info("(Config) aprscLogin: ", Configuration::global_aprsc_login);
-
-    Configuration::global_climate_host = cr.getProperty("climateSensorHost", "nA");
-    Logger::info("(Config) climateSensorHost: ", Configuration::global_climate_host);
-
-    Configuration::global_climate_port = cr.getProperty("climateSensorPort", "0");
-    Logger::info("(Config) climateSensorPort: ", Configuration::global_climate_port);
-
-    std::string tmp = cr.getProperty("maxHeight", "-1");
+    // get filters
+    std::string tmp = cr.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT, "-1");
     if (tmp == "-1")
     {
-        Configuration::filter_maxHeight = INT32_MAX;
+        filter_maxHeight = INT32_MAX;
     }
     else
     {
-        Configuration::filter_maxHeight = strToInt(tmp);
+        filter_maxHeight = strToInt(tmp);
     }
-    Logger::info("(Config) maxHeight: ", std::to_string(Configuration::filter_maxHeight));
+    Logger::info("(Config) "KV_KEY_MAX_HEIGHT": ", std::to_string(filter_maxHeight));
 
-    tmp = cr.getProperty("maxDist", "-1");
+    tmp = cr.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_DIST, "-1");
     if (tmp == "-1")
     {
-        Configuration::filter_maxDist = INT32_MAX;
+        filter_maxDist = INT32_MAX;
     }
     else
     {
-        Configuration::filter_maxDist = strToInt(tmp);
+        filter_maxDist = strToInt(tmp);
     }
-    Logger::info("(Config) maxDist: ", std::to_string(Configuration::filter_maxDist));
+    Logger::info("(Config) "KV_KEY_MAX_DIST": ", std::to_string(filter_maxDist));
+
+    // get general
+    global_server_port = (uint16_t) strToInt(
+            cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "9999"));
+    Logger::info("(Config) "KV_KEY_SERVER_PORT": ", std::to_string(global_server_port));
+
+    std::string feeds = cr.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS);
+    while (feeds.length() > 0)
+    {
+
+    }
 
     return false;
 }
