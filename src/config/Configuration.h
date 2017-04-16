@@ -22,11 +22,13 @@
 #ifndef SRC_CONFIG_CONFIGURATION_H_
 #define SRC_CONFIG_CONFIGURATION_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>
 
 #include "../vfrb/Feed.h"
+#include "ConfigReader.h"
 
 #define SECT_KEY_FALLBACK  "fallback"
 #define SECT_KEY_GENERAL   "general"

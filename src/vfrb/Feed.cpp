@@ -27,7 +27,7 @@
 #include "../tcp/client/SensorClient.h"
 
 Feed::Feed(const std::string& name, Priority prio, InputType type,
-           std::unordered_map<std::string, std::string>& kvmap)
+           const std::unordered_map<std::string, std::string>& kvmap)
         : mName(name),
           mPriority(prio),
           mType(type),
@@ -37,6 +37,19 @@ Feed::Feed(const std::string& name, Priority prio, InputType type,
 
 Feed::~Feed() noexcept
 {
+}
+
+Feed::Feed(BOOST_RV_REF(Feed) other)
+: mName(other.mName),
+  mPriority(other.mPriority),
+  mType(other.mType),
+  mKVmap(other.mKVmap)
+{
+}
+
+Feed& Feed::operator =(BOOST_RV_REF(Feed))
+{
+    return *this;
 }
 
 void Feed::run(boost::asio::signal_set& sigset)

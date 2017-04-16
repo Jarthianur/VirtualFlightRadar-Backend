@@ -56,7 +56,7 @@ VFRB::~VFRB() noexcept
 
 void VFRB::run() noexcept
 {
-    Logger::info("(VFRB) startup");
+    /*Logger::info("(VFRB) startup");
     //store start time
     boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
 
@@ -181,7 +181,7 @@ void VFRB::run() noexcept
     time_str += std::to_string(runtime.count() % 60);
     time_str += " mins";
 
-    Logger::info("EXITING / runtime: ", time_str);
+    Logger::info("EXITING / runtime: ", time_str);*/
 }
 
 void VFRB::handleNMAEServer(NMEAServer& server)
@@ -194,31 +194,31 @@ void VFRB::handleNMAEServer(NMEAServer& server)
 
 void VFRB::handleClimateInput(boost::asio::signal_set& sigset)
 {
-    if (!global_climate_enabled)
+    /*if (!global_climate_enabled)
     {
         return;
     }
     SensorClient client(sigset, Configuration::global_climate_host,
                       Configuration::global_climate_port);
     Logger::info("(WindClient) startup: ", Configuration::global_climate_host);
-    client.run();
+    client.run();*/
 }
 
 void VFRB::handleSBSInput(boost::asio::signal_set& sigset)
 {
-    if (!global_sbs_enabled)
+    /*if (!global_sbs_enabled)
     {
         return;
     }
     SBSClient client(sigset, Configuration::global_sbs_host,
                      Configuration::global_sbs_port);
     Logger::info("(SBSClient) startup: ", Configuration::global_sbs_host);
-    client.run();
+    client.run();*/
 }
 
 void VFRB::handleAPRSCInput(boost::asio::signal_set& sigset)
 {
-    if (!global_aprsc_enabled)
+    /*if (!global_aprsc_enabled)
     {
         return;
     }
@@ -226,7 +226,7 @@ void VFRB::handleAPRSCInput(boost::asio::signal_set& sigset)
                        Configuration::global_aprsc_port,
                        Configuration::global_aprsc_login);
     Logger::info("(APRSCClient) startup: ", Configuration::global_aprsc_host);
-    client.run();
+    client.run();*/
 }
 
 void VFRB::handleSignals(const boost::system::error_code& ec, const int sig)

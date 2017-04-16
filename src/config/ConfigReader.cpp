@@ -61,7 +61,7 @@ void ConfigReader::read()
             }
             if (line.at(0) == '[')
             {
-                section = line.substr(1, line.rfind(']', line.length() - 1) - 1);
+                section = line.substr(1, line.rfind(']') - 1);
                 if (!mConfig.emplace(
                         std::make_pair(section,
                                        std::unordered_map<std::string, std::string>())).second)
@@ -69,6 +69,7 @@ void ConfigReader::read()
                     Logger::debug("COULD NOT CREATE SECTION");
                 }
                 Logger::debug("new section: ", section);
+                continue;
             }
             boost::smatch match;
             if (boost::regex_match(line, match, mConfRE))

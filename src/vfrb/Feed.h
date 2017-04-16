@@ -28,11 +28,14 @@
 #include <string>
 #include <typeindex>
 #include <unordered_map>
+#include <boost/move/utility_core.hpp>
 
 class Client;
 
 class Feed
 {
+BOOST_MOVABLE_BUT_NOT_COPYABLE(Feed)
+
 public:
     enum class InputType
         : std::uint32_t
@@ -53,8 +56,11 @@ public:
     };
 
     Feed(const std::string& /*name*/, Priority /*prio*/, InputType /*type*/,
-         std::unordered_map<std::string, std::string>& /*kvmap*/);
+         const std::unordered_map<std::string, std::string>& /*kvmap*/);
     virtual ~Feed() noexcept;
+
+    Feed(BOOST_RV_REF(Feed));
+    Feed& operator=(BOOST_RV_REF(Feed));
 
     void run(boost::asio::signal_set& /*sigset*/);
 
