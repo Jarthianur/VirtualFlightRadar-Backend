@@ -77,7 +77,7 @@ std::int32_t WindParser::unpack(const std::string& msg) noexcept
         {
             return MSG_UNPACK_ERR;
         }
-        try
+        /*try
         {
             mtB = msg.find('C') - 1;
             mtS = msg.substr(0, mtB).find_last_of(',') + 1;
@@ -95,7 +95,7 @@ std::int32_t WindParser::unpack(const std::string& msg) noexcept
         catch (std::logic_error& e)
         {
             return MSG_UNPACK_ERR;
-        }
+        }*/
     }
     else
     {

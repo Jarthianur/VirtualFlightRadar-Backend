@@ -19,41 +19,29 @@
  }
  */
 
-#ifndef SRC_DATA_CLIMATEDATA_H_
-#define SRC_DATA_CLIMATEDATA_H_
+#ifndef SRC_UTIL_PRIORITY_H_
+#define SRC_UTIL_PRIORITY_H_
 
-#include <boost/thread/mutex.hpp>
-#include <string>
+#include <cstdint>
 
-#include "../config/Configuration.h"
-
-#define ICAO_STD_A 1013.25
-#define ICAO_STD_T 15.0
-
-class ClimateData
-{
-public:
-    ClimateData();
-    virtual ~ClimateData() noexcept;
-
-    /**
-     * Get WIMWV sentence.
-     * Set valid to false.
-     */
-    std::string extractWV();
-
-    /**
-     * Set WIMWV sentence.
-     * Set valid to true.
-     */
-    void insertWV(const std::string& /*wv*/);
-
-    double getPress();
-    void setPress(double /*p*/= Configuration::base_pressure, Priority /*prio*/);
-
-private:
-    struct Data<double> mPress;
-    struct Data<std::string> mWV;
+/**
+ * Priorities / update policies
+ * Override data if not valid, or lower.
+ *
+ * DONTCARE : used for single input (no other feed for this data),
+ *     or fallbacks. Overrides itself, but nothing else.
+ * LESSER: used as "I actually want input from other feed, but if not take it."
+ *     Overrides only DC, even not itself, until invalid.
+ * HIGHER: used for common backup feeds. Overrides itself and all but IMPORTANT.
+ * IMPORTANT: used for main feed. Overrides all, no matter what state.
+ */
+enum class Priority
+    : std::uint32_t
+    {
+        DONTCARE = 0,
+    LESSER = 1,
+    NORMAL = 2,
+    HIGHER = 3
 };
 
-#endif /* SRC_DATA_CLIMATEDATA_H_ */
+#endif /* SRC_UTIL_PRIORITY_H_ */

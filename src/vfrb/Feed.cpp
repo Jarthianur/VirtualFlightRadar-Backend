@@ -41,9 +41,9 @@ Feed::~Feed() noexcept
 
 Feed::Feed(BOOST_RV_REF(Feed) other)
 : mName(other.mName),
-  mPriority(other.mPriority),
-  mType(other.mType),
-  mKVmap(other.mKVmap)
+mPriority(other.mPriority),
+mType(other.mType),
+mKVmap(other.mKVmap)
 {
 }
 
@@ -75,7 +75,7 @@ void Feed::run(boost::asio::signal_set& sigset)
     }
     switch (mType)
     {
-        case Feed::InputType::APRSC:
+        case InputType::APRSC:
         {
             std::string login;
             auto it = mKVmap.find(KV_KEY_LOGIN);
@@ -90,13 +90,13 @@ void Feed::run(boost::asio::signal_set& sigset)
             mClient = std::unique_ptr<Client>(new APRSCClient(sigset, host, port, login));
             break;
         }
-        case Feed::InputType::SBS:
+        case InputType::SBS:
             mClient = std::unique_ptr<Client>(new SBSClient(sigset, host, port));
             break;
-        case Feed::InputType::SENSOR:
+        case InputType::SENSOR:
             mClient = std::unique_ptr<Client>(new SensorClient(sigset, host, port));
             break;
-            /*case Feed::InputType::GPS:
+            /*case InputType::GPS:
              mClient = std::unique_ptr<Client>(
              new GPSClient(sigset, host, port));
              break;*/

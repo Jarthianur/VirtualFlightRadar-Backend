@@ -30,6 +30,7 @@
 #include <unordered_map>
 
 #include "../util/Logger.h"
+#include "../util/Priority.h"
 
 Configuration::Configuration(const char* file)
 {
@@ -151,7 +152,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
         Logger::debug("item = \"", item + "\"");
     }
 
-    std::string prio_dc = std::to_string((std::uint32_t) Feed::Priority::DONTCARE);
+    std::string prio_dc = std::to_string((std::uint32_t) Priority::DONTCARE);
 
     for (auto it = feeds.cbegin(); it != feeds.cend(); ++it)
     {
@@ -160,8 +161,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
             try
             {
                 Feed f(*it,
-                       (Feed::Priority) strToInt(
-                               cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::APRSC, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
                 Logger::debug("made aprsc feed: ", *it);
@@ -175,8 +175,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
             try
             {
                 Feed f(*it,
-                       (Feed::Priority) strToInt(
-                               cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::SBS, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
                 Logger::debug("made sbs feed: ", *it);
@@ -190,8 +189,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
             try
             {
                 Feed f(*it,
-                       (Feed::Priority) strToInt(
-                               cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::SENSOR, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
                 Logger::debug("made sensor feed: ", *it);
@@ -205,8 +203,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
             try
             {
                 Feed f(*it,
-                       (Feed::Priority) strToInt(
-                               cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::GPS, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
                 Logger::debug("made gps feed: ", *it);

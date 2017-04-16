@@ -19,41 +19,19 @@
  }
  */
 
-#ifndef SRC_DATA_CLIMATEDATA_H_
-#define SRC_DATA_CLIMATEDATA_H_
+#ifndef SRC_DATA_DATA_H_
+#define SRC_DATA_DATA_H_
 
 #include <boost/thread/mutex.hpp>
-#include <string>
+#include "../util/Priority.h"
 
-#include "../config/Configuration.h"
-
-#define ICAO_STD_A 1013.25
-#define ICAO_STD_T 15.0
-
-class ClimateData
+template<typename T>
+struct Data
 {
-public:
-    ClimateData();
-    virtual ~ClimateData() noexcept;
-
-    /**
-     * Get WIMWV sentence.
-     * Set valid to false.
-     */
-    std::string extractWV();
-
-    /**
-     * Set WIMWV sentence.
-     * Set valid to true.
-     */
-    void insertWV(const std::string& /*wv*/);
-
-    double getPress();
-    void setPress(double /*p*/= Configuration::base_pressure, Priority /*prio*/);
-
-private:
-    struct Data<double> mPress;
-    struct Data<std::string> mWV;
+    T value;
+    bool valid;
+    Priority lastPriority;
+    boost::mutex mutex;
 };
 
-#endif /* SRC_DATA_CLIMATEDATA_H_ */
+#endif /* SRC_DATA_DATA_H_ */

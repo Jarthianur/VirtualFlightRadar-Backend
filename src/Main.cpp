@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 
     // set climate fallbacks
     VFRB::msClimateData.setPress();
-    VFRB::msClimateData.setTemp();
+    //VFRB::msClimateData.setTemp();
 
     // init containers processor
     VFRB::msAcCont.initProcessor(Configuration::base_latitude,

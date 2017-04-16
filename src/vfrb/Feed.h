@@ -23,12 +23,14 @@
 #define SRC_VFRB_FEED_H_
 
 #include <boost/asio/signal_set.hpp>
+#include <boost/move/core.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <typeindex>
 #include <unordered_map>
-#include <boost/move/utility_core.hpp>
+
+#include "../util/Priority.h"
 
 class Client;
 
@@ -44,15 +46,6 @@ public:
         SBS,
         GPS,
         SENSOR
-    };
-
-    enum class Priority
-        : std::uint32_t
-        {
-            DONTCARE = 0,
-        LESSER = 1,
-        HIGHER = 2,
-        IMPORTANT = 3
     };
 
     Feed(const std::string& /*name*/, Priority /*prio*/, InputType /*type*/,
