@@ -67,6 +67,11 @@ void ConfigReader::read()
             {
                 key = match.str(1);
                 value = match.str(2);
+                std::size_t l = value.find_last_not_of(' ');
+                if (l != std::string::npos)
+                {
+                    value = value.substr(0, l + 1);
+                }
                 mConfig[section].emplace(std::make_pair(key, value));
             }
             else

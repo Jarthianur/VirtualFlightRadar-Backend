@@ -104,7 +104,7 @@ void APRSCClient::handleLogin(const boost::system::error_code& ec, std::size_t s
 {
     if (!ec)
     {
-        Logger::info("(APRSCClient) connected to: ", mHost);
+        Logger::info("(APRSCClient) connected to: ", mHost + ":" + mPort);
         read();
     }
     else

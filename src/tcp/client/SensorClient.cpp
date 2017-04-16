@@ -123,7 +123,7 @@ void SensorClient::handleConnect(const boost::system::error_code& ec,
     if (!ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(WindClient) connected to: ", mHost);
+        Logger::info("(WindClient) connected to: ", mHost + ":" + mPort);
         read();
     }
     else

@@ -71,7 +71,7 @@ void Client::timedConnect() noexcept
 
 void Client::stop() noexcept
 {
-    Logger::info(mComponent + " stop connection to: ", mHost);
+    Logger::info(mComponent + " stop connection to: ", mHost + ":" + mPort);
     mConnectTimer.expires_at(boost::posix_time::pos_infin);
     mConnectTimer.cancel();
     boost::system::error_code ec;
@@ -96,7 +96,7 @@ void Client::handleTimedConnect(const boost::system::error_code& ec) noexcept
 {
     if (!ec)
     {
-        Logger::info(mComponent + " try connect to: ", mHost);
+        Logger::info(mComponent + " try connect to: ", mHost + ":" + mPort);
         connect();
     }
     else

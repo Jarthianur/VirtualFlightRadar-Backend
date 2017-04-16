@@ -79,7 +79,7 @@ void SBSClient::handleConnect(const boost::system::error_code& ec,
     if (!ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(SBSClient) connected to: ", mHost);
+        Logger::info("(SBSClient) connected to: ", mHost + ":" + mPort);
         read();
     }
     else

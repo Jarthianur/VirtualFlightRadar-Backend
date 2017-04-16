@@ -23,6 +23,9 @@
 #define SRC_DATA_DATA_HPP_
 
 #include <boost/thread/mutex.hpp>
+#include <cstdint>
+#include <string>
+
 #include "../util/Priority.h"
 
 template<typename T>
