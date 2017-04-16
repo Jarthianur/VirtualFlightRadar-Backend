@@ -22,6 +22,7 @@
 #ifndef SRC_VFRB_FEED_H_
 #define SRC_VFRB_FEED_H_
 
+#include <boost/asio/signal_set.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -42,14 +43,23 @@ public:
         SENSOR
     };
 
-    Feed(const std::string& /*name*/, std::uint32_t /*prio*/, InputType /*type*/,
+    enum class Priority
+        : std::uint32_t
+        {
+            DONTCARE = 0,
+        LESSER = 1,
+        HIGHER = 2,
+        IMPORTANT = 3
+    };
+
+    Feed(const std::string& /*name*/, Priority /*prio*/, InputType /*type*/,
          std::unordered_map<std::string, std::string>& /*kvmap*/);
     virtual ~Feed() noexcept;
 
     void run(boost::asio::signal_set& /*sigset*/);
 
     const std::string mName; //?
-    const std::uint32_t mPriority;
+    const Priority mPriority;
     const InputType mType;
 
 private:

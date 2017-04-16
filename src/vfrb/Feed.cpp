@@ -21,13 +21,12 @@
 
 #include "Feed.h"
 
-#include <boost/asio/signal_set.hpp>
-
+#include "../config/Configuration.h"
 #include "../tcp/client/APRSCClient.h"
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
 
-Feed::Feed(const std::string& name, std::uint32_t prio, InputType type,
+Feed::Feed(const std::string& name, Priority prio, InputType type,
            std::unordered_map<std::string, std::string>& kvmap)
         : mName(name),
           mPriority(prio),
@@ -42,24 +41,51 @@ Feed::~Feed() noexcept
 
 void Feed::run(boost::asio::signal_set& sigset)
 {
+    std::string host, port;
+    auto it = mKVmap.find(KV_KEY_HOST);
+    if (it != mKVmap.end())
+    {
+        host = it->second;
+    }
+    else
+    {
+        return;
+    }
+    it = mKVmap.find(KV_KEY_PORT);
+    if (it != mKVmap.end())
+    {
+        port = it->second;
+    }
+    else
+    {
+        return;
+    }
     switch (mType)
     {
         case Feed::InputType::APRSC:
-            mClient = std::unique_ptr<Client>(
-                    new APRSCClient(sigset, mKVmap.find("host"), mKVmap.find("port"),
-                                    mKVmap.find("login")));
+        {
+            std::string login;
+            auto it = mKVmap.find(KV_KEY_LOGIN);
+            if (it != mKVmap.end())
+            {
+                login = it->second;
+            }
+            else
+            {
+                return;
+            }
+            mClient = std::unique_ptr<Client>(new APRSCClient(sigset, host, port, login));
             break;
+        }
         case Feed::InputType::SBS:
-            mClient = std::unique_ptr<Client>(
-                    new SBSClient(sigset, mKVmap.find("host"), mKVmap.find("port")));
+            mClient = std::unique_ptr<Client>(new SBSClient(sigset, host, port));
             break;
         case Feed::InputType::SENSOR:
-            mClient = std::unique_ptr<Client>(
-                    new SensorClient(sigset, mKVmap.find("host"), mKVmap.find("port")));
+            mClient = std::unique_ptr<Client>(new SensorClient(sigset, host, port));
             break;
             /*case Feed::InputType::GPS:
              mClient = std::unique_ptr<Client>(
-             new GPSClient(sigset, mKVmap.find("host"), mKVmap.find("port")));
+             new GPSClient(sigset, host, port));
              break;*/
         default:
             return;

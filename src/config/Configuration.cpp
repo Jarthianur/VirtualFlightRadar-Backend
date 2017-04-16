@@ -21,36 +21,16 @@
 
 #include "Configuration.h"
 
+#include <iterator>
+#include <sstream>
 #include <stdexcept>
 
 #include "../util/Logger.h"
 #include "ConfigReader.h"
 
-#define SECT_KEY_FALLBACK  "fallback"
-#define SECT_KEY_GENERAL   "general"
-#define SECT_KEY_FILTER    "filter"
-#define SECT_KEY_APRSC     "aprsc"
-#define SECT_KEY_SBS       "sbs"
-#define SECT_KEY_GPS       "gps"
-#define SECT_KEY_SENS      "sens"
-#define KV_KEY_FEEDS       "feeds"
-#define KV_KEY_LATITUDE    "latitude"
-#define KV_KEY_LONGITUDE   "longitude"
-#define KV_KEY_ALTITUDE    "altitude"
-#define KV_KEY_GEOID       "geoid"
-#define KV_KEY_PRESSURE    "pressure"
-#define KV_KEY_TEMPERATURE "temperature"
-#define KV_KEY_MAX_DIST    "maxDist"
-#define KV_KEY_MAX_HEIGHT  "maxHeight"
-#define KV_KEY_SERVER_PORT "serverPort"
-#define KV_KEY_HOST        "host"
-#define KV_KEY_PORT        "port"
-#define KV_KEY_PRIORITY    "priority"
-#define KV_KEY_LOGIN       "login"
-
 Configuration::Configuration(const char* file)
 {
-    if (!readConfig(file))
+    if (!init(file))
     {
         throw std::logic_error("failed to read configuration file");
     }
@@ -70,9 +50,9 @@ std::int32_t Configuration::filter_maxHeight = 0;
 std::int32_t Configuration::filter_maxDist = 0;
 std::uint16_t Configuration::global_server_port = 1;
 
-std::string Configuration::global_feeds;
+std::vector<Feed> Configuration::global_feeds;
 
-bool Configuration::readConfig(const char* file)
+bool Configuration::init(const char* file)
 {
     ConfigReader cr(file);
     try
@@ -141,13 +121,76 @@ bool Configuration::readConfig(const char* file)
             cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "9999"));
     Logger::info("(Config) "KV_KEY_SERVER_PORT": ", std::to_string(global_server_port));
 
-    std::string feeds = cr.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS);
-    while (feeds.length() > 0)
-    {
-
-    }
+    registerFeeds(cr);
 
     return false;
+}
+
+std::size_t Configuration::registerFeeds(ConfigReader& cr)
+{
+    std::vector<std::string> feeds;
+    std::stringstream ss;
+    ss.str(cr.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+    std::string item;
+    while (std::getline(ss, item, ','))
+    {
+        feeds.push_back(item);
+    }
+
+    std::string prio_dc = std::to_string((std::uint32_t) Feed::Priority::DONTCARE);
+
+    for (auto it = feeds.rend(); it >= feeds.begin(); --it)
+    {
+        if (it->find(SECT_KEY_APRSC) != std::string::npos)
+        {
+            try
+            {
+                Feed f(*it, strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       Feed::InputType::APRSC, cr.getSectionKV(*it));
+                global_feeds.push_back(f);
+            }
+            catch (const std::out_of_range& e)
+            {
+            }
+        }
+        else if (it->find(SECT_KEY_SBS) != std::string::npos)
+        {
+            try
+            {
+                Feed f(*it, strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       Feed::InputType::SBS, cr.getSectionKV(*it));
+                global_feeds.push_back(f);
+            }
+            catch (const std::out_of_range& e)
+            {
+            }
+        }
+        else if (it->find(SECT_KEY_SENS) != std::string::npos)
+        {
+            try
+            {
+                Feed f(*it, strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       Feed::InputType::SENSOR, cr.getSectionKV(*it));
+                global_feeds.push_back(f);
+            }
+            catch (const std::out_of_range& e)
+            {
+            }
+        }
+        else if (it->find(SECT_KEY_GPS) != std::string::npos)
+        {
+            try
+            {
+                Feed f(*it, strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       Feed::InputType::GPS, cr.getSectionKV(*it));
+                global_feeds.push_back(f);
+            }
+            catch (const std::out_of_range& e)
+            {
+            }
+        }
+    }
+    return global_feeds.size();
 }
 
 std::int32_t Configuration::strToInt(const std::string& str) noexcept

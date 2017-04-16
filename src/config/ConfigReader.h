@@ -46,6 +46,9 @@ public:
                                   const std::string& /*key*/,
                                   const std::string& /*def_val*/= "") const;
 
+    const std::unordered_map<std::string, std::string>& getSectionKV(
+            const std::string& /*section*/) const;
+
 private:
     const std::string mFile;
     /**

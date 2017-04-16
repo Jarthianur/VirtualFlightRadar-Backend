@@ -21,11 +21,16 @@
 
 #include "ConfigReader.h"
 
-#include <boost/regex.hpp>
+#include <boost/regex/pattern_except.hpp>
+#include <boost/regex/v4/match_results.hpp>
+#include <boost/regex/v4/regbase.hpp>
+#include <boost/regex/v4/regex.hpp>
+#include <boost/regex/v4/regex_match.hpp>
 #include <fstream>
 #include <stdexcept>
+#include <typeindex>
 #include <utility>
-#include <initializer_list>
+
 #include "../util/Logger.h"
 
 ConfigReader::ConfigReader(const std::string& fname)
@@ -110,5 +115,19 @@ const std::string ConfigReader::getProperty(const std::string& section,
     else
     {
         return def_val;
+    }
+}
+
+const std::unordered_map<std::string, std::string>& ConfigReader::getSectionKV(
+        const std::string& section) const
+{
+    auto it = mConfig.find(section);
+    if (it != mConfig.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        throw std::out_of_range("section not found");
     }
 }
