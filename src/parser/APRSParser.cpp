@@ -167,7 +167,7 @@ std::int32_t APRSParser::unpack(const std::string& msg, Priority prio) noexcept
             ac.setAltQNE(false);
             ac.setFullInfo(mtFullInfo);
             ac.setTargetT(Aircraft::TargetType::FLARM);
-            VFRB::msAcCont.insertAircraft(ac);
+            VFRB::msAcCont.insertAircraft(ac, prio);
         }
         else
         {
