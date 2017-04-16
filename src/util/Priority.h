@@ -31,7 +31,7 @@
  * DONTCARE : used for single input (no other feed for this data),
  *     or fallbacks. Overrides itself, but nothing else.
  * LESSER: used as "I actually want input from other feed, but if not take it."
- *     Overrides only DC, even not itself, until invalid.
+ *     Overrides only DC, even not itself, until invalid. Data stays invalid.
  * NORMAL: used for common backup feeds. Overrides itself and all but HIGHER.
  * HIGHER: used for main feed. Overrides all, no matter what state.
  */

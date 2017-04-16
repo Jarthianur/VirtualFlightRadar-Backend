@@ -39,9 +39,6 @@
 #include "../util/GPSmodule.h"
 #include "../util/Logger.h"
 
-bool VFRB::global_climate_enabled = false;
-bool VFRB::global_aprsc_enabled = false;
-bool VFRB::global_sbs_enabled = false;
 bool VFRB::global_run_status = true;
 AircraftContainer VFRB::msAcCont;
 ClimateData VFRB::msClimateData;
@@ -87,8 +84,8 @@ void VFRB::run() noexcept
     NMEAServer server(signal_set, Configuration::global_server_port);
     boost::thread server_thread(boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
 
-    boost::thread_group threads;
     //init input threads
+    boost::thread_group threads;
     for (auto it = Configuration::global_feeds.begin();
             it != Configuration::global_feeds.end(); ++it)
     {
@@ -111,17 +108,14 @@ void VFRB::run() noexcept
             str = gpsm.gpsfix();
             server.writeToAll(str);
 
-            //write wind to clients
-            if (global_climate_enabled)
+            // write wind info to clients
+            str = msClimateData.getWVstr();
+            if (str.length() > 0)
             {
-                str = msClimateData.getWVstr();
-                if (str.length() > 0)
-                {
-                    server.writeToAll(str);
-                }
+                server.writeToAll(str);
             }
 
-            //synchronise cycles to ~VFRB_SYNC_TIME sec
+            //synchronise cycles to ~SYNC_TIME sec
             boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
         }
         catch (const std::exception& e)
@@ -164,46 +158,9 @@ void VFRB::handleNMAEServer(NMEAServer& server)
     global_run_status = false;
 }
 
-void VFRB::handleClimateInput(boost::asio::signal_set& sigset)
-{
-    /*if (!global_climate_enabled)
-     {
-     return;
-     }
-     SensorClient client(sigset, Configuration::global_climate_host,
-     Configuration::global_climate_port);
-     Logger::info("(WindClient) startup: ", Configuration::global_climate_host);
-     client.run();*/
-}
-
-void VFRB::handleSBSInput(boost::asio::signal_set& sigset)
-{
-    /*if (!global_sbs_enabled)
-     {
-     return;
-     }
-     SBSClient client(sigset, Configuration::global_sbs_host,
-     Configuration::global_sbs_port);
-     Logger::info("(SBSClient) startup: ", Configuration::global_sbs_host);
-     client.run();*/
-}
-
-void VFRB::handleAPRSCInput(boost::asio::signal_set& sigset)
-{
-    /*if (!global_aprsc_enabled)
-     {
-     return;
-     }
-     APRSCClient client(sigset, Configuration::global_aprsc_host,
-     Configuration::global_aprsc_port,
-     Configuration::global_aprsc_login);
-     Logger::info("(APRSCClient) startup: ", Configuration::global_aprsc_host);
-     client.run();*/
-}
-
 void VFRB::handleInputFeed(boost::asio::signal_set& sigset, Feed& feed)
 {
-    Logger::debug("(VFRB) run feed: ", feed.mName);
+    Logger::info("(VFRB) run feed: ", feed.mName);
     feed.run(sigset);
 }
 

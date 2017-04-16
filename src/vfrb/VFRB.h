@@ -50,9 +50,6 @@ public:
     /**
      * configuration
      */
-    static bool global_climate_enabled;
-    static bool global_aprsc_enabled;
-    static bool global_sbs_enabled;
     static bool global_run_status;
 
     /**
@@ -66,14 +63,10 @@ public:
 
 private:
     /**
-     * handlers for every thread
+     * handlers for threads
      */
     static void handleInputFeed(boost::asio::signal_set& /*sigset*/, Feed& /*feed*/);
-    static void handleSBSInput(boost::asio::signal_set& /*sigset*/);
-    static void handleAPRSCInput(boost::asio::signal_set& /*sigset*/);
-    static void handleClimateInput(boost::asio::signal_set& /*sigset*/);
     static void handleNMAEServer(NMEAServer& server);
-
     static void handleSignals(const boost::system::error_code& /*ec*/, const int /*sig*/);
 };
 

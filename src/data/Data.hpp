@@ -45,7 +45,7 @@ struct Data
         }
         if (write)
         {
-            valid = true;
+            valid = (prio != Priority::LESSER);
             value = nv;
             lastPriority = prio;
         }
