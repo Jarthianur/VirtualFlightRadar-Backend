@@ -25,6 +25,7 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include "../config/Parameters.h"
+#include "Feed.h"
 
 class AircraftContainer;
 class ClimateData;
@@ -67,6 +68,7 @@ private:
     /**
      * handlers for every thread
      */
+    static void handleInputFeed(boost::asio::signal_set& /*sigset*/, Feed& /*feed*/);
     static void handleSBSInput(boost::asio::signal_set& /*sigset*/);
     static void handleAPRSCInput(boost::asio::signal_set& /*sigset*/);
     static void handleClimateInput(boost::asio::signal_set& /*sigset*/);

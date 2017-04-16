@@ -127,7 +127,7 @@ bool Configuration::init(const char* file)
 
     Logger::info("(Config) Number of feeds: ", std::to_string(registerFeeds(cr)));
 
-    return false;//TODO true
+    return true;
 }
 
 std::size_t Configuration::registerFeeds(ConfigReader& cr)
