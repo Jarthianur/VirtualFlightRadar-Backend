@@ -32,6 +32,7 @@
 
 #include "../util/Priority.h"
 
+class Parser;
 class Client;
 
 class Feed
@@ -61,9 +62,14 @@ public:
     const Priority mPriority;
     const InputType mType;
 
+protected:
+    void process(const std::string& /*data*/) noexcept;
+    friend class Client;
+
 private:
     std::unordered_map<std::string, std::string> mKVmap;
-    std::unique_ptr<Client> mClient;
+    std::unique_ptr<Client> mpClient;
+    std::unique_ptr<Parser> mpParser;
 };
 
 #endif /* SRC_VFRB_FEED_H_ */

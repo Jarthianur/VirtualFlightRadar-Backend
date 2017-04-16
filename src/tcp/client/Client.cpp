@@ -25,11 +25,11 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <iostream>
-
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
 Client::Client(boost::asio::signal_set& sigset, const std::string& host,
-        const std::string& port, const std::string& comp, Priority prio)
+               const std::string& port, const std::string& comp, Feed& feed)
         : mIOservice(),
           mrSigSet(sigset),
           mSocket(mIOservice),
@@ -37,7 +37,7 @@ Client::Client(boost::asio::signal_set& sigset, const std::string& host,
           mHost(host),
           mPort(port),
           mComponent(comp),
-          mPriority(prio),
+          mrFeed(feed),
           mConnectTimer(mIOservice)
 
 {
@@ -115,7 +115,7 @@ void Client::handleRead(const boost::system::error_code& ec, std::size_t s) noex
     {
         std::istream is(&mBuffer);
         std::getline(is, mResponse);
-        process();
+        mrFeed.process(mResponse);
         read();
     }
     else if (ec != boost::system::errc::bad_file_descriptor)

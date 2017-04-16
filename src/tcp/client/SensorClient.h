@@ -28,7 +28,6 @@
 
 #include "Client.h"
 #include "../../config/Parameters.h"
-#include "../../parser/SensorParser.h"
 
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
 
@@ -39,12 +38,11 @@ public:
     SensorClient& operator=(const SensorClient&) = delete;
 
     SensorClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-               const std::string& /*port*/, Priority /*prio*/);
+                 const std::string& /*port*/, Feed& /*feed*/);
     virtual ~SensorClient() noexcept;
 
 private:
     void read() noexcept override;
-    void process() noexcept override;
     void connect() noexcept override;
     /**
      * Check read timed out.
@@ -65,10 +63,6 @@ private:
      * read timer
      */
     boost::asio::deadline_timer mTimeout;
-    /**
-     * Parser
-     */
-    SensorParser mParser;
 };
 
 #endif /* SRC_TCP_CLIENT_SENSORCLIENT_H_ */

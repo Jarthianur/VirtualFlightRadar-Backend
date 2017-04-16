@@ -27,7 +27,8 @@
 #include <cstddef>
 #include <string>
 #include "../../config/Parameters.h"
-#include "../../util/Priority.h"
+
+class Feed;
 
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
 
@@ -46,7 +47,7 @@ public:
 
 protected:
     Client(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-           const std::string& /*port*/, const std::string& /*comp*/, Priority /*prio*/);
+           const std::string& /*port*/, const std::string& /*comp*/, Feed& /*feed*/);
 
     /**
      * Register stop-handler to signals.
@@ -65,10 +66,6 @@ protected:
      * Read data.
      */
     virtual void read() noexcept;
-    /**
-     * Process read data.
-     */
-    virtual void process() noexcept = 0;
     /**
      * Connect to host.
      */
@@ -134,9 +131,9 @@ protected:
      */
     const std::string mComponent;
     /**
-     * Propagate priority to parser unpack.
+     * Parent feed.
      */
-    const Priority mPriority;
+    Feed& mrFeed;
 
 private:
     /**

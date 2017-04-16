@@ -26,7 +26,6 @@
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "../../parser/APRSParser.h"
 #include "Client.h"
 
 class APRSCClient: public Client
@@ -36,11 +35,11 @@ public:
     APRSCClient& operator=(const APRSCClient&) = delete;
 
     APRSCClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-                const std::string& /*port*/, const std::string& /*login*/, Priority /*prio*/);
+                const std::string& /*port*/, const std::string& /*login*/,
+                Feed& /*feed*/);
     virtual ~APRSCClient() noexcept;
 
 private:
-    void process() noexcept override;
     void connect() noexcept override;
 
     void handleResolve(const boost::system::error_code& /*ec*/,
@@ -56,10 +55,6 @@ private:
      * Login string
      */
     std::string mLoginStr;
-    /**
-     * Parser
-     */
-    APRSParser mParser;
 };
 
 #endif /* SRC_TCP_CLIENT_APRSCCLIENT_H_ */

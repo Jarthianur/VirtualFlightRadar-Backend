@@ -26,7 +26,6 @@
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "../../parser/SBSParser.h"
 #include "Client.h"
 
 class SBSClient: public Client
@@ -36,11 +35,10 @@ public:
     SBSClient& operator=(const SBSClient&) = delete;
 
     SBSClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-              const std::string& /*port*/, Priority /*prio*/);
+              const std::string& /*port*/, Feed& /*feed*/);
     virtual ~SBSClient() noexcept;
 
 private:
-    void process() noexcept override;
     void connect() noexcept override;
 
     void handleResolve(const boost::system::error_code& /*ec*/,
@@ -48,10 +46,6 @@ private:
     void handleConnect(const boost::system::error_code& /*ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
 
-    /**
-     * Parser
-     */
-    SBSParser mParser;
 };
 
 #endif /* SRC_TCP_CLIENT_SBSCLIENT_H_ */

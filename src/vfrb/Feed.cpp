@@ -22,6 +22,9 @@
 #include "Feed.h"
 
 #include "../config/Configuration.h"
+#include "../parser/APRSParser.h"
+#include "../parser/SBSParser.h"
+#include "../parser/SensorParser.h"
 #include "../tcp/client/APRSCClient.h"
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
@@ -91,24 +94,36 @@ void Feed::run(boost::asio::signal_set& sigset)
                 Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_LOGIN);
                 return;
             }
-            mClient = std::unique_ptr<Client>(
-                    new APRSCClient(sigset, host, port, login, mPriority));
+            mpParser = std::unique_ptr<Parser>(new APRSParser());
+            mpClient = std::unique_ptr<Client>(
+                    new APRSCClient(sigset, host, port, login, *this));
             break;
         }
         case InputType::SBS:
-            mClient = std::unique_ptr<Client>(
-                    new SBSClient(sigset, host, port, mPriority));
+        {
+            mpParser = std::unique_ptr<Parser>(new SBSParser());
+            mpClient = std::unique_ptr<Client>(new SBSClient(sigset, host, port, *this));
             break;
+        }
         case InputType::SENSOR:
-            mClient = std::unique_ptr<Client>(
-                    new SensorClient(sigset, host, port, mPriority));
+        {
+            mpParser = std::unique_ptr<Parser>(new SensorParser());
+            mpClient = std::unique_ptr<Client>(
+                    new SensorClient(sigset, host, port, *this));
             break;
-            /*case InputType::GPS:
+        }
+            /*case InputType::GPS:{
+             mpParser = std::unique_ptr<Parser>(new GPSParser());
              mClient = std::unique_ptr<Client>(
-             new GPSClient(sigset, host, port));
-             break;*/
+             new GPSClient(sigset, host, port, *this));
+             break;}*/
         default:
             return;
     }
-    mClient->run();
+    mpClient->run();
+}
+
+void Feed::process(const std::string& data) noexcept
+{
+    mpParser->unpack(data, mPriority);
 }

@@ -30,9 +30,8 @@
 #include "../../util/Logger.h"
 
 SBSClient::SBSClient(boost::asio::signal_set& sigset, const std::string& host,
-                     const std::string& port, Priority prio)
-        : Client(sigset, host, port, "(SBSClient)", prio),
-          mParser()
+                     const std::string& port, Feed& feed)
+        : Client(sigset, host, port, "(SBSClient)", feed)
 {
     connect();
 }
@@ -49,11 +48,6 @@ void SBSClient::connect() noexcept
             query,
             boost::bind(&SBSClient::handleResolve, this, boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
-}
-
-void SBSClient::process() noexcept
-{
-    mParser.unpack(mResponse, mPriority);
 }
 
 void SBSClient::handleResolve(const boost::system::error_code& ec,

@@ -29,11 +29,10 @@
 #include "../../util/Logger.h"
 
 SensorClient::SensorClient(boost::asio::signal_set& sigset, const std::string& host,
-                       const std::string& port, Priority prio)
-        : Client(sigset, host, port, "(WindClient)", prio),
+                           const std::string& port, Feed& feed)
+        : Client(sigset, host, port, "(WindClient)", feed),
           mStopped(false),
-          mTimeout(mIOservice),
-          mParser()
+          mTimeout(mIOservice)
 {
     connect();
     mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
@@ -87,13 +86,8 @@ void SensorClient::stop() noexcept
     mTimeout.cancel();
 }
 
-void SensorClient::process() noexcept
-{
-    mParser.unpack(mResponse, mPriority);
-}
-
 void SensorClient::handleResolve(const boost::system::error_code& ec,
-                               boost::asio::ip::tcp::resolver::iterator it) noexcept
+                                 boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
     if (mStopped)
     {
@@ -120,7 +114,7 @@ void SensorClient::handleResolve(const boost::system::error_code& ec,
 }
 
 void SensorClient::handleConnect(const boost::system::error_code& ec,
-                               boost::asio::ip::tcp::resolver::iterator it) noexcept
+                                 boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
     if (mStopped)
     {
