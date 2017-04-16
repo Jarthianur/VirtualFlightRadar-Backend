@@ -40,7 +40,7 @@ std::int32_t SensorParser::unpack(const std::string& msg, Priority prio) noexcep
 {
     try
     {
-        std::int32_t csum = std::stoi(msg.substr(msg.rfind('*', msg.length() - 1) + 1, 2),
+        std::int32_t csum = std::stoi(msg.substr(msg.rfind('*') + 1, 2),
                                       nullptr, 16);
         if (csum != Math::checksum(msg.c_str(), msg.length()))
         {
