@@ -68,17 +68,11 @@ inline std::int32_t dToI(double d)
     return (d >= 0.0) ? (std::int32_t) (d + 0.5) : (std::int32_t) (d - 0.5);
 }
 
-/**
- * convert : ddmm.hh ; h = 1/100 m
- * ( degree, minute-as-decimal )
- * to degree
- * Sign is determined otherwise for this protocol.
- */
-inline double dmToDeg(double dm)
+inline double dmsToDeg(double dms)
 {
-    double absDm = std::abs(dm / 100.0);
-    double d = std::floor(absDm);
-    double m = (absDm - d) * 100.0 / 60.0;
+    double absDms = std::abs(dms);
+    double d = std::floor(absDms);
+    double m = (absDms - d) * 100.0 / 60.0;
     return d + m;
 }
 
