@@ -30,6 +30,7 @@
 #include "../vfrb/Feed.h"
 #include "ConfigReader.h"
 
+// Keywords for configuration
 #define SECT_KEY_FALLBACK  "fallback"
 #define SECT_KEY_GENERAL   "general"
 #define SECT_KEY_FILTER    "filter"
@@ -55,7 +56,6 @@
 class Configuration
 {
 public:
-
     Configuration(const char* /*file*/);
     virtual ~Configuration() noexcept;
 
@@ -68,7 +68,6 @@ public:
     static std::int32_t filter_maxHeight;
     static std::int32_t filter_maxDist;
     static std::uint16_t global_server_port;
-
     static std::vector<Feed> global_feeds;
 
 private:

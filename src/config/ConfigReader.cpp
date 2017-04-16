@@ -21,11 +21,6 @@
 
 #include "ConfigReader.h"
 
-#include <boost/regex/pattern_except.hpp>
-#include <boost/regex/v4/match_results.hpp>
-#include <boost/regex/v4/regbase.hpp>
-#include <boost/regex/v4/regex.hpp>
-#include <boost/regex/v4/regex_match.hpp>
 #include <fstream>
 #include <stdexcept>
 #include <typeindex>
@@ -62,13 +57,9 @@ void ConfigReader::read()
             if (line.at(0) == '[')
             {
                 section = line.substr(1, line.rfind(']') - 1);
-                if (!mConfig.emplace(
+                mConfig.emplace(
                         std::make_pair(section,
-                                       std::unordered_map<std::string, std::string>())).second)
-                {
-                    Logger::debug("COULD NOT CREATE SECTION");
-                }
-                Logger::debug("new section: ", section);
+                                       std::unordered_map<std::string, std::string>()));
                 continue;
             }
             boost::smatch match;
@@ -77,7 +68,6 @@ void ConfigReader::read()
                 key = match.str(1);
                 value = match.str(2);
                 mConfig[section].emplace(std::make_pair(key, value));
-                Logger::debug(section + "." + key + " = ", value);
             }
             else
             {

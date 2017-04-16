@@ -125,9 +125,10 @@ bool Configuration::init(const char* file)
             cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "9999"));
     Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(global_server_port));
 
-    Logger::info("(Config) Number of feeds: ", std::to_string(registerFeeds(cr)));
+    std::size_t nrf = registerFeeds(cr);
+    Logger::info("(Config) number of feeds: ", std::to_string(nrf));
 
-    return true;
+    return nrf > 0;
 }
 
 std::size_t Configuration::registerFeeds(ConfigReader& cr)
@@ -166,6 +167,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
             }
             catch (const std::out_of_range& e)
             {
+                Logger::warn("(Config) create feed " + *it + ": ", e.what());
             }
         }
         else if (it->find(SECT_KEY_SBS) != std::string::npos)
@@ -179,6 +181,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
             }
             catch (const std::out_of_range& e)
             {
+                Logger::warn("(Config) create feed " + *it + ": ", e.what());
             }
         }
         else if (it->find(SECT_KEY_SENS) != std::string::npos)
@@ -192,6 +195,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
             }
             catch (const std::out_of_range& e)
             {
+                Logger::warn("(Config) create feed " + *it + ": ", e.what());
             }
         }
         else if (it->find(SECT_KEY_GPS) != std::string::npos)
@@ -205,6 +209,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
             }
             catch (const std::out_of_range& e)
             {
+                Logger::warn("(Config) create feed " + *it + ": ", e.what());
             }
         }
     }
