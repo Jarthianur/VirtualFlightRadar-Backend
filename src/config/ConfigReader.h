@@ -42,9 +42,9 @@ public:
      * Get value to given key from config map.
      * If key not found return given default.
      */
-    const std::string& getProperty(const std::string& /*section*/,
-                                   const std::string& /*key*/,
-                                   const std::string& /*def_val*/= "") const;
+    const std::string getProperty(const std::string& /*section*/,
+                                  const std::string& /*key*/,
+                                  const std::string& /*def_val*/= "") const;
 
 private:
     const std::string mFile;

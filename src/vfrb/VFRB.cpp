@@ -34,7 +34,7 @@
 #include "../data/ClimateData.h"
 #include "../tcp/client/APRSCClient.h"
 #include "../tcp/client/SBSClient.h"
-#include "../tcp/client/WindClient.h"
+#include "../tcp/client/SensorClient.h"
 #include "../tcp/server/NMEAServer.h"
 #include "../util/GPSmodule.h"
 #include "../util/Logger.h"
@@ -156,6 +156,11 @@ void VFRB::run() noexcept
             Logger::error("(VFRB) error: ", e.what());
             global_run_status = false;
         }
+        catch (...)
+        {
+            Logger::error("(VFRB) error");
+            global_run_status = false;
+        }
     }
 
     // exit sequence, join threads
@@ -193,7 +198,7 @@ void VFRB::handleClimateInput(boost::asio::signal_set& sigset)
     {
         return;
     }
-    WindClient client(sigset, Configuration::global_climate_host,
+    SensorClient client(sigset, Configuration::global_climate_host,
                       Configuration::global_climate_port);
     Logger::info("(WindClient) startup: ", Configuration::global_climate_host);
     client.run();

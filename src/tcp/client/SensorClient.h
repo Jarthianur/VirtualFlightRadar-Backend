@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_TCP_CLIENT_WINDCLIENT_H_
-#define SRC_TCP_CLIENT_WINDCLIENT_H_
+#ifndef SRC_TCP_CLIENT_SENSORCLIENT_H_
+#define SRC_TCP_CLIENT_SENSORCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
@@ -32,15 +32,15 @@
 
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
 
-class WindClient: public Client
+class SensorClient: public Client
 {
 public:
-    WindClient(const WindClient&) = delete;
-    WindClient& operator=(const WindClient&) = delete;
+    SensorClient(const SensorClient&) = delete;
+    SensorClient& operator=(const SensorClient&) = delete;
 
-    WindClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
+    SensorClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
                const std::string& /*port*/);
-    virtual ~WindClient() noexcept;
+    virtual ~SensorClient() noexcept;
 
 private:
     void read() noexcept override;
@@ -71,4 +71,4 @@ private:
     WindParser mParser;
 };
 
-#endif /* SRC_TCP_CLIENT_WINDCLIENT_H_ */
+#endif /* SRC_TCP_CLIENT_SENSORCLIENT_H_ */

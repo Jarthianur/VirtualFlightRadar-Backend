@@ -63,6 +63,7 @@ void ConfigReader::read()
                 {
                     Logger::debug("COULD NOT CREATE SECTION");
                 }
+                Logger::debug("new section: ", section);
             }
             boost::smatch match;
             if (boost::regex_match(line, match, mConfRE))
@@ -74,7 +75,7 @@ void ConfigReader::read()
             }
             else
             {
-                //Logger::error("(ConfigReader) malformed param: ", line);
+                Logger::error("(ConfigReader) malformed param: ", line);
             }
         }
         catch (const boost::regex_error& e)
@@ -89,9 +90,9 @@ void ConfigReader::read()
     }
 }
 
-const std::string& ConfigReader::getProperty(const std::string& section,
-                                             const std::string& key,
-                                             const std::string& def_val) const
+const std::string ConfigReader::getProperty(const std::string& section,
+                                            const std::string& key,
+                                            const std::string& def_val) const
 {
     auto s_it = mConfig.find(section);
     if (s_it != mConfig.end())

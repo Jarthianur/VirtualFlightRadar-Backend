@@ -19,36 +19,42 @@
  }
  */
 
-#ifndef SRC_CONFIG_CONFIGURATION_H_
-#define SRC_CONFIG_CONFIGURATION_H_
+#ifndef SRC_VFRB_FEED_H_
+#define SRC_VFRB_FEED_H_
 
 #include <cstdint>
+#include <memory>
 #include <string>
+#include <typeindex>
+#include <unordered_map>
 
+class Client;
 
-class Configuration
+class Feed
 {
 public:
+    enum class InputType
+        : std::uint32_t
+        {
+            APRSC,
+        SBS,
+        GPS,
+        SENSOR
+    };
 
-    Configuration(const char* /*file*/);
-    virtual ~Configuration() noexcept;
+    Feed(const std::string& /*name*/, std::uint32_t /*prio*/, InputType /*type*/,
+         std::unordered_map<std::string, std::string>& /*kvmap*/);
+    virtual ~Feed() noexcept;
 
-    static std::int32_t base_altitude;
-    static double base_latitude;
-    static double base_longitude;
-    static double base_geoid;
-    static double base_pressure;
-    static double base_temp;
-    static std::int32_t filter_maxHeight;
-    static std::int32_t filter_maxDist;
-    static std::uint16_t global_server_port;
+    void run(boost::asio::signal_set& /*sigset*/);
 
-    static std::vector<Feed> global_feeds;
+    const std::string mName; //?
+    const std::uint32_t mPriority;
+    const InputType mType;
 
 private:
-    bool readConfig(const char* /*file*/);
-    std::int32_t strToInt(const std::string& /*str*/) noexcept;
-    double strToDouble(const std::string& /*str*/) noexcept;
+    std::unordered_map<std::string, std::string> mKVmap;
+    std::unique_ptr<Client> mClient;
 };
 
-#endif /* SRC_CONFIG_CONFIGURATION_H_ */
+#endif /* SRC_VFRB_FEED_H_ */
