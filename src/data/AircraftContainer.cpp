@@ -28,6 +28,11 @@
 
 #include "../util/Logger.h"
 
+#define AC_NOT_FOUND          (-1)
+#define AC_INVALIDATE         (4)
+#define AC_DELETE_THRESHOLD   (120)
+#define AC_NO_FLARM_THRESHOLD (AC_INVALIDATE)
+
 AircraftContainer::AircraftContainer()
         : mAcProc(),
           mCont()

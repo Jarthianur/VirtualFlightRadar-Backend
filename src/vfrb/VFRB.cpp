@@ -39,6 +39,8 @@
 #include "../util/GPSmodule.h"
 #include "../util/Logger.h"
 
+#define SYNC_TIME (1)
+
 bool VFRB::global_climate_enabled = false;
 bool VFRB::global_aprsc_enabled = false;
 bool VFRB::global_sbs_enabled = false;
