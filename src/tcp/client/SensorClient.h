@@ -26,9 +26,9 @@
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "../../parser/WindParser.h"
 #include "Client.h"
 #include "../../config/Parameters.h"
+#include "../../parser/SensorParser.h"
 
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
 
@@ -39,7 +39,7 @@ public:
     SensorClient& operator=(const SensorClient&) = delete;
 
     SensorClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-               const std::string& /*port*/);
+               const std::string& /*port*/, Priority /*prio*/);
     virtual ~SensorClient() noexcept;
 
 private:
@@ -68,7 +68,7 @@ private:
     /**
      * Parser
      */
-    WindParser mParser;
+    SensorParser mParser;
 };
 
 #endif /* SRC_TCP_CLIENT_SENSORCLIENT_H_ */

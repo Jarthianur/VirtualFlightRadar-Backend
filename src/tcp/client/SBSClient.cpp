@@ -30,8 +30,8 @@
 #include "../../util/Logger.h"
 
 SBSClient::SBSClient(boost::asio::signal_set& sigset, const std::string& host,
-                     const std::string& port)
-        : Client(sigset, host, port, "(SBSClient)"),
+                     const std::string& port, Priority prio)
+        : Client(sigset, host, port, "(SBSClient)", prio),
           mParser()
 {
     connect();
@@ -53,7 +53,7 @@ void SBSClient::connect() noexcept
 
 void SBSClient::process() noexcept
 {
-    mParser.unpack(mResponse);
+    mParser.unpack(mResponse, mPriority);
 }
 
 void SBSClient::handleResolve(const boost::system::error_code& ec,

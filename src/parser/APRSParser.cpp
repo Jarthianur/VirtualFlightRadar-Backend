@@ -53,7 +53,7 @@ APRSParser::~APRSParser() noexcept
 {
 }
 
-std::int32_t APRSParser::unpack(const std::string& msg) noexcept
+std::int32_t APRSParser::unpack(const std::string& msg, Priority prio) noexcept
 {
     if (msg.size() > 0 && msg.at(0) == '#')
     {

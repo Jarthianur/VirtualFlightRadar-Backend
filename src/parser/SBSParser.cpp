@@ -39,7 +39,7 @@ SBSParser::~SBSParser() noexcept
 {
 }
 
-std::int32_t SBSParser::unpack(const std::string& msg) noexcept
+std::int32_t SBSParser::unpack(const std::string& msg, Priority prio) noexcept
 {
     /*
      * fields:

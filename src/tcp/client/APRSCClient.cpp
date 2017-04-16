@@ -30,8 +30,8 @@
 #include "../../util/Logger.h"
 
 APRSCClient::APRSCClient(boost::asio::signal_set& sigset, const std::string& host,
-                         const std::string& port, const std::string& login)
-        : Client(sigset, host, port, "(APRSCClient)"),
+                         const std::string& port, const std::string& login, Priority prio)
+        : Client(sigset, host, port, "(APRSCClient)", prio),
           mLoginStr(login),
           mParser()
 {
@@ -56,7 +56,7 @@ void APRSCClient::connect() noexcept
 
 void APRSCClient::process() noexcept
 {
-    mParser.unpack(mResponse);
+    mParser.unpack(mResponse, mPriority);
 }
 
 void APRSCClient::handleResolve(const boost::system::error_code& ec,

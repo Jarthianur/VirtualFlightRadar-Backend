@@ -29,8 +29,8 @@
 #include "../../util/Logger.h"
 
 SensorClient::SensorClient(boost::asio::signal_set& sigset, const std::string& host,
-                       const std::string& port)
-        : Client(sigset, host, port, "(WindClient)"),
+                       const std::string& port, Priority prio)
+        : Client(sigset, host, port, "(WindClient)", prio),
           mStopped(false),
           mTimeout(mIOservice),
           mParser()
@@ -89,7 +89,7 @@ void SensorClient::stop() noexcept
 
 void SensorClient::process() noexcept
 {
-    mParser.unpack(mResponse);
+    mParser.unpack(mResponse, mPriority);
 }
 
 void SensorClient::handleResolve(const boost::system::error_code& ec,

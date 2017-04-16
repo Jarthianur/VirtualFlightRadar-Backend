@@ -36,7 +36,7 @@ public:
     SBSClient& operator=(const SBSClient&) = delete;
 
     SBSClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-              const std::string& /*port*/);
+              const std::string& /*port*/, Priority /*prio*/);
     virtual ~SBSClient() noexcept;
 
 private:

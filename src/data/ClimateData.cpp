@@ -23,8 +23,8 @@
 #include <boost/thread/lock_guard.hpp>
 
 ClimateData::ClimateData()
-        : mPress(ICAO_STD_A)
 {
+    mPress.value = ICAO_STD_A;
 }
 
 ClimateData::~ClimateData() noexcept
@@ -37,7 +37,7 @@ std::string ClimateData::getWVstr()
     if (mWV.valid)
     {
         mWV.valid = false;
-        return mWV + "\r\n";
+        return mWV.value + "\r\n";
     }
     else
     {

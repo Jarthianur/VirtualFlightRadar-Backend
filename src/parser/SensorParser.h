@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_PARSER_WINDPARSER_H_
-#define SRC_PARSER_WINDPARSER_H_
+#ifndef SRC_PARSER_SENSORPARSER_H_
+#define SRC_PARSER_SENSORPARSER_H_
 
 #include <cstdint>
 #include <cstddef>
@@ -28,17 +28,17 @@
 
 #include "Parser.h"
 
-class WindParser: public Parser
+class SensorParser: public Parser
 {
 public:
-    WindParser();
-    virtual ~WindParser() noexcept;
+    SensorParser();
+    virtual ~SensorParser() noexcept;
 
-    std::int32_t unpack(const std::string& /*msg*/) noexcept override;
+    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
 
 private:
     std::size_t mtB = 0, mtS = 0, mtSubLen = 0, mtNumIdx = 0;
-    double mtPress = 0.0, mtTemp = 0.0;
+    double mtPress = 0.0;
 };
 
-#endif /* SRC_PARSER_WINDPARSER_H_ */
+#endif /* SRC_PARSER_SENSORPARSER_H_ */

@@ -36,7 +36,7 @@ public:
     APRSCClient& operator=(const APRSCClient&) = delete;
 
     APRSCClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-                const std::string& /*port*/, const std::string& /*login*/);
+                const std::string& /*port*/, const std::string& /*login*/, Priority /*prio*/);
     virtual ~APRSCClient() noexcept;
 
 private:

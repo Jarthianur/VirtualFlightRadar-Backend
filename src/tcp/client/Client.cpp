@@ -29,7 +29,7 @@
 #include "../../util/Logger.h"
 
 Client::Client(boost::asio::signal_set& sigset, const std::string& host,
-        const std::string& port, const std::string& comp)
+        const std::string& port, const std::string& comp, Priority prio)
         : mIOservice(),
           mrSigSet(sigset),
           mSocket(mIOservice),
@@ -37,6 +37,7 @@ Client::Client(boost::asio::signal_set& sigset, const std::string& host,
           mHost(host),
           mPort(port),
           mComponent(comp),
+          mPriority(prio),
           mConnectTimer(mIOservice)
 
 {

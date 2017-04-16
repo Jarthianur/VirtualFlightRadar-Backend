@@ -19,7 +19,7 @@
  }
  */
 
-#include "WindParser.h"
+#include "SensorParser.h"
 
 #include <stdexcept>
 
@@ -27,16 +27,16 @@
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
 
-WindParser::WindParser()
+SensorParser::SensorParser()
         : Parser()
 {
 }
 
-WindParser::~WindParser() noexcept
+SensorParser::~SensorParser() noexcept
 {
 }
 
-std::int32_t WindParser::unpack(const std::string& msg) noexcept
+std::int32_t SensorParser::unpack(const std::string& msg, Priority prio) noexcept
 {
     try
     {
@@ -62,7 +62,7 @@ std::int32_t WindParser::unpack(const std::string& msg) noexcept
             mtPress = std::stod(msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
             if (mtNumIdx == mtSubLen)
             {
-                VFRB::msClimateData.setPress(mtPress);
+                VFRB::msClimateData.setPress(prio, mtPress);
             }
             else
             {
@@ -95,7 +95,7 @@ std::int32_t WindParser::unpack(const std::string& msg) noexcept
     }
     else if (msg.find("WIMWV") != std::string::npos)
     {
-        VFRB::msClimateData.setWVstr(msg);
+        VFRB::msClimateData.setWVstr(prio, msg);
     }
     else
     {

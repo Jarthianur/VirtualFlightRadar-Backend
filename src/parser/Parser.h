@@ -25,6 +25,8 @@
 #include <cstdint>
 #include <string>
 
+#include "../util/Priority.h"
+
 #define MSG_UNPACK_SUC 0
 #define MSG_UNPACK_ERR -1
 #define MSG_UNPACK_IGN -2
@@ -40,7 +42,7 @@ public:
      * returns MSG_UNPACK_SUC on success, MSG_UNPACK_ERR on failure,
      * MSG_UNPACK_IGN when to ignore.
      */
-    virtual std::int32_t unpack(const std::string& /*msg*/) noexcept = 0;
+    virtual std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept = 0;
 
 };
 

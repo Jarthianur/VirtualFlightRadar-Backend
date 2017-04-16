@@ -33,7 +33,7 @@ public:
     SBSParser();
     virtual ~SBSParser() noexcept;
 
-    std::int32_t unpack(const std::string& /*msg*/) noexcept override;
+    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
 
 private:
     std::string mtID;

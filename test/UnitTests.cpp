@@ -31,7 +31,7 @@
 #include "../src/parser/APRSParser.h"
 #include "../src/parser/Parser.h"
 #include "../src/parser/SBSParser.h"
-#include "../src/parser/WindParser.h"
+#include "../src/parser/SensorParser.h"
 #include "../src/util/Math.hpp"
 #include "../src/vfrb/VFRB.h"
 #include "../src/util/GPSmodule.h"
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 
     SBSParser pars_sbs;
     APRSParser pars_aprs;
-    WindParser pars_wind;
+    SensorParser pars_wind;
 
     Configuration::filter_maxHeight = INT32_MAX;
     Configuration::filter_maxDist = INT32_MAX;
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
             Configuration::filter_maxHeight = INT32_MAX;
         });
 
-    describe<WindParser>("WindParser - unpack", runner)
+    describe<SensorParser>("WindParser - unpack", runner)
         ->test("valid msg", [&]() {
             assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"), MSG_UNPACK_SUC, eqi);
             assert(pars_wind.unpack("$WIMWV,242.8,R,6.9,N,A*20"), MSG_UNPACK_SUC, eqi);

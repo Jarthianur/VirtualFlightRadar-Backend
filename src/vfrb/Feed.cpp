@@ -25,6 +25,7 @@
 #include "../tcp/client/APRSCClient.h"
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
+#include "../util/Logger.h"
 
 Feed::Feed(const std::string& name, Priority prio, InputType type,
            const std::unordered_map<std::string, std::string>& kvmap)
@@ -90,14 +91,17 @@ void Feed::run(boost::asio::signal_set& sigset)
                 Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_LOGIN);
                 return;
             }
-            mClient = std::unique_ptr<Client>(new APRSCClient(sigset, host, port, login));
+            mClient = std::unique_ptr<Client>(
+                    new APRSCClient(sigset, host, port, login, mPriority));
             break;
         }
         case InputType::SBS:
-            mClient = std::unique_ptr<Client>(new SBSClient(sigset, host, port));
+            mClient = std::unique_ptr<Client>(
+                    new SBSClient(sigset, host, port, mPriority));
             break;
         case InputType::SENSOR:
-            mClient = std::unique_ptr<Client>(new SensorClient(sigset, host, port));
+            mClient = std::unique_ptr<Client>(
+                    new SensorClient(sigset, host, port, mPriority));
             break;
             /*case InputType::GPS:
              mClient = std::unique_ptr<Client>(

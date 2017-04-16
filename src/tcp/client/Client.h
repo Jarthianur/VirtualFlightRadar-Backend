@@ -27,6 +27,7 @@
 #include <cstddef>
 #include <string>
 #include "../../config/Parameters.h"
+#include "../../util/Priority.h"
 
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
 
@@ -45,7 +46,7 @@ public:
 
 protected:
     Client(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-           const std::string& /*port*/, const std::string& /*comp*/);
+           const std::string& /*port*/, const std::string& /*comp*/, Priority /*prio*/);
 
     /**
      * Register stop-handler to signals.
@@ -132,6 +133,10 @@ protected:
      * Component string for logging.
      */
     const std::string mComponent;
+    /**
+     * Propagate priority to parser unpack.
+     */
+    const Priority mPriority;
 
 private:
     /**
