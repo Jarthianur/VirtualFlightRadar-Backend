@@ -129,9 +129,9 @@ int main(int argc, char *argv[])
         })
         ->test("dmsToDeg", [&eqd]() {
             assert(Math::dmsToDeg(0.0), 0.0, eqd);
-            assert(Math::dmsToDeg(90.303000), 90.50833, eqd);
+            assert(Math::dmsToDeg(90.303000), 90.505000, eqd);
             assert(Math::dmsToDeg(180.0), 180.0, eqd);
-            assert(Math::dmsToDeg(-45.123456), 45.2096, eqd);
+            assert(Math::dmsToDeg(-45.123456), 45.205760, eqd);
         })
         ->test("calcIcaoHeight", [&eqd]() {
             assert(Math::calcIcaoHeight(0.0), 44330.769231, eqd);
