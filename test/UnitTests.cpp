@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
             assert(pars_wind.unpack(""), MSG_UNPACK_ERR, eqi);
         })
         ->test<ClimateData>("extract WIMWV", [&eqs, &eqb]() {
-            assert(VFRB::msClimateData.extractWV(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), eqs);
+            assert(VFRB::msClimateData.getWVstr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), eqs);
             assert(VFRB::msClimateData.isValid(), false, eqb);
         });
 

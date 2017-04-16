@@ -31,18 +31,24 @@ ClimateData::~ClimateData() noexcept
 {
 }
 
-std::string ClimateData::extractWV()
+std::string ClimateData::getWVstr()
 {
-    boost::lock_guard<boost::mutex> lock(this->mMutex);
-    mWVvalid = false;
-    return mWV + "\r\n";
+    boost::lock_guard<boost::mutex> lock(mWV.mutex);
+    if (mWV.valid)
+    {
+        mWV.valid = false;
+        return mWV + "\r\n";
+    }
+    else
+    {
+        return "";
+    }
 }
 
-void ClimateData::insertWV(const std::string& wv)
+void ClimateData::setWVstr(Priority prio, const std::string& wv)
 {
-    boost::lock_guard<boost::mutex> lock(this->mMutex);
-    mWV = wv;
-    mWVvalid = true;
+    boost::lock_guard<boost::mutex> lock(mWV.mutex);
+    mWV.update(wv, prio);
 }
 
 double ClimateData::getPress()
@@ -51,8 +57,8 @@ double ClimateData::getPress()
     return mPress.value;
 }
 
-void ClimateData::setPress(double p)
+void ClimateData::setPress(Priority prio, double p)
 {
-    //boost::lock_guard<boost::mutex> lock(this->mMutex);
-    mPress = p;
+    boost::lock_guard<boost::mutex> lock(mPress.mutex);
+    mPress.update(p, prio);
 }

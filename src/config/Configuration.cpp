@@ -125,9 +125,9 @@ bool Configuration::init(const char* file)
             cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "9999"));
     Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(global_server_port));
 
-    Logger::debug("Nr of feeds: ", std::to_string(registerFeeds(cr)));
+    Logger::info("(Config) Number of feeds: ", std::to_string(registerFeeds(cr)));
 
-    return false;
+    return false;//TODO true
 }
 
 std::size_t Configuration::registerFeeds(ConfigReader& cr)
@@ -149,7 +149,6 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
             item = item.substr(0, l + 1);
         }
         feeds.push_back(item);
-        Logger::debug("item = \"", item + "\"");
     }
 
     std::string prio_dc = std::to_string((std::uint32_t) Priority::DONTCARE);
@@ -164,7 +163,6 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
                        (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::APRSC, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
-                Logger::debug("made aprsc feed: ", *it);
             }
             catch (const std::out_of_range& e)
             {
@@ -178,7 +176,6 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
                        (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::SBS, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
-                Logger::debug("made sbs feed: ", *it);
             }
             catch (const std::out_of_range& e)
             {
@@ -192,7 +189,6 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
                        (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::SENSOR, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
-                Logger::debug("made sensor feed: ", *it);
             }
             catch (const std::out_of_range& e)
             {
@@ -206,7 +202,6 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
                        (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::GPS, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
-                Logger::debug("made gps feed: ", *it);
             }
             catch (const std::out_of_range& e)
             {

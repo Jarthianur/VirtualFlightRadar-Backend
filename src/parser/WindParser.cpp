@@ -52,11 +52,7 @@ std::int32_t WindParser::unpack(const std::string& msg) noexcept
         return MSG_UNPACK_ERR;
     }
 
-    if (msg.find("WIMWV") != std::string::npos)
-    {
-        VFRB::msClimateData.insertWV(msg);
-    }
-    else if (msg.find("WIMDA") != std::string::npos)
+    if (msg.find("WIMDA") != std::string::npos)
     {
         try
         {
@@ -78,24 +74,28 @@ std::int32_t WindParser::unpack(const std::string& msg) noexcept
             return MSG_UNPACK_ERR;
         }
         /*try
-        {
-            mtB = msg.find('C') - 1;
-            mtS = msg.substr(0, mtB).find_last_of(',') + 1;
-            mtSubLen = mtB - mtS;
-            mtTemp = std::stod(msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
-            if (mtNumIdx == mtSubLen)
-            {
-                VFRB::msClimateData.setTemp(mtTemp);
-            }
-            else
-            {
-                return MSG_UNPACK_ERR;
-            }
-        }
-        catch (std::logic_error& e)
-        {
-            return MSG_UNPACK_ERR;
-        }*/
+         {
+         mtB = msg.find('C') - 1;
+         mtS = msg.substr(0, mtB).find_last_of(',') + 1;
+         mtSubLen = mtB - mtS;
+         mtTemp = std::stod(msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
+         if (mtNumIdx == mtSubLen)
+         {
+         VFRB::msClimateData.setTemp(mtTemp);
+         }
+         else
+         {
+         return MSG_UNPACK_ERR;
+         }
+         }
+         catch (std::logic_error& e)
+         {
+         return MSG_UNPACK_ERR;
+         }*/
+    }
+    else if (msg.find("WIMWV") != std::string::npos)
+    {
+        VFRB::msClimateData.setWVstr(msg);
     }
     else
     {

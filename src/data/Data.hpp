@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_DATA_DATA_H_
-#define SRC_DATA_DATA_H_
+#ifndef SRC_DATA_DATA_HPP_
+#define SRC_DATA_DATA_HPP_
 
 #include <boost/thread/mutex.hpp>
 #include "../util/Priority.h"
@@ -32,6 +32,28 @@ struct Data
     bool valid;
     Priority lastPriority;
     boost::mutex mutex;
+
+    void update(const T& nv, Priority prio)
+    {
+        bool write = !valid;
+        if (!write)
+        {
+            if (prio > lastPriority || (prio == lastPriority && prio != Priority::LESSER))
+            {
+                write = true;
+            }
+        }
+        if (write)
+        {
+            valid = true;
+            value = nv;
+            lastPriority = prio;
+        }
+        else
+        {
+            valid = false;
+        }
+    }
 };
 
-#endif /* SRC_DATA_DATA_H_ */
+#endif /* SRC_DATA_DATA_HPP_ */

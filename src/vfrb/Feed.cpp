@@ -62,6 +62,7 @@ void Feed::run(boost::asio::signal_set& sigset)
     }
     else
     {
+        Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_HOST);
         return;
     }
     it = mKVmap.find(KV_KEY_PORT);
@@ -71,6 +72,7 @@ void Feed::run(boost::asio::signal_set& sigset)
     }
     else
     {
+        Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_PORT);
         return;
     }
     switch (mType)
@@ -85,6 +87,7 @@ void Feed::run(boost::asio::signal_set& sigset)
             }
             else
             {
+                Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_LOGIN);
                 return;
             }
             mClient = std::unique_ptr<Client>(new APRSCClient(sigset, host, port, login));

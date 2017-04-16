@@ -32,8 +32,8 @@
  *     or fallbacks. Overrides itself, but nothing else.
  * LESSER: used as "I actually want input from other feed, but if not take it."
  *     Overrides only DC, even not itself, until invalid.
- * HIGHER: used for common backup feeds. Overrides itself and all but IMPORTANT.
- * IMPORTANT: used for main feed. Overrides all, no matter what state.
+ * NORMAL: used for common backup feeds. Overrides itself and all but HIGHER.
+ * HIGHER: used for main feed. Overrides all, no matter what state.
  */
 enum class Priority
     : std::uint32_t
