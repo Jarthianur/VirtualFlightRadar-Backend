@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -21,44 +21,49 @@
 
 #include "AircraftProcessor.h"
 
-#include <stddef.h>
 #include <cmath>
 #include <cstdio>
-#include <ctime>
 
-#include "../base/Configuration.h"
-#include "../util/Math.h"
+#include "../config/Configuration.h"
+#include "../data/ClimateData.h"
+#include "../util/Math.hpp"
+#include "../vfrb/VFRB.h"
 #include "Aircraft.h"
 
-AircraftProcessor::AircraftProcessor(double b_lat, double b_long, int32_t b_alt,
-        double geo)
-        : baselat(b_lat),
-          baselong(b_long),
-          basegeoid(geo),
-          basealt(b_alt)
+AircraftProcessor::AircraftProcessor()
+        : mBaseLat(0.0),
+          mBaseLong(0.0),
+          mBaseAlt(0)
 {
 }
 
-AircraftProcessor::~AircraftProcessor()
+AircraftProcessor::AircraftProcessor(double b_lat, double b_long, std::int32_t b_alt)
+        : mBaseLat(b_lat),
+          mBaseLong(b_long),
+          mBaseAlt(b_alt)
+{
+    mRadLongB = Math::radian(mBaseLong);
+    mRadLatB = Math::radian(mBaseLat);
+}
+
+AircraftProcessor::~AircraftProcessor() noexcept
 {
 }
 
-int AircraftProcessor::checksum(const char* sentence) const
+void AircraftProcessor::init(double lat, double lon, std::int32_t alt)
 {
-    int32_t csum = 0;
-    size_t i = 1;
-    while (sentence[i] != '*' && sentence[i] != '\0')
-    {
-        csum ^= (int) sentence[i++];
-    }
-    return csum;
+    mBaseLat = lat;
+    mBaseLong = lon;
+    mBaseAlt = alt;
+    mRadLongB = Math::radian(mBaseLong);
+    mRadLatB = Math::radian(mBaseLat);
 }
 
 std::string AircraftProcessor::process(Aircraft& ac)
 {
     calcRelPosToBase(ac);
 
-    if (dist > Configuration::filter_maxDist)
+    if (mtDist > Configuration::filter_maxDist)
     {
         return "";
     }
@@ -66,95 +71,59 @@ std::string AircraftProcessor::process(Aircraft& ac)
     std::string nmea_str;
 
     //PFLAU
-    snprintf(buffer, AP_BUFF_S - 1, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
-             Math::dToI(bearing_rel), rel_V, dist, ac.id.c_str());
-    int32_t csum = checksum(buffer);
-    nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
-    nmea_str.append(buffer);
+    std::snprintf(mBuffer, AP_BUFF_S, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
+                  Math::dToI(mtBearingRel), mtRelV, mtDist, ac.getID().c_str());
+    std::int32_t csum = Math::checksum(mBuffer, sizeof(mBuffer));
+    nmea_str.append(mBuffer);
+    std::snprintf(mBuffer, AP_L_BUFF_S, "%02x\r\n", csum);
+    nmea_str.append(mBuffer);
+
     //PFLAA
-    if (ac.aircraft_type == A_MIN_DATA)
+    if (ac.isFullInfo())
     {
-        snprintf(buffer, AP_BUFF_S - 1, "$PFLAA,0,%d,%d,%d,1,%s,,,,,8*", rel_N, rel_E,
-                 rel_V, ac.id.c_str());
+        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
+                      mtRelN, mtRelE, mtRelV, ac.getIDtype(), ac.getID().c_str(),
+                      Math::dToI(ac.getHeading()),
+                      Math::dToI(ac.getGndSpeed() * Math::ms2kmh), ac.getClimbR(),
+                      ac.getAircraftT());
     }
     else
     {
-        snprintf(buffer, AP_BUFF_S - 1, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
-                 rel_N, rel_E, rel_V, ac.id_type, ac.id.c_str(), Math::dToI(ac.heading),
-                 Math::dToI(ac.gnd_speed * Math::ms2kmh), ac.climb_rate,
-                 ac.aircraft_type);
+        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", mtRelN,
+                      mtRelE, mtRelV, ac.getID().c_str(), ac.getAircraftT());
     }
-    csum = checksum(buffer);
-    nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
-    nmea_str.append(buffer);
+    csum = Math::checksum(mBuffer, sizeof(mBuffer));
+    nmea_str.append(mBuffer);
+    std::snprintf(mBuffer, AP_L_BUFF_S, "%02x\r\n", csum);
+    nmea_str.append(mBuffer);
+
     return nmea_str;
 }
 
 void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
 {
-    long_b = Math::radian(baselong);
-    long_ac = Math::radian(ac.longitude);
-    lat_b = Math::radian(baselat);
-    lat_ac = Math::radian(ac.latitude);
-    long_dist = long_ac - long_b;
-    lat_dist = lat_ac - lat_b;
+    mtRadLongAc = Math::radian(ac.getLongitude());
+    mtRadLatAc = Math::radian(ac.getLatitude());
+    mtLongDist = mtRadLongAc - mRadLongB;
+    mtLatDist = mtRadLatAc - mRadLatB;
 
-    a = std::pow(std::sin(lat_dist / 2.0), 2.0) + std::cos(lat_b)
-            * std::cos(lat_ac) * std::pow(std::sin(long_dist / 2.0), 2.0);
-    dist = Math::dToI(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
+    mtAval = std::pow(std::sin(mtLatDist / 2.0), 2.0)
+            + std::cos(mRadLatB) * std::cos(mtRadLatAc)
+              * std::pow(std::sin(mtLongDist / 2.0), 2.0);
+    mtDist = Math::dToI(
+            6371000.0 * (2.0 * std::atan2(std::sqrt(mtAval), std::sqrt(1.0 - mtAval))));
 
-    bearing_rel = Math::degree(
+    mtBearingRel = Math::degree(
             std::atan2(
-                    std::sin(long_ac - long_b) * std::cos(lat_ac),
-                    std::cos(lat_b) * std::sin(lat_ac) - std::sin(lat_b)
-                            * std::cos(lat_ac) * std::cos(long_ac - long_b)));
-    bearing_abs = std::fmod((bearing_rel + 360.0), 360.0);
+                    std::sin(mtRadLongAc - mRadLongB) * std::cos(mtRadLatAc),
+                    std::cos(mRadLatB) * std::sin(mtRadLatAc) - std::sin(mRadLatB)
+                            * std::cos(mtRadLatAc) * std::cos(mtRadLongAc - mRadLongB)));
+    mtBearingAbs = std::fmod((mtBearingRel + 360.0), 360.0);
 
-    rel_N = Math::dToI(std::cos(Math::radian(bearing_abs)) * dist);
-    rel_E = Math::dToI(std::sin(Math::radian(bearing_abs)) * dist);
-    rel_V = ac.qne ?
-            ac.altitude - Math::calcIcaoHeight(Configuration::base_pressure) :
-            ac.altitude - basealt;
-}
-
-std::string AircraftProcessor::gpsfix()
-{
-    std::string nmea_str;
-    int32_t csum;
-
-    latstr = (baselat < 0) ? 'S' : 'N';
-    longstr = (baselong < 0) ? 'W' : 'E';
-    lat_deg = std::abs(std::floor(baselat));
-    lat_min = std::abs(60.0 * (baselat - lat_deg));
-    long_deg = std::abs(std::floor(baselong));
-    long_min = std::abs(60.0 * (baselong - long_deg));
-
-    time_t now = time(0);
-    tm* utc = gmtime(&now);
-    //gprmc
-    snprintf(
-            buffer,
-            AP_BUFF_S - 1,
-            "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
-            utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg,
-            long_min, longstr, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
-    csum = checksum(buffer);
-    nmea_str.append(buffer);
-    snprintf(buffer, 64, "%02x\r\n", csum);
-    nmea_str.append(buffer);
-    //gpgga
-    snprintf(
-            buffer,
-            AP_BUFF_S - 1,
-            "$GPGGA,%02d%02d%02d,%02.0lf%06.4lf,%c,%03.0lf%07.4lf,%c,1,05,1,%d,M,%.1lf,M,,*",
-            utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, latstr, long_deg,
-            long_min, longstr, basealt, basegeoid);
-    csum = checksum(buffer);
-    nmea_str.append(buffer);
-    snprintf(buffer, AP_L_BUFF_S, "%02x\r\n", csum);
-    nmea_str.append(buffer);
-
-    return nmea_str;
+    mtRelN = Math::dToI(std::cos(Math::radian(mtBearingAbs)) * mtDist);
+    mtRelE = Math::dToI(std::sin(Math::radian(mtBearingAbs)) * mtDist);
+    mtRelV =
+            ac.isAltQNE() ?
+                    ac.getAltitude() - Math::calcIcaoHeight(
+                            VFRB::msClimateData.getPress()) : ac.getAltitude() - mBaseAlt;
 }

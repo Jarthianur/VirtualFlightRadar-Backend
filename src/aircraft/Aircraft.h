@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -19,54 +19,167 @@
  }
  */
 
-#ifndef AIRCRAFT_H_
-#define AIRCRAFT_H_
+#ifndef SRC_AIRCRAFT_AIRCRAFT_H_
+#define SRC_AIRCRAFT_AIRCRAFT_H_
 
 #include <cstdint>
 #include <string>
 
-#define A_UKNWN_T 0
 #define A_ADSB_T 8
-#define A_MIN_DATA -1
-#define A_VALUE_NA -1000.0
+#define A_VALUE_NA -1024.0
 
 class Aircraft
 {
 public:
-    Aircraft(std::string& id, double lat, double lon, int32_t alt);
-    Aircraft(std::string& id, double lat, double lon, int32_t alt, double gnd_spd,
-            uint32_t id_t, int32_t ac_t, double climb_r, double turn_r, double heading);
-    virtual ~Aircraft() throw ();
+    Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/);
+    Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/,
+             double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
+             double /*climb_r*/, double /*turn_r*/, double /*heading*/);
+
+    virtual ~Aircraft() noexcept;
 
     /**
-     * self explanatory
+     * Compare Aircrafts by their ID.
      */
-    std::string id;
-    // m/s
-    double gnd_speed = 0;
-    uint32_t id_type = 1;
-    int32_t aircraft_type = A_MIN_DATA;
+    bool operator==(const Aircraft&) const;
+
     /**
-     * absolue position
+     * Got data from ...
      */
-    double latitude = 0.0;
-    double longitude = 0.0;
-    // m
-    int32_t altitude = 0;
-    // deg [0-359]
-    double heading = 0;
+    enum class TargetType
+        : std::uint32_t
+        {
+            FLARM,
+        TRANSPONDER
+    };
+
     /**
-     * relative to last position
+     * Update values from given Aircraft reference.
+     * Set valid to 0.
      */
-    // m/s
-    double climb_rate = 0.0;
-    // deg/s
-    double turn_rate = 0.0;
+    void update(const Aircraft& /*ac*/);
+
+    /**
+     * Getter
+     */
+    inline const std::string& getID() const
+    {
+        return mID;
+    }
+    inline const std::uint32_t getIDtype() const
+    {
+        return mIDtype;
+    }
+    inline const TargetType getTargetT() const
+    {
+        return mTargetType;
+    }
+    inline const std::int32_t getAircraftT() const
+    {
+        return mAircraftType;
+    }
+    inline const bool isFullInfo() const
+    {
+        return mFullInfo;
+    }
+    inline const std::uint32_t getValid() const
+    {
+        return mValid;
+    }
+    inline const bool isAltQNE() const
+    {
+        return mAltAsQNE;
+    }
+    inline const double getLatitude() const
+    {
+        return mLatitude;
+    }
+    inline const double getLongitude() const
+    {
+        return mLongitude;
+    }
+    inline const std::int32_t getAltitude() const
+    {
+        return mAltitude;
+    }
+    inline const double getGndSpeed() const
+    {
+        return mGndSpeed;
+    }
+    inline const double getHeading() const
+    {
+        return mHeading;
+    }
+    inline const double getClimbR() const
+    {
+        return mClimbRate;
+    }
+    //const double getTurnR() const;
+
+    /**
+     * Setter
+     */
+    inline void incValid()
+    {
+        ++mValid;
+    }
+    inline void setTargetT(TargetType tt)
+    {
+        mTargetType = tt;
+    }
+    inline void setAltQNE(bool qne = true)
+    {
+        mAltAsQNE = qne;
+    }
+    inline void setFullInfo(bool info = true)
+    {
+        mFullInfo = info;
+    }
+
+private:
+    /**
+     * information
+     */
+    // id
+    std::string mID;
+    std::uint32_t mIDtype = 1;
+
+    std::int32_t mAircraftType = A_ADSB_T;
+    TargetType mTargetType = TargetType::FLARM;
+
+    // full info available
+    bool mFullInfo = false;
+
     //0 = valid; +x(cycles) = invalid
-    uint32_t valid = 0;
-    //differ altitude (gps from aprsc, QNE from sbs)
-    bool qne = false;
+    std::uint32_t mValid = 0;
 
+    //differ altitude (GPS from FLARM, QNE from TRANSPONDER)
+    bool mAltAsQNE = false;
+
+    /**
+     * position
+     */
+    // deg
+    double mLatitude = A_VALUE_NA;
+    double mLongitude = A_VALUE_NA;
+    // m
+    std::int32_t mAltitude = 0;
+
+    /**
+     * movement
+     */
+    // m/s
+    double mGndSpeed = A_VALUE_NA;
+
+    // deg [0-359]
+    double mHeading = A_VALUE_NA;
+
+    // m/s
+    double mClimbRate = A_VALUE_NA;
+
+    // currently unused
+    // deg/s
+    double mTurnRate = A_VALUE_NA;
 };
 
-#endif /* AIRCRAFT_H_ */
+#endif /* SRC_AIRCRAFT_AIRCRAFT_H_ */

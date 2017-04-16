@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -21,26 +21,53 @@
 
 #include "Aircraft.h"
 
-Aircraft::~Aircraft()
+Aircraft::~Aircraft() noexcept
 {
 }
 
-Aircraft::Aircraft(std::string& id, double lat, double lon, int32_t alt)
-        : id(id),
-          latitude(lat),
-          longitude(lon),
-          altitude(alt)
+Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt)
+        : mID(id),
+          mLatitude(lat),
+          mLongitude(lon),
+          mAltitude(alt)
 {
 }
 
-Aircraft::Aircraft(std::string& id, double lat, double lon, int32_t alt, double gnd_spd,
-        uint32_t id_t, int32_t ac_t, double climb_r, double turn_r, double heading)
-        : Aircraft(id, lat, lon, alt)
+Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt,
+                   double gnd_spd, std::uint32_t id_t, std::int32_t ac_t, double climb_r,
+                   double turn_r, double heading)
+        : mID(id),
+          mIDtype(id_t),
+          mAircraftType(ac_t),
+          mLatitude(lat),
+          mLongitude(lon),
+          mAltitude(alt),
+          mGndSpeed(gnd_spd),
+          mHeading(heading),
+          mClimbRate(climb_r),
+          mTurnRate(turn_r)
 {
-    this->climb_rate = climb_r;
-    this->turn_rate = turn_r;
-    this->heading = heading;
-    this->gnd_speed = gnd_spd;
-    this->id_type = id_t;
-    this->aircraft_type = ac_t;
+}
+
+bool Aircraft::operator==(const Aircraft& other) const
+{
+    return this->mID == other.mID;
+}
+
+void Aircraft::update(const Aircraft& ac)
+{
+    // no update for ID
+    this->mIDtype = ac.mIDtype;
+    this->mAircraftType = ac.mAircraftType;
+    this->mLatitude = ac.mLatitude;
+    this->mLongitude = ac.mLongitude;
+    this->mAltitude = ac.mAltitude;
+    this->mGndSpeed = ac.mGndSpeed;
+    this->mHeading = ac.mHeading;
+    this->mClimbRate = ac.mClimbRate;
+    this->mTurnRate = ac.mTurnRate;
+    this->mFullInfo = ac.mFullInfo;
+    this->mAltAsQNE = ac.mAltAsQNE;
+    this->mTargetType = ac.mTargetType;
+    this->mValid = 0;
 }

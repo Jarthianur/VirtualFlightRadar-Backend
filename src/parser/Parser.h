@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -19,13 +19,11 @@
  }
  */
 
-#ifndef PARSER_H_
-#define PARSER_H_
+#ifndef SRC_PARSER_PARSER_H_
+#define SRC_PARSER_PARSER_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
-
-class AircraftContainer;
 
 #define MSG_UNPACK_SUC 0
 #define MSG_UNPACK_ERR -1
@@ -35,15 +33,15 @@ class Parser
 {
 public:
     Parser();
-    virtual ~Parser() throw ();
+    virtual ~Parser() noexcept;
 
     /**
      * unpack a msg into Aircraft and insert in Container.
      * returns MSG_UNPACK_SUC on success, MSG_UNPACK_ERR on failure,
      * MSG_UNPACK_IGN when to ignore.
      */
-    virtual int32_t unpack(const std::string&, AircraftContainer&) = 0;
+    virtual std::int32_t unpack(const std::string& /*msg*/) noexcept = 0;
 
 };
 
-#endif /* PARSER_H_ */
+#endif /* SRC_PARSER_PARSER_H_ */

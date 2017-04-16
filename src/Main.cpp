@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -19,43 +19,43 @@
  }
  */
 
-#include <netinet/in.h>
 #include <cstdint>
-#include <iostream>
 #include <stdexcept>
 #include <string>
 
-#include "base/Configuration.h"
-#include "base/VFRB.h"
-#include "util/ConfigReader.h"
+#include "config/ConfigReader.h"
+#include "config/Configuration.h"
 #include "util/Logger.h"
+#include "vfrb/VFRB.h"
+#include "data/ClimateData.h"
+#include "data/AircraftContainer.h"
 
-using namespace std;
+#ifndef VERSION
+#define VERSION "DEMO"
+#endif
 
-#define VERSION "1.3.1-SNAPSHOT"
-
-int32_t strToInt(const string& str)
+std::int32_t strToInt(const std::string& str) noexcept
 {
     try
     {
         return stoi(str);
     }
-    catch (const invalid_argument& iae)
+    catch (const std::logic_error& iae)
     {
-        Logger::error("Invalid configuration: ", str);
+        Logger::error("(VFRB) invalid configuration: ", str);
     }
     return 0;
 }
 
-double strToDouble(const string& str)
+double strToDouble(const std::string& str) noexcept
 {
     try
     {
         return stod(str);
     }
-    catch (const invalid_argument& iae)
+    catch (const std::logic_error& iae)
     {
-        Logger::error("Invalid configuration: ", str);
+        Logger::error("(VFRB) invalid configuration: ", str);
     }
     return 0.0;
 }
@@ -65,75 +65,95 @@ int main(int argc, char* argv[])
 
     double latitude = 0.0;
     double longitude = 0.0;
-    int32_t altitude = 0;
+    std::int32_t altitude = 0;
     double geoid = 0.0;
     double pressure = 0.0;
     double temp = 0.0;
-    in_port_t out_port = 0;
-    in_port_t aprsc_port = 0;
-    in_port_t sbs_port = 0;
-    std::string aprsc_host("nA");
-    std::string sbs_host("nA");
-    std::string login;
-    std::string weather_feed_host("nA");
-    in_port_t weather_feed_port = 0;
-    int32_t maxHeight = 0;
-    int32_t maxDist = 0;
+
+    std::uint16_t server_port = 0;
+
+    std::string aprsc_host;
+    std::string aprsc_port;
+    std::string aprsc_login;
+
+    std::string sbs_host;
+    std::string sbs_port;
+
+    std::string climate_host;
+    std::string climate_port;
+
+    std::int32_t maxHeight = 0;
+    std::int32_t maxDist = 0;
 
     if (argc == 3)
     {
-        Logger::info(VERSION);
-        Logger::info("== Configuration ==");
+        Logger::info("VirtualFlightRadar-Backend -- ", VERSION);
         ConfigReader cr(argv[2]);
         cr.read();
 
         latitude = strToDouble(cr.getProperty("latitude", "0.0"));
-        Logger::info("latitude: ", to_string(latitude));
+        Logger::info("(Config) latitude: ", std::to_string(latitude));
 
         longitude = strToDouble(cr.getProperty("longitude", "0.0"));
-        Logger::info("longitude: ", to_string(longitude));
+        Logger::info("(Config) longitude: ", std::to_string(longitude));
 
         altitude = strToInt(cr.getProperty("altitude", "0"));
-        Logger::info("altitude: ", to_string(altitude));
+        Logger::info("(Config) altitude: ", std::to_string(altitude));
 
         geoid = strToDouble(cr.getProperty("geoid", "0.0"));
-        Logger::info("geoid: ", to_string(geoid));
+        Logger::info("(Config) geoid: ", std::to_string(geoid));
 
         pressure = strToDouble(cr.getProperty("pressure", "1013.25"));
-        Logger::info("Pressure: ", to_string(pressure));
+        Logger::info("(Config) pressure: ", std::to_string(pressure));
 
         temp = strToDouble(cr.getProperty("temp", "15.0"));
-        Logger::info("Temp: ", to_string(temp));
+        Logger::info("(Config) temp: ", std::to_string(temp));
 
-        out_port = (in_port_t) strToInt(cr.getProperty("outPort", "0"));
-        Logger::info("outPort: ", to_string(out_port));
+        server_port = (uint16_t) strToInt(cr.getProperty("serverPort", "9999"));
+        Logger::info("(Config) serverPort: ", std::to_string(server_port));
 
-        aprsc_port = (in_port_t) strToInt(cr.getProperty("aprscPort", "0"));
-        Logger::info("aprscPort: ", to_string(aprsc_port));
+        aprsc_port = cr.getProperty("aprscPort", "9998");
+        Logger::info("(Config) aprscPort: ", aprsc_port);
 
-        sbs_port = (in_port_t) strToInt(cr.getProperty("sbsPort", "0"));
-        Logger::info("sbsPort: ", to_string(sbs_port));
+        sbs_port = cr.getProperty("sbsPort", "9997");
+        Logger::info("(Config) sbsPort: ", sbs_port);
 
         aprsc_host = cr.getProperty("aprscHost", "nA");
-        Logger::info("aprscHost: ", aprsc_host);
+        Logger::info("(Config) aprscHost: ", aprsc_host);
 
         sbs_host = cr.getProperty("sbsHost", "nA");
-        Logger::info("sbsHost: ", sbs_host);
+        Logger::info("(Config) sbsHost: ", sbs_host);
 
-        login = cr.getProperty("aprscLogin", "");
-        Logger::info("aprscLogin: ", login);
+        aprsc_login = cr.getProperty("aprscLogin", "");
+        Logger::info("(Config) aprscLogin: ", aprsc_login);
 
-        weather_feed_host = cr.getProperty("weatherFeedHost", "nA");
-        Logger::info("weatherFeedHost: ", weather_feed_host);
+        climate_host = cr.getProperty("climateSensorHost", "nA");
+        Logger::info("(Config) climateSensorHost: ", climate_host);
 
-        weather_feed_port = (in_port_t) strToInt(cr.getProperty("weatherFeedPort", "0"));
-        Logger::info("weatherFeedPort: ", to_string(weather_feed_port));
+        climate_port = cr.getProperty("climateSensorPort", "0");
+        Logger::info("(Config) climateSensorPort: ", climate_port);
 
-        maxHeight = strToInt(cr.getProperty("maxHeight", "0"));
-        Logger::info("maxHeight: ", to_string(maxHeight));
+        std::string tmp = cr.getProperty("maxHeight", "-1");
+        if (tmp == "-1")
+        {
+            maxHeight = INT32_MAX;
+        }
+        else
+        {
+            maxHeight = strToInt(tmp);
+        }
+        Logger::info("(Config) maxHeight: ", std::to_string(maxHeight));
 
-        maxDist = strToInt(cr.getProperty("maxDist", "0"));
-        Logger::info("maxDist: ", to_string(maxDist));
+        tmp = cr.getProperty("maxDist", "-1");
+        if (tmp == "-1")
+        {
+            maxDist = INT32_MAX;
+        }
+        else
+        {
+            maxDist = strToInt(tmp);
+        }
+        Logger::info("(Config) maxDist: ", std::to_string(maxDist));
 
     }
     else
@@ -148,18 +168,25 @@ int main(int argc, char* argv[])
     Configuration::base_geoid = geoid;
     Configuration::base_pressure = pressure;
     Configuration::base_temp = temp;
-    Configuration::global_out_port = out_port;
+    Configuration::global_server_port = server_port;
     Configuration::global_aprsc_port = aprsc_port;
     Configuration::global_sbs_port = sbs_port;
     Configuration::global_aprsc_host = aprsc_host;
     Configuration::global_sbs_host = sbs_host;
-    Configuration::global_aprsc_login = login;
-    Configuration::global_weather_feed_host = weather_feed_host;
-    Configuration::global_weather_feed_port = weather_feed_port;
+    Configuration::global_aprsc_login = aprsc_login;
+    Configuration::global_climate_host = climate_host;
+    Configuration::global_climate_port = climate_port;
     Configuration::filter_maxHeight = maxHeight;
     Configuration::filter_maxDist = maxDist;
 
-    Logger::info("Running program ...");
+    // set climate fallbacks
+    VFRB::msClimateData.setPress();
+    VFRB::msClimateData.setTemp();
+
+    // init containers processor
+    VFRB::msAcCont.initProcessor(Configuration::base_latitude,
+                                Configuration::base_longitude,
+                                Configuration::base_altitude);
     VFRB::run();
 
     return 0;

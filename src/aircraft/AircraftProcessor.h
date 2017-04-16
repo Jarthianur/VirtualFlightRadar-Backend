@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -19,96 +19,76 @@
  }
  */
 
-#ifndef AIRCRAFTPROCESSOR_H_
-#define AIRCRAFTPROCESSOR_H_
+#ifndef SRC_AIRCRAFT_AIRCRAFTPROCESSOR_H_
+#define SRC_AIRCRAFT_AIRCRAFTPROCESSOR_H_
 
 #include <cstdint>
 #include <string>
 
 class Aircraft;
 
-#define AP_BUFF_S 4096
+#define AP_BUFF_S 8191
 #define AP_L_BUFF_S 128
 
 class AircraftProcessor
 {
 public:
-    AircraftProcessor(double, double, int32_t, double);
-    virtual ~AircraftProcessor();
+    AircraftProcessor();
+    AircraftProcessor(double /*b_lat*/, double /*b_long*/, std::int32_t /*b_alt*/);
+    virtual ~AircraftProcessor() noexcept;
 
     /**
-     * build nmea-msg from Aircraft into target string-reference
+     * build nmea-msg from Aircraft
      */
-    std::string process(Aircraft&);
+    std::string process(Aircraft& /*ac*/);
 
-    /**
-     * build GPRMC and GPGGA
-     */
-    std::string gpsfix();
+    void init(double /*lat*/, double /*lon*/, std::int32_t /*alt*/);
 
 private:
     /**
      * format string buffer
      */
-    char buffer[AP_BUFF_S];
+    char mBuffer[AP_BUFF_S + 1];
 
     /**
-     * compute checksum of nmea string
+     * calculate relative position to base
      */
-    int32_t checksum(const char*) const;
-
-    /**
-     * calculate relative position to base and absolute heading
-     */
-    void calcRelPosToBase(Aircraft&);
+    void calcRelPosToBase(Aircraft& /*ac*/);
 
     /**
      * base position info
      */
-    double baselat, baselong,
-    /**
-     * Latitude degree, minutes
-     * Longitude degree, minutes
-     */
-    lat_deg = 0.0, lat_min = 0.0, long_deg = 0.0, long_min = 0.0,
+    double mBaseLat, mBaseLong,
     /**
      * Longitude base, Aircraft
      * Latitude base, Aircraft
      */
-    long_b = 0.0, long_ac = 0.0, lat_b = 0.0, lat_ac = 0.0,
+    mRadLongB = 0.0, mtRadLongAc = 0.0, mRadLatB = 0.0, mtRadLatAc = 0.0,
     /**
      * Longitude, Latitude distance
      */
-    long_dist = 0.0, lat_dist = 0.0,
+    mtLongDist = 0.0, mtLatDist = 0.0,
     /**
      * relative bearing, absolute bearing
      */
-    bearing_rel = 0.0, bearing_abs = 0.0,
+    mtBearingRel = 0.0, mtBearingAbs = 0.0,
     /**
-     * values to calculate distance
+     * value to calculate distance
      */
-    a = 0.0,
-    /**
-     * geoid separation
-     */
-    basegeoid;
+    mtAval = 0.0;
     /**
      * (alt = height + antennaheight)
      */
-    int32_t basealt,
+    std::int32_t mBaseAlt,
     /**
      * relative North, East, Vertical
      */
-    rel_N = 0, rel_E = 0, rel_V = 0,
+    mtRelN = 0, mtRelE = 0, mtRelV = 0,
     /**
      * distance from base position to Aircraft
      */
-    dist = 0;
-    /**
-     * Latitude: S - N
-     * Longitude: W - E
-     */
-    char latstr = 'n', longstr = 'w';
+    mtDist = 0;
+
 };
 
-#endif /* AIRCRAFTPROCESSOR_H_ */
+#endif /* SRC_AIRCRAFT_AIRCRAFTPROCESSOR_H_ */

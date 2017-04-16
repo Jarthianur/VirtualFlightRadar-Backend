@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -19,21 +19,17 @@
  }
  */
 
-#ifndef LOGGER_H_
-#define LOGGER_H_
+#ifndef SRC_UTIL_LOGGER_H_
+#define SRC_UTIL_LOGGER_H_
 
 #include <string>
-
-namespace std
-{
-class mutex;
-} /* namespace std */
+#include <boost/thread/mutex.hpp>
 
 class Logger
 {
 public:
     Logger();
-    virtual ~Logger() throw ();
+    virtual ~Logger() noexcept;
 
     /**
      * Log informations, like succeeding connections etc
@@ -60,8 +56,9 @@ public:
     static void error(const std::string&, const std::string& = "");
 
 private:
+    static boost::mutex mMutex;
 
-    static std::mutex mutex;
+    static const std::string getTime();
 };
 
-#endif /* SRC_LOGGER_H_ */
+#endif /* SRC_UTIL_LOGGER_H_ */
