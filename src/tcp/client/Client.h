@@ -130,16 +130,16 @@ protected:
      * Component string for logging.
      */
     const std::string mComponent;
-    /**
-     * Parent feed.
-     */
-    Feed& mrFeed;
 
 private:
     /**
      * Connection timer
      */
     boost::asio::deadline_timer mConnectTimer;
+    /**
+     * Parent feed.
+     */
+    Feed& mrFeed;
 };
 
 #endif /* SRC_TCP_CLIENT_CLIENT_H_ */

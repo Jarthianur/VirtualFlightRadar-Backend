@@ -23,10 +23,9 @@
 #define SRC_PARSER_GPSPARSER_H_
 
 #include <boost/regex.hpp>
-#include <cstdint>
-#include <string>
-
 #include "Parser.h"
+
+struct GPSPosition;
 
 class GPSParser: public Parser
 {
@@ -40,8 +39,7 @@ private:
     //regex
     const boost::regex mGpggaRE;
     //tmps
-    std::int32_t mtAlt = 0, mtNrSats = 0, mtFixQa = 0;
-    double mtLat = 0.0, mtLong = 0.0, mtGeoid = 0.0;
+    struct GPSPosition mtGPSpos;
 };
 
 #endif /* SRC_PARSER_GPSPARSER_H_ */

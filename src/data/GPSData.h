@@ -25,29 +25,35 @@
 #include <cstdint>
 #include <string>
 
+#include "../util/Priority.h"
+#include "Data.hpp"
+
+struct GPSPosition
+{
+    std::int32_t altitude, nrSats, fixQa;
+    /**
+     * Base position in degree
+     */
+    double latitude, longitude;
+};
+
 class GPSData
 {
 public:
     GPSData();
-    virtual ~GPSData();
+    virtual ~GPSData() noexcept;
 
-    void insertRMC();
-    void insertGGA();
-    std::string extractRMC();
-    std::string extractGGA();
+    void setGGAstr(Priority /*prio*/, const std::string& /*gga*/);
+    std::string getGGAstr();
 
+    void setBasePos(Priority /*prio*/, const struct GPSPosition& /*pos*/);
     std::int32_t getBaseAlt();
     double getBaseLat();
     double getBaseLong();
 
 private:
-    std::int32_t mBaseAlt = 0, mNrSats = 0, mFixQa = 0;
-    /**
-     * Base position in degree
-     */
-    double mBaseLat = 0.0, mBaseLong = 0.0;
-
-    std::string mGPGGAstr, mGPRMCstr;
+    struct Data<struct GPSPosition> mBasePos;
+    struct Data<std::string> mGGAstr;
 };
 
 #endif /* SRC_DATA_GPSDATA_H_ */

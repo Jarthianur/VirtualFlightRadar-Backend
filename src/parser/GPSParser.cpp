@@ -20,17 +20,22 @@
  */
 
 #include "GPSParser.h"
+
+#include <boost/regex.hpp>
 #include <stdexcept>
+
+#include "../data/GPSData.h"
 #include "../util/Math.hpp"
+#include "../util/Priority.h"
+#include "../vfrb/VFRB.h"
 
 GPSParser::GPSParser()
         : Parser(),
-          mGpggaRE("^\\$GPGGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS])," // lat N/S #1,#2
+          mGpggaRE("^\\$[a-z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS])," // lat N/S #1,#2
                   "(\\d{5}\\.\\d{3,4}),([EW]),"// lon E/W #3,#4
                   "(\\d),"// fix #5
                   "(\\d{2}),(?:\\S+?),"// nr sats #6
-                  "(\\d+\\.\\d+),M,"// alt #7
-                  "(\\d+\\.\\d+),M,,\\*[0-9a-f]{2}$",// geoid #8
+                  "(\\d+\\.\\d+),M,\\d+\\.\\d+,M,,\\*[0-9a-f]{2}$",// alt #7
                   boost::regex_constants::optimize, boost::regex_constants::icase)
 {
 }
@@ -55,44 +60,38 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
     }
 
     boost::smatch match;
-    if (msg.find("GPRMC") != std::string::npos)
-    {
-// store directly? use if no gpgga is avail?
-    }
-    else if (boost::regex_match(msg, match, mGpggaRE))
+    if (boost::regex_match(msg, match, mGpggaRE))
     {
         try
         {
             //latitude
-            mtLat = Math::dmToDeg(std::stod(match.str(1)));
+            mtGPSpos.latitude = Math::dmToDeg(std::stod(match.str(1)));
             if (match.str(2).compare("S") == 0)
             {
-                mtLat = -mtLat;
+                mtGPSpos.latitude = -mtGPSpos.latitude;
             }
 
             //longitude
-            mtLong = Math::dmToDeg(std::stod(match.str(3)));
+            mtGPSpos.longitude = Math::dmToDeg(std::stod(match.str(3)));
             if (match.str(4).compare("W") == 0)
             {
-                mtLong = -mtLong;
+                mtGPSpos.longitude = -mtGPSpos.longitude;
             }
 
             //fix
-            mtFixQa = std::stoi(match.str(5));
+            mtGPSpos.fixQa = std::stoi(match.str(5));
             //sats
-            mtNrSats = std::stoi(match.str(6));
+            mtGPSpos.nrSats = std::stoi(match.str(6));
             //altitude
-            mtAlt = Math::dToI(std::stod(match.str(7)));
-            //geoid
-            mtGeoid = std::stod(match.str(8));
+            mtGPSpos.altitude = Math::dToI(std::stod(match.str(7)));
         }
         catch (const std::logic_error& e)
         {
             return MSG_UNPACK_ERR;
         }
 
-        // put data to gpsdata
-
+        VFRB::msGPSdata.setGGAstr(prio, msg);
+        VFRB::msGPSdata.setBasePos(prio, mtGPSpos);
     }
     else
     {

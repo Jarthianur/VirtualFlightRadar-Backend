@@ -21,14 +21,49 @@
 
 #include "GPSData.h"
 
+#include <boost/thread/lock_guard.hpp>
+#include <boost/thread/mutex.hpp>
+
 GPSData::GPSData()
 {
-    // TODO Auto-generated constructor stub
-
 }
 
-GPSData::~GPSData()
+GPSData::~GPSData() noexcept
 {
-    // TODO Auto-generated destructor stub
 }
 
+void GPSData::setGGAstr(Priority prio, const std::string& gga)
+{
+    boost::lock_guard<boost::mutex> lock(mGGAstr.mutex);
+    mGGAstr.update(gga, prio);
+}
+
+std::string GPSData::getGGAstr()
+{
+    boost::lock_guard<boost::mutex> lock(mGGAstr.mutex);
+    return mGGAstr.value;
+}
+
+std::int32_t GPSData::getBaseAlt()
+{
+    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+    return mBasePos.value.altitude;
+}
+
+double GPSData::getBaseLat()
+{
+    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+    return mBasePos.value.latitude;
+}
+
+void GPSData::setBasePos(Priority prio, const struct GPSPosition& pos)
+{
+    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+    mBasePos.update(pos, prio);
+}
+
+double GPSData::getBaseLong()
+{
+    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+    return mBasePos.value.longitude;
+}

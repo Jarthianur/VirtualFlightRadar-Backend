@@ -30,6 +30,7 @@
 class AircraftContainer;
 class ClimateData;
 class NMEAServer;
+class GPSData;
 
 #define SYNC_TIME VFRB_SYNC_TIME
 
@@ -60,6 +61,10 @@ public:
      * Container for climate information
      */
     static ClimateData msClimateData;
+    /**
+     * Container for GPS information
+     */
+    static GPSData msGPSdata;
 
 private:
     /**

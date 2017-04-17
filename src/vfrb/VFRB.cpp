@@ -32,6 +32,7 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftContainer.h"
 #include "../data/ClimateData.h"
+#include "../data/GPSData.h"
 #include "../tcp/client/APRSCClient.h"
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
@@ -42,6 +43,7 @@
 bool VFRB::global_run_status = true;
 AircraftContainer VFRB::msAcCont;
 ClimateData VFRB::msClimateData;
+GPSData VFRB::msGPSdata;
 
 VFRB::VFRB()
 {

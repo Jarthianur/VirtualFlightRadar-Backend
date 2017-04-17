@@ -52,7 +52,7 @@ std::int32_t SensorParser::unpack(const std::string& msg, Priority prio) noexcep
         return MSG_UNPACK_ERR;
     }
 
-    if (msg.find("WIMDA") != std::string::npos)
+    if (msg.find("MDA") != std::string::npos)
     {
         try
         {
@@ -73,27 +73,8 @@ std::int32_t SensorParser::unpack(const std::string& msg, Priority prio) noexcep
         {
             return MSG_UNPACK_ERR;
         }
-        /*try
-         {
-         mtB = msg.find('C') - 1;
-         mtS = msg.substr(0, mtB).find_last_of(',') + 1;
-         mtSubLen = mtB - mtS;
-         mtTemp = std::stod(msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
-         if (mtNumIdx == mtSubLen)
-         {
-         VFRB::msClimateData.setTemp(mtTemp);
-         }
-         else
-         {
-         return MSG_UNPACK_ERR;
-         }
-         }
-         catch (std::logic_error& e)
-         {
-         return MSG_UNPACK_ERR;
-         }*/
     }
-    else if (msg.find("WIMWV") != std::string::npos)
+    else if (msg.find("MWV") != std::string::npos)
     {
         VFRB::msClimateData.setWVstr(prio, msg);
     }
