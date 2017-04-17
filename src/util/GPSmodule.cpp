@@ -58,7 +58,7 @@ std::string GPSmodule::ggafix(double b_lat, double b_lon, std::int32_t b_alt,
             long_min, long_str, b_alt, geoid);
     csum = Math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
-    std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
+    std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x", csum);
     nmea_str.append(mBuffer);
 
     return nmea_str;
@@ -87,7 +87,7 @@ std::string GPSmodule::rmcfix(double b_lat, double b_lon, std::int32_t b_alt,
             long_min, long_str, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
     csum = Math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
-    std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
+    std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x", csum);
     nmea_str.append(mBuffer);
 
     return nmea_str;

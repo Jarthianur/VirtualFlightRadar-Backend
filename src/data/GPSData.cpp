@@ -65,7 +65,11 @@ void GPSData::setRMCstr(Priority prio, const std::string& rmc)
 
 std::string GPSData::getGPSstr()
 {
-    return getRMCstr() + getGGAstr();
+    std::string gps = getRMCstr();
+    gps.append("\r\n");
+    gps.append(getGGAstr());
+    gps.append("\r\n");
+    return gps;
 }
 
 std::string GPSData::getRMCstr()

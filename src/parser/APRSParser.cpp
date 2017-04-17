@@ -32,20 +32,10 @@
 
 APRSParser::APRSParser()
         : Parser(),
-          mAprsRE("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/"
-                  "(\\d{6})h" // timestamp #1
-                  "(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?"// latitude N/S #2,#3
-                  "(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?"// longitude E/W #4,#5
-                  "(?:(\\d{3})/(\\d{3}))?"// heading/gnd-speed #6,#7
-                  "/A=(\\d{6})\\s+?"// altitude #8
-                  "([\\S\\s]+?)$",// 'comment' #9
-                  boost::regex_constants::optimize),
-          mCommRE("^(?:[\\S\\s]+?)?id([0-9A-F]{2})" // id-/aircraft type #1
-                  "([0-9A-F]{6})\\s?"// id #2
-                  "(?:([\\+-]\\d{3})fpm\\s+?)?"// climb rate #3
-                  "(?:([\\+-]\\d+?\\.\\d+?)rot)?"// turn rate #4
-                  "(?:[\\S\\s]+?)?$",
-                  boost::regex_constants::optimize)
+          mAprsRE("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
+                  boost::regex::optimize | boost::regex::icase),
+          mCommRE("^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
+                  boost::regex::optimize | boost::regex::icase)
 {
 }
 

@@ -28,16 +28,12 @@
 #include "../util/Math.hpp"
 #include "../util/Priority.h"
 #include "../vfrb/VFRB.h"
-#include "../util/Logger.h"
 
 GPSParser::GPSParser()
         : Parser(),
-          mGpggaRE("^\\$[a-z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS])," // lat N/S #1,#2
-                  "(\\d{5}\\.\\d{3,4}),([EW]),"// lon E/W #3,#4
-                  "(\\d),"// fix #5
-                  "(\\d{2}),[0-9.]+?,"// nr sats #6
-                  "(\\d+\\.?\\d+?),M,\\d+\\.\\d+,M,,\\*[0-9a-f]{2}$",// alt #7
-                  boost::regex_constants::optimize, boost::regex_constants::icase)
+          mGpggaRE(
+                  "^\\$[A-Z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),[0-9.]+?,(\\d+\\.?\\d+?),M,\\d+\\.\\d+,M,,\\*[0-9A-F]{2}$",
+                  boost::regex::optimize | boost::regex::icase)
 {
 }
 
@@ -61,12 +57,8 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
     }
 
     boost::smatch match;
-    if (msg.find("RMC") != std::string::npos)
-    {Logger::debug(msg);
-        VFRB::msGPSdata.setRMCstr(prio, msg);
-    }
-    else if (boost::regex_match(msg, match, mGpggaRE))
-    {Logger::debug(msg);
+    if (boost::regex_match(msg, match, mGpggaRE))
+    {
         try
         {
             //latitude
@@ -97,6 +89,10 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
 
         VFRB::msGPSdata.setGGAstr(prio, msg);
         VFRB::msGPSdata.setBasePos(prio, mtGPSpos);
+    }
+    else if (msg.find("RMC") != std::string::npos)
+    {
+        VFRB::msGPSdata.setRMCstr(prio, msg);
     }
     else
     {
