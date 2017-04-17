@@ -31,28 +31,34 @@
 #include "ConfigReader.h"
 
 // Keywords for configuration
-#define SECT_KEY_FALLBACK  "fallback"
-#define SECT_KEY_GENERAL   "general"
-#define SECT_KEY_FILTER    "filter"
-#define SECT_KEY_APRSC     "aprsc"
-#define SECT_KEY_SBS       "sbs"
-#define SECT_KEY_GPS       "gps"
-#define SECT_KEY_SENS      "sens"
-#define KV_KEY_FEEDS       "feeds"
-#define KV_KEY_GND_MODE    "gndMode"
-#define KV_KEY_LATITUDE    "latitude"
-#define KV_KEY_LONGITUDE   "longitude"
-#define KV_KEY_ALTITUDE    "altitude"
-#define KV_KEY_GEOID       "geoid"
-#define KV_KEY_PRESSURE    "pressure"
-#define KV_KEY_TEMPERATURE "temperature"
-#define KV_KEY_MAX_DIST    "maxDist"
-#define KV_KEY_MAX_HEIGHT  "maxHeight"
-#define KV_KEY_SERVER_PORT "serverPort"
-#define KV_KEY_HOST        "host"
-#define KV_KEY_PORT        "port"
-#define KV_KEY_PRIORITY    "priority"
-#define KV_KEY_LOGIN       "login"
+#define SECT_KEY_FALLBACK   "fallback"
+#define SECT_KEY_GENERAL    "general"
+#define SECT_KEY_FILTER     "filter"
+#define SECT_KEY_APRSC      "aprsc"
+#define SECT_KEY_SBS        "sbs"
+#define SECT_KEY_GPS        "gps"
+#define SECT_KEY_SENS       "sens"
+
+#define KV_KEY_FEEDS        "feeds"
+#define KV_KEY_GND_MODE     "gndMode"
+#define KV_KEY_LATITUDE     "latitude"
+#define KV_KEY_LONGITUDE    "longitude"
+#define KV_KEY_ALTITUDE     "altitude"
+#define KV_KEY_GEOID        "geoid"
+#define KV_KEY_PRESSURE     "pressure"
+#define KV_KEY_TEMPERATURE  "temperature"
+#define KV_KEY_MAX_DIST     "maxDist"
+#define KV_KEY_MAX_HEIGHT   "maxHeight"
+#define KV_KEY_SERVER_PORT  "serverPort"
+#define KV_KEY_HOST         "host"
+#define KV_KEY_PORT         "port"
+#define KV_KEY_PRIORITY     "priority"
+#define KV_KEY_LOGIN        "login"
+
+#define PRIO_ALIAS_DONTCARE "dont"
+#define PRIO_ALIAS_LESSER   "less"
+#define PRIO_ALIAS_NORMAL   "norm"
+#define PRIO_ALIAS_HIGHER   "high"
 
 class Configuration
 {
@@ -77,6 +83,7 @@ private:
     std::size_t registerFeeds(ConfigReader& /*cr*/);
     std::int32_t strToInt(const std::string& /*str*/) noexcept;
     double strToDouble(const std::string& /*str*/) noexcept;
+    Priority aliasPriority(const std::string& /*str*/) noexcept;
 };
 
 #endif /* SRC_CONFIG_CONFIGURATION_H_ */

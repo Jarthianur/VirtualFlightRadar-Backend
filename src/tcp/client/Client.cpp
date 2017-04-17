@@ -37,8 +37,8 @@ Client::Client(boost::asio::signal_set& sigset, const std::string& host,
           mHost(host),
           mPort(port),
           mComponent(comp),
-          mConnectTimer(mIOservice),
-          mrFeed(feed)
+          mrFeed(feed),
+          mConnectTimer(mIOservice)
 
 {
     awaitStop();
