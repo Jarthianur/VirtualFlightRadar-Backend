@@ -29,6 +29,10 @@
 #include "../util/Priority.h"
 #include "../vfrb/VFRB.h"
 
+#define GPS_ASSUME_GOOD  (1)
+#define GPS_NR_SATS_GOOD (7)
+#define GPS_FIX_GOOD     (1)
+
 GPSParser::GPSParser()
         : Parser(),
           mGpggaRE(
@@ -89,6 +93,11 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
 
         VFRB::msGPSdata.setGGAstr(prio, msg);
         VFRB::msGPSdata.setBasePos(prio, mtGPSpos);
+
+        if (mtGPSpos.nrSats >= GPS_NR_SATS_GOOD && mtGPSpos.fixQa == GPS_FIX_GOOD)
+        {
+            return GPS_ASSUME_GOOD;
+        }
     }
     else if (msg.find("RMC") != std::string::npos)
     {

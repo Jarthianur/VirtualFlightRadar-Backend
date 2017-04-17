@@ -25,7 +25,7 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/operators.hpp>
-
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
 SensorClient::SensorClient(boost::asio::signal_set& sigset, const std::string& host,
@@ -57,6 +57,11 @@ void SensorClient::connect() noexcept
             boost::bind(&SensorClient::handleResolve, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
+}
+
+void SensorClient::process() noexcept
+{
+    mrFeed.process(mResponse);
 }
 
 void SensorClient::checkDeadline() noexcept

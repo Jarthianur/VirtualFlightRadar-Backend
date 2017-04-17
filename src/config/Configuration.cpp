@@ -53,6 +53,7 @@ double Configuration::base_temp = 0.0;
 std::int32_t Configuration::filter_maxHeight = 0;
 std::int32_t Configuration::filter_maxDist = 0;
 std::uint16_t Configuration::global_server_port = 1;
+bool Configuration::global_gnd_mode = false;
 
 std::vector<Feed> Configuration::global_feeds;
 
@@ -121,6 +122,8 @@ bool Configuration::init(const char* file)
     Logger::info("(Config) " KV_KEY_MAX_DIST ": ", std::to_string(filter_maxDist));
 
     // get general
+    global_gnd_mode = cr.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE) != "";
+
     global_server_port = (uint16_t) strToInt(
             cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "9999"));
     Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(global_server_port));

@@ -57,14 +57,11 @@ public:
     Feed& operator=(BOOST_RV_REF(Feed));
 
     void run(boost::asio::signal_set& /*sigset*/);
+    std::int32_t process(const std::string& /*data*/) noexcept;
 
     const std::string mName; //?
     const Priority mPriority;
     const InputType mType;
-
-protected:
-    void process(const std::string& /*data*/) noexcept;
-    friend class Client;
 
 private:
     std::unordered_map<std::string, std::string> mKVmap;

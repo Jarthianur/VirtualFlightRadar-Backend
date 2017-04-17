@@ -126,7 +126,7 @@ void Feed::run(boost::asio::signal_set& sigset)
     mpClient->run();
 }
 
-void Feed::process(const std::string& data) noexcept
+std::int32_t Feed::process(const std::string& data) noexcept
 {
-    mpParser->unpack(data, mPriority);
+    return mpParser->unpack(data, mPriority);
 }

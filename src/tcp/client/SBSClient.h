@@ -40,6 +40,7 @@ public:
 
 private:
     void connect() noexcept override;
+    void process() noexcept override;
 
     void handleResolve(const boost::system::error_code& /*ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;

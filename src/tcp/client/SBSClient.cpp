@@ -26,7 +26,7 @@
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <iostream>
-
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
 SBSClient::SBSClient(boost::asio::signal_set& sigset, const std::string& host,
@@ -48,6 +48,11 @@ void SBSClient::connect() noexcept
             query,
             boost::bind(&SBSClient::handleResolve, this, boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
+}
+
+void SBSClient::process() noexcept
+{
+    mrFeed.process(mResponse);
 }
 
 void SBSClient::handleResolve(const boost::system::error_code& ec,
