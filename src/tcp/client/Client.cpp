@@ -115,7 +115,7 @@ void Client::handleRead(const boost::system::error_code& ec, std::size_t s) noex
     {
         std::istream is(&mBuffer);
         std::getline(is, mResponse);
-        mrFeed.process(mResponse);
+        process();
         read();
     }
     else if (ec != boost::system::errc::bad_file_descriptor)

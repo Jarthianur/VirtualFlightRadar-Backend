@@ -33,23 +33,25 @@
 #define VERSION "DEMO"
 #endif
 
-int main(int argc, char* argv[])
+std::int32_t evalParams(std::int32_t argc, char** argv);
+
+int main(int argc, char** argv)
 {
-    if (argc != 3 || std::string(argv[1]) != "-c"
-        || std::string(argv[2]).rfind(".ini") == std::string::npos)
-    {
-        Logger::info("usage: ./VirtualFlightRadar-Backend -c path_to_file.ini");
-        return -1;
-    }
     Logger::info("VirtualFlightRadar-Backend -- ", VERSION);
 
-    try
+    if (argc < 3)
     {
-        Configuration conf(argv[2]);
+        Logger::info(
+                "usage: ./VirtualFlightRadar-Backend [OPTIONS] [-c | --config] path_to_file.ini\n"
+                "Run VFR-B with given config file.\n"
+                "The config file must be in valid '.ini' format!\n"
+                "OPTIONS:\n"
+                "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received.");
+        return -1;
     }
-    catch (const std::logic_error& e)
+
+    if (evalParams(argc, argv) != 0)
     {
-        Logger::error("(VFRB) eval config: ", e.what());
         return -1;
     }
 
@@ -59,6 +61,68 @@ int main(int argc, char* argv[])
                                 Configuration::base_longitude,
                                 Configuration::base_altitude, Configuration::base_geoid);
     VFRB::run();
+
+    return 0;
+}
+
+std::int32_t evalParams(std::int32_t argc, char** argv)
+{
+    std::string ini_file;
+    bool gnd = false;
+    bool cfg_found = false;
+
+    for (int i = 1; i < argc; i++)
+    {
+        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
+        {
+            ini_file = std::string(argv[++i]);
+            if (ini_file.rfind(".ini") == std::string::npos)
+            {
+                Logger::error("(VFRB) not a ini file: ", ini_file);
+                return -1;
+            }
+            else
+            {
+                cfg_found = true;
+            }
+        }
+        else if (std::string(argv[i]).find("-g") != std::string::npos)
+        {
+            gnd = true;
+        }
+        else
+        {
+            Logger::warn("(VFRB) unrecognized option: ", std::string(argv[i]));
+        }
+    }
+
+    if (cfg_found)
+    {
+        try
+        {
+            Configuration conf(ini_file.c_str());
+        }
+        catch (const std::logic_error& e)
+        {
+            Logger::error("(VFRB) eval config: ", e.what());
+            return -1;
+        }
+    }
+    else
+    {
+        Logger::error("(VFRB) no config file given");
+        return -1;
+    }
+
+    if (gnd)
+    {
+        Configuration::global_gnd_mode = true;
+        Logger::info("(VFRB) GND mode: yes");
+    }
+    else
+    {
+        Logger::info("(VFRB) GND mode: no");
+    }
 
     return 0;
 }

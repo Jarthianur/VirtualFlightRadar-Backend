@@ -26,7 +26,7 @@
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <iostream>
-
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
 APRSCClient::APRSCClient(boost::asio::signal_set& sigset, const std::string& host,
@@ -51,6 +51,11 @@ void APRSCClient::connect() noexcept
             boost::bind(&APRSCClient::handleResolve, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
+}
+
+void APRSCClient::process() noexcept
+{
+    mrFeed.process(mResponse);
 }
 
 void APRSCClient::handleResolve(const boost::system::error_code& ec,

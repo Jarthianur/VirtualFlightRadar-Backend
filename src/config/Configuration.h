@@ -39,6 +39,7 @@
 #define SECT_KEY_GPS       "gps"
 #define SECT_KEY_SENS      "sens"
 #define KV_KEY_FEEDS       "feeds"
+#define KV_KEY_GND_MODE    "gndMode"
 #define KV_KEY_LATITUDE    "latitude"
 #define KV_KEY_LONGITUDE   "longitude"
 #define KV_KEY_ALTITUDE    "altitude"
@@ -68,6 +69,7 @@ public:
     static std::int32_t filter_maxHeight;
     static std::int32_t filter_maxDist;
     static std::uint16_t global_server_port;
+    static bool global_gnd_mode;
     static std::vector<Feed> global_feeds;
 
 private:

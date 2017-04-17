@@ -24,7 +24,8 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <cstddef>
-
+#include "../../config/Configuration.h"
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
 GPSDClient::GPSDClient(boost::asio::signal_set& sigset, const std::string& host,
@@ -47,6 +48,15 @@ void GPSDClient::connect() noexcept
             boost::bind(&GPSDClient::handleResolve, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
+}
+
+void GPSDClient::process() noexcept
+{
+    if (mrFeed.process(mResponse) > 0 && Configuration::global_gnd_mode)
+    {
+        Logger::info("(GPSDClient) received good position -> stop");
+        stop();
+    }
 }
 
 void GPSDClient::handleResolve(const boost::system::error_code& ec,

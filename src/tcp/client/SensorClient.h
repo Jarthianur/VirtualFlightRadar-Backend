@@ -44,6 +44,7 @@ public:
 private:
     void read() noexcept override;
     void connect() noexcept override;
+    void process() noexcept override;
     /**
      * Check read timed out.
      */

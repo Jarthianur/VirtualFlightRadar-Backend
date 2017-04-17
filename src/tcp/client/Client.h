@@ -67,6 +67,10 @@ protected:
      */
     virtual void read() noexcept;
     /**
+     * Process read data.
+     */
+    virtual void process() noexcept = 0;
+    /**
      * Connect to host.
      */
     virtual void connect() noexcept = 0;
@@ -130,16 +134,16 @@ protected:
      * Component string for logging.
      */
     const std::string mComponent;
+    /**
+     * Parent feed.
+     */
+    Feed& mrFeed;
 
 private:
     /**
      * Connection timer
      */
     boost::asio::deadline_timer mConnectTimer;
-    /**
-     * Parent feed.
-     */
-    Feed& mrFeed;
 };
 
 #endif /* SRC_TCP_CLIENT_CLIENT_H_ */
