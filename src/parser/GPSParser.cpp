@@ -35,8 +35,8 @@ GPSParser::GPSParser()
           mGpggaRE("^\\$[a-z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS])," // lat N/S #1,#2
                   "(\\d{5}\\.\\d{3,4}),([EW]),"// lon E/W #3,#4
                   "(\\d),"// fix #5
-                  "(\\d{2}),(?:\\S+?),"// nr sats #6
-                  "(\\d+\\.\\d+),M,\\d+\\.\\d+,M,,\\*[0-9a-f]{2}$",// alt #7
+                  "(\\d{2}),[0-9.]+?,"// nr sats #6
+                  "(\\d+\\.?\\d+?),M,\\d+\\.\\d+,M,,\\*[0-9a-f]{2}$",// alt #7
                   boost::regex_constants::optimize, boost::regex_constants::icase)
 {
 }
