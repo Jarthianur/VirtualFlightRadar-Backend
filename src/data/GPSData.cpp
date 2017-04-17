@@ -32,6 +32,19 @@ GPSData::~GPSData() noexcept
 {
 }
 
+void GPSData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double geoid)
+{
+    setGGAstr(Priority::DONTCARE, mGPSfix.ggafix(b_lat, b_lon, b_alt, geoid));
+    setRMCstr(Priority::DONTCARE, mGPSfix.rmcfix(b_lat, b_lon, b_alt, geoid));
+    struct GPSPosition base;
+    base.latitude = b_lat;
+    base.longitude = b_lon;
+    base.altitude = b_alt;
+    base.nrSats = 5;
+    base.fixQa = 1;
+    setBasePos(Priority::DONTCARE, base);
+}
+
 void GPSData::setGGAstr(Priority prio, const std::string& gga)
 {
     boost::lock_guard<boost::mutex> lock(mGGAstr.mutex);
@@ -42,6 +55,23 @@ std::string GPSData::getGGAstr()
 {
     boost::lock_guard<boost::mutex> lock(mGGAstr.mutex);
     return mGGAstr.value;
+}
+
+void GPSData::setRMCstr(Priority prio, const std::string& rmc)
+{
+    boost::lock_guard<boost::mutex> lock(mRMCstr.mutex);
+    mRMCstr.update(rmc, prio);
+}
+
+std::string GPSData::getGPSstr()
+{
+    return getRMCstr() + getGGAstr();
+}
+
+std::string GPSData::getRMCstr()
+{
+    boost::lock_guard<boost::mutex> lock(mRMCstr.mutex);
+    return mRMCstr.value;
 }
 
 std::int32_t GPSData::getBaseAlt()

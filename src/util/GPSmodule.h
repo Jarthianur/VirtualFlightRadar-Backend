@@ -31,29 +31,21 @@
 class GPSmodule
 {
 public:
-    GPSmodule(double /*b_lat*/, double /*b_lon*/, std::int32_t /*b_alt*/, double /*geoid*/);
+    GPSmodule();
     virtual ~GPSmodule() noexcept;
 
     /**
-     * build GPRMC and GPGGA
+     * build GPGGA sentence
      */
-    std::string gpsfix();
+    std::string ggafix(double /*b_lat*/, double /*b_lon*/, std::int32_t /*b_alt*/,
+                       double /*geoid*/);
+    /**
+     * build GPRMC sentence
+     */
+    std::string rmcfix(double /*b_lat*/, double /*b_lon*/, std::int32_t /*b_alt*/,
+                       double /*geoid*/);
 
 private:
-    double mBaseLat, mBaseLong, mBaseGeoid,
-    /**
-     * Latitude degree, minutes
-     * Longitude degree, minutes
-     */
-    mLatDeg, mLatMin, mLongDeg, mLongMin;
-    std::int32_t mBaseAlt;
-
-    /**
-     * Latitude: S - N
-     * Longitude: W - E
-     */
-    char mLatStr, mLongStr;
-
     /**
      * format string mBuffer
      */

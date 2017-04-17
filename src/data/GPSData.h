@@ -22,9 +22,9 @@
 #ifndef SRC_DATA_GPSDATA_H_
 #define SRC_DATA_GPSDATA_H_
 
-#include <cstdint>
 #include <string>
 
+#include "../util/GPSmodule.h"
 #include "../util/Priority.h"
 #include "Data.hpp"
 
@@ -43,8 +43,13 @@ public:
     GPSData();
     virtual ~GPSData() noexcept;
 
+    void setDefaults(double /*b_lat*/, double /*b_lon*/, std::int32_t /*b_alt*/,
+                     double /*geoid*/);
+
+    std::string getGPSstr();
+
     void setGGAstr(Priority /*prio*/, const std::string& /*gga*/);
-    std::string getGGAstr();
+    void setRMCstr(Priority /*prio*/, const std::string& /*rmc*/);
 
     void setBasePos(Priority /*prio*/, const struct GPSPosition& /*pos*/);
     std::int32_t getBaseAlt();
@@ -52,8 +57,13 @@ public:
     double getBaseLong();
 
 private:
+    std::string getGGAstr();
+    std::string getRMCstr();
+
     struct Data<struct GPSPosition> mBasePos;
     struct Data<std::string> mGGAstr;
+    struct Data<std::string> mRMCstr;
+    GPSmodule mGPSfix;
 };
 
 #endif /* SRC_DATA_GPSDATA_H_ */

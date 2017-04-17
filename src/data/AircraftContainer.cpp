@@ -39,12 +39,6 @@ AircraftContainer::~AircraftContainer() noexcept
 {
 }
 
-void AircraftContainer::initProcessor(double proc_lat, double proc_lon,
-                                      std::int32_t proc_alt)
-{
-    mAcProc.init(proc_lat, proc_lon, proc_alt);
-}
-
 ssize_t AircraftContainer::find(const std::string& id)
 {
     const auto it = mIndexMap.find(id);

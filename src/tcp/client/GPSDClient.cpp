@@ -98,19 +98,23 @@ void GPSDClient::handleConnect(const boost::system::error_code& ec,
 
 void GPSDClient::stop() noexcept
 {
-    boost::asio::async_write(
-            mSocket, boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
-            [this](const boost::system::error_code& ec, std::size_t s)
-            {
-                if (!ec)
+    if (mSocket.is_open())
+    {
+        boost::asio::async_write(
+                mSocket,
+                boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
+                [this](const boost::system::error_code& ec, std::size_t s)
                 {
-                    Logger::info("(GPSDClient) stopped watch");
-                }
-                else
-                {
-                    Logger::error("(GPSDClient) send un-watch request: ", ec.message());
-                }
-            });
+                    if (!ec)
+                    {
+                        Logger::info("(GPSDClient) stopped watch");
+                    }
+                    else
+                    {
+                        Logger::error("(GPSDClient) send un-watch request: ", ec.message());
+                    }
+                });
+    }
     Client::stop();
 }
 

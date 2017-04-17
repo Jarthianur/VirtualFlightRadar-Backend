@@ -48,9 +48,6 @@ public:
     AircraftContainer();
     virtual ~AircraftContainer() noexcept;
 
-    void initProcessor(double /*proc_lat*/, double /*proc_lon*/,
-                       std::int32_t /*proc_alt*/);
-
     /**
      * Insert aircraft in container, prefer FLARM.
      */

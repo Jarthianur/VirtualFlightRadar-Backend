@@ -34,15 +34,12 @@ class AircraftProcessor
 {
 public:
     AircraftProcessor();
-    AircraftProcessor(double /*b_lat*/, double /*b_long*/, std::int32_t /*b_alt*/);
     virtual ~AircraftProcessor() noexcept;
 
     /**
      * build nmea-msg from Aircraft
      */
     std::string process(Aircraft& /*ac*/);
-
-    void init(double /*lat*/, double /*lon*/, std::int32_t /*alt*/);
 
 private:
     /**
@@ -55,15 +52,11 @@ private:
      */
     void calcRelPosToBase(Aircraft& /*ac*/);
 
-    /**
-     * base position info
-     */
-    double mBaseLat, mBaseLong,
-    /**
+        /**
      * Longitude base, Aircraft
      * Latitude base, Aircraft
      */
-    mRadLongB = 0.0, mtRadLongAc = 0.0, mRadLatB = 0.0, mtRadLatAc = 0.0,
+    double mtRadLongB = 0.0, mtRadLongAc = 0.0, mtRadLatB = 0.0, mtRadLatAc = 0.0,
     /**
      * Longitude, Latitude distance
      */
@@ -77,13 +70,9 @@ private:
      */
     mtAval = 0.0;
     /**
-     * (alt = height + antennaheight)
-     */
-    std::int32_t mBaseAlt,
-    /**
      * relative North, East, Vertical
      */
-    mtRelN = 0, mtRelE = 0, mtRelV = 0,
+    std::int32_t mtRelN = 0, mtRelE = 0, mtRelV = 0,
     /**
      * distance from base position to Aircraft
      */

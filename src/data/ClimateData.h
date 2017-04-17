@@ -24,7 +24,6 @@
 
 #include <string>
 
-#include "../config/Configuration.h"
 #include "../util/Priority.h"
 #include "Data.hpp"
 
@@ -50,7 +49,7 @@ public:
     void setWVstr(Priority /*prio*/, const std::string& /*wv*/);
 
     double getPress();
-    void setPress(Priority /*prio*/, double /*p*/= Configuration::base_pressure);
+    void setPress(Priority /*prio*/, double /*p*/);
 
 private:
     struct Data<double> mPress;

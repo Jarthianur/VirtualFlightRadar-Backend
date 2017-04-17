@@ -23,9 +23,11 @@
 #define SRC_PARSER_GPSPARSER_H_
 
 #include <boost/regex.hpp>
-#include "Parser.h"
+#include <string>
 
-struct GPSPosition;
+#include "../util/Priority.h"
+#include "Parser.h"
+#include "../data/GPSData.h"
 
 class GPSParser: public Parser
 {

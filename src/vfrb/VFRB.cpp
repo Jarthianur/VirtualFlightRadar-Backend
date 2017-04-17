@@ -37,7 +37,6 @@
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
 #include "../tcp/server/NMEAServer.h"
-#include "../util/GPSmodule.h"
 #include "../util/Logger.h"
 
 bool VFRB::global_run_status = true;
@@ -58,10 +57,6 @@ void VFRB::run() noexcept
     Logger::info("(VFRB) startup");
     //store start time
     boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
-
-    //create ac proc for gpsfix
-    GPSmodule gpsm(Configuration::base_latitude, Configuration::base_longitude,
-                   Configuration::base_altitude, Configuration::base_geoid);
 
     // register signals and run handler
     boost::asio::io_service io_service;
@@ -107,8 +102,7 @@ void VFRB::run() noexcept
             }
 
             //write GPS position to clients
-            str = gpsm.gpsfix();
-            server.writeToAll(str);
+            server.writeToAll(msGPSdata.getGPSstr());
 
             // write wind info to clients
             str = msClimateData.getWVstr();

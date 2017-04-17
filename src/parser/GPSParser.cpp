@@ -28,6 +28,7 @@
 #include "../util/Math.hpp"
 #include "../util/Priority.h"
 #include "../vfrb/VFRB.h"
+#include "../util/Logger.h"
 
 GPSParser::GPSParser()
         : Parser(),
@@ -60,8 +61,12 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
     }
 
     boost::smatch match;
-    if (boost::regex_match(msg, match, mGpggaRE))
-    {
+    if (msg.find("RMC") != std::string::npos)
+    {Logger::debug(msg);
+        VFRB::msGPSdata.setRMCstr(prio, msg);
+    }
+    else if (boost::regex_match(msg, match, mGpggaRE))
+    {Logger::debug(msg);
         try
         {
             //latitude

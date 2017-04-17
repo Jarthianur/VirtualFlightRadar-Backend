@@ -23,9 +23,10 @@
 #include <string>
 
 #include "config/Configuration.h"
-#include "data/AircraftContainer.h"
 #include "data/ClimateData.h"
+#include "data/GPSData.h"
 #include "util/Logger.h"
+#include "util/Priority.h"
 #include "vfrb/VFRB.h"
 
 #ifndef VERSION
@@ -53,12 +54,10 @@ int main(int argc, char* argv[])
     }
 
     // set climate fallbacks
-    VFRB::msClimateData.setPress(Priority::DONTCARE);
-
-    // init containers processor
-    VFRB::msAcCont.initProcessor(Configuration::base_latitude,
-                                 Configuration::base_longitude,
-                                 Configuration::base_altitude);
+    VFRB::msClimateData.setPress(Priority::DONTCARE, Configuration::base_pressure);
+    VFRB::msGPSdata.setDefaults(Configuration::base_latitude,
+                                Configuration::base_longitude,
+                                Configuration::base_altitude, Configuration::base_geoid);
     VFRB::run();
 
     return 0;
