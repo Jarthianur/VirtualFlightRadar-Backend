@@ -71,14 +71,14 @@ std::int32_t APRSParser::unpack(const std::string& msg, Priority prio) noexcept
                 mtTime = std::stoi(match.str(1));
 
                 //latitude
-                mtLat = Math::dmToDeg(std::stod(match.str(2)));
+                mtLat = Math::dmsToDeg(std::stod(match.str(2)) / 100.0);
                 if (match.str(3).compare("S") == 0)
                 {
                     mtLat = -mtLat;
                 }
 
                 //longitude
-                mtLong = Math::dmToDeg(std::stod(match.str(4)));
+                mtLong = Math::dmsToDeg(std::stod(match.str(4)) / 100.0);
                 if (match.str(5).compare("W") == 0)
                 {
                     mtLong = -mtLong;
