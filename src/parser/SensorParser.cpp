@@ -23,7 +23,7 @@
 
 #include <stdexcept>
 
-#include "../data/ClimateData.h"
+#include "../data/SensorData.h"
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
 
@@ -40,8 +40,7 @@ std::int32_t SensorParser::unpack(const std::string& msg, Priority prio) noexcep
 {
     try
     {
-        std::int32_t csum = std::stoi(msg.substr(msg.rfind('*') + 1, 2),
-                                      nullptr, 16);
+        std::int32_t csum = std::stoi(msg.substr(msg.rfind('*') + 1, 2), nullptr, 16);
         if (csum != Math::checksum(msg.c_str(), msg.length()))
         {
             return MSG_UNPACK_IGN;
@@ -62,7 +61,7 @@ std::int32_t SensorParser::unpack(const std::string& msg, Priority prio) noexcep
             mtPress = std::stod(msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
             if (mtNumIdx == mtSubLen)
             {
-                VFRB::msClimateData.setPress(prio, mtPress);
+                VFRB::msSensorData.setPress(prio, mtPress);
             }
             else
             {
@@ -76,7 +75,7 @@ std::int32_t SensorParser::unpack(const std::string& msg, Priority prio) noexcep
     }
     else if (msg.find("MWV") != std::string::npos)
     {
-        VFRB::msClimateData.setWVstr(prio, msg);
+        VFRB::msSensorData.setWVstr(prio, msg);
     }
     else
     {

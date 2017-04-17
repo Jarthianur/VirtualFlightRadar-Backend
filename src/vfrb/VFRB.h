@@ -28,7 +28,7 @@
 #include "Feed.h"
 
 class AircraftContainer;
-class ClimateData;
+class SensorData;
 class NMEAServer;
 class GPSData;
 
@@ -60,7 +60,7 @@ public:
     /**
      * Container for climate information
      */
-    static ClimateData msClimateData;
+    static SensorData msSensorData;
     /**
      * Container for GPS information
      */
