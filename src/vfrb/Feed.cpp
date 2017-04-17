@@ -23,9 +23,11 @@
 
 #include "../config/Configuration.h"
 #include "../parser/APRSParser.h"
+#include "../parser/GPSParser.h"
 #include "../parser/SBSParser.h"
 #include "../parser/SensorParser.h"
 #include "../tcp/client/APRSCClient.h"
+#include "../tcp/client/GPSDClient.h"
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
 #include "../util/Logger.h"
@@ -112,11 +114,12 @@ void Feed::run(boost::asio::signal_set& sigset)
                     new SensorClient(sigset, host, port, *this));
             break;
         }
-            /*case InputType::GPS:{
-             mpParser = std::unique_ptr<Parser>(new GPSParser());
-             mClient = std::unique_ptr<Client>(
-             new GPSClient(sigset, host, port, *this));
-             break;}*/
+        case InputType::GPS:
+        {
+            mpParser = std::unique_ptr<Parser>(new GPSParser());
+            mpClient = std::unique_ptr<Client>(new GPSDClient(sigset, host, port, *this));
+            break;
+        }
         default:
             return;
     }
