@@ -19,26 +19,29 @@
  }
  */
 
-#ifndef SRC_PARSER_WINDPARSER_H_
-#define SRC_PARSER_WINDPARSER_H_
+#ifndef SRC_UTIL_PRIORITY_H_
+#define SRC_UTIL_PRIORITY_H_
 
 #include <cstdint>
-#include <cstddef>
-#include <string>
 
-#include "Parser.h"
-
-class WindParser: public Parser
-{
-public:
-    WindParser();
-    virtual ~WindParser() noexcept;
-
-    std::int32_t unpack(const std::string& /*msg*/) noexcept override;
-
-private:
-    std::size_t mtB = 0, mtS = 0, mtSubLen = 0, mtNumIdx = 0;
-    double mtPress = 0.0, mtTemp = 0.0;
+/**
+ * Priorities / update policies
+ * Override data if not valid, or lower.
+ *
+ * DONTCARE : used for single input (no other feed for this data),
+ *     or fallbacks. Overrides itself, but nothing else.
+ * LESSER: used as "I actually want input from other feed, but if not take it."
+ *     Overrides only DC, even not itself, until invalid. Data stays invalid.
+ * NORMAL: used for common backup feeds. Overrides itself and all but HIGHER.
+ * HIGHER: used for main feed. Overrides all, no matter what state.
+ */
+enum class Priority
+    : std::uint32_t
+    {
+        DONTCARE = 0,
+    LESSER = 1,
+    NORMAL = 2,
+    HIGHER = 3
 };
 
-#endif /* SRC_PARSER_WINDPARSER_H_ */
+#endif /* SRC_UTIL_PRIORITY_H_ */

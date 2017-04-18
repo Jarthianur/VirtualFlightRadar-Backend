@@ -26,13 +26,12 @@
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <iostream>
-
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
 SBSClient::SBSClient(boost::asio::signal_set& sigset, const std::string& host,
-                     const std::string& port)
-        : Client(sigset, host, port, "(SBSClient)"),
-          mParser()
+                     const std::string& port, Feed& feed)
+        : Client(sigset, host, port, "(SBSClient)", feed)
 {
     connect();
 }
@@ -53,7 +52,7 @@ void SBSClient::connect() noexcept
 
 void SBSClient::process() noexcept
 {
-    mParser.unpack(mResponse);
+    mrFeed.process(mResponse);
 }
 
 void SBSClient::handleResolve(const boost::system::error_code& ec,
@@ -85,7 +84,7 @@ void SBSClient::handleConnect(const boost::system::error_code& ec,
     if (!ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(SBSClient) connected to: ", mHost);
+        Logger::info("(SBSClient) connected to: ", mHost + ":" + mPort);
         read();
     }
     else

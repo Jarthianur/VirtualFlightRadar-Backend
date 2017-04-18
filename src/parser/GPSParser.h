@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
+ Copyright (C) 2017 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -19,35 +19,29 @@
  }
  */
 
-#ifndef SRC_PARSER_APRSPARSER_H_
-#define SRC_PARSER_APRSPARSER_H_
+#ifndef SRC_PARSER_GPSPARSER_H_
+#define SRC_PARSER_GPSPARSER_H_
 
 #include <boost/regex.hpp>
-#include <cstdint>
 #include <string>
 
+#include "../util/Priority.h"
 #include "Parser.h"
+#include "../data/GPSData.h"
 
-#define APRS_REGEX_ERR -3
-
-class APRSParser: public Parser
+class GPSParser: public Parser
 {
 public:
-    APRSParser();
-    virtual ~APRSParser() noexcept;
+    GPSParser();
+    virtual ~GPSParser() noexcept;
 
     std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
 
 private:
     //regex
-    const boost::regex mAprsRE;
-    const boost::regex mCommRE;
-    // temps
-    std::string mtID;
-    std::int32_t mtIDtype = 0, mtAcType = 0, mtAlt = 0, mtTime = 0;
-    double mtLat = 0.0, mtLong = 0.0, mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0,
-            mtHeading = 0.0;
-    bool mtFullInfo = true;
+    const boost::regex mGpggaRE;
+    //tmps
+    struct GPSPosition mtGPSpos;
 };
 
-#endif /* SRC_PARSER_APRSPARSER_H_ */
+#endif /* SRC_PARSER_GPSPARSER_H_ */

@@ -26,37 +26,17 @@
 
 #include "../config/Configuration.h"
 #include "../data/ClimateData.h"
+#include "../data/GPSData.h"
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
 #include "Aircraft.h"
 
 AircraftProcessor::AircraftProcessor()
-        : mBaseLat(0.0),
-          mBaseLong(0.0),
-          mBaseAlt(0)
 {
-}
-
-AircraftProcessor::AircraftProcessor(double b_lat, double b_long, std::int32_t b_alt)
-        : mBaseLat(b_lat),
-          mBaseLong(b_long),
-          mBaseAlt(b_alt)
-{
-    mRadLongB = Math::radian(mBaseLong);
-    mRadLatB = Math::radian(mBaseLat);
 }
 
 AircraftProcessor::~AircraftProcessor() noexcept
 {
-}
-
-void AircraftProcessor::init(double lat, double lon, std::int32_t alt)
-{
-    mBaseLat = lat;
-    mBaseLong = lon;
-    mBaseAlt = alt;
-    mRadLongB = Math::radian(mBaseLong);
-    mRadLatB = Math::radian(mBaseLat);
 }
 
 std::string AircraftProcessor::process(Aircraft& ac)
@@ -102,22 +82,24 @@ std::string AircraftProcessor::process(Aircraft& ac)
 
 void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
 {
+    mtRadLatB = Math::radian(VFRB::msGPSdata.getBaseLat());
+    mtRadLongB = Math::radian(VFRB::msGPSdata.getBaseLong());
     mtRadLongAc = Math::radian(ac.getLongitude());
     mtRadLatAc = Math::radian(ac.getLatitude());
-    mtLongDist = mtRadLongAc - mRadLongB;
-    mtLatDist = mtRadLatAc - mRadLatB;
+    mtLongDist = mtRadLongAc - mtRadLongB;
+    mtLatDist = mtRadLatAc - mtRadLatB;
 
     mtAval = std::pow(std::sin(mtLatDist / 2.0), 2.0)
-            + std::cos(mRadLatB) * std::cos(mtRadLatAc)
+            + std::cos(mtRadLatB) * std::cos(mtRadLatAc)
               * std::pow(std::sin(mtLongDist / 2.0), 2.0);
     mtDist = Math::dToI(
             6371000.0 * (2.0 * std::atan2(std::sqrt(mtAval), std::sqrt(1.0 - mtAval))));
 
     mtBearingRel = Math::degree(
             std::atan2(
-                    std::sin(mtRadLongAc - mRadLongB) * std::cos(mtRadLatAc),
-                    std::cos(mRadLatB) * std::sin(mtRadLatAc) - std::sin(mRadLatB)
-                            * std::cos(mtRadLatAc) * std::cos(mtRadLongAc - mRadLongB)));
+                    std::sin(mtRadLongAc - mtRadLongB) * std::cos(mtRadLatAc),
+                    std::cos(mtRadLatB) * std::sin(mtRadLatAc) - std::sin(mtRadLatB)
+                            * std::cos(mtRadLatAc) * std::cos(mtRadLongAc - mtRadLongB)));
     mtBearingAbs = std::fmod((mtBearingRel + 360.0), 360.0);
 
     mtRelN = Math::dToI(std::cos(Math::radian(mtBearingAbs)) * mtDist);
@@ -125,5 +107,6 @@ void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
     mtRelV =
             ac.getTargetT() == Aircraft::TargetType::TRANSPONDER ?
                     ac.getAltitude() - Math::calcIcaoHeight(
-                            VFRB::msClimateData.getPress()) : ac.getAltitude() - mBaseAlt;
+                            VFRB::msClimateData.getPress()) :
+                    ac.getAltitude() - VFRB::msGPSdata.getBaseAlt();
 }

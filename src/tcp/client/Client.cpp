@@ -25,11 +25,11 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <iostream>
-
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
 Client::Client(boost::asio::signal_set& sigset, const std::string& host,
-        const std::string& port, const std::string& comp)
+               const std::string& port, const std::string& comp, Feed& feed)
         : mIOservice(),
           mrSigSet(sigset),
           mSocket(mIOservice),
@@ -37,7 +37,8 @@ Client::Client(boost::asio::signal_set& sigset, const std::string& host,
           mHost(host),
           mPort(port),
           mComponent(comp),
-          mConnectTimer(mIOservice)
+          mConnectTimer(mIOservice),
+          mrFeed(feed)
 
 {
     awaitStop();
@@ -70,7 +71,7 @@ void Client::timedConnect() noexcept
 
 void Client::stop() noexcept
 {
-    Logger::info(mComponent + " stop connection to: ", mHost);
+    Logger::info(mComponent + " stop connection to: ", mHost + ":" + mPort);
     mConnectTimer.expires_at(boost::posix_time::pos_infin);
     mConnectTimer.cancel();
     boost::system::error_code ec;
@@ -95,7 +96,7 @@ void Client::handleTimedConnect(const boost::system::error_code& ec) noexcept
 {
     if (!ec)
     {
-        Logger::info(mComponent + " try connect to: ", mHost);
+        Logger::info(mComponent + " try connect to: ", mHost + ":" + mPort);
         connect();
     }
     else

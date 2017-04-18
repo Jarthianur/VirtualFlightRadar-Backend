@@ -21,13 +21,12 @@
 
 #include "ConfigReader.h"
 
-#include <boost/regex.hpp>
 #include <fstream>
 #include <stdexcept>
+#include <typeindex>
 #include <utility>
 
 #include "../util/Logger.h"
-
 
 ConfigReader::ConfigReader(const std::string& fname)
         : mFile(fname),
@@ -46,12 +45,21 @@ void ConfigReader::read()
     std::string key;
     std::string value;
     std::string line;
+    std::string section;
     while (std::getline(src, line))
     {
         try
         {
-            if (line.at(0) == ';' || line.at(0) == '[')
+            if (line.length() == 0 || line.at(0) == ';')
             {
+                continue;
+            }
+            if (line.at(0) == '[')
+            {
+                section = line.substr(1, line.rfind(']') - 1);
+                mConfig.emplace(
+                        std::make_pair(section,
+                                       std::unordered_map<std::string, std::string>()));
                 continue;
             }
             boost::smatch match;
@@ -59,8 +67,12 @@ void ConfigReader::read()
             {
                 key = match.str(1);
                 value = match.str(2);
-                mConfig.insert(
-                { key, value });
+                std::size_t l = value.find_last_not_of(' ');
+                if (l != std::string::npos)
+                {
+                    value = value.substr(0, l + 1);
+                }
+                mConfig[section].emplace(std::make_pair(key, value));
             }
             else
             {
@@ -79,16 +91,39 @@ void ConfigReader::read()
     }
 }
 
-const std::string& ConfigReader::getProperty(const std::string& key,
-        const std::string& def_val) const
+const std::string ConfigReader::getProperty(const std::string& section,
+                                            const std::string& key,
+                                            const std::string& def_val) const
 {
-    auto it = mConfig.find(key);
-    if (it == mConfig.end())
+    auto s_it = mConfig.find(section);
+    if (s_it != mConfig.end())
     {
-        return def_val;
+        auto it = s_it->second.find(key);
+        if (it != s_it->second.end())
+        {
+            return it->second;
+        }
+        else
+        {
+            return def_val;
+        }
     }
     else
     {
+        return def_val;
+    }
+}
+
+const std::unordered_map<std::string, std::string>& ConfigReader::getSectionKV(
+        const std::string& section) const
+{
+    auto it = mConfig.find(section);
+    if (it != mConfig.end())
+    {
         return it->second;
+    }
+    else
+    {
+        throw std::out_of_range("section not found");
     }
 }

@@ -28,6 +28,8 @@
 #include <string>
 #include "../../config/Parameters.h"
 
+class Feed;
+
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
 
 class Client
@@ -45,7 +47,7 @@ public:
 
 protected:
     Client(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-           const std::string& /*port*/, const std::string& /*comp*/);
+           const std::string& /*port*/, const std::string& /*comp*/, Feed& /*feed*/);
 
     /**
      * Register stop-handler to signals.
@@ -132,6 +134,10 @@ protected:
      * Component string for logging.
      */
     const std::string mComponent;
+    /**
+     * Parent feed.
+     */
+    Feed& mrFeed;
 
 private:
     /**

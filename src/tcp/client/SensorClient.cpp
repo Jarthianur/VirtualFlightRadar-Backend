@@ -19,48 +19,52 @@
  }
  */
 
-#include "WindClient.h"
+#include "SensorClient.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/operators.hpp>
-
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
-WindClient::WindClient(boost::asio::signal_set& sigset, const std::string& host,
-                       const std::string& port)
-        : Client(sigset, host, port, "(WindClient)"),
+SensorClient::SensorClient(boost::asio::signal_set& sigset, const std::string& host,
+                           const std::string& port, Feed& feed)
+        : Client(sigset, host, port, "(WindClient)", feed),
           mStopped(false),
-          mTimeout(mIOservice),
-          mParser()
+          mTimeout(mIOservice)
 {
     connect();
-    mTimeout.async_wait(boost::bind(&WindClient::checkDeadline, this));
+    mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
 }
 
-WindClient::~WindClient() noexcept
+SensorClient::~SensorClient() noexcept
 {
 }
 
-void WindClient::read() noexcept
+void SensorClient::read() noexcept
 {
     mTimeout.expires_from_now(boost::posix_time::seconds(WC_RCV_TIMEOUT));
     Client::read();
 }
 
-void WindClient::connect() noexcept
+void SensorClient::connect() noexcept
 {
     boost::asio::ip::tcp::resolver::query query(
             mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(
             query,
-            boost::bind(&WindClient::handleResolve, this,
+            boost::bind(&SensorClient::handleResolve, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
 }
 
-void WindClient::checkDeadline() noexcept
+void SensorClient::process() noexcept
+{
+    mrFeed.process(mResponse);
+}
+
+void SensorClient::checkDeadline() noexcept
 {
     if (mStopped)
     {
@@ -76,10 +80,10 @@ void WindClient::checkDeadline() noexcept
         mTimeout.expires_at(boost::posix_time::pos_infin);
         connect();
     }
-    mTimeout.async_wait(boost::bind(&WindClient::checkDeadline, this));
+    mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
 }
 
-void WindClient::stop() noexcept
+void SensorClient::stop() noexcept
 {
     Client::stop();
     mStopped = true;
@@ -87,13 +91,8 @@ void WindClient::stop() noexcept
     mTimeout.cancel();
 }
 
-void WindClient::process() noexcept
-{
-    mParser.unpack(mResponse);
-}
-
-void WindClient::handleResolve(const boost::system::error_code& ec,
-                               boost::asio::ip::tcp::resolver::iterator it) noexcept
+void SensorClient::handleResolve(const boost::system::error_code& ec,
+                                 boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
     if (mStopped)
     {
@@ -104,7 +103,7 @@ void WindClient::handleResolve(const boost::system::error_code& ec,
         boost::asio::async_connect(
                 mSocket,
                 it,
-                boost::bind(&WindClient::handleConnect, this,
+                boost::bind(&SensorClient::handleConnect, this,
                             boost::asio::placeholders::error,
                             boost::asio::placeholders::iterator));
     }
@@ -119,8 +118,8 @@ void WindClient::handleResolve(const boost::system::error_code& ec,
     }
 }
 
-void WindClient::handleConnect(const boost::system::error_code& ec,
-                               boost::asio::ip::tcp::resolver::iterator it) noexcept
+void SensorClient::handleConnect(const boost::system::error_code& ec,
+                                 boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
     if (mStopped)
     {
@@ -129,7 +128,7 @@ void WindClient::handleConnect(const boost::system::error_code& ec,
     if (!ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(WindClient) connected to: ", mHost);
+        Logger::info("(WindClient) connected to: ", mHost + ":" + mPort);
         read();
     }
     else

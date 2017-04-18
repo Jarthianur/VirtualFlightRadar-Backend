@@ -19,35 +19,44 @@
  }
  */
 
-#ifndef SRC_PARSER_APRSPARSER_H_
-#define SRC_PARSER_APRSPARSER_H_
+#ifndef SRC_DATA_DATA_HPP_
+#define SRC_DATA_DATA_HPP_
 
-#include <boost/regex.hpp>
+#include <boost/thread/mutex.hpp>
 #include <cstdint>
 #include <string>
 
-#include "Parser.h"
+#include "../util/Priority.h"
 
-#define APRS_REGEX_ERR -3
-
-class APRSParser: public Parser
+template<typename T>
+struct Data
 {
-public:
-    APRSParser();
-    virtual ~APRSParser() noexcept;
+    T value;
+    bool valid;
+    Priority lastPriority;
+    boost::mutex mutex;
 
-    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
-
-private:
-    //regex
-    const boost::regex mAprsRE;
-    const boost::regex mCommRE;
-    // temps
-    std::string mtID;
-    std::int32_t mtIDtype = 0, mtAcType = 0, mtAlt = 0, mtTime = 0;
-    double mtLat = 0.0, mtLong = 0.0, mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0,
-            mtHeading = 0.0;
-    bool mtFullInfo = true;
+    void update(const T& nv, Priority prio)
+    {
+        bool write = !valid;
+        if (!write)
+        {
+            if (prio > lastPriority || (prio == lastPriority && prio != Priority::LESSER))
+            {
+                write = true;
+            }
+        }
+        if (write)
+        {
+            valid = (prio != Priority::LESSER);
+            value = nv;
+            lastPriority = prio;
+        }
+        else
+        {
+            valid = false;
+        }
+    }
 };
 
-#endif /* SRC_PARSER_APRSPARSER_H_ */
+#endif /* SRC_DATA_DATA_HPP_ */

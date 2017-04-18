@@ -44,12 +44,6 @@ AircraftContainer::~AircraftContainer() noexcept
 {
 }
 
-void AircraftContainer::initProcessor(double proc_lat, double proc_lon,
-                                      std::int32_t proc_alt)
-{
-    mAcProc.init(proc_lat, proc_lon, proc_alt);
-}
-
 ssize_t AircraftContainer::find(const std::string& id)
 {
     const auto it = mIndexMap.find(id);
@@ -111,23 +105,41 @@ std::string AircraftContainer::processAircrafts()
     return dest_str;
 }
 
-void AircraftContainer::insertAircraft(const Aircraft& update)
+void AircraftContainer::insertAircraft(const Aircraft& update, Priority prio)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    ssize_t i;
-
-    if ((i = find(update.getID())) == AC_NOT_FOUND)
+    bool write = !mInputValid;
+    if (!write)
     {
-        mCont.push_back(update);
-        mIndexMap.insert( { update.getID(), mCont.size() - 1 });
+        if (prio > mLastPriority || (prio == mLastPriority && prio != Priority::LESSER))
+        {
+            write = true;
+        }
+    }
+    if (write)
+    {
+        mInputValid = (prio != Priority::LESSER);
+        mLastPriority = prio;
+
+        ssize_t i;
+
+        if ((i = find(update.getID())) == AC_NOT_FOUND)
+        {
+            mCont.push_back(update);
+            mIndexMap.insert( { update.getID(), mCont.size() - 1 });
+        }
+        else
+        {
+            Aircraft& known_ac = mCont.at(i);
+            if (known_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER || update.getTargetT()
+                    == Aircraft::TargetType::FLARM)
+            {
+                known_ac.update(update);
+            }
+        }
     }
     else
     {
-        Aircraft& known_ac = mCont.at(i);
-        if (known_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER || update.getTargetT()
-                == Aircraft::TargetType::FLARM)
-        {
-            known_ac.update(update);
-        }
+        mInputValid = false;
     }
 }

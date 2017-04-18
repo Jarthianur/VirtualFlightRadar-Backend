@@ -19,35 +19,26 @@
  }
  */
 
-#ifndef SRC_PARSER_APRSPARSER_H_
-#define SRC_PARSER_APRSPARSER_H_
+#ifndef SRC_PARSER_SENSORPARSER_H_
+#define SRC_PARSER_SENSORPARSER_H_
 
-#include <boost/regex.hpp>
 #include <cstdint>
+#include <cstddef>
 #include <string>
 
 #include "Parser.h"
 
-#define APRS_REGEX_ERR -3
-
-class APRSParser: public Parser
+class SensorParser: public Parser
 {
 public:
-    APRSParser();
-    virtual ~APRSParser() noexcept;
+    SensorParser();
+    virtual ~SensorParser() noexcept;
 
     std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
 
 private:
-    //regex
-    const boost::regex mAprsRE;
-    const boost::regex mCommRE;
-    // temps
-    std::string mtID;
-    std::int32_t mtIDtype = 0, mtAcType = 0, mtAlt = 0, mtTime = 0;
-    double mtLat = 0.0, mtLong = 0.0, mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0,
-            mtHeading = 0.0;
-    bool mtFullInfo = true;
+    std::size_t mtB = 0, mtS = 0, mtSubLen = 0, mtNumIdx = 0;
+    double mtPress = 0.0;
 };
 
-#endif /* SRC_PARSER_APRSPARSER_H_ */
+#endif /* SRC_PARSER_SENSORPARSER_H_ */

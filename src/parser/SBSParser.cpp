@@ -39,7 +39,7 @@ SBSParser::~SBSParser() noexcept
 {
 }
 
-std::int32_t SBSParser::unpack(const std::string& msg) noexcept
+std::int32_t SBSParser::unpack(const std::string& msg, Priority prio) noexcept
 {
     /*
      * fields:
@@ -134,7 +134,7 @@ std::int32_t SBSParser::unpack(const std::string& msg) noexcept
     Aircraft ac(mtID, mtLat, mtLong, mtAlt);
     ac.setFullInfo(false);
     ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-    VFRB::msAcCont.insertAircraft(ac);
+    VFRB::msAcCont.insertAircraft(ac, prio);
 
     return MSG_UNPACK_SUC;
 }

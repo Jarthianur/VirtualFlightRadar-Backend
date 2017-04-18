@@ -19,43 +19,51 @@
  }
  */
 
-#ifndef SRC_TCP_CLIENT_APRSCCLIENT_H_
-#define SRC_TCP_CLIENT_APRSCCLIENT_H_
+#ifndef SRC_TCP_CLIENT_SENSORCLIENT_H_
+#define SRC_TCP_CLIENT_SENSORCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <string>
 
 #include "Client.h"
+#include "../../config/Parameters.h"
 
-class APRSCClient: public Client
+#define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
+
+class SensorClient: public Client
 {
 public:
-    APRSCClient(const APRSCClient&) = delete;
-    APRSCClient& operator=(const APRSCClient&) = delete;
+    SensorClient(const SensorClient&) = delete;
+    SensorClient& operator=(const SensorClient&) = delete;
 
-    APRSCClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-                const std::string& /*port*/, const std::string& /*login*/,
-                Feed& /*feed*/);
-    virtual ~APRSCClient() noexcept;
+    SensorClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
+                 const std::string& /*port*/, Feed& /*feed*/);
+    virtual ~SensorClient() noexcept;
 
 private:
+    void read() noexcept override;
     void connect() noexcept override;
     void process() noexcept override;
+    /**
+     * Check read timed out.
+     */
+    void checkDeadline() noexcept;
+    void stop() noexcept override;
 
     void handleResolve(const boost::system::error_code& /*ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
     void handleConnect(const boost::system::error_code& /*ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
-    /**
-     * Send login string - handler
-     */
-    void handleLogin(const boost::system::error_code& /*ec*/, std::size_t /*s*/) noexcept;
 
     /**
-     * Login string
+     * Client stopped
      */
-    std::string mLoginStr;
+    bool mStopped;
+    /**
+     * read timer
+     */
+    boost::asio::deadline_timer mTimeout;
 };
 
-#endif /* SRC_TCP_CLIENT_APRSCCLIENT_H_ */
+#endif /* SRC_TCP_CLIENT_SENSORCLIENT_H_ */

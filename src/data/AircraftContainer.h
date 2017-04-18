@@ -22,15 +22,22 @@
 #ifndef SRC_DATA_AIRCRAFTCONTAINER_H_
 #define SRC_DATA_AIRCRAFTCONTAINER_H_
 
-#include <cstddef>
-#include <cstdint>
 #include <boost/thread/mutex.hpp>
+#include <cstddef>
 #include <string>
+#include <typeindex>
 #include <unordered_map>
 #include <vector>
 
 #include "../aircraft/Aircraft.h"
 #include "../aircraft/AircraftProcessor.h"
+#include "../util/Priority.h"
+#include "../config/Parameters.h"
+
+#define AC_NOT_FOUND -1
+#define AC_INVALIDATE AIRCRAFT_INVALIDATE
+#define AC_DELETE_THRESHOLD 120
+#define AC_NO_FLARM_THRESHOLD 4
 
 class AircraftContainer
 {
@@ -41,17 +48,13 @@ public:
     AircraftContainer();
     virtual ~AircraftContainer() noexcept;
 
-    void initProcessor(double /*proc_lat*/, double /*proc_lon*/,
-                       std::int32_t /*proc_alt*/);
-
     /**
      * Insert aircraft in container, prefer FLARM.
      */
-    void insertAircraft(const Aircraft& /*update*/);
+    void insertAircraft(const Aircraft& /*update*/, Priority /*prio*/);
 
     /**
-     * process aircraft at index i into target string,
-     * if index i is valid.
+     * Process all aircrafts.
      */
     std::string processAircrafts();
 
@@ -81,6 +84,9 @@ private:
      * This makes find-method much more efficient.
      */
     std::unordered_map<std::string, size_t> mIndexMap;
+
+    Priority mLastPriority = Priority::DONTCARE;
+    bool mInputValid = false;
 };
 
 #endif /* SRC_DATA_AIRCRAFTCONTAINER_H_ */

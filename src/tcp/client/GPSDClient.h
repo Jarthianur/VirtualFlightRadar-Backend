@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
+ Copyright (C) 2017 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -19,56 +19,38 @@
  }
  */
 
-#ifndef SRC_TCP_CLIENT_WINDCLIENT_H_
-#define SRC_TCP_CLIENT_WINDCLIENT_H_
+#ifndef SRC_TCP_CLIENT_GPSDCLIENT_H_
+#define SRC_TCP_CLIENT_GPSDCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "../../parser/WindParser.h"
 #include "Client.h"
-#include "../../config/Parameters.h"
 
-#define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
-
-class WindClient: public Client
+class GPSDClient: public Client
 {
 public:
-    WindClient(const WindClient&) = delete;
-    WindClient& operator=(const WindClient&) = delete;
+    GPSDClient(const GPSDClient&) = delete;
+    GPSDClient& operator=(const GPSDClient&) = delete;
 
-    WindClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-               const std::string& /*port*/);
-    virtual ~WindClient() noexcept;
+    GPSDClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
+               const std::string& /*port*/, Feed& /*feed*/);
+    virtual ~GPSDClient() noexcept;
 
 private:
-    void read() noexcept override;
-    void process() noexcept override;
     void connect() noexcept override;
-    /**
-     * Check read timed out.
-     */
-    void checkDeadline() noexcept;
     void stop() noexcept override;
+    void process() noexcept override;
 
     void handleResolve(const boost::system::error_code& /*ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
     void handleConnect(const boost::system::error_code& /*ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
-
     /**
-     * Client stopped
+     * Send watch string - handler
      */
-    bool mStopped;
-    /**
-     * read timer
-     */
-    boost::asio::deadline_timer mTimeout;
-    /**
-     * Parser
-     */
-    WindParser mParser;
+    void handleWatch(const boost::system::error_code& /*ec*/, std::size_t /*s*/) noexcept;
 };
 
-#endif /* SRC_TCP_CLIENT_WINDCLIENT_H_ */
+#endif /* SRC_TCP_CLIENT_GPSDCLIENT_H_ */

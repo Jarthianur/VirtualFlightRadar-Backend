@@ -26,14 +26,13 @@
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <iostream>
-
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
 APRSCClient::APRSCClient(boost::asio::signal_set& sigset, const std::string& host,
-                         const std::string& port, const std::string& login)
-        : Client(sigset, host, port, "(APRSCClient)"),
-          mLoginStr(login),
-          mParser()
+                         const std::string& port, const std::string& login, Feed& feed)
+        : Client(sigset, host, port, "(APRSCClient)", feed),
+          mLoginStr(login)
 {
     mLoginStr.append("\r\n");
     connect();
@@ -56,7 +55,7 @@ void APRSCClient::connect() noexcept
 
 void APRSCClient::process() noexcept
 {
-    mParser.unpack(mResponse);
+    mrFeed.process(mResponse);
 }
 
 void APRSCClient::handleResolve(const boost::system::error_code& ec,
@@ -110,7 +109,7 @@ void APRSCClient::handleLogin(const boost::system::error_code& ec, std::size_t s
 {
     if (!ec)
     {
-        Logger::info("(APRSCClient) connected to: ", mHost);
+        Logger::info("(APRSCClient) connected to: ", mHost + ":" + mPort);
         read();
     }
     else

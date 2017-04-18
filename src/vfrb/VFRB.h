@@ -24,10 +24,13 @@
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
+#include "../config/Parameters.h"
+#include "Feed.h"
 
 class AircraftContainer;
 class ClimateData;
 class NMEAServer;
+class GPSData;
 
 class VFRB
 {
@@ -46,9 +49,6 @@ public:
     /**
      * configuration
      */
-    static bool global_climate_enabled;
-    static bool global_aprsc_enabled;
-    static bool global_sbs_enabled;
     static bool global_run_status;
 
     /**
@@ -59,16 +59,17 @@ public:
      * Container for climate information
      */
     static ClimateData msClimateData;
+    /**
+     * Container for GPS information
+     */
+    static GPSData msGPSdata;
 
 private:
     /**
-     * handlers for every thread
+     * handlers for threads
      */
-    static void handleSBSInput(boost::asio::signal_set& /*sigset*/);
-    static void handleAPRSCInput(boost::asio::signal_set& /*sigset*/);
-    static void handleClimateInput(boost::asio::signal_set& /*sigset*/);
+    static void handleInputFeed(boost::asio::signal_set& /*sigset*/, Feed& /*feed*/);
     static void handleNMAEServer(NMEAServer& server);
-
     static void handleSignals(const boost::system::error_code& /*ec*/, const int /*sig*/);
 };
 

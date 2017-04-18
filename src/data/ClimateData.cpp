@@ -23,64 +23,42 @@
 #include <boost/thread/lock_guard.hpp>
 
 ClimateData::ClimateData()
-        : mPress(ICAO_STD_A),
-          mTemp(ICAO_STD_T)
 {
+    mPress.value = ICAO_STD_A;
 }
 
 ClimateData::~ClimateData() noexcept
 {
 }
 
-std::string ClimateData::extractWV()
+std::string ClimateData::getWVstr()
 {
-    boost::lock_guard<boost::mutex> lock(this->mMutex);
-    mWVvalid = false;
-    return mWV + "\r\n";
+    boost::lock_guard<boost::mutex> lock(mWV.mutex);
+    if (mWV.valid)
+    {
+        mWV.valid = false;
+        return mWV.value + "\r\n";
+    }
+    else
+    {
+        return "";
+    }
 }
 
-bool ClimateData::isValid()
+void ClimateData::setWVstr(Priority prio, const std::string& wv)
 {
-    boost::lock_guard<boost::mutex> lock(this->mMutex);
-    return mWVvalid;
+    boost::lock_guard<boost::mutex> lock(mWV.mutex);
+    mWV.update(wv, prio);
 }
-
-void ClimateData::insertWV(const std::string& wv)
-{
-    boost::lock_guard<boost::mutex> lock(this->mMutex);
-    mWV = wv;
-    mWVvalid = true;
-}
-
-/**
- * Note:
- * Assuming that climate input is received every (few) second(s),
- * there is no need to enforce threadsafety and reduce performance by locks.
- * These single operations are atomic, hence no undefined value may occure.
- * Worst case is, that the reader gets an old value which is acceptable with
- * this frequency of updates.
- */
 
 double ClimateData::getPress()
 {
-    //boost::lock_guard<boost::mutex> lock(this->mMutex);
-    return mPress;
+    boost::lock_guard<boost::mutex> lock(mPress.mutex);
+    return mPress.value;
 }
 
-void ClimateData::setPress(double p)
+void ClimateData::setPress(Priority prio, double p)
 {
-    //boost::lock_guard<boost::mutex> lock(this->mMutex);
-    mPress = p;
-}
-
-void ClimateData::setTemp(double t)
-{
-    //boost::lock_guard<boost::mutex> lock(this->mMutex);
-    mTemp = t;
-}
-
-double ClimateData::getTemp()
-{
-    //boost::lock_guard<boost::mutex> lock(this->mMutex);
-    return mTemp;
+    boost::lock_guard<boost::mutex> lock(mPress.mutex);
+    mPress.update(p, prio);
 }

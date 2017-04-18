@@ -22,11 +22,10 @@
 #ifndef SRC_DATA_CLIMATEDATA_H_
 #define SRC_DATA_CLIMATEDATA_H_
 
-#include <boost/thread/mutex.hpp>
 #include <string>
 
-#include "../config/Configuration.h"
-
+#include "../util/Priority.h"
+#include "Data.hpp"
 
 #define ICAO_STD_A 1013.25
 #define ICAO_STD_T 15.0
@@ -41,28 +40,20 @@ public:
      * Get WIMWV sentence.
      * Set valid to false.
      */
-    std::string extractWV();
+    std::string getWVstr();
 
     /**
      * Set WIMWV sentence.
      * Set valid to true.
      */
-    void insertWV(const std::string& /*wv*/);
+    void setWVstr(Priority /*prio*/, const std::string& /*wv*/);
 
-    bool isValid();
     double getPress();
-    double getTemp();
-    void setPress(double /*p*/ = Configuration::base_pressure);
-    void setTemp(double /*t*/ = Configuration::base_temp);
+    void setPress(Priority /*prio*/, double /*p*/);
 
 private:
-    boost::mutex mMutex;
-    std::string mWV;
-    // hpa
-    double mPress;
-    // celsius
-    double mTemp;
-    bool mWVvalid = false;
+    struct Data<double> mPress;
+    struct Data<std::string> mWV;
 };
 
 #endif /* SRC_DATA_CLIMATEDATA_H_ */
