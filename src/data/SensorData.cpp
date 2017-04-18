@@ -19,19 +19,20 @@
  }
  */
 
-#include "ClimateData.h"
+#include "SensorData.h"
+
 #include <boost/thread/lock_guard.hpp>
 
-ClimateData::ClimateData()
+SensorData::SensorData()
 {
     mPress.value = ICAO_STD_A;
 }
 
-ClimateData::~ClimateData() noexcept
+SensorData::~SensorData() noexcept
 {
 }
 
-std::string ClimateData::getWVstr()
+std::string SensorData::getWVstr()
 {
     boost::lock_guard<boost::mutex> lock(mWV.mutex);
     if (mWV.valid)
@@ -45,19 +46,19 @@ std::string ClimateData::getWVstr()
     }
 }
 
-void ClimateData::setWVstr(Priority prio, const std::string& wv)
+void SensorData::setWVstr(Priority prio, const std::string& wv)
 {
     boost::lock_guard<boost::mutex> lock(mWV.mutex);
     mWV.update(wv, prio);
 }
 
-double ClimateData::getPress()
+double SensorData::getPress()
 {
     boost::lock_guard<boost::mutex> lock(mPress.mutex);
     return mPress.value;
 }
 
-void ClimateData::setPress(Priority prio, double p)
+void SensorData::setPress(Priority prio, double p)
 {
     boost::lock_guard<boost::mutex> lock(mPress.mutex);
     mPress.update(p, prio);

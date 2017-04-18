@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_DATA_CLIMATEDATA_H_
-#define SRC_DATA_CLIMATEDATA_H_
+#ifndef SRC_DATA_SENSORDATA_H_
+#define SRC_DATA_SENSORDATA_H_
 
 #include <string>
 
@@ -30,11 +30,11 @@
 #define ICAO_STD_A 1013.25
 #define ICAO_STD_T 15.0
 
-class ClimateData
+class SensorData
 {
 public:
-    ClimateData();
-    virtual ~ClimateData() noexcept;
+    SensorData();
+    virtual ~SensorData() noexcept;
 
     /**
      * Get WIMWV sentence.
@@ -56,4 +56,4 @@ private:
     struct Data<std::string> mWV;
 };
 
-#endif /* SRC_DATA_CLIMATEDATA_H_ */
+#endif /* SRC_DATA_SENSORDATA_H_ */

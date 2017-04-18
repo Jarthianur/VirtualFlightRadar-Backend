@@ -31,8 +31,8 @@
 
 #include "../config/Configuration.h"
 #include "../data/AircraftContainer.h"
-#include "../data/ClimateData.h"
 #include "../data/GPSData.h"
+#include "../data/SensorData.h"
 #include "../tcp/client/APRSCClient.h"
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
@@ -41,7 +41,7 @@
 
 bool VFRB::global_run_status = true;
 AircraftContainer VFRB::msAcCont;
-ClimateData VFRB::msClimateData;
+SensorData VFRB::msSensorData;
 GPSData VFRB::msGPSdata;
 
 VFRB::VFRB()
@@ -105,7 +105,7 @@ void VFRB::run() noexcept
             server.writeToAll(msGPSdata.getGPSstr());
 
             // write wind info to clients
-            str = msClimateData.getWVstr();
+            str = msSensorData.getWVstr();
             if (str.length() > 0)
             {
                 server.writeToAll(str);

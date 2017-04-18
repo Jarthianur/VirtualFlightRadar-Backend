@@ -163,8 +163,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
         {
             try
             {
-                Feed f(*it,
-                       (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                Feed f(*it, aliasPriority(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::APRSC, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             }
@@ -177,8 +176,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
         {
             try
             {
-                Feed f(*it,
-                       (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                Feed f(*it, aliasPriority(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::SBS, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             }
@@ -191,8 +189,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
         {
             try
             {
-                Feed f(*it,
-                       (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                Feed f(*it, aliasPriority(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::SENSOR, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             }
@@ -205,8 +202,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
         {
             try
             {
-                Feed f(*it,
-                       (Priority) strToInt(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                Feed f(*it, aliasPriority(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
                        Feed::InputType::GPS, cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             }
@@ -223,12 +219,11 @@ std::int32_t Configuration::strToInt(const std::string& str) noexcept
 {
     try
     {
-        return stoi(str);
+        return std::stoi(str);
     }
     catch (const std::logic_error& iae)
     {
-        Logger::error("(VFRB) invalid configuration: ",
-                      str.length() == 0 ? "empty" : str);
+        Logger::warn("(VFRB) invalid configuration: ", str.length() == 0 ? "empty" : str);
     }
     return 0;
 }
@@ -237,12 +232,39 @@ double Configuration::strToDouble(const std::string& str) noexcept
 {
     try
     {
-        return stod(str);
+        return std::stod(str);
     }
     catch (const std::logic_error& iae)
     {
-        Logger::error("(VFRB) invalid configuration: ",
-                      str.length() == 0 ? "empty" : str);
+        Logger::warn("(VFRB) invalid configuration: ", str.length() == 0 ? "empty" : str);
     }
     return 0.0;
+}
+
+Priority Configuration::aliasPriority(const std::string& str) noexcept
+{
+    Priority prio = Priority::DONTCARE;
+    try
+    {
+        prio = (Priority) std::stoul(str);
+    }
+    catch (...)
+    {
+    }
+    if (prio == Priority::NORMAL || str.find(PRIO_ALIAS_NORMAL) != std::string::npos)
+    {
+        return Priority::NORMAL;
+    }
+    else if (prio == Priority::HIGHER || str.find(PRIO_ALIAS_HIGHER) != std::string::npos)
+    {
+        return Priority::HIGHER;
+    }
+    else if (prio == Priority::LESSER || str.find(PRIO_ALIAS_LESSER) != std::string::npos)
+    {
+        return Priority::LESSER;
+    }
+    else
+    {
+        return Priority::DONTCARE;
+    }
 }

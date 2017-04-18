@@ -27,7 +27,7 @@
 #include "../src/config/Configuration.h"
 #include "../src/config/ConfigReader.h"
 #include "../src/data/AircraftContainer.h"
-#include "../src/data/ClimateData.h"
+#include "../src/data/SensorData.h"
 #include "../src/parser/APRSParser.h"
 #include "../src/parser/Parser.h"
 #include "../src/parser/SBSParser.h"
@@ -68,7 +68,7 @@ void clearAcCont()
  */
 void setupVFRB()
 {
-    VFRB::msClimateData.setPress();
+    VFRB::msSensorData.setPress();
     VFRB::msAcCont.initProcessor(Configuration::base_latitude,
                                  Configuration::base_longitude,
                                  Configuration::base_altitude);
@@ -203,9 +203,9 @@ int main(int argc, char *argv[])
             assert(pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,1#4.8,C,,,,,,,,,,,,,,*1d"), MSG_UNPACK_ERR, eqi);
             assert(pars_wind.unpack(""), MSG_UNPACK_ERR, eqi);
         })
-        ->test<ClimateData>("extract WIMWV", [&eqs, &eqb]() {
-            assert(VFRB::msClimateData.getWVstr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), eqs);
-            assert(VFRB::msClimateData.isValid(), false, eqb);
+        ->test<SensorData>("extract WIMWV", [&eqs, &eqb]() {
+            assert(VFRB::msSensorData.getWVstr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), eqs);
+            assert(VFRB::msSensorData.isValid(), false, eqb);
         });
 
     describe<AircraftProcessor>("Process Aircrafts", runner)
