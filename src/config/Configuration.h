@@ -34,7 +34,7 @@
 #define SECT_KEY_FALLBACK   "fallback"
 #define SECT_KEY_GENERAL    "general"
 #define SECT_KEY_FILTER     "filter"
-#define SECT_KEY_APRSC      "aprsc"
+#define SECT_KEY_APRSC      "aprs"
 #define SECT_KEY_SBS        "sbs"
 #define SECT_KEY_GPS        "gps"
 #define SECT_KEY_SENS       "sens"

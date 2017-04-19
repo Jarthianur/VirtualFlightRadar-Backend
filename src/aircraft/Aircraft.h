@@ -25,6 +25,8 @@
 #include <cstdint>
 #include <string>
 
+#include "../util/Priority.h"
+
 #define A_ADSB_T 8
 #define A_VALUE_NA -1024.0
 
@@ -57,7 +59,7 @@ public:
      * Update values from given Aircraft reference.
      * Set valid to 0.
      */
-    void update(const Aircraft& /*ac*/);
+    void update(const Aircraft& /*ac*/, Priority /*prio*/);
 
     /**
      * Getter
@@ -82,9 +84,17 @@ public:
     {
         return mFullInfo;
     }
-    inline const std::uint32_t getValid() const
+    inline const std::uint32_t getUpdateAge() const
     {
-        return mValid;
+        return mUpdateAge;
+    }
+    inline const Priority getLastPriority() const
+    {
+        return mLastPriority;
+    }
+    inline const bool getAttemptValid() const
+    {
+        return mAttemptValid;
     }
     inline const double getLatitude() const
     {
@@ -115,9 +125,9 @@ public:
     /**
      * Setter
      */
-    inline void incValid()
+    inline void incUpdateAge()
     {
-        ++mValid;
+        ++mUpdateAge;
     }
     inline void setTargetT(TargetType tt)
     {
@@ -126,6 +136,10 @@ public:
     inline void setFullInfo(bool info = true)
     {
         mFullInfo = info;
+    }
+    inline void setAttemptValid()
+    {
+        mAttemptValid = true;
     }
 
 private:
@@ -142,8 +156,12 @@ private:
     // full info available
     bool mFullInfo = false;
 
-    //0 = valid; +x(cycles) = invalid
-    std::uint32_t mValid = 0;
+    //cycles without update
+    std::uint32_t mUpdateAge = 0;
+
+    //last update by priority
+    Priority mLastPriority = Priority::DONTCARE;
+    bool mAttemptValid = true;
 
     /**
      * position

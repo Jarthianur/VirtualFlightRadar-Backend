@@ -79,9 +79,6 @@ private:
      * This makes find-method much more efficient.
      */
     std::unordered_map<std::string, size_t> mIndexMap;
-
-    Priority mLastPriority = Priority::DONTCARE;
-    bool mInputValid = false;
 };
 
 #endif /* SRC_DATA_AIRCRAFTCONTAINER_H_ */

@@ -54,7 +54,7 @@ bool Aircraft::operator==(const Aircraft& other) const
     return this->mID == other.mID;
 }
 
-void Aircraft::update(const Aircraft& ac)
+void Aircraft::update(const Aircraft& ac, Priority prio)
 {
     // no update for ID
     this->mIDtype = ac.mIDtype;
@@ -68,5 +68,7 @@ void Aircraft::update(const Aircraft& ac)
     this->mTurnRate = ac.mTurnRate;
     this->mFullInfo = ac.mFullInfo;
     this->mTargetType = ac.mTargetType;
-    this->mValid = 0;
+    this->mUpdateAge = 0;
+    this->mLastPriority = prio;
+    this->mAttemptValid = (prio == Priority::LESSER);
 }

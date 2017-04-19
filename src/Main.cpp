@@ -114,7 +114,7 @@ std::int32_t evalParams(std::int32_t argc, char** argv)
         return -1;
     }
 
-    if (gnd)
+    if (gnd || Configuration::global_gnd_mode)
     {
         Configuration::global_gnd_mode = true;
         Logger::info("(VFRB) GND mode: yes");

@@ -69,14 +69,14 @@ std::string AircraftContainer::processAircrafts()
     {
         try
         {
-            it->incValid();
+            it->incUpdateAge();
             // if no FLARM msg received after x, assume target has Transponder
-            if (it->getValid() == AC_NO_FLARM_THRESHOLD)
+            if (it->getUpdateAge() == AC_NO_FLARM_THRESHOLD)
             {
                 it->setTargetT(Aircraft::TargetType::TRANSPONDER);
             }
 
-            if (it->getValid() >= AC_DELETE_THRESHOLD)
+            if (it->getUpdateAge() >= AC_DELETE_THRESHOLD)
             {
                 del = true;
                 mIndexMap.erase(mIndexMap.find(it->getID()));
@@ -84,7 +84,7 @@ std::string AircraftContainer::processAircrafts()
             }
             else
             {
-                if (it->getValid() < AC_INVALIDATE)
+                if (it->getUpdateAge() < AC_INVALIDATE)
                 {
                     dest_str += mAcProc.process(*it);
                 }
@@ -108,38 +108,37 @@ std::string AircraftContainer::processAircrafts()
 void AircraftContainer::insertAircraft(const Aircraft& update, Priority prio)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    bool write = !mInputValid;
-    if (!write)
-    {
-        if (prio > mLastPriority || (prio == mLastPriority && prio != Priority::LESSER))
-        {
-            write = true;
-        }
-    }
-    if (write)
-    {
-        mInputValid = (prio != Priority::LESSER);
-        mLastPriority = prio;
+    ssize_t i;
 
-        ssize_t i;
-
-        if ((i = find(update.getID())) == AC_NOT_FOUND)
-        {
-            mCont.push_back(update);
-            mIndexMap.insert( { update.getID(), mCont.size() - 1 });
-        }
-        else
-        {
-            Aircraft& known_ac = mCont.at(i);
-            if (known_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER || update.getTargetT()
-                    == Aircraft::TargetType::FLARM)
-            {
-                known_ac.update(update);
-            }
-        }
+    if ((i = find(update.getID())) == AC_NOT_FOUND)
+    {
+        mCont.push_back(update);
+        mIndexMap.insert( { update.getID(), mCont.size() - 1 });
     }
     else
     {
-        mInputValid = false;
+        Aircraft& known_ac = mCont.at(i);
+        if (known_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER || update.getTargetT()
+                == Aircraft::TargetType::FLARM)
+        {
+            bool write = known_ac.getAttemptValid();
+            if (!write)
+            {
+                if (prio > known_ac.getLastPriority() || (prio
+                        == known_ac.getLastPriority()
+                                                          && prio != Priority::LESSER))
+                {
+                    write = true;
+                }
+            }
+            if (write)
+            {
+                known_ac.update(update, prio);
+            }
+            else
+            {
+                known_ac.setAttemptValid();
+            }
+        }
     }
 }

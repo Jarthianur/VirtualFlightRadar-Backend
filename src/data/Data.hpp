@@ -32,13 +32,13 @@ template<typename T>
 struct Data
 {
     T value;
-    bool valid;
+    bool attemptValid;
     Priority lastPriority;
     boost::mutex mutex;
 
     void update(const T& nv, Priority prio)
     {
-        bool write = !valid;
+        bool write = attemptValid;
         if (!write)
         {
             if (prio > lastPriority || (prio == lastPriority && prio != Priority::LESSER))
@@ -48,13 +48,13 @@ struct Data
         }
         if (write)
         {
-            valid = (prio != Priority::LESSER);
+            attemptValid = (prio == Priority::LESSER);
             value = nv;
             lastPriority = prio;
         }
         else
         {
-            valid = false;
+            attemptValid = true;
         }
     }
 };
