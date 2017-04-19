@@ -34,11 +34,6 @@
 #include "../util/Priority.h"
 #include "../config/Parameters.h"
 
-#define AC_NOT_FOUND -1
-#define AC_INVALIDATE AIRCRAFT_INVALIDATE
-#define AC_DELETE_THRESHOLD 120
-#define AC_NO_FLARM_THRESHOLD 4
-
 class AircraftContainer
 {
 public:

@@ -30,7 +30,7 @@
 
 ConfigReader::ConfigReader(const std::string& fname)
         : mFile(fname),
-          mConfRE("^(\\S+?)(?:\\s+?)?=(?:\\s+?)?(\\S+?[\\s\\S]*?)$",
+          mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
                   boost::regex_constants::optimize)
 {
 }
@@ -46,8 +46,10 @@ void ConfigReader::read()
     std::string value;
     std::string line;
     std::string section;
+    std::size_t line_nr = 0;
     while (std::getline(src, line))
     {
+        line_nr++;
         try
         {
             if (line.length() == 0 || line.at(0) == ';')
@@ -76,7 +78,10 @@ void ConfigReader::read()
             }
             else
             {
-                Logger::error("(ConfigReader) malformed param: ", line);
+                Logger::error(
+                        "(ConfigReader) malformed param [" + std::to_string(line_nr)
+                        + "]: ",
+                        line);
             }
         }
         catch (const boost::regex_error& e)

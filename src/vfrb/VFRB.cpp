@@ -39,6 +39,8 @@
 #include "../tcp/server/NMEAServer.h"
 #include "../util/Logger.h"
 
+#define SYNC_TIME (1)
+
 bool VFRB::global_run_status = true;
 AircraftContainer VFRB::msAcCont;
 SensorData VFRB::msSensorData;
