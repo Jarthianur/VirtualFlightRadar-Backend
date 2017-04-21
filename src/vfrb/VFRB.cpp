@@ -41,7 +41,7 @@
 
 #define SYNC_TIME (1)
 
-bool VFRB::global_run_status = true;
+std::atomic<bool> VFRB::global_run_status(true);
 AircraftContainer VFRB::msAcCont;
 SensorData VFRB::msSensorData;
 GPSData VFRB::msGPSdata;

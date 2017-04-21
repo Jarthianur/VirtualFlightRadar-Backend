@@ -22,11 +22,11 @@
 #ifndef SRC_VFRB_VFRB_H_
 #define SRC_VFRB_VFRB_H_
 
-#include <boost/asio.hpp>
+#include <boost/asio/signal_set.hpp>
 #include <boost/system/error_code.hpp>
-#include "../config/Parameters.h"
-#include "Feed.h"
+#include <atomic>
 
+class Feed;
 class AircraftContainer;
 class SensorData;
 class NMEAServer;
@@ -49,7 +49,7 @@ public:
     /**
      * configuration
      */
-    static bool global_run_status;
+    static std::atomic<bool> global_run_status;
 
     /**
      * Container for aircrafts
