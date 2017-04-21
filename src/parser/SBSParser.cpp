@@ -21,6 +21,7 @@
 
 #include "SBSParser.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <stdexcept>
 
@@ -28,6 +29,7 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftContainer.h"
 #include "../util/Math.hpp"
+#include "../util/Priority.h"
 #include "../vfrb/VFRB.h"
 
 SBSParser::SBSParser()
@@ -134,7 +136,7 @@ std::int32_t SBSParser::unpack(const std::string& msg, Priority prio) noexcept
     Aircraft ac(mtID, mtLat, mtLong, mtAlt);
     ac.setFullInfo(false);
     ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-    VFRB::msAcCont.insertAircraft(ac, prio);
+    VFRB::msAcCont.insertAircraft(std::move(ac), prio);
 
     return MSG_UNPACK_SUC;
 }

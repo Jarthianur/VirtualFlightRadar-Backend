@@ -54,6 +54,30 @@ bool Aircraft::operator==(const Aircraft& other) const
     return this->mID == other.mID;
 }
 
+Aircraft::Aircraft(BOOST_RV_REF(Aircraft) other)
+: mID(std::move(other.mID)),
+mIDtype(other.mIDtype),
+mAircraftType(other.mAircraftType),
+mTargetType(other.mTargetType),
+mFullInfo(other.mFullInfo),
+mUpdateAge(other.mUpdateAge),
+mLastPriority(other.mLastPriority),
+mAttemptValid(other.mAttemptValid),
+mLatitude(other.mLatitude),
+mLongitude(other.mLongitude),
+mAltitude(other.mAltitude),
+mGndSpeed(other.mGndSpeed),
+mHeading(other.mHeading),
+mClimbRate(other.mClimbRate),
+mTurnRate(other.mTurnRate)
+{
+}
+
+Aircraft& Aircraft::operator =(BOOST_RV_REF(Aircraft))
+{
+    return *this;
+}
+
 void Aircraft::update(const Aircraft& ac, Priority prio)
 {
     // no update for ID

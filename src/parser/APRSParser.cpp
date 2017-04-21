@@ -22,12 +22,15 @@
 #include "APRSParser.h"
 
 #include <boost/regex.hpp>
+#include <algorithm>
 #include <stdexcept>
 
+#include "../aircraft/Aircraft.h"
 #include "../config/Configuration.h"
 #include "../data/AircraftContainer.h"
 #include "../util/Logger.h"
 #include "../util/Math.hpp"
+#include "../util/Priority.h"
 #include "../vfrb/VFRB.h"
 
 APRSParser::APRSParser()
@@ -156,7 +159,7 @@ std::int32_t APRSParser::unpack(const std::string& msg, Priority prio) noexcept
                         mtClimbRate, mtTurnRate, mtHeading);
             ac.setFullInfo(mtFullInfo);
             ac.setTargetT(Aircraft::TargetType::FLARM);
-            VFRB::msAcCont.insertAircraft(ac, prio);
+            VFRB::msAcCont.insertAircraft(std::move(ac), prio);
         }
         else
         {

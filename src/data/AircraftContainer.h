@@ -46,7 +46,7 @@ public:
     /**
      * Insert aircraft in container, prefer FLARM.
      */
-    void insertAircraft(const Aircraft& /*update*/, Priority /*prio*/);
+    void insertAircraft(BOOST_RV_REF(Aircraft) /*update*/, Priority /*prio*/);
 
     /**
      * Process all aircrafts.

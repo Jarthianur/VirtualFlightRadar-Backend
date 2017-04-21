@@ -21,6 +21,9 @@
 
 #include "Feed.h"
 
+#include <boost/thread/lock_types.hpp>
+#include <algorithm>
+
 #include "../config/Configuration.h"
 #include "../parser/APRSParser.h"
 #include "../parser/GPSParser.h"
@@ -31,6 +34,7 @@
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
 #include "../util/Logger.h"
+#include "VFRB.h"
 
 Feed::Feed(const std::string& name, Priority prio, InputType type,
            const std::unordered_map<std::string, std::string>& kvmap)
@@ -46,10 +50,10 @@ Feed::~Feed() noexcept
 }
 
 Feed::Feed(BOOST_RV_REF(Feed) other)
-: mName(other.mName),
+: mName(std::move(other.mName)),
 mPriority(other.mPriority),
 mType(other.mType),
-mKVmap(other.mKVmap)
+mKVmap(std::move(other.mKVmap))
 {
 }
 
@@ -123,7 +127,10 @@ void Feed::run(boost::asio::signal_set& sigset)
         default:
             return;
     }
-    mpClient->run();
+    if (VFRB::global_run_status) // TODO while ?
+    {
+        mpClient->run();
+    }
 }
 
 std::int32_t Feed::process(const std::string& data) noexcept

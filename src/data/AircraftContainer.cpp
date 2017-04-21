@@ -21,10 +21,12 @@
 
 #include "AircraftContainer.h"
 
-#include <cstdint>
+#include <boost/thread/lock_guard.hpp>
+#include <boost/thread/pthread/mutex.hpp>
+#include <algorithm>
 #include <exception>
 #include <iterator>
-#include <boost/thread/lock_guard.hpp>
+#include <utility>
 
 #include "../util/Logger.h"
 
@@ -105,14 +107,14 @@ std::string AircraftContainer::processAircrafts()
     return dest_str;
 }
 
-void AircraftContainer::insertAircraft(const Aircraft& update, Priority prio)
+void AircraftContainer::insertAircraft(BOOST_RV_REF(Aircraft) update, Priority prio)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     ssize_t i;
 
     if ((i = find(update.getID())) == AC_NOT_FOUND)
     {
-        mCont.push_back(update);
+        mCont.push_back(std::move(update));
         mIndexMap.insert( { update.getID(), mCont.size() - 1 });
     }
     else
