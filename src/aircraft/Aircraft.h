@@ -32,22 +32,53 @@
 
 class Aircraft
 {
-
 public:
-    Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/);
-    Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/,
-             double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
-             double /*climb_r*/, double /*turn_r*/, double /*heading*/);
-
-    virtual ~Aircraft() noexcept;
-
     /**
-     * Compare Aircrafts by their ID.
+     * Construct an aircraft with a minimum
+     * set of information, as are the ID
+     * and the current position.
+     *
+     * @param r_id ID
+     * @param lat  latitude
+     * @param lon  longitude
+     * @param alt  altitude
      */
-    bool operator==(const Aircraft&) const;
-
+    Aircraft(std::string& /*r_id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/);
     /**
-     * Got data from ...
+     * Construct an aircraft with a full
+     * set of information, as are the ID,
+     * the current position and movement.
+     *
+     * @param r_id    ID
+     * @param lat     latitude
+     * @param lon     longitude
+     * @param alt     altitude
+     * @param gnd_spd ground speed
+     * @param id_t    ID type
+     * @param ac_t    aircraft type
+     * @param climb_r climb rate
+     * @param turn_r  turn rate
+     * @param head    heading
+     */
+    Aircraft(std::string& /*r_id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/,
+             double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
+             double /*climb_r*/, double /*turn_r*/, double /*head*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
+    virtual ~Aircraft() noexcept;
+    /**
+     * Compare aircrafts by ID.
+     *
+     * @param r_other aircraft to compare
+     * @return IDs equal?
+     */
+    bool operator==(const Aircraft& /*r_other*/) const;
+    /**
+     * Aircraft information received from
+     * device type.
      */
     enum class TargetType
         : std::uint32_t
@@ -55,24 +86,35 @@ public:
             FLARM,
         TRANSPONDER
     };
-
     /**
-     * Update values from given Aircraft reference.
-     * Set valid to 0.
+     * Update aircraft information.
+     * Reset update age.
+     *
+     * @param r_ac aircraft reference holding new information
+     * @param prio update from feed with priority
      */
-    void update(const Aircraft& /*ac*/, Priority /*prio*/);
-
+    void update(const Aircraft& /*r_ac*/, Priority /*prio*/);
     /**
-     * Getter
+     * Get ID.
+     *
+     * @return const reference to ID
      */
     inline const std::string& getID() const
     {
         return mID;
     }
+    /**
+     * Get ID type.
+     *
+     * @return ID type
+     */
     inline const std::uint32_t getIDtype() const
     {
         return mIDtype;
     }
+    /**
+     *
+     */
     inline const TargetType getTargetT() const
     {
         return mTargetType;
