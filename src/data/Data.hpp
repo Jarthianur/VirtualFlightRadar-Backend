@@ -59,4 +59,37 @@ struct Data
     }
 };
 
+template<typename T>
+struct TmpData
+{
+    T value;
+    bool attemptValid;
+    bool valueValid;
+    Priority lastPriority;
+    boost::mutex mutex;
+
+    void update(const T& nv, Priority prio)
+    {
+        bool write = attemptValid;
+        if (!write)
+        {
+            if (prio > lastPriority || (prio == lastPriority && prio != Priority::LESSER))
+            {
+                write = true;
+            }
+        }
+        if (write)
+        {
+            attemptValid = (prio == Priority::LESSER);
+            value = nv;
+            lastPriority = prio;
+            valueValid = true;
+        }
+        else
+        {
+            attemptValid = true;
+        }
+    }
+};
+
 #endif /* SRC_DATA_DATA_HPP_ */

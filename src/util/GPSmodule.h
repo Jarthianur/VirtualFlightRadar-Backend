@@ -22,7 +22,6 @@
 #ifndef SRC_UTIL_GPSMODULE_H_
 #define SRC_UTIL_GPSMODULE_H_
 
-#include <cstdint>
 #include <string>
 
 #define GPSM_BUFF_S 8191
@@ -37,13 +36,11 @@ public:
     /**
      * build GPGGA sentence
      */
-    std::string ggafix(double /*b_lat*/, double /*b_lon*/, std::int32_t /*b_alt*/,
-                       double /*geoid*/);
+    std::string ggafix(const struct GPSPosition& /*pos*/);
     /**
      * build GPRMC sentence
      */
-    std::string rmcfix(double /*b_lat*/, double /*b_lon*/, std::int32_t /*b_alt*/,
-                       double /*geoid*/);
+    std::string rmcfix(const struct GPSPosition& /*pos*/);
 
 private:
     /**

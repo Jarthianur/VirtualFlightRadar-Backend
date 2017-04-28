@@ -21,10 +21,12 @@
 
 #include "GPSmodule.h"
 
+#include <cstdint>
 #include <cmath>
 #include <cstdio>
 #include <ctime>
 
+#include "../data/GPSData.h"
 #include "Math.hpp"
 
 GPSmodule::GPSmodule()
@@ -35,49 +37,47 @@ GPSmodule::~GPSmodule() noexcept
 {
 }
 
-std::string GPSmodule::ggafix(double b_lat, double b_lon, std::int32_t b_alt,
-                              double geoid)
+std::string GPSmodule::ggafix(const struct GPSPosition& pos)
 {
     std::string nmea_str;
     std::int32_t csum;
     std::time_t now = std::time(0);
     std::tm* utc = std::gmtime(&now);
 
-    char lat_str = (b_lat < 0) ? 'S' : 'N';
-    char long_str = (b_lon < 0) ? 'W' : 'E';
-    double lat_deg = std::abs(std::floor(b_lat));
-    double lat_min = std::abs(60.0 * (b_lat - lat_deg));
-    double long_deg = std::abs(std::floor(b_lon));
-    double long_min = std::abs(60.0 * (b_lon - long_deg));
+    char lat_str = (pos.latitude < 0) ? 'S' : 'N';
+    char long_str = (pos.longitude < 0) ? 'W' : 'E';
+    double lat_deg = std::abs(std::floor(pos.latitude));
+    double lat_min = std::abs(60.0 * (pos.latitude - lat_deg));
+    double long_deg = std::abs(std::floor(pos.longitude));
+    double long_min = std::abs(60.0 * (pos.longitude - long_deg));
 
     std::snprintf(
             mBuffer,
             GPSM_BUFF_S,
-            "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,05,1,%d,M,%.1lf,M,,*",
+            "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*",
             utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, lat_str, long_deg,
-            long_min, long_str, b_alt, geoid);
+            long_min, long_str, pos.fixQa, pos.nrSats, pos.altitude, pos.geoid);
     csum = Math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
-    std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x", csum);
+    std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(mBuffer);
 
     return nmea_str;
 }
 
-std::string GPSmodule::rmcfix(double b_lat, double b_lon, std::int32_t b_alt,
-                              double geoid)
+std::string GPSmodule::rmcfix(const struct GPSPosition& pos)
 {
     std::string nmea_str;
     std::int32_t csum;
     std::time_t now = std::time(0);
     std::tm* utc = std::gmtime(&now);
 
-    char lat_str = (b_lat < 0) ? 'S' : 'N';
-    char long_str = (b_lon < 0) ? 'W' : 'E';
-    double lat_deg = std::abs(std::floor(b_lat));
-    double lat_min = std::abs(60.0 * (b_lat - lat_deg));
-    double long_deg = std::abs(std::floor(b_lon));
-    double long_min = std::abs(60.0 * (b_lon - long_deg));
+    char lat_str = (pos.latitude < 0) ? 'S' : 'N';
+    char long_str = (pos.longitude < 0) ? 'W' : 'E';
+    double lat_deg = std::abs(std::floor(pos.latitude));
+    double lat_min = std::abs(60.0 * (pos.latitude - lat_deg));
+    double long_deg = std::abs(std::floor(pos.longitude));
+    double long_min = std::abs(60.0 * (pos.longitude - long_deg));
 
     std::snprintf(
             mBuffer,
@@ -87,7 +87,7 @@ std::string GPSmodule::rmcfix(double b_lat, double b_lon, std::int32_t b_alt,
             long_min, long_str, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
     csum = Math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
-    std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x", csum);
+    std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(mBuffer);
 
     return nmea_str;

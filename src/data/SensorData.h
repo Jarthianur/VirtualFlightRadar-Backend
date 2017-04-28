@@ -53,7 +53,7 @@ public:
 
 private:
     struct Data<double> mPress;
-    struct Data<std::string> mWV;
+    struct TmpData<std::string> mWV;
 };
 
 #endif /* SRC_DATA_SENSORDATA_H_ */

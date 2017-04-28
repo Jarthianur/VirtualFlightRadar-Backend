@@ -34,8 +34,6 @@ GPSData::~GPSData() noexcept
 
 void GPSData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double geoid)
 {
-    setGGAstr(Priority::DONTCARE, mGPSfix.ggafix(b_lat, b_lon, b_alt, geoid));
-    setRMCstr(Priority::DONTCARE, mGPSfix.rmcfix(b_lat, b_lon, b_alt, geoid));
     struct GPSPosition base;
     base.latitude = b_lat;
     base.longitude = b_lon;
@@ -43,6 +41,10 @@ void GPSData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double
     base.nrSats = 5;
     base.fixQa = 1;
     setBasePos(Priority::DONTCARE, base);
+    mGGAstr.attemptValid = true;
+    mGGAstr.valueValid = false;
+    mRMCstr.attemptValid = true;
+    mRMCstr.valueValid = false;
 }
 
 void GPSData::setGGAstr(Priority prio, const std::string& gga)
@@ -54,6 +56,7 @@ void GPSData::setGGAstr(Priority prio, const std::string& gga)
 std::string GPSData::getGGAstr()
 {
     boost::lock_guard<boost::mutex> lock(mGGAstr.mutex);
+    mGGAstr.valueValid = false;
     return mGGAstr.value;
 }
 
@@ -65,16 +68,32 @@ void GPSData::setRMCstr(Priority prio, const std::string& rmc)
 
 std::string GPSData::getGPSstr()
 {
-    std::string gps = getRMCstr();
-    gps.append("\r\n");
-    gps.append(getGGAstr());
-    gps.append("\r\n");
+    std::string gps;
+    if (mRMCstr.valueValid)
+    {
+        gps = getRMCstr();
+        gps.append("\r\n");
+    }
+    else
+    {
+        gps = mGPSfix.rmcfix(getBasePos());
+    }
+    if (mGGAstr.valueValid)
+    {
+        gps.append(getGGAstr());
+        gps.append("\r\n");
+    }
+    else
+    {
+        gps.append(mGPSfix.ggafix(getBasePos()));
+    }
     return gps;
 }
 
 std::string GPSData::getRMCstr()
 {
     boost::lock_guard<boost::mutex> lock(mRMCstr.mutex);
+    mRMCstr.valueValid = false;
     return mRMCstr.value;
 }
 
@@ -100,4 +119,10 @@ double GPSData::getBaseLong()
 {
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
     return mBasePos.value.longitude;
+}
+
+struct GPSPosition GPSData::getBasePos()
+{
+    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+    return mBasePos.value;
 }

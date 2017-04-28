@@ -35,9 +35,9 @@ SensorData::~SensorData() noexcept
 std::string SensorData::getWVstr()
 {
     boost::lock_guard<boost::mutex> lock(mWV.mutex);
-    if (!mWV.attemptValid)
+    if (mWV.valueValid)
     {
-        mWV.attemptValid = true;
+        mWV.valueValid = false;
         return mWV.value + "\r\n";
     }
     else

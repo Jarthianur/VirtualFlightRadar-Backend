@@ -34,7 +34,7 @@ struct GPSPosition
     /**
      * Base position in degree
      */
-    double latitude, longitude;
+    double latitude, longitude, geoid;
 };
 
 class GPSData
@@ -52,6 +52,7 @@ public:
     void setRMCstr(Priority /*prio*/, const std::string& /*rmc*/);
 
     void setBasePos(Priority /*prio*/, const struct GPSPosition& /*pos*/);
+    struct GPSPosition getBasePos();
     std::int32_t getBaseAlt();
     double getBaseLat();
     double getBaseLong();
@@ -61,8 +62,8 @@ private:
     std::string getRMCstr();
 
     struct Data<struct GPSPosition> mBasePos;
-    struct Data<std::string> mGGAstr;
-    struct Data<std::string> mRMCstr;
+    struct TmpData<std::string> mGGAstr;
+    struct TmpData<std::string> mRMCstr;
     GPSmodule mGPSfix;
 };
 

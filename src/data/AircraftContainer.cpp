@@ -31,7 +31,6 @@
 #include "../util/Logger.h"
 #include <iostream>
 
-#define AC_NOT_FOUND          (-1)
 #define AC_INVALIDATE         (4)
 #define AC_DELETE_THRESHOLD   (120)
 #define AC_NO_FLARM_THRESHOLD (AC_INVALIDATE)
@@ -48,16 +47,16 @@ AircraftContainer::~AircraftContainer() noexcept
 {
 }
 
-ssize_t AircraftContainer::find(const std::string& id)
+std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& id)
 {
     const auto it = mIndexMap.find(id);
     if (it == mIndexMap.cend())
     {
-        return AC_NOT_FOUND;
+        return mCont.end();
     }
     else
     {
-        return it->second;
+        return mCont.begin() + it->second;
     }
 }
 
@@ -111,37 +110,35 @@ std::string AircraftContainer::processAircrafts()
 void AircraftContainer::insertAircraft(const Aircraft& update, Priority prio)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    ssize_t i;
-
-    if ((i = find(update.getID())) == AC_NOT_FOUND)
+    auto known_ac = find(update.getID());
+    if (known_ac != mCont.end())
     {
-        mIndexMap.insert( { update.getID(), mCont.size() });
-        mCont.push_back(update);
-    }
-    else
-    {
-        Aircraft& known_ac = mCont.at(i);
-        if (known_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER || update.getTargetT()
+        if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER || update.getTargetT()
                 == Aircraft::TargetType::FLARM)
         {
-            bool write = known_ac.getAttemptValid();
+            bool write = known_ac->getAttemptValid();
             if (!write)
             {
-                if (prio > known_ac.getLastPriority() || (prio
-                        == known_ac.getLastPriority()
-                                                          && prio != Priority::LESSER))
+                if (prio > known_ac->getLastPriority() || (prio
+                        == known_ac->getLastPriority()
+                                                           && prio != Priority::LESSER))
                 {
                     write = true;
                 }
             }
             if (write)
             {
-                known_ac.update(update, prio);
+                known_ac->update(update, prio);
             }
             else
             {
-                known_ac.setAttemptValid();
+                known_ac->setAttemptValid();
             }
         }
+    }
+    else
+    {
+        mIndexMap.insert( { update.getID(), mCont.size() });
+        mCont.push_back(update);
     }
 }

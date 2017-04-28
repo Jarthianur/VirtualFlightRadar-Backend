@@ -59,7 +59,7 @@ private:
      * if id is found returns index,
      * else returns -1.
      */
-    ssize_t find(const std::string& /*id*/);
+    std::vector<Aircraft>::iterator find(const std::string& /*id*/);
 
     boost::mutex mMutex;
 

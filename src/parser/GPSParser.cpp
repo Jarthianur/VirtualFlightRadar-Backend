@@ -36,7 +36,7 @@
 GPSParser::GPSParser()
         : Parser(),
           mGpggaRE(
-                  "^\\$[A-Z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),[0-9.]+?,(\\d+\\.?\\d+?),M,\\d+\\.\\d+,M,,\\*[0-9A-F]{2}\\s+?$",
+                  "^\\$[A-Z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),[0-9.]+?,(\\d+\\.?\\d+?),M,(\\d+\\.?\\d+?),M,,\\*[0-9A-F]{2}\\s+?$",
                   boost::regex::optimize | boost::regex::icase)
 {
 }
@@ -85,6 +85,8 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
             mtGPSpos.nrSats = std::stoi(match.str(6));
             //altitude
             mtGPSpos.altitude = Math::dToI(std::stod(match.str(7)));
+            //geoid
+            mtGPSpos.geoid = std::stod(match.str(8));
         }
         catch (const std::logic_error& e)
         {
