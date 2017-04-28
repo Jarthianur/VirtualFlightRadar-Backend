@@ -40,6 +40,7 @@ AircraftContainer::AircraftContainer()
           mCont()
 {
     mCont.reserve(20);
+    mIndexMap.reserve(20);
 }
 
 AircraftContainer::~AircraftContainer() noexcept
