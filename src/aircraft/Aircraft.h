@@ -22,7 +22,6 @@
 #ifndef SRC_AIRCRAFT_AIRCRAFT_H_
 #define SRC_AIRCRAFT_AIRCRAFT_H_
 
-#include <boost/move/core.hpp>
 #include <cstdint>
 #include <string>
 
@@ -33,11 +32,10 @@
 
 class Aircraft
 {
-BOOST_MOVABLE_BUT_NOT_COPYABLE(Aircraft)
 
 public:
-    Aircraft(const std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/);
-    Aircraft(const std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/,
+    Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/);
+    Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/,
              double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
              double /*climb_r*/, double /*turn_r*/, double /*heading*/);
 
@@ -47,8 +45,6 @@ public:
      * Compare Aircrafts by their ID.
      */
     bool operator==(const Aircraft&) const;
-    Aircraft(BOOST_RV_REF(Aircraft));
-    Aircraft& operator=(BOOST_RV_REF(Aircraft));
 
     /**
      * Got data from ...
@@ -152,7 +148,7 @@ private:
      * information
      */
     // id
-    const std::string mID;
+    std::string mID;
     std::uint32_t mIDtype = 1;
 
     std::int32_t mAircraftType = A_ADSB_T;

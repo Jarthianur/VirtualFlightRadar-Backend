@@ -136,7 +136,7 @@ std::int32_t SBSParser::unpack(const std::string& msg, Priority prio) noexcept
     Aircraft ac(mtID, mtLat, mtLong, mtAlt);
     ac.setFullInfo(false);
     ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-    VFRB::msAcCont.insertAircraft(std::move(ac), prio);
+    VFRB::msAcCont.insertAircraft(ac, prio);
 
     return MSG_UNPACK_SUC;
 }

@@ -25,7 +25,7 @@ Aircraft::~Aircraft() noexcept
 {
 }
 
-Aircraft::Aircraft(const std::string& id, double lat, double lon, std::int32_t alt)
+Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt)
         : mID(id),
           mLatitude(lat),
           mLongitude(lon),
@@ -33,7 +33,7 @@ Aircraft::Aircraft(const std::string& id, double lat, double lon, std::int32_t a
 {
 }
 
-Aircraft::Aircraft(const std::string& id, double lat, double lon, std::int32_t alt,
+Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt,
                    double gnd_spd, std::uint32_t id_t, std::int32_t ac_t, double climb_r,
                    double turn_r, double heading)
         : mID(id),
@@ -52,30 +52,6 @@ Aircraft::Aircraft(const std::string& id, double lat, double lon, std::int32_t a
 bool Aircraft::operator==(const Aircraft& other) const
 {
     return this->mID == other.mID;
-}
-
-Aircraft::Aircraft(BOOST_RV_REF(Aircraft) other)
-: mID(std::move(other.mID)),
-mIDtype(other.mIDtype),
-mAircraftType(other.mAircraftType),
-mTargetType(other.mTargetType),
-mFullInfo(other.mFullInfo),
-mUpdateAge(other.mUpdateAge),
-mLastPriority(other.mLastPriority),
-mAttemptValid(other.mAttemptValid),
-mLatitude(other.mLatitude),
-mLongitude(other.mLongitude),
-mAltitude(other.mAltitude),
-mGndSpeed(other.mGndSpeed),
-mHeading(other.mHeading),
-mClimbRate(other.mClimbRate),
-mTurnRate(other.mTurnRate)
-{
-}
-
-Aircraft& Aircraft::operator =(BOOST_RV_REF(Aircraft))
-{
-    return *this;
 }
 
 void Aircraft::update(const Aircraft& ac, Priority prio)

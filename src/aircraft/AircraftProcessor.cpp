@@ -39,7 +39,7 @@ AircraftProcessor::~AircraftProcessor() noexcept
 {
 }
 
-std::string AircraftProcessor::process(Aircraft& ac)
+std::string AircraftProcessor::process(const Aircraft& ac)
 {
     calcRelPosToBase(ac);
 
@@ -80,7 +80,7 @@ std::string AircraftProcessor::process(Aircraft& ac)
     return nmea_str;
 }
 
-void AircraftProcessor::calcRelPosToBase(Aircraft& ac)
+void AircraftProcessor::calcRelPosToBase(const Aircraft& ac)
 {
     mtRadLatB = Math::radian(VFRB::msGPSdata.getBaseLat());
     mtRadLongB = Math::radian(VFRB::msGPSdata.getBaseLong());

@@ -29,6 +29,7 @@
 #include <utility>
 
 #include "../util/Logger.h"
+#include <iostream>
 
 #define AC_NOT_FOUND          (-1)
 #define AC_INVALIDATE         (4)
@@ -40,7 +41,7 @@ AircraftContainer::AircraftContainer()
           mCont()
 {
     mCont.reserve(20);
-    mIndexMap.reserve(20);
+    mIndexMap.reserve(40);
 }
 
 AircraftContainer::~AircraftContainer() noexcept
@@ -79,11 +80,11 @@ std::string AircraftContainer::processAircrafts()
                 it->setTargetT(Aircraft::TargetType::TRANSPONDER);
             }
 
-            if (it->getUpdateAge() >= AC_DELETE_THRESHOLD)
+            if (it->getUpdateAge() >= 4)
             {
                 del = true;
-                mIndexMap.erase(mIndexMap.find(it->getID()));
-                mCont.erase(it);
+                mIndexMap.erase(it->getID());
+                it = mCont.erase(it);
             }
             else
             {
@@ -94,13 +95,12 @@ std::string AircraftContainer::processAircrafts()
                 ++it;
                 ++index;
             }
-
             if (del && it != mCont.end())
             {
                 mIndexMap.at(it->getID()) = index;
             }
         }
-        catch (std::exception& e)
+        catch (const std::exception& e)
         {
             Logger::warn("(AircraftContainer) processAircrafts: ", e.what());
         }
@@ -108,15 +108,15 @@ std::string AircraftContainer::processAircrafts()
     return dest_str;
 }
 
-void AircraftContainer::insertAircraft(BOOST_RV_REF(Aircraft) update, Priority prio)
+void AircraftContainer::insertAircraft(const Aircraft& update, Priority prio)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     ssize_t i;
 
     if ((i = find(update.getID())) == AC_NOT_FOUND)
     {
-        mCont.push_back(std::move(update));
-        mIndexMap.insert( { update.getID(), mCont.size() - 1 });
+        mIndexMap.insert( { update.getID(), mCont.size() });
+        mCont.push_back(update);
     }
     else
     {

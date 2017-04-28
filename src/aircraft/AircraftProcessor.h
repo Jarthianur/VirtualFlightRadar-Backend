@@ -39,7 +39,7 @@ public:
     /**
      * build nmea-msg from Aircraft
      */
-    std::string process(Aircraft& /*ac*/);
+    std::string process(const Aircraft& /*ac*/);
 
 private:
     /**
@@ -50,7 +50,7 @@ private:
     /**
      * calculate relative position to base
      */
-    void calcRelPosToBase(Aircraft& /*ac*/);
+    void calcRelPosToBase(const Aircraft& /*ac*/);
 
         /**
      * Longitude base, Aircraft
