@@ -25,23 +25,19 @@ Aircraft::~Aircraft() noexcept
 {
 }
 
-Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt)
-        : mID(id),
-          mLatitude(lat),
-          mLongitude(lon),
-          mAltitude(alt)
+Aircraft::Aircraft(std::string& r_id, struct GPSPosition& r_pos)
+        : mID(r_id),
+          mPosition(r_pos)
 {
 }
 
-Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt,
-                   double gnd_spd, std::uint32_t id_t, std::int32_t ac_t, double climb_r,
+Aircraft::Aircraft(std::string& r_id, struct GPSPosition& r_pos, double gnd_spd,
+                   std::uint32_t id_t, std::int32_t ac_t, double climb_r,
                    double turn_r, double heading)
-        : mID(id),
+        : mID(r_id),
           mIDtype(id_t),
           mAircraftType(ac_t),
-          mLatitude(lat),
-          mLongitude(lon),
-          mAltitude(alt),
+          mPosition(r_pos),
           mGndSpeed(gnd_spd),
           mHeading(heading),
           mClimbRate(climb_r),
@@ -49,25 +45,23 @@ Aircraft::Aircraft(std::string& id, double lat, double lon, std::int32_t alt,
 {
 }
 
-bool Aircraft::operator==(const Aircraft& other) const
+bool Aircraft::operator==(const Aircraft& r_other) const
 {
-    return this->mID == other.mID;
+    return this->mID == r_other.mID;
 }
 
-void Aircraft::update(const Aircraft& ac, Priority prio)
+void Aircraft::update(const Aircraft& r_ac, Priority prio)
 {
     // no update for ID
-    this->mIDtype = ac.mIDtype;
-    this->mAircraftType = ac.mAircraftType;
-    this->mLatitude = ac.mLatitude;
-    this->mLongitude = ac.mLongitude;
-    this->mAltitude = ac.mAltitude;
-    this->mGndSpeed = ac.mGndSpeed;
-    this->mHeading = ac.mHeading;
-    this->mClimbRate = ac.mClimbRate;
-    this->mTurnRate = ac.mTurnRate;
-    this->mFullInfo = ac.mFullInfo;
-    this->mTargetType = ac.mTargetType;
+    this->mIDtype = r_ac.mIDtype;
+    this->mAircraftType = r_ac.mAircraftType;
+    this->mPosition = r_ac.mPosition;
+    this->mGndSpeed = r_ac.mGndSpeed;
+    this->mHeading = r_ac.mHeading;
+    this->mClimbRate = r_ac.mClimbRate;
+    this->mTurnRate = r_ac.mTurnRate;
+    this->mFullInfo = r_ac.mFullInfo;
+    this->mTargetType = r_ac.mTargetType;
     this->mUpdateAge = 0;
     this->mLastPriority = prio;
     this->mAttemptValid = (prio == Priority::LESSER);

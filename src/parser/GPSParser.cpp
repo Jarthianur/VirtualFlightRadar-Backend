@@ -66,17 +66,17 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
         try
         {
             //latitude
-            mtGPSpos.latitude = Math::dmToDeg(std::stod(match.str(1)));
+            mtGPSpos.position.latitude = Math::dmToDeg(std::stod(match.str(1)));
             if (match.str(2).compare("S") == 0)
             {
-                mtGPSpos.latitude = -mtGPSpos.latitude;
+                mtGPSpos.position.latitude = -mtGPSpos.position.latitude;
             }
 
             //longitude
-            mtGPSpos.longitude = Math::dmToDeg(std::stod(match.str(3)));
+            mtGPSpos.position.longitude = Math::dmToDeg(std::stod(match.str(3)));
             if (match.str(4).compare("W") == 0)
             {
-                mtGPSpos.longitude = -mtGPSpos.longitude;
+                mtGPSpos.position.longitude = -mtGPSpos.position.longitude;
             }
 
             //fix
@@ -84,7 +84,7 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
             //sats
             mtGPSpos.nrSats = std::stoi(match.str(6));
             //altitude
-            mtGPSpos.altitude = Math::dToI(std::stod(match.str(7)));
+            mtGPSpos.position.altitude = Math::dToI(std::stod(match.str(7)));
             //geoid
             mtGPSpos.geoid = std::stod(match.str(8));
         }

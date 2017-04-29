@@ -116,7 +116,7 @@ void AircraftContainer::insertAircraft(const Aircraft& update, Priority prio)
         if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER || update.getTargetT()
                 == Aircraft::TargetType::FLARM)
         {
-            bool write = known_ac->getAttemptValid();
+            bool write = known_ac->isAttemptValid();
             if (!write)
             {
                 if (prio > known_ac->getLastPriority() || (prio

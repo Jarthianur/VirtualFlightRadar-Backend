@@ -27,6 +27,7 @@
 #include <string>
 
 #include "Parser.h"
+#include "../data/Position.hpp"
 
 #define APRS_REGEX_ERR -3
 
@@ -44,8 +45,9 @@ private:
     const boost::regex mCommRE;
     // temps
     std::string mtID;
-    std::int32_t mtIDtype = 0, mtAcType = 0, mtAlt = 0, mtTime = 0;
-    double mtLat = 0.0, mtLong = 0.0, mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0,
+    struct GPSPosition mtGPSpos;
+    std::int32_t mtIDtype = 0, mtAcType = 0, mtTime = 0;
+    double mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0,
             mtHeading = 0.0;
     bool mtFullInfo = true;
 };

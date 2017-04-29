@@ -26,6 +26,7 @@
 #include <string>
 
 #include "Parser.h"
+#include "../data/Position.hpp"
 
 class SBSParser: public Parser
 {
@@ -33,12 +34,13 @@ public:
     SBSParser();
     virtual ~SBSParser() noexcept;
 
-    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
+    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/)
+            noexcept override;
 
 private:
     std::string mtID;
-    std::int32_t mtAlt = 0, mtTime = 0;
-    double mtLat = 0.0, mtLong = 0.0;
+    struct GPSPosition mtGPSpos;
+    std::int32_t mtTime = 0;
 };
 
 #endif /* SRC_PARSER_SBSPARSER_H_ */

@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
+ Copyright (C) 2017 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -19,35 +19,28 @@
  }
  */
 
-#ifndef SRC_UTIL_GPSMODULE_H_
-#define SRC_UTIL_GPSMODULE_H_
+#ifndef DATA_POSITION_HPP_
+#define DATA_POSITION_HPP_
 
-#include <string>
+#include <cstdint>
 
-#define GPSM_BUFF_S 8191
-#define GPSM_L_BUFF_S 128
-
-class GPSmodule
+struct GPSPosition
 {
-public:
-    GPSmodule();
-    virtual ~GPSmodule() noexcept;
-
     /**
-     * build GPGGA sentence
+     * meters
      */
-    std::string ggafix(const struct ExtGPSPosition& /*pos*/);
+    std::int32_t altitude;
     /**
-     * build GPRMC sentence
+     * Base position in degree
      */
-    std::string rmcfix(const struct ExtGPSPosition& /*pos*/);
-
-private:
-    /**
-     * format string mBuffer
-     */
-    char mBuffer[GPSM_BUFF_S + 1];
-
+    double latitude, longitude;
 };
 
-#endif /* SRC_UTIL_GPSMODULE_H_ */
+struct ExtGPSPosition
+{
+    struct GPSPosition position;
+    std::int32_t nrSats, fixQa;
+    double geoid;
+};
+
+#endif /* DATA_POSITION_HPP_ */

@@ -35,9 +35,11 @@
 
 APRSParser::APRSParser()
         : Parser(),
-          mAprsRE("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
+          mAprsRE(
+                  "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
                   boost::regex::optimize | boost::regex::icase),
-          mCommRE("^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
+          mCommRE(
+                  "^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
                   boost::regex::optimize | boost::regex::icase)
 {
 }
@@ -64,27 +66,27 @@ std::int32_t APRSParser::unpack(const std::string& msg, Priority prio) noexcept
                 mtTime = std::stoi(match.str(1));
 
                 //latitude
-                mtLat = Math::dmToDeg(std::stod(match.str(2)));
+                mtGPSpos.latitude = Math::dmToDeg(std::stod(match.str(2)));
                 if (match.str(3).compare("S") == 0)
                 {
-                    mtLat = -mtLat;
+                    mtGPSpos.latitude = -mtGPSpos.latitude;
                 }
 
                 //longitude
-                mtLong = Math::dmToDeg(std::stod(match.str(4)));
+                mtGPSpos.longitude = Math::dmToDeg(std::stod(match.str(4)));
                 if (match.str(5).compare("W") == 0)
                 {
-                    mtLong = -mtLong;
+                    mtGPSpos.longitude = -mtGPSpos.longitude;
                 }
 
                 //altitude
-                mtAlt = Math::dToI(std::stod(match.str(8)) * Math::feet2m);
-                if (mtAlt > Configuration::filter_maxHeight)
+                mtGPSpos.altitude = Math::dToI(
+                        std::stod(match.str(8)) * Math::feet2m);
+                if (mtGPSpos.altitude > Configuration::filter_maxHeight)
                 {
                     return MSG_UNPACK_IGN;
                 }
-            }
-            catch (const std::logic_error& e)
+            } catch (const std::logic_error& e)
             {
                 return MSG_UNPACK_ERR;
             }
@@ -99,19 +101,20 @@ std::int32_t APRSParser::unpack(const std::string& msg, Priority prio) noexcept
                     mtID = comm_match.str(2);
                     try
                     {
-                        mtIDtype = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
-                        mtAcType = (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C)
-                                >> 2;
-                    }
-                    catch (const std::logic_error& e)
+                        mtIDtype = std::stoi(comm_match.str(1), nullptr, 16)
+                                & 0x03;
+                        mtAcType = (std::stoi(comm_match.str(1), nullptr, 16)
+                                & 0x7C)
+                                   >> 2;
+                    } catch (const std::logic_error& e)
                     {
                         return MSG_UNPACK_ERR;
                     }
                     try
                     {
-                        mtClimbRate = std::stod(comm_match.str(3)) * Math::fpm2ms;
-                    }
-                    catch (const std::logic_error& e)
+                        mtClimbRate = std::stod(comm_match.str(3))
+                                * Math::fpm2ms;
+                    } catch (const std::logic_error& e)
                     {
                         mtClimbRate = A_VALUE_NA;
                         mtFullInfo = false;
@@ -119,19 +122,16 @@ std::int32_t APRSParser::unpack(const std::string& msg, Priority prio) noexcept
                     try
                     {
                         mtTurnRate = std::stod(comm_match.str(4)) * 3.0; // 1rot = 1 halfcircle / 1 min => 3° / 1s
-                    }
-                    catch (const std::logic_error& e)
+                    } catch (const std::logic_error& e)
                     {
                         mtTurnRate = A_VALUE_NA;
                         mtFullInfo = false;
                     }
-                }
-                else
+                } else
                 {
                     return MSG_UNPACK_IGN;
                 }
-            }
-            else
+            } else
             {
                 return MSG_UNPACK_IGN;
             }
@@ -140,8 +140,7 @@ std::int32_t APRSParser::unpack(const std::string& msg, Priority prio) noexcept
             try
             {
                 mtHeading = std::stod(match.str(6));
-            }
-            catch (const std::logic_error& e)
+            } catch (const std::logic_error& e)
             {
                 mtHeading = A_VALUE_NA;
                 mtFullInfo = false;
@@ -149,24 +148,21 @@ std::int32_t APRSParser::unpack(const std::string& msg, Priority prio) noexcept
             try
             {
                 mtGndSpeed = std::stod(match.str(7)) * Math::kts2ms;
-            }
-            catch (const std::logic_error& e)
+            } catch (const std::logic_error& e)
             {
                 mtGndSpeed = A_VALUE_NA;
                 mtFullInfo = false;
             }
-            Aircraft ac(mtID, mtLat, mtLong, mtAlt, mtGndSpeed, mtIDtype, mtAcType,
-                        mtClimbRate, mtTurnRate, mtHeading);
+            Aircraft ac(mtID, mtGPSpos, mtGndSpeed, mtIDtype, mtAcType,
+                    mtClimbRate, mtTurnRate, mtHeading);
             ac.setFullInfo(mtFullInfo);
             ac.setTargetT(Aircraft::TargetType::FLARM);
             VFRB::msAcCont.insertAircraft(ac, prio);
-        }
-        else
+        } else
         {
             return MSG_UNPACK_IGN;
         }
-    }
-    catch (const std::runtime_error& e)
+    } catch (const std::runtime_error& e)
     {
         Logger::error("(APRSParser) regex: ", e.what());
         return APRS_REGEX_ERR;

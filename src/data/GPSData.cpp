@@ -34,10 +34,10 @@ GPSData::~GPSData() noexcept
 
 void GPSData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double geoid)
 {
-    struct GPSPosition base;
-    base.latitude = b_lat;
-    base.longitude = b_lon;
-    base.altitude = b_alt;
+    struct ExtGPSPosition base;
+    base.position.latitude = b_lat;
+    base.position.longitude = b_lon;
+    base.position.altitude = b_alt;
     base.nrSats = 5;
     base.fixQa = 1;
     setBasePos(Priority::DONTCARE, base);
@@ -100,16 +100,16 @@ std::string GPSData::getRMCstr()
 std::int32_t GPSData::getBaseAlt()
 {
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value.altitude;
+    return mBasePos.value.position.altitude;
 }
 
 double GPSData::getBaseLat()
 {
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value.latitude;
+    return mBasePos.value.position.latitude;
 }
 
-void GPSData::setBasePos(Priority prio, const struct GPSPosition& pos)
+void GPSData::setBasePos(Priority prio, const struct ExtGPSPosition& pos)
 {
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
     mBasePos.update(pos, prio);
@@ -118,10 +118,10 @@ void GPSData::setBasePos(Priority prio, const struct GPSPosition& pos)
 double GPSData::getBaseLong()
 {
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value.longitude;
+    return mBasePos.value.position.longitude;
 }
 
-struct GPSPosition GPSData::getBasePos()
+struct ExtGPSPosition GPSData::getBasePos()
 {
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
     return mBasePos.value;

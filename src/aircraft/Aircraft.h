@@ -26,8 +26,8 @@
 #include <string>
 
 #include "../util/Priority.h"
+#include "../data/Position.hpp"
 
-#define A_ADSB_T 8
 #define A_VALUE_NA -1024.0
 
 class Aircraft
@@ -43,7 +43,7 @@ public:
      * @param lon  longitude
      * @param alt  altitude
      */
-    Aircraft(std::string& /*r_id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/);
+    Aircraft(std::string& /*r_id*/, struct GPSPosition& /*r_pos*/);
     /**
      * Construct an aircraft with a full
      * set of information, as are the ID,
@@ -60,7 +60,7 @@ public:
      * @param turn_r  turn rate
      * @param head    heading
      */
-    Aircraft(std::string& /*r_id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/,
+    Aircraft(std::string& /*r_id*/, struct GPSPosition& /*r_pos*/,
              double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
              double /*climb_r*/, double /*turn_r*/, double /*head*/);
     /**
@@ -113,43 +113,75 @@ public:
         return mIDtype;
     }
     /**
+     * Get target type.
      *
+     * @return target type
      */
     inline const TargetType getTargetT() const
     {
         return mTargetType;
     }
+    /**
+     * Get aircraft type.
+     *
+     * @return aircraft type
+     */
     inline const std::int32_t getAircraftT() const
     {
         return mAircraftType;
     }
+    /**
+     * Full information available?
+     *
+     * @return full info avail
+     */
     inline const bool isFullInfo() const
     {
         return mFullInfo;
     }
+    /**
+     * Get update age.
+     *
+     * @return update age
+     */
     inline const std::uint32_t getUpdateAge() const
     {
         return mUpdateAge;
     }
+    /**
+     * Get last updated priority.
+     *
+     * @return last priority
+     */
     inline const Priority getLastPriority() const
     {
         return mLastPriority;
     }
-    inline const bool getAttemptValid() const
+    /**
+     * Is update attempt valid?
+     *
+     * @return attempt valid
+     */
+    inline const bool isAttemptValid() const
     {
         return mAttemptValid;
     }
+    /**
+     * Get latitude
+     *
+     * @return
+     */
     inline const double getLatitude() const
     {
-        return mLatitude;
+        return mPosition.latitude;
     }
     inline const double getLongitude() const
     {
-        return mLongitude;
+        return mPosition.longitude;
     }
     inline const std::int32_t getAltitude() const
     {
-        return mAltitude;
+        return mPosition.altitude;
     }
     inline const double getGndSpeed() const
     {
@@ -193,7 +225,7 @@ private:
     std::string mID;
     std::uint32_t mIDtype = 1;
 
-    std::int32_t mAircraftType = A_ADSB_T;
+    std::int32_t mAircraftType = 8;
     TargetType mTargetType = TargetType::FLARM;
 
     // full info available
@@ -209,11 +241,7 @@ private:
     /**
      * position
      */
-    // deg
-    double mLatitude = A_VALUE_NA;
-    double mLongitude = A_VALUE_NA;
-    // m
-    std::int32_t mAltitude = 0;
+    struct GPSPosition mPosition;
 
     /**
      * movement

@@ -55,7 +55,8 @@ std::int32_t SBSParser::unpack(const std::string& msg, Priority prio) noexcept
     std::uint32_t i = 2;
     std::size_t p = 6;
 
-    if (msg.find(',', p) == std::string::npos || !(msg.size() > 4 && msg.at(4) == '3'))
+    if (msg.find(',', p) == std::string::npos || !(msg.size() > 4
+            && msg.at(4) == '3'))
     {
         return MSG_UNPACK_IGN;
     }
@@ -67,12 +68,11 @@ std::int32_t SBSParser::unpack(const std::string& msg, Priority prio) noexcept
                 if (delim - p > 0)
                 {
                     mtID = msg.substr(p, delim - p);
-                }
-                else
+                } else
                 {
                     return MSG_UNPACK_IGN;
                 }
-                break;
+            break;
             case 7:
                 try
                 {
@@ -81,59 +81,54 @@ std::int32_t SBSParser::unpack(const std::string& msg, Priority prio) noexcept
                         mtTime = std::stoi(msg.substr(p, 2)) * 10000;
                         mtTime += std::stoi(msg.substr(p + 3, 2)) * 100;
                         mtTime += std::stoi(msg.substr(p + 6, 2));
-                    }
-                    else
+                    } else
                     {
                         return MSG_UNPACK_IGN;
                     }
-                }
-                catch (const std::logic_error& e)
+                } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
                 }
-                break;
+            break;
             case 11:
                 try
                 {
-                    mtAlt = Math::dToI(
+                    mtGPSpos.altitude = Math::dToI(
                             std::stod(msg.substr(p, delim - p)) * Math::feet2m);
-                    if (mtAlt > Configuration::filter_maxHeight)
+                    if (mtGPSpos.altitude > Configuration::filter_maxHeight)
                     {
                         return MSG_UNPACK_IGN;
                     }
-                }
-                catch (const std::logic_error& e)
+                } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
                 }
-                break;
+            break;
             case 14:
                 try
                 {
-                    mtLat = std::stod(msg.substr(p, delim - p));
-                }
-                catch (const std::logic_error& e)
+                    mtGPSpos.latitude = std::stod(msg.substr(p, delim - p));
+                } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
                 }
-                break;
+            break;
             case 15:
                 try
                 {
-                    mtLong = std::stod(msg.substr(p, delim - p));
-                }
-                catch (const std::logic_error& e)
+                    mtGPSpos.longitude = std::stod(msg.substr(p, delim - p));
+                } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
                 }
-                break;
+            break;
             default:
-                break;
+            break;
         }
         i++;
         p = delim + 1;
     }
-    Aircraft ac(mtID, mtLat, mtLong, mtAlt);
+    Aircraft ac(mtID, mtGPSpos);
     ac.setFullInfo(false);
     ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
     VFRB::msAcCont.insertAircraft(ac, prio);
