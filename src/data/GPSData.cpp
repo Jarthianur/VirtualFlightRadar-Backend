@@ -32,7 +32,8 @@ GPSData::~GPSData() noexcept
 {
 }
 
-void GPSData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double geoid)
+void GPSData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt,
+                          double geoid)
 {
     struct ExtGPSPosition base;
     base.position.latitude = b_lat;
@@ -41,60 +42,63 @@ void GPSData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double
     base.nrSats = 5;
     base.fixQa = 1;
     setBasePos(Priority::DONTCARE, base);
-    mGGAstr.attemptValid = true;
-    mGGAstr.valueValid = false;
-    mRMCstr.attemptValid = true;
-    mRMCstr.valueValid = false;
+    /*mGGAstr.attemptValid = true;
+     mGGAstr.valueValid = false;
+     mRMCstr.attemptValid = true;
+     mRMCstr.valueValid = false;*/
 }
 
-void GPSData::setGGAstr(Priority prio, const std::string& gga)
-{
-    boost::lock_guard<boost::mutex> lock(mGGAstr.mutex);
-    mGGAstr.update(gga, prio);
-}
+/*void GPSData::setGGAstr(Priority prio, const std::string& gga)
+ {
+ boost::lock_guard<boost::mutex> lock(mGGAstr.mutex);
+ mGGAstr.update(gga, prio);
+ }
 
-std::string GPSData::getGGAstr()
-{
-    boost::lock_guard<boost::mutex> lock(mGGAstr.mutex);
-    mGGAstr.valueValid = false;
-    return mGGAstr.value;
-}
+ std::string GPSData::getGGAstr()
+ {
+ boost::lock_guard<boost::mutex> lock(mGGAstr.mutex);
+ mGGAstr.valueValid = false;
+ return mGGAstr.value;
+ }
 
-void GPSData::setRMCstr(Priority prio, const std::string& rmc)
-{
-    boost::lock_guard<boost::mutex> lock(mRMCstr.mutex);
-    mRMCstr.update(rmc, prio);
-}
+ void GPSData::setRMCstr(Priority prio, const std::string& rmc)
+ {
+ boost::lock_guard<boost::mutex> lock(mRMCstr.mutex);
+ mRMCstr.update(rmc, prio);
+ }
+
+ std::string GPSData::getRMCstr()
+ {
+ boost::lock_guard<boost::mutex> lock(mRMCstr.mutex);
+ mRMCstr.valueValid = false;
+ return mRMCstr.value;
+ }
+ */
 
 std::string GPSData::getGPSstr()
 {
-    std::string gps;
-    if (mRMCstr.valueValid)
-    {
-        gps = getRMCstr();
-        gps.append("\r\n");
-    }
-    else
-    {
-        gps = mGPSfix.rmcfix(getBasePos());
-    }
-    if (mGGAstr.valueValid)
-    {
-        gps.append(getGGAstr());
-        gps.append("\r\n");
-    }
-    else
-    {
-        gps.append(mGPSfix.ggafix(getBasePos()));
-    }
+    /*std::string gps;
+     if (mRMCstr.valueValid)
+     {
+     gps = getRMCstr();
+     gps.append("\r\n");
+     }
+     else
+     {
+     gps = mGPSfix.rmcfix(getBasePos());
+     }
+     if (mGGAstr.valueValid)
+     {
+     gps.append(getGGAstr());
+     gps.append("\r\n");
+     }
+     else
+     {
+     gps.append(mGPSfix.ggafix(getBasePos()));
+     }*/
+    std::string gps = mGPSfix.rmcfix(getBasePos());
+    gps.append(mGPSfix.ggafix(getBasePos()));
     return gps;
-}
-
-std::string GPSData::getRMCstr()
-{
-    boost::lock_guard<boost::mutex> lock(mRMCstr.mutex);
-    mRMCstr.valueValid = false;
-    return mRMCstr.value;
 }
 
 std::int32_t GPSData::getBaseAlt()

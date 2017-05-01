@@ -72,7 +72,7 @@ inline std::int32_t dToI(double d)
  * convert : ddmm.hh ; h = 1/100 m
  * ( degree, minute-as-decimal )
  * to degree
- * Sign is determined otherwise for this protocol.
+ * Sign is determined otherwise.
  */
 inline double dmToDeg(double dm)
 {

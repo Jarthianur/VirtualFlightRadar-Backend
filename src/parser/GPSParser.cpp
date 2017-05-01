@@ -29,14 +29,15 @@
 #include "../util/Priority.h"
 #include "../vfrb/VFRB.h"
 
-#define GPS_ASSUME_GOOD  (1)
-#define GPS_NR_SATS_GOOD (7)
-#define GPS_FIX_GOOD     (1)
+#define GPS_ASSUME_GOOD       (1)
+#define GPS_NR_SATS_GOOD      (7)
+#define GPS_FIX_GOOD          (1)
+#define GPS_HOR_DILUTION_GOOD (1.0)
 
 GPSParser::GPSParser()
         : Parser(),
           mGpggaRE(
-                  "^\\$[A-Z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),[0-9.]+?,(\\d+\\.?\\d+?),M,(\\d+\\.?\\d+?),M,,\\*[0-9A-F]{2}\\s+?$",
+                  "^\\$[A-Z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s+?$",
                   boost::regex::optimize | boost::regex::icase)
 {
 }
@@ -49,13 +50,13 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
 {
     try
     {
-        std::int32_t csum = std::stoi(msg.substr(msg.rfind('*') + 1, 2), nullptr, 16);
+        std::int32_t csum = std::stoi(msg.substr(msg.rfind('*') + 1, 2),
+                nullptr, 16);
         if (csum != Math::checksum(msg.c_str(), msg.length()))
         {
             return MSG_UNPACK_IGN;
         }
-    }
-    catch (const std::logic_error& e)
+    } catch (const std::logic_error& e)
     {
         return MSG_UNPACK_ERR;
     }
@@ -63,6 +64,7 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
     boost::smatch match;
     if (boost::regex_match(msg, match, mGpggaRE))
     {
+        double dilution = 0.0;
         try
         {
             //latitude
@@ -73,7 +75,8 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
             }
 
             //longitude
-            mtGPSpos.position.longitude = Math::dmToDeg(std::stod(match.str(3)));
+            mtGPSpos.position.longitude = Math::dmToDeg(
+                    std::stod(match.str(3)));
             if (match.str(4).compare("W") == 0)
             {
                 mtGPSpos.position.longitude = -mtGPSpos.position.longitude;
@@ -83,29 +86,30 @@ std::int32_t GPSParser::unpack(const std::string& msg, Priority prio) noexcept
             mtGPSpos.fixQa = std::stoi(match.str(5));
             //sats
             mtGPSpos.nrSats = std::stoi(match.str(6));
+            //dilution
+            dilution = std::stod(match.str(7));
             //altitude
-            mtGPSpos.position.altitude = Math::dToI(std::stod(match.str(7)));
+            mtGPSpos.position.altitude = Math::dToI(std::stod(match.str(8)));
             //geoid
-            mtGPSpos.geoid = std::stod(match.str(8));
-        }
-        catch (const std::logic_error& e)
+            mtGPSpos.geoid = std::stod(match.str(9));
+        } catch (const std::logic_error& e)
         {
             return MSG_UNPACK_ERR;
         }
 
-        VFRB::msGPSdata.setGGAstr(prio, msg);
+        /*VFRB::msGPSdata.setGGAstr(prio, msg);*/
         VFRB::msGPSdata.setBasePos(prio, mtGPSpos);
 
-        if (mtGPSpos.nrSats >= GPS_NR_SATS_GOOD && mtGPSpos.fixQa == GPS_FIX_GOOD)
+        if (mtGPSpos.nrSats >= GPS_NR_SATS_GOOD && mtGPSpos.fixQa
+                >= GPS_FIX_GOOD
+            && dilution <= GPS_HOR_DILUTION_GOOD)
         {
             return GPS_ASSUME_GOOD;
         }
-    }
-    else if (msg.find("RMC") != std::string::npos)
-    {
-        VFRB::msGPSdata.setRMCstr(prio, msg);
-    }
-    else
+    }/*else if (msg.find("RMC") != std::string::npos)
+     {
+     VFRB::msGPSdata.setRMCstr(prio, msg);
+     }*/else
     {
         return MSG_UNPACK_IGN;
     }

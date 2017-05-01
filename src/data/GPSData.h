@@ -41,8 +41,8 @@ public:
 
     std::string getGPSstr();
 
-    void setGGAstr(Priority /*prio*/, const std::string& /*gga*/);
-    void setRMCstr(Priority /*prio*/, const std::string& /*rmc*/);
+    /*void setGGAstr(Priority /*prio* /, const std::string& /*gga* /);
+     void setRMCstr(Priority /*prio* /, const std::string& /*rmc* /);*/
 
     void setBasePos(Priority /*prio*/, const struct ExtGPSPosition& /*pos*/);
     struct ExtGPSPosition getBasePos();
@@ -51,12 +51,12 @@ public:
     double getBaseLong();
 
 private:
-    std::string getGGAstr();
-    std::string getRMCstr();
+    /*std::string getGGAstr();
+     std::string getRMCstr();*/
 
     struct Data<struct ExtGPSPosition> mBasePos;
-    struct TmpData<std::string> mGGAstr;
-    struct TmpData<std::string> mRMCstr;
+    /*struct TmpData<std::string> mGGAstr;
+     struct TmpData<std::string> mRMCstr;*/
     GPSmodule mGPSfix;
 };
 
