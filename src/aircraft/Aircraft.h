@@ -30,6 +30,12 @@
 
 #define A_VALUE_NA -1024.0
 
+/**
+ * The Aircraft class.
+ *
+ * Represents an aircraft, holding all necessary information
+ * about its position, movement and some meta-data.
+ */
 class Aircraft
 {
 public:
@@ -38,10 +44,8 @@ public:
      * set of information, as are the ID
      * and the current position.
      *
-     * @param r_id ID
-     * @param lat  latitude
-     * @param lon  longitude
-     * @param alt  altitude
+     * @param r_id  the ID
+     * @param r_pos the position
      */
     Aircraft(std::string& /*r_id*/, struct GPSPosition& /*r_pos*/);
     /**
@@ -49,16 +53,14 @@ public:
      * set of information, as are the ID,
      * the current position and movement.
      *
-     * @param r_id    ID
-     * @param lat     latitude
-     * @param lon     longitude
-     * @param alt     altitude
-     * @param gnd_spd ground speed
-     * @param id_t    ID type
-     * @param ac_t    aircraft type
-     * @param climb_r climb rate
-     * @param turn_r  turn rate
-     * @param head    heading
+     * @param r_id    the ID
+     * @param r_pos   the prosition
+     * @param gnd_spd the ground speed
+     * @param id_t    the ID type
+     * @param ac_t    the aircraft type
+     * @param climb_r the climb rate
+     * @param turn_r  the turn rate
+     * @param head    the heading
      */
     Aircraft(std::string& /*r_id*/, struct GPSPosition& /*r_pos*/,
              double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
@@ -72,13 +74,16 @@ public:
     /**
      * Compare aircrafts by ID.
      *
-     * @param r_other aircraft to compare
-     * @return IDs equal?
+     * @param r_other the aircraft to compare
+     *
+     * @return are IDs equal?
      */
     bool operator==(const Aircraft& /*r_other*/) const;
     /**
      * Aircraft information received from
      * device type.
+     * FLARM is preferred over TRANSPONDER,
+     * in case an aircraft has both available.
      */
     enum class TargetType
         : std::uint32_t
@@ -90,12 +95,12 @@ public:
      * Update aircraft information.
      * Reset update age.
      *
-     * @param r_ac aircraft reference holding new information
+     * @param r_ac an aircraft reference holding new information
      * @param prio update from feed with priority
      */
     void update(const Aircraft& /*r_ac*/, Priority /*prio*/);
     /**
-     * Get ID.
+     * Get the ID.
      *
      * @return const reference to ID
      */
@@ -104,7 +109,7 @@ public:
         return mID;
     }
     /**
-     * Get ID type.
+     * Get the ID type.
      *
      * @return ID type
      */
@@ -113,7 +118,7 @@ public:
         return mIDtype;
     }
     /**
-     * Get target type.
+     * Get the last registered target type.
      *
      * @return target type
      */
@@ -122,7 +127,7 @@ public:
         return mTargetType;
     }
     /**
-     * Get aircraft type.
+     * Get the aircraft type.
      *
      * @return aircraft type
      */
@@ -131,16 +136,16 @@ public:
         return mAircraftType;
     }
     /**
-     * Full information available?
+     * Is full information available?
      *
-     * @return full info avail
+     * @return full info available, or not
      */
     inline const bool isFullInfo() const
     {
         return mFullInfo;
     }
     /**
-     * Get update age.
+     * Get the current update age.
      *
      * @return update age
      */
@@ -160,104 +165,130 @@ public:
     /**
      * Is update attempt valid?
      *
-     * @return attempt valid
+     * @return is attempt valid
      */
     inline const bool isAttemptValid() const
     {
         return mAttemptValid;
     }
     /**
-     * Get latitude
+     * Get the last registered latitude.
      *
-     * @return
+     * @return the latitude
      */
     inline const double getLatitude() const
     {
         return mPosition.latitude;
     }
+    /**
+     * Get the last registered longitude.
+     *
+     * @return the longitude
+     */
     inline const double getLongitude() const
     {
         return mPosition.longitude;
     }
+    /**
+     * Get the last registered altitude.
+     *
+     * @return the altitude.
+     */
     inline const std::int32_t getAltitude() const
     {
         return mPosition.altitude;
     }
+    /**
+     * Get the last registered speed over ground.
+     *
+     * @return the ground speed
+     */
     inline const double getGndSpeed() const
     {
         return mGndSpeed;
     }
+    /**
+     * Get the last registered heading.
+     *
+     * @return the heading
+     */
     inline const double getHeading() const
     {
         return mHeading;
     }
+    /**
+     * Get the last registered climb rate.
+     *
+     * @return the climb rate
+     */
     inline const double getClimbR() const
     {
         return mClimbRate;
     }
-    //const double getTurnR() const;
-
+    /*inline const double getTurnR() const
+     {
+     return mTurnRate;
+     }*/
     /**
-     * Setter
+     * Increment the update age by one.
      */
     inline void incUpdateAge()
     {
         ++mUpdateAge;
     }
+    /**
+     * Set the new target type.
+     *
+     * @param tt the new target type
+     */
     inline void setTargetT(TargetType tt)
     {
         mTargetType = tt;
     }
+    /**
+     * Set full information available.
+     *
+     * @param info is available, or not, defaults to true
+     */
     inline void setFullInfo(bool info = true)
     {
         mFullInfo = info;
     }
+    /**
+     * Allow update attempts.
+     */
     inline void setAttemptValid()
     {
         mAttemptValid = true;
     }
 
 private:
-    /**
-     * information
-     */
-    // id
+    /// Aircraft ID (address), identifier; Uniqueness is assumed and must be guaranteed by input feed.
     std::string mID;
+    /// ID (address) type.
     std::uint32_t mIDtype = 1;
-
+/// Aircraft type encoded as number (glider, powered airplane ...)
     std::int32_t mAircraftType = 8;
+    /// Target type; Got the last update from which device.
     TargetType mTargetType = TargetType::FLARM;
-
-    // full info available
+    /// Is full set of information available?
     bool mFullInfo = false;
-
-    //cycles without update
+    /// Times processed without update.
     std::uint32_t mUpdateAge = 0;
-
-    //last update by priority
+    /// Got last update with which priority.
     Priority mLastPriority = Priority::DONTCARE;
+    /// Is an update attempt valid? If false, updates are only allowed with at least last priority.
     bool mAttemptValid = true;
-
-    /**
-     * position
-     */
+/// Last registered position.
     struct GPSPosition mPosition;
-
-    /**
-     * movement
-     */
-    // m/s
+    /// Speed over ground; m/s
     double mGndSpeed = A_VALUE_NA;
-
-    // deg [0-359]
+    /// Heading; deg [0-359]
     double mHeading = A_VALUE_NA;
-
-    // m/s
+    /// Climb rate; m/s
     double mClimbRate = A_VALUE_NA;
-
-    // currently unused
-    // deg/s
-    double mTurnRate = A_VALUE_NA;
+    /* deg/s
+     double mTurnRate = A_VALUE_NA;*/
 };
 
 #endif /* SRC_AIRCRAFT_AIRCRAFT_H_ */

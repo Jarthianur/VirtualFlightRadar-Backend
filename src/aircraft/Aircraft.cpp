@@ -40,8 +40,8 @@ Aircraft::Aircraft(std::string& r_id, struct GPSPosition& r_pos, double gnd_spd,
           mPosition(r_pos),
           mGndSpeed(gnd_spd),
           mHeading(heading),
-          mClimbRate(climb_r),
-          mTurnRate(turn_r)
+          mClimbRate(climb_r)
+/*,mTurnRate(turn_r)*/
 {
 }
 
@@ -59,7 +59,7 @@ void Aircraft::update(const Aircraft& r_ac, Priority prio)
     this->mGndSpeed = r_ac.mGndSpeed;
     this->mHeading = r_ac.mHeading;
     this->mClimbRate = r_ac.mClimbRate;
-    this->mTurnRate = r_ac.mTurnRate;
+    /*this->mTurnRate = r_ac.mTurnRate;*/
     this->mFullInfo = r_ac.mFullInfo;
     this->mTargetType = r_ac.mTargetType;
     this->mUpdateAge = 0;
