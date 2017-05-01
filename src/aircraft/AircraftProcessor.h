@@ -30,53 +30,70 @@ class Aircraft;
 #define AP_BUFF_S 8191
 #define AP_L_BUFF_S 128
 
+/**
+ * The AircraftProcessor class.
+ *
+ * Provide functionality to process Aircraft objects
+ * relative to the current base position.
+ */
 class AircraftProcessor
 {
 public:
-    AircraftProcessor();
-    virtual ~AircraftProcessor() noexcept;
-
     /**
-     * build nmea-msg from Aircraft
+     * Constructor
      */
-    std::string process(const Aircraft& /*ac*/);
+    AircraftProcessor();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
+    virtual ~AircraftProcessor() noexcept;
+    /**
+     * Process an Aircraft relative to the base position.
+     * Result as PFLAU + PFLAA NMEA sentence, with <cr><lf> postfix.
+     *
+     * @param r_ac the given Aircraft
+     *
+     * @return the NMEA string
+     */
+    std::string process(const Aircraft& /*r_ac*/);
 
 private:
     /**
-     * format string buffer
+     * Calcutale Aircrafts relative position to the base.
+     *
+     * @param r_ac the given Aircraft
      */
+    void calcRelPosToBase(const Aircraft& /*r_ac*/);
+
+    /// Formatstring buffer
     char mBuffer[AP_BUFF_S + 1];
-
-    /**
-     * calculate relative position to base
-     */
-    void calcRelPosToBase(const Aircraft& /*ac*/);
-
-        /**
-     * Longitude base, Aircraft
-     * Latitude base, Aircraft
-     */
-    double mtRadLongB = 0.0, mtRadLongAc = 0.0, mtRadLatB = 0.0, mtRadLatAc = 0.0,
-    /**
-     * Longitude, Latitude distance
-     */
-    mtLongDist = 0.0, mtLatDist = 0.0,
-    /**
-     * relative bearing, absolute bearing
-     */
-    mtBearingRel = 0.0, mtBearingAbs = 0.0,
-    /**
-     * value to calculate distance
-     */
-    mtAval = 0.0;
-    /**
-     * relative North, East, Vertical
-     */
-    std::int32_t mtRelN = 0, mtRelE = 0, mtRelV = 0,
-    /**
-     * distance from base position to Aircraft
-     */
-    mtDist = 0;
+    /// Temporary values
+    /// Bases longitude as radian
+    double mtRadLongB = 0.0,
+    /// Aircrafts longitude as radian
+            mtRadLongAc = 0.0,
+            /// Bases latitude as radian
+            mtRadLatB = 0.0,
+            /// Aircrafts latitude as radian
+            mtRadLatAc = 0.0,
+            /// Distance/Difference between Aircrafts and bases longitude
+            mtLongDist = 0.0,
+            /// Distance/Difference between Aircrafts and bases latitude
+            mtLatDist = 0.0,
+            /// Relative bearing
+            mtBearingRel = 0.0,
+            /// Absolute bearing
+            mtBearingAbs = 0.0;
+    /// Relative distance in northern direction; m
+    std::int32_t mtRelN = 0,
+    /// Relative distance in eastern direction; m
+            mtRelE = 0,
+            /// Relative vertical distance; m
+            mtRelV = 0,
+            /// Distance between Aircraft and base; m
+            mtDist = 0;
 
 };
 
