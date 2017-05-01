@@ -26,36 +26,63 @@
 #include <string>
 #include <unordered_map>
 
+/**
+ * The ConfigReader class.
+ *
+ * This class reads a configuration file in INI format
+ * and stores read parameters in a map.
+ */
 class ConfigReader
 {
 public:
-    ConfigReader(const std::string& /*fname*/);
+    /**
+     * Constructor
+     *
+     * @param r_fname the file to read
+     */
+    ConfigReader(const std::string& /*r_fname*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~ConfigReader() noexcept;
-
     /**
-     * Read given file.
-     * Store recognized key/value properties into map.
+     * Read the given file.
+     *
+     * @exceptsafe strong
      */
-    void read();
-
+    void read() noexcept;
     /**
-     * Get value to given key from config map.
-     * If key not found return given default.
+     * Get a property from all stored properties.
+     * Return the given default value, if the property was not found.
+     *
+     * @param r_section the section of the property
+     * @param r_key     the key to get the value for
+     * @param r_def_val the default value; defaults to empty string
+     *
+     * @return the value for key in section, if found, else the default value
      */
-    const std::string getProperty(const std::string& /*section*/,
-                                  const std::string& /*key*/,
-                                  const std::string& /*def_val*/= "") const;
-
+    const std::string getProperty(const std::string& /*r_section*/,
+                                  const std::string& /*r_key*/,
+                                  const std::string& /*r_def_val*/= "") const;
+    /**
+     * Get the key-value-map for a section.
+     * If the section is not found the kv-map is empty.
+     *
+     * @param r_section the section to get the kv-map for
+     *
+     * @return the kv-map for the section
+     */
     const std::unordered_map<std::string, std::string>& getSectionKV(
-            const std::string& /*section*/) const;
+            const std::string& /*r_section*/) const;
 
 private:
+    /// The filename
     const std::string mFile;
-    /**
-     * map:section
-     *     ->map:key-value
-     */
+    /// The map of sections with kv-maps
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> mConfig;
+    /// The regular expression for 'key = value' lines
     const boost::regex mConfRE;
 };
 
