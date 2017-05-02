@@ -27,23 +27,40 @@
 
 #include "../util/Priority.h"
 
+/// Parser -- unpack error codes
 #define MSG_UNPACK_SUC 0
 #define MSG_UNPACK_ERR -1
 #define MSG_UNPACK_IGN -2
 
+/**
+ * The Parser interface.
+ *
+ * Classes of this type implement the unpack method.
+ */
 class Parser
 {
 public:
+	/**
+	 * Constructor
+	 */
     Parser();
-    virtual ~Parser() noexcept;
-
     /**
-     * unpack a msg into Aircraft and insert in Container.
-     * returns MSG_UNPACK_SUC on success, MSG_UNPACK_ERR on failure,
-     * MSG_UNPACK_IGN when to ignore.
+     * Destructor
+     *
+     * @exceptsafe no-throw
      */
-    virtual std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept = 0;
-
+    virtual ~Parser() noexcept;
+    /**
+     * Unpack given string.
+     * Where to put unpacked data is handled by implementation,
+     * as well as Priority pass-through.
+     *
+     * @param r_msg the msg to unpack
+     * @param prio  the Priority to pass
+     *
+     * @return an error code
+     */
+    virtual std::int32_t unpack(const std::string& /*r_msg*/, Priority /*prio*/) noexcept = 0;
 };
 
 #endif /* SRC_PARSER_PARSER_H_ */

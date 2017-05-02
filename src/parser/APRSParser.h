@@ -29,21 +29,37 @@
 #include "Parser.h"
 #include "../data/Position.hpp"
 
-#define APRS_REGEX_ERR -3
-
+/**
+ * The APRSParser class, implements Parser.
+ *
+ * This class unpacks APRS strings into static AircraftContainer.
+ */
 class APRSParser: public Parser
 {
 public:
+	/**
+	 * Constructor
+	 */
     APRSParser();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~APRSParser() noexcept;
-
-    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
+/**
+ * Unpack APRS messages into the static VFRB::AircraftContainer.
+ *
+ * @override Parser::unpack
+ */
+    std::int32_t unpack(const std::string& /*r_msg*/, Priority /*prio*/) noexcept override;
 
 private:
-    //regex
+    /// Regular expression for APRS protocol
     const boost::regex mAprsRE;
+    /// Regular expression for OGN specific APRS extension
     const boost::regex mCommRE;
-    // temps
+    /// Temporary information to reduce allocations
     std::string mtID;
     struct GPSPosition mtGPSpos;
     std::int32_t mtIDtype = 0, mtAcType = 0, mtTime = 0;

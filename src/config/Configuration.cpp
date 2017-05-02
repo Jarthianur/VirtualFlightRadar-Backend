@@ -49,7 +49,6 @@ double Configuration::base_latitude = 0.0;
 double Configuration::base_longitude = 0.0;
 double Configuration::base_geoid = 0.0;
 double Configuration::base_pressure = 0.0;
-double Configuration::base_temp = 0.0;
 std::int32_t Configuration::filter_maxHeight = 0;
 std::int32_t Configuration::filter_maxDist = 0;
 std::uint16_t Configuration::global_server_port = 1;
@@ -94,10 +93,6 @@ bool Configuration::init(const char* file)
             cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25"));
     Logger::info("(Config) " KV_KEY_PRESSURE ": ", std::to_string(base_pressure));
 
-    base_temp = strToDouble(
-            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_TEMPERATURE, "15.0"));
-    Logger::info("(Config) " KV_KEY_TEMPERATURE ": ", std::to_string(base_temp));
-
     // get filters
     std::string tmp = cr.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT, "-1");
     if (tmp == "-1")
@@ -134,11 +129,11 @@ bool Configuration::init(const char* file)
     return nrf > 0;
 }
 
-std::size_t Configuration::registerFeeds(ConfigReader& cr)
+std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
 {
     std::vector<std::string> feeds;
     std::stringstream ss;
-    ss.str(cr.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+    ss.str(r_cr.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
     std::string item;
     while (std::getline(ss, item, ','))
     {
@@ -163,8 +158,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
         {
             try
             {
-                Feed f(*it, aliasPriority(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
-                       Feed::InputType::APRSC, cr.getSectionKV(*it));
+                Feed f(*it, aliasPriority(r_cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       Feed::InputType::APRSC, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             }
             catch (const std::out_of_range& e)
@@ -176,8 +171,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
         {
             try
             {
-                Feed f(*it, aliasPriority(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
-                       Feed::InputType::SBS, cr.getSectionKV(*it));
+                Feed f(*it, aliasPriority(r_cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       Feed::InputType::SBS, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             }
             catch (const std::out_of_range& e)
@@ -189,8 +184,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
         {
             try
             {
-                Feed f(*it, aliasPriority(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
-                       Feed::InputType::SENSOR, cr.getSectionKV(*it));
+                Feed f(*it, aliasPriority(r_cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       Feed::InputType::SENSOR, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             }
             catch (const std::out_of_range& e)
@@ -202,8 +197,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
         {
             try
             {
-                Feed f(*it, aliasPriority(cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
-                       Feed::InputType::GPS, cr.getSectionKV(*it));
+                Feed f(*it, aliasPriority(r_cr.getProperty(*it, KV_KEY_PRIORITY, prio_dc)),
+                       Feed::InputType::GPS, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             }
             catch (const std::out_of_range& e)
@@ -215,51 +210,51 @@ std::size_t Configuration::registerFeeds(ConfigReader& cr)
     return global_feeds.size();
 }
 
-std::int32_t Configuration::strToInt(const std::string& str) noexcept
+std::int32_t Configuration::strToInt(const std::string& r_str) noexcept
 {
     try
     {
-        return std::stoi(str);
+        return std::stoi(r_str);
     }
     catch (const std::logic_error& iae)
     {
-        Logger::warn("(VFRB) invalid configuration: ", str.length() == 0 ? "empty" : str);
+        Logger::warn("(VFRB) invalid configuration: ", r_str.length() == 0 ? "empty" : r_str);
     }
     return 0;
 }
 
-double Configuration::strToDouble(const std::string& str) noexcept
+double Configuration::strToDouble(const std::string& r_str) noexcept
 {
     try
     {
-        return std::stod(str);
+        return std::stod(r_str);
     }
     catch (const std::logic_error& iae)
     {
-        Logger::warn("(VFRB) invalid configuration: ", str.length() == 0 ? "empty" : str);
+        Logger::warn("(VFRB) invalid configuration: ", r_str.length() == 0 ? "empty" : r_str);
     }
     return 0.0;
 }
 
-Priority Configuration::aliasPriority(const std::string& str) noexcept
+Priority Configuration::aliasPriority(const std::string& r_str) noexcept
 {
     Priority prio = Priority::DONTCARE;
     try
     {
-        prio = (Priority) std::stoul(str);
+        prio = (Priority) std::stoul(r_str);
     }
     catch (...)
     {
     }
-    if (prio == Priority::NORMAL || str.find(PRIO_ALIAS_NORMAL) != std::string::npos)
+    if (prio == Priority::NORMAL || r_str.find(PRIO_ALIAS_NORMAL) != std::string::npos)
     {
         return Priority::NORMAL;
     }
-    else if (prio == Priority::HIGHER || str.find(PRIO_ALIAS_HIGHER) != std::string::npos)
+    else if (prio == Priority::HIGHER || r_str.find(PRIO_ALIAS_HIGHER) != std::string::npos)
     {
         return Priority::HIGHER;
     }
-    else if (prio == Priority::LESSER || str.find(PRIO_ALIAS_LESSER) != std::string::npos)
+    else if (prio == Priority::LESSER || r_str.find(PRIO_ALIAS_LESSER) != std::string::npos)
     {
         return Priority::LESSER;
     }

@@ -27,32 +27,66 @@
 #include "../util/Priority.h"
 #include "Data.hpp"
 
+/// ICAO standard atmospheric pressure at MSL
 #define ICAO_STD_A 1013.25
+/// ICAO standard temperature at MSL
+/// @deprecated
 #define ICAO_STD_T 15.0
 
+/**
+ * The SensorData class.
+ *
+ * This class holds data gathered from any sensor.
+ * E.g. wind sensor, pressure sensor
+ */
 class SensorData
 {
 public:
+	/**
+	 * Constructor
+	 */
     SensorData();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~SensorData() noexcept;
-
     /**
      * Get WIMWV sentence.
-     * Set valid to false.
+     * Wind data is invalid after this operation.
+     *
+     * @return the WIMWV sentence
      */
     std::string getWVstr();
-
     /**
      * Set WIMWV sentence.
-     * Set valid to true.
+     * Wind data is valid after this operation.
+     * May fail due to Priority.
+     *
+     * @param prio the Priority attempting to write
+     * @param r_wv the new WIMWV sentence to write
      */
-    void setWVstr(Priority /*prio*/, const std::string& /*wv*/);
-
+    void setWVstr(Priority /*prio*/, const std::string& /*r_wv*/);
+/**
+ * Get the last registered pressure.
+ *
+ * @return the pressure
+ */
     double getPress();
+    /**
+     * Set the new pressure.
+     * May fail due to Priority.
+     *
+     * @param prio the Priority attempting to write
+     * @param p the new pressure
+     */
     void setPress(Priority /*prio*/, double /*p*/);
 
 private:
+    /// Data holding pressure
     struct Data<double> mPress;
+    /// TmpData holding WIMWV sentence
     struct TmpData<std::string> mWV;
 };
 

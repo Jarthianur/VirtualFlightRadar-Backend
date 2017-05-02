@@ -23,43 +23,34 @@
 
 #include <boost/thread/lock_guard.hpp>
 
-SensorData::SensorData()
-{
-    mPress.value = ICAO_STD_A;
+SensorData::SensorData() {
+	mPress.value = ICAO_STD_A;
 }
 
 SensorData::~SensorData() noexcept
 {
 }
 
-std::string SensorData::getWVstr()
-{
-    boost::lock_guard<boost::mutex> lock(mWV.mutex);
-    if (mWV.valueValid)
-    {
-        mWV.valueValid = false;
-        return mWV.value + "\r\n";
-    }
-    else
-    {
-        return "";
-    }
+std::string SensorData::getWVstr() {
+	boost::lock_guard<boost::mutex> lock(mWV.mutex);
+	if (mWV.valueValid) {
+		return mWV.getValue() + "\r\n";
+	} else {
+		return "";
+	}
 }
 
-void SensorData::setWVstr(Priority prio, const std::string& wv)
-{
-    boost::lock_guard<boost::mutex> lock(mWV.mutex);
-    mWV.update(wv, prio);
+void SensorData::setWVstr(Priority prio, const std::string& r_wv) {
+	boost::lock_guard<boost::mutex> lock(mWV.mutex);
+	mWV.update(r_wv, prio);
 }
 
-double SensorData::getPress()
-{
-    boost::lock_guard<boost::mutex> lock(mPress.mutex);
-    return mPress.value;
+double SensorData::getPress() {
+	boost::lock_guard<boost::mutex> lock(mPress.mutex);
+	return mPress.value;
 }
 
-void SensorData::setPress(Priority prio, double p)
-{
-    boost::lock_guard<boost::mutex> lock(mPress.mutex);
-    mPress.update(p, prio);
+void SensorData::setPress(Priority prio, double p) {
+	boost::lock_guard<boost::mutex> lock(mPress.mutex);
+	mPress.update(p, prio);
 }

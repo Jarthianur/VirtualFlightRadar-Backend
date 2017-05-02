@@ -47,9 +47,9 @@ AircraftContainer::~AircraftContainer() noexcept
 {
 }
 
-std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& id)
+std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& r_id)
 {
-    const auto it = mIndexMap.find(id);
+    const auto it = mIndexMap.find(r_id);
     if (it == mIndexMap.cend())
     {
         return mCont.end();
@@ -60,7 +60,7 @@ std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& id)
     }
 }
 
-std::string AircraftContainer::processAircrafts()
+std::string AircraftContainer::processAircrafts() noexcept
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     std::string dest_str;
@@ -107,13 +107,13 @@ std::string AircraftContainer::processAircrafts()
     return dest_str;
 }
 
-void AircraftContainer::insertAircraft(const Aircraft& update, Priority prio)
+void AircraftContainer::insertAircraft(const Aircraft& r_update, Priority prio) noexcept
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    auto known_ac = find(update.getID());
+    auto known_ac = find(r_update.getID());
     if (known_ac != mCont.end())
     {
-        if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER || update.getTargetT()
+        if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER || r_update.getTargetT()
                 == Aircraft::TargetType::FLARM)
         {
             bool write = known_ac->isAttemptValid();
@@ -128,7 +128,7 @@ void AircraftContainer::insertAircraft(const Aircraft& update, Priority prio)
             }
             if (write)
             {
-                known_ac->update(update, prio);
+                known_ac->update(r_update, prio);
             }
             else
             {
@@ -138,7 +138,7 @@ void AircraftContainer::insertAircraft(const Aircraft& update, Priority prio)
     }
     else
     {
-        mIndexMap.insert( { update.getID(), mCont.size() });
-        mCont.push_back(update);
+        mIndexMap.insert( { r_update.getID(), mCont.size() });
+        mCont.push_back(r_update);
     }
 }

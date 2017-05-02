@@ -30,7 +30,7 @@
 #include "../vfrb/Feed.h"
 #include "ConfigReader.h"
 
-// Keywords for configuration
+/// Configuration section keys
 #define SECT_KEY_FALLBACK   "fallback"
 #define SECT_KEY_GENERAL    "general"
 #define SECT_KEY_FILTER     "filter"
@@ -38,7 +38,7 @@
 #define SECT_KEY_SBS        "sbs"
 #define SECT_KEY_GPS        "gps"
 #define SECT_KEY_SENS       "sens"
-
+/// Per section keys
 #define KV_KEY_FEEDS        "feeds"
 #define KV_KEY_GND_MODE     "gndMode"
 #define KV_KEY_LATITUDE     "latitude"
@@ -54,36 +54,108 @@
 #define KV_KEY_PORT         "port"
 #define KV_KEY_PRIORITY     "priority"
 #define KV_KEY_LOGIN        "login"
-
+/// Priority aliases
 #define PRIO_ALIAS_DONTCARE "dont"
 #define PRIO_ALIAS_LESSER   "less"
 #define PRIO_ALIAS_NORMAL   "norm"
 #define PRIO_ALIAS_HIGHER   "high"
 
-class Configuration
-{
+/**
+ * The Configuration class.
+ *
+ * This class provides functionality to unpack properties
+ * read by the ConfigReader into necessary information for
+ * running the VFR-B.
+ */
+class Configuration {
 public:
-    Configuration(const char* /*file*/);
-    virtual ~Configuration() noexcept;
+	/**
+	 * Constructor to initialize all Configuration fields.
+	 *
+	 * @param file the config file
+	 */
+	Configuration(const char* /*file*/);
+	/**
+	 * Destructor
+	 *
+	 * @exceptsafe no-throw
+	 */
+	virtual ~Configuration() noexcept;
 
-    static std::int32_t base_altitude;
-    static double base_latitude;
-    static double base_longitude;
-    static double base_geoid;
-    static double base_pressure;
-    static double base_temp;
-    static std::int32_t filter_maxHeight;
-    static std::int32_t filter_maxDist;
-    static std::uint16_t global_server_port;
-    static bool global_gnd_mode;
-    static std::vector<Feed> global_feeds;
+	/// Bases altitude
+	static std::int32_t base_altitude;
+	/// Bases latitude
+	static double base_latitude;
+	/// Bases longitude
+	static double base_longitude;
+	/// Bases geoid separation
+	static double base_geoid;
+	/// Air pressure at base
+	static double base_pressure;
+	/// Maximum height for reported Aircrafts
+	static std::int32_t filter_maxHeight;
+	/// Maximum distance for reported Aircrafts
+	static std::int32_t filter_maxDist;
+	/// Port where to serve reports
+	static std::uint16_t global_server_port;
+	/// Ground mode enabled?
+	static bool global_gnd_mode;
+	/// All registered and correctly parsed input feeds
+	static std::vector<Feed> global_feeds;
 
 private:
-    bool init(const char* /*file*/);
-    std::size_t registerFeeds(ConfigReader& /*cr*/);
-    std::int32_t strToInt(const std::string& /*str*/) noexcept;
-    double strToDouble(const std::string& /*str*/) noexcept;
-    Priority aliasPriority(const std::string& /*str*/) noexcept;
+	/**
+	 * Initialize Configuration.
+	 * Called by c'tor.
+	 * Read and unpack config file.
+	 *
+	 * @param file the file name
+	 *
+	 * @return whether reading and unpacking was successful
+	 */
+	bool init(const char* /*file*/);
+	/**
+	 * Register all input feeds found in the config file.
+	 * Only correctly configured feeds are registered.
+	 *
+	 * @param r_cr the ConfigReader holding read properties
+	 *
+	 * @return the number of registered feeds
+	 */
+	std::size_t registerFeeds(ConfigReader& /*r_cr*/);
+	/**
+	 * Parse a string to integer.
+	 * Always returns a valid value.
+	 *
+	 * @param r_str the string to parse
+	 *
+	 * @return the parsed number, 0 if error
+	 *
+	 * @exceptsafe no-throw
+	 */
+	std::int32_t strToInt(const std::string& /*r_str*/) noexcept;
+	/**
+	 * Parse a string to double.
+	 * Always returns a valid value.
+	 *
+	 * @param r_str the string to parse
+	 *
+	 * @return the parsed number, 0 if error
+	 *
+	 * @exceptsafe no-throw
+	 */
+	double strToDouble(const std::string& /*r_str*/) noexcept;
+	/**
+	 * Map given priority string to correct Priority.
+	 * Alias name if not the number is given.
+	 *
+	 * @param r_str the priority string
+	 *
+	 * @return the aliased Priority
+	 *
+	 * @exceptsafe no-throw
+	 */
+	Priority aliasPriority(const std::string& /*r_str*/) noexcept;
 };
 
 #endif /* SRC_CONFIG_CONFIGURATION_H_ */

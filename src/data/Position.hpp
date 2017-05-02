@@ -24,22 +24,35 @@
 
 #include <cstdint>
 
+/**
+ * GPS position structure.
+ *
+ * Minimal information for a position.
+ */
 struct GPSPosition
 {
-    /**
-     * meters
-     */
+    /// Altitude; m
     std::int32_t altitude;
-    /**
-     * Base position in degree
-     */
-    double latitude, longitude;
+    /// Latitude; deg
+    double latitude,
+	/// Longitude; deg
+	longitude;
 };
 
+/**
+ * Extended GPS position structure.
+ *
+ * Holds GPS meta information additionally to a position.
+ */
 struct ExtGPSPosition
 {
+	/// Position
     struct GPSPosition position;
-    std::int32_t nrSats, fixQa;
+    /// Number of satellites
+    std::int32_t nrSats,
+	/// GPS fix quality
+	fixQa;
+    /// Geoid separation
     double geoid;
 };
 
