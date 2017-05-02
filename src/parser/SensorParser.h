@@ -34,7 +34,8 @@ public:
     SensorParser();
     virtual ~SensorParser() noexcept;
 
-    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
+    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/)
+            noexcept override;
 
 private:
     std::size_t mtB = 0, mtS = 0, mtSubLen = 0, mtNumIdx = 0;

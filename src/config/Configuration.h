@@ -67,95 +67,96 @@
  * read by the ConfigReader into necessary information for
  * running the VFR-B.
  */
-class Configuration {
+class Configuration
+{
 public:
-	/**
-	 * Constructor to initialize all Configuration fields.
-	 *
-	 * @param file the config file
-	 */
-	Configuration(const char* /*file*/);
-	/**
-	 * Destructor
-	 *
-	 * @exceptsafe no-throw
-	 */
-	virtual ~Configuration() noexcept;
+    /**
+     * Constructor to initialize all Configuration fields.
+     *
+     * @param file the config file
+     */
+    Configuration(const char* /*file*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
+    virtual ~Configuration() noexcept;
 
-	/// Bases altitude
-	static std::int32_t base_altitude;
-	/// Bases latitude
-	static double base_latitude;
-	/// Bases longitude
-	static double base_longitude;
-	/// Bases geoid separation
-	static double base_geoid;
-	/// Air pressure at base
-	static double base_pressure;
-	/// Maximum height for reported Aircrafts
-	static std::int32_t filter_maxHeight;
-	/// Maximum distance for reported Aircrafts
-	static std::int32_t filter_maxDist;
-	/// Port where to serve reports
-	static std::uint16_t global_server_port;
-	/// Ground mode enabled?
-	static bool global_gnd_mode;
-	/// All registered and correctly parsed input feeds
-	static std::vector<Feed> global_feeds;
+    /// Bases altitude
+    static std::int32_t base_altitude;
+    /// Bases latitude
+    static double base_latitude;
+    /// Bases longitude
+    static double base_longitude;
+    /// Bases geoid separation
+    static double base_geoid;
+    /// Air pressure at base
+    static double base_pressure;
+    /// Maximum height for reported Aircrafts
+    static std::int32_t filter_maxHeight;
+    /// Maximum distance for reported Aircrafts
+    static std::int32_t filter_maxDist;
+    /// Port where to serve reports
+    static std::uint16_t global_server_port;
+    /// Ground mode enabled?
+    static bool global_gnd_mode;
+    /// All registered and correctly parsed input feeds
+    static std::vector<Feed> global_feeds;
 
 private:
-	/**
-	 * Initialize Configuration.
-	 * Called by c'tor.
-	 * Read and unpack config file.
-	 *
-	 * @param file the file name
-	 *
-	 * @return whether reading and unpacking was successful
-	 */
-	bool init(const char* /*file*/);
-	/**
-	 * Register all input feeds found in the config file.
-	 * Only correctly configured feeds are registered.
-	 *
-	 * @param r_cr the ConfigReader holding read properties
-	 *
-	 * @return the number of registered feeds
-	 */
-	std::size_t registerFeeds(ConfigReader& /*r_cr*/);
-	/**
-	 * Parse a string to integer.
-	 * Always returns a valid value.
-	 *
-	 * @param r_str the string to parse
-	 *
-	 * @return the parsed number, 0 if error
-	 *
-	 * @exceptsafe no-throw
-	 */
-	std::int32_t strToInt(const std::string& /*r_str*/) noexcept;
-	/**
-	 * Parse a string to double.
-	 * Always returns a valid value.
-	 *
-	 * @param r_str the string to parse
-	 *
-	 * @return the parsed number, 0 if error
-	 *
-	 * @exceptsafe no-throw
-	 */
-	double strToDouble(const std::string& /*r_str*/) noexcept;
-	/**
-	 * Map given priority string to correct Priority.
-	 * Alias name if not the number is given.
-	 *
-	 * @param r_str the priority string
-	 *
-	 * @return the aliased Priority
-	 *
-	 * @exceptsafe no-throw
-	 */
-	Priority aliasPriority(const std::string& /*r_str*/) noexcept;
+    /**
+     * Initialize Configuration.
+     * Called by c'tor.
+     * Read and unpack config file.
+     *
+     * @param file the file name
+     *
+     * @return whether reading and unpacking was successful
+     */
+    bool init(const char* /*file*/);
+    /**
+     * Register all input feeds found in the config file.
+     * Only correctly configured feeds are registered.
+     *
+     * @param r_cr the ConfigReader holding read properties
+     *
+     * @return the number of registered feeds
+     */
+    std::size_t registerFeeds(ConfigReader& /*r_cr*/);
+    /**
+     * Parse a string to integer.
+     * Always returns a valid value.
+     *
+     * @param r_str the string to parse
+     *
+     * @return the parsed number, 0 if error
+     *
+     * @exceptsafe no-throw
+     */
+    std::int32_t strToInt(const std::string& /*r_str*/) noexcept;
+    /**
+     * Parse a string to double.
+     * Always returns a valid value.
+     *
+     * @param r_str the string to parse
+     *
+     * @return the parsed number, 0 if error
+     *
+     * @exceptsafe no-throw
+     */
+    double strToDouble(const std::string& /*r_str*/) noexcept;
+    /**
+     * Map given priority string to correct Priority.
+     * Alias name if not the number is given.
+     *
+     * @param r_str the priority string
+     *
+     * @return the aliased Priority
+     *
+     * @exceptsafe no-throw
+     */
+    Priority aliasPriority(const std::string& /*r_str*/) noexcept;
 };
 
 #endif /* SRC_CONFIG_CONFIGURATION_H_ */

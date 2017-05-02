@@ -31,63 +31,113 @@
 /**
  * Data structure.
  *
- * Hold
+ * Hold a value providing its own mutex and meta-data.
+ *
+ * @tparam T the type of value to hold
  */
 template<typename T>
-struct Data {
-	T value;
-	bool attemptValid;
-	Priority lastPriority;
-	boost::mutex mutex;
-
-	void update(const T& nv, Priority prio) {
-		bool write = attemptValid;
-		if (!write) {
-			if (prio > lastPriority
-					|| (prio == lastPriority && prio != Priority::LESSER)) {
-				write = true;
-			}
-		}
-		if (write) {
-			attemptValid = (prio == Priority::LESSER);
-			value = nv;
-			lastPriority = prio;
-		} else {
-			attemptValid = true;
-		}
-	}
+struct Data
+{
+    /// The value
+    T value;
+    /// Is wrtite attempt valid?
+    bool attemptValid;
+    /// Last written Priority
+    Priority lastPriority;
+    /// Mutex to enable threadsafety per Data.
+    boost::mutex mutex;
+    /**
+     * Update the value.
+     * May fail due to Priority.
+     * Updates always if attempt is valid.
+     *
+     * @param nv   the new value
+     * @param prio the Priority attempting to write
+     */
+    void update(const T& nv, Priority prio)
+    {
+        bool write = attemptValid;
+        if (!write)
+        {
+            if (prio > lastPriority || (prio == lastPriority
+                    && prio != Priority::LESSER))
+            {
+                write = true;
+            }
+        }
+        if (write)
+        {
+            attemptValid = (prio == Priority::LESSER);
+            value = nv;
+            lastPriority = prio;
+        } else
+        {
+            attemptValid = true;
+        }
+    }
 };
-
+/**
+ * Pseudo temporary data structure.
+ *
+ * Same as the Data structure, but reading the value
+ * invalidates it and updating validates it.
+ *
+ * @tparam T the type of value to hold
+ */
 template<typename T>
-struct TmpData {
-	T value;
-	bool attemptValid;
-	bool valueValid;
-	Priority lastPriority;
-	boost::mutex mutex;
-
-	const T& getValue() {
-		valueValid = false;
-		return value;
-	}
-
-	void update(const T& nv, Priority prio) {
-		bool write = attemptValid;
-		if (!write) {
-			if (prio > lastPriority
-					|| (prio == lastPriority && prio != Priority::LESSER)) {
-				write = true;
-			}
-		}
-		if (write) {
-			attemptValid = (prio == Priority::LESSER);
-			value = nv;
-			lastPriority = prio;
-			valueValid = true;
-		} else {
-			attemptValid = true;
-		}
-	}
+struct TmpData
+{
+    /// The value
+    T value;
+    /// Is wrtite attempt valid?
+    bool attemptValid;
+    /// Is the value valid?
+    bool valueValid;
+    /// Last written Priority
+    Priority lastPriority;
+    /// Mutex to enable threadsafety per TmpData.
+    boost::mutex mutex;
+    /**
+     * Get the value and invalidate it.
+     *
+     * @return the value
+     */
+    const T& getValue()
+    {
+        valueValid = false;
+        return value;
+    }
+    /**
+     * Update the value.
+     * May fail due to Priority.
+     * Updates always if attempt is valid.
+     * Validates the value.
+     *
+     * @param nv   the new value
+     * @param prio the Priority attempting to write
+     */
+    void update(const T& nv, Priority prio)
+    {
+        bool write = attemptValid;
+        if (!write)
+        {
+            if (prio > lastPriority || (prio == lastPriority
+                    && prio != Priority::LESSER))
+            {
+                write = true;
+            }
+        }
+        if (write)
+        {
+            attemptValid = (prio == Priority::LESSER);
+            value = nv;
+            lastPriority = prio;
+            valueValid = true;
+        } else
+        {
+            attemptValid = true;
+        }
+    }
 };
 
 #endif /* SRC_DATA_DATA_HPP_ */

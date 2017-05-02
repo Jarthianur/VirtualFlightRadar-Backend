@@ -37,9 +37,9 @@
 class APRSParser: public Parser
 {
 public:
-	/**
-	 * Constructor
-	 */
+    /**
+     * Constructor
+     */
     APRSParser();
     /**
      * Destructor
@@ -47,12 +47,13 @@ public:
      * @exceptsafe no-throw
      */
     virtual ~APRSParser() noexcept;
-/**
- * Unpack APRS messages into the static VFRB::AircraftContainer.
- *
- * @override Parser::unpack
- */
-    std::int32_t unpack(const std::string& /*r_msg*/, Priority /*prio*/) noexcept override;
+    /**
+     * Unpack APRS messages into the static VFRB::AircraftContainer.
+     *
+     * @overload Parser::unpack
+     */
+    std::int32_t unpack(const std::string& /*r_msg*/, Priority /*prio*/)
+            noexcept override;
 
 private:
     /// Regular expression for APRS protocol
@@ -63,8 +64,8 @@ private:
     std::string mtID;
     struct GPSPosition mtGPSpos;
     std::int32_t mtIDtype = 0, mtAcType = 0, mtTime = 0;
-    double mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0,
-            mtHeading = 0.0;
+    double mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0, mtHeading =
+            0.0;
     bool mtFullInfo = true;
 };
 

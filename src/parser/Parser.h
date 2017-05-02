@@ -40,9 +40,9 @@
 class Parser
 {
 public:
-	/**
-	 * Constructor
-	 */
+    /**
+     * Constructor
+     */
     Parser();
     /**
      * Destructor
@@ -60,7 +60,8 @@ public:
      *
      * @return an error code
      */
-    virtual std::int32_t unpack(const std::string& /*r_msg*/, Priority /*prio*/) noexcept = 0;
+    virtual std::int32_t unpack(const std::string& /*r_msg*/, Priority /*prio*/)
+            noexcept = 0;
 };
 
 #endif /* SRC_PARSER_PARSER_H_ */

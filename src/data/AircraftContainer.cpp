@@ -53,8 +53,7 @@ std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& r_id)
     if (it == mIndexMap.cend())
     {
         return mCont.end();
-    }
-    else
+    } else
     {
         return mCont.begin() + it->second;
     }
@@ -84,8 +83,7 @@ std::string AircraftContainer::processAircrafts() noexcept
                 del = true;
                 mIndexMap.erase(it->getID());
                 it = mCont.erase(it);
-            }
-            else
+            } else
             {
                 if (it->getUpdateAge() < AC_INVALIDATE)
                 {
@@ -98,8 +96,7 @@ std::string AircraftContainer::processAircrafts() noexcept
             {
                 mIndexMap.at(it->getID()) = index;
             }
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception& e)
         {
             Logger::warn("(AircraftContainer) processAircrafts: ", e.what());
         }
@@ -107,8 +104,9 @@ std::string AircraftContainer::processAircrafts() noexcept
     return dest_str;
 }
 
-void AircraftContainer::insertAircraft(const Aircraft& r_update, Priority prio) noexcept
-{
+void AircraftContainer::insertAircraft(const Aircraft& r_update, Priority prio)
+        noexcept
+        {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     auto known_ac = find(r_update.getID());
     if (known_ac != mCont.end())
@@ -129,14 +127,12 @@ void AircraftContainer::insertAircraft(const Aircraft& r_update, Priority prio) 
             if (write)
             {
                 known_ac->update(r_update, prio);
-            }
-            else
+            } else
             {
                 known_ac->setAttemptValid();
             }
         }
-    }
-    else
+    } else
     {
         mIndexMap.insert( { r_update.getID(), mCont.size() });
         mCont.push_back(r_update);

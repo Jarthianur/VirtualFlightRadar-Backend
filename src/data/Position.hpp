@@ -35,8 +35,8 @@ struct GPSPosition
     std::int32_t altitude;
     /// Latitude; deg
     double latitude,
-	/// Longitude; deg
-	longitude;
+    /// Longitude; deg
+            longitude;
 };
 
 /**
@@ -46,12 +46,12 @@ struct GPSPosition
  */
 struct ExtGPSPosition
 {
-	/// Position
+    /// Position
     struct GPSPosition position;
     /// Number of satellites
     std::int32_t nrSats,
-	/// GPS fix quality
-	fixQa;
+    /// GPS fix quality
+            fixQa;
     /// Geoid separation
     double geoid;
 };
