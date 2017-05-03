@@ -43,128 +43,130 @@ class Feed;
  * - handleResolve
  * - handleConnect
  */
-class Client
-{
+class Client {
 public:
 	/**
 	 * Non-copyable
 	 */
-    Client(const Client&) = delete;
-    /**
-     * Not assignable
-     */
-    Client& operator=(const Client&) = delete;
-/**
- * Destructor
- *
- * @exceptsafe no-throw
- */
-    virtual ~Client() noexcept;
-
-    /**
-     * Run this client.
-     */
-    void run();
+	Client(const Client&) = delete;
+	/**
+	 * Not assignable
+	 */
+	Client& operator=(const Client&) = delete;
+	/**
+	 * Destructor
+	 *
+	 * @exceptsafe no-throw
+	 */
+	virtual ~Client() noexcept;
+	/**
+	 * Run the Client.
+	 * This function returns after all queued handles have returned.
+	 */
+	void run();
 
 protected:
-    Client(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-           const std::string& /*port*/, const std::string& /*comp*/, Feed& /*feed*/);
+	/**
+	 * Construct a Client given a signal set, handling interrupts,
+	 * host, port, a string representing the Client type
+	 * and the Feed handling this Client.
+	 *
+	 * @param r_sigset the signal set
+	 * @param cr_host  the hostname
+	 * @param cr_port  the port
+	 * @param cr_comp  the component string
+	 * @param r_feed   the handler Feed
+	 */
+	Client(boost::asio::signal_set& /*r_sigset*/,
+			const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+			const std::string& /*cr_comp*/, Feed& /*r_feed*/);
+	/**
+	 * Register stop-handler to signals.
+	 */
+	void awaitStop();
+	/**
+	 * Connect with timeout.
+	 */
+	void timedConnect() noexcept;
+	/**
+	 * Stop the Client and close the connection.
+	 */
+	virtual void stop() noexcept;
+	/**
+	 * Read data.
+	 */
+	virtual void read() noexcept;
+	/**
+	 * Process read data.
+	 */
+	virtual void process() noexcept = 0;
+	/**
+	 * Connect to host.
+	 */
+	virtual void connect() noexcept = 0;
+	/**
+	 * Timed connect - handler
+	 *
+	 * @param cr_ec the error code
+	 *
+	 * @exceptsafe strong
+	 */
+	void handleTimedConnect(const boost::system::error_code& /*cr_ec*/) noexcept;
+	/**
+	 * Read - handler
+	 *
+	 * @param cr_ec the error code
+	 * @param s     the sent bytes
+	 *
+	 * @exceptsafe strong
+	 */
+	void handleRead(const boost::system::error_code& /*cr_ec*/, std::size_t /*s*/)
+			noexcept;
+	/**
+	 * Resolve host - handler
+	 *
+	 * @param cr_ec the error code
+	 * @param it    the resolve iterator
+	 *
+	 * @exceptsafe strong
+	 */
+	virtual void handleResolve(const boost::system::error_code& /*cr_ec*/,
+			boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept = 0;
+	/**
+	 * Connect - handler
+	 *
+	 * @param cr_ec the error code
+	 * @param it    the resolve iterator
+	 *
+	 * @exceptsafe strong
+	 */
+	virtual void handleConnect(const boost::system::error_code& /*cr_ec*/,
+			boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept = 0;
 
-    /**
-     * Register stop-handler to signals.
-     */
-    void awaitStop();
-    /**
-     * Connect with timeout.
-     */
-    void timedConnect() noexcept;
-    /**
-     * Stop this client,
-     * close connection.
-     */
-    virtual void stop() noexcept;
-    /**
-     * Read data.
-     */
-    virtual void read() noexcept;
-    /**
-     * Process read data.
-     */
-    virtual void process() noexcept = 0;
-    /**
-     * Connect to host.
-     */
-    virtual void connect() noexcept = 0;
-
-    /**
-     * Timed connect - handler
-     */
-    void handleTimedConnect(const boost::system::error_code& /*ec*/) noexcept;
-    /**
-     * Read - handler
-     */
-    void handleRead(const boost::system::error_code& /*ec*/, std::size_t /*s*/) noexcept;
-
-    /**
-     * Resolve host - handler
-     */
-    virtual void handleResolve(const boost::system::error_code& /*ec*/,
-                               boost::asio::ip::tcp::resolver::iterator /*it*/)
-                                       noexcept = 0;
-    /**
-     * Connect - handler
-     */
-    virtual void handleConnect(const boost::system::error_code& /*ec*/,
-                               boost::asio::ip::tcp::resolver::iterator /*it*/)
-                                       noexcept = 0;
-
-    /**
-     * Internal IO-service
-     */
-    boost::asio::io_service mIOservice;
-    /**
-     * Signals reference
-     */
-    boost::asio::signal_set& mrSigSet;
-    /**
-     * Socket
-     */
-    boost::asio::ip::tcp::socket mSocket;
-    /**
-     * Resolver
-     */
-    boost::asio::ip::tcp::resolver mResolver;
-
-    /**
-     * String holding complete sentence.
-     */
-    std::string mResponse;
-    /**
-     * Read buffer
-     */
-    boost::asio::streambuf mBuffer;
-    /**
-     * Hostname
-     */
-    const std::string mHost;
-    /**
-     * Port
-     */
-    const std::string mPort;
-    /**
-     * Component string for logging.
-     */
-    const std::string mComponent;
-    /**
-     * Parent feed.
-     */
-    Feed& mrFeed;
+	/// Internal IO-service
+	boost::asio::io_service mIOservice;
+	/// Signal set reference
+	boost::asio::signal_set& mrSigSet;
+	/// Socket
+	boost::asio::ip::tcp::socket mSocket;
+	/// Resolver
+	boost::asio::ip::tcp::resolver mResolver;
+	/// Response string
+	std::string mResponse;
+	/// Read buffer
+	boost::asio::streambuf mBuffer;
+	/// Hostname
+	const std::string mHost;
+	/// Port
+	const std::string mPort;
+	/// Component string used for logging
+	const std::string mComponent;
+	/// Handler Feed reference
+	Feed& mrFeed;
 
 private:
-    /**
-     * Connection timer
-     */
-    boost::asio::deadline_timer mConnectTimer;
+	/// Connection timer
+	boost::asio::deadline_timer mConnectTimer;
 };
 
 #endif /* SRC_TCP_CLIENT_CLIENT_H_ */
