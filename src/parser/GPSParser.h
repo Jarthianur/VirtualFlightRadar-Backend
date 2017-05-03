@@ -30,18 +30,35 @@
 #include "Parser.h"
 #include "../data/Position.hpp"
 
+/**
+ * The GPSParser class, implememnts Parser.
+ *
+ * This class unpacks NMEA GPS sentences, as they are GGA (and RMC), into static GPSData container.
+ */
 class GPSParser: public Parser
 {
 public:
+	/**
+	 * Constructor
+	 */
     GPSParser();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~GPSParser() noexcept;
-
+    /**
+         * Unpack GGA messages into the static VFRB::GPSData.
+         *
+         * @overload Parser::unpack
+         */
     std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
 
 private:
-    //regex
+    /// Regular expression to parse GGA
     const boost::regex mGpggaRE;
-    //tmps
+    /// Temporary data
     struct ExtGPSPosition mtGPSpos;
 };
 

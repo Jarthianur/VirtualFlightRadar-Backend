@@ -28,16 +28,34 @@
 #include "Parser.h"
 #include "../data/Position.hpp"
 
+/**
+ * The SBSParser class, implements Parser.
+ *
+ * This class unpacks SBS sentences into static VFRB::AircraftContainer.
+ */
 class SBSParser: public Parser
 {
 public:
+	/**
+	 * Constructor
+	 */
     SBSParser();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~SBSParser() noexcept;
-
+    /**
+         * Unpack SBS messages into the static VFRB::AircraftContainer.
+         *
+         * @overload Parser::unpack
+         */
     std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/)
             noexcept override;
 
 private:
+    /// Temporary data
     std::string mtID;
     struct GPSPosition mtGPSpos;
     std::int32_t mtTime = 0;

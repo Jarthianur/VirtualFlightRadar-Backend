@@ -30,14 +30,35 @@
 
 class Feed;
 
+/// Wait for (re-)connect timeout
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
 
+/**
+ * The Client base class.
+ *
+ * This class provides functionality to connect to a server
+ * via TCP. Concrete Clients need to implement following methods:
+ * - process
+ * - connect
+ * - handleResolve
+ * - handleConnect
+ */
 class Client
 {
 public:
+	/**
+	 * Non-copyable
+	 */
     Client(const Client&) = delete;
+    /**
+     * Not assignable
+     */
     Client& operator=(const Client&) = delete;
-
+/**
+ * Destructor
+ *
+ * @exceptsafe no-throw
+ */
     virtual ~Client() noexcept;
 
     /**
