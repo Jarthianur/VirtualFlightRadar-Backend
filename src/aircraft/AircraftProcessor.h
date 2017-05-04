@@ -53,19 +53,19 @@ public:
      * Process an Aircraft relative to the base position.
      * Result as PFLAU + PFLAA NMEA sentence, with <cr><lf> postfix.
      *
-     * @param r_ac the given Aircraft
+     * @param cr_ac the given Aircraft
      *
      * @return the NMEA string
      */
-    std::string process(const Aircraft& /*r_ac*/);
+    std::string process(const Aircraft& /*cr_ac*/);
 
 private:
     /**
      * Calcutale Aircrafts relative position to the base.
      *
-     * @param r_ac the given Aircraft
+     * @param cr_ac the given Aircraft
      */
-    void calcRelPosToBase(const Aircraft& /*r_ac*/);
+    void calcRelPosToBase(const Aircraft& /*cr_ac*/);
 
     /// Formatstring buffer
     char mBuffer[AP_BUFF_S + 1];

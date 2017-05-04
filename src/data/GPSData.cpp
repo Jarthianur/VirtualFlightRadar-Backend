@@ -113,10 +113,10 @@ double GPSData::getBaseLat()
     return mBasePos.value.position.latitude;
 }
 
-void GPSData::setBasePos(Priority prio, const struct ExtGPSPosition& r_pos)
+void GPSData::setBasePos(Priority prio, const struct ExtGPSPosition& cr_pos)
 {
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    mBasePos.update(r_pos, prio);
+    mBasePos.update(cr_pos, prio);
 }
 
 double GPSData::getBaseLong()

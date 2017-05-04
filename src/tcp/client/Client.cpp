@@ -29,7 +29,8 @@
 #include "../../util/Logger.h"
 
 Client::Client(boost::asio::signal_set& r_sigset, const std::string& cr_host,
-               const std::string& cr_port, const std::string& cr_comp, Feed& r_feed)
+               const std::string& cr_port, const std::string& cr_comp,
+               Feed& r_feed)
         : mIOservice(),
           mrSigSet(r_sigset),
           mSocket(mIOservice),
@@ -63,10 +64,11 @@ void Client::awaitStop()
 
 void Client::timedConnect() noexcept
 {
-    mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
+    mConnectTimer.expires_from_now(
+            boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
     mConnectTimer.async_wait(
             boost::bind(&Client::handleTimedConnect, this,
-                        boost::asio::placeholders::error));
+                    boost::asio::placeholders::error));
 }
 
 void Client::stop() noexcept
@@ -84,12 +86,10 @@ void Client::stop() noexcept
 
 void Client::read() noexcept
 {
-    boost::asio::async_read_until(
-            mSocket,
-            mBuffer,
-            "\n",
-            boost::bind(&Client::handleRead, this, boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+    boost::asio::async_read_until(mSocket, mBuffer, "\n",
+            boost::bind(&Client::handleRead, this,
+                    boost::asio::placeholders::error,
+                    boost::asio::placeholders::bytes_transferred));
 }
 
 void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
@@ -98,8 +98,7 @@ void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
     {
         Logger::info(mComponent + " try connect to: ", mHost + ":" + mPort);
         connect();
-    }
-    else
+    } else
     {
         Logger::error(mComponent + " cancel connect: ", cr_ec.message());
         if (cr_ec != boost::asio::error::operation_aborted)
@@ -109,16 +108,16 @@ void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
     }
 }
 
-void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t s) noexcept
-{
+void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t s)
+        noexcept
+        {
     if (!cr_ec)
     {
         std::istream is(&mBuffer);
         std::getline(is, mResponse);
         process();
         read();
-    }
-    else if (cr_ec != boost::system::errc::bad_file_descriptor)
+    } else if (cr_ec != boost::system::errc::bad_file_descriptor)
     {
         Logger::error(mComponent + " read: ", cr_ec.message());
         if (cr_ec != boost::asio::error::operation_aborted)

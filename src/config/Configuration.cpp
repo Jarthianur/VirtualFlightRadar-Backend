@@ -215,51 +215,51 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
     return global_feeds.size();
 }
 
-std::int32_t Configuration::strToInt(const std::string& r_str) noexcept
+std::int32_t Configuration::strToInt(const std::string& cr_str) noexcept
 {
     try
     {
-        return std::stoi(r_str);
+        return std::stoi(cr_str);
     } catch (const std::logic_error& iae)
     {
         Logger::warn("(VFRB) invalid configuration: ",
-                r_str.length() == 0 ? "empty" : r_str);
+                cr_str.length() == 0 ? "empty" : cr_str);
     }
     return 0;
 }
 
-double Configuration::strToDouble(const std::string& r_str) noexcept
+double Configuration::strToDouble(const std::string& cr_str) noexcept
 {
     try
     {
-        return std::stod(r_str);
+        return std::stod(cr_str);
     } catch (const std::logic_error& iae)
     {
         Logger::warn("(VFRB) invalid configuration: ",
-                r_str.length() == 0 ? "empty" : r_str);
+                cr_str.length() == 0 ? "empty" : cr_str);
     }
     return 0.0;
 }
 
-Priority Configuration::aliasPriority(const std::string& r_str) noexcept
+Priority Configuration::aliasPriority(const std::string& cr_str) noexcept
 {
     Priority prio = Priority::DONTCARE;
     try
     {
-        prio = (Priority) std::stoul(r_str);
+        prio = (Priority) std::stoul(cr_str);
     } catch (...)
     {
     }
-    if (prio == Priority::NORMAL || r_str.find(PRIO_ALIAS_NORMAL)
+    if (prio == Priority::NORMAL || cr_str.find(PRIO_ALIAS_NORMAL)
             != std::string::npos)
     {
         return Priority::NORMAL;
     } else if (prio == Priority::HIGHER
-            || r_str.find(PRIO_ALIAS_HIGHER) != std::string::npos)
+            || cr_str.find(PRIO_ALIAS_HIGHER) != std::string::npos)
     {
         return Priority::HIGHER;
     } else if (prio == Priority::LESSER
-            || r_str.find(PRIO_ALIAS_LESSER) != std::string::npos)
+            || cr_str.find(PRIO_ALIAS_LESSER) != std::string::npos)
     {
         return Priority::LESSER;
     } else

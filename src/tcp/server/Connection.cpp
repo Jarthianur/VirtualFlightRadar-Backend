@@ -25,7 +25,8 @@
 #include <boost/system/error_code.hpp>
 #include <algorithm>
 
-boost::shared_ptr<Connection> Connection::start(boost::asio::ip::tcp::socket socket)
+boost::shared_ptr<Connection> Connection::start(
+        boost::asio::ip::tcp::socket socket)
 {
     return boost::shared_ptr<Connection>(new Connection(std::move(socket)));
 }

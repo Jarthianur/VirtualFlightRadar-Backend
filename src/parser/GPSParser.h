@@ -38,9 +38,9 @@
 class GPSParser: public Parser
 {
 public:
-	/**
-	 * Constructor
-	 */
+    /**
+     * Constructor
+     */
     GPSParser();
     /**
      * Destructor
@@ -49,11 +49,12 @@ public:
      */
     virtual ~GPSParser() noexcept;
     /**
-         * Unpack GGA messages into the static VFRB::GPSData.
-         *
-         * @overload Parser::unpack
-         */
-    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
+     * Unpack GGA messages into the static VFRB::GPSData.
+     *
+     * @overload Parser::unpack
+     */
+    std::int32_t unpack(const std::string& /*cr_msg*/, Priority /*prio*/)
+            noexcept override;
 
 private:
     /// Regular expression to parse GGA

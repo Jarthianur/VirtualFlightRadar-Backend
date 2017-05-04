@@ -74,11 +74,11 @@ public:
     /**
      * Compare aircrafts by ID.
      *
-     * @param r_other the aircraft to compare
+     * @param cr_other the aircraft to compare
      *
      * @return are IDs equal?
      */
-    bool operator==(const Aircraft& /*r_other*/) const;
+    bool operator==(const Aircraft& /*cr_other*/) const;
     /**
      * Aircraft information received from
      * device type.
@@ -95,10 +95,10 @@ public:
      * Update aircraft information.
      * Reset update age.
      *
-     * @param r_ac an aircraft reference holding new information
+     * @param cr_ac an aircraft reference holding new information
      * @param prio update from feed with priority
      */
-    void update(const Aircraft& /*r_ac*/, Priority /*prio*/);
+    void update(const Aircraft& /*cr_ac*/, Priority /*prio*/);
     /**
      * Get the ID.
      *

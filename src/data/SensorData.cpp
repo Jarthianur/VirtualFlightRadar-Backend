@@ -44,10 +44,10 @@ std::string SensorData::getWVstr()
     }
 }
 
-void SensorData::setWVstr(Priority prio, const std::string& r_wv)
+void SensorData::setWVstr(Priority prio, const std::string& cr_wv)
 {
     boost::lock_guard<boost::mutex> lock(mWV.mutex);
-    mWV.update(r_wv, prio);
+    mWV.update(cr_wv, prio);
 }
 
 double SensorData::getPress()

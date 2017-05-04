@@ -25,39 +25,73 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
+/**
+ * The Logger class.
+ *
+ * This class provides static functions for threadsafe logging.
+ */
 class Logger
 {
 public:
+    /**
+     * Constructor
+     */
     Logger();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~Logger() noexcept;
-
     /**
      * Log informations, like succeeding connections etc
      * to stdout.
      * Given a message and a subject.
+     *
+     * @param cr_subj the subject
+     * @param cr_msg  the msg, default empty
      */
-    static void info(const std::string&, const std::string& = "");
+    static void info(const std::string& /*cr_subj*/,
+                     const std::string& /*cr_msg*/= "");
     /**
      * Log debug informations to stdout.
      * Given a message and a subject.
+     *
+     *  @param cr_subj the subject
+     * @param cr_msg  the msg, default empty
      */
-    static void debug(const std::string&, const std::string& = "");
+    static void debug(const std::string& /*cr_subj*/,
+                      const std::string& /*cr_msg*/= "");
     /**
      * Log warnings and not-critical errors, like lost connections etc
      * to stdout.
      * Given a message and a subject.
+     *
+     * @param cr_subj the subject
+     * @param cr_msg  the msg, default empty
      */
-    static void warn(const std::string&, const std::string& = "");
+    static void warn(const std::string& /*cr_subj*/,
+                     const std::string& /*cr_msg*/= "");
     /**
      * Log fatal errors, like socket failures etc
      * to stderr.
      * Given a message and a subject.
+     *
+     * @param cr_subj the subject
+     * @param cr_msg  the msg, default empty
      */
-    static void error(const std::string&, const std::string& = "");
+    static void error(const std::string& /*cr_subj*/,
+                      const std::string& /*cr_msg*/= "");
 
 private:
+    /// Mutex
     static boost::mutex mMutex;
 
+    /**
+     * Get current date-time as string.
+     *
+     * @return the date-time-string
+     */
     static const std::string getTime();
 };
 

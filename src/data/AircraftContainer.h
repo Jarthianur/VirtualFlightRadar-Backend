@@ -63,12 +63,12 @@ public:
      * Handles FLARM preferation.
      * May fail due to Priority.
      *
-     * @param r_update the Aircraft update
+     * @param cr_update the Aircraft update
      * @param prio the Priority attempting to write
      *
      * @exceptsafe strong
      */
-    void insertAircraft(const Aircraft& /*r_update*/, Priority /*prio*/)
+    void insertAircraft(const Aircraft& /*cr_update*/, Priority /*prio*/)
             noexcept;
     /**
      * Process all aircrafts into NMEA sentences PFLAU and PFLAA.
@@ -85,11 +85,11 @@ private:
     /**
      * Find an Aircraft by ID efficiently in the container with index map.
      *
-     * @param r_id the ID to search
+     * @param cr_id the ID to search
      *
      * @return an iterator to the Aircraft if found, else vector::end
      */
-    std::vector<Aircraft>::iterator find(const std::string& /*r_id*/);
+    std::vector<Aircraft>::iterator find(const std::string& /*cr_id*/);
 
     /// Mutex for threadsafety
     boost::mutex mMutex;

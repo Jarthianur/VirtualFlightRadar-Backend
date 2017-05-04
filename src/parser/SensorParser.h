@@ -36,9 +36,9 @@
 class SensorParser: public Parser
 {
 public:
-	/**
-	 * Constructor
-	 */
+    /**
+     * Constructor
+     */
     SensorParser();
     /**
      * Destructor
@@ -47,11 +47,11 @@ public:
      */
     virtual ~SensorParser() noexcept;
     /**
-         * Unpack NMEA messages into the static VFRB::SensorData.
-         *
-         * @overload Parser::unpack
-         */
-    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/)
+     * Unpack NMEA messages into the static VFRB::SensorData.
+     *
+     * @overload Parser::unpack
+     */
+    std::int32_t unpack(const std::string& /*cr_msg*/, Priority /*prio*/)
             noexcept override;
 
 private:

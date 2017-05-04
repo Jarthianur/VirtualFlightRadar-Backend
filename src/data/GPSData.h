@@ -75,9 +75,9 @@ public:
      * May fail due to Priority.
      *
      * @param prio  the Priority attempting to write
-     * @param r_pos the new position
+     * @param cr_pos the new position
      */
-    void setBasePos(Priority /*prio*/, const struct ExtGPSPosition& /*r_pos*/);
+    void setBasePos(Priority /*prio*/, const struct ExtGPSPosition& /*cr_pos*/);
     /**
      * Get the last registered GPS position.
      *

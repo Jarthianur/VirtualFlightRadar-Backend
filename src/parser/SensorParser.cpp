@@ -36,14 +36,14 @@ SensorParser::~SensorParser() noexcept
 {
 }
 
-std::int32_t SensorParser::unpack(const std::string& r_msg, Priority prio)
+std::int32_t SensorParser::unpack(const std::string& cr_msg, Priority prio)
         noexcept
         {
     try
     {
-        std::int32_t csum = std::stoi(r_msg.substr(r_msg.rfind('*') + 1, 2),
+        std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),
                 nullptr, 16);
-        if (csum != Math::checksum(r_msg.c_str(), r_msg.length()))
+        if (csum != Math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return MSG_UNPACK_IGN;
         }
@@ -52,14 +52,14 @@ std::int32_t SensorParser::unpack(const std::string& r_msg, Priority prio)
         return MSG_UNPACK_ERR;
     }
 
-    if (r_msg.find("MDA") != std::string::npos)
+    if (cr_msg.find("MDA") != std::string::npos)
     {
         try
         {
-            mtB = r_msg.find('B') - 1;
-            mtS = r_msg.substr(0, mtB).find_last_of(',') + 1;
+            mtB = cr_msg.find('B') - 1;
+            mtS = cr_msg.substr(0, mtB).find_last_of(',') + 1;
             mtSubLen = mtB - mtS;
-            mtPress = std::stod(r_msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
+            mtPress = std::stod(cr_msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
             if (mtNumIdx == mtSubLen)
             {
                 VFRB::msSensorData.setPress(prio, mtPress);
@@ -71,9 +71,9 @@ std::int32_t SensorParser::unpack(const std::string& r_msg, Priority prio)
         {
             return MSG_UNPACK_ERR;
         }
-    } else if (r_msg.find("MWV") != std::string::npos)
+    } else if (cr_msg.find("MWV") != std::string::npos)
     {
-        VFRB::msSensorData.setWVstr(prio, r_msg);
+        VFRB::msSensorData.setWVstr(prio, cr_msg);
     } else
     {
         return MSG_UNPACK_IGN;

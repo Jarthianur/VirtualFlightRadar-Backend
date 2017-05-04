@@ -41,7 +41,7 @@ SBSParser::~SBSParser() noexcept
 {
 }
 
-std::int32_t SBSParser::unpack(const std::string& r_msg, Priority prio) noexcept
+std::int32_t SBSParser::unpack(const std::string& cr_msg, Priority prio) noexcept
 {
     /*
      * fields:
@@ -55,19 +55,19 @@ std::int32_t SBSParser::unpack(const std::string& r_msg, Priority prio) noexcept
     std::uint32_t i = 2;
     std::size_t p = 6;
 
-    if (r_msg.find(',', p) == std::string::npos || !(r_msg.size() > 4
-            && r_msg.at(4) == '3'))
+    if (cr_msg.find(',', p) == std::string::npos || !(cr_msg.size() > 4
+            && cr_msg.at(4) == '3'))
     {
         return MSG_UNPACK_IGN;
     }
-    while ((delim = r_msg.find(',', p)) != std::string::npos && i < 16)
+    while ((delim = cr_msg.find(',', p)) != std::string::npos && i < 16)
     {
         switch (i)
         {
             case 4:
                 if (delim - p > 0)
                 {
-                    mtID = r_msg.substr(p, delim - p);
+                    mtID = cr_msg.substr(p, delim - p);
                 } else
                 {
                     return MSG_UNPACK_IGN;
@@ -78,9 +78,9 @@ std::int32_t SBSParser::unpack(const std::string& r_msg, Priority prio) noexcept
                 {
                     if (delim - p > 7)
                     {
-                        mtTime = std::stoi(r_msg.substr(p, 2)) * 10000;
-                        mtTime += std::stoi(r_msg.substr(p + 3, 2)) * 100;
-                        mtTime += std::stoi(r_msg.substr(p + 6, 2));
+                        mtTime = std::stoi(cr_msg.substr(p, 2)) * 10000;
+                        mtTime += std::stoi(cr_msg.substr(p + 3, 2)) * 100;
+                        mtTime += std::stoi(cr_msg.substr(p + 6, 2));
                     } else
                     {
                         return MSG_UNPACK_IGN;
@@ -94,7 +94,7 @@ std::int32_t SBSParser::unpack(const std::string& r_msg, Priority prio) noexcept
                 try
                 {
                     mtGPSpos.altitude = Math::dToI(
-                            std::stod(r_msg.substr(p, delim - p)) * Math::feet2m);
+                            std::stod(cr_msg.substr(p, delim - p)) * Math::FEET_2_M);
                     if (mtGPSpos.altitude > Configuration::filter_maxHeight)
                     {
                         return MSG_UNPACK_IGN;
@@ -107,7 +107,7 @@ std::int32_t SBSParser::unpack(const std::string& r_msg, Priority prio) noexcept
             case 14:
                 try
                 {
-                    mtGPSpos.latitude = std::stod(r_msg.substr(p, delim - p));
+                    mtGPSpos.latitude = std::stod(cr_msg.substr(p, delim - p));
                 } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
@@ -116,7 +116,7 @@ std::int32_t SBSParser::unpack(const std::string& r_msg, Priority prio) noexcept
             case 15:
                 try
                 {
-                    mtGPSpos.longitude = std::stod(r_msg.substr(p, delim - p));
+                    mtGPSpos.longitude = std::stod(cr_msg.substr(p, delim - p));
                 } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;

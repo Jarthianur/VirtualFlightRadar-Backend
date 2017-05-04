@@ -46,13 +46,13 @@ GPSParser::~GPSParser() noexcept
 {
 }
 
-std::int32_t GPSParser::unpack(const std::string& r_msg, Priority prio) noexcept
+std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio) noexcept
 {
     try
     {
-        std::int32_t csum = std::stoi(r_msg.substr(r_msg.rfind('*') + 1, 2),
+        std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),
                 nullptr, 16);
-        if (csum != Math::checksum(r_msg.c_str(), r_msg.length()))
+        if (csum != Math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return MSG_UNPACK_IGN;
         }
@@ -62,7 +62,7 @@ std::int32_t GPSParser::unpack(const std::string& r_msg, Priority prio) noexcept
     }
 
     boost::smatch match;
-    if (boost::regex_match(r_msg, match, mGpggaRE))
+    if (boost::regex_match(cr_msg, match, mGpggaRE))
     {
         double dilution = 0.0;
         try

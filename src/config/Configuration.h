@@ -128,35 +128,35 @@ private:
      * Parse a string to integer.
      * Always returns a valid value.
      *
-     * @param r_str the string to parse
+     * @param cr_str the string to parse
      *
      * @return the parsed number, 0 if error
      *
      * @exceptsafe no-throw
      */
-    std::int32_t strToInt(const std::string& /*r_str*/) noexcept;
+    std::int32_t strToInt(const std::string& /*cr_str*/) noexcept;
     /**
      * Parse a string to double.
      * Always returns a valid value.
      *
-     * @param r_str the string to parse
+     * @param cr_str the string to parse
      *
      * @return the parsed number, 0 if error
      *
      * @exceptsafe no-throw
      */
-    double strToDouble(const std::string& /*r_str*/) noexcept;
+    double strToDouble(const std::string& /*cr_str*/) noexcept;
     /**
      * Map given priority string to correct Priority.
      * Alias name if not the number is given.
      *
-     * @param r_str the priority string
+     * @param cr_str the priority string
      *
      * @return the aliased Priority
      *
      * @exceptsafe no-throw
      */
-    Priority aliasPriority(const std::string& /*r_str*/) noexcept;
+    Priority aliasPriority(const std::string& /*cr_str*/) noexcept;
 };
 
 #endif /* SRC_CONFIG_CONFIGURATION_H_ */

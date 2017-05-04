@@ -48,16 +48,16 @@ APRSParser::~APRSParser() noexcept
 {
 }
 
-std::int32_t APRSParser::unpack(const std::string& r_msg, Priority prio)
+std::int32_t APRSParser::unpack(const std::string& cr_msg, Priority prio)
         noexcept
         {
-    if (r_msg.size() > 0 && r_msg.at(0) == '#')
+    if (cr_msg.size() > 0 && cr_msg.at(0) == '#')
     {
         return MSG_UNPACK_IGN;
     }
     mtFullInfo = true;
     boost::smatch match;
-    if (boost::regex_match(r_msg, match, mAprsRE))
+    if (boost::regex_match(cr_msg, match, mAprsRE))
     {
         try
         {
@@ -80,7 +80,7 @@ std::int32_t APRSParser::unpack(const std::string& r_msg, Priority prio)
 
             //altitude
             mtGPSpos.altitude = Math::dToI(
-                    std::stod(match.str(8)) * Math::feet2m);
+                    std::stod(match.str(8)) * Math::FEET_2_M);
             if (mtGPSpos.altitude > Configuration::filter_maxHeight)
             {
                 return MSG_UNPACK_IGN;
@@ -109,7 +109,7 @@ std::int32_t APRSParser::unpack(const std::string& r_msg, Priority prio)
                 }
                 try
                 {
-                    mtClimbRate = std::stod(comm_match.str(3)) * Math::fpm2ms;
+                    mtClimbRate = std::stod(comm_match.str(3)) * Math::FPM2MS;
                 } catch (const std::logic_error& e)
                 {
                     mtClimbRate = A_VALUE_NA;
@@ -143,7 +143,7 @@ std::int32_t APRSParser::unpack(const std::string& r_msg, Priority prio)
         }
         try
         {
-            mtGndSpeed = std::stod(match.str(7)) * Math::kts2ms;
+            mtGndSpeed = std::stod(match.str(7)) * Math::KTS2MS;
         } catch (const std::logic_error& e)
         {
             mtGndSpeed = A_VALUE_NA;

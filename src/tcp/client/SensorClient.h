@@ -31,38 +31,95 @@
 
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
 
+/**
+ * The SensorClient class, extends and implements Client.
+ *
+ * This Client provides functionality to handle connections to
+ * any server sending sensor information through NMEA MDA,WMV sentences.
+ */
 class SensorClient: public Client
 {
 public:
+    /**
+     * Non-copyable
+     */
     SensorClient(const SensorClient&) = delete;
+    /**
+     * Not assignable
+     */
     SensorClient& operator=(const SensorClient&) = delete;
-
-    SensorClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-                 const std::string& /*port*/, Feed& /*feed*/);
+    /**
+     * Constructor
+     *
+     * @param r_sigset the signal set handling interrupts
+     * @param cr_host  the hostname
+     * @param cr_port  the port
+     * @param cr_login the login string to transmit
+     * @param r_feed   the handler Feed
+     */
+    SensorClient(boost::asio::signal_set& /*r_sigset*/,
+                 const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+                 Feed& /*r_feed*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~SensorClient() noexcept;
 
 private:
+    /**
+     * Extend Client::read
+     * Read with timeout.
+     *
+     * @overload Client::read
+     */
     void read() noexcept override;
+    /**
+     * Implement Client::connect.
+     *
+     * @overload Client::connect
+     */
     void connect() noexcept override;
+    /**
+     * Implement Client::process
+     *
+     * @overload Client::process
+     */
     void process() noexcept override;
     /**
-     * Check read timed out.
+     * Check read timeout deadline reached.
+     *
+     * @exceptsafe strong
      */
     void checkDeadline() noexcept;
+    /**
+     * Extend Client::stop
+     * Cancel timer before disconnect.
+     *
+     * @overload Client::stop
+     */
     void stop() noexcept override;
-
-    void handleResolve(const boost::system::error_code& /*ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
-    void handleConnect(const boost::system::error_code& /*ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
-
     /**
-     * Client stopped
+     * Implement Client::handleResolve
+     *
+     * @overload Client::handleResolve
      */
+    void handleResolve(const boost::system::error_code& /*cr_ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/)
+                               noexcept override;
+    /**
+     * Implement Client::handleConnect
+     *
+     * @overload Client::handleConnect
+     */
+    void handleConnect(const boost::system::error_code& /*cr_ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/)
+                               noexcept override;
+
+    /// Client stopped?
     bool mStopped;
-    /**
-     * read timer
-     */
+    /// Read timer
     boost::asio::deadline_timer mTimeout;
 };
 

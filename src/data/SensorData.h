@@ -65,9 +65,9 @@ public:
      * May fail due to Priority.
      *
      * @param prio the Priority attempting to write
-     * @param r_wv the new WIMWV sentence to write
+     * @param cr_wv the new WIMWV sentence to write
      */
-    void setWVstr(Priority /*prio*/, const std::string& /*r_wv*/);
+    void setWVstr(Priority /*prio*/, const std::string& /*cr_wv*/);
     /**
      * Get the last registered pressure.
      *

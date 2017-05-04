@@ -46,26 +46,26 @@ const std::string Logger::getTime()
     return time;
 }
 
-void Logger::info(const std::string& msg, const std::string& subject)
+void Logger::info(const std::string& cr_subj, const std::string& cr_msg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cout << "[INFO]  " << getTime() << ":: " << msg << subject << std::endl;
+    std::cout << "[INFO]  " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
 }
 
-void Logger::debug(const std::string& msg, const std::string& subject)
+void Logger::debug(const std::string& cr_subj, const std::string& cr_msg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cout << "[DEBUG] " << getTime() << ":: " << msg << subject << std::endl;
+    std::cout << "[DEBUG] " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
 }
 
-void Logger::warn(const std::string& msg, const std::string& subject)
+void Logger::warn(const std::string& cr_subj, const std::string& cr_msg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cout << "[WARN]  " << getTime() << ":: " << msg << subject << std::endl;
+    std::cout << "[WARN]  " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
 }
 
-void Logger::error(const std::string& msg, const std::string& subject)
+void Logger::error(const std::string& cr_subj, const std::string& cr_msg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cerr << "[ERROR] " << getTime() << ":: " << msg << subject << std::endl;
+    std::cerr << "[ERROR] " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
 }

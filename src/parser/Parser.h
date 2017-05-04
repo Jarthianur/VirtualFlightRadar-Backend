@@ -55,12 +55,12 @@ public:
      * Where to put unpacked data is handled by implementation,
      * as well as Priority pass-through.
      *
-     * @param r_msg the msg to unpack
+     * @param cr_msg the msg to unpack
      * @param prio  the Priority to pass
      *
      * @return an error code
      */
-    virtual std::int32_t unpack(const std::string& /*r_msg*/, Priority /*prio*/)
+    virtual std::int32_t unpack(const std::string& /*cr_msg*/, Priority /*prio*/)
             noexcept = 0;
 };
 

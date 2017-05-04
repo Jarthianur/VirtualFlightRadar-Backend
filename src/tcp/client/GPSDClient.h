@@ -28,29 +28,88 @@
 
 #include "Client.h"
 
+/**
+ * The GPSDClient class, extends and implements Client.
+ *
+ * This Client provides functionality to handle connections to
+ * any GPSD server.
+ */
 class GPSDClient: public Client
 {
 public:
+    /**
+     * Non-copyable
+     */
     GPSDClient(const GPSDClient&) = delete;
+    /**
+     * Not assignable
+     */
     GPSDClient& operator=(const GPSDClient&) = delete;
-
-    GPSDClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-               const std::string& /*port*/, Feed& /*feed*/);
+    /**
+     * Constructor
+     *
+     * @param r_sigset the signal set handling interrupts
+     * @param cr_host  the hostname
+     * @param cr_port  the port
+     * @param cr_login the login string to transmit
+     * @param r_feed   the handler Feed
+     */
+    GPSDClient(boost::asio::signal_set& /*r_sigset*/,
+               const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+               Feed& /*r_feed*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~GPSDClient() noexcept;
 
 private:
-    void connect() noexcept override;
-    void stop() noexcept override;
-    void process() noexcept override;
-
-    void handleResolve(const boost::system::error_code& /*ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
-    void handleConnect(const boost::system::error_code& /*ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
     /**
-     * Send watch string - handler
+     * Implement Client::connect.
+     *
+     * @overload Client::connect
      */
-    void handleWatch(const boost::system::error_code& /*ec*/, std::size_t /*s*/) noexcept;
+    void connect() noexcept override;
+    /**
+     * Extend Client::stop
+     * Send unwatch-request to server before disconnect.
+     *
+     * @overload Client::stop
+     */
+    void stop() noexcept override;
+    /**
+     * Implement Client::process
+     *
+     * @overload Client::process
+     */
+    void process() noexcept override;
+    /**
+     * Implement Client::handleResolve
+     *
+     * @overload Client::handleResolve
+     */
+    void handleResolve(const boost::system::error_code& /*cr_ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/)
+                               noexcept override;
+    /**
+     * Implement Client::handleConnect
+     *
+     * @overload Client::handleConnect
+     */
+    void handleConnect(const boost::system::error_code& /*cr_ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/)
+                               noexcept override;
+    /**
+     * Send watch-request - handler
+     *
+     * @param cr_ec the error code
+     * @param s     the sent bytes
+     *
+     * @exceptsafe strong
+     */
+    void handleWatch(const boost::system::error_code& /*cr_ec*/,
+                     std::size_t /*s*/) noexcept;
 };
 
 #endif /* SRC_TCP_CLIENT_GPSDCLIENT_H_ */

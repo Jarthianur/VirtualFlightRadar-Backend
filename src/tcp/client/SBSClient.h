@@ -28,25 +28,71 @@
 
 #include "Client.h"
 
+/**
+ * The SBSClient class, extends and implements Client.
+ *
+ * This Client provides functionality to handle connections to
+ * any SBS server.
+ */
 class SBSClient: public Client
 {
 public:
+    /**
+     * Non-copyable
+     */
     SBSClient(const SBSClient&) = delete;
+    /**
+     * Not assignable
+     */
     SBSClient& operator=(const SBSClient&) = delete;
-
-    SBSClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-              const std::string& /*port*/, Feed& /*feed*/);
+    /**
+     * Constructor
+     *
+     * @param r_sigset the signal set handling interrupts
+     * @param cr_host  the hostname
+     * @param cr_port  the port
+     * @param cr_login the login string to transmit
+     * @param r_feed   the handler Feed
+     */
+    SBSClient(boost::asio::signal_set& /*r_sigset*/,
+              const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+              Feed& /*r_feed*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~SBSClient() noexcept;
 
 private:
+    /**
+     * Implement Client::connect.
+     *
+     * @overload Client::connect
+     */
     void connect() noexcept override;
+    /**
+     * Implement Client::process
+     *
+     * @overload Client::process
+     */
     void process() noexcept override;
-
-    void handleResolve(const boost::system::error_code& /*ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
-    void handleConnect(const boost::system::error_code& /*ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
-
+    /**
+     * Implement Client::handleResolve
+     *
+     * @overload Client::handleResolve
+     */
+    void handleResolve(const boost::system::error_code& /*cr_ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/)
+                               noexcept override;
+    /**
+     * Implement Client::handleConnect
+     *
+     * @overload Client::handleConnect
+     */
+    void handleConnect(const boost::system::error_code& /*cr_ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/)
+                               noexcept override;
 };
 
 #endif /* SRC_TCP_CLIENT_SBSCLIENT_H_ */

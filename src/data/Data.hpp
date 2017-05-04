@@ -51,10 +51,10 @@ struct Data
      * May fail due to Priority.
      * Updates always if attempt is valid.
      *
-     * @param nv   the new value
+     * @param cr_nv   the new value
      * @param prio the Priority attempting to write
      */
-    void update(const T& nv, Priority prio)
+    void update(const T& cr_nv, Priority prio)
     {
         bool write = attemptValid;
         if (!write)
@@ -68,7 +68,7 @@ struct Data
         if (write)
         {
             attemptValid = (prio == Priority::LESSER);
-            value = nv;
+            value = cr_nv;
             lastPriority = prio;
         } else
         {
@@ -113,10 +113,10 @@ struct TmpData
      * Updates always if attempt is valid.
      * Validates the value.
      *
-     * @param nv   the new value
+     * @param cr_nv   the new value
      * @param prio the Priority attempting to write
      */
-    void update(const T& nv, Priority prio)
+    void update(const T& cr_nv, Priority prio)
     {
         bool write = attemptValid;
         if (!write)
@@ -130,7 +130,7 @@ struct TmpData
         if (write)
         {
             attemptValid = (prio == Priority::LESSER);
-            value = nv;
+            value = cr_nv;
             lastPriority = prio;
             valueValid = true;
         } else

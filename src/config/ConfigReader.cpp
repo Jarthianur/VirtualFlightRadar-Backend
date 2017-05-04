@@ -28,8 +28,8 @@
 
 #include "../util/Logger.h"
 
-ConfigReader::ConfigReader(const std::string& r_fname)
-        : mFile(r_fname),
+ConfigReader::ConfigReader(const std::string& cr_fname)
+        : mFile(cr_fname),
           mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
                   boost::regex_constants::optimize)
 {
@@ -93,31 +93,31 @@ void ConfigReader::read() noexcept
     }
 }
 
-const std::string ConfigReader::getProperty(const std::string& r_section,
-                                            const std::string& r_key,
-                                            const std::string& r_def_val) const
+const std::string ConfigReader::getProperty(const std::string& cr_section,
+                                            const std::string& cr_key,
+                                            const std::string& cr_def_val) const
 {
-    auto s_it = mConfig.find(r_section);
+    auto s_it = mConfig.find(cr_section);
     if (s_it != mConfig.end())
     {
-        auto it = s_it->second.find(r_key);
+        auto it = s_it->second.find(cr_key);
         if (it != s_it->second.end())
         {
             return it->second;
         } else
         {
-            return r_def_val;
+            return cr_def_val;
         }
     } else
     {
-        return r_def_val;
+        return cr_def_val;
     }
 }
 
 const std::unordered_map<std::string, std::string>& ConfigReader::getSectionKV(
-        const std::string& r_section) const
+        const std::string& cr_section) const
 {
-    auto it = mConfig.find(r_section);
+    auto it = mConfig.find(cr_section);
     if (it != mConfig.end())
     {
         return it->second;

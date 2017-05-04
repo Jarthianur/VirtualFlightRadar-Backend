@@ -47,9 +47,9 @@ AircraftContainer::~AircraftContainer() noexcept
 {
 }
 
-std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& r_id)
+std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& cr_id)
 {
-    const auto it = mIndexMap.find(r_id);
+    const auto it = mIndexMap.find(cr_id);
     if (it == mIndexMap.cend())
     {
         return mCont.end();
@@ -104,14 +104,14 @@ std::string AircraftContainer::processAircrafts() noexcept
     return dest_str;
 }
 
-void AircraftContainer::insertAircraft(const Aircraft& r_update, Priority prio)
+void AircraftContainer::insertAircraft(const Aircraft& cr_update, Priority prio)
         noexcept
         {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    auto known_ac = find(r_update.getID());
+    auto known_ac = find(cr_update.getID());
     if (known_ac != mCont.end())
     {
-        if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER || r_update.getTargetT()
+        if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER || cr_update.getTargetT()
                 == Aircraft::TargetType::FLARM)
         {
             bool write = known_ac->isAttemptValid();
@@ -126,7 +126,7 @@ void AircraftContainer::insertAircraft(const Aircraft& r_update, Priority prio)
             }
             if (write)
             {
-                known_ac->update(r_update, prio);
+                known_ac->update(cr_update, prio);
             } else
             {
                 known_ac->setAttemptValid();
@@ -134,7 +134,7 @@ void AircraftContainer::insertAircraft(const Aircraft& r_update, Priority prio)
         }
     } else
     {
-        mIndexMap.insert( { r_update.getID(), mCont.size() });
-        mCont.push_back(r_update);
+        mIndexMap.insert( { cr_update.getID(), mCont.size() });
+        mCont.push_back(cr_update);
     }
 }
