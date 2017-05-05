@@ -109,7 +109,7 @@ std::int32_t APRSParser::unpack(const std::string& cr_msg, Priority prio)
                 }
                 try
                 {
-                    mtClimbRate = std::stod(comm_match.str(3)) * Math::FPM2MS;
+                    mtClimbRate = std::stod(comm_match.str(3)) * Math::FPM_2_MS;
                 } catch (const std::logic_error& e)
                 {
                     mtClimbRate = A_VALUE_NA;
@@ -143,7 +143,7 @@ std::int32_t APRSParser::unpack(const std::string& cr_msg, Priority prio)
         }
         try
         {
-            mtGndSpeed = std::stod(match.str(7)) * Math::KTS2MS;
+            mtGndSpeed = std::stod(match.str(7)) * Math::KTS_2_MS;
         } catch (const std::logic_error& e)
         {
             mtGndSpeed = A_VALUE_NA;

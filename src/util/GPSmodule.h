@@ -27,27 +27,47 @@
 #define GPSM_BUFF_S 8191
 #define GPSM_L_BUFF_S 128
 
+/**
+ * The GPSModule class.
+ *
+ * This class provides functionality to build NMEA GGA and RMC
+ * sentences from given ExtGPSPositions.
+ */
 class GPSmodule
 {
 public:
+    /**
+     * Constructor
+     */
     GPSmodule();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~GPSmodule() noexcept;
-
     /**
-     * build GPGGA sentence
+     * Build a GPGGA sentence from given GPS information.
+     * The sentence contains trailing <cr><lf>.
+     *
+     * @param cr_pos the extended GPS information
+     *
+     * @return the GPGGA sentence
      */
-    std::string ggafix(const struct ExtGPSPosition& /*pos*/);
+    std::string ggafix(const struct ExtGPSPosition& /*cr_pos*/);
     /**
-     * build GPRMC sentence
+     * Build a GPRMC sentence from given GPS information.
+     * The sentence contains trailing <cr><lf>.
+     *
+     * @param cr_pos the extended GPS information
+     *
+     * @return the GPRMC sentence
      */
-    std::string rmcfix(const struct ExtGPSPosition& /*pos*/);
+    std::string rmcfix(const struct ExtGPSPosition& /*cr_pos*/);
 
 private:
-    /**
-     * format string mBuffer
-     */
+    /// Formatstring buffer
     char mBuffer[GPSM_BUFF_S + 1];
-
 };
 
 #endif /* SRC_UTIL_GPSMODULE_H_ */

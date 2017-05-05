@@ -58,7 +58,8 @@ void VFRB::run() noexcept
 {
     Logger::info("(VFRB) startup");
     //store start time
-    boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
+    boost::chrono::steady_clock::time_point start =
+            boost::chrono::steady_clock::now();
 
     // register signals and run handler
     boost::asio::io_service io_service;
@@ -72,7 +73,7 @@ void VFRB::run() noexcept
 
     signal_set.async_wait(
             boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
-                        boost::asio::placeholders::signal_number));
+                    boost::asio::placeholders::signal_number));
 
     boost::thread signal_thread([&io_service]()
     {
@@ -81,7 +82,8 @@ void VFRB::run() noexcept
 
     // init server and run handler
     NMEAServer server(signal_set, Configuration::global_server_port);
-    boost::thread server_thread(boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
+    boost::thread server_thread(
+            boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
 
     //init input threads
     boost::thread_group threads;
@@ -89,7 +91,8 @@ void VFRB::run() noexcept
             it != Configuration::global_feeds.end(); ++it)
     {
         threads.create_thread(
-                boost::bind(&VFRB::handleInputFeed, std::ref(signal_set), std::ref(*it)));
+                boost::bind(&VFRB::handleInputFeed, std::ref(signal_set),
+                        std::ref(*it)));
     }
 
     while (global_run_status)
@@ -115,13 +118,11 @@ void VFRB::run() noexcept
 
             //synchronise cycles to ~SYNC_TIME sec
             boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception& e)
         {
             Logger::error("(VFRB) error: ", e.what());
             global_run_status = false;
-        }
-        catch (...)
+        } catch (...)
         {
             Logger::error("(VFRB) error");
             global_run_status = false;
@@ -134,9 +135,10 @@ void VFRB::run() noexcept
     signal_thread.join();
 
     //eval end time
-    boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
-    boost::chrono::minutes runtime = boost::chrono::duration_cast<boost::chrono::minutes>(
-            end - start);
+    boost::chrono::steady_clock::time_point end =
+            boost::chrono::steady_clock::now();
+    boost::chrono::minutes runtime = boost::chrono::duration_cast<
+            boost::chrono::minutes>(end - start);
     std::string time_str(std::to_string(runtime.count() / 60 / 24));
     time_str += " days, ";
     time_str += std::to_string(runtime.count() / 60);
@@ -148,21 +150,21 @@ void VFRB::run() noexcept
 
 }
 
-void VFRB::handleNMAEServer(NMEAServer& server)
+void VFRB::handleNMAEServer(NMEAServer& r_server)
 {
     Logger::info("(NMEAServer) startup: localhost ",
-                 std::to_string(Configuration::global_server_port));
-    server.run();
+            std::to_string(Configuration::global_server_port));
+    r_server.run();
     global_run_status = false;
 }
 
-void VFRB::handleInputFeed(boost::asio::signal_set& sigset, Feed& feed)
+void VFRB::handleInputFeed(boost::asio::signal_set& r_sigset, Feed& r_feed)
 {
-    Logger::info("(VFRB) run feed: ", feed.mName);
-    feed.run(sigset);
+    Logger::info("(VFRB) run feed: ", r_feed.mName);
+    r_feed.run(r_sigset);
 }
 
-void VFRB::handleSignals(const boost::system::error_code& ec, const int sig)
+void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)
 {
     Logger::info("(VFRB) caught signal: ", "shutdown");
     global_run_status = false;

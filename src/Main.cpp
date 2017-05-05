@@ -33,8 +33,21 @@
 #define VERSION "DEMO"
 #endif
 
-std::int32_t evalParams(std::int32_t argc, char** argv);
+/**
+ * Evaluate comandline arguments.
+ *
+ * @param argc the argument count
+ * @param argv the arguments
+ *
+ * @return 0 if succeeded, -1 in case of failure
+ */
+std::int32_t evalArgs(std::int32_t /*argc*/, char** /*argv*/);
 
+/**
+ * The application start point.
+ * In here the commandline arguments get evaluated,
+ * the Configuration initialized and the VFRB ran.
+ */
 int main(int argc, char** argv)
 {
     Logger::info("VirtualFlightRadar-Backend -- ", VERSION);
@@ -43,29 +56,30 @@ int main(int argc, char** argv)
     {
         Logger::info(
                 "usage: ./VirtualFlightRadar-Backend [OPTIONS] [-c | --config] path_to_file.ini\n"
-                "Run VFR-B with given config file.\n"
-                "The config file must be in valid '.ini' format!\n"
-                "OPTIONS:\n"
-                "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received.");
+                        "Run VFR-B with given config file.\n"
+                        "The config file must be in valid '.ini' format!\n"
+                        "OPTIONS:\n"
+                        "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received.");
         return -1;
     }
 
-    if (evalParams(argc, argv) != 0)
+    if (evalArgs(argc, argv) != 0)
     {
         return -1;
     }
 
     // set climate fallbacks
-    VFRB::msSensorData.setPress(Priority::DONTCARE, Configuration::base_pressure);
+    VFRB::msSensorData.setPress(Priority::DONTCARE,
+            Configuration::base_pressure);
     VFRB::msGPSdata.setDefaults(Configuration::base_latitude,
-                                Configuration::base_longitude,
-                                Configuration::base_altitude, Configuration::base_geoid);
+            Configuration::base_longitude, Configuration::base_altitude,
+            Configuration::base_geoid);
     VFRB::run();
 
     return 0;
 }
 
-std::int32_t evalParams(std::int32_t argc, char** argv)
+std::int32_t evalArgs(std::int32_t argc, char** argv)
 {
     std::string ini_file;
     bool gnd = false;
@@ -73,24 +87,22 @@ std::int32_t evalParams(std::int32_t argc, char** argv)
 
     for (int i = 1; i < argc; i++)
     {
-        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
+        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1
+                < argc)
         {
             ini_file = std::string(argv[++i]);
             if (ini_file.rfind(".ini") == std::string::npos)
             {
                 Logger::error("(VFRB) not a ini file: ", ini_file);
                 return -1;
-            }
-            else
+            } else
             {
                 cfg_found = true;
             }
-        }
-        else if (std::string(argv[i]).find("-g") != std::string::npos)
+        } else if (std::string(argv[i]).find("-g") != std::string::npos)
         {
             gnd = true;
-        }
-        else
+        } else
         {
             Logger::warn("(VFRB) unrecognized option: ", std::string(argv[i]));
         }
@@ -101,14 +113,12 @@ std::int32_t evalParams(std::int32_t argc, char** argv)
         try
         {
             Configuration conf(ini_file.c_str());
-        }
-        catch (const std::logic_error& e)
+        } catch (const std::logic_error& e)
         {
             Logger::error("(VFRB) eval config: ", e.what());
             return -1;
         }
-    }
-    else
+    } else
     {
         Logger::error("(VFRB) no config file given");
         return -1;
@@ -118,8 +128,7 @@ std::int32_t evalParams(std::int32_t argc, char** argv)
     {
         Configuration::global_gnd_mode = true;
         Logger::info("(VFRB) GND mode: yes");
-    }
-    else
+    } else
     {
         Logger::info("(VFRB) GND mode: no");
     }

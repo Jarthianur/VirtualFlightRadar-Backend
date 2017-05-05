@@ -37,27 +37,27 @@ GPSmodule::~GPSmodule() noexcept
 {
 }
 
-std::string GPSmodule::ggafix(const struct ExtGPSPosition& pos)
+std::string GPSmodule::ggafix(const struct ExtGPSPosition& cr_pos)
 {
     std::string nmea_str;
     std::int32_t csum;
     std::time_t now = std::time(0);
     std::tm* utc = std::gmtime(&now);
 
-    char lat_str = (pos.position.latitude < 0) ? 'S' : 'N';
-    char long_str = (pos.position.longitude < 0) ? 'W' : 'E';
-    double lat_deg = std::abs(std::floor(pos.position.latitude));
-    double lat_min = std::abs(60.0 * (pos.position.latitude - lat_deg));
-    double long_deg = std::abs(std::floor(pos.position.longitude));
-    double long_min = std::abs(60.0 * (pos.position.longitude - long_deg));
-
+    char lat_str = (cr_pos.position.latitude < 0) ? 'S' : 'N';
+    char long_str = (cr_pos.position.longitude < 0) ? 'W' : 'E';
+    double lat_deg = std::abs(std::floor(cr_pos.position.latitude));
+    double lat_min = std::abs(60.0 * (cr_pos.position.latitude - lat_deg));
+    double long_deg = std::abs(std::floor(cr_pos.position.longitude));
+    double long_min = std::abs(60.0 * (cr_pos.position.longitude - long_deg));
+// As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't support others.
     std::snprintf(mBuffer,
     GPSM_BUFF_S,
             /*"$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"*/
             "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02d,1,%d,M,%.1lf,M,,*",
             utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, lat_str,
-            long_deg, long_min, long_str, /*pos.fixQa,*/pos.nrSats,
-            pos.position.altitude, pos.geoid);
+            long_deg, long_min, long_str, /*pos.fixQa,*/cr_pos.nrSats,
+            cr_pos.position.altitude, cr_pos.geoid);
     csum = Math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
     std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
@@ -66,19 +66,19 @@ std::string GPSmodule::ggafix(const struct ExtGPSPosition& pos)
     return nmea_str;
 }
 
-std::string GPSmodule::rmcfix(const struct ExtGPSPosition& pos)
+std::string GPSmodule::rmcfix(const struct ExtGPSPosition& cr_pos)
 {
     std::string nmea_str;
     std::int32_t csum;
     std::time_t now = std::time(0);
     std::tm* utc = std::gmtime(&now);
 
-    char lat_str = (pos.position.latitude < 0) ? 'S' : 'N';
-    char long_str = (pos.position.longitude < 0) ? 'W' : 'E';
-    double lat_deg = std::abs(std::floor(pos.position.latitude));
-    double lat_min = std::abs(60.0 * (pos.position.latitude - lat_deg));
-    double long_deg = std::abs(std::floor(pos.position.longitude));
-    double long_min = std::abs(60.0 * (pos.position.longitude - long_deg));
+    char lat_str = (cr_pos.position.latitude < 0) ? 'S' : 'N';
+    char long_str = (cr_pos.position.longitude < 0) ? 'W' : 'E';
+    double lat_deg = std::abs(std::floor(cr_pos.position.latitude));
+    double lat_min = std::abs(60.0 * (cr_pos.position.latitude - lat_deg));
+    double long_deg = std::abs(std::floor(cr_pos.position.longitude));
+    double long_min = std::abs(60.0 * (cr_pos.position.longitude - long_deg));
 
     std::snprintf(mBuffer,
     GPSM_BUFF_S,

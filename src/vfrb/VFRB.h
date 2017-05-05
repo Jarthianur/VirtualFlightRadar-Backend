@@ -32,45 +32,75 @@ class SensorData;
 class NMEAServer;
 class GPSData;
 
+/**
+ * The VFRB class.
+ *
+ * This class combines all the functionality of VFR-B.
+ * Expects a valid Configuration.
+ * The whole VFR-B may be started by a single call of VFRB::run.
+ */
 class VFRB
 {
 public:
-    VFRB(const VFRB&) = delete;
-    VFRB& operator=(const VFRB&) = delete;
-
-    VFRB();
-    virtual ~VFRB() noexcept;
-
     /**
-     * runs the tool
+     * Non-copyable
+     */
+    VFRB(const VFRB&) = delete;
+    /**
+     * Not assignable
+     */
+    VFRB& operator=(const VFRB&) = delete;
+    /**
+     * Constructor
+     */
+    VFRB();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
+    virtual ~VFRB() noexcept;
+    /**
+     * The VFRB's main method.
+     * This function spawns all threads and
+     * actually runs the VFR-B.
+     *
+     * @exceptsafe no-throw
      */
     static void run() noexcept;
 
-    /**
-     * configuration
-     */
+    /// Atomic run-status. By this, every component may determine if the VFRB stops.
     static std::atomic<bool> global_run_status;
-
-    /**
-     * Container for aircrafts
-     */
+    /// Container holding all registered Aircrafts
     static AircraftContainer msAcCont;
-    /**
-     * Container for climate information
-     */
+    /// Container holding sensor and climate information.
     static SensorData msSensorData;
-    /**
-     * Container for GPS information
-     */
+    /// Container holding GPS information
     static GPSData msGPSdata;
 
 private:
     /**
-     * handlers for threads
+     * Handler for an input Feed thread.
+     *
+     * @param r_sigset the signal set to pass
+     * @param r_feed   the Feed to handle
      */
-    static void handleInputFeed(boost::asio::signal_set& /*sigset*/, Feed& /*feed*/);
-    static void handleNMAEServer(NMEAServer& server);
-    static void handleSignals(const boost::system::error_code& /*ec*/, const int /*sig*/);
+    static void handleInputFeed(boost::asio::signal_set& /*r_sigset*/,
+                                Feed& /*r_feed*/);
+    /**
+     * Handler for an NMEAServer thread.
+     *
+     * @param r_server the NMEAServer to handle
+     */
+    static void handleNMAEServer(NMEAServer& /*r_server*/);
+    /**
+     * Handler for a signal interrupt thread.
+     *
+     * @param cr_ec the error code
+     * @param sig   the signal number
+     */
+    static void handleSignals(const boost::system::error_code& /*cr_ec*/,
+                              const int /*sig*/);
 };
 
 #endif /* SRC_VFRB_VFRB_H_ */

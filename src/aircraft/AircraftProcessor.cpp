@@ -65,7 +65,7 @@ std::string AircraftProcessor::process(const Aircraft& cr_ac)
                 "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*", mtRelN, mtRelE,
                 mtRelV, cr_ac.getIDtype(), cr_ac.getID().c_str(),
                 Math::dToI(cr_ac.getHeading()),
-                Math::dToI(cr_ac.getGndSpeed() * Math::MS2KMH), cr_ac.getClimbR(),
+                Math::dToI(cr_ac.getGndSpeed() * Math::MS_2_KMH), cr_ac.getClimbR(),
                 cr_ac.getAircraftT());
     } else
     {

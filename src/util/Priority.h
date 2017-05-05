@@ -27,20 +27,19 @@
 /**
  * Priorities / update policies
  * Override data if not valid, or lower.
- *
- * DONTCARE : used for single input (no other feed for this data),
- *     or fallbacks. Overrides itself, but nothing else.
- * LESSER: used as "I actually want input from other feed, but if not take it."
- *     Overrides only DC, even not itself, until invalid. Data stays invalid.
- * NORMAL: used for common backup feeds. Overrides itself and all but HIGHER.
- * HIGHER: used for main feed. Overrides all, no matter what state.
  */
 enum class Priority
     : std::uint32_t
     {
-        DONTCARE = 0,
+        /// Used for single input (no other feed for this data),
+        /// or fallbacks. Overrides itself, but nothing else.
+    DONTCARE = 0,
+    /// Used as "I actually want input from other feed, but if not take it."
+    /// Overrides only DONTCARE, even not itself, until invalid. Data stays invalid.
     LESSER = 1,
+    /// Used for common backup feeds. Overrides itself and all but HIGHER.
     NORMAL = 2,
+    /// Used for main feed. Overrides all, no matter what state.
     HIGHER = 3
 };
 

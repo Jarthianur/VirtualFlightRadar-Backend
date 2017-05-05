@@ -36,12 +36,12 @@
 #include "../util/Logger.h"
 #include "VFRB.h"
 
-Feed::Feed(const std::string& name, Priority prio, InputType type,
-           const std::unordered_map<std::string, std::string>& kvmap)
-        : mName(name),
+Feed::Feed(const std::string& cr_name, Priority prio, InputType type,
+           const std::unordered_map<std::string, std::string>& cr_kvmap)
+        : mName(cr_name),
           mPriority(prio),
           mType(type),
-          mKVmap(kvmap)
+          mKVmap(cr_kvmap)
 {
 }
 
@@ -62,7 +62,7 @@ Feed& Feed::operator =(BOOST_RV_REF(Feed))
     return *this;
 }
 
-void Feed::run(boost::asio::signal_set& sigset)
+void Feed::run(boost::asio::signal_set& r_sigset) noexcept
 {
     std::string host, port;
     auto it = mKVmap.find(KV_KEY_HOST);
@@ -102,26 +102,26 @@ void Feed::run(boost::asio::signal_set& sigset)
             }
             mpParser = std::unique_ptr<Parser>(new APRSParser());
             mpClient = std::unique_ptr<Client>(
-                    new APRSCClient(sigset, host, port, login, *this));
+                    new APRSCClient(r_sigset, host, port, login, *this));
             break;
         }
         case InputType::SBS:
         {
             mpParser = std::unique_ptr<Parser>(new SBSParser());
-            mpClient = std::unique_ptr<Client>(new SBSClient(sigset, host, port, *this));
+            mpClient = std::unique_ptr<Client>(new SBSClient(r_sigset, host, port, *this));
             break;
         }
         case InputType::SENSOR:
         {
             mpParser = std::unique_ptr<Parser>(new SensorParser());
             mpClient = std::unique_ptr<Client>(
-                    new SensorClient(sigset, host, port, *this));
+                    new SensorClient(r_sigset, host, port, *this));
             break;
         }
         case InputType::GPS:
         {
             mpParser = std::unique_ptr<Parser>(new GPSParser());
-            mpClient = std::unique_ptr<Client>(new GPSDClient(sigset, host, port, *this));
+            mpClient = std::unique_ptr<Client>(new GPSDClient(r_sigset, host, port, *this));
             break;
         }
         default:
@@ -133,7 +133,7 @@ void Feed::run(boost::asio::signal_set& sigset)
     }
 }
 
-std::int32_t Feed::process(const std::string& data) noexcept
+std::int32_t Feed::process(const std::string& cr_res) noexcept
 {
-    return mpParser->unpack(data, mPriority);
+    return mpParser->unpack(cr_res, mPriority);
 }
