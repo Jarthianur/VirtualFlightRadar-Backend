@@ -38,7 +38,7 @@ script:
     - pushd build
     - make
     - popd
-    - build/VFR-Test
+    - build/VFR-Test 2> /dev/null
 
 
 notifications:

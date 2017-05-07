@@ -9,15 +9,6 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include test/subdir.mk
--include target/src/vfrb/subdir.mk
--include target/src/util/subdir.mk
--include target/src/tcp/server/subdir.mk
--include target/src/tcp/client/subdir.mk
--include target/src/parser/subdir.mk
--include target/src/data/subdir.mk
--include target/src/config/subdir.mk
--include target/src/aircraft/subdir.mk
--include target/src/subdir.mk
 -include src/vfrb/subdir.mk
 -include src/util/subdir.mk
 -include src/tcp/server/subdir.mk

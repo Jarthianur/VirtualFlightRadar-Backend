@@ -4,22 +4,25 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../../src/parser/APRSParser.cpp \
-../../src/parser/Parser.cpp \
-../../src/parser/SBSParser.cpp \
-../../src/parser/WindParser.cpp 
+../src/parser/APRSParser.cpp \
+../src/parser/GPSParser.cpp \
+../src/parser/Parser.cpp \
+../src/parser/SBSParser.cpp \
+../src/parser/SensorParser.cpp 
 
 OBJS += \
 ./src/parser/APRSParser.o \
+./src/parser/GPSParser.o \
 ./src/parser/Parser.o \
 ./src/parser/SBSParser.o \
-./src/parser/WindParser.o 
+./src/parser/SensorParser.o 
 
 CPP_DEPS += \
 ./src/parser/APRSParser.d \
+./src/parser/GPSParser.d \
 ./src/parser/Parser.d \
 ./src/parser/SBSParser.d \
-./src/parser/WindParser.d 
+./src/parser/SensorParser.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
