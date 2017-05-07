@@ -87,10 +87,6 @@ void ConfigReader::read() noexcept
                                 line_nr)
                         + "]: ", line);
             }
-        } catch (const boost::regex_error& e)
-        {
-            Logger::error("(ConfigReader) read config: ", e.what());
-            break;
         } catch (const std::out_of_range& e)
         {
             continue;
