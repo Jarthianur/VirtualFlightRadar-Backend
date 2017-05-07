@@ -28,6 +28,9 @@
 
 #include "../util/Priority.h"
 
+namespace data
+{
+
 /**
  * Data structure.
  *
@@ -43,7 +46,7 @@ struct Data
     /// Is wrtite attempt valid?
     bool attemptValid;
     /// Last written Priority
-    Priority lastPriority;
+    util::Priority lastPriority;
     /// Mutex to enable threadsafety per Data.
     boost::mutex mutex;
     /**
@@ -54,20 +57,20 @@ struct Data
      * @param cr_nv   the new value
      * @param prio the Priority attempting to write
      */
-    void update(const T& cr_nv, Priority prio)
+    void update(const T& cr_nv, util::Priority prio)
     {
         bool write = attemptValid;
         if (!write)
         {
             if (prio > lastPriority || (prio == lastPriority
-                    && prio != Priority::LESSER))
+                    && prio != util::Priority::LESSER))
             {
                 write = true;
             }
         }
         if (write)
         {
-            attemptValid = (prio == Priority::LESSER);
+            attemptValid = (prio == util::Priority::LESSER);
             value = cr_nv;
             lastPriority = prio;
         } else
@@ -94,7 +97,7 @@ struct TmpData
     /// Is the value valid?
     bool valueValid;
     /// Last written Priority
-    Priority lastPriority;
+    util::Priority lastPriority;
     /// Mutex to enable threadsafety per TmpData.
     boost::mutex mutex;
     /**
@@ -116,20 +119,20 @@ struct TmpData
      * @param cr_nv   the new value
      * @param prio the Priority attempting to write
      */
-    void update(const T& cr_nv, Priority prio)
+    void update(const T& cr_nv, util::Priority prio)
     {
         bool write = attemptValid;
         if (!write)
         {
             if (prio > lastPriority || (prio == lastPriority
-                    && prio != Priority::LESSER))
+                    && prio != util::Priority::LESSER))
             {
                 write = true;
             }
         }
         if (write)
         {
-            attemptValid = (prio == Priority::LESSER);
+            attemptValid = (prio == util::Priority::LESSER);
             value = cr_nv;
             lastPriority = prio;
             valueValid = true;
@@ -139,5 +142,7 @@ struct TmpData
         }
     }
 };
+
+}  // namespace data
 
 #endif /* SRC_DATA_DATA_HPP_ */

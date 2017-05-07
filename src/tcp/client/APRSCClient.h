@@ -28,6 +28,11 @@
 
 #include "Client.h"
 
+namespace tcp
+{
+namespace client
+{
+
 /**
  * The APRSCClient class, extends and implements Client.
  *
@@ -56,7 +61,7 @@ public:
      */
     APRSCClient(boost::asio::signal_set& /*r_sigset*/,
                 const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-                const std::string& /*cr_login*/, Feed& /*r_feed*/);
+                const std::string& /*cr_login*/, vfrb::Feed& /*r_feed*/);
     /**
      * Destructor
      *
@@ -107,5 +112,8 @@ private:
     /// Login string
     std::string mLoginStr;
 };
+
+}  // namespace client
+}  // namespace tcp
 
 #endif /* SRC_TCP_CLIENT_APRSCCLIENT_H_ */

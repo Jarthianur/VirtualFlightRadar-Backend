@@ -27,6 +27,9 @@
 
 #include "../util/Priority.h"
 
+namespace parser
+{
+
 /// Parser -- unpack error codes
 #define MSG_UNPACK_SUC 0
 #define MSG_UNPACK_ERR -1
@@ -60,8 +63,10 @@ public:
      *
      * @return an error code
      */
-    virtual std::int32_t unpack(const std::string& /*cr_msg*/, Priority /*prio*/)
-            noexcept = 0;
+    virtual std::int32_t unpack(const std::string& /*cr_msg*/,
+                                util::Priority /*prio*/) noexcept = 0;
 };
+
+}  // namespace parser
 
 #endif /* SRC_PARSER_PARSER_H_ */

@@ -28,6 +28,11 @@
 
 #include "Client.h"
 
+namespace tcp
+{
+namespace client
+{
+
 /**
  * The SBSClient class, extends and implements Client.
  *
@@ -56,7 +61,7 @@ public:
      */
     SBSClient(boost::asio::signal_set& /*r_sigset*/,
               const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-              Feed& /*r_feed*/);
+              vfrb::Feed& /*r_feed*/);
     /**
      * Destructor
      *
@@ -94,5 +99,8 @@ private:
                        boost::asio::ip::tcp::resolver::iterator /*it*/)
                                noexcept override;
 };
+
+}  // namespace client
+}  // namespace tcp
 
 #endif /* SRC_TCP_CLIENT_SBSCLIENT_H_ */

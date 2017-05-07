@@ -29,7 +29,13 @@
 #include <utility>
 
 #include "../util/Logger.h"
-#include <iostream>
+#include "../aircraft/Aircraft.h"
+
+using namespace util;
+using namespace aircraft;
+
+namespace data
+{
 
 #define AC_INVALIDATE         (4)
 #define AC_DELETE_THRESHOLD   (120)
@@ -47,7 +53,8 @@ AircraftContainer::~AircraftContainer() noexcept
 {
 }
 
-std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& cr_id)
+std::vector<Aircraft>::iterator AircraftContainer::find(
+        const std::string& cr_id)
 {
     const auto it = mIndexMap.find(cr_id);
     if (it == mIndexMap.cend())
@@ -105,8 +112,8 @@ std::string AircraftContainer::processAircrafts() noexcept
 }
 
 void AircraftContainer::insertAircraft(const Aircraft& cr_update, Priority prio)
-        noexcept
-        {
+noexcept
+{
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     auto known_ac = find(cr_update.getID());
     if (known_ac != mCont.end())
@@ -138,3 +145,5 @@ void AircraftContainer::insertAircraft(const Aircraft& cr_update, Priority prio)
         mCont.push_back(cr_update);
     }
 }
+
+} // namespace data

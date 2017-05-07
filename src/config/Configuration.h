@@ -30,6 +30,9 @@
 #include "../vfrb/Feed.h"
 #include "ConfigReader.h"
 
+namespace config
+{
+
 /// Configuration section keys
 #define SECT_KEY_FALLBACK   "fallback"
 #define SECT_KEY_GENERAL    "general"
@@ -102,7 +105,7 @@ public:
     /// Ground mode enabled?
     static bool global_gnd_mode;
     /// All registered and correctly parsed input feeds
-    static std::vector<Feed> global_feeds;
+    static std::vector<vfrb::Feed> global_feeds;
 
 private:
     /**
@@ -156,7 +159,9 @@ private:
      *
      * @exceptsafe no-throw
      */
-    Priority aliasPriority(const std::string& /*cr_str*/) noexcept;
+    util::Priority aliasPriority(const std::string& /*cr_str*/) noexcept;
 };
+
+}  // namespace config
 
 #endif /* SRC_CONFIG_CONFIGURATION_H_ */

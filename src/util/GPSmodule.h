@@ -24,6 +24,9 @@
 
 #include <string>
 
+namespace util
+{
+
 #define GPSM_BUFF_S 8191
 #define GPSM_L_BUFF_S 128
 
@@ -69,5 +72,7 @@ private:
     /// Formatstring buffer
     char mBuffer[GPSM_BUFF_S + 1];
 };
+
+}  // namespace util
 
 #endif /* SRC_UTIL_GPSMODULE_H_ */

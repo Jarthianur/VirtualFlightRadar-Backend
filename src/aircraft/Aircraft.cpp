@@ -21,6 +21,11 @@
 
 #include "Aircraft.h"
 
+using namespace util;
+
+namespace aircraft
+{
+
 Aircraft::~Aircraft() noexcept
 {
 }
@@ -66,3 +71,5 @@ void Aircraft::update(const Aircraft& cr_ac, Priority prio)
     this->mLastPriority = prio;
     this->mAttemptValid = (prio == Priority::LESSER);
 }
+
+}  // namespace aircraft

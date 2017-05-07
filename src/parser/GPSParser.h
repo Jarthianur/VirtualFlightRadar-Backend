@@ -28,7 +28,10 @@
 
 #include "../util/Priority.h"
 #include "Parser.h"
-#include "../data/Position.hpp"
+#include "../util/Position.hpp"
+
+namespace parser
+{
 
 /**
  * The GPSParser class, implememnts Parser.
@@ -53,14 +56,16 @@ public:
      *
      * @overload Parser::unpack
      */
-    std::int32_t unpack(const std::string& /*cr_msg*/, Priority /*prio*/)
+    std::int32_t unpack(const std::string& /*cr_msg*/, util::Priority /*prio*/)
             noexcept override;
 
 private:
     /// Regular expression to parse GGA
     const boost::regex mGpggaRE;
     /// Temporary data
-    struct ExtGPSPosition mtGPSpos;
+    struct util::ExtGPSPosition mtGPSpos;
 };
+
+}  // namespace parser
 
 #endif /* SRC_PARSER_GPSPARSER_H_ */

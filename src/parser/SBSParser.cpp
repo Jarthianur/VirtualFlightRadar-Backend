@@ -32,6 +32,11 @@
 #include "../util/Priority.h"
 #include "../vfrb/VFRB.h"
 
+using namespace util;
+
+namespace parser
+{
+
 SBSParser::SBSParser()
         : Parser()
 {
@@ -41,8 +46,9 @@ SBSParser::~SBSParser() noexcept
 {
 }
 
-std::int32_t SBSParser::unpack(const std::string& cr_msg, Priority prio) noexcept
-{
+std::int32_t SBSParser::unpack(const std::string& cr_msg, Priority prio)
+        noexcept
+        {
     /*
      * fields:
      * 4 : id
@@ -93,9 +99,10 @@ std::int32_t SBSParser::unpack(const std::string& cr_msg, Priority prio) noexcep
             case 11:
                 try
                 {
-                    mtGPSpos.altitude = Math::dToI(
-                            std::stod(cr_msg.substr(p, delim - p)) * Math::FEET_2_M);
-                    if (mtGPSpos.altitude > Configuration::filter_maxHeight)
+                    mtGPSpos.altitude =
+                            util::math::dToI(
+                                    std::stod(cr_msg.substr(p, delim - p)) * util::math::FEET_2_M);
+                    if (mtGPSpos.altitude > config::Configuration::filter_maxHeight)
                     {
                         return MSG_UNPACK_IGN;
                     }
@@ -128,10 +135,12 @@ std::int32_t SBSParser::unpack(const std::string& cr_msg, Priority prio) noexcep
         i++;
         p = delim + 1;
     }
-    Aircraft ac(mtID, mtGPSpos);
+    aircraft::Aircraft ac(mtID, mtGPSpos);
     ac.setFullInfo(false);
-    ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-    VFRB::msAcCont.insertAircraft(ac, prio);
+    ac.setTargetT(aircraft::Aircraft::TargetType::TRANSPONDER);
+    vfrb::VFRB::msAcCont.insertAircraft(ac, prio);
 
     return MSG_UNPACK_SUC;
 }
+
+}  // namespace parser

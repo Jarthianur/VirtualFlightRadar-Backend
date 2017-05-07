@@ -27,6 +27,11 @@
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
 
+using namespace util;
+
+namespace parser
+{
+
 SensorParser::SensorParser()
         : Parser()
 {
@@ -37,13 +42,13 @@ SensorParser::~SensorParser() noexcept
 }
 
 std::int32_t SensorParser::unpack(const std::string& cr_msg, Priority prio)
-        noexcept
-        {
+noexcept
+{
     try
     {
         std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),
                 nullptr, 16);
-        if (csum != Math::checksum(cr_msg.c_str(), cr_msg.length()))
+        if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return MSG_UNPACK_IGN;
         }
@@ -59,10 +64,11 @@ std::int32_t SensorParser::unpack(const std::string& cr_msg, Priority prio)
             mtB = cr_msg.find('B') - 1;
             mtS = cr_msg.substr(0, mtB).find_last_of(',') + 1;
             mtSubLen = mtB - mtS;
-            mtPress = std::stod(cr_msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
+            mtPress = std::stod(cr_msg.substr(mtS, mtSubLen), &mtNumIdx)
+                    * 1000.0;
             if (mtNumIdx == mtSubLen)
             {
-                VFRB::msSensorData.setPress(prio, mtPress);
+                vfrb::VFRB::msSensorData.setPress(prio, mtPress);
             } else
             {
                 return MSG_UNPACK_ERR;
@@ -73,10 +79,12 @@ std::int32_t SensorParser::unpack(const std::string& cr_msg, Priority prio)
         }
     } else if (cr_msg.find("MWV") != std::string::npos)
     {
-        VFRB::msSensorData.setWVstr(prio, cr_msg);
+        vfrb::VFRB::msSensorData.setWVstr(prio, cr_msg);
     } else
     {
         return MSG_UNPACK_IGN;
     }
     return MSG_UNPACK_SUC;
 }
+
+}  // namespace parser

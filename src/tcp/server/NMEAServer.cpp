@@ -31,6 +31,13 @@
 
 #include "../../util/Logger.h"
 
+using namespace util;
+
+namespace tcp
+{
+namespace server
+{
+
 NMEAServer::NMEAServer(boost::asio::signal_set& r_sigset, std::uint16_t port)
         : mIOservice(),
           mrSigSet(r_sigset),
@@ -120,3 +127,6 @@ void NMEAServer::handleAccept(const boost::system::error_code& cr_ec) noexcept
     }
     accept();
 }
+
+}  // namespace server
+}  // namespace tcp

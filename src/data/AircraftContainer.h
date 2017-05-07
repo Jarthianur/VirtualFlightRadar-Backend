@@ -29,10 +29,17 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../aircraft/Aircraft.h"
 #include "../aircraft/AircraftProcessor.h"
 #include "../util/Priority.h"
 #include "../config/Parameters.h"
+
+namespace aircraft
+{
+class Aircraft;
+}
+
+namespace data
+{
 
 /**
  * The AircraftContainer class.
@@ -68,8 +75,8 @@ public:
      *
      * @exceptsafe strong
      */
-    void insertAircraft(const Aircraft& /*cr_update*/, Priority /*prio*/)
-            noexcept;
+    void insertAircraft(const aircraft::Aircraft& /*cr_update*/,
+                        util::Priority /*prio*/) noexcept;
     /**
      * Process all aircrafts into NMEA sentences PFLAU and PFLAA.
      * Aircrafts with too old information are not reported, later deleted.
@@ -89,16 +96,19 @@ private:
      *
      * @return an iterator to the Aircraft if found, else vector::end
      */
-    std::vector<Aircraft>::iterator find(const std::string& /*cr_id*/);
+    std::vector<aircraft::Aircraft>::iterator find(
+            const std::string& /*cr_id*/);
 
     /// Mutex for threadsafety
     boost::mutex mMutex;
     /// Processor providing functionality to process Aircrafts
-    AircraftProcessor mAcProc;
+    aircraft::AircraftProcessor mAcProc;
     /// Vector holding the Aircrafts
-    std::vector<Aircraft> mCont;
+    std::vector<aircraft::Aircraft> mCont;
     /// Index map to make find efficient
     std::unordered_map<std::string, size_t> mIndexMap;
 };
+
+}  // namespace data
 
 #endif /* SRC_DATA_AIRCRAFTCONTAINER_H_ */

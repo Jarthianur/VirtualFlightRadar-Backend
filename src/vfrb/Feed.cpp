@@ -36,6 +36,11 @@
 #include "../util/Logger.h"
 #include "VFRB.h"
 
+using namespace util;
+
+namespace vfrb
+{
+
 Feed::Feed(const std::string& cr_name, Priority prio, InputType type,
            const std::unordered_map<std::string, std::string>& cr_kvmap)
         : mName(cr_name),
@@ -69,8 +74,7 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
     if (it != mKVmap.end())
     {
         host = it->second;
-    }
-    else
+    } else
     {
         Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_HOST);
         return;
@@ -79,8 +83,7 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
     if (it != mKVmap.end())
     {
         port = it->second;
-    }
-    else
+    } else
     {
         Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_PORT);
         return;
@@ -94,34 +97,39 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
             if (it != mKVmap.end())
             {
                 login = it->second;
-            }
-            else
+            } else
             {
-                Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_LOGIN);
+                Logger::warn("(Feed) could not find: ",
+                        mName + "." KV_KEY_LOGIN);
                 return;
             }
-            mpParser = std::unique_ptr<Parser>(new APRSParser());
-            mpClient = std::unique_ptr<Client>(
-                    new APRSCClient(r_sigset, host, port, login, *this));
+            mpParser = std::unique_ptr<parser::Parser>(
+                    new parser::APRSParser());
+            mpClient = std::unique_ptr<tcp::client::Client>(
+                    new tcp::client::APRSCClient(r_sigset, host, port, login,
+                            *this));
             break;
         }
         case InputType::SBS:
         {
-            mpParser = std::unique_ptr<Parser>(new SBSParser());
-            mpClient = std::unique_ptr<Client>(new SBSClient(r_sigset, host, port, *this));
+            mpParser = std::unique_ptr<parser::Parser>(new parser::SBSParser());
+            mpClient = std::unique_ptr<tcp::client::Client>(
+                    new tcp::client::SBSClient(r_sigset, host, port, *this));
             break;
         }
         case InputType::SENSOR:
         {
-            mpParser = std::unique_ptr<Parser>(new SensorParser());
-            mpClient = std::unique_ptr<Client>(
-                    new SensorClient(r_sigset, host, port, *this));
+            mpParser = std::unique_ptr<parser::Parser>(
+                    new parser::SensorParser());
+            mpClient = std::unique_ptr<tcp::client::Client>(
+                    new tcp::client::SensorClient(r_sigset, host, port, *this));
             break;
         }
         case InputType::GPS:
         {
-            mpParser = std::unique_ptr<Parser>(new GPSParser());
-            mpClient = std::unique_ptr<Client>(new GPSDClient(r_sigset, host, port, *this));
+            mpParser = std::unique_ptr<parser::Parser>(new parser::GPSParser());
+            mpClient = std::unique_ptr<tcp::client::Client>(
+                    new tcp::client::GPSDClient(r_sigset, host, port, *this));
             break;
         }
         default:
@@ -137,3 +145,5 @@ std::int32_t Feed::process(const std::string& cr_res) noexcept
 {
     return mpParser->unpack(cr_res, mPriority);
 }
+
+}  // namespace vfrb

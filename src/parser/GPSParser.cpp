@@ -29,6 +29,11 @@
 #include "../util/Priority.h"
 #include "../vfrb/VFRB.h"
 
+using namespace util;
+
+namespace parser
+{
+
 #define GPS_ASSUME_GOOD       (1)
 #define GPS_NR_SATS_GOOD      (7)
 #define GPS_FIX_GOOD          (1)
@@ -46,13 +51,14 @@ GPSParser::~GPSParser() noexcept
 {
 }
 
-std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio) noexcept
-{
+std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio)
+        noexcept
+        {
     try
     {
         std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),
                 nullptr, 16);
-        if (csum != Math::checksum(cr_msg.c_str(), cr_msg.length()))
+        if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return MSG_UNPACK_IGN;
         }
@@ -68,14 +74,15 @@ std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio) noexcep
         try
         {
             //latitude
-            mtGPSpos.position.latitude = Math::dmToDeg(std::stod(match.str(1)));
+            mtGPSpos.position.latitude = util::math::dmToDeg(
+                    std::stod(match.str(1)));
             if (match.str(2).compare("S") == 0)
             {
                 mtGPSpos.position.latitude = -mtGPSpos.position.latitude;
             }
 
             //longitude
-            mtGPSpos.position.longitude = Math::dmToDeg(
+            mtGPSpos.position.longitude = util::math::dmToDeg(
                     std::stod(match.str(3)));
             if (match.str(4).compare("W") == 0)
             {
@@ -89,7 +96,8 @@ std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio) noexcep
             //dilution
             dilution = std::stod(match.str(7));
             //altitude
-            mtGPSpos.position.altitude = Math::dToI(std::stod(match.str(8)));
+            mtGPSpos.position.altitude = util::math::dToI(
+                    std::stod(match.str(8)));
             //geoid
             mtGPSpos.geoid = std::stod(match.str(9));
         } catch (const std::logic_error& e)
@@ -98,7 +106,7 @@ std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio) noexcep
         }
 
         /*VFRB::msGPSdata.setGGAstr(prio, msg);*/
-        VFRB::msGPSdata.setBasePos(prio, mtGPSpos);
+        vfrb::VFRB::msGPSdata.setBasePos(prio, mtGPSpos);
 
         if (mtGPSpos.nrSats >= GPS_NR_SATS_GOOD && mtGPSpos.fixQa
                 >= GPS_FIX_GOOD
@@ -116,3 +124,5 @@ std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio) noexcep
 
     return MSG_UNPACK_SUC;
 }
+
+}  // namespace parser

@@ -31,6 +31,10 @@
 
 #include "../util/Logger.h"
 #include "../util/Priority.h"
+using namespace util;
+
+namespace config
+{
 
 Configuration::Configuration(const char* file)
 {
@@ -54,7 +58,7 @@ std::int32_t Configuration::filter_maxDist = 0;
 std::uint16_t Configuration::global_server_port = 1;
 bool Configuration::global_gnd_mode = false;
 
-std::vector<Feed> Configuration::global_feeds;
+std::vector<vfrb::Feed> Configuration::global_feeds;
 
 bool Configuration::init(const char* file)
 {
@@ -158,10 +162,10 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                Feed f(*it,
+                vfrb::Feed f(*it,
                         aliasPriority(
                                 r_cr.getProperty(*it, KV_KEY_PRIORITY,
-                                        prio_dc)), Feed::InputType::APRSC,
+                                        prio_dc)), vfrb::Feed::InputType::APRSC,
                         r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
@@ -172,10 +176,10 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                Feed f(*it,
+                vfrb::Feed f(*it,
                         aliasPriority(
                                 r_cr.getProperty(*it, KV_KEY_PRIORITY,
-                                        prio_dc)), Feed::InputType::SBS,
+                                        prio_dc)), vfrb::Feed::InputType::SBS,
                         r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
@@ -186,11 +190,11 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                Feed f(*it,
+                vfrb::Feed f(*it,
                         aliasPriority(
                                 r_cr.getProperty(*it, KV_KEY_PRIORITY,
-                                        prio_dc)), Feed::InputType::SENSOR,
-                        r_cr.getSectionKV(*it));
+                                        prio_dc)),
+                        vfrb::Feed::InputType::SENSOR, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -200,10 +204,10 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                Feed f(*it,
+                vfrb::Feed f(*it,
                         aliasPriority(
                                 r_cr.getProperty(*it, KV_KEY_PRIORITY,
-                                        prio_dc)), Feed::InputType::GPS,
+                                        prio_dc)), vfrb::Feed::InputType::GPS,
                         r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
@@ -267,3 +271,5 @@ Priority Configuration::aliasPriority(const std::string& cr_str) noexcept
         return Priority::DONTCARE;
     }
 }
+
+}  // namespace config

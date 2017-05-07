@@ -24,6 +24,9 @@
 
 #include <cstdint>
 
+namespace util
+{
+
 /**
  * Priorities / update policies
  * Override data if not valid, or lower.
@@ -42,5 +45,7 @@ enum class Priority
     /// Used for main feed. Overrides all, no matter what state.
     HIGHER = 3
 };
+
+}  // namespace util
 
 #endif /* SRC_UTIL_PRIORITY_H_ */

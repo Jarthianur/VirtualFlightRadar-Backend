@@ -25,6 +25,9 @@
 #include <cstdint>
 #include <string>
 
+namespace aircraft
+{
+
 class Aircraft;
 
 #define AP_BUFF_S 8191
@@ -96,5 +99,7 @@ private:
             mtDist = 0;
 
 };
+
+}  // namespace aircraft
 
 #endif /* SRC_AIRCRAFT_AIRCRAFTPROCESSOR_H_ */

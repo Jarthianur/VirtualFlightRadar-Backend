@@ -26,6 +26,9 @@
 #include <string>
 #include <unordered_map>
 
+namespace config
+{
+
 /**
  * The ConfigReader class.
  *
@@ -85,5 +88,7 @@ private:
     /// The regular expression for 'key = value' lines
     const boost::regex mConfRE;
 };
+
+}  // namespace config
 
 #endif /* SRC_CONFIG_CONFIGREADER_H_ */

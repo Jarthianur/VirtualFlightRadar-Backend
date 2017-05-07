@@ -25,6 +25,11 @@
 #include <boost/system/error_code.hpp>
 #include <algorithm>
 
+namespace tcp
+{
+namespace server
+{
+
 boost::shared_ptr<Connection> Connection::start(
         boost::asio::ip::tcp::socket socket)
 {
@@ -61,3 +66,6 @@ const std::string& Connection::getIP()
 {
     return mIP;
 }
+
+}  // namespace server
+}  // namespace tcp

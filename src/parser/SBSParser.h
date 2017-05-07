@@ -26,7 +26,10 @@
 #include <string>
 
 #include "Parser.h"
-#include "../data/Position.hpp"
+#include "../util/Position.hpp"
+
+namespace parser
+{
 
 /**
  * The SBSParser class, implements Parser.
@@ -51,14 +54,16 @@ public:
      *
      * @overload Parser::unpack
      */
-    std::int32_t unpack(const std::string& /*cr_msg*/, Priority /*prio*/)
+    std::int32_t unpack(const std::string& /*cr_msg*/, util::Priority /*prio*/)
             noexcept override;
 
 private:
     /// Temporary data
     std::string mtID;
-    struct GPSPosition mtGPSpos;
+    struct util::GPSPosition mtGPSpos;
     std::int32_t mtTime = 0;
 };
+
+}  // namespace parser
 
 #endif /* SRC_PARSER_SBSPARSER_H_ */

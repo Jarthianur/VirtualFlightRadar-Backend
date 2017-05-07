@@ -29,6 +29,11 @@
 #include "Client.h"
 #include "../../config/Parameters.h"
 
+namespace tcp
+{
+namespace client
+{
+
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
 
 /**
@@ -59,7 +64,7 @@ public:
      */
     SensorClient(boost::asio::signal_set& /*r_sigset*/,
                  const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-                 Feed& /*r_feed*/);
+                 vfrb::Feed& /*r_feed*/);
     /**
      * Destructor
      *
@@ -122,5 +127,8 @@ private:
     /// Read timer
     boost::asio::deadline_timer mTimeout;
 };
+
+}  // namespace client
+}  // namespace tcp
 
 #endif /* SRC_TCP_CLIENT_SENSORCLIENT_H_ */

@@ -24,6 +24,11 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
+using namespace util;
+
+namespace data
+{
+
 GPSData::GPSData()
 {
 }
@@ -130,3 +135,5 @@ struct ExtGPSPosition GPSData::getBasePos()
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
     return mBasePos.value;
 }
+
+} // namespace data

@@ -33,6 +33,8 @@
 #define VERSION "DEMO"
 #endif
 
+using namespace util;
+
 /**
  * Evaluate comandline arguments.
  *
@@ -69,12 +71,13 @@ int main(int argc, char** argv)
     }
 
     // set climate fallbacks
-    VFRB::msSensorData.setPress(Priority::DONTCARE,
-            Configuration::base_pressure);
-    VFRB::msGPSdata.setDefaults(Configuration::base_latitude,
-            Configuration::base_longitude, Configuration::base_altitude,
-            Configuration::base_geoid);
-    VFRB::run();
+    vfrb::VFRB::msSensorData.setPress(Priority::DONTCARE,
+            config::Configuration::base_pressure);
+    vfrb::VFRB::msGPSdata.setDefaults(config::Configuration::base_latitude,
+            config::Configuration::base_longitude,
+            config::Configuration::base_altitude,
+            config::Configuration::base_geoid);
+    vfrb::VFRB::run();
 
     return 0;
 }
@@ -112,7 +115,7 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
     {
         try
         {
-            Configuration conf(ini_file.c_str());
+            config::Configuration conf(ini_file.c_str());
         } catch (const std::logic_error& e)
         {
             Logger::error("(VFRB) eval config: ", e.what());
@@ -124,9 +127,9 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
         return -1;
     }
 
-    if (gnd || Configuration::global_gnd_mode)
+    if (gnd || config::Configuration::global_gnd_mode)
     {
-        Configuration::global_gnd_mode = true;
+        config::Configuration::global_gnd_mode = true;
         Logger::info("(VFRB) GND mode: yes");
     } else
     {

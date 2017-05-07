@@ -26,6 +26,11 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+namespace tcp
+{
+namespace server
+{
+
 /**
  * The Connection class.
  *
@@ -91,5 +96,8 @@ private:
     /// IP address
     const std::string mIP;
 };
+
+}  // namespace server
+}  // namespace tcp
 
 #endif /* SRC_TCP_SERVER_CONNECTION_H_ */

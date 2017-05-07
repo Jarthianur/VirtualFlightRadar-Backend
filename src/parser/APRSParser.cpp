@@ -33,6 +33,11 @@
 #include "../util/Priority.h"
 #include "../vfrb/VFRB.h"
 
+using namespace util;
+
+namespace parser
+{
+
 APRSParser::APRSParser()
         : Parser(),
           mAprsRE(
@@ -49,8 +54,8 @@ APRSParser::~APRSParser() noexcept
 }
 
 std::int32_t APRSParser::unpack(const std::string& cr_msg, Priority prio)
-        noexcept
-        {
+noexcept
+{
     if (cr_msg.size() > 0 && cr_msg.at(0) == '#')
     {
         return MSG_UNPACK_IGN;
@@ -65,23 +70,23 @@ std::int32_t APRSParser::unpack(const std::string& cr_msg, Priority prio)
             mtTime = std::stoi(match.str(1));
 
             //latitude
-            mtGPSpos.latitude = Math::dmToDeg(std::stod(match.str(2)));
+            mtGPSpos.latitude = util::math::dmToDeg(std::stod(match.str(2)));
             if (match.str(3).compare("S") == 0)
             {
                 mtGPSpos.latitude = -mtGPSpos.latitude;
             }
 
             //longitude
-            mtGPSpos.longitude = Math::dmToDeg(std::stod(match.str(4)));
+            mtGPSpos.longitude = util::math::dmToDeg(std::stod(match.str(4)));
             if (match.str(5).compare("W") == 0)
             {
                 mtGPSpos.longitude = -mtGPSpos.longitude;
             }
 
             //altitude
-            mtGPSpos.altitude = Math::dToI(
-                    std::stod(match.str(8)) * Math::FEET_2_M);
-            if (mtGPSpos.altitude > Configuration::filter_maxHeight)
+            mtGPSpos.altitude = util::math::dToI(
+                    std::stod(match.str(8)) * util::math::FEET_2_M);
+            if (mtGPSpos.altitude > config::Configuration::filter_maxHeight)
             {
                 return MSG_UNPACK_IGN;
             }
@@ -109,7 +114,8 @@ std::int32_t APRSParser::unpack(const std::string& cr_msg, Priority prio)
                 }
                 try
                 {
-                    mtClimbRate = std::stod(comm_match.str(3)) * Math::FPM_2_MS;
+                    mtClimbRate = std::stod(comm_match.str(3))
+                            * util::math::FPM_2_MS;
                 } catch (const std::logic_error& e)
                 {
                     mtClimbRate = A_VALUE_NA;
@@ -143,20 +149,22 @@ std::int32_t APRSParser::unpack(const std::string& cr_msg, Priority prio)
         }
         try
         {
-            mtGndSpeed = std::stod(match.str(7)) * Math::KTS_2_MS;
+            mtGndSpeed = std::stod(match.str(7)) * util::math::KTS_2_MS;
         } catch (const std::logic_error& e)
         {
             mtGndSpeed = A_VALUE_NA;
             mtFullInfo = false;
         }
-        Aircraft ac(mtID, mtGPSpos, mtGndSpeed, mtIDtype, mtAcType, mtClimbRate,
-                mtTurnRate, mtHeading);
+        aircraft::Aircraft ac(mtID, mtGPSpos, mtGndSpeed, mtIDtype, mtAcType,
+                mtClimbRate, mtTurnRate, mtHeading);
         ac.setFullInfo(mtFullInfo);
-        ac.setTargetT(Aircraft::TargetType::FLARM);
-        VFRB::msAcCont.insertAircraft(ac, prio);
+        ac.setTargetT(aircraft::Aircraft::TargetType::FLARM);
+        vfrb::VFRB::msAcCont.insertAircraft(ac, prio);
     } else
     {
         return MSG_UNPACK_IGN;
     }
     return MSG_UNPACK_SUC;
 }
+
+}  // namespace parser

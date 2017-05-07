@@ -22,15 +22,28 @@
 #ifndef SRC_VFRB_VFRB_H_
 #define SRC_VFRB_VFRB_H_
 
+#include <atomic>
 #include <boost/asio/signal_set.hpp>
 #include <boost/system/error_code.hpp>
-#include <atomic>
 
-class Feed;
+namespace data
+{
 class AircraftContainer;
 class SensorData;
-class NMEAServer;
 class GPSData;
+}
+namespace tcp
+{
+namespace server
+{
+class NMEAServer;
+}
+}
+
+namespace vfrb
+{
+
+class Feed;
 
 /**
  * The VFRB class.
@@ -72,11 +85,11 @@ public:
     /// Atomic run-status. By this, every component may determine if the VFRB stops.
     static std::atomic<bool> global_run_status;
     /// Container holding all registered Aircrafts
-    static AircraftContainer msAcCont;
+    static data::AircraftContainer msAcCont;
     /// Container holding sensor and climate information.
-    static SensorData msSensorData;
+    static data::SensorData msSensorData;
     /// Container holding GPS information
-    static GPSData msGPSdata;
+    static data::GPSData msGPSdata;
 
 private:
     /**
@@ -92,7 +105,7 @@ private:
      *
      * @param r_server the NMEAServer to handle
      */
-    static void handleNMAEServer(NMEAServer& /*r_server*/);
+    static void handleNMAEServer(tcp::server::NMEAServer& /*r_server*/);
     /**
      * Handler for a signal interrupt thread.
      *
@@ -102,5 +115,7 @@ private:
     static void handleSignals(const boost::system::error_code& /*cr_ec*/,
                               const int /*sig*/);
 };
+
+}  // namespace vfrb
 
 #endif /* SRC_VFRB_VFRB_H_ */

@@ -28,6 +28,9 @@
 
 #include "Parser.h"
 
+namespace parser
+{
+
 /**
  * The SensorParser class, implements Parser.
  *
@@ -51,7 +54,7 @@ public:
      *
      * @overload Parser::unpack
      */
-    std::int32_t unpack(const std::string& /*cr_msg*/, Priority /*prio*/)
+    std::int32_t unpack(const std::string& /*cr_msg*/, util::Priority /*prio*/)
             noexcept override;
 
 private:
@@ -59,5 +62,7 @@ private:
     std::size_t mtB = 0, mtS = 0, mtSubLen = 0, mtNumIdx = 0;
     double mtPress = 0.0;
 };
+
+}  // namespace parser
 
 #endif /* SRC_PARSER_SENSORPARSER_H_ */

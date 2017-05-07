@@ -23,6 +23,11 @@
 
 #include <boost/thread/lock_guard.hpp>
 
+using namespace util;
+
+namespace data
+{
+
 SensorData::SensorData()
 {
     mPress.value = ICAO_STD_A;
@@ -61,3 +66,5 @@ void SensorData::setPress(Priority prio, double p)
     boost::lock_guard<boost::mutex> lock(mPress.mutex);
     mPress.update(p, prio);
 }
+
+}  // namespace data

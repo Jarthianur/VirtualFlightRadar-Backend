@@ -28,6 +28,11 @@
 
 #include "Client.h"
 
+namespace tcp
+{
+namespace client
+{
+
 /**
  * The GPSDClient class, extends and implements Client.
  *
@@ -56,7 +61,7 @@ public:
      */
     GPSDClient(boost::asio::signal_set& /*r_sigset*/,
                const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-               Feed& /*r_feed*/);
+               vfrb::Feed& /*r_feed*/);
     /**
      * Destructor
      *
@@ -111,5 +116,8 @@ private:
     void handleWatch(const boost::system::error_code& /*cr_ec*/,
                      std::size_t /*s*/) noexcept;
 };
+
+}  // namespace client
+}  // namespace tcp
 
 #endif /* SRC_TCP_CLIENT_GPSDCLIENT_H_ */

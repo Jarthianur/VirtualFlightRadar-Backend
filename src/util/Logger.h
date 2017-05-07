@@ -25,6 +25,9 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
+namespace util
+{
+
 /**
  * The Logger class.
  *
@@ -94,5 +97,7 @@ private:
      */
     static const std::string getTime();
 };
+
+}  // namespace util
 
 #endif /* SRC_UTIL_LOGGER_H_ */

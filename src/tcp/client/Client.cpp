@@ -28,9 +28,16 @@
 #include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
+using namespace util;
+
+namespace tcp
+{
+namespace client
+{
+
 Client::Client(boost::asio::signal_set& r_sigset, const std::string& cr_host,
                const std::string& cr_port, const std::string& cr_comp,
-               Feed& r_feed)
+               vfrb::Feed& r_feed)
         : mIOservice(),
           mrSigSet(r_sigset),
           mSocket(mIOservice),
@@ -109,8 +116,8 @@ void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
 }
 
 void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t s)
-        noexcept
-        {
+noexcept
+{
     if (!cr_ec)
     {
         std::istream is(&mBuffer);
@@ -126,3 +133,6 @@ void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t s)
         }
     }
 }
+
+}  // namespace client
+}  // namespace tcp

@@ -27,6 +27,9 @@
 #include "../util/Priority.h"
 #include "Data.hpp"
 
+namespace data
+{
+
 /// ICAO standard atmospheric pressure at MSL
 #define ICAO_STD_A 1013.25
 /// ICAO standard temperature at MSL
@@ -67,7 +70,7 @@ public:
      * @param prio the Priority attempting to write
      * @param cr_wv the new WIMWV sentence to write
      */
-    void setWVstr(Priority /*prio*/, const std::string& /*cr_wv*/);
+    void setWVstr(util::Priority /*prio*/, const std::string& /*cr_wv*/);
     /**
      * Get the last registered pressure.
      *
@@ -81,7 +84,7 @@ public:
      * @param prio the Priority attempting to write
      * @param p the new pressure
      */
-    void setPress(Priority /*prio*/, double /*p*/);
+    void setPress(util::Priority /*prio*/, double /*p*/);
 
 private:
     /// Data holding pressure
@@ -89,5 +92,7 @@ private:
     /// TmpData holding WIMWV sentence
     struct TmpData<std::string> mWV;
 };
+
+} // namespace data
 
 #endif /* SRC_DATA_SENSORDATA_H_ */

@@ -28,7 +28,15 @@
 #include <string>
 #include "../../config/Parameters.h"
 
+namespace vfrb
+{
 class Feed;
+}
+
+namespace tcp
+{
+namespace client
+{
 
 /// Wait for (re-)connect timeout
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
@@ -80,7 +88,7 @@ protected:
      */
     Client(boost::asio::signal_set& /*r_sigset*/,
            const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-           const std::string& /*cr_comp*/, Feed& /*r_feed*/);
+           const std::string& /*cr_comp*/, vfrb::Feed& /*r_feed*/);
     /**
      * Register stop-handler to signals.
      */
@@ -166,11 +174,14 @@ protected:
     /// Component string used for logging
     const std::string mComponent;
     /// Handler Feed reference
-    Feed& mrFeed;
+    vfrb::Feed& mrFeed;
 
 private:
     /// Connection timer
     boost::asio::deadline_timer mConnectTimer;
 };
+
+}  // namespace client
+}  // namespace tcp
 
 #endif /* SRC_TCP_CLIENT_CLIENT_H_ */

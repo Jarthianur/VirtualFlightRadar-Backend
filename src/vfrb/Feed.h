@@ -32,8 +32,20 @@
 
 #include "../util/Priority.h"
 
+namespace parser
+{
 class Parser;
+}
+namespace tcp
+{
+namespace client
+{
 class Client;
+}
+}
+
+namespace vfrb
+{
 
 /**
  * The Feed class.
@@ -72,7 +84,8 @@ public:
      * @param type     the InputType
      * @param cr_kvmap the properties map
      */
-    Feed(const std::string& /*cr_name*/, Priority /*prio*/, InputType /*type*/,
+    Feed(const std::string& /*cr_name*/, util::Priority /*prio*/,
+         InputType /*type*/,
          const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
     /**
      * Destructor
@@ -113,7 +126,7 @@ public:
     /// Unique name
     const std::string mName;
     /// Priority to write data
-    const Priority mPriority;
+    const util::Priority mPriority;
     /// Type
     const InputType mType;
 
@@ -121,9 +134,11 @@ private:
     /// Key-value-map holding the properties.
     std::unordered_map<std::string, std::string> mKVmap;
     /// Client, later resolved according to InpuType
-    std::unique_ptr<Client> mpClient;
+    std::unique_ptr<tcp::client::Client> mpClient;
     /// Parser, later resolved according to InpuType
-    std::unique_ptr<Parser> mpParser;
+    std::unique_ptr<parser::Parser> mpParser;
 };
+
+}  // namespace vfrb
 
 #endif /* SRC_VFRB_FEED_H_ */

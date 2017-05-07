@@ -28,9 +28,16 @@
 #include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
+using namespace util;
+
+namespace tcp
+{
+namespace client
+{
+
 SensorClient::SensorClient(boost::asio::signal_set& r_sigset,
                            const std::string& cr_host,
-                           const std::string& cr_port, Feed& r_feed)
+                           const std::string& cr_port, vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(WindClient)", r_feed),
           mStopped(false),
           mTimeout(mIOservice)
@@ -93,8 +100,8 @@ void SensorClient::stop() noexcept
 
 void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
                                  boost::asio::ip::tcp::resolver::iterator it)
-                                         noexcept
-                                         {
+                                 noexcept
+                                 {
     if (mStopped)
     {
         return;
@@ -118,8 +125,8 @@ void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
 
 void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
                                  boost::asio::ip::tcp::resolver::iterator it)
-                                         noexcept
-                                         {
+                                 noexcept
+                                 {
     if (mStopped)
     {
         return;
@@ -139,3 +146,6 @@ void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
         timedConnect();
     }
 }
+
+}  // namespace client
+}  // namespace tcp

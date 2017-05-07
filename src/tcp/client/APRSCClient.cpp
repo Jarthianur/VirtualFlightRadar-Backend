@@ -29,9 +29,16 @@
 #include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
+using namespace util;
+
+namespace tcp
+{
+namespace client
+{
+
 APRSCClient::APRSCClient(boost::asio::signal_set& r_sigset,
                          const std::string& cr_host, const std::string& cr_port,
-                         const std::string& cr_login, Feed& r_feed)
+                         const std::string& cr_login, vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(APRSCClient)", r_feed),
           mLoginStr(cr_login)
 {
@@ -60,8 +67,8 @@ void APRSCClient::process() noexcept
 
 void APRSCClient::handleResolve(const boost::system::error_code& cr_ec,
                                 boost::asio::ip::tcp::resolver::iterator it)
-                                        noexcept
-                                        {
+                                noexcept
+                                {
     if (!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
@@ -81,8 +88,8 @@ void APRSCClient::handleResolve(const boost::system::error_code& cr_ec,
 
 void APRSCClient::handleConnect(const boost::system::error_code& cr_ec,
                                 boost::asio::ip::tcp::resolver::iterator it)
-                                        noexcept
-                                        {
+                                noexcept
+                                {
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
@@ -113,3 +120,6 @@ void APRSCClient::handleLogin(const boost::system::error_code& cr_ec,
         Logger::error("(APRSCClient) send login: ", cr_ec.message());
     }
 }
+
+}  // namespace client
+}  // namespace tcp

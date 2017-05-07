@@ -26,8 +26,11 @@
 #include <cstdio>
 #include <ctime>
 
-#include "../data/Position.hpp"
+#include "../util/Position.hpp"
 #include "Math.hpp"
+
+namespace util
+{
 
 GPSmodule::GPSmodule()
 {
@@ -58,7 +61,7 @@ std::string GPSmodule::ggafix(const struct ExtGPSPosition& cr_pos)
             utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, lat_str,
             long_deg, long_min, long_str, /*pos.fixQa,*/cr_pos.nrSats,
             cr_pos.position.altitude, cr_pos.geoid);
-    csum = Math::checksum(mBuffer, sizeof(mBuffer));
+    csum = util::math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
     std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(mBuffer);
@@ -86,10 +89,12 @@ std::string GPSmodule::rmcfix(const struct ExtGPSPosition& cr_pos)
             utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, lat_str,
             long_deg, long_min, long_str, utc->tm_mday, utc->tm_mon + 1,
             utc->tm_year - 100);
-    csum = Math::checksum(mBuffer, sizeof(mBuffer));
+    csum = util::math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
     std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
     nmea_str.append(mBuffer);
 
     return nmea_str;
 }
+
+}  // namespace util

@@ -28,7 +28,10 @@
 #include "../util/GPSmodule.h"
 #include "../util/Priority.h"
 #include "Data.hpp"
-#include "Position.hpp"
+#include "../util/Position.hpp"
+
+namespace data
+{
 
 /**
  * The GPSData class.
@@ -77,13 +80,14 @@ public:
      * @param prio  the Priority attempting to write
      * @param cr_pos the new position
      */
-    void setBasePos(Priority /*prio*/, const struct ExtGPSPosition& /*cr_pos*/);
+    void setBasePos(util::Priority /*prio*/,
+                    const struct util::ExtGPSPosition& /*cr_pos*/);
     /**
      * Get the last registered GPS position.
      *
      * @return the position
      */
-    struct ExtGPSPosition getBasePos();
+    struct util::ExtGPSPosition getBasePos();
     /**
      * Get the base positions latitude.
      *
@@ -107,11 +111,13 @@ private:
     /*std::string getGGAstr();
      std::string getRMCstr();*/
     /// Data holding the base position.
-    struct Data<struct ExtGPSPosition> mBasePos;
+    struct Data<struct util::ExtGPSPosition> mBasePos;
     /*struct TmpData<std::string> mGGAstr;
      struct TmpData<std::string> mRMCstr;*/
     /// GPSmodule providing functionality to build GPS sentences.
-    GPSmodule mGPSfix;
+    util::GPSmodule mGPSfix;
 };
+
+}  // namespace data
 
 #endif /* SRC_DATA_GPSDATA_H_ */

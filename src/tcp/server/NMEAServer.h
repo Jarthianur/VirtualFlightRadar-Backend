@@ -32,6 +32,11 @@
 #include "Connection.h"
 #include "../../config/Parameters.h"
 
+namespace tcp
+{
+namespace server
+{
+
 #define S_MAX_CLIENTS SERVER_MAX_CLIENTS
 
 /**
@@ -110,5 +115,8 @@ private:
     /// Vector holding Connections
     std::vector<boost::shared_ptr<Connection>> mClients;
 };
+
+}  // namespace server
+}  // namespace tcp
 
 #endif /* SRC_TCP_SERVER_NMEASERVER_H_ */

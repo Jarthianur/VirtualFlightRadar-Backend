@@ -29,9 +29,16 @@
 #include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
+using namespace util;
+
+namespace tcp
+{
+namespace client
+{
+
 SBSClient::SBSClient(boost::asio::signal_set& r_sigset,
                      const std::string& cr_host, const std::string& cr_port,
-                     Feed& r_feed)
+                     vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(SBSClient)", r_feed)
 {
     connect();
@@ -58,8 +65,8 @@ void SBSClient::process() noexcept
 
 void SBSClient::handleResolve(const boost::system::error_code& cr_ec,
                               boost::asio::ip::tcp::resolver::iterator it)
-                                      noexcept
-                                      {
+                              noexcept
+                              {
     if (!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
@@ -79,8 +86,8 @@ void SBSClient::handleResolve(const boost::system::error_code& cr_ec,
 
 void SBSClient::handleConnect(const boost::system::error_code& cr_ec,
                               boost::asio::ip::tcp::resolver::iterator it)
-                                      noexcept
-                                      {
+                              noexcept
+                              {
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
@@ -96,3 +103,6 @@ void SBSClient::handleConnect(const boost::system::error_code& cr_ec,
         timedConnect();
     }
 }
+
+}  // namespace client
+}  // namespace tcp

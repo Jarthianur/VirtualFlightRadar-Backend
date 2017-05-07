@@ -39,12 +39,17 @@
 #include "../tcp/server/NMEAServer.h"
 #include "../util/Logger.h"
 
+using namespace util;
+
+namespace vfrb
+{
+
 #define SYNC_TIME (1)
 
 std::atomic<bool> VFRB::global_run_status(true);
-AircraftContainer VFRB::msAcCont;
-SensorData VFRB::msSensorData;
-GPSData VFRB::msGPSdata;
+data::AircraftContainer VFRB::msAcCont;
+data::SensorData VFRB::msSensorData;
+data::GPSData VFRB::msGPSdata;
 
 VFRB::VFRB()
 {
@@ -81,14 +86,15 @@ void VFRB::run() noexcept
     });
 
     // init server and run handler
-    NMEAServer server(signal_set, Configuration::global_server_port);
+    tcp::server::NMEAServer server(signal_set,
+            config::Configuration::global_server_port);
     boost::thread server_thread(
             boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
 
     //init input threads
     boost::thread_group threads;
-    for (auto it = Configuration::global_feeds.begin();
-            it != Configuration::global_feeds.end(); ++it)
+    for (auto it = config::Configuration::global_feeds.begin();
+            it != config::Configuration::global_feeds.end(); ++it)
     {
         threads.create_thread(
                 boost::bind(&VFRB::handleInputFeed, std::ref(signal_set),
@@ -150,10 +156,10 @@ void VFRB::run() noexcept
 
 }
 
-void VFRB::handleNMAEServer(NMEAServer& r_server)
+void VFRB::handleNMAEServer(tcp::server::NMEAServer& r_server)
 {
     Logger::info("(NMEAServer) startup: localhost ",
-            std::to_string(Configuration::global_server_port));
+            std::to_string(config::Configuration::global_server_port));
     r_server.run();
     global_run_status = false;
 }
@@ -169,3 +175,5 @@ void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)
     Logger::info("(VFRB) caught signal: ", "shutdown");
     global_run_status = false;
 }
+
+}  // namespace vfrb

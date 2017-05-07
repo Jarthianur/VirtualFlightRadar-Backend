@@ -26,7 +26,10 @@
 #include <string>
 
 #include "../util/Priority.h"
-#include "../data/Position.hpp"
+#include "../util/Position.hpp"
+
+namespace aircraft
+{
 
 #define A_VALUE_NA -1024.0
 
@@ -47,7 +50,7 @@ public:
      * @param r_id  the ID
      * @param r_pos the position
      */
-    Aircraft(std::string& /*r_id*/, struct GPSPosition& /*r_pos*/);
+    Aircraft(std::string& /*r_id*/, struct util::GPSPosition& /*r_pos*/);
     /**
      * Construct an aircraft with a full
      * set of information, as are the ID,
@@ -62,7 +65,7 @@ public:
      * @param turn_r  the turn rate
      * @param head    the heading
      */
-    Aircraft(std::string& /*r_id*/, struct GPSPosition& /*r_pos*/,
+    Aircraft(std::string& /*r_id*/, struct util::GPSPosition& /*r_pos*/,
              double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
              double /*climb_r*/, double /*turn_r*/, double /*head*/);
     /**
@@ -98,7 +101,7 @@ public:
      * @param cr_ac an aircraft reference holding new information
      * @param prio update from feed with priority
      */
-    void update(const Aircraft& /*cr_ac*/, Priority /*prio*/);
+    void update(const Aircraft& /*cr_ac*/, util::Priority /*prio*/);
     /**
      * Get the ID.
      *
@@ -158,7 +161,7 @@ public:
      *
      * @return last priority
      */
-    inline const Priority getLastPriority() const
+    inline const util::Priority getLastPriority() const
     {
         return mLastPriority;
     }
@@ -276,11 +279,11 @@ private:
     /// Times processed without update.
     std::uint32_t mUpdateAge = 0;
     /// Got last update with which priority.
-    Priority mLastPriority = Priority::DONTCARE;
+    util::Priority mLastPriority = util::Priority::DONTCARE;
     /// Is an update attempt valid? If false, updates are only allowed with at least last priority.
     bool mAttemptValid = true;
 /// Last registered position.
-    struct GPSPosition mPosition;
+    struct util::GPSPosition mPosition;
     /// Speed over ground; m/s
     double mGndSpeed = A_VALUE_NA;
     /// Heading; deg [0-359]
@@ -290,5 +293,7 @@ private:
     /* deg/s
      double mTurnRate = A_VALUE_NA;*/
 };
+
+}  // namespace aircraft
 
 #endif /* SRC_AIRCRAFT_AIRCRAFT_H_ */

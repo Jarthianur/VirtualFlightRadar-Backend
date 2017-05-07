@@ -28,6 +28,11 @@
 
 #include "../util/Logger.h"
 
+using namespace util;
+
+namespace config
+{
+
 ConfigReader::ConfigReader(const std::string& cr_fname)
         : mFile(cr_fname),
           mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
@@ -126,3 +131,5 @@ const std::unordered_map<std::string, std::string>& ConfigReader::getSectionKV(
         throw std::out_of_range("section not found");
     }
 }
+
+}  // namespace config

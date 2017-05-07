@@ -26,10 +26,12 @@
 #include <cmath>
 #include <cstddef>
 
+namespace util
+{
 /**
  * Provide several functions and constants under this namespace Math.
  */
-namespace Math
+namespace math
 {
 /// Unit conversion constants
 const double KTS_2_KMH = 1.852;
@@ -130,6 +132,7 @@ inline std::int32_t checksum(const char* sentence, std::size_t size)
     return csum;
 }
 
-}
+}  // namespace math
+}  // namespace util
 
 #endif /* SRC_UTIL_MATH_H_ */

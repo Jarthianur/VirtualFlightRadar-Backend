@@ -19,10 +19,13 @@
  }
  */
 
-#ifndef DATA_POSITION_HPP_
-#define DATA_POSITION_HPP_
+#ifndef UTIL_POSITION_HPP_
+#define UTIL_POSITION_HPP_
 
 #include <cstdint>
+
+namespace util
+{
 
 /**
  * GPS position structure.
@@ -56,4 +59,6 @@ struct ExtGPSPosition
     double geoid;
 };
 
-#endif /* DATA_POSITION_HPP_ */
+}  // namespace util
+
+#endif /* UTIL_POSITION_HPP_ */

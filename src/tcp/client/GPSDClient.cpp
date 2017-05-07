@@ -28,9 +28,16 @@
 #include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
+using namespace util;
+
+namespace tcp
+{
+namespace client
+{
+
 GPSDClient::GPSDClient(boost::asio::signal_set& r_sigset,
                        const std::string& cr_host, const std::string& cr_port,
-                       Feed& r_feed)
+                       vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(GPSDClient)", r_feed)
 {
     connect();
@@ -52,7 +59,7 @@ void GPSDClient::connect() noexcept
 
 void GPSDClient::process() noexcept
 {
-    if (mrFeed.process(mResponse) > 0 && Configuration::global_gnd_mode)
+    if (mrFeed.process(mResponse) > 0 && config::Configuration::global_gnd_mode)
     {
         Logger::info("(GPSDClient) received good position -> stop");
         stop();
@@ -61,8 +68,8 @@ void GPSDClient::process() noexcept
 
 void GPSDClient::handleResolve(const boost::system::error_code& cr_ec,
                                boost::asio::ip::tcp::resolver::iterator it)
-                                       noexcept
-                                       {
+                               noexcept
+                               {
     if (!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
@@ -82,8 +89,8 @@ void GPSDClient::handleResolve(const boost::system::error_code& cr_ec,
 
 void GPSDClient::handleConnect(const boost::system::error_code& cr_ec,
                                boost::asio::ip::tcp::resolver::iterator it)
-                                       noexcept
-                                       {
+                               noexcept
+                               {
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true)); // necessary?
@@ -137,3 +144,6 @@ void GPSDClient::handleWatch(const boost::system::error_code& cr_ec,
         Logger::error("(GPSDClient) send watch request: ", cr_ec.message());
     }
 }
+
+}  // namespace client
+}  // namespace tcp

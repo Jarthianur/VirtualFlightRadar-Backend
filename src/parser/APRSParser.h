@@ -27,7 +27,10 @@
 #include <string>
 
 #include "Parser.h"
-#include "../data/Position.hpp"
+#include "../util/Position.hpp"
+
+namespace parser
+{
 
 /**
  * The APRSParser class, implements Parser.
@@ -52,7 +55,7 @@ public:
      *
      * @overload Parser::unpack
      */
-    std::int32_t unpack(const std::string& /*cr_msg*/, Priority /*prio*/)
+    std::int32_t unpack(const std::string& /*cr_msg*/, util::Priority /*prio*/)
             noexcept override;
 
 private:
@@ -62,11 +65,13 @@ private:
     const boost::regex mCommRE;
     /// Temporary information to reduce allocations
     std::string mtID;
-    struct GPSPosition mtGPSpos;
+    struct util::GPSPosition mtGPSpos;
     std::int32_t mtIDtype = 0, mtAcType = 0, mtTime = 0;
     double mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0, mtHeading =
             0.0;
     bool mtFullInfo = true;
 };
+
+}  // namespace parser
 
 #endif /* SRC_PARSER_APRSPARSER_H_ */
