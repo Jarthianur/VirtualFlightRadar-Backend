@@ -56,21 +56,37 @@ public:
      */
     virtual ~SensorData() noexcept;
     /**
-     * Get WIMWV sentence.
+     * Get MWV sentence.
      * Wind data is invalid after this operation.
      *
-     * @return the WIMWV sentence
+     * @return the MWV sentence, if valid, else empty string
      */
-    std::string getWVstr();
+    std::string getMWVstr();
     /**
-     * Set WIMWV sentence.
+     * Set MWV sentence.
      * Wind data is valid after this operation.
      * May fail due to Priority.
      *
      * @param prio the Priority attempting to write
-     * @param cr_wv the new WIMWV sentence to write
+     * @param cr_mwv the new MWV sentence to write
      */
-    void setWVstr(util::Priority /*prio*/, const std::string& /*cr_wv*/);
+    void setMWVstr(util::Priority /*prio*/, const std::string& /*cr_mwv*/);
+    /**
+     * Get MDA sentence.
+     * Data is invalid after this operation.
+     *
+     * @return the MDA sentence, if valid, else empty string
+     */
+    std::string getMDAstr();
+    /**
+     * Set MDA sentence.
+     * Data is valid after this operation.
+     * May fail due to Priority.
+     *
+     * @param prio the Priority attempting to write
+     * @param cr_mda the new MDA sentence to write
+     */
+    void setMDAstr(util::Priority /*prio*/, const std::string& /*cr_mda*/);
     /**
      * Get the last registered pressure.
      *
@@ -89,8 +105,10 @@ public:
 private:
     /// Data holding pressure
     struct Data<double> mPress;
-    /// TmpData holding WIMWV sentence
-    struct TmpData<std::string> mWV;
+    /// TmpData holding MWV sentence
+    struct TmpData<std::string> mMWV;
+    /// TmpData holding MDA sentence
+    struct TmpData<std::string> mMDA;
 };
 
 } // namespace data

@@ -115,8 +115,8 @@ void VFRB::run() noexcept
             //write GPS position to clients
             server.writeToAll(msGPSdata.getGPSstr());
 
-            // write wind info to clients
-            str = msSensorData.getWVstr();
+            // write weather info to clients
+            str = msSensorData.getMWVstr() + msSensorData.getMDAstr();
             if (str.length() > 0)
             {
                 server.writeToAll(str);

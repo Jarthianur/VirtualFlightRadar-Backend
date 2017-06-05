@@ -118,7 +118,7 @@ void test_parser(TestSuitesRunner& runner)
             })->test<data::SensorData>("extract WIMWV",
             []()
             {
-                assert(vfrb::VFRB::msSensorData.getWVstr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
-                assert(vfrb::VFRB::msSensorData.getWVstr(), std::string(""), helper::eqs);
+                assert(vfrb::VFRB::msSensorData.getMWVstr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
+                assert(vfrb::VFRB::msSensorData.getMWVstr(), std::string(""), helper::eqs);
             });
 }

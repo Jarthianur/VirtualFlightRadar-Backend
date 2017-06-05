@@ -37,22 +37,40 @@ SensorData::~SensorData() noexcept
 {
 }
 
-std::string SensorData::getWVstr()
+std::string SensorData::getMWVstr()
 {
-    boost::lock_guard<boost::mutex> lock(mWV.mutex);
-    if (mWV.valueValid)
+    boost::lock_guard<boost::mutex> lock(mMWV.mutex);
+    if (mMWV.valueValid)
     {
-        return mWV.getValue() + "\r\n";
+        return mMWV.getValue() + "\r\n";
     } else
     {
         return "";
     }
 }
 
-void SensorData::setWVstr(Priority prio, const std::string& cr_wv)
+void SensorData::setMWVstr(Priority prio, const std::string& cr_mwv)
 {
-    boost::lock_guard<boost::mutex> lock(mWV.mutex);
-    mWV.update(cr_wv, prio);
+    boost::lock_guard<boost::mutex> lock(mMWV.mutex);
+    mMWV.update(cr_mwv, prio);
+}
+
+std::string SensorData::getMDAstr()
+{
+    boost::lock_guard<boost::mutex> lock(mMDA.mutex);
+    if (mMDA.valueValid)
+    {
+        return mMWV.getValue() + "\r\n";
+    } else
+    {
+        return "";
+    }
+}
+
+void SensorData::setMDAstr(Priority prio, const std::string& cr_mda)
+{
+    boost::lock_guard<boost::mutex> lock(mMDA.mutex);
+    mMDA.update(cr_mda, prio);
 }
 
 double SensorData::getPress()

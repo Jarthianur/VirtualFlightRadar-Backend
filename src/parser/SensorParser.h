@@ -56,11 +56,6 @@ public:
      */
     std::int32_t unpack(const std::string& /*cr_msg*/, util::Priority /*prio*/)
             noexcept override;
-
-private:
-    /// Temporary data
-    std::size_t mtB = 0, mtS = 0, mtSubLen = 0, mtNumIdx = 0;
-    double mtPress = 0.0;
 };
 
 }  // namespace parser
