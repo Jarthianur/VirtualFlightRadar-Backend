@@ -60,7 +60,7 @@ noexcept
     {
         return MSG_UNPACK_IGN;
     }
-    mtFullInfo = true;
+    bool tmpFullInfo = true;
     boost::smatch match;
     if (boost::regex_match(cr_msg, match, mAprsRE))
     {
@@ -119,7 +119,7 @@ noexcept
                 } catch (const std::logic_error& e)
                 {
                     mtClimbRate = A_VALUE_NA;
-                    mtFullInfo = false;
+                    tmpFullInfo = false;
                 }
                 try
                 {
@@ -127,7 +127,7 @@ noexcept
                 } catch (const std::logic_error& e)
                 {
                     mtTurnRate = A_VALUE_NA;
-                    mtFullInfo = false;
+                    tmpFullInfo = false;
                 }
             } else
             {
@@ -145,7 +145,7 @@ noexcept
         } catch (const std::logic_error& e)
         {
             mtHeading = A_VALUE_NA;
-            mtFullInfo = false;
+            tmpFullInfo = false;
         }
         try
         {
@@ -153,11 +153,11 @@ noexcept
         } catch (const std::logic_error& e)
         {
             mtGndSpeed = A_VALUE_NA;
-            mtFullInfo = false;
+            tmpFullInfo = false;
         }
         aircraft::Aircraft ac(mtID, mtGPSpos, mtGndSpeed, mtIDtype, mtAcType,
                 mtClimbRate, mtTurnRate, mtHeading);
-        ac.setFullInfo(mtFullInfo);
+        ac.setFullInfo(tmpFullInfo);
         ac.setTargetT(aircraft::Aircraft::TargetType::FLARM);
         vfrb::VFRB::msAcCont.insertAircraft(ac, prio);
     } else

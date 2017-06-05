@@ -47,8 +47,8 @@ SBSParser::~SBSParser() noexcept
 }
 
 std::int32_t SBSParser::unpack(const std::string& cr_msg, Priority prio)
-        noexcept
-        {
+noexcept
+{
     /*
      * fields:
      * 4 : id
@@ -79,23 +79,23 @@ std::int32_t SBSParser::unpack(const std::string& cr_msg, Priority prio)
                     return MSG_UNPACK_IGN;
                 }
             break;
-            case 7:
-                try
-                {
-                    if (delim - p > 7)
-                    {
-                        mtTime = std::stoi(cr_msg.substr(p, 2)) * 10000;
-                        mtTime += std::stoi(cr_msg.substr(p + 3, 2)) * 100;
-                        mtTime += std::stoi(cr_msg.substr(p + 6, 2));
-                    } else
-                    {
-                        return MSG_UNPACK_IGN;
-                    }
-                } catch (const std::logic_error& e)
-                {
-                    return MSG_UNPACK_ERR;
-                }
-            break;
+                /*case 7:
+                 try
+                 {
+                 if (delim - p > 7)
+                 {
+                 mtTime = std::stoi(cr_msg.substr(p, 2)) * 10000;
+                 mtTime += std::stoi(cr_msg.substr(p + 3, 2)) * 100;
+                 mtTime += std::stoi(cr_msg.substr(p + 6, 2));
+                 } else
+                 {
+                 return MSG_UNPACK_IGN;
+                 }
+                 } catch (const std::logic_error& e)
+                 {
+                 return MSG_UNPACK_ERR;
+                 }
+                 break;*/
             case 11:
                 try
                 {

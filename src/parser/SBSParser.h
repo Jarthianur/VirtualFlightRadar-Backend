@@ -61,7 +61,7 @@ private:
     /// Temporary data
     std::string mtID;
     struct util::GPSPosition mtGPSpos;
-    std::int32_t mtTime = 0;
+    //std::int32_t mtTime = 0;
 };
 
 }  // namespace parser

@@ -71,8 +71,6 @@ public:
      * @return the NMEA sentences in string
      */
     std::string getGPSstr();
-    /*void setGGAstr(Priority / *prio* /, const std::string& / *gga* /);
-     void setRMCstr(Priority / *prio* /, const std::string& / *rmc* /);*/
     /**
      * Set the new base position.
      * May fail due to Priority.
@@ -108,12 +106,8 @@ public:
     std::int32_t getBaseAlt();
 
 private:
-    /*std::string getGGAstr();
-     std::string getRMCstr();*/
     /// Data holding the base position.
     struct Data<struct util::ExtGPSPosition> mBasePos;
-    /*struct TmpData<std::string> mGGAstr;
-     struct TmpData<std::string> mRMCstr;*/
     /// GPSmodule providing functionality to build GPS sentences.
     util::GPSmodule mGPSfix;
 };

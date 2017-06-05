@@ -52,8 +52,8 @@ GPSParser::~GPSParser() noexcept
 }
 
 std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio)
-        noexcept
-        {
+noexcept
+{
     try
     {
         std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),
@@ -104,8 +104,6 @@ std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio)
         {
             return MSG_UNPACK_ERR;
         }
-
-        /*VFRB::msGPSdata.setGGAstr(prio, msg);*/
         vfrb::VFRB::msGPSdata.setBasePos(prio, mtGPSpos);
 
         if (mtGPSpos.nrSats >= GPS_NR_SATS_GOOD && mtGPSpos.fixQa
@@ -114,10 +112,7 @@ std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio)
         {
             return GPS_ASSUME_GOOD;
         }
-    }/*else if (msg.find("RMC") != std::string::npos)
-     {
-     VFRB::msGPSdata.setRMCstr(prio, msg);
-     }*/else
+    } else
     {
         return MSG_UNPACK_IGN;
     }
