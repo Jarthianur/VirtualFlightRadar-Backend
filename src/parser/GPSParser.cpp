@@ -26,10 +26,7 @@
 
 #include "../data/GPSData.h"
 #include "../util/Math.hpp"
-#include "../util/Priority.h"
 #include "../vfrb/VFRB.h"
-
-using namespace util;
 
 namespace parser
 {
@@ -51,7 +48,7 @@ GPSParser::~GPSParser() noexcept
 {
 }
 
-std::int32_t GPSParser::unpack(const std::string& cr_msg, Priority prio)
+std::int32_t GPSParser::unpack(const std::string& cr_msg, std::int32_t prio)
 noexcept
 {
     try

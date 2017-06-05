@@ -27,8 +27,6 @@
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
 
-using namespace util;
-
 namespace parser
 {
 
@@ -41,7 +39,7 @@ SensorParser::~SensorParser() noexcept
 {
 }
 
-std::int32_t SensorParser::unpack(const std::string& cr_msg, Priority prio)
+std::int32_t SensorParser::unpack(const std::string& cr_msg, std::int32_t prio)
 noexcept
 {
     try

@@ -55,7 +55,7 @@ public:
      *
      * @overload Parser::unpack
      */
-    std::int32_t unpack(const std::string& /*cr_msg*/, util::Priority /*prio*/)
+    std::int32_t unpack(const std::string& /*cr_msg*/, std::int32_t /*prio*/)
             noexcept override;
 
 private:

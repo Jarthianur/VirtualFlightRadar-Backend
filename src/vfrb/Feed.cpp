@@ -41,7 +41,7 @@ using namespace util;
 namespace vfrb
 {
 
-Feed::Feed(const std::string& cr_name, Priority prio, InputType type,
+Feed::Feed(const std::string& cr_name, std::int32_t prio, InputType type,
            const std::unordered_map<std::string, std::string>& cr_kvmap)
         : mName(cr_name),
           mPriority(prio),

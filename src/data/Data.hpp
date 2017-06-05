@@ -26,8 +26,6 @@
 #include <cstdint>
 #include <string>
 
-#include "../util/Priority.h"
-
 namespace data
 {
 
@@ -45,32 +43,31 @@ struct Data
     T value;
     /// Is wrtite attempt valid?
     bool attemptValid;
-    /// Last written Priority
-    util::Priority lastPriority;
+    /// Last written priority
+    std::int32_t lastPriority;
     /// Mutex to enable threadsafety per Data.
     boost::mutex mutex;
     /**
      * Update the value.
-     * May fail due to Priority.
+     * May fail due to priority.
      * Updates always if attempt is valid.
      *
-     * @param cr_nv   the new value
-     * @param prio the Priority attempting to write
+     * @param cr_nv the new value
+     * @param prio  the priority attempting to write
      */
-    void update(const T& cr_nv, util::Priority prio)
+    void update(const T& cr_nv, std::int32_t prio)
     {
         bool write = attemptValid;
         if (!write)
         {
-            if (prio > lastPriority || (prio == lastPriority
-                    && prio != util::Priority::LESSER))
+            if (prio >= lastPriority)
             {
                 write = true;
             }
         }
         if (write)
         {
-            attemptValid = (prio == util::Priority::LESSER);
+            attemptValid = false;
             value = cr_nv;
             lastPriority = prio;
         } else
@@ -96,8 +93,8 @@ struct TmpData
     bool attemptValid;
     /// Is the value valid?
     bool valueValid;
-    /// Last written Priority
-    util::Priority lastPriority;
+    /// Last written priority
+    std::int32_t lastPriority;
     /// Mutex to enable threadsafety per TmpData.
     boost::mutex mutex;
     /**
@@ -112,27 +109,26 @@ struct TmpData
     }
     /**
      * Update the value.
-     * May fail due to Priority.
+     * May fail due to priority.
      * Updates always if attempt is valid.
      * Validates the value.
      *
-     * @param cr_nv   the new value
-     * @param prio the Priority attempting to write
+     * @param cr_nv the new value
+     * @param prio  the priority attempting to write
      */
-    void update(const T& cr_nv, util::Priority prio)
+    void update(const T& cr_nv, std::int32_t prio)
     {
         bool write = attemptValid;
         if (!write)
         {
-            if (prio > lastPriority || (prio == lastPriority
-                    && prio != util::Priority::LESSER))
+            if (prio >= lastPriority)
             {
                 write = true;
             }
         }
         if (write)
         {
-            attemptValid = (prio == util::Priority::LESSER);
+            attemptValid = false;
             value = cr_nv;
             lastPriority = prio;
             valueValid = true;

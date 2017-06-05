@@ -25,8 +25,6 @@
 #include <cstdint>
 #include <string>
 
-#include "../util/Priority.h"
-
 namespace parser
 {
 
@@ -56,15 +54,15 @@ public:
     /**
      * Unpack given string.
      * Where to put unpacked data is handled by implementation,
-     * as well as Priority pass-through.
+     * as well as priority pass-through.
      *
      * @param cr_msg the msg to unpack
-     * @param prio  the Priority to pass
+     * @param prio  the priority to pass
      *
      * @return an error code
      */
     virtual std::int32_t unpack(const std::string& /*cr_msg*/,
-                                util::Priority /*prio*/) noexcept = 0;
+                                std::int32_t /*prio*/) noexcept = 0;
 };
 
 }  // namespace parser

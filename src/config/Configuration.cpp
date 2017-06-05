@@ -30,7 +30,6 @@
 #include <unordered_map>
 
 #include "../util/Logger.h"
-#include "../util/Priority.h"
 using namespace util;
 
 namespace config
@@ -154,8 +153,6 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         feeds.push_back(item);
     }
 
-    std::string prio_dc = std::to_string((std::uint32_t) Priority::DONTCARE);
-
     for (auto it = feeds.cbegin(); it != feeds.cend(); ++it)
     {
         if (it->find(SECT_KEY_APRSC) != std::string::npos)
@@ -163,10 +160,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             try
             {
                 vfrb::Feed f(*it,
-                        aliasPriority(
-                                r_cr.getProperty(*it, KV_KEY_PRIORITY,
-                                        prio_dc)), vfrb::Feed::InputType::APRSC,
-                        r_cr.getSectionKV(*it));
+                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
+                        vfrb::Feed::InputType::APRSC, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -177,10 +172,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             try
             {
                 vfrb::Feed f(*it,
-                        aliasPriority(
-                                r_cr.getProperty(*it, KV_KEY_PRIORITY,
-                                        prio_dc)), vfrb::Feed::InputType::SBS,
-                        r_cr.getSectionKV(*it));
+                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
+                        vfrb::Feed::InputType::SBS, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -191,9 +184,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             try
             {
                 vfrb::Feed f(*it,
-                        aliasPriority(
-                                r_cr.getProperty(*it, KV_KEY_PRIORITY,
-                                        prio_dc)),
+                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
                         vfrb::Feed::InputType::SENSOR, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
@@ -205,10 +196,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             try
             {
                 vfrb::Feed f(*it,
-                        aliasPriority(
-                                r_cr.getProperty(*it, KV_KEY_PRIORITY,
-                                        prio_dc)), vfrb::Feed::InputType::GPS,
-                        r_cr.getSectionKV(*it));
+                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
+                        vfrb::Feed::InputType::GPS, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -243,33 +232,6 @@ double Configuration::strToDouble(const std::string& cr_str) noexcept
                 cr_str.length() == 0 ? "empty" : cr_str);
     }
     return 0.0;
-}
-
-Priority Configuration::aliasPriority(const std::string& cr_str) noexcept
-{
-    Priority prio = Priority::DONTCARE;
-    try
-    {
-        prio = (Priority) std::stoul(cr_str);
-    } catch (...)
-    {
-    }
-    if (prio == Priority::NORMAL || cr_str.find(PRIO_ALIAS_NORMAL)
-            != std::string::npos)
-    {
-        return Priority::NORMAL;
-    } else if (prio == Priority::HIGHER
-            || cr_str.find(PRIO_ALIAS_HIGHER) != std::string::npos)
-    {
-        return Priority::HIGHER;
-    } else if (prio == Priority::LESSER
-            || cr_str.find(PRIO_ALIAS_LESSER) != std::string::npos)
-    {
-        return Priority::LESSER;
-    } else
-    {
-        return Priority::DONTCARE;
-    }
 }
 
 }  // namespace config

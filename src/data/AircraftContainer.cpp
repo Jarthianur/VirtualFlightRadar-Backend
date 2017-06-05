@@ -111,9 +111,9 @@ std::string AircraftContainer::processAircrafts() noexcept
     return dest_str;
 }
 
-void AircraftContainer::insertAircraft(const Aircraft& cr_update, Priority prio)
-noexcept
-{
+void AircraftContainer::insertAircraft(const Aircraft& cr_update,
+                                       std::int32_t prio) noexcept
+                                       {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     auto known_ac = find(cr_update.getID());
     if (known_ac != mCont.end())
@@ -124,9 +124,7 @@ noexcept
             bool write = known_ac->isAttemptValid();
             if (!write)
             {
-                if (prio > known_ac->getLastPriority() || (prio
-                        == known_ac->getLastPriority()
-                                                           && prio != Priority::LESSER))
+                if (prio >= known_ac->getLastPriority())
                 {
                     write = true;
                 }

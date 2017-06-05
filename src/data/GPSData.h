@@ -26,7 +26,6 @@
 #include <string>
 
 #include "../util/GPSmodule.h"
-#include "../util/Priority.h"
 #include "Data.hpp"
 #include "../util/Position.hpp"
 
@@ -73,12 +72,12 @@ public:
     std::string getGPSstr();
     /**
      * Set the new base position.
-     * May fail due to Priority.
+     * May fail due to priority.
      *
-     * @param prio  the Priority attempting to write
+     * @param prio   the priority attempting to write
      * @param cr_pos the new position
      */
-    void setBasePos(util::Priority /*prio*/,
+    void setBasePos(std::int32_t /*prio*/,
                     const struct util::ExtGPSPosition& /*cr_pos*/);
     /**
      * Get the last registered GPS position.

@@ -30,8 +30,6 @@
 #include <typeindex>
 #include <unordered_map>
 
-#include "../util/Priority.h"
-
 namespace parser
 {
 class Parser;
@@ -84,7 +82,7 @@ public:
      * @param type     the InputType
      * @param cr_kvmap the properties map
      */
-    Feed(const std::string& /*cr_name*/, util::Priority /*prio*/,
+    Feed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
          InputType /*type*/,
          const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
     /**
@@ -126,7 +124,7 @@ public:
     /// Unique name
     const std::string mName;
     /// Priority to write data
-    const util::Priority mPriority;
+    const std::int32_t mPriority;
     /// Type
     const InputType mType;
 

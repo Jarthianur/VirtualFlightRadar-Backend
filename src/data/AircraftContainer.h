@@ -30,7 +30,6 @@
 #include <vector>
 
 #include "../aircraft/AircraftProcessor.h"
-#include "../util/Priority.h"
 #include "../config/Parameters.h"
 
 namespace aircraft
@@ -68,15 +67,15 @@ public:
     /**
      * Insert an Aircraft into container.
      * Handles FLARM preferation.
-     * May fail due to Priority.
+     * May fail due to priority.
      *
      * @param cr_update the Aircraft update
-     * @param prio the Priority attempting to write
+     * @param prio the priority attempting to write
      *
      * @exceptsafe strong
      */
     void insertAircraft(const aircraft::Aircraft& /*cr_update*/,
-                        util::Priority /*prio*/) noexcept;
+                        std::int32_t /*prio*/) noexcept;
     /**
      * Process all aircrafts into NMEA sentences PFLAU and PFLAA.
      * Aircrafts with too old information are not reported, later deleted.

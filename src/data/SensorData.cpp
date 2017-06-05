@@ -23,8 +23,6 @@
 
 #include <boost/thread/lock_guard.hpp>
 
-using namespace util;
-
 namespace data
 {
 
@@ -49,7 +47,7 @@ std::string SensorData::getMWVstr()
     }
 }
 
-void SensorData::setMWVstr(Priority prio, const std::string& cr_mwv)
+void SensorData::setMWVstr(std::int32_t prio, const std::string& cr_mwv)
 {
     boost::lock_guard<boost::mutex> lock(mMWV.mutex);
     mMWV.update(cr_mwv, prio);
@@ -60,14 +58,14 @@ std::string SensorData::getMDAstr()
     boost::lock_guard<boost::mutex> lock(mMDA.mutex);
     if (mMDA.valueValid)
     {
-        return mMWV.getValue() + "\r\n";
+        return mMDA.getValue() + "\r\n";
     } else
     {
         return "";
     }
 }
 
-void SensorData::setMDAstr(Priority prio, const std::string& cr_mda)
+void SensorData::setMDAstr(std::int32_t prio, const std::string& cr_mda)
 {
     boost::lock_guard<boost::mutex> lock(mMDA.mutex);
     mMDA.update(cr_mda, prio);
@@ -79,7 +77,7 @@ double SensorData::getPress()
     return mPress.value;
 }
 
-void SensorData::setPress(Priority prio, double p)
+void SensorData::setPress(std::int32_t prio, double p)
 {
     boost::lock_guard<boost::mutex> lock(mPress.mutex);
     mPress.update(p, prio);

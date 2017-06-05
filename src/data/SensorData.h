@@ -23,8 +23,6 @@
 #define SRC_DATA_SENSORDATA_H_
 
 #include <string>
-
-#include "../util/Priority.h"
 #include "Data.hpp"
 
 namespace data
@@ -65,12 +63,12 @@ public:
     /**
      * Set MWV sentence.
      * Wind data is valid after this operation.
-     * May fail due to Priority.
+     * May fail due to priority.
      *
-     * @param prio the Priority attempting to write
+     * @param prio the priority attempting to write
      * @param cr_mwv the new MWV sentence to write
      */
-    void setMWVstr(util::Priority /*prio*/, const std::string& /*cr_mwv*/);
+    void setMWVstr(std::int32_t /*prio*/, const std::string& /*cr_mwv*/);
     /**
      * Get MDA sentence.
      * Data is invalid after this operation.
@@ -81,12 +79,12 @@ public:
     /**
      * Set MDA sentence.
      * Data is valid after this operation.
-     * May fail due to Priority.
+     * May fail due to priority.
      *
-     * @param prio the Priority attempting to write
+     * @param prio the priority attempting to write
      * @param cr_mda the new MDA sentence to write
      */
-    void setMDAstr(util::Priority /*prio*/, const std::string& /*cr_mda*/);
+    void setMDAstr(std::int32_t /*prio*/, const std::string& /*cr_mda*/);
     /**
      * Get the last registered pressure.
      *
@@ -95,12 +93,12 @@ public:
     double getPress();
     /**
      * Set the new pressure.
-     * May fail due to Priority.
+     * May fail due to priority.
      *
-     * @param prio the Priority attempting to write
+     * @param prio the priority attempting to write
      * @param p the new pressure
      */
-    void setPress(util::Priority /*prio*/, double /*p*/);
+    void setPress(std::int32_t /*prio*/, double /*p*/);
 
 private:
     /// Data holding pressure

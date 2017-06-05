@@ -25,7 +25,6 @@
 #include <cstdint>
 #include <string>
 
-#include "../util/Priority.h"
 #include "../util/Position.hpp"
 
 namespace aircraft
@@ -101,7 +100,7 @@ public:
      * @param cr_ac an aircraft reference holding new information
      * @param prio update from feed with priority
      */
-    void update(const Aircraft& /*cr_ac*/, util::Priority /*prio*/);
+    void update(const Aircraft& /*cr_ac*/, std::int32_t /*prio*/);
     /**
      * Get the ID.
      *
@@ -161,7 +160,7 @@ public:
      *
      * @return last priority
      */
-    inline const util::Priority getLastPriority() const
+    inline const std::int32_t getLastPriority() const
     {
         return mLastPriority;
     }
@@ -279,7 +278,7 @@ private:
     /// Times processed without update.
     std::uint32_t mUpdateAge = 0;
     /// Got last update with which priority.
-    util::Priority mLastPriority = util::Priority::DONTCARE;
+    std::int32_t mLastPriority = 0;
     /// Is an update attempt valid? If false, updates are only allowed with at least last priority.
     bool mAttemptValid = true;
 /// Last registered position.

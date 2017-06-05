@@ -57,11 +57,6 @@ namespace config
 #define KV_KEY_PORT         "port"
 #define KV_KEY_PRIORITY     "priority"
 #define KV_KEY_LOGIN        "login"
-/// Priority aliases
-#define PRIO_ALIAS_DONTCARE "dont"
-#define PRIO_ALIAS_LESSER   "less"
-#define PRIO_ALIAS_NORMAL   "norm"
-#define PRIO_ALIAS_HIGHER   "high"
 
 /**
  * The Configuration class.
@@ -149,17 +144,6 @@ private:
      * @exceptsafe no-throw
      */
     double strToDouble(const std::string& /*cr_str*/) noexcept;
-    /**
-     * Map given priority string to correct Priority.
-     * Alias name if not the number is given.
-     *
-     * @param cr_str the priority string
-     *
-     * @return the aliased Priority
-     *
-     * @exceptsafe no-throw
-     */
-    util::Priority aliasPriority(const std::string& /*cr_str*/) noexcept;
 };
 
 }  // namespace config
