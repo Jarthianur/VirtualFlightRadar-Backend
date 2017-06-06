@@ -38,7 +38,7 @@ namespace client
 SensorClient::SensorClient(boost::asio::signal_set& r_sigset,
                            const std::string& cr_host,
                            const std::string& cr_port, vfrb::Feed& r_feed)
-        : Client(r_sigset, cr_host, cr_port, "(WindClient)", r_feed),
+        : Client(r_sigset, cr_host, cr_port, "(SensorClient)", r_feed),
           mStopped(false),
           mTimeout(mIOservice)
 {
@@ -114,7 +114,7 @@ void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
                         boost::asio::placeholders::iterator));
     } else
     {
-        Logger::error("(WindClient) resolve host: ", cr_ec.message());
+        Logger::error("(SensorClient) resolve host: ", cr_ec.message());
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -134,11 +134,11 @@ void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(WindClient) connected to: ", mHost + ":" + mPort);
+        Logger::info("(SensorClient) connected to: ", mHost + ":" + mPort);
         read();
     } else
     {
-        Logger::error("(WindClient) connect: ", cr_ec.message());
+        Logger::error("(SensorClient) connect: ", cr_ec.message());
         if (mSocket.is_open())
         {
             mSocket.close();
