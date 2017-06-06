@@ -44,6 +44,7 @@ void GPSData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt,
     base.position.altitude = b_alt;
     base.nrSats = 5;
     base.fixQa = 1;
+    base.geoid = geoid;
     setBasePos(0, base);
 }
 
