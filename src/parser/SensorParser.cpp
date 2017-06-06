@@ -80,6 +80,9 @@ noexcept
     } else if (cr_msg.find("MWV") != std::string::npos)
     {
         vfrb::VFRB::msSensorData.setMWVstr(prio, cr_msg);
+    } else if (cr_msg.find("XDR") != std::string::npos)
+    {
+        vfrb::VFRB::msSensorData.setXDRstr(prio, cr_msg);
     } else
     {
         return MSG_UNPACK_IGN;

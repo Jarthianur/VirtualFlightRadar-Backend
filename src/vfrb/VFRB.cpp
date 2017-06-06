@@ -116,7 +116,7 @@ void VFRB::run() noexcept
             server.writeToAll(msGPSdata.getGPSstr());
 
             // write weather info to clients
-            str = msSensorData.getMDAstr() + msSensorData.getMWVstr();
+            str = msSensorData.getMDAstr() + msSensorData.getMWVstr() + msSensorData.getXDRstr();
             if (str.length() > 0)
             {
                 server.writeToAll(str);

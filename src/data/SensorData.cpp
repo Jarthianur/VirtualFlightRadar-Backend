@@ -71,6 +71,24 @@ void SensorData::setMDAstr(std::int32_t prio, const std::string& cr_mda)
     mMDA.update(cr_mda, prio);
 }
 
+std::string SensorData::getXDRstr()
+{
+    boost::lock_guard<boost::mutex> lock(mXDR.mutex);
+    if (mXDR.valueValid)
+    {
+        return mXDR.getValue() + "\r\n";
+    } else
+    {
+        return "";
+    }
+}
+
+void SensorData::setXDRstr(std::int32_t prio, const std::string& cr_xdr)
+{
+    boost::lock_guard<boost::mutex> lock(mXDR.mutex);
+    mXDR.update(cr_xdr, prio);
+}
+
 double SensorData::getPress()
 {
     boost::lock_guard<boost::mutex> lock(mPress.mutex);
