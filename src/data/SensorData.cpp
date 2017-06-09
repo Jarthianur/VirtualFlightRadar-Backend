@@ -40,7 +40,7 @@ std::string SensorData::getMWVstr()
     boost::lock_guard<boost::mutex> lock(mMWV.mutex);
     if (mMWV.valueValid)
     {
-        return mMWV.getValue() + "\r\n";
+        return mMWV.getValue() + "\n";
     } else
     {
         return "";
@@ -58,7 +58,7 @@ std::string SensorData::getMDAstr()
     boost::lock_guard<boost::mutex> lock(mMDA.mutex);
     if (mMDA.valueValid)
     {
-        return mMDA.getValue() + "\r\n";
+        return mMDA.getValue() + "\n";
     } else
     {
         return "";
