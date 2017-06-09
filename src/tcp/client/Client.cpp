@@ -93,7 +93,7 @@ void Client::stop() noexcept
 
 void Client::read() noexcept
 {
-    boost::asio::async_read_until(mSocket, mBuffer, "\n",
+    boost::asio::async_read_until(mSocket, mBuffer, "\r\n",
             boost::bind(&Client::handleRead, this,
                     boost::asio::placeholders::error,
                     boost::asio::placeholders::bytes_transferred));
