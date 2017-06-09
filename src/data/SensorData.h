@@ -85,10 +85,6 @@ public:
      * @param cr_mda the new MDA sentence to write
      */
     void setMDAstr(std::int32_t /*prio*/, const std::string& /*cr_mda*/);
-
-    void setXDRstr(std::int32_t /*prio*/, const std::string& /*cr_xdr*/);
-    std::string getXDRstr();
-
     /**
      * Get the last registered pressure.
      *
@@ -111,7 +107,6 @@ private:
     struct TmpData<std::string> mMWV;
     /// TmpData holding MDA sentence
     struct TmpData<std::string> mMDA;
-    struct TmpData<std::string> mXDR;
 };
 
 } // namespace data
