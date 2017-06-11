@@ -25,12 +25,20 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/operators.hpp>
-
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
-SensorClient::SensorClient(boost::asio::signal_set& sigset, const std::string& host,
-                           const std::string& port, Feed& feed)
-        : Client(sigset, host, port, "(WindClient)", feed),
+using namespace util;
+
+namespace tcp
+{
+namespace client
+{
+
+SensorClient::SensorClient(boost::asio::signal_set& r_sigset,
+                           const std::string& cr_host,
+                           const std::string& cr_port, vfrb::Feed& r_feed)
+        : Client(r_sigset, cr_host, cr_port, "(SensorClient)", r_feed),
           mStopped(false),
           mTimeout(mIOservice)
 {
@@ -50,13 +58,17 @@ void SensorClient::read() noexcept
 
 void SensorClient::connect() noexcept
 {
-    boost::asio::ip::tcp::resolver::query query(
-            mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(
-            query,
+    boost::asio::ip::tcp::resolver::query query(mHost, mPort,
+            boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(query,
             boost::bind(&SensorClient::handleResolve, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::iterator));
+                    boost::asio::placeholders::error,
+                    boost::asio::placeholders::iterator));
+}
+
+void SensorClient::process() noexcept
+{
+    mrFeed.process(mResponse);
 }
 
 void SensorClient::checkDeadline() noexcept
@@ -86,25 +98,23 @@ void SensorClient::stop() noexcept
     mTimeout.cancel();
 }
 
-void SensorClient::handleResolve(const boost::system::error_code& ec,
-                                 boost::asio::ip::tcp::resolver::iterator it) noexcept
-{
+void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
+                                 boost::asio::ip::tcp::resolver::iterator it)
+                                 noexcept
+                                 {
     if (mStopped)
     {
         return;
     }
-    if (!ec)
+    if (!cr_ec)
     {
-        boost::asio::async_connect(
-                mSocket,
-                it,
+        boost::asio::async_connect(mSocket, it,
                 boost::bind(&SensorClient::handleConnect, this,
-                            boost::asio::placeholders::error,
-                            boost::asio::placeholders::iterator));
-    }
-    else
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::iterator));
+    } else
     {
-        Logger::error("(WindClient) resolve host: ", ec.message());
+        Logger::error("(SensorClient) resolve host: ", cr_ec.message());
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -113,22 +123,22 @@ void SensorClient::handleResolve(const boost::system::error_code& ec,
     }
 }
 
-void SensorClient::handleConnect(const boost::system::error_code& ec,
-                                 boost::asio::ip::tcp::resolver::iterator it) noexcept
-{
+void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
+                                 boost::asio::ip::tcp::resolver::iterator it)
+                                 noexcept
+                                 {
     if (mStopped)
     {
         return;
     }
-    if (!ec)
+    if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(WindClient) connected to: ", mHost + ":" + mPort);
+        Logger::info("(SensorClient) connected to: ", mHost + ":" + mPort);
         read();
-    }
-    else
+    } else
     {
-        Logger::error("(WindClient) connect: ", ec.message());
+        Logger::error("(SensorClient) connect: ", cr_ec.message());
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -136,3 +146,6 @@ void SensorClient::handleConnect(const boost::system::error_code& ec,
         timedConnect();
     }
 }
+
+}  // namespace client
+}  // namespace tcp

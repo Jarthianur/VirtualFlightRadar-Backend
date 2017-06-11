@@ -21,21 +21,32 @@
 
 #include "Feed.h"
 
+#include <boost/thread/lock_types.hpp>
+#include <algorithm>
+
 #include "../config/Configuration.h"
 #include "../parser/APRSParser.h"
+#include "../parser/GPSParser.h"
 #include "../parser/SBSParser.h"
 #include "../parser/SensorParser.h"
 #include "../tcp/client/APRSCClient.h"
+#include "../tcp/client/GPSDClient.h"
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
 #include "../util/Logger.h"
+#include "VFRB.h"
 
-Feed::Feed(const std::string& name, Priority prio, InputType type,
-           const std::unordered_map<std::string, std::string>& kvmap)
-        : mName(name),
+using namespace util;
+
+namespace vfrb
+{
+
+Feed::Feed(const std::string& cr_name, std::int32_t prio, InputType type,
+           const std::unordered_map<std::string, std::string>& cr_kvmap)
+        : mName(cr_name),
           mPriority(prio),
           mType(type),
-          mKVmap(kvmap)
+          mKVmap(cr_kvmap)
 {
 }
 
@@ -44,10 +55,10 @@ Feed::~Feed() noexcept
 }
 
 Feed::Feed(BOOST_RV_REF(Feed) other)
-: mName(other.mName),
+: mName(std::move(other.mName)),
 mPriority(other.mPriority),
 mType(other.mType),
-mKVmap(other.mKVmap)
+mKVmap(std::move(other.mKVmap))
 {
 }
 
@@ -56,15 +67,14 @@ Feed& Feed::operator =(BOOST_RV_REF(Feed))
     return *this;
 }
 
-void Feed::run(boost::asio::signal_set& sigset)
+void Feed::run(boost::asio::signal_set& r_sigset) noexcept
 {
     std::string host, port;
     auto it = mKVmap.find(KV_KEY_HOST);
     if (it != mKVmap.end())
     {
         host = it->second;
-    }
-    else
+    } else
     {
         Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_HOST);
         return;
@@ -73,8 +83,7 @@ void Feed::run(boost::asio::signal_set& sigset)
     if (it != mKVmap.end())
     {
         port = it->second;
-    }
-    else
+    } else
     {
         Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_PORT);
         return;
@@ -88,42 +97,53 @@ void Feed::run(boost::asio::signal_set& sigset)
             if (it != mKVmap.end())
             {
                 login = it->second;
-            }
-            else
+            } else
             {
-                Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_LOGIN);
+                Logger::warn("(Feed) could not find: ",
+                        mName + "." KV_KEY_LOGIN);
                 return;
             }
-            mpParser = std::unique_ptr<Parser>(new APRSParser());
-            mpClient = std::unique_ptr<Client>(
-                    new APRSCClient(sigset, host, port, login, *this));
+            mpParser = std::unique_ptr<parser::Parser>(
+                    new parser::APRSParser());
+            mpClient = std::unique_ptr<tcp::client::Client>(
+                    new tcp::client::APRSCClient(r_sigset, host, port, login,
+                            *this));
             break;
         }
         case InputType::SBS:
         {
-            mpParser = std::unique_ptr<Parser>(new SBSParser());
-            mpClient = std::unique_ptr<Client>(new SBSClient(sigset, host, port, *this));
+            mpParser = std::unique_ptr<parser::Parser>(new parser::SBSParser());
+            mpClient = std::unique_ptr<tcp::client::Client>(
+                    new tcp::client::SBSClient(r_sigset, host, port, *this));
             break;
         }
         case InputType::SENSOR:
         {
-            mpParser = std::unique_ptr<Parser>(new SensorParser());
-            mpClient = std::unique_ptr<Client>(
-                    new SensorClient(sigset, host, port, *this));
+            mpParser = std::unique_ptr<parser::Parser>(
+                    new parser::SensorParser());
+            mpClient = std::unique_ptr<tcp::client::Client>(
+                    new tcp::client::SensorClient(r_sigset, host, port, *this));
             break;
         }
-            /*case InputType::GPS:{
-             mpParser = std::unique_ptr<Parser>(new GPSParser());
-             mClient = std::unique_ptr<Client>(
-             new GPSClient(sigset, host, port, *this));
-             break;}*/
+        case InputType::GPS:
+        {
+            mpParser = std::unique_ptr<parser::Parser>(new parser::GPSParser());
+            mpClient = std::unique_ptr<tcp::client::Client>(
+                    new tcp::client::GPSDClient(r_sigset, host, port, *this));
+            break;
+        }
         default:
             return;
     }
-    mpClient->run();
+    if (VFRB::global_run_status)
+    {
+        mpClient->run();
+    }
 }
 
-void Feed::process(const std::string& data) noexcept
+std::int32_t Feed::process(const std::string& cr_res) noexcept
 {
-    mpParser->unpack(data, mPriority);
+    return mpParser->unpack(cr_res, mPriority);
 }
+
+}  // namespace vfrb

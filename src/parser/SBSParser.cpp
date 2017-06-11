@@ -21,6 +21,7 @@
 
 #include "SBSParser.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <stdexcept>
 
@@ -29,6 +30,9 @@
 #include "../data/AircraftContainer.h"
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
+
+namespace parser
+{
 
 SBSParser::SBSParser()
         : Parser()
@@ -39,7 +43,8 @@ SBSParser::~SBSParser() noexcept
 {
 }
 
-std::int32_t SBSParser::unpack(const std::string& msg, Priority prio) noexcept
+std::int32_t SBSParser::unpack(const std::string& cr_msg, std::int32_t prio)
+noexcept
 {
     /*
      * fields:
@@ -53,89 +58,86 @@ std::int32_t SBSParser::unpack(const std::string& msg, Priority prio) noexcept
     std::uint32_t i = 2;
     std::size_t p = 6;
 
-    if (msg.find(',', p) == std::string::npos || !(msg.size() > 4 && msg.at(4) == '3'))
+    if (cr_msg.find(',', p) == std::string::npos || !(cr_msg.size() > 4
+            && cr_msg.at(4) == '3'))
     {
         return MSG_UNPACK_IGN;
     }
-    while ((delim = msg.find(',', p)) != std::string::npos && i < 16)
+    while ((delim = cr_msg.find(',', p)) != std::string::npos && i < 16)
     {
         switch (i)
         {
             case 4:
                 if (delim - p > 0)
                 {
-                    mtID = msg.substr(p, delim - p);
-                }
-                else
+                    mtID = cr_msg.substr(p, delim - p);
+                } else
                 {
                     return MSG_UNPACK_IGN;
                 }
-                break;
-            case 7:
-                try
-                {
-                    if (delim - p > 7)
-                    {
-                        mtTime = std::stoi(msg.substr(p, 2)) * 10000;
-                        mtTime += std::stoi(msg.substr(p + 3, 2)) * 100;
-                        mtTime += std::stoi(msg.substr(p + 6, 2));
-                    }
-                    else
-                    {
-                        return MSG_UNPACK_IGN;
-                    }
-                }
-                catch (const std::logic_error& e)
-                {
-                    return MSG_UNPACK_ERR;
-                }
-                break;
+            break;
+                /*case 7:
+                 try
+                 {
+                 if (delim - p > 7)
+                 {
+                 mtTime = std::stoi(cr_msg.substr(p, 2)) * 10000;
+                 mtTime += std::stoi(cr_msg.substr(p + 3, 2)) * 100;
+                 mtTime += std::stoi(cr_msg.substr(p + 6, 2));
+                 } else
+                 {
+                 return MSG_UNPACK_IGN;
+                 }
+                 } catch (const std::logic_error& e)
+                 {
+                 return MSG_UNPACK_ERR;
+                 }
+                 break;*/
             case 11:
                 try
                 {
-                    mtAlt = Math::dToI(
-                            std::stod(msg.substr(p, delim - p)) * Math::feet2m);
-                    if (mtAlt > Configuration::filter_maxHeight)
+                    mtGPSpos.altitude =
+                            util::math::dToI(
+                                    std::stod(cr_msg.substr(p, delim - p)) * util::math::FEET_2_M);
+                    if (mtGPSpos.altitude > config::Configuration::filter_maxHeight)
                     {
                         return MSG_UNPACK_IGN;
                     }
-                }
-                catch (const std::logic_error& e)
+                } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
                 }
-                break;
+            break;
             case 14:
                 try
                 {
-                    mtLat = std::stod(msg.substr(p, delim - p));
-                }
-                catch (const std::logic_error& e)
+                    mtGPSpos.latitude = std::stod(cr_msg.substr(p, delim - p));
+                } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
                 }
-                break;
+            break;
             case 15:
                 try
                 {
-                    mtLong = std::stod(msg.substr(p, delim - p));
-                }
-                catch (const std::logic_error& e)
+                    mtGPSpos.longitude = std::stod(cr_msg.substr(p, delim - p));
+                } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
                 }
-                break;
+            break;
             default:
-                break;
+            break;
         }
         i++;
         p = delim + 1;
     }
-    Aircraft ac(mtID, mtLat, mtLong, mtAlt);
-    ac.setAltQNE();
+    aircraft::Aircraft ac(mtID, mtGPSpos);
     ac.setFullInfo(false);
-    ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-    VFRB::msAcCont.insertAircraft(ac, prio);
+    ac.setTargetT(aircraft::Aircraft::TargetType::TRANSPONDER);
+    vfrb::VFRB::msAcCont.insertAircraft(ac, prio);
 
     return MSG_UNPACK_SUC;
 }
+
+}  // namespace parser

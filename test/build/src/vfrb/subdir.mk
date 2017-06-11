@@ -4,12 +4,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../../src/vfrb/VFRB.cpp 
+../src/vfrb/Feed.cpp \
+../src/vfrb/VFRB.cpp 
 
 OBJS += \
+./src/vfrb/Feed.o \
 ./src/vfrb/VFRB.o 
 
 CPP_DEPS += \
+./src/vfrb/Feed.d \
 ./src/vfrb/VFRB.d 
 
 

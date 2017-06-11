@@ -31,17 +31,25 @@
 
 #include "../config/Configuration.h"
 #include "../data/AircraftContainer.h"
-#include "../data/ClimateData.h"
+#include "../data/GPSData.h"
+#include "../data/SensorData.h"
 #include "../tcp/client/APRSCClient.h"
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
-#include "../tcp/server/NMEAServer.h"
-#include "../util/GPSmodule.h"
+#include "../tcp/server/Server.h"
 #include "../util/Logger.h"
 
-bool VFRB::global_run_status = true;
-AircraftContainer VFRB::msAcCont;
-ClimateData VFRB::msClimateData;
+using namespace util;
+
+namespace vfrb
+{
+
+#define SYNC_TIME (1)
+
+std::atomic<bool> VFRB::global_run_status(true);
+data::AircraftContainer VFRB::msAcCont;
+data::SensorData VFRB::msSensorData;
+data::GPSData VFRB::msGPSdata;
 
 VFRB::VFRB()
 {
@@ -55,11 +63,8 @@ void VFRB::run() noexcept
 {
     Logger::info("(VFRB) startup");
     //store start time
-    boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
-
-    //create ac proc for gpsfix
-    GPSmodule gpsm(Configuration::base_latitude, Configuration::base_longitude,
-                   Configuration::base_altitude, Configuration::base_geoid);
+    boost::chrono::steady_clock::time_point start =
+            boost::chrono::steady_clock::now();
 
     // register signals and run handler
     boost::asio::io_service io_service;
@@ -73,7 +78,7 @@ void VFRB::run() noexcept
 
     signal_set.async_wait(
             boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
-                        boost::asio::placeholders::signal_number));
+                    boost::asio::placeholders::signal_number));
 
     boost::thread signal_thread([&io_service]()
     {
@@ -81,16 +86,19 @@ void VFRB::run() noexcept
     });
 
     // init server and run handler
-    NMEAServer server(signal_set, Configuration::global_server_port);
-    boost::thread server_thread(boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
+    tcp::server::Server server(signal_set,
+            config::Configuration::global_server_port);
+    boost::thread server_thread(
+            boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
 
     //init input threads
     boost::thread_group threads;
-    for (auto it = Configuration::global_feeds.begin();
-            it != Configuration::global_feeds.end(); ++it)
+    for (auto it = config::Configuration::global_feeds.begin();
+            it != config::Configuration::global_feeds.end(); ++it)
     {
         threads.create_thread(
-                boost::bind(&VFRB::handleInputFeed, std::ref(signal_set), std::ref(*it)));
+                boost::bind(&VFRB::handleInputFeed, std::ref(signal_set),
+                        std::ref(*it)));
     }
 
     while (global_run_status)
@@ -105,11 +113,10 @@ void VFRB::run() noexcept
             }
 
             //write GPS position to clients
-            str = gpsm.gpsfix();
-            server.writeToAll(str);
+            server.writeToAll(msGPSdata.getGPSstr());
 
-            // write wind info to clients
-            str = msClimateData.getWVstr();
+            // write weather info to clients
+            str = msSensorData.getMDAstr() + msSensorData.getMWVstr();
             if (str.length() > 0)
             {
                 server.writeToAll(str);
@@ -117,13 +124,11 @@ void VFRB::run() noexcept
 
             //synchronise cycles to ~SYNC_TIME sec
             boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception& e)
         {
             Logger::error("(VFRB) error: ", e.what());
             global_run_status = false;
-        }
-        catch (...)
+        } catch (...)
         {
             Logger::error("(VFRB) error");
             global_run_status = false;
@@ -136,9 +141,10 @@ void VFRB::run() noexcept
     signal_thread.join();
 
     //eval end time
-    boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
-    boost::chrono::minutes runtime = boost::chrono::duration_cast<boost::chrono::minutes>(
-            end - start);
+    boost::chrono::steady_clock::time_point end =
+            boost::chrono::steady_clock::now();
+    boost::chrono::minutes runtime = boost::chrono::duration_cast<
+            boost::chrono::minutes>(end - start);
     std::string time_str(std::to_string(runtime.count() / 60 / 24));
     time_str += " days, ";
     time_str += std::to_string(runtime.count() / 60);
@@ -150,22 +156,24 @@ void VFRB::run() noexcept
 
 }
 
-void VFRB::handleNMAEServer(NMEAServer& server)
+void VFRB::handleNMAEServer(tcp::server::Server& r_server)
 {
-    Logger::info("(NMEAServer) startup: localhost ",
-                 std::to_string(Configuration::global_server_port));
-    server.run();
+    Logger::info("(Server) startup: localhost ",
+            std::to_string(config::Configuration::global_server_port));
+    r_server.run();
     global_run_status = false;
 }
 
-void VFRB::handleInputFeed(boost::asio::signal_set& sigset, Feed& feed)
+void VFRB::handleInputFeed(boost::asio::signal_set& r_sigset, Feed& r_feed)
 {
-    Logger::info("(VFRB) run feed: ", feed.mName);
-    feed.run(sigset);
+    Logger::info("(VFRB) run feed: ", r_feed.mName);
+    r_feed.run(r_sigset);
 }
 
-void VFRB::handleSignals(const boost::system::error_code& ec, const int sig)
+void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)
 {
     Logger::info("(VFRB) caught signal: ", "shutdown");
     global_run_status = false;
 }
+
+}  // namespace vfrb

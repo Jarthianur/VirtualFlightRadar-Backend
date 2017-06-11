@@ -19,46 +19,68 @@
  }
  */
 
-#include "ClimateData.h"
+#include "SensorData.h"
+
 #include <boost/thread/lock_guard.hpp>
 
-ClimateData::ClimateData()
+namespace data
+{
+
+SensorData::SensorData()
 {
     mPress.value = ICAO_STD_A;
 }
 
-ClimateData::~ClimateData() noexcept
+SensorData::~SensorData() noexcept
 {
 }
 
-std::string ClimateData::getWVstr()
+std::string SensorData::getMWVstr()
 {
-    boost::lock_guard<boost::mutex> lock(mWV.mutex);
-    if (mWV.valid)
+    boost::lock_guard<boost::mutex> lock(mMWV.mutex);
+    if (mMWV.valueValid)
     {
-        mWV.valid = false;
-        return mWV.value + "\r\n";
-    }
-    else
+        return mMWV.getValue() + "\n";
+    } else
     {
         return "";
     }
 }
 
-void ClimateData::setWVstr(Priority prio, const std::string& wv)
+void SensorData::setMWVstr(std::int32_t prio, const std::string& cr_mwv)
 {
-    boost::lock_guard<boost::mutex> lock(mWV.mutex);
-    mWV.update(wv, prio);
+    boost::lock_guard<boost::mutex> lock(mMWV.mutex);
+    mMWV.update(cr_mwv, prio);
 }
 
-double ClimateData::getPress()
+std::string SensorData::getMDAstr()
+{
+    boost::lock_guard<boost::mutex> lock(mMDA.mutex);
+    if (mMDA.valueValid)
+    {
+        return mMDA.getValue() + "\n";
+    } else
+    {
+        return "";
+    }
+}
+
+void SensorData::setMDAstr(std::int32_t prio, const std::string& cr_mda)
+{
+    boost::lock_guard<boost::mutex> lock(mMDA.mutex);
+    mMDA.update(cr_mda, prio);
+}
+
+double SensorData::getPress()
 {
     boost::lock_guard<boost::mutex> lock(mPress.mutex);
     return mPress.value;
 }
 
-void ClimateData::setPress(Priority prio, double p)
+void SensorData::setPress(std::int32_t prio, double p)
 {
     boost::lock_guard<boost::mutex> lock(mPress.mutex);
     mPress.update(p, prio);
 }
+
+}  // namespace data

@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2017-03-24 14:18:12</td>
+            <td class="headerValue">2017-05-07 10:26:40</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">4</td>
@@ -108,28 +108,28 @@
 <span class="lineNum">      46 </span><span class="lineCov">          2 :     return time;</span>
 <a name="47"><span class="lineNum">      47 </span>            : }</a>
 <span class="lineNum">      48 </span>            : 
-<span class="lineNum">      49 </span><span class="lineNoCov">          0 : void Logger::info(const std::string&amp; msg, const std::string&amp; subject)</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 : void Logger::info(const std::string&amp; cr_subj, const std::string&amp; cr_msg)</span>
 <span class="lineNum">      50 </span>            : {
 <span class="lineNum">      51 </span><span class="lineNoCov">          0 :     boost::lock_guard&lt;boost::mutex&gt; lock(Logger::mMutex);</span>
-<span class="lineNum">      52 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;[INFO]  &quot; &lt;&lt; getTime() &lt;&lt; &quot;:: &quot; &lt;&lt; msg &lt;&lt; subject &lt;&lt; std::endl;</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;[INFO]  &quot; &lt;&lt; getTime() &lt;&lt; &quot;:: &quot; &lt;&lt; cr_subj &lt;&lt; cr_msg &lt;&lt; std::endl;</span>
 <a name="53"><span class="lineNum">      53 </span><span class="lineNoCov">          0 : }</span></a>
 <span class="lineNum">      54 </span>            : 
-<span class="lineNum">      55 </span><span class="lineNoCov">          0 : void Logger::debug(const std::string&amp; msg, const std::string&amp; subject)</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 : void Logger::debug(const std::string&amp; cr_subj, const std::string&amp; cr_msg)</span>
 <span class="lineNum">      56 </span>            : {
 <span class="lineNum">      57 </span><span class="lineNoCov">          0 :     boost::lock_guard&lt;boost::mutex&gt; lock(Logger::mMutex);</span>
-<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;[DEBUG] &quot; &lt;&lt; getTime() &lt;&lt; &quot;:: &quot; &lt;&lt; msg &lt;&lt; subject &lt;&lt; std::endl;</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;[DEBUG] &quot; &lt;&lt; getTime() &lt;&lt; &quot;:: &quot; &lt;&lt; cr_subj &lt;&lt; cr_msg &lt;&lt; std::endl;</span>
 <a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 : }</span></a>
 <span class="lineNum">      60 </span>            : 
-<span class="lineNum">      61 </span><span class="lineNoCov">          0 : void Logger::warn(const std::string&amp; msg, const std::string&amp; subject)</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 : void Logger::warn(const std::string&amp; cr_subj, const std::string&amp; cr_msg)</span>
 <span class="lineNum">      62 </span>            : {
 <span class="lineNum">      63 </span><span class="lineNoCov">          0 :     boost::lock_guard&lt;boost::mutex&gt; lock(Logger::mMutex);</span>
-<span class="lineNum">      64 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;[WARN]  &quot; &lt;&lt; getTime() &lt;&lt; &quot;:: &quot; &lt;&lt; msg &lt;&lt; subject &lt;&lt; std::endl;</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;[WARN]  &quot; &lt;&lt; getTime() &lt;&lt; &quot;:: &quot; &lt;&lt; cr_subj &lt;&lt; cr_msg &lt;&lt; std::endl;</span>
 <a name="65"><span class="lineNum">      65 </span><span class="lineNoCov">          0 : }</span></a>
 <span class="lineNum">      66 </span>            : 
-<span class="lineNum">      67 </span><span class="lineCov">          2 : void Logger::error(const std::string&amp; msg, const std::string&amp; subject)</span>
+<span class="lineNum">      67 </span><span class="lineCov">          2 : void Logger::error(const std::string&amp; cr_subj, const std::string&amp; cr_msg)</span>
 <span class="lineNum">      68 </span>            : {
 <a name="69"><span class="lineNum">      69 </span><span class="lineCov">          4 :     boost::lock_guard&lt;boost::mutex&gt; lock(Logger::mMutex);</span></a>
-<span class="lineNum">      70 </span><span class="lineCov">          2 :     std::cerr &lt;&lt; &quot;[ERROR] &quot; &lt;&lt; getTime() &lt;&lt; &quot;:: &quot; &lt;&lt; msg &lt;&lt; subject &lt;&lt; std::endl;</span>
+<span class="lineNum">      70 </span><span class="lineCov">          2 :     std::cerr &lt;&lt; &quot;[ERROR] &quot; &lt;&lt; getTime() &lt;&lt; &quot;:: &quot; &lt;&lt; cr_subj &lt;&lt; cr_msg &lt;&lt; std::endl;</span>
 <span class="lineNum">      71 </span><span class="lineCov">          5 : }</span>
 </pre>
       </td>

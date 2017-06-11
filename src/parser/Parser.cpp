@@ -21,6 +21,9 @@
 
 #include "Parser.h"
 
+namespace parser
+{
+
 Parser::Parser()
 {
 }
@@ -28,3 +31,5 @@ Parser::Parser()
 Parser::~Parser() noexcept
 {
 }
+
+}  // namespace parser

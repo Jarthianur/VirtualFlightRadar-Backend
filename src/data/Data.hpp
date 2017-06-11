@@ -26,37 +26,119 @@
 #include <cstdint>
 #include <string>
 
-#include "../util/Priority.h"
+namespace data
+{
 
+/**
+ * Data structure.
+ *
+ * Hold a value providing its own mutex and meta-data.
+ *
+ * @tparam T the type of value to hold
+ */
 template<typename T>
 struct Data
 {
+    /// The value
     T value;
-    bool valid;
-    Priority lastPriority;
+    /// Is wrtite attempt valid?
+    bool attemptValid;
+    /// Last written priority
+    std::int32_t lastPriority;
+    /// Mutex to enable threadsafety per Data.
     boost::mutex mutex;
-
-    void update(const T& nv, Priority prio)
+    /**
+     * Update the value.
+     * May fail due to priority.
+     * Updates always if attempt is valid.
+     *
+     * @param cr_nv the new value
+     * @param prio  the priority attempting to write
+     */
+    void update(const T& cr_nv, std::int32_t prio)
     {
-        bool write = !valid;
+        bool write = attemptValid;
         if (!write)
         {
-            if (prio > lastPriority || (prio == lastPriority && prio != Priority::LESSER))
+            if (prio >= lastPriority)
             {
                 write = true;
             }
         }
         if (write)
         {
-            valid = (prio != Priority::LESSER);
-            value = nv;
+            attemptValid = false;
+            value = cr_nv;
             lastPriority = prio;
-        }
-        else
+        } else
         {
-            valid = false;
+            attemptValid = true;
         }
     }
 };
+/**
+ * Pseudo temporary data structure.
+ *
+ * Same as the Data structure, but reading the value
+ * invalidates it and updating validates it.
+ *
+ * @tparam T the type of value to hold
+ */
+template<typename T>
+struct TmpData
+{
+    /// The value
+    T value;
+    /// Is wrtite attempt valid?
+    bool attemptValid;
+    /// Is the value valid?
+    bool valueValid;
+    /// Last written priority
+    std::int32_t lastPriority;
+    /// Mutex to enable threadsafety per TmpData.
+    boost::mutex mutex;
+    /**
+     * Get the value and invalidate it.
+     *
+     * @return the value
+     */
+    const T& getValue()
+    {
+        valueValid = false;
+        return value;
+    }
+    /**
+     * Update the value.
+     * May fail due to priority.
+     * Updates always if attempt is valid.
+     * Validates the value.
+     *
+     * @param cr_nv the new value
+     * @param prio  the priority attempting to write
+     */
+    void update(const T& cr_nv, std::int32_t prio)
+    {
+        bool write = attemptValid;
+        if (!write)
+        {
+            if (prio >= lastPriority)
+            {
+                write = true;
+            }
+        }
+        if (write)
+        {
+            attemptValid = false;
+            value = cr_nv;
+            lastPriority = prio;
+            valueValid = true;
+        } else
+        {
+            attemptValid = true;
+        }
+    }
+};
+
+}  // namespace data
 
 #endif /* SRC_DATA_DATA_HPP_ */

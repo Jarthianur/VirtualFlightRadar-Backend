@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
+ Copyright (C) 2017 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -19,29 +19,46 @@
  }
  */
 
-#ifndef SRC_UTIL_PRIORITY_H_
-#define SRC_UTIL_PRIORITY_H_
+#ifndef UTIL_POSITION_HPP_
+#define UTIL_POSITION_HPP_
 
 #include <cstdint>
 
+namespace util
+{
+
 /**
- * Priorities / update policies
- * Override data if not valid, or lower.
+ * GPS position structure.
  *
- * DONTCARE : used for single input (no other feed for this data),
- *     or fallbacks. Overrides itself, but nothing else.
- * LESSER: used as "I actually want input from other feed, but if not take it."
- *     Overrides only DC, even not itself, until invalid. Data stays invalid.
- * NORMAL: used for common backup feeds. Overrides itself and all but HIGHER.
- * HIGHER: used for main feed. Overrides all, no matter what state.
+ * Minimal information for a position.
  */
-enum class Priority
-    : std::uint32_t
-    {
-        DONTCARE = 0,
-    LESSER = 1,
-    NORMAL = 2,
-    HIGHER = 3
+struct GPSPosition
+{
+    /// Altitude; m
+    std::int32_t altitude;
+    /// Latitude; deg
+    double latitude,
+    /// Longitude; deg
+            longitude;
 };
 
-#endif /* SRC_UTIL_PRIORITY_H_ */
+/**
+ * Extended GPS position structure.
+ *
+ * Holds GPS meta information additionally to a position.
+ */
+struct ExtGPSPosition
+{
+    /// Position
+    struct GPSPosition position;
+    /// Number of satellites
+    std::int32_t nrSats,
+    /// GPS fix quality
+            fixQa;
+    /// Geoid separation
+    double geoid;
+};
+
+}  // namespace util
+
+#endif /* UTIL_POSITION_HPP_ */

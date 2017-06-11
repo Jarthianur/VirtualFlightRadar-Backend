@@ -27,27 +27,50 @@
 #include <string>
 
 #include "Parser.h"
+#include "../util/Position.hpp"
 
-#define APRS_REGEX_ERR -3
+namespace parser
+{
 
+/**
+ * The APRSParser class, implements Parser.
+ *
+ * This class unpacks APRS strings into static AircraftContainer.
+ */
 class APRSParser: public Parser
 {
 public:
+    /**
+     * Constructor
+     */
     APRSParser();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~APRSParser() noexcept;
-
-    std::int32_t unpack(const std::string& /*msg*/, Priority /*prio*/) noexcept override;
+    /**
+     * Unpack APRS messages into the static VFRB::AircraftContainer.
+     *
+     * @overload Parser::unpack
+     */
+    std::int32_t unpack(const std::string& /*cr_msg*/, std::int32_t /*prio*/)
+            noexcept override;
 
 private:
-    //regex
+    /// Regular expression for APRS protocol
     const boost::regex mAprsRE;
+    /// Regular expression for OGN specific APRS extension
     const boost::regex mCommRE;
-    // temps
+    /// Temporary information
     std::string mtID;
-    std::int32_t mtIDtype = 0, mtAcType = 0, mtAlt = 0, mtTime = 0;
-    double mtLat = 0.0, mtLong = 0.0, mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0,
-            mtHeading = 0.0;
-    bool mtFullInfo = true;
+    struct util::GPSPosition mtGPSpos;
+    std::int32_t mtIDtype = 0, mtAcType = 0, mtTime = 0;
+    double mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0, mtHeading =
+            0.0;
 };
+
+}  // namespace parser
 
 #endif /* SRC_PARSER_APRSPARSER_H_ */

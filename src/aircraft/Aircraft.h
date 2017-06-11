@@ -25,26 +25,67 @@
 #include <cstdint>
 #include <string>
 
-#define A_ADSB_T 8
+#include "../util/Position.hpp"
+
+namespace aircraft
+{
+
 #define A_VALUE_NA -1024.0
 
+/**
+ * The Aircraft class.
+ *
+ * Represents an aircraft, holding all necessary information
+ * about its position, movement and some meta-data.
+ */
 class Aircraft
 {
 public:
-    Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/);
-    Aircraft(std::string& /*id*/, double /*lat*/, double /*lon*/, std::int32_t /*alt*/,
-             double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
-             double /*climb_r*/, double /*turn_r*/, double /*heading*/);
-
-    virtual ~Aircraft() noexcept;
-
     /**
-     * Compare Aircrafts by their ID.
+     * Construct an aircraft with a minimum
+     * set of information, as are the ID
+     * and the current position.
+     *
+     * @param r_id  the ID
+     * @param r_pos the position
      */
-    bool operator==(const Aircraft&) const;
-
+    Aircraft(std::string& /*r_id*/, struct util::GPSPosition& /*r_pos*/);
     /**
-     * Got data from ...
+     * Construct an aircraft with a full
+     * set of information, as are the ID,
+     * the current position and movement.
+     *
+     * @param r_id    the ID
+     * @param r_pos   the prosition
+     * @param gnd_spd the ground speed
+     * @param id_t    the ID type
+     * @param ac_t    the aircraft type
+     * @param climb_r the climb rate
+     * @param turn_r  the turn rate
+     * @param head    the heading
+     */
+    Aircraft(std::string& /*r_id*/, struct util::GPSPosition& /*r_pos*/,
+             double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
+             double /*climb_r*/, double /*turn_r*/, double /*head*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
+    virtual ~Aircraft() noexcept;
+    /**
+     * Compare aircrafts by ID.
+     *
+     * @param cr_other the aircraft to compare
+     *
+     * @return are IDs equal?
+     */
+    bool operator==(const Aircraft& /*cr_other*/) const;
+    /**
+     * Aircraft information received from
+     * device type.
+     * FLARM is preferred over TRANSPONDER,
+     * in case an aircraft has both available.
      */
     enum class TargetType
         : std::uint32_t
@@ -52,134 +93,206 @@ public:
             FLARM,
         TRANSPONDER
     };
-
     /**
-     * Update values from given Aircraft reference.
-     * Set valid to 0.
+     * Update aircraft information.
+     * Reset update age.
+     *
+     * @param cr_ac an aircraft reference holding new information
+     * @param prio update from feed with priority
      */
-    void update(const Aircraft& /*ac*/);
-
+    void update(const Aircraft& /*cr_ac*/, std::int32_t /*prio*/);
     /**
-     * Getter
+     * Get the ID.
+     *
+     * @return const reference to ID
      */
     inline const std::string& getID() const
     {
         return mID;
     }
+    /**
+     * Get the ID type.
+     *
+     * @return ID type
+     */
     inline const std::uint32_t getIDtype() const
     {
         return mIDtype;
     }
+    /**
+     * Get the last registered target type.
+     *
+     * @return target type
+     */
     inline const TargetType getTargetT() const
     {
         return mTargetType;
     }
+    /**
+     * Get the aircraft type.
+     *
+     * @return aircraft type
+     */
     inline const std::int32_t getAircraftT() const
     {
         return mAircraftType;
     }
+    /**
+     * Is full information available?
+     *
+     * @return full info available, or not
+     */
     inline const bool isFullInfo() const
     {
         return mFullInfo;
     }
-    inline const std::uint32_t getValid() const
+    /**
+     * Get the current update age.
+     *
+     * @return update age
+     */
+    inline const std::uint32_t getUpdateAge() const
     {
-        return mValid;
+        return mUpdateAge;
     }
-    inline const bool isAltQNE() const
+    /**
+     * Get last updated priority.
+     *
+     * @return last priority
+     */
+    inline const std::int32_t getLastPriority() const
     {
-        return mAltAsQNE;
+        return mLastPriority;
     }
+    /**
+     * Is update attempt valid?
+     *
+     * @return is attempt valid
+     */
+    inline const bool isAttemptValid() const
+    {
+        return mAttemptValid;
+    }
+    /**
+     * Get the last registered latitude.
+     *
+     * @return the latitude
+     */
     inline const double getLatitude() const
     {
-        return mLatitude;
+        return mPosition.latitude;
     }
+    /**
+     * Get the last registered longitude.
+     *
+     * @return the longitude
+     */
     inline const double getLongitude() const
     {
-        return mLongitude;
+        return mPosition.longitude;
     }
+    /**
+     * Get the last registered altitude.
+     *
+     * @return the altitude.
+     */
     inline const std::int32_t getAltitude() const
     {
-        return mAltitude;
+        return mPosition.altitude;
     }
+    /**
+     * Get the last registered speed over ground.
+     *
+     * @return the ground speed
+     */
     inline const double getGndSpeed() const
     {
         return mGndSpeed;
     }
+    /**
+     * Get the last registered heading.
+     *
+     * @return the heading
+     */
     inline const double getHeading() const
     {
         return mHeading;
     }
+    /**
+     * Get the last registered climb rate.
+     *
+     * @return the climb rate
+     */
     inline const double getClimbR() const
     {
         return mClimbRate;
     }
-    //const double getTurnR() const;
-
+    /*inline const double getTurnR() const
+     {
+     return mTurnRate;
+     }*/
     /**
-     * Setter
+     * Increment the update age by one.
      */
-    inline void incValid()
+    inline void incUpdateAge()
     {
-        ++mValid;
+        ++mUpdateAge;
     }
+    /**
+     * Set the new target type.
+     *
+     * @param tt the new target type
+     */
     inline void setTargetT(TargetType tt)
     {
         mTargetType = tt;
     }
-    inline void setAltQNE(bool qne = true)
-    {
-        mAltAsQNE = qne;
-    }
+    /**
+     * Set full information available.
+     *
+     * @param info is available, or not, defaults to true
+     */
     inline void setFullInfo(bool info = true)
     {
         mFullInfo = info;
     }
+    /**
+     * Allow update attempts.
+     */
+    inline void setAttemptValid()
+    {
+        mAttemptValid = true;
+    }
 
 private:
-    /**
-     * information
-     */
-    // id
+    /// Aircraft ID (address), identifier; Uniqueness is assumed and must be guaranteed by input feed.
     std::string mID;
+    /// ID (address) type.
     std::uint32_t mIDtype = 1;
-
-    std::int32_t mAircraftType = A_ADSB_T;
+/// Aircraft type encoded as number (glider, powered airplane ...)
+    std::int32_t mAircraftType = 8;
+    /// Target type; Got the last update from which device.
     TargetType mTargetType = TargetType::FLARM;
-
-    // full info available
+    /// Is full set of information available?
     bool mFullInfo = false;
-
-    //0 = valid; +x(cycles) = invalid
-    std::uint32_t mValid = 0;
-
-    //differ altitude (GPS from FLARM, QNE from TRANSPONDER)
-    bool mAltAsQNE = false;
-
-    /**
-     * position
-     */
-    // deg
-    double mLatitude = A_VALUE_NA;
-    double mLongitude = A_VALUE_NA;
-    // m
-    std::int32_t mAltitude = 0;
-
-    /**
-     * movement
-     */
-    // m/s
+    /// Times processed without update.
+    std::uint32_t mUpdateAge = 0;
+    /// Got last update with which priority.
+    std::int32_t mLastPriority = 0;
+    /// Is an update attempt valid? If false, updates are only allowed with at least last priority.
+    bool mAttemptValid = true;
+/// Last registered position.
+    struct util::GPSPosition mPosition;
+    /// Speed over ground; m/s
     double mGndSpeed = A_VALUE_NA;
-
-    // deg [0-359]
+    /// Heading; deg [0-359]
     double mHeading = A_VALUE_NA;
-
-    // m/s
+    /// Climb rate; m/s
     double mClimbRate = A_VALUE_NA;
-
-    // currently unused
-    // deg/s
-    double mTurnRate = A_VALUE_NA;
+    /* deg/s
+     double mTurnRate = A_VALUE_NA;*/
 };
+
+}  // namespace aircraft
 
 #endif /* SRC_AIRCRAFT_AIRCRAFT_H_ */

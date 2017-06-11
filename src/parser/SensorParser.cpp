@@ -23,9 +23,12 @@
 
 #include <stdexcept>
 
-#include "../data/ClimateData.h"
+#include "../data/SensorData.h"
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
+
+namespace parser
+{
 
 SensorParser::SensorParser()
         : Parser()
@@ -36,70 +39,52 @@ SensorParser::~SensorParser() noexcept
 {
 }
 
-std::int32_t SensorParser::unpack(const std::string& msg, Priority prio) noexcept
+std::int32_t SensorParser::unpack(const std::string& cr_msg, std::int32_t prio)
+noexcept
 {
     try
     {
-        std::int32_t csum = std::stoi(msg.substr(msg.rfind('*') + 1, 2),
-                                      nullptr, 16);
-        if (csum != Math::checksum(msg.c_str(), msg.length()))
+        std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),
+                nullptr, 16);
+        if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return MSG_UNPACK_IGN;
         }
-    }
-    catch (const std::logic_error& e)
+    } catch (const std::logic_error& e)
     {
         return MSG_UNPACK_ERR;
     }
 
-    if (msg.find("WIMDA") != std::string::npos)
+    if (cr_msg.find("MDA") != std::string::npos)
     {
+        vfrb::VFRB::msSensorData.setMDAstr(prio, cr_msg);
         try
         {
-            mtB = msg.find('B') - 1;
-            mtS = msg.substr(0, mtB).find_last_of(',') + 1;
-            mtSubLen = mtB - mtS;
-            mtPress = std::stod(msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
-            if (mtNumIdx == mtSubLen)
+            std::size_t tmpB = cr_msg.find('B') - 1;
+            std::size_t tmpS = cr_msg.substr(0, tmpB).find_last_of(',') + 1;
+            std::size_t subLen = tmpB - tmpS;
+            std::size_t numIdx;
+            double tmpPress = std::stod(cr_msg.substr(tmpS, subLen), &numIdx)
+                    * 1000.0;
+            if (numIdx == subLen)
             {
-                VFRB::msClimateData.setPress(prio, mtPress);
-            }
-            else
+                vfrb::VFRB::msSensorData.setPress(prio, tmpPress);
+            } else
             {
                 return MSG_UNPACK_ERR;
             }
-        }
-        catch (std::logic_error& e)
+        } catch (const std::logic_error& e)
         {
             return MSG_UNPACK_ERR;
         }
-        /*try
-         {
-         mtB = msg.find('C') - 1;
-         mtS = msg.substr(0, mtB).find_last_of(',') + 1;
-         mtSubLen = mtB - mtS;
-         mtTemp = std::stod(msg.substr(mtS, mtSubLen), &mtNumIdx) * 1000.0;
-         if (mtNumIdx == mtSubLen)
-         {
-         VFRB::msClimateData.setTemp(mtTemp);
-         }
-         else
-         {
-         return MSG_UNPACK_ERR;
-         }
-         }
-         catch (std::logic_error& e)
-         {
-         return MSG_UNPACK_ERR;
-         }*/
-    }
-    else if (msg.find("WIMWV") != std::string::npos)
+    } else if (cr_msg.find("MWV") != std::string::npos)
     {
-        VFRB::msClimateData.setWVstr(prio, msg);
-    }
-    else
+        vfrb::VFRB::msSensorData.setMWVstr(prio, cr_msg);
+    } else
     {
         return MSG_UNPACK_IGN;
     }
     return MSG_UNPACK_SUC;
 }
+
+}  // namespace parser

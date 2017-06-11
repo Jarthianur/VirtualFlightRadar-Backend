@@ -28,33 +28,92 @@
 
 #include "Client.h"
 
+namespace tcp
+{
+namespace client
+{
+
+/**
+ * The APRSCClient class, extends and implements Client.
+ *
+ * This Client provides functionality to handle connections to
+ * any APRSC server.
+ */
 class APRSCClient: public Client
 {
 public:
+    /**
+     * Non-copyable
+     */
     APRSCClient(const APRSCClient&) = delete;
+    /**
+     * Not assignable
+     */
     APRSCClient& operator=(const APRSCClient&) = delete;
-
-    APRSCClient(boost::asio::signal_set& /*sigset*/, const std::string& /*host*/,
-                const std::string& /*port*/, const std::string& /*login*/,
-                Feed& /*feed*/);
+    /**
+     * Constructor
+     *
+     * @param r_sigset the signal set handling interrupts
+     * @param cr_host  the hostname
+     * @param cr_port  the port
+     * @param cr_login the login string to transmit
+     * @param r_feed   the handler Feed
+     */
+    APRSCClient(boost::asio::signal_set& /*r_sigset*/,
+                const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+                const std::string& /*cr_login*/, vfrb::Feed& /*r_feed*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~APRSCClient() noexcept;
 
 private:
+    /**
+     * Implement Client::connect.
+     *
+     * @overload Client::connect
+     */
     void connect() noexcept override;
-
-    void handleResolve(const boost::system::error_code& /*ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
-    void handleConnect(const boost::system::error_code& /*ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
+    /**
+     * Implement Client::process
+     *
+     * @overload Client::process
+     */
+    void process() noexcept override;
+    /**
+     * Implement Client::handleResolve
+     *
+     * @overload Client::handleResolve
+     */
+    void handleResolve(const boost::system::error_code& /*cr_ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/)
+                               noexcept override;
+    /**
+     * Implement Client::handleConnect
+     *
+     * @overload Client::handleConnect
+     */
+    void handleConnect(const boost::system::error_code& /*cr_ec*/,
+                       boost::asio::ip::tcp::resolver::iterator /*it*/)
+                               noexcept override;
     /**
      * Send login string - handler
+     *
+     * @param cr_ec the error code
+     * @param s     the sent bytes
+     *
+     * @exceptsafe strong
      */
-    void handleLogin(const boost::system::error_code& /*ec*/, std::size_t /*s*/) noexcept;
+    void handleLogin(const boost::system::error_code& /*cr_ec*/,
+                     std::size_t /*s*/) noexcept;
 
-    /**
-     * Login string
-     */
+    /// Login string
     std::string mLoginStr;
 };
+
+}  // namespace client
+}  // namespace tcp
 
 #endif /* SRC_TCP_CLIENT_APRSCCLIENT_H_ */

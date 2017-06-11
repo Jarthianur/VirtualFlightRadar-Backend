@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_TCP_SERVER_NMEASERVER_H_
-#define SRC_TCP_SERVER_NMEASERVER_H_
+#ifndef SRC_TCP_SERVER_SERVER_H_
+#define SRC_TCP_SERVER_SERVER_H_
 
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
@@ -32,30 +32,57 @@
 #include "Connection.h"
 #include "../../config/Parameters.h"
 
+namespace tcp
+{
+namespace server
+{
+
 #define S_MAX_CLIENTS SERVER_MAX_CLIENTS
 
-class NMEAServer
+/**
+ * The Server class.
+ *
+ * This class provides all functionality to run a standalone server.
+ * A message may only be sent to all endpoints.
+ */
+class Server
 {
 public:
-    NMEAServer(const NMEAServer&) = delete;
-    NMEAServer& operator=(const NMEAServer&) = delete;
-
-    NMEAServer(boost::asio::signal_set& /*sigset*/, std::uint16_t /*port*/);
-    virtual ~NMEAServer() noexcept;
-
+    /**
+     * Non-copyable
+     */
+    Server(const Server&) = delete;
+    /**
+     * Not assignable
+     */
+    Server& operator=(const Server&) = delete;
+    /**
+     * Construct a Server with its port and
+     * the signal set to handle interrupts.
+     *
+     * @param r_sigset the signal set
+     * @param port the port where to open the server
+     */
+    Server(boost::asio::signal_set& /*r_sigset*/, std::uint16_t /*port*/);
+    virtual ~Server() noexcept;
     /**
      * Run server.
+     * This function returns as soon as every operation in the queue
+     * has returned, what may only happen if the server got an interrupt.
      */
     void run();
-
     /**
-     * Write message to all clients.
+     * Write a message to all clients.
+     *
+     * @param cr_msg the msg to write
      */
-    void writeToAll(const std::string& /*msg*/) noexcept;
+    void writeToAll(const std::string& /*cr_msg*/) noexcept;
 
 private:
     /**
-     * Accept connections
+     * Accept Connections.
+     *
+     * @exceptsafe strong
      */
     void accept() noexcept;
     /**
@@ -63,40 +90,33 @@ private:
      */
     void awaitStop();
     /**
-     * Stop all connections.
+     * Stop all Connections.
      */
     void stopAll();
-
     /**
      * Accept - handler
+     *
+     * @param cr_ec the error code
+     *
+     * @exceptsafe strong
      */
-    void handleAccept(const boost::system::error_code& /*ec*/) noexcept;
+    void handleAccept(const boost::system::error_code& /*cr_ec*/) noexcept;
 
-    /**
-     * Mutex - threadsafety
-     */
+    /// Mutex
     boost::mutex mMutex;
-
-    /**
-     * Internal IO-service
-     */
+    /// Internal IO-service
     boost::asio::io_service mIOservice;
-    /**
-     * Signals reference
-     */
+    /// Ref to signal set
     boost::asio::signal_set& mrSigSet;
-    /**
-     * Acceptor
-     */
+    /// Acceptor
     boost::asio::ip::tcp::acceptor mAcceptor;
-    /**
-     * Socket
-     */
+    /// Socket
     boost::asio::ip::tcp::socket mSocket;
-    /**
-     * Container for connections.
-     */
+    /// Vector holding Connections
     std::vector<boost::shared_ptr<Connection>> mClients;
 };
 
-#endif /* SRC_TCP_SERVER_NMEASERVER_H_ */
+}  // namespace server
+}  // namespace tcp
+
+#endif /* SRC_TCP_SERVER_SERVER_H_ */
