@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_VFRB_VFRB_H_
-#define SRC_VFRB_VFRB_H_
+#ifndef SRC_VFRB_H_
+#define SRC_VFRB_H_
 
 #include <atomic>
 #include <boost/asio/signal_set.hpp>
@@ -39,11 +39,10 @@ namespace server
 class Server;
 }
 }
-
-namespace vfrb
+namespace feed
 {
-
 class Feed;
+}
 
 /**
  * The VFRB class.
@@ -98,14 +97,14 @@ private:
      * @param r_sigset the signal set to pass
      * @param r_feed   the Feed to handle
      */
-    static void handleInputFeed(boost::asio::signal_set& /*r_sigset*/,
-                                Feed& /*r_feed*/);
+    static void handleFeed(boost::asio::signal_set& /*r_sigset*/,
+                           feed::Feed& /*r_feed*/);
     /**
      * Handler for an Server thread.
      *
      * @param r_server the Server to handle
      */
-    static void handleNMAEServer(tcp::server::Server& /*r_server*/);
+    static void handleServer(tcp::server::Server& /*r_server*/);
     /**
      * Handler for a signal interrupt thread.
      *
@@ -116,6 +115,4 @@ private:
                               const int /*sig*/);
 };
 
-}  // namespace vfrb
-
-#endif /* SRC_VFRB_VFRB_H_ */
+#endif /* SRC_VFRB_H_ */

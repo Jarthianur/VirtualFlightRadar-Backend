@@ -64,7 +64,7 @@ public:
      */
     SensorClient(boost::asio::signal_set& /*r_sigset*/,
                  const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-                 vfrb::Feed& /*r_feed*/);
+                 feed::Feed& /*r_feed*/);
     /**
      * Destructor
      *

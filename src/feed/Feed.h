@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_VFRB_FEED_H_
-#define SRC_VFRB_FEED_H_
+#ifndef SRC_FEED_FEED_H_
+#define SRC_FEED_FEED_H_
 
 #include <boost/asio/signal_set.hpp>
 #include <boost/move/core.hpp>
@@ -42,7 +42,7 @@ class Client;
 }
 }
 
-namespace vfrb
+namespace feed
 {
 
 /**
@@ -57,34 +57,6 @@ class Feed
 BOOST_MOVABLE_BUT_NOT_COPYABLE(Feed)
 
 public:
-    /**
-     * The InputType of a Feed.
-     * Determines the type of Client and Parser to use.
-     */
-    enum class InputType
-        : std::uint32_t
-        {
-            /// Use APRSCClient and APRSParser
-        APRSC,
-        /// Use SBSClient and SBSParser
-        SBS,
-        /// Use GPSDClient and GPSParser
-        GPS,
-        /// Use SensorClient and SensorParser
-        SENSOR
-    };
-    /**
-     * Construct a Feed with its meta-data and
-     * a key-value-map holding all properties.
-     *
-     * @param cr_name  the Feeds unique name
-     * @param prio     the Priority
-     * @param type     the InputType
-     * @param cr_kvmap the properties map
-     */
-    Feed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
-         InputType /*type*/,
-         const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
     /**
      * Destructor
      *
@@ -125,18 +97,26 @@ public:
     const std::string mName;
     /// Priority to write data
     const std::int32_t mPriority;
-    /// Type
-    const InputType mType;
 
-private:
+protected:
+    /**
+     * Construct a Feed with its meta-data and
+     * a key-value-map holding all properties.
+     *
+     * @param cr_name  the Feeds unique name
+     * @param prio     the Priority
+     * @param cr_kvmap the properties map
+     */
+    Feed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
+         const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
     /// Key-value-map holding the properties.
     std::unordered_map<std::string, std::string> mKVmap;
-    /// Client, later resolved according to InpuType
+    /// Client receiving the input
     std::unique_ptr<tcp::client::Client> mpClient;
-    /// Parser, later resolved according to InpuType
+    /// Parser parsing the input
     std::unique_ptr<parser::Parser> mpParser;
 };
 
-}  // namespace vfrb
+}  // namespace feed
 
-#endif /* SRC_VFRB_FEED_H_ */
+#endif /* SRC_FEED_FEED_H_ */

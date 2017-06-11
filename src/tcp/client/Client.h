@@ -28,7 +28,7 @@
 #include <string>
 #include "../../config/Parameters.h"
 
-namespace vfrb
+namespace feed
 {
 class Feed;
 }
@@ -72,7 +72,7 @@ public:
      * Run the Client.
      * This function returns after all queued handles have returned.
      */
-    void run();
+    void run(boost::asio::signal_set& /*r_sigset*/);
 
 protected:
     /**
@@ -86,9 +86,8 @@ protected:
      * @param cr_comp  the component string
      * @param r_feed   the handler Feed
      */
-    Client(boost::asio::signal_set& /*r_sigset*/,
-           const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-           const std::string& /*cr_comp*/, vfrb::Feed& /*r_feed*/);
+    Client(const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+           const std::string& /*cr_comp*/, feed::Feed& /*r_feed*/);
     /**
      * Register stop-handler to signals.
      */
@@ -174,7 +173,7 @@ protected:
     /// Component string used for logging
     const std::string mComponent;
     /// Handler Feed reference
-    vfrb::Feed& mrFeed;
+    feed::Feed& mrFeed;
 
 private:
     /// Connection timer

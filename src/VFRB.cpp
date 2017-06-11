@@ -29,20 +29,18 @@
 #include <functional>
 #include <string>
 
-#include "../config/Configuration.h"
-#include "../data/AircraftContainer.h"
-#include "../data/GPSData.h"
-#include "../data/SensorData.h"
-#include "../tcp/client/APRSCClient.h"
-#include "../tcp/client/SBSClient.h"
-#include "../tcp/client/SensorClient.h"
-#include "../tcp/server/Server.h"
-#include "../util/Logger.h"
+#include "config/Configuration.h"
+#include "data/AircraftContainer.h"
+#include "data/GPSData.h"
+#include "data/SensorData.h"
+#include "tcp/client/APRSCClient.h"
+#include "tcp/client/SBSClient.h"
+#include "tcp/client/SensorClient.h"
+#include "tcp/server/Server.h"
+#include "util/Logger.h"
+#include "feed/Feed.h"
 
 using namespace util;
-
-namespace vfrb
-{
 
 #define SYNC_TIME (1)
 
@@ -89,15 +87,15 @@ void VFRB::run() noexcept
     tcp::server::Server server(signal_set,
             config::Configuration::global_server_port);
     boost::thread server_thread(
-            boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
+            boost::bind(&VFRB::handleServer, std::ref(server)));
 
     //init input threads
-    boost::thread_group threads;
+    boost::thread_group feed_threads;
     for (auto it = config::Configuration::global_feeds.begin();
             it != config::Configuration::global_feeds.end(); ++it)
     {
-        threads.create_thread(
-                boost::bind(&VFRB::handleInputFeed, std::ref(signal_set),
+        feed_threads.create_thread(
+                boost::bind(&VFRB::handleFeed, std::ref(signal_set),
                         std::ref(*it)));
     }
 
@@ -137,7 +135,7 @@ void VFRB::run() noexcept
 
     // exit sequence, join threads
     server_thread.join();
-    threads.join_all();
+    feed_threads.join_all();
     signal_thread.join();
 
     //eval end time
@@ -156,7 +154,7 @@ void VFRB::run() noexcept
 
 }
 
-void VFRB::handleNMAEServer(tcp::server::Server& r_server)
+void VFRB::handleServer(tcp::server::Server& r_server)
 {
     Logger::info("(Server) startup: localhost ",
             std::to_string(config::Configuration::global_server_port));
@@ -164,7 +162,7 @@ void VFRB::handleNMAEServer(tcp::server::Server& r_server)
     global_run_status = false;
 }
 
-void VFRB::handleInputFeed(boost::asio::signal_set& r_sigset, Feed& r_feed)
+void VFRB::handleFeed(boost::asio::signal_set& r_sigset, feed::Feed& r_feed)
 {
     Logger::info("(VFRB) run feed: ", r_feed.mName);
     r_feed.run(r_sigset);
@@ -175,5 +173,3 @@ void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)
     Logger::info("(VFRB) caught signal: ", "shutdown");
     global_run_status = false;
 }
-
-}  // namespace vfrb

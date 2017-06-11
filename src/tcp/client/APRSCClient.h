@@ -59,8 +59,7 @@ public:
      * @param cr_login the login string to transmit
      * @param r_feed   the handler Feed
      */
-    APRSCClient(boost::asio::signal_set& /*r_sigset*/,
-                const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+    APRSCClient(const std::string& /*cr_host*/, const std::string& /*cr_port*/,
                 const std::string& /*cr_login*/, vfrb::Feed& /*r_feed*/);
     /**
      * Destructor
