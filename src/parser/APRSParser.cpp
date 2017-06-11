@@ -30,7 +30,7 @@
 #include "../data/AircraftContainer.h"
 #include "../util/Logger.h"
 #include "../util/Math.hpp"
-#include "../vfrb/VFRB.h"
+#include "../VFRB.h"
 
 namespace parser
 {
@@ -156,7 +156,7 @@ noexcept
                 mtClimbRate, mtTurnRate, mtHeading);
         ac.setFullInfo(tmpFullInfo);
         ac.setTargetT(aircraft::Aircraft::TargetType::FLARM);
-        vfrb::VFRB::msAcCont.insertAircraft(ac, prio);
+        VFRB::msAcCont.insertAircraft(ac, prio);
     } else
     {
         return MSG_UNPACK_IGN;

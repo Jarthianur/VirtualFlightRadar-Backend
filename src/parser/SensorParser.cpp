@@ -25,7 +25,7 @@
 
 #include "../data/SensorData.h"
 #include "../util/Math.hpp"
-#include "../vfrb/VFRB.h"
+#include "../VFRB.h"
 
 namespace parser
 {
@@ -57,7 +57,7 @@ noexcept
 
     if (cr_msg.find("MDA") != std::string::npos)
     {
-        vfrb::VFRB::msSensorData.setMDAstr(prio, cr_msg);
+        VFRB::msSensorData.setMDAstr(prio, cr_msg);
         try
         {
             std::size_t tmpB = cr_msg.find('B') - 1;
@@ -68,7 +68,7 @@ noexcept
                     * 1000.0;
             if (numIdx == subLen)
             {
-                vfrb::VFRB::msSensorData.setPress(prio, tmpPress);
+                VFRB::msSensorData.setPress(prio, tmpPress);
             } else
             {
                 return MSG_UNPACK_ERR;
@@ -79,7 +79,7 @@ noexcept
         }
     } else if (cr_msg.find("MWV") != std::string::npos)
     {
-        vfrb::VFRB::msSensorData.setMWVstr(prio, cr_msg);
+        VFRB::msSensorData.setMWVstr(prio, cr_msg);
     } else
     {
         return MSG_UNPACK_IGN;

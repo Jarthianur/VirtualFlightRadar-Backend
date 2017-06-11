@@ -29,7 +29,7 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftContainer.h"
 #include "../util/Math.hpp"
-#include "../vfrb/VFRB.h"
+#include "../VFRB.h"
 
 namespace parser
 {
@@ -135,7 +135,7 @@ noexcept
     aircraft::Aircraft ac(mtID, mtGPSpos);
     ac.setFullInfo(false);
     ac.setTargetT(aircraft::Aircraft::TargetType::TRANSPONDER);
-    vfrb::VFRB::msAcCont.insertAircraft(ac, prio);
+    VFRB::msAcCont.insertAircraft(ac, prio);
 
     return MSG_UNPACK_SUC;
 }

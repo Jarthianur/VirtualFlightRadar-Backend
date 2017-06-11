@@ -26,6 +26,7 @@
 #include "../config/Configuration.h"
 #include "../parser/APRSParser.h"
 #include "../tcp/client/APRSCClient.h"
+#include "../util/Logger.h"
 
 using namespace util;
 

@@ -21,15 +21,18 @@
 
 #include "Configuration.h"
 
-#include <sys/types.h>
-#include <algorithm>
 #include <iterator>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <typeindex>
-#include <unordered_map>
 
+#include "../feed/AprscFeed.h"
+#include "../feed/GpsFeed.h"
+#include "../feed/SbsFeed.h"
+#include "../feed/SensorFeed.h"
 #include "../util/Logger.h"
+
 using namespace util;
 
 namespace config
@@ -39,7 +42,7 @@ Configuration::Configuration(const char* file)
 {
     if (!init(file))
     {
-        throw std::logic_error("failed to read configuration file");
+        throw std::logic_error("Failed to read configuration file");
     }
 }
 
@@ -57,7 +60,7 @@ std::int32_t Configuration::filter_maxDist = 0;
 std::uint16_t Configuration::global_server_port = 1;
 bool Configuration::global_gnd_mode = false;
 
-std::vector<vfrb::Feed> Configuration::global_feeds;
+std::vector<std::shared_ptr<feed::Feed>> Configuration::global_feeds;
 
 bool Configuration::init(const char* file)
 {
@@ -159,11 +162,13 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                vfrb::Feed f(*it,
-                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                        vfrb::Feed::InputType::APRSC, r_cr.getSectionKV(*it));
-                global_feeds.push_back(std::move(f));
-            } catch (const std::out_of_range& e)
+                global_feeds.push_back(
+                        std::shared_ptr<feed::Feed>(
+                                new feed::AprscFeed(*it,
+                                        strToInt(r_cr.getProperty(*it,
+                                        KV_KEY_PRIORITY, "0")),
+                                        r_cr.getSectionKV(*it))));
+            } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());
             }
@@ -171,11 +176,13 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                vfrb::Feed f(*it,
-                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                        vfrb::Feed::InputType::SBS, r_cr.getSectionKV(*it));
-                global_feeds.push_back(std::move(f));
-            } catch (const std::out_of_range& e)
+                global_feeds.push_back(
+                        std::shared_ptr<feed::Feed>(
+                                new feed::SbsFeed(*it,
+                                        strToInt(r_cr.getProperty(*it,
+                                        KV_KEY_PRIORITY, "0")),
+                                        r_cr.getSectionKV(*it))));
+            } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());
             }
@@ -183,11 +190,13 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                vfrb::Feed f(*it,
-                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                        vfrb::Feed::InputType::SENSOR, r_cr.getSectionKV(*it));
-                global_feeds.push_back(std::move(f));
-            } catch (const std::out_of_range& e)
+                global_feeds.push_back(
+                        std::shared_ptr<feed::Feed>(
+                                new feed::SensorFeed(*it,
+                                        strToInt(r_cr.getProperty(*it,
+                                        KV_KEY_PRIORITY, "0")),
+                                        r_cr.getSectionKV(*it))));
+            } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());
             }
@@ -195,11 +204,13 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                vfrb::Feed f(*it,
-                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                        vfrb::Feed::InputType::GPS, r_cr.getSectionKV(*it));
-                global_feeds.push_back(std::move(f));
-            } catch (const std::out_of_range& e)
+                global_feeds.push_back(
+                        std::shared_ptr<feed::Feed>(
+                                new feed::GpsFeed(*it,
+                                        strToInt(r_cr.getProperty(*it,
+                                        KV_KEY_PRIORITY, "0")),
+                                        r_cr.getSectionKV(*it))));
+            } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());
             }

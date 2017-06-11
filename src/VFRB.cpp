@@ -25,6 +25,7 @@
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
 #include <boost/thread.hpp>
+#include <boost/move/move.hpp>
 #include <exception>
 #include <functional>
 #include <string>
@@ -95,9 +96,9 @@ void VFRB::run() noexcept
             it != config::Configuration::global_feeds.end(); ++it)
     {
         feed_threads.create_thread(
-                boost::bind(&VFRB::handleFeed, std::ref(signal_set),
-                        std::ref(*it)));
+                boost::bind(&VFRB::handleFeed, std::ref(signal_set), *it));
     }
+    config::Configuration::global_feeds.clear();
 
     while (global_run_status)
     {
@@ -162,10 +163,11 @@ void VFRB::handleServer(tcp::server::Server& r_server)
     global_run_status = false;
 }
 
-void VFRB::handleFeed(boost::asio::signal_set& r_sigset, feed::Feed& r_feed)
+void VFRB::handleFeed(boost::asio::signal_set& r_sigset,
+                      std::shared_ptr<feed::Feed> p_feed)
 {
-    Logger::info("(VFRB) run feed: ", r_feed.mName);
-    r_feed.run(r_sigset);
+    Logger::info("(VFRB) run feed: ", p_feed->mName);
+    p_feed->run(r_sigset);
 }
 
 void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)

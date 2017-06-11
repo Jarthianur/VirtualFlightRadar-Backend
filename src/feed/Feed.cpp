@@ -28,6 +28,8 @@
 #include "../config/Configuration.h"
 #include "../util/Logger.h"
 #include "../VFRB.h"
+#include "../tcp/client/Client.h"
+#include "../parser/Parser.h"
 
 using namespace util;
 

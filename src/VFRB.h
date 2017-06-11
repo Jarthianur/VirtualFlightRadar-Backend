@@ -25,6 +25,7 @@
 #include <atomic>
 #include <boost/asio/signal_set.hpp>
 #include <boost/system/error_code.hpp>
+#include <memory>
 
 namespace data
 {
@@ -98,7 +99,7 @@ private:
      * @param r_feed   the Feed to handle
      */
     static void handleFeed(boost::asio::signal_set& /*r_sigset*/,
-                           feed::Feed& /*r_feed*/);
+                           std::shared_ptr<feed::Feed> /*p_feed*/);
     /**
      * Handler for an Server thread.
      *
