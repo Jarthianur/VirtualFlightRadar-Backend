@@ -34,7 +34,7 @@ namespace server
 /**
  * The Connection class.
  *
- * This class represents a TCP connection opened by the NMEAServer.
+ * This class represents a TCP connection opened by the Server.
  * The connection is closed with destruction.
  * May only be used as shared pointer to a singleton Connection.
  */

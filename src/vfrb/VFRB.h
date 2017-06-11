@@ -36,7 +36,7 @@ namespace tcp
 {
 namespace server
 {
-class NMEAServer;
+class Server;
 }
 }
 
@@ -101,11 +101,11 @@ private:
     static void handleInputFeed(boost::asio::signal_set& /*r_sigset*/,
                                 Feed& /*r_feed*/);
     /**
-     * Handler for an NMEAServer thread.
+     * Handler for an Server thread.
      *
-     * @param r_server the NMEAServer to handle
+     * @param r_server the Server to handle
      */
-    static void handleNMAEServer(tcp::server::NMEAServer& /*r_server*/);
+    static void handleNMAEServer(tcp::server::Server& /*r_server*/);
     /**
      * Handler for a signal interrupt thread.
      *

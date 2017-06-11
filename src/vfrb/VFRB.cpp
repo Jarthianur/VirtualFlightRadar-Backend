@@ -36,7 +36,7 @@
 #include "../tcp/client/APRSCClient.h"
 #include "../tcp/client/SBSClient.h"
 #include "../tcp/client/SensorClient.h"
-#include "../tcp/server/NMEAServer.h"
+#include "../tcp/server/Server.h"
 #include "../util/Logger.h"
 
 using namespace util;
@@ -86,7 +86,7 @@ void VFRB::run() noexcept
     });
 
     // init server and run handler
-    tcp::server::NMEAServer server(signal_set,
+    tcp::server::Server server(signal_set,
             config::Configuration::global_server_port);
     boost::thread server_thread(
             boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
@@ -156,9 +156,9 @@ void VFRB::run() noexcept
 
 }
 
-void VFRB::handleNMAEServer(tcp::server::NMEAServer& r_server)
+void VFRB::handleNMAEServer(tcp::server::Server& r_server)
 {
-    Logger::info("(NMEAServer) startup: localhost ",
+    Logger::info("(Server) startup: localhost ",
             std::to_string(config::Configuration::global_server_port));
     r_server.run();
     global_run_status = false;

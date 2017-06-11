@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_TCP_SERVER_NMEASERVER_H_
-#define SRC_TCP_SERVER_NMEASERVER_H_
+#ifndef SRC_TCP_SERVER_SERVER_H_
+#define SRC_TCP_SERVER_SERVER_H_
 
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
@@ -40,31 +40,31 @@ namespace server
 #define S_MAX_CLIENTS SERVER_MAX_CLIENTS
 
 /**
- * The NMEAServer class.
+ * The Server class.
  *
  * This class provides all functionality to run a standalone server.
  * A message may only be sent to all endpoints.
  */
-class NMEAServer
+class Server
 {
 public:
     /**
      * Non-copyable
      */
-    NMEAServer(const NMEAServer&) = delete;
+    Server(const Server&) = delete;
     /**
      * Not assignable
      */
-    NMEAServer& operator=(const NMEAServer&) = delete;
+    Server& operator=(const Server&) = delete;
     /**
-     * Construct a NMEAServer with its port and
+     * Construct a Server with its port and
      * the signal set to handle interrupts.
      *
      * @param r_sigset the signal set
      * @param port the port where to open the server
      */
-    NMEAServer(boost::asio::signal_set& /*r_sigset*/, std::uint16_t /*port*/);
-    virtual ~NMEAServer() noexcept;
+    Server(boost::asio::signal_set& /*r_sigset*/, std::uint16_t /*port*/);
+    virtual ~Server() noexcept;
     /**
      * Run server.
      * This function returns as soon as every operation in the queue
@@ -119,4 +119,4 @@ private:
 }  // namespace server
 }  // namespace tcp
 
-#endif /* SRC_TCP_SERVER_NMEASERVER_H_ */
+#endif /* SRC_TCP_SERVER_SERVER_H_ */

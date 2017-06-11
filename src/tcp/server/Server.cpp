@@ -19,7 +19,7 @@
  }
  */
 
-#include "NMEAServer.h"
+#include "Server.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -38,7 +38,7 @@ namespace tcp
 namespace server
 {
 
-NMEAServer::NMEAServer(boost::asio::signal_set& r_sigset, std::uint16_t port)
+Server::Server(boost::asio::signal_set& r_sigset, std::uint16_t port)
         : mIOservice(),
           mrSigSet(r_sigset),
           mAcceptor(mIOservice,
@@ -51,16 +51,16 @@ NMEAServer::NMEAServer(boost::asio::signal_set& r_sigset, std::uint16_t port)
     accept();
 }
 
-NMEAServer::~NMEAServer() noexcept
+Server::~Server() noexcept
 {
 }
 
-void NMEAServer::run()
+void Server::run()
 {
     mIOservice.run();
 }
 
-void NMEAServer::writeToAll(const std::string& cr_msg) noexcept
+void Server::writeToAll(const std::string& cr_msg) noexcept
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     boost::system::error_code ec;
@@ -70,7 +70,7 @@ void NMEAServer::writeToAll(const std::string& cr_msg) noexcept
                 ec);
         if (ec)
         {
-            Logger::warn("(NMEAServer) lost connection to: ",
+            Logger::warn("(Server) lost connection to: ",
                     it->get()->getIP());
             mClients.erase(it);
         } else
@@ -80,14 +80,14 @@ void NMEAServer::writeToAll(const std::string& cr_msg) noexcept
     }
 }
 
-void NMEAServer::accept() noexcept
+void Server::accept() noexcept
 {
     mAcceptor.async_accept(mSocket,
-            boost::bind(&NMEAServer::handleAccept, this,
+            boost::bind(&Server::handleAccept, this,
                     boost::asio::placeholders::error));
 }
 
-void NMEAServer::awaitStop()
+void Server::awaitStop()
 {
     mrSigSet.async_wait([this](const boost::system::error_code&, int)
     {
@@ -96,14 +96,14 @@ void NMEAServer::awaitStop()
     });
 }
 
-void NMEAServer::stopAll()
+void Server::stopAll()
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    Logger::info("(NMEAServer) stopping all clients...");
+    Logger::info("(Server) stopping all clients...");
     mClients.clear();
 }
 
-void NMEAServer::handleAccept(const boost::system::error_code& cr_ec) noexcept
+void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
 {
     if (!mAcceptor.is_open())
     {
@@ -115,15 +115,15 @@ void NMEAServer::handleAccept(const boost::system::error_code& cr_ec) noexcept
         if (mClients.size() < S_MAX_CLIENTS)
         {
             mClients.push_back(client);
-            Logger::info("(NMEAServer) connection from: ", client->getIP());
+            Logger::info("(Server) connection from: ", client->getIP());
         } else
         {
-            Logger::info("(NMEAServer) client count exceeded, refuse: ",
+            Logger::info("(Server) client count exceeded, refuse: ",
                     client->getIP());
         }
     } else if (cr_ec != boost::system::errc::bad_file_descriptor)
     {
-        Logger::warn("(NMEAServer) accept: ", cr_ec.message());
+        Logger::warn("(Server) accept: ", cr_ec.message());
     }
     accept();
 }

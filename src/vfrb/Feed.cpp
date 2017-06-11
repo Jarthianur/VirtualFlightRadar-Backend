@@ -135,7 +135,7 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
         default:
             return;
     }
-    if (VFRB::global_run_status) // TODO while ?
+    if (VFRB::global_run_status)
     {
         mpClient->run();
     }
