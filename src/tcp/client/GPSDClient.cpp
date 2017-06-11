@@ -25,7 +25,7 @@
 #include <boost/bind.hpp>
 #include <cstddef>
 #include "../../config/Configuration.h"
-#include "../../vfrb/Feed.h"
+#include "../../feed/Feed.h"
 #include "../../util/Logger.h"
 
 using namespace util;
@@ -35,10 +35,9 @@ namespace tcp
 namespace client
 {
 
-GPSDClient::GPSDClient(boost::asio::signal_set& r_sigset,
-                       const std::string& cr_host, const std::string& cr_port,
-                       vfrb::Feed& r_feed)
-        : Client(r_sigset, cr_host, cr_port, "(GPSDClient)", r_feed)
+GPSDClient::GPSDClient(const std::string& cr_host, const std::string& cr_port,
+                       feed::Feed& r_feed)
+        : Client(cr_host, cr_port, "(GPSDClient)", r_feed)
 {
     connect();
 }
@@ -93,7 +92,7 @@ void GPSDClient::handleConnect(const boost::system::error_code& cr_ec,
                                {
     if (!cr_ec)
     {
-        mSocket.set_option(boost::asio::socket_base::keep_alive(true)); // necessary?
+        mSocket.set_option(boost::asio::socket_base::keep_alive(true));
         boost::asio::async_write(mSocket,
                 boost::asio::buffer(
                         "?WATCH={\"enable\":true,\"nmea\":true}\r\n"),

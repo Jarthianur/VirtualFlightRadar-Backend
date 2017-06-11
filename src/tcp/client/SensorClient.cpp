@@ -35,10 +35,9 @@ namespace tcp
 namespace client
 {
 
-SensorClient::SensorClient(boost::asio::signal_set& r_sigset,
-                           const std::string& cr_host,
+SensorClient::SensorClient(const std::string& cr_host,
                            const std::string& cr_port, feed::Feed& r_feed)
-        : Client(r_sigset, cr_host, cr_port, "(SensorClient)", r_feed),
+        : Client(cr_host, cr_port, "(SensorClient)", r_feed),
           mStopped(false),
           mTimeout(mIOservice)
 {

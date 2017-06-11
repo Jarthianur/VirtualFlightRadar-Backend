@@ -89,10 +89,6 @@ protected:
     Client(const std::string& /*cr_host*/, const std::string& /*cr_port*/,
            const std::string& /*cr_comp*/, feed::Feed& /*r_feed*/);
     /**
-     * Register stop-handler to signals.
-     */
-    void awaitStop();
-    /**
      * Connect with timeout.
      */
     void timedConnect() noexcept;
@@ -156,8 +152,6 @@ protected:
 
     /// Internal IO-service
     boost::asio::io_service mIOservice;
-    /// Signal set reference
-    boost::asio::signal_set& mrSigSet;
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
     /// Resolver

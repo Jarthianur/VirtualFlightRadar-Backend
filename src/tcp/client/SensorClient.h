@@ -62,8 +62,7 @@ public:
      * @param cr_login the login string to transmit
      * @param r_feed   the handler Feed
      */
-    SensorClient(boost::asio::signal_set& /*r_sigset*/,
-                 const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+    SensorClient(const std::string& /*cr_host*/, const std::string& /*cr_port*/,
                  feed::Feed& /*r_feed*/);
     /**
      * Destructor

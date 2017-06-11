@@ -60,7 +60,7 @@ public:
      * @param r_feed   the handler Feed
      */
     APRSCClient(const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-                const std::string& /*cr_login*/, vfrb::Feed& /*r_feed*/);
+                const std::string& /*cr_login*/, feed::Feed& /*r_feed*/);
     /**
      * Destructor
      *
