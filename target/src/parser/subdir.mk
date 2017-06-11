@@ -4,24 +4,24 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/parser/APRSParser.cpp \
-../src/parser/GPSParser.cpp \
+../src/parser/AprsParser.cpp \
+../src/parser/GpsParser.cpp \
 ../src/parser/Parser.cpp \
-../src/parser/SBSParser.cpp \
+../src/parser/SbsParser.cpp \
 ../src/parser/SensorParser.cpp 
 
 OBJS += \
-./src/parser/APRSParser.o \
-./src/parser/GPSParser.o \
+./src/parser/AprsParser.o \
+./src/parser/GpsParser.o \
 ./src/parser/Parser.o \
-./src/parser/SBSParser.o \
+./src/parser/SbsParser.o \
 ./src/parser/SensorParser.o 
 
 CPP_DEPS += \
-./src/parser/APRSParser.d \
-./src/parser/GPSParser.d \
+./src/parser/AprsParser.d \
+./src/parser/GpsParser.d \
 ./src/parser/Parser.d \
-./src/parser/SBSParser.d \
+./src/parser/SbsParser.d \
 ./src/parser/SensorParser.d 
 
 
