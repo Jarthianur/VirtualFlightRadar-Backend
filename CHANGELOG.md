@@ -1,6 +1,6 @@
 # changelog
 
-#### 2.1.0
+### 2.1.0
 
 + support GPSD
 + common sensor interface (support [BME280 driver](https://github.com/Jarthianur/sensorics))

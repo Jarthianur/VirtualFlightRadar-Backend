@@ -5,15 +5,15 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/tcp/server/Connection.cpp \
-../src/tcp/server/NMEAServer.cpp 
+../src/tcp/server/Server.cpp 
 
 OBJS += \
 ./src/tcp/server/Connection.o \
-./src/tcp/server/NMEAServer.o 
+./src/tcp/server/Server.o 
 
 CPP_DEPS += \
 ./src/tcp/server/Connection.d \
-./src/tcp/server/NMEAServer.d 
+./src/tcp/server/Server.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
