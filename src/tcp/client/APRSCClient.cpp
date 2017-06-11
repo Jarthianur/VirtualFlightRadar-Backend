@@ -26,7 +26,7 @@
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <iostream>
-#include "../../vfrb/Feed.h"
+#include "../../feed/Feed.h"
 #include "../../util/Logger.h"
 
 using namespace util;
@@ -36,10 +36,9 @@ namespace tcp
 namespace client
 {
 
-APRSCClient::APRSCClient(boost::asio::signal_set& r_sigset,
-                         const std::string& cr_host, const std::string& cr_port,
-                         const std::string& cr_login, vfrb::Feed& r_feed)
-        : Client(r_sigset, cr_host, cr_port, "(APRSCClient)", r_feed),
+APRSCClient::APRSCClient(const std::string& cr_host, const std::string& cr_port,
+                         const std::string& cr_login, feed::Feed& r_feed)
+        : Client(cr_host, cr_port, "(APRSCClient)", r_feed),
           mLoginStr(cr_login)
 {
     mLoginStr.append("\r\n");

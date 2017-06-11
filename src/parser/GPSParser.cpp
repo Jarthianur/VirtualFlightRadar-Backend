@@ -26,7 +26,7 @@
 
 #include "../data/GPSData.h"
 #include "../util/Math.hpp"
-#include "../vfrb/VFRB.h"
+#include "../VFRB.h"
 
 namespace parser
 {
@@ -101,7 +101,7 @@ noexcept
         {
             return MSG_UNPACK_ERR;
         }
-        vfrb::VFRB::msGPSdata.setBasePos(prio, mtGPSpos);
+        VFRB::msGPSdata.setBasePos(prio, mtGPSpos);
 
         if (mtGPSpos.nrSats >= GPS_NR_SATS_GOOD && mtGPSpos.fixQa
                 >= GPS_FIX_GOOD

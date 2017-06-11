@@ -25,7 +25,7 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <iostream>
-#include "../../vfrb/Feed.h"
+#include "../../feed/Feed.h"
 #include "../../util/Logger.h"
 
 using namespace util;
@@ -35,11 +35,9 @@ namespace tcp
 namespace client
 {
 
-Client::Client(boost::asio::signal_set& r_sigset, const std::string& cr_host,
-               const std::string& cr_port, const std::string& cr_comp,
-               vfrb::Feed& r_feed)
+Client::Client(const std::string& cr_host, const std::string& cr_port,
+               const std::string& cr_comp, feed::Feed& r_feed)
         : mIOservice(),
-          mrSigSet(r_sigset),
           mSocket(mIOservice),
           mResolver(mIOservice),
           mHost(cr_host),
@@ -49,24 +47,19 @@ Client::Client(boost::asio::signal_set& r_sigset, const std::string& cr_host,
           mConnectTimer(mIOservice)
 
 {
-    awaitStop();
 }
 
 Client::~Client() noexcept
 {
 }
 
-void Client::run()
+void Client::run(boost::asio::signal_set& r_sigset)
 {
-    mIOservice.run();
-}
-
-void Client::awaitStop()
-{
-    mrSigSet.async_wait([this](const boost::system::error_code&, int)
+    r_sigset.async_wait([this](const boost::system::error_code&, int)
     {
         stop();
     });
+    mIOservice.run();
 }
 
 void Client::timedConnect() noexcept

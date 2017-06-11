@@ -28,7 +28,7 @@
 #include <string>
 #include "../../config/Parameters.h"
 
-namespace vfrb
+namespace feed
 {
 class Feed;
 }
@@ -71,28 +71,24 @@ public:
     /**
      * Run the Client.
      * This function returns after all queued handles have returned.
+     *
+     * @param r_sigset the signal set reference handling signals
      */
-    void run();
+    void run(boost::asio::signal_set& /*r_sigset*/);
 
 protected:
     /**
-     * Construct a Client given a signal set, handling interrupts,
-     * host, port, a string representing the Client type
+     * Construct a Client given a host, port,
+     * a string representing the Client type
      * and the Feed handling this Client.
      *
-     * @param r_sigset the signal set
      * @param cr_host  the hostname
      * @param cr_port  the port
      * @param cr_comp  the component string
-     * @param r_feed   the handler Feed
+     * @param r_feed   the handler Feed reference
      */
-    Client(boost::asio::signal_set& /*r_sigset*/,
-           const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-           const std::string& /*cr_comp*/, vfrb::Feed& /*r_feed*/);
-    /**
-     * Register stop-handler to signals.
-     */
-    void awaitStop();
+    Client(const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+           const std::string& /*cr_comp*/, feed::Feed& /*r_feed*/);
     /**
      * Connect with timeout.
      */
@@ -157,8 +153,6 @@ protected:
 
     /// Internal IO-service
     boost::asio::io_service mIOservice;
-    /// Signal set reference
-    boost::asio::signal_set& mrSigSet;
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
     /// Resolver
@@ -174,7 +168,7 @@ protected:
     /// Component string used for logging
     const std::string mComponent;
     /// Handler Feed reference
-    vfrb::Feed& mrFeed;
+    feed::Feed& mrFeed;
 
 private:
     /// Connection timer

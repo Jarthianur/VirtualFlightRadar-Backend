@@ -26,8 +26,9 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
 
-#include "../vfrb/Feed.h"
+#include "../feed/Feed.h"
 #include "ConfigReader.h"
 
 namespace config
@@ -100,7 +101,7 @@ public:
     /// Ground mode enabled?
     static bool global_gnd_mode;
     /// All registered and correctly parsed input feeds
-    static std::vector<vfrb::Feed> global_feeds;
+    static std::vector<std::shared_ptr<feed::Feed>> global_feeds;
 
 private:
     /**
