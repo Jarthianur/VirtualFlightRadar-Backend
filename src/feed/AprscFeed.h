@@ -27,11 +27,28 @@
 namespace feed
 {
 
+/**
+ * The AprscFeed class.
+ *
+ * This inherits from Feed and
+ * resolves to APRSC handling Client and Parser.
+ */
 class AprscFeed: public Feed
 {
 public:
+    /**
+     * Construct an AprscFeed.
+     * Pass parameters to parent constructor.
+     *
+     * @throws std::runtime_error if login is not given in cr_kvmap
+     */
     AprscFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
               const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~AprscFeed() noexcept;
 };
 

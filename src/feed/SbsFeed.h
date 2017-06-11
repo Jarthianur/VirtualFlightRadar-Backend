@@ -27,11 +27,26 @@
 namespace feed
 {
 
+/**
+ * The SbsFeed class.
+ *
+ * This inherits from Feed and
+ * resolves to SBS handling Client and Parser.
+ */
 class SbsFeed: public Feed
 {
 public:
+    /**
+     * Construct an SbsFeed.
+     * Pass all parameters to parent constructor.
+     */
     SbsFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
             const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~SbsFeed() noexcept;
 };
 

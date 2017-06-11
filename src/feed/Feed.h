@@ -49,8 +49,9 @@ namespace feed
  * The Feed class.
  *
  * This class represents an input feed.
- * A Feed is unique and handles its Client and Parser
- * according to its type.
+ * A Feed is unique and movable but not copyable.
+ * The Client and Parser are resolved by concrete
+ * derived classes.
  */
 class Feed
 {
@@ -73,9 +74,6 @@ public:
     Feed& operator=(BOOST_RV_REF(Feed));
     /**
      * Run a Feed.
-     * This function resolves the Feeds properties
-     * from the key-value-map and wraps the Clients
-     * run method.
      *
      * @param r_sigset the signal set to pass to the Client
      *
@@ -102,10 +100,13 @@ protected:
     /**
      * Construct a Feed with its meta-data and
      * a key-value-map holding all properties.
+     * Host and port for the Client get resolved in here.
      *
      * @param cr_name  the Feeds unique name
-     * @param prio     the Priority
+     * @param prio     the priority
      * @param cr_kvmap the properties map
+     *
+     * @throws std::runtime_error if host or port are not given
      */
     Feed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
          const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);

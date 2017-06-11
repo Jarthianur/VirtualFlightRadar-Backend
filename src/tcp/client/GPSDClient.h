@@ -53,11 +53,10 @@ public:
     /**
      * Constructor
      *
-     * @param r_sigset the signal set handling interrupts
      * @param cr_host  the hostname
      * @param cr_port  the port
      * @param cr_login the login string to transmit
-     * @param r_feed   the handler Feed
+     * @param r_feed   the handler Feed reference
      */
     GPSDClient(const std::string& /*cr_host*/, const std::string& /*cr_port*/,
                feed::Feed& /*r_feed*/);

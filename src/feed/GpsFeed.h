@@ -27,11 +27,26 @@
 namespace feed
 {
 
+/**
+ * The GpsFeed class.
+ *
+ * This inherits from Feed and
+ * resolves to GPS handling Client and Parser.
+ */
 class GpsFeed: public Feed
 {
 public:
+    /**
+     * Construct an GpsFeed.
+     * Pass all parameters to parent constructor.
+     */
     GpsFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
             const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~GpsFeed() noexcept;
 };
 
