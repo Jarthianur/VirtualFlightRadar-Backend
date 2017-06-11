@@ -38,15 +38,15 @@ namespace client
 Client::Client(boost::asio::signal_set& r_sigset, const std::string& cr_host,
                const std::string& cr_port, const std::string& cr_comp,
                vfrb::Feed& r_feed)
-        : mIOservice(),
+        : mIoService(),
           mrSigSet(r_sigset),
-          mSocket(mIOservice),
-          mResolver(mIOservice),
+          mSocket(mIoService),
+          mResolver(mIoService),
           mHost(cr_host),
           mPort(cr_port),
           mComponent(cr_comp),
           mrFeed(r_feed),
-          mConnectTimer(mIOservice)
+          mConnectTimer(mIoService)
 
 {
     awaitStop();
@@ -58,7 +58,7 @@ Client::~Client() noexcept
 
 void Client::run()
 {
-    mIOservice.run();
+    mIoService.run();
 }
 
 void Client::awaitStop()

@@ -27,11 +27,11 @@
 
 #include "../src/config/Configuration.h"
 #include "../src/data/AircraftContainer.h"
-#include "../src/data/GPSData.h"
+#include "../src/data/GpsData.h"
 #include "../src/data/SensorData.h"
 #include "../src/parser/APRSParser.h"
-#include "../src/parser/GPSParser.h"
-#include "../src/parser/SBSParser.h"
+#include "../src/parser/GpsParser.h"
+#include "../src/parser/SbsParser.h"
 #include "../src/parser/SensorParser.h"
 #include "../src/util/Priority.h"
 #include "../src/vfrb/VFRB.h"
@@ -58,7 +58,7 @@ inline void setupVFRB()
 {
     vfrb::VFRB::msSensorData.setPress(util::Priority::DONTCARE,
             config::Configuration::base_pressure);
-    vfrb::VFRB::msGPSdata.setDefaults(config::Configuration::base_latitude,
+    vfrb::VFRB::msGpsData.setDefaults(config::Configuration::base_latitude,
             config::Configuration::base_longitude,
             config::Configuration::base_altitude,
             config::Configuration::base_geoid);
@@ -73,10 +73,10 @@ static testsuite::comparator::Comparator<std::string> eqs =
 static testsuite::comparator::Comparator<bool> eqb =
         testsuite::comparator::EQUALS<bool>();
 
-static parser::SBSParser pars_sbs;
-static parser::APRSParser pars_aprs;
+static parser::SbsParser pars_sbs;
+static parser::AprsParser pars_aprs;
 static parser::SensorParser pars_wind;
-static parser::GPSParser pars_gps;
+static parser::GpsParser pars_gps;
 
 static boost::regex pflauRE(
         "\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");

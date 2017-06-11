@@ -19,7 +19,7 @@
  }
  */
 
-#include "SBSClient.h"
+#include "SbsClient.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -36,7 +36,7 @@ namespace tcp
 namespace client
 {
 
-SBSClient::SBSClient(boost::asio::signal_set& r_sigset,
+SbsClient::SbsClient(boost::asio::signal_set& r_sigset,
                      const std::string& cr_host, const std::string& cr_port,
                      vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(SBSClient)", r_feed)
@@ -44,33 +44,33 @@ SBSClient::SBSClient(boost::asio::signal_set& r_sigset,
     connect();
 }
 
-SBSClient::~SBSClient() noexcept
+SbsClient::~SbsClient() noexcept
 {
 }
 
-void SBSClient::connect() noexcept
+void SbsClient::connect() noexcept
 {
     boost::asio::ip::tcp::resolver::query query(mHost, mPort,
             boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(query,
-            boost::bind(&SBSClient::handleResolve, this,
+            boost::bind(&SbsClient::handleResolve, this,
                     boost::asio::placeholders::error,
                     boost::asio::placeholders::iterator));
 }
 
-void SBSClient::process() noexcept
+void SbsClient::process() noexcept
 {
     mrFeed.process(mResponse);
 }
 
-void SBSClient::handleResolve(const boost::system::error_code& cr_ec,
+void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
                               boost::asio::ip::tcp::resolver::iterator it)
                               noexcept
                               {
     if (!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
-                boost::bind(&SBSClient::handleConnect, this,
+                boost::bind(&SbsClient::handleConnect, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
     } else
@@ -84,7 +84,7 @@ void SBSClient::handleResolve(const boost::system::error_code& cr_ec,
     }
 }
 
-void SBSClient::handleConnect(const boost::system::error_code& cr_ec,
+void SbsClient::handleConnect(const boost::system::error_code& cr_ec,
                               boost::asio::ip::tcp::resolver::iterator it)
                               noexcept
                               {

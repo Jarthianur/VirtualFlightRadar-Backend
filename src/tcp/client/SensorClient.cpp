@@ -40,7 +40,7 @@ SensorClient::SensorClient(boost::asio::signal_set& r_sigset,
                            const std::string& cr_port, vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(SensorClient)", r_feed),
           mStopped(false),
-          mTimeout(mIOservice)
+          mTimeout(mIoService)
 {
     connect();
     mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));

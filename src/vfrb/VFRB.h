@@ -30,7 +30,7 @@ namespace data
 {
 class AircraftContainer;
 class SensorData;
-class GPSData;
+class GpsData;
 }
 namespace tcp
 {
@@ -89,7 +89,7 @@ public:
     /// Container holding sensor and climate information.
     static data::SensorData msSensorData;
     /// Container holding GPS information
-    static data::GPSData msGPSdata;
+    static data::GpsData msGpsData;
 
 private:
     /**

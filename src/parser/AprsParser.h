@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -19,12 +19,12 @@
  }
  */
 
-#ifndef SRC_PARSER_GPSPARSER_H_
-#define SRC_PARSER_GPSPARSER_H_
+#ifndef SRC_PARSER_APRSPARSER_H_
+#define SRC_PARSER_APRSPARSER_H_
 
+#include <boost/regex.hpp>
 #include <cstdint>
 #include <string>
-#include <boost/regex.hpp>
 
 #include "Parser.h"
 #include "../util/Position.hpp"
@@ -33,25 +33,25 @@ namespace parser
 {
 
 /**
- * The GPSParser class, implememnts Parser.
+ * The AprsParser class, implements Parser.
  *
- * This class unpacks NMEA GPS sentences, as they are GGA (and RMC), into static GPSData container.
+ * This class unpacks APRS strings into static AircraftContainer.
  */
-class GPSParser: public Parser
+class AprsParser: public Parser
 {
 public:
     /**
      * Constructor
      */
-    GPSParser();
+    AprsParser();
     /**
      * Destructor
      *
      * @exceptsafe no-throw
      */
-    virtual ~GPSParser() noexcept;
+    virtual ~AprsParser() noexcept;
     /**
-     * Unpack GGA messages into the static VFRB::GPSData.
+     * Unpack APRS messages into the static VFRB::AircraftContainer.
      *
      * @overload Parser::unpack
      */
@@ -59,12 +59,18 @@ public:
             noexcept override;
 
 private:
-    /// Regular expression to parse GGA
-    const boost::regex mGpggaRE;
-    /// Temporary data
-    struct util::ExtGPSPosition mtGPSpos;
+    /// Regular expression for APRS protocol
+    const boost::regex mAprsRe;
+    /// Regular expression for OGN specific APRS extension
+    const boost::regex mCommRe;
+    /// Temporary information
+    std::string mtId;
+    struct util::GPSPosition mtGpsPos;
+    std::int32_t mtIdType = 0, mtAcType = 0, mtTime = 0;
+    double mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0, mtHeading =
+            0.0;
 };
 
 }  // namespace parser
 
-#endif /* SRC_PARSER_GPSPARSER_H_ */
+#endif /* SRC_PARSER_APRSPARSER_H_ */

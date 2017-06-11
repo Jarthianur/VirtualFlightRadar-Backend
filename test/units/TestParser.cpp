@@ -24,9 +24,9 @@
 
 #include "../../src/config/Configuration.h"
 #include "../../src/data/SensorData.h"
-#include "../../src/parser/APRSParser.h"
+#include "../../src/parser/AprsParser.h"
 #include "../../src/parser/Parser.h"
-#include "../../src/parser/SBSParser.h"
+#include "../../src/parser/SbsParser.h"
 #include "../../src/parser/SensorParser.h"
 #include "../../src/util/Priority.h"
 #include "../../src/vfrb/VFRB.h"
@@ -46,7 +46,7 @@ using namespace comparator;
 
 void test_parser(TestSuitesRunner& runner)
 {
-    describe<parser::SBSParser>("parser::SBSParser - unpack", runner)->test(
+    describe<parser::SbsParser>("parser::SBSParser - unpack", runner)->test(
             "valid msg",
             []()
             {
@@ -74,7 +74,7 @@ void test_parser(TestSuitesRunner& runner)
                 assert(helper::pars_sbs.unpack("", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
             });
 
-    describe<parser::APRSParser>("parser::APRSParser - unpack", runner)->test(
+    describe<parser::AprsParser>("parser::APRSParser - unpack", runner)->test(
             "valid msg",
             []()
             {
@@ -118,7 +118,7 @@ void test_parser(TestSuitesRunner& runner)
             })->test<data::SensorData>("extract WIMWV",
             []()
             {
-                assert(vfrb::VFRB::msSensorData.getMWVstr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
-                assert(vfrb::VFRB::msSensorData.getMWVstr(), std::string(""), helper::eqs);
+                assert(vfrb::VFRB::msSensorData.getMwvStr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
+                assert(vfrb::VFRB::msSensorData.getMwvStr(), std::string(""), helper::eqs);
             });
 }

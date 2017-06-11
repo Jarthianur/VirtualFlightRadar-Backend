@@ -57,7 +57,7 @@ noexcept
 
     if (cr_msg.find("MDA") != std::string::npos)
     {
-        vfrb::VFRB::msSensorData.setMDAstr(prio, cr_msg);
+        vfrb::VFRB::msSensorData.setMdaStr(prio, cr_msg);
         try
         {
             std::size_t tmpB = cr_msg.find('B') - 1;
@@ -79,7 +79,7 @@ noexcept
         }
     } else if (cr_msg.find("MWV") != std::string::npos)
     {
-        vfrb::VFRB::msSensorData.setMWVstr(prio, cr_msg);
+        vfrb::VFRB::msSensorData.setMwvStr(prio, cr_msg);
     } else
     {
         return MSG_UNPACK_IGN;

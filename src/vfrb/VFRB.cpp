@@ -31,10 +31,10 @@
 
 #include "../config/Configuration.h"
 #include "../data/AircraftContainer.h"
-#include "../data/GPSData.h"
+#include "../data/GpsData.h"
 #include "../data/SensorData.h"
-#include "../tcp/client/APRSCClient.h"
-#include "../tcp/client/SBSClient.h"
+#include "../tcp/client/AprscClient.h"
+#include "../tcp/client/SbsClient.h"
 #include "../tcp/client/SensorClient.h"
 #include "../tcp/server/Server.h"
 #include "../util/Logger.h"
@@ -49,7 +49,7 @@ namespace vfrb
 std::atomic<bool> VFRB::global_run_status(true);
 data::AircraftContainer VFRB::msAcCont;
 data::SensorData VFRB::msSensorData;
-data::GPSData VFRB::msGPSdata;
+data::GpsData VFRB::msGpsData;
 
 VFRB::VFRB()
 {
@@ -113,10 +113,10 @@ void VFRB::run() noexcept
             }
 
             //write GPS position to clients
-            server.writeToAll(msGPSdata.getGPSstr());
+            server.writeToAll(msGpsData.getGpsStr());
 
             // write weather info to clients
-            str = msSensorData.getMDAstr() + msSensorData.getMWVstr();
+            str = msSensorData.getMdaStr() + msSensorData.getMwvStr();
             if (str.length() > 0)
             {
                 server.writeToAll(str);

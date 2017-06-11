@@ -19,7 +19,7 @@
  }
  */
 
-#include "SBSParser.h"
+#include "SbsParser.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -34,16 +34,16 @@
 namespace parser
 {
 
-SBSParser::SBSParser()
+SbsParser::SbsParser()
         : Parser()
 {
 }
 
-SBSParser::~SBSParser() noexcept
+SbsParser::~SbsParser() noexcept
 {
 }
 
-std::int32_t SBSParser::unpack(const std::string& cr_msg, std::int32_t prio)
+std::int32_t SbsParser::unpack(const std::string& cr_msg, std::int32_t prio)
 noexcept
 {
     /*
@@ -70,7 +70,7 @@ noexcept
             case 4:
                 if (delim - p > 0)
                 {
-                    mtID = cr_msg.substr(p, delim - p);
+                    mtId = cr_msg.substr(p, delim - p);
                 } else
                 {
                     return MSG_UNPACK_IGN;
@@ -96,10 +96,10 @@ noexcept
             case 11:
                 try
                 {
-                    mtGPSpos.altitude =
+                    mtGpsPos.altitude =
                             util::math::dToI(
                                     std::stod(cr_msg.substr(p, delim - p)) * util::math::FEET_2_M);
-                    if (mtGPSpos.altitude > config::Configuration::filter_maxHeight)
+                    if (mtGpsPos.altitude > config::Configuration::filter_maxHeight)
                     {
                         return MSG_UNPACK_IGN;
                     }
@@ -111,7 +111,7 @@ noexcept
             case 14:
                 try
                 {
-                    mtGPSpos.latitude = std::stod(cr_msg.substr(p, delim - p));
+                    mtGpsPos.latitude = std::stod(cr_msg.substr(p, delim - p));
                 } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
@@ -120,7 +120,7 @@ noexcept
             case 15:
                 try
                 {
-                    mtGPSpos.longitude = std::stod(cr_msg.substr(p, delim - p));
+                    mtGpsPos.longitude = std::stod(cr_msg.substr(p, delim - p));
                 } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
@@ -132,7 +132,7 @@ noexcept
         i++;
         p = delim + 1;
     }
-    aircraft::Aircraft ac(mtID, mtGPSpos);
+    aircraft::Aircraft ac(mtId, mtGpsPos);
     ac.setFullInfo(false);
     ac.setTargetT(aircraft::Aircraft::TargetType::TRANSPONDER);
     vfrb::VFRB::msAcCont.insertAircraft(ac, prio);

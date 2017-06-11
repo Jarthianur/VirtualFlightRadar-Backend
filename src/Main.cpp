@@ -24,7 +24,7 @@
 
 #include "config/Configuration.h"
 #include "data/SensorData.h"
-#include "data/GPSData.h"
+#include "data/GpsData.h"
 #include "util/Logger.h"
 #include "vfrb/VFRB.h"
 
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
     // set climate fallbacks
     vfrb::VFRB::msSensorData.setPress(0, config::Configuration::base_pressure);
-    vfrb::VFRB::msGPSdata.setDefaults(config::Configuration::base_latitude,
+    vfrb::VFRB::msGpsData.setDefaults(config::Configuration::base_latitude,
             config::Configuration::base_longitude,
             config::Configuration::base_altitude,
             config::Configuration::base_geoid);

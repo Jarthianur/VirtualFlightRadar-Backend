@@ -25,13 +25,13 @@
 #include <algorithm>
 
 #include "../config/Configuration.h"
-#include "../parser/APRSParser.h"
-#include "../parser/GPSParser.h"
-#include "../parser/SBSParser.h"
+#include "../parser/AprsParser.h"
+#include "../parser/GpsParser.h"
+#include "../parser/SbsParser.h"
 #include "../parser/SensorParser.h"
-#include "../tcp/client/APRSCClient.h"
-#include "../tcp/client/GPSDClient.h"
-#include "../tcp/client/SBSClient.h"
+#include "../tcp/client/AprscClient.h"
+#include "../tcp/client/GpsdClient.h"
+#include "../tcp/client/SbsClient.h"
 #include "../tcp/client/SensorClient.h"
 #include "../util/Logger.h"
 #include "VFRB.h"
@@ -104,17 +104,17 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
                 return;
             }
             mpParser = std::unique_ptr<parser::Parser>(
-                    new parser::APRSParser());
+                    new parser::AprsParser());
             mpClient = std::unique_ptr<tcp::client::Client>(
-                    new tcp::client::APRSCClient(r_sigset, host, port, login,
+                    new tcp::client::AprscClient(r_sigset, host, port, login,
                             *this));
             break;
         }
         case InputType::SBS:
         {
-            mpParser = std::unique_ptr<parser::Parser>(new parser::SBSParser());
+            mpParser = std::unique_ptr<parser::Parser>(new parser::SbsParser());
             mpClient = std::unique_ptr<tcp::client::Client>(
-                    new tcp::client::SBSClient(r_sigset, host, port, *this));
+                    new tcp::client::SbsClient(r_sigset, host, port, *this));
             break;
         }
         case InputType::SENSOR:
@@ -127,9 +127,9 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
         }
         case InputType::GPS:
         {
-            mpParser = std::unique_ptr<parser::Parser>(new parser::GPSParser());
+            mpParser = std::unique_ptr<parser::Parser>(new parser::GpsParser());
             mpClient = std::unique_ptr<tcp::client::Client>(
-                    new tcp::client::GPSDClient(r_sigset, host, port, *this));
+                    new tcp::client::GpsdClient(r_sigset, host, port, *this));
             break;
         }
         default:

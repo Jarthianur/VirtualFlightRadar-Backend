@@ -19,7 +19,7 @@
  }
  */
 
-#include "APRSParser.h"
+#include "AprsParser.h"
 
 #include <boost/regex.hpp>
 #include <algorithm>
@@ -35,22 +35,22 @@
 namespace parser
 {
 
-APRSParser::APRSParser()
+AprsParser::AprsParser()
         : Parser(),
-          mAprsRE(
+          mAprsRe(
                   "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
                   boost::regex::optimize | boost::regex::icase),
-          mCommRE(
+          mCommRe(
                   "^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
                   boost::regex::optimize | boost::regex::icase)
 {
 }
 
-APRSParser::~APRSParser() noexcept
+AprsParser::~AprsParser() noexcept
 {
 }
 
-std::int32_t APRSParser::unpack(const std::string& cr_msg, std::int32_t prio)
+std::int32_t AprsParser::unpack(const std::string& cr_msg, std::int32_t prio)
 noexcept
 {
     if (cr_msg.size() > 0 && cr_msg.at(0) == '#')
@@ -59,7 +59,7 @@ noexcept
     }
     bool tmpFullInfo = true;
     boost::smatch match;
-    if (boost::regex_match(cr_msg, match, mAprsRE))
+    if (boost::regex_match(cr_msg, match, mAprsRe))
     {
         try
         {
@@ -67,23 +67,23 @@ noexcept
             mtTime = std::stoi(match.str(1));
 
             //latitude
-            mtGPSpos.latitude = util::math::dmToDeg(std::stod(match.str(2)));
+            mtGpsPos.latitude = util::math::dmToDeg(std::stod(match.str(2)));
             if (match.str(3).compare("S") == 0)
             {
-                mtGPSpos.latitude = -mtGPSpos.latitude;
+                mtGpsPos.latitude = -mtGpsPos.latitude;
             }
 
             //longitude
-            mtGPSpos.longitude = util::math::dmToDeg(std::stod(match.str(4)));
+            mtGpsPos.longitude = util::math::dmToDeg(std::stod(match.str(4)));
             if (match.str(5).compare("W") == 0)
             {
-                mtGPSpos.longitude = -mtGPSpos.longitude;
+                mtGpsPos.longitude = -mtGpsPos.longitude;
             }
 
             //altitude
-            mtGPSpos.altitude = util::math::dToI(
+            mtGpsPos.altitude = util::math::dToI(
                     std::stod(match.str(8)) * util::math::FEET_2_M);
-            if (mtGPSpos.altitude > config::Configuration::filter_maxHeight)
+            if (mtGpsPos.altitude > config::Configuration::filter_maxHeight)
             {
                 return MSG_UNPACK_IGN;
             }
@@ -97,12 +97,12 @@ noexcept
         {
             std::string comm = match.str(9); // regex bug ! cannot work inplace, need to copy submatch.
             boost::smatch comm_match;
-            if (boost::regex_match(comm, comm_match, mCommRE))
+            if (boost::regex_match(comm, comm_match, mCommRe))
             {
-                mtID = comm_match.str(2);
+                mtId = comm_match.str(2);
                 try
                 {
-                    mtIDtype = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
+                    mtIdType = std::stoi(comm_match.str(1), nullptr, 16) & 0x03;
                     mtAcType =
                             (std::stoi(comm_match.str(1), nullptr, 16) & 0x7C) >> 2;
                 } catch (const std::logic_error& e)
@@ -152,7 +152,7 @@ noexcept
             mtGndSpeed = A_VALUE_NA;
             tmpFullInfo = false;
         }
-        aircraft::Aircraft ac(mtID, mtGPSpos, mtGndSpeed, mtIDtype, mtAcType,
+        aircraft::Aircraft ac(mtId, mtGpsPos, mtGndSpeed, mtIdType, mtAcType,
                 mtClimbRate, mtTurnRate, mtHeading);
         ac.setFullInfo(tmpFullInfo);
         ac.setTargetT(aircraft::Aircraft::TargetType::FLARM);

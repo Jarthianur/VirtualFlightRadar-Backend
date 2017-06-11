@@ -19,12 +19,12 @@
  }
  */
 
-#include "GPSParser.h"
+#include "GpsParser.h"
 
 #include <boost/regex.hpp>
 #include <stdexcept>
 
-#include "../data/GPSData.h"
+#include "../data/GpsData.h"
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
 
@@ -36,19 +36,19 @@ namespace parser
 #define GPS_FIX_GOOD          (1)
 #define GPS_HOR_DILUTION_GOOD (1.0)
 
-GPSParser::GPSParser()
+GpsParser::GpsParser()
         : Parser(),
-          mGpggaRE(
+          mGpggaRe(
                   "^\\$[A-Z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s+?$",
                   boost::regex::optimize | boost::regex::icase)
 {
 }
 
-GPSParser::~GPSParser() noexcept
+GpsParser::~GpsParser() noexcept
 {
 }
 
-std::int32_t GPSParser::unpack(const std::string& cr_msg, std::int32_t prio)
+std::int32_t GpsParser::unpack(const std::string& cr_msg, std::int32_t prio)
 noexcept
 {
     try
@@ -65,45 +65,45 @@ noexcept
     }
 
     boost::smatch match;
-    if (boost::regex_match(cr_msg, match, mGpggaRE))
+    if (boost::regex_match(cr_msg, match, mGpggaRe))
     {
         double dilution = 0.0;
         try
         {
             //latitude
-            mtGPSpos.position.latitude = util::math::dmToDeg(
+            mtGpsPos.position.latitude = util::math::dmToDeg(
                     std::stod(match.str(1)));
             if (match.str(2).compare("S") == 0)
             {
-                mtGPSpos.position.latitude = -mtGPSpos.position.latitude;
+                mtGpsPos.position.latitude = -mtGpsPos.position.latitude;
             }
 
             //longitude
-            mtGPSpos.position.longitude = util::math::dmToDeg(
+            mtGpsPos.position.longitude = util::math::dmToDeg(
                     std::stod(match.str(3)));
             if (match.str(4).compare("W") == 0)
             {
-                mtGPSpos.position.longitude = -mtGPSpos.position.longitude;
+                mtGpsPos.position.longitude = -mtGpsPos.position.longitude;
             }
 
             //fix
-            mtGPSpos.fixQa = std::stoi(match.str(5));
+            mtGpsPos.fixQa = std::stoi(match.str(5));
             //sats
-            mtGPSpos.nrSats = std::stoi(match.str(6));
+            mtGpsPos.nrSats = std::stoi(match.str(6));
             //dilution
             dilution = std::stod(match.str(7));
             //altitude
-            mtGPSpos.position.altitude = util::math::dToI(
+            mtGpsPos.position.altitude = util::math::dToI(
                     std::stod(match.str(8)));
             //geoid
-            mtGPSpos.geoid = std::stod(match.str(9));
+            mtGpsPos.geoid = std::stod(match.str(9));
         } catch (const std::logic_error& e)
         {
             return MSG_UNPACK_ERR;
         }
-        vfrb::VFRB::msGPSdata.setBasePos(prio, mtGPSpos);
+        vfrb::VFRB::msGpsData.setBasePos(prio, mtGpsPos);
 
-        if (mtGPSpos.nrSats >= GPS_NR_SATS_GOOD && mtGPSpos.fixQa
+        if (mtGpsPos.nrSats >= GPS_NR_SATS_GOOD && mtGpsPos.fixQa
                 >= GPS_FIX_GOOD
             && dilution <= GPS_HOR_DILUTION_GOOD)
         {

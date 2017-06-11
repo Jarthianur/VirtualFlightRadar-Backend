@@ -25,7 +25,7 @@
 #include <cstdint>
 #include <string>
 
-#include "../util/GPSmodule.h"
+#include "../util/GpsModule.h"
 #include "Data.hpp"
 #include "../util/Position.hpp"
 
@@ -33,23 +33,23 @@ namespace data
 {
 
 /**
- * The GPSData class.
+ * The GpsData class.
  *
  * This class holds GPS information.
  */
-class GPSData
+class GpsData
 {
 public:
     /**
      * Constructor
      */
-    GPSData();
+    GpsData();
     /**
      * Destructor
      *
      * @exceptsafe no-throw
      */
-    virtual ~GPSData() noexcept;
+    virtual ~GpsData() noexcept;
     /**
      * Set the default GPS position and meta-data.
      * After this operation, an instance of this class
@@ -69,7 +69,7 @@ public:
      *
      * @return the NMEA sentences in string
      */
-    std::string getGPSstr();
+    std::string getGpsStr();
     /**
      * Set the new base position.
      * May fail due to priority.
@@ -107,8 +107,8 @@ public:
 private:
     /// Data holding the base position.
     struct Data<struct util::ExtGPSPosition> mBasePos;
-    /// GPSmodule providing functionality to build GPS sentences.
-    util::GPSmodule mGPSfix;
+    /// GpsModule providing functionality to build GPS sentences.
+    util::GpsModule mGpsMod;
 };
 
 }  // namespace data

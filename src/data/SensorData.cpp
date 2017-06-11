@@ -35,40 +35,40 @@ SensorData::~SensorData() noexcept
 {
 }
 
-std::string SensorData::getMWVstr()
+std::string SensorData::getMwvStr()
 {
-    boost::lock_guard<boost::mutex> lock(mMWV.mutex);
-    if (mMWV.valueValid)
+    boost::lock_guard<boost::mutex> lock(mMwvData.mutex);
+    if (mMwvData.valueValid)
     {
-        return mMWV.getValue() + "\n";
+        return mMwvData.getValue() + "\n";
     } else
     {
         return "";
     }
 }
 
-void SensorData::setMWVstr(std::int32_t prio, const std::string& cr_mwv)
+void SensorData::setMwvStr(std::int32_t prio, const std::string& cr_mwv)
 {
-    boost::lock_guard<boost::mutex> lock(mMWV.mutex);
-    mMWV.update(cr_mwv, prio);
+    boost::lock_guard<boost::mutex> lock(mMwvData.mutex);
+    mMwvData.update(cr_mwv, prio);
 }
 
-std::string SensorData::getMDAstr()
+std::string SensorData::getMdaStr()
 {
-    boost::lock_guard<boost::mutex> lock(mMDA.mutex);
-    if (mMDA.valueValid)
+    boost::lock_guard<boost::mutex> lock(mMdaData.mutex);
+    if (mMdaData.valueValid)
     {
-        return mMDA.getValue() + "\n";
+        return mMdaData.getValue() + "\n";
     } else
     {
         return "";
     }
 }
 
-void SensorData::setMDAstr(std::int32_t prio, const std::string& cr_mda)
+void SensorData::setMdaStr(std::int32_t prio, const std::string& cr_mda)
 {
-    boost::lock_guard<boost::mutex> lock(mMDA.mutex);
-    mMDA.update(cr_mda, prio);
+    boost::lock_guard<boost::mutex> lock(mMdaData.mutex);
+    mMdaData.update(cr_mda, prio);
 }
 
 double SensorData::getPress()

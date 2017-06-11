@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_TCP_CLIENT_APRSCCLIENT_H_
-#define SRC_TCP_CLIENT_APRSCCLIENT_H_
+#ifndef SRC_TCP_CLIENT_SBSCLIENT_H_
+#define SRC_TCP_CLIENT_SBSCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
@@ -34,22 +34,22 @@ namespace client
 {
 
 /**
- * The APRSCClient class, extends and implements Client.
+ * The SbsClient class, extends and implements Client.
  *
  * This Client provides functionality to handle connections to
- * any APRSC server.
+ * any SBS server.
  */
-class APRSCClient: public Client
+class SbsClient: public Client
 {
 public:
     /**
      * Non-copyable
      */
-    APRSCClient(const APRSCClient&) = delete;
+    SbsClient(const SbsClient&) = delete;
     /**
      * Not assignable
      */
-    APRSCClient& operator=(const APRSCClient&) = delete;
+    SbsClient& operator=(const SbsClient&) = delete;
     /**
      * Constructor
      *
@@ -59,15 +59,15 @@ public:
      * @param cr_login the login string to transmit
      * @param r_feed   the handler Feed
      */
-    APRSCClient(boost::asio::signal_set& /*r_sigset*/,
-                const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-                const std::string& /*cr_login*/, vfrb::Feed& /*r_feed*/);
+    SbsClient(boost::asio::signal_set& /*r_sigset*/,
+              const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+              vfrb::Feed& /*r_feed*/);
     /**
      * Destructor
      *
      * @exceptsafe no-throw
      */
-    virtual ~APRSCClient() noexcept;
+    virtual ~SbsClient() noexcept;
 
 private:
     /**
@@ -98,22 +98,9 @@ private:
     void handleConnect(const boost::system::error_code& /*cr_ec*/,
                        boost::asio::ip::tcp::resolver::iterator /*it*/)
                                noexcept override;
-    /**
-     * Send login string - handler
-     *
-     * @param cr_ec the error code
-     * @param s     the sent bytes
-     *
-     * @exceptsafe strong
-     */
-    void handleLogin(const boost::system::error_code& /*cr_ec*/,
-                     std::size_t /*s*/) noexcept;
-
-    /// Login string
-    std::string mLoginStr;
 };
 
 }  // namespace client
 }  // namespace tcp
 
-#endif /* SRC_TCP_CLIENT_APRSCCLIENT_H_ */
+#endif /* SRC_TCP_CLIENT_SBSCLIENT_H_ */

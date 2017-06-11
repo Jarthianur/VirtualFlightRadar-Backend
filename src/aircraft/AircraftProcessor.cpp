@@ -25,7 +25,7 @@
 #include <cstdio>
 
 #include "../config/Configuration.h"
-#include "../data/GPSData.h"
+#include "../data/GpsData.h"
 #include "../data/SensorData.h"
 #include "../util/Math.hpp"
 #include "../vfrb/VFRB.h"
@@ -87,8 +87,8 @@ std::string AircraftProcessor::process(const Aircraft& cr_ac)
 
 void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac)
 {
-    mtRadLatB = util::math::radian(vfrb::VFRB::msGPSdata.getBaseLat());
-    mtRadLongB = util::math::radian(vfrb::VFRB::msGPSdata.getBaseLong());
+    mtRadLatB = util::math::radian(vfrb::VFRB::msGpsData.getBaseLat());
+    mtRadLongB = util::math::radian(vfrb::VFRB::msGpsData.getBaseLong());
     mtRadLongAc = util::math::radian(cr_ac.getLongitude());
     mtRadLatAc = util::math::radian(cr_ac.getLatitude());
     mtLongDist = mtRadLongAc - mtRadLongB;
@@ -118,7 +118,7 @@ void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac)
             cr_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER ?
                     cr_ac.getAltitude() - util::math::calcIcaoHeight(
                             vfrb::VFRB::msSensorData.getPress()) :
-                    cr_ac.getAltitude() - vfrb::VFRB::msGPSdata.getBaseAlt();
+                    cr_ac.getAltitude() - vfrb::VFRB::msGpsData.getBaseAlt();
 }
 
 }  // namespace aircraft

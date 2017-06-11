@@ -19,7 +19,7 @@
  }
  */
 
-#include "GPSmodule.h"
+#include "GpsModule.h"
 
 #include <cmath>
 #include <cstdint>
@@ -32,15 +32,15 @@
 namespace util
 {
 
-GPSmodule::GPSmodule()
+GpsModule::GpsModule()
 {
 }
 
-GPSmodule::~GPSmodule() noexcept
+GpsModule::~GpsModule() noexcept
 {
 }
 
-std::string GPSmodule::ggafix(const struct ExtGPSPosition& cr_pos)
+std::string GpsModule::genGpggaStr(const struct ExtGPSPosition& cr_pos)
 {
     std::string nmea_str;
     std::int32_t csum;
@@ -69,7 +69,7 @@ std::string GPSmodule::ggafix(const struct ExtGPSPosition& cr_pos)
     return nmea_str;
 }
 
-std::string GPSmodule::rmcfix(const struct ExtGPSPosition& cr_pos)
+std::string GpsModule::genGprmcStr(const struct ExtGPSPosition& cr_pos)
 {
     std::string nmea_str;
     std::int32_t csum;

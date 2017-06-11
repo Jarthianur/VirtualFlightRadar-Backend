@@ -19,7 +19,7 @@
  }
  */
 
-#include "APRSCClient.h"
+#include "AprscClient.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -36,7 +36,7 @@ namespace tcp
 namespace client
 {
 
-APRSCClient::APRSCClient(boost::asio::signal_set& r_sigset,
+AprscClient::AprscClient(boost::asio::signal_set& r_sigset,
                          const std::string& cr_host, const std::string& cr_port,
                          const std::string& cr_login, vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(APRSCClient)", r_feed),
@@ -46,33 +46,33 @@ APRSCClient::APRSCClient(boost::asio::signal_set& r_sigset,
     connect();
 }
 
-APRSCClient::~APRSCClient() noexcept
+AprscClient::~AprscClient() noexcept
 {
 }
 
-void APRSCClient::connect() noexcept
+void AprscClient::connect() noexcept
 {
     boost::asio::ip::tcp::resolver::query query(mHost, mPort,
             boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(query,
-            boost::bind(&APRSCClient::handleResolve, this,
+            boost::bind(&AprscClient::handleResolve, this,
                     boost::asio::placeholders::error,
                     boost::asio::placeholders::iterator));
 }
 
-void APRSCClient::process() noexcept
+void AprscClient::process() noexcept
 {
     mrFeed.process(mResponse);
 }
 
-void APRSCClient::handleResolve(const boost::system::error_code& cr_ec,
+void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
                                 boost::asio::ip::tcp::resolver::iterator it)
                                 noexcept
                                 {
     if (!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
-                boost::bind(&APRSCClient::handleConnect, this,
+                boost::bind(&AprscClient::handleConnect, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
     } else
@@ -86,7 +86,7 @@ void APRSCClient::handleResolve(const boost::system::error_code& cr_ec,
     }
 }
 
-void APRSCClient::handleConnect(const boost::system::error_code& cr_ec,
+void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
                                 boost::asio::ip::tcp::resolver::iterator it)
                                 noexcept
                                 {
@@ -94,7 +94,7 @@ void APRSCClient::handleConnect(const boost::system::error_code& cr_ec,
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
         boost::asio::async_write(mSocket, boost::asio::buffer(mLoginStr),
-                boost::bind(&APRSCClient::handleLogin, this,
+                boost::bind(&AprscClient::handleLogin, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
     } else
@@ -108,7 +108,7 @@ void APRSCClient::handleConnect(const boost::system::error_code& cr_ec,
     }
 }
 
-void APRSCClient::handleLogin(const boost::system::error_code& cr_ec,
+void AprscClient::handleLogin(const boost::system::error_code& cr_ec,
                               std::size_t s) noexcept
                               {
     if (!cr_ec)

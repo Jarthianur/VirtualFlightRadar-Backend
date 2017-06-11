@@ -32,23 +32,23 @@ namespace parser
 {
 
 /**
- * The SBSParser class, implements Parser.
+ * The SbsParser class, implements Parser.
  *
  * This class unpacks SBS sentences into static VFRB::AircraftContainer.
  */
-class SBSParser: public Parser
+class SbsParser: public Parser
 {
 public:
     /**
      * Constructor
      */
-    SBSParser();
+    SbsParser();
     /**
      * Destructor
      *
      * @exceptsafe no-throw
      */
-    virtual ~SBSParser() noexcept;
+    virtual ~SbsParser() noexcept;
     /**
      * Unpack SBS messages into the static VFRB::AircraftContainer.
      *
@@ -59,8 +59,8 @@ public:
 
 private:
     /// Temporary data
-    std::string mtID;
-    struct util::GPSPosition mtGPSpos;
+    std::string mtId;
+    struct util::GPSPosition mtGpsPos;
     //std::int32_t mtTime = 0;
 };
 

@@ -156,7 +156,7 @@ protected:
                                        noexcept = 0;
 
     /// Internal IO-service
-    boost::asio::io_service mIOservice;
+    boost::asio::io_service mIoService;
     /// Signal set reference
     boost::asio::signal_set& mrSigSet;
     /// Socket

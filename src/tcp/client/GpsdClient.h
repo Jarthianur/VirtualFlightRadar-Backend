@@ -34,22 +34,22 @@ namespace client
 {
 
 /**
- * The GPSDClient class, extends and implements Client.
+ * The GpsdClient class, extends and implements Client.
  *
  * This Client provides functionality to handle connections to
  * any GPSD server.
  */
-class GPSDClient: public Client
+class GpsdClient: public Client
 {
 public:
     /**
      * Non-copyable
      */
-    GPSDClient(const GPSDClient&) = delete;
+    GpsdClient(const GpsdClient&) = delete;
     /**
      * Not assignable
      */
-    GPSDClient& operator=(const GPSDClient&) = delete;
+    GpsdClient& operator=(const GpsdClient&) = delete;
     /**
      * Constructor
      *
@@ -59,7 +59,7 @@ public:
      * @param cr_login the login string to transmit
      * @param r_feed   the handler Feed
      */
-    GPSDClient(boost::asio::signal_set& /*r_sigset*/,
+    GpsdClient(boost::asio::signal_set& /*r_sigset*/,
                const std::string& /*cr_host*/, const std::string& /*cr_port*/,
                vfrb::Feed& /*r_feed*/);
     /**
@@ -67,7 +67,7 @@ public:
      *
      * @exceptsafe no-throw
      */
-    virtual ~GPSDClient() noexcept;
+    virtual ~GpsdClient() noexcept;
 
 private:
     /**
