@@ -40,14 +40,16 @@ using namespace comparator;
 
 void test_config(TestSuitesRunner& runner)
 {
-    describe<config::ConfigReader>("read config", runner)->test("read", []()
-    {
-        config::ConfigReader cr("test.ini"); // depends on $PWD
-            cr.read();
-            assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), std::string("0.000000"), helper::eqs);
-            assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"), std::string("invalid"), helper::eqs);
-            assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), std::string("1000"), helper::eqs);
-            assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "invalid"), std::string("invalid"), helper::eqs);
-            assert(cr.getProperty("nothing", ""), std::string(""), helper::eqs);
-        });
+    describe<config::ConfigReader>("read config", runner)->test("read",
+            []()
+            {
+                std::istringstream conf;
+                config::ConfigReader cr;
+                cr.read(conf);
+                assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), std::string("0.000000"), helper::eqs);
+                assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"), std::string("invalid"), helper::eqs);
+                assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), std::string("1000"), helper::eqs);
+                assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "invalid"), std::string("invalid"), helper::eqs);
+                assert(cr.getProperty("nothing", ""), std::string(""), helper::eqs);
+            });
 }

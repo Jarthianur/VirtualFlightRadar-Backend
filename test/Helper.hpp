@@ -29,11 +29,10 @@
 #include "../src/data/AircraftContainer.h"
 #include "../src/data/GpsData.h"
 #include "../src/data/SensorData.h"
-#include "../src/parser/APRSParser.h"
+#include "../src/parser/AprsParser.h"
 #include "../src/parser/GpsParser.h"
 #include "../src/parser/SbsParser.h"
 #include "../src/parser/SensorParser.h"
-#include "../src/util/Priority.h"
 #include "../src/vfrb/VFRB.h"
 #include "framework/src/comparator/Comparators.hpp"
 #include "framework/src/comparator/ComparatorStrategy.hpp"
@@ -56,8 +55,7 @@ inline void clearAcCont()
  */
 inline void setupVFRB()
 {
-    vfrb::VFRB::msSensorData.setPress(util::Priority::DONTCARE,
-            config::Configuration::base_pressure);
+    vfrb::VFRB::msSensorData.setPress(0, config::Configuration::base_pressure);
     vfrb::VFRB::msGpsData.setDefaults(config::Configuration::base_latitude,
             config::Configuration::base_longitude,
             config::Configuration::base_altitude,
