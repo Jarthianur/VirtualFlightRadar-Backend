@@ -62,13 +62,10 @@ private:
     /// Regular expression for APRS protocol
     const boost::regex mAprsRe;
     /// Regular expression for OGN specific APRS extension
-    const boost::regex mCommRe;
+    const boost::regex mComRe;
     /// Temporary information
     std::string mtId;
     struct util::GPSPosition mtGpsPos;
-    std::int32_t mtIdType = 0, mtAcType = 0, mtTime = 0;
-    double mtTurnRate = 0.0, mtClimbRate = 0.0, mtGndSpeed = 0.0, mtHeading =
-            0.0;
 };
 
 }  // namespace parser
