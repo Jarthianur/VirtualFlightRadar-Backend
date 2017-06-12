@@ -70,8 +70,7 @@ void Server::writeToAll(const std::string& cr_msg) noexcept
                 ec);
         if (ec)
         {
-            Logger::warn("(Server) lost connection to: ",
-                    it->get()->getIP());
+            Logger::warn("(Server) lost connection to: ", it->get()->getIP());
             mClients.erase(it);
         } else
         {
@@ -103,6 +102,18 @@ void Server::stopAll()
     mClients.clear();
 }
 
+bool Server::isRegistered(const std::string& cr_ip)
+{
+    for (auto it = mClients.cbegin(); it != mClients.cend(); it++)
+    {
+        if (it->get()->getIP() == cr_ip)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
 {
     if (!mAcceptor.is_open())
@@ -111,14 +122,15 @@ void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
     }
     if (!cr_ec)
     {
+        boost::lock_guard<boost::mutex> lock(this->mMutex);
         auto client = Connection::start(std::move(mSocket));
-        if (mClients.size() < S_MAX_CLIENTS)
+        if (mClients.size() < S_MAX_CLIENTS && !isRegistered(client->getIP()))
         {
             mClients.push_back(client);
             Logger::info("(Server) connection from: ", client->getIP());
         } else
         {
-            Logger::info("(Server) client count exceeded, refuse: ",
+            Logger::info("(Server) refused connection to ",
                     client->getIP());
         }
     } else if (cr_ec != boost::system::errc::bad_file_descriptor)

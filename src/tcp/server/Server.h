@@ -94,6 +94,15 @@ private:
      */
     void stopAll();
     /**
+     * Check whether an ip address is already registered in
+     * the Connection container.
+     *
+     * @param cr_ip the ip address to check
+     *
+     * @return true if the ip is already registered, else false
+     */
+    bool isRegistered(const std::string& /*cr_ip*/);
+    /**
      * Accept - handler
      *
      * @param cr_ec the error code
