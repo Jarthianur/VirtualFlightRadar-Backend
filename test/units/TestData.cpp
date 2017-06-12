@@ -24,7 +24,6 @@
 
 #include "../../src/config/Configuration.h"
 #include "../../src/data/AircraftContainer.h"
-#include "../../src/util/Priority.h"
 #include "../../src/vfrb/VFRB.h"
 #include "../framework/src/comparator/ComparatorStrategy.hpp"
 #include "../framework/src/testsuite/TestSuite.hpp"
@@ -65,11 +64,11 @@ void test_data(TestSuitesRunner& runner)
                 helper::setupVFRB();
                 boost::smatch match;
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", 0);
                 vfrb::VFRB::msAcCont.processAircrafts();
-                helper::pars_aprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot", Priority::DONTCARE);
+                helper::pars_aprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot", 0);
                 vfrb::VFRB::msAcCont.processAircrafts();
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 bool matched = boost::regex_search(proc, match, helper::pflauRE);
                 assert(matched, true, helper::eqb);
@@ -77,7 +76,7 @@ void test_data(TestSuitesRunner& runner)
                 assert(match.str(2), std::string("610"), helper::eqs);
 
                 helper::clearAcCont();
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0", 0);
                 proc = vfrb::VFRB::msAcCont.processAircrafts();
                 matched = boost::regex_search(proc, match, helper::pflauRE);
                 assert(matched, true, helper::eqb);

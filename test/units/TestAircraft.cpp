@@ -26,7 +26,6 @@
 #include "../../src/aircraft/AircraftProcessor.h"
 #include "../../src/config/Configuration.h"
 #include "../../src/data/AircraftContainer.h"
-#include "../../src/util/Priority.h"
 #include "../../src/vfrb/VFRB.h"
 #include "../framework/src/testsuite/TestSuite.hpp"
 #include "../framework/src/testsuite/TestSuitesRunner.hpp"
@@ -55,7 +54,7 @@ void test_aircraft(TestSuitesRunner& runner)
             })->test("Aircraft at,above base pos",
             []()
             {
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -79,7 +78,7 @@ void test_aircraft(TestSuitesRunner& runner)
             []()
             {
                 config::Configuration::filter_maxDist = 10000;
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.100000,8.100000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.100000,8.100000,,,,,,0", 0);
                 assert(vfrb::VFRB::msAcCont.processAircrafts(), std::string(""), helper::eqs);
                 config::Configuration::filter_maxDist = INT32_MAX;
             });
@@ -96,7 +95,7 @@ void test_aircraft(TestSuitesRunner& runner)
             })->test("Cross Equator S to N",
             []()
             {
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.100000,0.000000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.100000,0.000000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -117,7 +116,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 0.000000;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-0.100000,0.000000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-0.100000,0.000000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -138,7 +137,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 180.000000;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,89.900000,0.000000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,89.900000,0.000000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -159,7 +158,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 180.000000;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-89.900000,0.000000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-89.900000,0.000000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -180,7 +179,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 0.100000;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,-0.100000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,-0.100000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -201,7 +200,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = -0.100000;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,0.100000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,0.100000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -222,7 +221,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 0.100000;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,60.000000,-0.100000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,60.000000,-0.100000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -243,7 +242,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = -0.100000;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-60.000000,0.100000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-60.000000,0.100000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -264,7 +263,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 179.900000;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,-179.900000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,-179.900000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -285,7 +284,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = -179.900000;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,179.900000,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,179.900000,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -306,7 +305,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = -112.692253;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,33.825808,-112.219232,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,33.825808,-112.219232,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -327,7 +326,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = -58.818111;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-34.699833,-58.791788,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-34.699833,-58.791788,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -348,7 +347,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = -5.748392;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,5.386705,-5.750365,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,5.386705,-5.750365,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -369,7 +368,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 15.484389;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-23.229517,15.049683,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-23.229517,15.049683,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -390,7 +389,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 133.366885;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-26.152199,133.376684,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-26.152199,133.376684,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -411,7 +410,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 9.083279;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.719445,9.087646,,,,,,0", Priority::DONTCARE);
+                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.719445,9.087646,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
@@ -432,7 +431,7 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 101.570680;
                 helper::setupVFRB();
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,32.896360,103.855837,,,,,,0", Priority::DONTCARE);
+						helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,32.896360,103.855837,,,,,,0", 0);
                 std::string proc = vfrb::VFRB::msAcCont.processAircrafts();
                 boost::smatch match;
 
