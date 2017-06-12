@@ -29,10 +29,7 @@
 #include "../../src/parser/SbsParser.h"
 #include "../../src/parser/SensorParser.h"
 #include "../../src/vfrb/VFRB.h"
-#include "../framework/src/comparator/ComparatorStrategy.hpp"
-#include "../framework/src/testsuite/TestSuite.hpp"
-#include "../framework/src/testsuite/TestSuitesRunner.hpp"
-#include "../framework/src/util/assert.hpp"
+#include "../framework/src/framework.h"
 #include "../Helper.hpp"
 
 #ifdef assert
