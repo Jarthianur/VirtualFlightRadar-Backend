@@ -21,7 +21,6 @@
 
 #include "ConfigReader.h"
 
-#include <fstream>
 #include <stdexcept>
 #include <typeindex>
 #include <utility>
@@ -33,10 +32,9 @@ using namespace util;
 namespace config
 {
 
-ConfigReader::ConfigReader(const std::string& cr_fname)
-        : mFile(cr_fname),
-          mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
-                  boost::regex_constants::optimize)
+ConfigReader::ConfigReader()
+        : mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
+                boost::regex_constants::optimize)
 {
 }
 
@@ -44,15 +42,14 @@ ConfigReader::~ConfigReader() noexcept
 {
 }
 
-void ConfigReader::read() noexcept
+void ConfigReader::read(std::istream& r_file)
 {
-    std::ifstream src(mFile);
     std::string key;
     std::string value;
     std::string line;
     std::string section;
     std::size_t line_nr = 0;
-    while (std::getline(src, line))
+    while (std::getline(r_file, line))
     {
         line_nr++;
         try

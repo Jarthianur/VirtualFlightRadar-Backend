@@ -21,23 +21,22 @@
 
 #include "Configuration.h"
 
-#include <sys/types.h>
 #include <algorithm>
 #include <iterator>
 #include <sstream>
 #include <stdexcept>
 #include <typeindex>
-#include <unordered_map>
 
 #include "../util/Logger.h"
+
 using namespace util;
 
 namespace config
 {
 
-Configuration::Configuration(const char* file)
+Configuration::Configuration(std::istream& r_file)
 {
-    if (!init(file))
+    if (!init(r_file))
     {
         throw std::logic_error("failed to read configuration file");
     }
@@ -59,12 +58,12 @@ bool Configuration::global_gnd_mode = false;
 
 std::vector<vfrb::Feed> Configuration::global_feeds;
 
-bool Configuration::init(const char* file)
+bool Configuration::init(std::istream& r_file)
 {
-    ConfigReader cr(file);
+    ConfigReader cr;
     try
     {
-        cr.read();
+        cr.read(r_file);
     } catch (const std::exception& e)
     {
         Logger::error("(Config) read file: ", e.what());

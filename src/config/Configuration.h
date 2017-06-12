@@ -71,9 +71,9 @@ public:
     /**
      * Constructor to initialize all Configuration fields.
      *
-     * @param file the config file
+     * @param r_file the config file as stream
      */
-    Configuration(const char* /*file*/);
+    Configuration(std::istream& /*r_file*/);
     /**
      * Destructor
      *
@@ -108,11 +108,11 @@ private:
      * Called by c'tor.
      * Read and unpack config file.
      *
-     * @param file the file name
+     * @param r_file the file stream
      *
      * @return whether reading and unpacking was successful
      */
-    bool init(const char* /*file*/);
+    bool init(std::istream& /*r_file*/);
     /**
      * Register all input feeds found in the config file.
      * Only correctly configured feeds are registered.
