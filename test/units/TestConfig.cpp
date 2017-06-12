@@ -20,6 +20,7 @@
  */
 
 #include <string>
+#include <sstream>
 
 #include "../../src/config/ConfigReader.h"
 #include "../../src/config/Configuration.h"
@@ -43,7 +44,10 @@ void test_config(TestSuitesRunner& runner)
     describe<config::ConfigReader>("read config", runner)->test("read",
             []()
             {
-                std::istringstream conf;
+                std::stringstream conf;
+                conf << "[" << SECT_KEY_FALLBACK << "]\n" << KV_KEY_LATITUDE << "   = 0.000000\n";
+                conf << "[" << SECT_KEY_FALLBACK << "]\n" << KV_KEY_LONGITUDE << " = \n";
+                conf << "[" << SECT_KEY_FALLBACK << "]\n" << KV_KEY_ALTITUDE << "=1000\n";
                 config::ConfigReader cr;
                 cr.read(conf);
                 assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), std::string("0.000000"), helper::eqs);

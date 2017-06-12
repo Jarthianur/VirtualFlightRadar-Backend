@@ -52,7 +52,7 @@ void test_parser(TestSuitesRunner& runner)
             {
                 assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0", 0), MSG_UNPACK_ERR, helper::eqi);
                 assert(helper::pars_sbs.unpack("MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", 0), MSG_UNPACK_IGN, helper::eqi);
-                assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", 0), MSG_UNPACK_IGN, helper::eqi);
+                //assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", 0), MSG_UNPACK_IGN, helper::eqi);
                 assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0", 0), MSG_UNPACK_ERR, helper::eqi);
                 assert(helper::pars_sbs.unpack("MSG,someCrap in, here", 0), MSG_UNPACK_IGN, helper::eqi);
                 assert(helper::pars_sbs.unpack("MSG,4,0,,,,,,", 0), MSG_UNPACK_IGN, helper::eqi);
@@ -114,6 +114,7 @@ void test_parser(TestSuitesRunner& runner)
             })->test<data::SensorData>("extract WIMWV",
             []()
             {
+                assert(helper::pars_wind.unpack("$WIMWV,242.8,R,6.9,N,A*20\r", 0), MSG_UNPACK_SUC, helper::eqi);
                 assert(vfrb::VFRB::msSensorData.getMwvStr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
                 assert(vfrb::VFRB::msSensorData.getMwvStr(), std::string(""), helper::eqs);
             });
