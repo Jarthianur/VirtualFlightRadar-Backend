@@ -46,7 +46,7 @@ Feed::Feed(const std::string& cr_name, std::int32_t prio, InputType type,
         : mName(cr_name),
           mPriority(prio),
           mType(type),
-          mKVmap(cr_kvmap)
+          mKvMap(cr_kvmap)
 {
 }
 
@@ -58,7 +58,7 @@ Feed::Feed(BOOST_RV_REF(Feed) other)
 : mName(std::move(other.mName)),
 mPriority(other.mPriority),
 mType(other.mType),
-mKVmap(std::move(other.mKVmap))
+mKvMap(std::move(other.mKvMap))
 {
 }
 
@@ -70,8 +70,8 @@ Feed& Feed::operator =(BOOST_RV_REF(Feed))
 void Feed::run(boost::asio::signal_set& r_sigset) noexcept
 {
     std::string host, port;
-    auto it = mKVmap.find(KV_KEY_HOST);
-    if (it != mKVmap.end())
+    auto it = mKvMap.find(KV_KEY_HOST);
+    if (it != mKvMap.end())
     {
         host = it->second;
     } else
@@ -79,8 +79,8 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
         Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_HOST);
         return;
     }
-    it = mKVmap.find(KV_KEY_PORT);
-    if (it != mKVmap.end())
+    it = mKvMap.find(KV_KEY_PORT);
+    if (it != mKvMap.end())
     {
         port = it->second;
     } else
@@ -93,8 +93,8 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
         case InputType::APRSC:
         {
             std::string login;
-            auto it = mKVmap.find(KV_KEY_LOGIN);
-            if (it != mKVmap.end())
+            auto it = mKvMap.find(KV_KEY_LOGIN);
+            if (it != mKvMap.end())
             {
                 login = it->second;
             } else

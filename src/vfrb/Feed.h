@@ -130,7 +130,7 @@ public:
 
 private:
     /// Key-value-map holding the properties.
-    std::unordered_map<std::string, std::string> mKVmap;
+    std::unordered_map<std::string, std::string> mKvMap;
     /// Client, later resolved according to InpuType
     std::unique_ptr<tcp::client::Client> mpClient;
     /// Parser, later resolved according to InpuType
