@@ -23,11 +23,6 @@
 #include <string>
 
 #include "../../src/config/Configuration.h"
-#include "../../src/data/SensorData.h"
-#include "../../src/parser/AprsParser.h"
-#include "../../src/parser/Parser.h"
-#include "../../src/parser/SbsParser.h"
-#include "../../src/parser/SensorParser.h"
 #include "../../src/vfrb/VFRB.h"
 #include "../framework/src/framework.h"
 #include "../Helper.hpp"
@@ -112,7 +107,22 @@ void test_parser(TestSuitesRunner& runner) {
 				assert(helper::pars_wind.unpack("", 0), MSG_UNPACK_ERR, helper::eqi);
 			});
 
-	describe<parser::GpsParser>("unpack", runner)->test("valid msg", []() {
-
-	});
+	describe<parser::GpsParser>("unpack", runner)->test("valid msg",
+			[]() {
+				assert(helper::pars_gps.unpack("$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49\r\n", 0), MSG_UNPACK_SUC, helper::eqi);
+				assert(helper::pars_gps.unpack("$GPGGA,183552,5000.0466,S,00815.7555,W,1,05,1,105,M,48.0,M,,*46\r\n", 0), MSG_UNPACK_SUC, helper::eqi);
+				config::Configuration::global_gnd_mode = true;
+				assert(helper::pars_gps.unpack("$GPGGA,183552,5000.0466,N,00815.7555,E,1,07,1,105,M,48.0,M,,*4b\r\n", 0), 0, comparator::GREATER<int>());
+			})->test("invalid msg",
+			[]()
+			{
+				assert(helper::pars_gps.unpack("$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*59\r\n", 0), MSG_UNPACK_IGN, helper::eqi);
+				assert(helper::pars_gps.unpack("$GPGGA,183552,N,00815.7555,E,1,05,1,105,M,48.0,M,,*59\r\n", 0), MSG_UNPACK_IGN, helper::eqi);
+			})->test("broken msg",
+			[]()
+			{
+				assert(helper::pars_gps.unpack("$GPGGA,\r\n", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_gps.unpack("", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_gps.unpack("$GPGGA,183552,N,00815.7555,E,1,05,1,105,M,48.0,M,,*\r\n", 0), MSG_UNPACK_ERR, helper::eqi);
+			});
 }

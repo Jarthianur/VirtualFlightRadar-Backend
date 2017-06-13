@@ -102,7 +102,10 @@ void test_data(TestSuitesRunner& runner) {
 				assert(helper::pars_wind.unpack("$WIMWV,242.8,R,6.9,N,A*20\r", 0), MSG_UNPACK_SUC, helper::eqi);
 				assert(vfrb::VFRB::msSensorData.getMwvStr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
 				assert(vfrb::VFRB::msSensorData.getMwvStr(), std::string(""), helper::eqs);
-			})->test("extract WIMDA", []() {
-
-	});
+			})->test("extract WIMDA",
+			[]() {
+				vfrb::VFRB::msSensorData.setMdaStr(5, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r");
+				assert(vfrb::VFRB::msSensorData.getMdaStr(), std::string("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"), helper::eqs);
+				assert(vfrb::VFRB::msSensorData.getMdaStr(), std::string(""), helper::eqs);
+			});
 }
