@@ -209,28 +209,30 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
 
 std::int32_t Configuration::strToInt(const std::string& cr_str) noexcept
 {
+	std::int32_t val = 0;
     try
     {
-        return std::stoi(cr_str);
+        val = std::stoi(cr_str);
     } catch (const std::logic_error& iae)
     {
         Logger::warn("(Config) invalid configuration: ",
                 cr_str.length() == 0 ? "empty" : cr_str);
     }
-    return 0;
+    return val;
 }
 
 double Configuration::strToDouble(const std::string& cr_str) noexcept
 {
+	double val = 0.0;
     try
     {
-        return std::stod(cr_str);
+        val = std::stod(cr_str);
     } catch (const std::logic_error& iae)
     {
         Logger::warn("(Config) invalid configuration: ",
                 cr_str.length() == 0 ? "empty" : cr_str);
     }
-    return 0.0;
+    return val;
 }
 
 }  // namespace config

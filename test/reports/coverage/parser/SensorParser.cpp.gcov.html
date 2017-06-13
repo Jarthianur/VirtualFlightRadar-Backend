@@ -31,13 +31,13 @@
             <td class="headerValue">vfrb.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">26</td>
-            <td class="headerCovTableEntry">27</td>
-            <td class="headerCovTableEntryHi">96.3 %</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntry">29</td>
+            <td class="headerCovTableEntryHi">96.6 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2017-05-07 10:26:40</td>
+            <td class="headerValue">2017-06-13 10:14:21</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">5</td>
@@ -87,61 +87,69 @@
 <span class="lineNum">      25 </span>            : 
 <span class="lineNum">      26 </span>            : #include &quot;../data/SensorData.h&quot;
 <span class="lineNum">      27 </span>            : #include &quot;../util/Math.hpp&quot;
-<a name="28"><span class="lineNum">      28 </span>            : #include &quot;../vfrb/VFRB.h&quot;</a>
+<span class="lineNum">      28 </span>            : #include &quot;../vfrb/VFRB.h&quot;
 <span class="lineNum">      29 </span>            : 
-<span class="lineNum">      30 </span><span class="lineCov">          1 : SensorParser::SensorParser()</span>
-<span class="lineNum">      31 </span><span class="lineCov">          1 :         : Parser()</span>
-<span class="lineNum">      32 </span>            : {
-<a name="33"><span class="lineNum">      33 </span><span class="lineCov">          1 : }</span></a>
-<span class="lineNum">      34 </span>            : 
-<span class="lineNum">      35 </span><span class="lineCov">          1 : SensorParser::~SensorParser() noexcept</span>
-<span class="lineNum">      36 </span>            : {
-<a name="37"><span class="lineNum">      37 </span><span class="lineCov">          1 : }</span></a>
-<span class="lineNum">      38 </span>            : 
-<span class="lineNum">      39 </span><span class="lineCov">          8 : std::int32_t SensorParser::unpack(const std::string&amp; cr_msg, Priority prio)</span>
-<span class="lineNum">      40 </span>            :         noexcept
-<span class="lineNum">      41 </span>            :         {
-<span class="lineNum">      42 </span>            :     try
-<span class="lineNum">      43 </span>            :     {
-<span class="lineNum">      44 </span><span class="lineCov">         16 :         std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),</span>
-<span class="lineNum">      45 </span><span class="lineCov">          8 :                 nullptr, 16);</span>
-<span class="lineNum">      46 </span><span class="lineCov">          5 :         if (csum != Math::checksum(cr_msg.c_str(), cr_msg.length()))</span>
-<span class="lineNum">      47 </span>            :         {
-<span class="lineNum">      48 </span><span class="lineNoCov">          0 :             return MSG_UNPACK_IGN;</span>
-<span class="lineNum">      49 </span>            :         }
-<span class="lineNum">      50 </span><span class="lineCov">          6 :     } catch (const std::logic_error&amp; e)</span>
-<span class="lineNum">      51 </span>            :     {
-<span class="lineNum">      52 </span><span class="lineCov">          3 :         return MSG_UNPACK_ERR;</span>
-<span class="lineNum">      53 </span>            :     }
-<span class="lineNum">      54 </span>            : 
-<span class="lineNum">      55 </span><span class="lineCov">          5 :     if (cr_msg.find(&quot;MDA&quot;) != std::string::npos)</span>
-<span class="lineNum">      56 </span>            :     {
-<span class="lineNum">      57 </span>            :         try
-<span class="lineNum">      58 </span>            :         {
-<span class="lineNum">      59 </span><span class="lineCov">          3 :             mtB = cr_msg.find('B') - 1;</span>
-<span class="lineNum">      60 </span><span class="lineCov">          3 :             mtS = cr_msg.substr(0, mtB).find_last_of(',') + 1;</span>
-<span class="lineNum">      61 </span><span class="lineCov">          3 :             mtSubLen = mtB - mtS;</span>
-<span class="lineNum">      62 </span><span class="lineCov">          4 :             mtPress = std::stod(cr_msg.substr(mtS, mtSubLen), &amp;mtNumIdx) * 1000.0;</span>
-<span class="lineNum">      63 </span><span class="lineCov">          2 :             if (mtNumIdx == mtSubLen)</span>
-<span class="lineNum">      64 </span>            :             {
-<span class="lineNum">      65 </span><span class="lineCov">          1 :                 VFRB::msSensorData.setPress(prio, mtPress);</span>
-<span class="lineNum">      66 </span>            :             } else
-<span class="lineNum">      67 </span>            :             {
-<span class="lineNum">      68 </span><span class="lineCov">          1 :                 return MSG_UNPACK_ERR;</span>
-<span class="lineNum">      69 </span>            :             }
-<span class="lineNum">      70 </span><span class="lineCov">          2 :         } catch (std::logic_error&amp; e)</span>
-<span class="lineNum">      71 </span>            :         {
-<span class="lineNum">      72 </span><span class="lineCov">          1 :             return MSG_UNPACK_ERR;</span>
-<span class="lineNum">      73 </span>            :         }
-<span class="lineNum">      74 </span><span class="lineCov">          2 :     } else if (cr_msg.find(&quot;MWV&quot;) != std::string::npos)</span>
-<span class="lineNum">      75 </span>            :     {
-<span class="lineNum">      76 </span><span class="lineCov">          1 :         VFRB::msSensorData.setWVstr(prio, cr_msg);</span>
-<span class="lineNum">      77 </span>            :     } else
-<span class="lineNum">      78 </span>            :     {
-<span class="lineNum">      79 </span><span class="lineCov">          1 :         return MSG_UNPACK_IGN;</span>
-<a name="80"><span class="lineNum">      80 </span>            :     }</a>
-<span class="lineNum">      81 </span><span class="lineCov">          2 :     return MSG_UNPACK_SUC;</span>
-<span class="lineNum">      82 </span><span class="lineCov">          3 : }</span>
+<span class="lineNum">      30 </span>            : namespace parser
+<a name="31"><span class="lineNum">      31 </span>            : {</a>
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span><span class="lineCov">          5 : SensorParser::SensorParser()</span>
+<span class="lineNum">      34 </span><span class="lineCov">          5 :         : Parser()</span>
+<span class="lineNum">      35 </span>            : {
+<a name="36"><span class="lineNum">      36 </span><span class="lineCov">          5 : }</span></a>
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span><span class="lineCov">          4 : SensorParser::~SensorParser() noexcept</span>
+<span class="lineNum">      39 </span>            : {
+<a name="40"><span class="lineNum">      40 </span><span class="lineCov">          4 : }</span></a>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span><span class="lineCov">          9 : std::int32_t SensorParser::unpack(const std::string&amp; cr_msg, std::int32_t prio)</span>
+<span class="lineNum">      43 </span>            : noexcept
+<span class="lineNum">      44 </span>            : {
+<span class="lineNum">      45 </span>            :     try
+<span class="lineNum">      46 </span>            :     {
+<span class="lineNum">      47 </span><span class="lineCov">         18 :         std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),</span>
+<span class="lineNum">      48 </span><span class="lineCov">          9 :                 nullptr, 16);</span>
+<span class="lineNum">      49 </span><span class="lineCov">          6 :         if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))</span>
+<span class="lineNum">      50 </span>            :         {
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :             return MSG_UNPACK_IGN;</span>
+<span class="lineNum">      52 </span>            :         }
+<span class="lineNum">      53 </span><span class="lineCov">          6 :     } catch (const std::logic_error&amp; e)</span>
+<span class="lineNum">      54 </span>            :     {
+<span class="lineNum">      55 </span><span class="lineCov">          3 :         return MSG_UNPACK_ERR;</span>
+<span class="lineNum">      56 </span>            :     }
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineCov">          6 :     if (cr_msg.find(&quot;MDA&quot;) != std::string::npos)</span>
+<span class="lineNum">      59 </span>            :     {
+<span class="lineNum">      60 </span><span class="lineCov">          3 :         vfrb::VFRB::msSensorData.setMdaStr(prio, cr_msg);</span>
+<span class="lineNum">      61 </span>            :         try
+<span class="lineNum">      62 </span>            :         {
+<span class="lineNum">      63 </span><span class="lineCov">          3 :             std::size_t tmpB = cr_msg.find('B') - 1;</span>
+<span class="lineNum">      64 </span><span class="lineCov">          3 :             std::size_t tmpS = cr_msg.substr(0, tmpB).find_last_of(',') + 1;</span>
+<span class="lineNum">      65 </span><span class="lineCov">          3 :             std::size_t subLen = tmpB - tmpS;</span>
+<span class="lineNum">      66 </span>            :             std::size_t numIdx;
+<span class="lineNum">      67 </span><span class="lineCov">          6 :             double tmpPress = std::stod(cr_msg.substr(tmpS, subLen), &amp;numIdx)</span>
+<span class="lineNum">      68 </span><span class="lineCov">          2 :                     * 1000.0;</span>
+<span class="lineNum">      69 </span><span class="lineCov">          2 :             if (numIdx == subLen)</span>
+<span class="lineNum">      70 </span>            :             {
+<span class="lineNum">      71 </span><span class="lineCov">          1 :                 vfrb::VFRB::msSensorData.setPress(prio, tmpPress);</span>
+<span class="lineNum">      72 </span>            :             } else
+<span class="lineNum">      73 </span>            :             {
+<span class="lineNum">      74 </span><span class="lineCov">          1 :                 return MSG_UNPACK_ERR;</span>
+<span class="lineNum">      75 </span>            :             }
+<span class="lineNum">      76 </span><span class="lineCov">          2 :         } catch (const std::logic_error&amp; e)</span>
+<span class="lineNum">      77 </span>            :         {
+<span class="lineNum">      78 </span><span class="lineCov">          1 :             return MSG_UNPACK_ERR;</span>
+<span class="lineNum">      79 </span>            :         }
+<span class="lineNum">      80 </span><span class="lineCov">          3 :     } else if (cr_msg.find(&quot;MWV&quot;) != std::string::npos)</span>
+<span class="lineNum">      81 </span>            :     {
+<span class="lineNum">      82 </span><span class="lineCov">          2 :         vfrb::VFRB::msSensorData.setMwvStr(prio, cr_msg);</span>
+<span class="lineNum">      83 </span>            :     } else
+<span class="lineNum">      84 </span>            :     {
+<span class="lineNum">      85 </span><span class="lineCov">          1 :         return MSG_UNPACK_IGN;</span>
+<span class="lineNum">      86 </span>            :     }
+<span class="lineNum">      87 </span><span class="lineCov">          3 :     return MSG_UNPACK_SUC;</span>
+<a name="88"><span class="lineNum">      88 </span>            : }</a>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">          3 : }  // namespace parser</span>
 </pre>
       </td>
     </tr>

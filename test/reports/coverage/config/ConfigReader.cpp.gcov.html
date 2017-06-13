@@ -31,18 +31,18 @@
             <td class="headerValue">vfrb.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">41</td>
-            <td class="headerCovTableEntry">51</td>
-            <td class="headerCovTableEntryMed">80.4 %</td>
+            <td class="headerCovTableEntry">44</td>
+            <td class="headerCovTableEntry">47</td>
+            <td class="headerCovTableEntryHi">93.6 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2017-05-07 10:26:40</td>
+            <td class="headerValue">2017-06-13 10:14:21</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">7</td>
             <td class="headerCovTableEntry">8</td>
-            <td class="headerCovTableEntryMed">75.0 %</td>
+            <td class="headerCovTableEntryMed">87.5 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -83,111 +83,111 @@
 <span class="lineNum">      21 </span>            : 
 <span class="lineNum">      22 </span>            : #include &quot;ConfigReader.h&quot;
 <span class="lineNum">      23 </span>            : 
-<span class="lineNum">      24 </span>            : #include &lt;fstream&gt;
-<span class="lineNum">      25 </span>            : #include &lt;stdexcept&gt;
-<span class="lineNum">      26 </span>            : #include &lt;typeindex&gt;
-<span class="lineNum">      27 </span>            : #include &lt;utility&gt;
-<span class="lineNum">      28 </span>            : 
-<a name="29"><span class="lineNum">      29 </span>            : #include &quot;../util/Logger.h&quot;</a>
-<span class="lineNum">      30 </span>            : 
-<span class="lineNum">      31 </span><span class="lineCov">          1 : ConfigReader::ConfigReader(const std::string&amp; cr_fname)</span>
-<span class="lineNum">      32 </span>            :         : mFile(cr_fname),
-<span class="lineNum">      33 </span>            :           mConfRE(&quot;^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$&quot;,
-<span class="lineNum">      34 </span><span class="lineCov">          1 :                   boost::regex_constants::optimize)</span>
-<span class="lineNum">      35 </span>            : {
-<a name="36"><span class="lineNum">      36 </span><span class="lineCov">          1 : }</span></a>
-<span class="lineNum">      37 </span>            : 
-<span class="lineNum">      38 </span><span class="lineCov">          1 : ConfigReader::~ConfigReader() noexcept</span>
-<span class="lineNum">      39 </span>            : {
-<a name="40"><span class="lineNum">      40 </span><span class="lineCov">          1 : }</span></a>
-<span class="lineNum">      41 </span>            : 
-<span class="lineNum">      42 </span><span class="lineCov">          1 : void ConfigReader::read() noexcept</span>
-<span class="lineNum">      43 </span>            : {
-<span class="lineNum">      44 </span><span class="lineCov">          2 :     std::ifstream src(mFile);</span>
-<span class="lineNum">      45 </span><span class="lineCov">          2 :     std::string key;</span>
-<span class="lineNum">      46 </span><span class="lineCov">          2 :     std::string value;</span>
-<span class="lineNum">      47 </span><span class="lineCov">          2 :     std::string line;</span>
-<span class="lineNum">      48 </span><span class="lineCov">          2 :     std::string section;</span>
-<span class="lineNum">      49 </span><span class="lineCov">          1 :     std::size_t line_nr = 0;</span>
-<span class="lineNum">      50 </span><span class="lineCov">         19 :     while (std::getline(src, line))</span>
-<span class="lineNum">      51 </span>            :     {
-<span class="lineNum">      52 </span><span class="lineCov">          9 :         line_nr++;</span>
-<span class="lineNum">      53 </span>            :         try
-<span class="lineNum">      54 </span>            :         {
-<span class="lineNum">      55 </span><span class="lineCov">          9 :             if (line.length() == 0 || line.at(0) == ';')</span>
-<span class="lineNum">      56 </span>            :             {
-<span class="lineNum">      57 </span><span class="lineCov">          9 :                 continue;</span>
-<span class="lineNum">      58 </span>            :             }
-<span class="lineNum">      59 </span><span class="lineCov">          5 :             if (line.at(0) == '[')</span>
-<span class="lineNum">      60 </span>            :             {
-<span class="lineNum">      61 </span><span class="lineCov">          1 :                 section = line.substr(1, line.rfind(']') - 1);</span>
-<span class="lineNum">      62 </span>            :                 mConfig.emplace(
-<span class="lineNum">      63 </span><span class="lineCov">          2 :                         std::make_pair(section,</span>
-<span class="lineNum">      64 </span><span class="lineCov">          1 :                                 std::unordered_map&lt;std::string, std::string&gt;()));</span>
-<span class="lineNum">      65 </span><span class="lineCov">          1 :                 continue;</span>
-<span class="lineNum">      66 </span>            :             }
-<span class="lineNum">      67 </span><span class="lineCov">          8 :             boost::smatch match;</span>
-<span class="lineNum">      68 </span><span class="lineCov">          4 :             if (boost::regex_match(line, match, mConfRE))</span>
-<span class="lineNum">      69 </span>            :             {
-<span class="lineNum">      70 </span><span class="lineCov">          2 :                 key = match.str(1);</span>
-<span class="lineNum">      71 </span><span class="lineCov">          2 :                 value = match.str(2);</span>
-<span class="lineNum">      72 </span><span class="lineCov">          2 :                 std::size_t l = value.find_last_not_of(' ');</span>
-<span class="lineNum">      73 </span><span class="lineCov">          2 :                 if (l != std::string::npos)</span>
-<span class="lineNum">      74 </span>            :                 {
-<span class="lineNum">      75 </span><span class="lineCov">          2 :                     value = value.substr(0, l + 1);</span>
-<span class="lineNum">      76 </span>            :                 }
-<span class="lineNum">      77 </span><span class="lineCov">          2 :                 mConfig[section].emplace(std::make_pair(key, value));</span>
-<span class="lineNum">      78 </span>            :             } else
-<span class="lineNum">      79 </span>            :             {
-<span class="lineNum">      80 </span>            :                 Logger::error(
-<span class="lineNum">      81 </span><span class="lineCov">          4 :                         &quot;(ConfigReader) malformed param [&quot; + std::to_string(</span>
-<span class="lineNum">      82 </span>            :                                 line_nr)
-<span class="lineNum">      83 </span><span class="lineCov">          2 :                         + &quot;]: &quot;, line);</span>
-<span class="lineNum">      84 </span>            :             }
-<span class="lineNum">      85 </span><span class="lineNoCov">          0 :         } catch (const boost::regex_error&amp; e)</span>
-<span class="lineNum">      86 </span>            :         {
-<span class="lineNum">      87 </span><span class="lineNoCov">          0 :             Logger::error(&quot;(ConfigReader) read config: &quot;, e.what());</span>
-<span class="lineNum">      88 </span><span class="lineNoCov">          0 :             break;</span>
-<span class="lineNum">      89 </span><span class="lineNoCov">          0 :         } catch (const std::out_of_range&amp; e)</span>
-<span class="lineNum">      90 </span>            :         {
-<span class="lineNum">      91 </span><span class="lineNoCov">          0 :             continue;</span>
-<span class="lineNum">      92 </span>            :         }
-<span class="lineNum">      93 </span>            :     }
-<a name="94"><span class="lineNum">      94 </span><span class="lineCov">          1 : }</span></a>
-<span class="lineNum">      95 </span>            : 
-<span class="lineNum">      96 </span><span class="lineCov">          5 : const std::string ConfigReader::getProperty(const std::string&amp; cr_section,</span>
-<span class="lineNum">      97 </span>            :                                             const std::string&amp; cr_key,
-<span class="lineNum">      98 </span>            :                                             const std::string&amp; cr_def_val) const
-<span class="lineNum">      99 </span>            : {
-<span class="lineNum">     100 </span><span class="lineCov">          5 :     auto s_it = mConfig.find(cr_section);</span>
-<span class="lineNum">     101 </span><span class="lineCov">          5 :     if (s_it != mConfig.end())</span>
-<span class="lineNum">     102 </span>            :     {
-<span class="lineNum">     103 </span><span class="lineCov">          4 :         auto it = s_it-&gt;second.find(cr_key);</span>
-<span class="lineNum">     104 </span><span class="lineCov">          4 :         if (it != s_it-&gt;second.end())</span>
-<span class="lineNum">     105 </span>            :         {
-<span class="lineNum">     106 </span><span class="lineCov">          2 :             return it-&gt;second;</span>
-<span class="lineNum">     107 </span>            :         } else
-<span class="lineNum">     108 </span>            :         {
-<span class="lineNum">     109 </span><span class="lineCov">          2 :             return cr_def_val;</span>
-<span class="lineNum">     110 </span>            :         }
-<span class="lineNum">     111 </span>            :     } else
-<span class="lineNum">     112 </span>            :     {
-<span class="lineNum">     113 </span><span class="lineCov">          1 :         return cr_def_val;</span>
-<span class="lineNum">     114 </span>            :     }
-<a name="115"><span class="lineNum">     115 </span>            : }</a>
-<span class="lineNum">     116 </span>            : 
-<span class="lineNum">     117 </span><span class="lineNoCov">          0 : const std::unordered_map&lt;std::string, std::string&gt;&amp; ConfigReader::getSectionKV(</span>
-<span class="lineNum">     118 </span>            :         const std::string&amp; cr_section) const
-<span class="lineNum">     119 </span>            : {
-<span class="lineNum">     120 </span><span class="lineNoCov">          0 :     auto it = mConfig.find(cr_section);</span>
-<span class="lineNum">     121 </span><span class="lineNoCov">          0 :     if (it != mConfig.end())</span>
-<span class="lineNum">     122 </span>            :     {
-<span class="lineNum">     123 </span><span class="lineNoCov">          0 :         return it-&gt;second;</span>
-<span class="lineNum">     124 </span>            :     } else
-<span class="lineNum">     125 </span>            :     {
-<a name="126"><span class="lineNum">     126 </span><span class="lineNoCov">          0 :         throw std::out_of_range(&quot;section not found&quot;);</span></a>
-<span class="lineNum">     127 </span>            :     }
-<span class="lineNum">     128 </span><span class="lineCov">          3 : }</span>
+<span class="lineNum">      24 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">      25 </span>            : #include &lt;typeindex&gt;
+<span class="lineNum">      26 </span>            : #include &lt;utility&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &quot;../util/Logger.h&quot;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : using namespace util;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : namespace config
+<a name="33"><span class="lineNum">      33 </span>            : {</a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">          4 : ConfigReader::ConfigReader()</span>
+<span class="lineNum">      36 </span>            :         : mConfRE(&quot;^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$&quot;,
+<span class="lineNum">      37 </span><span class="lineCov">          4 :                 boost::regex_constants::optimize)</span>
+<span class="lineNum">      38 </span>            : {
+<a name="39"><span class="lineNum">      39 </span><span class="lineCov">          4 : }</span></a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">          4 : ConfigReader::~ConfigReader() noexcept</span>
+<span class="lineNum">      42 </span>            : {
+<a name="43"><span class="lineNum">      43 </span><span class="lineCov">          4 : }</span></a>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineCov">          4 : void ConfigReader::read(std::istream&amp; r_file)</span>
+<span class="lineNum">      46 </span>            : {
+<span class="lineNum">      47 </span><span class="lineCov">          8 :     std::string key;</span>
+<span class="lineNum">      48 </span><span class="lineCov">          8 :     std::string value;</span>
+<span class="lineNum">      49 </span><span class="lineCov">          8 :     std::string line;</span>
+<span class="lineNum">      50 </span><span class="lineCov">          8 :     std::string section;</span>
+<span class="lineNum">      51 </span><span class="lineCov">          4 :     std::size_t line_nr = 0;</span>
+<span class="lineNum">      52 </span><span class="lineCov">         80 :     while (std::getline(r_file, line))</span>
+<span class="lineNum">      53 </span>            :     {
+<span class="lineNum">      54 </span><span class="lineCov">         38 :         line_nr++;</span>
+<span class="lineNum">      55 </span>            :         try
+<span class="lineNum">      56 </span>            :         {
+<span class="lineNum">      57 </span><span class="lineCov">         38 :             if (line.length() == 0 || line.at(0) == ';')</span>
+<span class="lineNum">      58 </span>            :             {
+<span class="lineNum">      59 </span><span class="lineCov">         12 :                 continue;</span>
+<span class="lineNum">      60 </span>            :             }
+<span class="lineNum">      61 </span><span class="lineCov">         37 :             if (line.at(0) == '[')</span>
+<span class="lineNum">      62 </span>            :             {
+<span class="lineNum">      63 </span><span class="lineCov">         10 :                 section = line.substr(1, line.rfind(']') - 1);</span>
+<span class="lineNum">      64 </span>            :                 mConfig.emplace(
+<span class="lineNum">      65 </span><span class="lineCov">         20 :                         std::make_pair(section,</span>
+<span class="lineNum">      66 </span><span class="lineCov">         10 :                                 std::unordered_map&lt;std::string, std::string&gt;()));</span>
+<span class="lineNum">      67 </span><span class="lineCov">         10 :                 continue;</span>
+<span class="lineNum">      68 </span>            :             }
+<span class="lineNum">      69 </span><span class="lineCov">         54 :             boost::smatch match;</span>
+<span class="lineNum">      70 </span><span class="lineCov">         27 :             if (boost::regex_match(line, match, mConfRE))</span>
+<span class="lineNum">      71 </span>            :             {
+<span class="lineNum">      72 </span><span class="lineCov">         25 :                 key = match.str(1);</span>
+<span class="lineNum">      73 </span><span class="lineCov">         25 :                 value = match.str(2);</span>
+<span class="lineNum">      74 </span><span class="lineCov">         25 :                 std::size_t l = value.find_last_not_of(' ');</span>
+<span class="lineNum">      75 </span><span class="lineCov">         25 :                 if (l != std::string::npos)</span>
+<span class="lineNum">      76 </span>            :                 {
+<span class="lineNum">      77 </span><span class="lineCov">         25 :                     value = value.substr(0, l + 1);</span>
+<span class="lineNum">      78 </span>            :                 }
+<span class="lineNum">      79 </span><span class="lineCov">         25 :                 mConfig[section].emplace(std::make_pair(key, value));</span>
+<span class="lineNum">      80 </span>            :             } else
+<span class="lineNum">      81 </span>            :             {
+<span class="lineNum">      82 </span>            :                 Logger::error(
+<span class="lineNum">      83 </span><span class="lineCov">          4 :                         &quot;(ConfigReader) malformed param [&quot; + std::to_string(</span>
+<span class="lineNum">      84 </span>            :                                 line_nr)
+<span class="lineNum">      85 </span><span class="lineCov">          2 :                         + &quot;]: &quot;, line);</span>
+<span class="lineNum">      86 </span>            :             }
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :         } catch (const std::out_of_range&amp; e)</span>
+<span class="lineNum">      88 </span>            :         {
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">      90 </span>            :         }
+<span class="lineNum">      91 </span>            :     }
+<a name="92"><span class="lineNum">      92 </span><span class="lineCov">          4 : }</span></a>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">         39 : const std::string ConfigReader::getProperty(const std::string&amp; cr_section,</span>
+<span class="lineNum">      95 </span>            :                                             const std::string&amp; cr_key,
+<span class="lineNum">      96 </span>            :                                             const std::string&amp; cr_def_val) const
+<span class="lineNum">      97 </span>            : {
+<span class="lineNum">      98 </span><span class="lineCov">         39 :     auto s_it = mConfig.find(cr_section);</span>
+<span class="lineNum">      99 </span><span class="lineCov">         39 :     if (s_it != mConfig.end())</span>
+<span class="lineNum">     100 </span>            :     {
+<span class="lineNum">     101 </span><span class="lineCov">         24 :         auto it = s_it-&gt;second.find(cr_key);</span>
+<span class="lineNum">     102 </span><span class="lineCov">         24 :         if (it != s_it-&gt;second.end())</span>
+<span class="lineNum">     103 </span>            :         {
+<span class="lineNum">     104 </span><span class="lineCov">         17 :             return it-&gt;second;</span>
+<span class="lineNum">     105 </span>            :         } else
+<span class="lineNum">     106 </span>            :         {
+<span class="lineNum">     107 </span><span class="lineCov">          7 :             return cr_def_val;</span>
+<span class="lineNum">     108 </span>            :         }
+<span class="lineNum">     109 </span>            :     } else
+<span class="lineNum">     110 </span>            :     {
+<span class="lineNum">     111 </span><span class="lineCov">         15 :         return cr_def_val;</span>
+<span class="lineNum">     112 </span>            :     }
+<a name="113"><span class="lineNum">     113 </span>            : }</a>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">          4 : const std::unordered_map&lt;std::string, std::string&gt;&amp; ConfigReader::getSectionKV(</span>
+<span class="lineNum">     116 </span>            :         const std::string&amp; cr_section) const
+<span class="lineNum">     117 </span>            : {
+<span class="lineNum">     118 </span><span class="lineCov">          4 :     auto it = mConfig.find(cr_section);</span>
+<span class="lineNum">     119 </span><span class="lineCov">          4 :     if (it != mConfig.end())</span>
+<span class="lineNum">     120 </span>            :     {
+<span class="lineNum">     121 </span><span class="lineCov">          8 :         return it-&gt;second;</span>
+<span class="lineNum">     122 </span>            :     } else
+<span class="lineNum">     123 </span>            :     {
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :         throw std::out_of_range(&quot;section not found&quot;);</span>
+<span class="lineNum">     125 </span>            :     }
+<a name="126"><span class="lineNum">     126 </span>            : }</a>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">          3 : }  // namespace config</span>
 </pre>
       </td>
     </tr>
