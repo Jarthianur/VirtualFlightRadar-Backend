@@ -88,9 +88,8 @@ void test_config(TestSuitesRunner& runner) {
 				conf_in << "[" << SECT_KEY_GENERAL << "]\n" << KV_KEY_FEEDS << "=sens,sbs1 , sbs2, else,,\n";
 				conf_in << "[sens]\n" << KV_KEY_HOST << "=127.0.0.1\n" << KV_KEY_PORT << "=3333\n" << KV_KEY_PRIORITY << "=0\n";
 				conf_in << "[sbs1]\n" << KV_KEY_HOST << "=127.0.0.1\n" << KV_KEY_PORT << "=3334\n" << KV_KEY_PRIORITY << "=1\n";
-				conf_in << "[sbs2]\n" << KV_KEY_HOST << "=127.0.0.1\n" << KV_KEY_PORT << "=3335\n" << KV_KEY_PRIORITY << "=2\n";
 				config::Configuration config(conf_in);
-				std::string valid("sens,sbs1,sbs2,");
+				std::string valid("sens,sbs1,");
 				std::string result;
 				for (auto it = config::Configuration::global_feeds.cbegin(); it != config::Configuration::global_feeds.cend(); it++) {
 					result += it->mName + ",";
