@@ -102,7 +102,5 @@ void test_config(TestSuitesRunner& runner) {
 				std::stringstream conf_in;
 				conf_in << "[" << SECT_KEY_GENERAL << "]\n" << KV_KEY_FEEDS << "=\n";
 				assertException<std::logic_error>([&conf_in]() {config::Configuration config(conf_in);});
-			})->test("invalid feed config", []() {
-
-	});
+			});
 }

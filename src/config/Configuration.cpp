@@ -214,7 +214,7 @@ std::int32_t Configuration::strToInt(const std::string& cr_str) noexcept
         return std::stoi(cr_str);
     } catch (const std::logic_error& iae)
     {
-        Logger::warn("(VFRB) invalid configuration: ",
+        Logger::warn("(Config) invalid configuration: ",
                 cr_str.length() == 0 ? "empty" : cr_str);
     }
     return 0;
@@ -227,7 +227,7 @@ double Configuration::strToDouble(const std::string& cr_str) noexcept
         return std::stod(cr_str);
     } catch (const std::logic_error& iae)
     {
-        Logger::warn("(VFRB) invalid configuration: ",
+        Logger::warn("(Config) invalid configuration: ",
                 cr_str.length() == 0 ? "empty" : cr_str);
     }
     return 0.0;
