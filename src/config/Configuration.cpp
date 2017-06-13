@@ -121,7 +121,7 @@ bool Configuration::init(std::istream& r_file)
     global_gnd_mode = cr.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE) != "";
 
     global_server_port = (uint16_t) strToInt(
-            cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "9999"));
+            cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
     Logger::info("(Config) " KV_KEY_SERVER_PORT ": ",
             std::to_string(global_server_port));
 
