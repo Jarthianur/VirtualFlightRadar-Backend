@@ -4,8 +4,8 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/aircraft/Aircraft.cpp \
-../src/aircraft/AircraftProcessor.cpp 
+../../src/aircraft/Aircraft.cpp \
+../../src/aircraft/AircraftProcessor.cpp 
 
 OBJS += \
 ./src/aircraft/Aircraft.o \
@@ -17,7 +17,7 @@ CPP_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/aircraft/%.o: ../src/aircraft/%.cpp
+src/aircraft/%.o: ../../src/aircraft/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	g++ -std=c++0x -O0 -Wall -c -fmessage-length=0 -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
