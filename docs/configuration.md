@@ -71,7 +71,7 @@ The parameters for a feed section are
 + login
 
 Where `login` is only required for APRS feeds. `host` and `port` define the hostname /-address and port to connect to.
-`priority` defines the priority relative to all other feeds of the same type.
+`priority` defines the priority relative to all other feeds of the same type, therefor is only required if multiple feeds of same type exist.
 The priority is an integer, where a higher value means a higher priority.
 
 #### Ground-Mode
