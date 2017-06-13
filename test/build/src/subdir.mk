@@ -4,23 +4,20 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/util/GpsModule.cpp \
-../src/util/Logger.cpp 
+../src/Main.cpp 
 
 OBJS += \
-./src/util/GpsModule.o \
-./src/util/Logger.o 
+./src/Main.o 
 
 CPP_DEPS += \
-./src/util/GpsModule.d \
-./src/util/Logger.d 
+./src/Main.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/util/%.o: ../src/util/%.cpp
+src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -std=c++0x -O0 -Wall -c -fmessage-length=0 -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	g++ -std=c++0x -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

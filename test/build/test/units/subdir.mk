@@ -4,29 +4,29 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/tcp/client/AprscClient.cpp \
-../src/tcp/client/Client.cpp \
-../src/tcp/client/GpsdClient.cpp \
-../src/tcp/client/SbsClient.cpp \
-../src/tcp/client/SensorClient.cpp 
+../test/units/TestAircraft.cpp \
+../test/units/TestConfig.cpp \
+../test/units/TestData.cpp \
+../test/units/TestParser.cpp \
+../test/units/TestUtil.cpp 
 
 OBJS += \
-./src/tcp/client/AprscClient.o \
-./src/tcp/client/Client.o \
-./src/tcp/client/GpsdClient.o \
-./src/tcp/client/SbsClient.o \
-./src/tcp/client/SensorClient.o 
+./test/units/TestAircraft.o \
+./test/units/TestConfig.o \
+./test/units/TestData.o \
+./test/units/TestParser.o \
+./test/units/TestUtil.o 
 
 CPP_DEPS += \
-./src/tcp/client/AprscClient.d \
-./src/tcp/client/Client.d \
-./src/tcp/client/GpsdClient.d \
-./src/tcp/client/SbsClient.d \
-./src/tcp/client/SensorClient.d 
+./test/units/TestAircraft.d \
+./test/units/TestConfig.d \
+./test/units/TestData.d \
+./test/units/TestParser.d \
+./test/units/TestUtil.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/tcp/client/%.o: ../src/tcp/client/%.cpp
+test/units/%.o: ../test/units/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	g++ -std=c++0x -O0 -Wall -c -fmessage-length=0 -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"

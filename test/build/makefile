@@ -8,6 +8,7 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include test/units/subdir.mk
 -include test/subdir.mk
 -include src/vfrb/subdir.mk
 -include src/util/subdir.mk
@@ -46,19 +47,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: VFR-Test
+all: VirtualFlightRadar-Backend
 
 # Tool invocations
-VFR-Test: $(OBJS) $(USER_OBJS)
+VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -fopenmp -o "VFR-Test" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -fopenmp -o "VirtualFlightRadar-Backend" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CPP_DEPS)$(C_DEPS) VFR-Test
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CPP_DEPS)$(C_DEPS) VirtualFlightRadar-Backend
 	-@echo ' '
 
 .PHONY: all clean dependents

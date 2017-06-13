@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lboost_regex -lboost_chrono -lboost_system -lpthread -lboost_thread -lboost_signals
+LIBS := -lboost_chrono -lboost_thread -lpthread -lboost_system -lboost_signals -lboost_regex
 
