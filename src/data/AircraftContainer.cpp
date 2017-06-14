@@ -53,8 +53,7 @@ AircraftContainer::~AircraftContainer() noexcept
 {
 }
 
-std::vector<Aircraft>::iterator AircraftContainer::find(
-        const std::string& cr_id)
+std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& cr_id)
 {
     const auto it = mIndexMap.find(cr_id);
     if (it == mIndexMap.cend())
@@ -111,8 +110,8 @@ std::string AircraftContainer::processAircrafts() noexcept
     return dest_str;
 }
 
-void AircraftContainer::insertAircraft(const Aircraft& cr_update,
-        std::int32_t prio) noexcept
+void AircraftContainer::insertAircraft(const Aircraft& cr_update, std::int32_t prio)
+        noexcept
         {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     auto known_ac = find(cr_update.getID());

@@ -61,8 +61,8 @@ public:
      *
      * @return an error code
      */
-    virtual std::int32_t unpack(const std::string& /*cr_msg*/,
-            std::int32_t /*prio*/) noexcept = 0;
+    virtual std::int32_t unpack(const std::string& cr_msg, std::int32_t prio)
+            noexcept = 0;
 };
 
 }  // namespace parser

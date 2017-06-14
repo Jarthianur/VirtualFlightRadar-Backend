@@ -54,7 +54,7 @@ public:
      *
      * @param cr_file the file stream to read
      */
-    void read(std::istream& /*r_file*/);
+    void read(std::istream& r_file);
     /**
      * Get a property from all stored properties.
      * Return the given default value, if the property was not found.
@@ -65,9 +65,8 @@ public:
      *
      * @return the value for key in section, if found, else the default value
      */
-    const std::string getProperty(const std::string& /*cr_section*/,
-            const std::string& /*cr_key*/,
-            const std::string& /*cr_def_val*/= "") const;
+    const std::string getProperty(const std::string& cr_section,
+            const std::string& cr_key, const std::string& cr_def_val = "") const;
     /**
      * Get the key-value-map for a section.
      * If the section is not found the kv-map is empty.
@@ -77,7 +76,7 @@ public:
      * @return the kv-map for the section
      */
     const std::unordered_map<std::string, std::string>& getSectionKV(
-            const std::string& /*cr_section*/) const;
+            const std::string& cr_section) const;
 
 private:
     /// The map of sections with kv-maps

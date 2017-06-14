@@ -53,8 +53,8 @@ noexcept
 {
     try
     {
-        std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),
-                                      nullptr, 16);
+        std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr,
+                                      16);
         if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return MSG_UNPACK_IGN;
@@ -71,16 +71,14 @@ noexcept
         try
         {
             //latitude
-            mtGpsPos.position.latitude = util::math::dmToDeg(
-                    std::stod(match.str(1)));
+            mtGpsPos.position.latitude = util::math::dmToDeg(std::stod(match.str(1)));
             if (match.str(2).compare("S") == 0)
             {
                 mtGpsPos.position.latitude = -mtGpsPos.position.latitude;
             }
 
             //longitude
-            mtGpsPos.position.longitude = util::math::dmToDeg(
-                    std::stod(match.str(3)));
+            mtGpsPos.position.longitude = util::math::dmToDeg(std::stod(match.str(3)));
             if (match.str(4).compare("W") == 0)
             {
                 mtGpsPos.position.longitude = -mtGpsPos.position.longitude;
@@ -93,8 +91,7 @@ noexcept
             //dilution
             dilution = std::stod(match.str(7));
             //altitude
-            mtGpsPos.position.altitude = util::math::dToI(
-                    std::stod(match.str(8)));
+            mtGpsPos.position.altitude = util::math::dToI(std::stod(match.str(8)));
             //geoid
             mtGpsPos.geoid = std::stod(match.str(9));
         } catch (const std::logic_error& e)
@@ -103,8 +100,7 @@ noexcept
         }
         vfrb::VFRB::msGpsData.setBasePos(prio, mtGpsPos);
 
-        if (mtGpsPos.nrSats >= GPS_NR_SATS_GOOD
-                && mtGpsPos.fixQa >= GPS_FIX_GOOD
+        if (mtGpsPos.nrSats >= GPS_NR_SATS_GOOD && mtGpsPos.fixQa >= GPS_FIX_GOOD
                 && dilution <= GPS_HOR_DILUTION_GOOD)
         {
             return GPS_ASSUME_GOOD;

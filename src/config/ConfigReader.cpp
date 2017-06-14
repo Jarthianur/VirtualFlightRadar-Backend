@@ -62,9 +62,8 @@ void ConfigReader::read(std::istream& r_file)
             {
                 section = line.substr(1, line.rfind(']') - 1);
                 mConfig.emplace(
-                        std::make_pair(
-                                section,
-                                std::unordered_map<std::string, std::string>()));
+                        std::make_pair(section,
+                                       std::unordered_map<std::string, std::string>()));
                 continue;
             }
             boost::smatch match;
@@ -81,8 +80,8 @@ void ConfigReader::read(std::istream& r_file)
             } else
             {
                 Logger::error(
-                        "(ConfigReader) malformed param ["
-                                + std::to_string(line_nr) + "]: ",
+                        "(ConfigReader) malformed param [" + std::to_string(line_nr)
+                                + "]: ",
                         line);
             }
         } catch (const std::out_of_range& e)

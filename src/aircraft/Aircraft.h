@@ -49,7 +49,7 @@ public:
      * @param r_id  the ID
      * @param r_pos the position
      */
-    Aircraft(std::string & /*r_id*/, struct util::GPSPosition & /*r_pos*/);
+    Aircraft(std::string& r_id, struct util::GPSPosition& r_pos);
     /**
      * Construct an aircraft with a full
      * set of information, as are the ID,
@@ -64,9 +64,9 @@ public:
      * @param turn_r  the turn rate
      * @param head    the heading
      */
-    Aircraft(std::string & /*r_id*/, struct util::GPSPosition & /*r_pos*/,
-            double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
-            double /*climb_r*/, double /*turn_r*/, double /*head*/);
+    Aircraft(std::string& r_id, struct util::GPSPosition& r_pos, double gnd_spd,
+            std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r,
+            double head);
     /**
      * Destructor
      *
@@ -80,7 +80,7 @@ public:
      *
      * @return are IDs equal?
      */
-    bool operator==(const Aircraft & /*cr_other*/) const;
+    bool operator==(const Aircraft& cr_other) const;
     /**
      * Aircraft information received from
      * device type.
@@ -99,13 +99,13 @@ public:
      * @param cr_ac an aircraft reference holding new information
      * @param prio update from feed with priority
      */
-    void update(const Aircraft & /*cr_ac*/, std::int32_t /*prio*/);
+    void update(const Aircraft& cr_ac, std::int32_t prio);
     /**
      * Get the ID.
      *
      * @return const reference to ID
      */
-    inline const std::string &getID() const
+    inline const std::string& getID() const
     {
         return mID;
     }

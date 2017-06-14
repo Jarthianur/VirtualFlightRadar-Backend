@@ -60,8 +60,7 @@ public:
      * @param b_alt the altitude
      * @param geoid the geoid separation
      */
-    void setDefaults(double /*b_lat*/, double /*b_lon*/, std::int32_t /*b_alt*/,
-            double /*geoid*/);
+    void setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double geoid);
     /**
      * Get the NMEA sentences reporting a GPS position.
      * As they are GPGGA and GPRMC.
@@ -77,8 +76,7 @@ public:
      * @param prio   the priority attempting to write
      * @param cr_pos the new position
      */
-    void setBasePos(std::int32_t /*prio*/,
-            const struct util::ExtGPSPosition& /*cr_pos*/);
+    void setBasePos(std::int32_t prio, const struct util::ExtGPSPosition& cr_pos);
     /**
      * Get the last registered GPS position.
      *

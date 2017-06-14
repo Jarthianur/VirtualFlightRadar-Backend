@@ -59,9 +59,8 @@ public:
      * @param cr_login the login string to transmit
      * @param r_feed   the handler Feed
      */
-    SbsClient(boost::asio::signal_set& /*r_sigset*/,
-            const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-            vfrb::Feed& /*r_feed*/);
+    SbsClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
+            const std::string& cr_port, vfrb::Feed& r_feed);
     /**
      * Destructor
      *
@@ -87,15 +86,15 @@ private:
      *
      * @overload Client::handleResolve
      */
-    void handleResolve(const boost::system::error_code& /*cr_ec*/,
-            boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
+    void handleResolve(const boost::system::error_code& cr_ec,
+            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
      * Implement Client::handleConnect
      *
      * @overload Client::handleConnect
      */
-    void handleConnect(const boost::system::error_code& /*cr_ec*/,
-            boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
+    void handleConnect(const boost::system::error_code& cr_ec,
+            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
 };
 
 }  // namespace client

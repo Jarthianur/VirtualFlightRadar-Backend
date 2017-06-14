@@ -36,8 +36,7 @@ namespace client
 {
 
 Client::Client(boost::asio::signal_set& r_sigset, const std::string& cr_host,
-        const std::string& cr_port, const std::string& cr_comp,
-        vfrb::Feed& r_feed)
+        const std::string& cr_port, const std::string& cr_comp, vfrb::Feed& r_feed)
         : mIoService(),
           mrSigSet(r_sigset),
           mSocket(mIoService),
@@ -71,8 +70,7 @@ void Client::awaitStop()
 
 void Client::timedConnect() noexcept
 {
-    mConnectTimer.expires_from_now(
-            boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
+    mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
     mConnectTimer.async_wait(
             boost::bind(&Client::handleTimedConnect, this,
                         boost::asio::placeholders::error));
@@ -97,8 +95,7 @@ void Client::read() noexcept
             mSocket,
             mBuffer,
             "\r\n",
-            boost::bind(&Client::handleRead, this,
-                        boost::asio::placeholders::error,
+            boost::bind(&Client::handleRead, this, boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
 }
 

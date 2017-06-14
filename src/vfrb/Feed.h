@@ -82,9 +82,8 @@ public:
      * @param type     the InputType
      * @param cr_kvmap the properties map
      */
-    Feed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
-            InputType /*type*/,
-            const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
+    Feed(const std::string& cr_name, std::int32_t prio, InputType type,
+            const std::unordered_map<std::string, std::string>& cr_kvmap);
     /**
      * Destructor
      *
@@ -109,7 +108,7 @@ public:
      *
      * @exceptsafe strong
      */
-    void run(boost::asio::signal_set& /*r_sigset*/) noexcept;
+    void run(boost::asio::signal_set& r_sigset) noexcept;
     /**
      * Pass the Clients response to the Parser.
      *
@@ -119,7 +118,7 @@ public:
      *
      * @exceptsafe no-throw
      */
-    std::int32_t process(const std::string& /*cr_res*/) noexcept;
+    std::int32_t process(const std::string& cr_res) noexcept;
 
     /// Unique name
     const std::string mName;

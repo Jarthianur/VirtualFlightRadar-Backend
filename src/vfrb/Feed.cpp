@@ -99,15 +99,12 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
                 login = it->second;
             } else
             {
-                Logger::warn("(Feed) could not find: ",
-                             mName + "." KV_KEY_LOGIN);
+                Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_LOGIN);
                 return;
             }
-            mpParser = std::unique_ptr<parser::Parser>(
-                    new parser::AprsParser());
+            mpParser = std::unique_ptr<parser::Parser>(new parser::AprsParser());
             mpClient = std::unique_ptr<tcp::client::Client>(
-                    new tcp::client::AprscClient(r_sigset, host, port, login,
-                                                 *this));
+                    new tcp::client::AprscClient(r_sigset, host, port, login, *this));
             break;
         }
         case InputType::SBS:
@@ -119,8 +116,7 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
         }
         case InputType::SENSOR:
         {
-            mpParser = std::unique_ptr<parser::Parser>(
-                    new parser::SensorParser());
+            mpParser = std::unique_ptr<parser::Parser>(new parser::SensorParser());
             mpClient = std::unique_ptr<tcp::client::Client>(
                     new tcp::client::SensorClient(r_sigset, host, port, *this));
             break;

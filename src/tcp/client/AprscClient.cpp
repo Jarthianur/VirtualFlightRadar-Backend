@@ -36,9 +36,8 @@ namespace tcp
 namespace client
 {
 
-AprscClient::AprscClient(boost::asio::signal_set& r_sigset,
-        const std::string& cr_host, const std::string& cr_port,
-        const std::string& cr_login, vfrb::Feed& r_feed)
+AprscClient::AprscClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
+        const std::string& cr_port, const std::string& cr_login, vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(APRSCClient)", r_feed),
           mLoginStr(cr_login)
 {
@@ -53,8 +52,7 @@ AprscClient::~AprscClient() noexcept
 void AprscClient::connect() noexcept
 {
     boost::asio::ip::tcp::resolver::query query(
-            mHost, mPort,
-            boost::asio::ip::tcp::resolver::query::canonical_name);
+            mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(
             query,
             boost::bind(&AprscClient::handleResolve, this,
@@ -114,8 +112,8 @@ void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
     }
 }
 
-void AprscClient::handleLogin(const boost::system::error_code& cr_ec,
-        std::size_t s) noexcept
+void AprscClient::handleLogin(const boost::system::error_code& cr_ec, std::size_t s)
+        noexcept
         {
     if (!cr_ec)
     {

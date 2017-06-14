@@ -63,8 +63,7 @@ void VFRB::run() noexcept
 {
     Logger::info("(VFRB) startup");
     //store start time
-    boost::chrono::steady_clock::time_point start =
-            boost::chrono::steady_clock::now();
+    boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
 
     // register signals and run handler
     boost::asio::io_service io_service;
@@ -86,10 +85,8 @@ void VFRB::run() noexcept
     });
 
     // init server and run handler
-    tcp::server::Server server(signal_set,
-                               config::Configuration::global_server_port);
-    boost::thread server_thread(
-            boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
+    tcp::server::Server server(signal_set, config::Configuration::global_server_port);
+    boost::thread server_thread(boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
 
     //init input threads
     boost::thread_group threads;
@@ -97,8 +94,7 @@ void VFRB::run() noexcept
             it != config::Configuration::global_feeds.end(); ++it)
     {
         threads.create_thread(
-                boost::bind(&VFRB::handleInputFeed, std::ref(signal_set),
-                            std::ref(*it)));
+                boost::bind(&VFRB::handleInputFeed, std::ref(signal_set), std::ref(*it)));
     }
 
     while (global_run_status)
@@ -141,10 +137,9 @@ void VFRB::run() noexcept
     signal_thread.join();
 
     //eval end time
-    boost::chrono::steady_clock::time_point end =
-            boost::chrono::steady_clock::now();
-    boost::chrono::minutes runtime = boost::chrono::duration_cast<
-            boost::chrono::minutes>(end - start);
+    boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
+    boost::chrono::minutes runtime = boost::chrono::duration_cast<boost::chrono::minutes>(
+            end - start);
     std::string time_str(std::to_string(runtime.count() / 60 / 24));
     time_str += " days, ";
     time_str += std::to_string(runtime.count() / 60);

@@ -41,11 +41,9 @@ namespace server
 Server::Server(boost::asio::signal_set& r_sigset, std::uint16_t port)
         : mIOservice(),
           mrSigSet(r_sigset),
-          mAcceptor(
-                  mIOservice,
-                  boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),
-                                                 port),
-                  boost::asio::ip::tcp::acceptor::reuse_address(true)),
+          mAcceptor(mIOservice,
+                    boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
+                    boost::asio::ip::tcp::acceptor::reuse_address(true)),
           mSocket(mIOservice)
 {
     awaitStop();
@@ -67,8 +65,7 @@ void Server::writeToAll(const std::string& cr_msg) noexcept
     boost::system::error_code ec;
     for (auto it = mClients.begin(); it != mClients.end();)
     {
-        boost::asio::write(it->get()->getSocket(), boost::asio::buffer(cr_msg),
-                           ec);
+        boost::asio::write(it->get()->getSocket(), boost::asio::buffer(cr_msg), ec);
         if (ec)
         {
             Logger::warn("(Server) lost connection to: ", it->get()->getIP());
@@ -84,8 +81,7 @@ void Server::accept() noexcept
 {
     mAcceptor.async_accept(
             mSocket,
-            boost::bind(&Server::handleAccept, this,
-                        boost::asio::placeholders::error));
+            boost::bind(&Server::handleAccept, this, boost::asio::placeholders::error));
 }
 
 void Server::awaitStop()

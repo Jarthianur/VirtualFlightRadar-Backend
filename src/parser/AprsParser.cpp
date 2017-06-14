@@ -84,16 +84,14 @@ noexcept
             //time = std::stoi(match.str(1));
 
             //latitude
-            mtGpsPos.latitude = util::math::dmToDeg(
-                    std::stod(match.str(MATCH_LAT)));
+            mtGpsPos.latitude = util::math::dmToDeg(std::stod(match.str(MATCH_LAT)));
             if (match.str(MATCH_LAT_DIR).compare("S") == 0)
             {
                 mtGpsPos.latitude = -mtGpsPos.latitude;
             }
 
             //longitude
-            mtGpsPos.longitude = util::math::dmToDeg(
-                    std::stod(match.str(MATCH_LONG)));
+            mtGpsPos.longitude = util::math::dmToDeg(std::stod(match.str(MATCH_LONG)));
             if (match.str(MATCH_LONG_DIR).compare("W") == 0)
             {
                 mtGpsPos.longitude = -mtGpsPos.longitude;
@@ -121,10 +119,10 @@ noexcept
                 mtId = com_match.str(MATCH_COM_ID);
                 try
                 {
-                    idType = std::stoi(com_match.str(MATCH_COM_TYPE), nullptr,
-                                       16) & 0x03;
-                    acType = (std::stoi(com_match.str(MATCH_COM_TYPE), nullptr,
-                                        16) & 0x7C) >> 2;
+                    idType = std::stoi(com_match.str(MATCH_COM_TYPE), nullptr, 16) & 0x03;
+                    acType =
+                            (std::stoi(com_match.str(MATCH_COM_TYPE), nullptr, 16) & 0x7C)
+                                    >> 2;
                 } catch (const std::logic_error& e)
                 {
                     return MSG_UNPACK_ERR;
@@ -166,15 +164,14 @@ noexcept
         }
         try
         {
-            gndSpeed = std::stod(match.str(MATCH_GND_SPD))
-                    * util::math::KTS_2_MS;
+            gndSpeed = std::stod(match.str(MATCH_GND_SPD)) * util::math::KTS_2_MS;
         } catch (const std::logic_error& e)
         {
             gndSpeed = A_VALUE_NA;
             fullInfo = false;
         }
-        aircraft::Aircraft ac(mtId, mtGpsPos, gndSpeed, idType, acType,
-                              climbRate, turnRate, heading);
+        aircraft::Aircraft ac(mtId, mtGpsPos, gndSpeed, idType, acType, climbRate,
+                              turnRate, heading);
         ac.setFullInfo(fullInfo);
         ac.setTargetT(aircraft::Aircraft::TargetType::FLARM);
         vfrb::VFRB::msAcCont.insertAircraft(ac, prio);

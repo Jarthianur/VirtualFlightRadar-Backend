@@ -76,23 +76,17 @@ bool Configuration::init(std::istream& r_file)
     // get fallbacks
     base_latitude = strToDouble(
             cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0"));
-    Logger::info("(Config) " KV_KEY_LATITUDE ": ",
-                 std::to_string(base_latitude));
+    Logger::info("(Config) " KV_KEY_LATITUDE ": ", std::to_string(base_latitude));
     base_longitude = strToDouble(
             cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0"));
-    Logger::info("(Config) " KV_KEY_LONGITUDE ": ",
-                 std::to_string(base_longitude));
-    base_altitude = strToInt(
-            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
-    Logger::info("(Config) " KV_KEY_ALTITUDE ": ",
-                 std::to_string(base_altitude));
-    base_geoid = strToDouble(
-            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
+    Logger::info("(Config) " KV_KEY_LONGITUDE ": ", std::to_string(base_longitude));
+    base_altitude = strToInt(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
+    Logger::info("(Config) " KV_KEY_ALTITUDE ": ", std::to_string(base_altitude));
+    base_geoid = strToDouble(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
     Logger::info("(Config) " KV_KEY_GEOID ": ", std::to_string(base_geoid));
     base_pressure = strToDouble(
             cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25"));
-    Logger::info("(Config) " KV_KEY_PRESSURE ": ",
-                 std::to_string(base_pressure));
+    Logger::info("(Config) " KV_KEY_PRESSURE ": ", std::to_string(base_pressure));
 
     // get filters
     std::string tmp = cr.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT, "-1");
@@ -103,8 +97,7 @@ bool Configuration::init(std::istream& r_file)
     {
         filter_maxHeight = strToInt(tmp);
     }
-    Logger::info("(Config) " KV_KEY_MAX_HEIGHT ": ",
-                 std::to_string(filter_maxHeight));
+    Logger::info("(Config) " KV_KEY_MAX_HEIGHT ": ", std::to_string(filter_maxHeight));
 
     tmp = cr.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_DIST, "-1");
     if (tmp == "-1")
@@ -114,16 +107,14 @@ bool Configuration::init(std::istream& r_file)
     {
         filter_maxDist = strToInt(tmp);
     }
-    Logger::info("(Config) " KV_KEY_MAX_DIST ": ",
-                 std::to_string(filter_maxDist));
+    Logger::info("(Config) " KV_KEY_MAX_DIST ": ", std::to_string(filter_maxDist));
 
     // get general
     global_gnd_mode = cr.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE) != "";
 
     global_server_port = (uint16_t) strToInt(
             cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
-    Logger::info("(Config) " KV_KEY_SERVER_PORT ": ",
-                 std::to_string(global_server_port));
+    Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(global_server_port));
 
     std::size_t nrf = registerFeeds(cr);
     Logger::info("(Config) number of feeds: ", std::to_string(nrf));
@@ -158,10 +149,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                vfrb::Feed f(
-                        *it,
-                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                        vfrb::Feed::InputType::APRSC, r_cr.getSectionKV(*it));
+                vfrb::Feed f(*it, strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
+                             vfrb::Feed::InputType::APRSC, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -171,10 +160,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                vfrb::Feed f(
-                        *it,
-                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                        vfrb::Feed::InputType::SBS, r_cr.getSectionKV(*it));
+                vfrb::Feed f(*it, strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
+                             vfrb::Feed::InputType::SBS, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -184,10 +171,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                vfrb::Feed f(
-                        *it,
-                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                        vfrb::Feed::InputType::SENSOR, r_cr.getSectionKV(*it));
+                vfrb::Feed f(*it, strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
+                             vfrb::Feed::InputType::SENSOR, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -197,10 +182,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
         {
             try
             {
-                vfrb::Feed f(
-                        *it,
-                        strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                        vfrb::Feed::InputType::GPS, r_cr.getSectionKV(*it));
+                vfrb::Feed f(*it, strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
+                             vfrb::Feed::InputType::GPS, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {

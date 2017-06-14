@@ -59,9 +59,9 @@ std::string GpsModule::genGpggaStr(const struct ExtGPSPosition& cr_pos)
             GPSM_BUFF_S,
             /*"$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"*/
             "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02d,1,%d,M,%.1lf,M,,*",
-            utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, lat_str,
-            long_deg, long_min, long_str, /*pos.fixQa,*/cr_pos.nrSats,
-            cr_pos.position.altitude, cr_pos.geoid);
+            utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, lat_str, long_deg,
+            long_min, long_str, /*pos.fixQa,*/cr_pos.nrSats, cr_pos.position.altitude,
+            cr_pos.geoid);
     csum = util::math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
     std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);
@@ -88,9 +88,8 @@ std::string GpsModule::genGprmcStr(const struct ExtGPSPosition& cr_pos)
             mBuffer,
             GPSM_BUFF_S,
             "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
-            utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, lat_str,
-            long_deg, long_min, long_str, utc->tm_mday, utc->tm_mon + 1,
-            utc->tm_year - 100);
+            utc->tm_hour, utc->tm_min, utc->tm_sec, lat_deg, lat_min, lat_str, long_deg,
+            long_min, long_str, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
     csum = util::math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
     std::snprintf(mBuffer, GPSM_L_BUFF_S, "%02x\r\n", csum);

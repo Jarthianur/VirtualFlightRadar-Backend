@@ -35,9 +35,8 @@ namespace tcp
 namespace client
 {
 
-GpsdClient::GpsdClient(boost::asio::signal_set& r_sigset,
-        const std::string& cr_host, const std::string& cr_port,
-        vfrb::Feed& r_feed)
+GpsdClient::GpsdClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
+        const std::string& cr_port, vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(GPSDClient)", r_feed)
 {
     connect();
@@ -50,8 +49,7 @@ GpsdClient::~GpsdClient() noexcept
 void GpsdClient::connect() noexcept
 {
     boost::asio::ip::tcp::resolver::query query(
-            mHost, mPort,
-            boost::asio::ip::tcp::resolver::query::canonical_name);
+            mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(
             query,
             boost::bind(&GpsdClient::handleResolve, this,
@@ -100,8 +98,7 @@ void GpsdClient::handleConnect(const boost::system::error_code& cr_ec,
         mSocket.set_option(boost::asio::socket_base::keep_alive(true)); // necessary?
         boost::asio::async_write(
                 mSocket,
-                boost::asio::buffer(
-                        "?WATCH={\"enable\":true,\"nmea\":true}\r\n"),
+                boost::asio::buffer("?WATCH={\"enable\":true,\"nmea\":true}\r\n"),
                 boost::bind(&GpsdClient::handleWatch, this,
                             boost::asio::placeholders::error,
                             boost::asio::placeholders::bytes_transferred));
@@ -138,8 +135,8 @@ void GpsdClient::stop() noexcept
     Client::stop();
 }
 
-void GpsdClient::handleWatch(const boost::system::error_code& cr_ec,
-        std::size_t s) noexcept
+void GpsdClient::handleWatch(const boost::system::error_code& cr_ec, std::size_t s)
+        noexcept
         {
     if (!cr_ec)
     {

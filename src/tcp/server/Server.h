@@ -63,7 +63,7 @@ public:
      * @param r_sigset the signal set
      * @param port the port where to open the server
      */
-    Server(boost::asio::signal_set& /*r_sigset*/, std::uint16_t /*port*/);
+    Server(boost::asio::signal_set& r_sigset, std::uint16_t port);
     virtual ~Server() noexcept;
     /**
      * Run server.
@@ -76,7 +76,7 @@ public:
      *
      * @param cr_msg the msg to write
      */
-    void writeToAll(const std::string& /*cr_msg*/) noexcept;
+    void writeToAll(const std::string& cr_msg) noexcept;
 
 private:
     /**
@@ -101,7 +101,7 @@ private:
      *
      * @return true if the ip is already registered, else false
      */
-    bool isRegistered(const std::string& /*cr_ip*/);
+    bool isRegistered(const std::string& cr_ip);
     /**
      * Accept - handler
      *
@@ -109,7 +109,7 @@ private:
      *
      * @exceptsafe strong
      */
-    void handleAccept(const boost::system::error_code& /*cr_ec*/) noexcept;
+    void handleAccept(const boost::system::error_code& cr_ec) noexcept;
 
     /// Mutex
     boost::mutex mMutex;

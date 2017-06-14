@@ -74,8 +74,7 @@ public:
      *
      * @exceptsafe strong
      */
-    void insertAircraft(const aircraft::Aircraft& /*cr_update*/,
-            std::int32_t /*prio*/) noexcept;
+    void insertAircraft(const aircraft::Aircraft& cr_update, std::int32_t prio) noexcept;
     /**
      * Process all aircrafts into NMEA sentences PFLAU and PFLAA.
      * Aircrafts with too old information are not reported, later deleted.
@@ -95,8 +94,7 @@ private:
      *
      * @return an iterator to the Aircraft if found, else vector::end
      */
-    std::vector<aircraft::Aircraft>::iterator find(
-            const std::string& /*cr_id*/);
+    std::vector<aircraft::Aircraft>::iterator find(const std::string& cr_id);
 
     /// Mutex for threadsafety
     boost::mutex mMutex;

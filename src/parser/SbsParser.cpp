@@ -99,8 +99,7 @@ noexcept
                     mtGpsPos.altitude = util::math::dToI(
                             std::stod(cr_msg.substr(p, delim - p))
                                     * util::math::FEET_2_M);
-                    if (mtGpsPos.altitude
-                            > config::Configuration::filter_maxHeight)
+                    if (mtGpsPos.altitude > config::Configuration::filter_maxHeight)
                     {
                         return MSG_UNPACK_IGN;
                     }

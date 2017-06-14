@@ -35,9 +35,8 @@ namespace tcp
 namespace client
 {
 
-SensorClient::SensorClient(boost::asio::signal_set& r_sigset,
-        const std::string& cr_host, const std::string& cr_port,
-        vfrb::Feed& r_feed)
+SensorClient::SensorClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
+        const std::string& cr_port, vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(SensorClient)", r_feed),
           mStopped(false),
           mTimeout(mIoService)
@@ -59,8 +58,7 @@ void SensorClient::read() noexcept
 void SensorClient::connect() noexcept
 {
     boost::asio::ip::tcp::resolver::query query(
-            mHost, mPort,
-            boost::asio::ip::tcp::resolver::query::canonical_name);
+            mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(
             query,
             boost::bind(&SensorClient::handleResolve, this,
@@ -79,8 +77,7 @@ void SensorClient::checkDeadline() noexcept
     {
         return;
     }
-    if (mTimeout.expires_at()
-            <= boost::asio::deadline_timer::traits_type::now())
+    if (mTimeout.expires_at() <= boost::asio::deadline_timer::traits_type::now())
     {
         Logger::warn("(WindClient) timed out: reconnect...");
         if (mSocket.is_open())

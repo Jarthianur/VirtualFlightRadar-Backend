@@ -42,7 +42,7 @@ AircraftProcessor::~AircraftProcessor() noexcept
 {
 }
 
-std::string AircraftProcessor::process(const Aircraft &cr_ac)
+std::string AircraftProcessor::process(const Aircraft& cr_ac)
 {
     calcRelPosToBase(cr_ac);
 
@@ -55,8 +55,7 @@ std::string AircraftProcessor::process(const Aircraft &cr_ac)
 
     //PFLAU
     std::snprintf(mBuffer, AP_BUFF_S, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
-                  util::math::dToI(mtBearingRel), mtRelV, mtDist,
-                  cr_ac.getID().c_str());
+                  util::math::dToI(mtBearingRel), mtRelV, mtDist, cr_ac.getID().c_str());
     std::int32_t csum = util::math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
     std::snprintf(mBuffer, AP_L_BUFF_S, "%02x\r\n", csum);
@@ -65,18 +64,15 @@ std::string AircraftProcessor::process(const Aircraft &cr_ac)
     //PFLAA
     if (cr_ac.isFullInfo())
     {
-        std::snprintf(
-                mBuffer, AP_BUFF_S,
-                "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*", mtRelN, mtRelE,
-                mtRelV, cr_ac.getIDtype(), cr_ac.getID().c_str(),
-                util::math::dToI(cr_ac.getHeading()),
-                util::math::dToI(cr_ac.getGndSpeed() * util::math::MS_2_KMH),
-                cr_ac.getClimbR(), cr_ac.getAircraftT());
+        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
+                      mtRelN, mtRelE, mtRelV, cr_ac.getIDtype(), cr_ac.getID().c_str(),
+                      util::math::dToI(cr_ac.getHeading()),
+                      util::math::dToI(cr_ac.getGndSpeed() * util::math::MS_2_KMH),
+                      cr_ac.getClimbR(), cr_ac.getAircraftT());
     } else
     {
-        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*",
-                      mtRelN, mtRelE, mtRelV, cr_ac.getID().c_str(),
-                      cr_ac.getAircraftT());
+        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", mtRelN,
+                      mtRelE, mtRelV, cr_ac.getID().c_str(), cr_ac.getAircraftT());
     }
     csum = util::math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
@@ -86,7 +82,7 @@ std::string AircraftProcessor::process(const Aircraft &cr_ac)
     return nmea_str;
 }
 
-void AircraftProcessor::calcRelPosToBase(const Aircraft &cr_ac)
+void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac)
 {
     mtRadLatB = util::math::radian(vfrb::VFRB::msGpsData.getBaseLat());
     mtRadLongB = util::math::radian(vfrb::VFRB::msGpsData.getBaseLong());
@@ -106,10 +102,8 @@ void AircraftProcessor::calcRelPosToBase(const Aircraft &cr_ac)
                             - std::sin(mtRadLatB) * std::cos(mtRadLatAc)
                                     * std::cos(mtRadLongAc - mtRadLongB)));
     mtBearingAbs = std::fmod((mtBearingRel + 360.0), 360.0);
-    mtRelN = util::math::dToI(
-            std::cos(util::math::radian(mtBearingAbs)) * mtDist);
-    mtRelE = util::math::dToI(
-            std::sin(util::math::radian(mtBearingAbs)) * mtDist);
+    mtRelN = util::math::dToI(std::cos(util::math::radian(mtBearingAbs)) * mtDist);
+    mtRelE = util::math::dToI(std::sin(util::math::radian(mtBearingAbs)) * mtDist);
     mtRelV =
             cr_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER ?
                     cr_ac.getAltitude()

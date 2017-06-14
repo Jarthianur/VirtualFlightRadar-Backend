@@ -30,13 +30,13 @@ Aircraft::~Aircraft() noexcept
 {
 }
 
-Aircraft::Aircraft(std::string &r_id, struct GPSPosition &r_pos)
+Aircraft::Aircraft(std::string& r_id, struct GPSPosition& r_pos)
         : mID(r_id),
           mPosition(r_pos)
 {
 }
 
-Aircraft::Aircraft(std::string &r_id, struct GPSPosition &r_pos, double gnd_spd,
+Aircraft::Aircraft(std::string& r_id, struct GPSPosition& r_pos, double gnd_spd,
         std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r,
         double heading)
         : mID(r_id),
@@ -50,12 +50,12 @@ Aircraft::Aircraft(std::string &r_id, struct GPSPosition &r_pos, double gnd_spd,
 {
 }
 
-bool Aircraft::operator==(const Aircraft &cr_other) const
+bool Aircraft::operator==(const Aircraft& cr_other) const
 {
     return this->mID == cr_other.mID;
 }
 
-void Aircraft::update(const Aircraft &cr_ac, std::int32_t prio)
+void Aircraft::update(const Aircraft& cr_ac, std::int32_t prio)
 {
     // no update for ID
     this->mIDtype = cr_ac.mIDtype;
