@@ -112,14 +112,14 @@ std::string AircraftContainer::processAircrafts() noexcept
 }
 
 void AircraftContainer::insertAircraft(const Aircraft& cr_update,
-                                       std::int32_t prio) noexcept
-                                       {
+        std::int32_t prio) noexcept
+        {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     auto known_ac = find(cr_update.getID());
     if (known_ac != mCont.end())
     {
-        if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER || cr_update.getTargetT()
-                == Aircraft::TargetType::FLARM)
+        if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER
+                || cr_update.getTargetT() == Aircraft::TargetType::FLARM)
         {
             bool write = known_ac->isAttemptValid();
             if (!write)

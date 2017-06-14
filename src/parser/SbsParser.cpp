@@ -58,8 +58,8 @@ noexcept
     std::uint32_t i = 2;
     std::size_t p = 6;
 
-    if (cr_msg.find(',', p) == std::string::npos || !(cr_msg.size() > 4
-            && cr_msg.at(4) == '3'))
+    if (cr_msg.find(',', p) == std::string::npos
+            || !(cr_msg.size() > 4 && cr_msg.at(4) == '3'))
     {
         return MSG_UNPACK_IGN;
     }
@@ -75,7 +75,7 @@ noexcept
                 {
                     return MSG_UNPACK_IGN;
                 }
-            break;
+                break;
                 /*case 7:
                  try
                  {
@@ -96,10 +96,11 @@ noexcept
             case 11:
                 try
                 {
-                    mtGpsPos.altitude =
-                            util::math::dToI(
-                                    std::stod(cr_msg.substr(p, delim - p)) * util::math::FEET_2_M);
-                    if (mtGpsPos.altitude > config::Configuration::filter_maxHeight)
+                    mtGpsPos.altitude = util::math::dToI(
+                            std::stod(cr_msg.substr(p, delim - p))
+                                    * util::math::FEET_2_M);
+                    if (mtGpsPos.altitude
+                            > config::Configuration::filter_maxHeight)
                     {
                         return MSG_UNPACK_IGN;
                     }
@@ -107,7 +108,7 @@ noexcept
                 {
                     return MSG_UNPACK_ERR;
                 }
-            break;
+                break;
             case 14:
                 try
                 {
@@ -116,7 +117,7 @@ noexcept
                 {
                     return MSG_UNPACK_ERR;
                 }
-            break;
+                break;
             case 15:
                 try
                 {
@@ -125,9 +126,9 @@ noexcept
                 {
                     return MSG_UNPACK_ERR;
                 }
-            break;
+                break;
             default:
-            break;
+                break;
         }
         i++;
         p = delim + 1;

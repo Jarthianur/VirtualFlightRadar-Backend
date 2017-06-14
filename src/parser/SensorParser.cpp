@@ -45,7 +45,7 @@ noexcept
     try
     {
         std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),
-                nullptr, 16);
+                                      nullptr, 16);
         if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return MSG_UNPACK_IGN;

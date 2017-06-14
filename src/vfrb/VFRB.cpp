@@ -78,7 +78,7 @@ void VFRB::run() noexcept
 
     signal_set.async_wait(
             boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
-                    boost::asio::placeholders::signal_number));
+                        boost::asio::placeholders::signal_number));
 
     boost::thread signal_thread([&io_service]()
     {
@@ -87,7 +87,7 @@ void VFRB::run() noexcept
 
     // init server and run handler
     tcp::server::Server server(signal_set,
-            config::Configuration::global_server_port);
+                               config::Configuration::global_server_port);
     boost::thread server_thread(
             boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
 
@@ -98,7 +98,7 @@ void VFRB::run() noexcept
     {
         threads.create_thread(
                 boost::bind(&VFRB::handleInputFeed, std::ref(signal_set),
-                        std::ref(*it)));
+                            std::ref(*it)));
     }
 
     while (global_run_status)
@@ -159,7 +159,7 @@ void VFRB::run() noexcept
 void VFRB::handleNMAEServer(tcp::server::Server& r_server)
 {
     Logger::info("(Server) startup: localhost ",
-            std::to_string(config::Configuration::global_server_port));
+                 std::to_string(config::Configuration::global_server_port));
     r_server.run();
     global_run_status = false;
 }

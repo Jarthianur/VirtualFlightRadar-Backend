@@ -83,8 +83,8 @@ public:
      * @param cr_kvmap the properties map
      */
     Feed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
-         InputType /*type*/,
-         const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
+            InputType /*type*/,
+            const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
     /**
      * Destructor
      *

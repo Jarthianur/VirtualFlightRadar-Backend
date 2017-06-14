@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef PARAMETERS_H_
-#define PARAMETERS_H_
+#ifndef SRC_CONFIG_PARAMETERS_H_
+#define SRC_CONFIG_PARAMETERS_H_
 
 /**
  * This file contains some parameters,
@@ -65,5 +65,4 @@
  */
 #define SERVER_MAX_CLIENTS 5
 
-
-#endif /* PARAMETERS_H_ */
+#endif /* SRC_CONFIG_PARAMETERS_H_ */

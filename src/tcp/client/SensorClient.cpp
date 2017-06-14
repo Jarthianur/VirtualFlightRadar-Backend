@@ -36,8 +36,8 @@ namespace client
 {
 
 SensorClient::SensorClient(boost::asio::signal_set& r_sigset,
-                           const std::string& cr_host,
-                           const std::string& cr_port, vfrb::Feed& r_feed)
+        const std::string& cr_host, const std::string& cr_port,
+        vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(SensorClient)", r_feed),
           mStopped(false),
           mTimeout(mIoService)
@@ -58,12 +58,14 @@ void SensorClient::read() noexcept
 
 void SensorClient::connect() noexcept
 {
-    boost::asio::ip::tcp::resolver::query query(mHost, mPort,
+    boost::asio::ip::tcp::resolver::query query(
+            mHost, mPort,
             boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(query,
+    mResolver.async_resolve(
+            query,
             boost::bind(&SensorClient::handleResolve, this,
-                    boost::asio::placeholders::error,
-                    boost::asio::placeholders::iterator));
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::iterator));
 }
 
 void SensorClient::process() noexcept
@@ -77,7 +79,8 @@ void SensorClient::checkDeadline() noexcept
     {
         return;
     }
-    if (mTimeout.expires_at() <= boost::asio::deadline_timer::traits_type::now())
+    if (mTimeout.expires_at()
+            <= boost::asio::deadline_timer::traits_type::now())
     {
         Logger::warn("(WindClient) timed out: reconnect...");
         if (mSocket.is_open())
@@ -99,19 +102,21 @@ void SensorClient::stop() noexcept
 }
 
 void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
-                                 boost::asio::ip::tcp::resolver::iterator it)
-                                 noexcept
-                                 {
+        boost::asio::ip::tcp::resolver::iterator it)
+        noexcept
+        {
     if (mStopped)
     {
         return;
     }
     if (!cr_ec)
     {
-        boost::asio::async_connect(mSocket, it,
+        boost::asio::async_connect(
+                mSocket,
+                it,
                 boost::bind(&SensorClient::handleConnect, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::iterator));
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::iterator));
     } else
     {
         Logger::error("(SensorClient) resolve host: ", cr_ec.message());
@@ -124,9 +129,9 @@ void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
-                                 boost::asio::ip::tcp::resolver::iterator it)
-                                 noexcept
-                                 {
+        boost::asio::ip::tcp::resolver::iterator it)
+        noexcept
+        {
     if (mStopped)
     {
         return;

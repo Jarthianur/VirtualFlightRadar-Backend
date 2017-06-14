@@ -53,28 +53,28 @@ void Logger::info(const std::string& cr_subj, const std::string& cr_msg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
     std::cout << "[INFO]  " << getTime() << ":: " << cr_subj << cr_msg
-              << std::endl;
+            << std::endl;
 }
 
 void Logger::debug(const std::string& cr_subj, const std::string& cr_msg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
     std::cout << "[DEBUG] " << getTime() << ":: " << cr_subj << cr_msg
-              << std::endl;
+            << std::endl;
 }
 
 void Logger::warn(const std::string& cr_subj, const std::string& cr_msg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
     std::cout << "[WARN]  " << getTime() << ":: " << cr_subj << cr_msg
-              << std::endl;
+            << std::endl;
 }
 
 void Logger::error(const std::string& cr_subj, const std::string& cr_msg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
     std::cerr << "[ERROR] " << getTime() << ":: " << cr_subj << cr_msg
-              << std::endl;
+            << std::endl;
 }
 
 }  // namespace util

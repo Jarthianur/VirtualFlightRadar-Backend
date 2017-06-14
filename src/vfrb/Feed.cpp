@@ -42,7 +42,7 @@ namespace vfrb
 {
 
 Feed::Feed(const std::string& cr_name, std::int32_t prio, InputType type,
-           const std::unordered_map<std::string, std::string>& cr_kvmap)
+        const std::unordered_map<std::string, std::string>& cr_kvmap)
         : mName(cr_name),
           mPriority(prio),
           mType(type),
@@ -100,14 +100,14 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
             } else
             {
                 Logger::warn("(Feed) could not find: ",
-                        mName + "." KV_KEY_LOGIN);
+                             mName + "." KV_KEY_LOGIN);
                 return;
             }
             mpParser = std::unique_ptr<parser::Parser>(
                     new parser::AprsParser());
             mpClient = std::unique_ptr<tcp::client::Client>(
                     new tcp::client::AprscClient(r_sigset, host, port, login,
-                            *this));
+                                                 *this));
             break;
         }
         case InputType::SBS:

@@ -99,7 +99,7 @@ private:
      * @param r_feed   the Feed to handle
      */
     static void handleInputFeed(boost::asio::signal_set& /*r_sigset*/,
-                                Feed& /*r_feed*/);
+            Feed& /*r_feed*/);
     /**
      * Handler for an Server thread.
      *
@@ -113,7 +113,7 @@ private:
      * @param sig   the signal number
      */
     static void handleSignals(const boost::system::error_code& /*cr_ec*/,
-                              const int /*sig*/);
+            const int /*sig*/);
 };
 
 }  // namespace vfrb

@@ -49,7 +49,7 @@ public:
      * @param r_id  the ID
      * @param r_pos the position
      */
-    Aircraft(std::string& /*r_id*/, struct util::GPSPosition& /*r_pos*/);
+    Aircraft(std::string & /*r_id*/, struct util::GPSPosition & /*r_pos*/);
     /**
      * Construct an aircraft with a full
      * set of information, as are the ID,
@@ -64,9 +64,9 @@ public:
      * @param turn_r  the turn rate
      * @param head    the heading
      */
-    Aircraft(std::string& /*r_id*/, struct util::GPSPosition& /*r_pos*/,
-             double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
-             double /*climb_r*/, double /*turn_r*/, double /*head*/);
+    Aircraft(std::string & /*r_id*/, struct util::GPSPosition & /*r_pos*/,
+            double /*gnd_spd*/, std::uint32_t /*id_t*/, std::int32_t /*ac_t*/,
+            double /*climb_r*/, double /*turn_r*/, double /*head*/);
     /**
      * Destructor
      *
@@ -80,7 +80,7 @@ public:
      *
      * @return are IDs equal?
      */
-    bool operator==(const Aircraft& /*cr_other*/) const;
+    bool operator==(const Aircraft & /*cr_other*/) const;
     /**
      * Aircraft information received from
      * device type.
@@ -90,8 +90,7 @@ public:
     enum class TargetType
         : std::uint32_t
         {
-            FLARM,
-        TRANSPONDER
+            FLARM, TRANSPONDER
     };
     /**
      * Update aircraft information.
@@ -100,13 +99,13 @@ public:
      * @param cr_ac an aircraft reference holding new information
      * @param prio update from feed with priority
      */
-    void update(const Aircraft& /*cr_ac*/, std::int32_t /*prio*/);
+    void update(const Aircraft & /*cr_ac*/, std::int32_t /*prio*/);
     /**
      * Get the ID.
      *
      * @return const reference to ID
      */
-    inline const std::string& getID() const
+    inline const std::string &getID() const
     {
         return mID;
     }
@@ -269,7 +268,7 @@ private:
     std::string mID;
     /// ID (address) type.
     std::uint32_t mIDtype = 1;
-/// Aircraft type encoded as number (glider, powered airplane ...)
+    /// Aircraft type encoded as number (glider, powered airplane ...)
     std::int32_t mAircraftType = 8;
     /// Target type; Got the last update from which device.
     TargetType mTargetType = TargetType::FLARM;
@@ -281,7 +280,7 @@ private:
     std::int32_t mLastPriority = 0;
     /// Is an update attempt valid? If false, updates are only allowed with at least last priority.
     bool mAttemptValid = true;
-/// Last registered position.
+    /// Last registered position.
     struct util::GPSPosition mPosition;
     /// Speed over ground; m/s
     double mGndSpeed = A_VALUE_NA;
@@ -293,6 +292,6 @@ private:
      double mTurnRate = A_VALUE_NA;*/
 };
 
-}  // namespace aircraft
+} // namespace aircraft
 
 #endif /* SRC_AIRCRAFT_AIRCRAFT_H_ */

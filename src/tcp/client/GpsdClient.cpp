@@ -36,8 +36,8 @@ namespace client
 {
 
 GpsdClient::GpsdClient(boost::asio::signal_set& r_sigset,
-                       const std::string& cr_host, const std::string& cr_port,
-                       vfrb::Feed& r_feed)
+        const std::string& cr_host, const std::string& cr_port,
+        vfrb::Feed& r_feed)
         : Client(r_sigset, cr_host, cr_port, "(GPSDClient)", r_feed)
 {
     connect();
@@ -49,12 +49,14 @@ GpsdClient::~GpsdClient() noexcept
 
 void GpsdClient::connect() noexcept
 {
-    boost::asio::ip::tcp::resolver::query query(mHost, mPort,
+    boost::asio::ip::tcp::resolver::query query(
+            mHost, mPort,
             boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(query,
+    mResolver.async_resolve(
+            query,
             boost::bind(&GpsdClient::handleResolve, this,
-                    boost::asio::placeholders::error,
-                    boost::asio::placeholders::iterator));
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::iterator));
 }
 
 void GpsdClient::process() noexcept
@@ -67,15 +69,17 @@ void GpsdClient::process() noexcept
 }
 
 void GpsdClient::handleResolve(const boost::system::error_code& cr_ec,
-                               boost::asio::ip::tcp::resolver::iterator it)
-                               noexcept
-                               {
+        boost::asio::ip::tcp::resolver::iterator it)
+        noexcept
+        {
     if (!cr_ec)
     {
-        boost::asio::async_connect(mSocket, it,
+        boost::asio::async_connect(
+                mSocket,
+                it,
                 boost::bind(&GpsdClient::handleConnect, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::iterator));
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::iterator));
     } else
     {
         Logger::error("(GPSDClient) resolve host: ", cr_ec.message());
@@ -88,18 +92,19 @@ void GpsdClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void GpsdClient::handleConnect(const boost::system::error_code& cr_ec,
-                               boost::asio::ip::tcp::resolver::iterator it)
-                               noexcept
-                               {
+        boost::asio::ip::tcp::resolver::iterator it)
+        noexcept
+        {
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true)); // necessary?
-        boost::asio::async_write(mSocket,
+        boost::asio::async_write(
+                mSocket,
                 boost::asio::buffer(
                         "?WATCH={\"enable\":true,\"nmea\":true}\r\n"),
                 boost::bind(&GpsdClient::handleWatch, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::bytes_transferred));
     } else
     {
         Logger::error("(GPSDClient) connect: ", cr_ec.message());
@@ -115,7 +120,8 @@ void GpsdClient::stop() noexcept
 {
     if (mSocket.is_open())
     {
-        boost::asio::async_write(mSocket,
+        boost::asio::async_write(
+                mSocket,
                 boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
                 [this](const boost::system::error_code& ec, std::size_t s)
                 {
@@ -133,8 +139,8 @@ void GpsdClient::stop() noexcept
 }
 
 void GpsdClient::handleWatch(const boost::system::error_code& cr_ec,
-                             std::size_t s) noexcept
-                             {
+        std::size_t s) noexcept
+        {
     if (!cr_ec)
     {
         Logger::info("(GPSDClient) connected to: ", mHost + ":" + mPort);

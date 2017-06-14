@@ -34,7 +34,7 @@ namespace config
 
 ConfigReader::ConfigReader()
         : mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
-                boost::regex_constants::optimize)
+                  boost::regex_constants::optimize)
 {
 }
 
@@ -62,7 +62,8 @@ void ConfigReader::read(std::istream& r_file)
             {
                 section = line.substr(1, line.rfind(']') - 1);
                 mConfig.emplace(
-                        std::make_pair(section,
+                        std::make_pair(
+                                section,
                                 std::unordered_map<std::string, std::string>()));
                 continue;
             }
@@ -80,9 +81,9 @@ void ConfigReader::read(std::istream& r_file)
             } else
             {
                 Logger::error(
-                        "(ConfigReader) malformed param [" + std::to_string(
-                                line_nr)
-                        + "]: ", line);
+                        "(ConfigReader) malformed param ["
+                                + std::to_string(line_nr) + "]: ",
+                        line);
             }
         } catch (const std::out_of_range& e)
         {
@@ -92,8 +93,7 @@ void ConfigReader::read(std::istream& r_file)
 }
 
 const std::string ConfigReader::getProperty(const std::string& cr_section,
-                                            const std::string& cr_key,
-                                            const std::string& cr_def_val) const
+        const std::string& cr_key, const std::string& cr_def_val) const
 {
     auto s_it = mConfig.find(cr_section);
     if (s_it != mConfig.end())

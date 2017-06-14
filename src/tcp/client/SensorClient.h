@@ -63,8 +63,8 @@ public:
      * @param r_feed   the handler Feed
      */
     SensorClient(boost::asio::signal_set& /*r_sigset*/,
-                 const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-                 vfrb::Feed& /*r_feed*/);
+            const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+            vfrb::Feed& /*r_feed*/);
     /**
      * Destructor
      *
@@ -111,16 +111,14 @@ private:
      * @overload Client::handleResolve
      */
     void handleResolve(const boost::system::error_code& /*cr_ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/)
-                               noexcept override;
+            boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
     /**
      * Implement Client::handleConnect
      *
      * @overload Client::handleConnect
      */
     void handleConnect(const boost::system::error_code& /*cr_ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/)
-                               noexcept override;
+            boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept override;
 
     /// Client stopped?
     bool mStopped;

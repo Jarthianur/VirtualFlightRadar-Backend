@@ -41,9 +41,10 @@ namespace server
 Server::Server(boost::asio::signal_set& r_sigset, std::uint16_t port)
         : mIOservice(),
           mrSigSet(r_sigset),
-          mAcceptor(mIOservice,
+          mAcceptor(
+                  mIOservice,
                   boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),
-                          port),
+                                                 port),
                   boost::asio::ip::tcp::acceptor::reuse_address(true)),
           mSocket(mIOservice)
 {
@@ -67,7 +68,7 @@ void Server::writeToAll(const std::string& cr_msg) noexcept
     for (auto it = mClients.begin(); it != mClients.end();)
     {
         boost::asio::write(it->get()->getSocket(), boost::asio::buffer(cr_msg),
-                ec);
+                           ec);
         if (ec)
         {
             Logger::warn("(Server) lost connection to: ", it->get()->getIP());
@@ -81,9 +82,10 @@ void Server::writeToAll(const std::string& cr_msg) noexcept
 
 void Server::accept() noexcept
 {
-    mAcceptor.async_accept(mSocket,
+    mAcceptor.async_accept(
+            mSocket,
             boost::bind(&Server::handleAccept, this,
-                    boost::asio::placeholders::error));
+                        boost::asio::placeholders::error));
 }
 
 void Server::awaitStop()
@@ -130,8 +132,7 @@ void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
             Logger::info("(Server) connection from: ", client->getIP());
         } else
         {
-            Logger::info("(Server) refused connection to ",
-                    client->getIP());
+            Logger::info("(Server) refused connection to ", client->getIP());
         }
     } else if (cr_ec != boost::system::errc::bad_file_descriptor)
     {

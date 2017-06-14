@@ -75,7 +75,7 @@ public:
      * @exceptsafe strong
      */
     void insertAircraft(const aircraft::Aircraft& /*cr_update*/,
-                        std::int32_t /*prio*/) noexcept;
+            std::int32_t /*prio*/) noexcept;
     /**
      * Process all aircrafts into NMEA sentences PFLAU and PFLAA.
      * Aircrafts with too old information are not reported, later deleted.

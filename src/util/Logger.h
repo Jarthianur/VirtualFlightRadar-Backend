@@ -55,7 +55,7 @@ public:
      * @param cr_msg  the msg, default empty
      */
     static void info(const std::string& /*cr_subj*/,
-                     const std::string& /*cr_msg*/= "");
+            const std::string& /*cr_msg*/= "");
     /**
      * Log debug informations to stdout.
      * Given a message and a subject.
@@ -64,7 +64,7 @@ public:
      * @param cr_msg  the msg, default empty
      */
     static void debug(const std::string& /*cr_subj*/,
-                      const std::string& /*cr_msg*/= "");
+            const std::string& /*cr_msg*/= "");
     /**
      * Log warnings and not-critical errors, like lost connections etc
      * to stdout.
@@ -74,7 +74,7 @@ public:
      * @param cr_msg  the msg, default empty
      */
     static void warn(const std::string& /*cr_subj*/,
-                     const std::string& /*cr_msg*/= "");
+            const std::string& /*cr_msg*/= "");
     /**
      * Log fatal errors, like socket failures etc
      * to stderr.
@@ -84,7 +84,7 @@ public:
      * @param cr_msg  the msg, default empty
      */
     static void error(const std::string& /*cr_subj*/,
-                      const std::string& /*cr_msg*/= "");
+            const std::string& /*cr_msg*/= "");
 
 private:
     /// Mutex

@@ -87,8 +87,8 @@ protected:
      * @param r_feed   the handler Feed
      */
     Client(boost::asio::signal_set& /*r_sigset*/,
-           const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-           const std::string& /*cr_comp*/, vfrb::Feed& /*r_feed*/);
+            const std::string& /*cr_host*/, const std::string& /*cr_port*/,
+            const std::string& /*cr_comp*/, vfrb::Feed& /*r_feed*/);
     /**
      * Register stop-handler to signals.
      */
@@ -131,7 +131,7 @@ protected:
      * @exceptsafe strong
      */
     void handleRead(const boost::system::error_code& /*cr_ec*/,
-                    std::size_t /*s*/) noexcept;
+            std::size_t /*s*/) noexcept;
     /**
      * Resolve host - handler
      *
@@ -141,8 +141,7 @@ protected:
      * @exceptsafe strong
      */
     virtual void handleResolve(const boost::system::error_code& /*cr_ec*/,
-                               boost::asio::ip::tcp::resolver::iterator /*it*/)
-                                       noexcept = 0;
+            boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept = 0;
     /**
      * Connect - handler
      *
@@ -152,8 +151,7 @@ protected:
      * @exceptsafe strong
      */
     virtual void handleConnect(const boost::system::error_code& /*cr_ec*/,
-                               boost::asio::ip::tcp::resolver::iterator /*it*/)
-                                       noexcept = 0;
+            boost::asio::ip::tcp::resolver::iterator /*it*/) noexcept = 0;
 
     /// Internal IO-service
     boost::asio::io_service mIoService;

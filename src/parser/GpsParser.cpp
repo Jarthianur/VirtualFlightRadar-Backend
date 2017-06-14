@@ -54,7 +54,7 @@ noexcept
     try
     {
         std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),
-                nullptr, 16);
+                                      nullptr, 16);
         if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return MSG_UNPACK_IGN;
@@ -103,9 +103,9 @@ noexcept
         }
         vfrb::VFRB::msGpsData.setBasePos(prio, mtGpsPos);
 
-        if (mtGpsPos.nrSats >= GPS_NR_SATS_GOOD && mtGpsPos.fixQa
-                >= GPS_FIX_GOOD
-            && dilution <= GPS_HOR_DILUTION_GOOD)
+        if (mtGpsPos.nrSats >= GPS_NR_SATS_GOOD
+                && mtGpsPos.fixQa >= GPS_FIX_GOOD
+                && dilution <= GPS_HOR_DILUTION_GOOD)
         {
             return GPS_ASSUME_GOOD;
         }
