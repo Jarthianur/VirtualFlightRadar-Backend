@@ -50,7 +50,7 @@ endif
 all: VFR-Test
 
 # Tool invocations
-VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
+VFR-Test: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
 	g++ -fopenmp -o "VFR-Test" $(OBJS) $(USER_OBJS) $(LIBS)
