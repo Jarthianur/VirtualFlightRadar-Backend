@@ -82,6 +82,17 @@ private:
      */
     void process() noexcept override;
     /**
+     * Extend Client::stop
+     * Cancel timer before disconnect.
+     *
+     * @overload Client::stop
+     */
+    void stop() noexcept override;
+    /**
+     * Send a keep-alive beacon to APRSC every 10 minutes.
+     */
+    void sendKaBeacon() noexcept;
+    /**
      * Implement Client::handleResolve
      *
      * @overload Client::handleResolve
@@ -104,9 +115,23 @@ private:
      * @exceptsafe strong
      */
     void handleLogin(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
+    /**
+     * Send keep-alive beacon - handler
+     *
+     * @param cr_ec the error code
+     * @param s     the sent bytes
+     *
+     * @exceptsafe strong
+     */
+    void handleSendKaBeacon(const boost::system::error_code& cr_ec, std::size_t s)
+            noexcept;
 
     /// Login string
     std::string mLoginStr;
+    /// Client stopped?
+    bool mStopped;
+    /// Beacon timer
+    boost::asio::deadline_timer mTimeout;
 };
 
 }  // namespace client

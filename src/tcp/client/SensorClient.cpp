@@ -57,13 +57,12 @@ void SensorClient::read() noexcept
 
 void SensorClient::connect() noexcept
 {
-    boost::asio::ip::tcp::resolver::query query(
-            mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(
-            query,
+    boost::asio::ip::tcp::resolver::query query(mHost, mPort,
+            boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(query,
             boost::bind(&SensorClient::handleResolve, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::iterator));
+                    boost::asio::placeholders::error,
+                    boost::asio::placeholders::iterator));
 }
 
 void SensorClient::process() noexcept
@@ -102,18 +101,12 @@ void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
         boost::asio::ip::tcp::resolver::iterator it)
         noexcept
         {
-    if (mStopped)
-    {
-        return;
-    }
     if (!cr_ec)
     {
-        boost::asio::async_connect(
-                mSocket,
-                it,
+        boost::asio::async_connect(mSocket, it,
                 boost::bind(&SensorClient::handleConnect, this,
-                            boost::asio::placeholders::error,
-                            boost::asio::placeholders::iterator));
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::iterator));
     } else
     {
         Logger::error("(SensorClient) resolve host: ", cr_ec.message());
@@ -129,10 +122,6 @@ void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
         boost::asio::ip::tcp::resolver::iterator it)
         noexcept
         {
-    if (mStopped)
-    {
-        return;
-    }
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
