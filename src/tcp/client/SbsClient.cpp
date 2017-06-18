@@ -38,7 +38,7 @@ namespace client
 
 SbsClient::SbsClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
         const std::string& cr_port, vfrb::Feed& r_feed)
-        : Client(r_sigset, cr_host, cr_port, "(SBSClient)", r_feed)
+        : Client(r_sigset, cr_host, cr_port, "(SbsClient)", r_feed)
 {
     connect();
 }
@@ -76,7 +76,7 @@ void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
                             boost::asio::placeholders::iterator));
     } else
     {
-        Logger::error("(SBSClient) resolve host: ", cr_ec.message());
+        Logger::error("(SbsClient) resolve host: ", cr_ec.message());
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -92,11 +92,11 @@ void SbsClient::handleConnect(const boost::system::error_code& cr_ec,
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(SBSClient) connected to: ", mHost + ":" + mPort);
+        Logger::info("(SbsClient) connected to: ", mHost + ":" + mPort);
         read();
     } else
     {
-        Logger::error("(SBSClient) connect: ", cr_ec.message());
+        Logger::error("(SbsClient) connect: ", cr_ec.message());
         if (mSocket.is_open())
         {
             mSocket.close();

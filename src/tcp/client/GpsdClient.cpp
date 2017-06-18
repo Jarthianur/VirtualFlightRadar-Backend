@@ -37,7 +37,7 @@ namespace client
 
 GpsdClient::GpsdClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
         const std::string& cr_port, vfrb::Feed& r_feed)
-        : Client(r_sigset, cr_host, cr_port, "(GPSDClient)", r_feed)
+        : Client(r_sigset, cr_host, cr_port, "(GpsdClient)", r_feed)
 {
     connect();
 }
@@ -61,7 +61,7 @@ void GpsdClient::process() noexcept
 {
     if (mrFeed.process(mResponse) > 0 && config::Configuration::global_gnd_mode)
     {
-        Logger::info("(GPSDClient) received good position -> stop");
+        Logger::info("(GpsdClient) received good position -> stop");
         stop();
     }
 }
@@ -80,7 +80,7 @@ void GpsdClient::handleResolve(const boost::system::error_code& cr_ec,
                             boost::asio::placeholders::iterator));
     } else
     {
-        Logger::error("(GPSDClient) resolve host: ", cr_ec.message());
+        Logger::error("(GpsdClient) resolve host: ", cr_ec.message());
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -104,7 +104,7 @@ void GpsdClient::handleConnect(const boost::system::error_code& cr_ec,
                             boost::asio::placeholders::bytes_transferred));
     } else
     {
-        Logger::error("(GPSDClient) connect: ", cr_ec.message());
+        Logger::error("(GpsdClient) connect: ", cr_ec.message());
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -124,11 +124,11 @@ void GpsdClient::stop() noexcept
                 {
                     if (!ec)
                     {
-                        Logger::info("(GPSDClient) stopped watch");
+                        Logger::info("(GpsdClient) stopped watch");
                     }
                     else
                     {
-                        Logger::error("(GPSDClient) send un-watch request: ", ec.message());
+                        Logger::error("(GpsdClient) send un-watch request: ", ec.message());
                     }
                 });
     }
@@ -140,11 +140,11 @@ void GpsdClient::handleWatch(const boost::system::error_code& cr_ec, std::size_t
         {
     if (!cr_ec)
     {
-        Logger::info("(GPSDClient) connected to: ", mHost + ":" + mPort);
+        Logger::info("(GpsdClient) connected to: ", mHost + ":" + mPort);
         read();
     } else
     {
-        Logger::error("(GPSDClient) send watch request: ", cr_ec.message());
+        Logger::error("(GpsdClient) send watch request: ", cr_ec.message());
     }
 }
 
