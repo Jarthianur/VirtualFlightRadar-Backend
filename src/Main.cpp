@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 
     // set climate fallbacks
     VFRB::msSensorData.setPress(0, config::Configuration::base_pressure);
-    VFRB::msGPSdata.setDefaults(config::Configuration::base_latitude,
+    VFRB::msGpsData.setDefaults(config::Configuration::base_latitude,
             config::Configuration::base_longitude,
             config::Configuration::base_altitude,
             config::Configuration::base_geoid);

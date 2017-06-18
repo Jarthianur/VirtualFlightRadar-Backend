@@ -37,9 +37,9 @@ namespace client
 
 Client::Client(const std::string& cr_host, const std::string& cr_port,
                const std::string& cr_comp, feed::Feed& r_feed)
-        : mIOservice(),
-          mSocket(mIOservice),
-          mResolver(mIOservice),
+        : mIoService(),
+          mSocket(mIoService),
+          mResolver(mIoService),
           mHost(cr_host),
           mPort(cr_port),
           mComponent(cr_comp),
@@ -59,7 +59,7 @@ void Client::run(boost::asio::signal_set& r_sigset)
     {
         stop();
     });
-    mIOservice.run();
+    mIoService.run();
 }
 
 void Client::timedConnect() noexcept

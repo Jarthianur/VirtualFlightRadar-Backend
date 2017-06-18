@@ -28,7 +28,7 @@
 #include <boost/operators.hpp>
 #include <cstddef>
 #include <iostream>
-#include "../../vfrb/Feed.h"
+#include "../../feed/Feed.h"
 #include "../../util/Logger.h"
 
 using namespace util;

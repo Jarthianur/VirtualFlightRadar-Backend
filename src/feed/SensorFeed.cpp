@@ -28,15 +28,14 @@
 namespace feed
 {
 
-SensorFeed::SensorFeed(
-        const std::string& cr_name, std::int32_t prio,
+SensorFeed::SensorFeed(const std::string& cr_name, std::int32_t prio,
         const std::unordered_map<std::string, std::string>& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
     mpParser = std::unique_ptr<parser::Parser>(new parser::SensorParser());
     mpClient = std::unique_ptr<tcp::client::Client>(
-            new tcp::client::SensorClient(mKVmap.find(KV_KEY_HOST)->second,
-                    mKVmap.find(KV_KEY_PORT)->second, *this));
+            new tcp::client::SensorClient(mKvMap.find(KV_KEY_HOST)->second,
+                    mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 SensorFeed::~SensorFeed() noexcept

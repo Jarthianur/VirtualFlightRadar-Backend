@@ -22,20 +22,20 @@
 #include "GpsFeed.h"
 
 #include "../config/Configuration.h"
-#include "../parser/GPSParser.h"
-#include "../tcp/client/GPSDClient.h"
+#include "../parser/GpsParser.h"
+#include "../tcp/client/GpsdClient.h"
 
 namespace feed
 {
 
 GpsFeed::GpsFeed(const std::string& cr_name, std::int32_t prio,
-                 const std::unordered_map<std::string, std::string>& cr_kvmap)
+        const std::unordered_map<std::string, std::string>& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
-    mpParser = std::unique_ptr<parser::Parser>(new parser::GPSParser());
+    mpParser = std::unique_ptr<parser::Parser>(new parser::GpsParser());
     mpClient = std::unique_ptr<tcp::client::Client>(
-            new tcp::client::GPSDClient(mKVmap.find(KV_KEY_HOST)->second,
-                    mKVmap.find(KV_KEY_PORT)->second, *this));
+            new tcp::client::GpsdClient(mKvMap.find(KV_KEY_HOST)->second,
+                    mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 GpsFeed::~GpsFeed() noexcept

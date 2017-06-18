@@ -40,8 +40,7 @@ public:
      * Construct an SensorFeed.
      * Pass all parameters to parent constructor.
      */
-    SensorFeed(
-            const std::string& /*cr_name*/, std::int32_t /*prio*/,
+    SensorFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
             const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
     /**
      * Destructor

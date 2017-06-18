@@ -21,21 +21,21 @@
 
 #include "SbsFeed.h"
 
-#include "../parser/SBSParser.h"
-#include "../tcp/client/SBSClient.h"
+#include "../parser/SbsParser.h"
+#include "../tcp/client/SbsClient.h"
 #include "../config/Configuration.h"
 
 namespace feed
 {
 
 SbsFeed::SbsFeed(const std::string& cr_name, std::int32_t prio,
-                 const std::unordered_map<std::string, std::string>& cr_kvmap)
+        const std::unordered_map<std::string, std::string>& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
-    mpParser = std::unique_ptr<parser::Parser>(new parser::SBSParser());
+    mpParser = std::unique_ptr<parser::Parser>(new parser::SbsParser());
     mpClient = std::unique_ptr<tcp::client::Client>(
-            new tcp::client::SBSClient(mKVmap.find(KV_KEY_HOST)->second,
-                    mKVmap.find(KV_KEY_PORT)->second, *this));
+            new tcp::client::SbsClient(mKvMap.find(KV_KEY_HOST)->second,
+                    mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 SbsFeed::~SbsFeed() noexcept

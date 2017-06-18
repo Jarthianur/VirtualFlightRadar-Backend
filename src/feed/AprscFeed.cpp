@@ -24,8 +24,8 @@
 #include <stdexcept>
 
 #include "../config/Configuration.h"
-#include "../parser/APRSParser.h"
-#include "../tcp/client/APRSCClient.h"
+#include "../parser/AprsParser.h"
+#include "../tcp/client/AprscClient.h"
 #include "../util/Logger.h"
 
 using namespace util;
@@ -33,22 +33,21 @@ using namespace util;
 namespace feed
 {
 
-AprscFeed::AprscFeed(
-        const std::string& cr_name, std::int32_t prio,
+AprscFeed::AprscFeed(const std::string& cr_name, std::int32_t prio,
         const std::unordered_map<std::string, std::string>& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
-    auto it = mKVmap.find(KV_KEY_LOGIN);
-    if (it == mKVmap.end())
+    auto it = mKvMap.find(KV_KEY_LOGIN);
+    if (it == mKvMap.end())
     {
         Logger::warn("(AprscFeed) could not find: ", mName + "." KV_KEY_LOGIN);
         throw std::runtime_error("No login given");
     } else
     {
-        mpParser = std::unique_ptr<parser::Parser>(new parser::APRSParser());
+        mpParser = std::unique_ptr<parser::Parser>(new parser::AprsParser());
         mpClient = std::unique_ptr<tcp::client::Client>(
-                new tcp::client::APRSCClient(mKVmap.find(KV_KEY_HOST)->second,
-                        mKVmap.find(KV_KEY_PORT)->second, it->second, *this));
+                new tcp::client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
+                        mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
     }
 }
 

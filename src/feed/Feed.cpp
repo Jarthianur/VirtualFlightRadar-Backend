@@ -37,17 +37,17 @@ namespace feed
 {
 
 Feed::Feed(const std::string& cr_name, std::int32_t prio,
-           const std::unordered_map<std::string, std::string>& cr_kvmap)
+        const std::unordered_map<std::string, std::string>& cr_kvmap)
         : mName(cr_name),
           mPriority(prio),
-          mKVmap(cr_kvmap)
+          mKvMap(cr_kvmap)
 {
-    if (mKVmap.find(KV_KEY_HOST) == mKVmap.end())
+    if (mKvMap.find(KV_KEY_HOST) == mKvMap.end())
     {
         Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_HOST);
         throw std::runtime_error("No host given");
     }
-    if (mKVmap.find(KV_KEY_PORT) == mKVmap.end())
+    if (mKvMap.find(KV_KEY_PORT) == mKvMap.end())
     {
         Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_PORT);
         throw std::runtime_error("No port given");
@@ -61,7 +61,7 @@ Feed::~Feed() noexcept
 Feed::Feed(BOOST_RV_REF(Feed) other)
 : mName(std::move(other.mName)),
 mPriority(other.mPriority),
-mKVmap(std::move(other.mKVmap)),
+mKvMap(std::move(other.mKvMap)),
 mpClient(std::move(other.mpClient)),
 mpParser(std::move(other.mpParser))
 {
