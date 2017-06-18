@@ -42,9 +42,8 @@ Server::Server(boost::asio::signal_set& r_sigset, std::uint16_t port)
         : mIOservice(),
           mrSigSet(r_sigset),
           mAcceptor(mIOservice,
-                  boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),
-                          port),
-                  boost::asio::ip::tcp::acceptor::reuse_address(true)),
+                    boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
+                    boost::asio::ip::tcp::acceptor::reuse_address(true)),
           mSocket(mIOservice)
 {
     awaitStop();
@@ -66,12 +65,10 @@ void Server::writeToAll(const std::string& cr_msg) noexcept
     boost::system::error_code ec;
     for (auto it = mClients.begin(); it != mClients.end();)
     {
-        boost::asio::write(it->get()->getSocket(), boost::asio::buffer(cr_msg),
-                ec);
+        boost::asio::write(it->get()->getSocket(), boost::asio::buffer(cr_msg), ec);
         if (ec)
         {
-            Logger::warn("(Server) lost connection to: ",
-                    it->get()->getIP());
+            Logger::warn("(Server) lost connection to: ", it->get()->getIP());
             mClients.erase(it);
         } else
         {
@@ -82,9 +79,9 @@ void Server::writeToAll(const std::string& cr_msg) noexcept
 
 void Server::accept() noexcept
 {
-    mAcceptor.async_accept(mSocket,
-            boost::bind(&Server::handleAccept, this,
-                    boost::asio::placeholders::error));
+    mAcceptor.async_accept(
+            mSocket,
+            boost::bind(&Server::handleAccept, this, boost::asio::placeholders::error));
 }
 
 void Server::awaitStop()
@@ -103,6 +100,18 @@ void Server::stopAll()
     mClients.clear();
 }
 
+bool Server::isRegistered(const std::string& cr_ip)
+{
+    for (auto it = mClients.cbegin(); it != mClients.cend(); it++)
+    {
+        if (it->get()->getIP() == cr_ip)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
 {
     if (!mAcceptor.is_open())
@@ -111,15 +120,15 @@ void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
     }
     if (!cr_ec)
     {
+        boost::lock_guard<boost::mutex> lock(this->mMutex);
         auto client = Connection::start(std::move(mSocket));
-        if (mClients.size() < S_MAX_CLIENTS)
+        if (mClients.size() < S_MAX_CLIENTS && !isRegistered(client->getIP()))
         {
             mClients.push_back(client);
             Logger::info("(Server) connection from: ", client->getIP());
         } else
         {
-            Logger::info("(Server) client count exceeded, refuse: ",
-                    client->getIP());
+            Logger::info("(Server) refused connection to ", client->getIP());
         }
     } else if (cr_ec != boost::system::errc::bad_file_descriptor)
     {

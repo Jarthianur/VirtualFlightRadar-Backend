@@ -21,7 +21,6 @@
 
 #include "ConfigReader.h"
 
-#include <fstream>
 #include <stdexcept>
 #include <typeindex>
 #include <utility>
@@ -33,9 +32,8 @@ using namespace util;
 namespace config
 {
 
-ConfigReader::ConfigReader(const std::string& cr_fname)
-        : mFile(cr_fname),
-          mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
+ConfigReader::ConfigReader()
+        : mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
                   boost::regex_constants::optimize)
 {
 }
@@ -44,15 +42,14 @@ ConfigReader::~ConfigReader() noexcept
 {
 }
 
-void ConfigReader::read() noexcept
+void ConfigReader::read(std::istream& r_file)
 {
-    std::ifstream src(mFile);
     std::string key;
     std::string value;
     std::string line;
     std::string section;
     std::size_t line_nr = 0;
-    while (std::getline(src, line))
+    while (std::getline(r_file, line))
     {
         line_nr++;
         try
@@ -66,7 +63,7 @@ void ConfigReader::read() noexcept
                 section = line.substr(1, line.rfind(']') - 1);
                 mConfig.emplace(
                         std::make_pair(section,
-                                std::unordered_map<std::string, std::string>()));
+                                       std::unordered_map<std::string, std::string>()));
                 continue;
             }
             boost::smatch match;
@@ -83,9 +80,9 @@ void ConfigReader::read() noexcept
             } else
             {
                 Logger::error(
-                        "(ConfigReader) malformed param [" + std::to_string(
-                                line_nr)
-                        + "]: ", line);
+                        "(ConfigReader) malformed param [" + std::to_string(line_nr)
+                                + "]: ",
+                        line);
             }
         } catch (const std::out_of_range& e)
         {
@@ -95,8 +92,7 @@ void ConfigReader::read() noexcept
 }
 
 const std::string ConfigReader::getProperty(const std::string& cr_section,
-                                            const std::string& cr_key,
-                                            const std::string& cr_def_val) const
+        const std::string& cr_key, const std::string& cr_def_val) const
 {
     auto s_it = mConfig.find(cr_section);
     if (s_it != mConfig.end())

@@ -22,11 +22,8 @@
 #include <cstdint>
 
 #include "../src/config/Configuration.h"
-#include "framework/src/reporter/AbstractReporter.hpp"
-#include "framework/src/reporter/Reporters.hpp"
-#include "framework/src/testsuite/TestSuitesRunner.hpp"
+#include "framework/src/framework.h"
 
-using namespace util;
 using namespace testsuite;
 
 #ifdef assert

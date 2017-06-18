@@ -44,8 +44,8 @@ noexcept
 {
     try
     {
-        std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2),
-                nullptr, 16);
+        std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr,
+                                      16);
         if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return MSG_UNPACK_IGN;
@@ -57,15 +57,14 @@ noexcept
 
     if (cr_msg.find("MDA") != std::string::npos)
     {
-        VFRB::msSensorData.setMDAstr(prio, cr_msg);
+        VFRB::msSensorData.setMdaStr(prio, cr_msg);
         try
         {
             std::size_t tmpB = cr_msg.find('B') - 1;
             std::size_t tmpS = cr_msg.substr(0, tmpB).find_last_of(',') + 1;
             std::size_t subLen = tmpB - tmpS;
             std::size_t numIdx;
-            double tmpPress = std::stod(cr_msg.substr(tmpS, subLen), &numIdx)
-                    * 1000.0;
+            double tmpPress = std::stod(cr_msg.substr(tmpS, subLen), &numIdx) * 1000.0;
             if (numIdx == subLen)
             {
                 VFRB::msSensorData.setPress(prio, tmpPress);
@@ -79,7 +78,7 @@ noexcept
         }
     } else if (cr_msg.find("MWV") != std::string::npos)
     {
-        VFRB::msSensorData.setMWVstr(prio, cr_msg);
+        VFRB::msSensorData.setMwvStr(prio, cr_msg);
     } else
     {
         return MSG_UNPACK_IGN;

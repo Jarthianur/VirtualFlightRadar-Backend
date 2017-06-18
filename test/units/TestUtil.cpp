@@ -21,7 +21,7 @@
 
 #include <boost/regex.hpp>
 
-#include "../../src/util/GPSmodule.h"
+#include "../../src/util/GpsModule.h"
 #include "../../src/util/Math.hpp"
 #include "../../src/util/Position.hpp"
 #include "../framework/src/comparator/ComparatorStrategy.hpp"
@@ -75,16 +75,15 @@ void test_util(TestSuitesRunner& runner)
         assert(math::checksum("$abc*", sizeof("$abc*")), 96, helper::eqi);
     });
 
-    describe<GPSmodule>("GPSModule - gpsfix", runner)->test("gps nmea",
+    describe<GpsModule>("GPSModule - gpsfix", runner)->test("gps nmea",
             []()
             {
-                GPSmodule gpsm;
-                boost::regex re("(\\$GPRMC,\\d{6},A,0000\\.00,N,00000\\.00,E,0,0,\\d{6},001\\.0,W\\*[0-9a-fA-F]{2}\\s*)?(\\$GPGGA,\\d{6},0000\\.0000,N,00000\\.0000,E,1,00,1,0,M,0\\.0,M,,\\*[0-9a-fA-F]{2}\\s*)?");
+                GpsModule gpsm;
                 boost::smatch match;
                 struct ExtGPSPosition pos;
-                bool matched = boost::regex_search(gpsm.ggafix(pos), match, re);
+                bool matched = boost::regex_search(gpsm.genGpggaStr(pos), match, helper::gpsRe);
                 assert(matched, true, helper::eqb);
-                matched = boost::regex_search(gpsm.rmcfix(pos), match, re);
+                matched = boost::regex_search(gpsm.genGprmcStr(pos), match, helper::gpsRe);
                 assert(matched, true, helper::eqb);
             });
 }

@@ -61,8 +61,8 @@ public:
      * @param cr_login the login string to transmit
      * @param r_feed   the handler Feed reference
      */
-    SensorClient(const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-                 feed::Feed& /*r_feed*/);
+    SensorClient(const std::string& cr_host, const std::string& cr_port,
+                 feed::Feed& r_feed);
     /**
      * Destructor
      *
@@ -108,17 +108,15 @@ private:
      *
      * @overload Client::handleResolve
      */
-    void handleResolve(const boost::system::error_code& /*cr_ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/)
-                               noexcept override;
+    void handleResolve(const boost::system::error_code& cr_ec,
+            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
      * Implement Client::handleConnect
      *
      * @overload Client::handleConnect
      */
-    void handleConnect(const boost::system::error_code& /*cr_ec*/,
-                       boost::asio::ip::tcp::resolver::iterator /*it*/)
-                               noexcept override;
+    void handleConnect(const boost::system::error_code& cr_ec,
+            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
 
     /// Client stopped?
     bool mStopped;

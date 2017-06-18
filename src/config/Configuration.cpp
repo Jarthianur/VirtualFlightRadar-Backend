@@ -21,6 +21,7 @@
 
 #include "Configuration.h"
 
+#include <algorithm>
 #include <iterator>
 #include <memory>
 #include <sstream>
@@ -38,9 +39,9 @@ using namespace util;
 namespace config
 {
 
-Configuration::Configuration(const char* file)
+Configuration::Configuration(std::istream& r_file)
 {
-    if (!init(file))
+    if (!init(r_file))
     {
         throw std::logic_error("Failed to read configuration file");
     }
@@ -62,12 +63,12 @@ bool Configuration::global_gnd_mode = false;
 
 std::vector<std::shared_ptr<feed::Feed>> Configuration::global_feeds;
 
-bool Configuration::init(const char* file)
+bool Configuration::init(std::istream& r_file)
 {
-    ConfigReader cr(file);
+    ConfigReader cr;
     try
     {
-        cr.read();
+        cr.read(r_file);
     } catch (const std::exception& e)
     {
         Logger::error("(Config) read file: ", e.what());
@@ -80,23 +81,17 @@ bool Configuration::init(const char* file)
     // get fallbacks
     base_latitude = strToDouble(
             cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0"));
-    Logger::info("(Config) " KV_KEY_LATITUDE ": ",
-            std::to_string(base_latitude));
+    Logger::info("(Config) " KV_KEY_LATITUDE ": ", std::to_string(base_latitude));
     base_longitude = strToDouble(
             cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0"));
-    Logger::info("(Config) " KV_KEY_LONGITUDE ": ",
-            std::to_string(base_longitude));
-    base_altitude = strToInt(
-            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
-    Logger::info("(Config) " KV_KEY_ALTITUDE ": ",
-            std::to_string(base_altitude));
-    base_geoid = strToDouble(
-            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
+    Logger::info("(Config) " KV_KEY_LONGITUDE ": ", std::to_string(base_longitude));
+    base_altitude = strToInt(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
+    Logger::info("(Config) " KV_KEY_ALTITUDE ": ", std::to_string(base_altitude));
+    base_geoid = strToDouble(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
     Logger::info("(Config) " KV_KEY_GEOID ": ", std::to_string(base_geoid));
     base_pressure = strToDouble(
             cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25"));
-    Logger::info("(Config) " KV_KEY_PRESSURE ": ",
-            std::to_string(base_pressure));
+    Logger::info("(Config) " KV_KEY_PRESSURE ": ", std::to_string(base_pressure));
 
     // get filters
     std::string tmp = cr.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT, "-1");
@@ -107,8 +102,7 @@ bool Configuration::init(const char* file)
     {
         filter_maxHeight = strToInt(tmp);
     }
-    Logger::info("(Config) " KV_KEY_MAX_HEIGHT ": ",
-            std::to_string(filter_maxHeight));
+    Logger::info("(Config) " KV_KEY_MAX_HEIGHT ": ", std::to_string(filter_maxHeight));
 
     tmp = cr.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_DIST, "-1");
     if (tmp == "-1")
@@ -118,16 +112,14 @@ bool Configuration::init(const char* file)
     {
         filter_maxDist = strToInt(tmp);
     }
-    Logger::info("(Config) " KV_KEY_MAX_DIST ": ",
-            std::to_string(filter_maxDist));
+    Logger::info("(Config) " KV_KEY_MAX_DIST ": ", std::to_string(filter_maxDist));
 
     // get general
     global_gnd_mode = cr.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE) != "";
 
     global_server_port = (uint16_t) strToInt(
-            cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "9999"));
-    Logger::info("(Config) " KV_KEY_SERVER_PORT ": ",
-            std::to_string(global_server_port));
+            cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
+    Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(global_server_port));
 
     std::size_t nrf = registerFeeds(cr);
     Logger::info("(Config) number of feeds: ", std::to_string(nrf));
@@ -221,28 +213,30 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
 
 std::int32_t Configuration::strToInt(const std::string& cr_str) noexcept
 {
+    std::int32_t val = 0;
     try
     {
-        return std::stoi(cr_str);
+        val = std::stoi(cr_str);
     } catch (const std::logic_error& iae)
     {
-        Logger::warn("(VFRB) invalid configuration: ",
-                cr_str.length() == 0 ? "empty" : cr_str);
+        Logger::warn("(Config) invalid configuration: ",
+                     cr_str.length() == 0 ? "empty" : cr_str);
     }
-    return 0;
+    return val;
 }
 
 double Configuration::strToDouble(const std::string& cr_str) noexcept
 {
+    double val = 0.0;
     try
     {
-        return std::stod(cr_str);
+        val = std::stod(cr_str);
     } catch (const std::logic_error& iae)
     {
-        Logger::warn("(VFRB) invalid configuration: ",
-                cr_str.length() == 0 ? "empty" : cr_str);
+        Logger::warn("(Config) invalid configuration: ",
+                     cr_str.length() == 0 ? "empty" : cr_str);
     }
-    return 0.0;
+    return val;
 }
 
 }  // namespace config

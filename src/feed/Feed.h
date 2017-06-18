@@ -79,7 +79,7 @@ public:
      *
      * @exceptsafe strong
      */
-    void run(boost::asio::signal_set& /*r_sigset*/) noexcept;
+    void run(boost::asio::signal_set& r_sigset) noexcept;
     /**
      * Pass the Clients response to the Parser.
      *
@@ -89,7 +89,7 @@ public:
      *
      * @exceptsafe no-throw
      */
-    std::int32_t process(const std::string& /*cr_res*/) noexcept;
+    std::int32_t process(const std::string& cr_res) noexcept;
 
     /// Unique name
     const std::string mName;
@@ -108,11 +108,11 @@ protected:
      *
      * @throws std::runtime_error if host or port are not given
      */
-    Feed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
-         const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
+    Feed(const std::string& cr_name, std::int32_t prio,
+         const std::unordered_map<std::string, std::string>& cr_kvmap);
     /// Key-value-map holding the properties.
-    std::unordered_map<std::string, std::string> mKVmap;
-    /// Client receiving the input
+    std::unordered_map<std::string, std::string> mKvMap;
+    /// Client, later resolved according to InpuType
     std::unique_ptr<tcp::client::Client> mpClient;
     /// Parser parsing the input
     std::unique_ptr<parser::Parser> mpParser;

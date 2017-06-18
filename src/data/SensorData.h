@@ -59,7 +59,7 @@ public:
      *
      * @return the MWV sentence, if valid, else empty string
      */
-    std::string getMWVstr();
+    std::string getMwvStr();
     /**
      * Set MWV sentence.
      * Wind data is valid after this operation.
@@ -68,14 +68,14 @@ public:
      * @param prio the priority attempting to write
      * @param cr_mwv the new MWV sentence to write
      */
-    void setMWVstr(std::int32_t /*prio*/, const std::string& /*cr_mwv*/);
+    void setMwvStr(std::int32_t prio, const std::string& cr_mwv);
     /**
      * Get MDA sentence.
      * Data is invalid after this operation.
      *
      * @return the MDA sentence, if valid, else empty string
      */
-    std::string getMDAstr();
+    std::string getMdaStr();
     /**
      * Set MDA sentence.
      * Data is valid after this operation.
@@ -84,7 +84,7 @@ public:
      * @param prio the priority attempting to write
      * @param cr_mda the new MDA sentence to write
      */
-    void setMDAstr(std::int32_t /*prio*/, const std::string& /*cr_mda*/);
+    void setMdaStr(std::int32_t prio, const std::string& cr_mda);
     /**
      * Get the last registered pressure.
      *
@@ -98,15 +98,15 @@ public:
      * @param prio the priority attempting to write
      * @param p the new pressure
      */
-    void setPress(std::int32_t /*prio*/, double /*p*/);
+    void setPress(std::int32_t prio, double p);
 
 private:
     /// Data holding pressure
     struct Data<double> mPress;
     /// TmpData holding MWV sentence
-    struct TmpData<std::string> mMWV;
+    struct TmpData<std::string> mMwvData;
     /// TmpData holding MDA sentence
-    struct TmpData<std::string> mMDA;
+    struct TmpData<std::string> mMdaData;
 };
 
 } // namespace data

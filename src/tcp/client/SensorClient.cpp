@@ -39,7 +39,7 @@ SensorClient::SensorClient(const std::string& cr_host,
                            const std::string& cr_port, feed::Feed& r_feed)
         : Client(cr_host, cr_port, "(SensorClient)", r_feed),
           mStopped(false),
-          mTimeout(mIOservice)
+          mTimeout(mIoService)
 {
     connect();
     mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
@@ -98,13 +98,9 @@ void SensorClient::stop() noexcept
 }
 
 void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
-                                 boost::asio::ip::tcp::resolver::iterator it)
-                                 noexcept
-                                 {
-    if (mStopped)
-    {
-        return;
-    }
+        boost::asio::ip::tcp::resolver::iterator it)
+        noexcept
+        {
     if (!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
@@ -123,13 +119,9 @@ void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
-                                 boost::asio::ip::tcp::resolver::iterator it)
-                                 noexcept
-                                 {
-    if (mStopped)
-    {
-        return;
-    }
+        boost::asio::ip::tcp::resolver::iterator it)
+        noexcept
+        {
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));

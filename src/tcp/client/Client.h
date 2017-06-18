@@ -74,7 +74,7 @@ public:
      *
      * @param r_sigset the signal set reference handling signals
      */
-    void run(boost::asio::signal_set& /*r_sigset*/);
+    void run(boost::asio::signal_set& r_sigset);
 
 protected:
     /**
@@ -87,8 +87,8 @@ protected:
      * @param cr_comp  the component string
      * @param r_feed   the handler Feed reference
      */
-    Client(const std::string& /*cr_host*/, const std::string& /*cr_port*/,
-           const std::string& /*cr_comp*/, feed::Feed& /*r_feed*/);
+    Client(const std::string& cr_host, const std::string& cr_port,
+           const std::string& cr_comp, feed::Feed& r_feed);
     /**
      * Connect with timeout.
      */
@@ -116,8 +116,7 @@ protected:
      *
      * @exceptsafe strong
      */
-    void handleTimedConnect(const boost::system::error_code& /*cr_ec*/)
-            noexcept;
+    void handleTimedConnect(const boost::system::error_code& cr_ec) noexcept;
     /**
      * Read - handler
      *
@@ -126,8 +125,7 @@ protected:
      *
      * @exceptsafe strong
      */
-    void handleRead(const boost::system::error_code& /*cr_ec*/,
-                    std::size_t /*s*/) noexcept;
+    void handleRead(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
     /**
      * Resolve host - handler
      *
@@ -136,9 +134,8 @@ protected:
      *
      * @exceptsafe strong
      */
-    virtual void handleResolve(const boost::system::error_code& /*cr_ec*/,
-                               boost::asio::ip::tcp::resolver::iterator /*it*/)
-                                       noexcept = 0;
+    virtual void handleResolve(const boost::system::error_code& cr_ec,
+            boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
     /**
      * Connect - handler
      *
@@ -147,12 +144,11 @@ protected:
      *
      * @exceptsafe strong
      */
-    virtual void handleConnect(const boost::system::error_code& /*cr_ec*/,
-                               boost::asio::ip::tcp::resolver::iterator /*it*/)
-                                       noexcept = 0;
+    virtual void handleConnect(const boost::system::error_code& cr_ec,
+            boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
 
     /// Internal IO-service
-    boost::asio::io_service mIOservice;
+    boost::asio::io_service mIoService;
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
     /// Resolver

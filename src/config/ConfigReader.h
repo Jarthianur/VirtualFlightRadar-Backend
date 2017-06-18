@@ -25,6 +25,7 @@
 #include <boost/regex.hpp>
 #include <string>
 #include <unordered_map>
+#include <istream>
 
 namespace config
 {
@@ -40,10 +41,8 @@ class ConfigReader
 public:
     /**
      * Constructor
-     *
-     * @param cr_fname the file to read
      */
-    ConfigReader(const std::string& /*cr_fname*/);
+    ConfigReader();
     /**
      * Destructor
      *
@@ -53,9 +52,9 @@ public:
     /**
      * Read the given file.
      *
-     * @exceptsafe strong
+     * @param cr_file the file stream to read
      */
-    void read() noexcept;
+    void read(std::istream& r_file);
     /**
      * Get a property from all stored properties.
      * Return the given default value, if the property was not found.
@@ -66,9 +65,8 @@ public:
      *
      * @return the value for key in section, if found, else the default value
      */
-    const std::string getProperty(const std::string& /*cr_section*/,
-                                  const std::string& /*cr_key*/,
-                                  const std::string& /*cr_def_val*/= "") const;
+    const std::string getProperty(const std::string& cr_section,
+            const std::string& cr_key, const std::string& cr_def_val = "") const;
     /**
      * Get the key-value-map for a section.
      * If the section is not found the kv-map is empty.
@@ -78,11 +76,9 @@ public:
      * @return the kv-map for the section
      */
     const std::unordered_map<std::string, std::string>& getSectionKV(
-            const std::string& /*cr_section*/) const;
+            const std::string& cr_section) const;
 
 private:
-    /// The filename
-    const std::string mFile;
     /// The map of sections with kv-maps
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> mConfig;
     /// The regular expression for 'key = value' lines

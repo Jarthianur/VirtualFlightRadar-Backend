@@ -31,7 +31,7 @@ namespace data
 {
 class AircraftContainer;
 class SensorData;
-class GPSData;
+class GpsData;
 }
 namespace tcp
 {
@@ -89,31 +89,30 @@ public:
     /// Container holding sensor and climate information.
     static data::SensorData msSensorData;
     /// Container holding GPS information
-    static data::GPSData msGPSdata;
+    static data::GpsData msGpsData;
 
 private:
     /**
      * Handler for an input Feed thread.
      *
      * @param r_sigset the signal set to pass
-     * @param r_feed   the Feed to handle
+     * @param p_feed   the Feed to handle
      */
-    static void handleFeed(boost::asio::signal_set& /*r_sigset*/,
-                           std::shared_ptr<feed::Feed> /*p_feed*/);
+    static void handleFeed(boost::asio::signal_set& r_sigset,
+                           std::shared_ptr<feed::Feed> p_feed);
     /**
      * Handler for an Server thread.
      *
      * @param r_server the Server to handle
      */
-    static void handleServer(tcp::server::Server& /*r_server*/);
+    static void handleServer(tcp::server::Server& r_server);
     /**
      * Handler for a signal interrupt thread.
      *
      * @param cr_ec the error code
      * @param sig   the signal number
      */
-    static void handleSignals(const boost::system::error_code& /*cr_ec*/,
-                              const int /*sig*/);
+    static void handleSignals(const boost::system::error_code& cr_ec, const int sig);
 };
 
 #endif /* SRC_VFRB_H_ */

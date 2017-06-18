@@ -4,15 +4,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/util/GPSmodule.cpp \
+../src/util/GpsModule.cpp \
 ../src/util/Logger.cpp
 
 OBJS += \
-./src/util/GPSmodule.o \
+./src/util/GpsModule.o \
 ./src/util/Logger.o
 
 CPP_DEPS += \
-./src/util/GPSmodule.d \
+./src/util/GpsModule.d \
 ./src/util/Logger.d
 
 

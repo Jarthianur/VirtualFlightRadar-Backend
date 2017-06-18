@@ -60,7 +60,7 @@ public:
      *
      * @return the NMEA string
      */
-    std::string process(const Aircraft& /*cr_ac*/);
+    std::string process(const Aircraft& cr_ac);
 
 private:
     /**
@@ -68,7 +68,7 @@ private:
      *
      * @param cr_ac the given Aircraft
      */
-    void calcRelPosToBase(const Aircraft& /*cr_ac*/);
+    void calcRelPosToBase(const Aircraft& cr_ac);
 
     /// Formatstring buffer
     char mBuffer[AP_BUFF_S + 1];

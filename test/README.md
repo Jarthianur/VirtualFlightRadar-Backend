@@ -14,6 +14,7 @@ Run `git submodule update --remote`.
 ```bash
 #Compile with flags `-fprofile-arcs -ftest-coverage`.
 #Link with `-coverage`.
+#Or do all with --coverage
 cd build
 make all
 ./VFR-Test

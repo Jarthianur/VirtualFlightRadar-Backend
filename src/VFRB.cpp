@@ -32,10 +32,10 @@
 
 #include "config/Configuration.h"
 #include "data/AircraftContainer.h"
-#include "data/GPSData.h"
+#include "data/GpsData.h"
 #include "data/SensorData.h"
-#include "tcp/client/APRSCClient.h"
-#include "tcp/client/SBSClient.h"
+#include "tcp/client/AprscClient.h"
+#include "tcp/client/SbsClient.h"
 #include "tcp/client/SensorClient.h"
 #include "tcp/server/Server.h"
 #include "util/Logger.h"
@@ -48,7 +48,7 @@ using namespace util;
 std::atomic<bool> VFRB::global_run_status(true);
 data::AircraftContainer VFRB::msAcCont;
 data::SensorData VFRB::msSensorData;
-data::GPSData VFRB::msGPSdata;
+data::GpsData VFRB::msGpsData;
 
 VFRB::VFRB()
 {
@@ -62,8 +62,7 @@ void VFRB::run() noexcept
 {
     Logger::info("(VFRB) startup");
     //store start time
-    boost::chrono::steady_clock::time_point start =
-            boost::chrono::steady_clock::now();
+    boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
 
     // register signals and run handler
     boost::asio::io_service io_service;
@@ -77,7 +76,7 @@ void VFRB::run() noexcept
 
     signal_set.async_wait(
             boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
-                    boost::asio::placeholders::signal_number));
+                        boost::asio::placeholders::signal_number));
 
     boost::thread signal_thread([&io_service]()
     {
@@ -112,10 +111,10 @@ void VFRB::run() noexcept
             }
 
             //write GPS position to clients
-            server.writeToAll(msGPSdata.getGPSstr());
+            server.writeToAll(msGpsData.getGpsStr());
 
             // write weather info to clients
-            str = msSensorData.getMDAstr() + msSensorData.getMWVstr();
+            str = msSensorData.getMdaStr() + msSensorData.getMwvStr();
             if (str.length() > 0)
             {
                 server.writeToAll(str);
@@ -140,10 +139,9 @@ void VFRB::run() noexcept
     signal_thread.join();
 
     //eval end time
-    boost::chrono::steady_clock::time_point end =
-            boost::chrono::steady_clock::now();
-    boost::chrono::minutes runtime = boost::chrono::duration_cast<
-            boost::chrono::minutes>(end - start);
+    boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
+    boost::chrono::minutes runtime = boost::chrono::duration_cast<boost::chrono::minutes>(
+            end - start);
     std::string time_str(std::to_string(runtime.count() / 60 / 24));
     time_str += " days, ";
     time_str += std::to_string(runtime.count() / 60);
@@ -158,7 +156,7 @@ void VFRB::run() noexcept
 void VFRB::handleServer(tcp::server::Server& r_server)
 {
     Logger::info("(Server) startup: localhost ",
-            std::to_string(config::Configuration::global_server_port));
+                 std::to_string(config::Configuration::global_server_port));
     r_server.run();
     global_run_status = false;
 }

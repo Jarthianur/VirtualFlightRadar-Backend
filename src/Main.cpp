@@ -21,10 +21,11 @@
 
 #include <stdexcept>
 #include <string>
+#include <fstream>
 
 #include "config/Configuration.h"
 #include "data/SensorData.h"
-#include "data/GPSData.h"
+#include "data/GpsData.h"
 #include "util/Logger.h"
 #include "VFRB.h"
 
@@ -113,7 +114,8 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
     {
         try
         {
-            config::Configuration conf(ini_file.c_str());
+            std::ifstream file(ini_file);
+            config::Configuration conf(file);
         } catch (const std::logic_error& e)
         {
             Logger::error("(VFRB) eval config: ", e.what());

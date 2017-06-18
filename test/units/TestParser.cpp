@@ -23,17 +23,8 @@
 #include <string>
 
 #include "../../src/config/Configuration.h"
-#include "../../src/data/SensorData.h"
-#include "../../src/parser/APRSParser.h"
-#include "../../src/parser/Parser.h"
-#include "../../src/parser/SBSParser.h"
-#include "../../src/parser/SensorParser.h"
-#include "../../src/util/Priority.h"
 #include "../../src/vfrb/VFRB.h"
-#include "../framework/src/comparator/ComparatorStrategy.hpp"
-#include "../framework/src/testsuite/TestSuite.hpp"
-#include "../framework/src/testsuite/TestSuitesRunner.hpp"
-#include "../framework/src/util/assert.hpp"
+#include "../framework/src/framework.h"
 #include "../Helper.hpp"
 
 #ifdef assert
@@ -44,81 +35,94 @@ using namespace util;
 using namespace testsuite;
 using namespace comparator;
 
-void test_parser(TestSuitesRunner& runner)
-{
-    describe<parser::SBSParser>("parser::SBSParser - unpack", runner)->test(
-            "valid msg",
-            []()
-            {
-                assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0", Priority::DONTCARE), MSG_UNPACK_SUC, helper::eqi);
-            })->test("invalid msg",
-            []()
-            {
-                assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0", Priority::DONTCARE), MSG_UNPACK_ERR, helper::eqi);
-                assert(helper::pars_sbs.unpack("MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-                assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-                assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0", Priority::DONTCARE), MSG_UNPACK_ERR, helper::eqi);
-                assert(helper::pars_sbs.unpack("MSG,someCrap in, here", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-                assert(helper::pars_sbs.unpack("MSG,4,0,,,,,,", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-            })->test("filter height",
-            []()
-            {
-                config::Configuration::filter_maxHeight = 0;
-                assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-                config::Configuration::filter_maxHeight = INT32_MAX;
-            })->test("broken msg",
-            []()
-            {
-                assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", Priority::DONTCARE), MSG_UNPACK_ERR, helper::eqi);
-                assert(helper::pars_sbs.unpack("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", Priority::DONTCARE), MSG_UNPACK_ERR, helper::eqi);
-                assert(helper::pars_sbs.unpack("", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-            });
+void test_parser(TestSuitesRunner& runner) {
+	describe<parser::SbsParser>("parser::SBSParser - unpack", runner)->test(
+			"valid msg",
+			[]()
+			{
+				assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0", 0), MSG_UNPACK_SUC, helper::eqi);
+			})->test("invalid msg",
+			[]()
+			{
+				assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_sbs.unpack("MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", 0), MSG_UNPACK_IGN, helper::eqi);
+				//assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", 0), MSG_UNPACK_IGN, helper::eqi);
+				assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_sbs.unpack("MSG,someCrap in, here", 0), MSG_UNPACK_IGN, helper::eqi);
+				assert(helper::pars_sbs.unpack("MSG,4,0,,,,,,", 0), MSG_UNPACK_IGN, helper::eqi);
+			})->test("filter height",
+			[]()
+			{
+				config::Configuration::filter_maxHeight = 0;
+				assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0", 0), MSG_UNPACK_IGN, helper::eqi);
+				config::Configuration::filter_maxHeight = INT32_MAX;
+			})->test("broken msg",
+			[]()
+			{
+				assert(helper::pars_sbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_sbs.unpack("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_sbs.unpack("", 0), MSG_UNPACK_IGN, helper::eqi);
+			});
 
-    describe<parser::APRSParser>("parser::APRSParser - unpack", runner)->test(
-            "valid msg",
-            []()
-            {
-                assert(helper::pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA", Priority::DONTCARE), MSG_UNPACK_SUC, helper::eqi);
-                assert(helper::pars_aprs.unpack("ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4", Priority::DONTCARE), MSG_UNPACK_SUC, helper::eqi);
-                assert(helper::pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4", Priority::DONTCARE), MSG_UNPACK_SUC, helper::eqi);
-                assert(helper::pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz", Priority::DONTCARE), MSG_UNPACK_SUC, helper::eqi);
-            })->test("ignores",
-            []()
-            {
-                assert(helper::pars_aprs.unpack("Valhalla>APRS,TCPIP*,qAC,GLIDERN2:/074555h4900.00NI00800.00E&/A=000000 CPU:4.0 RAM:242.7/458.8MB NTP:0.8ms/-28.6ppm +56.2C RF:+38+2.4ppm/+1.7dB", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-                assert(helper::pars_aprs.unpack("# aprsc 2.0.14-g28c5a6a 29 Jun 2014 07:46:15 GMT SERVER1 00.000.00.000:14580", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-                assert(helper::pars_aprs.unpack("", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-                assert(helper::pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 ", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-            })->test("filter height",
-            []()
-            {
-                config::Configuration::filter_maxHeight = 0;
-                assert(helper::pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-                config::Configuration::filter_maxHeight = INT32_MAX;
-            });
+	describe<parser::AprsParser>("parser::APRSParser - unpack", runner)->test(
+			"valid msg",
+			[]()
+			{
+				assert(helper::pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA", 0), MSG_UNPACK_SUC, helper::eqi);
+				assert(helper::pars_aprs.unpack("ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4", 0), MSG_UNPACK_SUC, helper::eqi);
+				assert(helper::pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4", 0), MSG_UNPACK_SUC, helper::eqi);
+				assert(helper::pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz", 0), MSG_UNPACK_SUC, helper::eqi);
+			})->test("ignores",
+			[]()
+			{
+				assert(helper::pars_aprs.unpack("Valhalla>APRS,TCPIP*,qAC,GLIDERN2:/074555h4900.00NI00800.00E&/A=000000 CPU:4.0 RAM:242.7/458.8MB NTP:0.8ms/-28.6ppm +56.2C RF:+38+2.4ppm/+1.7dB", 0), MSG_UNPACK_IGN, helper::eqi);
+				assert(helper::pars_aprs.unpack("# aprsc 2.0.14-g28c5a6a 29 Jun 2014 07:46:15 GMT SERVER1 00.000.00.000:14580", 0), MSG_UNPACK_IGN, helper::eqi);
+				assert(helper::pars_aprs.unpack("", 0), MSG_UNPACK_IGN, helper::eqi);
+				assert(helper::pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 ", 0), MSG_UNPACK_IGN, helper::eqi);
+			})->test("filter height",
+			[]()
+			{
+				config::Configuration::filter_maxHeight = 0;
+				assert(helper::pars_aprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz", 0), MSG_UNPACK_IGN, helper::eqi);
+				config::Configuration::filter_maxHeight = INT32_MAX;
+			});
 
-    describe<parser::SensorParser>("parser::SensorParser - unpack", runner)->test(
-            "valid msg",
-            []()
-            {
-                assert(helper::pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n", Priority::DONTCARE), MSG_UNPACK_SUC, helper::eqi);
-                assert(helper::pars_wind.unpack("$WIMWV,242.8,R,6.9,N,A*20", Priority::DONTCARE), MSG_UNPACK_SUC, helper::eqi);
-            })->test("invalid msg",
-            []()
-            {
-                assert(helper::pars_wind.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75", Priority::DONTCARE), MSG_UNPACK_IGN, helper::eqi);
-                assert(helper::pars_wind.unpack("Someone sent other stuff", Priority::DONTCARE), MSG_UNPACK_ERR, helper::eqi);
-            })->test("broken msg",
-            []()
-            {
-                assert(helper::pars_wind.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3F", Priority::DONTCARE), MSG_UNPACK_ERR, helper::eqi);
-                assert(helper::pars_wind.unpack("$WIMDA,", Priority::DONTCARE), MSG_UNPACK_ERR, helper::eqi);
-                assert(helper::pars_wind.unpack("$WIMDA,29.7987,I,1.0#091,B,14.8,C,,,,,,,,,,,,,,*1d", Priority::DONTCARE), MSG_UNPACK_ERR, helper::eqi);
-                assert(helper::pars_wind.unpack("", Priority::DONTCARE), MSG_UNPACK_ERR, helper::eqi);
-            })->test<data::SensorData>("extract WIMWV",
-            []()
-            {
-                assert(vfrb::VFRB::msSensorData.getMWVstr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
-                assert(vfrb::VFRB::msSensorData.getMWVstr(), std::string(""), helper::eqs);
-            });
+	describe<parser::SensorParser>("parser::SensorParser - unpack", runner)->test(
+			"valid msg",
+			[]()
+			{
+				assert(helper::pars_wind.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n", 0), MSG_UNPACK_SUC, helper::eqi);
+				assert(helper::pars_wind.unpack("$WIMWV,242.8,R,6.9,N,A*20", 0), MSG_UNPACK_SUC, helper::eqi);
+			})->test("invalid msg",
+			[]()
+			{
+				assert(helper::pars_wind.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75", 0), MSG_UNPACK_IGN, helper::eqi);
+				assert(helper::pars_wind.unpack("Someone sent other stuff", 0), MSG_UNPACK_ERR, helper::eqi);
+			})->test("broken msg",
+			[]()
+			{
+				assert(helper::pars_wind.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3F", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_wind.unpack("$WIMDA,", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_wind.unpack("$WIMDA,29.7987,I,1.0#091,B,14.8,C,,,,,,,,,,,,,,*1d", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_wind.unpack("", 0), MSG_UNPACK_ERR, helper::eqi);
+			});
+
+	describe<parser::GpsParser>("unpack", runner)->test("valid msg",
+			[]() {
+				assert(helper::pars_gps.unpack("$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49\r\n", 0), MSG_UNPACK_SUC, helper::eqi);
+				assert(helper::pars_gps.unpack("$GPGGA,183552,5000.0466,S,00815.7555,W,1,05,1,105,M,48.0,M,,*46\r\n", 0), MSG_UNPACK_SUC, helper::eqi);
+				config::Configuration::global_gnd_mode = true;
+				assert(helper::pars_gps.unpack("$GPGGA,183552,5000.0466,N,00815.7555,E,1,07,1,105,M,48.0,M,,*4b\r\n", 0), 0, comparator::GREATER<int>());
+			})->test("invalid msg",
+			[]()
+			{
+				assert(helper::pars_gps.unpack("$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*59\r\n", 0), MSG_UNPACK_IGN, helper::eqi);
+				assert(helper::pars_gps.unpack("$GPGGA,183552,N,00815.7555,E,1,05,1,105,M,48.0,M,,*59\r\n", 0), MSG_UNPACK_IGN, helper::eqi);
+			})->test("broken msg",
+			[]()
+			{
+				assert(helper::pars_gps.unpack("$GPGGA,\r\n", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_gps.unpack("", 0), MSG_UNPACK_ERR, helper::eqi);
+				assert(helper::pars_gps.unpack("$GPGGA,183552,N,00815.7555,E,1,05,1,105,M,48.0,M,,*\r\n", 0), MSG_UNPACK_ERR, helper::eqi);
+			});
 }
