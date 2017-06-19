@@ -34,51 +34,43 @@ namespace aircraft
 
 /**
  * The Aircraft class.
- *
- * Represents an aircraft, holding all necessary information
- * about its position, movement and some meta-data.
+ * @brief Store all information about an aircraft, like position, id etc.
  */
 class Aircraft
 {
 public:
     /**
-     * Construct an aircraft with a minimum
-     * set of information, as are the ID
-     * and the current position.
-     *
-     * @param r_id  the ID
-     * @param r_pos the position
+     * @fn Aircraft
+     * @brief Constructor
+     * @param r_id  The id
+     * @param r_pos The position
      */
     Aircraft(std::string& r_id, struct util::GPSPosition& r_pos);
     /**
-     * Construct an aircraft with a full
-     * set of information, as are the ID,
-     * the current position and movement.
-     *
-     * @param r_id    the ID
-     * @param r_pos   the prosition
-     * @param gnd_spd the ground speed
-     * @param id_t    the ID type
-     * @param ac_t    the aircraft type
-     * @param climb_r the climb rate
-     * @param turn_r  the turn rate
-     * @param head    the heading
+     * @fn Aircraft
+     * @brief Constructor
+     * @param r_id    The Id
+     * @param r_pos   The prosition
+     * @param gnd_spd The ground speed
+     * @param id_t    The Id type
+     * @param ac_t    The aircraft type
+     * @param climb_r The climb rate
+     * @param turn_r  The turn rate
+     * @param head    The heading
      */
     Aircraft(std::string& r_id, struct util::GPSPosition& r_pos, double gnd_spd,
             std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r,
             double head);
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~Aircraft
+     * @brief Destructor
      */
     virtual ~Aircraft() noexcept;
     /**
-     * Compare aircrafts by ID.
-     *
-     * @param cr_other the aircraft to compare
-     *
-     * @return are IDs equal?
+     * @fn operator==
+     * @brief Compare aircrafts by their Id.
+     * @param cr_other The aircraft to compare
+     * @return true, if Id's equal, else false
      */
     bool operator==(const Aircraft& cr_other) const;
     /**
@@ -175,7 +167,7 @@ public:
     /**
      * Get the last registered latitude.
      *
-     * @return the latitude
+     * @return The latitude
      */
     inline const double getLatitude() const
     {
@@ -184,7 +176,7 @@ public:
     /**
      * Get the last registered longitude.
      *
-     * @return the longitude
+     * @return The longitude
      */
     inline const double getLongitude() const
     {
@@ -193,7 +185,7 @@ public:
     /**
      * Get the last registered altitude.
      *
-     * @return the altitude.
+     * @return The altitude.
      */
     inline const std::int32_t getAltitude() const
     {
@@ -202,7 +194,7 @@ public:
     /**
      * Get the last registered speed over ground.
      *
-     * @return the ground speed
+     * @return The ground speed
      */
     inline const double getGndSpeed() const
     {
@@ -211,7 +203,7 @@ public:
     /**
      * Get the last registered heading.
      *
-     * @return the heading
+     * @return The heading
      */
     inline const double getHeading() const
     {
@@ -220,7 +212,7 @@ public:
     /**
      * Get the last registered climb rate.
      *
-     * @return the climb rate
+     * @return The climb rate
      */
     inline const double getClimbR() const
     {
@@ -240,7 +232,7 @@ public:
     /**
      * Set the new target type.
      *
-     * @param tt the new target type
+     * @param tt The new target type
      */
     inline void setTargetT(TargetType tt)
     {
