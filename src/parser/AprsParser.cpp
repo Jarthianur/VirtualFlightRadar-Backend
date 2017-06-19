@@ -33,18 +33,18 @@
 #include "../vfrb/VFRB.h"
 
 //#define MATCH_TIME 1
-#define MATCH_LAT                1
-#define MATCH_LAT_DIR      2
-#define MATCH_LONG            3
-#define MATCH_LONG_DIR  4
-#define MATCH_HEAD            5
-#define MATCH_GND_SPD   6
-#define MATCH_ALT                 7
-#define MATCH_COM              8
+#define MATCH_LAT      1
+#define MATCH_LAT_DIR  2
+#define MATCH_LONG     3
+#define MATCH_LONG_DIR 4
+#define MATCH_HEAD     5
+#define MATCH_GND_SPD  6
+#define MATCH_ALT      7
+#define MATCH_COM      8
 #define MATCH_COM_TYPE 1
-#define MATCH_COM_ID       2
-#define MATCH_COM_CR      3
-#define MATCH_COM_TR       4
+#define MATCH_COM_ID   2
+#define MATCH_COM_CR   3
+#define MATCH_COM_TR   4
 
 namespace parser
 {
@@ -52,11 +52,12 @@ namespace parser
 AprsParser::AprsParser()
         : Parser(),
           mAprsRe(
-          //"^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
-          "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/\\d{6}h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
+                  //"^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
+                  "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/\\d{6}h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
                   boost::regex::optimize | boost::regex::icase),
-          mComRe("^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
-                 boost::regex::optimize | boost::regex::icase)
+          mComRe(
+                  "^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
+                  boost::regex::optimize | boost::regex::icase)
 {
 }
 
@@ -171,7 +172,7 @@ noexcept
             fullInfo = false;
         }
         aircraft::Aircraft ac(mtId, mtGpsPos, gndSpeed, idType, acType, climbRate,
-                              turnRate, heading);
+                turnRate, heading);
         ac.setFullInfo(fullInfo);
         ac.setTargetT(aircraft::Aircraft::TargetType::FLARM);
         vfrb::VFRB::msAcCont.insertAircraft(ac, prio);

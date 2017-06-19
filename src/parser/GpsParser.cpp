@@ -31,10 +31,10 @@
 namespace parser
 {
 
-#define GPS_ASSUME_GOOD       (1)
-#define GPS_NR_SATS_GOOD      (7)
-#define GPS_FIX_GOOD          (1)
-#define GPS_HOR_DILUTION_GOOD (1.0)
+#define GPS_ASSUME_GOOD       1
+#define GPS_NR_SATS_GOOD      7
+#define GPS_FIX_GOOD          1
+#define GPS_HOR_DILUTION_GOOD 1.0
 
 GpsParser::GpsParser()
         : Parser(),
@@ -54,7 +54,7 @@ noexcept
     try
     {
         std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr,
-                                      16);
+                16);
         if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return MSG_UNPACK_IGN;

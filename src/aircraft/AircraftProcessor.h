@@ -30,7 +30,7 @@ namespace aircraft
 
 class Aircraft;
 
-#define AP_BUFF_S 8191
+#define AP_BUFF_S   8191
 #define AP_L_BUFF_S 128
 
 /**

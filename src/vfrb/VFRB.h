@@ -104,7 +104,7 @@ private:
      *
      * @param r_server the Server to handle
      */
-    static void handleNMAEServer(tcp::server::Server& r_server);
+    static void handleNMEAServer(tcp::server::Server& r_server);
     /**
      * Handler for a signal interrupt thread.
      *
