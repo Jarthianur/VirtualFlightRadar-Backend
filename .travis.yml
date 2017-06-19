@@ -44,6 +44,6 @@ script:
 notifications:
     email:
         recipients:
-           - julian.jack@hotmail.de
+           - jarthianur.github@gmail.com
         on_success: change
 on_failure: change
