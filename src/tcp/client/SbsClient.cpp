@@ -49,12 +49,11 @@ SbsClient::~SbsClient() noexcept
 
 void SbsClient::connect() noexcept
 {
-    boost::asio::ip::tcp::resolver::query query(
-            mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(
-            query,
+    boost::asio::ip::tcp::resolver::query query(mHost, mPort,
+            boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(query,
             boost::bind(&SbsClient::handleResolve, this, boost::asio::placeholders::error,
-                        boost::asio::placeholders::iterator));
+                    boost::asio::placeholders::iterator));
 }
 
 void SbsClient::process() noexcept
@@ -68,12 +67,10 @@ void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
         {
     if (!cr_ec)
     {
-        boost::asio::async_connect(
-                mSocket,
-                it,
+        boost::asio::async_connect(mSocket, it,
                 boost::bind(&SbsClient::handleConnect, this,
-                            boost::asio::placeholders::error,
-                            boost::asio::placeholders::iterator));
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::iterator));
     } else
     {
         Logger::error("(SbsClient) resolve host: ", cr_ec.message());

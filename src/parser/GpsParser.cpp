@@ -31,10 +31,10 @@
 namespace parser
 {
 
-#define GPS_ASSUME_GOOD       (1)
-#define GPS_NR_SATS_GOOD      (7)
-#define GPS_FIX_GOOD          (1)
-#define GPS_HOR_DILUTION_GOOD (1.0)
+#define GPS_ASSUME_GOOD       1
+#define GPS_NR_SATS_GOOD      7
+#define GPS_FIX_GOOD          1
+#define GPS_HOR_DILUTION_GOOD 1.0
 
 GpsParser::GpsParser()
         : Parser(),

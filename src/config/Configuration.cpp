@@ -220,7 +220,7 @@ std::int32_t Configuration::strToInt(const std::string& cr_str) noexcept
     } catch (const std::logic_error& iae)
     {
         Logger::warn("(Config) invalid configuration: ",
-                     cr_str.length() == 0 ? "empty" : cr_str);
+                cr_str.length() == 0 ? "empty" : cr_str);
     }
     return val;
 }
@@ -234,7 +234,7 @@ double Configuration::strToDouble(const std::string& cr_str) noexcept
     } catch (const std::logic_error& iae)
     {
         Logger::warn("(Config) invalid configuration: ",
-                     cr_str.length() == 0 ? "empty" : cr_str);
+                cr_str.length() == 0 ? "empty" : cr_str);
     }
     return val;
 }
