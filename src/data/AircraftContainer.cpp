@@ -111,8 +111,8 @@ std::string AircraftContainer::processAircrafts() noexcept
 }
 
 void AircraftContainer::insertAircraft(const Aircraft& cr_update, std::int32_t prio)
-        noexcept
-        {
+noexcept
+{
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     auto known_ac = find(cr_update.getID());
     if (known_ac != mCont.end())

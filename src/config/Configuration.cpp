@@ -150,7 +150,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             try
             {
                 vfrb::Feed f(*it, strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                             vfrb::Feed::InputType::APRSC, r_cr.getSectionKV(*it));
+                        vfrb::Feed::InputType::APRSC, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -161,7 +161,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             try
             {
                 vfrb::Feed f(*it, strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                             vfrb::Feed::InputType::SBS, r_cr.getSectionKV(*it));
+                        vfrb::Feed::InputType::SBS, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -172,7 +172,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             try
             {
                 vfrb::Feed f(*it, strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                             vfrb::Feed::InputType::SENSOR, r_cr.getSectionKV(*it));
+                        vfrb::Feed::InputType::SENSOR, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -183,7 +183,7 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             try
             {
                 vfrb::Feed f(*it, strToInt(r_cr.getProperty(*it, KV_KEY_PRIORITY, "0")),
-                             vfrb::Feed::InputType::GPS, r_cr.getSectionKV(*it));
+                        vfrb::Feed::InputType::GPS, r_cr.getSectionKV(*it));
                 global_feeds.push_back(std::move(f));
             } catch (const std::out_of_range& e)
             {
@@ -203,7 +203,7 @@ std::int32_t Configuration::strToInt(const std::string& cr_str) noexcept
     } catch (const std::logic_error& iae)
     {
         Logger::warn("(Config) invalid configuration: ",
-                     cr_str.length() == 0 ? "empty" : cr_str);
+                cr_str.length() == 0 ? "empty" : cr_str);
     }
     return val;
 }
@@ -217,7 +217,7 @@ double Configuration::strToDouble(const std::string& cr_str) noexcept
     } catch (const std::logic_error& iae)
     {
         Logger::warn("(Config) invalid configuration: ",
-                     cr_str.length() == 0 ? "empty" : cr_str);
+                cr_str.length() == 0 ? "empty" : cr_str);
     }
     return val;
 }
