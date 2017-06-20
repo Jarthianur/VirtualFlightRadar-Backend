@@ -21,18 +21,20 @@
 
 #include "ConfigReader.h"
 
-#include <boost/regex.hpp>
-#include <fstream>
 #include <stdexcept>
+#include <typeindex>
 #include <utility>
 
 #include "../util/Logger.h"
 
+using namespace util;
 
-ConfigReader::ConfigReader(const std::string& fname)
-        : mFile(fname),
-          mConfRE("^(\\S+?)(?:\\s+?)?=(?:\\s+?)?(\\S+?[\\s\\S]*?)$",
-                  boost::regex_constants::optimize)
+namespace config
+{
+
+ConfigReader::ConfigReader()
+        : mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
+                boost::regex_constants::optimize)
 {
 }
 
@@ -40,18 +42,28 @@ ConfigReader::~ConfigReader() noexcept
 {
 }
 
-void ConfigReader::read()
+void ConfigReader::read(std::istream& r_file)
 {
-    std::ifstream src(mFile);
     std::string key;
     std::string value;
     std::string line;
-    while (std::getline(src, line))
+    std::string section;
+    std::size_t line_nr = 0;
+    while (std::getline(r_file, line))
     {
+        line_nr++;
         try
         {
-            if (line.at(0) == ';' || line.at(0) == '[')
+            if (line.length() == 0 || line.at(0) == ';')
             {
+                continue;
+            }
+            if (line.at(0) == '[')
+            {
+                section = line.substr(1, line.rfind(']') - 1);
+                mConfig.emplace(
+                        std::make_pair(section,
+                                std::unordered_map<std::string, std::string>()));
                 continue;
             }
             boost::smatch match;
@@ -59,36 +71,56 @@ void ConfigReader::read()
             {
                 key = match.str(1);
                 value = match.str(2);
-                mConfig.insert(
-                { key, value });
-            }
-            else
+                std::size_t l = value.find_last_not_of(' ');
+                if (l != std::string::npos)
+                {
+                    value = value.substr(0, l + 1);
+                }
+                mConfig[section].emplace(std::make_pair(key, value));
+            } else
             {
-                Logger::error("(ConfigReader) malformed param: ", line);
+                Logger::error(
+                        "(ConfigReader) malformed param [" + std::to_string(line_nr)
+                                + "]: ", line);
             }
-        }
-        catch (const boost::regex_error& e)
-        {
-            Logger::error("(ConfigReader) read config: ", e.what());
-            break;
-        }
-        catch (const std::out_of_range& e)
+        } catch (const std::out_of_range& e)
         {
             continue;
         }
     }
 }
 
-const std::string& ConfigReader::getProperty(const std::string& key,
-        const std::string& def_val) const
+const std::string ConfigReader::getProperty(const std::string& cr_section,
+        const std::string& cr_key, const std::string& cr_def_val) const
 {
-    auto it = mConfig.find(key);
-    if (it == mConfig.end())
+    auto s_it = mConfig.find(cr_section);
+    if (s_it != mConfig.end())
     {
-        return def_val;
-    }
-    else
+        auto it = s_it->second.find(cr_key);
+        if (it != s_it->second.end())
+        {
+            return it->second;
+        } else
+        {
+            return cr_def_val;
+        }
+    } else
     {
-        return it->second;
+        return cr_def_val;
     }
 }
+
+const std::unordered_map<std::string, std::string>& ConfigReader::getSectionKV(
+        const std::string& cr_section) const
+{
+    auto it = mConfig.find(cr_section);
+    if (it != mConfig.end())
+    {
+        return it->second;
+    } else
+    {
+        throw std::out_of_range("section not found");
+    }
+}
+
+}  // namespace config

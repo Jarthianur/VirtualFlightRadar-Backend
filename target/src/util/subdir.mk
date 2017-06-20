@@ -4,15 +4,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/util/GPSmodule.cpp \
+../src/util/GpsModule.cpp \
 ../src/util/Logger.cpp
 
 OBJS += \
-./src/util/GPSmodule.o \
+./src/util/GpsModule.o \
 ./src/util/Logger.o
 
 CPP_DEPS += \
-./src/util/GPSmodule.d \
+./src/util/GpsModule.d \
 ./src/util/Logger.d
 
 
@@ -20,7 +20,7 @@ CPP_DEPS += \
 src/util/%.o: ../src/util/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	$(CXX) -std=c++0x $(BOOST_I) -O$(OPT_LVL) $(DBG) -Wall -c -fmessage-length=0 -pthread -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	$(CXX) -std=c++0x $(BOOST_I) -O$(OPT_LVL) $(DBG) -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

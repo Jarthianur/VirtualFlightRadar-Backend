@@ -50,6 +50,9 @@ endif
 
 -include ../makefile.defs
 
+# All Target
+all: VirtualFlightRadar-Backend
+
 # Tool invocations
 VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
@@ -57,9 +60,6 @@ VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	$(CXX) $(BOOST_L) -o $(TARGET) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
-	
-# All Target
-all: VirtualFlightRadar-Backend
 
 clean:
 	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(C_DEPS)$(CPP_DEPS)

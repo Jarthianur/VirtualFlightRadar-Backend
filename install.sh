@@ -1,5 +1,10 @@
 #!/bin/bash
 
+PROG=$(basename $0)
+function log {
+    echo "[$(date +%T)] $PROG: $*"
+}
+
 # setup vars
 source bootstrap.sh
 export VFRB_NAME=${VFRB_NAME_B:-vfrb}
@@ -27,8 +32,8 @@ for arg in $*; do
             echo "This is the VFR-B install script."
             echo "Usage: ./install.sh [help] [service] [deps]"
             echo "Given 'help','h' will display this message."
-            echo "Given 'service' will install the VFR-B systemd service (requires 'root')."
-            echo "Given 'deps' will install all dependencies like boost,... (requires 'root')."
+            echo "Given 'service' will install the VFR-B systemd service (run with 'sudo')."
+            echo "Given 'deps' will install all dependencies like boost,... (run with 'sudo')."
             exit 1
         ;;
         *)
@@ -38,55 +43,55 @@ done
 
 ##########################################
 if [ $INST_DEPS -eq 1 ]; then
-    echo "... INSTALL DEPENDENCIES ..."
+    log "... INSTALL DEPENDENCIES ..."
     sudo apt-get update
     sudo apt-get install libboost-dev libboost-system-dev libboost-thread-dev \
         libboost-regex-dev libboost-chrono-dev libboost-signals-dev
     echo ""
 fi
-echo "... INSTALL VFRB ..."
+log "... INSTALL VFRB ..."
 echo ""
 
-echo "... CECK VARIABLES ..."
+log "... CECK VARIABLES ..."
 echo ""
-echo "WORKDIR = $VFRB_ROOT"
+log "WORKDIR = $VFRB_ROOT"
 if [ -z "$VFRB_NAME_B" ]; then
-    echo "VFRB_NAME not set, using default: $VFRB_NAME"
+    log "VFRB_NAME not set, using default: $VFRB_NAME"
 else
-    echo "VFRB_NAME:" $VFRB_NAME
+    log "VFRB_NAME:" $VFRB_NAME
 fi
 if [ -z "$VFRB_INI_B" ]; then
-    echo "VFRB_INI not set, using default: $VFRB_INI"
+    log "VFRB_INI not set, using default: $VFRB_INI"
 else
-    echo "VFRB_INI: $VFRB_INI"
+    log "VFRB_INI: $VFRB_INI"
 fi
 if [ -z "$VFRB_VERSION" ]; then
-    echo "VFRB_VERSION not set"
+    log "VFRB_VERSION not set"
 else
-    echo "VFRB_VERSION: $VFRB_VERSION"
+    log "VFRB_VERSION: $VFRB_VERSION"
 fi
 if [ -z "$VFRB_COMPILER_B" ]; then
-    echo "VFRB_COMPILER not set, using default: $VFRB_COMPILER"
+    log "VFRB_COMPILER not set, using default: $VFRB_COMPILER"
 else
-    echo "VFRB_COMPILER: $VFRB_COMPILER"
+    log "VFRB_COMPILER: $VFRB_COMPILER"
 fi
 if [ -z "$BOOST_ROOT_B" ]; then
-    echo "BOOST_ROOT not set, assuming default"
+    log "BOOST_ROOT not set, assuming default"
 else
-    echo "BOOST_ROOT: $BOOST_ROOT"
+    log "BOOST_ROOT: $BOOST_ROOT"
     export BOOST_LIBS_L="-L${BOOST_ROOT}/stage/lib"
     export BOOST_ROOT_I="-I${BOOST_ROOT}"
     BOOST_MAN=1
 fi
 if [ -z "$VFRB_EXEC_PATH_B" ]; then
-    echo "VFRB_EXEC_PATH not set, using default: $VFRB_EXEC_PATH"
+    log "VFRB_EXEC_PATH not set, using default: $VFRB_EXEC_PATH"
 else
-    echo "VFRB_EXEC_PATH: $VFRB_EXEC_PATH"
+    log "VFRB_EXEC_PATH: $VFRB_EXEC_PATH"
 fi
 if [ -z "$VFRB_INI_PATH_B" ]; then
-    echo "VFRB_INI_PATH not set, using default: $VFRB_INI_PATH"
+    log "VFRB_INI_PATH not set, using default: $VFRB_INI_PATH"
 else
-    echo "VFRB_INI_PATH: $VFRB_INI_PATH"
+    log "VFRB_INI_PATH: $VFRB_INI_PATH"
 fi
 unset VFRB_NAME_B
 unset VFRB_INI_B
@@ -95,7 +100,7 @@ unset BOOST_ROOT_B
 unset VFRB_EXEC_PATH_B
 unset VFRB_INI_PATH_B
 echo ""
-echo "... RUN MAKE ..."
+log "... RUN MAKE ..."
 echo ""
 pushd ${VFRB_ROOT}/target/
 make all
@@ -104,34 +109,34 @@ unset BOOST_LIBS_L
 unset BOOST_ROOT_I
 popd
 if [ $error -ne 0 ]; then
-    echo "ERROR: make failed with $error"
+    log "ERROR: make failed with $error"
     exit $error
 fi
 echo ""
-echo "... COPY TARGETS ..."
+log "... COPY TARGETS ..."
 echo ""
 if [ -x "${VFRB_ROOT}/target/${VFRB_TARGET}" ]; then
     mv ${VFRB_ROOT}/target/${VFRB_TARGET} ${VFRB_EXEC_PATH}/${VFRB_TARGET}
     echo ""
-    echo "$VFRB_TARGET copied to $VFRB_EXEC_PATH"
+    log "$VFRB_TARGET copied to $VFRB_EXEC_PATH"
 else
     echo ""
-    echo "ERROR: $VFRB_TARGET does not exist"
+    log "ERROR: $VFRB_TARGET does not exist"
     exit 1
 fi
 sed "s|%VERSION%|${VFRB_VERSION}|" <${VFRB_ROOT}/vfrb.ini >${VFRB_INI_PATH}/${VFRB_INI}.ini
-echo "${VFRB_INI}.ini copied to $VFRB_INI_PATH"
+log "${VFRB_INI}.ini copied to $VFRB_INI_PATH"
 echo ""
 BASH_LD=$(cat ~/.bashrc | grep "export LD_LIBRARY_PATH=${BOOST_ROOT}/stage/lib/:\$LD_LIBRARY_PATH")
 if [ $BOOST_MAN -eq 1 ] && [ "$BASH_LD" == "" ]; then
-    echo "... ADD TO LD_LIBRARY_PATH ..."
+    log "... ADD TO LD_LIBRARY_PATH ..."
     echo ""
-    echo "export LD_LIBRARY_PATH=${BOOST_ROOT}/stage/lib/:\$LD_LIBRARY_PATH" >> ~/.bashrc
-    echo "export LD_LIBRARY_PATH=${BOOST_ROOT}/stage/lib/:\$LD_LIBRARY_PATH"
+    log "export LD_LIBRARY_PATH=${BOOST_ROOT}/stage/lib/:\$LD_LIBRARY_PATH" >> ~/.bashrc
+    log "export LD_LIBRARY_PATH=${BOOST_ROOT}/stage/lib/:\$LD_LIBRARY_PATH"
     echo ""
 fi
 if [ $INST_SERVICE -eq 1 ]; then
-    echo "... SETUP SERVICE ..."
+    log "... SETUP SERVICE ..."
     echo ""
     SYSD_PATH="/etc/systemd/system"
     if [ $BOOST_MAN -eq 1 ]; then
@@ -146,10 +151,10 @@ if [ $INST_SERVICE -eq 1 ]; then
         -e 's|%VFRB_EXEC_PATH%|${VFRB_EXEC_PATH}/${VFRB_TARGET}|' \
         -e 's|%VFRB_INI_PATH%|${VFRB_INI_PATH}/${VFRB_INI}.ini|' \
         < ${VFRB_ROOT}/service/vfrb.service >${VFRB_NAME}.service"
-    echo "${VFRB_NAME}.service created in $SYSD_PATH"
+    log "${VFRB_NAME}.service created in $SYSD_PATH"
     sudo systemctl enable ${VFRB_NAME}.service
     echo ""
     popd
     echo ""
 fi
-echo "... FINISHED ..."
+log "... FINISHED ..."

@@ -25,29 +25,66 @@
 #include <boost/regex.hpp>
 #include <string>
 #include <unordered_map>
+#include <istream>
 
+namespace config
+{
+
+/**
+ * The ConfigReader class.
+ *
+ * This class reads a configuration file in INI format
+ * and stores read parameters in a map.
+ */
 class ConfigReader
 {
 public:
-    ConfigReader(const std::string& /*fname*/);
+    /**
+     * Constructor
+     */
+    ConfigReader();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~ConfigReader() noexcept;
-
     /**
-     * Read given file.
-     * Store recognized key/value properties into map.
+     * Read the given file.
+     *
+     * @param cr_file the file stream to read
      */
-    void read();
-
+    void read(std::istream& r_file);
     /**
-     * Get value to given key from config map.
-     * If key not found return given default.
+     * Get a property from all stored properties.
+     * Return the given default value, if the property was not found.
+     *
+     * @param cr_section the section of the property
+     * @param cr_key     the key to get the value for
+     * @param cr_def_val the default value; defaults to empty string
+     *
+     * @return the value for key in section, if found, else the default value
      */
-    const std::string& getProperty(const std::string& /*key*/, const std::string& /*def_val*/ = "") const;
+    const std::string getProperty(const std::string& cr_section,
+            const std::string& cr_key, const std::string& cr_def_val = "") const;
+    /**
+     * Get the key-value-map for a section.
+     * If the section is not found the kv-map is empty.
+     *
+     * @param cr_section the section to get the kv-map for
+     *
+     * @return the kv-map for the section
+     */
+    const std::unordered_map<std::string, std::string>& getSectionKV(
+            const std::string& cr_section) const;
 
 private:
-    const std::string mFile;
-    std::unordered_map<std::string, std::string> mConfig;
+    /// The map of sections with kv-maps
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> mConfig;
+    /// The regular expression for 'key = value' lines
     const boost::regex mConfRE;
 };
+
+}  // namespace config
 
 #endif /* SRC_CONFIG_CONFIGREADER_H_ */

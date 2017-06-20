@@ -26,26 +26,32 @@
 #include <cmath>
 #include <cstddef>
 
-namespace Math
+namespace util
 {
-
 /**
- * constants
+ * Provide several functions and constants under this namespace Math.
  */
-const double kts2kmh = 1.852;
-const double kmh2kts = 0.539957;
-const double kts2ms = 0.514444;
-const double ms2kts = 1.94384;
-const double kmh2ms = 0.277778;
-const double ms2kmh = 3.6;
-const double ms2fpm = 196.85;
-const double fpm2ms = 0.00508;
-const double feet2m = 0.3048;
-const double m2feet = 3.28084;
+namespace math
+{
+/// Unit conversion constants
+const double KTS_2_KMH = 1.852;
+const double KMH_2_KTS = 0.539957;
+const double KTS_2_MS = 0.514444;
+const double MS_2_KTS = 1.94384;
+const double KMH_2_MS = 0.277778;
+const double MS_2_KMH = 3.6;
+const double MS_2_FPM = 196.85;
+const double FPM_2_MS = 0.00508;
+const double FEET_2_M = 0.3048;
+const double M_2_FEET = 3.28084;
 const double PI = std::acos(-1.0);
 
 /**
- * convert degree to radian
+ * Convert degree to radian.
+ *
+ * @param deg the degrees
+ *
+ * @return the radian
  */
 inline double radian(double deg)
 {
@@ -53,7 +59,11 @@ inline double radian(double deg)
 }
 
 /**
- * convert radian to degree
+ * Convert radian to degree.
+ *
+ * @param rad the radian
+ *
+ * @return the degrees
  */
 inline double degree(double rad)
 {
@@ -61,24 +71,42 @@ inline double degree(double rad)
 }
 
 /**
- * convert to int, round to nearest number
+ * Convert to int, round to nearest number.
+ *
+ * @param d the floating point value
+ *
+ * @return the rounded integer
  */
 inline std::int32_t dToI(double d)
 {
     return (d >= 0.0) ? (std::int32_t) (d + 0.5) : (std::int32_t) (d - 0.5);
 }
 
-inline double dmsToDeg(double dms)
+/**
+ * Convert : ddmm.hh ; h = 1/100 m
+ * ( degree, minute-as-decimal )
+ * to degree.
+ * Sign is determined otherwise.
+ *
+ * @param dm the degree-minute value
+ *
+ * @return the degree value
+ */
+inline double dmToDeg(double dm)
 {
-    double absDms = std::abs(dms);
-    double d = std::floor(absDms);
-    double m = (absDms - d) * 100.0 / 60.0;
+    double absDm = std::abs(dm / 100.0);
+    double d = std::floor(absDm);
+    double m = (absDm - d) * 100.0 / 60.0;
     return d + m;
 }
 
 /**
- * calculate height difference from QNE to Pressure in meters
- * with ICAO height formula
+ * Calculate height difference from QNE to Pressure in meters
+ * with ICAO height formula.
+ *
+ * @param press the air pressure
+ *
+ * @return the height difference to QNE
  */
 inline double calcIcaoHeight(double press)
 {
@@ -86,7 +114,12 @@ inline double calcIcaoHeight(double press)
 }
 
 /**
- * compute checksum of nmea string
+ * Compute checksum of nmea string.
+ *
+ * @param sentence the sentence to eval
+ * @param size     the sentences size
+ *
+ * @return the checksum
  */
 inline std::int32_t checksum(const char* sentence, std::size_t size)
 {
@@ -99,6 +132,7 @@ inline std::int32_t checksum(const char* sentence, std::size_t size)
     return csum;
 }
 
-}
+}  // namespace math
+}  // namespace util
 
 #endif /* SRC_UTIL_MATH_H_ */

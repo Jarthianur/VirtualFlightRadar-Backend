@@ -21,44 +21,51 @@
 
 #include "AircraftContainer.h"
 
-#include <cstdint>
+#include <boost/thread/lock_guard.hpp>
+#include <boost/thread/pthread/mutex.hpp>
+#include <algorithm>
 #include <exception>
 #include <iterator>
-#include <boost/thread/lock_guard.hpp>
+#include <utility>
 
 #include "../util/Logger.h"
+#include "../aircraft/Aircraft.h"
+
+using namespace util;
+using namespace aircraft;
+
+namespace data
+{
+
+#define AC_INVALIDATE         (4)
+#define AC_DELETE_THRESHOLD   (120)
+#define AC_NO_FLARM_THRESHOLD (AC_INVALIDATE)
 
 AircraftContainer::AircraftContainer()
         : mAcProc(),
           mCont()
 {
     mCont.reserve(20);
+    mIndexMap.reserve(40);
 }
 
 AircraftContainer::~AircraftContainer() noexcept
 {
 }
 
-void AircraftContainer::initProcessor(double proc_lat, double proc_lon,
-                                      std::int32_t proc_alt)
+std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& cr_id)
 {
-    mAcProc.init(proc_lat, proc_lon, proc_alt);
-}
-
-ssize_t AircraftContainer::find(const std::string& id)
-{
-    const auto it = mIndexMap.find(id);
+    const auto it = mIndexMap.find(cr_id);
     if (it == mIndexMap.cend())
     {
-        return AC_NOT_FOUND;
-    }
-    else
+        return mCont.end();
+    } else
     {
-        return it->second;
+        return mCont.begin() + it->second;
     }
 }
 
-std::string AircraftContainer::processAircrafts()
+std::string AircraftContainer::processAircrafts() noexcept
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     std::string dest_str;
@@ -70,35 +77,32 @@ std::string AircraftContainer::processAircrafts()
     {
         try
         {
-            it->incValid();
+            it->incUpdateAge();
             // if no FLARM msg received after x, assume target has Transponder
-            if (it->getValid() == AC_NO_FLARM_THRESHOLD)
+            if (it->getUpdateAge() == AC_NO_FLARM_THRESHOLD)
             {
                 it->setTargetT(Aircraft::TargetType::TRANSPONDER);
             }
 
-            if (it->getValid() >= AC_DELETE_THRESHOLD)
+            if (it->getUpdateAge() >= 4)
             {
                 del = true;
-                mIndexMap.erase(mIndexMap.find(it->getID()));
-                mCont.erase(it);
-            }
-            else
+                mIndexMap.erase(it->getID());
+                it = mCont.erase(it);
+            } else
             {
-                if (it->getValid() < AC_INVALIDATE)
+                if (it->getUpdateAge() < AC_INVALIDATE)
                 {
                     dest_str += mAcProc.process(*it);
                 }
                 ++it;
                 ++index;
             }
-
             if (del && it != mCont.end())
             {
                 mIndexMap.at(it->getID()) = index;
             }
-        }
-        catch (std::exception& e)
+        } catch (const std::exception& e)
         {
             Logger::warn("(AircraftContainer) processAircrafts: ", e.what());
         }
@@ -106,23 +110,37 @@ std::string AircraftContainer::processAircrafts()
     return dest_str;
 }
 
-void AircraftContainer::insertAircraft(const Aircraft& update)
+void AircraftContainer::insertAircraft(const Aircraft& cr_update, std::int32_t prio)
+noexcept
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    ssize_t i;
-
-    if ((i = find(update.getID())) == AC_NOT_FOUND)
+    auto known_ac = find(cr_update.getID());
+    if (known_ac != mCont.end())
     {
-        mCont.push_back(update);
-        mIndexMap.insert( { update.getID(), mCont.size() - 1 });
-    }
-    else
-    {
-        Aircraft& known_ac = mCont.at(i);
-        if (known_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER || update.getTargetT()
-                == Aircraft::TargetType::FLARM)
+        if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER
+                || cr_update.getTargetT() == Aircraft::TargetType::FLARM)
         {
-            known_ac.update(update);
+            bool write = known_ac->isAttemptValid();
+            if (!write)
+            {
+                if (prio >= known_ac->getLastPriority())
+                {
+                    write = true;
+                }
+            }
+            if (write)
+            {
+                known_ac->update(cr_update, prio);
+            } else
+            {
+                known_ac->setAttemptValid();
+            }
         }
+    } else
+    {
+        mIndexMap.insert( { cr_update.getID(), mCont.size() });
+        mCont.push_back(cr_update);
     }
 }
+
+} // namespace data

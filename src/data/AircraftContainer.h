@@ -22,71 +22,90 @@
 #ifndef SRC_DATA_AIRCRAFTCONTAINER_H_
 #define SRC_DATA_AIRCRAFTCONTAINER_H_
 
-#include <cstddef>
-#include <cstdint>
 #include <boost/thread/mutex.hpp>
+#include <cstddef>
 #include <string>
+#include <typeindex>
 #include <unordered_map>
 #include <vector>
 
-#include "../aircraft/Aircraft.h"
 #include "../aircraft/AircraftProcessor.h"
 #include "../config/Parameters.h"
 
-#define AC_NOT_FOUND -1
-#define AC_INVALIDATE AIRCRAFT_INVALIDATE
-#define AC_DELETE_THRESHOLD 120
-#define AC_NO_FLARM_THRESHOLD 4
+namespace aircraft
+{
+class Aircraft;
+}
 
+namespace data
+{
+
+/**
+ * The AircraftContainer class.
+ *
+ * This class holds all registered Aircrafts and provides
+ * functionality to process these into NMEA sentences.
+ * Sentences are PFLAU and PFLAA.
+ */
 class AircraftContainer
 {
 public:
+    /// Non-copyable
     AircraftContainer(const AircraftContainer&) = delete;
+    /// Not assignable
     AircraftContainer& operator=(const AircraftContainer&) = delete;
-
+    /**
+     * Constructor
+     */
     AircraftContainer();
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
     virtual ~AircraftContainer() noexcept;
-
-    void initProcessor(double /*proc_lat*/, double /*proc_lon*/,
-                       std::int32_t /*proc_alt*/);
-
     /**
-     * Insert aircraft in container, prefer FLARM.
+     * Insert an Aircraft into container.
+     * Handles FLARM preferation.
+     * May fail due to priority.
+     *
+     * @param cr_update the Aircraft update
+     * @param prio the priority attempting to write
+     *
+     * @exceptsafe strong
      */
-    void insertAircraft(const Aircraft& /*update*/);
-
+    void insertAircraft(const aircraft::Aircraft& cr_update, std::int32_t prio) noexcept;
     /**
-     * process aircraft at index i into target string,
-     * if index i is valid.
+     * Process all aircrafts into NMEA sentences PFLAU and PFLAA.
+     * Aircrafts with too old information are not reported, later deleted.
+     * Resulting sentences contain trailing <cr><lf>.
+     *
+     * @return the string with all NMEA sentences
+     *
+     * @exceptsafe no-throw
      */
-    std::string processAircrafts();
+    std::string processAircrafts() noexcept;
 
 private:
     /**
-     * search aircraft in container by given id.
-     * if id is found returns index,
-     * else returns -1.
+     * Find an Aircraft by ID efficiently in the container with index map.
+     *
+     * @param cr_id the ID to search
+     *
+     * @return an iterator to the Aircraft if found, else vector::end
      */
-    ssize_t find(const std::string& /*id*/);
+    std::vector<aircraft::Aircraft>::iterator find(const std::string& cr_id);
 
+    /// Mutex for threadsafety
     boost::mutex mMutex;
-
-    /**
-     * Processor to process Aircrafts from
-     * within threadsafe context of container.
-     */
-    AircraftProcessor mAcProc;
-
-    /**
-     * Container that holds Aircrafts
-     */
-    std::vector<Aircraft> mCont;
-
-    /**
-     * Map to manage indices of Aircrafts.
-     * This makes find-method much more efficient.
-     */
+    /// Processor providing functionality to process Aircrafts
+    aircraft::AircraftProcessor mAcProc;
+    /// Vector holding the Aircrafts
+    std::vector<aircraft::Aircraft> mCont;
+    /// Index map to make find efficient
     std::unordered_map<std::string, size_t> mIndexMap;
 };
+
+}  // namespace data
 
 #endif /* SRC_DATA_AIRCRAFTCONTAINER_H_ */

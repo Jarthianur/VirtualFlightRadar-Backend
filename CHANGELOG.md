@@ -1,6 +1,17 @@
-# changelog (since 1.3.0)
+# changelog
 
-#### 2.0.0
+## 2.1.0
+
++ support GPSD
++ common sensor interface (support [BME280 driver](https://github.com/Jarthianur/sensorics))
++ generic input feeds
++ ! configuration refactoring
+
+### 2.0.1
+
++ latitude/longitude parsing fixed
+
+### 2.0.0
 
 + integrate boost
 + major refactoring, packaging
@@ -12,7 +23,7 @@
 + installation script
 + unit tests
 
-#### 1.3.0
+### 1.3.0
 
 + ADS-B (SBS) input
 + APRS (OGN flavor) input

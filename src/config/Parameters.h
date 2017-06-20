@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef PARAMETERS_H_
-#define PARAMETERS_H_
+#ifndef SRC_CONFIG_PARAMETERS_H_
+#define SRC_CONFIG_PARAMETERS_H_
 
 /**
  * This file contains some parameters,
@@ -29,27 +29,7 @@
  * !!! Note that some of those values may have a high impact
  * on the performance, memory/CPU usage, stability and
  * even may cause the program not to work properly !!!
- *
- * 4 is a magic number here, because XCSoar removes aircrafts
- * after 4 seconds without updates.
  */
-
-/**
- * VFRB_SYNC_TIME:
- * The round-about duration, in seconds, of one cycle.
- * Data will be processed and sent one time each cycle.
- * [1 <= x <= 4]
- */
-#define VFRB_SYNC_TIME 1
-
-/**
- * AIRCRAFT_INVALIDATE:
- * Number of cycles without updates until an aircraft
- * is outdated. This aircraft is kept registered but no report
- * will be sent.
- * [4 <= x]
- */
-#define AIRCRAFT_INVALIDATE 4
 
 /**
  * CLIENT_CONNECT_WAIT_TIMEVAL:
@@ -85,5 +65,4 @@
  */
 #define SERVER_MAX_CLIENTS 5
 
-
-#endif /* PARAMETERS_H_ */
+#endif /* SRC_CONFIG_PARAMETERS_H_ */

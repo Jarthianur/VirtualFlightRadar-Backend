@@ -31,20 +31,25 @@
 
 #include "../config/Configuration.h"
 #include "../data/AircraftContainer.h"
-#include "../data/ClimateData.h"
-#include "../tcp/client/APRSCClient.h"
-#include "../tcp/client/SBSClient.h"
-#include "../tcp/client/WindClient.h"
-#include "../tcp/server/NMEAServer.h"
-#include "../util/GPSmodule.h"
+#include "../data/GpsData.h"
+#include "../data/SensorData.h"
+#include "../tcp/client/AprscClient.h"
+#include "../tcp/client/SbsClient.h"
+#include "../tcp/client/SensorClient.h"
+#include "../tcp/server/Server.h"
 #include "../util/Logger.h"
 
-bool VFRB::global_climate_enabled = false;
-bool VFRB::global_aprsc_enabled = false;
-bool VFRB::global_sbs_enabled = false;
-bool VFRB::global_run_status = true;
-AircraftContainer VFRB::msAcCont;
-ClimateData VFRB::msClimateData;
+using namespace util;
+
+namespace vfrb
+{
+
+#define SYNC_TIME (1)
+
+std::atomic<bool> VFRB::global_run_status(true);
+data::AircraftContainer VFRB::msAcCont;
+data::SensorData VFRB::msSensorData;
+data::GpsData VFRB::msGpsData;
 
 VFRB::VFRB()
 {
@@ -60,41 +65,6 @@ void VFRB::run() noexcept
     //store start time
     boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
 
-    // eval config
-    if (Configuration::global_aprsc_host.compare("nA") != 0 || Configuration::global_aprsc_host.length()
-            == 0)
-    {
-        global_aprsc_enabled = true;
-    }
-    else
-    {
-        Logger::warn("(VFRB) APRSC not enabled: no FLARM targets");
-    }
-
-    if (Configuration::global_sbs_host.compare("nA") != 0 || Configuration::global_sbs_host.length()
-            == 0)
-    {
-        global_sbs_enabled = true;
-    }
-    else
-    {
-        Logger::warn("(VFRB) SBS input not enabled: no transponder targets");
-    }
-
-    if (Configuration::global_climate_host.compare("nA") != 0 || Configuration::global_climate_host.length()
-            == 0)
-    {
-        global_climate_enabled = true;
-    }
-    else
-    {
-        Logger::warn("(VFRB) climate input not enabled: no wind,pressure,temp");
-    }
-
-    //create ac proc for gpsfix
-    GPSmodule gpsm(Configuration::base_latitude, Configuration::base_longitude,
-                   Configuration::base_altitude, Configuration::base_geoid);
-
     // register signals and run handler
     boost::asio::io_service io_service;
     boost::asio::signal_set signal_set(io_service);
@@ -107,7 +77,7 @@ void VFRB::run() noexcept
 
     signal_set.async_wait(
             boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
-                        boost::asio::placeholders::signal_number));
+                    boost::asio::placeholders::signal_number));
 
     boost::thread signal_thread([&io_service]()
     {
@@ -115,16 +85,17 @@ void VFRB::run() noexcept
     });
 
     // init server and run handler
-    NMEAServer server(signal_set, Configuration::global_server_port);
-    boost::thread server_thread(boost::bind(&VFRB::handleNMAEServer, std::ref(server)));
+    tcp::server::Server server(signal_set, config::Configuration::global_server_port);
+    boost::thread server_thread(boost::bind(&VFRB::handleNMEAServer, std::ref(server)));
 
     //init input threads
-    boost::thread sbs_input_thread(
-            boost::bind(&VFRB::handleSBSInput, std::ref(signal_set)));
-    boost::thread aprs_input_thread(
-            boost::bind(&VFRB::handleAPRSCInput, std::ref(signal_set)));
-    boost::thread climate_input_thread(
-            boost::bind(&VFRB::handleClimateInput, std::ref(signal_set)));
+    boost::thread_group threads;
+    for (auto it = config::Configuration::global_feeds.begin();
+            it != config::Configuration::global_feeds.end(); ++it)
+    {
+        threads.create_thread(
+                boost::bind(&VFRB::handleInputFeed, std::ref(signal_set), std::ref(*it)));
+    }
 
     while (global_run_status)
     {
@@ -138,31 +109,31 @@ void VFRB::run() noexcept
             }
 
             //write GPS position to clients
-            str = gpsm.gpsfix();
-            server.writeToAll(str);
+            server.writeToAll(msGpsData.getGpsStr());
 
-            //write wind to clients
-            if (global_climate_enabled && msClimateData.isValid())
+            // write weather info to clients
+            str = msSensorData.getMdaStr() + msSensorData.getMwvStr();
+            if (str.length() > 0)
             {
-                str = msClimateData.extractWV();
                 server.writeToAll(str);
             }
 
-            //synchronise cycles to ~VFRB_SYNC_TIME sec
+            //synchronise cycles to ~SYNC_TIME sec
             boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception& e)
         {
             Logger::error("(VFRB) error: ", e.what());
+            global_run_status = false;
+        } catch (...)
+        {
+            Logger::error("(VFRB) error");
             global_run_status = false;
         }
     }
 
     // exit sequence, join threads
     server_thread.join();
-    sbs_input_thread.join();
-    aprs_input_thread.join();
-    climate_input_thread.join();
+    threads.join_all();
     signal_thread.join();
 
     //eval end time
@@ -177,55 +148,27 @@ void VFRB::run() noexcept
     time_str += " mins";
 
     Logger::info("EXITING / runtime: ", time_str);
+
 }
 
-void VFRB::handleNMAEServer(NMEAServer& server)
+void VFRB::handleNMEAServer(tcp::server::Server& r_server)
 {
-    Logger::info("(NMEAServer) startup: localhost ",
-                 std::to_string(Configuration::global_server_port));
-    server.run();
+    Logger::info("(Server) startup: localhost ",
+            std::to_string(config::Configuration::global_server_port));
+    r_server.run();
     global_run_status = false;
 }
 
-void VFRB::handleClimateInput(boost::asio::signal_set& sigset)
+void VFRB::handleInputFeed(boost::asio::signal_set& r_sigset, Feed& r_feed)
 {
-    if (!global_climate_enabled)
-    {
-        return;
-    }
-    WindClient client(sigset, Configuration::global_climate_host,
-                      Configuration::global_climate_port);
-    Logger::info("(WindClient) startup: ", Configuration::global_climate_host);
-    client.run();
+    Logger::info("(VFRB) run feed: ", r_feed.mName);
+    r_feed.run(r_sigset);
 }
 
-void VFRB::handleSBSInput(boost::asio::signal_set& sigset)
-{
-    if (!global_sbs_enabled)
-    {
-        return;
-    }
-    SBSClient client(sigset, Configuration::global_sbs_host,
-                     Configuration::global_sbs_port);
-    Logger::info("(SBSClient) startup: ", Configuration::global_sbs_host);
-    client.run();
-}
-
-void VFRB::handleAPRSCInput(boost::asio::signal_set& sigset)
-{
-    if (!global_aprsc_enabled)
-    {
-        return;
-    }
-    APRSCClient client(sigset, Configuration::global_aprsc_host,
-                       Configuration::global_aprsc_port,
-                       Configuration::global_aprsc_login);
-    Logger::info("(APRSCClient) startup: ", Configuration::global_aprsc_host);
-    client.run();
-}
-
-void VFRB::handleSignals(const boost::system::error_code& ec, const int sig)
+void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)
 {
     Logger::info("(VFRB) caught signal: ", "shutdown");
     global_run_status = false;
 }
+
+}  // namespace vfrb

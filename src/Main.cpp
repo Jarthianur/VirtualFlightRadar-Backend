@@ -19,175 +19,123 @@
  }
  */
 
-#include <cstdint>
 #include <stdexcept>
 #include <string>
+#include <fstream>
 
-#include "config/ConfigReader.h"
 #include "config/Configuration.h"
+#include "data/SensorData.h"
+#include "data/GpsData.h"
 #include "util/Logger.h"
 #include "vfrb/VFRB.h"
-#include "data/ClimateData.h"
-#include "data/AircraftContainer.h"
 
 #ifndef VERSION
 #define VERSION "DEMO"
 #endif
 
-std::int32_t strToInt(const std::string& str) noexcept
+using namespace util;
+
+/**
+ * Evaluate comandline arguments.
+ *
+ * @param argc the argument count
+ * @param argv the arguments
+ *
+ * @return 0 if succeeded, -1 in case of failure
+ */
+std::int32_t evalArgs(std::int32_t /*argc*/, char** /*argv*/);
+
+/**
+ * The application start point.
+ * In here the commandline arguments get evaluated,
+ * the Configuration initialized and the VFRB ran.
+ */
+int main(int argc, char** argv)
 {
-    try
+    Logger::info("VirtualFlightRadar-Backend -- ", VERSION);
+
+    if (argc < 3)
     {
-        return stoi(str);
-    }
-    catch (const std::logic_error& iae)
-    {
-        Logger::error("(VFRB) invalid configuration: ", str);
-    }
-    return 0;
-}
-
-double strToDouble(const std::string& str) noexcept
-{
-    try
-    {
-        return stod(str);
-    }
-    catch (const std::logic_error& iae)
-    {
-        Logger::error("(VFRB) invalid configuration: ", str);
-    }
-    return 0.0;
-}
-
-int main(int argc, char* argv[])
-{
-
-    double latitude = 0.0;
-    double longitude = 0.0;
-    std::int32_t altitude = 0;
-    double geoid = 0.0;
-    double pressure = 0.0;
-    double temp = 0.0;
-
-    std::uint16_t server_port = 0;
-
-    std::string aprsc_host;
-    std::string aprsc_port;
-    std::string aprsc_login;
-
-    std::string sbs_host;
-    std::string sbs_port;
-
-    std::string climate_host;
-    std::string climate_port;
-
-    std::int32_t maxHeight = 0;
-    std::int32_t maxDist = 0;
-
-    if (argc == 3)
-    {
-        Logger::info("VirtualFlightRadar-Backend -- ", VERSION);
-        ConfigReader cr(argv[2]);
-        cr.read();
-
-        latitude = strToDouble(cr.getProperty("latitude", "0.0"));
-        Logger::info("(Config) latitude: ", std::to_string(latitude));
-
-        longitude = strToDouble(cr.getProperty("longitude", "0.0"));
-        Logger::info("(Config) longitude: ", std::to_string(longitude));
-
-        altitude = strToInt(cr.getProperty("altitude", "0"));
-        Logger::info("(Config) altitude: ", std::to_string(altitude));
-
-        geoid = strToDouble(cr.getProperty("geoid", "0.0"));
-        Logger::info("(Config) geoid: ", std::to_string(geoid));
-
-        pressure = strToDouble(cr.getProperty("pressure", "1013.25"));
-        Logger::info("(Config) pressure: ", std::to_string(pressure));
-
-        temp = strToDouble(cr.getProperty("temp", "15.0"));
-        Logger::info("(Config) temp: ", std::to_string(temp));
-
-        server_port = (uint16_t) strToInt(cr.getProperty("serverPort", "9999"));
-        Logger::info("(Config) serverPort: ", std::to_string(server_port));
-
-        aprsc_port = cr.getProperty("aprscPort", "9998");
-        Logger::info("(Config) aprscPort: ", aprsc_port);
-
-        sbs_port = cr.getProperty("sbsPort", "9997");
-        Logger::info("(Config) sbsPort: ", sbs_port);
-
-        aprsc_host = cr.getProperty("aprscHost", "nA");
-        Logger::info("(Config) aprscHost: ", aprsc_host);
-
-        sbs_host = cr.getProperty("sbsHost", "nA");
-        Logger::info("(Config) sbsHost: ", sbs_host);
-
-        aprsc_login = cr.getProperty("aprscLogin", "");
-        Logger::info("(Config) aprscLogin: ", aprsc_login);
-
-        climate_host = cr.getProperty("climateSensorHost", "nA");
-        Logger::info("(Config) climateSensorHost: ", climate_host);
-
-        climate_port = cr.getProperty("climateSensorPort", "0");
-        Logger::info("(Config) climateSensorPort: ", climate_port);
-
-        std::string tmp = cr.getProperty("maxHeight", "-1");
-        if (tmp == "-1")
-        {
-            maxHeight = INT32_MAX;
-        }
-        else
-        {
-            maxHeight = strToInt(tmp);
-        }
-        Logger::info("(Config) maxHeight: ", std::to_string(maxHeight));
-
-        tmp = cr.getProperty("maxDist", "-1");
-        if (tmp == "-1")
-        {
-            maxDist = INT32_MAX;
-        }
-        else
-        {
-            maxDist = strToInt(tmp);
-        }
-        Logger::info("(Config) maxDist: ", std::to_string(maxDist));
-
-    }
-    else
-    {
-        Logger::info("usage: ./VirtualFlightRadar-Backend -c pathToConfigFile");
+        Logger::info(
+                "usage: ./VirtualFlightRadar-Backend [OPTIONS] [-c | --config] path_to_file.ini\n"
+                        "Run VFR-B with given config file.\n"
+                        "The config file must be in valid '.ini' format!\n"
+                        "OPTIONS:\n"
+                        "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received.");
         return -1;
     }
 
-    Configuration::base_altitude = altitude;
-    Configuration::base_latitude = latitude;
-    Configuration::base_longitude = longitude;
-    Configuration::base_geoid = geoid;
-    Configuration::base_pressure = pressure;
-    Configuration::base_temp = temp;
-    Configuration::global_server_port = server_port;
-    Configuration::global_aprsc_port = aprsc_port;
-    Configuration::global_sbs_port = sbs_port;
-    Configuration::global_aprsc_host = aprsc_host;
-    Configuration::global_sbs_host = sbs_host;
-    Configuration::global_aprsc_login = aprsc_login;
-    Configuration::global_climate_host = climate_host;
-    Configuration::global_climate_port = climate_port;
-    Configuration::filter_maxHeight = maxHeight;
-    Configuration::filter_maxDist = maxDist;
+    if (evalArgs(argc, argv) != 0)
+    {
+        return -1;
+    }
 
     // set climate fallbacks
-    VFRB::msClimateData.setPress();
-    VFRB::msClimateData.setTemp();
-
-    // init containers processor
-    VFRB::msAcCont.initProcessor(Configuration::base_latitude,
-                                Configuration::base_longitude,
-                                Configuration::base_altitude);
-    VFRB::run();
+    vfrb::VFRB::msSensorData.setPress(0, config::Configuration::base_pressure);
+    vfrb::VFRB::msGpsData.setDefaults(config::Configuration::base_latitude,
+            config::Configuration::base_longitude,
+            config::Configuration::base_altitude,
+            config::Configuration::base_geoid);
+    vfrb::VFRB::run();
 
     return 0;
 }
+
+std::int32_t evalArgs(std::int32_t argc, char** argv)
+{
+    std::string ini_file;
+    bool gnd = false;
+    bool cfg_found = false;
+
+    for (int i = 1; i < argc; i++)
+    {
+        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1
+                < argc)
+        {
+            ini_file = std::string(argv[++i]);
+            if (ini_file.rfind(".ini") == std::string::npos)
+            {
+                Logger::error("(VFRB) not a ini file: ", ini_file);
+                return -1;
+            } else
+            {
+                cfg_found = true;
+            }
+        } else if (std::string(argv[i]).find("-g") != std::string::npos)
+        {
+            gnd = true;
+        } else
+        {
+            Logger::warn("(VFRB) unrecognized option: ", std::string(argv[i]));
+        }
+    }
+
+    if (cfg_found)
+    {
+        try
+        {
+            std::ifstream file(ini_file);
+            config::Configuration conf(file);
+        } catch (const std::logic_error& e)
+        {
+            Logger::error("(VFRB) eval config: ", e.what());
+            return -1;
+        }
+    } else
+    {
+        Logger::error("(VFRB) no config file given");
+        return -1;
+    }
+
+    if (gnd || config::Configuration::global_gnd_mode)
+    {
+        config::Configuration::global_gnd_mode = true;
+        Logger::info("(VFRB) GND mode: yes");
+    } else
+    {
+        Logger::info("(VFRB) GND mode: no");
+    }
+
+    return 0;
+}
+

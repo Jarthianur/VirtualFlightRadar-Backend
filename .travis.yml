@@ -15,9 +15,9 @@ compiler:
     - g++-4.9
 
 # whitelist
-branches:
-    only:
-        - master
+#branches:
+#    only:
+#        - master
         
 git:
     submodules: true
@@ -34,11 +34,10 @@ before_script:
 
 script: 
     - ./install.sh
-    - cd test
-    - pushd build
+    - pushd test/build
     - make
+    - ./VFR-Test &2>/dev/null
     - popd
-    - build/VFR-Test
 
 
 notifications:

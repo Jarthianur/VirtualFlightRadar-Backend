@@ -25,19 +25,27 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <iostream>
-
+#include "../../vfrb/Feed.h"
 #include "../../util/Logger.h"
 
-Client::Client(boost::asio::signal_set& sigset, const std::string& host,
-        const std::string& port, const std::string& comp)
-        : mIOservice(),
-          mrSigSet(sigset),
-          mSocket(mIOservice),
-          mResolver(mIOservice),
-          mHost(host),
-          mPort(port),
-          mComponent(comp),
-          mConnectTimer(mIOservice)
+using namespace util;
+
+namespace tcp
+{
+namespace client
+{
+
+Client::Client(boost::asio::signal_set& r_sigset, const std::string& cr_host,
+        const std::string& cr_port, const std::string& cr_comp, vfrb::Feed& r_feed)
+        : mIoService(),
+          mrSigSet(r_sigset),
+          mSocket(mIoService),
+          mResolver(mIoService),
+          mHost(cr_host),
+          mPort(cr_port),
+          mComponent(cr_comp),
+          mrFeed(r_feed),
+          mConnectTimer(mIoService)
 
 {
     awaitStop();
@@ -49,7 +57,7 @@ Client::~Client() noexcept
 
 void Client::run()
 {
-    mIOservice.run();
+    mIoService.run();
 }
 
 void Client::awaitStop()
@@ -65,12 +73,12 @@ void Client::timedConnect() noexcept
     mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
     mConnectTimer.async_wait(
             boost::bind(&Client::handleTimedConnect, this,
-                        boost::asio::placeholders::error));
+                    boost::asio::placeholders::error));
 }
 
 void Client::stop() noexcept
 {
-    Logger::info(mComponent + " stop connection to: ", mHost);
+    Logger::info(mComponent + " stop connection to: ", mHost + ":" + mPort);
     mConnectTimer.expires_at(boost::posix_time::pos_infin);
     mConnectTimer.cancel();
     boost::system::error_code ec;
@@ -83,46 +91,49 @@ void Client::stop() noexcept
 
 void Client::read() noexcept
 {
-    boost::asio::async_read_until(
-            mSocket,
-            mBuffer,
-            "\n",
+    boost::asio::async_read_until(mSocket, mBuffer, "\r\n",
             boost::bind(&Client::handleRead, this, boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+                    boost::asio::placeholders::bytes_transferred));
 }
 
-void Client::handleTimedConnect(const boost::system::error_code& ec) noexcept
+void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
 {
-    if (!ec)
+    if (!cr_ec)
     {
-        Logger::info(mComponent + " try connect to: ", mHost);
+        Logger::info(mComponent + " try connect to: ", mHost + ":" + mPort);
         connect();
-    }
-    else
+    } else
     {
-        Logger::error(mComponent + " cancel connect: ", ec.message());
-        if (ec != boost::asio::error::operation_aborted)
+        Logger::error(mComponent + " cancel connect: ", cr_ec.message());
+        if (cr_ec != boost::asio::error::operation_aborted)
         {
             stop();
         }
     }
 }
 
-void Client::handleRead(const boost::system::error_code& ec, std::size_t s) noexcept
+void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t s)
+noexcept
 {
-    if (!ec)
+    if (!cr_ec)
     {
         std::istream is(&mBuffer);
         std::getline(is, mResponse);
         process();
         read();
-    }
-    else if (ec != boost::system::errc::bad_file_descriptor)
+    } else if (cr_ec != boost::system::errc::bad_file_descriptor)
     {
-        Logger::error(mComponent + " read: ", ec.message());
-        if (ec != boost::asio::error::operation_aborted)
+        Logger::error(mComponent + " read: ", cr_ec.message());
+        if (cr_ec != boost::asio::error::operation_aborted)
         {
             stop();
+            if (cr_ec == boost::asio::error::eof)
+            {
+                timedConnect();
+            }
         }
     }
 }
+
+}  // namespace client
+}  // namespace tcp
