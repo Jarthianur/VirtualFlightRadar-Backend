@@ -131,7 +131,7 @@ public:
     /**
      * @fn isFullInfo
      * @brief Is full information available?
-     * @note Full information means, all about position, movement are given.
+     * @note Full information means, all about position, movement is given.
      * @return true, if full info is available, else false
      */
     inline const bool isFullInfo() const
@@ -139,83 +139,83 @@ public:
         return mFullInfo;
     }
     /**
-     * Get the current update age.
-     *
-     * @return update age
+     * @fn getUpdateAge
+     * @brief Get the current update age.
+     * @return the update age
      */
     inline const std::uint32_t getUpdateAge() const
     {
         return mUpdateAge;
     }
     /**
-     * Get last updated priority.
-     *
-     * @return last priority
+     * @fn getLastPriority
+     * @brief Get last written priority.
+     * @return the last priority
      */
     inline const std::int32_t getLastPriority() const
     {
         return mLastPriority;
     }
     /**
-     * Is update attempt valid?
-     *
-     * @return is attempt valid
+     * @fn isAttemptValid
+     * @brief Is update attempt valid?
+     * @return true, if valid, else false
      */
     inline const bool isAttemptValid() const
     {
         return mAttemptValid;
     }
     /**
-     * Get the last registered latitude.
-     *
-     * @return The latitude
+     * @fn getLatitude
+     * @brief Get the last known latitude.
+     * @return the latitude
      */
     inline const double getLatitude() const
     {
         return mPosition.latitude;
     }
     /**
-     * Get the last registered longitude.
-     *
-     * @return The longitude
+     * @fn getLongitude
+     * @brief Get the last known longitude.
+     * @return the longitude
      */
     inline const double getLongitude() const
     {
         return mPosition.longitude;
     }
     /**
-     * Get the last registered altitude.
-     *
-     * @return The altitude.
+     * @fn getAltitude
+     * @brief Get the last known altitude.
+     * @return the altitude.
      */
     inline const std::int32_t getAltitude() const
     {
         return mPosition.altitude;
     }
     /**
-     * Get the last registered speed over ground.
-     *
-     * @return The ground speed
+     * @fn getGndSpeed
+     * @brief Get the last known speed over ground.
+     * @return the ground speed
      */
     inline const double getGndSpeed() const
     {
         return mGndSpeed;
     }
     /**
-     * Get the last registered heading.
-     *
-     * @return The heading
+     * @fn getHeading
+     * @brief Get the last known heading.
+     * @return the heading
      */
     inline const double getHeading() const
     {
         return mHeading;
     }
     /**
-     * Get the last registered climb rate.
-     *
-     * @return The climb rate
+     * @fn getClimbRate
+     * @brief Get the last known climb rate.
+     * @return the climb rate
      */
-    inline const double getClimbR() const
+    inline const double getClimbRate() const
     {
         return mClimbRate;
     }
@@ -224,15 +224,17 @@ public:
      return mTurnRate;
      }*/
     /**
-     * Increment the update age by one.
+     * @fn incUpdateAge
+     * @brief Increment the update age by one.
      */
     inline void incUpdateAge()
     {
         ++mUpdateAge;
     }
     /**
-     * Set the new target type.
-     *
+     * @fn setTargetT
+     * @brief Set the target type.
+     * @see TargetType
      * @param tt The new target type
      */
     inline void setTargetT(TargetType tt)
@@ -240,16 +242,17 @@ public:
         mTargetT = tt;
     }
     /**
-     * Set full information available.
-     *
-     * @param info is available, or not, defaults to true
+     * @fn setFullInfo
+     * @brief Set full information to be available.
+     * @param info Is available, or not (default: true)
      */
     inline void setFullInfo(bool info = true)
     {
         mFullInfo = info;
     }
     /**
-     * Allow update attempts.
+     * @fn setAttemptValid
+     * @brief Allow update attempts.
      */
     inline void setAttemptValid()
     {
