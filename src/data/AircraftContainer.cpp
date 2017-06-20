@@ -87,7 +87,7 @@ std::string AircraftContainer::processAircrafts() noexcept
             if (it->getUpdateAge() >= 4)
             {
                 del = true;
-                mIndexMap.erase(it->getID());
+                mIndexMap.erase(it->getId());
                 it = mCont.erase(it);
             } else
             {
@@ -100,7 +100,7 @@ std::string AircraftContainer::processAircrafts() noexcept
             }
             if (del && it != mCont.end())
             {
-                mIndexMap.at(it->getID()) = index;
+                mIndexMap.at(it->getId()) = index;
             }
         } catch (const std::exception& e)
         {
@@ -114,7 +114,7 @@ void AircraftContainer::insertAircraft(const Aircraft& cr_update, std::int32_t p
 noexcept
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    auto known_ac = find(cr_update.getID());
+    auto known_ac = find(cr_update.getId());
     if (known_ac != mCont.end())
     {
         if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER
@@ -138,7 +138,7 @@ noexcept
         }
     } else
     {
-        mIndexMap.insert( { cr_update.getID(), mCont.size() });
+        mIndexMap.insert( { cr_update.getId(), mCont.size() });
         mCont.push_back(cr_update);
     }
 }

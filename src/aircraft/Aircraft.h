@@ -33,7 +33,7 @@ namespace aircraft
 #define A_VALUE_NA -1024.0
 
 /**
- * The Aircraft class.
+ * Aircraft class
  * @brief Store all information about an aircraft, like position, id etc.
  */
 class Aircraft
@@ -69,15 +69,15 @@ public:
     /**
      * @fn operator==
      * @brief Compare aircrafts by their Id.
-     * @param cr_other The aircraft to compare
+     * @param cr_other The Aircraft to compare
      * @return true, if Id's equal, else false
      */
     bool operator==(const Aircraft& cr_other) const;
     /**
-     * Aircraft information received from
-     * device type.
-     * FLARM is preferred over TRANSPONDER,
-     * in case an aircraft has both available.
+     * TargetType enumeration
+     * @brief Device type from which the information is received.
+     * @note FLARM is preferred over TRANSPONDER,
+     *       in case an aircraft has both available.
      */
     enum class TargetType
         : std::uint32_t
@@ -85,53 +85,54 @@ public:
             FLARM, TRANSPONDER
     };
     /**
-     * Update aircraft information.
-     * Reset update age.
-     *
-     * @param cr_ac an aircraft reference holding new information
-     * @param prio update from feed with priority
+     * @fn update
+     * @brief Update this Aircraft, reset update age.
+     * @param cr_ac Other Aircraft with new data
+     * @param prio  Priority of the update
      */
     void update(const Aircraft& cr_ac, std::int32_t prio);
     /**
-     * Get the ID.
-     *
-     * @return const reference to ID
+     * @fn getId
+     * @brief Get the Id.
+     * @return the Id string
      */
-    inline const std::string& getID() const
+    inline const std::string& getId() const
     {
-        return mID;
+        return mId;
     }
     /**
-     * Get the ID type.
-     *
-     * @return ID type
+     * @fn getIdType
+     * @brief Get the Id type.
+     * @return the Id type
      */
-    inline const std::uint32_t getIDtype() const
+    inline const std::uint32_t getIdType() const
     {
-        return mIDtype;
+        return mIdType;
     }
     /**
-     * Get the last registered target type.
-     *
-     * @return target type
+     * @fn getTargetT
+     * @brief Get the target type.
+     * @see TargetType
+     * @return the target type
      */
     inline const TargetType getTargetT() const
     {
-        return mTargetType;
+        return mTargetT;
     }
     /**
-     * Get the aircraft type.
-     *
-     * @return aircraft type
+     * @fn getAircraftT
+     * @brief Get the aircraft type.
+     * @return the aircraft type
      */
     inline const std::int32_t getAircraftT() const
     {
-        return mAircraftType;
+        return mAircraftT;
     }
     /**
-     * Is full information available?
-     *
-     * @return full info available, or not
+     * @fn isFullInfo
+     * @brief Is full information available?
+     * @note Full information means, all about position, movement are given.
+     * @return true, if full info is available, else false
      */
     inline const bool isFullInfo() const
     {
@@ -236,7 +237,7 @@ public:
      */
     inline void setTargetT(TargetType tt)
     {
-        mTargetType = tt;
+        mTargetT = tt;
     }
     /**
      * Set full information available.
@@ -257,13 +258,13 @@ public:
 
 private:
     /// Aircraft ID (address), identifier; Uniqueness is assumed and must be guaranteed by input feed.
-    std::string mID;
+    std::string mId;
     /// ID (address) type.
-    std::uint32_t mIDtype = 1;
+    std::uint32_t mIdType = 1;
     /// Aircraft type encoded as number (glider, powered airplane ...)
-    std::int32_t mAircraftType = 8;
+    std::int32_t mAircraftT = 8;
     /// Target type; Got the last update from which device.
-    TargetType mTargetType = TargetType::FLARM;
+    TargetType mTargetT = TargetType::FLARM;
     /// Is full set of information available?
     bool mFullInfo = false;
     /// Times processed without update.

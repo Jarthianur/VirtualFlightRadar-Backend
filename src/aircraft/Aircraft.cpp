@@ -31,7 +31,7 @@ Aircraft::~Aircraft() noexcept
 }
 
 Aircraft::Aircraft(std::string& r_id, struct GPSPosition& r_pos)
-        : mID(r_id),
+        : mId(r_id),
           mPosition(r_pos)
 {
 }
@@ -39,9 +39,9 @@ Aircraft::Aircraft(std::string& r_id, struct GPSPosition& r_pos)
 Aircraft::Aircraft(std::string& r_id, struct GPSPosition& r_pos, double gnd_spd,
         std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r,
         double heading)
-        : mID(r_id),
-          mIDtype(id_t),
-          mAircraftType(ac_t),
+        : mId(r_id),
+          mIdType(id_t),
+          mAircraftT(ac_t),
           mPosition(r_pos),
           mGndSpeed(gnd_spd),
           mHeading(heading),
@@ -52,21 +52,21 @@ Aircraft::Aircraft(std::string& r_id, struct GPSPosition& r_pos, double gnd_spd,
 
 bool Aircraft::operator==(const Aircraft& cr_other) const
 {
-    return this->mID == cr_other.mID;
+    return this->mId == cr_other.mId;
 }
 
 void Aircraft::update(const Aircraft& cr_ac, std::int32_t prio)
 {
     // no update for ID
-    this->mIDtype = cr_ac.mIDtype;
-    this->mAircraftType = cr_ac.mAircraftType;
+    this->mIdType = cr_ac.mIdType;
+    this->mAircraftT = cr_ac.mAircraftT;
     this->mPosition = cr_ac.mPosition;
     this->mGndSpeed = cr_ac.mGndSpeed;
     this->mHeading = cr_ac.mHeading;
     this->mClimbRate = cr_ac.mClimbRate;
     //this->mTurnRate = r_ac.mTurnRate;
     this->mFullInfo = cr_ac.mFullInfo;
-    this->mTargetType = cr_ac.mTargetType;
+    this->mTargetT = cr_ac.mTargetT;
     this->mUpdateAge = 0;
     this->mLastPriority = prio;
     this->mAttemptValid = false;
