@@ -46,11 +46,6 @@
 #define MATCH_COM_CR   3
 #define MATCH_COM_TR   4
 
-#define GPS_ASSUME_GOOD       1
-#define GPS_NR_SATS_GOOD      7
-#define GPS_FIX_GOOD          1
-#define GPS_HOR_DILUTION_GOOD 1.0
-
 namespace util
 {
 
@@ -93,27 +88,23 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
         //time
         //time = std::stoi(match.str(1));
         //latitude
-        gpsPos.latitude = util::math::dmToDeg(std::stod(match.str(MATCH_LAT)));
+        gpsPos.latitude = math::dmToDeg(std::stod(match.str(MATCH_LAT)));
         if (match.str(MATCH_LAT_DIR).compare("S") == 0)
         {
             gpsPos.latitude = -gpsPos.latitude;
         }
-
         //longitude
-        gpsPos.longitude = util::math::dmToDeg(std::stod(match.str(MATCH_LONG)));
+        gpsPos.longitude = math::dmToDeg(std::stod(match.str(MATCH_LONG)));
         if (match.str(MATCH_LONG_DIR).compare("W") == 0)
         {
             gpsPos.longitude = -gpsPos.longitude;
         }
-
         //altitude
-        gpsPos.altitude = util::math::dToI(
-                std::stod(match.str(MATCH_ALT)) * util::math::FEET_2_M);
+        gpsPos.altitude = math::dToI(std::stod(match.str(MATCH_ALT)) * math::FEET_2_M);
         if (gpsPos.altitude > config::Configuration::filter_maxHeight)
         {
             throw std::logic_error();
         }
-
         //comment
         // climbrate / address / id / type
         if (match.str(MATCH_COM).size() > 0)
@@ -128,8 +119,7 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
                         >> 2;
                 try
                 {
-                    climbRate = std::stod(com_match.str(MATCH_COM_CR))
-                            * util::math::FPM_2_MS;
+                    climbRate = std::stod(com_match.str(MATCH_COM_CR)) * math::FPM_2_MS;
                 } catch (const std::logic_error& e)
                 {
                     climbRate = A_VALUE_NA;
@@ -151,7 +141,6 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
         {
             throw std::logic_error();
         }
-
         //track/gnd_speed
         try
         {
@@ -163,7 +152,7 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
         }
         try
         {
-            gndSpeed = std::stod(match.str(MATCH_GND_SPD)) * util::math::KTS_2_MS;
+            gndSpeed = std::stod(match.str(MATCH_GND_SPD)) * math::KTS_2_MS;
         } catch (const std::logic_error& e)
         {
             gndSpeed = A_VALUE_NA;
@@ -231,8 +220,8 @@ aircraft::Aircraft Parser::parseSbs(const std::string& cr_msg)
                  }
                  break;*/
             case 11:
-                gpsPos.altitude = util::math::dToI(
-                        std::stod(cr_msg.substr(p, delim - p)) * util::math::FEET_2_M);
+                gpsPos.altitude = math::dToI(
+                        std::stod(cr_msg.substr(p, delim - p)) * math::FEET_2_M);
                 if (gpsPos.altitude > config::Configuration::filter_maxHeight)
                 {
                     throw std::logic_error();
@@ -253,15 +242,13 @@ aircraft::Aircraft Parser::parseSbs(const std::string& cr_msg)
     aircraft::Aircraft ac(id, gpsPos);
     ac.setFullInfo(false);
     ac.setTargetT(aircraft::Aircraft::TargetType::TRANSPONDER);
-    //VFRB::msAcCont.insertAircraft(ac, prio);
-
     return ac;
 }
 
 ExtGPSPosition Parser::parseGpsNmea(const std::string& cr_msg)
 {
     std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16);
-    if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
+    if (csum != math::checksum(cr_msg.c_str(), cr_msg.length()))
     {
         throw std::logic_error();
     }
@@ -271,19 +258,17 @@ ExtGPSPosition Parser::parseGpsNmea(const std::string& cr_msg)
     {
         double dilution = 0.0;
         //latitude
-        gpsPos.position.latitude = util::math::dmToDeg(std::stod(match.str(1)));
+        gpsPos.position.latitude = math::dmToDeg(std::stod(match.str(1)));
         if (match.str(2).compare("S") == 0)
         {
             gpsPos.position.latitude = -gpsPos.position.latitude;
         }
-
         //longitude
-        gpsPos.position.longitude = util::math::dmToDeg(std::stod(match.str(3)));
+        gpsPos.position.longitude = math::dmToDeg(std::stod(match.str(3)));
         if (match.str(4).compare("W") == 0)
         {
             gpsPos.position.longitude = -gpsPos.position.longitude;
         }
-
         //fix
         gpsPos.fixQa = std::stoi(match.str(5));
         //sats
@@ -291,36 +276,27 @@ ExtGPSPosition Parser::parseGpsNmea(const std::string& cr_msg)
         //dilution
         dilution = std::stod(match.str(7));
         //altitude
-        gpsPos.position.altitude = util::math::dToI(std::stod(match.str(8)));
+        gpsPos.position.altitude = math::dToI(std::stod(match.str(8)));
         //geoid
         gpsPos.geoid = std::stod(match.str(9));
-
-        //VFRB::msGpsData.setBasePos(prio, gpsPos);
-
-        if (gpsPos.nrSats >= GPS_NR_SATS_GOOD && gpsPos.fixQa >= GPS_FIX_GOOD
-                && dilution <= GPS_HOR_DILUTION_GOOD)
-        {
-            // return GPS_ASSUME_GOOD;
-        }
     } else
     {
         throw std::logic_error();
     }
-
     return gpsPos;
 }
 
 SensInfo Parser::parseSensNmea(const std::string& cr_msg)
 {
     std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16);
-    if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
+    if (csum != math::checksum(cr_msg.c_str(), cr_msg.length()))
     {
         throw std::logic_error();
     }
     SensInfo info;
     if (cr_msg.find("MDA") != std::string::npos)
     {
-        //VFRB::msSensorData.setMdaStr(prio, cr_msg);
+        info.mdaStr = cr_msg;
         std::size_t tmpB = cr_msg.find('B') - 1;
         std::size_t tmpS = cr_msg.substr(0, tmpB).find_last_of(',') + 1;
         std::size_t subLen = tmpB - tmpS;
@@ -328,14 +304,14 @@ SensInfo Parser::parseSensNmea(const std::string& cr_msg)
         double tmpPress = std::stod(cr_msg.substr(tmpS, subLen), &numIdx) * 1000.0;
         if (numIdx == subLen)
         {
-            //VFRB::msSensorData.setPress(prio, tmpPress);
+            info.press = tmpPress;
         } else
         {
             throw std::logic_error();
         }
     } else if (cr_msg.find("MWV") != std::string::npos)
     {
-        //VFRB::msSensorData.setMwvStr(prio, cr_msg);
+        info.mwvStr = cr_msg;
     } else
     {
         throw std::logic_error();

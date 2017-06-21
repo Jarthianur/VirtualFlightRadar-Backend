@@ -39,7 +39,9 @@ namespace util
 
 struct SensInfo
 {
-
+    std::string mdaStr;
+    std::string mwvStr;
+    double press;
 };
 
 /**

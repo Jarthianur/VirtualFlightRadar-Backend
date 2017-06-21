@@ -31,6 +31,11 @@
 #include "../tcp/client/Client.h"
 #include "../parser/Parser.h"
 
+#define GPS_ASSUME_GOOD       1
+#define GPS_NR_SATS_GOOD      7
+#define GPS_FIX_GOOD          1
+#define GPS_HOR_DILUTION_GOOD 1.0
+
 using namespace util;
 
 namespace feed
@@ -82,6 +87,11 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
 
 std::int32_t Feed::process(const std::string& cr_res) noexcept
 {
+    if (gpsPos.nrSats >= GPS_NR_SATS_GOOD && gpsPos.fixQa >= GPS_FIX_GOOD
+            && dilution <= GPS_HOR_DILUTION_GOOD)
+    {
+        // return GPS_ASSUME_GOOD;
+    }
     return mpParser->unpack(cr_res, mPriority);
 }
 
