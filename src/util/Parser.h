@@ -22,13 +22,23 @@
 #ifndef SRC_PARSER_PARSER_H_
 #define SRC_PARSER_PARSER_H_
 
-#include <cstdint>
+#include <boost/regex.hpp>
 #include <string>
+
+namespace aircraft
+{
+class Aircraft;
+}
+namespace util
+{
+struct ExtGPSPosition;
+}
 
 namespace util
 {
 
-struct SensInfo {
+struct SensInfo
+{
 
 };
 
@@ -51,10 +61,17 @@ public:
      */
     virtual ~Parser() noexcept;
 
-    static aircraft::Aircraft parseAprs(const std::string& msg);
-    static aircraft::Aircraft parseSbs(const std::string& msg);
-    static ExtGPSPosition parseGpsNmea(const std::string& msg);
-    static SensInfo parseSensNmea(const std::string& msg);
+    static aircraft::Aircraft parseAprs(const std::string& cr_msg);
+    static aircraft::Aircraft parseSbs(const std::string& cr_msg);
+    static ExtGPSPosition parseGpsNmea(const std::string& cr_msg);
+    static SensInfo parseSensNmea(const std::string& cr_msg);
+
+private:
+    /// Regular expression for APRS protocol
+    static const boost::regex aprsRe;
+    /// Regular expression for OGN specific APRS extension
+    static const boost::regex aprsComRe;
+    static const boost::regex gpggaRe;
 };
 
 }  // namespace util
