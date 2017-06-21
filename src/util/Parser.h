@@ -25,13 +25,12 @@
 #include <cstdint>
 #include <string>
 
-namespace parser
+namespace util
 {
 
-/// Parser -- unpack error codes
-#define MSG_UNPACK_SUC 0
-#define MSG_UNPACK_ERR -1
-#define MSG_UNPACK_IGN -2
+struct SensInfo {
+
+};
 
 /**
  * The Parser interface.
@@ -51,20 +50,13 @@ public:
      * @exceptsafe no-throw
      */
     virtual ~Parser() noexcept;
-    /**
-     * Unpack given string.
-     * Where to put unpacked data is handled by implementation,
-     * as well as priority pass-through.
-     *
-     * @param cr_msg the msg to unpack
-     * @param prio  the priority to pass
-     *
-     * @return an error code
-     */
-    virtual std::int32_t unpack(const std::string& cr_msg, std::int32_t prio)
-            noexcept = 0;
+
+    static aircraft::Aircraft parseAprs(const std::string& msg);
+    static aircraft::Aircraft parseSbs(const std::string& msg);
+    static ExtGPSPosition parseGpsNmea(const std::string& msg);
+    static SensInfo parseSensNmea(const std::string& msg);
 };
 
-}  // namespace parser
+}  // namespace util
 
 #endif /* SRC_PARSER_PARSER_H_ */

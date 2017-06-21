@@ -21,7 +21,7 @@
 
 #include "Parser.h"
 
-namespace parser
+namespace util
 {
 
 Parser::Parser()
@@ -32,4 +32,20 @@ Parser::~Parser() noexcept
 {
 }
 
-}  // namespace parser
+aircraft::Aircraft Parser::parseAprs(const std::string& msg)
+{
+}
+
+aircraft::Aircraft Parser::parseSbs(const std::string& msg)
+{
+}
+
+ExtGPSPosition Parser::parseGpsNmea(const std::string& msg)
+{
+}
+
+SensInfo Parser::parseSensNmea(const std::string& msg)
+{
+}
+
+}  // namespace util
