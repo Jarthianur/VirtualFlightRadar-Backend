@@ -45,12 +45,12 @@ Feed::Feed(const std::string& cr_name, std::int32_t prio,
     if (mKvMap.find(KV_KEY_HOST) == mKvMap.end())
     {
         Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_HOST);
-        throw std::runtime_error("No host given");
+        throw std::logic_error("No host given");
     }
     if (mKvMap.find(KV_KEY_PORT) == mKvMap.end())
     {
         Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_PORT);
-        throw std::runtime_error("No port given");
+        throw std::logic_error("No port given");
     }
 }
 

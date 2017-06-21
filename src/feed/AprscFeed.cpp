@@ -41,7 +41,7 @@ AprscFeed::AprscFeed(const std::string& cr_name, std::int32_t prio,
     if (it == mKvMap.end())
     {
         Logger::warn("(AprscFeed) could not find: ", mName + "." KV_KEY_LOGIN);
-        throw std::runtime_error("No login given");
+        throw std::logic_error("No login given");
     } else
     {
         mpParser = std::unique_ptr<parser::Parser>(new parser::AprsParser());

@@ -23,7 +23,7 @@
 #include <string>
 
 #include "../../src/config/Configuration.h"
-#include "../../src/vfrb/VFRB.h"
+#include "../../src/VFRB.h"
 #include "../framework/src/framework.h"
 #include "../Helper.hpp"
 
