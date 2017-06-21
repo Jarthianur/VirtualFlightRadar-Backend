@@ -24,6 +24,7 @@
 
 #include <boost/regex.hpp>
 #include <string>
+#include "SensorInfo.hpp"
 
 namespace aircraft
 {
@@ -36,13 +37,6 @@ struct ExtGPSPosition;
 
 namespace util
 {
-
-struct SensInfo
-{
-    std::string mdaStr;
-    std::string mwvStr;
-    double press;
-};
 
 /**
  * The Parser interface.
@@ -66,7 +60,7 @@ public:
     static aircraft::Aircraft parseAprs(const std::string& cr_msg);
     static aircraft::Aircraft parseSbs(const std::string& cr_msg);
     static ExtGPSPosition parseGpsNmea(const std::string& cr_msg);
-    static SensInfo parseSensNmea(const std::string& cr_msg);
+    static SensorInfo parseSensNmea(const std::string& cr_msg);
 
 private:
     /// Regular expression for APRS protocol

@@ -286,14 +286,14 @@ ExtGPSPosition Parser::parseGpsNmea(const std::string& cr_msg)
     return gpsPos;
 }
 
-SensInfo Parser::parseSensNmea(const std::string& cr_msg)
+SensorInfo Parser::parseSensNmea(const std::string& cr_msg)
 {
     std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16);
     if (csum != math::checksum(cr_msg.c_str(), cr_msg.length()))
     {
         throw std::logic_error();
     }
-    SensInfo info;
+    SensorInfo info;
     if (cr_msg.find("MDA") != std::string::npos)
     {
         info.mdaStr = cr_msg;

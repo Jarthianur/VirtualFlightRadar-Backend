@@ -22,8 +22,12 @@
 #include "GpsFeed.h"
 
 #include "../config/Configuration.h"
-#include "../parser/GpsParser.h"
 #include "../tcp/client/GpsdClient.h"
+
+#define GPS_ASSUME_GOOD       1
+#define GPS_NR_SATS_GOOD      7
+#define GPS_FIX_GOOD          1
+#define GPS_HOR_DILUTION_GOOD 1.0
 
 namespace feed
 {
@@ -32,14 +36,19 @@ GpsFeed::GpsFeed(const std::string& cr_name, std::int32_t prio,
         const std::unordered_map<std::string, std::string>& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
-    mpParser = std::unique_ptr<parser::Parser>(new parser::GpsParser());
     mpClient = std::unique_ptr<tcp::client::Client>(
             new tcp::client::GpsdClient(mKvMap.find(KV_KEY_HOST)->second,
-                    mKvMap.find(KV_KEY_PORT)->second, *this));
+                                        mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 GpsFeed::~GpsFeed() noexcept
 {
 }
+
+/* if (gpsPos.nrSats >= GPS_NR_SATS_GOOD && gpsPos.fixQa >= GPS_FIX_GOOD
+ && dilution <= GPS_HOR_DILUTION_GOOD)
+ {
+ // return GPS_ASSUME_GOOD;
+ }*/
 
 } // namespace feed
