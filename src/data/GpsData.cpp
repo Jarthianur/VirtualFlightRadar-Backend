@@ -44,7 +44,7 @@ void GpsData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double
     base.nrSats = 5;
     base.fixQa = 1;
     base.geoid = geoid;
-    update(base, 0);
+    mBasePos.trySetValue(base, 0);
 }
 
 std::string GpsData::getGpsStr()

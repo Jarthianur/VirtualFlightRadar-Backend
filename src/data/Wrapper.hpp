@@ -42,9 +42,9 @@ struct Wrapper
     /// The value
     T value;
     /// Is wrtite attempt valid?
-    bool attemptValid;
+    bool attemptValid = true;
     /// Last written priority
-    std::int32_t lastPriority;
+    std::int32_t lastPriority = 0;
     /// Mutex to enable threadsafety per Data.
     boost::mutex mutex;
     /**

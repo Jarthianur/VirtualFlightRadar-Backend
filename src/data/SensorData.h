@@ -58,6 +58,7 @@ public:
     virtual ~SensorData() noexcept;
 
     void update(const struct util::SensorInfo& cr_info, std::int32_t prio) override;
+    void setDefaults(double p);
     /**
      * Get MWV sentence.
      * Wind data is invalid after this operation.
