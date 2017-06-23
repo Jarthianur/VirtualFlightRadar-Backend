@@ -23,11 +23,14 @@
 
 #include "../config/Configuration.h"
 #include "../tcp/client/GpsdClient.h"
+#include "../util/Parser.h"
 
 #define GPS_ASSUME_GOOD       1
 #define GPS_NR_SATS_GOOD      7
 #define GPS_FIX_GOOD          1
 #define GPS_HOR_DILUTION_GOOD 1.0
+
+using namespace util;
 
 namespace feed
 {
@@ -43,6 +46,18 @@ GpsFeed::GpsFeed(const std::string& cr_name, std::int32_t prio,
 
 GpsFeed::~GpsFeed() noexcept
 {
+}
+
+std::int32_t GpsFeed::process(const std::string& cr_res) noexcept
+{
+    try
+    {
+        VFRB:: Parser::parseGpsNmea(cr_res);
+    } catch (const std::logic_error& e)
+    {
+        return -1;
+    }
+    return 0;
 }
 
 /* if (gpsPos.nrSats >= GPS_NR_SATS_GOOD && gpsPos.fixQa >= GPS_FIX_GOOD

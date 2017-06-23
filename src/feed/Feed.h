@@ -85,7 +85,7 @@ public:
      *
      * @exceptsafe no-throw
      */
-    virtual std::int32_t process(const std::string& cr_res) noexcept;
+    virtual std::int32_t process(const std::string& cr_res) noexcept = 0;
 
     /// Unique name
     const std::string mName;

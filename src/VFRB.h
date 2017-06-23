@@ -44,6 +44,15 @@ namespace feed
 {
 class Feed;
 }
+namespace aircraft
+{
+class Aircraft;
+}
+namespace util
+{
+struct ExtGPSPosition;
+struct SensorInfo;
+}
 
 /**
  * The VFRB class.
@@ -82,14 +91,12 @@ public:
      */
     static void run() noexcept;
 
+    static void pushAircraft(const aircraft::Aircraft& cr_ac, std::int32_t prio);
+    static void pushSensorInfo(const util::SensorInfo& cr_si, std::int32_t prio);
+    static void pushGpsPosition(const util::ExtGPSPosition& cr_pos, std::int32_t prio);
+
     /// Atomic run-status. By this, every component may determine if the VFRB stops.
     static std::atomic<bool> global_run_status;
-    /// Container holding all registered Aircrafts
-    static data::AircraftContainer msAcCont;
-    /// Container holding sensor and climate information.
-    static data::SensorData msSensorData;
-    /// Container holding GPS information
-    static data::GpsData msGpsData;
 
 private:
     /**
@@ -99,7 +106,7 @@ private:
      * @param p_feed   the Feed to handle
      */
     static void handleFeed(boost::asio::signal_set& r_sigset,
-                           std::shared_ptr<feed::Feed> p_feed);
+            std::shared_ptr<feed::Feed> p_feed);
     /**
      * Handler for an Server thread.
      *
@@ -113,6 +120,12 @@ private:
      * @param sig   the signal number
      */
     static void handleSignals(const boost::system::error_code& cr_ec, const int sig);
+    /// Container holding all registered Aircrafts
+    static data::AircraftContainer msAcCont;
+    /// Container holding sensor and climate information.
+    static data::SensorData msSensorData;
+    /// Container holding GPS information
+    static data::GpsData msGpsData;
 };
 
 #endif /* SRC_VFRB_H_ */

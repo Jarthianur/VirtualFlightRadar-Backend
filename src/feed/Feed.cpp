@@ -29,7 +29,6 @@
 #include "../util/Logger.h"
 #include "../VFRB.h"
 #include "../tcp/client/Client.h"
-#include "../util/Parser.h"
 
 using namespace util;
 
@@ -77,11 +76,6 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
     {
         mpClient->run(r_sigset);
     }
-}
-
-std::int32_t Feed::process(const std::string& cr_res) noexcept
-{
-    return mpParser->unpack(cr_res, mPriority);
 }
 
 }  // namespace feed

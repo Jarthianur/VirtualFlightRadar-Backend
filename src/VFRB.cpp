@@ -40,6 +40,8 @@
 #include "tcp/server/Server.h"
 #include "util/Logger.h"
 #include "feed/Feed.h"
+#include "util/Position.hpp"
+#include "util/SensorInfo.hpp"
 
 using namespace util;
 
@@ -76,7 +78,7 @@ void VFRB::run() noexcept
 
     signal_set.async_wait(
             boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
-                    boost::asio::placeholders::signal_number));
+                        boost::asio::placeholders::signal_number));
 
     boost::thread signal_thread([&io_service]()
     {
@@ -84,10 +86,8 @@ void VFRB::run() noexcept
     });
 
     // init server and run handler
-    tcp::server::Server server(signal_set,
-            config::Configuration::global_server_port);
-    boost::thread server_thread(
-            boost::bind(&VFRB::handleServer, std::ref(server)));
+    tcp::server::Server server(signal_set, config::Configuration::global_server_port);
+    boost::thread server_thread(boost::bind(&VFRB::handleServer, std::ref(server)));
 
     //init input threads
     boost::thread_group feed_threads;
@@ -156,13 +156,13 @@ void VFRB::run() noexcept
 void VFRB::handleServer(tcp::server::Server& r_server)
 {
     Logger::info("(Server) startup: localhost ",
-            std::to_string(config::Configuration::global_server_port));
+                 std::to_string(config::Configuration::global_server_port));
     r_server.run();
     global_run_status = false;
 }
 
 void VFRB::handleFeed(boost::asio::signal_set& r_sigset,
-                      std::shared_ptr<feed::Feed> p_feed)
+        std::shared_ptr<feed::Feed> p_feed)
 {
     Logger::info("(VFRB) run feed: ", p_feed->mName);
     p_feed->run(r_sigset);
@@ -172,4 +172,19 @@ void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)
 {
     Logger::info("(VFRB) caught signal: ", "shutdown");
     global_run_status = false;
+}
+
+void VFRB::pushAircraft(const aircraft::Aircraft& cr_ac, std::int32_t prio)
+{
+    msAcCont.insertAircraft(cr_ac, prio);
+}
+
+void VFRB::pushSensorInfo(const SensorInfo& cr_si, std::int32_t prio)
+{
+    //msSensorData.
+}
+
+void VFRB::pushGpsPosition(const ExtGPSPosition& cr_pos, std::int32_t prio)
+{
+    msGpsData.setBasePos(prio, cr_pos);
 }
