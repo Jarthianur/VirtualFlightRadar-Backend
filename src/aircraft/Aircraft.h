@@ -27,10 +27,11 @@
 
 #include "../util/Position.hpp"
 
+/// Indicate a double value is not available.
+#define A_VALUE_NA -1024.0
+
 namespace aircraft
 {
-
-#define A_VALUE_NA -1024.0
 
 /**
  * Aircraft class

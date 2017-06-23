@@ -38,11 +38,8 @@ namespace aircraft
 class Aircraft;
 
 /**
- * The AircraftContainer class.
- *
- * This class holds all registered Aircrafts and provides
- * functionality to process these into NMEA sentences.
- * Sentences are PFLAU and PFLAA.
+ * AircraftContainer class
+ * @brief Store Aircrafts and trigger processing.
  */
 class AircraftContainer
 {
@@ -52,24 +49,21 @@ public:
     /// Not assignable
     AircraftContainer& operator=(const AircraftContainer&) = delete;
     /**
-     * Constructor
+     * @fn AircraftContainer
+     * @brief Constructor
      */
     AircraftContainer();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~AircraftContainer
+     * @brief Destructor
      */
     virtual ~AircraftContainer() noexcept;
     /**
-     * Insert an Aircraft into container.
-     * Handles FLARM preferation.
-     * May fail due to priority.
-     *
-     * @param cr_update the Aircraft update
-     * @param prio the priority attempting to write
-     *
-     * @exceptsafe strong
+     * @fn insertAircraft
+     * @brief Insert an Aircraft into container.
+     * @note May fail due to priority.
+     * @param cr_update The Aircraft update
+     * @param prio      The priority attempting to write
      */
     void insertAircraft(const Aircraft& cr_update, std::int32_t prio) noexcept;
     /**
