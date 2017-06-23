@@ -21,9 +21,14 @@
 
 #include "SbsFeed.h"
 
-#include "../parser/SbsParser.h"
-#include "../tcp/client/SbsClient.h"
+#include "../aircraft/Aircraft.h"
+#include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
+#include "../tcp/client/SbsClient.h"
+#include "../util/Parser.h"
+#include "../VFRB.h"
+
+using namespace util;
 
 namespace feed
 {
@@ -32,14 +37,25 @@ SbsFeed::SbsFeed(const std::string& cr_name, std::int32_t prio,
         const std::unordered_map<std::string, std::string>& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
-    mpParser = std::unique_ptr<parser::Parser>(new parser::SbsParser());
     mpClient = std::unique_ptr<tcp::client::Client>(
             new tcp::client::SbsClient(mKvMap.find(KV_KEY_HOST)->second,
-                    mKvMap.find(KV_KEY_PORT)->second, *this));
+                                       mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 SbsFeed::~SbsFeed() noexcept
 {
+}
+
+std::int32_t SbsFeed::process(const std::string& cr_res) noexcept
+{
+    try
+    {
+        VFRB::msAcCont.insertAircraft(Parser::parseSbs(cr_res), mPriority);
+    } catch (const std::logic_error& e)
+    {
+        return -1;
+    }
+    return 0;
 }
 
 } // namespace feed

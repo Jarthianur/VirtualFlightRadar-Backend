@@ -19,21 +19,23 @@
  }
  */
 
-#ifndef SRC_UTIL_SENSORINFO_HPP_
-#define SRC_UTIL_SENSORINFO_HPP_
+#ifndef SRC_UTIL_SENSORINFO_H_
+#define SRC_UTIL_SENSORINFO_H_
 
 #include <string>
+
+#define SI_PRESS_NA -1024.0
 
 namespace util
 {
 
 struct SensorInfo
 {
-    std::string mdaStr;
-    std::string mwvStr;
-    double press;
+    std::string mdaStr = "";
+    std::string mwvStr = "";
+    double press = SI_PRESS_NA;
 };
 
 }  // namespace util
 
-#endif /* SRC_UTIL_SENSORINFO_HPP_ */
+#endif /* SRC_UTIL_SENSORINFO_H_ */

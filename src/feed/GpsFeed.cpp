@@ -22,10 +22,13 @@
 #include "GpsFeed.h"
 
 #include "../config/Configuration.h"
+#include "../data/GpsData.h"
 #include "../tcp/client/GpsdClient.h"
+#include "../util/Logger.h"
 #include "../util/Parser.h"
+#include "../util/Position.hpp"
+#include "../VFRB.h"
 
-#define GPS_ASSUME_GOOD       1
 #define GPS_NR_SATS_GOOD      7
 #define GPS_FIX_GOOD          1
 #define GPS_HOR_DILUTION_GOOD 1.0
@@ -52,18 +55,19 @@ std::int32_t GpsFeed::process(const std::string& cr_res) noexcept
 {
     try
     {
-        VFRB:: Parser::parseGpsNmea(cr_res);
+        ExtGPSPosition pos = Parser::parseGpsNmea(cr_res);
+        VFRB::msGpsData.update(pos, mPriority);
+        if (config::Configuration::global_gnd_mode && pos.nrSats >= GPS_NR_SATS_GOOD
+                && pos.fixQa >= GPS_FIX_GOOD && pos.dilution <= GPS_HOR_DILUTION_GOOD)
+        {
+            Logger::info("(GpsFeed) received good position -> stop");
+            mpClient->stop();
+        }
     } catch (const std::logic_error& e)
     {
         return -1;
     }
     return 0;
 }
-
-/* if (gpsPos.nrSats >= GPS_NR_SATS_GOOD && gpsPos.fixQa >= GPS_FIX_GOOD
- && dilution <= GPS_HOR_DILUTION_GOOD)
- {
- // return GPS_ASSUME_GOOD;
- }*/
 
 } // namespace feed

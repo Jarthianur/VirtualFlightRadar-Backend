@@ -44,7 +44,7 @@ void GpsData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double
     base.nrSats = 5;
     base.fixQa = 1;
     base.geoid = geoid;
-    setBasePos(0, base);
+    update(base, 0);
 }
 
 std::string GpsData::getGpsStr()
@@ -66,10 +66,10 @@ double GpsData::getBaseLat()
     return mBasePos.value.position.latitude;
 }
 
-void GpsData::setBasePos(std::int32_t prio, const struct util::ExtGPSPosition& cr_pos)
+void GpsData::update(const struct util::ExtGPSPosition& cr_pos, std::int32_t prio)
 {
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    mBasePos.update(cr_pos, prio);
+    mBasePos.trySetValue(cr_pos, prio);
 }
 
 double GpsData::getBaseLong()

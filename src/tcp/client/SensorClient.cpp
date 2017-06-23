@@ -65,11 +65,6 @@ void SensorClient::connect() noexcept
                     boost::asio::placeholders::iterator));
 }
 
-void SensorClient::process() noexcept
-{
-    mrFeed.process(mResponse);
-}
-
 void SensorClient::checkDeadline() noexcept
 {
     if (mStopped)

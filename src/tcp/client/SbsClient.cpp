@@ -56,11 +56,6 @@ void SbsClient::connect() noexcept
                     boost::asio::placeholders::iterator));
 }
 
-void SbsClient::process() noexcept
-{
-    mrFeed.process(mResponse);
-}
-
 void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
         boost::asio::ip::tcp::resolver::iterator it)
         noexcept

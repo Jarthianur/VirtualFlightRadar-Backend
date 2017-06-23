@@ -56,7 +56,7 @@ struct ExtGPSPosition
     /// GPS fix quality
             fixQa;
     /// Geoid separation
-    double geoid;
+    double geoid, dilution;
 };
 
 }  // namespace util

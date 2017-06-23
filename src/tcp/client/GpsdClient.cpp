@@ -56,15 +56,6 @@ void GpsdClient::connect() noexcept
                     boost::asio::placeholders::iterator));
 }
 
-void GpsdClient::process() noexcept
-{
-    if (mrFeed.process(mResponse) > 0 && config::Configuration::global_gnd_mode)
-    {
-        Logger::info("(GpsdClient) received good position -> stop");
-        stop();
-    }
-}
-
 void GpsdClient::handleResolve(const boost::system::error_code& cr_ec,
         boost::asio::ip::tcp::resolver::iterator it)
         noexcept

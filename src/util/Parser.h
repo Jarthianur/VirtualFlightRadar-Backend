@@ -24,7 +24,7 @@
 
 #include <boost/regex.hpp>
 #include <string>
-#include "SensorInfo.hpp"
+#include "SensorInfo.h"
 
 namespace aircraft
 {

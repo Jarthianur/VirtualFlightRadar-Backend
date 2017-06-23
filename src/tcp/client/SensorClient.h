@@ -85,12 +85,6 @@ private:
      */
     void connect() noexcept override;
     /**
-     * Implement Client::process
-     *
-     * @overload Client::process
-     */
-    void process() noexcept override;
-    /**
      * Check read timeout deadline reached.
      *
      * @exceptsafe strong

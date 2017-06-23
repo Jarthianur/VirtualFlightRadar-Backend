@@ -48,6 +48,7 @@ public:
      * @exceptsafe no-throw
      */
     virtual ~SensorFeed() noexcept;
+    std::int32_t process(const std::string& cr_res) noexcept override;
 };
 
 } // namespace feed

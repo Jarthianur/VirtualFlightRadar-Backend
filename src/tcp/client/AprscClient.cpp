@@ -63,11 +63,6 @@ void AprscClient::connect() noexcept
                     boost::asio::placeholders::iterator));
 }
 
-void AprscClient::process() noexcept
-{
-    mrFeed.process(mResponse);
-}
-
 void AprscClient::stop() noexcept
 {
     Client::stop();

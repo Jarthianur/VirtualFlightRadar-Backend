@@ -31,7 +31,7 @@
 #include <string>
 
 #include "config/Configuration.h"
-#include "data/AircraftContainer.h"
+#include "aircraft/AircraftContainer.h"
 #include "data/GpsData.h"
 #include "data/SensorData.h"
 #include "tcp/client/AprscClient.h"
@@ -41,14 +41,14 @@
 #include "util/Logger.h"
 #include "feed/Feed.h"
 #include "util/Position.hpp"
-#include "util/SensorInfo.hpp"
+#include "util/SensorInfo.h"
 
 using namespace util;
 
 #define SYNC_TIME (1)
 
 std::atomic<bool> VFRB::global_run_status(true);
-data::AircraftContainer VFRB::msAcCont;
+aircraft::AircraftContainer VFRB::msAcCont;
 data::SensorData VFRB::msSensorData;
 data::GpsData VFRB::msGpsData;
 
@@ -172,19 +172,4 @@ void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)
 {
     Logger::info("(VFRB) caught signal: ", "shutdown");
     global_run_status = false;
-}
-
-void VFRB::pushAircraft(const aircraft::Aircraft& cr_ac, std::int32_t prio)
-{
-    msAcCont.insertAircraft(cr_ac, prio);
-}
-
-void VFRB::pushSensorInfo(const SensorInfo& cr_si, std::int32_t prio)
-{
-    //msSensorData.
-}
-
-void VFRB::pushGpsPosition(const ExtGPSPosition& cr_pos, std::int32_t prio)
-{
-    msGpsData.setBasePos(prio, cr_pos);
 }

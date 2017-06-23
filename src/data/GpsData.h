@@ -26,8 +26,9 @@
 #include <string>
 
 #include "../util/GpsModule.h"
-#include "Data.hpp"
 #include "../util/Position.hpp"
+#include "Data.hpp"
+#include "Wrapper.hpp"
 
 namespace data
 {
@@ -37,7 +38,7 @@ namespace data
  *
  * This class holds GPS information.
  */
-class GpsData
+class GpsData: public Data<struct util::ExtGPSPosition>
 {
 public:
     /**
@@ -76,7 +77,7 @@ public:
      * @param prio   the priority attempting to write
      * @param cr_pos the new position
      */
-    void setBasePos(std::int32_t prio, const struct util::ExtGPSPosition& cr_pos);
+    void update(const struct util::ExtGPSPosition& cr_pos, std::int32_t prio) override;
     /**
      * Get the last registered GPS position.
      *
@@ -104,7 +105,7 @@ public:
 
 private:
     /// Data holding the base position.
-    struct Data<struct util::ExtGPSPosition> mBasePos;
+    struct Wrapper<struct util::ExtGPSPosition> mBasePos;
     /// GpsModule providing functionality to build GPS sentences.
     util::GpsModule mGpsMod;
 };

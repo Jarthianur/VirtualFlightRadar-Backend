@@ -29,7 +29,6 @@
 
 namespace data
 {
-class AircraftContainer;
 class SensorData;
 class GpsData;
 }
@@ -47,6 +46,7 @@ class Feed;
 namespace aircraft
 {
 class Aircraft;
+class AircraftContainer;
 }
 namespace util
 {
@@ -91,12 +91,14 @@ public:
      */
     static void run() noexcept;
 
-    static void pushAircraft(const aircraft::Aircraft& cr_ac, std::int32_t prio);
-    static void pushSensorInfo(const util::SensorInfo& cr_si, std::int32_t prio);
-    static void pushGpsPosition(const util::ExtGPSPosition& cr_pos, std::int32_t prio);
-
     /// Atomic run-status. By this, every component may determine if the VFRB stops.
     static std::atomic<bool> global_run_status;
+    /// Container holding all registered Aircrafts
+    static aircraft::AircraftContainer msAcCont;
+    /// Container holding sensor and climate information.
+    static data::SensorData msSensorData;
+    /// Container holding GPS information
+    static data::GpsData msGpsData;
 
 private:
     /**
@@ -120,12 +122,6 @@ private:
      * @param sig   the signal number
      */
     static void handleSignals(const boost::system::error_code& cr_ec, const int sig);
-    /// Container holding all registered Aircrafts
-    static data::AircraftContainer msAcCont;
-    /// Container holding sensor and climate information.
-    static data::SensorData msSensorData;
-    /// Container holding GPS information
-    static data::GpsData msGpsData;
 };
 
 #endif /* SRC_VFRB_H_ */
