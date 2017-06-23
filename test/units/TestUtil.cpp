@@ -80,7 +80,7 @@ void test_util(TestSuitesRunner& runner)
             {
                 GpsModule gpsm;
                 boost::smatch match;
-                struct ExtGPSPosition pos;
+                struct ExtGpsPosition pos;
                 bool matched = boost::regex_search(gpsm.genGpggaStr(pos), match, helper::gpsRe);
                 assert(matched, true, helper::eqb);
                 matched = boost::regex_search(gpsm.genGprmcStr(pos), match, helper::gpsRe);

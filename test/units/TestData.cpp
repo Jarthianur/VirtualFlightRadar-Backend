@@ -116,9 +116,9 @@ void test_data(TestSuitesRunner& runner)
     })->test("write higher priority", []()
     {
         data::GpsData gps;
-        struct ExtGPSPosition pos1;
+        struct ExtGpsPosition pos1;
         pos1.position.altitude = 1000;
-        struct ExtGPSPosition pos2;
+        struct ExtGpsPosition pos2;
         pos2.position.altitude = 2000;
         gps.setBasePos(0, pos1);
         assert(gps.getBaseAlt(), 1000, helper::eqi);
@@ -129,9 +129,9 @@ void test_data(TestSuitesRunner& runner)
     })->test("write after attempt", []()
     {
         data::GpsData gps;
-        struct ExtGPSPosition pos1;
+        struct ExtGpsPosition pos1;
         pos1.position.altitude = 1000;
-        struct ExtGPSPosition pos2;
+        struct ExtGpsPosition pos2;
         pos2.position.altitude = 2000;
         gps.setBasePos(1, pos1);
         assert(gps.getBaseAlt(), 1000, helper::eqi);

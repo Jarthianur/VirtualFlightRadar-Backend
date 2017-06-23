@@ -55,7 +55,7 @@ std::int32_t GpsFeed::process(const std::string& cr_res) noexcept
 {
     try
     {
-        ExtGPSPosition pos = Parser::parseGpsNmea(cr_res);
+        ExtGpsPosition pos = Parser::parseGpsNmea(cr_res);
         VFRB::msGpsData.update(pos, mPriority);
         if (config::Configuration::global_gnd_mode && pos.nrSats >= GPS_NR_SATS_GOOD
                 && pos.fixQa >= GPS_FIX_GOOD && pos.dilution <= GPS_HOR_DILUTION_GOOD)

@@ -50,7 +50,7 @@ class AircraftContainer;
 }
 namespace util
 {
-struct ExtGPSPosition;
+struct ExtGpsPosition;
 struct SensorInfo;
 }
 

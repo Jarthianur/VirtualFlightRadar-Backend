@@ -57,7 +57,7 @@ public:
      *
      * @return the GPGGA sentence
      */
-    std::string genGpggaStr(const struct ExtGPSPosition& cr_pos);
+    std::string genGpggaStr(const struct ExtGpsPosition& cr_pos);
     /**
      * Build a GPRMC sentence from given GPS information.
      * The sentence contains trailing <cr><lf>.
@@ -66,7 +66,7 @@ public:
      *
      * @return the GPRMC sentence
      */
-    std::string genGprmcStr(const struct ExtGPSPosition& cr_pos);
+    std::string genGprmcStr(const struct ExtGpsPosition& cr_pos);
 
 private:
     /// Formatstring buffer

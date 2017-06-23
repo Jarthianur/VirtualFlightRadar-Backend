@@ -32,7 +32,7 @@ class Aircraft;
 }
 namespace util
 {
-struct ExtGPSPosition;
+struct ExtGpsPosition;
 }
 
 namespace util
@@ -59,7 +59,7 @@ public:
 
     static aircraft::Aircraft parseAprs(const std::string& cr_msg);
     static aircraft::Aircraft parseSbs(const std::string& cr_msg);
-    static ExtGPSPosition parseGpsNmea(const std::string& cr_msg);
+    static ExtGpsPosition parseGpsNmea(const std::string& cr_msg);
     static SensorInfo parseSensNmea(const std::string& cr_msg);
 
 private:

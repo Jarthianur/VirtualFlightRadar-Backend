@@ -38,7 +38,7 @@ namespace data
  *
  * This class holds GPS information.
  */
-class GpsData: public Data<struct util::ExtGPSPosition>
+class GpsData: public Data<struct util::ExtGpsPosition>
 {
 public:
     /**
@@ -77,13 +77,13 @@ public:
      * @param prio   the priority attempting to write
      * @param cr_pos the new position
      */
-    void update(const struct util::ExtGPSPosition& cr_pos, std::int32_t prio) override;
+    void update(const struct util::ExtGpsPosition& cr_pos, std::int32_t prio) override;
     /**
      * Get the last registered GPS position.
      *
      * @return the position
      */
-    struct util::ExtGPSPosition getBasePos();
+    struct util::ExtGpsPosition getBasePos();
     /**
      * Get the base positions latitude.
      *
@@ -105,7 +105,7 @@ public:
 
 private:
     /// Data holding the base position.
-    struct Wrapper<struct util::ExtGPSPosition> mBasePos;
+    struct Wrapper<struct util::ExtGpsPosition> mBasePos;
     /// GpsModule providing functionality to build GPS sentences.
     util::GpsModule mGpsMod;
 };

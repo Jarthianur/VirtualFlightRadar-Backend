@@ -32,7 +32,7 @@ namespace util
  *
  * Minimal information for a position.
  */
-struct GPSPosition
+struct GpsPosition
 {
     /// Altitude; m
     std::int32_t altitude;
@@ -47,10 +47,10 @@ struct GPSPosition
  *
  * Holds GPS meta information additionally to a position.
  */
-struct ExtGPSPosition
+struct ExtGpsPosition
 {
     /// Position
-    struct GPSPosition position;
+    struct GpsPosition position;
     /// Number of satellites
     std::int32_t nrSats,
     /// GPS fix quality

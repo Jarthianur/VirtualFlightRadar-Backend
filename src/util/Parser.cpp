@@ -79,7 +79,7 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
     std::int32_t idType = 0, acType = 0;
     //std::int_32_t time = 0;
     double turnRate = 0.0, climbRate = 0.0, gndSpeed = 0.0, heading = 0.0;
-    GPSPosition gpsPos;
+    GpsPosition gpsPos;
     std::string id;
     boost::smatch match;
     if (boost::regex_match(cr_msg, match, aprsRe))
@@ -187,7 +187,7 @@ aircraft::Aircraft Parser::parseSbs(const std::string& cr_msg)
     std::size_t delim;
     std::uint32_t i = 2;
     std::string id;
-    GPSPosition gpsPos;
+    GpsPosition gpsPos;
     while ((delim = cr_msg.find(',', p)) != std::string::npos && i < 16)
     {
         switch (i)
@@ -244,14 +244,14 @@ aircraft::Aircraft Parser::parseSbs(const std::string& cr_msg)
     return ac;
 }
 
-ExtGPSPosition Parser::parseGpsNmea(const std::string& cr_msg)
+ExtGpsPosition Parser::parseGpsNmea(const std::string& cr_msg)
 {
     std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16);
     if (csum != math::checksum(cr_msg.c_str(), cr_msg.length()))
     {
         throw std::logic_error("");
     }
-    ExtGPSPosition gpsPos;
+    ExtGpsPosition gpsPos;
     boost::smatch match;
     if (boost::regex_match(cr_msg, match, gpggaRe))
     {

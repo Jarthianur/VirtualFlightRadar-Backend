@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_DATA_DATA_HPP_
-#define SRC_DATA_DATA_HPP_
+#ifndef SRC_DATA_WRAPPER_HPP_
+#define SRC_DATA_WRAPPER_HPP_
 
 #include <boost/thread/mutex.hpp>
 #include <cstdint>
@@ -141,4 +141,4 @@ struct TmpWrapper
 
 }  // namespace data
 
-#endif /* SRC_DATA_DATA_HPP_ */
+#endif /* SRC_DATA_WRAPPER_HPP_ */
