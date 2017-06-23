@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 #include <string>
 
 #include "../../src/config/Configuration.h"
-#include "../../src/vfrb/VFRB.h"
+#include "../../src/VFRB.h"
 #include "../framework/src/framework.h"
 #include "../Helper.hpp"
 

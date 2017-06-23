@@ -25,7 +25,7 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/operators.hpp>
-#include "../../vfrb/Feed.h"
+#include "../../feed/Feed.h"
 #include "../../util/Logger.h"
 
 using namespace util;
@@ -35,9 +35,9 @@ namespace tcp
 namespace client
 {
 
-SensorClient::SensorClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
-        const std::string& cr_port, vfrb::Feed& r_feed)
-        : Client(r_sigset, cr_host, cr_port, "(SensorClient)", r_feed),
+SensorClient::SensorClient(const std::string& cr_host, const std::string& cr_port,
+        feed::Feed& r_feed)
+        : Client(cr_host, cr_port, "(SensorClient)", r_feed),
           mStopped(false),
           mTimeout(mIoService)
 {
@@ -63,11 +63,6 @@ void SensorClient::connect() noexcept
             boost::bind(&SensorClient::handleResolve, this,
                     boost::asio::placeholders::error,
                     boost::asio::placeholders::iterator));
-}
-
-void SensorClient::process() noexcept
-{
-    mrFeed.process(mResponse);
 }
 
 void SensorClient::checkDeadline() noexcept

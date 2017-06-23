@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -53,14 +53,13 @@ public:
     /**
      * Constructor
      *
-     * @param r_sigset the signal set handling interrupts
      * @param cr_host  the hostname
      * @param cr_port  the port
      * @param cr_login the login string to transmit
-     * @param r_feed   the handler Feed
+     * @param r_feed   the handler Feed reference
      */
-    GpsdClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
-            const std::string& cr_port, vfrb::Feed& r_feed);
+    GpsdClient(const std::string& cr_host, const std::string& cr_port,
+            feed::Feed& r_feed);
     /**
      * Destructor
      *
@@ -82,12 +81,6 @@ private:
      * @overload Client::stop
      */
     void stop() noexcept override;
-    /**
-     * Implement Client::process
-     *
-     * @overload Client::process
-     */
-    void process() noexcept override;
     /**
      * Implement Client::handleResolve
      *

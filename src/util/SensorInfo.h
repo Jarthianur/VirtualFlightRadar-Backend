@@ -19,17 +19,23 @@
  }
  */
 
-#include "Parser.h"
+#ifndef SRC_UTIL_SENSORINFO_H_
+#define SRC_UTIL_SENSORINFO_H_
 
-namespace parser
+#include <string>
+
+#define SI_PRESS_NA -1024.0
+
+namespace util
 {
 
-Parser::Parser()
+struct SensorInfo
 {
-}
+    std::string mdaStr = "";
+    std::string mwvStr = "";
+    double press = SI_PRESS_NA;
+};
 
-Parser::~Parser() noexcept
-{
-}
+}  // namespace util
 
-}  // namespace parser
+#endif /* SRC_UTIL_SENSORINFO_H_ */

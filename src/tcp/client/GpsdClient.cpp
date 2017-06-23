@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #include <boost/bind.hpp>
 #include <cstddef>
 #include "../../config/Configuration.h"
-#include "../../vfrb/Feed.h"
+#include "../../feed/Feed.h"
 #include "../../util/Logger.h"
 
 using namespace util;
@@ -35,9 +35,9 @@ namespace tcp
 namespace client
 {
 
-GpsdClient::GpsdClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
-        const std::string& cr_port, vfrb::Feed& r_feed)
-        : Client(r_sigset, cr_host, cr_port, "(GpsdClient)", r_feed)
+GpsdClient::GpsdClient(const std::string& cr_host, const std::string& cr_port,
+        feed::Feed& r_feed)
+        : Client(cr_host, cr_port, "(GpsdClient)", r_feed)
 {
     connect();
 }
@@ -54,15 +54,6 @@ void GpsdClient::connect() noexcept
             boost::bind(&GpsdClient::handleResolve, this,
                     boost::asio::placeholders::error,
                     boost::asio::placeholders::iterator));
-}
-
-void GpsdClient::process() noexcept
-{
-    if (mrFeed.process(mResponse) > 0 && config::Configuration::global_gnd_mode)
-    {
-        Logger::info("(GpsdClient) received good position -> stop");
-        stop();
-    }
 }
 
 void GpsdClient::handleResolve(const boost::system::error_code& cr_ec,

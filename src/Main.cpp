@@ -27,7 +27,8 @@
 #include "data/SensorData.h"
 #include "data/GpsData.h"
 #include "util/Logger.h"
-#include "vfrb/VFRB.h"
+#include "VFRB.h"
+#include "util/SensorInfo.h"
 
 #ifndef VERSION
 #define VERSION "DEMO"
@@ -71,12 +72,12 @@ int main(int argc, char** argv)
     }
 
     // set climate fallbacks
-    vfrb::VFRB::msSensorData.setPress(0, config::Configuration::base_pressure);
-    vfrb::VFRB::msGpsData.setDefaults(config::Configuration::base_latitude,
-            config::Configuration::base_longitude,
-            config::Configuration::base_altitude,
+
+    VFRB::msSensorData.setDefaults(config::Configuration::base_pressure);
+    VFRB::msGpsData.setDefaults(config::Configuration::base_latitude,
+            config::Configuration::base_longitude, config::Configuration::base_altitude,
             config::Configuration::base_geoid);
-    vfrb::VFRB::run();
+    VFRB::run();
 
     return 0;
 }
@@ -89,8 +90,7 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
 
     for (int i = 1; i < argc; i++)
     {
-        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1
-                < argc)
+        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
         {
             ini_file = std::string(argv[++i]);
             if (ini_file.rfind(".ini") == std::string::npos)

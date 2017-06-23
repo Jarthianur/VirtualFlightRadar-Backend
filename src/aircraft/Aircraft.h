@@ -45,7 +45,7 @@ public:
      * @param r_id  The id
      * @param r_pos The position
      */
-    Aircraft(std::string& r_id, struct util::GPSPosition& r_pos);
+    Aircraft(std::string& r_id, struct util::GpsPosition& r_pos);
     /**
      * @fn Aircraft
      * @brief Constructor
@@ -58,7 +58,7 @@ public:
      * @param turn_r  The turn rate
      * @param head    The heading
      */
-    Aircraft(std::string& r_id, struct util::GPSPosition& r_pos, double gnd_spd,
+    Aircraft(std::string& r_id, struct util::GpsPosition& r_pos, double gnd_spd,
             std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r,
             double head);
     /**
@@ -277,7 +277,7 @@ private:
     /// Is an update attempt valid? If false, updates are only allowed with at least last priority.
     bool mAttemptValid = true;
     /// Last registered position.
-    struct util::GPSPosition mPosition;
+    struct util::GpsPosition mPosition;
     /// Speed over ground; m/s
     double mGndSpeed = A_VALUE_NA;
     /// Heading; deg [0-359]

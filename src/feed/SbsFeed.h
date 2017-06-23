@@ -19,50 +19,38 @@
  }
  */
 
-#ifndef SRC_PARSER_SBSPARSER_H_
-#define SRC_PARSER_SBSPARSER_H_
+#ifndef SRC_FEED_SBSFEED_H_
+#define SRC_FEED_SBSFEED_H_
 
-#include <cstdint>
-#include <string>
+#include "Feed.h"
 
-#include "Parser.h"
-#include "../util/Position.hpp"
-
-namespace parser
+namespace feed
 {
 
 /**
- * The SbsParser class, implements Parser.
+ * The SbsFeed class.
  *
- * This class unpacks SBS sentences into static VFRB::AircraftContainer.
+ * This inherits from Feed and
+ * resolves to SBS handling Client and Parser.
  */
-class SbsParser: public Parser
+class SbsFeed: public Feed
 {
 public:
     /**
-     * Constructor
+     * Construct an SbsFeed.
+     * Pass all parameters to parent constructor.
      */
-    SbsParser();
+    SbsFeed(const std::string& cr_name, std::int32_t prio,
+            const std::unordered_map<std::string, std::string>& cr_kvmap);
     /**
      * Destructor
      *
      * @exceptsafe no-throw
      */
-    virtual ~SbsParser() noexcept;
-    /**
-     * Unpack SBS messages into the static VFRB::AircraftContainer.
-     *
-     * @overload Parser::unpack
-     */
-    std::int32_t unpack(const std::string& cr_msg, std::int32_t prio) noexcept override;
-
-private:
-    /// Temporary data
-    std::string mtId;
-    struct util::GPSPosition mtGpsPos;
-    //std::int32_t mtTime = 0;
+    virtual ~SbsFeed() noexcept;
+    std::int32_t process(const std::string& cr_res) noexcept override;
 };
 
-}  // namespace parser
+} // namespace feed
 
-#endif /* SRC_PARSER_SBSPARSER_H_ */
+#endif /* SRC_FEED_SBSFEED_H_ */

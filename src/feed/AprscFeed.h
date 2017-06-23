@@ -19,44 +19,40 @@
  }
  */
 
-#ifndef SRC_PARSER_SENSORPARSER_H_
-#define SRC_PARSER_SENSORPARSER_H_
+#ifndef SRC_FEED_APRSCFEED_H_
+#define SRC_FEED_APRSCFEED_H_
 
-#include <cstdint>
-#include <cstddef>
-#include <string>
+#include "Feed.h"
 
-#include "Parser.h"
-
-namespace parser
+namespace feed
 {
 
 /**
- * The SensorParser class, implements Parser.
+ * The AprscFeed class.
  *
- * This class unpacks NMEA sentences, as they are MDA and MWV, into static VFRB::SensorData.
+ * This inherits from Feed and
+ * resolves to APRSC handling Client and Parser.
  */
-class SensorParser: public Parser
+class AprscFeed: public Feed
 {
 public:
     /**
-     * Constructor
+     * Construct an AprscFeed.
+     * Pass parameters to parent constructor.
+     *
+     * @throws std::runtime_error if login is not given in cr_kvmap
      */
-    SensorParser();
+    AprscFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
+            const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
     /**
      * Destructor
      *
      * @exceptsafe no-throw
      */
-    virtual ~SensorParser() noexcept;
-    /**
-     * Unpack NMEA messages into the static VFRB::SensorData.
-     *
-     * @overload Parser::unpack
-     */
-    std::int32_t unpack(const std::string& cr_msg, std::int32_t prio) noexcept override;
+    virtual ~AprscFeed() noexcept;
+    std::int32_t process(const std::string& cr_res) noexcept override;
 };
 
-}  // namespace parser
+} // namespace feed
 
-#endif /* SRC_PARSER_SENSORPARSER_H_ */
+#endif /* SRC_FEED_APRSCFEED_H_ */

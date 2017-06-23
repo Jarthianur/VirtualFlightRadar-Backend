@@ -23,7 +23,10 @@
 #define SRC_DATA_SENSORDATA_H_
 
 #include <string>
+#include <cstdint>
+#include "../util/SensorInfo.h"
 #include "Data.hpp"
+#include "Wrapper.hpp"
 
 namespace data
 {
@@ -40,7 +43,7 @@ namespace data
  * This class holds data gathered from any sensor.
  * E.g. wind sensor, pressure sensor
  */
-class SensorData
+class SensorData: public Data<struct util::SensorInfo>
 {
 public:
     /**
@@ -53,6 +56,9 @@ public:
      * @exceptsafe no-throw
      */
     virtual ~SensorData() noexcept;
+
+    void update(const struct util::SensorInfo& cr_info, std::int32_t prio) override;
+    void setDefaults(double p);
     /**
      * Get MWV sentence.
      * Wind data is invalid after this operation.
@@ -61,21 +67,20 @@ public:
      */
     std::string getMwvStr();
     /**
-     * Set MWV sentence.
-     * Wind data is valid after this operation.
-     * May fail due to priority.
-     *
-     * @param prio the priority attempting to write
-     * @param cr_mwv the new MWV sentence to write
-     */
-    void setMwvStr(std::int32_t prio, const std::string& cr_mwv);
-    /**
      * Get MDA sentence.
      * Data is invalid after this operation.
      *
      * @return the MDA sentence, if valid, else empty string
      */
     std::string getMdaStr();
+    /**
+     * Get the last registered pressure.
+     *
+     * @return the pressure
+     */
+    double getPress();
+
+private:
     /**
      * Set MDA sentence.
      * Data is valid after this operation.
@@ -84,13 +89,16 @@ public:
      * @param prio the priority attempting to write
      * @param cr_mda the new MDA sentence to write
      */
-    void setMdaStr(std::int32_t prio, const std::string& cr_mda);
+    void setMdaStr(const std::string& cr_mda, std::int32_t prio);
     /**
-     * Get the last registered pressure.
+     * Set MWV sentence.
+     * Wind data is valid after this operation.
+     * May fail due to priority.
      *
-     * @return the pressure
+     * @param prio the priority attempting to write
+     * @param cr_mwv the new MWV sentence to write
      */
-    double getPress();
+    void setMwvStr(const std::string& cr_mwv, std::int32_t prio);
     /**
      * Set the new pressure.
      * May fail due to priority.
@@ -98,15 +106,13 @@ public:
      * @param prio the priority attempting to write
      * @param p the new pressure
      */
-    void setPress(std::int32_t prio, double p);
-
-private:
+    void setPress(double p, std::int32_t prio);
     /// Data holding pressure
-    struct Data<double> mPress;
+    struct Wrapper<double> mPress;
     /// TmpData holding MWV sentence
-    struct TmpData<std::string> mMwvData;
+    struct TmpWrapper<std::string> mMwvData;
     /// TmpData holding MDA sentence
-    struct TmpData<std::string> mMdaData;
+    struct TmpWrapper<std::string> mMdaData;
 };
 
 } // namespace data

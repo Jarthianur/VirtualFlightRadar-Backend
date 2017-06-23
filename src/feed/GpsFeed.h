@@ -19,28 +19,39 @@
  }
  */
 
-#ifndef SRC_DATA_DATA_H_
-#define SRC_DATA_DATA_H_
+#ifndef SRC_FEED_GPSFEED_H_
+#define SRC_FEED_GPSFEED_H_
 
-#include <cstdint>
+#include "Feed.h"
 
-namespace data
+namespace feed
 {
 
-template<typename T>
-class Data
+/**
+ * The GpsFeed class.
+ *
+ * This inherits from Feed and
+ * resolves to GPS handling Client and Parser.
+ */
+class GpsFeed: public Feed
 {
 public:
-    inline Data()
-    {
-    }
-    inline virtual ~Data() noexcept
-    {
-    }
+    /**
+     * Construct an GpsFeed.
+     * Pass all parameters to parent constructor.
+     */
+    GpsFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
+            const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
+    /**
+     * Destructor
+     *
+     * @exceptsafe no-throw
+     */
+    virtual ~GpsFeed() noexcept;
 
-    virtual void update(const T&, std::int32_t prio) = 0;
+    std::int32_t process(const std::string& cr_res) noexcept override;
 };
 
-} /* namespace data */
+} // namespace feed
 
-#endif /* SRC_DATA_DATA_H_ */
+#endif /* SRC_FEED_GPSFEED_H_ */

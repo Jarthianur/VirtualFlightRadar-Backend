@@ -19,52 +19,38 @@
  }
  */
 
-#ifndef SRC_PARSER_PARSER_H_
-#define SRC_PARSER_PARSER_H_
+#ifndef SRC_FEED_SENSORFEED_H_
+#define SRC_FEED_SENSORFEED_H_
 
-#include <cstdint>
-#include <string>
+#include "Feed.h"
 
-namespace parser
+namespace feed
 {
 
-/// Parser -- unpack error codes
-#define MSG_UNPACK_SUC 0
-#define MSG_UNPACK_ERR -1
-#define MSG_UNPACK_IGN -2
-
 /**
- * The Parser interface.
+ * The SensorFeed class.
  *
- * Classes of this type implement the unpack method.
+ * This inherits from Feed and
+ * resolves to Sensor handling Client and Parser.
  */
-class Parser
+class SensorFeed: public Feed
 {
 public:
     /**
-     * Constructor
+     * Construct an SensorFeed.
+     * Pass all parameters to parent constructor.
      */
-    Parser();
+    SensorFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
+            const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
     /**
      * Destructor
      *
      * @exceptsafe no-throw
      */
-    virtual ~Parser() noexcept;
-    /**
-     * Unpack given string.
-     * Where to put unpacked data is handled by implementation,
-     * as well as priority pass-through.
-     *
-     * @param cr_msg the msg to unpack
-     * @param prio  the priority to pass
-     *
-     * @return an error code
-     */
-    virtual std::int32_t unpack(const std::string& cr_msg, std::int32_t prio)
-            noexcept = 0;
+    virtual ~SensorFeed() noexcept;
+    std::int32_t process(const std::string& cr_res) noexcept override;
 };
 
-}  // namespace parser
+} // namespace feed
 
-#endif /* SRC_PARSER_PARSER_H_ */
+#endif /* SRC_FEED_SENSORFEED_H_ */

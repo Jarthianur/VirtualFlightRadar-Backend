@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_DATA_AIRCRAFTCONTAINER_H_
-#define SRC_DATA_AIRCRAFTCONTAINER_H_
+#ifndef SRC_AIRCRAFT_AIRCRAFTCONTAINER_H_
+#define SRC_AIRCRAFT_AIRCRAFTCONTAINER_H_
 
 #include <boost/thread/mutex.hpp>
 #include <cstddef>
@@ -34,11 +34,8 @@
 
 namespace aircraft
 {
-class Aircraft;
-}
 
-namespace data
-{
+class Aircraft;
 
 /**
  * The AircraftContainer class.
@@ -74,7 +71,7 @@ public:
      *
      * @exceptsafe strong
      */
-    void insertAircraft(const aircraft::Aircraft& cr_update, std::int32_t prio) noexcept;
+    void insertAircraft(const Aircraft& cr_update, std::int32_t prio) noexcept;
     /**
      * Process all aircrafts into NMEA sentences PFLAU and PFLAA.
      * Aircrafts with too old information are not reported, later deleted.
@@ -94,18 +91,18 @@ private:
      *
      * @return an iterator to the Aircraft if found, else vector::end
      */
-    std::vector<aircraft::Aircraft>::iterator find(const std::string& cr_id);
+    std::vector<Aircraft>::iterator find(const std::string& cr_id);
 
     /// Mutex for threadsafety
     boost::mutex mMutex;
     /// Processor providing functionality to process Aircrafts
-    aircraft::AircraftProcessor mAcProc;
+    AircraftProcessor mAcProc;
     /// Vector holding the Aircrafts
-    std::vector<aircraft::Aircraft> mCont;
+    std::vector<Aircraft> mCont;
     /// Index map to make find efficient
     std::unordered_map<std::string, size_t> mIndexMap;
 };
 
-}  // namespace data
+}  // namespace aircraft
 
-#endif /* SRC_DATA_AIRCRAFTCONTAINER_H_ */
+#endif /* SRC_AIRCRAFT_AIRCRAFTCONTAINER_H_ */

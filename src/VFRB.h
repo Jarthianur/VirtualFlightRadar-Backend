@@ -19,16 +19,16 @@
  }
  */
 
-#ifndef SRC_VFRB_VFRB_H_
-#define SRC_VFRB_VFRB_H_
+#ifndef SRC_VFRB_H_
+#define SRC_VFRB_H_
 
 #include <atomic>
 #include <boost/asio/signal_set.hpp>
 #include <boost/system/error_code.hpp>
+#include <memory>
 
 namespace data
 {
-class AircraftContainer;
 class SensorData;
 class GpsData;
 }
@@ -39,11 +39,20 @@ namespace server
 class Server;
 }
 }
-
-namespace vfrb
+namespace feed
 {
-
 class Feed;
+}
+namespace aircraft
+{
+class Aircraft;
+class AircraftContainer;
+}
+namespace util
+{
+struct ExtGpsPosition;
+struct SensorInfo;
+}
 
 /**
  * The VFRB class.
@@ -85,7 +94,7 @@ public:
     /// Atomic run-status. By this, every component may determine if the VFRB stops.
     static std::atomic<bool> global_run_status;
     /// Container holding all registered Aircrafts
-    static data::AircraftContainer msAcCont;
+    static aircraft::AircraftContainer msAcCont;
     /// Container holding sensor and climate information.
     static data::SensorData msSensorData;
     /// Container holding GPS information
@@ -96,15 +105,16 @@ private:
      * Handler for an input Feed thread.
      *
      * @param r_sigset the signal set to pass
-     * @param r_feed   the Feed to handle
+     * @param p_feed   the Feed to handle
      */
-    static void handleInputFeed(boost::asio::signal_set& r_sigset, Feed& r_feed);
+    static void handleFeed(boost::asio::signal_set& r_sigset,
+            std::shared_ptr<feed::Feed> p_feed);
     /**
      * Handler for an Server thread.
      *
      * @param r_server the Server to handle
      */
-    static void handleNMEAServer(tcp::server::Server& r_server);
+    static void handleServer(tcp::server::Server& r_server);
     /**
      * Handler for a signal interrupt thread.
      *
@@ -114,6 +124,4 @@ private:
     static void handleSignals(const boost::system::error_code& cr_ec, const int sig);
 };
 
-}  // namespace vfrb
-
-#endif /* SRC_VFRB_VFRB_H_ */
+#endif /* SRC_VFRB_H_ */

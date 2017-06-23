@@ -19,54 +19,57 @@
  }
  */
 
-#ifndef SRC_PARSER_APRSPARSER_H_
-#define SRC_PARSER_APRSPARSER_H_
+#ifndef SRC_PARSER_PARSER_H_
+#define SRC_PARSER_PARSER_H_
 
 #include <boost/regex.hpp>
-#include <cstdint>
 #include <string>
+#include "SensorInfo.h"
 
-#include "Parser.h"
-#include "../util/Position.hpp"
+namespace aircraft
+{
+class Aircraft;
+}
+namespace util
+{
+struct ExtGpsPosition;
+}
 
-namespace parser
+namespace util
 {
 
 /**
- * The AprsParser class, implements Parser.
+ * The Parser interface.
  *
- * This class unpacks APRS strings into static AircraftContainer.
+ * Classes of this type implement the unpack method.
  */
-class AprsParser: public Parser
+class Parser
 {
 public:
     /**
      * Constructor
      */
-    AprsParser();
+    Parser();
     /**
      * Destructor
      *
      * @exceptsafe no-throw
      */
-    virtual ~AprsParser() noexcept;
-    /**
-     * Unpack APRS messages into the static VFRB::AircraftContainer.
-     *
-     * @overload Parser::unpack
-     */
-    std::int32_t unpack(const std::string& cr_msg, std::int32_t prio) noexcept override;
+    virtual ~Parser() noexcept;
+
+    static aircraft::Aircraft parseAprs(const std::string& cr_msg);
+    static aircraft::Aircraft parseSbs(const std::string& cr_msg);
+    static ExtGpsPosition parseGpsNmea(const std::string& cr_msg);
+    static SensorInfo parseSensNmea(const std::string& cr_msg);
 
 private:
     /// Regular expression for APRS protocol
-    const boost::regex mAprsRe;
+    static const boost::regex aprsRe;
     /// Regular expression for OGN specific APRS extension
-    const boost::regex mComRe;
-    /// Temporary information
-    std::string mtId;
-    struct util::GPSPosition mtGpsPos;
+    static const boost::regex aprsComRe;
+    static const boost::regex gpggaRe;
 };
 
-}  // namespace parser
+}  // namespace util
 
-#endif /* SRC_PARSER_APRSPARSER_H_ */
+#endif /* SRC_PARSER_PARSER_H_ */

@@ -53,14 +53,12 @@ public:
     /**
      * Constructor
      *
-     * @param r_sigset the signal set handling interrupts
      * @param cr_host  the hostname
      * @param cr_port  the port
      * @param cr_login the login string to transmit
-     * @param r_feed   the handler Feed
+     * @param r_feed   the handler Feed reference
      */
-    SbsClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
-            const std::string& cr_port, vfrb::Feed& r_feed);
+    SbsClient(const std::string& cr_host, const std::string& cr_port, feed::Feed& r_feed);
     /**
      * Destructor
      *
@@ -75,12 +73,6 @@ private:
      * @overload Client::connect
      */
     void connect() noexcept override;
-    /**
-     * Implement Client::process
-     *
-     * @overload Client::process
-     */
-    void process() noexcept override;
     /**
      * Implement Client::handleResolve
      *
