@@ -67,7 +67,7 @@ void Client::timedConnect() noexcept
     mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
     mConnectTimer.async_wait(
             boost::bind(&Client::handleTimedConnect, this,
-                        boost::asio::placeholders::error));
+                    boost::asio::placeholders::error));
 }
 
 void Client::stop() noexcept
@@ -85,12 +85,9 @@ void Client::stop() noexcept
 
 void Client::read() noexcept
 {
-    boost::asio::async_read_until(
-            mSocket,
-            mBuffer,
-            "\r\n",
+    boost::asio::async_read_until(mSocket, mBuffer, "\r\n",
             boost::bind(&Client::handleRead, this, boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+                    boost::asio::placeholders::bytes_transferred));
 }
 
 void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept

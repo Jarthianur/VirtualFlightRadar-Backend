@@ -39,7 +39,7 @@ SbsFeed::SbsFeed(const std::string& cr_name, std::int32_t prio,
 {
     mpClient = std::unique_ptr<tcp::client::Client>(
             new tcp::client::SbsClient(mKvMap.find(KV_KEY_HOST)->second,
-                                       mKvMap.find(KV_KEY_PORT)->second, *this));
+                    mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 SbsFeed::~SbsFeed() noexcept

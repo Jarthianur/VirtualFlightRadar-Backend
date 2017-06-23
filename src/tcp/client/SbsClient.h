@@ -58,8 +58,7 @@ public:
      * @param cr_login the login string to transmit
      * @param r_feed   the handler Feed reference
      */
-    SbsClient(const std::string& cr_host,
-            const std::string& cr_port, feed::Feed& r_feed);
+    SbsClient(const std::string& cr_host, const std::string& cr_port, feed::Feed& r_feed);
     /**
      * Destructor
      *

@@ -62,7 +62,7 @@ public:
      * @param r_feed   the handler Feed reference
      */
     SensorClient(const std::string& cr_host, const std::string& cr_port,
-                 feed::Feed& r_feed);
+            feed::Feed& r_feed);
     /**
      * Destructor
      *

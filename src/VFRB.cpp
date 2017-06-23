@@ -78,7 +78,7 @@ void VFRB::run() noexcept
 
     signal_set.async_wait(
             boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
-                        boost::asio::placeholders::signal_number));
+                    boost::asio::placeholders::signal_number));
 
     boost::thread signal_thread([&io_service]()
     {
@@ -156,7 +156,7 @@ void VFRB::run() noexcept
 void VFRB::handleServer(tcp::server::Server& r_server)
 {
     Logger::info("(Server) startup: localhost ",
-                 std::to_string(config::Configuration::global_server_port));
+            std::to_string(config::Configuration::global_server_port));
     r_server.run();
     global_run_status = false;
 }

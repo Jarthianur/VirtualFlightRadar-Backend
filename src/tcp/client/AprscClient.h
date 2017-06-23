@@ -58,8 +58,8 @@ public:
      * @param cr_login the login string to transmit
      * @param r_feed   the handler Feed reference
      */
-    AprscClient(const std::string& cr_host,
-            const std::string& cr_port, const std::string& cr_login, feed::Feed& r_feed);
+    AprscClient(const std::string& cr_host, const std::string& cr_port,
+            const std::string& cr_login, feed::Feed& r_feed);
     /**
      * Destructor
      *

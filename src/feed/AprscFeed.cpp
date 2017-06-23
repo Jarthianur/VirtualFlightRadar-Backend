@@ -49,8 +49,7 @@ AprscFeed::AprscFeed(const std::string& cr_name, std::int32_t prio,
     {
         mpClient = std::unique_ptr<tcp::client::Client>(
                 new tcp::client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
-                                             mKvMap.find(KV_KEY_PORT)->second, it->second,
-                                             *this));
+                        mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
     }
 }
 

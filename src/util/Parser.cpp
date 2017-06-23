@@ -162,7 +162,7 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
         throw std::logic_error("");
     }
     aircraft::Aircraft ac(id, gpsPos, gndSpeed, idType, acType, climbRate, turnRate,
-                          heading);
+            heading);
     ac.setFullInfo(fullInfo);
     ac.setTargetT(aircraft::Aircraft::TargetType::FLARM);
     return ac;

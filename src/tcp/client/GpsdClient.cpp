@@ -35,8 +35,8 @@ namespace tcp
 namespace client
 {
 
-GpsdClient::GpsdClient(const std::string& cr_host,
-        const std::string& cr_port, feed::Feed& r_feed)
+GpsdClient::GpsdClient(const std::string& cr_host, const std::string& cr_port,
+        feed::Feed& r_feed)
         : Client(cr_host, cr_port, "(GpsdClient)", r_feed)
 {
     connect();
