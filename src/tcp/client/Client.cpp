@@ -36,7 +36,7 @@ namespace client
 {
 
 Client::Client(const std::string& cr_host, const std::string& cr_port,
-               const std::string& cr_comp, feed::Feed& r_feed)
+        const std::string& cr_comp, feed::Feed& r_feed)
         : mIoService(),
           mSocket(mIoService),
           mResolver(mIoService),
@@ -113,7 +113,7 @@ noexcept
     {
         std::istream is(&mBuffer);
         std::getline(is, mResponse);
-        process();
+        mrFeed.process(mResponse);
         read();
     } else if (cr_ec != boost::system::errc::bad_file_descriptor)
     {

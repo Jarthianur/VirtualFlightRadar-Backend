@@ -29,7 +29,6 @@
 
 namespace data
 {
-class AircraftContainer;
 class SensorData;
 class GpsData;
 }
@@ -43,6 +42,16 @@ class Server;
 namespace feed
 {
 class Feed;
+}
+namespace aircraft
+{
+class Aircraft;
+class AircraftContainer;
+}
+namespace util
+{
+struct ExtGpsPosition;
+struct SensorInfo;
 }
 
 /**
@@ -85,7 +94,7 @@ public:
     /// Atomic run-status. By this, every component may determine if the VFRB stops.
     static std::atomic<bool> global_run_status;
     /// Container holding all registered Aircrafts
-    static data::AircraftContainer msAcCont;
+    static aircraft::AircraftContainer msAcCont;
     /// Container holding sensor and climate information.
     static data::SensorData msSensorData;
     /// Container holding GPS information
@@ -99,7 +108,7 @@ private:
      * @param p_feed   the Feed to handle
      */
     static void handleFeed(boost::asio::signal_set& r_sigset,
-                           std::shared_ptr<feed::Feed> p_feed);
+            std::shared_ptr<feed::Feed> p_feed);
     /**
      * Handler for an Server thread.
      *

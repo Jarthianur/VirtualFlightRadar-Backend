@@ -43,13 +43,14 @@ public:
      * @throws std::runtime_error if login is not given in cr_kvmap
      */
     AprscFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
-              const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
+            const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
     /**
      * Destructor
      *
      * @exceptsafe no-throw
      */
     virtual ~AprscFeed() noexcept;
+    std::int32_t process(const std::string& cr_res) noexcept override;
 };
 
 } // namespace feed

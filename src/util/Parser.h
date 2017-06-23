@@ -22,16 +22,21 @@
 #ifndef SRC_PARSER_PARSER_H_
 #define SRC_PARSER_PARSER_H_
 
-#include <cstdint>
+#include <boost/regex.hpp>
 #include <string>
+#include "SensorInfo.h"
 
-namespace parser
+namespace aircraft
 {
+class Aircraft;
+}
+namespace util
+{
+struct ExtGpsPosition;
+}
 
-/// Parser -- unpack error codes
-#define MSG_UNPACK_SUC 0
-#define MSG_UNPACK_ERR -1
-#define MSG_UNPACK_IGN -2
+namespace util
+{
 
 /**
  * The Parser interface.
@@ -51,20 +56,20 @@ public:
      * @exceptsafe no-throw
      */
     virtual ~Parser() noexcept;
-    /**
-     * Unpack given string.
-     * Where to put unpacked data is handled by implementation,
-     * as well as priority pass-through.
-     *
-     * @param cr_msg the msg to unpack
-     * @param prio  the priority to pass
-     *
-     * @return an error code
-     */
-    virtual std::int32_t unpack(const std::string& cr_msg, std::int32_t prio)
-            noexcept = 0;
+
+    static aircraft::Aircraft parseAprs(const std::string& cr_msg);
+    static aircraft::Aircraft parseSbs(const std::string& cr_msg);
+    static ExtGpsPosition parseGpsNmea(const std::string& cr_msg);
+    static SensorInfo parseSensNmea(const std::string& cr_msg);
+
+private:
+    /// Regular expression for APRS protocol
+    static const boost::regex aprsRe;
+    /// Regular expression for OGN specific APRS extension
+    static const boost::regex aprsComRe;
+    static const boost::regex gpggaRe;
 };
 
-}  // namespace parser
+}  // namespace util
 
 #endif /* SRC_PARSER_PARSER_H_ */

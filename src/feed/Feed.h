@@ -30,10 +30,6 @@
 #include <typeindex>
 #include <unordered_map>
 
-namespace parser
-{
-class Parser;
-}
 namespace tcp
 {
 namespace client
@@ -89,7 +85,7 @@ public:
      *
      * @exceptsafe no-throw
      */
-    std::int32_t process(const std::string& cr_res) noexcept;
+    virtual std::int32_t process(const std::string& cr_res) noexcept = 0;
 
     /// Unique name
     const std::string mName;
@@ -109,13 +105,11 @@ protected:
      * @throws std::runtime_error if host or port are not given
      */
     Feed(const std::string& cr_name, std::int32_t prio,
-         const std::unordered_map<std::string, std::string>& cr_kvmap);
+            const std::unordered_map<std::string, std::string>& cr_kvmap);
     /// Key-value-map holding the properties.
     std::unordered_map<std::string, std::string> mKvMap;
     /// Client, later resolved according to InpuType
     std::unique_ptr<tcp::client::Client> mpClient;
-    /// Parser parsing the input
-    std::unique_ptr<parser::Parser> mpParser;
 };
 
 }  // namespace feed

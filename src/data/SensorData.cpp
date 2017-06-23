@@ -20,19 +20,37 @@
  */
 
 #include "SensorData.h"
-
 #include <boost/thread/lock_guard.hpp>
+
+using namespace util;
 
 namespace data
 {
 
 SensorData::SensorData()
+        : Data<struct SensorInfo>()
 {
     mPress.value = ICAO_STD_A;
 }
 
 SensorData::~SensorData() noexcept
 {
+}
+
+void SensorData::update(const struct SensorInfo& cr_info, std::int32_t prio)
+{
+    if (!cr_info.mdaStr.empty())
+    {
+        setMdaStr(cr_info.mdaStr, prio);
+    }
+    if (!cr_info.mwvStr.empty())
+    {
+        setMwvStr(cr_info.mwvStr, prio);
+    }
+    if (cr_info.press != SI_PRESS_NA)
+    {
+        setPress(cr_info.press, prio);
+    }
 }
 
 std::string SensorData::getMwvStr()
@@ -47,10 +65,10 @@ std::string SensorData::getMwvStr()
     }
 }
 
-void SensorData::setMwvStr(std::int32_t prio, const std::string& cr_mwv)
+void SensorData::setMwvStr(const std::string& cr_mwv, std::int32_t prio)
 {
     boost::lock_guard<boost::mutex> lock(mMwvData.mutex);
-    mMwvData.update(cr_mwv, prio);
+    mMwvData.trySetValue(cr_mwv, prio);
 }
 
 std::string SensorData::getMdaStr()
@@ -65,10 +83,10 @@ std::string SensorData::getMdaStr()
     }
 }
 
-void SensorData::setMdaStr(std::int32_t prio, const std::string& cr_mda)
+void SensorData::setMdaStr(const std::string& cr_mda, std::int32_t prio)
 {
     boost::lock_guard<boost::mutex> lock(mMdaData.mutex);
-    mMdaData.update(cr_mda, prio);
+    mMdaData.trySetValue(cr_mda, prio);
 }
 
 double SensorData::getPress()
@@ -77,10 +95,15 @@ double SensorData::getPress()
     return mPress.value;
 }
 
-void SensorData::setPress(std::int32_t prio, double p)
+void SensorData::setDefaults(double p)
+{
+    mPress.trySetValue(p, 0);
+}
+
+void SensorData::setPress(double p, std::int32_t prio)
 {
     boost::lock_guard<boost::mutex> lock(mPress.mutex);
-    mPress.update(p, prio);
+    mPress.trySetValue(p, prio);
 }
 
 }  // namespace data

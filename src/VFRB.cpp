@@ -31,7 +31,7 @@
 #include <string>
 
 #include "config/Configuration.h"
-#include "data/AircraftContainer.h"
+#include "aircraft/AircraftContainer.h"
 #include "data/GpsData.h"
 #include "data/SensorData.h"
 #include "tcp/client/AprscClient.h"
@@ -40,13 +40,15 @@
 #include "tcp/server/Server.h"
 #include "util/Logger.h"
 #include "feed/Feed.h"
+#include "util/Position.hpp"
+#include "util/SensorInfo.h"
 
 using namespace util;
 
 #define SYNC_TIME (1)
 
 std::atomic<bool> VFRB::global_run_status(true);
-data::AircraftContainer VFRB::msAcCont;
+aircraft::AircraftContainer VFRB::msAcCont;
 data::SensorData VFRB::msSensorData;
 data::GpsData VFRB::msGpsData;
 
@@ -84,10 +86,8 @@ void VFRB::run() noexcept
     });
 
     // init server and run handler
-    tcp::server::Server server(signal_set,
-            config::Configuration::global_server_port);
-    boost::thread server_thread(
-            boost::bind(&VFRB::handleServer, std::ref(server)));
+    tcp::server::Server server(signal_set, config::Configuration::global_server_port);
+    boost::thread server_thread(boost::bind(&VFRB::handleServer, std::ref(server)));
 
     //init input threads
     boost::thread_group feed_threads;
@@ -162,7 +162,7 @@ void VFRB::handleServer(tcp::server::Server& r_server)
 }
 
 void VFRB::handleFeed(boost::asio::signal_set& r_sigset,
-                      std::shared_ptr<feed::Feed> p_feed)
+        std::shared_ptr<feed::Feed> p_feed)
 {
     Logger::info("(VFRB) run feed: ", p_feed->mName);
     p_feed->run(r_sigset);

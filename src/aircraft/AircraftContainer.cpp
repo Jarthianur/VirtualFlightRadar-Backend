@@ -32,14 +32,13 @@
 #include "../aircraft/Aircraft.h"
 
 using namespace util;
-using namespace aircraft;
 
-namespace data
+namespace aircraft
 {
 
-#define AC_INVALIDATE         (4)
-#define AC_DELETE_THRESHOLD   (120)
-#define AC_NO_FLARM_THRESHOLD (AC_INVALIDATE)
+#define AC_INVALIDATE         4
+#define AC_DELETE_THRESHOLD   120
+#define AC_NO_FLARM_THRESHOLD AC_INVALIDATE
 
 AircraftContainer::AircraftContainer()
         : mAcProc(),
@@ -143,4 +142,4 @@ noexcept
     }
 }
 
-} // namespace data
+} // namespace aircraft

@@ -29,7 +29,6 @@
 #include "../util/Logger.h"
 #include "../VFRB.h"
 #include "../tcp/client/Client.h"
-#include "../parser/Parser.h"
 
 using namespace util;
 
@@ -62,8 +61,7 @@ Feed::Feed(BOOST_RV_REF(Feed) other)
 : mName(std::move(other.mName)),
 mPriority(other.mPriority),
 mKvMap(std::move(other.mKvMap)),
-mpClient(std::move(other.mpClient)),
-mpParser(std::move(other.mpParser))
+mpClient(std::move(other.mpClient))
 {
 }
 
@@ -78,11 +76,6 @@ void Feed::run(boost::asio::signal_set& r_sigset) noexcept
     {
         mpClient->run(r_sigset);
     }
-}
-
-std::int32_t Feed::process(const std::string& cr_res) noexcept
-{
-    return mpParser->unpack(cr_res, mPriority);
 }
 
 }  // namespace feed

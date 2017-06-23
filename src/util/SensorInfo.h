@@ -19,44 +19,23 @@
  }
  */
 
-#ifndef SRC_PARSER_SENSORPARSER_H_
-#define SRC_PARSER_SENSORPARSER_H_
+#ifndef SRC_UTIL_SENSORINFO_H_
+#define SRC_UTIL_SENSORINFO_H_
 
-#include <cstdint>
-#include <cstddef>
 #include <string>
 
-#include "Parser.h"
+#define SI_PRESS_NA -1024.0
 
-namespace parser
+namespace util
 {
 
-/**
- * The SensorParser class, implements Parser.
- *
- * This class unpacks NMEA sentences, as they are MDA and MWV, into static VFRB::SensorData.
- */
-class SensorParser: public Parser
+struct SensorInfo
 {
-public:
-    /**
-     * Constructor
-     */
-    SensorParser();
-    /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
-     */
-    virtual ~SensorParser() noexcept;
-    /**
-     * Unpack NMEA messages into the static VFRB::SensorData.
-     *
-     * @overload Parser::unpack
-     */
-    std::int32_t unpack(const std::string& cr_msg, std::int32_t prio) noexcept override;
+    std::string mdaStr = "";
+    std::string mwvStr = "";
+    double press = SI_PRESS_NA;
 };
 
-}  // namespace parser
+}  // namespace util
 
-#endif /* SRC_PARSER_SENSORPARSER_H_ */
+#endif /* SRC_UTIL_SENSORINFO_H_ */

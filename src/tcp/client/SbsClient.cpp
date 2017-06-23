@@ -36,8 +36,8 @@ namespace tcp
 namespace client
 {
 
-SbsClient::SbsClient(const std::string& cr_host,
-        const std::string& cr_port, feed::Feed& r_feed)
+SbsClient::SbsClient(const std::string& cr_host, const std::string& cr_port,
+        feed::Feed& r_feed)
         : Client(cr_host, cr_port, "(SbsClient)", r_feed)
 {
     connect();
@@ -54,11 +54,6 @@ void SbsClient::connect() noexcept
     mResolver.async_resolve(query,
             boost::bind(&SbsClient::handleResolve, this, boost::asio::placeholders::error,
                     boost::asio::placeholders::iterator));
-}
-
-void SbsClient::process() noexcept
-{
-    mrFeed.process(mResponse);
 }
 
 void SbsClient::handleResolve(const boost::system::error_code& cr_ec,

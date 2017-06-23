@@ -38,8 +38,8 @@ namespace tcp
 namespace client
 {
 
-AprscClient::AprscClient(const std::string& cr_host,
-        const std::string& cr_port, const std::string& cr_login, feed::Feed& r_feed)
+AprscClient::AprscClient(const std::string& cr_host, const std::string& cr_port,
+        const std::string& cr_login, feed::Feed& r_feed)
         : Client(cr_host, cr_port, "(AprscClient)", r_feed),
           mLoginStr(cr_login),
           mStopped(false),
@@ -61,11 +61,6 @@ void AprscClient::connect() noexcept
             boost::bind(&AprscClient::handleResolve, this,
                     boost::asio::placeholders::error,
                     boost::asio::placeholders::iterator));
-}
-
-void AprscClient::process() noexcept
-{
-    mrFeed.process(mResponse);
 }
 
 void AprscClient::stop() noexcept

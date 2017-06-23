@@ -156,10 +156,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             {
                 global_feeds.push_back(
                         std::shared_ptr<feed::Feed>(
-                                new feed::AprscFeed(*it,
-                                        strToInt(r_cr.getProperty(*it,
-                                        KV_KEY_PRIORITY, "0")),
-                                        r_cr.getSectionKV(*it))));
+                                new feed::AprscFeed(*it, strToInt(r_cr.getProperty(*it,
+                                KV_KEY_PRIORITY, "0")), r_cr.getSectionKV(*it))));
             } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());
@@ -170,10 +168,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             {
                 global_feeds.push_back(
                         std::shared_ptr<feed::Feed>(
-                                new feed::SbsFeed(*it,
-                                        strToInt(r_cr.getProperty(*it,
-                                        KV_KEY_PRIORITY, "0")),
-                                        r_cr.getSectionKV(*it))));
+                                new feed::SbsFeed(*it, strToInt(r_cr.getProperty(*it,
+                                KV_KEY_PRIORITY, "0")), r_cr.getSectionKV(*it))));
             } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());
@@ -184,10 +180,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             {
                 global_feeds.push_back(
                         std::shared_ptr<feed::Feed>(
-                                new feed::SensorFeed(*it,
-                                        strToInt(r_cr.getProperty(*it,
-                                        KV_KEY_PRIORITY, "0")),
-                                        r_cr.getSectionKV(*it))));
+                                new feed::SensorFeed(*it, strToInt(r_cr.getProperty(*it,
+                                KV_KEY_PRIORITY, "0")), r_cr.getSectionKV(*it))));
             } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());
@@ -198,10 +192,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             {
                 global_feeds.push_back(
                         std::shared_ptr<feed::Feed>(
-                                new feed::GpsFeed(*it,
-                                        strToInt(r_cr.getProperty(*it,
-                                        KV_KEY_PRIORITY, "0")),
-                                        r_cr.getSectionKV(*it))));
+                                new feed::GpsFeed(*it, strToInt(r_cr.getProperty(*it,
+                                KV_KEY_PRIORITY, "0")), r_cr.getSectionKV(*it))));
             } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());

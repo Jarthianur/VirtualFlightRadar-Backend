@@ -19,126 +19,28 @@
  }
  */
 
-#ifndef SRC_DATA_DATA_HPP_
-#define SRC_DATA_DATA_HPP_
+#ifndef SRC_DATA_DATA_H_
+#define SRC_DATA_DATA_H_
 
-#include <boost/thread/mutex.hpp>
 #include <cstdint>
-#include <string>
 
 namespace data
 {
 
-/**
- * Data structure.
- *
- * Hold a value providing its own mutex and meta-data.
- *
- * @tparam T the type of value to hold
- */
 template<typename T>
-struct Data
+class Data
 {
-    /// The value
-    T value;
-    /// Is wrtite attempt valid?
-    bool attemptValid;
-    /// Last written priority
-    std::int32_t lastPriority;
-    /// Mutex to enable threadsafety per Data.
-    boost::mutex mutex;
-    /**
-     * Update the value.
-     * May fail due to priority.
-     * Updates always if attempt is valid.
-     *
-     * @param cr_nv the new value
-     * @param prio  the priority attempting to write
-     */
-    void update(const T& cr_nv, std::int32_t prio)
+public:
+    inline Data()
     {
-        bool write = attemptValid;
-        if (!write)
-        {
-            if (prio >= lastPriority)
-            {
-                write = true;
-            }
-        }
-        if (write)
-        {
-            attemptValid = false;
-            value = cr_nv;
-            lastPriority = prio;
-        } else
-        {
-            attemptValid = true;
-        }
     }
-};
-/**
- * Pseudo temporary data structure.
- *
- * Same as the Data structure, but reading the value
- * invalidates it and updating validates it.
- *
- * @tparam T the type of value to hold
- */
-template<typename T>
-struct TmpData
-{
-    /// The value
-    T value;
-    /// Is wrtite attempt valid?
-    bool attemptValid;
-    /// Is the value valid?
-    bool valueValid;
-    /// Last written priority
-    std::int32_t lastPriority;
-    /// Mutex to enable threadsafety per TmpData.
-    boost::mutex mutex;
-    /**
-     * Get the value and invalidate it.
-     *
-     * @return the value
-     */
-    const T& getValue()
+    inline virtual ~Data() noexcept
     {
-        valueValid = false;
-        return value;
     }
-    /**
-     * Update the value.
-     * May fail due to priority.
-     * Updates always if attempt is valid.
-     * Validates the value.
-     *
-     * @param cr_nv the new value
-     * @param prio  the priority attempting to write
-     */
-    void update(const T& cr_nv, std::int32_t prio)
-    {
-        bool write = attemptValid;
-        if (!write)
-        {
-            if (prio >= lastPriority)
-            {
-                write = true;
-            }
-        }
-        if (write)
-        {
-            attemptValid = false;
-            value = cr_nv;
-            lastPriority = prio;
-            valueValid = true;
-        } else
-        {
-            attemptValid = true;
-        }
-    }
+
+    virtual void update(const T&, std::int32_t prio) = 0;
 };
 
-}  // namespace data
+} /* namespace data */
 
-#endif /* SRC_DATA_DATA_HPP_ */
+#endif /* SRC_DATA_DATA_H_ */

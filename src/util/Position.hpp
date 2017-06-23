@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@ namespace util
  *
  * Minimal information for a position.
  */
-struct GPSPosition
+struct GpsPosition
 {
     /// Altitude; m
     std::int32_t altitude;
@@ -47,16 +47,16 @@ struct GPSPosition
  *
  * Holds GPS meta information additionally to a position.
  */
-struct ExtGPSPosition
+struct ExtGpsPosition
 {
     /// Position
-    struct GPSPosition position;
+    struct GpsPosition position;
     /// Number of satellites
     std::int32_t nrSats,
     /// GPS fix quality
             fixQa;
     /// Geoid separation
-    double geoid;
+    double geoid, dilution;
 };
 
 }  // namespace util

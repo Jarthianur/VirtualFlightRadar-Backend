@@ -23,10 +23,13 @@
 
 #include <stdexcept>
 
+#include "../aircraft/Aircraft.h"
+#include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
-#include "../parser/AprsParser.h"
 #include "../tcp/client/AprscClient.h"
 #include "../util/Logger.h"
+#include "../util/Parser.h"
+#include "../VFRB.h"
 
 using namespace util;
 
@@ -44,7 +47,6 @@ AprscFeed::AprscFeed(const std::string& cr_name, std::int32_t prio,
         throw std::logic_error("No login given");
     } else
     {
-        mpParser = std::unique_ptr<parser::Parser>(new parser::AprsParser());
         mpClient = std::unique_ptr<tcp::client::Client>(
                 new tcp::client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
                         mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
@@ -53,6 +55,18 @@ AprscFeed::AprscFeed(const std::string& cr_name, std::int32_t prio,
 
 AprscFeed::~AprscFeed() noexcept
 {
+}
+
+std::int32_t AprscFeed::process(const std::string& cr_res) noexcept
+{
+    try
+    {
+        VFRB::msAcCont.insertAircraft(Parser::parseAprs(cr_res), mPriority);
+    } catch (const std::logic_error& e)
+    {
+        return -1;
+    }
+    return 0;
 }
 
 } // namespace feed

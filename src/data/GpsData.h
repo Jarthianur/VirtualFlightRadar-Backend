@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -26,8 +26,9 @@
 #include <string>
 
 #include "../util/GpsModule.h"
-#include "Data.hpp"
 #include "../util/Position.hpp"
+#include "Data.hpp"
+#include "Wrapper.hpp"
 
 namespace data
 {
@@ -37,7 +38,7 @@ namespace data
  *
  * This class holds GPS information.
  */
-class GpsData
+class GpsData: public Data<struct util::ExtGpsPosition>
 {
 public:
     /**
@@ -76,13 +77,13 @@ public:
      * @param prio   the priority attempting to write
      * @param cr_pos the new position
      */
-    void setBasePos(std::int32_t prio, const struct util::ExtGPSPosition& cr_pos);
+    void update(const struct util::ExtGpsPosition& cr_pos, std::int32_t prio) override;
     /**
      * Get the last registered GPS position.
      *
      * @return the position
      */
-    struct util::ExtGPSPosition getBasePos();
+    struct util::ExtGpsPosition getBasePos();
     /**
      * Get the base positions latitude.
      *
@@ -104,7 +105,7 @@ public:
 
 private:
     /// Data holding the base position.
-    struct Data<struct util::ExtGPSPosition> mBasePos;
+    struct Wrapper<struct util::ExtGpsPosition> mBasePos;
     /// GpsModule providing functionality to build GPS sentences.
     util::GpsModule mGpsMod;
 };

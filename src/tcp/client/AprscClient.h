@@ -58,8 +58,8 @@ public:
      * @param cr_login the login string to transmit
      * @param r_feed   the handler Feed reference
      */
-    AprscClient(const std::string& cr_host,
-            const std::string& cr_port, const std::string& cr_login, feed::Feed& r_feed);
+    AprscClient(const std::string& cr_host, const std::string& cr_port,
+            const std::string& cr_login, feed::Feed& r_feed);
     /**
      * Destructor
      *
@@ -74,12 +74,6 @@ private:
      * @overload Client::connect
      */
     void connect() noexcept override;
-    /**
-     * Implement Client::process
-     *
-     * @overload Client::process
-     */
-    void process() noexcept override;
     /**
      * Extend Client::stop
      * Cancel timer before disconnect.
