@@ -31,38 +31,34 @@ namespace config
 {
 
 /**
- * The ConfigReader class.
- *
- * This class reads a configuration file in INI format
- * and stores read parameters in a map.
+ * ConfigReader class
+ * @brief Provide functions to read properties from an input stream into a map.
  */
 class ConfigReader
 {
 public:
     /**
-     * Constructor
+     * @fn ConfigReader
+     * @brief Constructor
      */
     ConfigReader();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~ConfigReader
+     * @brief Destructor
      */
     virtual ~ConfigReader() noexcept;
     /**
-     * Read the given file.
-     *
-     * @param cr_file the file stream to read
+     * @fn read
+     * @brief Read the given stream and store valid properties in a map.
+     * @param r_file The stream to read
      */
     void read(std::istream& r_file);
     /**
-     * Get a property from all stored properties.
-     * Return the given default value, if the property was not found.
-     *
-     * @param cr_section the section of the property
-     * @param cr_key     the key to get the value for
-     * @param cr_def_val the default value; defaults to empty string
-     *
+     * @fn getProperty
+     * @brief Get the value under a section for the given key.     *
+     * @param cr_section The section of the property
+     * @param cr_key     The key to get the value for
+     * @param cr_def_val The default value; defaults to empty string
      * @return the value for key in section, if found, else the default value
      */
     const std::string getProperty(const std::string& cr_section,

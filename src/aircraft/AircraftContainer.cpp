@@ -64,7 +64,7 @@ std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& cr_id
     }
 }
 
-std::string AircraftContainer::processAircrafts() noexcept
+std::string AircraftContainer::processAircrafts()
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     std::string dest_str;
@@ -110,7 +110,6 @@ std::string AircraftContainer::processAircrafts() noexcept
 }
 
 void AircraftContainer::insertAircraft(const Aircraft& cr_update, std::int32_t prio)
-noexcept
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     auto known_ac = find(cr_update.getId());

@@ -65,24 +65,21 @@ public:
      * @param cr_update The Aircraft update
      * @param prio      The priority attempting to write
      */
-    void insertAircraft(const Aircraft& cr_update, std::int32_t prio) noexcept;
+    void insertAircraft(const Aircraft& cr_update, std::int32_t prio);
     /**
-     * Process all aircrafts into NMEA sentences PFLAU and PFLAA.
-     * Aircrafts with too old information are not reported, later deleted.
-     * Resulting sentences contain trailing <cr><lf>.
-     *
-     * @return the string with all NMEA sentences
-     *
-     * @exceptsafe no-throw
+     * @fn processAircrafts
+     * @brief Process all Aircrafts and get the reports as string.
+     *        Increases update ages; "too old" Aircrafts are not reported and later deleted.
+     * @see AircraftProcesser::process
+     * @return the string with all NMEA reports
      */
-    std::string processAircrafts() noexcept;
+    std::string processAircrafts();
 
 private:
     /**
-     * Find an Aircraft by ID efficiently in the container with index map.
-     *
-     * @param cr_id the ID to search
-     *
+     * @fn find
+     * @brief Find an Aircraft by Id efficiently in the container using an index map.
+     * @param cr_id The Id to search
      * @return an iterator to the Aircraft if found, else vector::end
      */
     std::vector<Aircraft>::iterator find(const std::string& cr_id);
