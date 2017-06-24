@@ -32,18 +32,27 @@
 #include "Position.hpp"
 
 //#define MATCH_TIME 1
-#define MATCH_LAT      1
-#define MATCH_LAT_DIR  2
-#define MATCH_LONG     3
-#define MATCH_LONG_DIR 4
-#define MATCH_HEAD     5
-#define MATCH_GND_SPD  6
-#define MATCH_ALT      7
-#define MATCH_COM      8
-#define MATCH_COM_TYPE 1
-#define MATCH_COM_ID   2
-#define MATCH_COM_CR   3
-#define MATCH_COM_TR   4
+#define RE_APRS_LAT      1
+#define RE_APRS_LAT_DIR  2
+#define RE_APRS_LONG     3
+#define RE_APRS_LONG_DIR 4
+#define RE_APRS_HEAD     5
+#define RE_APRS_GND_SPD  6
+#define RE_APRS_ALT      7
+#define RE_APRS_COM      8
+#define RE_APRS_COM_TYPE 1
+#define RE_APRS_COM_ID   2
+#define RE_APRS_COM_CR   3
+#define RE_APRS_COM_TR   4
+#define RE_GGA_LAT       1
+#define RE_GGA_LAT_DIR   2
+#define RE_GGA_LONG      3
+#define RE_GGA_LONG_DIR  4
+#define RE_GGA_FIX       5
+#define RE_GGA_SAT       6
+#define RE_GGA_DIL       7
+#define RE_GGA_ALT       8
+#define RE_GGA_GEOID     9
 
 namespace util
 {
@@ -87,38 +96,38 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
         //time
         //time = std::stoi(match.str(1));
         //latitude
-        gpsPos.latitude = math::dmToDeg(std::stod(match.str(MATCH_LAT)));
-        if (match.str(MATCH_LAT_DIR).compare("S") == 0)
+        gpsPos.latitude = math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
+        if (match.str(RE_APRS_LAT_DIR).compare("S") == 0)
         {
             gpsPos.latitude = -gpsPos.latitude;
         }
         //longitude
-        gpsPos.longitude = math::dmToDeg(std::stod(match.str(MATCH_LONG)));
-        if (match.str(MATCH_LONG_DIR).compare("W") == 0)
+        gpsPos.longitude = math::dmToDeg(std::stod(match.str(RE_APRS_LONG)));
+        if (match.str(RE_APRS_LONG_DIR).compare("W") == 0)
         {
             gpsPos.longitude = -gpsPos.longitude;
         }
         //altitude
-        gpsPos.altitude = math::dToI(std::stod(match.str(MATCH_ALT)) * math::FEET_2_M);
+        gpsPos.altitude = math::dToI(std::stod(match.str(RE_APRS_ALT)) * math::FEET_2_M);
         if (gpsPos.altitude > config::Configuration::filter_maxHeight)
         {
             throw std::logic_error("");
         }
         //comment
         // climbrate / address / id / type
-        if (match.str(MATCH_COM).size() > 0)
+        if (match.str(RE_APRS_COM).size() > 0)
         {
-            std::string comm = match.str(MATCH_COM); // regex bug ! cannot work inplace, need to copy submatch.
+            std::string comm = match.str(RE_APRS_COM); // regex bug ! cannot work inplace, need to copy submatch.
             boost::smatch com_match;
             if (boost::regex_match(comm, com_match, aprsComRe))
             {
-                id = com_match.str(MATCH_COM_ID);
-                idType = std::stoi(com_match.str(MATCH_COM_TYPE), nullptr, 16) & 0x03;
-                acType = (std::stoi(com_match.str(MATCH_COM_TYPE), nullptr, 16) & 0x7C)
+                id = com_match.str(RE_APRS_COM_ID);
+                idType = std::stoi(com_match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03;
+                acType = (std::stoi(com_match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C)
                         >> 2;
                 try
                 {
-                    climbRate = std::stod(com_match.str(MATCH_COM_CR)) * math::FPM_2_MS;
+                    climbRate = std::stod(com_match.str(RE_APRS_COM_CR)) * math::FPM_2_MS;
                 } catch (const std::logic_error& e)
                 {
                     climbRate = A_VALUE_NA;
@@ -126,7 +135,7 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
                 }
                 try
                 {
-                    turnRate = std::stod(com_match.str(MATCH_COM_TR)) * 3.0; // 1rot = 1 halfcircle / 1 min => 3° / 1s
+                    turnRate = std::stod(com_match.str(RE_APRS_COM_TR)) * 3.0; // 1rot = 1 halfcircle / 1 min => 3° / 1s
                 } catch (const std::logic_error& e)
                 {
                     turnRate = A_VALUE_NA;
@@ -143,7 +152,7 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
         //track/gnd_speed
         try
         {
-            heading = std::stod(match.str(MATCH_HEAD));
+            heading = std::stod(match.str(RE_APRS_HEAD));
         } catch (const std::logic_error& e)
         {
             heading = A_VALUE_NA;
@@ -151,7 +160,7 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
         }
         try
         {
-            gndSpeed = std::stod(match.str(MATCH_GND_SPD)) * math::KTS_2_MS;
+            gndSpeed = std::stod(match.str(RE_APRS_GND_SPD)) * math::KTS_2_MS;
         } catch (const std::logic_error& e)
         {
             gndSpeed = A_VALUE_NA;
