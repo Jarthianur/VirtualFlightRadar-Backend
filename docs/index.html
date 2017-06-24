@@ -1,0 +1,9 @@
+---
+layout: default
+title: 'HOME'
+group: 'navigation'
+grp_index: 1
+---
+<article>
+    {% capture my_include %}{% include_relative README.md %}{% endcapture %} {{ my_include | markdownify }}
+</article>
