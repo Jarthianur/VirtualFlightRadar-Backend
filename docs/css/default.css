@@ -1,0 +1,23 @@
+body {
+    height: 100%
+}
+
+a {
+    text-decoration: none;
+}
+
+* {
+    font-family: "Allerta Stencil", Sans-serif !important;
+}
+
+.test {
+    border: 1px dotted black;
+}
+
+.a {
+    color: blue
+}
+
+.a:hover {
+    text-decoration: underline
+}

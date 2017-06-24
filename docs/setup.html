@@ -1,0 +1,67 @@
+---
+layout: default
+---
+<article>
+   <h2>What to configure</h2>
+    <p>The INI file has entries like this</p>
+    <blockquote class="w3-leftbar w3-container">
+      <p>latitude=49.000000<br> longitude=8.000000
+        <br> altitude=400
+        <br> geoid=47.0
+        <br> pressure=1013.25
+        <br> temp=15.0
+        <br> serverPort=1234
+        <br> aprscHost=localhost
+        <br> aprscPort=14580
+        <br> aprscLogin=user x pass x<br> sbsHost=
+        <br> sbsPort=x
+        <br> climateSensorHost=nA
+        <br> climateSensorPort=0
+        <br> maxHeight=-1
+        <br> maxDist=40000
+      </p>
+    </blockquote>
+    <p>There are base position parameters, connection parameters and climate fallback values, along with filters. To disable
+      any input feed, just leave corresponding hostnames empty, or set them to <em>'nA'</em> . Same with the filters, to
+      disable leave it empty, or set to <em>-1</em> . Additional information, like units, can be found in the comments. Comments
+      begin with a <em>';'</em> , feel free to add comments containing whatever liked, e.g. available ports and hosts.</p>
+   
+    <h2>How to run</h2>
+   
+    <h3>manually</h3>
+    <p>Don't care about the following, if boost was installed via package manager. Boost is linked dynamically, which means
+      the <em>LD_LIBRARY_PATH</em> variable has to be set to boost libs path. This is done by the install.sh automatically
+      through appending the export instruction to <em>~/.bashrc</em> . To apply this change reboot the system.</p>
+    <div class="w3-codespan">
+      <pre>$ {path to binary} -c {path to config file} <span class="pl-k">&gt;</span> {path to log file}  <span class="pl-k">2&gt;&amp;1</span> <span class="pl-k">&amp;</span></pre>
+    </div>
+    <p><b>example:</b></p>
+    <div class="w3-codespan">
+      <pre>$ ./vfrb -c vfrb.ini <span class="pl-k">&gt;</span> vfrb.log <span class="pl-k">2&gt;&amp;1</span> <span class="pl-k">&amp;</span></pre>
+    </div>
+    <p>The log will be in the specified file.</p>
+   
+    <h3>as service</h3>
+    <p>By invoking <code class="w3-codespan">./install.sh service</code>, the systemd service for VFR-B was automatically configured to start after boot.  
+To disable it call, where <i>servicename</i> is like <i>VFRB_NAME_B</i> from bootstrap.sh.</p>
+    <p><b>Run the service once by:</b></p>
+    <div class="w3-codespan">
+      <pre>$ sudo service {servicename} start</pre>
+    </div>
+    <p><b>Watch the log with</b></p>
+    <div class="w3-code w3-border-blue w3-black w3-text-white">
+      <pre>$ journalctl -u {servicename}.service
+<span class="pl-c"><span class="pl-c">#</span> or</span>
+$ sudo cat /var/log/{servicename}.log</pre>
+    </div>
+    <p><b>Examples:</b></p>
+    <div class="w3-code w3-border-blue w3-black w3-text-white">
+      <pre>$ sudo service vfrb start
+<span class="pl-c"><span class="pl-c">#</span> ------</span>
+$ sudo systemctl <span class="pl-c1">enable</span> vfrb.service
+<span class="pl-c"><span class="pl-c">#</span> ------</span>
+$ journalctl -u vfrb.service
+<span class="pl-c"><span class="pl-c">#</span> ------</span>
+$ sudo cat /var/log/vfrb.log</pre>
+    </div>
+</article>

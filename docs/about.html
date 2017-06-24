@@ -1,0 +1,35 @@
+---
+layout: default
+---
+<article>
+    <h2>About</h2>
+    <h3>The core functionalities of the VFR-B are:</h3>
+    <ul>
+      <li>receive and parse APRS messages from APRSC (FLARM reports)</li>
+      <li>receive and parse ADS-B messages, transcoded into SBS, from any SDR (e.g. <a href="https://github.com/antirez/dump1090" class="a">Dump1090</a>)</li>
+      <li>receive and parse NMEA messages from any wind-sensor, integrated in the network (WIMWV, WIMDA)</li>
+      <li>keep track of and manage detected aircrafts, normalizing measuring units</li>
+      <li>serve these information as NMEA sentences on the network</li>
+    </ul>
+    <p>APRSC := APRS server coupled with a SDR, e.g. utilized by <a href="http://wiki.glidernet.org/" title="Open Glider Network" class="a">OGN</a><br>      SDR := Software Defined Radio</p>
+    
+    <h2>What are the benefits</h2>
+    <p>The greatest benefit may be, that it assists an airfield manager to survey surrounding traffic. Also having real-time
+      wind information, much more accurate than a windsock, is a great benefit too. But it is also useful for pilots waiting,
+      on the ground, for a good moment to start, or to observe their comrades. Although, <strong>this system is no replacement for airspace surveilance!</strong>      Nevertheless detecting (E-)planes before they cross a winch-start in low altitude, or any other imaginable scenario,
+      may increase safety and prevent some or other dangerous situations.</p>
+    
+    <h2>The whole system</h2>
+    <p><strong>VFR-B is a standalone backend module. To make it to be of use, working installations of, or access to any APRS server,
+ASDB-to-SBS decoder and network serving wind-sensor are required.</strong> Module means one can replace each component with
+      whatever liked, unless it fits to the interfaces.</p>
+    <p>VFR-B is, for example, used in <a href="https://github.com/rueckwaertsflieger/AMVR" class="a">AMVR</a>.</p>
+   
+    <h2>What about privacy</h2>
+    <p>One aim of VFR-B is to stay, as much as possible, independent from the outside world/internet. This means no aircraft-,
+      wind reports, or whatever is going to be sent to the internet directly.
+      <strong>But this depends on how one will use this service.</strong> Of course, one can configure it to receive APRS
+      from public OGN servers, but to keep track of local traffic, the traffic information must be sent to OGN first. Also
+      the internal NMEA server will send its data to <em>localhost</em>, which means, everybody, inside the local network,
+      is able to fetch it. It is also possible to make the machine, which runs the VFR-B, accessible to the public.</p>
+</article>
