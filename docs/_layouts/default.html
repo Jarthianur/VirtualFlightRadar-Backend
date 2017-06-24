@@ -26,8 +26,9 @@
     </div>
   </header>
   <nav class="w3-black w3-bar w3-mobile">
-    <a href="index.html" class="w3-bar-item w3-hover-sand">HOME</a>
-    <a href="about.html" class="w3-bar-item w3-hover-sand">ABOUT</a>
+    {% assign pages_list = site.pages %}
+    {% assign group = 'navigation' %}
+    {% include pages_list %}
     <a href="https://github.com/Jarthianur/VirtualFlightRadar-Backend" class="w3-bar-item w3-hover-sand">GITHUB</a>
     <a href="https://github.com/Jarthianur/VirtualFlightRadar-Backend/releases" class="w3-bar-item w3-hover-sand">DOWNLOADS</a>
   </nav>

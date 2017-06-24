@@ -1,0 +1,12 @@
+{% assign pages_list = pages_list | sort:"grp_index" %}
+{% for node in pages_list %}
+  {% if group == null or group == node.group %}
+    {% if page.url == node.url or node.sub_urls contains page.url %}
+      <a href="{{node.url}}" class="w3-sand w3-bar-item w3-hover-sand">{{node.title}}</a>
+    {% else %}
+      <a href="{{node.url}}" class="w3-bar-item w3-hover-sand">{{node.title}}</a>
+    {% endif %}
+  {% endif %}
+{% endfor %}
+{% assign pages_list = nil %}
+{% assign group = nil %}
