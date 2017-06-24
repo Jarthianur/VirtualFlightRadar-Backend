@@ -4,20 +4,17 @@ body {
 
 a {
     text-decoration: none;
+    color: #154889
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.not-a, .not-a:hover {
+    text-decoration: none;
 }
 
 * {
     font-family: "Allerta Stencil", Sans-serif !important;
-}
-
-.test {
-    border: 1px dotted black;
-}
-
-.a {
-    color: blue
-}
-
-.a:hover {
-    text-decoration: underline
 }
