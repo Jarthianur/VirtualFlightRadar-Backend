@@ -33,7 +33,7 @@ namespace config
 {
 
 ConfigReader::ConfigReader()
-        : mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
+        : mConfRe("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
                 boost::regex_constants::optimize)
 {
 }
@@ -61,13 +61,13 @@ void ConfigReader::read(std::istream& r_file)
             if (line.at(0) == '[')
             {
                 section = line.substr(1, line.rfind(']') - 1);
-                mConfig.emplace(
+                mPropertiesMap.emplace(
                         std::make_pair(section,
                                 std::unordered_map<std::string, std::string>()));
                 continue;
             }
             boost::smatch match;
-            if (boost::regex_match(line, match, mConfRE))
+            if (boost::regex_match(line, match, mConfRe))
             {
                 key = match.str(1);
                 value = match.str(2);
@@ -76,7 +76,7 @@ void ConfigReader::read(std::istream& r_file)
                 {
                     value = value.substr(0, l + 1);
                 }
-                mConfig[section].emplace(std::make_pair(key, value));
+                mPropertiesMap[section].emplace(std::make_pair(key, value));
             } else
             {
                 Logger::error(
@@ -93,8 +93,8 @@ void ConfigReader::read(std::istream& r_file)
 const std::string ConfigReader::getProperty(const std::string& cr_section,
         const std::string& cr_key, const std::string& cr_def_val) const
 {
-    auto s_it = mConfig.find(cr_section);
-    if (s_it != mConfig.end())
+    auto s_it = mPropertiesMap.find(cr_section);
+    if (s_it != mPropertiesMap.end())
     {
         auto it = s_it->second.find(cr_key);
         if (it != s_it->second.end())
@@ -110,11 +110,11 @@ const std::string ConfigReader::getProperty(const std::string& cr_section,
     }
 }
 
-const std::unordered_map<std::string, std::string>& ConfigReader::getSectionKV(
+const std::unordered_map<std::string, std::string>& ConfigReader::getSectionKv(
         const std::string& cr_section) const
 {
-    auto it = mConfig.find(cr_section);
-    if (it != mConfig.end())
+    auto it = mPropertiesMap.find(cr_section);
+    if (it != mPropertiesMap.end())
     {
         return it->second;
     } else

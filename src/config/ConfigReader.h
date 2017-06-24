@@ -64,21 +64,19 @@ public:
     const std::string getProperty(const std::string& cr_section,
             const std::string& cr_key, const std::string& cr_def_val = "") const;
     /**
-     * Get the key-value-map for a section.
-     * If the section is not found the kv-map is empty.
-     *
-     * @param cr_section the section to get the kv-map for
-     *
-     * @return the kv-map for the section
+     * @fn getSectionKv
+     * @brief Get the key-value-map for a section.
+     * @param cr_section The section to get the kv-map for
+     * @return the kv-map if found, else an empty one
      */
-    const std::unordered_map<std::string, std::string>& getSectionKV(
+    const std::unordered_map<std::string, std::string>& getSectionKv(
             const std::string& cr_section) const;
 
 private:
     /// The map of sections with kv-maps
-    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> mConfig;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> mPropertiesMap;
     /// The regular expression for 'key = value' lines
-    const boost::regex mConfRE;
+    const boost::regex mConfRe;
 };
 
 }  // namespace config
