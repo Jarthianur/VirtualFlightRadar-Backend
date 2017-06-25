@@ -1,1 +1,0 @@
-docs/CODE-OF-CONDUCT.md
