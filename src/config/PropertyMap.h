@@ -24,25 +24,40 @@
 
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 namespace config
 {
 
+/// Typedef for a map of key-value pairs
 using keyValueMap = std::unordered_map<std::string, std::string>;
+/// Typedef for a key-value pair
 using keyValue = std::pair<std::string, std::string>;
 
+/**
+ * @class PropertyMap
+ * @brief Store key-value pairs for sections.
+ */
 class PropertyMap
 {
 public:
+    /**
+     * @fn PropertyMap
+     * @brief Constructor
+     */
     PropertyMap();
-    virtual ~PropertyMap();
+    /**
+     * @fn ~PropertyMap
+     * @brief Destructor
+     */
+    virtual ~PropertyMap() noexcept;
     /**
      * @fn getProperty
-     * @brief Get the value under a section for the given key.     *
+     * @brief Get the value under a section for the given key.
      * @param cr_section The section of the property
      * @param cr_key     The key to get the value for
      * @param cr_def_val The default value; defaults to empty string
-     * @return the value for key in section, if found, else the default value
+     * @return the value for key in section if found, else the default value
      */
     const std::string getProperty(const std::string& cr_section,
             const std::string& cr_key, const std::string& cr_def_val = "") const;
@@ -52,10 +67,16 @@ public:
      * @param cr_section The section to get the kv-map for
      * @return the kv-map if found, else an empty one
      */
-    const keyValueMap& getSectionKv(
-            const std::string& cr_section) const;
-
-    bool addProperty(const std::string& r_section, const keyValue& r_kv = {});
+    const keyValueMap& getSectionKv(const std::string& cr_section) const;
+    /**
+     * @fn addProperty
+     * @brief Add a key-value pair for a section.
+     * @note If the section does not exist, it gets created.
+     * @param r_section The section name
+     * @param r_kv      The key-value pair
+     * @return true on success, else false
+     */
+    bool addProperty(const std::string& r_section, const keyValue& r_kv = { });
 
 private:
     /// The map of sections with kv-maps

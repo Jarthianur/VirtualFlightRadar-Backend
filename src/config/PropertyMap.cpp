@@ -21,18 +21,17 @@
 
 #include "PropertyMap.h"
 
+#include <stdexcept>
+
 namespace config
 {
 
 PropertyMap::PropertyMap()
 {
-    // TODO Auto-generated constructor stub
-
 }
 
 PropertyMap::~PropertyMap()
 {
-    // TODO Auto-generated destructor stub
 }
 
 const std::string PropertyMap::getProperty(const std::string& cr_section,

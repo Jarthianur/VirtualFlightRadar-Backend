@@ -38,9 +38,9 @@ using namespace util;
 namespace config
 {
 
-Configuration::Configuration(std::istream& r_file)
+Configuration::Configuration(std::istream& r_stream)
 {
-    if (!init(r_file))
+    if (!init(r_stream))
     {
         throw std::logic_error("Failed to read configuration file");
     }
@@ -62,13 +62,13 @@ bool Configuration::global_gnd_mode = false;
 
 std::vector<std::shared_ptr<feed::Feed>> Configuration::global_feeds;
 
-bool Configuration::init(std::istream& r_file)
+bool Configuration::init(std::istream& r_stream)
 {
     ConfigReader reader;
     PropertyMap properties;
     try
     {
-        reader.read(r_file, properties);
+        reader.read(r_stream, properties);
     } catch (const std::exception& e)
     {
         Logger::error("(Config) read file: ", e.what());

@@ -25,10 +25,10 @@
 #include <boost/regex.hpp>
 #include <istream>
 
-#include "PropertyMap.h"
-
 namespace config
 {
+
+class PropertyMap;
 
 /**
  * @class ConfigReader
@@ -50,9 +50,10 @@ public:
     /**
      * @fn read
      * @brief Read the given stream and store valid properties in a map.
-     * @param r_file The stream to read
+     * @param r_stream The stream to read
+     * @param r_map  The map to store the properties in
      */
-    void read(std::istream& r_file, PropertyMap& r_map);
+    void read(std::istream& r_stream, PropertyMap& r_map);
 
 private:
     /// The regular expression for 'key = value' lines

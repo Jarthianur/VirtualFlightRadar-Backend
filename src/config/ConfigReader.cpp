@@ -21,11 +21,13 @@
 
 #include "ConfigReader.h"
 
+#include <cstddef>
 #include <stdexcept>
-#include <typeindex>
+#include <string>
 #include <utility>
 
 #include "../util/Logger.h"
+#include "PropertyMap.h"
 
 using namespace util;
 
@@ -42,14 +44,14 @@ ConfigReader::~ConfigReader() noexcept
 {
 }
 
-void ConfigReader::read(std::istream& r_file, PropertyMap& r_map)
+void ConfigReader::read(std::istream& r_stream, PropertyMap& r_map)
 {
     std::string key;
     std::string value;
     std::string line;
     std::string section;
     std::size_t line_nr = 0;
-    while (std::getline(r_file, line))
+    while (std::getline(r_stream, line))
     {
         line_nr++;
         try
