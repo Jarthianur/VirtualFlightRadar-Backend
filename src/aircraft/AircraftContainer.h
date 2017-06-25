@@ -38,7 +38,7 @@ namespace aircraft
 class Aircraft;
 
 /**
- * AircraftContainer class
+ * @class AircraftContainer
  * @brief Store Aircrafts and trigger processing.
  */
 class AircraftContainer

@@ -21,14 +21,15 @@
 
 #include "Feed.h"
 
-#include <boost/thread/lock_types.hpp>
 #include <algorithm>
+#include <atomic>
 #include <stdexcept>
+#include <unordered_map>
 
+#include "../tcp/client/Client.h"
+#include "../VFRB.h"
 #include "../config/Configuration.h"
 #include "../util/Logger.h"
-#include "../VFRB.h"
-#include "../tcp/client/Client.h"
 
 using namespace util;
 
@@ -36,7 +37,7 @@ namespace feed
 {
 
 Feed::Feed(const std::string& cr_name, std::int32_t prio,
-        const std::unordered_map<std::string, std::string>& cr_kvmap)
+        const config::keyValueMap& cr_kvmap)
         : mName(cr_name),
           mPriority(prio),
           mKvMap(cr_kvmap)

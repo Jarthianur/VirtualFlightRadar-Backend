@@ -34,7 +34,7 @@ class Aircraft;
 #define AP_L_BUFF_S 128
 
 /**
- * AircraftProcessor class
+ * @class AircraftProcessor
  * @brief Process Aircrafts relative to the base position.
  */
 class AircraftProcessor

@@ -21,18 +21,17 @@
 
 #include "Configuration.h"
 
-#include <algorithm>
 #include <iterator>
-#include <memory>
 #include <sstream>
 #include <stdexcept>
-#include <typeindex>
 
 #include "../feed/AprscFeed.h"
 #include "../feed/GpsFeed.h"
 #include "../feed/SbsFeed.h"
 #include "../feed/SensorFeed.h"
 #include "../util/Logger.h"
+#include "ConfigReader.h"
+#include "PropertyMap.h"
 
 using namespace util;
 
@@ -65,10 +64,11 @@ std::vector<std::shared_ptr<feed::Feed>> Configuration::global_feeds;
 
 bool Configuration::init(std::istream& r_file)
 {
-    ConfigReader cr;
+    ConfigReader reader;
+    PropertyMap properties;
     try
     {
-        cr.read(r_file);
+        reader.read(r_file, properties);
     } catch (const std::exception& e)
     {
         Logger::error("(Config) read file: ", e.what());
@@ -78,23 +78,26 @@ bool Configuration::init(std::istream& r_file)
         Logger::error("(Config) read file");
         return false;
     }
+
     // get fallbacks
     base_latitude = strToDouble(
-            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0"));
+            properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0"));
     Logger::info("(Config) " KV_KEY_LATITUDE ": ", std::to_string(base_latitude));
     base_longitude = strToDouble(
-            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0"));
+            properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0"));
     Logger::info("(Config) " KV_KEY_LONGITUDE ": ", std::to_string(base_longitude));
-    base_altitude = strToInt(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
+    base_altitude = strToInt(
+            properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
     Logger::info("(Config) " KV_KEY_ALTITUDE ": ", std::to_string(base_altitude));
-    base_geoid = strToDouble(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
+    base_geoid = strToDouble(
+            properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
     Logger::info("(Config) " KV_KEY_GEOID ": ", std::to_string(base_geoid));
     base_pressure = strToDouble(
-            cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25"));
+            properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25"));
     Logger::info("(Config) " KV_KEY_PRESSURE ": ", std::to_string(base_pressure));
 
     // get filters
-    std::string tmp = cr.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT, "-1");
+    std::string tmp = properties.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT, "-1");
     if (tmp == "-1")
     {
         filter_maxHeight = INT32_MAX;
@@ -104,7 +107,7 @@ bool Configuration::init(std::istream& r_file)
     }
     Logger::info("(Config) " KV_KEY_MAX_HEIGHT ": ", std::to_string(filter_maxHeight));
 
-    tmp = cr.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_DIST, "-1");
+    tmp = properties.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_DIST, "-1");
     if (tmp == "-1")
     {
         filter_maxDist = INT32_MAX;
@@ -115,23 +118,23 @@ bool Configuration::init(std::istream& r_file)
     Logger::info("(Config) " KV_KEY_MAX_DIST ": ", std::to_string(filter_maxDist));
 
     // get general
-    global_gnd_mode = cr.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE) != "";
+    global_gnd_mode = properties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE) != "";
 
     global_server_port = (uint16_t) strToInt(
-            cr.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
+            properties.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
     Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(global_server_port));
 
-    std::size_t nrf = registerFeeds(cr);
+    std::size_t nrf = registerFeeds(properties);
     Logger::info("(Config) number of feeds: ", std::to_string(nrf));
 
     return nrf > 0;
 }
 
-std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
+std::size_t Configuration::registerFeeds(const PropertyMap& cr_map)
 {
     std::vector<std::string> feeds;
     std::stringstream ss;
-    ss.str(r_cr.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+    ss.str(cr_map.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
     std::string item;
     while (std::getline(ss, item, ','))
     {
@@ -156,8 +159,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             {
                 global_feeds.push_back(
                         std::shared_ptr<feed::Feed>(
-                                new feed::AprscFeed(*it, strToInt(r_cr.getProperty(*it,
-                                KV_KEY_PRIORITY, "0")), r_cr.getSectionKv(*it))));
+                                new feed::AprscFeed(*it, strToInt(cr_map.getProperty(*it,
+                                KV_KEY_PRIORITY, "0")), cr_map.getSectionKv(*it))));
             } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());
@@ -168,8 +171,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             {
                 global_feeds.push_back(
                         std::shared_ptr<feed::Feed>(
-                                new feed::SbsFeed(*it, strToInt(r_cr.getProperty(*it,
-                                KV_KEY_PRIORITY, "0")), r_cr.getSectionKv(*it))));
+                                new feed::SbsFeed(*it, strToInt(cr_map.getProperty(*it,
+                                KV_KEY_PRIORITY, "0")), cr_map.getSectionKv(*it))));
             } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());
@@ -180,8 +183,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             {
                 global_feeds.push_back(
                         std::shared_ptr<feed::Feed>(
-                                new feed::SensorFeed(*it, strToInt(r_cr.getProperty(*it,
-                                KV_KEY_PRIORITY, "0")), r_cr.getSectionKv(*it))));
+                                new feed::SensorFeed(*it, strToInt(cr_map.getProperty(*it,
+                                KV_KEY_PRIORITY, "0")), cr_map.getSectionKv(*it))));
             } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());
@@ -192,8 +195,8 @@ std::size_t Configuration::registerFeeds(ConfigReader& r_cr)
             {
                 global_feeds.push_back(
                         std::shared_ptr<feed::Feed>(
-                                new feed::GpsFeed(*it, strToInt(r_cr.getProperty(*it,
-                                KV_KEY_PRIORITY, "0")), r_cr.getSectionKv(*it))));
+                                new feed::GpsFeed(*it, strToInt(cr_map.getProperty(*it,
+                                KV_KEY_PRIORITY, "0")), cr_map.getSectionKv(*it))));
             } catch (const std::exception& e)
             {
                 Logger::warn("(Config) create feed " + *it + ": ", e.what());

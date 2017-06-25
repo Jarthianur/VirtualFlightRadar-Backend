@@ -27,8 +27,8 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <typeindex>
-#include <unordered_map>
+
+#include "../config/PropertyMap.h"
 
 namespace tcp
 {
@@ -105,9 +105,9 @@ protected:
      * @throws std::runtime_error if host or port are not given
      */
     Feed(const std::string& cr_name, std::int32_t prio,
-            const std::unordered_map<std::string, std::string>& cr_kvmap);
+            const config::keyValueMap& cr_kvmap);
     /// Key-value-map holding the properties.
-    std::unordered_map<std::string, std::string> mKvMap;
+    const config::keyValueMap mKvMap;
     /// Client, later resolved according to InpuType
     std::unique_ptr<tcp::client::Client> mpClient;
 };

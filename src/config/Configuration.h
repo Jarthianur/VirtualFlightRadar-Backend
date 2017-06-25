@@ -24,15 +24,20 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <istream>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
-#include "../feed/Feed.h"
-#include "ConfigReader.h"
+namespace feed
+{
+class Feed;
+}
 
 namespace config
 {
+
+class PropertyMap;
 
 /// Configuration section keys
 #define SECT_KEY_FALLBACK   "fallback"
@@ -60,25 +65,22 @@ namespace config
 #define KV_KEY_LOGIN        "login"
 
 /**
- * The Configuration class.
- *
- * This class provides functionality to unpack properties
- * read by the ConfigReader into necessary information for
- * running the VFR-B.
+ * @class Configuration
+ * @brief Evaluate and store configuration for VFR-B.
  */
 class Configuration
 {
 public:
     /**
-     * Constructor to initialize all Configuration fields.
-     *
-     * @param r_file the config file as stream
+     * @fn Configuration
+     * @brief Constructor
+     * @param r_file The config file as stream
+     * @throws std::logic_error if any error occures or no feeds are given
      */
     Configuration(std::istream& r_file);
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~Configuration
+     * @brief Destructor
      */
     virtual ~Configuration() noexcept;
 
@@ -105,24 +107,20 @@ public:
 
 private:
     /**
-     * Initialize Configuration.
-     * Called by c'tor.
-     * Read and unpack config file.
-     *
-     * @param r_file the file stream
-     *
-     * @return whether reading and unpacking was successful
+     * @fn init
+     * @brief Initialize Configuration, read and unpack config file with ConfigReader.
+     * @param r_file The input stream
+     * @return true on success and at least one feed was registered, else false
      */
     bool init(std::istream& r_file);
     /**
-     * Register all input feeds found in the config file.
-     * Only correctly configured feeds are registered.
-     *
-     * @param r_cr the ConfigReader holding read properties
-     *
+     * @fn registerFeeds
+     * @brief Register all input feeds found from ConfigReader.
+     * @note Only correctly configured feeds get registered.
+     * @param cr_reader The ConfigReader holding read properties
      * @return the number of registered feeds
      */
-    std::size_t registerFeeds(ConfigReader& r_cr);
+    std::size_t registerFeeds(const PropertyMap& cr_map);
     /**
      * Parse a string to integer.
      * Always returns a valid value.

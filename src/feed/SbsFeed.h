@@ -41,7 +41,7 @@ public:
      * Pass all parameters to parent constructor.
      */
     SbsFeed(const std::string& cr_name, std::int32_t prio,
-            const std::unordered_map<std::string, std::string>& cr_kvmap);
+            const config::keyValueMap& cr_kvmap);
     /**
      * Destructor
      *

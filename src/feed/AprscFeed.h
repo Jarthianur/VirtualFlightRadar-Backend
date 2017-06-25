@@ -43,7 +43,7 @@ public:
      * @throws std::runtime_error if login is not given in cr_kvmap
      */
     AprscFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
-            const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
+            const config::keyValueMap& /*cr_kvmap*/);
     /**
      * Destructor
      *

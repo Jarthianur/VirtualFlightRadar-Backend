@@ -34,7 +34,7 @@ namespace aircraft
 {
 
 /**
- * Aircraft class
+ * @class Aircraft
  * @brief Store all information about an aircraft, like position, id etc.
  */
 class Aircraft

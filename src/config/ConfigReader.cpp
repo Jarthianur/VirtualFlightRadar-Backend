@@ -42,7 +42,7 @@ ConfigReader::~ConfigReader() noexcept
 {
 }
 
-void ConfigReader::read(std::istream& r_file)
+void ConfigReader::read(std::istream& r_file, PropertyMap& r_map)
 {
     std::string key;
     std::string value;
@@ -61,9 +61,12 @@ void ConfigReader::read(std::istream& r_file)
             if (line.at(0) == '[')
             {
                 section = line.substr(1, line.rfind(']') - 1);
-                mPropertiesMap.emplace(
-                        std::make_pair(section,
-                                std::unordered_map<std::string, std::string>()));
+                if (!r_map.addProperty(section))
+                {
+                    Logger::warn(
+                            "(ConfigReader) could not add section ["
+                                    + std::to_string(line_nr) + "]: ", section);
+                }
                 continue;
             }
             boost::smatch match;
@@ -76,7 +79,13 @@ void ConfigReader::read(std::istream& r_file)
                 {
                     value = value.substr(0, l + 1);
                 }
-                mPropertiesMap[section].emplace(std::make_pair(key, value));
+                keyValue kv_pair = std::make_pair(key, value);
+                if (!r_map.addProperty(section, kv_pair))
+                {
+                    Logger::warn(
+                            "(ConfigReader) could not add property ["
+                                    + std::to_string(line_nr) + "]: ", key);
+                }
             } else
             {
                 Logger::error(
@@ -87,39 +96,6 @@ void ConfigReader::read(std::istream& r_file)
         {
             continue;
         }
-    }
-}
-
-const std::string ConfigReader::getProperty(const std::string& cr_section,
-        const std::string& cr_key, const std::string& cr_def_val) const
-{
-    auto s_it = mPropertiesMap.find(cr_section);
-    if (s_it != mPropertiesMap.end())
-    {
-        auto it = s_it->second.find(cr_key);
-        if (it != s_it->second.end())
-        {
-            return it->second;
-        } else
-        {
-            return cr_def_val;
-        }
-    } else
-    {
-        return cr_def_val;
-    }
-}
-
-const std::unordered_map<std::string, std::string>& ConfigReader::getSectionKv(
-        const std::string& cr_section) const
-{
-    auto it = mPropertiesMap.find(cr_section);
-    if (it != mPropertiesMap.end())
-    {
-        return it->second;
-    } else
-    {
-        throw std::out_of_range("section not found");
     }
 }
 

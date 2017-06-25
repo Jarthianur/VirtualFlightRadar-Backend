@@ -23,15 +23,15 @@
 #define SRC_CONFIG_CONFIGREADER_H_
 
 #include <boost/regex.hpp>
-#include <string>
-#include <unordered_map>
 #include <istream>
+
+#include "PropertyMap.h"
 
 namespace config
 {
 
 /**
- * ConfigReader class
+ * @class ConfigReader
  * @brief Provide functions to read properties from an input stream into a map.
  */
 class ConfigReader
@@ -52,29 +52,9 @@ public:
      * @brief Read the given stream and store valid properties in a map.
      * @param r_file The stream to read
      */
-    void read(std::istream& r_file);
-    /**
-     * @fn getProperty
-     * @brief Get the value under a section for the given key.     *
-     * @param cr_section The section of the property
-     * @param cr_key     The key to get the value for
-     * @param cr_def_val The default value; defaults to empty string
-     * @return the value for key in section, if found, else the default value
-     */
-    const std::string getProperty(const std::string& cr_section,
-            const std::string& cr_key, const std::string& cr_def_val = "") const;
-    /**
-     * @fn getSectionKv
-     * @brief Get the key-value-map for a section.
-     * @param cr_section The section to get the kv-map for
-     * @return the kv-map if found, else an empty one
-     */
-    const std::unordered_map<std::string, std::string>& getSectionKv(
-            const std::string& cr_section) const;
+    void read(std::istream& r_file, PropertyMap& r_map);
 
 private:
-    /// The map of sections with kv-maps
-    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> mPropertiesMap;
     /// The regular expression for 'key = value' lines
     const boost::regex mConfRe;
 };

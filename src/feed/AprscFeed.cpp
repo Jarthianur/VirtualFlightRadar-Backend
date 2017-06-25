@@ -25,8 +25,8 @@
 
 #include "../aircraft/Aircraft.h"
 #include "../aircraft/AircraftContainer.h"
-#include "../config/Configuration.h"
 #include "../tcp/client/AprscClient.h"
+#include "../config/Configuration.h"
 #include "../util/Logger.h"
 #include "../util/Parser.h"
 #include "../VFRB.h"
@@ -37,7 +37,7 @@ namespace feed
 {
 
 AprscFeed::AprscFeed(const std::string& cr_name, std::int32_t prio,
-        const std::unordered_map<std::string, std::string>& cr_kvmap)
+        const config::keyValueMap& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
     auto it = mKvMap.find(KV_KEY_LOGIN);
