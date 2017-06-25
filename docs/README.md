@@ -70,4 +70,4 @@ Contributions are always welcome.
 Status quo:
 
 Version **2.1.0**  
-Read more in the [CHANGELOG.md](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/master/CHANGELOG.md).
+Read more in the [CHANGELOG](CHANGELOG.html).
