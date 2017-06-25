@@ -28,6 +28,7 @@
     </div>
   </header>
   <nav class="w3-card ral-blue w3-bar w3-mobile w3-border-top">
+    {% include base %}
     {% assign pages_list = site.pages %}
     {% assign group = 'navigation' %}
     {% include pages_list %}
