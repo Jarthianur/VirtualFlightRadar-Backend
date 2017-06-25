@@ -34,12 +34,12 @@ namespace util
  */
 struct GpsPosition
 {
-    /// Altitude; m
-    std::int32_t altitude;
     /// Latitude; deg
     double latitude,
     /// Longitude; deg
             longitude;
+    /// Altitude; m
+    std::int32_t altitude;
 };
 
 /**

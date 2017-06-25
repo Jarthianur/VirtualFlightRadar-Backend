@@ -34,34 +34,29 @@ namespace data
 {
 
 /**
- * The GpsData class.
- *
- * This class holds GPS information.
+ * @class GpsData implements Data
+ * @brief Manage GPS information.
+ * @see Data.hpp
  */
 class GpsData: public Data<struct util::ExtGpsPosition>
 {
 public:
     /**
-     * Constructor
+     * @fn GpsData
+     * @brief Constructor
      */
     GpsData();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~GpsData
+     * @brief Destructor
      */
     virtual ~GpsData() noexcept;
     /**
-     * Set the default GPS position and meta-data.
-     * After this operation, an instance of this class
-     * returns always a valid, usable GPS position.
-     *
-     * @param b_lat the latitude
-     * @param b_lon the longitude
-     * @param b_alt the altitude
-     * @param geoid the geoid separation
+     * @fn init
+     * @brief Initialize the GPS information.
+     * @param r_pos The initial position
      */
-    void setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double geoid);
+    void init(const struct util::ExtGpsPosition& r_pos);
     /**
      * Get the NMEA sentences reporting a GPS position.
      * As they are GPGGA and GPRMC.

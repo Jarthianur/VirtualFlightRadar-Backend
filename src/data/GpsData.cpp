@@ -35,16 +35,9 @@ GpsData::~GpsData() noexcept
 {
 }
 
-void GpsData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double geoid)
+void GpsData::init(const struct util::ExtGpsPosition& r_pos)
 {
-    struct util::ExtGpsPosition base;
-    base.position.latitude = b_lat;
-    base.position.longitude = b_lon;
-    base.position.altitude = b_alt;
-    base.nrSats = 5;
-    base.fixQa = 1;
-    base.geoid = geoid;
-    mBasePos.trySetValue(base, 0);
+    mBasePos.trySetValue(r_pos, 0);
 }
 
 std::string GpsData::getGpsStr()

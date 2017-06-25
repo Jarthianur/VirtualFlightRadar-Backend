@@ -56,7 +56,7 @@ inline void clearAcCont()
 inline void setupVFRB()
 {
     VFRB::msSensorData.setPress(0, config::Configuration::base_pressure);
-    VFRB::msGpsData.setDefaults(config::Configuration::base_latitude,
+    VFRB::msGpsData.init(config::Configuration::base_latitude,
                                 config::Configuration::base_longitude,
                                 config::Configuration::base_altitude,
                                 config::Configuration::base_geoid);

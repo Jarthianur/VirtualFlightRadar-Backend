@@ -105,7 +105,7 @@ void test_data(TestSuitesRunner& runner)
     describe<data::GpsData>("gps string", runner)->test("correct gps position", []()
     {
         data::GpsData gps;
-        gps.setDefaults(10.0, 85.0,100,40.0);
+        gps.init(10.0, 85.0,100,40.0);
         assert(gps.getBaseLat(), 10.0, helper::eqd);
         assert(gps.getBaseLong(), 85.0, helper::eqd);
         assert(gps.getBaseAlt(), 100, helper::eqi);
