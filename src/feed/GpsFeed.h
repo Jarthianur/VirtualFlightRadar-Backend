@@ -22,34 +22,43 @@
 #ifndef SRC_FEED_GPSFEED_H_
 #define SRC_FEED_GPSFEED_H_
 
+#include <cstdint>
+#include <string>
+
+#include "../config/PropertyMap.h"
 #include "Feed.h"
 
 namespace feed
 {
 
 /**
- * The GpsFeed class.
- *
- * This inherits from Feed and
- * resolves to GPS handling Client and Parser.
+ * @class GpsFeed extends Feed
+ * @brief Represents a GPS input feed.
+ * @see Feed.h
  */
 class GpsFeed: public Feed
 {
 public:
     /**
-     * Construct an GpsFeed.
-     * Pass all parameters to parent constructor.
+     * @fn GpsFeed
+     * @brief Constructor
+     * @param cr_name  The GpsFeeds unique name
+     * @param prio     The priority
+     * @param cr_kvmap The properties map
      */
     GpsFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
             const config::keyValueMap& /*cr_kvmap*/);
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~GpsFeed
+     * @brief Destructor
      */
     virtual ~GpsFeed() noexcept;
-
-    std::int32_t process(const std::string& cr_res) noexcept override;
+    /**
+     * @fn process
+     * @brief Handle GpsdClients response.
+     * @param cr_res The response to process
+     */
+    void process(const std::string& cr_res) noexcept override;
 };
 
 } // namespace feed

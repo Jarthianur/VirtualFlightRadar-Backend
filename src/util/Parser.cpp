@@ -303,7 +303,7 @@ SensorInfo Parser::parseSensNmea(const std::string& cr_msg)
     {
         throw std::logic_error("");
     }
-    SensorInfo info;
+    SensorInfo info = {"", "", SI_PRESS_NA};
     if (cr_msg.find("MDA") != std::string::npos)
     {
         info.mdaStr = cr_msg;

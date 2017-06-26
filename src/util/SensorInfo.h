@@ -31,9 +31,9 @@ namespace util
 
 struct SensorInfo
 {
-    std::string mdaStr = "";
-    std::string mwvStr = "";
-    double press = SI_PRESS_NA;
+    std::string mdaStr;
+    std::string mwvStr;
+    double press;
 };
 
 }  // namespace util

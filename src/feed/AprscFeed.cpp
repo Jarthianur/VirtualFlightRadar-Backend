@@ -21,12 +21,14 @@
 
 #include "AprscFeed.h"
 
+#include <memory>
 #include <stdexcept>
+#include <unordered_map>
 
 #include "../aircraft/Aircraft.h"
 #include "../aircraft/AircraftContainer.h"
-#include "../tcp/client/AprscClient.h"
 #include "../config/Configuration.h"
+#include "../tcp/client/AprscClient.h"
 #include "../util/Logger.h"
 #include "../util/Parser.h"
 #include "../VFRB.h"
@@ -57,16 +59,14 @@ AprscFeed::~AprscFeed() noexcept
 {
 }
 
-std::int32_t AprscFeed::process(const std::string& cr_res) noexcept
+void AprscFeed::process(const std::string& cr_res) noexcept
 {
     try
     {
         VFRB::msAcCont.insertAircraft(Parser::parseAprs(cr_res), mPriority);
     } catch (const std::logic_error& e)
     {
-        return -1;
     }
-    return 0;
 }
 
 } // namespace feed

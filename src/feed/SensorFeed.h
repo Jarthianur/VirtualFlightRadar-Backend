@@ -22,33 +22,43 @@
 #ifndef SRC_FEED_SENSORFEED_H_
 #define SRC_FEED_SENSORFEED_H_
 
+#include <cstdint>
+#include <string>
+
+#include "../config/PropertyMap.h"
 #include "Feed.h"
 
 namespace feed
 {
 
 /**
- * The SensorFeed class.
- *
- * This inherits from Feed and
- * resolves to Sensor handling Client and Parser.
+ * @class SensorFeed extends Feed
+ * @brief Represents a sensor input feed.
+ * @see Feed.h
  */
 class SensorFeed: public Feed
 {
 public:
     /**
-     * Construct an SensorFeed.
-     * Pass all parameters to parent constructor.
+     * @fn SensorFeed
+     * @brief Constructor
+     * @param cr_name  The SensorFeeds unique name
+     * @param prio     The priority
+     * @param cr_kvmap The properties map
      */
     SensorFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
             const config::keyValueMap& /*cr_kvmap*/);
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~SensorFeed
+     * @brief Destructor
      */
     virtual ~SensorFeed() noexcept;
-    std::int32_t process(const std::string& cr_res) noexcept override;
+    /**
+     * @fn process
+     * @brief Handle SensorClients response.
+     * @param cr_res The response to process
+     */
+    void process(const std::string& cr_res) noexcept override;
 };
 
 } // namespace feed

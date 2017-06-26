@@ -21,6 +21,10 @@
 
 #include "GpsFeed.h"
 
+#include <memory>
+#include <stdexcept>
+#include <unordered_map>
+
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
 #include "../tcp/client/GpsdClient.h"
@@ -29,6 +33,7 @@
 #include "../util/Position.hpp"
 #include "../VFRB.h"
 
+/// Define GPS metrics
 #define GPS_NR_SATS_GOOD      7
 #define GPS_FIX_GOOD          1
 #define GPS_HOR_DILUTION_GOOD 1.0
@@ -51,7 +56,7 @@ GpsFeed::~GpsFeed() noexcept
 {
 }
 
-std::int32_t GpsFeed::process(const std::string& cr_res) noexcept
+void GpsFeed::process(const std::string& cr_res) noexcept
 {
     try
     {
@@ -65,9 +70,7 @@ std::int32_t GpsFeed::process(const std::string& cr_res) noexcept
         }
     } catch (const std::logic_error& e)
     {
-        return -1;
     }
-    return 0;
 }
 
 } // namespace feed

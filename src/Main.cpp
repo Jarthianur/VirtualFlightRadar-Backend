@@ -19,16 +19,18 @@
  }
  */
 
+#include <cstdint>
+#include <fstream>
 #include <stdexcept>
 #include <string>
-#include <fstream>
 
 #include "config/Configuration.h"
-#include "data/SensorData.h"
 #include "data/GpsData.h"
+#include "data/SensorData.h"
 #include "util/Logger.h"
-#include "VFRB.h"
+#include "util/Position.hpp"
 #include "util/SensorInfo.h"
+#include "VFRB.h"
 
 #ifndef VERSION
 #define VERSION "DEMO"
@@ -73,7 +75,7 @@ int main(int argc, char** argv)
 
     // set climate fallbacks
 
-    VFRB::msSensorData.setDefaults(config::Configuration::base_pressure);
+    VFRB::msSensorData.init( { "", "", config::Configuration::base_pressure });
     VFRB::msGpsData.init( { config::Configuration::base_latitude,
             config::Configuration::base_longitude, config::Configuration::base_altitude,
             1, 5, config::Configuration::base_geoid, 0.0 });

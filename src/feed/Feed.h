@@ -42,12 +42,9 @@ namespace feed
 {
 
 /**
- * The Feed class.
- *
- * This class represents an input feed.
- * A Feed is unique and movable but not copyable.
- * The Client and Parser are resolved by concrete
- * derived classes.
+ * @class Feed
+ * @brief Incomplete base-class representing an input feed.
+ * @note A Feed is unique and only movable.
  */
 class Feed
 {
@@ -55,37 +52,35 @@ BOOST_MOVABLE_BUT_NOT_COPYABLE(Feed)
 
 public:
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~Feed
+     * @brief Destructor
      */
     virtual ~Feed() noexcept;
     /**
-     * Move-constructor
+     * @fn Feed
+     * @brief Move-constructor
+     * @param The Feed to move
      */
     Feed(BOOST_RV_REF(Feed));
     /**
-     * Move-assignment
+     * @fn operator=
+     * @brief Move-assignment
+     * @param The Feed to assign
      */
     Feed& operator=(BOOST_RV_REF(Feed));
     /**
-     * Run a Feed.
-     *
-     * @param r_sigset the signal set to pass to the Client
-     *
-     * @exceptsafe strong
+     * @fn run
+     * @brief Run a Feed.
+     * @param r_sigset The signal set to pass to the Client
      */
     void run(boost::asio::signal_set& r_sigset) noexcept;
     /**
-     * Pass the Clients response to the Parser.
-     *
-     * @param cr_res the response to process
-     *
-     * @return the Parsers return value
-     *
-     * @exceptsafe no-throw
+     * @fn process
+     * @brief Handle Clients response.
+     * @note To be implemented.
+     * @param cr_res The response to process
      */
-    virtual std::int32_t process(const std::string& cr_res) noexcept = 0;
+    virtual void process(const std::string& cr_res) noexcept = 0;
 
     /// Unique name
     const std::string mName;
@@ -94,15 +89,12 @@ public:
 
 protected:
     /**
-     * Construct a Feed with its meta-data and
-     * a key-value-map holding all properties.
-     * Host and port for the Client get resolved in here.
-     *
-     * @param cr_name  the Feeds unique name
-     * @param prio     the priority
-     * @param cr_kvmap the properties map
-     *
-     * @throws std::runtime_error if host or port are not given
+     * @fn Feed
+     * @brief Constructor
+     * @param cr_name  The Feeds unique name
+     * @param prio     The priority
+     * @param cr_kvmap The properties map
+     * @throws std::logic_error if host or port are not given
      */
     Feed(const std::string& cr_name, std::int32_t prio,
             const config::keyValueMap& cr_kvmap);

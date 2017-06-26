@@ -21,6 +21,10 @@
 
 #include "SbsFeed.h"
 
+#include <memory>
+#include <stdexcept>
+#include <unordered_map>
+
 #include "../aircraft/Aircraft.h"
 #include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
@@ -46,16 +50,14 @@ SbsFeed::~SbsFeed() noexcept
 {
 }
 
-std::int32_t SbsFeed::process(const std::string& cr_res) noexcept
+void SbsFeed::process(const std::string& cr_res) noexcept
 {
     try
     {
         VFRB::msAcCont.insertAircraft(Parser::parseSbs(cr_res), mPriority);
     } catch (const std::logic_error& e)
     {
-        return -1;
     }
-    return 0;
 }
 
 } // namespace feed

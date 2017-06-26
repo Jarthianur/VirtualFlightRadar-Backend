@@ -21,6 +21,10 @@
 
 #include "SensorFeed.h"
 
+#include <memory>
+#include <stdexcept>
+#include <unordered_map>
+
 #include "../config/Configuration.h"
 #include "../data/SensorData.h"
 #include "../tcp/client/SensorClient.h"
@@ -46,16 +50,14 @@ SensorFeed::~SensorFeed() noexcept
 {
 }
 
-std::int32_t SensorFeed::process(const std::string& cr_res) noexcept
+void SensorFeed::process(const std::string& cr_res) noexcept
 {
     try
     {
         VFRB::msSensorData.update(Parser::parseSensNmea(cr_res), mPriority);
     } catch (const std::logic_error& e)
     {
-        return -1;
     }
-    return 0;
 }
 
 } // namespace feed

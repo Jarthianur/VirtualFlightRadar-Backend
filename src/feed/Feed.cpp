@@ -26,10 +26,10 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../tcp/client/Client.h"
-#include "../VFRB.h"
 #include "../config/Configuration.h"
+#include "../tcp/client/Client.h"
 #include "../util/Logger.h"
+#include "../VFRB.h"
 
 using namespace util;
 

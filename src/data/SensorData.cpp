@@ -95,6 +95,13 @@ double SensorData::getPress()
     return mPress.value;
 }
 
+void SensorData::init(const struct util::SensorInfo& cr_info)
+{
+    mMdaData.trySetValue(cr_info.mdaStr, 0);
+    mMwvData.trySetValue(cr_info.mwvStr, 0);
+    mPress.trySetValue(cr_info.press, 0);
+}
+
 void SensorData::setPress(double p, std::int32_t prio)
 {
     boost::lock_guard<boost::mutex> lock(mPress.mutex);

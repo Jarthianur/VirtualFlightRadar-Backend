@@ -103,27 +103,27 @@ private:
      */
     void setMdaStr(const std::string& cr_mda, std::int32_t prio);
     /**
-     * Set MWV sentence.
-     * Wind data is valid after this operation.
-     * May fail due to priority.
-     *
-     * @param prio the priority attempting to write
-     * @param cr_mwv the new MWV sentence to write
+     * @fn setMwvStr
+     * @brief Set MWV sentence.
+     * @note MWV is valid after this operation.
+     * @param cr_mwv The new MWV sentence
+     * @param prio   The attempts priority
+     * @threadsafe
      */
     void setMwvStr(const std::string& cr_mwv, std::int32_t prio);
     /**
-     * Set the new pressure.
-     * May fail due to priority.
-     *
-     * @param prio the priority attempting to write
-     * @param p the new pressure
+     * @fn setPress
+     * @brief Set pressure.
+     * @param p    The new pressure
+     * @param prio The attempts priority
+     * @threadsafe
      */
     void setPress(double p, std::int32_t prio);
-    /// Data holding pressure
+    /// Holding pressure
     struct Wrapper<double> mPress;
-    /// TmpData holding MWV sentence
+    /// Holding MWV sentence
     struct TmpWrapper<std::string> mMwvData;
-    /// TmpData holding MDA sentence
+    /// Holding MDA sentence
     struct TmpWrapper<std::string> mMdaData;
 };
 

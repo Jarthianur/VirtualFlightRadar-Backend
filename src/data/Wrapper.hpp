@@ -30,11 +30,9 @@ namespace data
 {
 
 /**
- * Data structure.
- *
- * Hold a value providing its own mutex and meta-data.
- *
- * @tparam T the type of value to hold
+ * @class Wrapper
+ * @brief Store any value and provide per Wrapper meta-data and mutex.
+ * @tparam T The type of value to hold
  */
 template<typename T>
 struct Wrapper
@@ -45,15 +43,14 @@ struct Wrapper
     bool attemptValid = true;
     /// Last written priority
     std::int32_t lastPriority = 0;
-    /// Mutex to enable threadsafety per Data.
+    /// Mutex to enable threadsafety per Wrapper.
     boost::mutex mutex;
     /**
-     * Update the value.
-     * May fail due to priority.
-     * Updates always if attempt is valid.
-     *
-     * @param cr_nv the new value
-     * @param prio  the priority attempting to write
+     * @fn trySetValue
+     * @brief Try to set the value, fails if attempts priority is less.
+     * @note Succeeds always if attempt is valid.
+     * @param cr_nv The new value
+     * @param prio  The attempts priority
      */
     void trySetValue(const T& cr_nv, std::int32_t prio)
     {
@@ -77,11 +74,8 @@ struct Wrapper
     }
 };
 /**
- * Pseudo temporary data structure.
- *
- * Same as the Data structure, but reading the value
- * invalidates it and updating validates it.
- *
+ * @class TmpWrapper
+ * @brief Pseudo temporary Wrapper; value is invalid after read and valid after write.
  * @tparam T the type of value to hold
  */
 template<typename T>
@@ -95,11 +89,11 @@ struct TmpWrapper
     bool valueValid;
     /// Last written priority
     std::int32_t lastPriority;
-    /// Mutex to enable threadsafety per TmpData.
+    /// Mutex to enable threadsafety per TmpWrapper.
     boost::mutex mutex;
     /**
-     * Get the value and invalidate it.
-     *
+     * @fn getValue
+     * @brief Get the value and invalidate it.
      * @return the value
      */
     const T& getValue()
@@ -108,13 +102,11 @@ struct TmpWrapper
         return value;
     }
     /**
-     * Update the value.
-     * May fail due to priority.
-     * Updates always if attempt is valid.
-     * Validates the value.
-     *
-     * @param cr_nv the new value
-     * @param prio  the priority attempting to write
+     * @fn trySetValue
+     * @brief Try to set the value, fails if attempts priority is less.
+     * @note Succeeds always if attempt is valid.
+     * @param cr_nv The new value
+     * @param prio  The attempts priority
      */
     void trySetValue(const T& cr_nv, std::int32_t prio)
     {
