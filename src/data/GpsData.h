@@ -55,6 +55,7 @@ public:
      * @fn init
      * @brief Initialize the GPS information.
      * @param cr_pos The initial position
+     * @override Data::init
      */
     void init(const struct util::ExtGpsPosition& cr_pos) override;
     /**
@@ -62,6 +63,7 @@ public:
      * @brief Try to update the base position.
      * @param cr_pos The new position
      * @param prio   The attempts priority
+     * @override Data::update
      * @threadsafe
      */
     void update(const struct util::ExtGpsPosition& cr_pos, std::int32_t prio) override;

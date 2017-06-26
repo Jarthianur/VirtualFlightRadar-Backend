@@ -62,7 +62,7 @@ void Client::run(boost::asio::signal_set& r_sigset)
     mIoService.run();
 }
 
-void Client::timedConnect() noexcept
+void Client::timedConnect()
 {
     mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
     mConnectTimer.async_wait(
@@ -70,7 +70,7 @@ void Client::timedConnect() noexcept
                     boost::asio::placeholders::error));
 }
 
-void Client::stop() noexcept
+void Client::stop()
 {
     Logger::info(mComponent + " stop connection to: ", mHost + ":" + mPort);
     mConnectTimer.expires_at(boost::posix_time::pos_infin);
@@ -83,14 +83,14 @@ void Client::stop() noexcept
     }
 }
 
-void Client::read() noexcept
+void Client::read()
 {
     boost::asio::async_read_until(mSocket, mBuffer, "\r\n",
             boost::bind(&Client::handleRead, this, boost::asio::placeholders::error,
                     boost::asio::placeholders::bytes_transferred));
 }
 
-void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
+void Client::handleTimedConnect(const boost::system::error_code& cr_ec)
 {
     if (!cr_ec)
     {
@@ -107,7 +107,6 @@ void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
 }
 
 void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t s)
-noexcept
 {
     if (!cr_ec)
     {

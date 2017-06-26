@@ -42,14 +42,9 @@ namespace client
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
 
 /**
- * The Client base class.
- *
- * This class provides functionality to connect to a server
- * via TCP. Concrete Clients need to implement following methods:
- * - process
- * - connect
- * - handleResolve
- * - handleConnect
+ * @class Client
+ * @brief Incomplete base-class representing a TCP client.
+ * @note A Client is unique and only movable.
  */
 class Client
 {
@@ -63,85 +58,81 @@ public:
      */
     Client& operator=(const Client&) = delete;
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~Client
+     * @brief Destructor
      */
     virtual ~Client() noexcept;
     /**
-     * Run the Client.
-     * This function returns after all queued handles have returned.
-     *
-     * @param r_sigset the signal set reference handling signals
+     * @fn run
+     * @brief Run the Client.
+     * @note Returns after all queued handlers have returned.
+     * @param r_sigset The signal set reference to register handler
      */
     void run(boost::asio::signal_set& r_sigset);
     /**
-     * Stop the Client and close the connection.
+     * @fn stop
+     * @brief Stop the Client and close the connection.
      */
-    virtual void stop() noexcept;
+    virtual void stop();
 
 protected:
     /**
-     * Construct a Client given a host, port,
-     * a string representing the Client type
-     * and the Feed handling this Client.
-     *
-     * @param cr_host  the hostname
-     * @param cr_port  the port
-     * @param cr_comp  the component string
-     * @param r_feed   the handler Feed reference
+     * @fn Client
+     * @brief Constructor
+     * @param cr_host  The hostname
+     * @param cr_port  The port
+     * @param cr_comp  The component name
+     * @param r_feed   The handler Feed reference
      */
     Client(const std::string& cr_host, const std::string& cr_port,
             const std::string& cr_comp, feed::Feed& r_feed);
     /**
-     * Connect with timeout.
+     * @fn timedConnect
+     * @brief Connect after timeout.
      */
-    void timedConnect() noexcept;
+    void timedConnect();
     /**
-     * Read data.
+     * @fn read
+     * @brief Read from remote endpoint.
      */
-    virtual void read() noexcept;
+    virtual void read();
     /**
-     * Connect to host.
+     * @fn connect
+     * @brief Connect to host.
+     * @note To be implemented.
      */
-    virtual void connect() noexcept = 0;
+    virtual void connect() = 0;
     /**
-     * Timed connect - handler
-     *
-     * @param cr_ec the error code
-     *
-     * @exceptsafe strong
+     * @fn handleTimedConnect
+     * @brief Handler for timedConnect.
+     * @param cr_ec The error code
      */
-    void handleTimedConnect(const boost::system::error_code& cr_ec) noexcept;
+    void handleTimedConnect(const boost::system::error_code& cr_ec);
     /**
-     * Read - handler
-     *
-     * @param cr_ec the error code
-     * @param s     the sent bytes
-     *
-     * @exceptsafe strong
+     * @fn handleRead
+     * @brief Handler for read.
+     * @param cr_ec The error code
+     * @param s     The sent bytes
      */
-    void handleRead(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
+    void handleRead(const boost::system::error_code& cr_ec, std::size_t s);
     /**
-     * Resolve host - handler
-     *
-     * @param cr_ec the error code
-     * @param it    the resolve iterator
-     *
-     * @exceptsafe strong
+     * @fn handleResolve
+     * @brief Handler for resolve host.
+     * @note Internally used in connect. To be implemented.
+     * @param cr_ec The error code
+     * @param it    The resolve iterator
      */
     virtual void handleResolve(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
+            boost::asio::ip::tcp::resolver::iterator it) = 0;
     /**
-     * Connect - handler
-     *
-     * @param cr_ec the error code
-     * @param it    the resolve iterator
-     *
-     * @exceptsafe strong
+     * @fn handleConnect
+     * @brief Handler for connect.
+     * @note To be implemented.
+     * @param cr_ec The error code
+     * @param it    The resolve iterator
      */
     virtual void handleConnect(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
+            boost::asio::ip::tcp::resolver::iterator it) = 0;
 
     /// Internal IO-service
     boost::asio::io_service mIoService;

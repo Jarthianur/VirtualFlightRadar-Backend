@@ -57,6 +57,7 @@ public:
      * @fn init
      * @brief Initialize the sensor information.
      * @param cr_info The initial data
+     * @override Data::init
      */
     void init(const struct util::SensorInfo& cr_info) override;
     /**
@@ -65,6 +66,7 @@ public:
      * @note Splits the given info, using setters.
      * @param cr_info The new sensor information.
      * @param prio    The attempts priority
+     * @override Data::update
      * @threadsafe
      */
     void update(const struct util::SensorInfo& cr_info, std::int32_t prio) override;
