@@ -65,6 +65,7 @@ public:
      * @note Splits the given info, using setters.
      * @param cr_info The new sensor information.
      * @param prio    The attempts priority
+     * @threadsafe
      */
     void update(const struct util::SensorInfo& cr_info, std::int32_t prio) override;
     /**
@@ -72,7 +73,7 @@ public:
      * @brief Get the MWV sentence.
      * @note MWV is invalid after this operation.
      * @return the MWV sentence, if valid, else empty string
-     * @locks mMwvData.mutex
+     * @threadsafe
      */
     std::string getMwvStr();
     /**
@@ -80,25 +81,25 @@ public:
      * @brief Get the MDA sentence.
      * @note MDA is invalid after this operation.
      * @return the MDA sentence, if valid, else empty string
-     * @locks mMdaData.mutex
+     * @threadsafe
      */
     std::string getMdaStr();
     /**
      * @fn getPress
      * @brief Get pressure.
      * @return the pressure
-     * @locks mPress.mutex
+     * @threadsafe
      */
     double getPress();
 
 private:
     /**
-     * Set MDA sentence.
-     * Data is valid after this operation.
-     * May fail due to priority.
-     *
-     * @param prio the priority attempting to write
-     * @param cr_mda the new MDA sentence to write
+     * @fn setMdaStr
+     * @brief Set MDA sentence.
+     * @note MDA is valid after this operation.
+     * @param cr_mda The new MDA sentence
+     * @param prio   The attempts priority
+     * @threadsafe
      */
     void setMdaStr(const std::string& cr_mda, std::int32_t prio);
     /**

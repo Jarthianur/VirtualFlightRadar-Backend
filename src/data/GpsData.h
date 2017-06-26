@@ -62,7 +62,7 @@ public:
      * @brief Try to update the base position.
      * @param cr_pos The new position
      * @param prio   The attempts priority
-     * @locks mBasePos.mutex
+     * @threadsafe
      */
     void update(const struct util::ExtGpsPosition& cr_pos, std::int32_t prio) override;
     /**
@@ -70,35 +70,35 @@ public:
      * @brief Get a full NMEA GPS report.
      * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
      * @return the NMEA string
-     * @locks mBasePos.mutex
+     * @threadsafe
      */
     std::string getGpsStr();
     /**
      * @fn getBasePos
      * @brief Get the base GPS position.
      * @return the position
-     * @locks mBasePos.mutex
+     * @threadsafe
      */
     struct util::ExtGpsPosition getBasePos();
     /**
      * @fn getBaseLat
      * @brief Get the base latitude.
      * @return the latitude
-     * @locks mBasePos.mutex
+     * @threadsafe
      */
     double getBaseLat();
     /**
      * @fn getBaseLong
      * @brief Get the base longitude.
      * @return the longitude
-     * @locks mBasePos.mutex
+     * @threadsafe
      */
     double getBaseLong();
     /**
      * @fn getBaseAlt
      * @brief Get the base altitude.
      * @return the altitude
-     * @locks mBasePos.mutex
+     * @threadsafe
      */
     std::int32_t getBaseAlt();
 

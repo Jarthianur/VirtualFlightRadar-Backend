@@ -64,6 +64,7 @@ public:
      * @note May fail due to priority.
      * @param cr_update The Aircraft update
      * @param prio      The priority attempting to write
+     * @threadsafe
      */
     void insertAircraft(const Aircraft& cr_update, std::int32_t prio);
     /**
@@ -72,6 +73,7 @@ public:
      *        Increases update ages; "too old" Aircrafts are not reported and later deleted.
      * @see AircraftProcesser::process
      * @return the string with all NMEA reports
+     * @threadsafe
      */
     std::string processAircrafts();
 
