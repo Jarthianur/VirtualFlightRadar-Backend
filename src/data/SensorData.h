@@ -22,61 +22,72 @@
 #ifndef SRC_DATA_SENSORDATA_H_
 #define SRC_DATA_SENSORDATA_H_
 
-#include <string>
 #include <cstdint>
+#include <string>
+
 #include "../util/SensorInfo.h"
 #include "Data.hpp"
 #include "Wrapper.hpp"
 
+/// ICAO standard atmospheric pressure at MSL
+#define ICAO_STD_A 1013.25
+
 namespace data
 {
 
-/// ICAO standard atmospheric pressure at MSL
-#define ICAO_STD_A 1013.25
-/// ICAO standard temperature at MSL
-/// @deprecated
-#define ICAO_STD_T 15.0
-
 /**
- * The SensorData class.
- *
- * This class holds data gathered from any sensor.
- * E.g. wind sensor, pressure sensor
+ * @class SensorData implements Data
+ * @brief Manage sensor information.
+ * @see Data.hpp
  */
 class SensorData: public Data<struct util::SensorInfo>
 {
 public:
     /**
-     * Constructor
+     * @fn SensorData
+     * @brief Constructor
      */
     SensorData();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~SensorData
+     * @brief Destructor
      */
     virtual ~SensorData() noexcept;
-
-    void update(const struct util::SensorInfo& cr_info, std::int32_t prio) override;
-    void setDefaults(double p);
     /**
-     * Get MWV sentence.
-     * Wind data is invalid after this operation.
-     *
+     * @fn init
+     * @brief Initialize the sensor information.
+     * @param cr_info The initial data
+     */
+    void init(const struct util::SensorInfo& cr_info) override;
+    /**
+     * @fn update
+     * @brief Try to update the sensor information.
+     * @note Splits the given info, using setters.
+     * @param cr_info The new sensor information.
+     * @param prio    The attempts priority
+     */
+    void update(const struct util::SensorInfo& cr_info, std::int32_t prio) override;
+    /**
+     * @fn getMwvStr
+     * @brief Get the MWV sentence.
+     * @note MWV is invalid after this operation.
      * @return the MWV sentence, if valid, else empty string
+     * @locks mMwvData.mutex
      */
     std::string getMwvStr();
     /**
-     * Get MDA sentence.
-     * Data is invalid after this operation.
-     *
+     * @fn getMdaStr
+     * @brief Get the MDA sentence.
+     * @note MDA is invalid after this operation.
      * @return the MDA sentence, if valid, else empty string
+     * @locks mMdaData.mutex
      */
     std::string getMdaStr();
     /**
-     * Get the last registered pressure.
-     *
+     * @fn getPress
+     * @brief Get pressure.
      * @return the pressure
+     * @locks mPress.mutex
      */
     double getPress();
 

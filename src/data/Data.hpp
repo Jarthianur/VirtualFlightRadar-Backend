@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_DATA_DATA_H_
-#define SRC_DATA_DATA_H_
+#ifndef SRC_DATA_DATA_HPP_
+#define SRC_DATA_DATA_HPP_
 
 #include <cstdint>
 
@@ -69,4 +69,4 @@ public:
 
 } /* namespace data */
 
-#endif /* SRC_DATA_DATA_H_ */
+#endif /* SRC_DATA_DATA_HPP_ */

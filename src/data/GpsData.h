@@ -54,52 +54,56 @@ public:
     /**
      * @fn init
      * @brief Initialize the GPS information.
-     * @param r_pos The initial position
+     * @param cr_pos The initial position
      */
-    void init(const struct util::ExtGpsPosition& r_pos);
+    void init(const struct util::ExtGpsPosition& cr_pos) override;
     /**
-     * Get the NMEA sentences reporting a GPS position.
-     * As they are GPGGA and GPRMC.
-     * The returned sentences include trailing <cr><lf>.
-     *
-     * @return the NMEA sentences in string
-     */
-    std::string getGpsStr();
-    /**
-     * Set the new base position.
-     * May fail due to priority.
-     *
-     * @param prio   the priority attempting to write
-     * @param cr_pos the new position
+     * @fn update
+     * @brief Try to update the base position.
+     * @param cr_pos The new position
+     * @param prio   The attempts priority
+     * @locks mBasePos.mutex
      */
     void update(const struct util::ExtGpsPosition& cr_pos, std::int32_t prio) override;
     /**
-     * Get the last registered GPS position.
-     *
+     * @fn getGpsStr
+     * @brief Get a full NMEA GPS report.
+     * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
+     * @return the NMEA string
+     * @locks mBasePos.mutex
+     */
+    std::string getGpsStr();
+    /**
+     * @fn getBasePos
+     * @brief Get the base GPS position.
      * @return the position
+     * @locks mBasePos.mutex
      */
     struct util::ExtGpsPosition getBasePos();
     /**
-     * Get the base positions latitude.
-     *
+     * @fn getBaseLat
+     * @brief Get the base latitude.
      * @return the latitude
+     * @locks mBasePos.mutex
      */
     double getBaseLat();
     /**
-     * Get the base positions longitude.
-     *
+     * @fn getBaseLong
+     * @brief Get the base longitude.
      * @return the longitude
+     * @locks mBasePos.mutex
      */
     double getBaseLong();
     /**
-     * Get the base positions altitude.
-     *
+     * @fn getBaseAlt
+     * @brief Get the base altitude.
      * @return the altitude
+     * @locks mBasePos.mutex
      */
     std::int32_t getBaseAlt();
 
 private:
-    /// Data holding the base position.
+    /// Wrapper holding the base position.
     struct Wrapper<struct util::ExtGpsPosition> mBasePos;
     /// GpsModule providing functionality to build GPS sentences.
     util::GpsModule mGpsMod;

@@ -95,11 +95,6 @@ double SensorData::getPress()
     return mPress.value;
 }
 
-void SensorData::setDefaults(double p)
-{
-    mPress.trySetValue(p, 0);
-}
-
 void SensorData::setPress(double p, std::int32_t prio)
 {
     boost::lock_guard<boost::mutex> lock(mPress.mutex);
