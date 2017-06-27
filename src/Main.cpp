@@ -75,8 +75,8 @@ int main(int argc, char** argv)
     }
 
     VFRB::msSensorData.init( { "", "", config::Configuration::base_pressure });
-    VFRB::msGpsData.init( { config::Configuration::base_latitude,
-            config::Configuration::base_longitude, config::Configuration::base_altitude,
+    VFRB::msGpsData.init( { { config::Configuration::base_latitude,
+            config::Configuration::base_longitude, config::Configuration::base_altitude },
             1, 5, config::Configuration::base_geoid, 0.0 });
     VFRB::run();
 

@@ -54,10 +54,10 @@ public:
     /**
      * @fn init
      * @brief Initialize the GPS information.
-     * @param cr_pos The initial position
+     * @param pos The initial position
      * @override Data::init
      */
-    void init(const struct util::ExtGpsPosition& cr_pos) override;
+    void init(struct util::ExtGpsPosition pos) override;
     /**
      * @fn update
      * @brief Try to update the base position.
