@@ -82,20 +82,20 @@ private:
      * @override Client::handleResolve
      */
     void handleResolve(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) override;
+            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
      * @fn handleConnect
      * @override Client::handleConnect
      */
     void handleConnect(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) override;
+            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
      * @fn handleWatch
      * @brief Handler for send watch-reques
      * @param cr_ec The error code
      * @param s     The sent bytes
      */
-    void handleWatch(const boost::system::error_code& cr_ec, std::size_t s);
+    void handleWatch(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
 };
 
 }  // namespace client

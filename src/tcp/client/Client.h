@@ -107,14 +107,14 @@ protected:
      * @brief Handler for timedConnect.
      * @param cr_ec The error code
      */
-    void handleTimedConnect(const boost::system::error_code& cr_ec);
+    void handleTimedConnect(const boost::system::error_code& cr_ec) noexcept;
     /**
      * @fn handleRead
      * @brief Handler for read.
      * @param cr_ec The error code
      * @param s     The sent bytes
      */
-    void handleRead(const boost::system::error_code& cr_ec, std::size_t s);
+    void handleRead(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
     /**
      * @fn handleResolve
      * @brief Handler for resolve host.
@@ -123,7 +123,7 @@ protected:
      * @param it    The resolve iterator
      */
     virtual void handleResolve(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) = 0;
+            boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
     /**
      * @fn handleConnect
      * @brief Handler for connect.
@@ -132,7 +132,7 @@ protected:
      * @param it    The resolve iterator
      */
     virtual void handleConnect(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) = 0;
+            boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
 
     /// Internal IO-service
     boost::asio::io_service mIoService;

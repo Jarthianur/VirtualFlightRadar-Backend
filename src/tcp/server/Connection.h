@@ -32,11 +32,9 @@ namespace server
 {
 
 /**
- * The Connection class.
- *
- * This class represents a TCP connection opened by the Server.
- * The connection is closed with destruction.
- * May only be used as shared pointer to a singleton Connection.
+ * @class Connection
+ * @brief Represents a TCP connection opened by the Server.
+ * @see Server.h
  */
 class Connection: public boost::enable_shared_from_this<Connection>
 {
@@ -50,50 +48,46 @@ public:
      */
     Connection& operator=(const Connection&) = delete;
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~Connection
+     * @brief Destructor
      */
     virtual ~Connection() noexcept;
     /**
-     * Start a Connection on given socket.
-     * Return shared ptr to it.
-     *
-     * @param socket the socket
-     *
-     * @return shared ptr to the Connection object
+     * @fn start
+     * @brief Start a Connection.
+     * @param socket The socket
+     * @return a shared ptr to the Connection object
      */
     static boost::shared_ptr<Connection> start(boost::asio::ip::tcp::socket socket);
     /**
-     * Stop connection, shutdown and close socket.
-     *
-     * @exceptsafe strong
+     * @fn stop
+     * @brief Stop the connection, shutdown and close socket.
      */
-    void stop() noexcept;
+    void stop();
     /**
-     * Get the socket as reference.
-     *
+     * @fn getSocket
+     * @brief Get the socket as reference.
      * @return the socket ref
      */
     boost::asio::ip::tcp::socket& getSocket();
     /**
-     * Get the endpoints IP address.
-     *
+     * @fn getIp
+     * @brief Get the endpoints IP address.
      * @return the IP address
      */
-    const std::string& getIP();
+    const std::string& getIp();
 
 private:
     /**
-     * Constructor
-     *
-     * @param socket the socket
+     * @fn Connection
+     * @brief Constructor
+     * @param socket The socket
      */
     Connection(boost::asio::ip::tcp::socket socket);
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
     /// IP address
-    const std::string mIP;
+    const std::string mIp;
 };
 
 }  // namespace server

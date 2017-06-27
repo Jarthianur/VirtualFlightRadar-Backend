@@ -59,7 +59,7 @@ void Server::run()
     mIOservice.run();
 }
 
-void Server::writeToAll(const std::string& cr_msg) noexcept
+void Server::writeToAll(const std::string& cr_msg)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     boost::system::error_code ec;
@@ -68,7 +68,7 @@ void Server::writeToAll(const std::string& cr_msg) noexcept
         boost::asio::write(it->get()->getSocket(), boost::asio::buffer(cr_msg), ec);
         if (ec)
         {
-            Logger::warn("(Server) lost connection to: ", it->get()->getIP());
+            Logger::warn("(Server) lost connection to: ", it->get()->getIp());
             mClients.erase(it);
         } else
         {
@@ -77,7 +77,7 @@ void Server::writeToAll(const std::string& cr_msg) noexcept
     }
 }
 
-void Server::accept() noexcept
+void Server::accept()
 {
     mAcceptor.async_accept(mSocket,
             boost::bind(&Server::handleAccept, this, boost::asio::placeholders::error));
@@ -99,11 +99,11 @@ void Server::stopAll()
     mClients.clear();
 }
 
-bool Server::isRegistered(const std::string& cr_ip)
+bool Server::isConnected(const std::string& cr_ip)
 {
     for (auto it = mClients.cbegin(); it != mClients.cend(); it++)
     {
-        if (it->get()->getIP() == cr_ip)
+        if (it->get()->getIp() == cr_ip)
         {
             return true;
         }
@@ -121,13 +121,13 @@ void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
     {
         boost::lock_guard<boost::mutex> lock(this->mMutex);
         auto client = Connection::start(std::move(mSocket));
-        if (mClients.size() < S_MAX_CLIENTS && !isRegistered(client->getIP()))
+        if (mClients.size() < S_MAX_CLIENTS && !isConnected(client->getIp()))
         {
             mClients.push_back(client);
-            Logger::info("(Server) connection from: ", client->getIP());
+            Logger::info("(Server) connection from: ", client->getIp());
         } else
         {
-            Logger::info("(Server) refused connection to ", client->getIP());
+            Logger::info("(Server) refused connection to ", client->getIp());
         }
     } else if (cr_ec != boost::system::errc::bad_file_descriptor)
     {

@@ -57,6 +57,7 @@ public:
      * @fn process
      * @brief Handle SbsClients response.
      * @param cr_res The response to process
+     * @override Feed::process
      */
     void process(const std::string& cr_res) noexcept override;
 };

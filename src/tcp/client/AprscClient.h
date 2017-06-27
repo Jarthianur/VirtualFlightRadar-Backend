@@ -87,27 +87,28 @@ private:
      * @override Client::handleResolve
      */
     void handleResolve(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) override;
+            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
      * @fn handleConnect
      * @override Client::handleConnect
      */
     void handleConnect(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) override;
+            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
      * @fn handleLogin
      * @brief Handler fro send login string.
      * @param cr_ec The error code
      * @param s     The sent bytes
      */
-    void handleLogin(const boost::system::error_code& cr_ec, std::size_t s);
+    void handleLogin(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
     /**
      * @fn handleSendKaBeacon
      * @brief Handler for sendKaBeacon
      * @param cr_ec The error code
      * @param s     The sent bytes
      */
-    void handleSendKaBeacon(const boost::system::error_code& cr_ec, std::size_t s);
+    void handleSendKaBeacon(const boost::system::error_code& cr_ec, std::size_t s)
+            noexcept;
 
     /// Login string
     std::string mLoginStr;

@@ -72,8 +72,8 @@ void AprscClient::stop()
 }
 
 void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-{
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
+        {
     if (!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
@@ -92,8 +92,8 @@ void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-{
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
+        {
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
@@ -128,7 +128,8 @@ void AprscClient::sendKaBeacon()
 }
 
 void AprscClient::handleLogin(const boost::system::error_code& cr_ec, std::size_t s)
-{
+        noexcept
+        {
     if (!cr_ec)
     {
         Logger::info("(AprscClient) connected to: ", mHost + ":" + mPort);
@@ -140,8 +141,8 @@ void AprscClient::handleLogin(const boost::system::error_code& cr_ec, std::size_
 }
 
 void AprscClient::handleSendKaBeacon(const boost::system::error_code& cr_ec,
-        std::size_t s)
-{
+        std::size_t s) noexcept
+        {
     if (cr_ec)
     {
         Logger::error("(AprscClient) send beacon:", cr_ec.message());

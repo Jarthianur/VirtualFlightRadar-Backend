@@ -32,18 +32,16 @@
 #include "Connection.h"
 #include "../../config/Parameters.h"
 
+#define S_MAX_CLIENTS SERVER_MAX_CLIENTS
+
 namespace tcp
 {
 namespace server
 {
 
-#define S_MAX_CLIENTS SERVER_MAX_CLIENTS
-
 /**
- * The Server class.
- *
- * This class provides all functionality to run a standalone server.
- * A message may only be sent to all endpoints.
+ * @class Server
+ * @brief A TCP server to serve the same reports to all clients.
  */
 class Server
 {
@@ -57,57 +55,57 @@ public:
      */
     Server& operator=(const Server&) = delete;
     /**
-     * Construct a Server with its port and
-     * the signal set to handle interrupts.
-     *
-     * @param r_sigset the signal set
-     * @param port the port where to open the server
+     * @fn Server
+     * @brief Constructor
+     * @param r_sigset The signal set
+     * @param port     The port
      */
     Server(boost::asio::signal_set& r_sigset, std::uint16_t port);
+    /**
+     * @fn ~Server
+     * @brief Destructor
+     */
     virtual ~Server() noexcept;
     /**
-     * Run server.
-     * This function returns as soon as every operation in the queue
-     * has returned, what may only happen if the server got an interrupt.
+     * @fn run
+     * @brief Run the Server.
+     * @note Returns after all operations in the queue have returned.
      */
     void run();
     /**
-     * Write a message to all clients.
-     *
-     * @param cr_msg the msg to write
+     * @fn writeToAll
+     * @brief Write a message to all clients.
+     * @param cr_msg The msg to write
      */
-    void writeToAll(const std::string& cr_msg) noexcept;
+    void writeToAll(const std::string& cr_msg);
 
 private:
     /**
-     * Accept Connections.
-     *
-     * @exceptsafe strong
+     * @fn accept
+     * @brief Accept connections.
      */
-    void accept() noexcept;
+    void accept();
     /**
-     * Register stop-handler to signals
+     * @fn awaitStop
+     * @brief Register stop-handler to signal set.
      */
     void awaitStop();
     /**
-     * Stop all Connections.
+     * @fn stopAll
+     * @brief Stop all connections.
      */
     void stopAll();
     /**
-     * Check whether an ip address is already registered in
-     * the Connection container.
-     *
-     * @param cr_ip the ip address to check
-     *
+     * @fn isConnected
+     * @brief Check whether an ip address already exists in the Connection container.
+     * @param cr_ip The ip address to check
      * @return true if the ip is already registered, else false
      */
-    bool isRegistered(const std::string& cr_ip);
+    bool isConnected(const std::string& cr_ip);
     /**
-     * Accept - handler
-     *
-     * @param cr_ec the error code
-     *
-     * @exceptsafe strong
+     * @fn handleAccept
+     * @brief Handler for accept
+     * @param cr_ec The error code
      */
     void handleAccept(const boost::system::error_code& cr_ec) noexcept;
 

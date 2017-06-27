@@ -90,7 +90,7 @@ void Client::read()
                     boost::asio::placeholders::bytes_transferred));
 }
 
-void Client::handleTimedConnect(const boost::system::error_code& cr_ec)
+void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
 {
     if (!cr_ec)
     {
@@ -106,7 +106,7 @@ void Client::handleTimedConnect(const boost::system::error_code& cr_ec)
     }
 }
 
-void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t s)
+void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t s) noexcept
 {
     if (!cr_ec)
     {
