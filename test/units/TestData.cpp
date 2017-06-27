@@ -69,11 +69,11 @@ void test_data(TestSuitesRunner& runner)
                 helper::setupVFRB();
                 boost::smatch match;
 
-                VFRB::msAcCont.insertAircraft(Parser::parseSbs("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0"), 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseSbs("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0"), 0);
                 VFRB::msAcCont.processAircrafts();
-                VFRB::msAcCont.insertAircraft(Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot"), 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot"), 0);
                 VFRB::msAcCont.processAircrafts();
-                VFRB::msAcCont.insertAircraft(Parser::parseSbs("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0"), 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseSbs("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0"), 0);
                 std::string proc = VFRB::msAcCont.processAircrafts();
                 bool matched = boost::regex_search(proc, match, helper::pflauRe);
                 assert(matched, true, helper::eqb);
@@ -81,7 +81,7 @@ void test_data(TestSuitesRunner& runner)
                 assert(match.str(2), std::string("610"), helper::eqs);
 
                 helper::clearAcCont();
-                VFRB::msAcCont.insertAircraft(Parser::parseSbs("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0"), 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseSbs("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0"), 0);
                 proc = VFRB::msAcCont.processAircrafts();
                 matched = boost::regex_search(proc, match, helper::pflauRe);
                 assert(matched, true, helper::eqb);
@@ -92,14 +92,14 @@ void test_data(TestSuitesRunner& runner)
             {
                 helper::setupVFRB();
                 boost::smatch match;
-                VFRB::msAcCont.insertAircraft(Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot"), 1);
+                VFRB::msAcCont.insertAircraft(*Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot"), 1);
                 VFRB::msAcCont.processAircrafts();
-                VFRB::msAcCont.insertAircraft(Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot"), 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot"), 0);
                 std::string proc = VFRB::msAcCont.processAircrafts();
                 bool matched = boost::regex_search(proc, match, helper::pflauRe);
                 assert(matched, true, helper::eqb);
                 assert(match.str(2), std::string("610"), helper::eqs);
-                VFRB::msAcCont.insertAircraft(Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot"), 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot"), 0);
                 proc = VFRB::msAcCont.processAircrafts();
                 matched = boost::regex_search(proc, match, helper::pflauRe);
                 assert(matched, true, helper::eqb);
@@ -150,7 +150,7 @@ void test_data(TestSuitesRunner& runner)
     describe<data::SensorData>("sensoric data", runner)->test("extract WIMWV",
             []()
             {
-                struct SensorInfo info = Parser::parseSensNmea("$WIMWV,242.8,R,6.9,N,A*20\r");
+                struct SensorInfo info = *Parser::parseSensNmea("$WIMWV,242.8,R,6.9,N,A*20\r");
                 assert(info.mwvStr, std::string("$WIMWV,242.8,R,6.9,N,A*20\r"), helper::eqs);
                 VFRB::msSensorData.update(info, 0);
                 assert(VFRB::msSensorData.getMwvStr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
@@ -158,7 +158,7 @@ void test_data(TestSuitesRunner& runner)
             })->test("extract WIMDA",
             []()
             {
-                struct SensorInfo info = Parser::parseSensNmea("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r");
+                struct SensorInfo info = *Parser::parseSensNmea("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r");
                 VFRB::msSensorData.update(info, 0);
                 assert(VFRB::msSensorData.getMdaStr(), std::string("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"), helper::eqs);
                 assert(VFRB::msSensorData.getMdaStr(), std::string(""), helper::eqs);

@@ -19,12 +19,19 @@
  }
  */
 
+#include <boost/optional.hpp>
 #include <cstdint>
+#include <stdexcept>
 #include <string>
 
+#include "../../src/aircraft/Aircraft.h"
 #include "../../src/config/Configuration.h"
-#include "../../src/VFRB.h"
-#include "../framework/src/framework.h"
+#include "../../src/util/Parser.h"
+#include "../framework/src/comparator/Comparators.hpp"
+#include "../framework/src/comparator/ComparatorStrategy.hpp"
+#include "../framework/src/testsuite/TestSuite.hpp"
+#include "../framework/src/testsuite/TestSuitesRunner.hpp"
+#include "../framework/src/util/assert.hpp"
 #include "../Helper.hpp"
 
 #ifdef assert
@@ -40,7 +47,7 @@ void test_parser(TestSuitesRunner& runner)
     describe<Parser>("parseSbs", runner)->test("valid msg",
             []()
             {
-                aircraft::Aircraft ac = Parser::parseSbs("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0");
+                aircraft::Aircraft ac = *Parser::parseSbs("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0");
                 assert(ac.getId(), std::string("AAAAAA"), helper::eqs);
                 assert(ac.getTargetT(), aircraft::Aircraft::TargetType::TRANSPONDER, helper::eqtt);
                 assert(ac.getAltitude(), 1000, helper::eqi);

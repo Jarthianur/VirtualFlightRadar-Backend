@@ -26,6 +26,7 @@
 #include <string>
 
 #include "../src/aircraft/AircraftContainer.h"
+#include "../src/aircraft/Aircraft.h"
 #include "../src/config/Configuration.h"
 #include "../src/data/GpsData.h"
 #include "../src/data/SensorData.h"
