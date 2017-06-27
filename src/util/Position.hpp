@@ -28,9 +28,8 @@ namespace util
 {
 
 /**
- * GPS position structure.
- *
- * Minimal information for a position.
+ * @class GpsPosition
+ * @brief Minimal information for a position.
  */
 struct GpsPosition
 {
@@ -43,9 +42,8 @@ struct GpsPosition
 };
 
 /**
- * Extended GPS position structure.
- *
- * Holds GPS meta information additionally to a position.
+ * @class ExtGpsPosition
+ * @brief GPS position and meta information.
  */
 struct ExtGpsPosition
 {

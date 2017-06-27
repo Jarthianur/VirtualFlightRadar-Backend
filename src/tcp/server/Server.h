@@ -76,6 +76,7 @@ public:
      * @fn writeToAll
      * @brief Write a message to all clients.
      * @param cr_msg The msg to write
+     * @threadsafe
      */
     void writeToAll(const std::string& cr_msg);
 
@@ -93,6 +94,7 @@ private:
     /**
      * @fn stopAll
      * @brief Stop all connections.
+     * @threadsafe
      */
     void stopAll();
     /**
@@ -106,6 +108,7 @@ private:
      * @fn handleAccept
      * @brief Handler for accept
      * @param cr_ec The error code
+     * @threadsafe
      */
     void handleAccept(const boost::system::error_code& cr_ec) noexcept;
 

@@ -55,11 +55,8 @@ struct SensorInfo;
 }
 
 /**
- * The VFRB class.
- *
- * This class combines all the functionality of VFR-B.
- * Expects a valid Configuration.
- * The whole VFR-B may be started by a single call of VFRB::run.
+ * @class VFRB
+ * @brief Combine all features and is the main entry point for the actual VFR-B.
  */
 class VFRB
 {
@@ -73,21 +70,18 @@ public:
      */
     VFRB& operator=(const VFRB&) = delete;
     /**
-     * Constructor
+     * @fn VFRB
+     * @brief Constructor
      */
     VFRB();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~VFRB
+     * @brief Destructor
      */
     virtual ~VFRB() noexcept;
     /**
-     * The VFRB's main method.
-     * This function spawns all threads and
-     * actually runs the VFR-B.
-     *
-     * @exceptsafe no-throw
+     * @fn run
+     * @brief The VFRB's main method, runs the VFR-B.
      */
     static void run() noexcept;
 
@@ -102,24 +96,24 @@ public:
 
 private:
     /**
-     * Handler for an input Feed thread.
-     *
-     * @param r_sigset the signal set to pass
-     * @param p_feed   the Feed to handle
+     * @fn handleFeed
+     * @brief Handler for an input Feed thread.
+     * @param r_sigset The signal set to pass
+     * @param p_feed   The Feed to handle
      */
     static void handleFeed(boost::asio::signal_set& r_sigset,
             std::shared_ptr<feed::Feed> p_feed);
     /**
-     * Handler for an Server thread.
-     *
-     * @param r_server the Server to handle
+     * @fn handleServer
+     * @brief Handler for an Server thread.
+     * @param r_server The Server to handle
      */
     static void handleServer(tcp::server::Server& r_server);
     /**
-     * Handler for a signal interrupt thread.
-     *
-     * @param cr_ec the error code
-     * @param sig   the signal number
+     * @fn handleSignals
+     * @brief Handler for a signal interrupt thread.
+     * @param cr_ec The error code
+     * @param sig   The signal number
      */
     static void handleSignals(const boost::system::error_code& cr_ec, const int sig);
 };

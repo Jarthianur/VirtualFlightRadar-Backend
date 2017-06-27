@@ -39,27 +39,57 @@ namespace util
 {
 
 /**
- * The Parser interface.
- *
- * Classes of this type implement the unpack method.
+ * @class Parser
+ * @brief Collection of static methods to parse messages into corresponding objects.
  */
 class Parser
 {
 public:
     /**
-     * Constructor
+     * @fn Parser
+     * @brief Constructor
      */
     Parser();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~Parser
+     * @brief Destructor
      */
     virtual ~Parser() noexcept;
-
+    /**
+     * @fn parseAprs
+     * @brief Parse an APRS sentence into an Aircraft.
+     * @see ../aircraft/Aircraft.h
+     * @param cr_msg The APRS sentence
+     * @return the Aircraft
+     * @throws std::logic_error if the sentence is invalid
+     */
     static aircraft::Aircraft parseAprs(const std::string& cr_msg);
+    /**
+     * @fn parseSbs
+     * @brief Parse an SBS sentence into an Aircraft.
+     * @see ../aircraft/Aircraft.h
+     * @param cr_msg The SBS sentence
+     * @return the Aircraft
+     * @throws std::logic_error if the sentence is invalid
+     */
     static aircraft::Aircraft parseSbs(const std::string& cr_msg);
-    static ExtGpsPosition parseGpsNmea(const std::string& cr_msg);
+    /**
+     * @fn parseGgaNmea
+     * @brief Parse an NMEA GGA sentence into an ExtGpsPosition.
+     * @see Position.hpp
+     * @param cr_msg The GGA sentence
+     * @return the ExtGpsPosition
+     * @throws std::logic_error if the sentence is invalid
+     */
+    static ExtGpsPosition parseGgaNmea(const std::string& cr_msg);
+    /**
+     * @fn parseSensNmea
+     * @brief Parse an NMEA MDA/MWV sentence into a SensorInfo.
+     * @see SensorInfo.h
+     * @param cr_msg The NMEA sentence
+     * @return the SensorInfo
+     * @throws std::logic_error if the sentence is invalid
+     */
     static SensorInfo parseSensNmea(const std::string& cr_msg);
 
 private:
@@ -67,6 +97,7 @@ private:
     static const boost::regex aprsRe;
     /// Regular expression for OGN specific APRS extension
     static const boost::regex aprsComRe;
+    /// Regular expression for GGA sentence
     static const boost::regex gpggaRe;
 };
 

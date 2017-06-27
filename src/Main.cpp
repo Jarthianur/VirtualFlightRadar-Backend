@@ -39,19 +39,20 @@
 using namespace util;
 
 /**
- * Evaluate comandline arguments.
- *
- * @param argc the argument count
- * @param argv the arguments
- *
+ * @fn evalArgs
+ * @brief Evaluate comandline arguments.
+ * @param argc The argument count
+ * @param argv The arguments
  * @return 0 if succeeded, -1 in case of failure
  */
-std::int32_t evalArgs(std::int32_t /*argc*/, char** /*argv*/);
+std::int32_t evalArgs(std::int32_t argc, char** argv);
 
 /**
- * The application start point.
- * In here the commandline arguments get evaluated,
- * the Configuration initialized and the VFRB ran.
+ * @fn main
+ * @brief The application start point.
+ * @param argc The argument count
+ * @param argv The arguments
+ * @return 0 on success, else -1
  */
 int main(int argc, char** argv)
 {
@@ -72,8 +73,6 @@ int main(int argc, char** argv)
     {
         return -1;
     }
-
-    // set climate fallbacks
 
     VFRB::msSensorData.init( { "", "", config::Configuration::base_pressure });
     VFRB::msGpsData.init( { config::Configuration::base_latitude,

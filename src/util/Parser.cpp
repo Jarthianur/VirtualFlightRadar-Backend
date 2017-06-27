@@ -256,7 +256,7 @@ aircraft::Aircraft Parser::parseSbs(const std::string& cr_msg)
     return ac;
 }
 
-ExtGpsPosition Parser::parseGpsNmea(const std::string& cr_msg)
+ExtGpsPosition Parser::parseGgaNmea(const std::string& cr_msg)
 {
     std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16);
     if (csum != math::checksum(cr_msg.c_str(), cr_msg.length()))
@@ -303,7 +303,7 @@ SensorInfo Parser::parseSensNmea(const std::string& cr_msg)
     {
         throw std::logic_error("");
     }
-    SensorInfo info = {"", "", SI_PRESS_NA};
+    SensorInfo info = { "", "", SI_PRESS_NA };
     if (cr_msg.find("MDA") != std::string::npos)
     {
         info.mdaStr = cr_msg;
