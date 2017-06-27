@@ -21,6 +21,7 @@
 
 #include "AprscFeed.h"
 
+#include <boost/optional.hpp>
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
@@ -63,7 +64,10 @@ void AprscFeed::process(const std::string& cr_res) noexcept
 {
     try
     {
-        VFRB::msAcCont.insertAircraft(Parser::parseAprs(cr_res), mPriority);
+        if (boost::optional<aircraft::Aircraft> ac = Parser::parseAprs(cr_res))
+        {
+            VFRB::msAcCont.insertAircraft(*ac, mPriority);
+        }
     } catch (const std::logic_error& e)
     {
     }

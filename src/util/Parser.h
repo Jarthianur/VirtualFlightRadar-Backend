@@ -22,17 +22,17 @@
 #ifndef SRC_PARSER_PARSER_H_
 #define SRC_PARSER_PARSER_H_
 
+#include <boost/optional.hpp>
 #include <boost/regex.hpp>
 #include <string>
+
+#include "../aircraft/Aircraft.h"
+#include "Position.hpp"
 #include "SensorInfo.h"
 
 namespace aircraft
 {
 class Aircraft;
-}
-namespace util
-{
-struct ExtGpsPosition;
 }
 
 namespace util
@@ -60,37 +60,37 @@ public:
      * @brief Parse an APRS sentence into an Aircraft.
      * @see ../aircraft/Aircraft.h
      * @param cr_msg The APRS sentence
-     * @return the Aircraft
+     * @return the Aircraft if valid, else boost::none
      * @throws std::logic_error if the sentence is invalid
      */
-    static aircraft::Aircraft parseAprs(const std::string& cr_msg);
+    static boost::optional<aircraft::Aircraft> parseAprs(const std::string& cr_msg);
     /**
      * @fn parseSbs
      * @brief Parse an SBS sentence into an Aircraft.
      * @see ../aircraft/Aircraft.h
      * @param cr_msg The SBS sentence
-     * @return the Aircraft
+     * @return the Aircraft if valid, else boost::none
      * @throws std::logic_error if the sentence is invalid
      */
-    static aircraft::Aircraft parseSbs(const std::string& cr_msg);
+    static boost::optional<aircraft::Aircraft> parseSbs(const std::string& cr_msg);
     /**
      * @fn parseGgaNmea
      * @brief Parse an NMEA GGA sentence into an ExtGpsPosition.
      * @see Position.hpp
      * @param cr_msg The GGA sentence
-     * @return the ExtGpsPosition
+     * @return the ExtGpsPosition if valid, else boost::none
      * @throws std::logic_error if the sentence is invalid
      */
-    static ExtGpsPosition parseGgaNmea(const std::string& cr_msg);
+    static boost::optional<struct ExtGpsPosition> parseGgaNmea(const std::string& cr_msg);
     /**
      * @fn parseSensNmea
      * @brief Parse an NMEA MDA/MWV sentence into a SensorInfo.
      * @see SensorInfo.h
      * @param cr_msg The NMEA sentence
-     * @return the SensorInfo
+     * @return the SensorInfo if valid, else boost::none
      * @throws std::logic_error if the sentence is invalid
      */
-    static SensorInfo parseSensNmea(const std::string& cr_msg);
+    static boost::optional<struct SensorInfo> parseSensNmea(const std::string& cr_msg);
 
 private:
     /// Regular expression for APRS protocol

@@ -21,15 +21,15 @@
 
 #include "Parser.h"
 
+#include <boost/none.hpp>
+#include <boost/optional.hpp>
 #include <boost/regex.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 
-#include "../aircraft/Aircraft.h"
 #include "../config/Configuration.h"
 #include "Math.hpp"
-#include "Position.hpp"
 
 /// Define regex match groups
 /// For APRS
@@ -81,7 +81,7 @@ Parser::~Parser() noexcept
 {
 }
 
-aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
+boost::optional<aircraft::Aircraft> Parser::parseAprs(const std::string& cr_msg)
 {
     if (cr_msg.size() > 0 && cr_msg.at(0) == '#')
     {
@@ -114,7 +114,7 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
         gpsPos.altitude = math::dToI(std::stod(match.str(RE_APRS_ALT)) * math::FEET_2_M);
         if (gpsPos.altitude > config::Configuration::filter_maxHeight)
         {
-            throw std::logic_error("");
+            return boost::none;
         }
         //comment
         // climbrate / address / id / type
@@ -146,11 +146,11 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
                 }
             } else
             {
-                throw std::logic_error("");
+                return boost::none;
             }
         } else
         {
-            throw std::logic_error("");
+            return boost::none;
         }
         //track/gnd_speed
         try
@@ -171,7 +171,7 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
         }
     } else
     {
-        throw std::logic_error("");
+        return boost::none;
     }
     aircraft::Aircraft ac(id, gpsPos, gndSpeed, idType, acType, climbRate, turnRate,
             heading);
@@ -180,7 +180,7 @@ aircraft::Aircraft Parser::parseAprs(const std::string& cr_msg)
     return ac;
 }
 
-aircraft::Aircraft Parser::parseSbs(const std::string& cr_msg)
+boost::optional<aircraft::Aircraft> Parser::parseSbs(const std::string& cr_msg)
 {
     /*
      * fields:
@@ -235,7 +235,7 @@ aircraft::Aircraft Parser::parseSbs(const std::string& cr_msg)
                         std::stod(cr_msg.substr(p, delim - p)) * math::FEET_2_M);
                 if (gpsPos.altitude > config::Configuration::filter_maxHeight)
                 {
-                    throw std::logic_error("");
+                    return boost::none;
                 }
                 break;
             case 14:
@@ -256,14 +256,14 @@ aircraft::Aircraft Parser::parseSbs(const std::string& cr_msg)
     return ac;
 }
 
-ExtGpsPosition Parser::parseGgaNmea(const std::string& cr_msg)
+boost::optional<struct ExtGpsPosition> Parser::parseGgaNmea(const std::string& cr_msg)
 {
     std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16);
     if (csum != math::checksum(cr_msg.c_str(), cr_msg.length()))
     {
         throw std::logic_error("");
     }
-    ExtGpsPosition gpsPos;
+    struct ExtGpsPosition gpsPos;
     boost::smatch match;
     if (boost::regex_match(cr_msg, match, gpggaRe))
     {
@@ -291,19 +291,19 @@ ExtGpsPosition Parser::parseGgaNmea(const std::string& cr_msg)
         gpsPos.geoid = std::stod(match.str(RE_GGA_GEOID));
     } else
     {
-        throw std::logic_error("");
+        return boost::none;
     }
     return gpsPos;
 }
 
-SensorInfo Parser::parseSensNmea(const std::string& cr_msg)
+boost::optional<struct SensorInfo> Parser::parseSensNmea(const std::string& cr_msg)
 {
     std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16);
     if (csum != math::checksum(cr_msg.c_str(), cr_msg.length()))
     {
         throw std::logic_error("");
     }
-    SensorInfo info = { "", "", SI_PRESS_NA };
+    struct SensorInfo info = { "", "", SI_PRESS_NA };
     if (cr_msg.find("MDA") != std::string::npos)
     {
         info.mdaStr = cr_msg;
@@ -324,7 +324,7 @@ SensorInfo Parser::parseSensNmea(const std::string& cr_msg)
         info.mwvStr = cr_msg;
     } else
     {
-        throw std::logic_error("");
+        return boost::none;
     }
     return info;
 }

@@ -21,6 +21,7 @@
 
 #include "SbsFeed.h"
 
+#include <boost/optional.hpp>
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
@@ -54,7 +55,10 @@ void SbsFeed::process(const std::string& cr_res) noexcept
 {
     try
     {
-        VFRB::msAcCont.insertAircraft(Parser::parseSbs(cr_res), mPriority);
+        if (boost::optional<aircraft::Aircraft> ac = Parser::parseSbs(cr_res))
+        {
+            VFRB::msAcCont.insertAircraft(*ac, mPriority);
+        }
     } catch (const std::logic_error& e)
     {
     }
