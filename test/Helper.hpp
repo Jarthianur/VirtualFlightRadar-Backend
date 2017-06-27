@@ -65,6 +65,8 @@ static testsuite::comparator::Comparator<std::string> eqs = testsuite::comparato
         std::string>();
 static testsuite::comparator::Comparator<bool> eqb =
         testsuite::comparator::EQUALS<bool>();
+static testsuite::comparator::Comparator<aircraft::Aircraft::TargetType> eqtt =
+        testsuite::comparator::EQUALS<aircraft::Aircraft::TargetType>();
 
 static boost::regex pflauRe(
         "\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
