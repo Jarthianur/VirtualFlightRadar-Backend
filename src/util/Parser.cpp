@@ -26,7 +26,7 @@
 #include <cstdint>
 #include <stdexcept>
 
-#include "../aircraft/Aircraft.h"
+#include "../aircraft/Aircraft.hpp"
 #include "../config/Configuration.h"
 #include "Math.hpp"
 #include "Position.hpp"

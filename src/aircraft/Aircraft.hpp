@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_AIRCRAFT_AIRCRAFT_H_
-#define SRC_AIRCRAFT_AIRCRAFT_H_
+#ifndef SRC_AIRCRAFT_AIRCRAFT_HPP_
+#define SRC_AIRCRAFT_AIRCRAFT_HPP_
 
 #include <cstdint>
 #include <string>
@@ -60,7 +60,7 @@ public:
      * @param head    The heading
      */
     Aircraft(std::string& r_id, struct util::GpsPosition& r_pos, double gnd_spd,
-            std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r,
+            std::uint32_t id_t, std::int32_t ac_t, double climb_r, /*double turn_r,*/
             double head);
     /**
      * @fn ~Aircraft
@@ -225,12 +225,30 @@ public:
      return mTurnRate;
      }*/
     /**
+     * @fn setId
+     * @brief Set the Id.
+     * @param cr_id The new Id
+     */
+    inline void setId(const std::string& cr_id)
+    {
+        mId = cr_id;
+    }
+    /**
      * @fn incUpdateAge
      * @brief Increment the update age by one.
      */
     inline void incUpdateAge()
     {
         ++mUpdateAge;
+    }
+    /**
+     * @fn setPosition
+     * @brief Set the GPS position.
+     * @param cr_pos The new position
+     */
+    inline void setPosition(const struct util::GpsPosition& cr_pos)
+    {
+        mPosition = cr_pos;
     }
     /**
      * @fn setTargetT
@@ -291,4 +309,4 @@ private:
 
 } // namespace aircraft
 
-#endif /* SRC_AIRCRAFT_AIRCRAFT_H_ */
+#endif /* SRC_AIRCRAFT_AIRCRAFT_HPP_ */

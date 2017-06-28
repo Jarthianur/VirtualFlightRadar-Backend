@@ -29,7 +29,7 @@
 #include "../data/SensorData.h"
 #include "../util/Math.hpp"
 #include "../VFRB.h"
-#include "Aircraft.h"
+#include "Aircraft.hpp"
 
 namespace aircraft
 {

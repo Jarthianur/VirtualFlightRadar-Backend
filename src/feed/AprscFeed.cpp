@@ -25,7 +25,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../aircraft/Aircraft.h"
+#include "../aircraft/Aircraft.hpp"
 #include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
 #include "../tcp/client/AprscClient.h"
