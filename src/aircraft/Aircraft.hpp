@@ -251,6 +251,51 @@ public:
         mPosition = cr_pos;
     }
     /**
+     * @fn setAircraftT
+     * @brief Set the Aircraft type.
+     * @param c_act The new Aircraft type
+     */
+    inline void setAircraftT(const std::int32_t c_act)
+    {
+        mAircraftT = c_act;
+    }
+    /**
+     * @fn setIdType
+     * @brief Set the Id type.
+     * @param c_idt The new Id type
+     */
+    inline void setIdType(const std::uint32_t c_idt)
+    {
+        mIdType = c_idt;
+    }
+    /**
+     * @fn setClimbRate
+     * @brief Set the climb rate.
+     * @param c_climb The new climb rate; default A_VALUE_NA
+     */
+    inline void setClimbRate(const double c_climb = A_VALUE_NA)
+    {
+        mClimbRate = c_climb;
+    }
+    /**
+     * @fn setHeading
+     * @brief Set the heading.
+     * @param c_head The new heading; default A_VALUE_NA
+     */
+    inline void setHeading(const double c_head = A_VALUE_NA)
+    {
+        mHeading = c_head;
+    }
+    /**
+     * @fn setGndSpeed
+     * @brief Set the ground speed.
+     * @param c_gndspd The new ground speed; default  A_VALUE_NA
+     */
+    inline void setGndSpeed(const double c_gndspd = A_VALUE_NA)
+    {
+        mGndSpeed = c_gndspd;
+    }
+    /**
      * @fn setTargetT
      * @brief Set the target type.
      * @see TargetType

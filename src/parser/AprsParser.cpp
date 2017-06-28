@@ -130,7 +130,7 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
                                     * util::math::FPM_2_MS);
                 } catch (const std::logic_error& e)
                 {
-                    r_ac.setClimbRate(A_VALUE_NA);
+                    r_ac.setClimbRate();
                     fullInfo = false;
                 }
                 /*try
@@ -153,22 +153,21 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
         //track/gnd_speed
         try
         {
-            heading = std::stod(match.str(MATCH_HEAD));
+            r_ac.setHeading(std::stod(match.str(MATCH_HEAD)));
         } catch (const std::logic_error& e)
         {
-            heading = A_VALUE_NA;
+            r_ac.setHeading();
             fullInfo = false;
         }
         try
         {
-            gndSpeed = std::stod(match.str(MATCH_GND_SPD)) * util::math::KTS_2_MS;
+            r_ac.setGndSpeed(std::stod(match.str(MATCH_GND_SPD)) * util::math::KTS_2_MS);
         } catch (const std::logic_error& e)
         {
-            gndSpeed = A_VALUE_NA;
+            r_ac.setGndSpeed();
             fullInfo = false;
         }
-        r_ac.update(mtId, pos, gndSpeed, idType, acType, climbRate,
-        /*turnRate,*/heading);
+        r_ac.setPosition(pos);
         r_ac.setFullInfo(fullInfo);
         r_ac.setTargetT(aircraft::Aircraft::TargetType::FLARM);
     } else
