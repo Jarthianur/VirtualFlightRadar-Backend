@@ -24,6 +24,7 @@
 
 #include <string>
 
+#include "../aircraft/Aircraft.hpp"
 #include "Parser.hpp"
 
 namespace parser
@@ -34,7 +35,7 @@ namespace parser
  *
  * This class unpacks SBS sentences into static VFRB::AircraftContainer.
  */
-class SbsParser: public Parser
+class SbsParser: public Parser<aircraft::Aircraft>
 {
 public:
     /**

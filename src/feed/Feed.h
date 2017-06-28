@@ -102,6 +102,7 @@ protected:
     const config::keyValueMap mKvMap;
     /// Client, later resolved according to InpuType
     std::unique_ptr<tcp::client::Client> mpClient;
+    // Could define Parser ptr here with nested template (c++14)
 };
 
 }  // namespace feed
