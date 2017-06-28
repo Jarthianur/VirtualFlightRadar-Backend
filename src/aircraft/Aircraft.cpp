@@ -30,6 +30,10 @@ Aircraft::~Aircraft() noexcept
 {
 }
 
+Aircraft::Aircraft()
+{
+}
+
 Aircraft::Aircraft(std::string& r_id, struct GpsPosition& r_pos)
         : mId(r_id),
           mPosition(r_pos)

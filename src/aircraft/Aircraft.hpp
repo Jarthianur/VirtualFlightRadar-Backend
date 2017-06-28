@@ -43,6 +43,11 @@ public:
     /**
      * @fn Aircraft
      * @brief Constructor
+     */
+    Aircraft();
+    /**
+     * @fn Aircraft
+     * @brief Constructor
      * @param r_id  The id
      * @param r_pos The position
      */

@@ -27,6 +27,17 @@
 #include "../data/GpsData.h"
 #include "../util/Math.hpp"
 
+/// Define regex match groups for GGA
+#define RE_GGA_LAT       1
+#define RE_GGA_LAT_DIR   2
+#define RE_GGA_LONG      3
+#define RE_GGA_LONG_DIR  4
+#define RE_GGA_FIX       5
+#define RE_GGA_SAT       6
+#define RE_GGA_DIL       7
+#define RE_GGA_ALT       8
+#define RE_GGA_GEOID     9
+
 namespace parser
 {
 
@@ -58,31 +69,32 @@ noexcept
         boost::smatch match;
         if (boost::regex_match(cr_msg, match, msGpggaRe))
         {
-            double dilution = 0.0;
             //latitude
-            r_pos.position.latitude = util::math::dmToDeg(std::stod(match.str(1)));
-            if (match.str(2).compare("S") == 0)
+            r_pos.position.latitude = util::math::dmToDeg(
+                    std::stod(match.str(RE_GGA_LAT)));
+            if (match.str(RE_GGA_LAT_DIR).compare("S") == 0)
             {
                 r_pos.position.latitude = -r_pos.position.latitude;
             }
 
             //longitude
-            r_pos.position.longitude = util::math::dmToDeg(std::stod(match.str(3)));
-            if (match.str(4).compare("W") == 0)
+            r_pos.position.longitude = util::math::dmToDeg(
+                    std::stod(match.str(RE_GGA_LONG)));
+            if (match.str(RE_GGA_LONG_DIR).compare("W") == 0)
             {
                 r_pos.position.longitude = -r_pos.position.longitude;
             }
 
             //fix
-            r_pos.fixQa = std::stoi(match.str(5));
+            r_pos.fixQa = std::stoi(match.str(RE_GGA_FIX));
             //sats
-            r_pos.nrSats = std::stoi(match.str(6));
+            r_pos.nrSats = std::stoi(match.str(RE_GGA_SAT));
             //dilution
-            dilution = std::stod(match.str(7));
+            r_pos.dilution = std::stod(match.str(RE_GGA_DIL));
             //altitude
-            r_pos.position.altitude = util::math::dToI(std::stod(match.str(8)));
+            r_pos.position.altitude = util::math::dToI(std::stod(match.str(RE_GGA_ALT)));
             //geoid
-            r_pos.geoid = std::stod(match.str(9));
+            r_pos.geoid = std::stod(match.str(RE_GGA_GEOID));
         } else
         {
             return false;

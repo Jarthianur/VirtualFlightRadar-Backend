@@ -26,6 +26,7 @@
 #include <string>
 
 #include "../config/PropertyMap.h"
+#include "../parser/SbsParser.h"
 #include "Feed.h"
 
 namespace feed
@@ -60,6 +61,10 @@ public:
      * @override Feed::process
      */
     void process(const std::string& cr_res) noexcept override;
+
+private:
+    /// Parser to unpack response from Client
+    parser::SbsParser mParser;
 };
 
 } // namespace feed

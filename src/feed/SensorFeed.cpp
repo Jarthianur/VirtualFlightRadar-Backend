@@ -21,15 +21,12 @@
 
 #include "SensorFeed.h"
 
-#include <boost/optional.hpp>
 #include <memory>
-#include <stdexcept>
 #include <unordered_map>
 
 #include "../config/Configuration.h"
 #include "../data/SensorData.h"
 #include "../tcp/client/SensorClient.h"
-#include "../util/Parser.h"
 #include "../util/SensorInfo.h"
 #include "../VFRB.h"
 
@@ -53,14 +50,10 @@ SensorFeed::~SensorFeed() noexcept
 
 void SensorFeed::process(const std::string& cr_res) noexcept
 {
-    try
+    struct SensorInfo info;
+    if (mParser.unpack(cr_res, info))
     {
-        if (boost::optional<struct SensorInfo> info = Parser::parseSensNmea(cr_res))
-        {
-            VFRB::msSensorData.update(*info, mPriority);
-        }
-    } catch (const std::logic_error& e)
-    {
+        VFRB::msSensorData.update(info, mPriority);
     }
 }
 

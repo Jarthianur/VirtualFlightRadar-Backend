@@ -27,19 +27,20 @@
 #include "../config/Configuration.h"
 #include "../util/Math.hpp"
 
-//#define MATCH_TIME 1
-#define MATCH_LAT      1
-#define MATCH_LAT_DIR  2
-#define MATCH_LONG     3
-#define MATCH_LONG_DIR 4
-#define MATCH_HEAD     5
-#define MATCH_GND_SPD  6
-#define MATCH_ALT      7
-#define MATCH_COM      8
-#define MATCH_COM_TYPE 1
-#define MATCH_COM_ID   2
-#define MATCH_COM_CR   3
-#define MATCH_COM_TR   4
+/// Define regex match groups for APRS
+//#define RE_APRS_TIME 1
+#define RE_APRS_LAT      1
+#define RE_APRS_LAT_DIR  2
+#define RE_APRS_LONG     3
+#define RE_APRS_LONG_DIR 4
+#define RE_APRS_HEAD     5
+#define RE_APRS_GND_SPD  6
+#define RE_APRS_ALT      7
+#define RE_APRS_COM      8
+#define RE_APRS_COM_TYPE 1
+#define RE_APRS_COM_ID   2
+#define RE_APRS_COM_CR   3
+#define RE_APRS_COM_TR   4
 
 namespace parser
 {
@@ -79,22 +80,22 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
             //time = std::stoi(match.str(1));
 
             //latitude
-            pos.latitude = util::math::dmToDeg(std::stod(match.str(MATCH_LAT)));
-            if (match.str(MATCH_LAT_DIR).compare("S") == 0)
+            pos.latitude = util::math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
+            if (match.str(RE_APRS_LAT_DIR).compare("S") == 0)
             {
                 pos.latitude = -pos.latitude;
             }
 
             //longitude
-            pos.longitude = util::math::dmToDeg(std::stod(match.str(MATCH_LONG)));
-            if (match.str(MATCH_LONG_DIR).compare("W") == 0)
+            pos.longitude = util::math::dmToDeg(std::stod(match.str(RE_APRS_LONG)));
+            if (match.str(RE_APRS_LONG_DIR).compare("W") == 0)
             {
                 pos.longitude = -pos.longitude;
             }
 
             //altitude
             pos.altitude = util::math::dToI(
-                    std::stod(match.str(MATCH_ALT)) * util::math::FEET_2_M);
+                    std::stod(match.str(RE_APRS_ALT)) * util::math::FEET_2_M);
             if (pos.altitude > config::Configuration::filter_maxHeight)
             {
                 return false;
@@ -105,20 +106,21 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
         }
         //comment
         // climbrate / address / id / type
-        if (match.str(MATCH_COM).size() > 0)
+        if (match.str(RE_APRS_COM).size() > 0)
         {
-            std::string comm = match.str(MATCH_COM); // regex bug ! cannot work inplace, need to copy submatch.
+            std::string comm = match.str(RE_APRS_COM); // regex bug ! cannot work inplace, need to copy submatch.
             boost::smatch com_match;
             if (boost::regex_match(comm, com_match, msAprsComRe))
             {
-                r_ac.setId(com_match.str(MATCH_COM_ID));
+                r_ac.setId(com_match.str(RE_APRS_COM_ID));
                 try
                 {
                     r_ac.setIdType(
-                            std::stoi(com_match.str(MATCH_COM_TYPE), nullptr, 16) & 0x03);
+                            std::stoi(com_match.str(RE_APRS_COM_TYPE), nullptr, 16)
+                                    & 0x03);
                     r_ac.setAircraftT(
-                            (std::stoi(com_match.str(MATCH_COM_TYPE), nullptr, 16) & 0x7C)
-                                    >> 2);
+                            (std::stoi(com_match.str(RE_APRS_COM_TYPE), nullptr, 16)
+                                    & 0x7C) >> 2);
                 } catch (const std::logic_error& e)
                 {
                     return false;
@@ -126,7 +128,7 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
                 try
                 {
                     r_ac.setClimbRate(
-                            std::stod(com_match.str(MATCH_COM_CR))
+                            std::stod(com_match.str(RE_APRS_COM_CR))
                                     * util::math::FPM_2_MS);
                 } catch (const std::logic_error& e)
                 {
@@ -135,7 +137,7 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
                 }
                 /*try
                  {
-                 turnRate = std::stod(com_match.str(MATCH_COM_TR)) * 3.0; // 1rot = 1 halfcircle / 1 min => 3° / 1s
+                 turnRate = std::stod(com_match.str(RE_APRS_COM_TR)) * 3.0; // 1rot = 1 halfcircle / 1 min => 3° / 1s
                  } catch (const std::logic_error& e)
                  {
                  turnRate = A_VALUE_NA;
@@ -153,7 +155,7 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
         //track/gnd_speed
         try
         {
-            r_ac.setHeading(std::stod(match.str(MATCH_HEAD)));
+            r_ac.setHeading(std::stod(match.str(RE_APRS_HEAD)));
         } catch (const std::logic_error& e)
         {
             r_ac.setHeading();
@@ -161,7 +163,8 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
         }
         try
         {
-            r_ac.setGndSpeed(std::stod(match.str(MATCH_GND_SPD)) * util::math::KTS_2_MS);
+            r_ac.setGndSpeed(
+                    std::stod(match.str(RE_APRS_GND_SPD)) * util::math::KTS_2_MS);
         } catch (const std::logic_error& e)
         {
             r_ac.setGndSpeed();
