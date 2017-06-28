@@ -29,7 +29,7 @@
 #include <utility>
 
 #include "../util/Logger.h"
-#include "../aircraft/Aircraft.h"
+#include "Aircraft.hpp"
 
 using namespace util;
 

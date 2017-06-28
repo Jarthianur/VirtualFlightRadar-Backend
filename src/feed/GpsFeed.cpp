@@ -21,16 +21,13 @@
 
 #include "GpsFeed.h"
 
-#include <boost/optional.hpp>
 #include <memory>
-#include <stdexcept>
 #include <unordered_map>
 
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
 #include "../tcp/client/GpsdClient.h"
 #include "../util/Logger.h"
-#include "../util/Parser.h"
 #include "../util/Position.hpp"
 #include "../VFRB.h"
 
@@ -59,21 +56,16 @@ GpsFeed::~GpsFeed() noexcept
 
 void GpsFeed::process(const std::string& cr_res) noexcept
 {
-    try
+    struct ExtGpsPosition pos;
+    if (mParser.unpack(cr_res, pos))
     {
-        if (boost::optional<struct ExtGpsPosition> pos = Parser::parseGgaNmea(cr_res))
+        VFRB::msGpsData.update(pos, mPriority);
+        if (config::Configuration::global_gnd_mode && pos.nrSats >= GPS_NR_SATS_GOOD
+                && pos.fixQa >= GPS_FIX_GOOD && pos.dilution <= GPS_HOR_DILUTION_GOOD)
         {
-            VFRB::msGpsData.update(*pos, mPriority);
-            if (config::Configuration::global_gnd_mode && pos->nrSats >= GPS_NR_SATS_GOOD
-                    && pos->fixQa >= GPS_FIX_GOOD
-                    && pos->dilution <= GPS_HOR_DILUTION_GOOD)
-            {
-                Logger::info("(GpsFeed) received good position -> stop");
-                mpClient->stop();
-            }
+            Logger::info("(GpsFeed) received good position -> stop");
+            mpClient->stop();
         }
-    } catch (const std::logic_error& e)
-    {
     }
 }
 

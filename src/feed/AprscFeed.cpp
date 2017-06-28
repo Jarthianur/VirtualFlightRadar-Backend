@@ -21,17 +21,15 @@
 
 #include "AprscFeed.h"
 
-#include <boost/optional.hpp>
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../aircraft/Aircraft.h"
+#include "../aircraft/Aircraft.hpp"
 #include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
 #include "../tcp/client/AprscClient.h"
 #include "../util/Logger.h"
-#include "../util/Parser.h"
 #include "../VFRB.h"
 
 using namespace util;
@@ -62,14 +60,10 @@ AprscFeed::~AprscFeed() noexcept
 
 void AprscFeed::process(const std::string& cr_res) noexcept
 {
-    try
+    aircraft::Aircraft ac;
+    if (mParser.unpack(cr_res, ac))
     {
-        if (boost::optional<aircraft::Aircraft> ac = Parser::parseAprs(cr_res))
-        {
-            VFRB::msAcCont.insertAircraft(*ac, mPriority);
-        }
-    } catch (const std::logic_error& e)
-    {
+        VFRB::msAcCont.insertAircraft(ac, mPriority);
     }
 }
 

@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_AIRCRAFT_AIRCRAFT_H_
-#define SRC_AIRCRAFT_AIRCRAFT_H_
+#ifndef SRC_AIRCRAFT_AIRCRAFT_HPP_
+#define SRC_AIRCRAFT_AIRCRAFT_HPP_
 
 #include <cstdint>
 #include <string>
@@ -43,6 +43,11 @@ public:
     /**
      * @fn Aircraft
      * @brief Constructor
+     */
+    Aircraft();
+    /**
+     * @fn Aircraft
+     * @brief Constructor
      * @param r_id  The id
      * @param r_pos The position
      */
@@ -60,7 +65,7 @@ public:
      * @param head    The heading
      */
     Aircraft(std::string& r_id, struct util::GpsPosition& r_pos, double gnd_spd,
-            std::uint32_t id_t, std::int32_t ac_t, double climb_r, double turn_r,
+            std::uint32_t id_t, std::int32_t ac_t, double climb_r, /*double turn_r,*/
             double head);
     /**
      * @fn ~Aircraft
@@ -225,12 +230,75 @@ public:
      return mTurnRate;
      }*/
     /**
+     * @fn setId
+     * @brief Set the Id.
+     * @param cr_id The new Id
+     */
+    inline void setId(const std::string& cr_id)
+    {
+        mId = cr_id;
+    }
+    /**
      * @fn incUpdateAge
      * @brief Increment the update age by one.
      */
     inline void incUpdateAge()
     {
         ++mUpdateAge;
+    }
+    /**
+     * @fn setPosition
+     * @brief Set the GPS position.
+     * @param cr_pos The new position
+     */
+    inline void setPosition(const struct util::GpsPosition& cr_pos)
+    {
+        mPosition = cr_pos;
+    }
+    /**
+     * @fn setAircraftT
+     * @brief Set the Aircraft type.
+     * @param c_act The new Aircraft type
+     */
+    inline void setAircraftT(const std::int32_t c_act)
+    {
+        mAircraftT = c_act;
+    }
+    /**
+     * @fn setIdType
+     * @brief Set the Id type.
+     * @param c_idt The new Id type
+     */
+    inline void setIdType(const std::uint32_t c_idt)
+    {
+        mIdType = c_idt;
+    }
+    /**
+     * @fn setClimbRate
+     * @brief Set the climb rate.
+     * @param c_climb The new climb rate; default A_VALUE_NA
+     */
+    inline void setClimbRate(const double c_climb = A_VALUE_NA)
+    {
+        mClimbRate = c_climb;
+    }
+    /**
+     * @fn setHeading
+     * @brief Set the heading.
+     * @param c_head The new heading; default A_VALUE_NA
+     */
+    inline void setHeading(const double c_head = A_VALUE_NA)
+    {
+        mHeading = c_head;
+    }
+    /**
+     * @fn setGndSpeed
+     * @brief Set the ground speed.
+     * @param c_gndspd The new ground speed; default  A_VALUE_NA
+     */
+    inline void setGndSpeed(const double c_gndspd = A_VALUE_NA)
+    {
+        mGndSpeed = c_gndspd;
     }
     /**
      * @fn setTargetT
@@ -291,4 +359,4 @@ private:
 
 } // namespace aircraft
 
-#endif /* SRC_AIRCRAFT_AIRCRAFT_H_ */
+#endif /* SRC_AIRCRAFT_AIRCRAFT_HPP_ */
