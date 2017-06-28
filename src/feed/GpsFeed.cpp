@@ -21,6 +21,7 @@
 
 #include "GpsFeed.h"
 
+#include <boost/optional.hpp>
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
@@ -60,13 +61,16 @@ void GpsFeed::process(const std::string& cr_res) noexcept
 {
     try
     {
-        ExtGpsPosition pos = Parser::parseGgaNmea(cr_res);
-        VFRB::msGpsData.update(pos, mPriority);
-        if (config::Configuration::global_gnd_mode && pos.nrSats >= GPS_NR_SATS_GOOD
-                && pos.fixQa >= GPS_FIX_GOOD && pos.dilution <= GPS_HOR_DILUTION_GOOD)
+        if (boost::optional<struct ExtGpsPosition> pos = Parser::parseGgaNmea(cr_res))
         {
-            Logger::info("(GpsFeed) received good position -> stop");
-            mpClient->stop();
+            VFRB::msGpsData.update(*pos, mPriority);
+            if (config::Configuration::global_gnd_mode && pos->nrSats >= GPS_NR_SATS_GOOD
+                    && pos->fixQa >= GPS_FIX_GOOD
+                    && pos->dilution <= GPS_HOR_DILUTION_GOOD)
+            {
+                Logger::info("(GpsFeed) received good position -> stop");
+                mpClient->stop();
+            }
         }
     } catch (const std::logic_error& e)
     {

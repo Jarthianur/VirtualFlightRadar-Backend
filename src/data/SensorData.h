@@ -56,10 +56,10 @@ public:
     /**
      * @fn init
      * @brief Initialize the sensor information.
-     * @param cr_info The initial data
+     * @param info The initial data
      * @override Data::init
      */
-    void init(const struct util::SensorInfo& cr_info) override;
+    void init(struct util::SensorInfo info) override;
     /**
      * @fn update
      * @brief Try to update the sensor information.

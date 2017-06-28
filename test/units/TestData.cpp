@@ -19,11 +19,16 @@
  }
  */
 
-#include <string>
 #include <boost/regex.hpp>
+#include <string>
 
+#include "../../src/aircraft/Aircraft.h"
+#include "../../src/aircraft/AircraftContainer.h"
 #include "../../src/config/Configuration.h"
-#include "../../src/data/AircraftContainer.h"
+#include "../../src/data/GpsData.h"
+#include "../../src/data/SensorData.h"
+#include "../../src/util/Parser.h"
+#include "../../src/util/Position.hpp"
 #include "../../src/VFRB.h"
 #include "../framework/src/comparator/ComparatorStrategy.hpp"
 #include "../framework/src/testsuite/TestSuite.hpp"
@@ -38,10 +43,11 @@
 using namespace util;
 using namespace testsuite;
 using namespace comparator;
+using namespace aircraft;
 
 void test_data(TestSuitesRunner& runner)
 {
-    describe<data::AircraftContainer>("Container Functions", runner)->test(
+    describe<AircraftContainer>("Container Functions", runner)->test(
             "invalidate aircraft", []()
             {
                 helper::clearAcCont();
@@ -49,12 +55,11 @@ void test_data(TestSuitesRunner& runner)
             })->test("delete aircraft", []()
     {
         //just for coverage
-                     for (int i = 0; i < 30; ++i)
-                     {
-                         helper::clearAcCont();
-                     }
-                 })->test(
-            "prefer FLARM, accept again if no input",
+            for (int i = 0; i < 40; ++i)
+            {
+                helper::clearAcCont();
+            }
+        })->test("prefer FLARM, accept again if no input",
             []()
             {
                 config::Configuration::base_altitude = 0;
@@ -64,11 +69,11 @@ void test_data(TestSuitesRunner& runner)
                 helper::setupVFRB();
                 boost::smatch match;
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseSbs("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0"), 0);
                 VFRB::msAcCont.processAircrafts();
-                helper::pars_aprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot", 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot"), 0);
                 VFRB::msAcCont.processAircrafts();
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0", 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseSbs("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0"), 0);
                 std::string proc = VFRB::msAcCont.processAircrafts();
                 bool matched = boost::regex_search(proc, match, helper::pflauRe);
                 assert(matched, true, helper::eqb);
@@ -76,26 +81,25 @@ void test_data(TestSuitesRunner& runner)
                 assert(match.str(2), std::string("610"), helper::eqs);
 
                 helper::clearAcCont();
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0", 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseSbs("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0"), 0);
                 proc = VFRB::msAcCont.processAircrafts();
                 matched = boost::regex_search(proc, match, helper::pflauRe);
                 assert(matched, true, helper::eqb);
 
                 assert(match.str(2), std::string("1000"), helper::eqs);
-            })->test(
-            "write after attempt",
+            })->test("write after attempt",
             []()
             {
                 helper::setupVFRB();
                 boost::smatch match;
-                helper::pars_aprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot", 1);
+                VFRB::msAcCont.insertAircraft(*Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot"), 1);
                 VFRB::msAcCont.processAircrafts();
-                helper::pars_aprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot", 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot"), 0);
                 std::string proc = VFRB::msAcCont.processAircrafts();
                 bool matched = boost::regex_search(proc, match, helper::pflauRe);
                 assert(matched, true, helper::eqb);
                 assert(match.str(2), std::string("610"), helper::eqs);
-                helper::pars_aprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot", 0);
+                VFRB::msAcCont.insertAircraft(*Parser::parseAprs("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot"), 0);
                 proc = VFRB::msAcCont.processAircrafts();
                 matched = boost::regex_search(proc, match, helper::pflauRe);
                 assert(matched, true, helper::eqb);
@@ -105,7 +109,9 @@ void test_data(TestSuitesRunner& runner)
     describe<data::GpsData>("gps string", runner)->test("correct gps position", []()
     {
         data::GpsData gps;
-        gps.init(10.0, 85.0,100,40.0);
+        gps.init(
+                {
+                    {   10.0, 85.0, 100}, 5, 1, 40.0, 0.0});
         assert(gps.getBaseLat(), 10.0, helper::eqd);
         assert(gps.getBaseLong(), 85.0, helper::eqd);
         assert(gps.getBaseAlt(), 100, helper::eqi);
@@ -120,11 +126,11 @@ void test_data(TestSuitesRunner& runner)
         pos1.position.altitude = 1000;
         struct ExtGpsPosition pos2;
         pos2.position.altitude = 2000;
-        gps.setBasePos(0, pos1);
+        gps.update(pos1, 0);
         assert(gps.getBaseAlt(), 1000, helper::eqi);
-        gps.setBasePos(1, pos2);
+        gps.update(pos2, 0);
         assert(gps.getBaseAlt(), 2000, helper::eqi);
-        gps.setBasePos(0, pos1);
+        gps.update(pos1, 0);
         assert(gps.getBaseAlt(), 2000, helper::eqi);
     })->test("write after attempt", []()
     {
@@ -133,43 +139,51 @@ void test_data(TestSuitesRunner& runner)
         pos1.position.altitude = 1000;
         struct ExtGpsPosition pos2;
         pos2.position.altitude = 2000;
-        gps.setBasePos(1, pos1);
+        gps.update(pos1, 1);
         assert(gps.getBaseAlt(), 1000, helper::eqi);
-        gps.setBasePos(0, pos2);
+        gps.update(pos2, 0);
         assert(gps.getBaseAlt(), 1000, helper::eqi);
-        gps.setBasePos(0, pos2);
+        gps.update(pos2, 0);
         assert(gps.getBaseAlt(), 2000, helper::eqi);
     });
 
-    describe<data::SensorData>("sensoric data", runner)->test(
-            "extract WIMWV",
+    describe<data::SensorData>("sensoric data", runner)->test("extract WIMWV",
             []()
             {
-                assert(helper::pars_wind.unpack("$WIMWV,242.8,R,6.9,N,A*20\r", 0), MSG_UNPACK_SUC, helper::eqi);
+                struct SensorInfo info = *Parser::parseSensNmea("$WIMWV,242.8,R,6.9,N,A*20\r");
+                assert(info.mwvStr, std::string("$WIMWV,242.8,R,6.9,N,A*20\r"), helper::eqs);
+                VFRB::msSensorData.update(info, 0);
                 assert(VFRB::msSensorData.getMwvStr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
                 assert(VFRB::msSensorData.getMwvStr(), std::string(""), helper::eqs);
-            })->test(
-            "extract WIMDA",
+            })->test("extract WIMDA",
             []()
             {
-                VFRB::msSensorData.setMdaStr(0, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r");
+                struct SensorInfo info = *Parser::parseSensNmea("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r");
+                VFRB::msSensorData.update(info, 0);
                 assert(VFRB::msSensorData.getMdaStr(), std::string("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"), helper::eqs);
                 assert(VFRB::msSensorData.getMdaStr(), std::string(""), helper::eqs);
             })->test("write higher priority", []()
     {
-        VFRB::msSensorData.setPress(0, 900.0);
+        struct SensorInfo info =
+        {   "", "", 900.0};
+        VFRB::msSensorData.update(info, 0);
         assert(VFRB::msSensorData.getPress(), 900.0, helper::eqd);
-        VFRB::msSensorData.setPress(1, 950.0);
+        info.press = 950.0;
+        VFRB::msSensorData.update(info, 1);
         assert(VFRB::msSensorData.getPress(), 950.0, helper::eqd);
-        VFRB::msSensorData.setPress(0, 900.0);
+        info.press = 900.0;
+        VFRB::msSensorData.update(info, 0);
         assert(VFRB::msSensorData.getPress(), 950.0, helper::eqd);
     })->test("write after attempt", []()
     {
-        VFRB::msSensorData.setPress(2, 900.0);
+        struct SensorInfo info =
+        {   "", "", 900.0};
+        VFRB::msSensorData.update(info, 2);
         assert(VFRB::msSensorData.getPress(), 900.0, helper::eqd);
-        VFRB::msSensorData.setPress(0, 950.0);
+        info.press = 950.0;
+        VFRB::msSensorData.update(info, 0);
         assert(VFRB::msSensorData.getPress(), 900.0, helper::eqd);
-        VFRB::msSensorData.setPress(0, 950.0);
+        VFRB::msSensorData.update(info, 0);
         assert(VFRB::msSensorData.getPress(), 950.0, helper::eqd);
     });
 }

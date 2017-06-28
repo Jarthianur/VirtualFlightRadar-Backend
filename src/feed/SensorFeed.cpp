@@ -21,6 +21,7 @@
 
 #include "SensorFeed.h"
 
+#include <boost/optional.hpp>
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
@@ -54,7 +55,10 @@ void SensorFeed::process(const std::string& cr_res) noexcept
 {
     try
     {
-        VFRB::msSensorData.update(Parser::parseSensNmea(cr_res), mPriority);
+        if (boost::optional<struct SensorInfo> info = Parser::parseSensNmea(cr_res))
+        {
+            VFRB::msSensorData.update(*info, mPriority);
+        }
     } catch (const std::logic_error& e)
     {
     }

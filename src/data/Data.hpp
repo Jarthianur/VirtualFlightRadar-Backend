@@ -64,7 +64,7 @@ public:
      * @note To be implemented.
      * @tparam T The initial data
      */
-    virtual void init(const T&) = 0;
+    virtual void init(T) = 0;
 };
 
 } /* namespace data */

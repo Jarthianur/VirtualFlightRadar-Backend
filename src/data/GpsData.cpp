@@ -35,9 +35,9 @@ GpsData::~GpsData() noexcept
 {
 }
 
-void GpsData::init(const struct util::ExtGpsPosition& cr_pos)
+void GpsData::init(struct util::ExtGpsPosition pos)
 {
-    mBasePos.trySetValue(cr_pos, 0);
+    mBasePos.trySetValue(pos, 0);
 }
 
 std::string GpsData::getGpsStr()
