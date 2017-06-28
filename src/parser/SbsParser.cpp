@@ -27,7 +27,7 @@
 
 #include "../config/Configuration.h"
 #include "../util/Math.hpp"
-#include "../util/Position.hpp"
+#include "../util/Position.h"
 
 namespace parser
 {

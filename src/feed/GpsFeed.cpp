@@ -28,7 +28,7 @@
 #include "../data/GpsData.h"
 #include "../tcp/client/GpsdClient.h"
 #include "../util/Logger.h"
-#include "../util/Position.hpp"
+#include "../util/Position.h"
 #include "../VFRB.h"
 
 /// Define GPS metrics
