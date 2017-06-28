@@ -128,8 +128,8 @@ void AprscClient::sendKaBeacon()
 }
 
 void AprscClient::handleLogin(const boost::system::error_code& cr_ec, std::size_t s)
-        noexcept
-        {
+noexcept
+{
     if (!cr_ec)
     {
         Logger::info("(AprscClient) connected to: ", mHost + ":" + mPort);
