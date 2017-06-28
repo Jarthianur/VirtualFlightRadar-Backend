@@ -19,46 +19,44 @@
  }
  */
 
-#ifndef UTIL_POSITION_HPP_
-#define UTIL_POSITION_HPP_
+#ifndef SRC_PARSER_SBSPARSER_H_
+#define SRC_PARSER_SBSPARSER_H_
 
-#include <cstdint>
+#include <string>
 
-namespace util
+#include "../aircraft/Aircraft.hpp"
+#include "Parser.hpp"
+
+namespace parser
 {
 
 /**
- * GPS position structure.
- *
- * Minimal information for a position.
+ * @class SbsParser implements Parser
+ * @brief Provide unpacking method for SBS sentences.
+ * @see Parser.hpp
+ * @see ../aircraft/Aircraft.hpp
  */
-struct GpsPosition
+class SbsParser: public Parser<aircraft::Aircraft>
 {
-    /// Altitude; m
-    std::int32_t altitude;
-    /// Latitude; deg
-    double latitude,
-    /// Longitude; deg
-            longitude;
+public:
+    /**
+     * @fn SbsParser
+     * @brief Constructor
+     */
+    SbsParser();
+    /**
+     * @fn ~SbsParser
+     * @brief Destructor
+     */
+    virtual ~SbsParser() noexcept;
+    /**
+     * @fn unpack
+     * @brief Unpack into Aircraft.
+     * @override Parser::unpack
+     */
+    bool unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noexcept override;
 };
 
-/**
- * Extended GPS position structure.
- *
- * Holds GPS meta information additionally to a position.
- */
-struct ExtGpsPosition
-{
-    /// Position
-    struct GpsPosition position;
-    /// Number of satellites
-    std::int32_t nrSats,
-    /// GPS fix quality
-            fixQa;
-    /// Geoid separation
-    double geoid, dilution;
-};
+}  // namespace parser
 
-}  // namespace util
-
-#endif /* UTIL_POSITION_HPP_ */
+#endif /* SRC_PARSER_SBSPARSER_H_ */

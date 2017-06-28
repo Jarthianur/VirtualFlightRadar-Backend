@@ -4,17 +4,14 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/data/AircraftContainer.cpp \
 ../src/data/GpsData.cpp \
 ../src/data/SensorData.cpp 
 
 OBJS += \
-./src/data/AircraftContainer.o \
 ./src/data/GpsData.o \
 ./src/data/SensorData.o 
 
 CPP_DEPS += \
-./src/data/AircraftContainer.d \
 ./src/data/GpsData.d \
 ./src/data/SensorData.d 
 

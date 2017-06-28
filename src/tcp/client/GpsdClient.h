@@ -34,10 +34,9 @@ namespace client
 {
 
 /**
- * The GpsdClient class, extends and implements Client.
- *
- * This Client provides functionality to handle connections to
- * any GPSD server.
+ * @class GpsdClient extends Client.
+ * @brief Handle connections to a GPSD server.
+ * @see Client.h
  */
 class GpsdClient: public Client
 {
@@ -51,57 +50,50 @@ public:
      */
     GpsdClient& operator=(const GpsdClient&) = delete;
     /**
-     * Constructor
-     *
-     * @param cr_host  the hostname
-     * @param cr_port  the port
-     * @param cr_login the login string to transmit
-     * @param r_feed   the handler Feed reference
+     * @fn GpsdClient
+     * @brief Constructor
+     * @param cr_host  The hostname
+     * @param cr_port  The port
+     * @param cr_login The login string to transmit
+     * @param r_feed   The handler Feed reference
      */
     GpsdClient(const std::string& cr_host, const std::string& cr_port,
             feed::Feed& r_feed);
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~GpsdClient
+     * @brief Destructor
      */
     virtual ~GpsdClient() noexcept;
 
 private:
     /**
-     * Implement Client::connect.
-     *
-     * @overload Client::connect
+     * @fn connect.
+     * @override Client::connect
      */
-    void connect() noexcept override;
+    void connect() override;
     /**
-     * Extend Client::stop
-     * Send unwatch-request to server before disconnect.
-     *
-     * @overload Client::stop
+     * @fn stop
+     * @brief Send unwatch-request to server before stop.
+     * @override Client::stop
      */
-    void stop() noexcept override;
+    void stop() override;
     /**
-     * Implement Client::handleResolve
-     *
-     * @overload Client::handleResolve
+     * @fn handleResolve
+     * @override Client::handleResolve
      */
     void handleResolve(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
-     * Implement Client::handleConnect
-     *
-     * @overload Client::handleConnect
+     * @fn handleConnect
+     * @override Client::handleConnect
      */
     void handleConnect(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
-     * Send watch-request - handler
-     *
-     * @param cr_ec the error code
-     * @param s     the sent bytes
-     *
-     * @exceptsafe strong
+     * @fn handleWatch
+     * @brief Handler for send watch-reques
+     * @param cr_ec The error code
+     * @param s     The sent bytes
      */
     void handleWatch(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
 };

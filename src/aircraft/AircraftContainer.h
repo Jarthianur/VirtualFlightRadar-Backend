@@ -38,11 +38,8 @@ namespace aircraft
 class Aircraft;
 
 /**
- * The AircraftContainer class.
- *
- * This class holds all registered Aircrafts and provides
- * functionality to process these into NMEA sentences.
- * Sentences are PFLAU and PFLAA.
+ * @class AircraftContainer
+ * @brief Store Aircrafts and trigger processing.
  */
 class AircraftContainer
 {
@@ -52,43 +49,39 @@ public:
     /// Not assignable
     AircraftContainer& operator=(const AircraftContainer&) = delete;
     /**
-     * Constructor
+     * @fn AircraftContainer
+     * @brief Constructor
      */
     AircraftContainer();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~AircraftContainer
+     * @brief Destructor
      */
     virtual ~AircraftContainer() noexcept;
     /**
-     * Insert an Aircraft into container.
-     * Handles FLARM preferation.
-     * May fail due to priority.
-     *
-     * @param cr_update the Aircraft update
-     * @param prio the priority attempting to write
-     *
-     * @exceptsafe strong
+     * @fn insertAircraft
+     * @brief Insert an Aircraft into container.
+     * @note May fail due to priority.
+     * @param cr_update The Aircraft update
+     * @param prio      The priority attempting to write
+     * @threadsafe
      */
-    void insertAircraft(const Aircraft& cr_update, std::int32_t prio) noexcept;
+    void insertAircraft(const Aircraft& cr_update, std::int32_t prio);
     /**
-     * Process all aircrafts into NMEA sentences PFLAU and PFLAA.
-     * Aircrafts with too old information are not reported, later deleted.
-     * Resulting sentences contain trailing <cr><lf>.
-     *
-     * @return the string with all NMEA sentences
-     *
-     * @exceptsafe no-throw
+     * @fn processAircrafts
+     * @brief Process all Aircrafts and get the reports as string.
+     *        Increases update ages; "too old" Aircrafts are not reported and later deleted.
+     * @see AircraftProcesser::process
+     * @return the string with all NMEA reports
+     * @threadsafe
      */
-    std::string processAircrafts() noexcept;
+    std::string processAircrafts();
 
 private:
     /**
-     * Find an Aircraft by ID efficiently in the container with index map.
-     *
-     * @param cr_id the ID to search
-     *
+     * @fn find
+     * @brief Find an Aircraft by Id efficiently in the container using an index map.
+     * @param cr_id The Id to search
      * @return an iterator to the Aircraft if found, else vector::end
      */
     std::vector<Aircraft>::iterator find(const std::string& cr_id);

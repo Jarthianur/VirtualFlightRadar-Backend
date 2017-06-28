@@ -7,7 +7,7 @@
 RM := rm -rf
 OPT_LVL := 1
 # -g3
-DBG :=
+DBG := ${VFRB_DEBUG}
 TARGET := ${VFRB_TARGET}
 CXX := ${VFRB_COMPILER}
 BOOST_L := ${BOOST_LIBS_L}
@@ -57,7 +57,7 @@ all: VirtualFlightRadar-Backend
 VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: G++ Linker'
-	$(CXX) $(BOOST_L) -o $(TARGET) $(OBJS) $(USER_OBJS) $(LIBS)
+	$(CXX) $(BOOST_L) $(DBG) -o $(TARGET) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

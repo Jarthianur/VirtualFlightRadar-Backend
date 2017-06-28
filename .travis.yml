@@ -27,16 +27,29 @@ before_install:
     - sudo apt-get install -qq
 
 install:
+    - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
+    - tar xf lcov_1.11.orig.tar.gz
+    - sudo make -C lcov-1.11/ install
+    - gem install coveralls-lcov
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 90
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 90
+    - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-4.9 90
 
 before_script:
 
 script: 
     - ./install.sh
     - pushd test/build
-    - make
-    - ./VFR-Test &2>/dev/null
+    - make all
+    - ./VFR-Test
+    - popd
+
+after_success:
+    - pushd test/
+    - lcov --directory ./build --capture --output-file cov.info
+    - lcov -e cov.info "../src/*" -o vfrb.info
+    - lcov --list vfrb.info
+    - coveralls-lcov --repo-token ${COVERALLS_TOKEN} vfrb.info
     - popd
 
 

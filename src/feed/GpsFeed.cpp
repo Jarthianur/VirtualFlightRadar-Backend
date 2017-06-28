@@ -21,14 +21,17 @@
 
 #include "GpsFeed.h"
 
+#include <memory>
+#include <unordered_map>
+
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
 #include "../tcp/client/GpsdClient.h"
 #include "../util/Logger.h"
-#include "../util/Parser.h"
-#include "../util/Position.hpp"
+#include "../util/Position.h"
 #include "../VFRB.h"
 
+/// Define GPS metrics
 #define GPS_NR_SATS_GOOD      7
 #define GPS_FIX_GOOD          1
 #define GPS_HOR_DILUTION_GOOD 1.0
@@ -39,7 +42,7 @@ namespace feed
 {
 
 GpsFeed::GpsFeed(const std::string& cr_name, std::int32_t prio,
-        const std::unordered_map<std::string, std::string>& cr_kvmap)
+        const config::keyValueMap& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
     mpClient = std::unique_ptr<tcp::client::Client>(
@@ -51,11 +54,11 @@ GpsFeed::~GpsFeed() noexcept
 {
 }
 
-std::int32_t GpsFeed::process(const std::string& cr_res) noexcept
+void GpsFeed::process(const std::string& cr_res) noexcept
 {
-    try
+    struct ExtGpsPosition pos;
+    if (mParser.unpack(cr_res, pos))
     {
-        ExtGpsPosition pos = Parser::parseGpsNmea(cr_res);
         VFRB::msGpsData.update(pos, mPriority);
         if (config::Configuration::global_gnd_mode && pos.nrSats >= GPS_NR_SATS_GOOD
                 && pos.fixQa >= GPS_FIX_GOOD && pos.dilution <= GPS_HOR_DILUTION_GOOD)
@@ -63,11 +66,7 @@ std::int32_t GpsFeed::process(const std::string& cr_res) noexcept
             Logger::info("(GpsFeed) received good position -> stop");
             mpClient->stop();
         }
-    } catch (const std::logic_error& e)
-    {
-        return -1;
     }
-    return 0;
 }
 
 } // namespace feed

@@ -19,12 +19,17 @@
  }
  */
 
-#include <string>
+#include <cstdint>
+#include <iterator>
 #include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 #include "../../src/config/ConfigReader.h"
 #include "../../src/config/Configuration.h"
-#include "../framework/src/comparator/Comparators.hpp"
+#include "../../src/config/PropertyMap.h"
+#include "../../src/feed/Feed.h"
 #include "../framework/src/comparator/ComparatorStrategy.hpp"
 #include "../framework/src/testsuite/TestSuite.hpp"
 #include "../framework/src/testsuite/TestSuitesRunner.hpp"
@@ -41,20 +46,20 @@ using namespace comparator;
 
 void test_config(TestSuitesRunner& runner)
 {
-    describe<config::ConfigReader>("read config", runner)->test(
-            "read",
+    describe<config::ConfigReader>("read config", runner)->test("read",
             []()
             {
                 std::stringstream conf;
                 conf << "[" << SECT_KEY_FALLBACK << "]\n" << KV_KEY_LATITUDE << "   = 0.000000\n";
                 conf << KV_KEY_LONGITUDE << " = \n" << KV_KEY_ALTITUDE << "=1000; alt\n;ghsgd";
                 config::ConfigReader cr;
-                cr.read(conf);
-                assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), std::string("0.000000"), helper::eqs);
-                assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"), std::string("invalid"), helper::eqs);
-                assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), std::string("1000"), helper::eqs);
-                assert(cr.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "invalid"), std::string("invalid"), helper::eqs);
-                assert(cr.getProperty("nothing", ""), std::string(""), helper::eqs);
+                config::PropertyMap map;
+                cr.read(conf, map);
+                assert(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), std::string("0.000000"), helper::eqs);
+                assert(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"), std::string("invalid"), helper::eqs);
+                assert(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), std::string("1000"), helper::eqs);
+                assert(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "invalid"), std::string("invalid"), helper::eqs);
+                assert(map.getProperty("nothing", ""), std::string(""), helper::eqs);
             });
 
     describe<config::Configuration>("initialize configuration", runner)->test(
@@ -84,8 +89,7 @@ void test_config(TestSuitesRunner& runner)
                 assert(config::Configuration::base_pressure, 999.9, helper::eqd);
                 assert(config::Configuration::filter_maxHeight, INT32_MAX, helper::eqi);
                 assert(config::Configuration::filter_maxDist, 10000, helper::eqi);
-            })->test(
-            "only valid feeds",
+            })->test("only valid feeds",
             []()
             {
                 config::Configuration::global_feeds.clear();

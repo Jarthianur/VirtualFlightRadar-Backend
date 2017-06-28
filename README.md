@@ -9,7 +9,7 @@ and finally sending NMEA reports to any client. These reports may be displayed b
 The well-known, free glider navigation tool [XCSoar](https://www.xcsoar.org/) is recommended as such, as it supports all features provided by the VFR-B
 and is also available for most common platforms.
 
-Have a look at the [code of conduct](/CODE_OF_CONDUCT.md).
+Have a look at the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## Content
 
@@ -69,5 +69,5 @@ Contributions are always welcome.
 ---
 Status quo:
 
-Version 2.1.0  
-Read more in the [CHANGELOG.md](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/master/CHANGELOG.md).
+Version **2.1.0**  
+Read more in the [CHANGELOG](CHANGELOG.md).

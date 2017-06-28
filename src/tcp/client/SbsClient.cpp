@@ -47,7 +47,7 @@ SbsClient::~SbsClient() noexcept
 {
 }
 
-void SbsClient::connect() noexcept
+void SbsClient::connect()
 {
     boost::asio::ip::tcp::resolver::query query(mHost, mPort,
             boost::asio::ip::tcp::resolver::query::canonical_name);
@@ -57,8 +57,7 @@ void SbsClient::connect() noexcept
 }
 
 void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-        noexcept
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
         {
     if (!cr_ec)
     {
@@ -78,8 +77,7 @@ void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void SbsClient::handleConnect(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-        noexcept
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
         {
     if (!cr_ec)
     {

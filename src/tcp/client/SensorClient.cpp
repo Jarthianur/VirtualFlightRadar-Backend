@@ -49,13 +49,13 @@ SensorClient::~SensorClient() noexcept
 {
 }
 
-void SensorClient::read() noexcept
+void SensorClient::read()
 {
     mTimeout.expires_from_now(boost::posix_time::seconds(WC_RCV_TIMEOUT));
     Client::read();
 }
 
-void SensorClient::connect() noexcept
+void SensorClient::connect()
 {
     boost::asio::ip::tcp::resolver::query query(mHost, mPort,
             boost::asio::ip::tcp::resolver::query::canonical_name);
@@ -65,7 +65,7 @@ void SensorClient::connect() noexcept
                     boost::asio::placeholders::iterator));
 }
 
-void SensorClient::checkDeadline() noexcept
+void SensorClient::checkDeadline()
 {
     if (mStopped)
     {
@@ -84,7 +84,7 @@ void SensorClient::checkDeadline() noexcept
     mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
 }
 
-void SensorClient::stop() noexcept
+void SensorClient::stop()
 {
     Client::stop();
     mStopped = true;
@@ -93,8 +93,7 @@ void SensorClient::stop() noexcept
 }
 
 void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-        noexcept
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
         {
     if (!cr_ec)
     {
@@ -114,8 +113,7 @@ void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-        noexcept
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
         {
     if (!cr_ec)
     {

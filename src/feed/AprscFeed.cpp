@@ -21,14 +21,15 @@
 
 #include "AprscFeed.h"
 
+#include <memory>
 #include <stdexcept>
+#include <unordered_map>
 
-#include "../aircraft/Aircraft.h"
+#include "../aircraft/Aircraft.hpp"
 #include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
 #include "../tcp/client/AprscClient.h"
 #include "../util/Logger.h"
-#include "../util/Parser.h"
 #include "../VFRB.h"
 
 using namespace util;
@@ -37,7 +38,7 @@ namespace feed
 {
 
 AprscFeed::AprscFeed(const std::string& cr_name, std::int32_t prio,
-        const std::unordered_map<std::string, std::string>& cr_kvmap)
+        const config::keyValueMap& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
     auto it = mKvMap.find(KV_KEY_LOGIN);
@@ -57,16 +58,13 @@ AprscFeed::~AprscFeed() noexcept
 {
 }
 
-std::int32_t AprscFeed::process(const std::string& cr_res) noexcept
+void AprscFeed::process(const std::string& cr_res) noexcept
 {
-    try
+    aircraft::Aircraft ac;
+    if (mParser.unpack(cr_res, ac))
     {
-        VFRB::msAcCont.insertAircraft(Parser::parseAprs(cr_res), mPriority);
-    } catch (const std::logic_error& e)
-    {
-        return -1;
+        VFRB::msAcCont.insertAircraft(ac, mPriority);
     }
-    return 0;
 }
 
 } // namespace feed

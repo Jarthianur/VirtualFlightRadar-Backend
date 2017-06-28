@@ -29,11 +29,18 @@
 namespace util
 {
 
+/**
+ * @class SensorInfo
+ * @brief Set of sensor informations.
+ */
 struct SensorInfo
 {
-    std::string mdaStr = "";
-    std::string mwvStr = "";
-    double press = SI_PRESS_NA;
+    /// The MDA sentence
+    std::string mdaStr;
+    /// The MWV sentence
+    std::string mwvStr;
+    /// The pressure; hPa
+    double press;
 };
 
 }  // namespace util

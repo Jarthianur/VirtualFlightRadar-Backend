@@ -29,18 +29,21 @@
 #include "Client.h"
 #include "../../config/Parameters.h"
 
+#ifdef WINDCLIENT_RECEIVE_TIMEOUT
+#define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
+#else
+#define WC_RCV_TIMEOUT 5
+#endif
+
 namespace tcp
 {
 namespace client
 {
 
-#define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
-
 /**
- * The SensorClient class, extends and implements Client.
- *
- * This Client provides functionality to handle connections to
- * any server sending sensor information through NMEA MDA,WMV sentences.
+ * @class SensorClient extends Client
+ * @brief Handle connections to a server sending sensor information in NMEA MDA,WMV sentences.
+ * @see Client.h
  */
 class SensorClient: public Client
 {
@@ -54,60 +57,53 @@ public:
      */
     SensorClient& operator=(const SensorClient&) = delete;
     /**
-     * Constructor
-     *
-     * @param cr_host  the hostname
-     * @param cr_port  the port
-     * @param cr_login the login string to transmit
-     * @param r_feed   the handler Feed reference
+     * @fn SensorClient
+     * @brief Constructor
+     * @param cr_host  The hostname
+     * @param cr_port  The port
+     * @param cr_login The login string to transmit
+     * @param r_feed   The handler Feed reference
      */
     SensorClient(const std::string& cr_host, const std::string& cr_port,
             feed::Feed& r_feed);
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~SensorClient
+     * @brief Destructor
      */
     virtual ~SensorClient() noexcept;
 
 private:
     /**
-     * Extend Client::read
-     * Read with timeout.
-     *
-     * @overload Client::read
+     * @fn read
+     * @brief Read with timeout.
+     * @override Client::read
      */
-    void read() noexcept override;
+    void read() override;
     /**
-     * Implement Client::connect.
-     *
-     * @overload Client::connect
+     * @fn connect
+     * @override Client::connect
      */
-    void connect() noexcept override;
+    void connect() override;
     /**
-     * Check read timeout deadline reached.
-     *
-     * @exceptsafe strong
+     * @fn checkDeadline
+     * @brief Check read timeout deadline reached.
      */
-    void checkDeadline() noexcept;
+    void checkDeadline();
     /**
-     * Extend Client::stop
-     * Cancel timer before disconnect.
-     *
-     * @overload Client::stop
+     * @fn stop
+     * @brief Cancel timer before stop.
+     * @override Client::stop
      */
-    void stop() noexcept override;
+    void stop() override;
     /**
-     * Implement Client::handleResolve
-     *
-     * @overload Client::handleResolve
+     * @fn handleResolve
+     * @override Client::handleResolve
      */
     void handleResolve(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
-     * Implement Client::handleConnect
-     *
-     * @overload Client::handleConnect
+     * @fn handleConnect
+     * @override Client::handleConnect
      */
     void handleConnect(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;

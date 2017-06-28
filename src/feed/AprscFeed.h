@@ -22,35 +22,50 @@
 #ifndef SRC_FEED_APRSCFEED_H_
 #define SRC_FEED_APRSCFEED_H_
 
+#include <cstdint>
+#include <string>
+
+#include "../config/PropertyMap.h"
+#include "../parser/AprsParser.h"
 #include "Feed.h"
 
 namespace feed
 {
 
 /**
- * The AprscFeed class.
- *
- * This inherits from Feed and
- * resolves to APRSC handling Client and Parser.
+ * @class AprscFeed extends Feed
+ * @brief Represents an APRSC input feed.
+ * @see Feed.h
  */
 class AprscFeed: public Feed
 {
 public:
     /**
-     * Construct an AprscFeed.
-     * Pass parameters to parent constructor.
-     *
-     * @throws std::runtime_error if login is not given in cr_kvmap
+     * @fn AprscFeed
+     * @brief Constructor
+     * @param cr_name  The AprscFeeds unique name
+     * @param prio     The priority
+     * @param cr_kvmap The properties map
+     * @throws std::logic_error if login is not given in cr_kvmap
      */
     AprscFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
-            const std::unordered_map<std::string, std::string>& /*cr_kvmap*/);
+            const config::keyValueMap& /*cr_kvmap*/);
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~AprscFeed
+     * @brief Destructor
      */
     virtual ~AprscFeed() noexcept;
-    std::int32_t process(const std::string& cr_res) noexcept override;
+    /**
+     * @fn process
+     * @brief Handle AprscClients response.
+     * @param cr_res The response to process
+     * @override Feed::process
+     */
+    void process(const std::string& cr_res) noexcept override;
+
+private:
+    /// Parser to unpack response from Client
+    parser::AprsParser mParser;
 };
 
 } // namespace feed

@@ -23,10 +23,12 @@
 #include <string>
 #include <boost/regex.hpp>
 
+#include "../../src/aircraft/Aircraft.h"
 #include "../../src/aircraft/AircraftProcessor.h"
 #include "../../src/config/Configuration.h"
-#include "../../src/data/AircraftContainer.h"
+#include "../../src/aircraft/AircraftContainer.h"
 #include "../../src/VFRB.h"
+#include "../../src/util/Parser.h"
 #include "../framework/src/testsuite/TestSuite.hpp"
 #include "../framework/src/testsuite/TestSuitesRunner.hpp"
 #include "../framework/src/util/assert.hpp"
@@ -39,6 +41,7 @@
 using namespace util;
 using namespace testsuite;
 using namespace comparator;
+using namespace aircraft;
 
 void test_aircraft(TestSuitesRunner& runner)
 {
@@ -50,39 +53,47 @@ void test_aircraft(TestSuitesRunner& runner)
         config::Configuration::base_longitude = 8.000000;
         config::Configuration::base_pressure = 1013.25;
         helper::setupVFRB();
-    })->test(
-            "Aircraft at,above base pos",
-            []()
-            {
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+    })->test("Aircraft at,above base pos", []()
+    {
+        struct GpsPosition pos =
+        {   49.0, 8.0, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
 
-                assert(match.str(1), std::string("0"), helper::eqs);
-                assert(match.str(2), std::string("1000"), helper::eqs);
-                assert(match.str(3), std::string("0"), helper::eqs);
-                assert(match.str(4), std::string("BBBBBB"), helper::eqs);
+        assert(match.str(1), std::string("0"), helper::eqs);
+        assert(match.str(2), std::string("1000"), helper::eqs);
+        assert(match.str(3), std::string("0"), helper::eqs);
+        assert(match.str(4), std::string("BBBBBB"), helper::eqs);
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
 
-                assert(match.str(1), std::string("0"), helper::eqs);
-                assert(match.str(2), std::string("0"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-                assert(match.str(5), std::string("BBBBBB"), helper::eqs);
-                assert(match.str(9), std::string("8"), helper::eqs);
-            })->test(
-            "filter distance",
-            []()
-            {
-                config::Configuration::filter_maxDist = 10000;
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.100000,8.100000,,,,,,0", 0);
-                assert(VFRB::msAcCont.processAircrafts(), std::string(""), helper::eqs);
-                config::Configuration::filter_maxDist = INT32_MAX;
-            });
+        assert(match.str(1), std::string("0"), helper::eqs);
+        assert(match.str(2), std::string("0"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+        assert(match.str(5), std::string("BBBBBB"), helper::eqs);
+        assert(match.str(9), std::string("8"), helper::eqs);
+    })->test("filter distance", []()
+    {
+        config::Configuration::filter_maxDist = 10000;
+        struct GpsPosition pos =
+        {   49.1, 8.1, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        assert(VFRB::msAcCont.processAircrafts(), std::string(""), helper::eqs);
+        config::Configuration::filter_maxDist = INT32_MAX;
+    });
 
     describe<aircraft::AircraftProcessor>("process relative positions", runner)->test(
             "setup", []()
@@ -93,375 +104,427 @@ void test_aircraft(TestSuitesRunner& runner)
                 config::Configuration::base_longitude = 0.000000;
                 config::Configuration::base_pressure = 1013.25;
                 helper::setupVFRB();
-            })->test(
-            "Cross Equator S to N",
-            []()
-            {
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.100000,0.000000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+            })->test("Cross Equator S to N", []()
+    {
+        struct GpsPosition pos =
+        {   0.1, 0.0, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("0"), helper::eqs);
-                assert(match.str(3), std::string("22239"), helper::eqs);
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("0"), helper::eqs);
+        assert(match.str(3), std::string("22239"), helper::eqs);
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("22239"), helper::eqs);
-                assert(match.str(2), std::string("0"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Cross Equator N to S",
-            []()
-            {
-                config::Configuration::base_latitude = 0.100000;
-                config::Configuration::base_longitude = 0.000000;
-                helper::setupVFRB();
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("22239"), helper::eqs);
+        assert(match.str(2), std::string("0"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Cross Equator N to S", []()
+    {
+        config::Configuration::base_latitude = 0.100000;
+        config::Configuration::base_longitude = 0.000000;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   -0.1, 0.0, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-0.100000,0.000000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("180"), helper::eqs);
+        assert(match.str(3), std::string("22239"), helper::eqs);
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("180"), helper::eqs);
-                assert(match.str(3), std::string("22239"), helper::eqs);
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-22239"), helper::eqs);
+        assert(match.str(2), std::string("0"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Cross Northpole", []()
+    {
+        config::Configuration::base_latitude = 89.900000;
+        config::Configuration::base_longitude = 180.000000;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   89.9, 0.0, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-22239"), helper::eqs);
-                assert(match.str(2), std::string("0"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Cross Northpole",
-            []()
-            {
-                config::Configuration::base_latitude = 89.900000;
-                config::Configuration::base_longitude = 180.000000;
-                helper::setupVFRB();
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("0"), helper::eqs);
+        assert(match.str(3), std::string("22239"), helper::eqs);
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,89.900000,0.000000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("22239"), helper::eqs);
+        assert(match.str(2), std::string("0"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Cross Southpole", []()
+    {
+        config::Configuration::base_latitude = -89.900000;
+        config::Configuration::base_longitude = 180.000000;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   -89.9, 0.0, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("0"), helper::eqs);
-                assert(match.str(3), std::string("22239"), helper::eqs);
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-180"), helper::eqs);
+        assert(match.str(3), std::string("22239"), helper::eqs);
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("22239"), helper::eqs);
-                assert(match.str(2), std::string("0"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Cross Southpole",
-            []()
-            {
-                config::Configuration::base_latitude = -89.900000;
-                config::Configuration::base_longitude = 180.000000;
-                helper::setupVFRB();
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-22239"), helper::eqs);
+        assert(match.str(2), std::string("0"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Cross 0-Meridian on Equator E to W", []()
+    {
+        config::Configuration::base_latitude = 0.000000;
+        config::Configuration::base_longitude = 0.100000;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   0.0, -0.1, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-89.900000,0.000000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-90"), helper::eqs);
+        assert(match.str(3), std::string("22239"), helper::eqs);
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-180"), helper::eqs);
-                assert(match.str(3), std::string("22239"), helper::eqs);
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("0"), helper::eqs);
+        assert(match.str(2), std::string("-22239"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Cross 0-Meridian on Equator W to E", []()
+    {
+        config::Configuration::base_latitude = 0.000000;
+        config::Configuration::base_longitude = -0.100000;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   0.0, 0.1, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-22239"), helper::eqs);
-                assert(match.str(2), std::string("0"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Cross 0-Meridian on Equator E to W",
-            []()
-            {
-                config::Configuration::base_latitude = 0.000000;
-                config::Configuration::base_longitude = 0.100000;
-                helper::setupVFRB();
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("90"), helper::eqs);
+        assert(match.str(3), std::string("22239"), helper::eqs);
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,-0.100000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("0"), helper::eqs);
+        assert(match.str(2), std::string("22239"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Cross 0-Meridian on LAT(60) E to W", []()
+    {
+        config::Configuration::base_latitude = 60.000000;
+        config::Configuration::base_longitude = 0.100000;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   60.0, -0.1, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-90"), helper::eqs);
-                assert(match.str(3), std::string("22239"), helper::eqs);
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-90"), helper::eqs);
+        assert(match.str(3), std::string("11119"), helper::eqs);
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("0"), helper::eqs);
-                assert(match.str(2), std::string("-22239"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Cross 0-Meridian on Equator W to E",
-            []()
-            {
-                config::Configuration::base_latitude = 0.000000;
-                config::Configuration::base_longitude = -0.100000;
-                helper::setupVFRB();
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("17"), helper::eqs);
+        assert(match.str(2), std::string("-11119"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Cross 0-Meridian on LAT(-60) W to E", []()
+    {
+        config::Configuration::base_latitude = -60.000000;
+        config::Configuration::base_longitude = -0.100000;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   -60.0, 0.1, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,0.100000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("90"), helper::eqs);
+        assert(match.str(3), std::string("11119"), helper::eqs);
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("90"), helper::eqs);
-                assert(match.str(3), std::string("22239"), helper::eqs);
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-17"), helper::eqs);
+        assert(match.str(2), std::string("11119"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Cross 180-Meridian on Equator E to W", []()
+    {
+        config::Configuration::base_latitude = 0.000000;
+        config::Configuration::base_longitude = 179.900000;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   0.0, -179.9, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("0"), helper::eqs);
-                assert(match.str(2), std::string("22239"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Cross 0-Meridian on LAT(60) E to W",
-            []()
-            {
-                config::Configuration::base_latitude = 60.000000;
-                config::Configuration::base_longitude = 0.100000;
-                helper::setupVFRB();
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("90"), helper::eqs);
+        assert(match.str(3), std::string("22239"), helper::eqs);
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,60.000000,-0.100000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("0"), helper::eqs);
+        assert(match.str(2), std::string("22239"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Cross 180-Meridian on Equator W to E", []()
+    {
+        config::Configuration::base_latitude = 0.000000;
+        config::Configuration::base_longitude = -179.900000;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   0.0, 179.9, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-90"), helper::eqs);
-                assert(match.str(3), std::string("11119"), helper::eqs);
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-90"), helper::eqs);
+        assert(match.str(3), std::string("22239"), helper::eqs);
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("17"), helper::eqs);
-                assert(match.str(2), std::string("-11119"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Cross 0-Meridian on LAT(-60) W to E",
-            []()
-            {
-                config::Configuration::base_latitude = -60.000000;
-                config::Configuration::base_longitude = -0.100000;
-                helper::setupVFRB();
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("0"), helper::eqs);
+        assert(match.str(2), std::string("-22239"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("North America", []()
+    {
+        config::Configuration::base_latitude = 33.653124;
+        config::Configuration::base_longitude = -112.692253;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   33.825808, -112.219232, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-60.000000,0.100000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("66"), helper::eqs);
+        assert(match.str(3), std::string("47768"), helper::eqs);
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("90"), helper::eqs);
-                assert(match.str(3), std::string("11119"), helper::eqs);
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("19302"), helper::eqs);
+        assert(match.str(2), std::string("43695"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("South America", []()
+    {
+        config::Configuration::base_latitude = -34.680059;
+        config::Configuration::base_longitude = -58.818111;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   -34.699833,-58.791788, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-17"), helper::eqs);
-                assert(match.str(2), std::string("11119"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Cross 180-Meridian on Equator E to W",
-            []()
-            {
-                config::Configuration::base_latitude = 0.000000;
-                config::Configuration::base_longitude = 179.900000;
-                helper::setupVFRB();
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("132"), helper::eqs);
+        assert(match.str(3), std::string("3260"), helper::eqs);
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,-179.900000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-2199"), helper::eqs);
+        assert(match.str(2), std::string("2407"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("North Africa", []()
+    {
+        config::Configuration::base_latitude = 5.392435;
+        config::Configuration::base_longitude = -5.748392;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   5.386705,-5.750365, 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("90"), helper::eqs);
-                assert(match.str(3), std::string("22239"), helper::eqs);
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-161"), helper::eqs);
+        assert(match.str(3), std::string("674"), helper::eqs);
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("0"), helper::eqs);
-                assert(match.str(2), std::string("22239"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Cross 180-Meridian on Equator W to E",
-            []()
-            {
-                config::Configuration::base_latitude = 0.000000;
-                config::Configuration::base_longitude = -179.900000;
-                helper::setupVFRB();
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-638"), helper::eqs);
+        assert(match.str(2), std::string("-219"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("South Africa", []()
+    {
+        config::Configuration::base_latitude = -26.069244;
+        config::Configuration::base_longitude = 15.484389;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   -23.229517,15.049683 , 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,0.000000,179.900000,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-8"), helper::eqs);
+        assert(match.str(3), std::string("318804"), helper::eqs);
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-90"), helper::eqs);
-                assert(match.str(3), std::string("22239"), helper::eqs);
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("315692"), helper::eqs);
+        assert(match.str(2), std::string("-44437"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Australia", []()
+    {
+        config::Configuration::base_latitude = -25.278208;
+        config::Configuration::base_longitude = 133.366885;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   -26.152199,133.376684 , 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("0"), helper::eqs);
-                assert(match.str(2), std::string("-22239"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "North America",
-            []()
-            {
-                config::Configuration::base_latitude = 33.653124;
-                config::Configuration::base_longitude = -112.692253;
-                helper::setupVFRB();
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("179"), helper::eqs);
+        assert(match.str(3), std::string("97188"), helper::eqs);
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,33.825808,-112.219232,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-97183"), helper::eqs);
+        assert(match.str(2), std::string("978"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Central Europe", []()
+    {
+        config::Configuration::base_latitude = 49.719521;
+        config::Configuration::base_longitude = 9.083279;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   49.719445,9.087646 , 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("66"), helper::eqs);
-                assert(match.str(3), std::string("47768"), helper::eqs);
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("92"), helper::eqs);
+        assert(match.str(3), std::string("314"), helper::eqs);
 
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("19302"), helper::eqs);
-                assert(match.str(2), std::string("43695"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "South America",
-            []()
-            {
-                config::Configuration::base_latitude = -34.680059;
-                config::Configuration::base_longitude = -58.818111;
-                helper::setupVFRB();
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-8"), helper::eqs);
+        assert(match.str(2), std::string("314"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    })->test("Asia", []()
+    {
+        config::Configuration::base_latitude = 65.900837;
+        config::Configuration::base_longitude = 101.570680;
+        helper::setupVFRB();
+        struct GpsPosition pos =
+        {   32.896360,103.855837 , 3281};
+        std::string id("BBBBBB");
+        Aircraft ac(id, pos);
+        ac.setFullInfo(false);
+        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        VFRB::msAcCont.insertAircraft(ac, 0);
+        std::string proc = VFRB::msAcCont.processAircrafts();
+        boost::smatch match;
 
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-34.699833,-58.791788,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("176"), helper::eqs);
+        assert(match.str(3), std::string("3673118"), helper::eqs);
 
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("132"), helper::eqs);
-                assert(match.str(3), std::string("3260"), helper::eqs);
-
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-2199"), helper::eqs);
-                assert(match.str(2), std::string("2407"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "North Africa",
-            []()
-            {
-                config::Configuration::base_latitude = 5.392435;
-                config::Configuration::base_longitude = -5.748392;
-                helper::setupVFRB();
-
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,5.386705,-5.750365,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
-
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-161"), helper::eqs);
-                assert(match.str(3), std::string("674"), helper::eqs);
-
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-638"), helper::eqs);
-                assert(match.str(2), std::string("-219"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "South Africa",
-            []()
-            {
-                config::Configuration::base_latitude = -26.069244;
-                config::Configuration::base_longitude = 15.484389;
-                helper::setupVFRB();
-
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-23.229517,15.049683,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
-
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-8"), helper::eqs);
-                assert(match.str(3), std::string("318804"), helper::eqs);
-
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("315692"), helper::eqs);
-                assert(match.str(2), std::string("-44437"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Australia",
-            []()
-            {
-                config::Configuration::base_latitude = -25.278208;
-                config::Configuration::base_longitude = 133.366885;
-                helper::setupVFRB();
-
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,-26.152199,133.376684,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
-
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("179"), helper::eqs);
-                assert(match.str(3), std::string("97188"), helper::eqs);
-
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-97183"), helper::eqs);
-                assert(match.str(2), std::string("978"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Central Europe",
-            []()
-            {
-                config::Configuration::base_latitude = 49.719521;
-                config::Configuration::base_longitude = 9.083279;
-                helper::setupVFRB();
-
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.719445,9.087646,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
-
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("92"), helper::eqs);
-                assert(match.str(3), std::string("314"), helper::eqs);
-
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-8"), helper::eqs);
-                assert(match.str(2), std::string("314"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            })->test(
-            "Asia",
-            []()
-            {
-                config::Configuration::base_latitude = 65.900837;
-                config::Configuration::base_longitude = 101.570680;
-                helper::setupVFRB();
-
-                helper::pars_sbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,32.896360,103.855837,,,,,,0", 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                boost::smatch match;
-
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("176"), helper::eqs);
-                assert(match.str(3), std::string("3673118"), helper::eqs);
-
-                matched = boost::regex_search(proc, match, helper::pflaaRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(1), std::string("-3666184"), helper::eqs);
-                assert(match.str(2), std::string("225589"), helper::eqs);
-                assert(match.str(3), std::string("1000"), helper::eqs);
-            });
+        matched = boost::regex_search(proc, match, helper::pflaaRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(1), std::string("-3666184"), helper::eqs);
+        assert(match.str(2), std::string("225589"), helper::eqs);
+        assert(match.str(3), std::string("1000"), helper::eqs);
+    });
 }

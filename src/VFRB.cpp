@@ -40,7 +40,7 @@
 #include "tcp/server/Server.h"
 #include "util/Logger.h"
 #include "feed/Feed.h"
-#include "util/Position.hpp"
+#include "util/Position.h"
 #include "util/SensorInfo.h"
 
 using namespace util;

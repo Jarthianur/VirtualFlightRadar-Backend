@@ -34,10 +34,9 @@ namespace client
 {
 
 /**
- * The SbsClient class, extends and implements Client.
- *
- * This Client provides functionality to handle connections to
- * any SBS server.
+ * @class SbsClient extends Client
+ * @brief Handle connections to a SBS server.
+ * @see Client.h
  */
 class SbsClient: public Client
 {
@@ -51,39 +50,35 @@ public:
      */
     SbsClient& operator=(const SbsClient&) = delete;
     /**
-     * Constructor
-     *
-     * @param cr_host  the hostname
-     * @param cr_port  the port
-     * @param cr_login the login string to transmit
-     * @param r_feed   the handler Feed reference
+     * @fn SbsClient
+     * @brief Constructor
+     * @param cr_host  The hostname
+     * @param cr_port  The port
+     * @param cr_login The login string to transmit
+     * @param r_feed   The handler Feed reference
      */
     SbsClient(const std::string& cr_host, const std::string& cr_port, feed::Feed& r_feed);
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~SbsClient
+     * @brief Destructor
      */
     virtual ~SbsClient() noexcept;
 
 private:
     /**
-     * Implement Client::connect.
-     *
-     * @overload Client::connect
+     * @fn connect
+     * @override Client::connect
      */
-    void connect() noexcept override;
+    void connect() override;
     /**
-     * Implement Client::handleResolve
-     *
-     * @overload Client::handleResolve
+     * @fn handleResolve
+     * @override Client::handleResolve
      */
     void handleResolve(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
-     * Implement Client::handleConnect
-     *
-     * @overload Client::handleConnect
+     * @fn handleConnect
+     * @override Client::handleConnect
      */
     void handleConnect(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;

@@ -21,10 +21,12 @@
 
 #include "SensorFeed.h"
 
+#include <memory>
+#include <unordered_map>
+
 #include "../config/Configuration.h"
 #include "../data/SensorData.h"
 #include "../tcp/client/SensorClient.h"
-#include "../util/Parser.h"
 #include "../util/SensorInfo.h"
 #include "../VFRB.h"
 
@@ -34,7 +36,7 @@ namespace feed
 {
 
 SensorFeed::SensorFeed(const std::string& cr_name, std::int32_t prio,
-        const std::unordered_map<std::string, std::string>& cr_kvmap)
+        const config::keyValueMap& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
     mpClient = std::unique_ptr<tcp::client::Client>(
@@ -46,16 +48,13 @@ SensorFeed::~SensorFeed() noexcept
 {
 }
 
-std::int32_t SensorFeed::process(const std::string& cr_res) noexcept
+void SensorFeed::process(const std::string& cr_res) noexcept
 {
-    try
+    struct SensorInfo info;
+    if (mParser.unpack(cr_res, info))
     {
-        VFRB::msSensorData.update(Parser::parseSensNmea(cr_res), mPriority);
-    } catch (const std::logic_error& e)
-    {
-        return -1;
+        VFRB::msSensorData.update(info, mPriority);
     }
-    return 0;
 }
 
 } // namespace feed

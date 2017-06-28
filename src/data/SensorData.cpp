@@ -95,9 +95,11 @@ double SensorData::getPress()
     return mPress.value;
 }
 
-void SensorData::setDefaults(double p)
+void SensorData::init(struct util::SensorInfo info)
 {
-    mPress.trySetValue(p, 0);
+    mMdaData.trySetValue(info.mdaStr, 0);
+    mMwvData.trySetValue(info.mwvStr, 0);
+    mPress.trySetValue(info.press, 0);
 }
 
 void SensorData::setPress(double p, std::int32_t prio)

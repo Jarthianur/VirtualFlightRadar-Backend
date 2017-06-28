@@ -53,7 +53,7 @@ AprscClient::~AprscClient() noexcept
 {
 }
 
-void AprscClient::connect() noexcept
+void AprscClient::connect()
 {
     boost::asio::ip::tcp::resolver::query query(mHost, mPort,
             boost::asio::ip::tcp::resolver::query::canonical_name);
@@ -63,7 +63,7 @@ void AprscClient::connect() noexcept
                     boost::asio::placeholders::iterator));
 }
 
-void AprscClient::stop() noexcept
+void AprscClient::stop()
 {
     Client::stop();
     mStopped = true;
@@ -72,8 +72,7 @@ void AprscClient::stop() noexcept
 }
 
 void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-        noexcept
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
         {
     if (!cr_ec)
     {
@@ -93,8 +92,7 @@ void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-        noexcept
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
         {
     if (!cr_ec)
     {
@@ -115,7 +113,7 @@ void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
     }
 }
 
-void AprscClient::sendKaBeacon() noexcept
+void AprscClient::sendKaBeacon()
 {
     if (mStopped)
     {

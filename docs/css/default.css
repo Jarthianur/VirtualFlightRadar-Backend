@@ -1,0 +1,21 @@
+body {
+    height: 100%
+}
+
+a {
+    text-decoration: none;
+    color: #008000
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #00b51a;
+}
+
+.not-a, .not-a:hover {
+    text-decoration: none;
+}
+
+* {
+    font-family: 'Inconsolata', monospace !important;
+}

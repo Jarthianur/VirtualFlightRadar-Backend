@@ -1,0 +1,15 @@
+**
+!_includes/
+!_includes/**
+!_layouts/
+!_layouts/**
+!assets/
+!assets/**
+!css/
+!css/**
+!coverage/
+!coverage/**
+!_config.yml
+!.gitignore
+!*.html
+!*.md

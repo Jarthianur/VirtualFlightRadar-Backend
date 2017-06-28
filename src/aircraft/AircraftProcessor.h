@@ -34,39 +34,36 @@ class Aircraft;
 #define AP_L_BUFF_S 128
 
 /**
- * The AircraftProcessor class.
- *
- * Provide functionality to process Aircraft objects
- * relative to the current base position.
+ * @class AircraftProcessor
+ * @brief Process Aircrafts relative to the base position.
  */
 class AircraftProcessor
 {
 public:
     /**
-     * Constructor
+     * @fn AircraftProcessor
+     * @brief Constructor
      */
     AircraftProcessor();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~AircraftProcessor
+     * @brief Destructor
      */
     virtual ~AircraftProcessor() noexcept;
     /**
-     * Process an Aircraft relative to the base position.
-     * Result as PFLAU + PFLAA NMEA sentence, with <cr><lf> postfix.
-     *
-     * @param cr_ac the given Aircraft
-     *
+     * @fn process
+     * @brief Generate NMEA report for an Aircraft with relative position etc.
+     * @note Resulting string has trailing <cr><lf>.
+     * @param cr_ac The Aircraft to process
      * @return the NMEA string
      */
     std::string process(const Aircraft& cr_ac);
 
 private:
     /**
-     * Calcutale Aircrafts relative position to the base.
-     *
-     * @param cr_ac the given Aircraft
+     * @fn calcRelPosToBase
+     * @brief Calcutale an Aircrafts position relative to the base.
+     * @param cr_ac The Aircraft to calculate for
      */
     void calcRelPosToBase(const Aircraft& cr_ac);
 

@@ -29,7 +29,7 @@
 #include <utility>
 
 #include "../util/Logger.h"
-#include "../aircraft/Aircraft.h"
+#include "Aircraft.hpp"
 
 using namespace util;
 
@@ -41,8 +41,6 @@ namespace aircraft
 #define AC_NO_FLARM_THRESHOLD AC_INVALIDATE
 
 AircraftContainer::AircraftContainer()
-        : mAcProc(),
-          mCont()
 {
     mCont.reserve(20);
     mIndexMap.reserve(40);
@@ -64,7 +62,7 @@ std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& cr_id
     }
 }
 
-std::string AircraftContainer::processAircrafts() noexcept
+std::string AircraftContainer::processAircrafts()
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     std::string dest_str;
@@ -86,7 +84,7 @@ std::string AircraftContainer::processAircrafts() noexcept
             if (it->getUpdateAge() >= 4)
             {
                 del = true;
-                mIndexMap.erase(it->getID());
+                mIndexMap.erase(it->getId());
                 it = mCont.erase(it);
             } else
             {
@@ -99,7 +97,7 @@ std::string AircraftContainer::processAircrafts() noexcept
             }
             if (del && it != mCont.end())
             {
-                mIndexMap.at(it->getID()) = index;
+                mIndexMap.at(it->getId()) = index;
             }
         } catch (const std::exception& e)
         {
@@ -110,10 +108,9 @@ std::string AircraftContainer::processAircrafts() noexcept
 }
 
 void AircraftContainer::insertAircraft(const Aircraft& cr_update, std::int32_t prio)
-noexcept
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    auto known_ac = find(cr_update.getID());
+    auto known_ac = find(cr_update.getId());
     if (known_ac != mCont.end())
     {
         if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER
@@ -137,7 +134,7 @@ noexcept
         }
     } else
     {
-        mIndexMap.insert( { cr_update.getID(), mCont.size() });
+        mIndexMap.insert( { cr_update.getId(), mCont.size() });
         mCont.push_back(cr_update);
     }
 }

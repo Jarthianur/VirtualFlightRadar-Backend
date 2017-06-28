@@ -19,28 +19,54 @@
  }
  */
 
-#ifndef SRC_DATA_DATA_H_
-#define SRC_DATA_DATA_H_
+#ifndef SRC_DATA_DATA_HPP_
+#define SRC_DATA_DATA_HPP_
 
 #include <cstdint>
 
 namespace data
 {
 
+/**
+ * @class Data
+ * @brief An interface for data containers.
+ * @tparam T The type of data to manage
+ */
 template<typename T>
 class Data
 {
 public:
+    /**
+     * @fn Data
+     * @brief Constructor
+     */
     inline Data()
     {
     }
+    /**
+     * @fn ~Data
+     * @brief Destructor
+     */
     inline virtual ~Data() noexcept
     {
     }
-
+    /**
+     * @fn update
+     * @brief Update the specialized data.
+     * @note To be implemented.
+     * @tparam T The new data
+     * @param prio The priority of the update
+     */
     virtual void update(const T&, std::int32_t prio) = 0;
+    /**
+     * @fn init
+     * @brief Initialize data.
+     * @note To be implemented.
+     * @tparam T The initial data
+     */
+    virtual void init(T) = 0;
 };
 
 } /* namespace data */
 
-#endif /* SRC_DATA_DATA_H_ */
+#endif /* SRC_DATA_DATA_HPP_ */

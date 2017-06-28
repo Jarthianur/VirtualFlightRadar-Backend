@@ -26,8 +26,8 @@
 #include <cstdio>
 #include <ctime>
 
-#include "../util/Position.hpp"
 #include "Math.hpp"
+#include "Position.h"
 
 namespace util
 {

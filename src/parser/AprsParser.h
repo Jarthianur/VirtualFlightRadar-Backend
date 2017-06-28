@@ -19,57 +19,52 @@
  }
  */
 
-#ifndef SRC_PARSER_PARSER_H_
-#define SRC_PARSER_PARSER_H_
+#ifndef SRC_PARSER_APRSPARSER_H_
+#define SRC_PARSER_APRSPARSER_H_
 
 #include <boost/regex.hpp>
+#include <cstdint>
 #include <string>
-#include "SensorInfo.h"
 
-namespace aircraft
-{
-class Aircraft;
-}
-namespace util
-{
-struct ExtGpsPosition;
-}
+#include "../aircraft/Aircraft.hpp"
+#include "Parser.hpp"
 
-namespace util
+namespace parser
 {
 
 /**
- * The Parser interface.
- *
- * Classes of this type implement the unpack method.
+ * @class AprsParser implements Parser
+ * @brief Provide unpacking method for APRS sentences.
+ * @see Parser.hpp
+ * @see ../aircraft/Aircraft.hpp
  */
-class Parser
+class AprsParser: public Parser<aircraft::Aircraft>
 {
 public:
     /**
-     * Constructor
+     * @fn AprsParser
+     * @brief Constructor
      */
-    Parser();
+    AprsParser();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~AprsParser
+     * @brief Destructor
      */
-    virtual ~Parser() noexcept;
-
-    static aircraft::Aircraft parseAprs(const std::string& cr_msg);
-    static aircraft::Aircraft parseSbs(const std::string& cr_msg);
-    static ExtGpsPosition parseGpsNmea(const std::string& cr_msg);
-    static SensorInfo parseSensNmea(const std::string& cr_msg);
+    virtual ~AprsParser() noexcept;
+    /**
+     * @fn unpack
+     * @brief Unpack into Aircraft.
+     * @override Parser::unpack
+     */
+    bool unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noexcept override;
 
 private:
     /// Regular expression for APRS protocol
-    static const boost::regex aprsRe;
+    static const boost::regex msAprsRe;
     /// Regular expression for OGN specific APRS extension
-    static const boost::regex aprsComRe;
-    static const boost::regex gpggaRe;
+    static const boost::regex msAprsComRe;
 };
 
-}  // namespace util
+}  // namespace parser
 
-#endif /* SRC_PARSER_PARSER_H_ */
+#endif /* SRC_PARSER_APRSPARSER_H_ */
