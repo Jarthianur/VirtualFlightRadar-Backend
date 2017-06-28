@@ -25,7 +25,7 @@
 #include <cstdint>
 #include <string>
 
-#include "../util/Position.hpp"
+#include "../util/Position.h"
 
 /// Indicate a double value is not available.
 #define A_VALUE_NA -1024.0

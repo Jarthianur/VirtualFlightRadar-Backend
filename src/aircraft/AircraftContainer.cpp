@@ -41,8 +41,6 @@ namespace aircraft
 #define AC_NO_FLARM_THRESHOLD AC_INVALIDATE
 
 AircraftContainer::AircraftContainer()
-        : mAcProc(),
-          mCont()
 {
     mCont.reserve(20);
     mIndexMap.reserve(40);

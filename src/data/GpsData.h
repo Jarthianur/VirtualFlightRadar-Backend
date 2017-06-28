@@ -26,7 +26,7 @@
 #include <string>
 
 #include "../util/GpsModule.h"
-#include "../util/Position.hpp"
+#include "../util/Position.h"
 #include "Data.hpp"
 #include "Wrapper.hpp"
 

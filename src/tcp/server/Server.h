@@ -32,7 +32,11 @@
 #include "Connection.h"
 #include "../../config/Parameters.h"
 
+#ifdef SERVER_MAX_CLIENTS
 #define S_MAX_CLIENTS SERVER_MAX_CLIENTS
+#else
+#define S_MAX_CLIENTS 5
+#endif
 
 namespace tcp
 {

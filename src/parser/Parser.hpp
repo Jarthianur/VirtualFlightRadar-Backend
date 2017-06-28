@@ -27,43 +27,41 @@
 namespace aircraft
 {
 class Aircraft;
-} /* namespace aircraft */
+}
 
 namespace parser
 {
 
 /**
- * The Parser interface.
- *
- * Classes of this type implement the unpack method.
+ * @class Parser
+ * @brief Interface for parsers.
+ * @tparam T The corresponding data type
  */
 template<typename T>
 class Parser
 {
 public:
     /**
-     * Constructor
+     * @fn Parser
+     * @brief Constructor
      */
     inline Parser()
     {
     }
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~Parser
+     * @brief Destructor
      */
     inline virtual ~Parser() noexcept
     {
     }
     /**
-     * Unpack given string.
-     * Where to put unpacked data is handled by implementation,
-     * as well as priority pass-through.
-     *
-     * @param cr_msg the msg to unpack
-     * @param prio  the priority to pass
-     *
-     * @return an error code
+     * @fn unpack
+     * @brief Unpack a given string into the templated object.
+     * @note To be impemented.
+     * @param cr_msg The msg to unpack
+     * @tparam T     The object where to unpack into
+     * @return true on success, else false
      */
     virtual bool unpack(const std::string& cr_msg, T&) noexcept = 0;
 };

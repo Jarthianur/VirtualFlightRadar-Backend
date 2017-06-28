@@ -29,7 +29,11 @@
 #include "Client.h"
 #include "../../config/Parameters.h"
 
+#ifdef WINDCLIENT_RECEIVE_TIMEOUT
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
+#else
+#define WC_RCV_TIMEOUT 5
+#endif
 
 namespace tcp
 {

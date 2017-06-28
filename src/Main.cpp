@@ -28,7 +28,7 @@
 #include "data/GpsData.h"
 #include "data/SensorData.h"
 #include "util/Logger.h"
-#include "util/Position.hpp"
+#include "util/Position.h"
 #include "util/SensorInfo.h"
 #include "VFRB.h"
 

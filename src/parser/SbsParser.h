@@ -31,27 +31,28 @@ namespace parser
 {
 
 /**
- * The SbsParser class, implements Parser.
- *
- * This class unpacks SBS sentences into static VFRB::AircraftContainer.
+ * @class SbsParser implements Parser
+ * @brief Provide unpacking method for SBS sentences.
+ * @see Parser.hpp
+ * @see ../aircraft/Aircraft.hpp
  */
 class SbsParser: public Parser<aircraft::Aircraft>
 {
 public:
     /**
-     * Constructor
+     * @fn SbsParser
+     * @brief Constructor
      */
     SbsParser();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~SbsParser
+     * @brief Destructor
      */
     virtual ~SbsParser() noexcept;
     /**
-     * Unpack SBS messages into the static VFRB::AircraftContainer.
-     *
-     * @overload Parser::unpack
+     * @fn unpack
+     * @brief Unpack into Aircraft.
+     * @override Parser::unpack
      */
     bool unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noexcept override;
 };

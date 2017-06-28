@@ -33,27 +33,28 @@ namespace parser
 {
 
 /**
- * The AprsParser class, implements Parser.
- *
- * This class unpacks APRS strings into static AircraftContainer.
+ * @class AprsParser implements Parser
+ * @brief Provide unpacking method for APRS sentences.
+ * @see Parser.hpp
+ * @see ../aircraft/Aircraft.hpp
  */
 class AprsParser: public Parser<aircraft::Aircraft>
 {
 public:
     /**
-     * Constructor
+     * @fn AprsParser
+     * @brief Constructor
      */
     AprsParser();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~AprsParser
+     * @brief Destructor
      */
     virtual ~AprsParser() noexcept;
     /**
-     * Unpack APRS messages into the static VFRB::AircraftContainer.
-     *
-     * @overload Parser::unpack
+     * @fn unpack
+     * @brief Unpack into Aircraft.
+     * @override Parser::unpack
      */
     bool unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noexcept override;
 

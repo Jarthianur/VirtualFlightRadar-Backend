@@ -26,34 +26,35 @@
 #include <string>
 #include <boost/regex.hpp>
 
-#include "../util/Position.hpp"
+#include "../util/Position.h"
 #include "Parser.hpp"
 
 namespace parser
 {
 
 /**
- * The GpsParser class, implememnts Parser.
- *
- * This class unpacks NMEA GPS sentences, as they are GGA (and RMC), into static GPSData container.
+ * @class GpsParser implements Parser
+ * @brief Provide unpacking method for NMEA sentences from GPS sensors.
+ * @see Parser.hpp
+ * @see ../util/Position.h
  */
 class GpsParser: public Parser<struct util::ExtGpsPosition>
 {
 public:
     /**
-     * Constructor
+     * @fn GpsParser
+     * @brief Constructor
      */
     GpsParser();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~GpsParser
+     * @brief Destructor
      */
     virtual ~GpsParser() noexcept;
     /**
-     * Unpack GGA messages into the static VFRB::GPSData.
-     *
-     * @overload Parser::unpack
+     * @fn unpack
+     * @brief Unpack into ExtGpsPosition.
+     * @override Parser::unpack
      */
     bool unpack(const std::string& cr_msg, struct util::ExtGpsPosition& r_pos)
             noexcept override;

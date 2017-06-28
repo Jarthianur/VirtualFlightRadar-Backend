@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef UTIL_POSITION_HPP_
-#define UTIL_POSITION_HPP_
+#ifndef UTIL_POSITION_H_
+#define UTIL_POSITION_H_
 
 #include <cstdint>
 
@@ -59,4 +59,4 @@ struct ExtGpsPosition
 
 }  // namespace util
 
-#endif /* UTIL_POSITION_HPP_ */
+#endif /* UTIL_POSITION_H_ */
