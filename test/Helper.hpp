@@ -25,12 +25,17 @@
 #include <boost/regex.hpp>
 #include <string>
 
+#include "../src/aircraft/Aircraft.hpp"
 #include "../src/aircraft/AircraftContainer.h"
-#include "../src/aircraft/Aircraft.h"
 #include "../src/config/Configuration.h"
 #include "../src/data/GpsData.h"
 #include "../src/data/SensorData.h"
-#include "../src/util/Position.hpp"
+#include "../src/parser/AprsParser.h"
+#include "../src/parser/GpsParser.h"
+#include "../src/parser/SbsParser.h"
+#include "../src/parser/SensorParser.h"
+#include "../src/util/Position.h"
+#include "../src/util/SensorInfo.h"
 #include "../src/VFRB.h"
 #include "framework/src/comparator/Comparators.hpp"
 #include "framework/src/comparator/ComparatorStrategy.hpp"
@@ -42,10 +47,10 @@ namespace helper
  */
 inline void clearAcCont()
 {
-    for (int i = 0; i < 4; ++i)
-    {
-        VFRB::msAcCont.processAircrafts();
-    }
+	for (int i = 0; i < 4; ++i)
+	{
+		VFRB::msAcCont.processAircrafts();
+	}
 }
 
 /**
@@ -53,10 +58,10 @@ inline void clearAcCont()
  */
 inline void setupVFRB()
 {
-    VFRB::msSensorData.init( { "", "", config::Configuration::base_pressure });
-    VFRB::msGpsData.init( { { config::Configuration::base_latitude,
-            config::Configuration::base_longitude, config::Configuration::base_altitude },
-            1, 5, config::Configuration::base_geoid, 0.0 });
+	VFRB::msSensorData.init( { "", "", config::Configuration::base_pressure });
+	VFRB::msGpsData.init( { { config::Configuration::base_latitude,
+	        config::Configuration::base_longitude, config::Configuration::base_altitude },
+	        1, 5, config::Configuration::base_geoid, 0.0 });
 }
 
 static testsuite::comparator::Comparator<int> eqi = testsuite::comparator::EQUALS<int>();
@@ -66,8 +71,11 @@ static testsuite::comparator::Comparator<std::string> eqs = testsuite::comparato
         std::string>();
 static testsuite::comparator::Comparator<bool> eqb =
         testsuite::comparator::EQUALS<bool>();
-static testsuite::comparator::Comparator<aircraft::Aircraft::TargetType> eqtt =
-        testsuite::comparator::EQUALS<aircraft::Aircraft::TargetType>();
+
+static parser::SbsParser parsSbs;
+static parser::AprsParser parsAprs;
+static parser::SensorParser parsSens;
+static parser::GpsParser parsGps;
 
 static boost::regex pflauRe(
         "\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
