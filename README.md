@@ -1,6 +1,7 @@
 # VirtualFlightRadar-Backend (VFR-B)
 
 [![Build Status](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend.svg?branch=master)](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend)
+[![Coverage Status](https://coveralls.io/repos/github/Jarthianur/VirtualFlightRadar-Backend/badge.svg?branch=generic-inputs)](https://coveralls.io/github/Jarthianur/VirtualFlightRadar-Backend?branch=generic-inputs)
 
 This project is intended to be an interface between APRS-/ADS-B-receivers, weather-sensors and XCSoar and the airfield manager respectively.
 
