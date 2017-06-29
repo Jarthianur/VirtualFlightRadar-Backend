@@ -10,14 +10,15 @@ RM := rm -rf
 -include sources.mk
 -include test/units/subdir.mk
 -include test/subdir.mk
--include src/vfrb/subdir.mk
 -include src/util/subdir.mk
 -include src/tcp/server/subdir.mk
 -include src/tcp/client/subdir.mk
 -include src/parser/subdir.mk
+-include src/feed/subdir.mk
 -include src/data/subdir.mk
 -include src/config/subdir.mk
 -include src/aircraft/subdir.mk
+-include src/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -53,7 +54,7 @@ all: VFR-Test
 VFR-Test: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -fopenmp -o "VFR-Test" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -coverage -fopenmp -o "VFR-Test" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

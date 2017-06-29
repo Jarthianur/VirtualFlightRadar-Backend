@@ -4,29 +4,29 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../../src/tcp/client/AprscClient.cpp \
-../../src/tcp/client/Client.cpp \
-../../src/tcp/client/GpsdClient.cpp \
-../../src/tcp/client/SbsClient.cpp \
-../../src/tcp/client/SensorClient.cpp 
+../../src/feed/AprscFeed.cpp \
+../../src/feed/Feed.cpp \
+../../src/feed/GpsFeed.cpp \
+../../src/feed/SbsFeed.cpp \
+../../src/feed/SensorFeed.cpp 
 
 OBJS += \
-./src/tcp/client/AprscClient.o \
-./src/tcp/client/Client.o \
-./src/tcp/client/GpsdClient.o \
-./src/tcp/client/SbsClient.o \
-./src/tcp/client/SensorClient.o 
+./src/feed/AprscFeed.o \
+./src/feed/Feed.o \
+./src/feed/GpsFeed.o \
+./src/feed/SbsFeed.o \
+./src/feed/SensorFeed.o 
 
 CPP_DEPS += \
-./src/tcp/client/AprscClient.d \
-./src/tcp/client/Client.d \
-./src/tcp/client/GpsdClient.d \
-./src/tcp/client/SbsClient.d \
-./src/tcp/client/SensorClient.d 
+./src/feed/AprscFeed.d \
+./src/feed/Feed.d \
+./src/feed/GpsFeed.d \
+./src/feed/SbsFeed.d \
+./src/feed/SensorFeed.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/tcp/client/%.o: ../../src/tcp/client/%.cpp
+src/feed/%.o: ../../src/feed/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	g++ -std=c++0x -O0 -g3 -Wall -c -fmessage-length=0 -fprofile-arcs -ftest-coverage -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"

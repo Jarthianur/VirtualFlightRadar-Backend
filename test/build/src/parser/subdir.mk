@@ -6,21 +6,18 @@
 CPP_SRCS += \
 ../../src/parser/AprsParser.cpp \
 ../../src/parser/GpsParser.cpp \
-../../src/parser/Parser.cpp \
 ../../src/parser/SbsParser.cpp \
 ../../src/parser/SensorParser.cpp 
 
 OBJS += \
 ./src/parser/AprsParser.o \
 ./src/parser/GpsParser.o \
-./src/parser/Parser.o \
 ./src/parser/SbsParser.o \
 ./src/parser/SensorParser.o 
 
 CPP_DEPS += \
 ./src/parser/AprsParser.d \
 ./src/parser/GpsParser.d \
-./src/parser/Parser.d \
 ./src/parser/SbsParser.d \
 ./src/parser/SensorParser.d 
 
@@ -29,7 +26,7 @@ CPP_DEPS += \
 src/parser/%.o: ../../src/parser/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -std=c++0x -O0 -Wall -c -fmessage-length=0 -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	g++ -std=c++0x -O0 -g3 -Wall -c -fmessage-length=0 -fprofile-arcs -ftest-coverage -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
