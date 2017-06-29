@@ -7,8 +7,6 @@
 !assets/**
 !css/
 !css/**
-!coverage/
-!coverage/**
 !_config.yml
 !.gitignore
 !*.html
