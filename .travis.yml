@@ -45,13 +45,12 @@ script:
     - popd
 
 after_success:
-    - echo ${TRAVIS_BUILD_DIR}
-   # - pushd test/
-   # - lcov --directory ./build --capture --output-file cov.info
-   # - lcov -e cov.info "${TRAVIS_BUILD_DIR}/src/*" -o vfrb.info
-  #  - lcov --list vfrb.info
-  #  - coveralls-lcov --repo-token ${COVERALLS_TOKEN} vfrb.info
-   # - popd
+    - pushd test/
+    - lcov --directory ./build --capture --output-file cov.info
+    - lcov -e cov.info "${TRAVIS_BUILD_DIR}/src/*" -o vfrb.info
+    - lcov --list vfrb.info
+    - coveralls-lcov --repo-token ${COVERALLS_TOKEN} vfrb.info
+    - popd
 
 
 notifications:
