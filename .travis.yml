@@ -44,12 +44,10 @@ script:
     - popd
 
 after_success:
-    - pushd test/
-    - lcov --directory ./build --capture --output-file cov.info
-    - lcov -e cov.info "${TRAVIS_BUILD_DIR}/src/*" -o vfrb.info
+    - lcov --directory test/build --capture --output-file cov.info
+    - lcov --remove cov.info 'test/*' '/usr/*' -o vfrb.info
     - lcov --list vfrb.info
     - coveralls-lcov --repo-token ${COVERALLS_TOKEN} vfrb.info
-    - popd
 
 
 notifications:
