@@ -52,8 +52,6 @@ noexcept
      * 14: latitude
      * 15: longitude
      */
-    std::size_t delim;
-    std::uint32_t i = 2;
     std::size_t p = 6;
 
     if (cr_msg.find(',', p) == std::string::npos
@@ -61,6 +59,8 @@ noexcept
     {
         return false;
     }
+    std::size_t delim;
+    std::uint32_t i = 2;
     struct util::GpsPosition pos;
     try
     {
