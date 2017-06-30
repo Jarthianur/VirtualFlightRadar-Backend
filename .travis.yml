@@ -48,15 +48,15 @@ script:
     - lcov --initial --directory target --capture --output-file vfrb_base.info
     # start tests
     - test/build/VFR-Test
-    - target/vfrb-$(cat version.txt) | true
-    - target/vfrb-$(cat version.txt) -g -c bla.txt | true
+    - if ! target/vfrb-$(cat version.txt); then $(exit 0); fi
+    - if ! target/vfrb-$(cat version.txt) -g -c bla.txt; then $(exit 0); fi
     - pushd test
     - ./regression.sh serve
     - ../target/vfrb-$(cat ../version.txt) -c resources/test.ini &
     - ./regression.sh receive
     - ./regression.sh receive
     - sleep 20
-    - sudo pkill -2 -f vfrb-$(cat ../version.txt)
+    - sudo pkill -2 -f vfrb-$(cat ../version.txt) | true
     - ./regression.sh check
     - popd
 
