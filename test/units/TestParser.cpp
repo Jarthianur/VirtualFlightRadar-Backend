@@ -133,8 +133,9 @@ void test_parser(TestSuitesRunner& runner)
             []()
             {
                 struct ExtGpsPosition pos;
+                assert(helper::parsGps.unpack("$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49", pos), true, helper::eqb);
                 assert(helper::parsGps.unpack("$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49\r\n", pos), true, helper::eqb);
-                assert(helper::parsGps.unpack("$GPGGA,183552,5000.0466,S,00815.7555,W,1,05,1,105,M,48.0,M,,*46\r\n", pos), true, helper::eqb);
+                assert(helper::parsGps.unpack("$GPGGA,183552,5000.0466,S,00815.7555,W,1,05,1,105,M,48.0,M,,*46\n", pos), true, helper::eqb);
                 assert(pos.dilution, 1.0, helper::eqd);
                 assert(pos.fixQa, 1, helper::eqi);
                 assert(pos.nrSats, 5, helper::eqi);

@@ -11,3 +11,6 @@
 !units/
 !units/**
 !framework/
+!regression.sh
+!resources/
+!resources/**
