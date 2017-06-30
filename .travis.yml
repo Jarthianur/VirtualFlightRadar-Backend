@@ -34,9 +34,7 @@ install:
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 90
     - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-4.9 90
 
-#before_script:
-
-script: 
+before_script:
     - export VFRB_DEBUG="-g --coverage"
     - export VFRB_OPT="0"
     - ./install.sh
@@ -44,23 +42,25 @@ script:
     - make all -j2
     - popd
 
-after_success:
+script:
     # initialize lines
     - lcov --initial --directory test/build --capture --output-file test_base.info
     - lcov --initial --directory target --capture --output-file vfrb_base.info
     # start tests
     - test/build/VFR-Test
-    - target/vfrb-$(cat version.txt)
-    - target/vfrb-$(cat version.txt) -g -c bla.txt
+    - target/vfrb-$(cat version.txt) | true
+    - target/vfrb-$(cat version.txt) -g -c bla.txt | true
     - pushd test
     - ./regression.sh serve
     - ../target/vfrb-$(cat ../version.txt) -c resources/test.ini &
     - ./regression.sh receive
     - ./regression.sh receive
-    - sleep 15
+    - sleep 20
     - sudo pkill -2 -f vfrb-$(cat ../version.txt)
     - ./regression.sh check
     - popd
+
+after_success:
     # gather coverage
     - lcov --directory test/build --capture --output-file test.info
     - lcov --directory target --capture --output-file vfrb.info
