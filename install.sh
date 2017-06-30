@@ -103,6 +103,7 @@ echo ""
 log "... RUN MAKE ..."
 echo ""
 pushd ${VFRB_ROOT}/target/
+export VFRB_OPT=${VFRB_OPT:-"2"}
 make all -j2
 error=$?
 unset BOOST_LIBS_L

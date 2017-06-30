@@ -5,8 +5,7 @@
 -include ../makefile.init
 
 RM := rm -rf
-OPT_LVL := 1
-# -g3
+OPT_LVL := ${VFRB_OPT}
 DBG := ${VFRB_DEBUG}
 TARGET := ${VFRB_TARGET}
 CXX := ${VFRB_COMPILER}

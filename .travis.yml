@@ -34,20 +34,27 @@ install:
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 90
     - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-4.9 90
 
-before_script:
+#before_script:
 
 script: 
+    - export VFRB_DEBUG="-g --coverage"
+    - export VFRB_OPT="0"
     - ./install.sh
     - pushd test/build
     - make all -j2
-    - ./VFR-Test
     - popd
 
 after_success:
-    - lcov --directory test/build --capture --output-file cov.info
-    - lcov --remove cov.info 'test/*' '/usr/*' -o vfrb.info
-    - lcov --list vfrb.info
-    - coveralls-lcov --repo-token ${COVERALLS_TOKEN} vfrb.info
+    - lcov --initial --directory test/build --capture --output-file test_base.info
+    - lcov --initial --directory target --capture --output-file vfrb_base.info
+    - test/build/VFR-Test
+    - 
+    - lcov --directory test/build --capture --output-file test.info
+    - lcov --directory target --capture --output-file vfrb.info
+    - lcov -a test_base.info -a test.info -a vfrb_base.info -a vfrb.info -o all.info
+    - lcov --remove all.info 'test/*' '/usr/*' -o cov.info
+    - lcov --list cov.info
+    - coveralls-lcov --repo-token ${COVERALLS_TOKEN} cov.info
 
 
 notifications:
