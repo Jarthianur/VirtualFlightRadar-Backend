@@ -52,10 +52,15 @@ after_success:
     - test/build/VFR-Test
     - target/vfrb-$(cat version.txt)
     - target/vfrb-$(cat version.txt) -g -c bla.txt
-    - test/regression.sh serve
-    - target/vfrb-$(cat version.txt) -c test/resources/test.ini &
-    - test/regression.sh receive
-    - sudo pkill -2 -f target/vfrb-$(cat version.txt)
+    - pushd test
+    - ./regression.sh serve
+    - ../target/vfrb-$(cat ../version.txt) -c resources/test.ini &
+    - ./regression.sh receive
+    - ./regression.sh receive
+    - sleep 15
+    - sudo pkill -2 -f vfrb-$(cat ../version.txt)
+    - ./regression.sh check
+    - popd
     # gather coverage
     - lcov --directory test/build --capture --output-file test.info
     - lcov --directory target --capture --output-file vfrb.info
