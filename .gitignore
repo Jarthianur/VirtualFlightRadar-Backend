@@ -7,11 +7,9 @@
 !/service/
 !/docs/
 !/service/**
-!/src/**
 !/docs/_includes/**
 !/docs/assets/**
 !LICENSE
-!AUTHORS
 !.gitattributes
 !.gitignore
 !.gitmodules
