@@ -71,4 +71,4 @@ Contributions are always welcome.
 Status quo:
 
 Version **2.2.0**  
-Read more in the [CHANGELOG](CHANGELOG.md).
+Read more in the [CHANGELOG](docs/CHANGELOG.md).
