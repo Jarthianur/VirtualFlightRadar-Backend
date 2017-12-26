@@ -29,6 +29,7 @@ install:
     - pushd boost_1_63_0
     - sudo ./bootstrap.sh
     - sudo ./b2 install --with-system --with-chrono --with-regex --with-signals --with-thread
+    - popd
     - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
     - tar xf lcov_1.11.orig.tar.gz
     - sudo make -C lcov-1.11/ install
@@ -36,6 +37,7 @@ install:
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 90
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 90
     - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-4.9 90
+    - popd
 
 before_script:
     - export VFRB_DEBUG="-g --coverage"
