@@ -19,15 +19,18 @@
  }
  */
 
+#include <cstdint>
+#include <fstream>
 #include <stdexcept>
 #include <string>
-#include <fstream>
 
 #include "config/Configuration.h"
-#include "data/SensorData.h"
 #include "data/GpsData.h"
+#include "data/SensorData.h"
 #include "util/Logger.h"
-#include "vfrb/VFRB.h"
+#include "util/Position.h"
+#include "util/SensorInfo.h"
+#include "VFRB.h"
 
 #ifndef VERSION
 #define VERSION "DEMO"
@@ -36,19 +39,20 @@
 using namespace util;
 
 /**
- * Evaluate comandline arguments.
- *
- * @param argc the argument count
- * @param argv the arguments
- *
+ * @fn evalArgs
+ * @brief Evaluate comandline arguments.
+ * @param argc The argument count
+ * @param argv The arguments
  * @return 0 if succeeded, -1 in case of failure
  */
-std::int32_t evalArgs(std::int32_t /*argc*/, char** /*argv*/);
+std::int32_t evalArgs(std::int32_t argc, char** argv);
 
 /**
- * The application start point.
- * In here the commandline arguments get evaluated,
- * the Configuration initialized and the VFRB ran.
+ * @fn main
+ * @brief The application start point.
+ * @param argc The argument count
+ * @param argv The arguments
+ * @return 0 on success, else -1
  */
 int main(int argc, char** argv)
 {
@@ -70,13 +74,11 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    // set climate fallbacks
-    vfrb::VFRB::msSensorData.setPress(0, config::Configuration::base_pressure);
-    vfrb::VFRB::msGpsData.setDefaults(config::Configuration::base_latitude,
-            config::Configuration::base_longitude,
-            config::Configuration::base_altitude,
-            config::Configuration::base_geoid);
-    vfrb::VFRB::run();
+    VFRB::msSensorData.init( { "", "", config::Configuration::base_pressure });
+    VFRB::msGpsData.init( { { config::Configuration::base_latitude,
+            config::Configuration::base_longitude, config::Configuration::base_altitude },
+            1, 5, config::Configuration::base_geoid, 0.0 });
+    VFRB::run();
 
     return 0;
 }
@@ -89,8 +91,7 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
 
     for (int i = 1; i < argc; i++)
     {
-        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1
-                < argc)
+        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
         {
             ini_file = std::string(argv[++i]);
             if (ini_file.rfind(".ini") == std::string::npos)

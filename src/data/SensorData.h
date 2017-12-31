@@ -22,91 +22,111 @@
 #ifndef SRC_DATA_SENSORDATA_H_
 #define SRC_DATA_SENSORDATA_H_
 
+#include <cstdint>
 #include <string>
+
+#include "../util/SensorInfo.h"
 #include "Data.hpp"
+#include "Wrapper.hpp"
+
+/// ICAO standard atmospheric pressure at MSL
+#define ICAO_STD_A 1013.25
 
 namespace data
 {
 
-/// ICAO standard atmospheric pressure at MSL
-#define ICAO_STD_A 1013.25
-/// ICAO standard temperature at MSL
-/// @deprecated
-#define ICAO_STD_T 15.0
-
 /**
- * The SensorData class.
- *
- * This class holds data gathered from any sensor.
- * E.g. wind sensor, pressure sensor
+ * @class SensorData implements Data
+ * @brief Manage sensor information.
+ * @see Data.hpp
  */
-class SensorData
+class SensorData: public Data<struct util::SensorInfo>
 {
 public:
     /**
-     * Constructor
+     * @fn SensorData
+     * @brief Constructor
      */
     SensorData();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~SensorData
+     * @brief Destructor
      */
     virtual ~SensorData() noexcept;
     /**
-     * Get MWV sentence.
-     * Wind data is invalid after this operation.
-     *
+     * @fn init
+     * @brief Initialize the sensor information.
+     * @param info The initial data
+     * @override Data::init
+     */
+    void init(struct util::SensorInfo info) override;
+    /**
+     * @fn update
+     * @brief Try to update the sensor information.
+     * @note Splits the given info, using setters.
+     * @param cr_info The new sensor information.
+     * @param prio    The attempts priority
+     * @override Data::update
+     * @threadsafe
+     */
+    void update(const struct util::SensorInfo& cr_info, std::int32_t prio) override;
+    /**
+     * @fn getMwvStr
+     * @brief Get the MWV sentence.
+     * @note MWV is invalid after this operation.
      * @return the MWV sentence, if valid, else empty string
+     * @threadsafe
      */
     std::string getMwvStr();
     /**
-     * Set MWV sentence.
-     * Wind data is valid after this operation.
-     * May fail due to priority.
-     *
-     * @param prio the priority attempting to write
-     * @param cr_mwv the new MWV sentence to write
-     */
-    void setMwvStr(std::int32_t prio, const std::string& cr_mwv);
-    /**
-     * Get MDA sentence.
-     * Data is invalid after this operation.
-     *
+     * @fn getMdaStr
+     * @brief Get the MDA sentence.
+     * @note MDA is invalid after this operation.
      * @return the MDA sentence, if valid, else empty string
+     * @threadsafe
      */
     std::string getMdaStr();
     /**
-     * Set MDA sentence.
-     * Data is valid after this operation.
-     * May fail due to priority.
-     *
-     * @param prio the priority attempting to write
-     * @param cr_mda the new MDA sentence to write
-     */
-    void setMdaStr(std::int32_t prio, const std::string& cr_mda);
-    /**
-     * Get the last registered pressure.
-     *
+     * @fn getPress
+     * @brief Get pressure.
      * @return the pressure
+     * @threadsafe
      */
     double getPress();
-    /**
-     * Set the new pressure.
-     * May fail due to priority.
-     *
-     * @param prio the priority attempting to write
-     * @param p the new pressure
-     */
-    void setPress(std::int32_t prio, double p);
 
 private:
-    /// Data holding pressure
-    struct Data<double> mPress;
-    /// TmpData holding MWV sentence
-    struct TmpData<std::string> mMwvData;
-    /// TmpData holding MDA sentence
-    struct TmpData<std::string> mMdaData;
+    /**
+     * @fn setMdaStr
+     * @brief Set MDA sentence.
+     * @note MDA is valid after this operation.
+     * @param cr_mda The new MDA sentence
+     * @param prio   The attempts priority
+     * @threadsafe
+     */
+    void setMdaStr(const std::string& cr_mda, std::int32_t prio);
+    /**
+     * @fn setMwvStr
+     * @brief Set MWV sentence.
+     * @note MWV is valid after this operation.
+     * @param cr_mwv The new MWV sentence
+     * @param prio   The attempts priority
+     * @threadsafe
+     */
+    void setMwvStr(const std::string& cr_mwv, std::int32_t prio);
+    /**
+     * @fn setPress
+     * @brief Set pressure.
+     * @param p    The new pressure
+     * @param prio The attempts priority
+     * @threadsafe
+     */
+    void setPress(double p, std::int32_t prio);
+    /// Holding pressure
+    struct Wrapper<double> mPress;
+    /// Holding MWV sentence
+    struct TmpWrapper<std::string> mMwvData;
+    /// Holding MDA sentence
+    struct TmpWrapper<std::string> mMdaData;
 };
 
 } // namespace data

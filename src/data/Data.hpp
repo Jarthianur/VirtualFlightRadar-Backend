@@ -22,123 +22,51 @@
 #ifndef SRC_DATA_DATA_HPP_
 #define SRC_DATA_DATA_HPP_
 
-#include <boost/thread/mutex.hpp>
 #include <cstdint>
-#include <string>
 
 namespace data
 {
 
 /**
- * Data structure.
- *
- * Hold a value providing its own mutex and meta-data.
- *
- * @tparam T the type of value to hold
+ * @class Data
+ * @brief An interface for data containers.
+ * @tparam T The type of data to manage
  */
 template<typename T>
-struct Data
+class Data
 {
-    /// The value
-    T value;
-    /// Is wrtite attempt valid?
-    bool attemptValid;
-    /// Last written priority
-    std::int32_t lastPriority;
-    /// Mutex to enable threadsafety per Data.
-    boost::mutex mutex;
+public:
     /**
-     * Update the value.
-     * May fail due to priority.
-     * Updates always if attempt is valid.
-     *
-     * @param cr_nv the new value
-     * @param prio  the priority attempting to write
+     * @fn Data
+     * @brief Constructor
      */
-    void update(const T& cr_nv, std::int32_t prio)
+    inline Data()
     {
-        bool write = attemptValid;
-        if (!write)
-        {
-            if (prio >= lastPriority)
-            {
-                write = true;
-            }
-        }
-        if (write)
-        {
-            attemptValid = false;
-            value = cr_nv;
-            lastPriority = prio;
-        } else
-        {
-            attemptValid = true;
-        }
-    }
-};
-/**
- * Pseudo temporary data structure.
- *
- * Same as the Data structure, but reading the value
- * invalidates it and updating validates it.
- *
- * @tparam T the type of value to hold
- */
-template<typename T>
-struct TmpData
-{
-    /// The value
-    T value;
-    /// Is wrtite attempt valid?
-    bool attemptValid;
-    /// Is the value valid?
-    bool valueValid;
-    /// Last written priority
-    std::int32_t lastPriority;
-    /// Mutex to enable threadsafety per TmpData.
-    boost::mutex mutex;
-    /**
-     * Get the value and invalidate it.
-     *
-     * @return the value
-     */
-    const T& getValue()
-    {
-        valueValid = false;
-        return value;
     }
     /**
-     * Update the value.
-     * May fail due to priority.
-     * Updates always if attempt is valid.
-     * Validates the value.
-     *
-     * @param cr_nv the new value
-     * @param prio  the priority attempting to write
+     * @fn ~Data
+     * @brief Destructor
      */
-    void update(const T& cr_nv, std::int32_t prio)
+    inline virtual ~Data() noexcept
     {
-        bool write = attemptValid;
-        if (!write)
-        {
-            if (prio >= lastPriority)
-            {
-                write = true;
-            }
-        }
-        if (write)
-        {
-            attemptValid = false;
-            value = cr_nv;
-            lastPriority = prio;
-            valueValid = true;
-        } else
-        {
-            attemptValid = true;
-        }
     }
+    /**
+     * @fn update
+     * @brief Update the specialized data.
+     * @note To be implemented.
+     * @tparam T The new data
+     * @param prio The priority of the update
+     */
+    virtual void update(const T&, std::int32_t prio) = 0;
+    /**
+     * @fn init
+     * @brief Initialize data.
+     * @note To be implemented.
+     * @tparam T The initial data
+     */
+    virtual void init(T) = 0;
 };
 
-}  // namespace data
+} /* namespace data */
 
 #endif /* SRC_DATA_DATA_HPP_ */

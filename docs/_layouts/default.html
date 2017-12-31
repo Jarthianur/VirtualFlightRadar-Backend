@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Allerta+Stencil">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">
   <link rel="stylesheet" href="css/default.css">
   <link rel="stylesheet" href="css/syntax.css">
   <link rel="stylesheet" href="css/colors.css">
@@ -17,35 +18,36 @@
 </head>
 
 <body class="ral-white">
-  <header class="ral-blue w3-display-container ral-text-white" style="width: 100%">
+  <header class="ral-black w3-display-container" style="width: 100%">
     <div class="w3-container w3-margin w3-padding w3-show-inline-block" style="width: 100%">
       <img src="assets/header.png" class="w3-image w3-hide-small w3-hide-medium" />
       <div class="w3-display-middle" style="max-width: 90%">
-        <a href="index.html" class="not-a ral-text-white">
+        <a href="index.html" class="not-a ral-text-lumi-green">
           <h1 style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap">{{ site.title }}</h1>
         </a>
       </div>
     </div>
+    <a href="https://github.com/Jarthianur/VirtualFlightRadar-Backend">
+      <img style="position: absolute; top: 0; right: 0; border: 0; max-width: 15%; max-height: 100%"
+           src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67"
+           alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png">
+    </a>
   </header>
-  <nav class="w3-card ral-blue w3-bar w3-mobile w3-border-top">
-    {% include base %}
-    {% assign pages_list = site.pages %}
-    {% assign group = 'navigation' %}
-    {% include pages_list %}
-    <a href="https://github.com/Jarthianur/VirtualFlightRadar-Backend" class="w3-right w3-bar-item ral-blue ral-hover-white not-a">GITHUB</a>
-    <a href="https://github.com/Jarthianur/VirtualFlightRadar-Backend/releases" class=" w3-right w3-bar-item ral-blue ral-hover-white not-a">DOWNLOADS</a>
+  <nav class="w3-card ral-black w3-bar w3-mobile w3-border-top w3-large">
+    {% include base %} {% assign pages_list = site.pages %} {% assign group = 'navigation' %} {% include pages_list %}
+    <a href="https://github.com/Jarthianur/VirtualFlightRadar-Backend/releases" class="w3-border-left w3-right w3-bar-item ral-black ral-hover-lumi-green ral-text-lumi-green not-a">DOWNLOADS</a>
     <div class="w3-clear"></div>
   </nav>
   <div class="w3-card w3-container w3-content w3-margin-top">
     {{ content }}
   </div>
   <br>
-  <footer class="w3-card w3-container ral-black">
+  <footer class="w3-card w3-container ral-black ral-text-lumi-green w3-large">
     <ul class="w3-ul" style="max-width: 10%">TEAM:
-      <li style="border: none"><a href="https://github.com/Jarthianur" class="ral-text-white">Jarthianur</a></li>
-      <li style="border: none"><a href="https://github.com/rueckwaertsflieger" class="ral-text-white">rueckwaertsflieger</a></li>
-      </ul>
-      <br>
+      <li style="border: none"><a href="https://github.com/Jarthianur" class="ral-text-lumi-green">Jarthianur</a></li>
+      <li style="border: none"><a href="https://github.com/rueckwaertsflieger" class="ral-text-lumi-green">rueckwaertsflieger</a></li>
+    </ul>
+    <br>
   </footer>
 </body>
 

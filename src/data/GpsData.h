@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -26,85 +26,87 @@
 #include <string>
 
 #include "../util/GpsModule.h"
+#include "../util/Position.h"
 #include "Data.hpp"
-#include "../util/Position.hpp"
+#include "Wrapper.hpp"
 
 namespace data
 {
 
 /**
- * The GpsData class.
- *
- * This class holds GPS information.
+ * @class GpsData implements Data
+ * @brief Manage GPS information.
+ * @see Data.hpp
  */
-class GpsData
+class GpsData: public Data<struct util::ExtGpsPosition>
 {
 public:
     /**
-     * Constructor
+     * @fn GpsData
+     * @brief Constructor
      */
     GpsData();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~GpsData
+     * @brief Destructor
      */
     virtual ~GpsData() noexcept;
     /**
-     * Set the default GPS position and meta-data.
-     * After this operation, an instance of this class
-     * returns always a valid, usable GPS position.
-     *
-     * @param b_lat the latitude
-     * @param b_lon the longitude
-     * @param b_alt the altitude
-     * @param geoid the geoid separation
+     * @fn init
+     * @brief Initialize the GPS information.
+     * @param pos The initial position
+     * @override Data::init
      */
-    void setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double geoid);
+    void init(struct util::ExtGpsPosition pos) override;
     /**
-     * Get the NMEA sentences reporting a GPS position.
-     * As they are GPGGA and GPRMC.
-     * The returned sentences include trailing <cr><lf>.
-     *
-     * @return the NMEA sentences in string
+     * @fn update
+     * @brief Try to update the base position.
+     * @param cr_pos The new position
+     * @param prio   The attempts priority
+     * @override Data::update
+     * @threadsafe
+     */
+    void update(const struct util::ExtGpsPosition& cr_pos, std::int32_t prio) override;
+    /**
+     * @fn getGpsStr
+     * @brief Get a full NMEA GPS report.
+     * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
+     * @return the NMEA string
+     * @threadsafe
      */
     std::string getGpsStr();
     /**
-     * Set the new base position.
-     * May fail due to priority.
-     *
-     * @param prio   the priority attempting to write
-     * @param cr_pos the new position
-     */
-    void setBasePos(std::int32_t prio, const struct util::ExtGPSPosition& cr_pos);
-    /**
-     * Get the last registered GPS position.
-     *
+     * @fn getBasePos
+     * @brief Get the base GPS position.
      * @return the position
+     * @threadsafe
      */
-    struct util::ExtGPSPosition getBasePos();
+    struct util::ExtGpsPosition getBasePos();
     /**
-     * Get the base positions latitude.
-     *
+     * @fn getBaseLat
+     * @brief Get the base latitude.
      * @return the latitude
+     * @threadsafe
      */
     double getBaseLat();
     /**
-     * Get the base positions longitude.
-     *
+     * @fn getBaseLong
+     * @brief Get the base longitude.
      * @return the longitude
+     * @threadsafe
      */
     double getBaseLong();
     /**
-     * Get the base positions altitude.
-     *
+     * @fn getBaseAlt
+     * @brief Get the base altitude.
      * @return the altitude
+     * @threadsafe
      */
     std::int32_t getBaseAlt();
 
 private:
-    /// Data holding the base position.
-    struct Data<struct util::ExtGPSPosition> mBasePos;
+    /// Wrapper holding the base position.
+    struct Wrapper<struct util::ExtGpsPosition> mBasePos;
     /// GpsModule providing functionality to build GPS sentences.
     util::GpsModule mGpsMod;
 };

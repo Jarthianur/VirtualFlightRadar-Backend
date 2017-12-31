@@ -34,10 +34,9 @@ namespace client
 {
 
 /**
- * The AprscClient class, extends and implements Client.
- *
- * This Client provides functionality to handle connections to
- * any APRSC server.
+ * @class AprscClient extends Client
+ * @brief Handle connections to APRSC server.
+ * @see Client.h
  */
 class AprscClient: public Client
 {
@@ -51,77 +50,62 @@ public:
      */
     AprscClient& operator=(const AprscClient&) = delete;
     /**
-     * Constructor
-     *
-     * @param r_sigset the signal set handling interrupts
-     * @param cr_host  the hostname
-     * @param cr_port  the port
-     * @param cr_login the login string to transmit
-     * @param r_feed   the handler Feed
+     * @fn AprscClient
+     * @brief Constructor
+     * @param cr_host  The hostname
+     * @param cr_port  The port
+     * @param cr_login The login string to transmit
+     * @param r_feed   The handler Feed reference
      */
-    AprscClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
-            const std::string& cr_port, const std::string& cr_login, vfrb::Feed& r_feed);
+    AprscClient(const std::string& cr_host, const std::string& cr_port,
+            const std::string& cr_login, feed::Feed& r_feed);
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~AprscClient
+     * @brief Destructor
      */
     virtual ~AprscClient() noexcept;
 
 private:
     /**
-     * Implement Client::connect.
-     *
-     * @overload Client::connect
+     * @fn connect
+     * @override Client::connect
      */
-    void connect() noexcept override;
+    void connect() override;
     /**
-     * Implement Client::process
-     *
-     * @overload Client::process
+     * @fn stop
+     * @brief Cancel timer before stop.
+     * @override Client::stop
      */
-    void process() noexcept override;
+    void stop() override;
     /**
-     * Extend Client::stop
-     * Cancel timer before disconnect.
-     *
-     * @overload Client::stop
+     * @fn sendKaBeacon
+     * @brief Send a keep-alive beacon to APRSC every 10 minutes.
      */
-    void stop() noexcept override;
+    void sendKaBeacon();
     /**
-     * Send a keep-alive beacon to APRSC every 10 minutes.
-     */
-    void sendKaBeacon() noexcept;
-    /**
-     * Implement Client::handleResolve
-     *
-     * @overload Client::handleResolve
+     * @fn handleResolve
+     * @override Client::handleResolve
      */
     void handleResolve(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
-     * Implement Client::handleConnect
-     *
-     * @overload Client::handleConnect
+     * @fn handleConnect
+     * @override Client::handleConnect
      */
     void handleConnect(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
-     * Send login string - handler
-     *
-     * @param cr_ec the error code
-     * @param s     the sent bytes
-     *
-     * @exceptsafe strong
+     * @fn handleLogin
+     * @brief Handler fro send login string.
+     * @param cr_ec The error code
+     * @param s     The sent bytes
      */
     void handleLogin(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
     /**
-     * Send keep-alive beacon - handler
-     *
-     * @param cr_ec the error code
-     * @param s     the sent bytes
-     *
-     * @exceptsafe strong
+     * @fn handleSendKaBeacon
+     * @brief Handler for sendKaBeacon
+     * @param cr_ec The error code
+     * @param s     The sent bytes
      */
     void handleSendKaBeacon(const boost::system::error_code& cr_ec, std::size_t s)
             noexcept;

@@ -5,9 +5,8 @@
 -include ../makefile.init
 
 RM := rm -rf
-OPT_LVL := 1
-# -g3
-DBG :=
+OPT_LVL := ${VFRB_OPT}
+DBG := ${VFRB_DEBUG}
 TARGET := ${VFRB_TARGET}
 CXX := ${VFRB_COMPILER}
 BOOST_L := ${BOOST_LIBS_L}
@@ -15,11 +14,11 @@ BOOST_I := ${BOOST_ROOT_I}
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/vfrb/subdir.mk
 -include src/util/subdir.mk
 -include src/tcp/server/subdir.mk
 -include src/tcp/client/subdir.mk
 -include src/parser/subdir.mk
+-include src/feed/subdir.mk
 -include src/data/subdir.mk
 -include src/config/subdir.mk
 -include src/aircraft/subdir.mk
@@ -57,7 +56,7 @@ all: VirtualFlightRadar-Backend
 VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: G++ Linker'
-	$(CXX) $(BOOST_L) -o $(TARGET) $(OBJS) $(USER_OBJS) $(LIBS)
+	$(CXX) $(BOOST_L) $(DBG) -o $(TARGET) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

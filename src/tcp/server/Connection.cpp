@@ -37,7 +37,7 @@ boost::shared_ptr<Connection> Connection::start(boost::asio::ip::tcp::socket soc
 
 Connection::Connection(boost::asio::ip::tcp::socket socket)
         : mSocket(std::move(socket)),
-          mIP(mSocket.remote_endpoint().address().to_string())
+          mIp(mSocket.remote_endpoint().address().to_string())
 {
 }
 
@@ -46,7 +46,7 @@ Connection::~Connection() noexcept
     stop();
 }
 
-void Connection::stop() noexcept
+void Connection::stop()
 {
     boost::system::error_code ignored_ec;
     mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
@@ -61,9 +61,9 @@ boost::asio::ip::tcp::socket& Connection::getSocket()
     return mSocket;
 }
 
-const std::string& Connection::getIP()
+const std::string& Connection::getIp()
 {
-    return mIP;
+    return mIp;
 }
 
 }  // namespace server

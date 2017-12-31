@@ -5,14 +5,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/aircraft/Aircraft.cpp \
+../src/aircraft/AircraftContainer.cpp \
 ../src/aircraft/AircraftProcessor.cpp 
 
 OBJS += \
 ./src/aircraft/Aircraft.o \
+./src/aircraft/AircraftContainer.o \
 ./src/aircraft/AircraftProcessor.o 
 
 CPP_DEPS += \
 ./src/aircraft/Aircraft.d \
+./src/aircraft/AircraftContainer.d \
 ./src/aircraft/AircraftProcessor.d 
 
 

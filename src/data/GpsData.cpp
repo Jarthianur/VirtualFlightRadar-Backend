@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -35,16 +35,9 @@ GpsData::~GpsData() noexcept
 {
 }
 
-void GpsData::setDefaults(double b_lat, double b_lon, std::int32_t b_alt, double geoid)
+void GpsData::init(struct util::ExtGpsPosition pos)
 {
-    struct util::ExtGPSPosition base;
-    base.position.latitude = b_lat;
-    base.position.longitude = b_lon;
-    base.position.altitude = b_alt;
-    base.nrSats = 5;
-    base.fixQa = 1;
-    base.geoid = geoid;
-    setBasePos(0, base);
+    mBasePos.trySetValue(pos, 0);
 }
 
 std::string GpsData::getGpsStr()
@@ -66,10 +59,10 @@ double GpsData::getBaseLat()
     return mBasePos.value.position.latitude;
 }
 
-void GpsData::setBasePos(std::int32_t prio, const struct util::ExtGPSPosition& cr_pos)
+void GpsData::update(const struct util::ExtGpsPosition& cr_pos, std::int32_t prio)
 {
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    mBasePos.update(cr_pos, prio);
+    mBasePos.trySetValue(cr_pos, prio);
 }
 
 double GpsData::getBaseLong()
@@ -78,7 +71,7 @@ double GpsData::getBaseLong()
     return mBasePos.value.position.longitude;
 }
 
-struct util::ExtGPSPosition GpsData::getBasePos()
+struct util::ExtGpsPosition GpsData::getBasePos()
 {
     boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
     return mBasePos.value;

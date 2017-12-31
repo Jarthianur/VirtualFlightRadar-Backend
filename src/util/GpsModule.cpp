@@ -26,8 +26,8 @@
 #include <cstdio>
 #include <ctime>
 
-#include "../util/Position.hpp"
 #include "Math.hpp"
+#include "Position.h"
 
 namespace util
 {
@@ -40,7 +40,7 @@ GpsModule::~GpsModule() noexcept
 {
 }
 
-std::string GpsModule::genGpggaStr(const struct ExtGPSPosition& cr_pos)
+std::string GpsModule::genGpggaStr(const struct ExtGpsPosition& cr_pos)
 {
     std::string nmea_str;
     std::int32_t csum;
@@ -69,7 +69,7 @@ std::string GpsModule::genGpggaStr(const struct ExtGPSPosition& cr_pos)
     return nmea_str;
 }
 
-std::string GpsModule::genGprmcStr(const struct ExtGPSPosition& cr_pos)
+std::string GpsModule::genGprmcStr(const struct ExtGpsPosition& cr_pos)
 {
     std::string nmea_str;
     std::int32_t csum;

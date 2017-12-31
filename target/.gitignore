@@ -1,7 +1,0 @@
-**
-!src/
-!src/**/
-!src/**/*.mk
-!.gitignore
-!makefile
-!*.mk

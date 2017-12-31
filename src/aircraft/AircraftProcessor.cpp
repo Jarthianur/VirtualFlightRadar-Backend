@@ -28,8 +28,8 @@
 #include "../data/GpsData.h"
 #include "../data/SensorData.h"
 #include "../util/Math.hpp"
-#include "../vfrb/VFRB.h"
-#include "Aircraft.h"
+#include "../VFRB.h"
+#include "Aircraft.hpp"
 
 namespace aircraft
 {
@@ -55,7 +55,7 @@ std::string AircraftProcessor::process(const Aircraft& cr_ac)
 
     //PFLAU
     std::snprintf(mBuffer, AP_BUFF_S, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
-            util::math::dToI(mtBearingRel), mtRelV, mtDist, cr_ac.getID().c_str());
+            util::math::dToI(mtBearingRel), mtRelV, mtDist, cr_ac.getId().c_str());
     std::int32_t csum = util::math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
     std::snprintf(mBuffer, AP_L_BUFF_S, "%02x\r\n", csum);
@@ -65,14 +65,14 @@ std::string AircraftProcessor::process(const Aircraft& cr_ac)
     if (cr_ac.isFullInfo())
     {
         std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
-                mtRelN, mtRelE, mtRelV, cr_ac.getIDtype(), cr_ac.getID().c_str(),
+                mtRelN, mtRelE, mtRelV, cr_ac.getIdType(), cr_ac.getId().c_str(),
                 util::math::dToI(cr_ac.getHeading()),
                 util::math::dToI(cr_ac.getGndSpeed() * util::math::MS_2_KMH),
-                cr_ac.getClimbR(), cr_ac.getAircraftT());
+                cr_ac.getClimbRate(), cr_ac.getAircraftT());
     } else
     {
         std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", mtRelN,
-                mtRelE, mtRelV, cr_ac.getID().c_str(), cr_ac.getAircraftT());
+                mtRelE, mtRelV, cr_ac.getId().c_str(), cr_ac.getAircraftT());
     }
     csum = util::math::checksum(mBuffer, sizeof(mBuffer));
     nmea_str.append(mBuffer);
@@ -84,8 +84,8 @@ std::string AircraftProcessor::process(const Aircraft& cr_ac)
 
 void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac)
 {
-    mtRadLatB = util::math::radian(vfrb::VFRB::msGpsData.getBaseLat());
-    mtRadLongB = util::math::radian(vfrb::VFRB::msGpsData.getBaseLong());
+    mtRadLatB = util::math::radian(VFRB::msGpsData.getBaseLat());
+    mtRadLongB = util::math::radian(VFRB::msGpsData.getBaseLong());
     mtRadLongAc = util::math::radian(cr_ac.getLongitude());
     mtRadLatAc = util::math::radian(cr_ac.getLatitude());
     mtLongDist = mtRadLongAc - mtRadLongB;
@@ -106,9 +106,8 @@ void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac)
     mtRelV =
             cr_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER ?
                     cr_ac.getAltitude()
-                            - util::math::calcIcaoHeight(
-                                    vfrb::VFRB::msSensorData.getPress()) :
-                    cr_ac.getAltitude() - vfrb::VFRB::msGpsData.getBaseAlt();
+                            - util::math::calcIcaoHeight(VFRB::msSensorData.getPress()) :
+                    cr_ac.getAltitude() - VFRB::msGpsData.getBaseAlt();
 }
 
 } // namespace aircraft

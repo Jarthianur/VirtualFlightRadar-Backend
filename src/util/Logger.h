@@ -29,56 +29,52 @@ namespace util
 {
 
 /**
- * The Logger class.
- *
- * This class provides static functions for threadsafe logging.
+ * @class Logger
+ * @brief Provides static functions for threadsafe logging.
  */
 class Logger
 {
 public:
     /**
-     * Constructor
+     * @fn Logger
+     * @brief Constructor
      */
     Logger();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~Logger
+     * @brief Destructor
      */
     virtual ~Logger() noexcept;
     /**
-     * Log informations, like succeeding connections etc
-     * to stdout.
-     * Given a message and a subject.
-     *
-     * @param cr_subj the subject
-     * @param cr_msg  the msg, default empty
+     * @fn info
+     * @brief Log informations to stdout.
+     * @param cr_subj The subject
+     * @param cr_msg  The msg, default empty
+     * @threadsafe
      */
     static void info(const std::string& cr_subj, const std::string& cr_msg = "");
     /**
-     * Log debug informations to stdout.
-     * Given a message and a subject.
-     *
-     *  @param cr_subj the subject
-     * @param cr_msg  the msg, default empty
+     * @fn debug
+     * @brief Log debug informations to stdout.
+     * @param cr_subj The subject
+     * @param cr_msg  The msg, default empty
+     * @threadsafe
      */
     static void debug(const std::string& cr_subj, const std::string& cr_msg = "");
     /**
-     * Log warnings and not-critical errors, like lost connections etc
-     * to stdout.
-     * Given a message and a subject.
-     *
-     * @param cr_subj the subject
-     * @param cr_msg  the msg, default empty
+     * @fn warn
+     * @brief Log warnings to stdout.
+     * @param cr_subj The subject
+     * @param cr_msg  The msg, default empty
+     * @threadsafe
      */
     static void warn(const std::string& cr_subj, const std::string& cr_msg = "");
     /**
-     * Log fatal errors, like socket failures etc
-     * to stderr.
-     * Given a message and a subject.
-     *
-     * @param cr_subj the subject
-     * @param cr_msg  the msg, default empty
+     * @fn error
+     * @brief Log fatal errors to stderr.
+     * @param cr_subj The subject
+     * @param cr_msg  The msg, default empty
+     * @threadsafe
      */
     static void error(const std::string& cr_subj, const std::string& cr_msg = "");
 
@@ -87,8 +83,8 @@ private:
     static boost::mutex mMutex;
 
     /**
-     * Get current date-time as string.
-     *
+     * @fn getTime
+     * @brief Get current date-time as string.
      * @return the date-time-string
      */
     static const std::string getTime();

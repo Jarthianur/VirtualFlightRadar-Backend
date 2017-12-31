@@ -22,39 +22,40 @@
 #ifndef SRC_PARSER_SENSORPARSER_H_
 #define SRC_PARSER_SENSORPARSER_H_
 
-#include <cstdint>
-#include <cstddef>
 #include <string>
 
-#include "Parser.h"
+#include "../util/SensorInfo.h"
+#include "Parser.hpp"
 
 namespace parser
 {
 
 /**
- * The SensorParser class, implements Parser.
- *
- * This class unpacks NMEA sentences, as they are MDA and MWV, into static VFRB::SensorData.
+ * @class SensorParser implements Parser
+ * @brief Provide unpacking method for NMEA sentences from sensors.
+ * @see Parser.hpp
+ * @see ../util/SensorInfo.h
  */
-class SensorParser: public Parser
+class SensorParser: public Parser<struct util::SensorInfo>
 {
 public:
     /**
-     * Constructor
+     * @fn SensorParser
+     * @brief Constructor
      */
     SensorParser();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~SensorParser
+     * @brief Destructor
      */
     virtual ~SensorParser() noexcept;
     /**
-     * Unpack NMEA messages into the static VFRB::SensorData.
-     *
-     * @overload Parser::unpack
+     * @fn unpack
+     * @brief Unpack into SensorInfo.
+     * @override Parser::unpack
      */
-    std::int32_t unpack(const std::string& cr_msg, std::int32_t prio) noexcept override;
+    bool unpack(const std::string& cr_msg, struct util::SensorInfo& r_info)
+            noexcept override;
 };
 
 }  // namespace parser

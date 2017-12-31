@@ -49,13 +49,31 @@
 .ral-white,
 .ral-hover-white:hover {
     color: #000;
-    background-color: #f4f4f4
+    background-color: #ecece7
 }
 
 .ral-black,
 .ral-hover-black:hover {
     color: #fff;
     background-color: #282828
+}
+
+.ral-steel-blue,
+.ral-hover-steel-blue:hover {
+    color: #fff;
+    background-color: #1a2b3c
+}
+
+.ral-sky-blue,
+.ral-hover-sky-blue:hover {
+    color: #fff;
+    background-color: #007cb0
+}
+
+.ral-lumi-green,
+.ral-hover-lumi-green:hover {
+    color: #282828;
+    background-color: #00b51a
 }
 
 .ral-text-yellow,
@@ -106,4 +124,19 @@
 .ral-text-black,
 .ral-text-hover-black:hover {
     color: #282828
+}
+
+.ral-text-steel-blue,
+.ral-text-hover-steel-blue:hover {
+    color: #1a2b3c
+}
+
+.ral-text-sky-blue,
+.ral-text-hover-sky-blue:hover {
+    color: #007cb0
+}
+
+.ral-text-lumi-green,
+.ral-text-hover-lumi-green:hover {
+    color: #00b51a
 }

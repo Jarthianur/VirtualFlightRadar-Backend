@@ -28,7 +28,7 @@
 #include <boost/operators.hpp>
 #include <cstddef>
 #include <iostream>
-#include "../../vfrb/Feed.h"
+#include "../../feed/Feed.h"
 #include "../../util/Logger.h"
 
 using namespace util;
@@ -38,9 +38,9 @@ namespace tcp
 namespace client
 {
 
-AprscClient::AprscClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
-        const std::string& cr_port, const std::string& cr_login, vfrb::Feed& r_feed)
-        : Client(r_sigset, cr_host, cr_port, "(AprscClient)", r_feed),
+AprscClient::AprscClient(const std::string& cr_host, const std::string& cr_port,
+        const std::string& cr_login, feed::Feed& r_feed)
+        : Client(cr_host, cr_port, "(AprscClient)", r_feed),
           mLoginStr(cr_login),
           mStopped(false),
           mTimeout(mIoService, boost::posix_time::minutes(10))
@@ -53,7 +53,7 @@ AprscClient::~AprscClient() noexcept
 {
 }
 
-void AprscClient::connect() noexcept
+void AprscClient::connect()
 {
     boost::asio::ip::tcp::resolver::query query(mHost, mPort,
             boost::asio::ip::tcp::resolver::query::canonical_name);
@@ -63,12 +63,7 @@ void AprscClient::connect() noexcept
                     boost::asio::placeholders::iterator));
 }
 
-void AprscClient::process() noexcept
-{
-    mrFeed.process(mResponse);
-}
-
-void AprscClient::stop() noexcept
+void AprscClient::stop()
 {
     Client::stop();
     mStopped = true;
@@ -77,8 +72,7 @@ void AprscClient::stop() noexcept
 }
 
 void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-        noexcept
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
         {
     if (!cr_ec)
     {
@@ -98,8 +92,7 @@ void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-        noexcept
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
         {
     if (!cr_ec)
     {
@@ -120,7 +113,7 @@ void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
     }
 }
 
-void AprscClient::sendKaBeacon() noexcept
+void AprscClient::sendKaBeacon()
 {
     if (mStopped)
     {

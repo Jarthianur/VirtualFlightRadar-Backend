@@ -28,8 +28,9 @@
 
 namespace util
 {
+
 /**
- * Provide several functions and constants under this namespace Math.
+ * @brief Provide several functions and constants under this namespace.
  */
 namespace math
 {
@@ -47,10 +48,9 @@ const double M_2_FEET = 3.28084;
 const double PI = std::acos(-1.0);
 
 /**
- * Convert degree to radian.
- *
- * @param deg the degrees
- *
+ * @fn radian
+ * @brief Convert degree to radian.
+ * @param deg The degrees
  * @return the radian
  */
 inline double radian(double deg)
@@ -59,10 +59,9 @@ inline double radian(double deg)
 }
 
 /**
- * Convert radian to degree.
- *
- * @param rad the radian
- *
+ * @fn degree
+ * @brief Convert radian to degree.
+ * @param rad The radian
  * @return the degrees
  */
 inline double degree(double rad)
@@ -71,10 +70,9 @@ inline double degree(double rad)
 }
 
 /**
- * Convert to int, round to nearest number.
- *
- * @param d the floating point value
- *
+ * @fn dToI
+ * @brief Convert double to int, round to nearest number.
+ * @param d The floating point value
  * @return the rounded integer
  */
 inline std::int32_t dToI(double d)
@@ -83,13 +81,9 @@ inline std::int32_t dToI(double d)
 }
 
 /**
- * Convert : ddmm.hh ; h = 1/100 m
- * ( degree, minute-as-decimal )
- * to degree.
- * Sign is determined otherwise.
- *
- * @param dm the degree-minute value
- *
+ * @fn dmToDeg
+ * @brief Convert ( degree, minute-as-decimal ) to degree.
+ * @param dm The degree-minute value
  * @return the degree value
  */
 inline double dmToDeg(double dm)
@@ -101,11 +95,9 @@ inline double dmToDeg(double dm)
 }
 
 /**
- * Calculate height difference from QNE to Pressure in meters
- * with ICAO height formula.
- *
- * @param press the air pressure
- *
+ * @fn calcIcaoHeight
+ * @brief Calculate height difference from QNE to Pressure in meters with ICAO height formula.
+ * @param press The air pressure
  * @return the height difference to QNE
  */
 inline double calcIcaoHeight(double press)
@@ -114,11 +106,10 @@ inline double calcIcaoHeight(double press)
 }
 
 /**
- * Compute checksum of nmea string.
- *
- * @param sentence the sentence to eval
- * @param size     the sentences size
- *
+ * @fn checksum
+ * @brief Compute checksum of nmea string.
+ * @param sentence The sentence to eval
+ * @param size     The sentences size
  * @return the checksum
  */
 inline std::int32_t checksum(const char* sentence, std::size_t size)

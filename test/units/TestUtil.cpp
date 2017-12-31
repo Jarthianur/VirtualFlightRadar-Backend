@@ -1,7 +1,7 @@
 /*
  Copyright_License {
 
- Copyright (C) 2017 VirtualFlightRadar-Backend
+ Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 
 #include "../../src/util/GpsModule.h"
 #include "../../src/util/Math.hpp"
-#include "../../src/util/Position.hpp"
+#include "../../src/util/Position.h"
 #include "../framework/src/comparator/ComparatorStrategy.hpp"
 #include "../framework/src/testsuite/TestSuite.hpp"
 #include "../framework/src/testsuite/TestSuitesRunner.hpp"
@@ -40,50 +40,49 @@ using namespace comparator;
 
 void test_util(TestSuitesRunner& runner)
 {
-    describe("math utils", runner, "math")->test("radian", []()
-    {
-        assert(math::radian(45.0), 0.785398, helper::eqd);
-        assert(math::radian(0.0), 0.0, helper::eqd);
-        assert(math::radian(360.0), 6.28319, helper::eqd);
-    })->test("degree", []()
-    {
-        assert(math::degree(0.785398), 45.0, helper::eqd);
-        assert(math::degree(0.0), 0.0, helper::eqd);
-        assert(math::degree(6.28319), 360.0, helper::eqd);
-    })->test("dToI", []()
-    {
-        assert(math::dToI(0.0), 0, helper::eqi);
-        assert(math::dToI(1.4), 1, helper::eqi);
-        assert(math::dToI(1.5), 2, helper::eqi);
-        assert(math::dToI(-1.4), -1, helper::eqi);
-        assert(math::dToI(-1.5), -2, helper::eqi);
-    })->test("dmToDeg", []()
-    {
-        assert(math::dmToDeg(0.0), 0.0, helper::eqd);
-        assert(math::dmToDeg(9030.50), 90.508333, helper::eqd);
-        assert(math::dmToDeg(18000.0), 180.0, helper::eqd);
-        assert(math::dmToDeg(-4512.3456), 45.205760, helper::eqd);
-    })->test("calcIcaoHeight", []()
-    {
-        assert(math::calcIcaoHeight(0.0), 44330.769231, helper::eqd);
-        assert(math::calcIcaoHeight(1013.25), 0.0, helper::eqd);
-        assert(math::calcIcaoHeight(980.0), 280.578763, helper::eqd);
-    })->test("checksum", []()
-    {
-        assert(math::checksum("", sizeof("")), 0, helper::eqi);
-        assert(math::checksum("\0", sizeof("\0")), 0, helper::eqi);
-        assert(math::checksum("$abc*", sizeof("$abc*")), 96, helper::eqi);
-    });
+	describe("math utils", runner, "math")->test("radian", []()
+	{
+		assert(math::radian(45.0), 0.785398, helper::eqd);
+		assert(math::radian(0.0), 0.0, helper::eqd);
+		assert(math::radian(360.0), 6.28319, helper::eqd);
+	})->test("degree", []()
+	{
+		assert(math::degree(0.785398), 45.0, helper::eqd);
+		assert(math::degree(0.0), 0.0, helper::eqd);
+		assert(math::degree(6.28319), 360.0, helper::eqd);
+	})->test("dToI", []()
+	{
+		assert(math::dToI(0.0), 0, helper::eqi);
+		assert(math::dToI(1.4), 1, helper::eqi);
+		assert(math::dToI(1.5), 2, helper::eqi);
+		assert(math::dToI(-1.4), -1, helper::eqi);
+		assert(math::dToI(-1.5), -2, helper::eqi);
+	})->test("dmToDeg", []()
+	{
+		assert(math::dmToDeg(0.0), 0.0, helper::eqd);
+		assert(math::dmToDeg(9030.50), 90.508333, helper::eqd);
+		assert(math::dmToDeg(18000.0), 180.0, helper::eqd);
+		assert(math::dmToDeg(-4512.3456), 45.205760, helper::eqd);
+	})->test("calcIcaoHeight", []()
+	{
+		assert(math::calcIcaoHeight(0.0), 44330.769231, helper::eqd);
+		assert(math::calcIcaoHeight(1013.25), 0.0, helper::eqd);
+		assert(math::calcIcaoHeight(980.0), 280.578763, helper::eqd);
+	})->test("checksum", []()
+	{
+		assert(math::checksum("", sizeof("")), 0, helper::eqi);
+		assert(math::checksum("\0", sizeof("\0")), 0, helper::eqi);
+		assert(math::checksum("$abc*", sizeof("$abc*")), 96, helper::eqi);
+	});
 
-    describe<GpsModule>("GPSModule - gpsfix", runner)->test("gps nmea",
-            []()
-            {
-                GpsModule gpsm;
-                boost::smatch match;
-                struct ExtGPSPosition pos;
-                bool matched = boost::regex_search(gpsm.genGpggaStr(pos), match, helper::gpsRe);
-                assert(matched, true, helper::eqb);
-                matched = boost::regex_search(gpsm.genGprmcStr(pos), match, helper::gpsRe);
-                assert(matched, true, helper::eqb);
-            });
+	describe<GpsModule>("GPSModule - gpsfix", runner)->test("gps nmea", []()
+	{
+		GpsModule gpsm;
+		boost::smatch match;
+		struct ExtGpsPosition pos;
+		bool matched = boost::regex_search(gpsm.genGpggaStr(pos), match, helper::gpsRe);
+		assert(matched, true, helper::eqb);
+		matched = boost::regex_search(gpsm.genGprmcStr(pos), match, helper::gpsRe);
+		assert(matched, true, helper::eqb);
+	});
 }

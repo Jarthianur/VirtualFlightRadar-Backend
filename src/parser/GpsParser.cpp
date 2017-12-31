@@ -26,21 +26,27 @@
 
 #include "../data/GpsData.h"
 #include "../util/Math.hpp"
-#include "../vfrb/VFRB.h"
+
+/// Define regex match groups for GGA
+#define RE_GGA_LAT       1
+#define RE_GGA_LAT_DIR   2
+#define RE_GGA_LONG      3
+#define RE_GGA_LONG_DIR  4
+#define RE_GGA_FIX       5
+#define RE_GGA_SAT       6
+#define RE_GGA_DIL       7
+#define RE_GGA_ALT       8
+#define RE_GGA_GEOID     9
 
 namespace parser
 {
 
-#define GPS_ASSUME_GOOD       1
-#define GPS_NR_SATS_GOOD      7
-#define GPS_FIX_GOOD          1
-#define GPS_HOR_DILUTION_GOOD 1.0
+const boost::regex GpsParser::msGpggaRe(
+        "^\\$[A-Z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
+        boost::regex::optimize | boost::regex::icase);
 
 GpsParser::GpsParser()
-        : Parser(),
-          mGpggaRe(
-                  "^\\$[A-Z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s+?$",
-                  boost::regex::optimize | boost::regex::icase)
+        : Parser()
 {
 }
 
@@ -48,7 +54,7 @@ GpsParser::~GpsParser() noexcept
 {
 }
 
-std::int32_t GpsParser::unpack(const std::string& cr_msg, std::int32_t prio)
+bool GpsParser::unpack(const std::string& cr_msg, struct util::ExtGpsPosition& r_pos)
 noexcept
 {
     try
@@ -57,60 +63,47 @@ noexcept
                 16);
         if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
-            return MSG_UNPACK_IGN;
+            return false;
         }
-    } catch (const std::logic_error& e)
-    {
-        return MSG_UNPACK_ERR;
-    }
 
-    boost::smatch match;
-    if (boost::regex_match(cr_msg, match, mGpggaRe))
-    {
-        double dilution = 0.0;
-        try
+        boost::smatch match;
+        if (boost::regex_match(cr_msg, match, msGpggaRe))
         {
             //latitude
-            mtGpsPos.position.latitude = util::math::dmToDeg(std::stod(match.str(1)));
-            if (match.str(2).compare("S") == 0)
+            r_pos.position.latitude = util::math::dmToDeg(
+                    std::stod(match.str(RE_GGA_LAT)));
+            if (match.str(RE_GGA_LAT_DIR).compare("S") == 0)
             {
-                mtGpsPos.position.latitude = -mtGpsPos.position.latitude;
+                r_pos.position.latitude = -r_pos.position.latitude;
             }
 
             //longitude
-            mtGpsPos.position.longitude = util::math::dmToDeg(std::stod(match.str(3)));
-            if (match.str(4).compare("W") == 0)
+            r_pos.position.longitude = util::math::dmToDeg(
+                    std::stod(match.str(RE_GGA_LONG)));
+            if (match.str(RE_GGA_LONG_DIR).compare("W") == 0)
             {
-                mtGpsPos.position.longitude = -mtGpsPos.position.longitude;
+                r_pos.position.longitude = -r_pos.position.longitude;
             }
 
             //fix
-            mtGpsPos.fixQa = std::stoi(match.str(5));
+            r_pos.fixQa = std::stoi(match.str(RE_GGA_FIX));
             //sats
-            mtGpsPos.nrSats = std::stoi(match.str(6));
+            r_pos.nrSats = std::stoi(match.str(RE_GGA_SAT));
             //dilution
-            dilution = std::stod(match.str(7));
+            r_pos.dilution = std::stod(match.str(RE_GGA_DIL));
             //altitude
-            mtGpsPos.position.altitude = util::math::dToI(std::stod(match.str(8)));
+            r_pos.position.altitude = util::math::dToI(std::stod(match.str(RE_GGA_ALT)));
             //geoid
-            mtGpsPos.geoid = std::stod(match.str(9));
-        } catch (const std::logic_error& e)
+            r_pos.geoid = std::stod(match.str(RE_GGA_GEOID));
+        } else
         {
-            return MSG_UNPACK_ERR;
+            return false;
         }
-        vfrb::VFRB::msGpsData.setBasePos(prio, mtGpsPos);
-
-        if (mtGpsPos.nrSats >= GPS_NR_SATS_GOOD && mtGpsPos.fixQa >= GPS_FIX_GOOD
-                && dilution <= GPS_HOR_DILUTION_GOOD)
-        {
-            return GPS_ASSUME_GOOD;
-        }
-    } else
+    } catch (const std::logic_error& e)
     {
-        return MSG_UNPACK_IGN;
+        return false;
     }
-
-    return MSG_UNPACK_SUC;
+    return true;
 }
 
 }  // namespace parser

@@ -24,49 +24,45 @@
 
 #include <string>
 
+#define GPSM_BUFF_S   8191
+#define GPSM_L_BUFF_S 128
+
 namespace util
 {
 
-#define GPSM_BUFF_S 8191
-#define GPSM_L_BUFF_S 128
-
 /**
- * The GpsModule class.
- *
- * This class provides functionality to build NMEA GGA and RMC
- * sentences from given ExtGPSPositions.
+ * @class GpsModule
+ * @brief Provides functionalities to build NMEA GGA and RMC sentences.
  */
 class GpsModule
 {
 public:
     /**
-     * Constructor
+     * @fn GpsModule
+     * @brief Constructor
      */
     GpsModule();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~GpsModule
+     * @brief Destructor
      */
     virtual ~GpsModule() noexcept;
     /**
-     * Build a GPGGA sentence from given GPS information.
-     * The sentence contains trailing <cr><lf>.
-     *
-     * @param cr_pos the extended GPS information
-     *
+     * @fn genGpggaStr
+     * @brief Build a GPGGA sentence.
+     * @note Contains trailing <cr><lf>.
+     * @param cr_pos The extended GPS information
      * @return the GPGGA sentence
      */
-    std::string genGpggaStr(const struct ExtGPSPosition& cr_pos);
+    std::string genGpggaStr(const struct ExtGpsPosition& cr_pos);
     /**
-     * Build a GPRMC sentence from given GPS information.
-     * The sentence contains trailing <cr><lf>.
-     *
-     * @param cr_pos the extended GPS information
-     *
+     * @fn genGprmcStr
+     * @brief Build a GPRMC sentence.
+     * @note Contains trailing <cr><lf>.
+     * @param cr_pos The extended GPS information
      * @return the GPRMC sentence
      */
-    std::string genGprmcStr(const struct ExtGPSPosition& cr_pos);
+    std::string genGprmcStr(const struct ExtGpsPosition& cr_pos);
 
 private:
     /// Formatstring buffer

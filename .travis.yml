@@ -3,18 +3,16 @@ language: cpp
 addons:
   apt:
     sources:
-    - boost-latest
     - ubuntu-toolchain-r-test
     packages:
     - gcc-4.9
     - g++-4.9
-    - libboost1.55-all-dev
-    - libboost1.55-dev
+    - libboost-dev
+    - libboost-all-dev
 
 compiler:
     - g++-4.9
 
-# whitelist
 #branches:
 #    only:
 #        - master
@@ -23,21 +21,52 @@ git:
     submodules: true
 
 before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq
 
 install:
+    - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
+    - tar xf lcov_1.11.orig.tar.gz
+    - sudo make -C lcov-1.11/ install
+    - gem install coveralls-lcov
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 90
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 90
+    - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-4.9 90
 
 before_script:
-
-script: 
+    - export VFRB_DEBUG="-g --coverage"
+    - export VFRB_OPT="0"
     - ./install.sh
     - pushd test/build
-    - make
-    - ./VFR-Test &2>/dev/null
+    - make all -j2
     - popd
+
+script:
+    # initialize lines
+    - lcov --initial --directory test/build --capture --output-file test_base.info
+    - lcov --initial --directory target --capture --output-file vfrb_base.info
+    # start tests
+    - test/build/VFR-Test
+    - if ! target/vfrb-$(cat version.txt); then $(exit 0); fi
+    - if ! target/vfrb-$(cat version.txt) -g -c bla.txt; then $(exit 0); fi
+    - pushd test
+    - ./regression.sh serve
+    - ../target/vfrb-$(cat ../version.txt) -c resources/test.ini &
+    - ./regression.sh receive
+    - ./regression.sh receive
+    - sleep 20
+    - sudo pkill -2 -f vfrb-$(cat ../version.txt) | true
+    - ./regression.sh check
+    - popd
+
+after_success:
+    # gather coverage
+    - lcov --directory test/build --capture --output-file test.info
+    - lcov --directory target --capture --output-file vfrb.info
+    # combine and filter
+    - lcov -a test_base.info -a test.info -a vfrb_base.info -a vfrb.info -o all.info
+    - lcov --remove all.info 'test/*' '/usr/*' -o cov.info
+    - lcov --list cov.info
+    # push to coveralls
+    - coveralls-lcov --repo-token ${COVERALLS_TOKEN} cov.info
 
 
 notifications:

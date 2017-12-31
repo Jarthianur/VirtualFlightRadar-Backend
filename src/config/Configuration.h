@@ -24,14 +24,20 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <istream>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "../vfrb/Feed.h"
-#include "ConfigReader.h"
+namespace feed
+{
+class Feed;
+}
 
 namespace config
 {
+
+class PropertyMap;
 
 /// Configuration section keys
 #define SECT_KEY_FALLBACK   "fallback"
@@ -59,25 +65,22 @@ namespace config
 #define KV_KEY_LOGIN        "login"
 
 /**
- * The Configuration class.
- *
- * This class provides functionality to unpack properties
- * read by the ConfigReader into necessary information for
- * running the VFR-B.
+ * @class Configuration
+ * @brief Evaluate and store configuration for VFR-B.
  */
 class Configuration
 {
 public:
     /**
-     * Constructor to initialize all Configuration fields.
-     *
-     * @param r_file the config file as stream
+     * @fn Configuration
+     * @brief Constructor
+     * @param r_stream The config file as stream
+     * @throws std::logic_error if any error occures or no feeds are given
      */
-    Configuration(std::istream& r_file);
+    Configuration(std::istream& r_stream);
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~Configuration
+     * @brief Destructor
      */
     virtual ~Configuration() noexcept;
 
@@ -100,48 +103,38 @@ public:
     /// Ground mode enabled?
     static bool global_gnd_mode;
     /// All registered and correctly parsed input feeds
-    static std::vector<vfrb::Feed> global_feeds;
+    static std::vector<std::shared_ptr<feed::Feed>> global_feeds;
 
 private:
     /**
-     * Initialize Configuration.
-     * Called by c'tor.
-     * Read and unpack config file.
-     *
-     * @param r_file the file stream
-     *
-     * @return whether reading and unpacking was successful
+     * @fn init
+     * @brief Initialize Configuration, read and unpack config file with ConfigReader.
+     * @param r_stream The input stream
+     * @return true on success and at least one feed was registered, else false
      */
-    bool init(std::istream& r_file);
+    bool init(std::istream& r_stream);
     /**
-     * Register all input feeds found in the config file.
-     * Only correctly configured feeds are registered.
-     *
-     * @param r_cr the ConfigReader holding read properties
-     *
+     * @fn registerFeeds
+     * @brief Register all input feeds found from ConfigReader.
+     * @note Only correctly configured feeds get registered.
+     * @param cr_map The PropertyMap holding read properties
      * @return the number of registered feeds
      */
-    std::size_t registerFeeds(ConfigReader& r_cr);
+    std::size_t registerFeeds(const PropertyMap& cr_map);
     /**
-     * Parse a string to integer.
-     * Always returns a valid value.
-     *
-     * @param cr_str the string to parse
-     *
+     * @fn strToInt
+     * @brief Parse a string to integer.
+     * @note Always returns a valid value.
+     * @param cr_str The string to parse
      * @return the parsed number, 0 if error
-     *
-     * @exceptsafe no-throw
      */
     std::int32_t strToInt(const std::string& cr_str) noexcept;
     /**
-     * Parse a string to double.
-     * Always returns a valid value.
-     *
-     * @param cr_str the string to parse
-     *
+     * @fn strToDouble
+     * @brief Parse a string to double.
+     * @note Always returns a valid value.
+     * @param cr_str The string to parse
      * @return the parsed number, 0 if error
-     *
-     * @exceptsafe no-throw
      */
     double strToDouble(const std::string& cr_str) noexcept;
 };

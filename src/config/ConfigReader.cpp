@@ -21,11 +21,13 @@
 
 #include "ConfigReader.h"
 
+#include <cstddef>
 #include <stdexcept>
-#include <typeindex>
+#include <string>
 #include <utility>
 
 #include "../util/Logger.h"
+#include "PropertyMap.h"
 
 using namespace util;
 
@@ -33,7 +35,7 @@ namespace config
 {
 
 ConfigReader::ConfigReader()
-        : mConfRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
+        : mConfRe("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
                 boost::regex_constants::optimize)
 {
 }
@@ -42,14 +44,14 @@ ConfigReader::~ConfigReader() noexcept
 {
 }
 
-void ConfigReader::read(std::istream& r_file)
+void ConfigReader::read(std::istream& r_stream, PropertyMap& r_map)
 {
     std::string key;
     std::string value;
     std::string line;
     std::string section;
     std::size_t line_nr = 0;
-    while (std::getline(r_file, line))
+    while (std::getline(r_stream, line))
     {
         line_nr++;
         try
@@ -61,13 +63,16 @@ void ConfigReader::read(std::istream& r_file)
             if (line.at(0) == '[')
             {
                 section = line.substr(1, line.rfind(']') - 1);
-                mConfig.emplace(
-                        std::make_pair(section,
-                                std::unordered_map<std::string, std::string>()));
+                if (!r_map.addProperty(section))
+                {
+                    Logger::warn(
+                            "(ConfigReader) could not add section ["
+                                    + std::to_string(line_nr) + "]: ", section);
+                }
                 continue;
             }
             boost::smatch match;
-            if (boost::regex_match(line, match, mConfRE))
+            if (boost::regex_match(line, match, mConfRe))
             {
                 key = match.str(1);
                 value = match.str(2);
@@ -76,7 +81,13 @@ void ConfigReader::read(std::istream& r_file)
                 {
                     value = value.substr(0, l + 1);
                 }
-                mConfig[section].emplace(std::make_pair(key, value));
+                keyValue kv_pair = std::make_pair(key, value);
+                if (!r_map.addProperty(section, kv_pair))
+                {
+                    Logger::warn(
+                            "(ConfigReader) could not add property ["
+                                    + std::to_string(line_nr) + "]: ", key);
+                }
             } else
             {
                 Logger::error(
@@ -87,39 +98,6 @@ void ConfigReader::read(std::istream& r_file)
         {
             continue;
         }
-    }
-}
-
-const std::string ConfigReader::getProperty(const std::string& cr_section,
-        const std::string& cr_key, const std::string& cr_def_val) const
-{
-    auto s_it = mConfig.find(cr_section);
-    if (s_it != mConfig.end())
-    {
-        auto it = s_it->second.find(cr_key);
-        if (it != s_it->second.end())
-        {
-            return it->second;
-        } else
-        {
-            return cr_def_val;
-        }
-    } else
-    {
-        return cr_def_val;
-    }
-}
-
-const std::unordered_map<std::string, std::string>& ConfigReader::getSectionKV(
-        const std::string& cr_section) const
-{
-    auto it = mConfig.find(cr_section);
-    if (it != mConfig.end())
-    {
-        return it->second;
-    } else
-    {
-        throw std::out_of_range("section not found");
     }
 }
 

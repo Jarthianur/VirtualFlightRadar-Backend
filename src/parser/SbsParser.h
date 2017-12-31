@@ -22,45 +22,39 @@
 #ifndef SRC_PARSER_SBSPARSER_H_
 #define SRC_PARSER_SBSPARSER_H_
 
-#include <cstdint>
 #include <string>
 
-#include "Parser.h"
-#include "../util/Position.hpp"
+#include "../aircraft/Aircraft.hpp"
+#include "Parser.hpp"
 
 namespace parser
 {
 
 /**
- * The SbsParser class, implements Parser.
- *
- * This class unpacks SBS sentences into static VFRB::AircraftContainer.
+ * @class SbsParser implements Parser
+ * @brief Provide unpacking method for SBS sentences.
+ * @see Parser.hpp
+ * @see ../aircraft/Aircraft.hpp
  */
-class SbsParser: public Parser
+class SbsParser: public Parser<aircraft::Aircraft>
 {
 public:
     /**
-     * Constructor
+     * @fn SbsParser
+     * @brief Constructor
      */
     SbsParser();
     /**
-     * Destructor
-     *
-     * @exceptsafe no-throw
+     * @fn ~SbsParser
+     * @brief Destructor
      */
     virtual ~SbsParser() noexcept;
     /**
-     * Unpack SBS messages into the static VFRB::AircraftContainer.
-     *
-     * @overload Parser::unpack
+     * @fn unpack
+     * @brief Unpack into Aircraft.
+     * @override Parser::unpack
      */
-    std::int32_t unpack(const std::string& cr_msg, std::int32_t prio) noexcept override;
-
-private:
-    /// Temporary data
-    std::string mtId;
-    struct util::GPSPosition mtGpsPos;
-    //std::int32_t mtTime = 0;
+    bool unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noexcept override;
 };
 
 }  // namespace parser

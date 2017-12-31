@@ -4,11 +4,12 @@ body {
 
 a {
     text-decoration: none;
-    color: #154889
+    color: #008000
 }
 
 a:hover {
     text-decoration: underline;
+    color: #00b51a;
 }
 
 .not-a, .not-a:hover {
@@ -16,5 +17,5 @@ a:hover {
 }
 
 * {
-    font-family: "Allerta Stencil", Sans-serif !important;
+    font-family: 'Inconsolata', monospace !important;
 }

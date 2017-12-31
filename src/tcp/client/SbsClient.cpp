@@ -26,7 +26,7 @@
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <iostream>
-#include "../../vfrb/Feed.h"
+#include "../../feed/Feed.h"
 #include "../../util/Logger.h"
 
 using namespace util;
@@ -36,9 +36,9 @@ namespace tcp
 namespace client
 {
 
-SbsClient::SbsClient(boost::asio::signal_set& r_sigset, const std::string& cr_host,
-        const std::string& cr_port, vfrb::Feed& r_feed)
-        : Client(r_sigset, cr_host, cr_port, "(SbsClient)", r_feed)
+SbsClient::SbsClient(const std::string& cr_host, const std::string& cr_port,
+        feed::Feed& r_feed)
+        : Client(cr_host, cr_port, "(SbsClient)", r_feed)
 {
     connect();
 }
@@ -47,7 +47,7 @@ SbsClient::~SbsClient() noexcept
 {
 }
 
-void SbsClient::connect() noexcept
+void SbsClient::connect()
 {
     boost::asio::ip::tcp::resolver::query query(mHost, mPort,
             boost::asio::ip::tcp::resolver::query::canonical_name);
@@ -56,14 +56,8 @@ void SbsClient::connect() noexcept
                     boost::asio::placeholders::iterator));
 }
 
-void SbsClient::process() noexcept
-{
-    mrFeed.process(mResponse);
-}
-
 void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-        noexcept
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
         {
     if (!cr_ec)
     {
@@ -83,8 +77,7 @@ void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void SbsClient::handleConnect(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it)
-        noexcept
+        boost::asio::ip::tcp::resolver::iterator it) noexcept
         {
     if (!cr_ec)
     {
