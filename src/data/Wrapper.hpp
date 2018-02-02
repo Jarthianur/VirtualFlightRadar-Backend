@@ -39,12 +39,13 @@ struct Wrapper
 {
     /// The value
     T value;
-    /// Is wrtite attempt valid?
-    bool attemptValid = true;
+
     /// Last written priority
     std::int32_t lastPriority = 0;
+
     /// Mutex to enable threadsafety per Wrapper.
     boost::mutex mutex;
+
     /**
      * @fn trySetValue
      * @brief Try to set the value, fails if attempts priority is less.
@@ -52,27 +53,18 @@ struct Wrapper
      * @param cr_nv The new value
      * @param prio  The attempts priority
      */
-    void trySetValue(const T& cr_nv, std::int32_t prio)
+    bool trySetValue(const T& cr_nv, std::int32_t prio, std::int32_t& rAttempts)
     {
-        bool write = attemptValid;
-        if (!write)
+        if (prio * ++rAttempts >= lastPriority)
         {
-            if (prio >= lastPriority)
-            {
-                write = true;
-            }
-        }
-        if (write)
-        {
-            attemptValid = false;
             value = cr_nv;
             lastPriority = prio;
-        } else
-        {
-            attemptValid = true;
+            return true;
         }
+        return false;
     }
 };
+
 /**
  * @class TmpWrapper
  * @brief Pseudo temporary Wrapper; value is invalid after read and valid after write.
@@ -83,14 +75,19 @@ struct TmpWrapper
 {
     /// The value
     T value;
+
     /// Is wrtite attempt valid?
     bool attemptValid;
+
     /// Is the value valid?
     bool valueValid;
+
     /// Last written priority
     std::int32_t lastPriority;
+
     /// Mutex to enable threadsafety per TmpWrapper.
     boost::mutex mutex;
+
     /**
      * @fn getValue
      * @brief Get the value and invalidate it.
@@ -101,6 +98,7 @@ struct TmpWrapper
         valueValid = false;
         return value;
     }
+
     /**
      * @fn trySetValue
      * @brief Try to set the value, fails if attempts priority is less.
@@ -124,7 +122,8 @@ struct TmpWrapper
             value = cr_nv;
             lastPriority = prio;
             valueValid = true;
-        } else
+        }
+        else
         {
             attemptValid = true;
         }
