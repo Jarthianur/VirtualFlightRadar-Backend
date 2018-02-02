@@ -19,7 +19,7 @@
  }
  */
 
-#include "SbsClient.h"
+#include "../../network/client/SbsClient.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -31,7 +31,7 @@
 
 using namespace util;
 
-namespace tcp
+namespace network
 {
 namespace client
 {
@@ -96,4 +96,4 @@ void SbsClient::handleConnect(const boost::system::error_code& cr_ec,
 }
 
 }  // namespace client
-}  // namespace tcp
+}  // namespace network

@@ -19,7 +19,7 @@
  }
  */
 
-#include "Client.h"
+#include "../../network/client/Client.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -30,7 +30,7 @@
 
 using namespace util;
 
-namespace tcp
+namespace network
 {
 namespace client
 {
@@ -129,4 +129,4 @@ void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t s) n
 }
 
 }  // namespace client
-}  // namespace tcp
+}  // namespace network

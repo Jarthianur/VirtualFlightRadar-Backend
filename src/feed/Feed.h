@@ -30,7 +30,7 @@
 
 #include "../config/PropertyMap.h"
 
-namespace tcp
+namespace network
 {
 namespace client
 {
@@ -51,58 +51,66 @@ class Feed
 BOOST_MOVABLE_BUT_NOT_COPYABLE(Feed)
 
 public:
-    /**
-     * @fn ~Feed
-     * @brief Destructor
-     */
-    virtual ~Feed() noexcept;
-    /**
-     * @fn Feed
-     * @brief Move-constructor
-     * @param The Feed to move
-     */
-    Feed(BOOST_RV_REF(Feed));
-    /**
-     * @fn operator=
-     * @brief Move-assignment
-     * @param The Feed to assign
-     */
-    Feed& operator=(BOOST_RV_REF(Feed));
-    /**
-     * @fn run
-     * @brief Run a Feed.
-     * @param r_sigset The signal set to pass to the Client
-     */
-    void run(boost::asio::signal_set& r_sigset) noexcept;
-    /**
-     * @fn process
-     * @brief Handle Clients response.
-     * @note To be implemented.
-     * @param cr_res The response to process
-     */
-    virtual void process(const std::string& cr_res) noexcept = 0;
+	/**
+	 * @fn ~Feed
+	 * @brief Destructor
+	 */
+	virtual ~Feed() noexcept;
 
-    /// Unique name
-    const std::string mName;
-    /// Priority to write data
-    const std::int32_t mPriority;
+	/**
+	 * @fn Feed
+	 * @brief Move-constructor
+	 * @param The Feed to move
+	 */
+	Feed(BOOST_RV_REF(Feed));
+
+	/**
+	 * @fn operator=
+	 * @brief Move-assignment
+	 * @param The Feed to assign
+	 */
+	Feed& operator=(BOOST_RV_REF(Feed));
+
+	/**
+	 * @fn run
+	 * @brief Run a Feed.
+	 * @param r_sigset The signal set to pass to the Client
+	 */
+	void run(boost::asio::signal_set& rSigset) noexcept;
+
+	/**
+	 * @fn process
+	 * @brief Handle Clients response.
+	 * @note To be implemented.
+	 * @param cr_res The response to process
+	 */
+	virtual void process(const std::string& crResponse) noexcept = 0;
+
+	/// Unique name
+	const std::string mName;
+
+	/// Priority to write data
+	const std::uint32_t mPriority;
 
 protected:
-    /**
-     * @fn Feed
-     * @brief Constructor
-     * @param cr_name  The Feeds unique name
-     * @param prio     The priority
-     * @param cr_kvmap The properties map
-     * @throws std::logic_error if host or port are not given
-     */
-    Feed(const std::string& cr_name, std::int32_t prio,
-            const config::keyValueMap& cr_kvmap);
-    /// Key-value-map holding the properties.
-    const config::keyValueMap mKvMap;
-    /// Client, later resolved according to InpuType
-    std::unique_ptr<tcp::client::Client> mpClient;
-    // Could define Parser ptr here with nested template (c++14)
+	/**
+	 * @fn Feed
+	 * @brief Constructor
+	 * @param cr_name  The Feeds unique name
+	 * @param prio     The priority
+	 * @param cr_kvmap The properties map
+	 * @throws std::logic_error if host or port are not given
+	 */
+	Feed(const std::string& crName, std::uint32_t vPriority,
+	        const config::keyValueMap& crKvMap);
+
+	/// Key-value-map holding the properties.
+	const config::keyValueMap mKvMap;
+
+	/// Client, later resolved according to InpuType
+	std::unique_ptr<network::client::Client> mpClient;
+
+	// Could define Parser ptr here with nested template (c++14)
 };
 
 }  // namespace feed

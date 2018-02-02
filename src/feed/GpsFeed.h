@@ -47,7 +47,7 @@ public:
      * @param prio     The priority
      * @param cr_kvmap The properties map
      */
-    GpsFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
+    GpsFeed(const std::string& /*cr_name*/, std::uint32_t /*prio*/,
             const config::keyValueMap& /*cr_kvmap*/);
     /**
      * @fn ~GpsFeed
@@ -65,6 +65,8 @@ public:
 private:
     /// Parser to unpack response from Client
     parser::GpsParser mParser;
+    ///
+    std::uint32_t mUpdateAttempts;
 };
 
 } // namespace feed

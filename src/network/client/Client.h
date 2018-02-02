@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_TCP_CLIENT_CLIENT_H_
-#define SRC_TCP_CLIENT_CLIENT_H_
+#ifndef SRC_NETWORK_CLIENT_CLIENT_H_
+#define SRC_NETWORK_CLIENT_CLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
@@ -33,7 +33,7 @@ namespace feed
 class Feed;
 }
 
-namespace tcp
+namespace network
 {
 namespace client
 {
@@ -163,6 +163,6 @@ private:
 };
 
 }  // namespace client
-}  // namespace tcp
+}  // namespace network
 
-#endif /* SRC_TCP_CLIENT_CLIENT_H_ */
+#endif /* SRC_NETWORK_CLIENT_CLIENT_H_ */

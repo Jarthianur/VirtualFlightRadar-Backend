@@ -19,7 +19,7 @@
  }
  */
 
-#include "AprscClient.h"
+#include "../../network/client/AprscClient.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -33,7 +33,7 @@
 
 using namespace util;
 
-namespace tcp
+namespace network
 {
 namespace client
 {
@@ -150,4 +150,4 @@ void AprscClient::handleSendKaBeacon(const boost::system::error_code& cr_ec,
 }
 
 }  // namespace client
-}  // namespace tcp
+}  // namespace network

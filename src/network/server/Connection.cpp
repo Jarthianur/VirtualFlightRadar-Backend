@@ -19,13 +19,13 @@
  }
  */
 
-#include "Connection.h"
+#include "../../network/server/Connection.h"
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <algorithm>
 
-namespace tcp
+namespace network
 {
 namespace server
 {
@@ -67,4 +67,4 @@ const std::string& Connection::getIp()
 }
 
 }  // namespace server
-}  // namespace tcp
+}  // namespace network

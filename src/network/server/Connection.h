@@ -19,14 +19,14 @@
  }
  */
 
-#ifndef SRC_TCP_SERVER_CONNECTION_H_
-#define SRC_TCP_SERVER_CONNECTION_H_
+#ifndef SRC_NETWORK_SERVER_CONNECTION_H_
+#define SRC_NETWORK_SERVER_CONNECTION_H_
 
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace tcp
+namespace network
 {
 namespace server
 {
@@ -91,6 +91,6 @@ private:
 };
 
 }  // namespace server
-}  // namespace tcp
+}  // namespace network
 
-#endif /* SRC_TCP_SERVER_CONNECTION_H_ */
+#endif /* SRC_NETWORK_SERVER_CONNECTION_H_ */

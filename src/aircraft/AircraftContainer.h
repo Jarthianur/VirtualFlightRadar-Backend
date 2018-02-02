@@ -66,7 +66,7 @@ public:
      * @param prio      The priority attempting to write
      * @threadsafe
      */
-    void insertAircraft(const Aircraft& cr_update, std::int32_t prio);
+    void upsert(const Aircraft& cr_update, std::uint32_t prio);
     /**
      * @fn processAircrafts
      * @brief Process all Aircrafts and get the reports as string.

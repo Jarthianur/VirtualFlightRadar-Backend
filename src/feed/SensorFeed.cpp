@@ -25,9 +25,10 @@
 #include <unordered_map>
 
 #include "../config/Configuration.h"
-#include "../data/SensorData.h"
-#include "../tcp/client/SensorClient.h"
-#include "../util/SensorInfo.h"
+#include "../data/AtmosphereData.h"
+#include "../data/WindData.h"
+#include "../network/client/SensorClient.h"
+#include "../util/Sensor.h"
 #include "../VFRB.h"
 
 using namespace util;
@@ -35,26 +36,37 @@ using namespace util;
 namespace feed
 {
 
-SensorFeed::SensorFeed(const std::string& cr_name, std::int32_t prio,
-        const config::keyValueMap& cr_kvmap)
-        : Feed(cr_name, prio, cr_kvmap)
+SensorFeed::SensorFeed(const std::string& crName, std::uint32_t vPriority,
+        const config::keyValueMap& crKvMap)
+		: Feed(crName, vPriority, crKvMap),
+		  mWindUpdateAttempts(0),
+		  mAtmosUpdateAttempts(0)
+
 {
-    mpClient = std::unique_ptr<tcp::client::Client>(
-            new tcp::client::SensorClient(mKvMap.find(KV_KEY_HOST)->second,
-                    mKvMap.find(KV_KEY_PORT)->second, *this));
+	mpClient = std::unique_ptr<network::client::Client>(
+	        new network::client::SensorClient(mKvMap.find(KV_KEY_HOST)->second,
+	                mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 SensorFeed::~SensorFeed() noexcept
 {
 }
 
-void SensorFeed::process(const std::string& cr_res) noexcept
+void SensorFeed::process(const std::string& crResponse) noexcept
 {
-    struct SensorInfo info;
-    if (mParser.unpack(cr_res, info))
-    {
-        VFRB::msSensorData.update(info, mPriority);
-    }
+	struct Climate climate;
+	if (mParser.unpack(crResponse, climate))
+	{
+		if (climate.hasWind())
+		{
+			VFRB::msWindData.update(climate.mWind, mPriority, mWindUpdateAttempts);
+		}
+		if (climate.hasAtmosphere())
+		{
+			VFRB::msAtmosData.update(climate.mAtmosphere, mPriority,
+			        mAtmosUpdateAttempts);
+		}
+	}
 }
 
 } // namespace feed

@@ -61,7 +61,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -90,7 +90,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         assert(VFRB::msAcCont.processAircrafts(), std::string(""), helper::eqs);
         config::Configuration::filter_maxDist = INT32_MAX;
     });
@@ -112,7 +112,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -137,7 +137,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -162,7 +162,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -187,7 +187,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -212,7 +212,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -237,7 +237,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -262,7 +262,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -287,7 +287,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -312,7 +312,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -337,7 +337,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -362,7 +362,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -387,7 +387,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -412,7 +412,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -437,7 +437,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -462,7 +462,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -487,7 +487,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 
@@ -512,7 +512,7 @@ void test_aircraft(TestSuitesRunner& runner)
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
         ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
-        VFRB::msAcCont.insertAircraft(ac, 0);
+        VFRB::msAcCont.upsert(ac, 0);
         std::string proc = VFRB::msAcCont.processAircrafts();
         boost::smatch match;
 

@@ -29,10 +29,11 @@
 
 namespace data
 {
-class SensorData;
+class WindData;
+class AtmosphereData;
 class GpsData;
 }
-namespace tcp
+namespace network
 {
 namespace server
 {
@@ -61,61 +62,69 @@ struct SensorInfo;
 class VFRB
 {
 public:
-    /**
-     * Non-copyable
-     */
-    VFRB(const VFRB&) = delete;
-    /**
-     * Not assignable
-     */
-    VFRB& operator=(const VFRB&) = delete;
-    /**
-     * @fn VFRB
-     * @brief Constructor
-     */
-    VFRB();
-    /**
-     * @fn ~VFRB
-     * @brief Destructor
-     */
-    virtual ~VFRB() noexcept;
-    /**
-     * @fn run
-     * @brief The VFRB's main method, runs the VFR-B.
-     */
-    static void run() noexcept;
+	/**
+	 * Non-copyable
+	 */
+	VFRB(const VFRB&) = delete;
+	/**
+	 * Not assignable
+	 */
+	VFRB& operator=(const VFRB&) = delete;
+	/**
+	 * @fn VFRB
+	 * @brief Constructor
+	 */
+	VFRB();
+	/**
+	 * @fn ~VFRB
+	 * @brief Destructor
+	 */
+	virtual ~VFRB() noexcept;
+	/**
+	 * @fn run
+	 * @brief The VFRB's main method, runs the VFR-B.
+	 */
+	static void run() noexcept;
 
-    /// Atomic run-status. By this, every component may determine if the VFRB stops.
-    static std::atomic<bool> global_run_status;
-    /// Container holding all registered Aircrafts
-    static aircraft::AircraftContainer msAcCont;
-    /// Container holding sensor and climate information.
-    static data::SensorData msSensorData;
-    /// Container holding GPS information
-    static data::GpsData msGpsData;
+	/// Atomic run-status. By this, every component may determine if the VFRB stops.
+	static std::atomic<bool> global_run_status;
+
+	/// Container holding all registered Aircrafts
+	static aircraft::AircraftContainer msAcCont;
+
+	/// Container holding sensor and climate information.
+	static data::WindData msWindData;
+
+	///
+	static data::AtmosphereData msAtmosData;
+
+	/// Container holding GPS information
+	static data::GpsData msGpsData;
 
 private:
-    /**
-     * @fn handleFeed
-     * @brief Handler for an input Feed thread.
-     * @param r_sigset The signal set to pass
-     * @param p_feed   The Feed to handle
-     */
-    static void handleFeed(boost::asio::signal_set& r_sigset,
-            std::shared_ptr<feed::Feed> p_feed);
-    /**
-     * @fn handleServer
-     * @brief Handler for an Server thread.
-     * @param r_server The Server to handle
-     */
-    static void handleServer(tcp::server::Server& r_server);
-    /**
-     * @fn handleSignals
-     * @brief Handler for a signal interrupt thread.
-     * @param cr_ec The error code
-     * @param sig   The signal number
-     */
-    static void handleSignals(const boost::system::error_code& cr_ec, const int sig);
+	/**
+	 * @fn handleFeed
+	 * @brief Handler for an input Feed thread.
+	 * @param r_sigset The signal set to pass
+	 * @param p_feed   The Feed to handle
+	 */
+	static void handleFeed(boost::asio::signal_set& r_sigset,
+	        std::shared_ptr<feed::Feed> p_feed);
+
+	/**
+	 * @fn handleServer
+	 * @brief Handler for an Server thread.
+	 * @param r_server The Server to handle
+	 */
+	static void handleServer(network::server::Server& r_server);
+
+	/**
+	 * @fn handleSignals
+	 * @brief Handler for a signal interrupt thread.
+	 * @param cr_ec The error code
+	 * @param sig   The signal number
+	 */
+	static void handleSignals(const boost::system::error_code& cr_ec, const int sig);
 };
 
 #endif /* SRC_VFRB_H_ */

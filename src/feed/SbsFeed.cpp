@@ -29,7 +29,7 @@
 #include "../aircraft/Aircraft.hpp"
 #include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
-#include "../tcp/client/SbsClient.h"
+#include "../network/client/SbsClient.h"
 #include "../VFRB.h"
 
 using namespace util;
@@ -37,12 +37,12 @@ using namespace util;
 namespace feed
 {
 
-SbsFeed::SbsFeed(const std::string& cr_name, std::int32_t prio,
+SbsFeed::SbsFeed(const std::string& cr_name, std::uint32_t prio,
         const config::keyValueMap& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
-    mpClient = std::unique_ptr<tcp::client::Client>(
-            new tcp::client::SbsClient(mKvMap.find(KV_KEY_HOST)->second,
+    mpClient = std::unique_ptr<network::client::Client>(
+            new network::client::SbsClient(mKvMap.find(KV_KEY_HOST)->second,
                     mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
@@ -55,7 +55,7 @@ void SbsFeed::process(const std::string& cr_res) noexcept
     aircraft::Aircraft ac;
     if (mParser.unpack(cr_res, ac))
     {
-        VFRB::msAcCont.insertAircraft(ac, mPriority);
+        VFRB::msAcCont.upsert(ac, mPriority);
     }
 }
 

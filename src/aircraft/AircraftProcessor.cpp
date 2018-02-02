@@ -25,8 +25,8 @@
 #include <cstdio>
 
 #include "../config/Configuration.h"
+#include "../data/AtmosphereData.h"
 #include "../data/GpsData.h"
-#include "../data/SensorData.h"
 #include "../util/Math.hpp"
 #include "../VFRB.h"
 #include "Aircraft.hpp"
@@ -106,7 +106,7 @@ void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac)
     mtRelV =
             cr_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER ?
                     cr_ac.getAltitude()
-                            - util::math::calcIcaoHeight(VFRB::msSensorData.getPress()) :
+                            - util::math::calcIcaoHeight(VFRB::msAtmosData.getAtmPress()) :
                     cr_ac.getAltitude() - VFRB::msGpsData.getBaseAlt();
 }
 

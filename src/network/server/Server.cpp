@@ -19,7 +19,7 @@
  }
  */
 
-#include "Server.h"
+#include "../../network/server/Server.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -33,7 +33,7 @@
 
 using namespace util;
 
-namespace tcp
+namespace network
 {
 namespace server
 {
@@ -137,4 +137,4 @@ void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
 }
 
 }  // namespace server
-}  // namespace tcp
+}  // namespace network

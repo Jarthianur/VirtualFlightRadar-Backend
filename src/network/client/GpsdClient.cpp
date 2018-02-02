@@ -19,7 +19,7 @@
  }
  */
 
-#include "GpsdClient.h"
+#include "../../network/client/GpsdClient.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -30,7 +30,7 @@
 
 using namespace util;
 
-namespace tcp
+namespace network
 {
 namespace client
 {
@@ -133,4 +133,4 @@ noexcept
 }
 
 }  // namespace client
-}  // namespace tcp
+}  // namespace network

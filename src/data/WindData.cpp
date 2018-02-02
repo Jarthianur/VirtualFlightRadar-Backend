@@ -19,57 +19,50 @@
  }
  */
 
-#ifndef SRC_DATA_DATA_HPP_
-#define SRC_DATA_DATA_HPP_
+#include <boost/thread/lock_guard.hpp>
+#include "WindData.h"
 
-#include <cstdint>
+using namespace util;
 
 namespace data
 {
 
-/**
- * @class Data
- * @brief An interface for data containers.
- * @tparam T The type of data to manage
- */
-template<typename T>
-class Data
+WindData::WindData()
+		: Data<struct Wind>()
 {
-public:
-	/**
-	 * @fn Data
-	 * @brief Constructor
-	 */
-	inline Data()
+}
+
+WindData::~WindData() noexcept
+{
+}
+
+void WindData::update(const struct Wind& crWind, std::uint32_t vPriority,
+        std::uint32_t& rAttempts)
+{
+	boost::lock_guard<boost::mutex> lock(mWind.mMutex);
+	if (mWind.trySetValue(crWind, vPriority, rAttempts))
 	{
+		rAttempts = 0;
 	}
+}
 
-	/**
-	 * @fn ~Data
-	 * @brief Destructor
-	 */
-	inline virtual ~Data() noexcept
+std::string WindData::getMwvStr()
+{
+	boost::lock_guard<boost::mutex> lock(mWind.mMutex);
+	if (mWind.mValueValid)
 	{
+		return mWind.getValue().mwvStr + "\n";
 	}
+	else
+	{
+		return "";
+	}
+}
 
-	/**
-	 * @fn update
-	 * @brief Update the specialized data.
-	 * @note To be implemented.
-	 * @tparam T The new data
-	 * @param prio The priority of the update
-	 */
-	virtual void update(const T&, std::uint32_t vPriority, std::uint32_t& rAttempts) = 0;
+void WindData::init(struct Wind vWind)
+{
+	std::uint32_t dummy = 0;
+	mWind.trySetValue(vWind, 0, dummy);
+}
 
-	/**
-	 * @fn init
-	 * @brief Initialize data.
-	 * @note To be implemented.
-	 * @tparam T The initial data
-	 */
-	virtual void init(T) = 0;
-};
-
-} /* namespace data */
-
-#endif /* SRC_DATA_DATA_HPP_ */
+}  // namespace data

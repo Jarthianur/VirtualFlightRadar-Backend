@@ -19,30 +19,45 @@
  }
  */
 
-#ifndef SRC_UTIL_SENSORINFO_H_
-#define SRC_UTIL_SENSORINFO_H_
+#ifndef UTIL_SENSOR_H_
+#define UTIL_SENSOR_H_
 
 #include <string>
 
-#define SI_PRESS_NA -1024.0
+/// ICAO standard atmospheric pressure at MSL
+#define ICAO_STD_A 1013.25
 
 namespace util
 {
 
-/**
- * @class SensorInfo
- * @brief Set of sensor informations.
- */
-struct SensorInfo
+struct Atmosphere
 {
-    /// The MDA sentence
-    std::string mdaStr;
-    /// The MWV sentence
-    std::string mwvStr;
-    /// The pressure; hPa
-    double press;
+	std::string mdaStr;
+	double pressure;
+	/* Humidity and temperature are not important for us, yet.*/
+};
+
+struct Wind
+{
+	std::string mwvStr;
+};
+
+struct Climate
+{
+	struct Wind mWind;
+	struct Atmosphere mAtmosphere;
+
+	inline bool hasAtmosphere()
+	{
+		return mAtmosphere.mdaStr.empty();
+	}
+
+	inline bool hasWind()
+	{
+		return mWind.mwvStr.empty();
+	}
 };
 
 }  // namespace util
 
-#endif /* SRC_UTIL_SENSORINFO_H_ */
+#endif /* UTIL_SENSOR_H_ */

@@ -19,7 +19,7 @@
  }
  */
 
-#include "SensorClient.h"
+#include "../../network/client/SensorClient.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -30,7 +30,7 @@
 
 using namespace util;
 
-namespace tcp
+namespace network
 {
 namespace client
 {
@@ -132,4 +132,4 @@ void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
 }
 
 }  // namespace client
-}  // namespace tcp
+}  // namespace network

@@ -28,7 +28,7 @@
 #include "../aircraft/Aircraft.hpp"
 #include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
-#include "../tcp/client/AprscClient.h"
+#include "../network/client/AprscClient.h"
 #include "../util/Logger.h"
 #include "../VFRB.h"
 
@@ -37,7 +37,7 @@ using namespace util;
 namespace feed
 {
 
-AprscFeed::AprscFeed(const std::string& cr_name, std::int32_t prio,
+AprscFeed::AprscFeed(const std::string& cr_name, std::uint32_t prio,
         const config::keyValueMap& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
@@ -48,8 +48,8 @@ AprscFeed::AprscFeed(const std::string& cr_name, std::int32_t prio,
         throw std::logic_error("No login given");
     } else
     {
-        mpClient = std::unique_ptr<tcp::client::Client>(
-                new tcp::client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
+        mpClient = std::unique_ptr<network::client::Client>(
+                new network::client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
                         mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
     }
 }
@@ -63,7 +63,7 @@ void AprscFeed::process(const std::string& cr_res) noexcept
     aircraft::Aircraft ac;
     if (mParser.unpack(cr_res, ac))
     {
-        VFRB::msAcCont.insertAircraft(ac, mPriority);
+        VFRB::msAcCont.upsert(ac, mPriority);
     }
 }
 

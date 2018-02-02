@@ -19,50 +19,51 @@
  }
  */
 
-#ifndef SRC_TCP_CLIENT_SBSCLIENT_H_
-#define SRC_TCP_CLIENT_SBSCLIENT_H_
+#ifndef SRC_NETWORK_CLIENT_APRSCCLIENT_H_
+#define SRC_NETWORK_CLIENT_APRSCCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "Client.h"
+#include "../../network/client/Client.h"
 
-namespace tcp
+namespace network
 {
 namespace client
 {
 
 /**
- * @class SbsClient extends Client
- * @brief Handle connections to a SBS server.
+ * @class AprscClient extends Client
+ * @brief Handle connections to APRSC server.
  * @see Client.h
  */
-class SbsClient: public Client
+class AprscClient: public Client
 {
 public:
     /**
      * Non-copyable
      */
-    SbsClient(const SbsClient&) = delete;
+    AprscClient(const AprscClient&) = delete;
     /**
      * Not assignable
      */
-    SbsClient& operator=(const SbsClient&) = delete;
+    AprscClient& operator=(const AprscClient&) = delete;
     /**
-     * @fn SbsClient
+     * @fn AprscClient
      * @brief Constructor
      * @param cr_host  The hostname
      * @param cr_port  The port
      * @param cr_login The login string to transmit
      * @param r_feed   The handler Feed reference
      */
-    SbsClient(const std::string& cr_host, const std::string& cr_port, feed::Feed& r_feed);
+    AprscClient(const std::string& cr_host, const std::string& cr_port,
+            const std::string& cr_login, feed::Feed& r_feed);
     /**
-     * @fn ~SbsClient
+     * @fn ~AprscClient
      * @brief Destructor
      */
-    virtual ~SbsClient() noexcept;
+    virtual ~AprscClient() noexcept;
 
 private:
     /**
@@ -70,6 +71,17 @@ private:
      * @override Client::connect
      */
     void connect() override;
+    /**
+     * @fn stop
+     * @brief Cancel timer before stop.
+     * @override Client::stop
+     */
+    void stop() override;
+    /**
+     * @fn sendKaBeacon
+     * @brief Send a keep-alive beacon to APRSC every 10 minutes.
+     */
+    void sendKaBeacon();
     /**
      * @fn handleResolve
      * @override Client::handleResolve
@@ -82,9 +94,31 @@ private:
      */
     void handleConnect(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    /**
+     * @fn handleLogin
+     * @brief Handler fro send login string.
+     * @param cr_ec The error code
+     * @param s     The sent bytes
+     */
+    void handleLogin(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
+    /**
+     * @fn handleSendKaBeacon
+     * @brief Handler for sendKaBeacon
+     * @param cr_ec The error code
+     * @param s     The sent bytes
+     */
+    void handleSendKaBeacon(const boost::system::error_code& cr_ec, std::size_t s)
+            noexcept;
+
+    /// Login string
+    std::string mLoginStr;
+    /// Client stopped?
+    bool mStopped;
+    /// Beacon timer
+    boost::asio::deadline_timer mTimeout;
 };
 
 }  // namespace client
-}  // namespace tcp
+}  // namespace network
 
-#endif /* SRC_TCP_CLIENT_SBSCLIENT_H_ */
+#endif /* SRC_NETWORK_CLIENT_APRSCCLIENT_H_ */

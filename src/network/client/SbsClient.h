@@ -19,64 +19,57 @@
  }
  */
 
-#ifndef SRC_TCP_CLIENT_GPSDCLIENT_H_
-#define SRC_TCP_CLIENT_GPSDCLIENT_H_
+#ifndef SRC_NETWORK_CLIENT_SBSCLIENT_H_
+#define SRC_NETWORK_CLIENT_SBSCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "Client.h"
+#include "../../network/client/Client.h"
 
-namespace tcp
+namespace network
 {
 namespace client
 {
 
 /**
- * @class GpsdClient extends Client.
- * @brief Handle connections to a GPSD server.
+ * @class SbsClient extends Client
+ * @brief Handle connections to a SBS server.
  * @see Client.h
  */
-class GpsdClient: public Client
+class SbsClient: public Client
 {
 public:
     /**
      * Non-copyable
      */
-    GpsdClient(const GpsdClient&) = delete;
+    SbsClient(const SbsClient&) = delete;
     /**
      * Not assignable
      */
-    GpsdClient& operator=(const GpsdClient&) = delete;
+    SbsClient& operator=(const SbsClient&) = delete;
     /**
-     * @fn GpsdClient
+     * @fn SbsClient
      * @brief Constructor
      * @param cr_host  The hostname
      * @param cr_port  The port
      * @param cr_login The login string to transmit
      * @param r_feed   The handler Feed reference
      */
-    GpsdClient(const std::string& cr_host, const std::string& cr_port,
-            feed::Feed& r_feed);
+    SbsClient(const std::string& cr_host, const std::string& cr_port, feed::Feed& r_feed);
     /**
-     * @fn ~GpsdClient
+     * @fn ~SbsClient
      * @brief Destructor
      */
-    virtual ~GpsdClient() noexcept;
+    virtual ~SbsClient() noexcept;
 
 private:
     /**
-     * @fn connect.
+     * @fn connect
      * @override Client::connect
      */
     void connect() override;
-    /**
-     * @fn stop
-     * @brief Send unwatch-request to server before stop.
-     * @override Client::stop
-     */
-    void stop() override;
     /**
      * @fn handleResolve
      * @override Client::handleResolve
@@ -89,16 +82,9 @@ private:
      */
     void handleConnect(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;
-    /**
-     * @fn handleWatch
-     * @brief Handler for send watch-reques
-     * @param cr_ec The error code
-     * @param s     The sent bytes
-     */
-    void handleWatch(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
 };
 
 }  // namespace client
-}  // namespace tcp
+}  // namespace network
 
-#endif /* SRC_TCP_CLIENT_GPSDCLIENT_H_ */
+#endif /* SRC_NETWORK_CLIENT_SBSCLIENT_H_ */

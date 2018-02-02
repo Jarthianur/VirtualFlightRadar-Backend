@@ -96,7 +96,7 @@ public:
      * @param cr_ac Other Aircraft with new data
      * @param prio  Priority of the update
      */
-    void update(const Aircraft& cr_ac, std::int32_t prio);
+    void update(const Aircraft& cr_ac, std::uint32_t prio);
     /**
      * @fn getId
      * @brief Get the Id.
@@ -149,7 +149,7 @@ public:
      * @brief Get the current update age.
      * @return the update age
      */
-    inline const std::uint32_t getUpdateAge() const
+    inline std::uint32_t& getUpdateAge()
     {
         return mUpdateAge;
     }
@@ -158,19 +158,11 @@ public:
      * @brief Get last written priority.
      * @return the last priority
      */
-    inline const std::int32_t getLastPriority() const
+    inline const std::uint32_t getLastPriority() const
     {
         return mLastPriority;
     }
-    /**
-     * @fn isAttemptValid
-     * @brief Is update attempt valid?
-     * @return true, if valid, else false
-     */
-    inline const bool isAttemptValid() const
-    {
-        return mAttemptValid;
-    }
+
     /**
      * @fn getLatitude
      * @brief Get the last known latitude.
@@ -238,14 +230,7 @@ public:
     {
         mId = cr_id;
     }
-    /**
-     * @fn incUpdateAge
-     * @brief Increment the update age by one.
-     */
-    inline void incUpdateAge()
-    {
-        ++mUpdateAge;
-    }
+
     /**
      * @fn setPosition
      * @brief Set the GPS position.
@@ -319,13 +304,9 @@ public:
     {
         mFullInfo = info;
     }
-    /**
-     * @fn setAttemptValid
-     * @brief Allow update attempts.
-     */
-    inline void setAttemptValid()
-    {
-        mAttemptValid = true;
+
+    inline std::uint32_t& getUpdateAttempts() {
+return mUpdateAttempts;
     }
 
 private:
@@ -342,9 +323,9 @@ private:
     /// Times processed without update.
     std::uint32_t mUpdateAge = 0;
     /// Got last update with which priority.
-    std::int32_t mLastPriority = 0;
-    /// Is an update attempt valid? If false, updates are only allowed with at least last priority.
-    bool mAttemptValid = true;
+    std::uint32_t mLastPriority = 0;
+    ///
+    std::uint32_t mUpdateAttempts = 0;
     /// Last registered position.
     struct util::GpsPosition mPosition;
     /// Speed over ground; m/s

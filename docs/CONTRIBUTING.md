@@ -55,6 +55,7 @@ We have some simple, but effective guidelines, on how the code should look like.
   + c => const declared
   + r => reference
   + p => pointer
+  + v => value (only for function arguments)
   + s => static
 + Non-static members are private, use getters/setters to access
 + Prefer std types over builtin types (e.g. std::int32_t instead of int)

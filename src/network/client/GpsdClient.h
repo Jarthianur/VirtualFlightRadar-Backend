@@ -19,79 +19,61 @@
  }
  */
 
-#ifndef SRC_TCP_CLIENT_SENSORCLIENT_H_
-#define SRC_TCP_CLIENT_SENSORCLIENT_H_
+#ifndef SRC_NETWORK_CLIENT_GPSDCLIENT_H_
+#define SRC_NETWORK_CLIENT_GPSDCLIENT_H_
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <string>
 
-#include "Client.h"
-#include "../../config/Parameters.h"
+#include "../../network/client/Client.h"
 
-#ifdef WINDCLIENT_RECEIVE_TIMEOUT
-#define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
-#else
-#define WC_RCV_TIMEOUT 5
-#endif
-
-namespace tcp
+namespace network
 {
 namespace client
 {
 
 /**
- * @class SensorClient extends Client
- * @brief Handle connections to a server sending sensor information in NMEA MDA,WMV sentences.
+ * @class GpsdClient extends Client.
+ * @brief Handle connections to a GPSD server.
  * @see Client.h
  */
-class SensorClient: public Client
+class GpsdClient: public Client
 {
 public:
     /**
      * Non-copyable
      */
-    SensorClient(const SensorClient&) = delete;
+    GpsdClient(const GpsdClient&) = delete;
     /**
      * Not assignable
      */
-    SensorClient& operator=(const SensorClient&) = delete;
+    GpsdClient& operator=(const GpsdClient&) = delete;
     /**
-     * @fn SensorClient
+     * @fn GpsdClient
      * @brief Constructor
      * @param cr_host  The hostname
      * @param cr_port  The port
      * @param cr_login The login string to transmit
      * @param r_feed   The handler Feed reference
      */
-    SensorClient(const std::string& cr_host, const std::string& cr_port,
+    GpsdClient(const std::string& cr_host, const std::string& cr_port,
             feed::Feed& r_feed);
     /**
-     * @fn ~SensorClient
+     * @fn ~GpsdClient
      * @brief Destructor
      */
-    virtual ~SensorClient() noexcept;
+    virtual ~GpsdClient() noexcept;
 
 private:
     /**
-     * @fn read
-     * @brief Read with timeout.
-     * @override Client::read
-     */
-    void read() override;
-    /**
-     * @fn connect
+     * @fn connect.
      * @override Client::connect
      */
     void connect() override;
     /**
-     * @fn checkDeadline
-     * @brief Check read timeout deadline reached.
-     */
-    void checkDeadline();
-    /**
      * @fn stop
-     * @brief Cancel timer before stop.
+     * @brief Send unwatch-request to server before stop.
      * @override Client::stop
      */
     void stop() override;
@@ -107,14 +89,16 @@ private:
      */
     void handleConnect(const boost::system::error_code& cr_ec,
             boost::asio::ip::tcp::resolver::iterator it) noexcept override;
-
-    /// Client stopped?
-    bool mStopped;
-    /// Read timer
-    boost::asio::deadline_timer mTimeout;
+    /**
+     * @fn handleWatch
+     * @brief Handler for send watch-reques
+     * @param cr_ec The error code
+     * @param s     The sent bytes
+     */
+    void handleWatch(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
 };
 
 }  // namespace client
-}  // namespace tcp
+}  // namespace network
 
-#endif /* SRC_TCP_CLIENT_SENSORCLIENT_H_ */
+#endif /* SRC_NETWORK_CLIENT_GPSDCLIENT_H_ */

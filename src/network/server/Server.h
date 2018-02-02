@@ -19,8 +19,8 @@
  }
  */
 
-#ifndef SRC_TCP_SERVER_SERVER_H_
-#define SRC_TCP_SERVER_SERVER_H_
+#ifndef SRC_NETWORK_SERVER_SERVER_H_
+#define SRC_NETWORK_SERVER_SERVER_H_
 
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
@@ -29,8 +29,8 @@
 #include <string>
 #include <vector>
 
-#include "Connection.h"
 #include "../../config/Parameters.h"
+#include "../../network/server/Connection.h"
 
 #ifdef SERVER_MAX_CLIENTS
 #define S_MAX_CLIENTS SERVER_MAX_CLIENTS
@@ -38,7 +38,7 @@
 #define S_MAX_CLIENTS 5
 #endif
 
-namespace tcp
+namespace network
 {
 namespace server
 {
@@ -131,6 +131,6 @@ private:
 };
 
 }  // namespace server
-}  // namespace tcp
+}  // namespace network
 
-#endif /* SRC_TCP_SERVER_SERVER_H_ */
+#endif /* SRC_NETWORK_SERVER_SERVER_H_ */
