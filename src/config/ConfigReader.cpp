@@ -88,7 +88,8 @@ void ConfigReader::read(std::istream& r_stream, PropertyMap& r_map)
                             "(ConfigReader) could not add property ["
                                     + std::to_string(line_nr) + "]: ", key);
                 }
-            } else
+            }
+            else
             {
                 Logger::error(
                         "(ConfigReader) malformed param [" + std::to_string(line_nr)

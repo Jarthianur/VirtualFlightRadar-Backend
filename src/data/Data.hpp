@@ -36,38 +36,38 @@ template<typename T>
 class Data
 {
 public:
-	/**
-	 * @fn Data
-	 * @brief Constructor
-	 */
-	inline Data()
-	{
-	}
+    /**
+     * @fn Data
+     * @brief Constructor
+     */
+    inline Data()
+    {
+    }
 
-	/**
-	 * @fn ~Data
-	 * @brief Destructor
-	 */
-	inline virtual ~Data() noexcept
-	{
-	}
+    /**
+     * @fn ~Data
+     * @brief Destructor
+     */
+    inline virtual ~Data() noexcept
+    {
+    }
 
-	/**
-	 * @fn update
-	 * @brief Update the specialized data.
-	 * @note To be implemented.
-	 * @tparam T The new data
-	 * @param prio The priority of the update
-	 */
-	virtual void update(const T&, std::uint32_t vPriority, std::uint32_t& rAttempts) = 0;
+    /**
+     * @fn update
+     * @brief Update the specialized data.
+     * @note To be implemented.
+     * @tparam T The new data
+     * @param prio The priority of the update
+     */
+    virtual void update(const T&, std::uint32_t vPriority, std::uint32_t& rAttempts) = 0;
 
-	/**
-	 * @fn init
-	 * @brief Initialize data.
-	 * @note To be implemented.
-	 * @tparam T The initial data
-	 */
-	virtual void init(T) = 0;
+    /**
+     * @fn init
+     * @brief Initialize data.
+     * @note To be implemented.
+     * @tparam T The initial data
+     */
+    virtual void init(T) = 0;
 };
 
 } /* namespace data */

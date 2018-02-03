@@ -58,7 +58,7 @@ public:
      * @param r_feed   The handler Feed reference
      */
     AprscClient(const std::string& cr_host, const std::string& cr_port,
-            const std::string& cr_login, feed::Feed& r_feed);
+                const std::string& cr_login, feed::Feed& r_feed);
     /**
      * @fn ~AprscClient
      * @brief Destructor
@@ -87,13 +87,13 @@ private:
      * @override Client::handleResolve
      */
     void handleResolve(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
      * @fn handleConnect
      * @override Client::handleConnect
      */
     void handleConnect(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
      * @fn handleLogin
      * @brief Handler fro send login string.

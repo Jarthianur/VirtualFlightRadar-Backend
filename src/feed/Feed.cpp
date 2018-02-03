@@ -37,21 +37,21 @@ namespace feed
 {
 
 Feed::Feed(const std::string& crName, std::uint32_t vPriority,
-        const config::keyValueMap& crKvMap)
-		: mName(crName),
-		  mPriority(vPriority),
-		  mKvMap(crKvMap)
+           const config::keyValueMap& crKvMap)
+        : mName(crName),
+          mPriority(vPriority),
+          mKvMap(crKvMap)
 {
-	if (mKvMap.find(KV_KEY_HOST) == mKvMap.end())
-	{
-		Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_HOST);
-		throw std::logic_error("No host given");
-	}
-	if (mKvMap.find(KV_KEY_PORT) == mKvMap.end())
-	{
-		Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_PORT);
-		throw std::logic_error("No port given");
-	}
+    if (mKvMap.find(KV_KEY_HOST) == mKvMap.end())
+    {
+        Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_HOST);
+        throw std::logic_error("No host given");
+    }
+    if (mKvMap.find(KV_KEY_PORT) == mKvMap.end())
+    {
+        Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_PORT);
+        throw std::logic_error("No port given");
+    }
 }
 
 Feed::~Feed() noexcept
@@ -68,15 +68,15 @@ mpClient(std::move(other.mpClient))
 
 Feed& Feed::operator =(BOOST_RV_REF(Feed))
 {
-	return *this;
+    return *this;
 }
 
 void Feed::run(boost::asio::signal_set& rSigset) noexcept
 {
-	if (VFRB::global_run_status)
-	{
-		mpClient->run(rSigset);
-	}
+    if (VFRB::global_run_status)
+    {
+        mpClient->run(rSigset);
+    }
 }
 
 }  // namespace feed

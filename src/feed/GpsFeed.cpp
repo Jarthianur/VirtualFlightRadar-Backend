@@ -42,13 +42,13 @@ namespace feed
 {
 
 GpsFeed::GpsFeed(const std::string& cr_name, std::uint32_t prio,
-        const config::keyValueMap& cr_kvmap)
-		: Feed(cr_name, prio, cr_kvmap),
-		  mUpdateAttempts(0)
+                 const config::keyValueMap& cr_kvmap)
+        : Feed(cr_name, prio, cr_kvmap),
+          mUpdateAttempts(0)
 {
-	mpClient = std::unique_ptr<network::client::Client>(
-	        new network::client::GpsdClient(mKvMap.find(KV_KEY_HOST)->second,
-	                mKvMap.find(KV_KEY_PORT)->second, *this));
+    mpClient = std::unique_ptr<network::client::Client>(
+            new network::client::GpsdClient(mKvMap.find(KV_KEY_HOST)->second,
+                    mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 GpsFeed::~GpsFeed() noexcept
@@ -57,17 +57,17 @@ GpsFeed::~GpsFeed() noexcept
 
 void GpsFeed::process(const std::string& cr_res) noexcept
 {
-	struct ExtGpsPosition pos;
-	if (mParser.unpack(cr_res, pos))
-	{
-		VFRB::msGpsData.update(pos, mPriority, mUpdateAttempts);
-		if (config::Configuration::global_gnd_mode && pos.nrSats >= GPS_NR_SATS_GOOD
-		        && pos.fixQa >= GPS_FIX_GOOD && pos.dilution <= GPS_HOR_DILUTION_GOOD)
-		{
-			Logger::info("(GpsFeed) received good position -> stop");
-			mpClient->stop();
-		}
-	}
+    struct ExtGpsPosition pos;
+    if (mParser.unpack(cr_res, pos))
+    {
+        VFRB::msGpsData.update(pos, mPriority, mUpdateAttempts);
+        if (config::Configuration::global_gnd_mode && pos.nrSats >= GPS_NR_SATS_GOOD
+                && pos.fixQa >= GPS_FIX_GOOD && pos.dilution <= GPS_HOR_DILUTION_GOOD)
+        {
+            Logger::info("(GpsFeed) received good position -> stop");
+            mpClient->stop();
+        }
+    }
 }
 
 } // namespace feed

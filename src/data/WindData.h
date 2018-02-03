@@ -40,51 +40,51 @@ namespace data
 class WindData: public Data<struct util::Wind>
 {
 public:
-	/**
-	 * @fn WindData
-	 * @brief Constructor
-	 */
-	WindData();
+    /**
+     * @fn WindData
+     * @brief Constructor
+     */
+    WindData();
 
-	/**
-	 * @fn ~WindData
-	 * @brief Destructor
-	 */
-	virtual ~WindData() noexcept;
+    /**
+     * @fn ~WindData
+     * @brief Destructor
+     */
+    virtual ~WindData() noexcept;
 
-	/**
-	 * @fn init
-	 * @brief Initialize the sensor information.
-	 * @param info The initial data
-	 * @override Data::init
-	 */
-	void init(struct util::Wind vWind) override;
+    /**
+     * @fn init
+     * @brief Initialize the sensor information.
+     * @param info The initial data
+     * @override Data::init
+     */
+    void init(struct util::Wind vWind) override;
 
-	/**
-	 * @fn update
-	 * @brief Try to update the sensor information.
-	 * @note Splits the given info, using setters.
-	 * @param cr_info The new sensor information.
-	 * @param prio    The attempts priority
-	 * @override Data::update
-	 * @threadsafe
-	 */
-	void update(const struct util::Wind& crWind, std::uint32_t vPriority,
-	        std::uint32_t& rAttempts) override;
+    /**
+     * @fn update
+     * @brief Try to update the sensor information.
+     * @note Splits the given info, using setters.
+     * @param cr_info The new sensor information.
+     * @param prio    The attempts priority
+     * @override Data::update
+     * @threadsafe
+     */
+    void update(const struct util::Wind& crWind, std::uint32_t vPriority,
+                std::uint32_t& rAttempts) override;
 
-	/**
-	 * @fn getMwvStr
-	 * @brief Get the MWV sentence.
-	 * @note MWV is invalid after this operation.
-	 * @return the MWV sentence, if valid, else empty string
-	 * @threadsafe
-	 */
-	std::string getMwvStr();
+    /**
+     * @fn getMwvStr
+     * @brief Get the MWV sentence.
+     * @note MWV is invalid after this operation.
+     * @return the MWV sentence, if valid, else empty string
+     * @threadsafe
+     */
+    std::string getMwvStr();
 
 private:
 
-	/// Holding MDA sentence
-	struct util::TmpWrapper<util::Wind> mWind;
+    /// Holding MDA sentence
+    struct util::TmpWrapper<util::Wind> mWind;
 };
 
 } // namespace data

@@ -69,7 +69,8 @@ std::string AircraftProcessor::process(const Aircraft& cr_ac)
                 util::math::dToI(cr_ac.getHeading()),
                 util::math::dToI(cr_ac.getGndSpeed() * util::math::MS_2_KMH),
                 cr_ac.getClimbRate(), cr_ac.getAircraftT());
-    } else
+    }
+    else
     {
         std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", mtRelN,
                 mtRelE, mtRelV, cr_ac.getId().c_str(), cr_ac.getAircraftT());
@@ -106,7 +107,8 @@ void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac)
     mtRelV =
             cr_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER ?
                     cr_ac.getAltitude()
-                            - util::math::calcIcaoHeight(VFRB::msAtmosData.getAtmPress()) :
+                            - util::math::calcIcaoHeight(
+                                    VFRB::msAtmosData.getAtmPress()) :
                     cr_ac.getAltitude() - VFRB::msGpsData.getBaseAlt();
 }
 

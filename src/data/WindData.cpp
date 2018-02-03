@@ -28,7 +28,7 @@ namespace data
 {
 
 WindData::WindData()
-		: Data<struct Wind>()
+        : Data<struct Wind>()
 {
 }
 
@@ -37,32 +37,32 @@ WindData::~WindData() noexcept
 }
 
 void WindData::update(const struct Wind& crWind, std::uint32_t vPriority,
-        std::uint32_t& rAttempts)
+                      std::uint32_t& rAttempts)
 {
-	boost::lock_guard<boost::mutex> lock(mWind.mutex);
-	if (mWind.trySetValue(crWind, vPriority, rAttempts))
-	{
-		rAttempts = 0;
-	}
+    boost::lock_guard<boost::mutex> lock(mWind.mutex);
+    if (mWind.trySetValue(crWind, vPriority, rAttempts))
+    {
+        rAttempts = 0;
+    }
 }
 
 std::string WindData::getMwvStr()
 {
-	boost::lock_guard<boost::mutex> lock(mWind.mutex);
-	if (mWind.isValueValid)
-	{
-		return mWind.getValue().mwvStr + "\n";
-	}
-	else
-	{
-		return "";
-	}
+    boost::lock_guard<boost::mutex> lock(mWind.mutex);
+    if (mWind.isValueValid)
+    {
+        return mWind.getValue().mwvStr + "\n";
+    }
+    else
+    {
+        return "";
+    }
 }
 
 void WindData::init(struct Wind vWind)
 {
-	std::uint32_t dummy = 0;
-	mWind.trySetValue(vWind, 0, dummy);
+    std::uint32_t dummy = 0;
+    mWind.trySetValue(vWind, 0, dummy);
 }
 
 }  // namespace data

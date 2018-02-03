@@ -65,8 +65,8 @@ public:
      * @param head    The heading
      */
     Aircraft(std::string& r_id, struct util::GpsPosition& r_pos, double gnd_spd,
-            std::uint32_t id_t, std::int32_t ac_t, double climb_r, /*double turn_r,*/
-            double head);
+             std::uint32_t id_t, std::int32_t ac_t, double climb_r, /*double turn_r,*/
+             double head);
     /**
      * @fn ~Aircraft
      * @brief Destructor
@@ -305,8 +305,9 @@ public:
         mFullInfo = info;
     }
 
-    inline std::uint32_t& getUpdateAttempts() {
-return mUpdateAttempts;
+    inline std::uint32_t& getUpdateAttempts()
+    {
+        return mUpdateAttempts;
     }
 
 private:

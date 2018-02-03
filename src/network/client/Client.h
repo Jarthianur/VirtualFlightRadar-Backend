@@ -89,7 +89,7 @@ protected:
      * @param r_feed   The handler Feed reference
      */
     Client(const std::string& cr_host, const std::string& cr_port,
-            const std::string& cr_comp, feed::Feed& r_feed);
+           const std::string& cr_comp, feed::Feed& r_feed);
     /**
      * @fn timedConnect
      * @brief Connect after timeout.
@@ -127,7 +127,7 @@ protected:
      * @param it    The resolve iterator
      */
     virtual void handleResolve(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
+                               boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
     /**
      * @fn handleConnect
      * @brief Handler for connect.
@@ -136,7 +136,7 @@ protected:
      * @param it    The resolve iterator
      */
     virtual void handleConnect(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
+                               boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
 
     /// Internal IO-service
     boost::asio::io_service mIoService;

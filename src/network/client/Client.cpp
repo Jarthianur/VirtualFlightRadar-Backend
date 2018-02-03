@@ -36,7 +36,7 @@ namespace client
 {
 
 Client::Client(const std::string& cr_host, const std::string& cr_port,
-        const std::string& cr_comp, feed::Feed& r_feed)
+               const std::string& cr_comp, feed::Feed& r_feed)
         : mIoService(),
           mSocket(mIoService),
           mResolver(mIoService),
@@ -96,7 +96,8 @@ void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
     {
         Logger::info(mComponent + " try connect to: ", mHost + ":" + mPort);
         connect();
-    } else
+    }
+    else
     {
         Logger::error(mComponent + " cancel connect: ", cr_ec.message());
         if (cr_ec != boost::asio::error::operation_aborted)
@@ -114,7 +115,8 @@ void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t s) n
         std::getline(is, mResponse);
         mrFeed.process(mResponse);
         read();
-    } else if (cr_ec != boost::system::errc::bad_file_descriptor)
+    }
+    else if (cr_ec != boost::system::errc::bad_file_descriptor)
     {
         Logger::error(mComponent + " read: ", cr_ec.message());
         if (cr_ec != boost::asio::error::operation_aborted)

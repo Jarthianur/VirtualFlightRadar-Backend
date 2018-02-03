@@ -70,7 +70,8 @@ void Server::writeToAll(const std::string& cr_msg)
         {
             Logger::warn("(Server) lost connection to: ", it->get()->getIp());
             mClients.erase(it);
-        } else
+        }
+        else
         {
             ++it;
         }
@@ -125,11 +126,13 @@ void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
         {
             mClients.push_back(client);
             Logger::info("(Server) connection from: ", client->getIp());
-        } else
+        }
+        else
         {
             Logger::info("(Server) refused connection to ", client->getIp());
         }
-    } else if (cr_ec != boost::system::errc::bad_file_descriptor)
+    }
+    else if (cr_ec != boost::system::errc::bad_file_descriptor)
     {
         Logger::warn("(Server) accept: ", cr_ec.message());
     }

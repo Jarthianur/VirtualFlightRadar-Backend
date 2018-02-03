@@ -39,7 +39,7 @@ namespace client
 {
 
 AprscClient::AprscClient(const std::string& cr_host, const std::string& cr_port,
-        const std::string& cr_login, feed::Feed& r_feed)
+                         const std::string& cr_login, feed::Feed& r_feed)
         : Client(cr_host, cr_port, "(AprscClient)", r_feed),
           mLoginStr(cr_login),
           mStopped(false),
@@ -72,15 +72,16 @@ void AprscClient::stop()
 }
 
 void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it) noexcept
-        {
+                                boost::asio::ip::tcp::resolver::iterator it) noexcept
+{
     if (!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
                 boost::bind(&AprscClient::handleConnect, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
-    } else
+    }
+    else
     {
         Logger::error("(AprscClient) resolve host: ", cr_ec.message());
         if (mSocket.is_open())
@@ -92,8 +93,8 @@ void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it) noexcept
-        {
+                                boost::asio::ip::tcp::resolver::iterator it) noexcept
+{
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
@@ -102,7 +103,8 @@ void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
         mTimeout.async_wait(boost::bind(&AprscClient::sendKaBeacon, this));
-    } else
+    }
+    else
     {
         Logger::error("(AprscClient) connect: ", cr_ec.message());
         if (mSocket.is_open())
@@ -134,15 +136,16 @@ noexcept
     {
         Logger::info("(AprscClient) connected to: ", mHost + ":" + mPort);
         read();
-    } else
+    }
+    else
     {
         Logger::error("(AprscClient) send login: ", cr_ec.message());
     }
 }
 
 void AprscClient::handleSendKaBeacon(const boost::system::error_code& cr_ec,
-        std::size_t s) noexcept
-        {
+                                     std::size_t s) noexcept
+{
     if (cr_ec)
     {
         Logger::error("(AprscClient) send beacon:", cr_ec.message());

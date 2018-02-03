@@ -37,15 +37,15 @@ namespace feed
 {
 
 SensorFeed::SensorFeed(const std::string& crName, std::uint32_t vPriority,
-        const config::keyValueMap& crKvMap)
-		: Feed(crName, vPriority, crKvMap),
-		  mWindUpdateAttempts(0),
-		  mAtmosUpdateAttempts(0)
+                       const config::keyValueMap& crKvMap)
+        : Feed(crName, vPriority, crKvMap),
+          mWindUpdateAttempts(0),
+          mAtmosUpdateAttempts(0)
 
 {
-	mpClient = std::unique_ptr<network::client::Client>(
-	        new network::client::SensorClient(mKvMap.find(KV_KEY_HOST)->second,
-	                mKvMap.find(KV_KEY_PORT)->second, *this));
+    mpClient = std::unique_ptr<network::client::Client>(
+            new network::client::SensorClient(mKvMap.find(KV_KEY_HOST)->second,
+                    mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 SensorFeed::~SensorFeed() noexcept
@@ -54,19 +54,19 @@ SensorFeed::~SensorFeed() noexcept
 
 void SensorFeed::process(const std::string& crResponse) noexcept
 {
-	struct Climate climate;
-	if (mParser.unpack(crResponse, climate))
-	{
-		if (climate.hasWind())
-		{
-			VFRB::msWindData.update(climate.mWind, mPriority, mWindUpdateAttempts);
-		}
-		if (climate.hasAtmosphere())
-		{
-			VFRB::msAtmosData.update(climate.mAtmosphere, mPriority,
-			        mAtmosUpdateAttempts);
-		}
-	}
+    struct Climate climate;
+    if (mParser.unpack(crResponse, climate))
+    {
+        if (climate.hasWind())
+        {
+            VFRB::msWindData.update(climate.mWind, mPriority, mWindUpdateAttempts);
+        }
+        if (climate.hasAtmosphere())
+        {
+            VFRB::msAtmosData.update(climate.mAtmosphere, mPriority,
+                    mAtmosUpdateAttempts);
+        }
+    }
 }
 
 } // namespace feed

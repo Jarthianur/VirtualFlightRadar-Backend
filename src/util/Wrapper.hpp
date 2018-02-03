@@ -37,48 +37,48 @@ namespace util
 template<typename T>
 struct Wrapper
 {
-	/// Mutex to enable threadsafety per Wrapper.
-	boost::mutex mutex;
+    /// Mutex to enable threadsafety per Wrapper.
+    boost::mutex mutex;
 
-	/**
-	 * @fn trySetValue
-	 * @brief Try to set the value, fails if attempts priority is less.
-	 * @note Succeeds always if attempt is valid.
-	 * @param cr_nv The new value
-	 * @param prio  The attempts priority
-	 */
-	bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
-	        std::uint32_t& rAttempts)
-	{
-		mUpdated = (vPriority >= mLastPriority)
-		        || (!mUpdated && vPriority * ++rAttempts >= mLastPriority);
-		if (mUpdated)
-		{
-			mValue = crNewValue;
-			mLastPriority = vPriority;
-		}
-		return mUpdated;
-	}
+    /**
+     * @fn trySetValue
+     * @brief Try to set the value, fails if attempts priority is less.
+     * @note Succeeds always if attempt is valid.
+     * @param cr_nv The new value
+     * @param prio  The attempts priority
+     */
+    bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
+                     std::uint32_t& rAttempts)
+    {
+        mUpdated = (vPriority >= mLastPriority)
+                || (!mUpdated && vPriority * ++rAttempts >= mLastPriority);
+        if (mUpdated)
+        {
+            mValue = crNewValue;
+            mLastPriority = vPriority;
+        }
+        return mUpdated;
+    }
 
-	/**
-	 * @fn getValue
-	 * @brief Get the value.
-	 * @return the value
-	 */
-	inline const T& getValue()
-	{
-		return mValue;
-	}
+    /**
+     * @fn getValue
+     * @brief Get the value.
+     * @return the value
+     */
+    inline const T& getValue()
+    {
+        return mValue;
+    }
 
 private:
-	/// The value
-	T mValue;
+    /// The value
+    T mValue;
 
-	/// Last written priority
-	std::uint32_t mLastPriority = 0;
+    /// Last written priority
+    std::uint32_t mLastPriority = 0;
 
-	///
-	bool mUpdated = false;
+    ///
+    bool mUpdated = false;
 };
 
 /**
@@ -89,53 +89,53 @@ private:
 template<typename T>
 struct TmpWrapper
 {
-	/// Is the value valid?
-	bool isValueValid;
+    /// Is the value valid?
+    bool isValueValid;
 
-	/// Mutex to enable threadsafety per TmpWrapper.
-	boost::mutex mutex;
+    /// Mutex to enable threadsafety per TmpWrapper.
+    boost::mutex mutex;
 
-	/**
-	 * @fn trySetValue
-	 * @brief Try to set the value, fails if attempts priority is less.
-	 * @note Succeeds always if attempt is valid.
-	 * @param cr_nv The new value
-	 * @param prio  The attempts priority
-	 */
-	bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
-	        std::uint32_t& rAttempts)
-	{
-		mUpdated = (vPriority >= mLastPriority)
-		        || (!mUpdated && vPriority * ++rAttempts >= mLastPriority);
-		if (mUpdated)
-		{
-			mValue = crNewValue;
-			mLastPriority = vPriority;
-			isValueValid = true;
-		}
-		return mUpdated;
-	}
+    /**
+     * @fn trySetValue
+     * @brief Try to set the value, fails if attempts priority is less.
+     * @note Succeeds always if attempt is valid.
+     * @param cr_nv The new value
+     * @param prio  The attempts priority
+     */
+    bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
+                     std::uint32_t& rAttempts)
+    {
+        mUpdated = (vPriority >= mLastPriority)
+                || (!mUpdated && vPriority * ++rAttempts >= mLastPriority);
+        if (mUpdated)
+        {
+            mValue = crNewValue;
+            mLastPriority = vPriority;
+            isValueValid = true;
+        }
+        return mUpdated;
+    }
 
-	/**
-	 * @fn getValue
-	 * @brief Get the value and invalidate it.
-	 * @return the value
-	 */
-	inline const T& getValue()
-	{
-		isValueValid = false;
-		return mValue;
-	}
+    /**
+     * @fn getValue
+     * @brief Get the value and invalidate it.
+     * @return the value
+     */
+    inline const T& getValue()
+    {
+        isValueValid = false;
+        return mValue;
+    }
 
 private:
-	/// The value
-	T mValue;
+    /// The value
+    T mValue;
 
-	/// Last written priority
-	std::uint32_t mLastPriority;
+    /// Last written priority
+    std::uint32_t mLastPriority;
 
-	///
-	bool mUpdated = false;
+    ///
+    bool mUpdated = false;
 };
 
 }  // namespace util

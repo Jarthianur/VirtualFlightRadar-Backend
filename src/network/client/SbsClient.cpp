@@ -37,7 +37,7 @@ namespace client
 {
 
 SbsClient::SbsClient(const std::string& cr_host, const std::string& cr_port,
-        feed::Feed& r_feed)
+                     feed::Feed& r_feed)
         : Client(cr_host, cr_port, "(SbsClient)", r_feed)
 {
     connect();
@@ -57,15 +57,16 @@ void SbsClient::connect()
 }
 
 void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it) noexcept
-        {
+                              boost::asio::ip::tcp::resolver::iterator it) noexcept
+{
     if (!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
                 boost::bind(&SbsClient::handleConnect, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::iterator));
-    } else
+    }
+    else
     {
         Logger::error("(SbsClient) resolve host: ", cr_ec.message());
         if (mSocket.is_open())
@@ -77,14 +78,15 @@ void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
 }
 
 void SbsClient::handleConnect(const boost::system::error_code& cr_ec,
-        boost::asio::ip::tcp::resolver::iterator it) noexcept
-        {
+                              boost::asio::ip::tcp::resolver::iterator it) noexcept
+{
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
         Logger::info("(SbsClient) connected to: ", mHost + ":" + mPort);
         read();
-    } else
+    }
+    else
     {
         Logger::error("(SbsClient) connect: ", cr_ec.message());
         if (mSocket.is_open())

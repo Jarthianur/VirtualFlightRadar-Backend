@@ -32,30 +32,30 @@ namespace util
 
 struct Atmosphere
 {
-	std::string mdaStr;
-	double pressure;
-	/* Humidity and temperature are not important for us, yet.*/
+    std::string mdaStr;
+    double pressure;
+    /* Humidity and temperature are not important for us, yet.*/
 };
 
 struct Wind
 {
-	std::string mwvStr;
+    std::string mwvStr;
 };
 
 struct Climate
 {
-	struct Wind mWind;
-	struct Atmosphere mAtmosphere;
+    struct Wind mWind;
+    struct Atmosphere mAtmosphere;
 
-	inline bool hasAtmosphere()
-	{
-		return mAtmosphere.mdaStr.empty();
-	}
+    inline bool hasAtmosphere()
+    {
+        return mAtmosphere.mdaStr.empty();
+    }
 
-	inline bool hasWind()
-	{
-		return mWind.mwvStr.empty();
-	}
+    inline bool hasWind()
+    {
+        return mWind.mwvStr.empty();
+    }
 };
 
 }  // namespace util

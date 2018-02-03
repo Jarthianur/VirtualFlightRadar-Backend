@@ -38,7 +38,7 @@ namespace feed
 {
 
 AprscFeed::AprscFeed(const std::string& cr_name, std::uint32_t prio,
-        const config::keyValueMap& cr_kvmap)
+                     const config::keyValueMap& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
     auto it = mKvMap.find(KV_KEY_LOGIN);
@@ -46,7 +46,8 @@ AprscFeed::AprscFeed(const std::string& cr_name, std::uint32_t prio,
     {
         Logger::warn("(AprscFeed) could not find: ", mName + "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
-    } else
+    }
+    else
     {
         mpClient = std::unique_ptr<network::client::Client>(
                 new network::client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,

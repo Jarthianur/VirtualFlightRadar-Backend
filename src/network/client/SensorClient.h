@@ -48,70 +48,70 @@ namespace client
 class SensorClient: public Client
 {
 public:
-	/**
-	 * Non-copyable
-	 */
-	SensorClient(const SensorClient&) = delete;
-	/**
-	 * Not assignable
-	 */
-	SensorClient& operator=(const SensorClient&) = delete;
-	/**
-	 * @fn SensorClient
-	 * @brief Constructor
-	 * @param cr_host  The hostname
-	 * @param cr_port  The port
-	 * @param cr_login The login string to transmit
-	 * @param r_feed   The handler Feed reference
-	 */
-	SensorClient(const std::string& cr_host, const std::string& cr_port,
-	        feed::Feed& r_feed);
-	/**
-	 * @fn ~SensorClient
-	 * @brief Destructor
-	 */
-	virtual ~SensorClient() noexcept;
+    /**
+     * Non-copyable
+     */
+    SensorClient(const SensorClient&) = delete;
+    /**
+     * Not assignable
+     */
+    SensorClient& operator=(const SensorClient&) = delete;
+    /**
+     * @fn SensorClient
+     * @brief Constructor
+     * @param cr_host  The hostname
+     * @param cr_port  The port
+     * @param cr_login The login string to transmit
+     * @param r_feed   The handler Feed reference
+     */
+    SensorClient(const std::string& cr_host, const std::string& cr_port,
+                 feed::Feed& r_feed);
+    /**
+     * @fn ~SensorClient
+     * @brief Destructor
+     */
+    virtual ~SensorClient() noexcept;
 
 private:
-	/**
-	 * @fn read
-	 * @brief Read with timeout.
-	 * @override Client::read
-	 */
-	void read() override;
-	/**
-	 * @fn connect
-	 * @override Client::connect
-	 */
-	void connect() override;
-	/**
-	 * @fn checkDeadline
-	 * @brief Check read timeout deadline reached.
-	 */
-	void checkDeadline();
-	/**
-	 * @fn stop
-	 * @brief Cancel timer before stop.
-	 * @override Client::stop
-	 */
-	void stop() override;
-	/**
-	 * @fn handleResolve
-	 * @override Client::handleResolve
-	 */
-	void handleResolve(const boost::system::error_code& cr_ec,
-	        boost::asio::ip::tcp::resolver::iterator it) noexcept override;
-	/**
-	 * @fn handleConnect
-	 * @override Client::handleConnect
-	 */
-	void handleConnect(const boost::system::error_code& cr_ec,
-	        boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    /**
+     * @fn read
+     * @brief Read with timeout.
+     * @override Client::read
+     */
+    void read() override;
+    /**
+     * @fn connect
+     * @override Client::connect
+     */
+    void connect() override;
+    /**
+     * @fn checkDeadline
+     * @brief Check read timeout deadline reached.
+     */
+    void checkDeadline();
+    /**
+     * @fn stop
+     * @brief Cancel timer before stop.
+     * @override Client::stop
+     */
+    void stop() override;
+    /**
+     * @fn handleResolve
+     * @override Client::handleResolve
+     */
+    void handleResolve(const boost::system::error_code& cr_ec,
+                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    /**
+     * @fn handleConnect
+     * @override Client::handleConnect
+     */
+    void handleConnect(const boost::system::error_code& cr_ec,
+                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
 
-	/// Client stopped?
-	bool mStopped;
-	/// Read timer
-	boost::asio::deadline_timer mTimeout;
+    /// Client stopped?
+    bool mStopped;
+    /// Read timer
+    boost::asio::deadline_timer mTimeout;
 };
 
 }  // namespace client

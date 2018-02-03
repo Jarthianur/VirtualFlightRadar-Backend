@@ -95,7 +95,8 @@ noexcept
             r_pos.position.altitude = util::math::dToI(std::stod(match.str(RE_GGA_ALT)));
             //geoid
             r_pos.geoid = std::stod(match.str(RE_GGA_GEOID));
-        } else
+        }
+        else
         {
             return false;
         }

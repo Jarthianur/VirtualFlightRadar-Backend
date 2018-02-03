@@ -60,7 +60,8 @@ public:
      * @return the value for key in section if found, else the default value
      */
     const std::string getProperty(const std::string& cr_section,
-            const std::string& cr_key, const std::string& cr_def_val = "") const;
+                                  const std::string& cr_key,
+                                  const std::string& cr_def_val = "") const;
     /**
      * @fn getSectionKv
      * @brief Get the key-value-map for a section.

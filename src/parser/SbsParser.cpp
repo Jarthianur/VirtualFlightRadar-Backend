@@ -72,7 +72,8 @@ noexcept
                     if (delim - p > 0)
                     {
                         r_ac.setId(cr_msg.substr(p, delim - p));
-                    } else
+                    }
+                    else
                     {
                         return false;
                     }

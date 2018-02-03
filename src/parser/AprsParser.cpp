@@ -143,11 +143,13 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
                  turnRate = A_VALUE_NA;
                  fullInfo = false;
                  }*/
-            } else
+            }
+            else
             {
                 return false;
             }
-        } else
+        }
+        else
         {
             return false;
         }
@@ -173,7 +175,8 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
         r_ac.setPosition(pos);
         r_ac.setFullInfo(fullInfo);
         r_ac.setTargetT(aircraft::Aircraft::TargetType::FLARM);
-    } else
+    }
+    else
     {
         return false;
     }

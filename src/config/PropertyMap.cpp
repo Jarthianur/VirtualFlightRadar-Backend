@@ -35,7 +35,8 @@ PropertyMap::~PropertyMap()
 }
 
 const std::string PropertyMap::getProperty(const std::string& cr_section,
-        const std::string& cr_key, const std::string& cr_def_val) const
+                                           const std::string& cr_key,
+                                           const std::string& cr_def_val) const
 {
     auto s_it = mPropertiesMap.find(cr_section);
     if (s_it != mPropertiesMap.end())
@@ -44,11 +45,13 @@ const std::string PropertyMap::getProperty(const std::string& cr_section,
         if (it != s_it->second.end())
         {
             return it->second;
-        } else
+        }
+        else
         {
             return cr_def_val;
         }
-    } else
+    }
+    else
     {
         return cr_def_val;
     }
@@ -60,7 +63,8 @@ const keyValueMap& PropertyMap::getSectionKv(const std::string& cr_section) cons
     if (it != mPropertiesMap.end())
     {
         return it->second;
-    } else
+    }
+    else
     {
         throw std::out_of_range("section not found");
     }

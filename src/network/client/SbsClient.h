@@ -75,13 +75,13 @@ private:
      * @override Client::handleResolve
      */
     void handleResolve(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
     /**
      * @fn handleConnect
      * @override Client::handleConnect
      */
     void handleConnect(const boost::system::error_code& cr_ec,
-            boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
 };
 
 }  // namespace client

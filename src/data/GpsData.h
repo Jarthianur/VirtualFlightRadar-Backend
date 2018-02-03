@@ -41,75 +41,75 @@ namespace data
 class GpsData: public Data<struct util::ExtGpsPosition>
 {
 public:
-	/**
-	 * @fn GpsData
-	 * @brief Constructor
-	 */
-	GpsData();
-	/**
-	 * @fn ~GpsData
-	 * @brief Destructor
-	 */
-	virtual ~GpsData() noexcept;
-	/**
-	 * @fn init
-	 * @brief Initialize the GPS information.
-	 * @param pos The initial position
-	 * @override Data::init
-	 */
-	void init(struct util::ExtGpsPosition pos) override;
-	/**
-	 * @fn update
-	 * @brief Try to update the base position.
-	 * @param cr_pos The new position
-	 * @param prio   The attempts priority
-	 * @override Data::update
-	 * @threadsafe
-	 */
-	void update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t vPriority,
-	        std::uint32_t& rAttempts) override;
-	/**
-	 * @fn getGpsStr
-	 * @brief Get a full NMEA GPS report.
-	 * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
-	 * @return the NMEA string
-	 * @threadsafe
-	 */
-	std::string getGpsStr();
-	/**
-	 * @fn getBasePos
-	 * @brief Get the base GPS position.
-	 * @return the position
-	 * @threadsafe
-	 */
-	struct util::ExtGpsPosition getBasePos();
-	/**
-	 * @fn getBaseLat
-	 * @brief Get the base latitude.
-	 * @return the latitude
-	 * @threadsafe
-	 */
-	double getBaseLat();
-	/**
-	 * @fn getBaseLong
-	 * @brief Get the base longitude.
-	 * @return the longitude
-	 * @threadsafe
-	 */
-	double getBaseLong();
-	/**
-	 * @fn getBaseAlt
-	 * @brief Get the base altitude.
-	 * @return the altitude
-	 * @threadsafe
-	 */
-	std::int32_t getBaseAlt();
+    /**
+     * @fn GpsData
+     * @brief Constructor
+     */
+    GpsData();
+    /**
+     * @fn ~GpsData
+     * @brief Destructor
+     */
+    virtual ~GpsData() noexcept;
+    /**
+     * @fn init
+     * @brief Initialize the GPS information.
+     * @param pos The initial position
+     * @override Data::init
+     */
+    void init(struct util::ExtGpsPosition pos) override;
+    /**
+     * @fn update
+     * @brief Try to update the base position.
+     * @param cr_pos The new position
+     * @param prio   The attempts priority
+     * @override Data::update
+     * @threadsafe
+     */
+    void update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t vPriority,
+                std::uint32_t& rAttempts) override;
+    /**
+     * @fn getGpsStr
+     * @brief Get a full NMEA GPS report.
+     * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
+     * @return the NMEA string
+     * @threadsafe
+     */
+    std::string getGpsStr();
+    /**
+     * @fn getBasePos
+     * @brief Get the base GPS position.
+     * @return the position
+     * @threadsafe
+     */
+    struct util::ExtGpsPosition getBasePos();
+    /**
+     * @fn getBaseLat
+     * @brief Get the base latitude.
+     * @return the latitude
+     * @threadsafe
+     */
+    double getBaseLat();
+    /**
+     * @fn getBaseLong
+     * @brief Get the base longitude.
+     * @return the longitude
+     * @threadsafe
+     */
+    double getBaseLong();
+    /**
+     * @fn getBaseAlt
+     * @brief Get the base altitude.
+     * @return the altitude
+     * @threadsafe
+     */
+    std::int32_t getBaseAlt();
 
 private:
-	/// Wrapper holding the base position.
-	struct util::Wrapper<struct util::ExtGpsPosition> mBasePos;
-	/// GpsModule providing functionality to build GPS sentences.
-	util::GpsModule mGpsMod;
+    /// Wrapper holding the base position.
+    struct util::Wrapper<struct util::ExtGpsPosition> mBasePos;
+    /// GpsModule providing functionality to build GPS sentences.
+    util::GpsModule mGpsMod;
 };
 
 }  // namespace data
