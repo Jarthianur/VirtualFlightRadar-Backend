@@ -35,10 +35,10 @@
 #include "../src/parser/SbsParser.h"
 #include "../src/parser/SensorParser.h"
 #include "../src/util/Position.h"
-#include "../src/util/SensorInfo.h"
+#include "../src/util/Sensor.h"
 #include "../src/VFRB.h"
-#include "framework/src/comparator/Comparators.hpp"
-#include "framework/src/comparator/ComparatorStrategy.hpp"
+#include "../testframework/src/comparator/Comparators.hpp"
+#include "../testframework/src/comparator/ComparatorStrategy.hpp"
 
 namespace helper
 {
@@ -47,10 +47,10 @@ namespace helper
  */
 inline void clearAcCont()
 {
-	for (int i = 0; i < 4; ++i)
-	{
-		VFRB::msAcCont.processAircrafts();
-	}
+    for (int i = 0; i < 4; ++i)
+    {
+        VFRB::msAcCont.processAircrafts();
+    }
 }
 
 /**
@@ -58,10 +58,11 @@ inline void clearAcCont()
  */
 inline void setupVFRB()
 {
-	VFRB::msSensorData.init( { "", "", config::Configuration::base_pressure });
-	VFRB::msGpsData.init( { { config::Configuration::base_latitude,
-	        config::Configuration::base_longitude, config::Configuration::base_altitude },
-	        1, 5, config::Configuration::base_geoid, 0.0 });
+    VFRB::msWindData.init( { "" });
+    VFRB::msAtmosData.init( { "", config::Configuration::base_pressure });
+    VFRB::msGpsData.init( { { config::Configuration::base_latitude,
+            config::Configuration::base_longitude, config::Configuration::base_altitude },
+            1, 5, config::Configuration::base_geoid, 0.0 });
 }
 
 static testsuite::comparator::Comparator<int> eqi = testsuite::comparator::EQUALS<int>();

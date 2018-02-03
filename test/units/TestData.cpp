@@ -29,10 +29,10 @@
 #include "../../src/data/GpsData.h"
 #include "../../src/util/Position.h"
 #include "../../src/VFRB.h"
-#include "../framework/src/comparator/ComparatorStrategy.hpp"
-#include "../framework/src/testsuite/TestSuite.hpp"
-#include "../framework/src/testsuite/TestSuitesRunner.hpp"
-#include "../framework/src/util/assert.hpp"
+#include "../../testframework/src/comparator/ComparatorStrategy.hpp"
+#include "../../testframework/src/testsuite/TestSuite.hpp"
+#include "../../testframework/src/testsuite/TestSuitesRunner.hpp"
+#include "../../testframework/src/util/assert.hpp"
 #include "../Helper.hpp"
 
 #ifdef assert

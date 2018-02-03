@@ -30,10 +30,10 @@
 #include "../../src/config/Configuration.h"
 #include "../../src/config/PropertyMap.h"
 #include "../../src/feed/Feed.h"
-#include "../framework/src/comparator/ComparatorStrategy.hpp"
-#include "../framework/src/testsuite/TestSuite.hpp"
-#include "../framework/src/testsuite/TestSuitesRunner.hpp"
-#include "../framework/src/util/assert.hpp"
+#include "../../testframework/src/comparator/ComparatorStrategy.hpp"
+#include "../../testframework/src/testsuite/TestSuite.hpp"
+#include "../../testframework/src/testsuite/TestSuitesRunner.hpp"
+#include "../../testframework/src/util/assert.hpp"
 #include "../Helper.hpp"
 
 #ifdef assert
