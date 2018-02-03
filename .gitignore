@@ -6,10 +6,11 @@
 !/src/
 !/service/
 !/docs/
+!/.ide/
 !/service/**
 !/docs/_includes/**
 !/docs/assets/**
-!/.ide/
+!/.ide/**
 !LICENSE
 !.gitattributes
 !.gitignore
