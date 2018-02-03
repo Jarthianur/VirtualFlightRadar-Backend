@@ -39,7 +39,7 @@ WindData::~WindData() noexcept
 void WindData::update(const struct Wind& crWind, std::uint32_t vPriority,
         std::uint32_t& rAttempts)
 {
-	boost::lock_guard<boost::mutex> lock(mWind.mMutex);
+	boost::lock_guard<boost::mutex> lock(mWind.mutex);
 	if (mWind.trySetValue(crWind, vPriority, rAttempts))
 	{
 		rAttempts = 0;
@@ -48,8 +48,8 @@ void WindData::update(const struct Wind& crWind, std::uint32_t vPriority,
 
 std::string WindData::getMwvStr()
 {
-	boost::lock_guard<boost::mutex> lock(mWind.mMutex);
-	if (mWind.mValueValid)
+	boost::lock_guard<boost::mutex> lock(mWind.mutex);
+	if (mWind.isValueValid)
 	{
 		return mWind.getValue().mwvStr + "\n";
 	}

@@ -38,7 +38,7 @@ template<typename T>
 struct Wrapper
 {
 	/// Mutex to enable threadsafety per Wrapper.
-	boost::mutex mMutex;
+	boost::mutex mutex;
 
 	/**
 	 * @fn trySetValue
@@ -50,13 +50,14 @@ struct Wrapper
 	bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
 	        std::uint32_t& rAttempts)
 	{
-		if (vPriority * ++rAttempts >= mLastPriority)
+		mUpdated = (vPriority >= mLastPriority)
+		        || (!mUpdated && vPriority * ++rAttempts >= mLastPriority);
+		if (mUpdated)
 		{
 			mValue = crNewValue;
 			mLastPriority = vPriority;
-			return true;
 		}
-		return false;
+		return mUpdated;
 	}
 
 	/**
@@ -75,6 +76,9 @@ private:
 
 	/// Last written priority
 	std::uint32_t mLastPriority = 0;
+
+	///
+	bool mUpdated = false;
 };
 
 /**
@@ -86,10 +90,10 @@ template<typename T>
 struct TmpWrapper
 {
 	/// Is the value valid?
-	bool mValueValid;
+	bool isValueValid;
 
 	/// Mutex to enable threadsafety per TmpWrapper.
-	boost::mutex mMutex;
+	boost::mutex mutex;
 
 	/**
 	 * @fn trySetValue
@@ -101,14 +105,15 @@ struct TmpWrapper
 	bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
 	        std::uint32_t& rAttempts)
 	{
-		if (vPriority * ++rAttempts >= mLastPriority)
+		mUpdated = (vPriority >= mLastPriority)
+		        || (!mUpdated && vPriority * ++rAttempts >= mLastPriority);
+		if (mUpdated)
 		{
 			mValue = crNewValue;
 			mLastPriority = vPriority;
-			mValueValid = true;
-			return true;
+			isValueValid = true;
 		}
-		return false;
+		return mUpdated;
 	}
 
 	/**
@@ -118,7 +123,7 @@ struct TmpWrapper
 	 */
 	inline const T& getValue()
 	{
-		mValueValid = false;
+		isValueValid = false;
 		return mValue;
 	}
 
@@ -128,6 +133,9 @@ private:
 
 	/// Last written priority
 	std::uint32_t mLastPriority;
+
+	///
+	bool mUpdated = false;
 };
 
 }  // namespace util

@@ -39,7 +39,7 @@ AtmosphereData::~AtmosphereData() noexcept
 void AtmosphereData::update(const struct Atmosphere& crAtmos, std::uint32_t vPriority,
         std::uint32_t& rAttempts)
 {
-	boost::lock_guard<boost::mutex> lock(mAtmosphere.mMutex);
+	boost::lock_guard<boost::mutex> lock(mAtmosphere.mutex);
 	if (mAtmosphere.trySetValue(crAtmos, vPriority, rAttempts))
 	{
 		rAttempts = 0;
@@ -48,13 +48,13 @@ void AtmosphereData::update(const struct Atmosphere& crAtmos, std::uint32_t vPri
 
 std::string AtmosphereData::getMdaStr()
 {
-	boost::lock_guard<boost::mutex> lock(mAtmosphere.mMutex);
+	boost::lock_guard<boost::mutex> lock(mAtmosphere.mutex);
 	return mAtmosphere.getValue().mdaStr + "\n";
 }
 
 double AtmosphereData::getAtmPress()
 {
-	boost::lock_guard<boost::mutex> lock(mAtmosphere.mMutex);
+	boost::lock_guard<boost::mutex> lock(mAtmosphere.mutex);
 	return mAtmosphere.getValue().pressure;
 }
 
