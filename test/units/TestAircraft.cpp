@@ -29,9 +29,9 @@
 #include "../../src/aircraft/AircraftContainer.h"
 #include "../../src/VFRB.h"
 #include "../../src/util/Math.hpp"
-#include "../../testframework/src/testsuite/TestSuite.hpp"
-#include "../../testframework/src/testsuite/TestSuitesRunner.hpp"
-#include "../../testframework/src/util/assert.hpp"
+#include "../framework/src/testsuite/TestSuite.hpp"
+#include "../framework/src/testsuite/TestSuitesRunner.hpp"
+#include "../framework/src/util/assert.hpp"
 #include "../Helper.hpp"
 
 #ifdef assert

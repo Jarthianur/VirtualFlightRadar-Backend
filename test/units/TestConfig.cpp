@@ -30,10 +30,10 @@
 #include "../../src/config/Configuration.h"
 #include "../../src/config/PropertyMap.h"
 #include "../../src/feed/Feed.h"
-#include "../../testframework/src/comparator/ComparatorStrategy.hpp"
-#include "../../testframework/src/testsuite/TestSuite.hpp"
-#include "../../testframework/src/testsuite/TestSuitesRunner.hpp"
-#include "../../testframework/src/util/assert.hpp"
+#include "../framework/src/comparator/ComparatorStrategy.hpp"
+#include "../framework/src/testsuite/TestSuite.hpp"
+#include "../framework/src/testsuite/TestSuitesRunner.hpp"
+#include "../framework/src/util/assert.hpp"
 #include "../Helper.hpp"
 
 #ifdef assert
@@ -79,7 +79,7 @@ void test_config(TestSuitesRunner& runner)
                 config::Configuration config(conf_in);
                 auto feed_it = config::Configuration::global_feeds.cbegin();
                 assert((*feed_it)->mName, std::string("sens1"), helper::eqs);
-                assert((*feed_it)->mPriority, 1, helper::eqi);
+                assert((*feed_it)->mPriority, (std::uint32_t) 1, helper::equ);
                 assert((std::int32_t) config::Configuration::global_server_port, 1234, helper::eqi);
                 assert(config::Configuration::global_gnd_mode, true, helper::eqb);
                 assert(config::Configuration::base_latitude, 77.777777, helper::eqd);

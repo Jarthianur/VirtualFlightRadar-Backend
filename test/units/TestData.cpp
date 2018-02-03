@@ -29,10 +29,10 @@
 #include "../../src/data/GpsData.h"
 #include "../../src/util/Position.h"
 #include "../../src/VFRB.h"
-#include "../../testframework/src/comparator/ComparatorStrategy.hpp"
-#include "../../testframework/src/testsuite/TestSuite.hpp"
-#include "../../testframework/src/testsuite/TestSuitesRunner.hpp"
-#include "../../testframework/src/util/assert.hpp"
+#include "../framework/src/comparator/ComparatorStrategy.hpp"
+#include "../framework/src/testsuite/TestSuite.hpp"
+#include "../framework/src/testsuite/TestSuitesRunner.hpp"
+#include "../framework/src/util/assert.hpp"
 #include "../Helper.hpp"
 
 #ifdef assert
@@ -133,66 +133,113 @@ void test_data(TestSuitesRunner& runner)
         pos1.position.altitude = 1000;
         struct ExtGpsPosition pos2;
         pos2.position.altitude = 2000;
-        gps.update(pos1, 0);
+        std::uint32_t dummy = 0;
+        gps.update(pos1, 0, dummy);
         assert(gps.getBaseAlt(), 1000, helper::eqi);
-        gps.update(pos2, 1);
+        gps.update(pos2, 1, dummy);
         assert(gps.getBaseAlt(), 2000, helper::eqi);
-        gps.update(pos1, 0);
+        gps.update(pos1, 0, dummy);
         assert(gps.getBaseAlt(), 2000, helper::eqi);
-    })->test("write after attempt", []()
+    })->test("write after attempts", []()
     {
         data::GpsData gps;
         struct ExtGpsPosition pos1;
         pos1.position.altitude = 1000;
         struct ExtGpsPosition pos2;
         pos2.position.altitude = 2000;
-        gps.update(pos1, 1);
+        std::uint32_t dummy = 0;
+        gps.update(pos1, 2, dummy);
         assert(gps.getBaseAlt(), 1000, helper::eqi);
-        gps.update(pos2, 0);
+        gps.update(pos2, 1, dummy);
         assert(gps.getBaseAlt(), 1000, helper::eqi);
-        gps.update(pos2, 0);
+        gps.update(pos2, 1, dummy);
         assert(gps.getBaseAlt(), 2000, helper::eqi);
     });
 
-    describe<data::SensorData>("sensoric data", runner)->test("extract WIMWV",
+    describe<data::WindData>("wind data", runner)->test("extract WIMWV",
             []()
             {
-                struct SensorInfo info;
+                struct Climate info;
+                std::uint32_t dummy = 0;
                 helper::parsSens.unpack("$WIMWV,242.8,R,6.9,N,A*20\r", info);
-                assert(info.mwvStr, std::string("$WIMWV,242.8,R,6.9,N,A*20\r"), helper::eqs);
-                VFRB::msSensorData.update(info, 0);
-                assert(VFRB::msSensorData.getMwvStr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
-                assert(VFRB::msSensorData.getMwvStr(), std::string(""), helper::eqs);
-            })->test("extract WIMDA",
-            []()
-            {
-                struct SensorInfo info;
-                helper::parsSens.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r", info);
-                VFRB::msSensorData.update(info, 0);
-                assert(VFRB::msSensorData.getMdaStr(), std::string("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"), helper::eqs);
-                assert(VFRB::msSensorData.getMdaStr(), std::string(""), helper::eqs);
+                VFRB::msWindData.update(info.mWind, 1, dummy);
+                assert(info.hasWind(), true, helper::eqb);
+                assert(VFRB::msWindData.getMwvStr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
+                assert(VFRB::msWindData.getMwvStr(), std::string(""), helper::eqs);
             })->test("write higher priority", []()
     {
-        struct SensorInfo info =
-        {   "", "", 900.0};
-        VFRB::msSensorData.update(info, 0);
-        assert(VFRB::msSensorData.getAtmPress(), 900.0, helper::eqd);
-        info.press = 950.0;
-        VFRB::msSensorData.update(info, 1);
-        assert(VFRB::msSensorData.getAtmPress(), 950.0, helper::eqd);
-        info.press = 900.0;
-        VFRB::msSensorData.update(info, 0);
-        assert(VFRB::msSensorData.getAtmPress(), 950.0, helper::eqd);
+        struct Climate info =
+        {
+            {   ""},
+            {   "", 0.0}};
+        std::uint32_t dummy = 0;
+        VFRB::msWindData.init(info.mWind);
+        assert(VFRB::msWindData.getMwvStr(), std::string(""), helper::eqs);
+        info.mWind.mwvStr = "updated";
+        VFRB::msWindData.update(info.mWind, 1, dummy);
+        assert(VFRB::msWindData.getMwvStr(), std::string("updated"), helper::eqs);
+        info.mWind.mwvStr = "lower";
+        VFRB::msWindData.update(info.mWind, 0, dummy);
+        assert(VFRB::msWindData.getMwvStr(), std::string("updated"), helper::eqs);
     })->test("write after attempt", []()
     {
-        struct SensorInfo info =
-        {   "", "", 900.0};
-        VFRB::msSensorData.update(info, 2);
-        assert(VFRB::msSensorData.getAtmPress(), 900.0, helper::eqd);
-        info.press = 950.0;
-        VFRB::msSensorData.update(info, 0);
-        assert(VFRB::msSensorData.getAtmPress(), 900.0, helper::eqd);
-        VFRB::msSensorData.update(info, 0);
-        assert(VFRB::msSensorData.getAtmPress(), 950.0, helper::eqd);
+        struct Climate info =
+        {
+            {   ""},
+            {   "", 0.0}};
+        std::uint32_t dummy = 0;
+        VFRB::msWindData.init(info.mWind);
+        info.mWind.mwvStr = "updated";
+        VFRB::msWindData.update(info.mWind, 2, dummy);
+        assert(VFRB::msWindData.getMwvStr(), std::string("updated"), helper::eqs);
+        info.mWind.mwvStr = "lower";
+        VFRB::msWindData.update(info.mWind, 1, dummy);
+        assert(VFRB::msWindData.getMwvStr(), std::string("updated"), helper::eqs);
+        VFRB::msWindData.update(info.mWind, 1, dummy);
+        assert(VFRB::msWindData.getMwvStr(), std::string("lower"), helper::eqs);
+    });
+
+    describe<data::AtmosphereData>("atmosphere data", runner)->test("get WIMDA, pressure",
+            []()
+            {
+                struct Climate info;
+                std::uint32_t dummy = 0;
+                helper::parsSens.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r", info);
+                VFRB::msAtmosData.update(info.mAtmosphere, 1, dummy);
+                assert(info.hasAtmosphere(), true, helper::eqb);
+                assert(VFRB::msAtmosData.getMdaStr(), std::string("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"), helper::eqs);
+                assert(VFRB::msAtmosData.getAtmPress(), 1009.1, helper::eqd);
+            })->test("write higher priority", []()
+    {
+        struct Climate info =
+        {
+            {   ""},
+            {   "", 900.0}};
+        std::uint32_t dummy = 0;
+        VFRB::msAtmosData.init(info.mAtmosphere);
+        assert(VFRB::msAtmosData.getAtmPress(), 900.0, helper::eqd);
+        info.mAtmosphere.pressure = 1000.0;
+        VFRB::msAtmosData.update(info.mAtmosphere, 1, dummy);
+        assert(VFRB::msAtmosData.getAtmPress(), 1000.0, helper::eqd);
+        info.mAtmosphere.pressure = 950.0;
+        VFRB::msAtmosData.update(info.mAtmosphere, 0, dummy);
+        assert(VFRB::msAtmosData.getAtmPress(), 1000.0, helper::eqd);
+    })->test("write after attempt", []()
+    {
+        struct Climate info =
+        {
+            {   ""},
+            {   "", 900.0}};
+        std::uint32_t dummy = 0;
+        VFRB::msAtmosData.init(info.mAtmosphere);
+        assert(VFRB::msAtmosData.getAtmPress(), 900.0, helper::eqd);
+        info.mAtmosphere.pressure = 1000.0;
+        VFRB::msAtmosData.update(info.mAtmosphere, 2, dummy);
+        assert(VFRB::msAtmosData.getAtmPress(), 1000.0, helper::eqd);
+        info.mAtmosphere.pressure = 950.0;
+        VFRB::msAtmosData.update(info.mAtmosphere, 1, dummy);
+        assert(VFRB::msAtmosData.getAtmPress(), 1000.0, helper::eqd);
+        VFRB::msAtmosData.update(info.mAtmosphere, 1, dummy);
+        assert(VFRB::msAtmosData.getAtmPress(), 950.0, helper::eqd);
     });
 }

@@ -29,6 +29,7 @@
 #include "../src/aircraft/AircraftContainer.h"
 #include "../src/config/Configuration.h"
 #include "../src/data/AtmosphereData.h"
+#include "../src/data/WindData.h"
 #include "../src/data/GpsData.h"
 #include "../src/parser/AprsParser.h"
 #include "../src/parser/GpsParser.h"
@@ -37,8 +38,8 @@
 #include "../src/util/Position.h"
 #include "../src/util/Sensor.h"
 #include "../src/VFRB.h"
-#include "../testframework/src/comparator/Comparators.hpp"
-#include "../testframework/src/comparator/ComparatorStrategy.hpp"
+#include "framework/src/comparator/Comparators.hpp"
+#include "framework/src/comparator/ComparatorStrategy.hpp"
 
 namespace helper
 {
@@ -65,7 +66,8 @@ inline void setupVFRB()
             1, 5, config::Configuration::base_geoid, 0.0 });
 }
 
-static testsuite::comparator::Comparator<int> eqi = testsuite::comparator::EQUALS<int>();
+static testsuite::comparator::Comparator<std::int32_t> eqi = testsuite::comparator::EQUALS<std::int32_t>();
+static testsuite::comparator::Comparator<std::uint32_t> equ = testsuite::comparator::EQUALS<std::uint32_t>();
 static testsuite::comparator::Comparator<double> eqd = testsuite::comparator::EQUALS<
         double>();
 static testsuite::comparator::Comparator<std::string> eqs = testsuite::comparator::EQUALS<

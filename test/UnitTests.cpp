@@ -22,7 +22,7 @@
 #include <cstdint>
 
 #include "../src/config/Configuration.h"
-#include "../testframework/src/framework.h"
+#include "framework/src/framework.h"
 
 using namespace testsuite;
 
