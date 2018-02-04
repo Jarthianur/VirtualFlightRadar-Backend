@@ -67,10 +67,10 @@ private:
 	parser::SensorParser mParser;
 
 	///
-	std::uint32_t mWindUpdateAttempts;
+	std::uint64_t mWindUpdateAttempts;
 
 	///
-	std::uint32_t mAtmosUpdateAttempts;
+	std::uint64_t mAtmosUpdateAttempts;
 };
 
 } // namespace feed

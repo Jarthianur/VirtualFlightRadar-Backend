@@ -48,7 +48,7 @@ struct Wrapper
 	 * @param prio  The attempts priority
 	 */
 	bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
-	        std::uint32_t& rAttempts)
+	        std::uint64_t& rAttempts)
 	{
 		mUpdated = (vPriority >= mLastPriority)
 		        || (!mUpdated && vPriority * ++rAttempts >= mLastPriority);
@@ -103,7 +103,7 @@ struct TmpWrapper
 	 * @param prio  The attempts priority
 	 */
 	bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
-	        std::uint32_t& rAttempts)
+	        std::uint64_t& rAttempts)
 	{
 		mUpdated = (vPriority >= mLastPriority)
 		        || (!mUpdated && vPriority * ++rAttempts >= mLastPriority);

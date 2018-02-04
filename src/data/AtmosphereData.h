@@ -70,7 +70,7 @@ public:
 	 * @threadsafe
 	 */
 	void update(const struct util::Atmosphere& crAtmos, std::uint32_t vPriority,
-	        std::uint32_t& rAttempts) override;
+	        std::uint64_t& rAttempts) override;
 
 	/**
 	 * @fn getMdaStr

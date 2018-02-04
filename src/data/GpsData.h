@@ -67,7 +67,7 @@ public:
 	 * @threadsafe
 	 */
 	void update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t vPriority,
-	        std::uint32_t& rAttempts) override;
+	        std::uint64_t& rAttempts) override;
 	/**
 	 * @fn getGpsStr
 	 * @brief Get a full NMEA GPS report.

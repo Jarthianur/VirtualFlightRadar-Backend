@@ -64,7 +64,7 @@ VFRB::~VFRB() noexcept
 
 void VFRB::run() noexcept
 {
-	Logger::info("(VFRB) startup");
+    Logger::info("(VFRB) startup");
 	//store start time
 	boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
 

@@ -40,10 +40,10 @@ namespace config
 
 Configuration::Configuration(std::istream& r_stream)
 {
-	if (!init(r_stream))
-	{
-		throw std::logic_error("Failed to read configuration file");
-	}
+    if (!init(r_stream))
+    {
+        throw std::logic_error("Failed to read configuration file");
+    }
 }
 
 Configuration::~Configuration() noexcept
@@ -64,192 +64,234 @@ std::vector<std::shared_ptr<feed::Feed>> Configuration::global_feeds;
 
 bool Configuration::init(std::istream& r_stream)
 {
-	ConfigReader reader;
-	PropertyMap properties;
-	try
-	{
-		reader.read(r_stream, properties);
-	} catch (const std::exception& e)
-	{
-		Logger::error("(Config) read file: ", e.what());
-		return false;
-	} catch (...)
-	{
-		Logger::error("(Config) read file");
-		return false;
-	}
+    ConfigReader reader;
+    PropertyMap properties;
+    try
+    {
+        reader.read(r_stream, properties);
+    } catch (const std::exception& e)
+    {
+        Logger::error("(Config) read file: ", e.what());
+        return false;
+    } catch (...)
+    {
+        Logger::error("(Config) read file");
+        return false;
+    }
 
-	// get fallbacks
-	base_latitude = strToDouble(
-	        properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0"));
-	Logger::info("(Config) " KV_KEY_LATITUDE ": ", std::to_string(base_latitude));
+    resolveFallbacks(properties);
+    resolveFilters(properties);
 
-	base_longitude = strToDouble(
-	        properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0"));
-	Logger::info("(Config) " KV_KEY_LONGITUDE ": ", std::to_string(base_longitude));
+    global_gnd_mode = !properties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
+    std::uint64_t port = 4353;
+    try
+    {
+        port = std::stoul(
+                properties.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
+        if (port > UINT16_MAX)
+        {
+            throw std::invalid_argument("");
+        }
+    } catch (const std::logic_error& e)
+    {
+        port = 4353;
+        Logger::warn(
+                "(Config) " KV_KEY_SERVER_PORT ": Invalid server port; use default.");
+    }
+    global_server_port = (std::uint16_t) port;
+    Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(global_server_port));
 
-	base_altitude = strToInt(
-	        properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
-	Logger::info("(Config) " KV_KEY_ALTITUDE ": ", std::to_string(base_altitude));
+    std::size_t nrf = registerFeeds(properties);
+    Logger::info("(Config) number of feeds: ", std::to_string(nrf));
 
-	base_geoid = strToDouble(
-	        properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
-	Logger::info("(Config) " KV_KEY_GEOID ": ", std::to_string(base_geoid));
-
-	base_pressure = strToDouble(
-	        properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25"));
-	Logger::info("(Config) " KV_KEY_PRESSURE ": ", std::to_string(base_pressure));
-
-	// get filters
-	std::string tmp = properties.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT, "-1");
-	if (tmp == "-1")
-	{
-		filter_maxHeight = INT32_MAX;
-	}
-	else
-	{
-		filter_maxHeight = strToInt(tmp);
-	}
-	Logger::info("(Config) " KV_KEY_MAX_HEIGHT ": ", std::to_string(filter_maxHeight));
-
-	tmp = properties.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_DIST, "-1");
-	if (tmp == "-1")
-	{
-		filter_maxDist = INT32_MAX;
-	}
-	else
-	{
-		filter_maxDist = strToInt(tmp);
-	}
-	Logger::info("(Config) " KV_KEY_MAX_DIST ": ", std::to_string(filter_maxDist));
-
-	// get general
-	global_gnd_mode = properties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE) != "";
-
-	global_server_port = (uint16_t) strToInt(
-	        properties.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
-	Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(global_server_port));
-
-	std::size_t nrf = registerFeeds(properties);
-	Logger::info("(Config) number of feeds: ", std::to_string(nrf));
-
-	return nrf > 0;
+    return nrf > 0;
 }
 
 std::size_t Configuration::registerFeeds(const PropertyMap& cr_map)
 {
-	std::vector<std::string> feeds;
-	std::stringstream ss;
-	ss.str(cr_map.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
-	std::string item;
+    std::vector<std::string> feeds;
+    std::stringstream ss;
+    ss.str(cr_map.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+    std::string item;
 
-	while (std::getline(ss, item, ','))
-	{
-		std::size_t f = item.find_first_not_of(' ');
-		if (f != std::string::npos)
-		{
-			item = item.substr(f);
-		}
-		std::size_t l = item.find_last_not_of(' ');
-		if (l != std::string::npos)
-		{
-			item = item.substr(0, l + 1);
-		}
-		feeds.push_back(item);
-	}
+    while (std::getline(ss, item, ','))
+    {
+        std::size_t f = item.find_first_not_of(' ');
+        if (f != std::string::npos)
+        {
+            item = item.substr(f);
+        }
+        std::size_t l = item.find_last_not_of(' ');
+        if (l != std::string::npos)
+        {
+            item = item.substr(0, l + 1);
+        }
+        feeds.push_back(item);
+    }
 
-	for (auto it = feeds.cbegin(); it != feeds.cend(); ++it)
-	{
-		if (it->find(SECT_KEY_APRSC) != std::string::npos)
-		{
-			try
-			{
-				global_feeds.push_back(
-				        std::shared_ptr<feed::Feed>(
-				                new feed::AprscFeed(*it,
-				                        (std::uint32_t) strToInt(cr_map.getProperty(*it,
-				                        KV_KEY_PRIORITY, "0")),
-				                        cr_map.getSectionKv(*it))));
-			} catch (const std::exception& e)
-			{
-				Logger::warn("(Config) create feed " + *it + ": ", e.what());
-			}
-		}
-		else if (it->find(SECT_KEY_SBS) != std::string::npos)
-		{
-			try
-			{
-				global_feeds.push_back(
-				        std::shared_ptr<feed::Feed>(
-				                new feed::SbsFeed(*it,
-				                        (std::uint32_t) strToInt(cr_map.getProperty(*it,
-				                        KV_KEY_PRIORITY, "0")),
-				                        cr_map.getSectionKv(*it))));
-			} catch (const std::exception& e)
-			{
-				Logger::warn("(Config) create feed " + *it + ": ", e.what());
-			}
-		}
-		else if (it->find(SECT_KEY_SENS) != std::string::npos)
-		{
-			try
-			{
-				global_feeds.push_back(
-				        std::shared_ptr<feed::Feed>(
-				                new feed::SensorFeed(*it,
-				                        (std::uint32_t) strToInt(cr_map.getProperty(*it,
-				                        KV_KEY_PRIORITY, "0")),
-				                        cr_map.getSectionKv(*it))));
-			} catch (const std::exception& e)
-			{
-				Logger::warn("(Config) create feed " + *it + ": ", e.what());
-			}
-		}
-		else if (it->find(SECT_KEY_GPS) != std::string::npos)
-		{
-			try
-			{
-				global_feeds.push_back(
-				        std::shared_ptr<feed::Feed>(
-				                new feed::GpsFeed(*it,
-				                        (std::uint32_t) strToInt(cr_map.getProperty(*it,
-				                        KV_KEY_PRIORITY, "0")),
-				                        cr_map.getSectionKv(*it))));
-			} catch (const std::exception& e)
-			{
-				Logger::warn("(Config) create feed " + *it + ": ", e.what());
-			}
-		}
-	}
-	return global_feeds.size();
+    for (auto it = feeds.cbegin(); it != feeds.cend(); ++it)
+    {
+        std::uint64_t priority = 0;
+        try
+        {
+            priority = std::stoul(cr_map.getProperty(*it, KV_KEY_PRIORITY, "0"));
+            if (priority > UINT32_MAX)
+            {
+                throw std::invalid_argument("");
+            }
+        } catch (const std::logic_error& e)
+        {
+            Logger::warn("(Config) create feed " + *it, ": Invalid priority given.");
+            // Drop this feed, or create with priority 0?
+            continue;
+        }
+        if (priority == 0)
+        {
+            Logger::warn("(Config) create feed " + *it,
+                    ": Priority is 0; this feed cannot update higher ones.");
+        }
+
+        try
+        {
+            if (it->find(SECT_KEY_APRSC) != std::string::npos)
+            {
+                global_feeds.push_back(
+                        std::shared_ptr<feed::Feed>(
+                                new feed::AprscFeed(*it, (std::uint32_t) priority,
+                                        cr_map.getSectionKv(*it))));
+            }
+            else if (it->find(SECT_KEY_SBS) != std::string::npos)
+            {
+                global_feeds.push_back(
+                        std::shared_ptr<feed::Feed>(
+                                new feed::SbsFeed(*it, (std::uint32_t) priority,
+                                        cr_map.getSectionKv(*it))));
+            }
+            else if (it->find(SECT_KEY_SENS) != std::string::npos)
+            {
+                global_feeds.push_back(
+                        std::shared_ptr<feed::Feed>(
+                                new feed::SensorFeed(*it, (std::uint32_t) priority,
+                                        cr_map.getSectionKv(*it))));
+            }
+            else if (it->find(SECT_KEY_GPS) != std::string::npos)
+            {
+                global_feeds.push_back(
+                        std::shared_ptr<feed::Feed>(
+                                new feed::GpsFeed(*it, (std::uint32_t) priority,
+                                        cr_map.getSectionKv(*it))));
+            }
+            else
+            {
+                Logger::warn("(Config) create feed " + *it,
+                        ": No keywords found; be sure feed names contain one of "
+                        SECT_KEY_APRSC ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
+            }
+        } catch (const std::exception& e)
+        {
+            Logger::warn("(Config) create feed " + *it + ": ", e.what());
+        }
+    }
+    return global_feeds.size();
 }
 
-std::int32_t Configuration::strToInt(const std::string& cr_str) noexcept
+void Configuration::resolveFallbacks(const PropertyMap& cr_map)
 {
-	std::int32_t val = 0;
-	try
-	{
-		val = std::stoi(cr_str);
-	} catch (const std::logic_error& iae)
-	{
-		Logger::warn("(Config) invalid configuration: ",
-		        cr_str.length() == 0 ? "empty" : cr_str);
-	}
-	return val;
+    // resolve latitude
+    try
+    {
+        base_latitude = std::stod(
+                cr_map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0"));
+        Logger::info("(Config) " KV_KEY_LATITUDE ": ", std::to_string(base_latitude));
+    } catch (const std::logic_error& e)
+    {
+        Logger::warn("(Config) " KV_KEY_LATITUDE ": Can not resolve fallback.");
+    }
+
+    // resolve longitude
+    try
+    {
+        base_longitude = std::stod(
+                cr_map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0"));
+        Logger::info("(Config) " KV_KEY_LONGITUDE ": ", std::to_string(base_longitude));
+    } catch (const std::logic_error& e)
+    {
+        Logger::warn("(Config) " KV_KEY_LONGITUDE ": Can not resolve fallback.");
+    }
+
+    // resolve altitude
+    try
+    {
+        base_altitude = std::stoi(
+                cr_map.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
+        Logger::info("(Config) " KV_KEY_ALTITUDE ": ", std::to_string(base_altitude));
+    } catch (const std::logic_error& e)
+    {
+        Logger::warn("(Config) " KV_KEY_ALTITUDE ": Can not resolve fallback.");
+    }
+
+    // resolve geoid
+    try
+    {
+        base_geoid = std::stod(
+                cr_map.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
+        Logger::info("(Config) " KV_KEY_GEOID ": ", std::to_string(base_geoid));
+    } catch (const std::logic_error& e)
+    {
+        Logger::warn("(Config) " KV_KEY_GEOID ": Can not resolve fallback.");
+    }
+
+    // resolve atmospheric pressure, ICAO standard as default
+    try
+    {
+        base_pressure = std::stod(
+                cr_map.getProperty(SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25"));
+        Logger::info("(Config) " KV_KEY_PRESSURE ": ", std::to_string(base_pressure));
+    } catch (const std::logic_error& e)
+    {
+        Logger::warn("(Config) " KV_KEY_PRESSURE ": Can not resolve fallback.");
+    }
 }
 
-double Configuration::strToDouble(const std::string& cr_str) noexcept
+void Configuration::resolveFilters(const PropertyMap& cr_map)
 {
-	double val = 0.0;
-	try
-	{
-		val = std::stod(cr_str);
-	} catch (const std::logic_error& iae)
-	{
-		Logger::warn("(Config) invalid configuration: ",
-		        cr_str.length() == 0 ? "empty" : cr_str);
-	}
-	return val;
+    std::string tmp = cr_map.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT, "-1");
+    if (tmp == "-1")
+    {
+        filter_maxHeight = INT32_MAX;
+    }
+    else
+    {
+        try
+        {
+            filter_maxHeight = std::stoi(tmp);
+        } catch (const std::logic_error& e)
+        {
+            filter_maxHeight = INT32_MAX;
+            Logger::warn(
+                    "(Config) " KV_KEY_MAX_HEIGHT ": Can not resolve filter; thus disabled.");
+        }
+    }
+    Logger::info("(Config) " KV_KEY_MAX_HEIGHT ": ", std::to_string(filter_maxHeight));
+
+    tmp = cr_map.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_DIST, "-1");
+    if (tmp == "-1")
+    {
+        filter_maxDist = INT32_MAX;
+    }
+    else
+    {
+        try
+        {
+            filter_maxDist = std::stoi(tmp);
+        } catch (const std::logic_error& e)
+        {
+            filter_maxDist = INT32_MAX;
+            Logger::warn(
+                    "(Config) " KV_KEY_MAX_DIST ": Can not resolve filter; thus disabled.");
+        }
+    }
+    Logger::info("(Config) " KV_KEY_MAX_DIST ": ", std::to_string(filter_maxDist));
 }
 
 }  // namespace config

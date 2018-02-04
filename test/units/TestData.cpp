@@ -53,12 +53,11 @@ void test_data(TestSuitesRunner& runner)
                 assert(VFRB::msAcCont.processAircrafts(), std::string(""), helper::eqs);
             })->test("delete aircraft", []()
     {
-        //just for coverage
-            for (int i = 0; i < 40; ++i)
-            {
-                helper::clearAcCont();
-            }
-        })->test("prefer FLARM, accept again if no input",
+        for (int i = 0; i < 40; ++i)
+        {
+            helper::clearAcCont();
+        }
+    })->test("prefer FLARM, accept again if no input",
             []()
             {
                 config::Configuration::base_altitude = 0;
@@ -173,10 +172,10 @@ void test_data(TestSuitesRunner& runner)
             {   ""},
             {   "", 0.0}};
         std::uint32_t dummy = 0;
-        VFRB::msWindData.init(info.mWind);
+        VFRB::msWindData.update(info.mWind, 1, dummy);
         assert(VFRB::msWindData.getMwvStr(), std::string(""), helper::eqs);
         info.mWind.mwvStr = "updated";
-        VFRB::msWindData.update(info.mWind, 1, dummy);
+        VFRB::msWindData.update(info.mWind, 2, dummy);
         assert(VFRB::msWindData.getMwvStr(), std::string("updated"), helper::eqs);
         info.mWind.mwvStr = "lower";
         VFRB::msWindData.update(info.mWind, 0, dummy);
@@ -188,7 +187,7 @@ void test_data(TestSuitesRunner& runner)
             {   ""},
             {   "", 0.0}};
         std::uint32_t dummy = 0;
-        VFRB::msWindData.init(info.mWind);
+        VFRB::msWindData.update(info.mWind, 1, dummy);
         info.mWind.mwvStr = "updated";
         VFRB::msWindData.update(info.mWind, 2, dummy);
         assert(VFRB::msWindData.getMwvStr(), std::string("updated"), helper::eqs);
@@ -216,10 +215,10 @@ void test_data(TestSuitesRunner& runner)
             {   ""},
             {   "", 900.0}};
         std::uint32_t dummy = 0;
-        VFRB::msAtmosData.init(info.mAtmosphere);
+        VFRB::msAtmosData.update(info.mAtmosphere, 1, dummy);
         assert(VFRB::msAtmosData.getAtmPress(), 900.0, helper::eqd);
         info.mAtmosphere.pressure = 1000.0;
-        VFRB::msAtmosData.update(info.mAtmosphere, 1, dummy);
+        VFRB::msAtmosData.update(info.mAtmosphere, 2, dummy);
         assert(VFRB::msAtmosData.getAtmPress(), 1000.0, helper::eqd);
         info.mAtmosphere.pressure = 950.0;
         VFRB::msAtmosData.update(info.mAtmosphere, 0, dummy);
@@ -231,7 +230,7 @@ void test_data(TestSuitesRunner& runner)
             {   ""},
             {   "", 900.0}};
         std::uint32_t dummy = 0;
-        VFRB::msAtmosData.init(info.mAtmosphere);
+        VFRB::msAtmosData.update(info.mAtmosphere, 1, dummy);
         assert(VFRB::msAtmosData.getAtmPress(), 900.0, helper::eqd);
         info.mAtmosphere.pressure = 1000.0;
         VFRB::msAtmosData.update(info.mAtmosphere, 2, dummy);

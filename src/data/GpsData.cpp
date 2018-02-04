@@ -37,12 +37,12 @@ GpsData::~GpsData() noexcept
 
 void GpsData::init(struct util::ExtGpsPosition pos)
 {
-	std::uint32_t dummy = 0;
+	std::uint64_t dummy = 0;
 	mBasePos.trySetValue(pos, 0, dummy);
 }
 
 void GpsData::update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t prio,
-        std::uint32_t& rAttempts)
+        std::uint64_t& rAttempts)
 {
 	boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
 	if (mBasePos.trySetValue(cr_pos, prio, rAttempts))
