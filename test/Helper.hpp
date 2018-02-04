@@ -43,31 +43,11 @@
 
 namespace helper
 {
-/**
- * after that, inserted aircraft is not reported until update
- */
-inline void clearAcCont()
-{
-    for (int i = 0; i < 4; ++i)
-    {
-        VFRB::msAcCont.processAircrafts();
-    }
-}
 
-/**
- * set vfrb statics to config
- */
-inline void setupVFRB()
-{
-    VFRB::msWindData.init( { "" });
-    VFRB::msAtmosData.init( { "", config::Configuration::base_pressure });
-    VFRB::msGpsData.init( { { config::Configuration::base_latitude,
-            config::Configuration::base_longitude, config::Configuration::base_altitude },
-            1, 5, config::Configuration::base_geoid, 0.0 });
-}
-
-static testsuite::comparator::Comparator<std::int32_t> eqi = testsuite::comparator::EQUALS<std::int32_t>();
-static testsuite::comparator::Comparator<std::uint32_t> equ = testsuite::comparator::EQUALS<std::uint32_t>();
+static testsuite::comparator::Comparator<std::int32_t> eqi =
+        testsuite::comparator::EQUALS<std::int32_t>();
+static testsuite::comparator::Comparator<std::uint32_t> equ =
+        testsuite::comparator::EQUALS<std::uint32_t>();
 static testsuite::comparator::Comparator<double> eqd = testsuite::comparator::EQUALS<
         double>();
 static testsuite::comparator::Comparator<std::string> eqs = testsuite::comparator::EQUALS<

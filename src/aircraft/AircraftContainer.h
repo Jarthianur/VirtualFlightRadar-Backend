@@ -32,6 +32,10 @@
 #include "../aircraft/AircraftProcessor.h"
 #include "../config/Parameters.h"
 
+#define AC_INVALIDATE         4
+#define AC_DELETE_THRESHOLD   120
+#define AC_NO_FLARM_THRESHOLD AC_INVALIDATE
+
 namespace aircraft
 {
 

@@ -46,48 +46,61 @@ using namespace aircraft;
 
 void test_data(TestSuitesRunner& runner)
 {
-    describe<AircraftContainer>("Container Functions", runner)->test(
-            "invalidate aircraft", []()
+    describe<AircraftContainer>("Container functions", runner)->test(
+            "invalidate aircraft",
+            []()
             {
-                helper::clearAcCont();
-                assert(VFRB::msAcCont.processAircrafts(), std::string(""), helper::eqs);
-            })->test("delete aircraft", []()
-    {
-        for (int i = 0; i < 40; ++i)
-        {
-            helper::clearAcCont();
-        }
-    })->test("prefer FLARM, accept again if no input",
+                AircraftContainer container;
+                Aircraft ac;
+                helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", ac);
+                container.upsert(ac, 1);
+                for (int i = 0; i < AC_INVALIDATE; ++i)
+                {
+                    container.processAircrafts();
+                }
+                assert(container.processAircrafts(), std::string(""), helper::eqs);
+            })->test("delete aircraft",
+            []()
+            {
+                AircraftContainer container;
+                Aircraft ac;
+                helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", ac);
+                container.upsert(ac, 1);
+                for (int i = 0; i < AC_DELETE_THRESHOLD; ++i)
+                {
+                    container.processAircrafts();
+                }
+            })->test("prefer FLARM, accept again if no input",
             []()
             {
                 config::Configuration::base_altitude = 0;
                 config::Configuration::base_latitude = 49.000000;
                 config::Configuration::base_longitude = 8.000000;
                 config::Configuration::base_pressure = 1013.25;
-                helper::setupVFRB();
+                AircraftContainer container;
                 boost::smatch match;
                 Aircraft ac;
                 helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", ac);
-                VFRB::msAcCont.upsert(ac, 0);
-                VFRB::msAcCont.processAircrafts();
+                container.upsert(ac, 0);
+                container.processAircrafts();
                 helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot", ac);
-                VFRB::msAcCont.upsert(ac, 0);
-                VFRB::msAcCont.processAircrafts();
+                container.upsert(ac, 0);
+                container.processAircrafts();
                 helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0", ac);
-                VFRB::msAcCont.upsert(ac, 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
+                container.upsert(ac, 0);
+                std::string proc = container.processAircrafts();
                 bool matched = boost::regex_search(proc, match, helper::pflauRe);
                 assert(matched, true, helper::eqb);
-
                 assert(match.str(2), std::string("610"), helper::eqs);
-
-                helper::clearAcCont();
+                for (int i =0; i < AC_NO_FLARM_THRESHOLD; ++i)
+                {
+                    container.processAircrafts();
+                }
                 helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0", ac);
-                VFRB::msAcCont.upsert(ac, 0);
-                proc = VFRB::msAcCont.processAircrafts();
+                container.upsert(ac, 0);
+                proc = container.processAircrafts();
                 matched = boost::regex_search(proc, match, helper::pflauRe);
                 assert(matched, true, helper::eqb);
-
                 assert(match.str(2), std::string("1000"), helper::eqs);
             })->test("write after attempt",
             []()
