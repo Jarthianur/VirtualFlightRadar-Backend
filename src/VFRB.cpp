@@ -65,113 +65,115 @@ VFRB::~VFRB() noexcept
 void VFRB::run() noexcept
 {
     Logger::info("(VFRB) startup");
-	//store start time
-	boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
+    //store start time
+    boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
 
-	// register signals and run handler
-	boost::asio::io_service io_service;
-	boost::asio::signal_set signal_set(io_service);
+    // register signals and run handler
+    boost::asio::io_service io_service;
+    boost::asio::signal_set signal_set(io_service);
 
-	signal_set.add(SIGINT);
-	signal_set.add(SIGTERM);
+    signal_set.add(SIGINT);
+    signal_set.add(SIGTERM);
 #if defined(SIGQUIT)
-	signal_set.add(SIGQUIT);
+    signal_set.add(SIGQUIT);
 #endif // defined(SIGQUIT)
 
-	signal_set.async_wait(
-	        boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
-	                boost::asio::placeholders::signal_number));
+    signal_set.async_wait(
+            boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
+                    boost::asio::placeholders::signal_number));
 
-	boost::thread signal_thread([&io_service]()
-	{
-		io_service.run();
-	});
+    boost::thread signal_thread([&io_service]()
+    {
+        io_service.run();
+    });
 
-	// init server and run handler
-	network::server::Server server(signal_set, config::Configuration::global_server_port);
-	boost::thread server_thread(boost::bind(&VFRB::handleServer, std::ref(server)));
+    // init server and run handler
+    network::server::Server server(signal_set, config::Configuration::global_server_port);
+    boost::thread server_thread(boost::bind(&VFRB::handleServer, std::ref(server)));
 
-	//init input threads
-	boost::thread_group feed_threads;
-	for (auto it = config::Configuration::global_feeds.begin();
-	        it != config::Configuration::global_feeds.end(); ++it)
-	{
-		feed_threads.create_thread(
-		        boost::bind(&VFRB::handleFeed, std::ref(signal_set), *it));
-	}
-	config::Configuration::global_feeds.clear();
+    //init input threads
+    boost::thread_group feed_threads;
+    for (auto it = config::Configuration::global_feeds.begin();
+            it != config::Configuration::global_feeds.end(); ++it)
+    {
+        feed_threads.create_thread(
+                boost::bind(&VFRB::handleFeed, std::ref(signal_set), *it));
+    }
+    config::Configuration::global_feeds.clear();
 
-	while (global_run_status)
-	{
-		try
-		{
-			//write Aircrafts to clients
-			std::string str = msAcCont.processAircrafts();
-			if (str.length() > 0)
-			{
-				server.writeToAll(str);
-			}
+    while (global_run_status)
+    {
+        try
+        {
+            //write Aircrafts to clients
+            std::string str = msAcCont.processAircrafts( { msGpsData.getBaseLat(),
+                    msGpsData.getBaseLong(), msGpsData.getBaseAlt() },
+                    msAtmosData.getAtmPress());
+            if (str.length() > 0)
+            {
+                server.writeToAll(str);
+            }
 
-			//write GPS position to clients
-			server.writeToAll(msGpsData.getGpsStr());
+            //write GPS position to clients
+            server.writeToAll(msGpsData.getGpsStr());
 
-			// write climate info to clients
-			str = msAtmosData.getMdaStr() + msWindData.getMwvStr();
-			if (str.length() > 0)
-			{
-				server.writeToAll(str);
-			}
+            // write climate info to clients
+            str = msAtmosData.getMdaStr() + msWindData.getMwvStr();
+            if (str.length() > 0)
+            {
+                server.writeToAll(str);
+            }
 
-			//synchronise cycles to ~SYNC_TIME sec
-			boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
-		} catch (const std::exception& e)
-		{
-			Logger::error("(VFRB) error: ", e.what());
-			global_run_status = false;
-		} catch (...)
-		{
-			Logger::error("(VFRB) error");
-			global_run_status = false;
-		}
-	}
+            //synchronise cycles to ~SYNC_TIME sec
+            boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
+        } catch (const std::exception& e)
+        {
+            Logger::error("(VFRB) error: ", e.what());
+            global_run_status = false;
+        } catch (...)
+        {
+            Logger::error("(VFRB) error");
+            global_run_status = false;
+        }
+    }
 
-	// exit sequence, join threads
-	server_thread.join();
-	feed_threads.join_all();
-	signal_thread.join();
+    // exit sequence, join threads
+    server_thread.join();
+    feed_threads.join_all();
+    signal_thread.join();
 
-	//eval end time
-	boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
-	boost::chrono::minutes runtime = boost::chrono::duration_cast<boost::chrono::minutes>(
-	        end - start);
-	std::string time_str(std::to_string(runtime.count() / 60 / 24));
-	time_str += " days, ";
-	time_str += std::to_string(runtime.count() / 60);
-	time_str += " hours, ";
-	time_str += std::to_string(runtime.count() % 60);
-	time_str += " mins";
+    //eval end time
+    boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
+    boost::chrono::minutes runtime = boost::chrono::duration_cast<boost::chrono::minutes>(
+            end - start);
+    std::string time_str(std::to_string(runtime.count() / 60 / 24));
+    time_str += " days, ";
+    time_str += std::to_string(runtime.count() / 60);
+    time_str += " hours, ";
+    time_str += std::to_string(runtime.count() % 60);
+    time_str += " mins";
 
-	Logger::info("EXITING / runtime: ", time_str);
+    Logger::info("EXITING / runtime: ", time_str);
 
 }
 
 void VFRB::handleServer(network::server::Server& r_server)
 {
-	Logger::info("(Server) startup: localhost ",
-	        std::to_string(config::Configuration::global_server_port));
-	r_server.run();
-	global_run_status = false;
+    Logger::info("(Server) startup: localhost ",
+            std::to_string(config::Configuration::global_server_port));
+    r_server.run();
+    global_run_status = false;
 }
 
 void VFRB::handleFeed(boost::asio::signal_set& r_sigset,
-        std::shared_ptr<feed::Feed> p_feed)
+                      std::shared_ptr<feed::Feed> p_feed)
 {
-	Logger::info("(VFRB) run feed: ", p_feed->mName);
-	p_feed->run(r_sigset);
+    Logger::info("(VFRB) run feed: ", p_feed->mName);
+    p_feed->run(r_sigset);
 }
 
 void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)
 {
-	Logger::info("(VFRB) caught signal: ", "shutdown");
-	global_run_status = false;
+    Logger::info("(VFRB) caught signal: ", "shutdown");
+    global_run_status = false;
 }

@@ -29,6 +29,7 @@
 #include <utility>
 
 #include "../util/Logger.h"
+#include "../util/Position.h"
 #include "Aircraft.hpp"
 
 using namespace util;
@@ -38,8 +39,8 @@ namespace aircraft
 
 AircraftContainer::AircraftContainer()
 {
-	mCont.reserve(20);
-	mIndexMap.reserve(40);
+    mCont.reserve(20);
+    mIndexMap.reserve(40);
 }
 
 AircraftContainer::~AircraftContainer() noexcept
@@ -48,82 +49,83 @@ AircraftContainer::~AircraftContainer() noexcept
 
 std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& cr_id)
 {
-	const auto it = mIndexMap.find(cr_id);
-	if (it == mIndexMap.cend())
-	{
-		return mCont.end();
-	}
-	else
-	{
-		return mCont.begin() + it->second;
-	}
+    const auto it = mIndexMap.find(cr_id);
+    if (it == mIndexMap.cend())
+    {
+        return mCont.end();
+    }
+    else
+    {
+        return mCont.begin() + it->second;
+    }
 }
 
-std::string AircraftContainer::processAircrafts()
+std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& crBasePos,
+                                                double vAtmPress)
 {
-	boost::lock_guard<boost::mutex> lock(this->mMutex);
-	std::string dest_str;
-	std::size_t index = 0;
-	bool del = false;
-	auto it = mCont.begin();
+    boost::lock_guard<boost::mutex> lock(this->mMutex);
+    std::string dest_str;
+    std::size_t index = 0;
+    bool del = false;
+    auto it = mCont.begin();
 
-	while (it != mCont.end())
-	{
-		try
-		{
-			// if no FLARM msg received after x, assume target has Transponder
-			if (++(it->getUpdateAge()) == AC_NO_FLARM_THRESHOLD)
-			{
-				it->setTargetT(Aircraft::TargetType::TRANSPONDER);
-			}
+    while (it != mCont.end())
+    {
+        try
+        {
+            // if no FLARM msg received after x, assume target has Transponder
+            if (++(it->getUpdateAge()) == AC_NO_FLARM_THRESHOLD)
+            {
+                it->setTargetT(Aircraft::TargetType::TRANSPONDER);
+            }
 
-			if (it->getUpdateAge() >= AC_DELETE_THRESHOLD)
-			{
-				del = true;
-				mIndexMap.erase(it->getId());
-				it = mCont.erase(it);
-			}
-			else
-			{
-				if (it->getUpdateAge() < AC_INVALIDATE)
-				{
-					dest_str += mAcProc.process(*it);
-				}
-				++it;
-				++index;
-			}
-			if (del && it != mCont.end())
-			{
-				mIndexMap.at(it->getId()) = index;
-			}
-		} catch (const std::exception& e)
-		{
-			Logger::warn("(AircraftContainer) processAircrafts: ", e.what());
-		}
-	}
-	return dest_str;
+            if (it->getUpdateAge() >= AC_DELETE_THRESHOLD)
+            {
+                del = true;
+                mIndexMap.erase(it->getId());
+                it = mCont.erase(it);
+            }
+            else
+            {
+                if (it->getUpdateAge() < AC_INVALIDATE)
+                {
+                    dest_str += mAcProc.process(*it, crBasePos, vAtmPress);
+                }
+                ++it;
+                ++index;
+            }
+            if (del && it != mCont.end())
+            {
+                mIndexMap.at(it->getId()) = index;
+            }
+        } catch (const std::exception& e)
+        {
+            Logger::warn("(AircraftContainer) processAircrafts: ", e.what());
+        }
+    }
+    return dest_str;
 }
 
 void AircraftContainer::upsert(const Aircraft& cr_update, std::uint32_t prio)
 {
-	boost::lock_guard<boost::mutex> lock(this->mMutex);
-	auto known_ac = find(cr_update.getId());
-	if (known_ac != mCont.end())
-	{
-		if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER
-		        || cr_update.getTargetT() == Aircraft::TargetType::FLARM)
-		{
-			if (prio * ++(known_ac->getUpdateAttempts()) >= known_ac->getLastPriority())
-			{
-				known_ac->update(cr_update, prio);
-			}
-		}
-	}
-	else
-	{
-		mIndexMap.insert( { cr_update.getId(), mCont.size() });
-		mCont.push_back(cr_update);
-	}
+    boost::lock_guard<boost::mutex> lock(this->mMutex);
+    auto known_ac = find(cr_update.getId());
+    if (known_ac != mCont.end())
+    {
+        if (known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER
+                || cr_update.getTargetT() == Aircraft::TargetType::FLARM)
+        {
+            if (prio * ++(known_ac->getUpdateAttempts()) >= known_ac->getLastPriority())
+            {
+                known_ac->update(cr_update, prio);
+            }
+        }
+    }
+    else
+    {
+        mIndexMap.insert( { cr_update.getId(), mCont.size() });
+        mCont.push_back(cr_update);
+    }
 }
 
 } // namespace aircraft

@@ -79,7 +79,8 @@ public:
      * @return the string with all NMEA reports
      * @threadsafe
      */
-    std::string processAircrafts();
+    std::string processAircrafts(const struct util::GpsPosition& crBasePos,
+                                 double vAtmPress);
 
 private:
     /**
