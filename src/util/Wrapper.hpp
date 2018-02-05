@@ -90,7 +90,7 @@ template<typename T>
 struct TmpWrapper
 {
 	/// Is the value valid?
-	bool isValueValid;
+    bool isValueValid = false;
 
 	/// Mutex to enable threadsafety per TmpWrapper.
 	boost::mutex mutex;
@@ -132,7 +132,7 @@ private:
 	T mValue;
 
 	/// Last written priority
-	std::uint32_t mLastPriority;
+    std::uint32_t mLastPriority = 0;
 
 	///
 	bool mUpdated = false;

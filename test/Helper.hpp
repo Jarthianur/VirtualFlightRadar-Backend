@@ -48,6 +48,8 @@ static testsuite::comparator::Comparator<std::int32_t> eqi =
         testsuite::comparator::EQUALS<std::int32_t>();
 static testsuite::comparator::Comparator<std::uint32_t> equ =
         testsuite::comparator::EQUALS<std::uint32_t>();
+static testsuite::comparator::Comparator<std::uint64_t> equl =
+        testsuite::comparator::EQUALS<std::uint64_t>();
 static testsuite::comparator::Comparator<double> eqd = testsuite::comparator::EQUALS<
         double>();
 static testsuite::comparator::Comparator<std::string> eqs = testsuite::comparator::EQUALS<
