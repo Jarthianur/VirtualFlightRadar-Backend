@@ -49,12 +49,12 @@ struct Climate
 
 	inline bool hasAtmosphere()
 	{
-		return mAtmosphere.mdaStr.empty();
+        return !mAtmosphere.mdaStr.empty();
 	}
 
 	inline bool hasWind()
 	{
-		return mWind.mwvStr.empty();
+        return !mWind.mwvStr.empty();
 	}
 };
 

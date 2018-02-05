@@ -191,7 +191,6 @@ void test_data(TestSuitesRunner& runner)
                 struct Climate info;
                 data::WindData wind;helper::parsSens.unpack("$WIMWV,242.8,R,6.9,N,A*20\r", info);
                 wind.init(info.mWind);
-                std::uint64_t dummy = 0;
                 assert(info.hasWind(), true, helper::eqb);
                 assert(wind.getMwvStr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
                 assert(wind.getMwvStr(), std::string(""), helper::eqs);
@@ -203,7 +202,7 @@ void test_data(TestSuitesRunner& runner)
             {   "", 0.0}};
         std::uint64_t dummy = 0;
         data::WindData wind;
-        wind.init(info.mWind)
+        wind.init(info.mWind);
         assert(wind.getMwvStr(), std::string(""), helper::eqs);
         info.mWind.mwvStr = "updated";
         wind.update(info.mWind, 2, dummy);
@@ -235,7 +234,6 @@ void test_data(TestSuitesRunner& runner)
             []()
             {
                 struct Climate info;
-                std::uint64_t dummy = 0;
                 helper::parsSens.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r", info);
                 data::AtmosphereData atm;
                 atm.init(info.mAtmosphere);
