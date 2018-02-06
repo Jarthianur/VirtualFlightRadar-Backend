@@ -163,6 +163,10 @@ public:
         return mLastPriority;
     }
 
+    inline void setLastPriority(std::uint32_t prio) {
+        mLastPriority = prio;
+    }
+
     /**
      * @fn getLatitude
      * @brief Get the last known latitude.

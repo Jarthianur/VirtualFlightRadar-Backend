@@ -106,7 +106,7 @@ std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& 
     return dest_str;
 }
 
-void AircraftContainer::upsert(const Aircraft& cr_update, std::uint32_t prio)
+void AircraftContainer::upsert(Aircraft& cr_update, std::uint32_t prio)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     auto known_ac = find(cr_update.getId());
@@ -123,6 +123,7 @@ void AircraftContainer::upsert(const Aircraft& cr_update, std::uint32_t prio)
     }
     else
     {
+        cr_update.setLastPriority(prio);
         mIndexMap.insert( { cr_update.getId(), mCont.size() });
         mCont.push_back(cr_update);
     }

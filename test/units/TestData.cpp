@@ -71,7 +71,6 @@ void test_data(TestSuitesRunner& runner)
         GpsPosition pos =
         {   49.0, 8.0, 0};
         double press = 1013.25;
-
         helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", ac);
         container.upsert(ac, 0);
         for (int i = 0; i < AC_DELETE_THRESHOLD; ++i)
@@ -123,11 +122,9 @@ void test_data(TestSuitesRunner& runner)
         boost::smatch match;
         Aircraft ac;
         AircraftContainer container;
-
         helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot", ac);
         container.upsert(ac, 2);
         helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot", ac);
-        container.upsert(ac, 1);
         container.upsert(ac, 1);
         std::string proc = container.processAircrafts(pos, press);
         bool matched = boost::regex_search(proc, match, helper::pflauRe);
