@@ -37,7 +37,7 @@ WindData::~WindData() noexcept
 }
 
 void WindData::update(const struct Wind& crWind, std::uint32_t vPriority,
-                      std::uint32_t& rAttempts)
+        std::uint64_t& rAttempts)
 {
     boost::lock_guard<boost::mutex> lock(mWind.mutex);
     if (mWind.trySetValue(crWind, vPriority, rAttempts))
@@ -61,8 +61,8 @@ std::string WindData::getMwvStr()
 
 void WindData::init(struct Wind vWind)
 {
-    std::uint32_t dummy = 0;
-    mWind.trySetValue(vWind, 0, dummy);
+	std::uint64_t dummy = 0;
+	mWind.trySetValue(vWind, 0, dummy);
 }
 
 }  // namespace data

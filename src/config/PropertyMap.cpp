@@ -42,7 +42,7 @@ const std::string PropertyMap::getProperty(const std::string& cr_section,
     if (s_it != mPropertiesMap.end())
     {
         auto it = s_it->second.find(cr_key);
-        if (it != s_it->second.end())
+        if (it != s_it->second.end() && !it->second.empty())
         {
             return it->second;
         }

@@ -52,14 +52,14 @@ public:
     {
     }
 
-    /**
-     * @fn update
-     * @brief Update the specialized data.
-     * @note To be implemented.
-     * @tparam T The new data
-     * @param prio The priority of the update
-     */
-    virtual void update(const T&, std::uint32_t vPriority, std::uint32_t& rAttempts) = 0;
+	/**
+	 * @fn update
+	 * @brief Update the specialized data.
+	 * @note To be implemented.
+	 * @tparam T The new data
+	 * @param prio The priority of the update
+	 */
+	virtual void update(const T&, std::uint32_t vPriority, std::uint64_t& rAttempts) = 0;
 
     /**
      * @fn init

@@ -29,16 +29,13 @@
 #include <utility>
 
 #include "../util/Logger.h"
+#include "../util/Position.h"
 #include "Aircraft.hpp"
 
 using namespace util;
 
 namespace aircraft
 {
-
-#define AC_INVALIDATE         4
-#define AC_DELETE_THRESHOLD   120
-#define AC_NO_FLARM_THRESHOLD AC_INVALIDATE
 
 AircraftContainer::AircraftContainer()
 {
@@ -63,7 +60,8 @@ std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& cr_id
     }
 }
 
-std::string AircraftContainer::processAircrafts()
+std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& crBasePos,
+                                                double vAtmPress)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     std::string dest_str;
@@ -91,7 +89,7 @@ std::string AircraftContainer::processAircrafts()
             {
                 if (it->getUpdateAge() < AC_INVALIDATE)
                 {
-                    dest_str += mAcProc.process(*it);
+                    dest_str += mAcProc.process(*it, crBasePos, vAtmPress);
                 }
                 ++it;
                 ++index;
@@ -108,7 +106,7 @@ std::string AircraftContainer::processAircrafts()
     return dest_str;
 }
 
-void AircraftContainer::upsert(const Aircraft& cr_update, std::uint32_t prio)
+void AircraftContainer::upsert(Aircraft& cr_update, std::uint32_t prio)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     auto known_ac = find(cr_update.getId());
@@ -125,6 +123,7 @@ void AircraftContainer::upsert(const Aircraft& cr_update, std::uint32_t prio)
     }
     else
     {
+        cr_update.setLastPriority(prio);
         mIndexMap.insert( { cr_update.getId(), mCont.size() });
         mCont.push_back(cr_update);
     }

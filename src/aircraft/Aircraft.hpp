@@ -149,7 +149,7 @@ public:
      * @brief Get the current update age.
      * @return the update age
      */
-    inline std::uint32_t& getUpdateAge()
+    inline std::uint64_t& getUpdateAge()
     {
         return mUpdateAge;
     }
@@ -161,6 +161,10 @@ public:
     inline const std::uint32_t getLastPriority() const
     {
         return mLastPriority;
+    }
+
+    inline void setLastPriority(std::uint32_t prio) {
+        mLastPriority = prio;
     }
 
     /**
@@ -305,7 +309,7 @@ public:
         mFullInfo = info;
     }
 
-    inline std::uint32_t& getUpdateAttempts()
+    inline std::uint64_t& getUpdateAttempts()
     {
         return mUpdateAttempts;
     }
@@ -322,11 +326,11 @@ private:
     /// Is full set of information available?
     bool mFullInfo = false;
     /// Times processed without update.
-    std::uint32_t mUpdateAge = 0;
+    std::uint64_t mUpdateAge = 0;
     /// Got last update with which priority.
     std::uint32_t mLastPriority = 0;
     ///
-    std::uint32_t mUpdateAttempts = 0;
+    std::uint64_t mUpdateAttempts = 0;
     /// Last registered position.
     struct util::GpsPosition mPosition;
     /// Speed over ground; m/s

@@ -32,6 +32,10 @@
 #include "../aircraft/AircraftProcessor.h"
 #include "../config/Parameters.h"
 
+#define AC_INVALIDATE         4
+#define AC_DELETE_THRESHOLD   120
+#define AC_NO_FLARM_THRESHOLD AC_INVALIDATE
+
 namespace aircraft
 {
 
@@ -66,7 +70,7 @@ public:
      * @param prio      The priority attempting to write
      * @threadsafe
      */
-    void upsert(const Aircraft& cr_update, std::uint32_t prio);
+    void upsert(Aircraft& cr_update, std::uint32_t prio);
     /**
      * @fn processAircrafts
      * @brief Process all Aircrafts and get the reports as string.
@@ -75,7 +79,8 @@ public:
      * @return the string with all NMEA reports
      * @threadsafe
      */
-    std::string processAircrafts();
+    std::string processAircrafts(const struct util::GpsPosition& crBasePos,
+                                 double vAtmPress);
 
 private:
     /**

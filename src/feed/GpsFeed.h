@@ -66,7 +66,7 @@ private:
     /// Parser to unpack response from Client
     parser::GpsParser mParser;
     ///
-    std::uint32_t mUpdateAttempts;
+    std::uint64_t mUpdateAttempts;
 };
 
 } // namespace feed

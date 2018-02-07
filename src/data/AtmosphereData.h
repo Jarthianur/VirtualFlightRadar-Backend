@@ -40,54 +40,54 @@ namespace data
 class AtmosphereData: public Data<struct util::Atmosphere>
 {
 public:
-    /**
-     * @fn AtmosphereData
-     * @brief Constructor
-     */
-    AtmosphereData();
+	/**
+	 * @fn AtmosphereData
+	 * @brief Constructor
+	 */
+	AtmosphereData();
 
-    /**
-     * @fn ~AtmosphereData
-     * @brief Destructor
-     */
-    virtual ~AtmosphereData() noexcept;
+	/**
+	 * @fn ~AtmosphereData
+	 * @brief Destructor
+	 */
+	virtual ~AtmosphereData() noexcept;
 
-    /**
-     * @fn init
-     * @brief Initialize the sensor information.
-     * @param info The initial data
-     * @override Data::init
-     */
-    void init(struct util::Atmosphere vAtmos) override;
+	/**
+	 * @fn init
+	 * @brief Initialize the sensor information.
+	 * @param info The initial data
+	 * @override Data::init
+	 */
+	void init(struct util::Atmosphere vAtmos) override;
 
-    /**
-     * @fn update
-     * @brief Try to update the sensor information.
-     * @note Splits the given info, using setters.
-     * @param cr_info The new sensor information.
-     * @param prio    The attempts priority
-     * @override Data::update
-     * @threadsafe
-     */
-    void update(const struct util::Atmosphere& crAtmos, std::uint32_t vPriority,
-                std::uint32_t& rAttempts) override;
+	/**
+	 * @fn update
+	 * @brief Try to update the sensor information.
+	 * @note Splits the given info, using setters.
+	 * @param cr_info The new sensor information.
+	 * @param prio    The attempts priority
+	 * @override Data::update
+	 * @threadsafe
+	 */
+	void update(const struct util::Atmosphere& crAtmos, std::uint32_t vPriority,
+	        std::uint64_t& rAttempts) override;
 
-    /**
-     * @fn getMdaStr
-     * @brief Get the MDA sentence.
-     * @note MDA is invalid after this operation.
-     * @return the MDA sentence, if valid, else empty string
-     * @threadsafe
-     */
-    std::string getMdaStr();
+	/**
+	 * @fn getMdaStr
+	 * @brief Get the MDA sentence.
+	 * @note MDA is invalid after this operation.
+	 * @return the MDA sentence, if valid, else empty string
+	 * @threadsafe
+	 */
+	std::string getMdaStr();
 
-    /**
-     * @fn getPress
-     * @brief Get pressure.
-     * @return the pressure
-     * @threadsafe
-     */
-    double getAtmPress();
+	/**
+	 * @fn getPress
+	 * @brief Get pressure.
+	 * @return the pressure
+	 * @threadsafe
+	 */
+	double getAtmPress();
 
 private:
 

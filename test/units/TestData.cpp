@@ -46,79 +46,105 @@ using namespace aircraft;
 
 void test_data(TestSuitesRunner& runner)
 {
-    describe<AircraftContainer>("Container Functions", runner)->test(
-            "invalidate aircraft", []()
-            {
-                helper::clearAcCont();
-                assert(VFRB::msAcCont.processAircrafts(), std::string(""), helper::eqs);
-            })->test("delete aircraft", []()
+    describe<AircraftContainer>("Container functions", runner)->test(
+                "invalidate aircraft",
+                []()
     {
-        //just for coverage
-            for (int i = 0; i < 40; ++i)
-            {
-                helper::clearAcCont();
-            }
-        })->test("prefer FLARM, accept again if no input",
-            []()
-            {
-                config::Configuration::base_altitude = 0;
-                config::Configuration::base_latitude = 49.000000;
-                config::Configuration::base_longitude = 8.000000;
-                config::Configuration::base_pressure = 1013.25;
-                helper::setupVFRB();
-                boost::smatch match;
-                Aircraft ac;
-                helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", ac);
-                VFRB::msAcCont.upsert(ac, 0);
-                VFRB::msAcCont.processAircrafts();
-                helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot", ac);
-                VFRB::msAcCont.upsert(ac, 0);
-                VFRB::msAcCont.processAircrafts();
-                helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0", ac);
-                VFRB::msAcCont.upsert(ac, 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
+        AircraftContainer container;
+        Aircraft ac;
+        GpsPosition pos =
+        {   49.0, 8.0, 0};
+        double press = 1013.25;
 
-                assert(match.str(2), std::string("610"), helper::eqs);
+        helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", ac);
+        container.upsert(ac, 0);
+        for (int i = 0; i < AC_INVALIDATE; ++i)
+        {
+            container.processAircrafts(pos, press);
+        }
+        assert(container.processAircrafts(pos, press), std::string(""), helper::eqs);
+    })->test("delete aircraft",
+             []()
+    {
+        AircraftContainer container;
+        Aircraft ac;
+        GpsPosition pos =
+        {   49.0, 8.0, 0};
+        double press = 1013.25;
+        helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", ac);
+        container.upsert(ac, 0);
+        for (int i = 0; i < AC_DELETE_THRESHOLD; ++i)
+        {
+            container.processAircrafts(pos, press);
+        }
+    })->test("prefer FLARM, accept again if no input",
+             []()
+    {
+        config::Configuration::filter_maxDist = INT32_MAX;
+        config::Configuration::filter_maxHeight = INT32_MAX;
+        GpsPosition pos =
+        {   49.0, 8.0, 0};
+        double press = 1013.25;
+        AircraftContainer container;
+        boost::smatch match;
+        Aircraft ac;
 
-                helper::clearAcCont();
-                helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0", ac);
-                VFRB::msAcCont.upsert(ac, 0);
-                proc = VFRB::msAcCont.processAircrafts();
-                matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
+        helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", ac);
+        container.upsert(ac, 0);
+        container.processAircrafts(pos, press);
+        helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot", ac);
+        container.upsert(ac, 0);
+        container.processAircrafts(pos, press);
+        helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0", ac);
+        container.upsert(ac, 0);
+        std::string proc = container.processAircrafts(pos, press);
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(2), std::string("610"), helper::eqs);
+        for (int i =0; i < AC_NO_FLARM_THRESHOLD; ++i)
+        {
+            container.processAircrafts(pos, press);
+        }
+        helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0", ac);
+        container.upsert(ac, 0);
+        proc = container.processAircrafts(pos, press);
+        matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(2), std::string("1000"), helper::eqs);
+    })->test("write after attempt",
+             []()
+    {
+        config::Configuration::filter_maxDist = INT32_MAX;
+        config::Configuration::filter_maxHeight = INT32_MAX;
+        GpsPosition pos =
+        {   49.0, 8.0, 0};
+        double press = 1013.25;
+        boost::smatch match;
+        Aircraft ac;
+        AircraftContainer container;
+        helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot", ac);
+        container.upsert(ac, 2);
+        helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot", ac);
+        container.upsert(ac, 1);
+        std::string proc = container.processAircrafts(pos, press);
+        bool matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(2), std::string("610"), helper::eqs);
+        helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot", ac);
+        container.upsert(ac, 1);
+        proc = container.processAircrafts(pos, press);
+        matched = boost::regex_search(proc, match, helper::pflauRe);
+        assert(matched, true, helper::eqb);
+        assert(match.str(2), std::string("305"), helper::eqs);
+    });
 
-                assert(match.str(2), std::string("1000"), helper::eqs);
-            })->test("write after attempt",
-            []()
-            {
-                helper::setupVFRB();
-                boost::smatch match;
-                Aircraft ac;
-                helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot", ac);
-                VFRB::msAcCont.upsert(ac, 1);
-                VFRB::msAcCont.processAircrafts();
-                helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot", ac);
-                VFRB::msAcCont.upsert(ac, 0);
-                std::string proc = VFRB::msAcCont.processAircrafts();
-                bool matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(2), std::string("610"), helper::eqs);
-                helper::parsAprs.unpack("FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot", ac);
-                VFRB::msAcCont.upsert(ac, 0);
-                proc = VFRB::msAcCont.processAircrafts();
-                matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::eqb);
-                assert(match.str(2), std::string("305"), helper::eqs);
-            });
-
-    describe<data::GpsData>("gps string", runner)->test("correct gps position", []()
+    describeParallel<data::GpsData>("gps string", runner)->test("correct gps position",
+                                                                []()
     {
         data::GpsData gps;
         gps.init(
-                {
-                    {   10.0, 85.0, 100}, 5, 1, 40.0, 0.0});
+        {
+                        {   10.0, 85.0, 100}, 5, 1, 40.0, 0.0});
         assert(gps.getBaseLat(), 10.0, helper::eqd);
         assert(gps.getBaseLong(), 85.0, helper::eqd);
         assert(gps.getBaseAlt(), 100, helper::eqi);
@@ -133,66 +159,129 @@ void test_data(TestSuitesRunner& runner)
         pos1.position.altitude = 1000;
         struct ExtGpsPosition pos2;
         pos2.position.altitude = 2000;
-        gps.update(pos1, 0);
+        std::uint64_t dummy = 0;
+        gps.update(pos1, 0, dummy);
         assert(gps.getBaseAlt(), 1000, helper::eqi);
-        gps.update(pos2, 1);
+        gps.update(pos2, 1, dummy);
         assert(gps.getBaseAlt(), 2000, helper::eqi);
-        gps.update(pos1, 0);
+        gps.update(pos1, 0, dummy);
         assert(gps.getBaseAlt(), 2000, helper::eqi);
-    })->test("write after attempt", []()
+    })->test("write after attempts", []()
     {
         data::GpsData gps;
         struct ExtGpsPosition pos1;
         pos1.position.altitude = 1000;
         struct ExtGpsPosition pos2;
         pos2.position.altitude = 2000;
-        gps.update(pos1, 1);
+        std::uint64_t dummy = 0;
+        gps.update(pos1, 2, dummy);
+        assert(dummy, (std::uint64_t) 0, helper::equl);
         assert(gps.getBaseAlt(), 1000, helper::eqi);
-        gps.update(pos2, 0);
+        gps.update(pos2, 1, dummy);
+        assert(dummy, (std::uint64_t) 0, helper::equl);
         assert(gps.getBaseAlt(), 1000, helper::eqi);
-        gps.update(pos2, 0);
+        gps.update(pos2, 1, dummy);
+        assert(dummy, (std::uint64_t) 1, helper::equl);
+        gps.update(pos2, 1, dummy);
+        assert(dummy, (std::uint64_t) 0, helper::equl);
         assert(gps.getBaseAlt(), 2000, helper::eqi);
     });
 
-    describe<data::SensorData>("sensoric data", runner)->test("extract WIMWV",
-            []()
-            {
-                struct SensorInfo info;
-                helper::parsSens.unpack("$WIMWV,242.8,R,6.9,N,A*20\r", info);
-                assert(info.mwvStr, std::string("$WIMWV,242.8,R,6.9,N,A*20\r"), helper::eqs);
-                VFRB::msSensorData.update(info, 0);
-                assert(VFRB::msSensorData.getMwvStr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
-                assert(VFRB::msSensorData.getMwvStr(), std::string(""), helper::eqs);
-            })->test("extract WIMDA",
-            []()
-            {
-                struct SensorInfo info;
-                helper::parsSens.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r", info);
-                VFRB::msSensorData.update(info, 0);
-                assert(VFRB::msSensorData.getMdaStr(), std::string("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"), helper::eqs);
-                assert(VFRB::msSensorData.getMdaStr(), std::string(""), helper::eqs);
-            })->test("write higher priority", []()
+    describeParallel<data::WindData>("wind data", runner)->test("extract WIMWV",
+                                                                []()
     {
-        struct SensorInfo info =
-        {   "", "", 900.0};
-        VFRB::msSensorData.update(info, 0);
-        assert(VFRB::msSensorData.getAtmPress(), 900.0, helper::eqd);
-        info.press = 950.0;
-        VFRB::msSensorData.update(info, 1);
-        assert(VFRB::msSensorData.getAtmPress(), 950.0, helper::eqd);
-        info.press = 900.0;
-        VFRB::msSensorData.update(info, 0);
-        assert(VFRB::msSensorData.getAtmPress(), 950.0, helper::eqd);
+        struct Climate info;
+        data::WindData wind;
+        helper::parsSens.unpack("$WIMWV,242.8,R,6.9,N,A*20\r", info);
+        wind.init(info.mWind);
+        assert(info.hasWind(), true, helper::eqb);
+        assert(wind.getMwvStr(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"), helper::eqs);
+        assert(wind.getMwvStr(), std::string(""), helper::eqs);
+    })->test("write higher priority", []()
+    {
+        struct Climate info =
+        {
+        {   ""},
+        {   "", 0.0}};
+        std::uint64_t dummy = 0;
+        data::WindData wind;
+        wind.init(info.mWind);
+        assert(wind.getMwvStr(), std::string("\n"), helper::eqs);
+        info.mWind.mwvStr = "updated";
+        wind.update(info.mWind, 2, dummy);
+        assert(wind.getMwvStr(), std::string("updated\n"), helper::eqs);
     })->test("write after attempt", []()
     {
-        struct SensorInfo info =
-        {   "", "", 900.0};
-        VFRB::msSensorData.update(info, 2);
-        assert(VFRB::msSensorData.getAtmPress(), 900.0, helper::eqd);
-        info.press = 950.0;
-        VFRB::msSensorData.update(info, 0);
-        assert(VFRB::msSensorData.getAtmPress(), 900.0, helper::eqd);
-        VFRB::msSensorData.update(info, 0);
-        assert(VFRB::msSensorData.getAtmPress(), 950.0, helper::eqd);
+        struct Climate info =
+        {
+        {   ""},
+        {   "", 0.0}};
+        std::uint64_t dummy = 0;
+        data::WindData wind;
+        wind.init(info.mWind);
+        info.mWind.mwvStr = "updated";
+        wind.update(info.mWind, 2, dummy);
+        assert(dummy, (std::uint64_t) 0, helper::equl);
+        assert(wind.getMwvStr(), std::string("updated\n"), helper::eqs);
+        info.mWind.mwvStr = "lower";
+        wind.update(info.mWind, 1, dummy);
+        assert(dummy, (std::uint64_t) 0, helper::equl);
+        wind.update(info.mWind, 1, dummy);
+        assert(dummy, (std::uint64_t) 1, helper::equl);
+        wind.update(info.mWind, 1, dummy);
+        assert(dummy, (std::uint64_t) 0, helper::equl);
+        assert(wind.getMwvStr(), std::string("lower\n"), helper::eqs);
+    });
+
+    describeParallel<data::AtmosphereData>("atmosphere data", runner)->test(
+                "get WIMDA, pressure",
+                []()
+    {
+        struct Climate info;
+        helper::parsSens.unpack("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r", info);
+        data::AtmosphereData atm;
+        atm.init(info.mAtmosphere);
+        assert(info.hasAtmosphere(), true, helper::eqb);
+        assert(atm.getMdaStr(), std::string("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"), helper::eqs);
+        assert(atm.getAtmPress(), 1009.1, helper::eqd);
+    })->test("write higher priority", []()
+    {
+        struct Climate info =
+        {
+        {   ""},
+        {   "", 900.0}};
+        std::uint64_t dummy = 0;
+        data::AtmosphereData atm;
+        atm.init(info.mAtmosphere);
+        assert(atm.getAtmPress(), 900.0, helper::eqd);
+        info.mAtmosphere.pressure = 1000.0;
+        atm.update(info.mAtmosphere, 2, dummy);
+        assert(atm.getAtmPress(), 1000.0, helper::eqd);
+        info.mAtmosphere.pressure = 950.0;
+        atm.update(info.mAtmosphere, 1, dummy);
+        assert(atm.getAtmPress(), 1000.0, helper::eqd);
+    })->test("write after attempt", []()
+    {
+        struct Climate info =
+        {
+        {   ""},
+        {   "", 900.0}};
+        std::uint64_t dummy = 0;
+        data::AtmosphereData atm;
+        atm.init(info.mAtmosphere);
+        assert(atm.getAtmPress(), 900.0, helper::eqd);
+        info.mAtmosphere.pressure = 1000.0;
+        atm.update(info.mAtmosphere, 2, dummy);
+        assert(atm.getAtmPress(), 1000.0, helper::eqd);
+        assert(dummy, (std::uint64_t) 0, helper::equl);
+        info.mAtmosphere.pressure = 950.0;
+        atm.update(info.mAtmosphere, 1, dummy);
+        assert(dummy, (std::uint64_t) 0, helper::equl);
+        assert(atm.getAtmPress(), 1000.0, helper::eqd);
+        atm.update(info.mAtmosphere, 1, dummy);
+        assert(dummy, (std::uint64_t) 1, helper::equl);
+        atm.update(info.mAtmosphere, 1, dummy);
+        assert(dummy, (std::uint64_t) 0, helper::equl);
+        assert(atm.getAtmPress(), 950.0, helper::eqd);
     });
 }

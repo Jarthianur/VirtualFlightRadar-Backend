@@ -4,20 +4,29 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../../src/tcp/server/Connection.cpp \
-../../src/tcp/server/Server.cpp 
+../../src/network/client/AprscClient.cpp \
+../../src/network/client/Client.cpp \
+../../src/network/client/GpsdClient.cpp \
+../../src/network/client/SbsClient.cpp \
+../../src/network/client/SensorClient.cpp 
 
 OBJS += \
-./src/tcp/server/Connection.o \
-./src/tcp/server/Server.o 
+./src/network/client/AprscClient.o \
+./src/network/client/Client.o \
+./src/network/client/GpsdClient.o \
+./src/network/client/SbsClient.o \
+./src/network/client/SensorClient.o 
 
 CPP_DEPS += \
-./src/tcp/server/Connection.d \
-./src/tcp/server/Server.d 
+./src/network/client/AprscClient.d \
+./src/network/client/Client.d \
+./src/network/client/GpsdClient.d \
+./src/network/client/SbsClient.d \
+./src/network/client/SensorClient.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/tcp/server/%.o: ../../src/tcp/server/%.cpp
+src/network/client/%.o: ../../src/network/client/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	g++ -std=c++0x -O0 -g3 -Wall -c -fmessage-length=0 -fprofile-arcs -ftest-coverage -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"

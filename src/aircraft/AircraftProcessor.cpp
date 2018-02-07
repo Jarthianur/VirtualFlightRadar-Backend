@@ -25,10 +25,8 @@
 #include <cstdio>
 
 #include "../config/Configuration.h"
-#include "../data/AtmosphereData.h"
-#include "../data/GpsData.h"
 #include "../util/Math.hpp"
-#include "../VFRB.h"
+#include "../util/Position.h"
 #include "Aircraft.hpp"
 
 namespace aircraft
@@ -42,9 +40,11 @@ AircraftProcessor::~AircraftProcessor() noexcept
 {
 }
 
-std::string AircraftProcessor::process(const Aircraft& cr_ac)
+std::string AircraftProcessor::process(const Aircraft& cr_ac,
+                                       const struct util::GpsPosition& crBasePos,
+                                       double vAtmPress)
 {
-    calcRelPosToBase(cr_ac);
+    calcRelPosToBase(cr_ac, crBasePos, vAtmPress);
 
     if (mtDist > config::Configuration::filter_maxDist)
     {
@@ -83,10 +83,12 @@ std::string AircraftProcessor::process(const Aircraft& cr_ac)
     return nmea_str;
 }
 
-void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac)
+void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac,
+                                         const struct util::GpsPosition& crBasePos,
+                                         double vAtmPress)
 {
-    mtRadLatB = util::math::radian(VFRB::msGpsData.getBaseLat());
-    mtRadLongB = util::math::radian(VFRB::msGpsData.getBaseLong());
+    mtRadLatB = util::math::radian(crBasePos.latitude);
+    mtRadLongB = util::math::radian(crBasePos.longitude);
     mtRadLongAc = util::math::radian(cr_ac.getLongitude());
     mtRadLatAc = util::math::radian(cr_ac.getLatitude());
     mtLongDist = mtRadLongAc - mtRadLongB;
@@ -106,10 +108,8 @@ void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac)
     mtRelE = util::math::dToI(std::sin(util::math::radian(mtBearingAbs)) * mtDist);
     mtRelV =
             cr_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER ?
-                    cr_ac.getAltitude()
-                            - util::math::calcIcaoHeight(
-                                    VFRB::msAtmosData.getAtmPress()) :
-                    cr_ac.getAltitude() - VFRB::msGpsData.getBaseAlt();
+                    cr_ac.getAltitude() - util::math::calcIcaoHeight(vAtmPress) :
+                    cr_ac.getAltitude() - crBasePos.altitude;
 }
 
 } // namespace aircraft

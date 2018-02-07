@@ -106,7 +106,9 @@ void VFRB::run() noexcept
         try
         {
             //write Aircrafts to clients
-            std::string str = msAcCont.processAircrafts();
+            std::string str = msAcCont.processAircrafts( { msGpsData.getBaseLat(),
+                    msGpsData.getBaseLong(), msGpsData.getBaseAlt() },
+                    msAtmosData.getAtmPress());
             if (str.length() > 0)
             {
                 server.writeToAll(str);

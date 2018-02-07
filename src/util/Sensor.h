@@ -44,18 +44,18 @@ struct Wind
 
 struct Climate
 {
-    struct Wind mWind;
-    struct Atmosphere mAtmosphere;
+	struct Wind mWind;
+	struct Atmosphere mAtmosphere;
 
-    inline bool hasAtmosphere()
-    {
-        return mAtmosphere.mdaStr.empty();
-    }
+	inline bool hasAtmosphere()
+	{
+        return !mAtmosphere.mdaStr.empty();
+	}
 
-    inline bool hasWind()
-    {
-        return mWind.mwvStr.empty();
-    }
+	inline bool hasWind()
+	{
+        return !mWind.mwvStr.empty();
+	}
 };
 
 }  // namespace util
