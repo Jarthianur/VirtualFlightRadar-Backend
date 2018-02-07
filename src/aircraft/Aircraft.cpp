@@ -59,7 +59,7 @@ bool Aircraft::operator==(const Aircraft& cr_other) const
     return this->mId == cr_other.mId;
 }
 
-void Aircraft::update(const Aircraft& cr_ac, std::int32_t prio)
+void Aircraft::update(const Aircraft& cr_ac, std::uint32_t prio)
 {
     // no update for ID
     this->mIdType = cr_ac.mIdType;
@@ -73,7 +73,7 @@ void Aircraft::update(const Aircraft& cr_ac, std::int32_t prio)
     this->mTargetT = cr_ac.mTargetT;
     this->mUpdateAge = 0;
     this->mLastPriority = prio;
-    this->mAttemptValid = false;
+    this->mUpdateAttempts = 0;
 }
 
 } // namespace aircraft

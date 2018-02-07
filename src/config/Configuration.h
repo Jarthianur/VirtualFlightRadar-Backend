@@ -121,22 +121,9 @@ private:
      * @return the number of registered feeds
      */
     std::size_t registerFeeds(const PropertyMap& cr_map);
-    /**
-     * @fn strToInt
-     * @brief Parse a string to integer.
-     * @note Always returns a valid value.
-     * @param cr_str The string to parse
-     * @return the parsed number, 0 if error
-     */
-    std::int32_t strToInt(const std::string& cr_str) noexcept;
-    /**
-     * @fn strToDouble
-     * @brief Parse a string to double.
-     * @note Always returns a valid value.
-     * @param cr_str The string to parse
-     * @return the parsed number, 0 if error
-     */
-    double strToDouble(const std::string& cr_str) noexcept;
+
+    void resolveFallbacks(const PropertyMap& cr_map);
+    void resolveFilters(const PropertyMap& cr_map);
 };
 
 }  // namespace config

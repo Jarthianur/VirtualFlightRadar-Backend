@@ -25,6 +25,11 @@
 #include <cstdint>
 #include <string>
 
+namespace util
+{
+struct GpsPosition;
+}
+
 namespace aircraft
 {
 
@@ -57,7 +62,8 @@ public:
      * @param cr_ac The Aircraft to process
      * @return the NMEA string
      */
-    std::string process(const Aircraft& cr_ac);
+    std::string process(const Aircraft& cr_ac, const struct util::GpsPosition& crBasePos,
+                        double vAtmPress);
 
 private:
     /**
@@ -65,7 +71,8 @@ private:
      * @brief Calcutale an Aircrafts position relative to the base.
      * @param cr_ac The Aircraft to calculate for
      */
-    void calcRelPosToBase(const Aircraft& cr_ac);
+    void calcRelPosToBase(const Aircraft& cr_ac,
+                          const struct util::GpsPosition& crBasePos, double vAtmPress);
 
     /// Formatstring buffer
     char mBuffer[AP_BUFF_S + 1];

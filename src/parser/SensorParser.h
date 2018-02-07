@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include "../util/SensorInfo.h"
+#include "../util/Sensor.h"
 #include "Parser.hpp"
 
 namespace parser
@@ -36,7 +36,7 @@ namespace parser
  * @see Parser.hpp
  * @see ../util/SensorInfo.h
  */
-class SensorParser: public Parser<struct util::SensorInfo>
+class SensorParser: public Parser<struct util::Climate>
 {
 public:
     /**
@@ -54,7 +54,7 @@ public:
      * @brief Unpack into SensorInfo.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& cr_msg, struct util::SensorInfo& r_info)
+    bool unpack(const std::string& crMsg, struct util::Climate& rClimate)
             noexcept override;
 };
 

@@ -32,16 +32,17 @@
 
 #include "config/Configuration.h"
 #include "aircraft/AircraftContainer.h"
+#include "data/AtmosphereData.h"
 #include "data/GpsData.h"
-#include "data/SensorData.h"
-#include "tcp/client/AprscClient.h"
-#include "tcp/client/SbsClient.h"
-#include "tcp/client/SensorClient.h"
-#include "tcp/server/Server.h"
+#include "data/WindData.h"
 #include "util/Logger.h"
 #include "feed/Feed.h"
 #include "util/Position.h"
-#include "util/SensorInfo.h"
+#include "util/Sensor.h"
+#include "network/client/AprscClient.h"
+#include "network/client/SbsClient.h"
+#include "network/client/SensorClient.h"
+#include "network/server/Server.h"
 
 using namespace util;
 
@@ -49,7 +50,8 @@ using namespace util;
 
 std::atomic<bool> VFRB::global_run_status(true);
 aircraft::AircraftContainer VFRB::msAcCont;
-data::SensorData VFRB::msSensorData;
+data::WindData VFRB::msWindData;
+data::AtmosphereData VFRB::msAtmosData;
 data::GpsData VFRB::msGpsData;
 
 VFRB::VFRB()
@@ -86,7 +88,7 @@ void VFRB::run() noexcept
     });
 
     // init server and run handler
-    tcp::server::Server server(signal_set, config::Configuration::global_server_port);
+    network::server::Server server(signal_set, config::Configuration::global_server_port);
     boost::thread server_thread(boost::bind(&VFRB::handleServer, std::ref(server)));
 
     //init input threads
@@ -104,7 +106,9 @@ void VFRB::run() noexcept
         try
         {
             //write Aircrafts to clients
-            std::string str = msAcCont.processAircrafts();
+            std::string str = msAcCont.processAircrafts( { msGpsData.getBaseLat(),
+                    msGpsData.getBaseLong(), msGpsData.getBaseAlt() },
+                    msAtmosData.getAtmPress());
             if (str.length() > 0)
             {
                 server.writeToAll(str);
@@ -113,8 +117,8 @@ void VFRB::run() noexcept
             //write GPS position to clients
             server.writeToAll(msGpsData.getGpsStr());
 
-            // write weather info to clients
-            str = msSensorData.getMdaStr() + msSensorData.getMwvStr();
+            // write climate info to clients
+            str = msAtmosData.getMdaStr() + msWindData.getMwvStr();
             if (str.length() > 0)
             {
                 server.writeToAll(str);
@@ -153,7 +157,7 @@ void VFRB::run() noexcept
 
 }
 
-void VFRB::handleServer(tcp::server::Server& r_server)
+void VFRB::handleServer(network::server::Server& r_server)
 {
     Logger::info("(Server) startup: localhost ",
             std::to_string(config::Configuration::global_server_port));
@@ -162,7 +166,7 @@ void VFRB::handleServer(tcp::server::Server& r_server)
 }
 
 void VFRB::handleFeed(boost::asio::signal_set& r_sigset,
-        std::shared_ptr<feed::Feed> p_feed)
+                      std::shared_ptr<feed::Feed> p_feed)
 {
     Logger::info("(VFRB) run feed: ", p_feed->mName);
     p_feed->run(r_sigset);

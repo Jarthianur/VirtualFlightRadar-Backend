@@ -37,44 +37,49 @@ GpsData::~GpsData() noexcept
 
 void GpsData::init(struct util::ExtGpsPosition pos)
 {
-    mBasePos.trySetValue(pos, 0);
+	std::uint64_t dummy = 0;
+	mBasePos.trySetValue(pos, 0, dummy);
+}
+
+void GpsData::update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t prio,
+        std::uint64_t& rAttempts)
+{
+	boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+	if (mBasePos.trySetValue(cr_pos, prio, rAttempts))
+	{
+		rAttempts = 0;
+	}
 }
 
 std::string GpsData::getGpsStr()
 {
-    std::string gps = mGpsMod.genGprmcStr(getBasePos());
-    gps.append(mGpsMod.genGpggaStr(getBasePos()));
-    return gps;
+	std::string gps = mGpsMod.genGprmcStr(getBasePos());
+	gps.append(mGpsMod.genGpggaStr(getBasePos()));
+	return gps;
 }
 
 std::int32_t GpsData::getBaseAlt()
 {
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value.position.altitude;
+	boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+	return mBasePos.getValue().position.altitude;
 }
 
 double GpsData::getBaseLat()
 {
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value.position.latitude;
-}
-
-void GpsData::update(const struct util::ExtGpsPosition& cr_pos, std::int32_t prio)
-{
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    mBasePos.trySetValue(cr_pos, prio);
+	boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+	return mBasePos.getValue().position.latitude;
 }
 
 double GpsData::getBaseLong()
 {
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value.position.longitude;
+	boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+	return mBasePos.getValue().position.longitude;
 }
 
 struct util::ExtGpsPosition GpsData::getBasePos()
 {
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value;
+	boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+	return mBasePos.getValue();
 }
 
 } // namespace data

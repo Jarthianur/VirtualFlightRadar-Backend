@@ -109,18 +109,18 @@ void test_parser(TestSuitesRunner& runner)
 
     describe<parser::SensorParser>("unpack", runner)->test("valid msg", []()
     {
-        struct SensorInfo info;
+        struct Climate info;
         std::string mda("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
         std::string mwv("$WIMWV,242.8,R,6.9,N,A*20");
         assert(helper::parsSens.unpack(mda, info), true, helper::eqb);
         assert(helper::parsSens.unpack(mwv, info), true, helper::eqb);
-        assert(info.press, 1009.1, helper::eqd);
-        assert(info.mdaStr, mda, helper::eqs);
-        assert(info.mwvStr, mwv, helper::eqs);
+        assert(info.mAtmosphere.pressure, 1009.1, helper::eqd);
+        assert(info.mAtmosphere.mdaStr, mda, helper::eqs);
+        assert(info.mWind.mwvStr, mwv, helper::eqs);
     })->test("invalid msg",
             []()
             {
-                struct SensorInfo info;
+                struct Climate info;
                 assert(helper::parsSens.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75", info), false, helper::eqb);
                 assert(helper::parsSens.unpack("Someone sent other stuff", info), false, helper::eqb);
                 assert(helper::parsSens.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3F", info), false, helper::eqb);

@@ -40,31 +40,37 @@ namespace feed
 class SensorFeed: public Feed
 {
 public:
-    /**
-     * @fn SensorFeed
-     * @brief Constructor
-     * @param cr_name  The SensorFeeds unique name
-     * @param prio     The priority
-     * @param cr_kvmap The properties map
-     */
-    SensorFeed(const std::string& /*cr_name*/, std::int32_t /*prio*/,
-            const config::keyValueMap& /*cr_kvmap*/);
-    /**
-     * @fn ~SensorFeed
-     * @brief Destructor
-     */
-    virtual ~SensorFeed() noexcept;
-    /**
-     * @fn process
-     * @brief Handle SensorClients response.
-     * @param cr_res The response to process
-     * @override Feed::process
-     */
-    void process(const std::string& cr_res) noexcept override;
+	/**
+	 * @fn SensorFeed
+	 * @brief Constructor
+	 * @param cr_name  The SensorFeeds unique name
+	 * @param prio     The priority
+	 * @param cr_kvmap The properties map
+	 */
+	SensorFeed(const std::string& crName, std::uint32_t vPriority,
+	        const config::keyValueMap& crKvMap);
+	/**
+	 * @fn ~SensorFeed
+	 * @brief Destructor
+	 */
+	virtual ~SensorFeed() noexcept;
+	/**
+	 * @fn process
+	 * @brief Handle SensorClients response.
+	 * @param cr_res The response to process
+	 * @override Feed::process
+	 */
+	void process(const std::string& crResponse) noexcept override;
 
 private:
-    /// Parser to unpack response from Client
-    parser::SensorParser mParser;
+	/// Parser to unpack response from Client
+	parser::SensorParser mParser;
+
+	///
+	std::uint64_t mWindUpdateAttempts;
+
+	///
+	std::uint64_t mAtmosUpdateAttempts;
 };
 
 } // namespace feed

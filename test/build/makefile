@@ -11,8 +11,8 @@ RM := rm -rf
 -include test/units/subdir.mk
 -include test/subdir.mk
 -include src/util/subdir.mk
--include src/tcp/server/subdir.mk
--include src/tcp/client/subdir.mk
+-include src/network/server/subdir.mk
+-include src/network/client/subdir.mk
 -include src/parser/subdir.mk
 -include src/feed/subdir.mk
 -include src/data/subdir.mk

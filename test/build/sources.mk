@@ -29,8 +29,8 @@ src/config \
 src/data \
 src/feed \
 src/parser \
-src/tcp/client \
-src/tcp/server \
+src/network/client \
+src/network/server \
 src/util \
 test \
 test/units \

@@ -1,5 +1,9 @@
 # changelog
 
+## 2.3.0
+
++ improved priority handling of feeds
+
 ## 2.2.0
 
 + new code documentation
