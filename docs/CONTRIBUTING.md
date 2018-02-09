@@ -42,7 +42,7 @@ A PR may contain any change to the code, documentation, or whatever. We have a [
 We have some simple, but effective guidelines, on how the code should look like.
 
 + The code is written in C++11, using [boost](http://www.boost.org/)
-+ The code design is completely Object oriented
++ The code design is completely object oriented
 + Namings are short, but expressive
 + Names are in lowerCamelCase, enums and macros in UPPERCASE
 + Implementation files have *.cpp* extension
@@ -73,19 +73,7 @@ The code documentation should follow some guidelines listed here.
 
 + Every sourcefile begins with the copyright license
 + Descriptions are short, but expressive
-+ Single line comments begin with *///*
-+ Multi line comments begin with */\*\** and end with *\*/*, while every line begins with *\**
++ The code documentation is based on Doxygen
 + Class and function descriptions should not contain implementation details
-+ Classes have these comments:
-  + @class classname
-  + @brief short description
-+ Functions have these comments:
-  + @fn function name
-  + @brief short description
-  + @param p1 param description
-  + @return returned value
-  + @throw except exception thrown when what happened
-  + @threadsafe (function is safe to use in multithreaded context)
-+ @note may be added to every comment with a respective note
-+ @author is used in a top down hierarchy; top is file
-+ Variables are commented with a single line comment
++ See [Doxygen](http://www.stack.nl/~dimitri/doxygen/manual/commands.html) for a command list
++ Additionally add `@threadsafe` if a function appears in a multithreaded context and is safe to use

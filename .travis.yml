@@ -40,6 +40,7 @@ before_script:
     - popd
 
 script:
+    #- cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
     # initialize lines
     - lcov --initial --directory test/build --capture --output-file test_base.info
     - lcov --initial --directory target --capture --output-file vfrb_base.info

@@ -55,6 +55,7 @@ void Logger::info(const std::string& cr_subj, const std::string& cr_msg)
     std::cout << "[INFO]  " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
 }
 
+// cppcheck-suppress unusedFunction
 void Logger::debug(const std::string& cr_subj, const std::string& cr_msg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);

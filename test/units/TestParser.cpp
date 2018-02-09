@@ -50,11 +50,11 @@ void test_parser(TestSuitesRunner& runner)
                 aircraft::Aircraft ac;
                 helper::parsSbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0", ac);
                 assert(ac.getId(), std::string("AAAAAA"), helper::eqs);
-                assert((std::int32_t) ac.getTargetT(), (std::int32_t) aircraft::Aircraft::TargetType::TRANSPONDER, helper::eqi);
+                assert((std::int32_t) ac.getTargetType(), (std::int32_t) aircraft::Aircraft::TargetType::TRANSPONDER, helper::eqi);
                 assert(ac.getAltitude(), math::dToI(math::FEET_2_M * 1000), helper::eqi);
                 assert(ac.getLatitude(), 49.0, helper::eqd);
                 assert(ac.getLongitude(), 8.0, helper::eqd);
-                assert(ac.isFullInfo(), false, helper::eqb);
+                assert(ac.hasFullInfo(), false, helper::eqb);
             })->test("invalid msg",
             []()
             {
@@ -85,11 +85,11 @@ void test_parser(TestSuitesRunner& runner)
                 assert(helper::parsAprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4", ac), true, helper::eqb);
                 assert(helper::parsAprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz", ac), true, helper::eqb);
                 assert(ac.getId(), std::string("AAAAAA"), helper::eqs);
-                assert((std::int32_t) ac.getTargetT(), (std::int32_t) aircraft::Aircraft::TargetType::FLARM, helper::eqi);
+                assert((std::int32_t) ac.getTargetType(), (std::int32_t) aircraft::Aircraft::TargetType::FLARM, helper::eqi);
                 assert(ac.getAltitude(), 0, helper::eqi);
                 assert(ac.getLatitude(), 49.0, helper::eqd);
                 assert(ac.getLongitude(), -8.0, helper::eqd);
-                assert(ac.isFullInfo(), true, helper::eqb);
+                assert(ac.hasFullInfo(), true, helper::eqb);
             })->test("invalid msg",
             []()
             {

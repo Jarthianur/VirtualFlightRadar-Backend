@@ -112,7 +112,7 @@ void AircraftContainer::upsert(Aircraft& cr_update, std::uint32_t prio)
     if(known_ac != mCont.end())
     {
         if(known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER
-           || cr_update.getTargetT() == Aircraft::TargetType::FLARM)
+           || cr_update.getTargetType() == Aircraft::TargetType::FLARM)
         {
             if(prio * ++(known_ac->getUpdateAttempts()) >= known_ac->getLastPriority())
             {
