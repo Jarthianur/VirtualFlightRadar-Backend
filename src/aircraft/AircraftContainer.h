@@ -32,8 +32,8 @@
 #include "../aircraft/AircraftProcessor.h"
 #include "../config/Parameters.h"
 
-#define AC_INVALIDATE         4
-#define AC_DELETE_THRESHOLD   120
+#define AC_INVALIDATE 4
+#define AC_DELETE_THRESHOLD 120
 #define AC_NO_FLARM_THRESHOLD AC_INVALIDATE
 
 namespace aircraft
@@ -47,7 +47,7 @@ class Aircraft;
  */
 class AircraftContainer
 {
-public:
+  public:
     /// Non-copyable
     AircraftContainer(const AircraftContainer&) = delete;
     /// Not assignable
@@ -74,7 +74,8 @@ public:
     /**
      * @fn processAircrafts
      * @brief Process all Aircrafts and get the reports as string.
-     *        Increases update ages; "too old" Aircrafts are not reported and later deleted.
+     *        Increases update ages; "too old" Aircrafts are not reported and later
+     * deleted.
      * @see AircraftProcesser::process
      * @return the string with all NMEA reports
      * @threadsafe
@@ -82,7 +83,7 @@ public:
     std::string processAircrafts(const struct util::GpsPosition& crBasePos,
                                  double vAtmPress);
 
-private:
+  private:
     /**
      * @fn find
      * @brief Find an Aircraft by Id efficiently in the container using an index map.
@@ -101,6 +102,6 @@ private:
     std::unordered_map<std::string, size_t> mIndexMap;
 };
 
-}  // namespace aircraft
+} // namespace aircraft
 
 #endif /* SRC_AIRCRAFT_AIRCRAFTCONTAINER_H_ */

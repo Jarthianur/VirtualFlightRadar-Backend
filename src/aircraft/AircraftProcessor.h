@@ -35,7 +35,7 @@ namespace aircraft
 
 class Aircraft;
 
-#define AP_BUFF_S   8191
+#define AP_BUFF_S 8191
 #define AP_L_BUFF_S 128
 
 /**
@@ -44,7 +44,7 @@ class Aircraft;
  */
 class AircraftProcessor
 {
-public:
+  public:
     /**
      * @fn AircraftProcessor
      * @brief Constructor
@@ -65,7 +65,7 @@ public:
     std::string process(const Aircraft& cr_ac, const struct util::GpsPosition& crBasePos,
                         double vAtmPress);
 
-private:
+  private:
     /**
      * @fn calcRelPosToBase
      * @brief Calcutale an Aircrafts position relative to the base.
@@ -79,31 +79,30 @@ private:
     /// Temporary values
     /// Bases longitude as radian
     double mtRadLongB = 0.0,
-    /// Aircrafts longitude as radian
-            mtRadLongAc = 0.0,
-            /// Bases latitude as radian
-            mtRadLatB = 0.0,
-            /// Aircrafts latitude as radian
-            mtRadLatAc = 0.0,
-            /// Distance/Difference between Aircrafts and bases longitude
-            mtLongDist = 0.0,
-            /// Distance/Difference between Aircrafts and bases latitude
-            mtLatDist = 0.0,
-            /// Relative bearing
-            mtBearingRel = 0.0,
-            /// Absolute bearing
-            mtBearingAbs = 0.0;
+           /// Aircrafts longitude as radian
+        mtRadLongAc = 0.0,
+           /// Bases latitude as radian
+        mtRadLatB = 0.0,
+           /// Aircrafts latitude as radian
+        mtRadLatAc = 0.0,
+           /// Distance/Difference between Aircrafts and bases longitude
+        mtLongDist = 0.0,
+           /// Distance/Difference between Aircrafts and bases latitude
+        mtLatDist = 0.0,
+           /// Relative bearing
+        mtBearingRel = 0.0,
+           /// Absolute bearing
+        mtBearingAbs = 0.0;
     /// Relative distance in northern direction; m
     std::int32_t mtRelN = 0,
-    /// Relative distance in eastern direction; m
-            mtRelE = 0,
-            /// Relative vertical distance; m
-            mtRelV = 0,
-            /// Distance between Aircraft and base; m
-            mtDist = 0;
-
+                 /// Relative distance in eastern direction; m
+        mtRelE = 0,
+                 /// Relative vertical distance; m
+        mtRelV = 0,
+                 /// Distance between Aircraft and base; m
+        mtDist = 0;
 };
 
-}  // namespace aircraft
+} // namespace aircraft
 
 #endif /* SRC_AIRCRAFT_AIRCRAFTPROCESSOR_H_ */

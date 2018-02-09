@@ -61,7 +61,7 @@ struct SensorInfo;
  */
 class VFRB
 {
-public:
+  public:
     /**
      * Non-copyable
      */
@@ -101,7 +101,7 @@ public:
     /// Container holding GPS information
     static data::GpsData msGpsData;
 
-private:
+  private:
     /**
      * @fn handleFeed
      * @brief Handler for an input Feed thread.

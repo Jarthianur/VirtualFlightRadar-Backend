@@ -39,7 +39,7 @@ namespace aircraft
  */
 class Aircraft
 {
-public:
+  public:
     /**
      * @fn Aircraft
      * @brief Constructor
@@ -85,10 +85,10 @@ public:
      * @note FLARM is preferred over TRANSPONDER,
      *       in case an aircraft has both available.
      */
-    enum class TargetType
-        : std::uint32_t
-        {
-            FLARM, TRANSPONDER
+    enum class TargetType : std::uint32_t
+    {
+        FLARM,
+        TRANSPONDER
     };
     /**
      * @fn update
@@ -163,7 +163,8 @@ public:
         return mLastPriority;
     }
 
-    inline void setLastPriority(std::uint32_t prio) {
+    inline void setLastPriority(std::uint32_t prio)
+    {
         mLastPriority = prio;
     }
 
@@ -314,8 +315,9 @@ public:
         return mUpdateAttempts;
     }
 
-private:
-    /// Aircraft ID (address), identifier; Uniqueness is assumed and must be guaranteed by input feed.
+  private:
+    /// Aircraft ID (address), identifier; Uniqueness is assumed and must be guaranteed by
+    /// input feed.
     std::string mId;
     /// ID (address) type.
     std::uint32_t mIdType = 1;
