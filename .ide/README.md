@@ -5,4 +5,4 @@ This directory includes all files for IDE configurations. These can then be impo
 ### IDE's
 
 + eclipse CDT
-
++ QT Creator

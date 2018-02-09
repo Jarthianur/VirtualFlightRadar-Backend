@@ -15,6 +15,7 @@
 !.gitattributes
 !.gitignore
 !.gitmodules
+!.clang-format
 !makefile
 !*.mk
 !*.sh

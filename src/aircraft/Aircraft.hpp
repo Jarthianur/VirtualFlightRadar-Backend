@@ -32,14 +32,13 @@
 
 namespace aircraft
 {
-
 /**
  * @class Aircraft
  * @brief Store all information about an aircraft, like position, id etc.
  */
 class Aircraft
 {
-  public:
+public:
     /**
      * @fn Aircraft
      * @brief Constructor
@@ -315,7 +314,7 @@ class Aircraft
         return mUpdateAttempts;
     }
 
-  private:
+private:
     /// Aircraft ID (address), identifier; Uniqueness is assumed and must be guaranteed by
     /// input feed.
     std::string mId;
@@ -345,6 +344,6 @@ class Aircraft
      double mTurnRate = A_VALUE_NA;*/
 };
 
-} // namespace aircraft
+}  // namespace aircraft
 
 #endif /* SRC_AIRCRAFT_AIRCRAFT_HPP_ */

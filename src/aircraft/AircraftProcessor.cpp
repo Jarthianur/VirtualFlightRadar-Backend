@@ -31,14 +31,11 @@
 
 namespace aircraft
 {
-
 AircraftProcessor::AircraftProcessor()
-{
-}
+{}
 
 AircraftProcessor::~AircraftProcessor() noexcept
-{
-}
+{}
 
 std::string AircraftProcessor::process(const Aircraft& cr_ac,
                                        const struct util::GpsPosition& crBasePos,
@@ -46,7 +43,7 @@ std::string AircraftProcessor::process(const Aircraft& cr_ac,
 {
     calcRelPosToBase(cr_ac, crBasePos, vAtmPress);
 
-    if (mtDist > config::Configuration::filter_maxDist)
+    if(mtDist > config::Configuration::filter_maxDist)
     {
         return "";
     }
@@ -62,7 +59,7 @@ std::string AircraftProcessor::process(const Aircraft& cr_ac,
     nmea_str.append(mBuffer);
 
     // PFLAA
-    if (cr_ac.isFullInfo())
+    if(cr_ac.isFullInfo())
     {
         std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
                       mtRelN, mtRelE, mtRelV, cr_ac.getIdType(), cr_ac.getId().c_str(),
@@ -87,16 +84,16 @@ void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac,
                                          const struct util::GpsPosition& crBasePos,
                                          double vAtmPress)
 {
-    mtRadLatB = util::math::radian(crBasePos.latitude);
-    mtRadLongB = util::math::radian(crBasePos.longitude);
+    mtRadLatB   = util::math::radian(crBasePos.latitude);
+    mtRadLongB  = util::math::radian(crBasePos.longitude);
     mtRadLongAc = util::math::radian(cr_ac.getLongitude());
-    mtRadLatAc = util::math::radian(cr_ac.getLatitude());
-    mtLongDist = mtRadLongAc - mtRadLongB;
-    mtLatDist = mtRadLatAc - mtRadLatB;
-    double a = std::pow(std::sin(mtLatDist / 2.0), 2.0)
+    mtRadLatAc  = util::math::radian(cr_ac.getLatitude());
+    mtLongDist  = mtRadLongAc - mtRadLongB;
+    mtLatDist   = mtRadLatAc - mtRadLatB;
+    double a    = std::pow(std::sin(mtLatDist / 2.0), 2.0)
                + std::cos(mtRadLatB) * std::cos(mtRadLatAc)
                      * std::pow(std::sin(mtLongDist / 2.0), 2.0);
-    mtDist = util::math::dToI(6371000.0
+    mtDist       = util::math::dToI(6371000.0
                               * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
     mtBearingRel = util::math::degree(
         std::atan2(std::sin(mtRadLongAc - mtRadLongB) * std::cos(mtRadLatAc),
@@ -104,11 +101,11 @@ void AircraftProcessor::calcRelPosToBase(const Aircraft& cr_ac,
                        - std::sin(mtRadLatB) * std::cos(mtRadLatAc)
                              * std::cos(mtRadLongAc - mtRadLongB)));
     mtBearingAbs = std::fmod((mtBearingRel + 360.0), 360.0);
-    mtRelN = util::math::dToI(std::cos(util::math::radian(mtBearingAbs)) * mtDist);
-    mtRelE = util::math::dToI(std::sin(util::math::radian(mtBearingAbs)) * mtDist);
-    mtRelV = cr_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER
+    mtRelN       = util::math::dToI(std::cos(util::math::radian(mtBearingAbs)) * mtDist);
+    mtRelE       = util::math::dToI(std::sin(util::math::radian(mtBearingAbs)) * mtDist);
+    mtRelV       = cr_ac.getTargetT() == Aircraft::TargetType::TRANSPONDER
                  ? cr_ac.getAltitude() - util::math::calcIcaoHeight(vAtmPress)
                  : cr_ac.getAltitude() - crBasePos.altitude;
 }
 
-} // namespace aircraft
+}  // namespace aircraft

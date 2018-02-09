@@ -25,19 +25,15 @@ using namespace util;
 
 namespace aircraft
 {
-
 Aircraft::~Aircraft() noexcept
-{
-}
+{}
 
 Aircraft::Aircraft()
-{
-}
+{}
 
 Aircraft::Aircraft(std::string& r_id, struct GpsPosition& r_pos)
     : mId(r_id), mPosition(r_pos)
-{
-}
+{}
 
 Aircraft::Aircraft(std::string& r_id, struct GpsPosition& r_pos, double gnd_spd,
                    std::uint32_t id_t, std::int32_t ac_t,
@@ -51,8 +47,7 @@ Aircraft::Aircraft(std::string& r_id, struct GpsPosition& r_pos, double gnd_spd,
       mHeading(heading),
       mClimbRate(climb_r)
 //,mTurnRate(turn_r)
-{
-}
+{}
 
 bool Aircraft::operator==(const Aircraft& cr_other) const
 {
@@ -62,18 +57,18 @@ bool Aircraft::operator==(const Aircraft& cr_other) const
 void Aircraft::update(const Aircraft& cr_ac, std::uint32_t prio)
 {
     // no update for ID
-    this->mIdType = cr_ac.mIdType;
+    this->mIdType    = cr_ac.mIdType;
     this->mAircraftT = cr_ac.mAircraftT;
-    this->mPosition = cr_ac.mPosition;
-    this->mGndSpeed = cr_ac.mGndSpeed;
-    this->mHeading = cr_ac.mHeading;
+    this->mPosition  = cr_ac.mPosition;
+    this->mGndSpeed  = cr_ac.mGndSpeed;
+    this->mHeading   = cr_ac.mHeading;
     this->mClimbRate = cr_ac.mClimbRate;
     // this->mTurnRate = r_ac.mTurnRate;
-    this->mFullInfo = cr_ac.mFullInfo;
-    this->mTargetT = cr_ac.mTargetT;
-    this->mUpdateAge = 0;
-    this->mLastPriority = prio;
+    this->mFullInfo       = cr_ac.mFullInfo;
+    this->mTargetT        = cr_ac.mTargetT;
+    this->mUpdateAge      = 0;
+    this->mLastPriority   = prio;
     this->mUpdateAttempts = 0;
 }
 
-} // namespace aircraft
+}  // namespace aircraft

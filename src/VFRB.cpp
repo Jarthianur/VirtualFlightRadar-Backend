@@ -21,14 +21,14 @@
 
 #include "VFRB.h"
 
+#include <exception>
+#include <functional>
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
 #include <boost/move/move.hpp>
 #include <boost/thread.hpp>
-#include <exception>
-#include <functional>
-#include <string>
 
 #include "aircraft/AircraftContainer.h"
 #include "config/Configuration.h"
@@ -55,12 +55,10 @@ data::AtmosphereData VFRB::msAtmosData;
 data::GpsData VFRB::msGpsData;
 
 VFRB::VFRB()
-{
-}
+{}
 
 VFRB::~VFRB() noexcept
-{
-}
+{}
 
 void VFRB::run() noexcept
 {
@@ -76,7 +74,7 @@ void VFRB::run() noexcept
     signal_set.add(SIGTERM);
 #if defined(SIGQUIT)
     signal_set.add(SIGQUIT);
-#endif // defined(SIGQUIT)
+#endif  // defined(SIGQUIT)
 
     signal_set.async_wait(boost::bind(&VFRB::handleSignals,
                                       boost::asio::placeholders::error,
@@ -90,15 +88,15 @@ void VFRB::run() noexcept
 
     // init input threads
     boost::thread_group feed_threads;
-    for (auto it = config::Configuration::global_feeds.begin();
-         it != config::Configuration::global_feeds.end(); ++it)
+    for(auto it = config::Configuration::global_feeds.begin();
+        it != config::Configuration::global_feeds.end(); ++it)
     {
         feed_threads.create_thread(
             boost::bind(&VFRB::handleFeed, std::ref(signal_set), *it));
     }
     config::Configuration::global_feeds.clear();
 
-    while (global_run_status)
+    while(global_run_status)
     {
         try
         {
@@ -106,7 +104,7 @@ void VFRB::run() noexcept
             std::string str = msAcCont.processAircrafts(
                 {msGpsData.getBaseLat(), msGpsData.getBaseLong(), msGpsData.getBaseAlt()},
                 msAtmosData.getAtmPress());
-            if (str.length() > 0)
+            if(str.length() > 0)
             {
                 server.writeToAll(str);
             }
@@ -116,7 +114,7 @@ void VFRB::run() noexcept
 
             // write climate info to clients
             str = msAtmosData.getMdaStr() + msWindData.getMwvStr();
-            if (str.length() > 0)
+            if(str.length() > 0)
             {
                 server.writeToAll(str);
             }
@@ -124,12 +122,12 @@ void VFRB::run() noexcept
             // synchronise cycles to ~SYNC_TIME sec
             boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
         }
-        catch (const std::exception& e)
+        catch(const std::exception& e)
         {
             Logger::error("(VFRB) error: ", e.what());
             global_run_status = false;
         }
-        catch (...)
+        catch(...)
         {
             Logger::error("(VFRB) error");
             global_run_status = false;
