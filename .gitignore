@@ -7,6 +7,7 @@
 !/service/
 !/docs/
 !/.ide/
+!/.ide/**
 !/service/**
 !/docs/_includes/**
 !/docs/assets/**
