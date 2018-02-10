@@ -32,29 +32,33 @@
 #include "../util/Position.h"
 #include "Aircraft.hpp"
 
+#ifndef ESTIMATED_TRAFFIC
+#define ESTIMATED_TRAFFIC 1
+#endif
+
 using namespace util;
 
 namespace aircraft
 {
 AircraftContainer::AircraftContainer()
 {
-    mCont.reserve(20);
-    mIndexMap.reserve(40);
+    mContainer.reserve(ESTIMATED_TRAFFIC);
+    mIndexMap.reserve(ESTIMATED_TRAFFIC * 2);
 }
 
 AircraftContainer::~AircraftContainer() noexcept
 {}
 
-std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& cr_id)
+std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& crId)
 {
-    const auto it = mIndexMap.find(cr_id);
+    const auto it = mIndexMap.find(crId);
     if(it == mIndexMap.cend())
     {
-        return mCont.end();
+        return mContainer.end();
     }
     else
     {
-        return mCont.begin() + it->second;
+        return mContainer.begin() + it->second;
     }
 }
 
@@ -65,9 +69,9 @@ std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& 
     std::string dest_str;
     std::size_t index = 0;
     bool del          = false;
-    auto it           = mCont.begin();
+    auto it           = mContainer.begin();
 
-    while(it != mCont.end())
+    while(it != mContainer.end())
     {
         try
         {
@@ -81,18 +85,18 @@ std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& 
             {
                 del = true;
                 mIndexMap.erase(it->getId());
-                it = mCont.erase(it);
+                it = mContainer.erase(it);
             }
             else
             {
-                if(it->getUpdateAge() < AC_INVALIDATE)
+                if(it->getUpdateAge() < AC_OUTDATED)
                 {
-                    dest_str += mAcProc.process(*it, crBasePos, vAtmPress);
+                    dest_str += mProcessor.process(*it, crBasePos, vAtmPress);
                 }
                 ++it;
                 ++index;
             }
-            if(del && it != mCont.end())
+            if(del && it != mContainer.end())
             {
                 mIndexMap.at(it->getId()) = index;
             }
@@ -105,26 +109,27 @@ std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& 
     return dest_str;
 }
 
-void AircraftContainer::upsert(Aircraft& cr_update, std::uint32_t prio)
+void AircraftContainer::upsert(Aircraft& rUpdate, std::uint32_t vPriority)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    auto known_ac = find(cr_update.getId());
-    if(known_ac != mCont.end())
+    auto known_ac = find(rUpdate.getId());
+    if(known_ac != mContainer.end())
     {
         if(known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER
-           || cr_update.getTargetType() == Aircraft::TargetType::FLARM)
+           || rUpdate.getTargetType() == Aircraft::TargetType::FLARM)
         {
-            if(prio * ++(known_ac->getUpdateAttempts()) >= known_ac->getLastPriority())
+            if(vPriority * ++(known_ac->getUpdateAttempts())
+               >= known_ac->getLastPriority())
             {
-                known_ac->update(cr_update, prio);
+                known_ac->update(rUpdate, vPriority);
             }
         }
     }
     else
     {
-        cr_update.setLastPriority(prio);
-        mIndexMap.insert({cr_update.getId(), mCont.size()});
-        mCont.push_back(cr_update);
+        rUpdate.setLastPriority(vPriority);
+        mIndexMap.insert({rUpdate.getId(), mContainer.size()});
+        mContainer.push_back(rUpdate);
     }
 }
 

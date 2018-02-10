@@ -58,7 +58,7 @@ void test_data(TestSuitesRunner& runner)
 
         helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", ac);
         container.upsert(ac, 0);
-        for (int i = 0; i < AC_INVALIDATE; ++i)
+        for (int i = 0; i < AC_OUTDATED; ++i)
         {
             container.processAircrafts(pos, press);
         }

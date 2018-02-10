@@ -19,26 +19,33 @@
  }
  */
 
-#ifndef SRC_AIRCRAFT_AIRCRAFTCONTAINER_H_
-#define SRC_AIRCRAFT_AIRCRAFTCONTAINER_H_
+#pragma once
 
-#include <boost/thread/mutex.hpp>
 #include <cstddef>
 #include <string>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
+#include <boost/thread/mutex.hpp>
 
 #include "../aircraft/AircraftProcessor.h"
 #include "../config/Parameters.h"
 
-#define AC_INVALIDATE 4
-#define AC_DELETE_THRESHOLD 120
-#define AC_NO_FLARM_THRESHOLD AC_INVALIDATE
+/// @def AC_OUTDATED
+/// Times until aircraft is outdated
+#define AC_OUTDATED 4
 
+///  @def AC_DELETE_THRESHOLD
+/// Times until aircraft gets deleted
+#define AC_DELETE_THRESHOLD 120
+
+/// @def AC_NO_FLARM_THRESHOLD
+/// Times until FLARM status is removed
+#define AC_NO_FLARM_THRESHOLD AC_OUTDATED
+
+/// @namespace aircraft
 namespace aircraft
 {
-
 class Aircraft;
 
 /**
@@ -47,61 +54,69 @@ class Aircraft;
  */
 class AircraftContainer
 {
-  public:
-    /// Non-copyable
+public:
+    /// Not copyable
     AircraftContainer(const AircraftContainer&) = delete;
+
     /// Not assignable
     AircraftContainer& operator=(const AircraftContainer&) = delete;
+
     /**
      * @fn AircraftContainer
      * @brief Constructor
      */
     AircraftContainer();
+
     /**
      * @fn ~AircraftContainer
      * @brief Destructor
      */
     virtual ~AircraftContainer() noexcept;
+
     /**
-     * @fn insertAircraft
-     * @brief Insert an Aircraft into container.
-     * @note May fail due to priority.
-     * @param cr_update The Aircraft update
-     * @param prio      The priority attempting to write
+     * @fn upsert
+     * @brief Insert or update an Aircraft, if priority is high enough.
+     * @param rUpdate
+     * @param vPriority
      * @threadsafe
      */
-    void upsert(Aircraft& cr_update, std::uint32_t prio);
+    void upsert(Aircraft& rUpdate, std::uint32_t vPriority);
+
     /**
      * @fn processAircrafts
-     * @brief Process all Aircrafts and get the reports as string.
-     *        Increases update ages; "too old" Aircrafts are not reported and later
-     * deleted.
-     * @see AircraftProcesser::process
+     * @brief Process all Aircrafts and get the reports.
+     * @param crBasePos The base position to relate
+     * @param vAtmPress The atmospheric pressure
      * @return the string with all NMEA reports
      * @threadsafe
      */
     std::string processAircrafts(const struct util::GpsPosition& crBasePos,
                                  double vAtmPress);
 
-  private:
+private:
     /**
      * @fn find
      * @brief Find an Aircraft by Id efficiently in the container using an index map.
-     * @param cr_id The Id to search
+     * @param crId The Id to search
      * @return an iterator to the Aircraft if found, else vector::end
      */
-    std::vector<Aircraft>::iterator find(const std::string& cr_id);
+    std::vector<Aircraft>::iterator find(const std::string& crId);
 
-    /// Mutex for threadsafety
+    /// @var mMutex
+    /// Used for RW on the container.
     boost::mutex mMutex;
-    /// Processor providing functionality to process Aircrafts
-    AircraftProcessor mAcProc;
+
+    /// @var mProcessor
+    /// Providing functionality to process Aircrafts
+    AircraftProcessor mProcessor;
+
+    /// @var mContainer
     /// Vector holding the Aircrafts
-    std::vector<Aircraft> mCont;
-    /// Index map to make find efficient
+    std::vector<Aircraft> mContainer;
+
+    /// @var mIndexMap
+    /// Map IDs to vector indices to make find efficient
     std::unordered_map<std::string, size_t> mIndexMap;
 };
 
-} // namespace aircraft
-
-#endif /* SRC_AIRCRAFT_AIRCRAFTCONTAINER_H_ */
+}  // namespace aircraft

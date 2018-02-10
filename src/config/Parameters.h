@@ -19,10 +19,10 @@
  }
  */
 
-#ifndef SRC_CONFIG_PARAMETERS_H_
-#define SRC_CONFIG_PARAMETERS_H_
+#pragma once
 
 /**
+ * @file Parameters.h
  * This file contains some parameters,
  * which should be fixed at compile-time.
  *
@@ -32,7 +32,7 @@
  */
 
 /**
- * CLIENT_CONNECT_WAIT_TIMEVAL:
+ * @def CLIENT_CONNECT_WAIT_TIMEVAL
  * Input-clients wait for this duration, in seconds, until
  * attempting a connect (reconnect).
  * [1 <= x]
@@ -45,18 +45,18 @@
 #define CLIENT_CONNECT_WAIT_TIMEVAL 120
 
 /**
- * WINDCLIENT_RECEIVE_TIMEOUT:
+ * @def WINDCLIENT_RECEIVE_TIMEOUT
  * Due to unstable hardware/drivers, it became apparent that
  * it is necessary to timeout the wind-sensors input.
  * [1 <= x]
  * A good way is to set this value to 1.5 * Y, where
- * Y is the time the wind-sensor sends its data.
+ * Y is the time interval the wind-sensor sends its data.
  */
 #define WINDCLIENT_RECEIVE_TIMEOUT 5
 
 /**
- * SERVER_MAX_CLIENTS:
- * Maximal amount of clients, which can connect to the VFR-B's
+ * @def SERVER_MAX_CLIENTS
+ * Max amount of clients, which can connect to the VFR-B's
  * internal NMEA-server.
  * [1 <= x]
  * More clients, more network traffic; but at least 1 client is recommended.
@@ -65,4 +65,15 @@
  */
 #define SERVER_MAX_CLIENTS 5
 
-#endif /* SRC_CONFIG_PARAMETERS_H_ */
+/**
+ * @def ESTIMATED_TRAFFIC
+ * Initial amount of space reserved for aircrafts.
+ * The higher this value, the more memory is preallocated for the internal container.
+ * This can increase the performance, but also uses up more RAM.
+ * [0 <= x]
+ * If traffic of 50 aircrafts is common at your base, set it accordingly.
+ * If 10 aircrafts are a high amount of traffic,
+ * there is no need to set it higher than that.
+ * In doubt, set it to a lower value.
+ */
+#define ESTIMATED_TRAFFIC 10
