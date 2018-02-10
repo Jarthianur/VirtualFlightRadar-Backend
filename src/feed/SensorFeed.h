@@ -48,7 +48,7 @@ public:
      * @param cr_kvmap The properties map
      */
     SensorFeed(const std::string& crName, std::uint32_t vPriority,
-               const config::keyValueMap& crKvMap);
+               const config::KeyValueMap& crKvMap);
     /**
      * @fn ~SensorFeed
      * @brief Destructor

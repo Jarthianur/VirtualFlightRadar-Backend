@@ -49,7 +49,7 @@ public:
      * @throws std::logic_error if login is not given in cr_kvmap
      */
     AprscFeed(const std::string& /*cr_name*/, std::uint32_t /*prio*/,
-              const config::keyValueMap& /*cr_kvmap*/);
+              const config::KeyValueMap& /*cr_kvmap*/);
     /**
      * @fn ~AprscFeed
      * @brief Destructor

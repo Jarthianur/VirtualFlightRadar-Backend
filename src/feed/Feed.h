@@ -102,10 +102,10 @@ protected:
      * @throws std::logic_error if host or port are not given
      */
     Feed(const std::string& crName, std::uint32_t vPriority,
-         const config::keyValueMap& crKvMap);
+         const config::KeyValueMap& crKvMap);
 
     /// Key-value-map holding the properties.
-    const config::keyValueMap mKvMap;
+    const config::KeyValueMap mKvMap;
 
     /// Client, later resolved according to InpuType
     std::unique_ptr<network::client::Client> mpClient;

@@ -57,7 +57,7 @@ const std::string PropertyMap::getProperty(const std::string& cr_section,
     }
 }
 
-const keyValueMap& PropertyMap::getSectionKv(const std::string& cr_section) const
+const KeyValueMap& PropertyMap::getSectionKv(const std::string& cr_section) const
 {
     auto it = mPropertiesMap.find(cr_section);
     if (it != mPropertiesMap.end())
@@ -70,7 +70,7 @@ const keyValueMap& PropertyMap::getSectionKv(const std::string& cr_section) cons
     }
 }
 
-bool config::PropertyMap::addProperty(const std::string& r_section, const keyValue& r_kv)
+bool config::PropertyMap::addProperty(const std::string& r_section, const KeyValue& r_kv)
 {
     return mPropertiesMap[r_section].emplace(r_kv).second;
 }

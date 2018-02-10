@@ -48,7 +48,7 @@ public:
      * @param cr_kvmap The properties map
      */
     SbsFeed(const std::string& cr_name, std::uint32_t prio,
-            const config::keyValueMap& cr_kvmap);
+            const config::KeyValueMap& cr_kvmap);
     /**
      * @fn ~SbsFeed
      * @brief Destructor

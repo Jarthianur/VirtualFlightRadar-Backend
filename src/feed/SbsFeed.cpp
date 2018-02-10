@@ -38,7 +38,7 @@ namespace feed
 {
 
 SbsFeed::SbsFeed(const std::string& cr_name, std::uint32_t prio,
-                 const config::keyValueMap& cr_kvmap)
+                 const config::KeyValueMap& cr_kvmap)
         : Feed(cr_name, prio, cr_kvmap)
 {
     mpClient = std::unique_ptr<network::client::Client>(

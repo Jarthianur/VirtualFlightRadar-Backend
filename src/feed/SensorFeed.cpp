@@ -37,7 +37,7 @@ namespace feed
 {
 
 SensorFeed::SensorFeed(const std::string& crName, std::uint32_t vPriority,
-                       const config::keyValueMap& crKvMap)
+                       const config::KeyValueMap& crKvMap)
         : Feed(crName, vPriority, crKvMap),
           mWindUpdateAttempts(0),
           mAtmosUpdateAttempts(0)

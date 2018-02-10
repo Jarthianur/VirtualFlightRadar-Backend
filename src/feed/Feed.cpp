@@ -37,7 +37,7 @@ namespace feed
 {
 
 Feed::Feed(const std::string& crName, std::uint32_t vPriority,
-           const config::keyValueMap& crKvMap)
+           const config::KeyValueMap& crKvMap)
         : mName(crName),
           mPriority(vPriority),
           mKvMap(crKvMap)

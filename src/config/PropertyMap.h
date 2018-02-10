@@ -30,9 +30,9 @@ namespace config
 {
 
 /// Typedef for a map of key-value pairs
-using keyValueMap = std::unordered_map<std::string, std::string>;
+using KeyValueMap = std::unordered_map<std::string, std::string>;
 /// Typedef for a key-value pair
-using keyValue = std::pair<std::string, std::string>;
+using KeyValue = std::pair<std::string, std::string>;
 
 /**
  * @class PropertyMap
@@ -68,7 +68,7 @@ public:
      * @param cr_section The section to get the kv-map for
      * @return the kv-map if found, else an empty one
      */
-    const keyValueMap& getSectionKv(const std::string& cr_section) const;
+    const KeyValueMap& getSectionKv(const std::string& cr_section) const;
     /**
      * @fn addProperty
      * @brief Add a key-value pair for a section.
@@ -77,11 +77,11 @@ public:
      * @param r_kv      The key-value pair
      * @return true on success, else false
      */
-    bool addProperty(const std::string& r_section, const keyValue& r_kv = { });
+    bool addProperty(const std::string& r_section, const KeyValue& r_kv = { });
 
 private:
     /// The map of sections with kv-maps
-    std::unordered_map<std::string, keyValueMap> mPropertiesMap;
+    std::unordered_map<std::string, KeyValueMap> mPropertiesMap;
 };
 
 } /* namespace config */
