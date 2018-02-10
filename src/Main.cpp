@@ -25,8 +25,8 @@
 #include <string>
 
 #include "config/Configuration.h"
-#include "data/GpsData.h"
 #include "data/AtmosphereData.h"
+#include "data/GpsData.h"
 #include "data/WindData.h"
 #include "util/Logger.h"
 #include "util/Position.h"
@@ -59,30 +59,33 @@ int main(int argc, char** argv)
 {
     Logger::info("VirtualFlightRadar-Backend -- ", VERSION);
 
-    if (argc < 3)
+    if(argc < 3)
     {
         Logger::info(
-                "usage: ./VirtualFlightRadar-Backend [OPTIONS] [-c | --config] path_to_file.ini\n"
-                        "Run VFR-B with given config file.\n"
-                        "The config file must be in valid '.ini' format!\n"
-                        "OPTIONS:\n"
-                        "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received.");
+            "usage: ./VirtualFlightRadar-Backend [OPTIONS] [-c | --config] path_to_file.ini\n"
+            "Run VFR-B with given config file.\n"
+            "The config file must be in valid '.ini' format!\n"
+            "OPTIONS:\n"
+            "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received.");
         return -1;
     }
 
-    if (evalArgs(argc, argv) != 0)
+    if(evalArgs(argc, argv) != 0)
     {
         return -1;
     }
 
-    VFRB::msWindData.init( { "" });
-    VFRB::msAtmosData.init( { "", config::Configuration::sBaseAtmPressure });
-    VFRB::msGpsData.init( { { config::Configuration::sBaseLatitude,
-            config::Configuration::sBaseLongitude, config::Configuration::sBaseAltitude },
-            1, 5, config::Configuration::sBaseGeoid, 0.0 });
+    VFRB::msWindData.init({""});
+    VFRB::msAtmosData.init({"", config::Configuration::sBaseAtmPressure});
+    VFRB::msGpsData.init(
+        {{config::Configuration::sBaseLatitude, config::Configuration::sBaseLongitude,
+          config::Configuration::sBaseAltitude},
+         1,
+         5,
+         config::Configuration::sBaseGeoid,
+         0.0});
 
     VFRB::run();
-
     return 0;
 }
 
@@ -92,12 +95,12 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
     bool gnd = false;
     bool cfg_found = false;
 
-    for (int i = 1; i < argc; i++)
+    for(int i = 1; i < argc; i++)
     {
-        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
+        if(std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
         {
             ini_file = std::string(argv[++i]);
-            if (ini_file.rfind(".ini") == std::string::npos)
+            if(ini_file.rfind(".ini") == std::string::npos)
             {
                 Logger::error("(VFRB) not a ini file: ", ini_file);
                 return -1;
@@ -107,7 +110,7 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
                 cfg_found = true;
             }
         }
-        else if (std::string(argv[i]).find("-g") != std::string::npos)
+        else if(std::string(argv[i]).find("-g") != std::string::npos)
         {
             gnd = true;
         }
@@ -117,13 +120,14 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
         }
     }
 
-    if (cfg_found)
+    if(cfg_found)
     {
         try
         {
             std::ifstream file(ini_file);
             config::Configuration conf(file);
-        } catch (const std::logic_error& e)
+        }
+        catch(const std::logic_error& e)
         {
             Logger::error("(VFRB) eval config: ", e.what());
             return -1;
@@ -135,7 +139,7 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
         return -1;
     }
 
-    if (gnd || config::Configuration::sGndModeEnabled)
+    if(gnd || config::Configuration::sGndModeEnabled)
     {
         config::Configuration::sGndModeEnabled = true;
         Logger::info("(VFRB) GND mode: yes");
@@ -147,4 +151,3 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
 
     return 0;
 }
-
