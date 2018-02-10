@@ -76,10 +76,10 @@ int main(int argc, char** argv)
     }
 
     VFRB::msWindData.init( { "" });
-    VFRB::msAtmosData.init( { "", config::Configuration::base_pressure });
-    VFRB::msGpsData.init( { { config::Configuration::base_latitude,
-            config::Configuration::base_longitude, config::Configuration::base_altitude },
-            1, 5, config::Configuration::base_geoid, 0.0 });
+    VFRB::msAtmosData.init( { "", config::Configuration::sBaseAtmPressure });
+    VFRB::msGpsData.init( { { config::Configuration::sBaseLatitude,
+            config::Configuration::sBaseLongitude, config::Configuration::sBaseAltitude },
+            1, 5, config::Configuration::sBaseGeoid, 0.0 });
 
     VFRB::run();
 
@@ -135,9 +135,9 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
         return -1;
     }
 
-    if (gnd || config::Configuration::global_gnd_mode)
+    if (gnd || config::Configuration::sGndModeEnabled)
     {
-        config::Configuration::global_gnd_mode = true;
+        config::Configuration::sGndModeEnabled = true;
         Logger::info("(VFRB) GND mode: yes");
     }
     else

@@ -43,7 +43,7 @@ std::string AircraftProcessor::process(const Aircraft& crAircraft,
 {
     calcRelativePosition(crAircraft, crRelPos, vAtmPress);
 
-    if(mtDist > config::Configuration::filter_maxDist)
+    if(mtDist > config::Configuration::sMaxDistance)
     {
         return "";
     }
@@ -101,7 +101,7 @@ inline void AircraftProcessor::buildPflaaStr(const Aircraft& crAircraft,
 {
     if(crAircraft.hasFullInfo())
     {
-        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%u,%s,%03d,,%d,%3.1lf,%1x*",
+        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%d,%s,%03d,,%d,%3.1lf,%1x*",
                       mtRelN, mtRelE, mtRelV, crAircraft.getIdType(),
                       crAircraft.getId().c_str(),
                       util::math::dToI(crAircraft.getHeading()),

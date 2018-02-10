@@ -19,8 +19,7 @@
  }
  */
 
-#ifndef SRC_CONFIG_CONFIGURATION_H_
-#define SRC_CONFIG_CONFIGURATION_H_
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -34,34 +33,82 @@ namespace feed
 class Feed;
 }
 
+/// @namespace config
 namespace config
 {
 
 class PropertyMap;
 
-/// Configuration section keys
+/**
+ * Configuration section keys
+ */
+/// @def SECT_KEY_FALLBACK
 #define SECT_KEY_FALLBACK   "fallback"
+
+/// @def SECT_KEY_GENERAL
 #define SECT_KEY_GENERAL    "general"
+
+/// @def SECT_KEY_FILTER
 #define SECT_KEY_FILTER     "filter"
+
+/// @def SECT_KEY_APRSC
 #define SECT_KEY_APRSC      "aprs"
+
+/// @def SECT_KEY_SBS
 #define SECT_KEY_SBS        "sbs"
+
+/// @def SECT_KEY_GPS
 #define SECT_KEY_GPS        "gps"
+
+/// @def SECT_KEY_SENS
 #define SECT_KEY_SENS       "sens"
-/// Per section keys
+
+/**
+ * Per section keys
+ */
+/// @def KV_KEY_FEEDS
 #define KV_KEY_FEEDS        "feeds"
+
+/// @def KV_KEY_GND_MODE
 #define KV_KEY_GND_MODE     "gndMode"
+
+/// @def KV_KEY_LATITUDE
 #define KV_KEY_LATITUDE     "latitude"
+
+/// @def KV_KEY_LONGITUDE
 #define KV_KEY_LONGITUDE    "longitude"
+
+/// @def KV_KEY_ALTITUDE
 #define KV_KEY_ALTITUDE     "altitude"
+
+/// @def KV_KEY_GEOID
 #define KV_KEY_GEOID        "geoid"
+
+/// @def KV_KEY_PRESSURE
 #define KV_KEY_PRESSURE     "pressure"
+
+/// @def KV_KEY_TEMPERATURE
 #define KV_KEY_TEMPERATURE  "temperature"
+
+/// @def KV_KEY_MAX_DIST
 #define KV_KEY_MAX_DIST     "maxDist"
+
+/// @def KV_KEY_MAX_HEIGHT
 #define KV_KEY_MAX_HEIGHT   "maxHeight"
+
+/// @def KV_KEY_SERVER_PORT
 #define KV_KEY_SERVER_PORT  "serverPort"
+
+/// @def KV_KEY_HOST
 #define KV_KEY_HOST         "host"
+
+/// @def KV_KEY_PORT
 #define KV_KEY_PORT         "port"
+
+/// @def KV_KEY_PRIORITY
 #define KV_KEY_PRIORITY     "priority"
+
+/// @def KV_KEY_LOGIN
 #define KV_KEY_LOGIN        "login"
 
 /**
@@ -74,36 +121,56 @@ public:
     /**
      * @fn Configuration
      * @brief Constructor
-     * @param r_stream The config file as stream
+     * @param rStream The config file as stream
      * @throws std::logic_error if any error occures or no feeds are given
      */
-    Configuration(std::istream& r_stream);
+    explicit Configuration(std::istream& rStream);
+
     /**
      * @fn ~Configuration
      * @brief Destructor
      */
     virtual ~Configuration() noexcept;
 
-    /// Bases altitude
-    static std::int32_t base_altitude;
-    /// Bases latitude
-    static double base_latitude;
-    /// Bases longitude
-    static double base_longitude;
-    /// Bases geoid separation
-    static double base_geoid;
-    /// Air pressure at base
-    static double base_pressure;
+    /// @var sBaseAltitude
+    /// Base altitude
+    static std::int32_t sBaseAltitude;
+
+    /// @var sBaseLatitude
+    /// Base latitude
+    static double sBaseLatitude;
+
+    /// @var sBaseLongitude
+    /// Base longitude
+    static double sBaseLongitude;
+
+    /// @var sBaseGeoid
+    /// Base geoid separation
+    static double sBaseGeoid;
+
+    /// @var sBaseAtmPressure
+    /// Atmospheric pressure at base
+    static double sBaseAtmPressure;
+
+    /// @var sMaxHeight
     /// Maximum height for reported Aircrafts
-    static std::int32_t filter_maxHeight;
+    static std::int32_t sMaxHeight;
+
+    /// @var sMaxDistance
     /// Maximum distance for reported Aircrafts
-    static std::int32_t filter_maxDist;
+    static std::int32_t sMaxDistance;
+
+    /// @var sServerPort
     /// Port where to serve reports
-    static std::uint16_t global_server_port;
+    static std::uint16_t sServerPort;
+
+    /// @var sGndModeEnabled
     /// Ground mode enabled?
-    static bool global_gnd_mode;
+    static bool sGndModeEnabled;
+
+    /// @var sRegisteredFeeds
     /// All registered and correctly parsed input feeds
-    static std::vector<std::shared_ptr<feed::Feed>> global_feeds;
+    static std::vector<std::shared_ptr<feed::Feed>> sRegisteredFeeds;
 
 private:
     /**
@@ -113,6 +180,7 @@ private:
      * @return true on success and at least one feed was registered, else false
      */
     bool init(std::istream& r_stream);
+
     /**
      * @fn registerFeeds
      * @brief Register all input feeds found from ConfigReader.
@@ -123,9 +191,10 @@ private:
     std::size_t registerFeeds(const PropertyMap& cr_map);
 
     void resolveFallbacks(const PropertyMap& cr_map);
+
     void resolveFilters(const PropertyMap& cr_map);
+
+    void resolveServerPort(const PropertyMap& cr_map);
 };
 
 }  // namespace config
-
-#endif /* SRC_CONFIG_CONFIGURATION_H_ */

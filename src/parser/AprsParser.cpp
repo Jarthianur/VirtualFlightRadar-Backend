@@ -96,7 +96,7 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
             //altitude
             pos.altitude = util::math::dToI(
                     std::stod(match.str(RE_APRS_ALT)) * util::math::FEET_2_M);
-            if (pos.altitude > config::Configuration::filter_maxHeight)
+            if (pos.altitude > config::Configuration::sMaxHeight)
             {
                 return false;
             }

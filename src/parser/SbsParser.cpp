@@ -93,7 +93,7 @@ noexcept
                     pos.altitude = util::math::dToI(
                             std::stod(cr_msg.substr(p, delim - p))
                                     * util::math::FEET_2_M);
-                    if (pos.altitude > config::Configuration::filter_maxHeight)
+                    if (pos.altitude > config::Configuration::sMaxHeight)
                     {
                         return false;
                     }

@@ -80,8 +80,8 @@ void test_data(TestSuitesRunner& runner)
     })->test("prefer FLARM, accept again if no input",
              []()
     {
-        config::Configuration::filter_maxDist = INT32_MAX;
-        config::Configuration::filter_maxHeight = INT32_MAX;
+        config::Configuration::sMaxDistance = INT32_MAX;
+        config::Configuration::sMaxHeight = INT32_MAX;
         GpsPosition pos =
         {   49.0, 8.0, 0};
         double press = 1013.25;
@@ -114,8 +114,8 @@ void test_data(TestSuitesRunner& runner)
     })->test("write after attempt",
              []()
     {
-        config::Configuration::filter_maxDist = INT32_MAX;
-        config::Configuration::filter_maxHeight = INT32_MAX;
+        config::Configuration::sMaxDistance = INT32_MAX;
+        config::Configuration::sMaxHeight = INT32_MAX;
         GpsPosition pos =
         {   49.0, 8.0, 0};
         double press = 1013.25;

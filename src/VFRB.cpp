@@ -83,18 +83,18 @@ void VFRB::run() noexcept
     boost::thread signal_thread([&io_service]() { io_service.run(); });
 
     // init server and run handler
-    network::server::Server server(signal_set, config::Configuration::global_server_port);
+    network::server::Server server(signal_set, config::Configuration::sServerPort);
     boost::thread server_thread(boost::bind(&VFRB::handleServer, std::ref(server)));
 
     // init input threads
     boost::thread_group feed_threads;
-    for(auto it = config::Configuration::global_feeds.begin();
-        it != config::Configuration::global_feeds.end(); ++it)
+    for(auto it = config::Configuration::sRegisteredFeeds.begin();
+        it != config::Configuration::sRegisteredFeeds.end(); ++it)
     {
         feed_threads.create_thread(
             boost::bind(&VFRB::handleFeed, std::ref(signal_set), *it));
     }
-    config::Configuration::global_feeds.clear();
+    config::Configuration::sRegisteredFeeds.clear();
 
     while(global_run_status)
     {
@@ -156,7 +156,7 @@ void VFRB::run() noexcept
 void VFRB::handleServer(network::server::Server& r_server)
 {
     Logger::info("(Server) startup: localhost ",
-                 std::to_string(config::Configuration::global_server_port));
+                 std::to_string(config::Configuration::sServerPort));
     r_server.run();
     global_run_status = false;
 }
