@@ -66,7 +66,7 @@ public:
      * @param vHeading      The heading
      */
     Aircraft(std::string& rId, struct util::GpsPosition& rPos, double vGndSpd,
-             std::uint32_t vIdType, std::int32_t vAircraftType, double vClimbRate,
+             IdType vIdType, AircraftType vAircraftType, double vClimbRate,
              double vHeading);
 
     /**
@@ -96,6 +96,42 @@ public:
     };
 
     /**
+     * @enum AircraftType
+     * @brief Aircraft types with their protocol codes.
+     */
+    enum class AircraftType : std::uint32_t
+    {
+        UNKNOWN               = 0,
+        GLIDER                = 1,
+        TOW_PLANE             = 2,
+        HELICOPTER_ROTORCRAFT = 3,
+        PARACHUTE             = 4,
+        DROP_PLANE            = 5,
+        HANG_GLIDER           = 6,
+        PARA_GLIDER           = 7,
+        POWERED_AIRCRAFT      = 8,  ///< Default for TRANSPONDER targets
+        JET_AIRCRAFT          = 9,
+        UFO                   = 10,
+        BALLOON               = 11,
+        AIRSHIP               = 12,
+        UAV                   = 13,
+        STATIC_OBJECT         = 15
+    };
+
+    /**
+     * @enum IdType
+     * @brief Id (address) types with their protocol codes.
+     */
+    enum class IdType : std::int32_t
+    {
+        UNRECOGNIZED = -1,
+        RANDOM       = 0,
+        ICAO         = 1,
+        FLARM        = 2,
+        OGN          = 3
+    };
+
+    /**
      * @fn update
      * @brief Update this Aircraft.
      * @param crUpdate  Other Aircraft with new data
@@ -113,9 +149,10 @@ public:
     /**
      * @fn getIdType
      * @brief Get the Id type.
+     * @see IdType
      * @return the Id type
      */
-    const std::uint32_t getIdType() const;
+    IdType getIdType() const;
 
     /**
      * @fn getTargetT
@@ -123,21 +160,22 @@ public:
      * @see TargetType
      * @return the target type
      */
-    const TargetType getTargetType() const;
+    TargetType getTargetType() const;
 
     /**
      * @fn getAircraftT
      * @brief Get the aircraft type.
+     * @see AircraftType
      * @return the aircraft type
      */
-    const std::int32_t getAircraftType() const;
+    AircraftType getAircraftType() const;
 
     /**
      * @fn hasFullInfo
      * @brief Are position and movement informations given?
      * @return true, if full info is available, else false
      */
-    const bool hasFullInfo() const;
+    bool hasFullInfo() const;
 
     /**
      * @fn getUpdateAge
@@ -151,49 +189,49 @@ public:
      * @brief Get last written priority.
      * @return the last priority
      */
-    const std::uint32_t getLastPriority() const;
+    std::uint32_t getLastPriority() const;
 
     /**
      * @fn getLatitude
      * @brief Get the last known latitude.
      * @return the latitude
      */
-    const double getLatitude() const;
+    double getLatitude() const;
 
     /**
      * @fn getLongitude
      * @brief Get the last known longitude.
      * @return the longitude
      */
-    const double getLongitude() const;
+    double getLongitude() const;
 
     /**
      * @fn getAltitude
      * @brief Get the last known altitude.
      * @return the altitude.
      */
-    const std::int32_t getAltitude() const;
+    std::int32_t getAltitude() const;
 
     /**
      * @fn getGndSpeed
      * @brief Get the last known speed over ground.
      * @return the ground speed
      */
-    const double getGndSpeed() const;
+    double getGndSpeed() const;
 
     /**
      * @fn getHeading
      * @brief Get the last known heading.
      * @return the heading
      */
-    const double getHeading() const;
+    double getHeading() const;
 
     /**
      * @fn getClimbRate
      * @brief Get the last known climb rate.
      * @return the climb rate
      */
-    const double getClimbRate() const;
+    double getClimbRate() const;
 
     /**
      * @fn getUpdateAttempts
@@ -205,95 +243,123 @@ public:
     /**
      * @fn setId
      * @brief Set the Id.
-     * @param cr_id The new Id
+     * @param crId The new Id
      */
-    void setId(const std::string& cr_id);
+    void setId(const std::string& crId);
 
     /**
      * @fn setPosition
      * @brief Set the GPS position.
-     * @param cr_pos The new position
+     * @param crPos The new position
      */
-    void setPosition(const struct util::GpsPosition& cr_pos);
+    void setPosition(const struct util::GpsPosition& crPos);
+
     /**
-     * @fn setAircraftT
+     * @fn setAircraftType
      * @brief Set the Aircraft type.
-     * @param c_act The new Aircraft type
+     * @see AircraftType
+     * @param vType The new Aircraft type
      */
-    void setAircraftT(const std::int32_t c_act);
+    void setAircraftType(AircraftType vType);
+
     /**
      * @fn setIdType
      * @brief Set the Id type.
-     * @param c_idt The new Id type
+     * @see IdType
+     * @param vType The new Id type
      */
-    void setIdType(const std::uint32_t c_idt);
+    void setIdType(IdType vType);
+
     /**
      * @fn setClimbRate
      * @brief Set the climb rate.
-     * @param c_climb The new climb rate; default A_VALUE_NA
+     * @param vRate The new climb rate (default: A_VALUE_NA)
      */
-    void setClimbRate(const double c_climb = A_VALUE_NA);
+    void setClimbRate(double vRate = A_VALUE_NA);
+
     /**
      * @fn setHeading
      * @brief Set the heading.
-     * @param c_head The new heading; default A_VALUE_NA
+     * @param vHeading The new heading (default: A_VALUE_NA)
      */
-    void setHeading(const double c_head = A_VALUE_NA);
+    void setHeading(double vHeading = A_VALUE_NA);
+
     /**
      * @fn setGndSpeed
      * @brief Set the ground speed.
-     * @param c_gndspd The new ground speed; default  A_VALUE_NA
+     * @param vGndSpd The new ground speed (default: A_VALUE_NA)
      */
-    void setGndSpeed(const double c_gndspd = A_VALUE_NA);
+    void setGndSpeed(double vGndSpd = A_VALUE_NA);
+
     /**
-     * @fn setTargetT
+     * @fn setTargetType
      * @brief Set the target type.
      * @see TargetType
-     * @param tt The new target type
+     * @param vType The new target type
      */
-    void setTargetT(TargetType tt);
+    void setTargetType(TargetType vType);
+
     /**
      * @fn setFullInfo
      * @brief Set full information to be available.
-     * @param info Is available, or not (default: true)
+     * @param vInfo Is available, or not (default: true)
      */
-    void setFullInfo(bool info = true);
+    void setFullInfo(bool vInfo = true);
 
     /**
      * @fn setLastPriority
-     * @brief
-     * @param prio
+     * @brief Set the lastly updating priority.
+     * @param vPriority
      */
-    void setLastPriority(std::uint32_t prio);
+    void setLastPriority(std::uint32_t vPriority);
 
 private:
-    /// Aircraft ID (address), identifier; Uniqueness is assumed and must be guaranteed by
-    /// input feed.
+    /// @var mId
+    /// Aircraft identifier
     std::string mId;
-    /// ID (address) type.
-    std::uint32_t mIdType = 1;
-    /// Aircraft type encoded as number (glider, powered airplane ...)
-    std::int32_t mAircraftType = 8;
+
+    /// @var mIdType
+    /// @see IdType
+    IdType mIdType;
+
+    /// @var mAircraftType
+    /// @see AircraftType
+    AircraftType mAircraftType;
+
     /// Target type; Got the last update from which device.
-    TargetType mTargetType = TargetType::FLARM;
+    TargetType mTargetType;
+
+    /// @var mFullInfo
     /// Is full set of information available?
     bool mFullInfo = false;
+
+    /// @var mUpdateAge
     /// Times processed without update.
     std::uint64_t mUpdateAge = 0;
-    /// Got last update with which priority.
+
+    /// @var mLastPriority
+    /// Got last update with this priority.
     std::uint32_t mLastPriority = 0;
-    ///
+
+    /// @var mUpdateAttempts
+    /// Number of unsuccessfull update attempts.
     std::uint64_t mUpdateAttempts = 0;
-    /// Last registered position.
+
+    /// @var mPosition
+    /// Currently known position.
     struct util::GpsPosition mPosition;
+
+    /// @var mGndSpeed
     /// Speed over ground; m/s
     double mGndSpeed = A_VALUE_NA;
+
+    /// @var mHeading
     /// Heading; deg [0-359]
     double mHeading = A_VALUE_NA;
+
+    /// @var mClimbRate
     /// Climb rate; m/s
     double mClimbRate = A_VALUE_NA;
-    /* deg/s
-     double mTurnRate = A_VALUE_NA;*/
 };
 
 }  // namespace aircraft

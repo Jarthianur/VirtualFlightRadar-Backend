@@ -25,48 +25,50 @@ using namespace util;
 
 namespace aircraft
 {
-Aircraft::~Aircraft() noexcept
-{}
-
 Aircraft::Aircraft()
 {}
 
-Aircraft::Aircraft(std::string& r_id, struct GpsPosition& r_pos)
-    : mId(r_id), mPosition(r_pos)
+Aircraft::Aircraft(std::string& rId, struct GpsPosition& rPos)
+    : mId(rId),
+      mPosition(rPos),
+      mIdType(IdType::ICAO),
+      mTargetType(TargetType::TRANSPONDER),
+      mAircraftType(AircraftType::POWERED_AIRCRAFT)
 {}
 
-Aircraft::Aircraft(std::string& r_id, struct GpsPosition& r_pos, double gnd_spd,
-                   std::uint32_t id_t, std::int32_t ac_t,
-                   double climb_r, /*double turn_r,*/
-                   double heading)
-    : mId(r_id),
-      mIdType(id_t),
-      mAircraftType(ac_t),
-      mPosition(r_pos),
-      mGndSpeed(gnd_spd),
-      mHeading(heading),
-      mClimbRate(climb_r)
+Aircraft::Aircraft(std::string& rId, struct GpsPosition& rPos, double vGndSpd,
+                   IdType vIdType, AircraftType vAircraftType, double vClimbRate,
+                   double vHeading)
+    : mId(rId),
+      mIdType(vIdType),
+      mAircraftType(vAircraftType),
+      mPosition(rPos),
+      mGndSpeed(vGndSpd),
+      mHeading(vHeading),
+      mClimbRate(vClimbRate),
+      mTargetType(TargetType::FLARM)
 {}
 
-bool Aircraft::operator==(const Aircraft& cr_other) const
+Aircraft::~Aircraft() noexcept
+{}
+
+bool Aircraft::operator==(const Aircraft& crOther) const
 {
-    return this->mId == cr_other.mId;
+    return this->mId == crOther.mId;
 }
 
-void Aircraft::update(const Aircraft& cr_ac, std::uint32_t prio)
+void Aircraft::update(const Aircraft& crUpdate, std::uint32_t vPriority)
 {
-    // no update for ID
-    this->mIdType       = cr_ac.mIdType;
-    this->mAircraftType = cr_ac.mAircraftType;
-    this->mPosition     = cr_ac.mPosition;
-    this->mGndSpeed     = cr_ac.mGndSpeed;
-    this->mHeading      = cr_ac.mHeading;
-    this->mClimbRate    = cr_ac.mClimbRate;
-    // this->mTurnRate = r_ac.mTurnRate;
-    this->mFullInfo       = cr_ac.mFullInfo;
-    this->mTargetType     = cr_ac.mTargetType;
+    this->mIdType         = crUpdate.mIdType;
+    this->mAircraftType   = crUpdate.mAircraftType;
+    this->mPosition       = crUpdate.mPosition;
+    this->mGndSpeed       = crUpdate.mGndSpeed;
+    this->mHeading        = crUpdate.mHeading;
+    this->mClimbRate      = crUpdate.mClimbRate;
+    this->mFullInfo       = crUpdate.mFullInfo;
+    this->mTargetType     = crUpdate.mTargetType;
     this->mUpdateAge      = 0;
-    this->mLastPriority   = prio;
+    this->mLastPriority   = vPriority;
     this->mUpdateAttempts = 0;
 }
 
@@ -75,22 +77,22 @@ inline const std::string& Aircraft::getId() const
     return mId;
 }
 
-inline const std::uint32_t Aircraft::getIdType() const
+inline Aircraft::IdType Aircraft::getIdType() const
 {
     return mIdType;
 }
 
-inline const Aircraft::TargetType Aircraft::getTargetType() const
+inline Aircraft::TargetType Aircraft::getTargetType() const
 {
     return mTargetType;
 }
 
-inline const std::int32_t Aircraft::getAircraftType() const
+inline Aircraft::AircraftType Aircraft::getAircraftType() const
 {
     return mAircraftType;
 }
 
-inline const bool Aircraft::hasFullInfo() const
+inline bool Aircraft::hasFullInfo() const
 {
     return mFullInfo;
 }
@@ -100,37 +102,37 @@ inline std::uint64_t& Aircraft::getUpdateAge()
     return mUpdateAge;
 }
 
-inline const std::uint32_t Aircraft::getLastPriority() const
+inline std::uint32_t Aircraft::getLastPriority() const
 {
     return mLastPriority;
 }
 
-inline const double Aircraft::getLatitude() const
+inline double Aircraft::getLatitude() const
 {
     return mPosition.latitude;
 }
 
-inline const double Aircraft::getLongitude() const
+inline double Aircraft::getLongitude() const
 {
     return mPosition.longitude;
 }
 
-inline const std::int32_t Aircraft::getAltitude() const
+inline std::int32_t Aircraft::getAltitude() const
 {
     return mPosition.altitude;
 }
 
-inline const double Aircraft::getGndSpeed() const
+inline double Aircraft::getGndSpeed() const
 {
     return mGndSpeed;
 }
 
-inline const double Aircraft::getHeading() const
+inline double Aircraft::getHeading() const
 {
     return mHeading;
 }
 
-inline const double Aircraft::getClimbRate() const
+inline double Aircraft::getClimbRate() const
 {
     return mClimbRate;
 }
@@ -140,54 +142,54 @@ inline std::uint64_t& Aircraft::getUpdateAttempts()
     return mUpdateAttempts;
 }
 
-inline void Aircraft::setId(const std::string& cr_id)
+inline void Aircraft::setId(const std::string& crId)
 {
-    mId = cr_id;
+    mId = crId;
 }
 
-inline void Aircraft::setPosition(const struct util::GpsPosition& cr_pos)
+inline void Aircraft::setPosition(const struct util::GpsPosition& crPos)
 {
-    mPosition = cr_pos;
+    mPosition = crPos;
 }
 
-inline void Aircraft::setAircraftT(const std::int32_t c_act)
+inline void Aircraft::setAircraftType(Aircraft::AircraftType vType)
 {
-    mAircraftType = c_act;
+    mAircraftType = vType;
 }
 
-inline void Aircraft::setIdType(const std::uint32_t c_idt)
+inline void Aircraft::setIdType(Aircraft::IdType vType)
 {
-    mIdType = c_idt;
+    mIdType = vType;
 }
 
-inline void Aircraft::setClimbRate(const double c_climb = A_VALUE_NA)
+inline void Aircraft::setClimbRate(double vRate)
 {
-    mClimbRate = c_climb;
+    mClimbRate = vRate;
 }
 
-inline void Aircraft::setHeading(const double c_head = A_VALUE_NA)
+inline void Aircraft::setHeading(double vHeading)
 {
-    mHeading = c_head;
+    mHeading = vHeading;
 }
 
-inline void Aircraft::setGndSpeed(const double c_gndspd = A_VALUE_NA)
+inline void Aircraft::setGndSpeed(double vGndSpd)
 {
-    mGndSpeed = c_gndspd;
+    mGndSpeed = vGndSpd;
 }
 
-inline void Aircraft::setTargetT(Aircraft::TargetType tt)
+inline void Aircraft::setTargetType(Aircraft::TargetType vType)
 {
-    mTargetType = tt;
+    mTargetType = vType;
 }
 
-inline void Aircraft::setFullInfo(bool info = true)
+inline void Aircraft::setFullInfo(bool vInfo)
 {
-    mFullInfo = info;
+    mFullInfo = vInfo;
 }
 
-inline void Aircraft::setLastPriority(std::uint32_t prio)
+inline void Aircraft::setLastPriority(std::uint32_t vPriority)
 {
-    mLastPriority = prio;
+    mLastPriority = vPriority;
 }
 
 }  // namespace aircraft

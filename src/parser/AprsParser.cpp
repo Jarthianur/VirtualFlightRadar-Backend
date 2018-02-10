@@ -118,7 +118,7 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
                     r_ac.setIdType(
                             std::stoi(com_match.str(RE_APRS_COM_TYPE), nullptr, 16)
                                     & 0x03);
-                    r_ac.setAircraftT(
+                    r_ac.setAircraftType(
                             (std::stoi(com_match.str(RE_APRS_COM_TYPE), nullptr, 16)
                                     & 0x7C) >> 2);
                 } catch (const std::logic_error& e)
@@ -174,7 +174,7 @@ bool AprsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noe
         }
         r_ac.setPosition(pos);
         r_ac.setFullInfo(fullInfo);
-        r_ac.setTargetT(aircraft::Aircraft::TargetType::FLARM);
+        r_ac.setTargetType(aircraft::Aircraft::TargetType::FLARM);
     }
     else
     {

@@ -116,7 +116,9 @@ noexcept
     }
     r_ac.setPosition(pos);
     r_ac.setFullInfo(false);
-    r_ac.setTargetT(aircraft::Aircraft::TargetType::TRANSPONDER);
+    r_ac.setTargetType(aircraft::Aircraft::TargetType::TRANSPONDER);
+    r_ac.setAircraftType(aircraft::Aircraft::AircraftType::POWERED_AIRCRAFT);
+    r_ac.setIdType(aircraft::Aircraft::IdType::ICAO);
     return true;
 }
 
