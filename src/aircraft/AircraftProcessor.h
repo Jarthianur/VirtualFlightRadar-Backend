@@ -19,24 +19,28 @@
  }
  */
 
-#ifndef SRC_AIRCRAFT_AIRCRAFTPROCESSOR_H_
-#define SRC_AIRCRAFT_AIRCRAFTPROCESSOR_H_
+#pragma once
 
 #include <cstdint>
 #include <string>
+
+/// @def AP_BUFF_S
+/// Internal buffer size
+#define AP_BUFF_S 8191
+
+/// @def AP_L_BUFF_S
+/// Internal buffer less size
+#define AP_L_BUFF_S 128
 
 namespace util
 {
 struct GpsPosition;
 }
 
+/// @namespace aircraft
 namespace aircraft
 {
-
 class Aircraft;
-
-#define AP_BUFF_S 8191
-#define AP_L_BUFF_S 128
 
 /**
  * @class AircraftProcessor
@@ -44,65 +48,118 @@ class Aircraft;
  */
 class AircraftProcessor
 {
-  public:
+public:
     /**
      * @fn AircraftProcessor
      * @brief Constructor
      */
     AircraftProcessor();
+
     /**
      * @fn ~AircraftProcessor
      * @brief Destructor
      */
     virtual ~AircraftProcessor() noexcept;
+
     /**
      * @fn process
      * @brief Generate NMEA report for an Aircraft with relative position etc.
      * @note Resulting string has trailing <cr><lf>.
-     * @param cr_ac The Aircraft to process
+     * @param crAircraft The Aircraft to process
+     * @param crRelPos The position to relate
+     * @param vAtmPress The atmospheric pressure
      * @return the NMEA string
      */
-    std::string process(const Aircraft& cr_ac, const struct util::GpsPosition& crBasePos,
-                        double vAtmPress);
+    std::string process(const Aircraft& crAircraft,
+                        const struct util::GpsPosition& crRelPos, double vAtmPress);
 
-  private:
+private:
     /**
      * @fn calcRelPosToBase
      * @brief Calcutale an Aircrafts position relative to the base.
-     * @param cr_ac The Aircraft to calculate for
+     * @param crAircraft The Aircraft to calculate for
+     * @param crRelPos The position to relate
+     * @param vAtmPress The atmospheric pressure
      */
-    void calcRelPosToBase(const Aircraft& cr_ac,
-                          const struct util::GpsPosition& crBasePos, double vAtmPress);
+    void calcRelativePosition(const Aircraft& crAircraft,
+                              const struct util::GpsPosition& crRelPos, double vAtmPress);
 
-    /// Formatstring buffer
+    /**
+     * @fn buildPflauStr
+     * @brief Build PFLAU sentence for an aircraft.
+     * @param crAircraft The Aircaft
+     * @param rDestStr   The destination string
+     */
+    void buildPflauStr(const Aircraft& crAircraft, std::string& rDestStr);
+
+    /**
+     * @fn buildPflaaStr
+     * @brief Build PFLAA sentence for an aircraft.
+     * @param crAircraft The Aircaft
+     * @param rDestStr   The destination string
+     */
+    void buildPflaaStr(const Aircraft& crAircraft, std::string& rDestStr);
+
+    /**
+     * @fn appendChecksum
+     * @brief Append the checksum and line ending <cr><lf>
+     *        and write the buffered sentence.
+     * @note The checksum is computed upon the internal buffer.
+     * @param rDestStr The destination string
+     */
+    void finishSentence(std::string& rDestStr);
+
+    /// @var mBuffer
+    /// Internal buffer
     char mBuffer[AP_BUFF_S + 1];
-    /// Temporary values
-    /// Bases longitude as radian
-    double mtRadLongB = 0.0,
-           /// Aircrafts longitude as radian
-        mtRadLongAc = 0.0,
-           /// Bases latitude as radian
-        mtRadLatB = 0.0,
-           /// Aircrafts latitude as radian
-        mtRadLatAc = 0.0,
-           /// Distance/Difference between Aircrafts and bases longitude
-        mtLongDist = 0.0,
-           /// Distance/Difference between Aircrafts and bases latitude
-        mtLatDist = 0.0,
-           /// Relative bearing
-        mtBearingRel = 0.0,
-           /// Absolute bearing
-        mtBearingAbs = 0.0;
+
+    /// @var mtRadLatB
+    /// Base latitude as radian
+    double mtRadLatB = 0.0;
+
+    ///@var mtRadLatAc
+    /// Aircraft latitude as radian
+    double mtRadLatAc = 0.0;
+
+    /// @var mtLatDist
+    /// Distance/Difference between Aircrafts and bases latitude
+    double mtLatDist = 0.0;
+
+    /// @var mtRadLongB
+    /// Base longitude as radian
+    double mtRadLongB = 0.0;
+
+    ///@var mtRadLongAc
+    /// Aircraft longitude as radian
+    double mtRadLongAc = 0.0;
+
+    /// @var mtLongDist
+    /// Distance/Difference between Aircraft and base longitude
+    double mtLongDist = 0.0;
+
+    /// @var mtBearingRel
+    /// Relative bearing
+    double mtBearingRel = 0.0;
+
+    /// @var mtBearingAbs
+    /// Absolute bearing
+    double mtBearingAbs = 0.0;
+
+    /// @var mtRelN
     /// Relative distance in northern direction; m
-    std::int32_t mtRelN = 0,
-                 /// Relative distance in eastern direction; m
-        mtRelE = 0,
-                 /// Relative vertical distance; m
-        mtRelV = 0,
-                 /// Distance between Aircraft and base; m
-        mtDist = 0;
+    std::int32_t mtRelN = 0;
+
+    /// @var mtRelE
+    /// Relative distance in eastern direction; m
+    std::int32_t mtRelE = 0;
+
+    /// @var mtRelV
+    /// Relative vertical distance; m
+    std::int32_t mtRelV = 0;
+
+    /// @var mtDist
+    /// Distance between Aircraft and base; m
+    std::int32_t mtDist = 0;
 };
 
-} // namespace aircraft
-
-#endif /* SRC_AIRCRAFT_AIRCRAFTPROCESSOR_H_ */
+}  // namespace aircraft
