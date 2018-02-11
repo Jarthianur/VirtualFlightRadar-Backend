@@ -30,23 +30,20 @@ Aircraft::Aircraft()
 
 Aircraft::Aircraft(std::string& rId, struct GpsPosition& rPos)
     : mId(rId),
-      mPosition(rPos),
       mIdType(IdType::ICAO),
+      mAircraftType(AircraftType::POWERED_AIRCRAFT),
       mTargetType(TargetType::TRANSPONDER),
-      mAircraftType(AircraftType::POWERED_AIRCRAFT)
+      mPosition(rPos)
 {}
 
-Aircraft::Aircraft(std::string& rId, struct GpsPosition& rPos, double vGndSpd,
-                   IdType vIdType, AircraftType vAircraftType, double vClimbRate,
-                   double vHeading)
+Aircraft::Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
+                   struct GpsPosition& rPos, struct Movement& rMove)
     : mId(rId),
       mIdType(vIdType),
       mAircraftType(vAircraftType),
+      mTargetType(TargetType::FLARM),
       mPosition(rPos),
-      mGndSpeed(vGndSpd),
-      mHeading(vHeading),
-      mClimbRate(vClimbRate),
-      mTargetType(TargetType::FLARM)
+      mMovement(rMove)
 {}
 
 Aircraft::~Aircraft() noexcept
@@ -61,12 +58,10 @@ void Aircraft::update(const Aircraft& crUpdate, std::uint32_t vPriority)
 {
     this->mIdType         = crUpdate.mIdType;
     this->mAircraftType   = crUpdate.mAircraftType;
-    this->mPosition       = crUpdate.mPosition;
-    this->mGndSpeed       = crUpdate.mGndSpeed;
-    this->mHeading        = crUpdate.mHeading;
-    this->mClimbRate      = crUpdate.mClimbRate;
-    this->mFullInfo       = crUpdate.mFullInfo;
     this->mTargetType     = crUpdate.mTargetType;
+    this->mPosition       = crUpdate.mPosition;
+    this->mMovement       = crUpdate.mMovement;
+    this->mFullInfo       = crUpdate.mFullInfo;
     this->mUpdateAge      = 0;
     this->mLastPriority   = vPriority;
     this->mUpdateAttempts = 0;
@@ -124,17 +119,17 @@ std::int32_t Aircraft::getAltitude() const
 
 double Aircraft::getGndSpeed() const
 {
-    return mGndSpeed;
+    return mMovement.gndSpeed;
 }
 
 double Aircraft::getHeading() const
 {
-    return mHeading;
+    return mMovement.heading;
 }
 
 double Aircraft::getClimbRate() const
 {
-    return mClimbRate;
+    return mMovement.climbRate;
 }
 
 std::uint64_t& Aircraft::getUpdateAttempts()
@@ -167,17 +162,17 @@ void Aircraft::setIdType(Aircraft::IdType vType)
 
 void Aircraft::setClimbRate(double vRate)
 {
-    mClimbRate = vRate;
+    mMovement.climbRate = vRate;
 }
 
 void Aircraft::setHeading(double vHeading)
 {
-    mHeading = vHeading;
+    mMovement.heading = vHeading;
 }
 
 void Aircraft::setGndSpeed(double vGndSpd)
 {
-    mGndSpeed = vGndSpd;
+    mMovement.gndSpeed = vGndSpd;
 }
 
 void Aircraft::setTargetType(Aircraft::TargetType vType)

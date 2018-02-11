@@ -191,7 +191,7 @@ private:
 
     bool resolveFallbacks(const PropertyMap& cr_map);
 
-    void resolveFilters(const PropertyMap& cr_map);
+    std::int32_t resolveFilter(const PropertyMap& cr_map, const std::string& crKey);
 
     template<typename T>
     T resolveNumberKey(const PropertyMap& cr_map, const std::string& crSection,

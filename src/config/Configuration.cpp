@@ -81,8 +81,9 @@ bool Configuration::init(std::istream& r_stream)
         return false;
     }
 
-    resolveFilters(properties);
-    sServerPort = resolveServerPort(
+    sMaxDistance = resolveFilter(properties, KV_KEY_MAX_DIST);
+    sMaxHeight   = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
+    sServerPort  = resolveServerPort(
         properties.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
     sGndModeEnabled = !properties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
 
@@ -219,34 +220,18 @@ bool Configuration::resolveFallbacks(const PropertyMap& cr_map)
     return true;
 }
 
-void Configuration::resolveFilters(const PropertyMap& cr_map)
+std::int32_t Configuration::resolveFilter(const PropertyMap& cr_map,
+                                          const std::string& crKey)
 {
     try
     {
-        sMaxHeight = resolveNumberKey<std::int32_t>(cr_map, SECT_KEY_FILTER,
-                                                    KV_KEY_MAX_HEIGHT, "-1");
-        if(sMaxHeight < 0)
-        {
-            sMaxHeight = INT32_MAX;
-        }
+        std::int32_t tmp
+            = resolveNumberKey<std::int32_t>(cr_map, SECT_KEY_FILTER, crKey, "-1");
+        return tmp < 0 ? std::numeric_limits<std::int32_t>::max() : tmp;
     }
     catch(const std::invalid_argument&)
     {
-        sMaxHeight = INT32_MAX;
-    }
-
-    try
-    {
-        sMaxDistance = resolveNumberKey<std::int32_t>(cr_map, SECT_KEY_FILTER,
-                                                      KV_KEY_MAX_DIST, "-1");
-        if(sMaxDistance < 0)
-        {
-            sMaxDistance = INT32_MAX;
-        }
-    }
-    catch(const std::invalid_argument&)
-    {
-        sMaxDistance = INT32_MAX;
+        return std::numeric_limits<std::int32_t>::max();
     }
 }
 

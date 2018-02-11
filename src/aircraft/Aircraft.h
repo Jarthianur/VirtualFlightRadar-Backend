@@ -34,6 +34,25 @@
 namespace aircraft
 {
 /**
+ * @struct Movement
+ * @brief Hold information about an Aircrafts movement.
+ */
+struct Movement
+{
+    /// @var gndSpeed
+    /// Speed over ground; m/s
+    double gndSpeed = A_VALUE_NA;
+
+    /// @var heading
+    /// Heading; deg [0-359]
+    double heading = A_VALUE_NA;
+
+    /// @var climbRate
+    /// Climb rate; m/s
+    double climbRate = A_VALUE_NA;
+};
+
+/**
  * @class Aircraft
  * @brief Respresents an aircraft.
  */
@@ -106,16 +125,13 @@ public:
      * @fn Aircraft
      * @brief Constructor
      * @param rId           The Id
-     * @param rPos          The prosition
-     * @param vGndSpd       The ground speed
      * @param vIdType       The Id type
      * @param vAircraftType The aircraft type
-     * @param vClimbRate    The climb rate
-     * @param vHeading      The heading
+     * @param rPos          The prosition
+     * @param rMove         The aircrafts movement
      */
-    Aircraft(std::string& rId, struct util::GpsPosition& rPos, double vGndSpd,
-             IdType vIdType, AircraftType vAircraftType, double vClimbRate,
-             double vHeading);
+    Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
+             struct util::GpsPosition& rPos, struct Movement& rMove);
 
     /**
      * @fn ~Aircraft
@@ -329,6 +345,14 @@ private:
     /// Target type; Got the last update from which device.
     TargetType mTargetType;
 
+    /// @var mPosition
+    /// Currently known position.
+    struct util::GpsPosition mPosition;
+
+    /// @var mMovement
+    /// Currently known movement.
+    struct Movement mMovement;
+
     /// @var mFullInfo
     /// Is full set of information available?
     bool mFullInfo = false;
@@ -344,22 +368,6 @@ private:
     /// @var mUpdateAttempts
     /// Number of unsuccessfull update attempts.
     std::uint64_t mUpdateAttempts = 0;
-
-    /// @var mPosition
-    /// Currently known position.
-    struct util::GpsPosition mPosition;
-
-    /// @var mGndSpeed
-    /// Speed over ground; m/s
-    double mGndSpeed = A_VALUE_NA;
-
-    /// @var mHeading
-    /// Heading; deg [0-359]
-    double mHeading = A_VALUE_NA;
-
-    /// @var mClimbRate
-    /// Climb rate; m/s
-    double mClimbRate = A_VALUE_NA;
 };
 
 }  // namespace aircraft
