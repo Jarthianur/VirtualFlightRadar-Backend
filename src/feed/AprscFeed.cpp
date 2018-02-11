@@ -37,9 +37,9 @@ using namespace util;
 namespace feed
 {
 
-AprscFeed::AprscFeed(const std::string& cr_name, std::uint32_t prio,
+AprscFeed::AprscFeed(const std::string& cr_name,
                      const config::KeyValueMap& cr_kvmap)
-        : Feed(cr_name, prio, cr_kvmap)
+        : Feed(cr_name, cr_kvmap)
 {
     auto it = mKvMap.find(KV_KEY_LOGIN);
     if (it == mKvMap.end())
@@ -64,7 +64,7 @@ void AprscFeed::process(const std::string& cr_res) noexcept
     aircraft::Aircraft ac;
     if (mParser.unpack(cr_res, ac))
     {
-        VFRB::msAcCont.upsert(ac, mPriority);
+        VFRB::msAcCont.upsert(ac, getPriority());
     }
 }
 

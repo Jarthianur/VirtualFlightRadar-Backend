@@ -37,9 +37,9 @@ using namespace util;
 namespace feed
 {
 
-SbsFeed::SbsFeed(const std::string& cr_name, std::uint32_t prio,
+SbsFeed::SbsFeed(const std::string& cr_name,
                  const config::KeyValueMap& cr_kvmap)
-        : Feed(cr_name, prio, cr_kvmap)
+        : Feed(cr_name,  cr_kvmap)
 {
     mpClient = std::unique_ptr<network::client::Client>(
             new network::client::SbsClient(mKvMap.find(KV_KEY_HOST)->second,
@@ -55,7 +55,7 @@ void SbsFeed::process(const std::string& cr_res) noexcept
     aircraft::Aircraft ac;
     if (mParser.unpack(cr_res, ac))
     {
-        VFRB::msAcCont.upsert(ac, mPriority);
+        VFRB::msAcCont.upsert(ac, getPriority());
     }
 }
 

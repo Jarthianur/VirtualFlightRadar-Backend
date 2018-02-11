@@ -19,19 +19,21 @@
  }
  */
 
-#ifndef SRC_CONFIG_PROPERTYMAP_H_
-#define SRC_CONFIG_PROPERTYMAP_H_
+#pragma once
 
 #include <string>
 #include <unordered_map>
 #include <utility>
 
+/// @namespace config
 namespace config
 {
-
-/// Typedef for a map of key-value pairs
+/// @typedef KeyValueMap
+/// Map of key-value pairs
 using KeyValueMap = std::unordered_map<std::string, std::string>;
-/// Typedef for a key-value pair
+
+/// @typedef KeyValue
+/// key-value pair
 using KeyValue = std::pair<std::string, std::string>;
 
 /**
@@ -46,44 +48,46 @@ public:
      * @brief Constructor
      */
     PropertyMap();
+
     /**
      * @fn ~PropertyMap
      * @brief Destructor
      */
     virtual ~PropertyMap() noexcept;
+
     /**
      * @fn getProperty
      * @brief Get the value under a section for the given key.
-     * @param cr_section The section of the property
-     * @param cr_key     The key to get the value for
-     * @param cr_def_val The default value; defaults to empty string
+     * @param crSection The section of the property
+     * @param crKey     The key to get the value for
+     * @param crDefault The default value; defaults to empty string
      * @return the value for key in section if found, else the default value
      */
-    const std::string getProperty(const std::string& cr_section,
-                                  const std::string& cr_key,
-                                  const std::string& cr_def_val = "") const;
+    const std::string getProperty(const std::string& crSection, const std::string& crKey,
+                                  const std::string& crDefault = "") const;
+
     /**
      * @fn getSectionKv
      * @brief Get the key-value-map for a section.
-     * @param cr_section The section to get the kv-map for
+     * @param crSection The section to get the kv-map for
      * @return the kv-map if found, else an empty one
      */
-    const KeyValueMap& getSectionKv(const std::string& cr_section) const;
+    const KeyValueMap& getSectionKv(const std::string& crSection) const;
+
     /**
      * @fn addProperty
      * @brief Add a key-value pair for a section.
      * @note If the section does not exist, it gets created.
-     * @param r_section The section name
-     * @param r_kv      The key-value pair
+     * @param rSection  The section name
+     * @param rKeyValue The key-value pair
      * @return true on success, else false
      */
-    bool addProperty(const std::string& r_section, const KeyValue& r_kv = { });
+    bool addProperty(const std::string& rSection, const KeyValue& rKeyValue = {});
 
 private:
+    /// @var mPropertiesMap
     /// The map of sections with kv-maps
     std::unordered_map<std::string, KeyValueMap> mPropertiesMap;
 };
 
 } /* namespace config */
-
-#endif /* SRC_CONFIG_PROPERTYMAP_H_ */

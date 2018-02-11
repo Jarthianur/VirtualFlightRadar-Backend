@@ -121,7 +121,7 @@ public:
      * @fn Configuration
      * @brief Constructor
      * @param rStream The config file as stream
-     * @throws std::logic_error if any error occures or no feeds are given
+     * @throw std::logic_error if any error occures or no feeds are given
      */
     explicit Configuration(std::istream& rStream);
 
@@ -174,32 +174,69 @@ public:
 private:
     /**
      * @fn init
-     * @brief Initialize Configuration, read and unpack config file with ConfigReader.
-     * @param r_stream The input stream
+     * @brief Initialize Configuration, read and unpack the config stream.
+     * @param rStream The input stream
      * @return true on success and at least one feed was registered, else false
      */
-    bool init(std::istream& r_stream);
+    bool init(std::istream& rStream);
 
     /**
      * @fn registerFeeds
      * @brief Register all input feeds found from ConfigReader.
      * @note Only correctly configured feeds get registered.
-     * @param cr_map The PropertyMap holding read properties
+     * @param crProperties The PropertyMap holding read properties
      * @return the number of registered feeds
      */
-    std::size_t registerFeeds(const PropertyMap& cr_map);
+    std::size_t registerFeeds(const PropertyMap& crProperties);
 
-    bool resolveFallbacks(const PropertyMap& cr_map);
+    /**
+     * @fn resolveFallbacks
+     * @brief Resolve all fallback values from the properties.
+     * @param crProperties The properties
+     * @return whether all fallbacks could be resolved
+     */
+    bool resolveFallbacks(const PropertyMap& crProperties);
 
-    std::int32_t resolveFilter(const PropertyMap& cr_map, const std::string& crKey);
+    /**
+     * @fn resolveFilter
+     * @brief Resolve a filter from the properties.
+     * @param crProperties The properties
+     * @param crKey The filter key
+     * @return the filter value
+     */
+    std::int32_t resolveFilter(const PropertyMap& crProperties, const std::string& crKey);
 
+    /**
+     * @fn resolveNumberKey
+     * @brief Resolve a number value for a key.
+     * @tparam T        The type of number
+     * @param crProperties     The properties
+     * @param crSection The section name
+     * @param crKey     The key
+     * @param crDefault The default value
+     * @return the resolved number value
+     *
+     * Maybe use a union to prevent specialization.
+     */
     template<typename T>
-    T resolveNumberKey(const PropertyMap& cr_map, const std::string& crSection,
-                       const std::string& crKey, const std::string& crDefault);
+    T resolveNumberValue(const PropertyMap& crProperties, const std::string& crSection,
+                         const std::string& crKey, const std::string& crDefault);
 
-    std::uint16_t resolveServerPort(const std::string& cr_port);
+    /**
+     * @fn resolveServerPort
+     * @brief Resolve the server port.
+     * @param crPort The port string
+     * @return the port
+     */
+    std::uint16_t resolveServerPort(const std::string& crPort);
 
-    std::vector<std::string> resolveFeeds(const std::string& cr_feeds);
+    /**
+     * @fn resolveFeeds
+     * @brief Resolve all Feed names.
+     * @param crFeeds The feeds string
+     * @return all feed names
+     */
+    std::vector<std::string> resolveFeeds(const std::string& crFeeds);
 };
 
 }  // namespace config

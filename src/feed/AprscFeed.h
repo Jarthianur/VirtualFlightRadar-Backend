@@ -48,7 +48,7 @@ public:
      * @param cr_kvmap The properties map
      * @throws std::logic_error if login is not given in cr_kvmap
      */
-    AprscFeed(const std::string& /*cr_name*/, std::uint32_t /*prio*/,
+    AprscFeed(const std::string& /*cr_name*/,
               const config::KeyValueMap& /*cr_kvmap*/);
     /**
      * @fn ~AprscFeed

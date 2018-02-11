@@ -36,9 +36,9 @@ using namespace util;
 namespace feed
 {
 
-SensorFeed::SensorFeed(const std::string& crName, std::uint32_t vPriority,
+SensorFeed::SensorFeed(const std::string& crName,
                        const config::KeyValueMap& crKvMap)
-        : Feed(crName, vPriority, crKvMap),
+        : Feed(crName, crKvMap),
           mWindUpdateAttempts(0),
           mAtmosUpdateAttempts(0)
 
@@ -59,11 +59,11 @@ void SensorFeed::process(const std::string& crResponse) noexcept
     {
         if (climate.hasWind())
         {
-            VFRB::msWindData.update(climate.mWind, mPriority, mWindUpdateAttempts);
+            VFRB::msWindData.update(climate.mWind, getPriority(), mWindUpdateAttempts);
         }
         if (climate.hasAtmosphere())
         {
-            VFRB::msAtmosData.update(climate.mAtmosphere, mPriority,
+            VFRB::msAtmosData.update(climate.mAtmosphere, getPriority(),
                     mAtmosUpdateAttempts);
         }
     }

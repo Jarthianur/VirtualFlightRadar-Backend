@@ -47,7 +47,7 @@ public:
      * @param prio     The priority
      * @param cr_kvmap The properties map
      */
-    SbsFeed(const std::string& cr_name, std::uint32_t prio,
+    SbsFeed(const std::string& cr_name,
             const config::KeyValueMap& cr_kvmap);
     /**
      * @fn ~SbsFeed

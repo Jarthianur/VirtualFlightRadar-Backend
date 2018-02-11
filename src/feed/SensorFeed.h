@@ -47,7 +47,7 @@ public:
      * @param prio     The priority
      * @param cr_kvmap The properties map
      */
-    SensorFeed(const std::string& crName, std::uint32_t vPriority,
+    SensorFeed(const std::string& crName,
                const config::KeyValueMap& crKvMap);
     /**
      * @fn ~SensorFeed

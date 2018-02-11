@@ -41,9 +41,9 @@ using namespace util;
 namespace feed
 {
 
-GpsFeed::GpsFeed(const std::string& cr_name, std::uint32_t prio,
+GpsFeed::GpsFeed(const std::string& cr_name,
                  const config::KeyValueMap& cr_kvmap)
-        : Feed(cr_name, prio, cr_kvmap),
+        : Feed(cr_name,  cr_kvmap),
           mUpdateAttempts(0)
 {
     mpClient = std::unique_ptr<network::client::Client>(
@@ -60,7 +60,7 @@ void GpsFeed::process(const std::string& cr_res) noexcept
     struct ExtGpsPosition pos;
     if (mParser.unpack(cr_res, pos))
     {
-        VFRB::msGpsData.update(pos, mPriority, mUpdateAttempts);
+        VFRB::msGpsData.update(pos, getPriority(), mUpdateAttempts);
         if (config::Configuration::sGndModeEnabled && pos.nrSats >= GPS_NR_SATS_GOOD
                 && pos.fixQa >= GPS_FIX_GOOD && pos.dilution <= GPS_HOR_DILUTION_GOOD)
         {

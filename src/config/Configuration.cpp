@@ -36,9 +36,9 @@ using namespace util;
 
 namespace config
 {
-Configuration::Configuration(std::istream& r_stream)
+Configuration::Configuration(std::istream& rStream)
 {
-    if(!init(r_stream))
+    if(!init(rStream))
     {
         throw std::logic_error("Failed to read configuration file");
     }
@@ -61,14 +61,14 @@ std::uint16_t Configuration::sServerPort  = 1;
 bool Configuration::sGndModeEnabled       = false;
 std::vector<std::shared_ptr<feed::Feed>> Configuration::sRegisteredFeeds;
 
-bool Configuration::init(std::istream& r_stream)
+bool Configuration::init(std::istream& rStream)
 {
     ConfigReader reader;
     PropertyMap properties;
 
     try
     {
-        reader.read(r_stream, properties);
+        reader.read(rStream, properties);
     }
     catch(const std::exception& e)
     {
@@ -93,58 +93,34 @@ bool Configuration::init(std::istream& r_stream)
     return nrf > 0;
 }
 
-std::size_t Configuration::registerFeeds(const PropertyMap& cr_map)
+std::size_t Configuration::registerFeeds(const PropertyMap& crProperties)
 {
     std::vector<std::string> feeds
-        = resolveFeeds(cr_map.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+        = resolveFeeds(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
 
     for(auto it = feeds.cbegin(); it != feeds.cend(); ++it)
     {
-        // TODO put to feed construct
-        std::uint64_t priority = 0;
-        try
-        {
-            priority = std::stoul(cr_map.getProperty(*it, KV_KEY_PRIORITY, "0"));
-            if(priority > UINT32_MAX)
-            {
-                throw std::invalid_argument("");
-            }
-        }
-        catch(const std::logic_error&)
-        {
-            Logger::warn("(Config) create feed " + *it, ": Invalid priority given.");
-            // Drop this feed, or create with priority 0?
-            continue;
-        }
-        if(priority == 0)
-        {
-            Logger::warn("(Config) create feed " + *it,
-                         ": Priority is 0; this feed cannot update higher ones.");
-        }
-
         try
         {
             if(it->find(SECT_KEY_APRSC) != std::string::npos)
             {
-                sRegisteredFeeds.push_back(
-                    std::shared_ptr<feed::Feed>(new feed::AprscFeed(
-                        *it, (std::uint32_t) priority, cr_map.getSectionKv(*it))));
+                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
+                    new feed::AprscFeed(*it, crProperties.getSectionKv(*it))));
             }
             else if(it->find(SECT_KEY_SBS) != std::string::npos)
             {
-                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::SbsFeed(
-                    *it, (std::uint32_t) priority, cr_map.getSectionKv(*it))));
+                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
+                    new feed::SbsFeed(*it, crProperties.getSectionKv(*it))));
             }
             else if(it->find(SECT_KEY_SENS) != std::string::npos)
             {
-                sRegisteredFeeds.push_back(
-                    std::shared_ptr<feed::Feed>(new feed::SensorFeed(
-                        *it, (std::uint32_t) priority, cr_map.getSectionKv(*it))));
+                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
+                    new feed::SensorFeed(*it, crProperties.getSectionKv(*it))));
             }
             else if(it->find(SECT_KEY_GPS) != std::string::npos)
             {
-                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::GpsFeed(
-                    *it, (std::uint32_t) priority, cr_map.getSectionKv(*it))));
+                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
+                    new feed::GpsFeed(*it, crProperties.getSectionKv(*it))));
             }
             else
             {
@@ -163,55 +139,58 @@ std::size_t Configuration::registerFeeds(const PropertyMap& cr_map)
 }
 
 template<>
-double Configuration::resolveNumberKey<double>(const PropertyMap& cr_map,
-                                               const std::string& crSection,
-                                               const std::string& crKey,
-                                               const std::string& crDefault)
+double Configuration::resolveNumberValue<double>(const PropertyMap& crProperties,
+                                                 const std::string& crSection,
+                                                 const std::string& crKey,
+                                                 const std::string& crDefault)
 {
     boost::tuple<bool, double> result = util::math::stringToNumber<double>(
-        cr_map.getProperty(crSection, crKey, crDefault));
+        crProperties.getProperty(crSection, crKey, crDefault));
+
     if(!result.get<0>())
     {
         Logger::warn("(Config) " + crSection + "." + crKey, ": Could not resolve value.");
         throw std::invalid_argument("");
     }
+
     Logger::info("(Config) " + crSection + "." + crKey + ": ",
                  std::to_string(result.get<1>()));
     return result.get<1>();
 }
 
 template<>
-std::int32_t Configuration::resolveNumberKey<std::int32_t>(const PropertyMap& cr_map,
-                                                           const std::string& crSection,
-                                                           const std::string& crKey,
-                                                           const std::string& crDefault)
+std::int32_t Configuration::resolveNumberValue<std::int32_t>(
+    const PropertyMap& crProperties, const std::string& crSection,
+    const std::string& crKey, const std::string& crDefault)
 {
     boost::tuple<bool, std::int32_t> result = util::math::stringToNumber<std::int32_t>(
-        cr_map.getProperty(crSection, crKey, crDefault));
+        crProperties.getProperty(crSection, crKey, crDefault));
+
     if(!result.get<0>())
     {
         Logger::warn("(Config) " + crSection + "." + crKey, ": Could not resolve value.");
         throw std::invalid_argument("");
     }
+
     Logger::info("(Config) " + crSection + "." + crKey + ": ",
                  std::to_string(result.get<1>()));
     return result.get<1>();
 }
 
-bool Configuration::resolveFallbacks(const PropertyMap& cr_map)
+bool Configuration::resolveFallbacks(const PropertyMap& crProperties)
 {
     try
     {
-        sBaseLatitude
-            = resolveNumberKey<double>(cr_map, SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "");
-        sBaseLongitude
-            = resolveNumberKey<double>(cr_map, SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "");
-        sBaseAltitude = resolveNumberKey<std::int32_t>(cr_map, SECT_KEY_FALLBACK,
-                                                       KV_KEY_ALTITUDE, "");
-        sBaseGeoid
-            = resolveNumberKey<double>(cr_map, SECT_KEY_FALLBACK, KV_KEY_GEOID, "");
-        sBaseAtmPressure = resolveNumberKey<double>(cr_map, SECT_KEY_FALLBACK,
-                                                    KV_KEY_PRESSURE, "1013.25");
+        sBaseLatitude  = resolveNumberValue<double>(crProperties, SECT_KEY_FALLBACK,
+                                                   KV_KEY_LATITUDE, "");
+        sBaseLongitude = resolveNumberValue<double>(crProperties, SECT_KEY_FALLBACK,
+                                                    KV_KEY_LONGITUDE, "");
+        sBaseAltitude  = resolveNumberValue<std::int32_t>(crProperties, SECT_KEY_FALLBACK,
+                                                         KV_KEY_ALTITUDE, "");
+        sBaseGeoid     = resolveNumberValue<double>(crProperties, SECT_KEY_FALLBACK,
+                                                KV_KEY_GEOID, "");
+        sBaseAtmPressure = resolveNumberValue<double>(crProperties, SECT_KEY_FALLBACK,
+                                                      KV_KEY_PRESSURE, "1013.25");
     }
     catch(const std::invalid_argument&)
     {
@@ -220,13 +199,13 @@ bool Configuration::resolveFallbacks(const PropertyMap& cr_map)
     return true;
 }
 
-std::int32_t Configuration::resolveFilter(const PropertyMap& cr_map,
+std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
                                           const std::string& crKey)
 {
     try
     {
-        std::int32_t tmp
-            = resolveNumberKey<std::int32_t>(cr_map, SECT_KEY_FILTER, crKey, "-1");
+        std::int32_t tmp = resolveNumberValue<std::int32_t>(crProperties, SECT_KEY_FILTER,
+                                                            crKey, "-1");
         return tmp < 0 ? std::numeric_limits<std::int32_t>::max() : tmp;
     }
     catch(const std::invalid_argument&)
@@ -235,13 +214,13 @@ std::int32_t Configuration::resolveFilter(const PropertyMap& cr_map,
     }
 }
 
-std::uint16_t Configuration::resolveServerPort(const std::string& cr_port)
+std::uint16_t Configuration::resolveServerPort(const std::string& crPort)
 {
     std::uint64_t port = 4353;
     try
     {
-        port = std::stoul(cr_port);
-        if(port > UINT16_MAX)
+        port = std::stoul(crPort);
+        if(port > std::numeric_limits<std::uint16_t>::max())
         {
             throw std::invalid_argument("");
         }
@@ -252,15 +231,15 @@ std::uint16_t Configuration::resolveServerPort(const std::string& cr_port)
         Logger::warn("(Config) " KV_KEY_SERVER_PORT
                      ": Invalid server port; use default.");
     }
-    Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(sServerPort));
+    Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(port));
     return port & 0xFFFF;
 }
 
-std::vector<std::string> Configuration::resolveFeeds(const std::string& cr_feeds)
+std::vector<std::string> Configuration::resolveFeeds(const std::string& crFeeds)
 {
     std::vector<std::string> feeds;
     std::stringstream ss;
-    ss.str(cr_feeds);
+    ss.str(crFeeds);
     std::string item;
 
     while(std::getline(ss, item, ','))

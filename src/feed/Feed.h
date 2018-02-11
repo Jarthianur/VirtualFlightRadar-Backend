@@ -22,11 +22,11 @@
 #ifndef SRC_FEED_FEED_H_
 #define SRC_FEED_FEED_H_
 
-#include <boost/asio/signal_set.hpp>
-#include <boost/move/core.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <boost/asio/signal_set.hpp>
+#include <boost/move/core.hpp>
 
 #include "../config/PropertyMap.h"
 
@@ -40,7 +40,6 @@ class Client;
 
 namespace feed
 {
-
 /**
  * @class Feed
  * @brief Incomplete base-class representing an input feed.
@@ -48,7 +47,7 @@ namespace feed
  */
 class Feed
 {
-BOOST_MOVABLE_BUT_NOT_COPYABLE(Feed)
+    BOOST_MOVABLE_BUT_NOT_COPYABLE(Feed)
 
 public:
     /**
@@ -86,23 +85,21 @@ public:
      */
     virtual void process(const std::string& crResponse) noexcept = 0;
 
-    /// Unique name
-    const std::string mName;
-
-    /// Priority to write data
-    const std::uint32_t mPriority;
+    const std::string& getName() const;
+    std::uint32_t getPriority() const;
 
 protected:
     /**
      * @fn Feed
      * @brief Constructor
      * @param cr_name  The Feeds unique name
-     * @param prio     The priority
      * @param cr_kvmap The properties map
      * @throws std::logic_error if host or port are not given
      */
-    Feed(const std::string& crName, std::uint32_t vPriority,
-         const config::KeyValueMap& crKvMap);
+    Feed(const std::string& crName, const config::KeyValueMap& crKvMap);
+
+    /// Unique name
+    const std::string mName;
 
     /// Key-value-map holding the properties.
     const config::KeyValueMap mKvMap;
@@ -110,7 +107,11 @@ protected:
     /// Client, later resolved according to InpuType
     std::unique_ptr<network::client::Client> mpClient;
 
-    // Could define Parser ptr here with nested template (c++14)
+private:
+    void initPriority();
+
+    /// Priority to write data
+    std::uint32_t mPriority;
 };
 
 }  // namespace feed
