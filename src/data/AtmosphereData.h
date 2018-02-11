@@ -19,82 +19,79 @@
  }
  */
 
-#ifndef SRC_DATA_ATMOSPHEREDATA_H_
-#define SRC_DATA_ATMOSPHEREDATA_H_
+#pragma once
 
 #include <cstdint>
 #include <string>
 
 #include "../util/Sensor.h"
-#include "Data.hpp"
 #include "../util/Wrapper.hpp"
+#include "Data.hpp"
 
+/// @namespace data
 namespace data
 {
-
 /**
- * @class AtmosphereData implements Data
+ * @class AtmosphereData
+ * @implements Data
  * @brief Manage sensor information.
  * @see Data.hpp
  */
-class AtmosphereData: public Data<struct util::Atmosphere>
+class AtmosphereData : public Data<struct util::Atmosphere>
 {
 public:
-	/**
-	 * @fn AtmosphereData
-	 * @brief Constructor
-	 */
-	AtmosphereData();
+    /**
+     * @fn AtmosphereData
+     * @brief Constructor
+     */
+    AtmosphereData();
 
-	/**
-	 * @fn ~AtmosphereData
-	 * @brief Destructor
-	 */
-	virtual ~AtmosphereData() noexcept;
+    /**
+     * @fn ~AtmosphereData
+     * @brief Destructor
+     */
+    virtual ~AtmosphereData() noexcept;
 
-	/**
-	 * @fn init
-	 * @brief Initialize the sensor information.
-	 * @param info The initial data
-	 * @override Data::init
-	 */
-	void init(struct util::Atmosphere vAtmos) override;
+    /**
+     * @fn init
+     * @brief Initialize the atmosphere data.
+     * @param vAtmos The initial data
+     */
+    void init(struct util::Atmosphere vAtmos) override;
 
-	/**
-	 * @fn update
-	 * @brief Try to update the sensor information.
-	 * @note Splits the given info, using setters.
-	 * @param cr_info The new sensor information.
-	 * @param prio    The attempts priority
-	 * @override Data::update
-	 * @threadsafe
-	 */
-	void update(const struct util::Atmosphere& crAtmos, std::uint32_t vPriority,
-	        std::uint64_t& rAttempts) override;
+    /**
+     * @fn update
+     * @brief Try to update the sensor information.
+     * @note Splits the given info, using setters.
+     * @param crAtmos   The new data.
+     * @param vPriority The priority
+     * @param rAttempts The update attempts by reference
+     * @threadsafe
+     */
+    void update(const struct util::Atmosphere& crAtmos, std::uint32_t vPriority,
+                std::uint64_t& rAttempts) override;
 
-	/**
-	 * @fn getMdaStr
-	 * @brief Get the MDA sentence.
-	 * @note MDA is invalid after this operation.
-	 * @return the MDA sentence, if valid, else empty string
-	 * @threadsafe
-	 */
-	std::string getMdaStr();
+    /**
+     * @fn getMdaStr
+     * @brief Get the MDA sentence.
+     * @note MDA is invalid after this operation.
+     * @return the MDA sentence, if valid, else empty string
+     * @threadsafe
+     */
+    std::string getMdaStr();
 
-	/**
-	 * @fn getPress
-	 * @brief Get pressure.
-	 * @return the pressure
-	 * @threadsafe
-	 */
-	double getAtmPress();
+    /**
+     * @fn getPress
+     * @brief Get pressure.
+     * @return the pressure
+     * @threadsafe
+     */
+    double getAtmPress();
 
 private:
-
+    /// @var mAtmosphere
     /// Holding atmospheric pressure
     struct util::Wrapper<util::Atmosphere> mAtmosphere;
 };
 
-} // namespace data
-
-#endif /* SRC_DATA_ATMOSPHEREDATA_H_ */
+}  // namespace data
