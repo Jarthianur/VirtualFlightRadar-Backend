@@ -26,7 +26,7 @@
 #include <cstdint>
 #include <string>
 
-#include "../aircraft/Aircraft.hpp"
+#include "../aircraft/Aircraft.h"
 #include "Parser.hpp"
 
 namespace parser

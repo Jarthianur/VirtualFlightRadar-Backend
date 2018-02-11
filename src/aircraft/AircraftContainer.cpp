@@ -30,7 +30,7 @@
 
 #include "../util/Logger.h"
 #include "../util/Position.h"
-#include "Aircraft.hpp"
+#include "Aircraft.h"
 
 #ifndef ESTIMATED_TRAFFIC
 #define ESTIMATED_TRAFFIC 1
@@ -58,7 +58,7 @@ std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& crId)
     }
     else
     {
-        return mContainer.begin() + it->second;
+        return mContainer.begin() + static_cast<std::int64_t>(it->second);
     }
 }
 
@@ -78,7 +78,7 @@ std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& 
             // if no FLARM msg received after x, assume target has Transponder
             if(++(it->getUpdateAge()) == AC_NO_FLARM_THRESHOLD)
             {
-                it->setTargetT(Aircraft::TargetType::TRANSPONDER);
+                it->setTargetType(Aircraft::TargetType::TRANSPONDER);
             }
 
             if(it->getUpdateAge() >= AC_DELETE_THRESHOLD)
@@ -115,7 +115,7 @@ void AircraftContainer::upsert(Aircraft& rUpdate, std::uint32_t vPriority)
     auto known_ac = find(rUpdate.getId());
     if(known_ac != mContainer.end())
     {
-        if(known_ac->getTargetT() == Aircraft::TargetType::TRANSPONDER
+        if(known_ac->getTargetType() == Aircraft::TargetType::TRANSPONDER
            || rUpdate.getTargetType() == Aircraft::TargetType::FLARM)
         {
             if(vPriority * ++(known_ac->getUpdateAttempts())

@@ -46,7 +46,7 @@ using namespace util;
  * @param argv The arguments
  * @return 0 if succeeded, -1 in case of failure
  */
-std::int32_t evalArgs(std::int32_t argc, char** argv);
+bool evalArgs(std::int32_t argc, char** argv);
 
 /**
  * @fn main
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    if(evalArgs(argc, argv) != 0)
+    if(!evalArgs(argc, argv))
     {
         return -1;
     }
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
     return 0;
 }
 
-std::int32_t evalArgs(std::int32_t argc, char** argv)
+bool evalArgs(std::int32_t argc, char** argv)
 {
     std::string ini_file;
     bool gnd = false;
@@ -130,13 +130,13 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
         catch(const std::logic_error& e)
         {
             Logger::error("(VFRB) eval config: ", e.what());
-            return -1;
+            return false;
         }
     }
     else
     {
         Logger::error("(VFRB) no config file given");
-        return -1;
+        return false;
     }
 
     if(gnd || config::Configuration::sGndModeEnabled)
@@ -149,5 +149,5 @@ std::int32_t evalArgs(std::int32_t argc, char** argv)
         Logger::info("(VFRB) GND mode: no");
     }
 
-    return 0;
+    return true;
 }

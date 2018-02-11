@@ -116,7 +116,7 @@ private:
 
     /// @var mIndexMap
     /// Map IDs to vector indices to make find efficient
-    std::unordered_map<std::string, size_t> mIndexMap;
+    std::unordered_map<std::string, std::size_t> mIndexMap;
 };
 
 }  // namespace aircraft

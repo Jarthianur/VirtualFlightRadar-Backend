@@ -23,7 +23,7 @@
 #include <string>
 #include <boost/regex.hpp>
 
-#include "../../src/aircraft/Aircraft.hpp"
+#include "../../src/aircraft/Aircraft.h"
 #include "../../src/aircraft/AircraftProcessor.h"
 #include "../../src/config/Configuration.h"
 #include "../../src/aircraft/AircraftContainer.h"

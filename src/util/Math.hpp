@@ -22,30 +22,33 @@
 #ifndef SRC_UTIL_MATH_H_
 #define SRC_UTIL_MATH_H_
 
-#include <cstdint>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
+#include <sstream>
+#include <string>
+#include <boost/tuple/tuple.hpp>
 
 namespace util
 {
-
 /**
  * @brief Provide several functions and constants under this namespace.
  */
 namespace math
 {
+/// TODO make as MACRO
 /// Unit conversion constants
 const double KTS_2_KMH = 1.852;
 const double KMH_2_KTS = 0.539957;
-const double KTS_2_MS = 0.514444;
-const double MS_2_KTS = 1.94384;
-const double KMH_2_MS = 0.277778;
-const double MS_2_KMH = 3.6;
-const double MS_2_FPM = 196.85;
-const double FPM_2_MS = 0.00508;
-const double FEET_2_M = 0.3048;
-const double M_2_FEET = 3.28084;
-const double PI = std::acos(-1.0);
+const double KTS_2_MS  = 0.514444;
+const double MS_2_KTS  = 1.94384;
+const double KMH_2_MS  = 0.277778;
+const double MS_2_KMH  = 3.6;
+const double MS_2_FPM  = 196.85;
+const double FPM_2_MS  = 0.00508;
+const double FEET_2_M  = 0.3048;
+const double M_2_FEET  = 3.28084;
+const double PI        = std::acos(-1.0);
 
 /**
  * @fn radian
@@ -77,7 +80,7 @@ inline double degree(double rad)
  */
 inline std::int32_t dToI(double d)
 {
-    return (d >= 0.0) ? (std::int32_t) (d + 0.5) : (std::int32_t) (d - 0.5);
+    return (d >= 0.0) ? (std::int32_t)(d + 0.5) : (std::int32_t)(d - 0.5);
 }
 
 /**
@@ -89,20 +92,21 @@ inline std::int32_t dToI(double d)
 inline double dmToDeg(double dm)
 {
     double absDm = std::abs(dm / 100.0);
-    double d = std::floor(absDm);
-    double m = (absDm - d) * 100.0 / 60.0;
+    double d     = std::floor(absDm);
+    double m     = (absDm - d) * 100.0 / 60.0;
     return d + m;
 }
 
 /**
  * @fn calcIcaoHeight
- * @brief Calculate height difference from QNE to Pressure in meters with ICAO height formula.
+ * @brief Calculate height difference from QNE to Pressure in meters with ICAO height
+ * formula.
  * @param press The air pressure
  * @return the height difference to QNE
  */
-inline double calcIcaoHeight(double press)
+inline std::int32_t calcIcaoHeight(double press)
 {
-    return 288.15 * (1.0 - std::pow((press / 1013.25), 0.190295)) / 0.0065;
+    return dToI(288.15 * (1.0 - std::pow((press / 1013.25), 0.190295)) / 0.0065);
 }
 
 /**
@@ -115,12 +119,21 @@ inline double calcIcaoHeight(double press)
 inline std::int32_t checksum(const char* sentence, std::size_t size)
 {
     std::int32_t csum = 0;
-    std::size_t i = 1; // $ in nmea str not included
-    while (sentence[i] != '*' && sentence[i] != '\0' && i < size)
+    std::size_t i     = 1;  // $ in nmea str not included
+    while(i < size && sentence[i] != '*' && sentence[i] != '\0')
     {
         csum ^= (std::int32_t) sentence[i++];
     }
     return csum;
+}
+
+template<typename T>
+inline boost::tuple<bool, T> stringToNumber(const std::string& crStr)
+{
+    std::stringstream ss(crStr);
+    T result;
+    bool suc = ss >> result;
+    return boost::make_tuple(suc, result);
 }
 
 }  // namespace math

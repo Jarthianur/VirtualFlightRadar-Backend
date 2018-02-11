@@ -19,7 +19,7 @@
  }
  */
 
-#include "Aircraft.hpp"
+#include "Aircraft.h"
 
 using namespace util;
 
@@ -72,122 +72,125 @@ void Aircraft::update(const Aircraft& crUpdate, std::uint32_t vPriority)
     this->mUpdateAttempts = 0;
 }
 
-inline const std::string& Aircraft::getId() const
+const std::string& Aircraft::getId() const
 {
     return mId;
 }
 
-inline Aircraft::IdType Aircraft::getIdType() const
+Aircraft::IdType Aircraft::getIdType() const
 {
     return mIdType;
 }
 
-inline Aircraft::TargetType Aircraft::getTargetType() const
+Aircraft::TargetType Aircraft::getTargetType() const
 {
     return mTargetType;
 }
 
-inline Aircraft::AircraftType Aircraft::getAircraftType() const
+Aircraft::AircraftType Aircraft::getAircraftType() const
 {
     return mAircraftType;
 }
 
-inline bool Aircraft::hasFullInfo() const
+bool Aircraft::hasFullInfo() const
 {
     return mFullInfo;
 }
 
-inline std::uint64_t& Aircraft::getUpdateAge()
+std::uint64_t& Aircraft::getUpdateAge()
 {
     return mUpdateAge;
 }
 
-inline std::uint32_t Aircraft::getLastPriority() const
+std::uint32_t Aircraft::getLastPriority() const
 {
     return mLastPriority;
 }
 
-inline double Aircraft::getLatitude() const
+double Aircraft::getLatitude() const
 {
     return mPosition.latitude;
 }
 
-inline double Aircraft::getLongitude() const
+double Aircraft::getLongitude() const
 {
     return mPosition.longitude;
 }
 
-inline std::int32_t Aircraft::getAltitude() const
+std::int32_t Aircraft::getAltitude() const
 {
     return mPosition.altitude;
 }
 
-inline double Aircraft::getGndSpeed() const
+double Aircraft::getGndSpeed() const
 {
     return mGndSpeed;
 }
 
-inline double Aircraft::getHeading() const
+double Aircraft::getHeading() const
 {
     return mHeading;
 }
 
-inline double Aircraft::getClimbRate() const
+double Aircraft::getClimbRate() const
 {
     return mClimbRate;
 }
 
-inline std::uint64_t& Aircraft::getUpdateAttempts()
+std::uint64_t& Aircraft::getUpdateAttempts()
 {
     return mUpdateAttempts;
 }
 
-inline void Aircraft::setId(const std::string& crId)
+void Aircraft::setId(const std::string& crId)
 {
     mId = crId;
 }
 
-inline void Aircraft::setPosition(const struct util::GpsPosition& crPos)
+void Aircraft::setPosition(const struct util::GpsPosition& crPos)
 {
     mPosition = crPos;
 }
 
-inline void Aircraft::setAircraftType(Aircraft::AircraftType vType)
+void Aircraft::setAircraftType(Aircraft::AircraftType vType)
 {
-    mAircraftType = vType;
+    mAircraftType = vType < AircraftType::UNKNOWN || vType > AircraftType::STATIC_OBJECT
+                        ? AircraftType::UNKNOWN
+                        : vType;
 }
 
-inline void Aircraft::setIdType(Aircraft::IdType vType)
+void Aircraft::setIdType(Aircraft::IdType vType)
 {
-    mIdType = vType;
+    mIdType = vType < IdType::UNRECOGNIZED || vType > IdType::OGN ? IdType::UNRECOGNIZED
+                                                                  : vType;
 }
 
-inline void Aircraft::setClimbRate(double vRate)
+void Aircraft::setClimbRate(double vRate)
 {
     mClimbRate = vRate;
 }
 
-inline void Aircraft::setHeading(double vHeading)
+void Aircraft::setHeading(double vHeading)
 {
     mHeading = vHeading;
 }
 
-inline void Aircraft::setGndSpeed(double vGndSpd)
+void Aircraft::setGndSpeed(double vGndSpd)
 {
     mGndSpeed = vGndSpd;
 }
 
-inline void Aircraft::setTargetType(Aircraft::TargetType vType)
+void Aircraft::setTargetType(Aircraft::TargetType vType)
 {
     mTargetType = vType;
 }
 
-inline void Aircraft::setFullInfo(bool vInfo)
+void Aircraft::setFullInfo(bool vInfo)
 {
     mFullInfo = vInfo;
 }
 
-inline void Aircraft::setLastPriority(std::uint32_t vPriority)
+void Aircraft::setLastPriority(std::uint32_t vPriority)
 {
     mLastPriority = vPriority;
 }

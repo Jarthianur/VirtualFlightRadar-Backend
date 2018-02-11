@@ -22,14 +22,14 @@
 #include "Configuration.h"
 
 #include <iterator>
-#include <sstream>
 #include <stdexcept>
-
 #include "../feed/AprscFeed.h"
 #include "../feed/GpsFeed.h"
 #include "../feed/SbsFeed.h"
 #include "../feed/SensorFeed.h"
 #include "../util/Logger.h"
+#include "../util/Math.hpp"
+
 #include "ConfigReader.h"
 
 using namespace util;
@@ -65,6 +65,7 @@ bool Configuration::init(std::istream& r_stream)
 {
     ConfigReader reader;
     PropertyMap properties;
+
     try
     {
         reader.read(r_stream, properties);
@@ -75,10 +76,14 @@ bool Configuration::init(std::istream& r_stream)
         return false;
     }
 
-    resolveFallbacks(properties);
-    resolveFilters(properties);
-    resolveServerPort(properties);
+    if(!resolveFallbacks(properties))
+    {
+        return false;
+    }
 
+    resolveFilters(properties);
+    sServerPort = resolveServerPort(
+        properties.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
     sGndModeEnabled = !properties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
 
     std::size_t nrf = registerFeeds(properties);
@@ -89,28 +94,12 @@ bool Configuration::init(std::istream& r_stream)
 
 std::size_t Configuration::registerFeeds(const PropertyMap& cr_map)
 {
-    std::vector<std::string> feeds;
-    std::stringstream ss;
-    ss.str(cr_map.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
-    std::string item;
-
-    while(std::getline(ss, item, ','))
-    {
-        std::size_t f = item.find_first_not_of(' ');
-        if(f != std::string::npos)
-        {
-            item = item.substr(f);
-        }
-        std::size_t l = item.find_last_not_of(' ');
-        if(l != std::string::npos)
-        {
-            item = item.substr(0, l + 1);
-        }
-        feeds.push_back(item);
-    }
+    std::vector<std::string> feeds
+        = resolveFeeds(cr_map.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
 
     for(auto it = feeds.cbegin(); it != feeds.cend(); ++it)
     {
+        // TODO put to feed construct
         std::uint64_t priority = 0;
         try
         {
@@ -120,7 +109,7 @@ std::size_t Configuration::registerFeeds(const PropertyMap& cr_map)
                 throw std::invalid_argument("");
             }
         }
-        catch(const std::logic_error& e)
+        catch(const std::logic_error&)
         {
             Logger::warn("(Config) create feed " + *it, ": Invalid priority given.");
             // Drop this feed, or create with priority 0?
@@ -172,132 +161,138 @@ std::size_t Configuration::registerFeeds(const PropertyMap& cr_map)
     return sRegisteredFeeds.size();
 }
 
-void Configuration::resolveFallbacks(const PropertyMap& cr_map)
+template<>
+double Configuration::resolveNumberKey<double>(const PropertyMap& cr_map,
+                                               const std::string& crSection,
+                                               const std::string& crKey,
+                                               const std::string& crDefault)
 {
-    // resolve latitude
+    boost::tuple<bool, double> result = util::math::stringToNumber<double>(
+        cr_map.getProperty(crSection, crKey, crDefault));
+    if(!result.get<0>())
+    {
+        Logger::warn("(Config) " + crSection + "." + crKey, ": Could not resolve value.");
+        throw std::invalid_argument("");
+    }
+    Logger::info("(Config) " + crSection + "." + crKey + ": ",
+                 std::to_string(result.get<1>()));
+    return result.get<1>();
+}
+
+template<>
+std::int32_t Configuration::resolveNumberKey<std::int32_t>(const PropertyMap& cr_map,
+                                                           const std::string& crSection,
+                                                           const std::string& crKey,
+                                                           const std::string& crDefault)
+{
+    boost::tuple<bool, std::int32_t> result = util::math::stringToNumber<std::int32_t>(
+        cr_map.getProperty(crSection, crKey, crDefault));
+    if(!result.get<0>())
+    {
+        Logger::warn("(Config) " + crSection + "." + crKey, ": Could not resolve value.");
+        throw std::invalid_argument("");
+    }
+    Logger::info("(Config) " + crSection + "." + crKey + ": ",
+                 std::to_string(result.get<1>()));
+    return result.get<1>();
+}
+
+bool Configuration::resolveFallbacks(const PropertyMap& cr_map)
+{
     try
     {
         sBaseLatitude
-            = std::stod(cr_map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0"));
-        Logger::info("(Config) " KV_KEY_LATITUDE ": ", std::to_string(sBaseLatitude));
-    }
-    catch(const std::logic_error& e)
-    {
-        Logger::warn("(Config) " KV_KEY_LATITUDE ": Can not resolve fallback.");
-    }
-
-    // resolve longitude
-    try
-    {
+            = resolveNumberKey<double>(cr_map, SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "");
         sBaseLongitude
-            = std::stod(cr_map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0"));
-        Logger::info("(Config) " KV_KEY_LONGITUDE ": ", std::to_string(sBaseLongitude));
-    }
-    catch(const std::logic_error& e)
-    {
-        Logger::warn("(Config) " KV_KEY_LONGITUDE ": Can not resolve fallback.");
-    }
-
-    // resolve altitude
-    try
-    {
-        sBaseAltitude
-            = std::stoi(cr_map.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
-        Logger::info("(Config) " KV_KEY_ALTITUDE ": ", std::to_string(sBaseAltitude));
-    }
-    catch(const std::logic_error& e)
-    {
-        Logger::warn("(Config) " KV_KEY_ALTITUDE ": Can not resolve fallback.");
-    }
-
-    // resolve geoid
-    try
-    {
+            = resolveNumberKey<double>(cr_map, SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "");
+        sBaseAltitude = resolveNumberKey<std::int32_t>(cr_map, SECT_KEY_FALLBACK,
+                                                       KV_KEY_ALTITUDE, "");
         sBaseGeoid
-            = std::stod(cr_map.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
-        Logger::info("(Config) " KV_KEY_GEOID ": ", std::to_string(sBaseGeoid));
+            = resolveNumberKey<double>(cr_map, SECT_KEY_FALLBACK, KV_KEY_GEOID, "");
+        sBaseAtmPressure = resolveNumberKey<double>(cr_map, SECT_KEY_FALLBACK,
+                                                    KV_KEY_PRESSURE, "1013.25");
     }
-    catch(const std::logic_error& e)
+    catch(const std::invalid_argument&)
     {
-        Logger::warn("(Config) " KV_KEY_GEOID ": Can not resolve fallback.");
+        return false;
     }
-
-    // resolve atmospheric pressure, ICAO standard as default
-    try
-    {
-        sBaseAtmPressure = std::stod(
-            cr_map.getProperty(SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25"));
-        Logger::info("(Config) " KV_KEY_PRESSURE ": ", std::to_string(sBaseAtmPressure));
-    }
-    catch(const std::logic_error& e)
-    {
-        Logger::warn("(Config) " KV_KEY_PRESSURE ": Can not resolve fallback.");
-    }
+    return true;
 }
 
 void Configuration::resolveFilters(const PropertyMap& cr_map)
 {
-    std::string tmp = cr_map.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT, "-1");
-    if(tmp == "-1")
+    try
+    {
+        sMaxHeight = resolveNumberKey<std::int32_t>(cr_map, SECT_KEY_FILTER,
+                                                    KV_KEY_MAX_HEIGHT, "-1");
+        if(sMaxHeight < 0)
+        {
+            sMaxHeight = INT32_MAX;
+        }
+    }
+    catch(const std::invalid_argument&)
     {
         sMaxHeight = INT32_MAX;
     }
-    else
+
+    try
     {
-        try
+        sMaxDistance = resolveNumberKey<std::int32_t>(cr_map, SECT_KEY_FILTER,
+                                                      KV_KEY_MAX_DIST, "-1");
+        if(sMaxDistance < 0)
         {
-            sMaxHeight = std::stoi(tmp);
-        }
-        catch(const std::logic_error& e)
-        {
-            sMaxHeight = INT32_MAX;
-            Logger::warn("(Config) " KV_KEY_MAX_HEIGHT
-                         ": Can not resolve filter; thus disabled.");
+            sMaxDistance = INT32_MAX;
         }
     }
-    Logger::info("(Config) " KV_KEY_MAX_HEIGHT ": ", std::to_string(sMaxHeight));
-
-    tmp = cr_map.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_DIST, "-1");
-    if(tmp == "-1")
+    catch(const std::invalid_argument&)
     {
         sMaxDistance = INT32_MAX;
     }
-    else
-    {
-        try
-        {
-            sMaxDistance = std::stoi(tmp);
-        }
-        catch(const std::logic_error& e)
-        {
-            sMaxDistance = INT32_MAX;
-            Logger::warn("(Config) " KV_KEY_MAX_DIST
-                         ": Can not resolve filter; thus disabled.");
-        }
-    }
-    Logger::info("(Config) " KV_KEY_MAX_DIST ": ", std::to_string(sMaxDistance));
 }
 
-void Configuration::resolveServerPort(const PropertyMap& cr_map)
+std::uint16_t Configuration::resolveServerPort(const std::string& cr_port)
 {
     std::uint64_t port = 4353;
     try
     {
-        port = std::stoul(
-            cr_map.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
+        port = std::stoul(cr_port);
         if(port > UINT16_MAX)
         {
             throw std::invalid_argument("");
         }
     }
-    catch(const std::logic_error& e)
+    catch(const std::logic_error&)
     {
         port = 4353;
         Logger::warn("(Config) " KV_KEY_SERVER_PORT
                      ": Invalid server port; use default.");
     }
-    global_server_port = (std::uint16_t) port;
-    Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(global_server_port));
+    Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(sServerPort));
+    return port & 0xFFFF;
+}
+
+std::vector<std::string> Configuration::resolveFeeds(const std::string& cr_feeds)
+{
+    std::vector<std::string> feeds;
+    std::stringstream ss;
+    ss.str(cr_feeds);
+    std::string item;
+
+    while(std::getline(ss, item, ','))
+    {
+        std::size_t f = item.find_first_not_of(' ');
+        if(f != std::string::npos)
+        {
+            item = item.substr(f);
+        }
+        std::size_t l = item.find_last_not_of(' ');
+        if(l != std::string::npos)
+        {
+            item = item.substr(0, l + 1);
+        }
+        feeds.push_back(item);
+    }
+    return feeds;
 }
 
 }  // namespace config

@@ -24,7 +24,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "../../src/aircraft/Aircraft.hpp"
+#include "../../src/aircraft/Aircraft.h"
 #include "../../src/config/Configuration.h"
 #include "../../src/util/Math.hpp"
 #include "../framework/src/comparator/Comparators.hpp"

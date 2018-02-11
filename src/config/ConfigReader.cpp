@@ -53,7 +53,7 @@ void ConfigReader::read(std::istream& rStream, PropertyMap& rMap)
             continue;
         }
 
-        auto section = parseSection(currentLine, lineNr, rMap);
+        auto section = parseSection(currentLine);
         if(section.get<0>())
         {
             currentSection = section.get<1>();
@@ -79,14 +79,14 @@ boost::tuple<bool, std::string> ConfigReader::parseSection(const std::string& cr
 {
     std::string section;
     bool valid = false;
-    if(rLine.at(0) == '[')
+    if(crLine.at(0) == '[')
     {
         try
         {
-            section = rLine.substr(1, rLine.rfind(']') - 1);
+            section = crLine.substr(1, crLine.rfind(']') - 1);
             valid   = true;
         }
-        catch(const std::out_of_range& e)
+        catch(const std::out_of_range&)
         {
         }
     }
@@ -102,20 +102,13 @@ boost::tuple<bool, KeyValue> ConfigReader::parseKeyValue(const std::string& crLi
 
     if(valid)
     {
-        try
-        {
-            key           = match.str(1);
-            value         = match.str(2);
-            std::size_t l = value.find_last_not_of(' ');
+        key           = match.str(1);
+        value         = match.str(2);
+        std::size_t l = value.find_last_not_of(' ');
 
-            if(l != std::string::npos)
-            {
-                value = value.substr(0, l + 1);
-            }
-        }
-        catch(const std::out_of_range& e)
+        if(l != std::string::npos)
         {
-            valid = false;
+            value = value.substr(0, l + 1);
         }
     }
     return boost::make_tuple(valid, std::make_pair(key, value));

@@ -27,7 +27,7 @@
 #include "../config/Configuration.h"
 #include "../util/Math.hpp"
 #include "../util/Position.h"
-#include "Aircraft.hpp"
+#include "Aircraft.h"
 
 namespace aircraft
 {
@@ -55,10 +55,9 @@ std::string AircraftProcessor::process(const Aircraft& crAircraft,
     return nmea_str;
 }
 
-inline void
-AircraftProcessor::calcRelativePosition(const Aircraft& crAircraft,
-                                        const struct util::GpsPosition& crRelPos,
-                                        double vAtmPress)
+void AircraftProcessor::calcRelativePosition(const Aircraft& crAircraft,
+                                             const struct util::GpsPosition& crRelPos,
+                                             double vAtmPress)
 {
     mtRadLatB   = util::math::radian(crRelPos.latitude);
     mtRadLongB  = util::math::radian(crRelPos.longitude);
@@ -87,8 +86,7 @@ AircraftProcessor::calcRelativePosition(const Aircraft& crAircraft,
                  : crAircraft.getAltitude() - crRelPos.altitude;
 }
 
-inline void AircraftProcessor::buildPflauStr(const Aircraft& crAircraft,
-                                             std::string& rDestStr)
+void AircraftProcessor::buildPflauStr(const Aircraft& crAircraft, std::string& rDestStr)
 {
     std::snprintf(mBuffer, AP_BUFF_S, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
                   util::math::dToI(mtBearingRel), mtRelV, mtDist,
@@ -96,28 +94,28 @@ inline void AircraftProcessor::buildPflauStr(const Aircraft& crAircraft,
     finishSentence(rDestStr);
 }
 
-inline void AircraftProcessor::buildPflaaStr(const Aircraft& crAircraft,
-                                             std::string& rDestStr)
+void AircraftProcessor::buildPflaaStr(const Aircraft& crAircraft, std::string& rDestStr)
 {
     if(crAircraft.hasFullInfo())
     {
-        std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%d,%s,%03d,,%d,%3.1lf,%1x*",
-                      mtRelN, mtRelE, mtRelV, crAircraft.getIdType(),
-                      crAircraft.getId().c_str(),
-                      util::math::dToI(crAircraft.getHeading()),
-                      util::math::dToI(crAircraft.getGndSpeed() * util::math::MS_2_KMH),
-                      crAircraft.getClimbRate(), crAircraft.getAircraftType());
+        std::snprintf(
+            mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,%d,%s,%03d,,%d,%3.1lf,%1x*", mtRelN,
+            mtRelE, mtRelV, static_cast<std::int32_t>(crAircraft.getIdType()),
+            crAircraft.getId().c_str(), util::math::dToI(crAircraft.getHeading()),
+            util::math::dToI(crAircraft.getGndSpeed() * util::math::MS_2_KMH),
+            crAircraft.getClimbRate(),
+            static_cast<std::uint32_t>(crAircraft.getAircraftType()));
     }
     else
     {
         std::snprintf(mBuffer, AP_BUFF_S, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", mtRelN,
                       mtRelE, mtRelV, crAircraft.getId().c_str(),
-                      crAircraft.getAircraftType());
+                      static_cast<std::uint32_t>(crAircraft.getAircraftType()));
     }
     finishSentence(rDestStr);
 }
 
-inline void AircraftProcessor::finishSentence(std::string& rDestStr)
+void AircraftProcessor::finishSentence(std::string& rDestStr)
 {
     std::int32_t csum = util::math::checksum(mBuffer, AP_BUFF_S);
     rDestStr.append(mBuffer);

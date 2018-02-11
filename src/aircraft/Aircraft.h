@@ -41,49 +41,6 @@ class Aircraft
 {
 public:
     /**
-     * @fn Aircraft
-     * @brief Constructor
-     */
-    Aircraft();
-
-    /**
-     * @fn Aircraft
-     * @brief Constructor
-     * @param rId  The id
-     * @param rPos The position
-     */
-    Aircraft(std::string& rId, struct util::GpsPosition& rPos);
-
-    /**
-     * @fn Aircraft
-     * @brief Constructor
-     * @param rId           The Id
-     * @param rPos          The prosition
-     * @param vGndSpd       The ground speed
-     * @param vIdType       The Id type
-     * @param vAircraftType The aircraft type
-     * @param vClimbRate    The climb rate
-     * @param vHeading      The heading
-     */
-    Aircraft(std::string& rId, struct util::GpsPosition& rPos, double vGndSpd,
-             IdType vIdType, AircraftType vAircraftType, double vClimbRate,
-             double vHeading);
-
-    /**
-     * @fn ~Aircraft
-     * @brief Destructor
-     */
-    virtual ~Aircraft() noexcept;
-
-    /**
-     * @fn operator==
-     * @brief Compare two aircrafts by their Id.
-     * @param crOther The Aircraft to compare
-     * @return true, if Id's are equal, else false
-     */
-    bool operator==(const Aircraft& crOther) const;
-
-    /**
      * @enum TargetType
      * @brief Device type from which the information is received.
      * @note FLARM is preferred over TRANSPONDER,
@@ -130,6 +87,49 @@ public:
         FLARM        = 2,
         OGN          = 3
     };
+
+    /**
+     * @fn Aircraft
+     * @brief Constructor
+     */
+    Aircraft();
+
+    /**
+     * @fn Aircraft
+     * @brief Constructor
+     * @param rId  The id
+     * @param rPos The position
+     */
+    Aircraft(std::string& rId, struct util::GpsPosition& rPos);
+
+    /**
+     * @fn Aircraft
+     * @brief Constructor
+     * @param rId           The Id
+     * @param rPos          The prosition
+     * @param vGndSpd       The ground speed
+     * @param vIdType       The Id type
+     * @param vAircraftType The aircraft type
+     * @param vClimbRate    The climb rate
+     * @param vHeading      The heading
+     */
+    Aircraft(std::string& rId, struct util::GpsPosition& rPos, double vGndSpd,
+             IdType vIdType, AircraftType vAircraftType, double vClimbRate,
+             double vHeading);
+
+    /**
+     * @fn ~Aircraft
+     * @brief Destructor
+     */
+    virtual ~Aircraft() noexcept;
+
+    /**
+     * @fn operator==
+     * @brief Compare two aircrafts by their Id.
+     * @param crOther The Aircraft to compare
+     * @return true, if Id's are equal, else false
+     */
+    bool operator==(const Aircraft& crOther) const;
 
     /**
      * @fn update

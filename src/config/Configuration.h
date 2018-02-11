@@ -36,80 +36,79 @@ class Feed;
 /// @namespace config
 namespace config
 {
-
 class PropertyMap;
 
 /**
  * Configuration section keys
  */
 /// @def SECT_KEY_FALLBACK
-#define SECT_KEY_FALLBACK   "fallback"
+#define SECT_KEY_FALLBACK "fallback"
 
 /// @def SECT_KEY_GENERAL
-#define SECT_KEY_GENERAL    "general"
+#define SECT_KEY_GENERAL "general"
 
 /// @def SECT_KEY_FILTER
-#define SECT_KEY_FILTER     "filter"
+#define SECT_KEY_FILTER "filter"
 
 /// @def SECT_KEY_APRSC
-#define SECT_KEY_APRSC      "aprs"
+#define SECT_KEY_APRSC "aprs"
 
 /// @def SECT_KEY_SBS
-#define SECT_KEY_SBS        "sbs"
+#define SECT_KEY_SBS "sbs"
 
 /// @def SECT_KEY_GPS
-#define SECT_KEY_GPS        "gps"
+#define SECT_KEY_GPS "gps"
 
 /// @def SECT_KEY_SENS
-#define SECT_KEY_SENS       "sens"
+#define SECT_KEY_SENS "sens"
 
 /**
  * Per section keys
  */
 /// @def KV_KEY_FEEDS
-#define KV_KEY_FEEDS        "feeds"
+#define KV_KEY_FEEDS "feeds"
 
 /// @def KV_KEY_GND_MODE
-#define KV_KEY_GND_MODE     "gndMode"
+#define KV_KEY_GND_MODE "gndMode"
 
 /// @def KV_KEY_LATITUDE
-#define KV_KEY_LATITUDE     "latitude"
+#define KV_KEY_LATITUDE "latitude"
 
 /// @def KV_KEY_LONGITUDE
-#define KV_KEY_LONGITUDE    "longitude"
+#define KV_KEY_LONGITUDE "longitude"
 
 /// @def KV_KEY_ALTITUDE
-#define KV_KEY_ALTITUDE     "altitude"
+#define KV_KEY_ALTITUDE "altitude"
 
 /// @def KV_KEY_GEOID
-#define KV_KEY_GEOID        "geoid"
+#define KV_KEY_GEOID "geoid"
 
 /// @def KV_KEY_PRESSURE
-#define KV_KEY_PRESSURE     "pressure"
+#define KV_KEY_PRESSURE "pressure"
 
 /// @def KV_KEY_TEMPERATURE
-#define KV_KEY_TEMPERATURE  "temperature"
+#define KV_KEY_TEMPERATURE "temperature"
 
 /// @def KV_KEY_MAX_DIST
-#define KV_KEY_MAX_DIST     "maxDist"
+#define KV_KEY_MAX_DIST "maxDist"
 
 /// @def KV_KEY_MAX_HEIGHT
-#define KV_KEY_MAX_HEIGHT   "maxHeight"
+#define KV_KEY_MAX_HEIGHT "maxHeight"
 
 /// @def KV_KEY_SERVER_PORT
-#define KV_KEY_SERVER_PORT  "serverPort"
+#define KV_KEY_SERVER_PORT "serverPort"
 
 /// @def KV_KEY_HOST
-#define KV_KEY_HOST         "host"
+#define KV_KEY_HOST "host"
 
 /// @def KV_KEY_PORT
-#define KV_KEY_PORT         "port"
+#define KV_KEY_PORT "port"
 
 /// @def KV_KEY_PRIORITY
-#define KV_KEY_PRIORITY     "priority"
+#define KV_KEY_PRIORITY "priority"
 
 /// @def KV_KEY_LOGIN
-#define KV_KEY_LOGIN        "login"
+#define KV_KEY_LOGIN "login"
 
 /**
  * @class Configuration
@@ -190,11 +189,17 @@ private:
      */
     std::size_t registerFeeds(const PropertyMap& cr_map);
 
-    void resolveFallbacks(const PropertyMap& cr_map);
+    bool resolveFallbacks(const PropertyMap& cr_map);
 
     void resolveFilters(const PropertyMap& cr_map);
 
-    void resolveServerPort(const PropertyMap& cr_map);
+    template<typename T>
+    T resolveNumberKey(const PropertyMap& cr_map, const std::string& crSection,
+                       const std::string& crKey, const std::string& crDefault);
+
+    std::uint16_t resolveServerPort(const std::string& cr_port);
+
+    std::vector<std::string> resolveFeeds(const std::string& cr_feeds);
 };
 
 }  // namespace config
