@@ -21,42 +21,38 @@
 
 #include "SbsFeed.h"
 
-#include <boost/optional.hpp>
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
+#include <boost/optional.hpp>
 
 #include "../aircraft/Aircraft.h"
-#include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
+#include "../data/AircraftData.h"
 #include "../network/client/SbsClient.h"
-#include "../VFRB.h"
 
 using namespace util;
 
 namespace feed
 {
-
-SbsFeed::SbsFeed(const std::string& cr_name,
-                 const config::KeyValueMap& cr_kvmap)
-        : Feed(cr_name,  cr_kvmap)
+SbsFeed::SbsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
+                 std::shared_ptr<data::AircraftData> pData)
+    : Feed(cr_name, cr_kvmap), mpData(pData)
 {
-    mpClient = std::unique_ptr<network::client::Client>(
-            new network::client::SbsClient(mKvMap.find(KV_KEY_HOST)->second,
-                    mKvMap.find(KV_KEY_PORT)->second, *this));
+    mpClient = std::unique_ptr<network::client::Client>(new network::client::SbsClient(
+        mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 SbsFeed::~SbsFeed() noexcept
-{
-}
+{}
 
 void SbsFeed::process(const std::string& cr_res) noexcept
 {
-    aircraft::Aircraft ac;
-    if (mParser.unpack(cr_res, ac))
+    aircraft::Aircraft ac(getPriority());
+    if(mParser.unpack(cr_res, ac))
     {
-        VFRB::msAcCont.upsert(ac, getPriority());
+        mpData->update(ac, getPriority(), ac.getUpdateAttempts());
     }
 }
 
-} // namespace feed
+}  // namespace feed

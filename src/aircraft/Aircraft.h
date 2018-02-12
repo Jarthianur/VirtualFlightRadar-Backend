@@ -116,6 +116,13 @@ public:
     /**
      * @fn Aircraft
      * @brief Constructor
+     * @param vPriority The initial priority
+     */
+    Aircraft(std::uint32_t vPriority);
+
+    /**
+     * @fn Aircraft
+     * @brief Constructor
      * @param rId  The id
      * @param rPos The position
      */

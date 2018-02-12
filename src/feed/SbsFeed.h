@@ -29,15 +29,19 @@
 #include "../parser/SbsParser.h"
 #include "Feed.h"
 
+namespace data
+{
+class AircraftData;
+}
+
 namespace feed
 {
-
 /**
  * @class SbsFeed extends Feed
  * @brief Represents a SBS input feed.
  * @see Feed.h
  */
-class SbsFeed: public Feed
+class SbsFeed : public Feed
 {
 public:
     /**
@@ -47,8 +51,8 @@ public:
      * @param prio     The priority
      * @param cr_kvmap The properties map
      */
-    SbsFeed(const std::string& cr_name,
-            const config::KeyValueMap& cr_kvmap);
+    SbsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
+            std::shared_ptr<data::AircraftData> pData);
     /**
      * @fn ~SbsFeed
      * @brief Destructor
@@ -65,8 +69,10 @@ public:
 private:
     /// Parser to unpack response from Client
     parser::SbsParser mParser;
+
+    std::shared_ptr<data::AircraftData> mpData;
 };
 
-} // namespace feed
+}  // namespace feed
 
 #endif /* SRC_FEED_SBSFEED_H_ */

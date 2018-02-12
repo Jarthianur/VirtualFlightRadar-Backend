@@ -52,8 +52,9 @@ public:
     /**
      * @fn AircraftProcessor
      * @brief Constructor
+     * @param vMaxDist The max distance filter
      */
-    AircraftProcessor();
+    explicit AircraftProcessor(std::int32_t vMaxDist);
 
     /**
      * @fn ~AircraftProcessor
@@ -72,8 +73,7 @@ public:
      * @return the NMEA string
      */
     std::string process(const Aircraft& crAircraft,
-                        const struct util::GpsPosition& crRelPos, double vAtmPress,
-                        std::int32_t vMaxDist);
+                        const struct util::GpsPosition& crRelPos, double vAtmPress);
 
 private:
     /**
@@ -110,6 +110,10 @@ private:
      * @param rDestStr The destination string
      */
     void finishSentence(std::string& rDestStr);
+
+    /// @var mMaxDistance
+    /// Max distance to process an aircraft
+    std::int32_t mMaxDistance;
 
     /// @var mBuffer
     /// Internal buffer

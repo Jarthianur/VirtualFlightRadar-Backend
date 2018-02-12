@@ -19,7 +19,7 @@
  }
  */
 
-#include "AircraftContainer.h"
+#include "AircraftData.h"
 
 #include <algorithm>
 #include <exception>
@@ -37,19 +37,29 @@
 #endif
 
 using namespace util;
+using namespace aircraft;
 
-namespace aircraft
+namespace data
 {
-AircraftContainer::AircraftContainer()
+AircraftData::AircraftData() : AircraftData(std::numeric_limits<std::int32_t>::max())
+{}
+
+AircraftData::AircraftData(std::int32_t vMaxDist) : mProcessor(vMaxDist)
 {
     mContainer.reserve(ESTIMATED_TRAFFIC);
     mIndexMap.reserve(ESTIMATED_TRAFFIC * 2);
 }
 
-AircraftContainer::~AircraftContainer() noexcept
+AircraftData::~AircraftData() noexcept
 {}
 
-std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& crId)
+void AircraftData::init(Aircraft vAircraft)
+{
+    std::uint64_t dummy = 0;
+    update(vAircraft, 0, dummy);
+}
+
+std::vector<Aircraft>::iterator AircraftData::find(const std::string& crId)
 {
     const auto it = mIndexMap.find(crId);
     if(it == mIndexMap.cend())
@@ -62,8 +72,8 @@ std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& crId)
     }
 }
 
-std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& crBasePos,
-                                                double vAtmPress, std::int32_t vMaxDist)
+std::string AircraftData::processAircrafts(const struct util::GpsPosition& crBasePos,
+                                           double vAtmPress)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     std::string dest_str;
@@ -91,7 +101,7 @@ std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& 
             {
                 if(it->getUpdateAge() < AC_OUTDATED)
                 {
-                    dest_str += mProcessor.process(*it, crBasePos, vAtmPress, vMaxDist);
+                    dest_str += mProcessor.process(*it, crBasePos, vAtmPress);
                 }
                 ++it;
                 ++index;
@@ -103,13 +113,14 @@ std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& 
         }
         catch(const std::exception& e)
         {
-            Logger::warn("(AircraftContainer) processAircrafts: ", e.what());
+            Logger::warn("(AircraftData) processAircrafts: ", e.what());
         }
     }
     return dest_str;
 }
 
-void AircraftContainer::upsert(Aircraft& rUpdate, std::uint32_t vPriority)
+void AircraftData::update(const Aircraft& rUpdate, std::uint32_t vPriority,
+                          std::uint64_t&)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     auto known_ac = find(rUpdate.getId());
@@ -127,7 +138,6 @@ void AircraftContainer::upsert(Aircraft& rUpdate, std::uint32_t vPriority)
     }
     else
     {
-        rUpdate.setLastPriority(vPriority);
         mIndexMap.insert({rUpdate.getId(), mContainer.size()});
         mContainer.push_back(rUpdate);
     }

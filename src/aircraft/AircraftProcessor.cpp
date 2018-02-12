@@ -30,7 +30,7 @@
 
 namespace aircraft
 {
-AircraftProcessor::AircraftProcessor()
+AircraftProcessor::AircraftProcessor(std::int32_t vMaxDist) : mMaxDistance(vMaxDist)
 {}
 
 AircraftProcessor::~AircraftProcessor() noexcept
@@ -38,11 +38,11 @@ AircraftProcessor::~AircraftProcessor() noexcept
 
 std::string AircraftProcessor::process(const Aircraft& crAircraft,
                                        const struct util::GpsPosition& crRelPos,
-                                       double vAtmPress, std::int32_t vMaxDist)
+                                       double vAtmPress)
 {
     calcRelativePosition(crAircraft, crRelPos, vAtmPress);
 
-    if(mtDist > vMaxDist)
+    if(mtDist > mMaxDistance)
     {
         return "";
     }

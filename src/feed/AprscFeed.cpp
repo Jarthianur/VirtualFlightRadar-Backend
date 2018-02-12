@@ -26,46 +26,44 @@
 #include <unordered_map>
 
 #include "../aircraft/Aircraft.h"
-#include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
+#include "../data/AircraftData.h"
 #include "../network/client/AprscClient.h"
 #include "../util/Logger.h"
-#include "../VFRB.h"
 
 using namespace util;
 
 namespace feed
 {
-
-AprscFeed::AprscFeed(const std::string& cr_name,
-                     const config::KeyValueMap& cr_kvmap)
-        : Feed(cr_name, cr_kvmap)
+AprscFeed::AprscFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
+                     std::shared_ptr<data::AircraftData> pData)
+    : Feed(cr_name, cr_kvmap), mpData(pData)
 {
     auto it = mKvMap.find(KV_KEY_LOGIN);
-    if (it == mKvMap.end())
+    if(it == mKvMap.end())
     {
         Logger::warn("(AprscFeed) could not find: ", mName + "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
     else
     {
-        mpClient = std::unique_ptr<network::client::Client>(
-                new network::client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
-                        mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
+        mpClient
+            = std::unique_ptr<network::client::Client>(new network::client::AprscClient(
+                mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second,
+                it->second, *this));
     }
 }
 
 AprscFeed::~AprscFeed() noexcept
-{
-}
+{}
 
 void AprscFeed::process(const std::string& cr_res) noexcept
 {
-    aircraft::Aircraft ac;
-    if (mParser.unpack(cr_res, ac))
+    aircraft::Aircraft ac(getPriority());
+    if(mParser.unpack(cr_res, ac))
     {
-        VFRB::msAcCont.upsert(ac, getPriority());
+        mpData->update(ac, getPriority(), ac.getUpdateAttempts());
     }
 }
 
-} // namespace feed
+}  // namespace feed

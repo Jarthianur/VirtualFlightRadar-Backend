@@ -30,6 +30,7 @@
 
 #include "../aircraft/AircraftProcessor.h"
 #include "../config/Parameters.h"
+#include "Data.hpp"
 
 /// @def AC_OUTDATED
 /// Times until aircraft is outdated
@@ -43,35 +44,57 @@
 /// Times until FLARM status is removed
 #define AC_NO_FLARM_THRESHOLD AC_OUTDATED
 
-/// @namespace aircraft
 namespace aircraft
 {
 class Aircraft;
+}
 
+namespace util
+{
+struct GpsPosition;
+}
+
+/// @namespace data
+namespace data
+{
 /**
  * @class AircraftContainer
  * @brief Store Aircrafts and trigger processing.
  */
-class AircraftContainer
+class AircraftData : public Data<aircraft::Aircraft>
 {
 public:
     /// Not copyable
-    AircraftContainer(const AircraftContainer&) = delete;
+    AircraftData(const AircraftData&) = delete;
 
     /// Not assignable
-    AircraftContainer& operator=(const AircraftContainer&) = delete;
+    AircraftData& operator=(const AircraftData&) = delete;
 
     /**
-     * @fn AircraftContainer
+     * @fn AircraftData
      * @brief Constructor
      */
-    AircraftContainer();
+    AircraftData();
 
     /**
-     * @fn ~AircraftContainer
+     * @fn AircraftData
+     * @brief Constructor
+     * @param vMaxDist The max distance filter
+     */
+    AircraftData(std::int32_t vMaxDist);
+
+    /**
+     * @fn ~AircraftData
      * @brief Destructor
      */
-    virtual ~AircraftContainer() noexcept;
+    virtual ~AircraftData() noexcept;
+
+    /**
+     * @fn init
+     * @brief init
+     * @param crAircraft
+     */
+    void init(aircraft::Aircraft crAircraft) override;
 
     /**
      * @fn upsert
@@ -80,7 +103,8 @@ public:
      * @param vPriority
      * @threadsafe
      */
-    void upsert(Aircraft& rUpdate, std::uint32_t vPriority);
+    void update(const aircraft::Aircraft& crUpdate, std::uint32_t vPriority,
+                std::uint64_t&) override;
 
     /**
      * @fn processAircrafts
@@ -92,7 +116,7 @@ public:
      * @threadsafe
      */
     std::string processAircrafts(const struct util::GpsPosition& crBasePos,
-                                 double vAtmPress, std::int32_t vMaxDist);
+                                 double vAtmPress);
 
 private:
     /**
@@ -101,7 +125,7 @@ private:
      * @param crId The Id to search
      * @return an iterator to the Aircraft if found, else vector::end
      */
-    std::vector<Aircraft>::iterator find(const std::string& crId);
+    std::vector<aircraft::Aircraft>::iterator find(const std::string& crId);
 
     /// @var mMutex
     /// Used for RW on the container.
@@ -109,15 +133,15 @@ private:
 
     /// @var mProcessor
     /// Providing functionality to process Aircrafts
-    AircraftProcessor mProcessor;
+    aircraft::AircraftProcessor mProcessor;
 
     /// @var mContainer
     /// Vector holding the Aircrafts
-    std::vector<Aircraft> mContainer;
+    std::vector<aircraft::Aircraft> mContainer;
 
     /// @var mIndexMap
     /// Map IDs to vector indices to make find efficient
     std::unordered_map<std::string, std::size_t> mIndexMap;
 };
 
-}  // namespace aircraft
+}  // namespace data

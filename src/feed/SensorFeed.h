@@ -29,15 +29,20 @@
 #include "../parser/SensorParser.h"
 #include "Feed.h"
 
+namespace data
+{
+class WindData;
+class AtmosphereData;
+}
+
 namespace feed
 {
-
 /**
  * @class SensorFeed extends Feed
  * @brief Represents a sensor input feed.
  * @see Feed.h
  */
-class SensorFeed: public Feed
+class SensorFeed : public Feed
 {
 public:
     /**
@@ -47,8 +52,9 @@ public:
      * @param prio     The priority
      * @param cr_kvmap The properties map
      */
-    SensorFeed(const std::string& crName,
-               const config::KeyValueMap& crKvMap);
+    SensorFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+               std::shared_ptr<data::WindData> pWindData,
+               std::shared_ptr<data::AtmosphereData> pAtmosData);
     /**
      * @fn ~SensorFeed
      * @brief Destructor
@@ -66,13 +72,17 @@ private:
     /// Parser to unpack response from Client
     parser::SensorParser mParser;
 
-	///
-	std::uint64_t mWindUpdateAttempts;
+    ///
+    std::uint64_t mWindUpdateAttempts;
 
-	///
-	std::uint64_t mAtmosUpdateAttempts;
+    ///
+    std::uint64_t mAtmosUpdateAttempts;
+
+    std::shared_ptr<data::WindData> mpWindData;
+
+    std::shared_ptr<data::AtmosphereData> mpAtmosphereData;
 };
 
-} // namespace feed
+}  // namespace feed
 
 #endif /* SRC_FEED_SENSORFEED_H_ */

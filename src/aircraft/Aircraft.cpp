@@ -28,6 +28,9 @@ namespace aircraft
 Aircraft::Aircraft()
 {}
 
+Aircraft::Aircraft(std::uint32_t vPriority) : mLastPriority(vPriority)
+{}
+
 Aircraft::Aircraft(std::string& rId, struct GpsPosition& rPos)
     : mId(rId),
       mIdType(IdType::ICAO),

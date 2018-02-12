@@ -53,17 +53,19 @@ public:
      * @fn update
      * @brief Update the specialized data.
      * @tparam T The new data
-     * @param vPriority The priority of the update
-     * @param rAttempts The update attempts by reference
+     * @param _1
+     * @param _2 The priority of the update
+     * @param _3 The update attempts by reference
      */
-    virtual void update(const T&, std::uint32_t vPriority, std::uint64_t& rAttempts) = 0;
+    virtual void update(const T& _1, std::uint32_t _2, std::uint64_t& _3) = 0;
 
     /**
      * @fn init
      * @brief Initialize data.
      * @tparam T The initial data
+     * @param _1
      */
-    virtual void init(T) = 0;
+    virtual void init(T _1) = 0;
 };
 
 } /* namespace data */

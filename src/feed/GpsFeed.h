@@ -29,15 +29,19 @@
 #include "../parser/GpsParser.h"
 #include "Feed.h"
 
+namespace data
+{
+class GpsData;
+}
+
 namespace feed
 {
-
 /**
  * @class GpsFeed extends Feed
  * @brief Represents a GPS input feed.
  * @see Feed.h
  */
-class GpsFeed: public Feed
+class GpsFeed : public Feed
 {
 public:
     /**
@@ -47,8 +51,8 @@ public:
      * @param prio     The priority
      * @param cr_kvmap The properties map
      */
-    GpsFeed(const std::string& /*cr_name*/,
-            const config::KeyValueMap& /*cr_kvmap*/);
+    GpsFeed(const std::string& /*cr_name*/, const config::KeyValueMap& /*cr_kvmap*/,
+            std::shared_ptr<data::GpsData> pData);
     /**
      * @fn ~GpsFeed
      * @brief Destructor
@@ -67,8 +71,10 @@ private:
     parser::GpsParser mParser;
     ///
     std::uint64_t mUpdateAttempts;
+
+    std::shared_ptr<data::GpsData> mpData;
 };
 
-} // namespace feed
+}  // namespace feed
 
 #endif /* SRC_FEED_GPSFEED_H_ */

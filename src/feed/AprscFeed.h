@@ -29,15 +29,19 @@
 #include "../parser/AprsParser.h"
 #include "Feed.h"
 
+namespace data
+{
+class AircraftData;
+}
+
 namespace feed
 {
-
 /**
  * @class AprscFeed extends Feed
  * @brief Represents an APRSC input feed.
  * @see Feed.h
  */
-class AprscFeed: public Feed
+class AprscFeed : public Feed
 {
 public:
     /**
@@ -48,8 +52,8 @@ public:
      * @param cr_kvmap The properties map
      * @throws std::logic_error if login is not given in cr_kvmap
      */
-    AprscFeed(const std::string& /*cr_name*/,
-              const config::KeyValueMap& /*cr_kvmap*/);
+    AprscFeed(const std::string& /*cr_name*/, const config::KeyValueMap& /*cr_kvmap*/,
+              std::shared_ptr<data::AircraftData> pData);
     /**
      * @fn ~AprscFeed
      * @brief Destructor
@@ -66,8 +70,10 @@ public:
 private:
     /// Parser to unpack response from Client
     parser::AprsParser mParser;
+
+    std::shared_ptr<data::AircraftData> mpData;
 };
 
-} // namespace feed
+}  // namespace feed
 
 #endif /* SRC_FEED_APRSCFEED_H_ */

@@ -29,44 +29,43 @@
 #include "../data/WindData.h"
 #include "../network/client/SensorClient.h"
 #include "../util/Sensor.h"
-#include "../VFRB.h"
 
 using namespace util;
 
 namespace feed
 {
-
-SensorFeed::SensorFeed(const std::string& crName,
-                       const config::KeyValueMap& crKvMap)
-        : Feed(crName, crKvMap),
-          mWindUpdateAttempts(0),
-          mAtmosUpdateAttempts(0)
+SensorFeed::SensorFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+                       std::shared_ptr<data::WindData> pWindData,
+                       std::shared_ptr<data::AtmosphereData> pAtmosData)
+    : Feed(crName, crKvMap),
+      mWindUpdateAttempts(0),
+      mAtmosUpdateAttempts(0),
+      mpWindData(pWindData),
+      mpAtmosphereData(pAtmosData)
 
 {
-    mpClient = std::unique_ptr<network::client::Client>(
-            new network::client::SensorClient(mKvMap.find(KV_KEY_HOST)->second,
-                    mKvMap.find(KV_KEY_PORT)->second, *this));
+    mpClient = std::unique_ptr<network::client::Client>(new network::client::SensorClient(
+        mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
 }
 
 SensorFeed::~SensorFeed() noexcept
-{
-}
+{}
 
 void SensorFeed::process(const std::string& crResponse) noexcept
 {
     struct Climate climate;
-    if (mParser.unpack(crResponse, climate))
+    if(mParser.unpack(crResponse, climate))
     {
-        if (climate.hasWind())
+        if(climate.hasWind())
         {
-            VFRB::msWindData.update(climate.mWind, getPriority(), mWindUpdateAttempts);
+            mpWindData->update(climate.mWind, getPriority(), mWindUpdateAttempts);
         }
-        if (climate.hasAtmosphere())
+        if(climate.hasAtmosphere())
         {
-            VFRB::msAtmosData.update(climate.mAtmosphere, getPriority(),
-                    mAtmosUpdateAttempts);
+            mpAtmosphereData->update(climate.mAtmosphere, getPriority(),
+                                     mAtmosUpdateAttempts);
         }
     }
 }
 
-} // namespace feed
+}  // namespace feed

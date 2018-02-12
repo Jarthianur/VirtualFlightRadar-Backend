@@ -38,6 +38,11 @@ class Client;
 }
 }
 
+namespace data
+{
+class Data;
+}
+
 namespace feed
 {
 /**
