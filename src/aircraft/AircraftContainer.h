@@ -87,11 +87,12 @@ public:
      * @brief Process all Aircrafts and get the reports.
      * @param crBasePos The base position to relate
      * @param vAtmPress The atmospheric pressure
+     * @param vMaxDist  The max distance
      * @return the string with all NMEA reports
      * @threadsafe
      */
     std::string processAircrafts(const struct util::GpsPosition& crBasePos,
-                                 double vAtmPress);
+                                 double vAtmPress, std::int32_t vMaxDist);
 
 private:
     /**

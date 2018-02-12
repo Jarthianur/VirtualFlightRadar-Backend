@@ -63,7 +63,7 @@ std::vector<Aircraft>::iterator AircraftContainer::find(const std::string& crId)
 }
 
 std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& crBasePos,
-                                                double vAtmPress)
+                                                double vAtmPress, std::int32_t vMaxDist)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     std::string dest_str;
@@ -91,7 +91,7 @@ std::string AircraftContainer::processAircrafts(const struct util::GpsPosition& 
             {
                 if(it->getUpdateAge() < AC_OUTDATED)
                 {
-                    dest_str += mProcessor.process(*it, crBasePos, vAtmPress);
+                    dest_str += mProcessor.process(*it, crBasePos, vAtmPress, vMaxDist);
                 }
                 ++it;
                 ++index;

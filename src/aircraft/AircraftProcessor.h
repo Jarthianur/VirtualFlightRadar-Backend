@@ -66,20 +66,22 @@ public:
      * @brief Generate NMEA report for an Aircraft with relative position etc.
      * @note Resulting string has trailing <cr><lf>.
      * @param crAircraft The Aircraft to process
-     * @param crRelPos The position to relate
-     * @param vAtmPress The atmospheric pressure
+     * @param crRelPos   The position to relate
+     * @param vAtmPress  The atmospheric pressure
+     * @param vMaxDist   The max distance
      * @return the NMEA string
      */
     std::string process(const Aircraft& crAircraft,
-                        const struct util::GpsPosition& crRelPos, double vAtmPress);
+                        const struct util::GpsPosition& crRelPos, double vAtmPress,
+                        std::int32_t vMaxDist);
 
 private:
     /**
      * @fn calcRelPosToBase
      * @brief Calcutale an Aircrafts position relative to the base.
      * @param crAircraft The Aircraft to calculate for
-     * @param crRelPos The position to relate
-     * @param vAtmPress The atmospheric pressure
+     * @param crRelPos   The position to relate
+     * @param vAtmPress  The atmospheric pressure
      */
     void calcRelativePosition(const Aircraft& crAircraft,
                               const struct util::GpsPosition& crRelPos, double vAtmPress);

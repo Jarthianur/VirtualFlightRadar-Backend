@@ -103,7 +103,8 @@ void VFRB::run() noexcept
             // write Aircrafts to clients
             std::string str = msAcCont.processAircrafts(
                 {msGpsData.getBaseLat(), msGpsData.getBaseLong(), msGpsData.getBaseAlt()},
-                msAtmosData.getAtmPress());
+                msAtmosData.getAtmPress(), config::Configuration::sMaxDistance);
+
             if(str.length() > 0)
             {
                 server.writeToAll(str);
@@ -164,7 +165,7 @@ void VFRB::handleServer(network::server::Server& r_server)
 void VFRB::handleFeed(boost::asio::signal_set& r_sigset,
                       std::shared_ptr<feed::Feed> p_feed)
 {
-    Logger::info("(VFRB) run feed: ", p_feed->mName);
+    Logger::info("(VFRB) run feed: ", p_feed->getName());
     p_feed->run(r_sigset);
 }
 

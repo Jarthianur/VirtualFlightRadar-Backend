@@ -24,7 +24,6 @@
 #include <cmath>
 #include <cstdio>
 
-#include "../config/Configuration.h"
 #include "../util/Math.hpp"
 #include "../util/Position.h"
 #include "Aircraft.h"
@@ -39,11 +38,11 @@ AircraftProcessor::~AircraftProcessor() noexcept
 
 std::string AircraftProcessor::process(const Aircraft& crAircraft,
                                        const struct util::GpsPosition& crRelPos,
-                                       double vAtmPress)
+                                       double vAtmPress, std::int32_t vMaxDist)
 {
     calcRelativePosition(crAircraft, crRelPos, vAtmPress);
 
-    if(mtDist > config::Configuration::sMaxDistance)
+    if(mtDist > vMaxDist)
     {
         return "";
     }
