@@ -266,7 +266,7 @@ private:
             if(crName.find(crKeyword) != std::string::npos)
             {
                 sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
-                    new T(crName, crProperties.getSectionKv(crName))));
+                    new T(crName, crProperties.getSectionKeyValue(crName))));
                 return true;
             }
             return false;

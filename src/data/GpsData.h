@@ -19,8 +19,7 @@
  }
  */
 
-#ifndef SRC_DATA_GPSDATA_H_
-#define SRC_DATA_GPSDATA_H_
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -30,11 +29,13 @@
 #include "Data.hpp"
 #include "../util/Wrapper.hpp"
 
+/// @namespace data
 namespace data
 {
 
 /**
- * @class GpsData implements Data
+ * @class GpsData
+ * @implements Data
  * @brief Manage GPS information.
  * @see Data.hpp
  */
@@ -46,18 +47,20 @@ public:
 	 * @brief Constructor
 	 */
 	GpsData();
+
 	/**
 	 * @fn ~GpsData
 	 * @brief Destructor
 	 */
 	virtual ~GpsData() noexcept;
+
 	/**
 	 * @fn init
 	 * @brief Initialize the GPS information.
-	 * @param pos The initial position
-	 * @override Data::init
+     * @param pos The initial position
 	 */
 	void init(struct util::ExtGpsPosition pos) override;
+
 	/**
 	 * @fn update
 	 * @brief Try to update the base position.
@@ -68,6 +71,7 @@ public:
 	 */
 	void update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t vPriority,
 	        std::uint64_t& rAttempts) override;
+
 	/**
 	 * @fn getGpsStr
 	 * @brief Get a full NMEA GPS report.
@@ -76,6 +80,7 @@ public:
 	 * @threadsafe
 	 */
 	std::string getGpsStr();
+
 	/**
 	 * @fn getBasePos
 	 * @brief Get the base GPS position.
@@ -83,6 +88,7 @@ public:
 	 * @threadsafe
 	 */
 	struct util::ExtGpsPosition getBasePos();
+
 	/**
 	 * @fn getBaseLat
 	 * @brief Get the base latitude.
@@ -90,6 +96,7 @@ public:
 	 * @threadsafe
 	 */
 	double getBaseLat();
+
 	/**
 	 * @fn getBaseLong
 	 * @brief Get the base longitude.
@@ -97,6 +104,7 @@ public:
 	 * @threadsafe
 	 */
 	double getBaseLong();
+
 	/**
 	 * @fn getBaseAlt
 	 * @brief Get the base altitude.
@@ -108,10 +116,9 @@ public:
 private:
     /// Wrapper holding the base position.
     struct util::Wrapper<struct util::ExtGpsPosition> mBasePos;
+
     /// GpsModule providing functionality to build GPS sentences.
     util::GpsModule mGpsMod;
 };
 
 }  // namespace data
-
-#endif /* SRC_DATA_GPSDATA_H_ */

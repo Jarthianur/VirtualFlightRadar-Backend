@@ -54,7 +54,7 @@ const std::string PropertyMap::getProperty(const std::string& crSection,
     }
 }
 
-const KeyValueMap& PropertyMap::getSectionKv(const std::string& crSection) const
+const KeyValueMap& PropertyMap::getSectionKeyValue(const std::string& crSection) const
 {
     auto it = mPropertiesMap.find(crSection);
     if(it != mPropertiesMap.end())

@@ -67,12 +67,12 @@ public:
                                   const std::string& crDefault = "") const;
 
     /**
-     * @fn getSectionKv
+     * @fn getSectionKeyValue
      * @brief Get the key-value-map for a section.
      * @param crSection The section to get the kv-map for
      * @return the kv-map if found, else an empty one
      */
-    const KeyValueMap& getSectionKv(const std::string& crSection) const;
+    const KeyValueMap& getSectionKeyValue(const std::string& crSection) const;
 
     /**
      * @fn addProperty
