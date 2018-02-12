@@ -191,42 +191,20 @@ private:
     std::size_t registerFeeds(const PropertyMap& crProperties);
 
     /**
-     * @fn resolveFallbacks
-     * @brief Resolve all fallback values from the properties.
+     * @fn setFallbacks
+     * @brief Set all fallback values from the properties.
      * @param crProperties The properties
-     * @return whether all fallbacks could be resolved
+     * @return whether all fallbacks could be set
      */
-    bool resolveFallbacks(const PropertyMap& crProperties);
-
-    /**
-     * @fn resolveFilter
-     * @brief Resolve a filter from the properties.
-     * @param crProperties The properties
-     * @param crKey The filter key
-     * @return the filter value
-     */
-    std::int32_t resolveFilter(const PropertyMap& crProperties, const std::string& crKey);
-
-    /**
-     * @fn resolveNumberKey
-     * @brief Resolve a number value for a key.
-     * @param crProperties     The properties
-     * @param crSection The section name
-     * @param crKey     The key
-     * @param crDefault The default value
-     * @return the resolved number value
-     */
-    util::math::Number
-    resolveNumberValue(const boost::tuple<bool, util::math::Number>& crOptNumber,
-                       const std::string& crSection, const std::string& crKey);
+    bool setFallbacks(const PropertyMap& crProperties);
 
     /**
      * @fn resolveServerPort
      * @brief Resolve the server port.
-     * @param crPort The port string
+     * @param crProperties The properties
      * @return the port
      */
-    std::uint16_t resolveServerPort(const PropertyMap& crProperties);
+    std::uint16_t resolveServerPort(const PropertyMap& crProperties) const;
 
     /**
      * @fn resolveFeeds
@@ -234,8 +212,35 @@ private:
      * @param crFeeds The feeds string
      * @return all feed names
      */
-    std::vector<std::string> resolveFeeds(const std::string& crFeeds);
+    std::vector<std::string> resolveFeeds(const std::string& crFeeds) const;
 
+    /**
+     * @fn resolveFilter
+     * @brief Resolve a filter from the properties.
+     * @param crProperties The properties
+     * @param crKey        The filter key
+     * @return the filter value
+     */
+    std::int32_t resolveFilter(const PropertyMap& crProperties,
+                               const std::string& crKey) const;
+
+    /**
+     * @fn checkNumberValue
+     * @brief Check a Number.
+     * @param crOptNumber The Number
+     * @param crSection   The section name
+     * @param crKey       The key
+     * @return the number value
+     * @throw std::invalid_argument if the value is invalid
+     */
+    util::math::Number checkNumberValue(const util::math::OptNumber& crOptNumber,
+                                        const std::string& crSection,
+                                        const std::string& crKey) const;
+
+    /**
+     * @fn dumpInfo
+     * @brief Dump the current config state using info logs.
+     */
     void dumpInfo() const;
 };
 

@@ -76,7 +76,7 @@ bool Configuration::init(std::istream& rStream)
         return false;
     }
 
-    if(!resolveFallbacks(properties))
+    if(!setFallbacks(properties))
     {
         return false;
     }
@@ -88,7 +88,6 @@ bool Configuration::init(std::istream& rStream)
     std::size_t nrf = registerFeeds(properties);
 
     dumpInfo();
-    Logger::info("(Config) number of feeds: ", std::to_string(nrf));
     return nrf > 0;
 }
 
@@ -137,9 +136,104 @@ std::size_t Configuration::registerFeeds(const PropertyMap& crProperties)
     return sRegisteredFeeds.size();
 }
 
-math::Number Configuration::resolveNumberValue(
-    const boost::tuple<bool, util::math::Number>& crOptNumber,
-    const std::string& crSection, const std::string& crKey)
+bool Configuration::setFallbacks(const PropertyMap& crProperties)
+{
+    try
+    {
+        sBaseLatitude = boost::get<double>(
+            checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+                                 SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "")),
+                             SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
+        sBaseLongitude = boost::get<double>(
+            checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+                                 SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "")),
+                             SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
+        sBaseAltitude = boost::get<std::int32_t>(
+            checkNumberValue(math::stringToNumber<std::int32_t>(crProperties.getProperty(
+                                 SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "")),
+                             SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
+        sBaseGeoid = boost::get<double>(
+            checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+                                 SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
+                             SECT_KEY_FALLBACK, KV_KEY_GEOID));
+        sBaseAtmPressure = boost::get<double>(
+            checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+                                 SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
+                             SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
+    }
+    // Don't catch boost::bad_get (runtime) as it only occurres on implementation fault
+    // (actually compiletime).
+    catch(const std::invalid_argument&)
+    {
+        return false;
+    }
+    return true;
+}
+
+std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) const
+{
+    try
+    {
+        std::uint64_t port = boost::get<std::uint64_t>(
+            checkNumberValue(math::stringToNumber<std::uint64_t>(crProperties.getProperty(
+                                 SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353")),
+                             SECT_KEY_GENERAL, KV_KEY_SERVER_PORT));
+        if(port > std::numeric_limits<std::uint16_t>::max())
+        {
+            throw std::invalid_argument("");
+        }
+        return port & 0xFFFF;
+    }
+    catch(const std::logic_error&)
+    {
+        return 4353;
+    }
+}
+
+std::vector<std::string> Configuration::resolveFeeds(const std::string& crFeeds) const
+{
+    std::vector<std::string> feeds;
+    std::stringstream ss;
+    ss.str(crFeeds);
+    std::string item;
+
+    while(std::getline(ss, item, ','))
+    {
+        std::size_t f = item.find_first_not_of(' ');
+        if(f != std::string::npos)
+        {
+            item = item.substr(f);
+        }
+        std::size_t l = item.find_last_not_of(' ');
+        if(l != std::string::npos)
+        {
+            item = item.substr(0, l + 1);
+        }
+        feeds.push_back(item);
+    }
+    return feeds;
+}
+
+std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
+                                          const std::string& crKey) const
+{
+    try
+    {
+        std::int32_t tmp = boost::get<std::int32_t>(
+            checkNumberValue(math::stringToNumber<std::int32_t>(
+                                 crProperties.getProperty(SECT_KEY_FILTER, crKey, "-1")),
+                             SECT_KEY_FILTER, crKey));
+        return tmp < 0 ? std::numeric_limits<std::int32_t>::max() : tmp;
+    }
+    catch(const std::invalid_argument&)
+    {
+        return std::numeric_limits<std::int32_t>::max();
+    }
+}
+
+math::Number Configuration::checkNumberValue(const math::OptNumber& crOptNumber,
+                                             const std::string& crSection,
+                                             const std::string& crKey) const
 {
     if(!crOptNumber.get<0>())
     {
@@ -169,108 +263,7 @@ void Configuration::dumpInfo() const
                  std::to_string(sServerPort));
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ",
                  sGndModeEnabled ? "Yes" : "No");
-}
-
-bool Configuration::resolveFallbacks(const PropertyMap& crProperties)
-{
-    try
-    {
-        sBaseLatitude
-            = resolveNumberValue(math::stringToNumber<double>(crProperties.getProperty(
-                                     SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "")),
-                                 SECT_KEY_FALLBACK, KV_KEY_LATITUDE)
-                  .float64;
-        sBaseLongitude
-            = resolveNumberValue(math::stringToNumber<double>(crProperties.getProperty(
-                                     SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "")),
-                                 SECT_KEY_FALLBACK, KV_KEY_LONGITUDE)
-                  .float64;
-        sBaseAltitude = resolveNumberValue(
-                            math::stringToNumber<std::int32_t>(crProperties.getProperty(
-                                SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "")),
-                            SECT_KEY_FALLBACK, KV_KEY_ALTITUDE)
-                            .int32;
-        sBaseGeoid
-            = resolveNumberValue(math::stringToNumber<double>(crProperties.getProperty(
-                                     SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
-                                 SECT_KEY_FALLBACK, KV_KEY_GEOID)
-                  .float64;
-        sBaseAtmPressure
-            = resolveNumberValue(math::stringToNumber<double>(crProperties.getProperty(
-                                     SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
-                                 SECT_KEY_FALLBACK, KV_KEY_PRESSURE)
-                  .float64;
-    }
-    catch(const std::invalid_argument&)
-    {
-        return false;
-    }
-    return true;
-}
-
-std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
-                                          const std::string& crKey)
-{
-    try
-    {
-        std::int32_t tmp
-            = resolveNumberValue(
-                  math::stringToNumber<std::int32_t>(
-                      crProperties.getProperty(SECT_KEY_FILTER, crKey, "-1")),
-                  SECT_KEY_FILTER, crKey)
-                  .int32;
-        return tmp < 0 ? std::numeric_limits<std::int32_t>::max() : tmp;
-    }
-    catch(const std::invalid_argument&)
-    {
-        return std::numeric_limits<std::int32_t>::max();
-    }
-}
-
-std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties)
-{
-    try
-    {
-        std::uint64_t port
-            = resolveNumberValue(
-                  math::stringToNumber<std::uint64_t>(crProperties.getProperty(
-                      SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353")),
-                  SECT_KEY_GENERAL, KV_KEY_SERVER_PORT)
-                  .uint64;
-        if(port > std::numeric_limits<std::uint16_t>::max())
-        {
-            throw std::invalid_argument("");
-        }
-        return port & 0xFFFF;
-    }
-    catch(const std::logic_error&)
-    {
-        return 4353;
-    }
-}
-
-std::vector<std::string> Configuration::resolveFeeds(const std::string& crFeeds)
-{
-    std::vector<std::string> feeds;
-    std::stringstream ss;
-    ss.str(crFeeds);
-    std::string item;
-
-    while(std::getline(ss, item, ','))
-    {
-        std::size_t f = item.find_first_not_of(' ');
-        if(f != std::string::npos)
-        {
-            item = item.substr(f);
-        }
-        std::size_t l = item.find_last_not_of(' ');
-        if(l != std::string::npos)
-        {
-            item = item.substr(0, l + 1);
-        }
-        feeds.push_back(item);
-    }
-    return feeds;
+    Logger::info("(Config) number of feeds: ", std::to_string(sRegisteredFeeds.size()));
 }
 
 }  // namespace config

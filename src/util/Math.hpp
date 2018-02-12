@@ -28,6 +28,7 @@
 #include <sstream>
 #include <string>
 #include <boost/tuple/tuple.hpp>
+#include <boost/variant.hpp>
 
 namespace util
 {
@@ -50,11 +51,8 @@ const double FEET_2_M  = 0.3048;
 const double M_2_FEET  = 3.28084;
 const double PI        = std::acos(-1.0);
 
-union Number {
-    std::int32_t int32;
-    std::uint64_t uint64;
-    double float64;
-};
+using Number = boost::variant<std::int32_t, std::uint64_t, double>;
+using OptNumber = boost::tuple<bool, Number>;
 
 /**
  * @fn radian
@@ -134,14 +132,12 @@ inline std::int32_t checksum(const char* sentence, std::size_t size)
 }
 
 template<typename T>
-inline boost::tuple<bool, Number> stringToNumber(const std::string& crStr)
+inline OptNumber stringToNumber(const std::string& crStr)
 {
     std::stringstream ss(crStr);
     T result;
-    Number number;
     bool suc = ss >> result;
-    *(reinterpret_cast<T*>(&number)) = result;
-    return boost::make_tuple(suc, number);
+    return boost::make_tuple(suc, Number(result));
 }
 
 }  // namespace math
