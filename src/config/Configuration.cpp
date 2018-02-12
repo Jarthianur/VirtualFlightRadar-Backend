@@ -95,42 +95,37 @@ std::size_t Configuration::registerFeeds(const PropertyMap& crProperties)
 {
     std::vector<std::string> feeds
         = resolveFeeds(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+    std::vector<std::function<bool(const std::string&, const PropertyMap&)>> creators;
+    creators.push_back(registerCreator<feed::AprscFeed>(SECT_KEY_APRSC));
+    creators.push_back(registerCreator<feed::SbsFeed>(SECT_KEY_SBS));
+    creators.push_back(registerCreator<feed::SensorFeed>(SECT_KEY_SENS));
+    creators.push_back(registerCreator<feed::GpsFeed>(SECT_KEY_GPS));
 
-    for(auto it = feeds.cbegin(); it != feeds.cend(); ++it)
+    for(const auto& feed : feeds)
     {
-        try
+        bool found = false;
+        for(auto& creator : creators)
         {
-            if(it->find(SECT_KEY_APRSC) != std::string::npos)
+            try
             {
-                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
-                    new feed::AprscFeed(*it, crProperties.getSectionKv(*it))));
+                if((found = creator(feed, crProperties)))
+                {
+                    break;
+                }
             }
-            else if(it->find(SECT_KEY_SBS) != std::string::npos)
+            catch(const std::exception& e)
             {
-                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
-                    new feed::SbsFeed(*it, crProperties.getSectionKv(*it))));
-            }
-            else if(it->find(SECT_KEY_SENS) != std::string::npos)
-            {
-                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
-                    new feed::SensorFeed(*it, crProperties.getSectionKv(*it))));
-            }
-            else if(it->find(SECT_KEY_GPS) != std::string::npos)
-            {
-                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
-                    new feed::GpsFeed(*it, crProperties.getSectionKv(*it))));
-            }
-            else
-            {
-                Logger::warn(
-                    "(Config) create feed " + *it,
-                    ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                    ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
+                Logger::warn("(Config) create feed " + feed + ": ", e.what());
+                found = true;
+                break;
             }
         }
-        catch(const std::exception& e)
+        if(!found)
         {
-            Logger::warn("(Config) create feed " + *it + ": ", e.what());
+            Logger::warn(
+                "(Config) create feed " + feed,
+                ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
+                ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
         }
     }
     return sRegisteredFeeds.size();

@@ -26,8 +26,10 @@
 #include <istream>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <vector>
 #include "../util/Math.hpp"
+#include "PropertyMap.h"
 
 namespace feed
 {
@@ -37,8 +39,6 @@ class Feed;
 /// @namespace config
 namespace config
 {
-class PropertyMap;
-
 /**
  * Configuration section keys
  */
@@ -242,6 +242,36 @@ private:
      * @brief Dump the current config state using info logs.
      */
     void dumpInfo() const;
+
+    /**
+     * @fn registerCreator
+     * @brief Get a creator functor for a specific Feed type.
+     *
+     * This creator checks the feed name for a keyword and registers the respective Feed
+     * in sRegisteredFeeds.
+     * #fparam crName       The feed name
+     * #fparam crProperties The properties
+     * #freturn whether the keyword was found in name
+     *
+     * @tparam T A derivate of Feed to register
+     * @param crKeyword The keyword
+     * @return The creator
+     */
+    template<typename T, typename std::enable_if<
+                             std::is_base_of<feed::Feed, T>::value>::type* = nullptr>
+    std::function<bool(const std::string&, const PropertyMap&)>
+    registerCreator(const std::string& crKeyword) const
+    {
+        return [&crKeyword](const std::string& crName, const PropertyMap& crProperties) {
+            if(crName.find(crKeyword) != std::string::npos)
+            {
+                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
+                    new T(crName, crProperties.getSectionKv(crName))));
+                return true;
+            }
+            return false;
+        };
+    }
 };
 
 }  // namespace config
