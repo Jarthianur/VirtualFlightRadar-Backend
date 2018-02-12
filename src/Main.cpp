@@ -139,14 +139,10 @@ bool evalArgs(std::int32_t argc, char** argv)
         return false;
     }
 
-    if(gnd || config::Configuration::sGndModeEnabled)
+    if(gnd)
     {
         config::Configuration::sGndModeEnabled = true;
-        Logger::info("(VFRB) GND mode: yes");
-    }
-    else
-    {
-        Logger::info("(VFRB) GND mode: no");
+        Logger::info("(VFRB) Override ground mode: Yes");
     }
 
     return true;

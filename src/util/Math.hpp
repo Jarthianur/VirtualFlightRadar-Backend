@@ -50,6 +50,12 @@ const double FEET_2_M  = 0.3048;
 const double M_2_FEET  = 3.28084;
 const double PI        = std::acos(-1.0);
 
+union Number {
+    std::int32_t int32;
+    std::uint64_t uint64;
+    double float64;
+};
+
 /**
  * @fn radian
  * @brief Convert degree to radian.
@@ -128,12 +134,14 @@ inline std::int32_t checksum(const char* sentence, std::size_t size)
 }
 
 template<typename T>
-inline boost::tuple<bool, T> stringToNumber(const std::string& crStr)
+inline boost::tuple<bool, Number> stringToNumber(const std::string& crStr)
 {
     std::stringstream ss(crStr);
     T result;
+    Number number;
     bool suc = ss >> result;
-    return boost::make_tuple(suc, result);
+    *(reinterpret_cast<T*>(&number)) = result;
+    return boost::make_tuple(suc, number);
 }
 
 }  // namespace math

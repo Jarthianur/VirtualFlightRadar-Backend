@@ -27,6 +27,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "../util/Math.hpp"
 
 namespace feed
 {
@@ -131,10 +132,6 @@ public:
      */
     virtual ~Configuration() noexcept;
 
-    /// @var sBaseAltitude
-    /// Base altitude
-    static std::int32_t sBaseAltitude;
-
     /// @var sBaseLatitude
     /// Base latitude
     static double sBaseLatitude;
@@ -142,6 +139,10 @@ public:
     /// @var sBaseLongitude
     /// Base longitude
     static double sBaseLongitude;
+
+    /// @var sBaseAltitude
+    /// Base altitude
+    static std::int32_t sBaseAltitude;
 
     /// @var sBaseGeoid
     /// Base geoid separation
@@ -209,18 +210,15 @@ private:
     /**
      * @fn resolveNumberKey
      * @brief Resolve a number value for a key.
-     * @tparam T        The type of number
      * @param crProperties     The properties
      * @param crSection The section name
      * @param crKey     The key
      * @param crDefault The default value
      * @return the resolved number value
-     *
-     * Maybe use a union to prevent specialization.
      */
-    template<typename T>
-    T resolveNumberValue(const PropertyMap& crProperties, const std::string& crSection,
-                         const std::string& crKey, const std::string& crDefault);
+    util::math::Number
+    resolveNumberValue(const boost::tuple<bool, util::math::Number>& crOptNumber,
+                       const std::string& crSection, const std::string& crKey);
 
     /**
      * @fn resolveServerPort
@@ -228,7 +226,7 @@ private:
      * @param crPort The port string
      * @return the port
      */
-    std::uint16_t resolveServerPort(const std::string& crPort);
+    std::uint16_t resolveServerPort(const PropertyMap& crProperties);
 
     /**
      * @fn resolveFeeds
@@ -237,6 +235,8 @@ private:
      * @return all feed names
      */
     std::vector<std::string> resolveFeeds(const std::string& crFeeds);
+
+    void dumpInfo() const;
 };
 
 }  // namespace config
