@@ -38,24 +38,23 @@ namespace network
 namespace server
 {
 
-Server::Server(boost::asio::signal_set& r_sigset, std::uint16_t port)
+Server::Server(std::uint16_t port)
         : mIOservice(),
-          mrSigSet(r_sigset),
           mAcceptor(mIOservice,
                   boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
                   boost::asio::ip::tcp::acceptor::reuse_address(true)),
           mSocket(mIOservice)
 {
-    awaitStop();
-    accept();
-}
+    }
 
 Server::~Server() noexcept
 {
 }
 
-void Server::run()
+void Server::run(boost::asio::signal_set& r_sigset)
 {
+    awaitStop(r_sigset);
+    accept();
     mIOservice.run();
 }
 
@@ -84,9 +83,9 @@ void Server::accept()
             boost::bind(&Server::handleAccept, this, boost::asio::placeholders::error));
 }
 
-void Server::awaitStop()
+void Server::awaitStop(boost::asio::signal_set& r_sigset)
 {
-    mrSigSet.async_wait([this](const boost::system::error_code&, int)
+    r_sigset.async_wait([this](const boost::system::error_code&, int)
     {
         mAcceptor.close();
         stopAll();

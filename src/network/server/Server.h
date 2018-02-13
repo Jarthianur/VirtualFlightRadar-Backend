@@ -64,7 +64,7 @@ public:
      * @param r_sigset The signal set
      * @param port     The port
      */
-    Server(boost::asio::signal_set& r_sigset, std::uint16_t port);
+    Server(std::uint16_t port);
     /**
      * @fn ~Server
      * @brief Destructor
@@ -75,7 +75,7 @@ public:
      * @brief Run the Server.
      * @note Returns after all operations in the queue have returned.
      */
-    void run();
+    void run(boost::asio::signal_set& r_sigset);
     /**
      * @fn writeToAll
      * @brief Write a message to all clients.
@@ -94,7 +94,7 @@ private:
      * @fn awaitStop
      * @brief Register stop-handler to signal set.
      */
-    void awaitStop();
+    void awaitStop(boost::asio::signal_set& r_sigset);
     /**
      * @fn stopAll
      * @brief Stop all connections.
@@ -120,8 +120,6 @@ private:
     boost::mutex mMutex;
     /// Internal IO-service
     boost::asio::io_service mIOservice;
-    /// Ref to signal set
-    boost::asio::signal_set& mrSigSet;
     /// Acceptor
     boost::asio::ip::tcp::acceptor mAcceptor;
     /// Socket

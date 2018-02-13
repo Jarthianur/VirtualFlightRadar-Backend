@@ -23,23 +23,19 @@
 #define SRC_VFRB_H_
 
 #include <atomic>
+#include <memory>
 #include <boost/asio/signal_set.hpp>
 #include <boost/system/error_code.hpp>
-#include <memory>
+#include "network/server/Server.h"
 
 namespace data
 {
+class AircraftData;
 class WindData;
 class AtmosphereData;
 class GpsData;
 }
-namespace network
-{
-namespace server
-{
-class Server;
-}
-}
+
 namespace feed
 {
 class Feed;
@@ -47,7 +43,6 @@ class Feed;
 namespace aircraft
 {
 class Aircraft;
-class AircraftContainer;
 }
 namespace util
 {
@@ -61,7 +56,7 @@ struct SensorInfo;
  */
 class VFRB
 {
-  public:
+public:
     /**
      * Non-copyable
      */
@@ -89,19 +84,7 @@ class VFRB
     /// Atomic run-status. By this, every component may determine if the VFRB stops.
     static std::atomic<bool> global_run_status;
 
-    /// Container holding all registered Aircrafts
-    static aircraft::AircraftContainer msAcCont;
-
-    /// Container holding sensor and climate information.
-    static data::WindData msWindData;
-
-    ///
-    static data::AtmosphereData msAtmosData;
-
-    /// Container holding GPS information
-    static data::GpsData msGpsData;
-
-  private:
+private:
     /**
      * @fn handleFeed
      * @brief Handler for an input Feed thread.
@@ -125,6 +108,59 @@ class VFRB
      * @param sig   The signal number
      */
     static void handleSignals(const boost::system::error_code& cr_ec, const int sig);
+
+    /**
+     * @fn registerFeeds
+     * @brief Register all input feeds found from ConfigReader.
+     * @note Only correctly configured feeds get registered.
+     * @param crProperties The PropertyMap holding read properties
+     * @return the number of registered feeds
+     */
+    std::size_t registerFeeds(const PropertyMap& crProperties);
+
+    /**
+     * @fn registerCreator
+     * @brief Get a creator functor for a specific Feed type.
+     *
+     * This creator checks the feed name for a keyword and registers the respective Feed
+     * in sRegisteredFeeds.
+     * #fparam crName       The feed name
+     * #fparam crProperties The properties
+     * #freturn whether the keyword was found in name
+     *
+     * @tparam T A derivate of Feed to register
+     * @param crKeyword The keyword
+     * @return The creator
+     */
+    template<typename T, typename std::enable_if<
+                             std::is_base_of<feed::Feed, T>::value>::type* = nullptr>
+    std::function<bool(const std::string&, const PropertyMap&)>
+    registerCreator(const std::string& crKeyword) const
+    {
+        return [&crKeyword](const std::string& crName, const PropertyMap& crProperties) {
+            if(crName.find(crKeyword) != std::string::npos)
+            {
+                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
+                    new T(crName, crProperties.getSectionKeyValue(crName))));
+                return true;
+            }
+            return false;
+        };
+    }
+
+    /// Container holding all registered Aircrafts
+    std::shared_ptr<data::AircraftData> mpAircraftData;
+
+    /// Container holding sensor and climate information.
+    std::shared_ptr<data::WindData> mpWindData;
+
+    ///
+    std::shared_ptr<data::AtmosphereData> mpAtmosphereData;
+
+    /// Container holding GPS information
+    std::shared_ptr<data::GpsData> mpGpsData;
+
+    network::server::Server mServer;
 };
 
 #endif /* SRC_VFRB_H_ */

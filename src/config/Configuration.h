@@ -132,45 +132,27 @@ public:
      */
     virtual ~Configuration() noexcept;
 
-    /// @var sBaseLatitude
-    /// Base latitude
-    static double sBaseLatitude;
+    double getSBaseLatitude() const;
 
-    /// @var sBaseLongitude
-    /// Base longitude
-    static double sBaseLongitude;
+    double getSBaseLongitude() const;
 
-    /// @var sBaseAltitude
-    /// Base altitude
-    static std::int32_t sBaseAltitude;
+    std::int32_t getSBaseAltitude() const;
 
-    /// @var sBaseGeoid
-    /// Base geoid separation
-    static double sBaseGeoid;
+    double getSBaseGeoid() const;
 
-    /// @var sBaseAtmPressure
-    /// Atmospheric pressure at base
-    static double sBaseAtmPressure;
+    double getSBaseAtmPressure() const;
 
-    /// @var sMaxHeight
-    /// Maximum height for reported Aircrafts
-    static std::int32_t sMaxHeight;
+    std::int32_t getSMaxHeight() const;
 
-    /// @var sMaxDistance
-    /// Maximum distance for reported Aircrafts
-    static std::int32_t sMaxDistance;
+    std::int32_t getSMaxDistance() const;
 
-    /// @var sServerPort
-    /// Port where to serve reports
-    static std::uint16_t sServerPort;
+    std::uint16_t getSServerPort() const;
 
-    /// @var sGndModeEnabled
-    /// Ground mode enabled?
-    static bool sGndModeEnabled;
+    bool getSGndModeEnabled() const;
 
-    /// @var sRegisteredFeeds
-    /// All registered and correctly parsed input feeds
-    static std::vector<std::shared_ptr<feed::Feed>> sRegisteredFeeds;
+    void overrideSGndModeEnabled();
+
+    std::vector<std::pair<std::string, KeyValueMap>> getFeeds() const;
 
 private:
     /**
@@ -180,15 +162,6 @@ private:
      * @return true on success and at least one feed was registered, else false
      */
     bool init(std::istream& rStream);
-
-    /**
-     * @fn registerFeeds
-     * @brief Register all input feeds found from ConfigReader.
-     * @note Only correctly configured feeds get registered.
-     * @param crProperties The PropertyMap holding read properties
-     * @return the number of registered feeds
-     */
-    std::size_t registerFeeds(const PropertyMap& crProperties);
 
     /**
      * @fn setFallbacks
@@ -243,35 +216,41 @@ private:
      */
     void dumpInfo() const;
 
-    /**
-     * @fn registerCreator
-     * @brief Get a creator functor for a specific Feed type.
-     *
-     * This creator checks the feed name for a keyword and registers the respective Feed
-     * in sRegisteredFeeds.
-     * #fparam crName       The feed name
-     * #fparam crProperties The properties
-     * #freturn whether the keyword was found in name
-     *
-     * @tparam T A derivate of Feed to register
-     * @param crKeyword The keyword
-     * @return The creator
-     */
-    template<typename T, typename std::enable_if<
-                             std::is_base_of<feed::Feed, T>::value>::type* = nullptr>
-    std::function<bool(const std::string&, const PropertyMap&)>
-    registerCreator(const std::string& crKeyword) const
-    {
-        return [&crKeyword](const std::string& crName, const PropertyMap& crProperties) {
-            if(crName.find(crKeyword) != std::string::npos)
-            {
-                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
-                    new T(crName, crProperties.getSectionKeyValue(crName))));
-                return true;
-            }
-            return false;
-        };
-    }
+    /// @var sBaseLatitude
+    /// Base latitude
+    double sBaseLatitude;
+
+    /// @var sBaseLongitude
+    /// Base longitude
+    double sBaseLongitude;
+
+    /// @var sBaseAltitude
+    /// Base altitude
+    std::int32_t sBaseAltitude;
+
+    /// @var sBaseGeoid
+    /// Base geoid separation
+    double sBaseGeoid;
+
+    /// @var sBaseAtmPressure
+    /// Atmospheric pressure at base
+    double sBaseAtmPressure;
+
+    /// @var sMaxHeight
+    /// Maximum height for reported Aircrafts
+    std::int32_t sMaxHeight;
+
+    /// @var sMaxDistance
+    /// Maximum distance for reported Aircrafts
+    std::int32_t sMaxDistance;
+
+    /// @var sServerPort
+    /// Port where to serve reports
+    std::uint16_t sServerPort;
+
+    /// @var sGndModeEnabled
+    /// Ground mode enabled?
+    bool sGndModeEnabled;
 };
 
 }  // namespace config

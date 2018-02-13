@@ -30,7 +30,6 @@
 #include <boost/move/move.hpp>
 #include <boost/thread.hpp>
 
-#include "aircraft/AircraftContainer.h"
 #include "config/Configuration.h"
 #include "data/AtmosphereData.h"
 #include "data/GpsData.h"
@@ -39,7 +38,7 @@
 #include "network/client/AprscClient.h"
 #include "network/client/SbsClient.h"
 #include "network/client/SensorClient.h"
-#include "network/server/Server.h"
+
 #include "util/Logger.h"
 #include "util/Position.h"
 #include "util/Sensor.h"
@@ -49,17 +48,18 @@ using namespace util;
 #define SYNC_TIME (1)
 
 std::atomic<bool> VFRB::global_run_status(true);
-aircraft::AircraftContainer VFRB::msAcCont;
-data::WindData VFRB::msWindData;
-data::AtmosphereData VFRB::msAtmosData;
-data::GpsData VFRB::msGpsData;
 
-VFRB::VFRB()
-{}
+VFRB::VFRB(const config::Configuration& config)
+    :mServer(config.getSServerPort())
+{
+    //TODO create config object here and init all components
+
+}
 
 VFRB::~VFRB() noexcept
 {}
 
+// only start threads with components here
 void VFRB::run() noexcept
 {
     Logger::info("(VFRB) startup");
@@ -103,7 +103,7 @@ void VFRB::run() noexcept
             // write Aircrafts to clients
             std::string str = msAcCont.processAircrafts(
                 {msGpsData.getBaseLat(), msGpsData.getBaseLong(), msGpsData.getBaseAlt()},
-                msAtmosData.getAtmPress(), config::Configuration::sMaxDistance);
+                msAtmosData.getAtmPress());
 
             if(str.length() > 0)
             {
@@ -128,11 +128,6 @@ void VFRB::run() noexcept
             Logger::error("(VFRB) error: ", e.what());
             global_run_status = false;
         }
-        catch(...)
-        {
-            Logger::error("(VFRB) error");
-            global_run_status = false;
-        }
     }
 
     // exit sequence, join threads
@@ -152,6 +147,46 @@ void VFRB::run() noexcept
     time_str += " mins";
 
     Logger::info("EXITING / runtime: ", time_str);
+}
+
+std::size_t VFRB::registerFeeds(const PropertyMap& crProperties)
+{
+    std::vector<std::string> feeds
+        = resolveFeeds(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+    std::vector<std::function<bool(const std::string&, const PropertyMap&)>> creators;
+    creators.push_back(registerCreator<feed::AprscFeed>(SECT_KEY_APRSC));
+    creators.push_back(registerCreator<feed::SbsFeed>(SECT_KEY_SBS));
+    creators.push_back(registerCreator<feed::SensorFeed>(SECT_KEY_SENS));
+    creators.push_back(registerCreator<feed::GpsFeed>(SECT_KEY_GPS));
+
+    for(const auto& feed : feeds)
+    {
+        bool found = false;
+        for(auto& creator : creators)
+        {
+            try
+            {
+                if((found = creator(feed, crProperties)))
+                {
+                    break;
+                }
+            }
+            catch(const std::exception& e)
+            {
+                Logger::warn("(Config) create feed " + feed + ": ", e.what());
+                found = true;
+                break;
+            }
+        }
+        if(!found)
+        {
+            Logger::warn(
+                "(Config) create feed " + feed,
+                ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
+                ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
+        }
+    }
+    return sRegisteredFeeds.size();
 }
 
 void VFRB::handleServer(network::server::Server& r_server)

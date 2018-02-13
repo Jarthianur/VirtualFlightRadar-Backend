@@ -47,20 +47,6 @@ Configuration::Configuration(std::istream& rStream)
 Configuration::~Configuration() noexcept
 {}
 
-/**
- * Static initializers
- */
-std::int32_t Configuration::sBaseAltitude = 0;
-double Configuration::sBaseLatitude       = 0.0;
-double Configuration::sBaseLongitude      = 0.0;
-double Configuration::sBaseGeoid          = 0.0;
-double Configuration::sBaseAtmPressure    = 0.0;
-std::int32_t Configuration::sMaxHeight    = 0;
-std::int32_t Configuration::sMaxDistance  = 0;
-std::uint16_t Configuration::sServerPort  = 1;
-bool Configuration::sGndModeEnabled       = false;
-std::vector<std::shared_ptr<feed::Feed>> Configuration::sRegisteredFeeds;
-
 bool Configuration::init(std::istream& rStream)
 {
     ConfigReader reader;
@@ -85,50 +71,9 @@ bool Configuration::init(std::istream& rStream)
     sMaxHeight      = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
     sServerPort     = resolveServerPort(properties);
     sGndModeEnabled = !properties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
-    std::size_t nrf = registerFeeds(properties);
 
     dumpInfo();
-    return nrf > 0;
-}
-
-std::size_t Configuration::registerFeeds(const PropertyMap& crProperties)
-{
-    std::vector<std::string> feeds
-        = resolveFeeds(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
-    std::vector<std::function<bool(const std::string&, const PropertyMap&)>> creators;
-    creators.push_back(registerCreator<feed::AprscFeed>(SECT_KEY_APRSC));
-    creators.push_back(registerCreator<feed::SbsFeed>(SECT_KEY_SBS));
-    creators.push_back(registerCreator<feed::SensorFeed>(SECT_KEY_SENS));
-    creators.push_back(registerCreator<feed::GpsFeed>(SECT_KEY_GPS));
-
-    for(const auto& feed : feeds)
-    {
-        bool found = false;
-        for(auto& creator : creators)
-        {
-            try
-            {
-                if((found = creator(feed, crProperties)))
-                {
-                    break;
-                }
-            }
-            catch(const std::exception& e)
-            {
-                Logger::warn("(Config) create feed " + feed + ": ", e.what());
-                found = true;
-                break;
-            }
-        }
-        if(!found)
-        {
-            Logger::warn(
-                "(Config) create feed " + feed,
-                ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
-        }
-    }
-    return sRegisteredFeeds.size();
+    return true;
 }
 
 bool Configuration::setFallbacks(const PropertyMap& crProperties)
@@ -184,6 +129,9 @@ std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) 
         return 4353;
     }
 }
+
+std::vector<std::pair<std::string, KeyValueMap>> Configuration::getFeeds() const
+{}
 
 std::vector<std::string> Configuration::resolveFeeds(const std::string& crFeeds) const
 {
@@ -259,6 +207,51 @@ void Configuration::dumpInfo() const
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ",
                  sGndModeEnabled ? "Yes" : "No");
     Logger::info("(Config) number of feeds: ", std::to_string(sRegisteredFeeds.size()));
+}
+
+bool Configuration::getSGndModeEnabled() const
+{
+    return sGndModeEnabled;
+}
+
+std::uint16_t Configuration::getSServerPort() const
+{
+    return sServerPort;
+}
+
+std::int32_t Configuration::getSMaxDistance() const
+{
+    return sMaxDistance;
+}
+
+std::int32_t Configuration::getSMaxHeight() const
+{
+    return sMaxHeight;
+}
+
+double Configuration::getSBaseAtmPressure() const
+{
+    return sBaseAtmPressure;
+}
+
+double Configuration::getSBaseGeoid() const
+{
+    return sBaseGeoid;
+}
+
+std::int32_t Configuration::getSBaseAltitude() const
+{
+    return sBaseAltitude;
+}
+
+double Configuration::getSBaseLongitude() const
+{
+    return sBaseLongitude;
+}
+
+double Configuration::getSBaseLatitude() const
+{
+    return sBaseLatitude;
 }
 
 }  // namespace config
