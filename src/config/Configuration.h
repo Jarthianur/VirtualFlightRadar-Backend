@@ -24,11 +24,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <istream>
+#include <list>
 #include <memory>
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <list>
+
 #include "../util/Math.hpp"
 #include "PropertyMap.h"
 
@@ -114,7 +115,7 @@ namespace config
 
 /// @typedef FeedMapping
 /// List of pairs with feed name and key-values
-using FeedMapping = std::list<std::pair<std::string, KeyValueMap> >;
+using FeedMapping = std::list<std::pair<std::string, KeyValueMap>>;
 
 /**
  * @class Configuration
@@ -127,7 +128,7 @@ public:
      * @fn Configuration
      * @brief Constructor
      * @param rStream The config file as stream
-     * @throw std::logic_error if any error occures or no feeds are given
+     * @throw std::runtime_error if any error occures
      */
     explicit Configuration(std::istream& rStream);
 
@@ -137,33 +138,88 @@ public:
      */
     virtual ~Configuration() noexcept;
 
-    double getSBaseLatitude() const;
+    /**
+     * @fn getLatitude
+     * @brief Get the latitude.
+     * @return mLatitude
+     */
+    double getLatitude() const;
 
-    double getSBaseLongitude() const;
+    /**
+     * @fn getLongitude
+     * @brief Get the longitude.
+     * @return mLongitude
+     */
+    double getLongitude() const;
 
-    std::int32_t getSBaseAltitude() const;
+    /**
+     * @fn getAltitude
+     * @brief Get the altitude.
+     * @return mAltitude
+     */
+    std::int32_t getAltitude() const;
 
-    double getSBaseGeoid() const;
+    /**
+     * @fn getGeoid
+     * @brief Get the geoid sepparatioon.
+     * @return mGeoid
+     */
+    double getGeoid() const;
 
-    double getSBaseAtmPressure() const;
+    /**
+     * @fn getAtmPressure
+     * @brief Get the atmospheric pressure.
+     * @return mAtmPressure
+     */
+    double getAtmPressure() const;
 
-    std::int32_t getSMaxHeight() const;
+    /**
+     * @fn getMaxHeight
+     * @brief Get the max height filter.
+     * @return mMaxHeight
+     */
+    std::int32_t getMaxHeight() const;
 
-    std::int32_t getSMaxDistance() const;
+    /**
+     * @fn getMaxDistance
+     * @brief Get the max distance filter.
+     * @return mMaxDistance
+     */
+    std::int32_t getMaxDistance() const;
 
-    std::uint16_t getSServerPort() const;
+    /**
+     * @fn getServerPort
+     * @brief Get the server port.
+     * @return mServerPort
+     */
+    std::uint16_t getServerPort() const;
 
+    /**
+     * @fn isGndModeEnabled
+     * @brief Is the ground mode enabled?
+     * @return mGndMode
+     */
     bool isGndModeEnabled() const;
+
+    /**
+     * @fn forceGndMode
+     * @brief Force ground mode to be enabled.
+     */
     void forceGndMode();
 
-    const FeedMapping& getFeeds() const;
+    /**
+     * @fn getFeedMapping
+     * @brief Get the list of feeds with their key-value maps.
+     * @return mFeedMapping
+     */
+    const FeedMapping& getFeedMapping() const;
 
 private:
     /**
      * @fn init
-     * @brief Initialize Configuration, read and unpack the config stream.
-     * @param rStream The input stream
-     * @return true on success and at least one feed was registered, else false
+     * @brief Unpack the given properties.
+     * @param crProperties The properties
+     * @throw std::invalid_argument from invoked statements
      */
     void init(const PropertyMap& crProperties);
 
@@ -191,7 +247,12 @@ private:
      */
     std::list<std::string> resolveFeedList(const std::string& crFeeds) const;
 
-
+    /**
+     * @fn resolveFeeds
+     * @brief Resolve the feeds and their config.
+     * @param crProperties The properties
+     * @return a list of all feeds with their config
+     */
     FeedMapping resolveFeeds(const PropertyMap& crProperties);
 
     /**
@@ -217,6 +278,12 @@ private:
                                         const std::string& crSection,
                                         const std::string& crKey) const;
 
+    /**
+     * @fn trimString
+     * @brief Trim a string on both sides.
+     * @param rStr The string
+     * @return the trimmed string
+     */
     std::string& trimString(std::string& rStr) const;
 
     /**
@@ -225,41 +292,45 @@ private:
      */
     void dumpInfo() const;
 
-    /// @var sBaseLatitude
+    /// @var mLatitude
     /// Base latitude
-    double mFbLatitude;
+    double mLatitude;
 
-    /// @var sBaseLongitude
+    /// @var mLongitude
     /// Base longitude
-    double mFbLongitude;
+    double mLongitude;
 
-    /// @var sBaseAltitude
+    /// @var mAltitude
     /// Base altitude
-    std::int32_t mFbAltitude;
+    std::int32_t mAltitude;
 
-    /// @var sBaseGeoid
+    /// @var mGeoid
     /// Base geoid separation
-    double mFbGeoid;
+    double mGeoid;
 
-    /// @var sBaseAtmPressure
+    /// @var mAtmPressure
     /// Atmospheric pressure at base
-    double mFbAtmPressure;
+    double mAtmPressure;
 
-    /// @var sMaxHeight
+    /// @var mMaxHeight
     /// Maximum height for reported Aircrafts
     std::int32_t mMaxHeight;
 
-    /// @var sMaxDistance
+    /// @var mMaxDistance
     /// Maximum distance for reported Aircrafts
     std::int32_t mMaxDistance;
 
-    /// @var sServerPort
+    /// @var mServerPort
     /// Port where to serve reports
     std::uint16_t mServerPort;
 
+    /// @var mGndMode
+    /// Enabling state of ground mode
     bool mGndMode;
 
-FeedMapping mFeedsWithMap;
+    /// @var mFeedMapping
+    /// List of feeds with their key-value map
+    FeedMapping mFeedMapping;
 };
 
 }  // namespace config

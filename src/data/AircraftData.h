@@ -28,8 +28,8 @@
 #include <vector>
 #include <boost/thread/mutex.hpp>
 
-#include "../aircraft/AircraftProcessor.h"
 #include "../aircraft/Aircraft.h"
+#include "../aircraft/AircraftProcessor.h"
 #include "../config/Parameters.h"
 
 /// @def AC_OUTDATED
@@ -44,7 +44,8 @@
 /// Times until FLARM status is removed
 #define AC_NO_FLARM_THRESHOLD AC_OUTDATED
 
-namespace feed {
+namespace feed
+{
 class AprscFeed;
 class SbsFeed;
 }
@@ -58,7 +59,7 @@ struct GpsPosition;
 namespace data
 {
 /**
- * @class AircraftContainer
+ * @class AircraftData
  * @brief Store Aircrafts and trigger processing.
  */
 class AircraftData
@@ -77,7 +78,7 @@ public:
      */
     virtual ~AircraftData() noexcept;
 
-        /**
+    /**
      * @fn processAircrafts
      * @brief Process all Aircrafts and get the reports.
      * @param crBasePos The base position to relate
@@ -92,15 +93,16 @@ public:
 protected:
     friend class feed::AprscFeed;
     friend class feed::SbsFeed;
+
     /// @var mMutex
     /// Used for RW on the container.
     boost::mutex mMutex;
+
     /**
      * @fn upsert
      * @brief Insert or update an Aircraft, if priority is high enough.
      * @param rUpdate
      * @param vPriority
-     * @threadsafe
      */
     void update(const aircraft::Aircraft& crUpdate, std::uint32_t vPriority,
                 std::uint64_t&);
@@ -114,7 +116,7 @@ private:
      */
     std::vector<aircraft::Aircraft>::iterator find(const std::string& crId);
 
-        /// @var mProcessor
+    /// @var mProcessor
     /// Providing functionality to process Aircrafts
     aircraft::AircraftProcessor mProcessor;
 

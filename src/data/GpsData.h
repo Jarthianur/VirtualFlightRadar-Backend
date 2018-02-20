@@ -23,81 +23,91 @@
 
 #include <cstdint>
 #include <string>
+#include <boost/thread/mutex.hpp>
 
 #include "../util/GpsModule.h"
-#include <boost/thread/mutex.hpp>
 #include "../util/Position.h"
 #include "../util/Wrapper.hpp"
 
-namespace feed {
+namespace feed
+{
 class GpsFeed;
 }
 
 /// @namespace data
 namespace data
 {
-
 /**
  * @class GpsData
- * @implements Data
  * @brief Manage GPS information.
- * @see Data.hpp
  */
 class GpsData
 {
 public:
-	/**
-	 * @fn GpsData
-	 * @brief Constructor
-	 */
-    explicit GpsData(struct util::ExtGpsPosition vPos);
+    /**
+     * @fn GpsData
+     * @brief Constructor
+     * @param vPosition The initial info
+     */
+    explicit GpsData(struct util::ExtGpsPosition vPosition);
 
-	/**
-	 * @fn ~GpsData
-	 * @brief Destructor
-	 */
-	virtual ~GpsData() noexcept;
+    /**
+     * @fn ~GpsData
+     * @brief Destructor
+     */
+    virtual ~GpsData() noexcept;
 
-        /**
-	 * @fn getGpsStr
-	 * @brief Get a full NMEA GPS report.
-	 * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
-	 * @return the NMEA string
-	 * @threadsafe
-	 */
-	std::string getGpsStr();
+    /**
+     * @fn getGpsStr
+     * @brief Get a full NMEA GPS report.
+     * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
+     * @return the NMEA string
+     * @threadsafe
+     */
+    std::string getGpsStr();
 
-	/**
-	 * @fn getBasePos
-	 * @brief Get the base GPS position.
-	 * @return the position
-	 * @threadsafe
-	 */
+    /**
+     * @fn getBasePos
+     * @brief Get the base GPS position.
+     * @return the position
+     * @threadsafe
+     */
     struct util::GpsPosition getBasePos();
 
 protected:
-
     friend class feed::GpsFeed;
+
+    /// @var mMutex
+    /// Used for RW on this data
     boost::mutex mMutex;
+
+    /**
+     * @fn lockPosition
+     * @brief Set the current position to locked
+     */
     void lockPosition();
+
     /**
      * @fn update
      * @brief Try to update the base position.
-     * @param cr_pos The new position
-     * @param prio   The attempts priority
-     * @override Data::update
-     * @threadsafe
+     * @param crPosition The new position
+     * @param vPriority  The attempts priority
+     * @param rAttempts  The update attempts
      */
-    void update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t vPriority,
-            std::uint64_t& rAttempts);
+    void update(const struct util::ExtGpsPosition& crPosition, std::uint32_t vPriority,
+                std::uint64_t& rAttempts);
 
 private:
-        /// Wrapper holding the base position.
+    /// @var mBasePos
+    /// Wrapper holding the base position
     struct util::Wrapper<struct util::ExtGpsPosition> mBasePos;
 
-    /// GpsModule providing functionality to build GPS sentences.
-    util::GpsModule mGpsMod;
+    /// @var mGpsModule
+    /// GpsModule providing functionality to build GPS sentences
+    util::GpsModule mGpsModule;
 
+    /// @var mPosLocked
+    /// Locking state of the current position
     bool mPosLocked = false;
 };
 

@@ -23,13 +23,13 @@
 
 #include <iterator>
 #include <stdexcept>
+
 #include "../feed/AprscFeed.h"
 #include "../feed/GpsFeed.h"
 #include "../feed/SbsFeed.h"
 #include "../feed/SensorFeed.h"
 #include "../util/Logger.h"
 #include "../util/Math.hpp"
-
 #include "ConfigReader.h"
 
 using namespace util;
@@ -57,34 +57,34 @@ Configuration::~Configuration() noexcept
 void Configuration::init(const PropertyMap& crProperties)
 {
     setFallbacks(crProperties);
-    mMaxDistance  = resolveFilter(crProperties, KV_KEY_MAX_DIST);
-    mMaxHeight    = resolveFilter(crProperties, KV_KEY_MAX_HEIGHT);
-    mServerPort   = resolveServerPort(crProperties);
-    mFeedsWithMap = resolveFeeds(crProperties);
-    mGndMode      = !crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
+    mMaxDistance = resolveFilter(crProperties, KV_KEY_MAX_DIST);
+    mMaxHeight   = resolveFilter(crProperties, KV_KEY_MAX_HEIGHT);
+    mServerPort  = resolveServerPort(crProperties);
+    mFeedMapping = resolveFeeds(crProperties);
+    mGndMode     = !crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
 
     dumpInfo();
 }
 
 void Configuration::setFallbacks(const PropertyMap& crProperties)
 {
-    mFbLatitude = boost::get<double>(
+    mLatitude = boost::get<double>(
         checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "")),
                          SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
-    mFbLongitude = boost::get<double>(
+    mLongitude = boost::get<double>(
         checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "")),
                          SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
-    mFbAltitude = boost::get<std::int32_t>(
+    mAltitude = boost::get<std::int32_t>(
         checkNumberValue(math::stringToNumber<std::int32_t>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "")),
                          SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
-    mFbGeoid = boost::get<double>(
+    mGeoid = boost::get<double>(
         checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
                          SECT_KEY_FALLBACK, KV_KEY_GEOID));
-    mFbAtmPressure = boost::get<double>(
+    mAtmPressure = boost::get<double>(
         checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
                          SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
@@ -141,7 +141,6 @@ std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
     }
 }
 
-
 FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties)
 {
     std::list<std::string> list
@@ -166,7 +165,8 @@ math::Number Configuration::checkNumberValue(const math::OptNumber& crOptNumber,
     return crOptNumber.get<1>();
 }
 
-std::string& Configuration::trimString(std::string& rStr) const {
+std::string& Configuration::trimString(std::string& rStr) const
+{
     std::size_t f = rStr.find_first_not_of(' ');
     if(f != std::string::npos)
     {
@@ -183,15 +183,15 @@ std::string& Configuration::trimString(std::string& rStr) const {
 void Configuration::dumpInfo() const
 {
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_LATITUDE ": ",
-                 std::to_string(mFbLatitude));
+                 std::to_string(mLatitude));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_LONGITUDE ": ",
-                 std::to_string(mFbLongitude));
+                 std::to_string(mLongitude));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_ALTITUDE ": ",
-                 std::to_string(mFbAltitude));
+                 std::to_string(mAltitude));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_GEOID ": ",
-                 std::to_string(mFbGeoid));
+                 std::to_string(mGeoid));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_PRESSURE ": ",
-                 std::to_string(mFbAtmPressure));
+                 std::to_string(mAtmPressure));
     Logger::info("(Config) " SECT_KEY_FILTER "." KV_KEY_MAX_HEIGHT ": ",
                  std::to_string(mMaxHeight));
     Logger::info("(Config) " SECT_KEY_FILTER "." KV_KEY_MAX_DIST ": ",
@@ -200,47 +200,47 @@ void Configuration::dumpInfo() const
                  std::to_string(mServerPort));
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ",
                  mGndMode ? "Yes" : "No");
-    Logger::info("(Config) number of feeds: ", std::to_string(mFeedsWithMap.size()));
+    Logger::info("(Config) number of feeds: ", std::to_string(mFeedMapping.size()));
 }
 
-std::uint16_t Configuration::getSServerPort() const
+std::uint16_t Configuration::getServerPort() const
 {
     return mServerPort;
 }
 
-std::int32_t Configuration::getSMaxDistance() const
+std::int32_t Configuration::getMaxDistance() const
 {
     return mMaxDistance;
 }
 
-std::int32_t Configuration::getSMaxHeight() const
+std::int32_t Configuration::getMaxHeight() const
 {
     return mMaxHeight;
 }
 
-double Configuration::getSBaseAtmPressure() const
+double Configuration::getAtmPressure() const
 {
-    return mFbAtmPressure;
+    return mAtmPressure;
 }
 
-double Configuration::getSBaseGeoid() const
+double Configuration::getGeoid() const
 {
-    return mFbGeoid;
+    return mGeoid;
 }
 
-std::int32_t Configuration::getSBaseAltitude() const
+std::int32_t Configuration::getAltitude() const
 {
-    return mFbAltitude;
+    return mAltitude;
 }
 
-double Configuration::getSBaseLongitude() const
+double Configuration::getLongitude() const
 {
-    return mFbLongitude;
+    return mLongitude;
 }
 
-double Configuration::getSBaseLatitude() const
+double Configuration::getLatitude() const
 {
-    return mFbLatitude;
+    return mLatitude;
 }
 
 bool Configuration::isGndModeEnabled() const
@@ -253,9 +253,9 @@ void Configuration::forceGndMode()
     mGndMode = true;
 }
 
-const FeedMapping& Configuration::getFeeds() const
+const FeedMapping& Configuration::getFeedMapping() const
 {
-    return mFeedsWithMap;
+    return mFeedMapping;
 }
 
 }  // namespace config

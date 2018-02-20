@@ -19,14 +19,14 @@
  }
  */
 
-#include <boost/thread/lock_guard.hpp>
 #include "WindData.h"
+
+#include <boost/thread/lock_guard.hpp>
 
 using namespace util;
 
 namespace data
 {
-
 WindData::WindData()
 {
     std::uint64_t dummy = 0;
@@ -34,13 +34,12 @@ WindData::WindData()
 }
 
 WindData::~WindData() noexcept
-{
-}
+{}
 
 void WindData::update(const struct Wind& crWind, std::uint32_t vPriority,
-        std::uint64_t& rAttempts)
+                      std::uint64_t& rAttempts)
 {
-    if (mWind.trySetValue(crWind, vPriority, rAttempts))
+    if(mWind.trySetValue(crWind, vPriority, rAttempts))
     {
         rAttempts = 0;
     }
@@ -49,7 +48,7 @@ void WindData::update(const struct Wind& crWind, std::uint32_t vPriority,
 std::string WindData::getMwvStr()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    if (mWind.isValueValid)
+    if(mWind.isValueValid)
     {
         return mWind.getValue().mwvStr + "\n";
     }

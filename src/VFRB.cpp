@@ -55,16 +55,16 @@ using namespace util;
 std::atomic<bool> VFRB::global_run_status(true);
 
 VFRB::VFRB(const config::Configuration& config)
-    : mpAircraftData(new data::AircraftData(config.getSMaxDistance())),
-      mpAtmosphereData(new data::AtmosphereData({"", config.getSBaseAtmPressure()})),
+    : mpAircraftData(new data::AircraftData(config.getMaxDistance())),
+      mpAtmosphereData(new data::AtmosphereData({"", config.getAtmPressure()})),
       mpWindData(new data::WindData()),
-      mpGpsData(new data::GpsData({{config.getSBaseLatitude(), config.getSBaseLongitude(),
-                                    config.getSBaseAltitude()},
+      mpGpsData(new data::GpsData({{config.getLatitude(), config.getLongitude(),
+                                    config.getAltitude()},
                                    1,
                                    5,
-                                   config.getSBaseGeoid(),
+                                   config.getGeoid(),
                                    0.0})),
-      mServer(config.getSServerPort())
+      mServer(config.getServerPort())
 {
     registerFeeds(config);
 }
@@ -168,19 +168,19 @@ void VFRB::run() noexcept
 
 void VFRB::registerFeeds(const config::Configuration& crConfig)
 {
-    for(const auto& feed : crConfig.getFeeds())
+    for(const auto& feed : crConfig.getFeedMapping())
     {
         try
         {
             if(feed.first.find(SECT_KEY_APRSC) != std::string::npos)
             {
                 mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::AprscFeed(
-                    feed.first, feed.second, mpAircraftData, crConfig.getSMaxHeight())));
+                    feed.first, feed.second, mpAircraftData, crConfig.getMaxHeight())));
             }
             else if(feed.first.find(SECT_KEY_SBS) != std::string::npos)
             {
                 mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::SbsFeed(
-                    feed.first, feed.second, mpAircraftData, crConfig.getSMaxHeight())));
+                    feed.first, feed.second, mpAircraftData, crConfig.getMaxHeight())));
             }
             else if(feed.first.find(SECT_KEY_GPS) != std::string::npos)
             {

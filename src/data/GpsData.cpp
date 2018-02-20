@@ -21,29 +21,28 @@
 
 #include "GpsData.h"
 
-#include <boost/thread/lock_guard.hpp>
 #include <stdexcept>
+#include <boost/thread/lock_guard.hpp>
 
 namespace data
 {
-
-GpsData::GpsData(struct util::ExtGpsPosition vPos)
+GpsData::GpsData(struct util::ExtGpsPosition vPosition)
 {
     std::uint64_t dummy = 0;
-    mBasePos.trySetValue(vPos, 0, dummy);
+    mBasePos.trySetValue(vPosition, 0, dummy);
 }
 
 GpsData::~GpsData() noexcept
-{
-}
+{}
 
-void GpsData::update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t prio,
-        std::uint64_t& rAttempts)
+void GpsData::update(const struct util::ExtGpsPosition& crPosition,
+                     std::uint32_t vPriority, std::uint64_t& rAttempts)
 {
-    if (mPosLocked) {
+    if(mPosLocked)
+    {
         throw std::runtime_error("Position was locked before.");
     }
-    if (mBasePos.trySetValue(cr_pos, prio, rAttempts))
+    if(mBasePos.trySetValue(crPosition, vPriority, rAttempts))
     {
         rAttempts = 0;
     }
@@ -52,8 +51,8 @@ void GpsData::update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t pr
 std::string GpsData::getGpsStr()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    std::string gps = mGpsMod.genGprmcStr(mBasePos.getValue());
-    gps.append(mGpsMod.genGpggaStr(mBasePos.getValue()));
+    std::string gps = mGpsModule.genGprmcStr(mBasePos.getValue());
+    gps.append(mGpsModule.genGpggaStr(mBasePos.getValue()));
     return gps;
 }
 
@@ -63,8 +62,9 @@ struct util::GpsPosition GpsData::getBasePos()
     return mBasePos.getValue().position;
 }
 
-void GpsData::lockPosition() {
+void GpsData::lockPosition()
+{
     mPosLocked = true;
 }
 
-} // namespace data
+}  // namespace data

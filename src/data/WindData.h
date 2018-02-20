@@ -19,73 +19,72 @@
  }
  */
 
-#ifndef SRC_DATA_WINDDATA_H_
-#define SRC_DATA_WINDDATA_H_
+#pragma once
 
 #include <cstdint>
 #include <string>
-
 #include <boost/thread/mutex.hpp>
+
 #include "../util/Sensor.h"
 #include "../util/Wrapper.hpp"
 
-namespace feed {
+namespace feed
+{
 class SensorFeed;
 }
 
+/// @namespace data
 namespace data
 {
-
 /**
- * @class WindData implements Data
+ * @class WindData
  * @brief Manage sensor information.
- * @see Data.hpp
  */
 class WindData
 {
 public:
-	/**
-	 * @fn WindData
-	 * @brief Constructor
-	 */
-	WindData();
+    /**
+     * @fn WindData
+     * @brief Constructor
+     */
+    WindData();
 
-	/**
-	 * @fn ~WindData
-	 * @brief Destructor
-	 */
-	virtual ~WindData() noexcept;
+    /**
+     * @fn ~WindData
+     * @brief Destructor
+     */
+    virtual ~WindData() noexcept;
 
-        /**
-	 * @fn getMwvStr
-	 * @brief Get the MWV sentence.
-	 * @note MWV is invalid after this operation.
-	 * @return the MWV sentence, if valid, else empty string
-	 * @threadsafe
-	 */
-	std::string getMwvStr();
+    /**
+     * @fn getMwvStr
+     * @brief Get the MWV sentence.
+     * @note MWV is invalid after this operation.
+     * @return the MWV sentence, if valid, else empty string
+     * @threadsafe
+     */
+    std::string getMwvStr();
 
 protected:
     friend class feed::SensorFeed;
+
+    /// @var mMutex
+    /// Used for RW on this data
     boost::mutex mMutex;
+
     /**
      * @fn update
      * @brief Try to update the sensor information.
-     * @note Splits the given info, using setters.
-     * @param cr_info The new sensor information.
-     * @param prio    The attempts priority
-     * @override Data::update
-     * @threadsafe
+     * @param crWind    The new wind information.
+     * @param vPriority The attempts priority
+     * @param rAttempts The update attempts
      */
     void update(const struct util::Wind& crWind, std::uint32_t vPriority,
-            std::uint64_t& rAttempts);
+                std::uint64_t& rAttempts);
 
 private:
-
+    /// @var mWind
     /// Holding MDA sentence
     struct util::TmpWrapper<util::Wind> mWind;
 };
 
-} // namespace data
-
-#endif /* SRC_DATA_WINDDATA_H_ */
+}  // namespace data

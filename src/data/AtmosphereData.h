@@ -23,12 +23,13 @@
 
 #include <cstdint>
 #include <string>
-
 #include <boost/thread/mutex.hpp>
+
 #include "../util/Sensor.h"
 #include "../util/Wrapper.hpp"
 
-namespace feed {
+namespace feed
+{
 class SensorFeed;
 }
 
@@ -37,9 +38,7 @@ namespace data
 {
 /**
  * @class AtmosphereData
- * @implements Data
  * @brief Manage sensor information.
- * @see Data.hpp
  */
 class AtmosphereData
 {
@@ -47,6 +46,7 @@ public:
     /**
      * @fn AtmosphereData
      * @brief Constructor
+     * @param vAtmos The initial info
      */
     explicit AtmosphereData(struct util::Atmosphere vAtmos);
 
@@ -56,11 +56,10 @@ public:
      */
     virtual ~AtmosphereData() noexcept;
 
-        /**
+    /**
      * @fn getMdaStr
      * @brief Get the MDA sentence.
-     * @note MDA is invalid after this operation.
-     * @return the MDA sentence, if valid, else empty string
+     * @return the MDA sentence
      * @threadsafe
      */
     std::string getMdaStr();
@@ -75,15 +74,17 @@ public:
 
 protected:
     friend class feed::SensorFeed;
+
+    /// @var mMutex
+    /// Used for RW on this data
     boost::mutex mMutex;
+
     /**
      * @fn update
      * @brief Try to update the sensor information.
-     * @note Splits the given info, using setters.
      * @param crAtmos   The new data.
      * @param vPriority The priority
-     * @param rAttempts The update attempts by reference
-     * @threadsafe
+     * @param rAttempts The update attempts
      */
     void update(const struct util::Atmosphere& crAtmos, std::uint32_t vPriority,
                 std::uint64_t& rAttempts);
