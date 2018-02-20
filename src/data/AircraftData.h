@@ -68,12 +68,6 @@ public:
     /**
      * @fn AircraftData
      * @brief Constructor
-     */
-    AircraftData();
-
-    /**
-     * @fn AircraftData
-     * @brief Constructor
      * @param vMaxDist The max distance filter
      */
     explicit AircraftData(std::int32_t vMaxDist);
@@ -83,13 +77,6 @@ public:
      * @brief Destructor
      */
     virtual ~AircraftData() noexcept;
-
-    /**
-     * @fn init
-     * @brief init
-     * @param crAircraft
-     */
-    void init(aircraft::Aircraft crAircraft) override;
 
         /**
      * @fn processAircrafts

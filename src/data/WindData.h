@@ -57,14 +57,6 @@ public:
 	 */
 	virtual ~WindData() noexcept;
 
-	/**
-	 * @fn init
-	 * @brief Initialize the sensor information.
-	 * @param info The initial data
-	 * @override Data::init
-	 */
-	void init(struct util::Wind vWind) override;
-
         /**
 	 * @fn getMwvStr
 	 * @brief Get the MWV sentence.

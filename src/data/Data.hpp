@@ -49,14 +49,6 @@ public:
     inline virtual ~Data() noexcept
     {}
 
-        /**
-     * @fn init
-     * @brief Initialize data.
-     * @tparam T The initial data
-     * @param _1
-     */
-    virtual void init(T _1) = 0;
-
 protected:
     /**
      * @fn update

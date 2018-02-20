@@ -49,20 +49,13 @@ public:
      * @fn AtmosphereData
      * @brief Constructor
      */
-    AtmosphereData();
+    explicit AtmosphereData(struct util::Atmosphere vAtmos);
 
     /**
      * @fn ~AtmosphereData
      * @brief Destructor
      */
     virtual ~AtmosphereData() noexcept;
-
-    /**
-     * @fn init
-     * @brief Initialize the atmosphere data.
-     * @param vAtmos The initial data
-     */
-    void init(struct util::Atmosphere vAtmos) override;
 
         /**
      * @fn getMdaStr

@@ -40,8 +40,6 @@ using namespace aircraft;
 
 namespace data
 {
-AircraftData::AircraftData() : AircraftData(std::numeric_limits<std::int32_t>::max())
-{}
 
 AircraftData::AircraftData(std::int32_t vMaxDist) : mProcessor(vMaxDist)
 {
@@ -51,12 +49,6 @@ AircraftData::AircraftData(std::int32_t vMaxDist) : mProcessor(vMaxDist)
 
 AircraftData::~AircraftData() noexcept
 {}
-
-void AircraftData::init(Aircraft vAircraft)
-{
-    std::uint64_t dummy = 0;
-    update(vAircraft, 0, dummy);
-}
 
 std::vector<Aircraft>::iterator AircraftData::find(const std::string& crId)
 {

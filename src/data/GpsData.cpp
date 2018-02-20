@@ -27,18 +27,14 @@
 namespace data
 {
 
-GpsData::GpsData()
+GpsData::GpsData(struct util::ExtGpsPosition vPos)
 {
+    std::uint64_t dummy = 0;
+    mBasePos.trySetValue(vPos, 0, dummy);
 }
 
 GpsData::~GpsData() noexcept
 {
-}
-
-void GpsData::init(struct util::ExtGpsPosition pos)
-{
-	std::uint64_t dummy = 0;
-	mBasePos.trySetValue(pos, 0, dummy);
 }
 
 void GpsData::update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t prio,

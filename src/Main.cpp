@@ -46,7 +46,7 @@ using namespace util;
  * @param argv The arguments
  * @return 0 if succeeded, -1 in case of failure
  */
-bool evalArgs(std::int32_t argc, char** argv);
+config::Configuration evalArgs(std::int32_t argc, char** argv);
 
 /**
  * @fn main
@@ -70,29 +70,24 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    if(!evalArgs(argc, argv))
+    try
     {
+        VFRB vfrb(evalArgs(argc, argv));
+        vfrb.run();
+    }
+    catch(const std::exception& e)
+    {
+        Logger::error("(VFRB) fatal: ", e.what());
         return -1;
     }
 
-    VFRB::msWindData.init({""});
-    VFRB::msAtmosData.init({"", config::Configuration::sBaseAtmPressure});
-    VFRB::msGpsData.init(
-        {{config::Configuration::sBaseLatitude, config::Configuration::sBaseLongitude,
-          config::Configuration::sBaseAltitude},
-         1,
-         5,
-         config::Configuration::sBaseGeoid,
-         0.0});
-
-    VFRB::run();
     return 0;
 }
 
-bool evalArgs(std::int32_t argc, char** argv)
+config::Configuration evalArgs(std::int32_t argc, char** argv)
 {
     std::string ini_file;
-    bool gnd = false;
+    bool gnd       = false;
     bool cfg_found = false;
 
     for(int i = 1; i < argc; i++)
@@ -100,14 +95,9 @@ bool evalArgs(std::int32_t argc, char** argv)
         if(std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
         {
             ini_file = std::string(argv[++i]);
-            if(ini_file.rfind(".ini") == std::string::npos)
+            if(!(cfg_found = ini_file.rfind(".ini") != std::string::npos))
             {
-                Logger::error("(VFRB) not a ini file: ", ini_file);
-                return -1;
-            }
-            else
-            {
-                cfg_found = true;
+                throw std::runtime_error(ini_file + " is not a .ini file.");
             }
         }
         else if(std::string(argv[i]).find("-g") != std::string::npos)
@@ -122,28 +112,17 @@ bool evalArgs(std::int32_t argc, char** argv)
 
     if(cfg_found)
     {
-        try
+        std::ifstream file(ini_file);
+        config::Configuration conf(file);
+        if(gnd)
         {
-            std::ifstream file(ini_file);
-            config::Configuration conf(file);
+            conf.forceGndMode();
+            Logger::info("(VFRB) Override ground mode: Yes");
         }
-        catch(const std::logic_error& e)
-        {
-            Logger::error("(VFRB) eval config: ", e.what());
-            return false;
-        }
+        return conf;
     }
     else
     {
-        Logger::error("(VFRB) no config file given");
-        return false;
+        throw std::runtime_error("No config file given.");
     }
-
-    if(gnd)
-    {
-        config::Configuration::sGndModeEnabled = true;
-        Logger::info("(VFRB) Override ground mode: Yes");
-    }
-
-    return true;
 }

@@ -34,7 +34,7 @@ struct Atmosphere
 {
     std::string mdaStr;
     double pressure;
-    /* Humidity and temperature are not important for us, yet.*/
+    /* Humidity and temperature are not important for us.*/
 };
 
 struct Wind

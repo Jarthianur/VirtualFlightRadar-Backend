@@ -51,20 +51,13 @@ public:
 	 * @fn GpsData
 	 * @brief Constructor
 	 */
-	GpsData();
+    explicit GpsData(struct util::ExtGpsPosition vPos);
 
 	/**
 	 * @fn ~GpsData
 	 * @brief Destructor
 	 */
 	virtual ~GpsData() noexcept;
-
-	/**
-	 * @fn init
-	 * @brief Initialize the GPS information.
-     * @param pos The initial position
-	 */
-	void init(struct util::ExtGpsPosition pos) override;
 
         /**
 	 * @fn getGpsStr

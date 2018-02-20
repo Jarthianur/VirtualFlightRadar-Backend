@@ -26,8 +26,11 @@ using namespace util;
 
 namespace data
 {
-AtmosphereData::AtmosphereData() : Data<struct Atmosphere>()
-{}
+AtmosphereData::AtmosphereData(struct Atmosphere vAtmos) : Data<struct Atmosphere>()
+{
+    std::uint64_t dummy = 0;
+    mAtmosphere.trySetValue(vAtmos, 0, dummy);
+}
 
 AtmosphereData::~AtmosphereData() noexcept
 {}
@@ -51,12 +54,6 @@ double AtmosphereData::getAtmPress()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     return mAtmosphere.getValue().pressure;
-}
-
-void AtmosphereData::init(struct util::Atmosphere vAtmos)
-{
-    std::uint64_t dummy = 0;
-    mAtmosphere.trySetValue(vAtmos, 0, dummy);
 }
 
 }  // namespace data

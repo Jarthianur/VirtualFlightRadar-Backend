@@ -30,6 +30,8 @@ namespace data
 WindData::WindData()
         : Data<struct Wind>()
 {
+    std::uint64_t dummy = 0;
+    mWind.trySetValue({""}, 0, dummy);
 }
 
 WindData::~WindData() noexcept
@@ -56,12 +58,6 @@ std::string WindData::getMwvStr()
     {
         return "";
     }
-}
-
-void WindData::init(struct Wind vWind)
-{
-	std::uint64_t dummy = 0;
-	mWind.trySetValue(vWind, 0, dummy);
 }
 
 }  // namespace data

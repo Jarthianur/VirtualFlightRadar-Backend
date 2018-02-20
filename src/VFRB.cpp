@@ -54,9 +54,16 @@ using namespace util;
 
 std::atomic<bool> VFRB::global_run_status(true);
 
-VFRB::VFRB(const config::Configuration& config) : mServer(config.getSServerPort())
+VFRB::VFRB(const config::Configuration& config)
+    : mpAircraftData(std::make_shared<data::AircraftData>(config.getSMaxDistance())),
+      mpAtmosphereData(
+          std::make_shared<data::AtmosphereData>("", config.getSBaseAtmPressure())),
+      mpWindData(std::make_shared<data::WindData>()),
+      mpGpsData(std::make_shared<data::GpsData>(
+          config.getSBaseLatitude(), config.getSBaseLongitude(),
+          config.getSBaseAltitude(), 1, 5, config.getSBaseGeoid(), 0.0)),
+      mServer(config.getSServerPort())
 {
-    // TODO init all components
     registerFeeds(config);
 }
 
