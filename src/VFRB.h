@@ -24,11 +24,15 @@
 
 #include <atomic>
 #include <memory>
+#include <list>
 #include <boost/asio/signal_set.hpp>
 #include <boost/system/error_code.hpp>
 #include "network/server/Server.h"
-#include "config/Configuration.h"
 
+
+namespace config {
+class Configuration;
+}
 namespace data
 {
 class AircraftData;
@@ -51,8 +55,6 @@ namespace util
 struct ExtGpsPosition;
 struct SensorInfo;
 }
-
-using Creator = std::function<bool(const std::string&, const config::KeyValueMap&)>;
 
 /**
  * @class VFRB
@@ -96,39 +98,9 @@ private:
      * @param crProperties The PropertyMap holding read properties
      * @return the number of registered feeds
      */
-    void registerFeeds(const config::FeedMapping& crFeeds);
+    void registerFeeds(const config::Configuration& crFeeds);
 
-    /**
-     * @fn registerCreator
-     * @brief Get a creator functor for a specific Feed type.
-     *
-     * This creator checks the feed name for a keyword and registers the respective Feed
-     * in sRegisteredFeeds.
-     * #fparam crName       The feed name
-     * #fparam crProperties The properties
-     * #freturn whether the keyword was found in name
-     *
-     * @tparam T A derivate of Feed to register
-     * @param crKeyword The keyword
-     * @return The creator
-     */
-    template<typename T, typename std::enable_if<
-                             std::is_base_of<feed::Feed, T>::value>::type* = nullptr, typename... D, typename... A>
-    Creator
-    registerCreator(const std::string& crKeyword, D... datas, A... adds)
-    {
-        return [&,this](const std::string& crName, const config::KeyValueMap& crMap) {
-            if(crName.find(crKeyword) != std::string::npos)
-            {
-                mFeeds.push_back(std::shared_ptr<feed::Feed>(
-                    new T(crName, crMap, datas..., adds...)));
-                return true;
-            }
-            return false;
-        };
-    }
-
-    /// Container holding all registered Aircrafts
+       /// Container holding all registered Aircrafts
     std::shared_ptr<data::AircraftData> mpAircraftData;
 
     /// Container holding sensor and climate information.

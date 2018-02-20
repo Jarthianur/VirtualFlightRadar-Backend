@@ -48,7 +48,7 @@ public:
      * @param cr_kvmap The properties map
      */
     GpsFeed(const std::string& /*cr_name*/, const config::KeyValueMap& /*cr_kvmap*/,
-            data::GpsData* pData);
+            std::shared_ptr<data::GpsData> pData, bool vGndMode);
     /**
      * @fn ~GpsFeed
      * @brief Destructor

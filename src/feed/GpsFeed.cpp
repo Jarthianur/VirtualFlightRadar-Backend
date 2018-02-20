@@ -40,14 +40,12 @@ using namespace util;
 namespace feed
 {
 GpsFeed::GpsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
-                 data::GpsData* pData)
-    : Feed(cr_name, cr_kvmap), mUpdateAttempts(0), mpData(pData)
+                 std::shared_ptr<data::GpsData> pData, bool vGndMode)
+    : Feed(cr_name, cr_kvmap), mUpdateAttempts(0), mpData(pData), mGndModeEnabled(vGndMode)
 {
     mpClient = std::unique_ptr<network::client::Client>(new network::client::GpsdClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
-    mGndModeEnabled = !mKvMap.find(KV_KEY_GND_MODE)->second.empty();
-    Logger::info("(GpsFeed) " +mName+ " - ground mode: ",
-                 mGndModeEnabled ? "Yes" : "No");
+
 }
 
 GpsFeed::~GpsFeed() noexcept

@@ -151,6 +151,9 @@ public:
 
     std::uint16_t getSServerPort() const;
 
+    bool isGndModeEnabled() const;
+    void forceGndMode();
+
     const FeedMapping& getFeeds() const;
 
 private:
@@ -249,6 +252,8 @@ private:
     /// @var sServerPort
     /// Port where to serve reports
     std::uint16_t sServerPort;
+
+    bool mGndMode;
 
 FeedMapping sRegisteredFeeds;
 };

@@ -31,14 +31,14 @@
 #include <boost/thread.hpp>
 
 #include "config/Configuration.h"
+#include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
 #include "data/GpsData.h"
 #include "data/WindData.h"
-#include "data/AircraftData.h"
-#include "feed/Feed.h"
 #include "feed/AprscFeed.h"
-#include "feed/SbsFeed.h"
+#include "feed/Feed.h"
 #include "feed/GpsFeed.h"
+#include "feed/SbsFeed.h"
 #include "feed/SensorFeed.h"
 #include "network/client/AprscClient.h"
 #include "network/client/SbsClient.h"
@@ -54,11 +54,10 @@ using namespace util;
 
 std::atomic<bool> VFRB::global_run_status(true);
 
-VFRB::VFRB(const config::Configuration& config)
-    :mServer(config.getSServerPort())
+VFRB::VFRB(const config::Configuration& config) : mServer(config.getSServerPort())
 {
-    //TODO init all components
-registerFeeds(config.getFeeds());
+    // TODO init all components
+    registerFeeds(config);
 }
 
 VFRB::~VFRB() noexcept
@@ -81,27 +80,30 @@ void VFRB::run() noexcept
     signal_set.add(SIGQUIT);
 #endif  // defined(SIGQUIT)
 
-    signal_set.async_wait([this](const boost::system::error_code&, const int){Logger::info("(VFRB) caught signal: ", "shutdown");
-        global_run_status = false;});
+    signal_set.async_wait([this](const boost::system::error_code&, const int) {
+        Logger::info("(VFRB) caught signal: ", "shutdown");
+        global_run_status = false;
+    });
 
     boost::thread signal_thread([&io_service]() { io_service.run(); });
 
     // init server and run handler
-    boost::thread server_thread([this,&signal_set](){Logger::info("(Server) start server.");
+    boost::thread server_thread([this, &signal_set]() {
+        Logger::info("(Server) start server.");
         mServer.run(signal_set);
-        global_run_status = false;});
+        global_run_status = false;
+    });
 
     // init input threads
     boost::thread_group feed_threads;
     for(const auto& it : mFeeds)
     {
-        feed_threads.create_thread([&](){
+        feed_threads.create_thread([&]() {
             Logger::info("(VFRB) run feed: ", it->getName());
             it->run(signal_set);
-        }
-                );
+        });
     }
-    //mFeeds.clear();
+    // mFeeds.clear();
 
     while(global_run_status)
     {
@@ -109,8 +111,7 @@ void VFRB::run() noexcept
         {
             // write Aircrafts to clients
             std::string str = mpAircraftData->processAircrafts(
-                mpGpsData->getBasePos(),
-                mpAtmosphereData->getAtmPress());
+                mpGpsData->getBasePos(), mpAtmosphereData->getAtmPress());
 
             if(str.length() > 0)
             {
@@ -156,39 +157,43 @@ void VFRB::run() noexcept
     Logger::info("EXITING / runtime: ", time_str);
 }
 
-void VFRB::registerFeeds(const config::FeedMapping& crFeeds)
+void VFRB::registerFeeds(const config::Configuration& crConfig)
 {
-    std::list<Creator> creators;
-    creators.push_back(registerCreator<feed::AprscFeed>(SECT_KEY_APRSC, mpAircraftData.get()));
-    creators.push_back(registerCreator<feed::SbsFeed>(SECT_KEY_SBS, mpAircraftData.get()));
-    creators.push_back(registerCreator<feed::SensorFeed>(SECT_KEY_SENS, mpAtmosphereData.get(), mpWindData.get()));
-    creators.push_back(registerCreator<feed::GpsFeed>(SECT_KEY_GPS, mpGpsData.get()));
-
-    for(const auto& feed : crFeeds)
+    for(const auto& feed : crConfig.getFeeds())
     {
-        bool found = false;
-        for(auto& creator : creators)
+        try
         {
-            try
+            if(feed.first.find(SECT_KEY_APRSC) != std::string::npos)
             {
-                if((found = creator(feed.first, feed.second)))
-                {
-                    break;
-                }
+                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::AprscFeed(
+                    feed.first, feed.second, mpAircraftData, crConfig.getSMaxHeight())));
             }
-            catch(const std::exception& e)
+            else if(feed.first.find(SECT_KEY_SBS) != std::string::npos)
             {
-                Logger::warn("(Config) create feed " + feed.first + ": ", e.what());
-                found = true;
-                break;
+                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::SbsFeed(
+                    feed.first, feed.second, mpAircraftData, crConfig.getSMaxHeight())));
+            }
+            else if(feed.first.find(SECT_KEY_GPS) != std::string::npos)
+            {
+                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::GpsFeed(
+                    feed.first, feed.second, mpGpsData, crConfig.isGndModeEnabled())));
+            }
+            else if(feed.first.find(SECT_KEY_SENS) != std::string::npos)
+            {
+                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::SensorFeed(
+                    feed.first, feed.second, mpWindData, mpAtmosphereData)));
+            }
+            else
+            {
+                Logger::warn(
+                    "(Config) create feed " + feed.first,
+                    ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
+                    ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
             }
         }
-        if(!found)
+        catch(const std::exception& e)
         {
-            Logger::warn(
-                "(Config) create feed " + feed.first,
-                ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
+            Logger::warn("(Config) create feed " + feed.first + ": ", e.what());
         }
     }
 }

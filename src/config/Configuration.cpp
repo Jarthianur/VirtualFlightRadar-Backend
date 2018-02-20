@@ -71,6 +71,7 @@ bool Configuration::init(std::istream& rStream)
     sMaxHeight      = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
     sServerPort     = resolveServerPort(properties);
     sRegisteredFeeds = resolveFeeds(properties);
+    mGndMode = !properties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
 
     dumpInfo();
     return true;
@@ -206,6 +207,8 @@ void Configuration::dumpInfo() const
                  std::to_string(sMaxDistance));
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_SERVER_PORT ": ",
                  std::to_string(sServerPort));
+    Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ",
+                 mGndMode ? "Yes" : "No");
         Logger::info("(Config) number of feeds: ", std::to_string(sRegisteredFeeds.size()));
 }
 
@@ -247,6 +250,14 @@ double Configuration::getSBaseLongitude() const
 double Configuration::getSBaseLatitude() const
 {
     return sBaseLatitude;
+}
+
+bool Configuration::isGndModeEnabled() const{
+    return mGndMode;
+}
+
+void Configuration::forceGndMode(){
+    mGndMode = true;
 }
 
 FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties) {
