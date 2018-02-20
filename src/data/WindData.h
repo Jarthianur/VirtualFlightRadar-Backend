@@ -25,9 +25,14 @@
 #include <cstdint>
 #include <string>
 
+#include <boost/thread/mutex.hpp>
 #include "../util/Sensor.h"
 #include "Data.hpp"
 #include "../util/Wrapper.hpp"
+
+namespace feed {
+class SensorFeed;
+}
 
 namespace data
 {
@@ -60,19 +65,7 @@ public:
 	 */
 	void init(struct util::Wind vWind) override;
 
-	/**
-	 * @fn update
-	 * @brief Try to update the sensor information.
-	 * @note Splits the given info, using setters.
-	 * @param cr_info The new sensor information.
-	 * @param prio    The attempts priority
-	 * @override Data::update
-	 * @threadsafe
-	 */
-	void update(const struct util::Wind& crWind, std::uint32_t vPriority,
-	        std::uint64_t& rAttempts) override;
-
-	/**
+        /**
 	 * @fn getMwvStr
 	 * @brief Get the MWV sentence.
 	 * @note MWV is invalid after this operation.
@@ -80,6 +73,21 @@ public:
 	 * @threadsafe
 	 */
 	std::string getMwvStr();
+
+protected:
+    friend class feed::SensorFeed;
+    boost::mutex mMutex;
+    /**
+     * @fn update
+     * @brief Try to update the sensor information.
+     * @note Splits the given info, using setters.
+     * @param cr_info The new sensor information.
+     * @param prio    The attempts priority
+     * @override Data::update
+     * @threadsafe
+     */
+    void update(const struct util::Wind& crWind, std::uint32_t vPriority,
+            std::uint64_t& rAttempts) override;
 
 private:
 

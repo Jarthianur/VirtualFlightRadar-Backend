@@ -24,9 +24,14 @@
 #include <cstdint>
 #include <string>
 
+#include <boost/thread/mutex.hpp>
 #include "../util/Sensor.h"
 #include "../util/Wrapper.hpp"
 #include "Data.hpp"
+
+namespace feed {
+class SensorFeed;
+}
 
 /// @namespace data
 namespace data
@@ -59,19 +64,7 @@ public:
      */
     void init(struct util::Atmosphere vAtmos) override;
 
-    /**
-     * @fn update
-     * @brief Try to update the sensor information.
-     * @note Splits the given info, using setters.
-     * @param crAtmos   The new data.
-     * @param vPriority The priority
-     * @param rAttempts The update attempts by reference
-     * @threadsafe
-     */
-    void update(const struct util::Atmosphere& crAtmos, std::uint32_t vPriority,
-                std::uint64_t& rAttempts) override;
-
-    /**
+        /**
      * @fn getMdaStr
      * @brief Get the MDA sentence.
      * @note MDA is invalid after this operation.
@@ -87,6 +80,21 @@ public:
      * @threadsafe
      */
     double getAtmPress();
+
+protected:
+    friend class feed::SensorFeed;
+    boost::mutex mMutex;
+    /**
+     * @fn update
+     * @brief Try to update the sensor information.
+     * @note Splits the given info, using setters.
+     * @param crAtmos   The new data.
+     * @param vPriority The priority
+     * @param rAttempts The update attempts by reference
+     * @threadsafe
+     */
+    void update(const struct util::Atmosphere& crAtmos, std::uint32_t vPriority,
+                std::uint64_t& rAttempts) override;
 
 private:
     /// @var mAtmosphere

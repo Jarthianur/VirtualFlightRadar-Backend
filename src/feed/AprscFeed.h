@@ -53,7 +53,7 @@ public:
      * @throws std::logic_error if login is not given in cr_kvmap
      */
     AprscFeed(const std::string& /*cr_name*/, const config::KeyValueMap& /*cr_kvmap*/,
-              std::shared_ptr<data::AircraftData> pData);
+              std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
     /**
      * @fn ~AprscFeed
      * @brief Destructor

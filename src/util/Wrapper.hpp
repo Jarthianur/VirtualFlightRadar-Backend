@@ -22,7 +22,6 @@
 #ifndef SRC_UTIL_WRAPPER_HPP_
 #define SRC_UTIL_WRAPPER_HPP_
 
-#include <boost/thread/mutex.hpp>
 #include <cstdint>
 #include <string>
 
@@ -37,10 +36,7 @@ namespace util
 template<typename T>
 struct Wrapper
 {
-	/// Mutex to enable threadsafety per Wrapper.
-	boost::mutex mutex;
-
-	/**
+            /**
 	 * @fn trySetValue
 	 * @brief Try to set the value, fails if attempts priority is less.
 	 * @note Succeeds always if attempt is valid.
@@ -91,9 +87,6 @@ struct TmpWrapper
 {
 	/// Is the value valid?
     bool isValueValid = false;
-
-	/// Mutex to enable threadsafety per TmpWrapper.
-	boost::mutex mutex;
 
 	/**
 	 * @fn trySetValue

@@ -25,9 +25,14 @@
 #include <string>
 
 #include "../util/GpsModule.h"
+#include <boost/thread/mutex.hpp>
 #include "../util/Position.h"
 #include "Data.hpp"
 #include "../util/Wrapper.hpp"
+
+namespace feed {
+class GpsFeed;
+}
 
 /// @namespace data
 namespace data
@@ -61,18 +66,7 @@ public:
 	 */
 	void init(struct util::ExtGpsPosition pos) override;
 
-	/**
-	 * @fn update
-	 * @brief Try to update the base position.
-	 * @param cr_pos The new position
-	 * @param prio   The attempts priority
-	 * @override Data::update
-	 * @threadsafe
-	 */
-	void update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t vPriority,
-	        std::uint64_t& rAttempts) override;
-
-	/**
+        /**
 	 * @fn getGpsStr
 	 * @brief Get a full NMEA GPS report.
 	 * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
@@ -87,38 +81,32 @@ public:
 	 * @return the position
 	 * @threadsafe
 	 */
-	struct util::ExtGpsPosition getBasePos();
+    struct util::GpsPosition getBasePos();
 
-	/**
-	 * @fn getBaseLat
-	 * @brief Get the base latitude.
-	 * @return the latitude
-	 * @threadsafe
-	 */
-	double getBaseLat();
+protected:
 
-	/**
-	 * @fn getBaseLong
-	 * @brief Get the base longitude.
-	 * @return the longitude
-	 * @threadsafe
-	 */
-	double getBaseLong();
-
-	/**
-	 * @fn getBaseAlt
-	 * @brief Get the base altitude.
-	 * @return the altitude
-	 * @threadsafe
-	 */
-	std::int32_t getBaseAlt();
+    friend class feed::GpsFeed;
+    boost::mutex mMutex;
+    void lockPosition();
+    /**
+     * @fn update
+     * @brief Try to update the base position.
+     * @param cr_pos The new position
+     * @param prio   The attempts priority
+     * @override Data::update
+     * @threadsafe
+     */
+    void update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t vPriority,
+            std::uint64_t& rAttempts) override;
 
 private:
-    /// Wrapper holding the base position.
+        /// Wrapper holding the base position.
     struct util::Wrapper<struct util::ExtGpsPosition> mBasePos;
 
     /// GpsModule providing functionality to build GPS sentences.
     util::GpsModule mGpsMod;
+
+    bool mPosLocked = false;
 };
 
 }  // namespace data

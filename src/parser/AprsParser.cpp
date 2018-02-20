@@ -55,7 +55,7 @@ const boost::regex AprsParser::msAprsComRe(
     "^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
     boost::regex::optimize | boost::regex::icase);
 
-AprsParser::AprsParser() : Parser()
+AprsParser::AprsParser(std::int32_t vMaxHeight) : Parser(),mMaxHeight(vMaxHeight)
 {}
 
 AprsParser::~AprsParser() noexcept
@@ -91,7 +91,7 @@ bool AprsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
             // altitude
             pos.altitude = util::math::dToI(std::stod(match.str(RE_APRS_ALT))
                                             * util::math::FEET_2_M);
-            if(pos.altitude > config::Configuration::sMaxHeight)
+            if(pos.altitude > mMaxHeight)
             {
                 return false;
             }

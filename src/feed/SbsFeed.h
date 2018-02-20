@@ -52,7 +52,7 @@ public:
      * @param cr_kvmap The properties map
      */
     SbsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
-            std::shared_ptr<data::AircraftData> pData);
+            std::shared_ptr<data::AircraftData> pData,std::int32_t vMaxHeight);
     /**
      * @fn ~SbsFeed
      * @brief Destructor

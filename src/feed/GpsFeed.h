@@ -52,7 +52,7 @@ public:
      * @param cr_kvmap The properties map
      */
     GpsFeed(const std::string& /*cr_name*/, const config::KeyValueMap& /*cr_kvmap*/,
-            std::shared_ptr<data::GpsData> pData);
+            data::GpsData* pData);
     /**
      * @fn ~GpsFeed
      * @brief Destructor
@@ -73,6 +73,8 @@ private:
     std::uint64_t mUpdateAttempts;
 
     std::shared_ptr<data::GpsData> mpData;
+
+    bool mGndModeEnabled;
 };
 
 }  // namespace feed

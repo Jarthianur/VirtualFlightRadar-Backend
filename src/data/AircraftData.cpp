@@ -26,7 +26,6 @@
 #include <iterator>
 #include <utility>
 #include <boost/thread/lock_guard.hpp>
-#include <boost/thread/pthread/mutex.hpp>
 
 #include "../util/Logger.h"
 #include "../util/Position.h"
@@ -122,8 +121,7 @@ std::string AircraftData::processAircrafts(const struct util::GpsPosition& crBas
 void AircraftData::update(const Aircraft& rUpdate, std::uint32_t vPriority,
                           std::uint64_t&)
 {
-    boost::lock_guard<boost::mutex> lock(this->mMutex);
-    auto known_ac = find(rUpdate.getId());
+        auto known_ac = find(rUpdate.getId());
     if(known_ac != mContainer.end())
     {
         if(known_ac->getTargetType() == Aircraft::TargetType::TRANSPONDER

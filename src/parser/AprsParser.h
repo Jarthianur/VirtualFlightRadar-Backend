@@ -45,7 +45,7 @@ public:
      * @fn AprsParser
      * @brief Constructor
      */
-    AprsParser();
+    explicit AprsParser(std::int32_t vMaxHeight);
     /**
      * @fn ~AprsParser
      * @brief Destructor
@@ -63,6 +63,7 @@ private:
     static const boost::regex msAprsRe;
     /// Regular expression for OGN specific APRS extension
     static const boost::regex msAprsComRe;
+    const std::int32_t mMaxHeight;
 };
 
 }  // namespace parser

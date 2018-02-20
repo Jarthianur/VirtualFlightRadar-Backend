@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <boost/optional.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../aircraft/Aircraft.h"
 #include "../config/Configuration.h"
@@ -36,8 +37,8 @@ using namespace util;
 namespace feed
 {
 SbsFeed::SbsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
-                 std::shared_ptr<data::AircraftData> pData)
-    : Feed(cr_name, cr_kvmap), mpData(pData)
+                 std::shared_ptr<data::AircraftData> pData,std::int32_t vMaxHeight)
+    : Feed(cr_name, cr_kvmap), mParser(vMaxHeight),mpData(pData)
 {
     mpClient = std::unique_ptr<network::client::Client>(new network::client::SbsClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
@@ -51,6 +52,7 @@ void SbsFeed::process(const std::string& cr_res) noexcept
     aircraft::Aircraft ac(getPriority());
     if(mParser.unpack(cr_res, ac))
     {
+        boost::lock_guard<boost::mutex> lock(mpData->mMutex);
         mpData->update(ac, getPriority(), ac.getUpdateAttempts());
     }
 }

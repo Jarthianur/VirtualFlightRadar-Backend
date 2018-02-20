@@ -1,4 +1,4 @@
-/*
+﻿/*
  Copyright_License {
 
  Copyright (C) 2016 VirtualFlightRadar-Backend
@@ -34,7 +34,12 @@
 #include "data/AtmosphereData.h"
 #include "data/GpsData.h"
 #include "data/WindData.h"
+#include "data/AircraftData.h"
 #include "feed/Feed.h"
+#include "feed/AprscFeed.h"
+#include "feed/SbsFeed.h"
+#include "feed/GpsFeed.h"
+#include "feed/SensorFeed.h"
 #include "network/client/AprscClient.h"
 #include "network/client/SbsClient.h"
 #include "network/client/SensorClient.h"
@@ -52,8 +57,8 @@ std::atomic<bool> VFRB::global_run_status(true);
 VFRB::VFRB(const config::Configuration& config)
     :mServer(config.getSServerPort())
 {
-    //TODO create config object here and init all components
-
+    //TODO init all components
+registerFeeds(config.getFeeds());
 }
 
 VFRB::~VFRB() noexcept
@@ -76,48 +81,50 @@ void VFRB::run() noexcept
     signal_set.add(SIGQUIT);
 #endif  // defined(SIGQUIT)
 
-    signal_set.async_wait(boost::bind(&VFRB::handleSignals,
-                                      boost::asio::placeholders::error,
-                                      boost::asio::placeholders::signal_number));
+    signal_set.async_wait([this](const boost::system::error_code&, const int){Logger::info("(VFRB) caught signal: ", "shutdown");
+        global_run_status = false;});
 
     boost::thread signal_thread([&io_service]() { io_service.run(); });
 
     // init server and run handler
-    network::server::Server server(signal_set, config::Configuration::sServerPort);
-    boost::thread server_thread(boost::bind(&VFRB::handleServer, std::ref(server)));
+    boost::thread server_thread([this,&signal_set](){Logger::info("(Server) start server.");
+        mServer.run(signal_set);
+        global_run_status = false;});
 
     // init input threads
     boost::thread_group feed_threads;
-    for(auto it = config::Configuration::sRegisteredFeeds.begin();
-        it != config::Configuration::sRegisteredFeeds.end(); ++it)
+    for(const auto& it : mFeeds)
     {
-        feed_threads.create_thread(
-            boost::bind(&VFRB::handleFeed, std::ref(signal_set), *it));
+        feed_threads.create_thread([&](){
+            Logger::info("(VFRB) run feed: ", it->getName());
+            it->run(signal_set);
+        }
+                );
     }
-    config::Configuration::sRegisteredFeeds.clear();
+    //mFeeds.clear();
 
     while(global_run_status)
     {
         try
         {
             // write Aircrafts to clients
-            std::string str = msAcCont.processAircrafts(
-                {msGpsData.getBaseLat(), msGpsData.getBaseLong(), msGpsData.getBaseAlt()},
-                msAtmosData.getAtmPress());
+            std::string str = mpAircraftData->processAircrafts(
+                mpGpsData->getBasePos(),
+                mpAtmosphereData->getAtmPress());
 
             if(str.length() > 0)
             {
-                server.writeToAll(str);
+                mServer.writeToAll(str);
             }
 
             // write GPS position to clients
-            server.writeToAll(msGpsData.getGpsStr());
+            mServer.writeToAll(mpGpsData->getGpsStr());
 
             // write climate info to clients
-            str = msAtmosData.getMdaStr() + msWindData.getMwvStr();
+            str = mpAtmosphereData->getMdaStr() + mpWindData->getMwvStr();
             if(str.length() > 0)
             {
-                server.writeToAll(str);
+                mServer.writeToAll(str);
             }
 
             // synchronise cycles to ~SYNC_TIME sec
@@ -149,31 +156,29 @@ void VFRB::run() noexcept
     Logger::info("EXITING / runtime: ", time_str);
 }
 
-std::size_t VFRB::registerFeeds(const PropertyMap& crProperties)
+void VFRB::registerFeeds(const config::FeedMapping& crFeeds)
 {
-    std::vector<std::string> feeds
-        = resolveFeeds(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
-    std::vector<std::function<bool(const std::string&, const PropertyMap&)>> creators;
-    creators.push_back(registerCreator<feed::AprscFeed>(SECT_KEY_APRSC));
-    creators.push_back(registerCreator<feed::SbsFeed>(SECT_KEY_SBS));
-    creators.push_back(registerCreator<feed::SensorFeed>(SECT_KEY_SENS));
-    creators.push_back(registerCreator<feed::GpsFeed>(SECT_KEY_GPS));
+    std::list<Creator> creators;
+    creators.push_back(registerCreator<feed::AprscFeed>(SECT_KEY_APRSC, mpAircraftData.get()));
+    creators.push_back(registerCreator<feed::SbsFeed>(SECT_KEY_SBS, mpAircraftData.get()));
+    creators.push_back(registerCreator<feed::SensorFeed>(SECT_KEY_SENS, mpAtmosphereData.get(), mpWindData.get()));
+    creators.push_back(registerCreator<feed::GpsFeed>(SECT_KEY_GPS, mpGpsData.get()));
 
-    for(const auto& feed : feeds)
+    for(const auto& feed : crFeeds)
     {
         bool found = false;
         for(auto& creator : creators)
         {
             try
             {
-                if((found = creator(feed, crProperties)))
+                if((found = creator(feed.first, feed.second)))
                 {
                     break;
                 }
             }
             catch(const std::exception& e)
             {
-                Logger::warn("(Config) create feed " + feed + ": ", e.what());
+                Logger::warn("(Config) create feed " + feed.first + ": ", e.what());
                 found = true;
                 break;
             }
@@ -181,31 +186,9 @@ std::size_t VFRB::registerFeeds(const PropertyMap& crProperties)
         if(!found)
         {
             Logger::warn(
-                "(Config) create feed " + feed,
+                "(Config) create feed " + feed.first,
                 ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
                 ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
         }
     }
-    return sRegisteredFeeds.size();
-}
-
-void VFRB::handleServer(network::server::Server& r_server)
-{
-    Logger::info("(Server) startup: localhost ",
-                 std::to_string(config::Configuration::sServerPort));
-    r_server.run();
-    global_run_status = false;
-}
-
-void VFRB::handleFeed(boost::asio::signal_set& r_sigset,
-                      std::shared_ptr<feed::Feed> p_feed)
-{
-    Logger::info("(VFRB) run feed: ", p_feed->getName());
-    p_feed->run(r_sigset);
-}
-
-void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)
-{
-    Logger::info("(VFRB) caught signal: ", "shutdown");
-    global_run_status = false;
 }

@@ -27,6 +27,7 @@
 #include <boost/asio/signal_set.hpp>
 #include <boost/system/error_code.hpp>
 #include "network/server/Server.h"
+#include "config/Configuration.h"
 
 namespace data
 {
@@ -34,6 +35,7 @@ class AircraftData;
 class WindData;
 class AtmosphereData;
 class GpsData;
+class Data;
 }
 
 namespace feed
@@ -49,6 +51,8 @@ namespace util
 struct ExtGpsPosition;
 struct SensorInfo;
 }
+
+using Creator = std::function<bool(const std::string&, const config::KeyValueMap&)>;
 
 /**
  * @class VFRB
@@ -69,7 +73,7 @@ public:
      * @fn VFRB
      * @brief Constructor
      */
-    VFRB();
+    explicit VFRB(const config::Configuration& crConfig);
     /**
      * @fn ~VFRB
      * @brief Destructor
@@ -79,44 +83,20 @@ public:
      * @fn run
      * @brief The VFRB's main method, runs the VFR-B.
      */
-    static void run() noexcept;
+    void run() noexcept;
 
     /// Atomic run-status. By this, every component may determine if the VFRB stops.
     static std::atomic<bool> global_run_status;
 
 private:
-    /**
-     * @fn handleFeed
-     * @brief Handler for an input Feed thread.
-     * @param r_sigset The signal set to pass
-     * @param p_feed   The Feed to handle
-     */
-    static void handleFeed(boost::asio::signal_set& r_sigset,
-                           std::shared_ptr<feed::Feed> p_feed);
-
-    /**
-     * @fn handleServer
-     * @brief Handler for an Server thread.
-     * @param r_server The Server to handle
-     */
-    static void handleServer(network::server::Server& r_server);
-
-    /**
-     * @fn handleSignals
-     * @brief Handler for a signal interrupt thread.
-     * @param cr_ec The error code
-     * @param sig   The signal number
-     */
-    static void handleSignals(const boost::system::error_code& cr_ec, const int sig);
-
-    /**
+       /**
      * @fn registerFeeds
      * @brief Register all input feeds found from ConfigReader.
      * @note Only correctly configured feeds get registered.
      * @param crProperties The PropertyMap holding read properties
      * @return the number of registered feeds
      */
-    std::size_t registerFeeds(const PropertyMap& crProperties);
+    void registerFeeds(const config::FeedMapping& crFeeds);
 
     /**
      * @fn registerCreator
@@ -133,15 +113,15 @@ private:
      * @return The creator
      */
     template<typename T, typename std::enable_if<
-                             std::is_base_of<feed::Feed, T>::value>::type* = nullptr>
-    std::function<bool(const std::string&, const PropertyMap&)>
-    registerCreator(const std::string& crKeyword) const
+                             std::is_base_of<feed::Feed, T>::value>::type* = nullptr, typename... D, typename... A>
+    Creator
+    registerCreator(const std::string& crKeyword, D... datas, A... adds)
     {
-        return [&crKeyword](const std::string& crName, const PropertyMap& crProperties) {
+        return [&,this](const std::string& crName, const config::KeyValueMap& crMap) {
             if(crName.find(crKeyword) != std::string::npos)
             {
-                sRegisteredFeeds.push_back(std::shared_ptr<feed::Feed>(
-                    new T(crName, crProperties.getSectionKeyValue(crName))));
+                mFeeds.push_back(std::shared_ptr<feed::Feed>(
+                    new T(crName, crMap, datas..., adds...)));
                 return true;
             }
             return false;
@@ -161,6 +141,8 @@ private:
     std::shared_ptr<data::GpsData> mpGpsData;
 
     network::server::Server mServer;
+
+    std::list<std::shared_ptr<feed::Feed> > mFeeds;
 };
 
 #endif /* SRC_VFRB_H_ */

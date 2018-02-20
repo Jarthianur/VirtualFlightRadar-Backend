@@ -32,8 +32,8 @@
 namespace parser
 {
 
-SbsParser::SbsParser()
-        : Parser()
+SbsParser::SbsParser(std::int32_t vMaxHeight)
+        : Parser(),mMaxHeight(vMaxHeight)
 {
 }
 
@@ -78,22 +78,11 @@ noexcept
                         return false;
                     }
                     break;
-                    /*case 7:
-                     if (delim - p > 7)
-                     {
-                     mtTime = std::stoi(cr_msg.substr(p, 2)) * 10000;
-                     mtTime += std::stoi(cr_msg.substr(p + 3, 2)) * 100;
-                     mtTime += std::stoi(cr_msg.substr(p + 6, 2));
-                     } else
-                     {
-                     return false;
-                     }
-                     break;*/
-                case 11:
+                                   case 11:
                     pos.altitude = util::math::dToI(
                             std::stod(cr_msg.substr(p, delim - p))
                                     * util::math::FEET_2_M);
-                    if (pos.altitude > config::Configuration::sMaxHeight)
+                    if (pos.altitude > mMaxHeight)
                     {
                         return false;
                     }
@@ -110,7 +99,7 @@ noexcept
             i++;
             p = delim + 1;
         }
-    } catch (const std::logic_error& e)
+    } catch (const std::logic_error&)
     {
         return false;
     }

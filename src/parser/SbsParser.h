@@ -43,7 +43,7 @@ public:
      * @fn SbsParser
      * @brief Constructor
      */
-    SbsParser();
+    explicit SbsParser(std::int32_t vMaxHeight);
     /**
      * @fn ~SbsParser
      * @brief Destructor
@@ -55,6 +55,9 @@ public:
      * @override Parser::unpack
      */
     bool unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noexcept override;
+
+private:
+const    std::int32_t mMaxHeight;
 };
 
 }  // namespace parser

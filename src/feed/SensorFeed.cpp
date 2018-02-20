@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../config/Configuration.h"
 #include "../data/AtmosphereData.h"
@@ -58,10 +59,12 @@ void SensorFeed::process(const std::string& crResponse) noexcept
     {
         if(climate.hasWind())
         {
+            boost::lock_guard<boost::mutex> lock(mpWindData->mMutex);
             mpWindData->update(climate.mWind, getPriority(), mWindUpdateAttempts);
         }
         if(climate.hasAtmosphere())
         {
+            boost::lock_guard<boost::mutex> lock(mpAtmosphereData->mMutex);
             mpAtmosphereData->update(climate.mAtmosphere, getPriority(),
                                      mAtmosUpdateAttempts);
         }

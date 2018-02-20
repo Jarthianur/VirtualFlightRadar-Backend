@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include <boost/thread/lock_guard.hpp>
 #include "../aircraft/Aircraft.h"
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
@@ -36,8 +37,8 @@ using namespace util;
 namespace feed
 {
 AprscFeed::AprscFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
-                     std::shared_ptr<data::AircraftData> pData)
-    : Feed(cr_name, cr_kvmap), mpData(pData)
+                     std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
+    : Feed(cr_name, cr_kvmap),mParser(vMaxHeight), mpData(pData)
 {
     auto it = mKvMap.find(KV_KEY_LOGIN);
     if(it == mKvMap.end())
@@ -62,6 +63,7 @@ void AprscFeed::process(const std::string& cr_res) noexcept
     aircraft::Aircraft ac(getPriority());
     if(mParser.unpack(cr_res, ac))
     {
+        boost::lock_guard<boost::mutex> lock(mpData->mMutex);
         mpData->update(ac, getPriority(), ac.getUpdateAttempts());
     }
 }

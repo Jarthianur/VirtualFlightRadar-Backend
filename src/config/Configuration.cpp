@@ -70,7 +70,7 @@ bool Configuration::init(std::istream& rStream)
     sMaxDistance    = resolveFilter(properties, KV_KEY_MAX_DIST);
     sMaxHeight      = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
     sServerPort     = resolveServerPort(properties);
-    sGndModeEnabled = !properties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
+    sRegisteredFeeds = resolveFeeds(properties);
 
     dumpInfo();
     return true;
@@ -130,12 +130,14 @@ std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) 
     }
 }
 
-std::vector<std::pair<std::string, KeyValueMap>> Configuration::getFeeds() const
-{}
-
-std::vector<std::string> Configuration::resolveFeeds(const std::string& crFeeds) const
+const FeedMapping& Configuration::getFeeds() const
 {
-    std::vector<std::string> feeds;
+    return sRegisteredFeeds;
+}
+
+std::list<std::string> Configuration::resolveFeedList(const std::string& crFeeds) const
+{
+    std::list<std::string> feeds;
     std::stringstream ss;
     ss.str(crFeeds);
     std::string item;
@@ -204,14 +206,7 @@ void Configuration::dumpInfo() const
                  std::to_string(sMaxDistance));
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_SERVER_PORT ": ",
                  std::to_string(sServerPort));
-    Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ",
-                 sGndModeEnabled ? "Yes" : "No");
-    Logger::info("(Config) number of feeds: ", std::to_string(sRegisteredFeeds.size()));
-}
-
-bool Configuration::getSGndModeEnabled() const
-{
-    return sGndModeEnabled;
+        Logger::info("(Config) number of feeds: ", std::to_string(sRegisteredFeeds.size()));
 }
 
 std::uint16_t Configuration::getSServerPort() const
@@ -252,6 +247,15 @@ double Configuration::getSBaseLongitude() const
 double Configuration::getSBaseLatitude() const
 {
     return sBaseLatitude;
+}
+
+FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties) {
+	std::list<std::string> list = resolveFeedList(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+	FeedMapping mapping;
+for (auto& it : list) {
+	mapping.push_back(std::make_pair(it,crProperties.getSectionKeyValue(it)));
+}
+return mapping;
 }
 
 }  // namespace config

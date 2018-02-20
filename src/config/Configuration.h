@@ -28,6 +28,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <list>
 #include "../util/Math.hpp"
 #include "PropertyMap.h"
 
@@ -111,6 +112,8 @@ namespace config
 /// @def KV_KEY_LOGIN
 #define KV_KEY_LOGIN "login"
 
+using FeedMapping = std::list<std::pair<std::string, KeyValueMap> >;
+
 /**
  * @class Configuration
  * @brief Evaluate and store configuration for VFR-B.
@@ -148,11 +151,7 @@ public:
 
     std::uint16_t getSServerPort() const;
 
-    bool getSGndModeEnabled() const;
-
-    void overrideSGndModeEnabled();
-
-    std::vector<std::pair<std::string, KeyValueMap>> getFeeds() const;
+    const FeedMapping& getFeeds() const;
 
 private:
     /**
@@ -185,7 +184,10 @@ private:
      * @param crFeeds The feeds string
      * @return all feed names
      */
-    std::vector<std::string> resolveFeeds(const std::string& crFeeds) const;
+    std::list<std::string> resolveFeedList(const std::string& crFeeds) const;
+
+
+    FeedMapping resolveFeeds(const PropertyMap& crProperties);
 
     /**
      * @fn resolveFilter
@@ -248,9 +250,7 @@ private:
     /// Port where to serve reports
     std::uint16_t sServerPort;
 
-    /// @var sGndModeEnabled
-    /// Ground mode enabled?
-    bool sGndModeEnabled;
+FeedMapping sRegisteredFeeds;
 };
 
 }  // namespace config

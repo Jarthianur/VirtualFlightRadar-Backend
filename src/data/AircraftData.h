@@ -29,6 +29,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include "../aircraft/AircraftProcessor.h"
+#include "../aircraft/Aircraft.h"
 #include "../config/Parameters.h"
 #include "Data.hpp"
 
@@ -44,9 +45,9 @@
 /// Times until FLARM status is removed
 #define AC_NO_FLARM_THRESHOLD AC_OUTDATED
 
-namespace aircraft
-{
-class Aircraft;
+namespace feed {
+class AprscFeed;
+class SbsFeed;
 }
 
 namespace util
@@ -64,12 +65,6 @@ namespace data
 class AircraftData : public Data<aircraft::Aircraft>
 {
 public:
-    /// Not copyable
-    AircraftData(const AircraftData&) = delete;
-
-    /// Not assignable
-    AircraftData& operator=(const AircraftData&) = delete;
-
     /**
      * @fn AircraftData
      * @brief Constructor
@@ -81,7 +76,7 @@ public:
      * @brief Constructor
      * @param vMaxDist The max distance filter
      */
-    AircraftData(std::int32_t vMaxDist);
+    explicit AircraftData(std::int32_t vMaxDist);
 
     /**
      * @fn ~AircraftData
@@ -96,17 +91,7 @@ public:
      */
     void init(aircraft::Aircraft crAircraft) override;
 
-    /**
-     * @fn upsert
-     * @brief Insert or update an Aircraft, if priority is high enough.
-     * @param rUpdate
-     * @param vPriority
-     * @threadsafe
-     */
-    void update(const aircraft::Aircraft& crUpdate, std::uint32_t vPriority,
-                std::uint64_t&) override;
-
-    /**
+        /**
      * @fn processAircrafts
      * @brief Process all Aircrafts and get the reports.
      * @param crBasePos The base position to relate
@@ -118,6 +103,22 @@ public:
     std::string processAircrafts(const struct util::GpsPosition& crBasePos,
                                  double vAtmPress);
 
+protected:
+    friend class feed::AprscFeed;
+    friend class feed::SbsFeed;
+    /// @var mMutex
+    /// Used for RW on the container.
+    boost::mutex mMutex;
+    /**
+     * @fn upsert
+     * @brief Insert or update an Aircraft, if priority is high enough.
+     * @param rUpdate
+     * @param vPriority
+     * @threadsafe
+     */
+    void update(const aircraft::Aircraft& crUpdate, std::uint32_t vPriority,
+                std::uint64_t&) override;
+
 private:
     /**
      * @fn find
@@ -127,11 +128,7 @@ private:
      */
     std::vector<aircraft::Aircraft>::iterator find(const std::string& crId);
 
-    /// @var mMutex
-    /// Used for RW on the container.
-    boost::mutex mMutex;
-
-    /// @var mProcessor
+        /// @var mProcessor
     /// Providing functionality to process Aircrafts
     aircraft::AircraftProcessor mProcessor;
 

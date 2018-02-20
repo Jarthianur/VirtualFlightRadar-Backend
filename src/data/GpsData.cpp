@@ -22,7 +22,7 @@
 #include "GpsData.h"
 
 #include <boost/thread/lock_guard.hpp>
-#include <boost/thread/mutex.hpp>
+#include <stdexcept>
 
 namespace data
 {
@@ -44,7 +44,9 @@ void GpsData::init(struct util::ExtGpsPosition pos)
 void GpsData::update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t prio,
         std::uint64_t& rAttempts)
 {
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
+    if (mPosLocked) {
+        throw std::runtime_error("Position was locked before.");
+    }
     if (mBasePos.trySetValue(cr_pos, prio, rAttempts))
     {
         rAttempts = 0;
@@ -53,33 +55,20 @@ void GpsData::update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t pr
 
 std::string GpsData::getGpsStr()
 {
-    std::string gps = mGpsMod.genGprmcStr(getBasePos());
-    gps.append(mGpsMod.genGpggaStr(getBasePos()));
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::string gps = mGpsMod.genGprmcStr(mBasePos.getValue());
+    gps.append(mGpsMod.genGpggaStr(mBasePos.getValue()));
     return gps;
 }
 
-std::int32_t GpsData::getBaseAlt()
+struct util::GpsPosition GpsData::getBasePos()
 {
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.getValue().position.altitude;
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    return mBasePos.getValue().position;
 }
 
-double GpsData::getBaseLat()
-{
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.getValue().position.latitude;
-}
-
-double GpsData::getBaseLong()
-{
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.getValue().position.longitude;
-}
-
-struct util::ExtGpsPosition GpsData::getBasePos()
-{
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.getValue();
+void GpsData::lockPosition() {
+    mPosLocked = true;
 }
 
 } // namespace data

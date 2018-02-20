@@ -49,6 +49,15 @@ public:
     inline virtual ~Data() noexcept
     {}
 
+        /**
+     * @fn init
+     * @brief Initialize data.
+     * @tparam T The initial data
+     * @param _1
+     */
+    virtual void init(T _1) = 0;
+
+protected:
     /**
      * @fn update
      * @brief Update the specialized data.
@@ -58,14 +67,6 @@ public:
      * @param _3 The update attempts by reference
      */
     virtual void update(const T& _1, std::uint32_t _2, std::uint64_t& _3) = 0;
-
-    /**
-     * @fn init
-     * @brief Initialize data.
-     * @tparam T The initial data
-     * @param _1
-     */
-    virtual void init(T _1) = 0;
 };
 
 } /* namespace data */
