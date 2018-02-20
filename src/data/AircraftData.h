@@ -31,7 +31,6 @@
 #include "../aircraft/AircraftProcessor.h"
 #include "../aircraft/Aircraft.h"
 #include "../config/Parameters.h"
-#include "Data.hpp"
 
 /// @def AC_OUTDATED
 /// Times until aircraft is outdated
@@ -62,7 +61,7 @@ namespace data
  * @class AircraftContainer
  * @brief Store Aircrafts and trigger processing.
  */
-class AircraftData : public Data<aircraft::Aircraft>
+class AircraftData
 {
 public:
     /**
@@ -104,7 +103,7 @@ protected:
      * @threadsafe
      */
     void update(const aircraft::Aircraft& crUpdate, std::uint32_t vPriority,
-                std::uint64_t&) override;
+                std::uint64_t&);
 
 private:
     /**

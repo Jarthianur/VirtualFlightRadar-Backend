@@ -25,12 +25,7 @@
 #include <string>
 
 #include "config/Configuration.h"
-#include "data/AtmosphereData.h"
-#include "data/GpsData.h"
-#include "data/WindData.h"
 #include "util/Logger.h"
-#include "util/Position.h"
-#include "util/Sensor.h"
 #include "VFRB.h"
 
 #ifndef VERSION

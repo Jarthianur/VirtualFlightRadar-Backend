@@ -26,7 +26,7 @@ using namespace util;
 
 namespace data
 {
-AtmosphereData::AtmosphereData(struct Atmosphere vAtmos) : Data<struct Atmosphere>()
+AtmosphereData::AtmosphereData(struct Atmosphere vAtmos)
 {
     std::uint64_t dummy = 0;
     mAtmosphere.trySetValue(vAtmos, 0, dummy);

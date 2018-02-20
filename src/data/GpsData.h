@@ -27,7 +27,6 @@
 #include "../util/GpsModule.h"
 #include <boost/thread/mutex.hpp>
 #include "../util/Position.h"
-#include "Data.hpp"
 #include "../util/Wrapper.hpp"
 
 namespace feed {
@@ -44,7 +43,7 @@ namespace data
  * @brief Manage GPS information.
  * @see Data.hpp
  */
-class GpsData: public Data<struct util::ExtGpsPosition>
+class GpsData
 {
 public:
 	/**
@@ -90,7 +89,7 @@ protected:
      * @threadsafe
      */
     void update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t vPriority,
-            std::uint64_t& rAttempts) override;
+            std::uint64_t& rAttempts);
 
 private:
         /// Wrapper holding the base position.

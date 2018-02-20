@@ -27,7 +27,6 @@
 #include <boost/thread/mutex.hpp>
 #include "../util/Sensor.h"
 #include "../util/Wrapper.hpp"
-#include "Data.hpp"
 
 namespace feed {
 class SensorFeed;
@@ -42,7 +41,7 @@ namespace data
  * @brief Manage sensor information.
  * @see Data.hpp
  */
-class AtmosphereData : public Data<struct util::Atmosphere>
+class AtmosphereData
 {
 public:
     /**
@@ -87,7 +86,7 @@ protected:
      * @threadsafe
      */
     void update(const struct util::Atmosphere& crAtmos, std::uint32_t vPriority,
-                std::uint64_t& rAttempts) override;
+                std::uint64_t& rAttempts);
 
 private:
     /// @var mAtmosphere

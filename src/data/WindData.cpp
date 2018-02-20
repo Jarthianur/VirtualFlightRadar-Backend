@@ -28,7 +28,6 @@ namespace data
 {
 
 WindData::WindData()
-        : Data<struct Wind>()
 {
     std::uint64_t dummy = 0;
     mWind.trySetValue({""}, 0, dummy);
