@@ -131,7 +131,6 @@ inline std::int32_t checksum(const char* sentence, std::size_t size)
     return csum;
 }
 
-// No optnumber, if not valid throw exception
 template<typename T>
 inline OptNumber stringToNumber(const std::string& crStr)
 {

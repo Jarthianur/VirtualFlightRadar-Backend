@@ -47,8 +47,8 @@ void test_aircraft(TestSuitesRunner& runner)
 {
     describe<aircraft::AircraftProcessor>("Process Aircrafts", runner)->test("Aircraft at,above base pos", []()
     {
-        config::Configuration::sMaxDistance = INT32_MAX;
-        config::Configuration::sMaxHeight = INT32_MAX;
+        config::Configuration::mMaxDistance = INT32_MAX;
+        config::Configuration::mMaxHeight = INT32_MAX;
         struct GpsPosition pos =
         {   49.0, 8.0, math::dToI(math::FEET_2_M * 3281)};
         double press = 1013.25;
@@ -80,8 +80,8 @@ void test_aircraft(TestSuitesRunner& runner)
         assert(match.str(9), std::string("8"), helper::eqs);
     })->test("filter distance", []()
     {
-        config::Configuration::sMaxDistance = 10000;
-        config::Configuration::sMaxHeight = INT32_MAX;
+        config::Configuration::mMaxDistance = 10000;
+        config::Configuration::mMaxHeight = INT32_MAX;
         struct GpsPosition pos =
         {   49.1, 8.1, math::dToI(math::FEET_2_M * 3281)};
         double press = 1013.25;
@@ -93,7 +93,7 @@ void test_aircraft(TestSuitesRunner& runner)
         ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         assert(container.processAircrafts(base, press), std::string(""), helper::eqs);
-        config::Configuration::sMaxDistance = INT32_MAX;
+        config::Configuration::mMaxDistance = INT32_MAX;
     });
 
     describeParallel<aircraft::AircraftProcessor>("process relative positions", runner)->test("Cross Equator S to N", []()

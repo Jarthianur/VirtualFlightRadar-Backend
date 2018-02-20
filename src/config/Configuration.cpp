@@ -38,77 +38,56 @@ namespace config
 {
 Configuration::Configuration(std::istream& rStream)
 {
-    if(!init(rStream))
+    try
     {
-        throw std::logic_error("Failed to read configuration file");
+        ConfigReader reader;
+        PropertyMap properties;
+        reader.read(rStream, properties);
+        init(properties);
+    }
+    catch(const std::exception&)
+    {
+        throw std::runtime_error("Failed to read configuration file");
     }
 }
 
 Configuration::~Configuration() noexcept
 {}
 
-bool Configuration::init(std::istream& rStream)
+void Configuration::init(const PropertyMap& crProperties)
 {
-    ConfigReader reader;
-    PropertyMap properties;
-
-    try
-    {
-        reader.read(rStream, properties);
-    }
-    catch(const std::exception& e)
-    {
-        Logger::error("(Config) read file: ", e.what());
-        return false;
-    }
-
-    if(!setFallbacks(properties))
-    {
-        return false;
-    }
-
-    sMaxDistance    = resolveFilter(properties, KV_KEY_MAX_DIST);
-    sMaxHeight      = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
-    sServerPort     = resolveServerPort(properties);
-    sRegisteredFeeds = resolveFeeds(properties);
-    mGndMode = !properties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
+    setFallbacks(crProperties);
+    mMaxDistance  = resolveFilter(crProperties, KV_KEY_MAX_DIST);
+    mMaxHeight    = resolveFilter(crProperties, KV_KEY_MAX_HEIGHT);
+    mServerPort   = resolveServerPort(crProperties);
+    mFeedsWithMap = resolveFeeds(crProperties);
+    mGndMode      = !crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
 
     dumpInfo();
-    return true;
 }
 
-bool Configuration::setFallbacks(const PropertyMap& crProperties)
+void Configuration::setFallbacks(const PropertyMap& crProperties)
 {
-    try
-    {
-        sBaseLatitude = boost::get<double>(
-            checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
-                                 SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "")),
-                             SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
-        sBaseLongitude = boost::get<double>(
-            checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
-                                 SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "")),
-                             SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
-        sBaseAltitude = boost::get<std::int32_t>(
-            checkNumberValue(math::stringToNumber<std::int32_t>(crProperties.getProperty(
-                                 SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "")),
-                             SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
-        sBaseGeoid = boost::get<double>(
-            checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
-                                 SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
-                             SECT_KEY_FALLBACK, KV_KEY_GEOID));
-        sBaseAtmPressure = boost::get<double>(
-            checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
-                                 SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
-                             SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
-    }
-    // Don't catch boost::bad_get (runtime) as it only occurres on implementation fault
-    // (actually compiletime).
-    catch(const std::invalid_argument&)
-    {
-        return false;
-    }
-    return true;
+    mFbLatitude = boost::get<double>(
+        checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+                             SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "")),
+                         SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
+    mFbLongitude = boost::get<double>(
+        checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+                             SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "")),
+                         SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
+    mFbAltitude = boost::get<std::int32_t>(
+        checkNumberValue(math::stringToNumber<std::int32_t>(crProperties.getProperty(
+                             SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "")),
+                         SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
+    mFbGeoid = boost::get<double>(
+        checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+                             SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
+                         SECT_KEY_FALLBACK, KV_KEY_GEOID));
+    mFbAtmPressure = boost::get<double>(
+        checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+                             SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
+                         SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
 }
 
 std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) const
@@ -131,11 +110,6 @@ std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) 
     }
 }
 
-const FeedMapping& Configuration::getFeeds() const
-{
-    return sRegisteredFeeds;
-}
-
 std::list<std::string> Configuration::resolveFeedList(const std::string& crFeeds) const
 {
     std::list<std::string> feeds;
@@ -145,17 +119,7 @@ std::list<std::string> Configuration::resolveFeedList(const std::string& crFeeds
 
     while(std::getline(ss, item, ','))
     {
-        std::size_t f = item.find_first_not_of(' ');
-        if(f != std::string::npos)
-        {
-            item = item.substr(f);
-        }
-        std::size_t l = item.find_last_not_of(' ');
-        if(l != std::string::npos)
-        {
-            item = item.substr(0, l + 1);
-        }
-        feeds.push_back(item);
+        feeds.push_back(trimString(item));
     }
     return feeds;
 }
@@ -177,6 +141,19 @@ std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
     }
 }
 
+
+FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties)
+{
+    std::list<std::string> list
+        = resolveFeedList(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+    FeedMapping mapping;
+    for(auto& it : list)
+    {
+        mapping.push_back(std::make_pair(it, crProperties.getSectionKeyValue(it)));
+    }
+    return mapping;
+}
+
 math::Number Configuration::checkNumberValue(const math::OptNumber& crOptNumber,
                                              const std::string& crSection,
                                              const std::string& crKey) const
@@ -189,84 +166,96 @@ math::Number Configuration::checkNumberValue(const math::OptNumber& crOptNumber,
     return crOptNumber.get<1>();
 }
 
+std::string& Configuration::trimString(std::string& rStr) const {
+    std::size_t f = rStr.find_first_not_of(' ');
+    if(f != std::string::npos)
+    {
+        rStr = rStr.substr(f);
+    }
+    std::size_t l = rStr.find_last_not_of(' ');
+    if(l != std::string::npos)
+    {
+        rStr = rStr.substr(0, l + 1);
+    }
+    return rStr;
+}
+
 void Configuration::dumpInfo() const
 {
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_LATITUDE ": ",
-                 std::to_string(sBaseLatitude));
+                 std::to_string(mFbLatitude));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_LONGITUDE ": ",
-                 std::to_string(sBaseLongitude));
+                 std::to_string(mFbLongitude));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_ALTITUDE ": ",
-                 std::to_string(sBaseAltitude));
+                 std::to_string(mFbAltitude));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_GEOID ": ",
-                 std::to_string(sBaseGeoid));
+                 std::to_string(mFbGeoid));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_PRESSURE ": ",
-                 std::to_string(sBaseAtmPressure));
+                 std::to_string(mFbAtmPressure));
     Logger::info("(Config) " SECT_KEY_FILTER "." KV_KEY_MAX_HEIGHT ": ",
-                 std::to_string(sMaxHeight));
+                 std::to_string(mMaxHeight));
     Logger::info("(Config) " SECT_KEY_FILTER "." KV_KEY_MAX_DIST ": ",
-                 std::to_string(sMaxDistance));
+                 std::to_string(mMaxDistance));
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_SERVER_PORT ": ",
-                 std::to_string(sServerPort));
+                 std::to_string(mServerPort));
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ",
                  mGndMode ? "Yes" : "No");
-        Logger::info("(Config) number of feeds: ", std::to_string(sRegisteredFeeds.size()));
+    Logger::info("(Config) number of feeds: ", std::to_string(mFeedsWithMap.size()));
 }
 
 std::uint16_t Configuration::getSServerPort() const
 {
-    return sServerPort;
+    return mServerPort;
 }
 
 std::int32_t Configuration::getSMaxDistance() const
 {
-    return sMaxDistance;
+    return mMaxDistance;
 }
 
 std::int32_t Configuration::getSMaxHeight() const
 {
-    return sMaxHeight;
+    return mMaxHeight;
 }
 
 double Configuration::getSBaseAtmPressure() const
 {
-    return sBaseAtmPressure;
+    return mFbAtmPressure;
 }
 
 double Configuration::getSBaseGeoid() const
 {
-    return sBaseGeoid;
+    return mFbGeoid;
 }
 
 std::int32_t Configuration::getSBaseAltitude() const
 {
-    return sBaseAltitude;
+    return mFbAltitude;
 }
 
 double Configuration::getSBaseLongitude() const
 {
-    return sBaseLongitude;
+    return mFbLongitude;
 }
 
 double Configuration::getSBaseLatitude() const
 {
-    return sBaseLatitude;
+    return mFbLatitude;
 }
 
-bool Configuration::isGndModeEnabled() const{
+bool Configuration::isGndModeEnabled() const
+{
     return mGndMode;
 }
 
-void Configuration::forceGndMode(){
+void Configuration::forceGndMode()
+{
     mGndMode = true;
 }
 
-FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties) {
-	std::list<std::string> list = resolveFeedList(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
-	FeedMapping mapping;
-for (auto& it : list) {
-	mapping.push_back(std::make_pair(it,crProperties.getSectionKeyValue(it)));
-}
-return mapping;
+const FeedMapping& Configuration::getFeeds() const
+{
+    return mFeedsWithMap;
 }
 
 }  // namespace config

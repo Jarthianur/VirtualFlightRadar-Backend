@@ -77,22 +77,22 @@ void test_config(TestSuitesRunner& runner)
                 conf_in << "[sens1]\n" << KV_KEY_HOST << "=localhost\n";
                 conf_in << KV_KEY_PORT << "=3456\n" << KV_KEY_PRIORITY << "=1\n";
                 config::Configuration config(conf_in);
-                auto feed_it = config::Configuration::sRegisteredFeeds.cbegin();
+                auto feed_it = config::Configuration::mFeedsWithMap.cbegin();
                 assert((*feed_it)->mName, std::string("sens1"), helper::eqs);
                 assert((*feed_it)->mPriority, (std::uint32_t) 1, helper::equ);
-                assert((std::int32_t) config::Configuration::sServerPort, 1234, helper::eqi);
+                assert((std::int32_t) config::Configuration::mServerPort, 1234, helper::eqi);
                 assert(config::Configuration::sGndModeEnabled, true, helper::eqb);
-                assert(config::Configuration::sBaseLatitude, 77.777777, helper::eqd);
-                assert(config::Configuration::sBaseLongitude, -12.121212, helper::eqd);
-                assert(config::Configuration::sBaseAltitude, 1234, helper::eqi);
-                assert(config::Configuration::sBaseGeoid, 40.4, helper::eqd);
-                assert(config::Configuration::sBaseAtmPressure, 999.9, helper::eqd);
-                assert(config::Configuration::sMaxHeight, INT32_MAX, helper::eqi);
-                assert(config::Configuration::sMaxDistance, 10000, helper::eqi);
+                assert(config::Configuration::mFbLatitude, 77.777777, helper::eqd);
+                assert(config::Configuration::mFbLongitude, -12.121212, helper::eqd);
+                assert(config::Configuration::mFbAltitude, 1234, helper::eqi);
+                assert(config::Configuration::mFbGeoid, 40.4, helper::eqd);
+                assert(config::Configuration::mFbAtmPressure, 999.9, helper::eqd);
+                assert(config::Configuration::mMaxHeight, INT32_MAX, helper::eqi);
+                assert(config::Configuration::mMaxDistance, 10000, helper::eqi);
             })->test("only valid feeds",
             []()
             {
-                config::Configuration::sRegisteredFeeds.clear();
+                config::Configuration::mFeedsWithMap.clear();
                 std::stringstream conf_in;
                 conf_in << "[" << SECT_KEY_GENERAL << "]\n" << KV_KEY_FEEDS << "=sens,sbs1 , sbs2, else,,\n";
                 conf_in << "[sens]\n" << KV_KEY_HOST << "=127.0.0.1\n" << KV_KEY_PORT << "=3333\n" << KV_KEY_PRIORITY << "=0\n";
@@ -100,14 +100,14 @@ void test_config(TestSuitesRunner& runner)
                 config::Configuration config(conf_in);
                 std::string valid("sens,sbs1,");
                 std::string result;
-                for (auto it = config::Configuration::sRegisteredFeeds.cbegin(); it != config::Configuration::sRegisteredFeeds.cend(); it++)
+                for (auto it = config::Configuration::mFeedsWithMap.cbegin(); it != config::Configuration::mFeedsWithMap.cend(); it++)
                 {
                     result += (*it)->mName + ",";
                 }
                 assert(result, valid, helper::eqs);
             })->test("no feeds", []()
     {
-        config::Configuration::sRegisteredFeeds.clear();
+        config::Configuration::mFeedsWithMap.clear();
         std::stringstream conf_in;
         conf_in << "[" << SECT_KEY_GENERAL << "]\n" << KV_KEY_FEEDS << "=\n";
         assertException<std::logic_error>([&conf_in]()

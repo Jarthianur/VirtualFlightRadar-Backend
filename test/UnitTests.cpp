@@ -41,8 +41,8 @@ int main(int argc, char *argv[])
     auto rep = reporter::createXmlReporter();
     TestSuitesRunner runner;
 
-    config::Configuration::sMaxHeight = INT32_MAX;
-    config::Configuration::sMaxDistance = INT32_MAX;
+    config::Configuration::mMaxHeight = INT32_MAX;
+    config::Configuration::mMaxDistance = INT32_MAX;
 
     test_util(runner);
     test_config(runner);

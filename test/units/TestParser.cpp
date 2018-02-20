@@ -70,10 +70,10 @@ void test_parser(TestSuitesRunner& runner)
             })->test("filter height",
             []()
             {
-                config::Configuration::sMaxHeight = 0;
+                config::Configuration::mMaxHeight = 0;
                 aircraft::Aircraft ac;
                 assert(helper::parsSbs.unpack("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0", ac), false, helper::eqb);
-                config::Configuration::sMaxHeight = INT32_MAX;
+                config::Configuration::mMaxHeight = INT32_MAX;
             });
 
     describe<parser::AprsParser>("unpack", runner)->test("valid msg",
@@ -101,10 +101,10 @@ void test_parser(TestSuitesRunner& runner)
             })->test("filter height",
             []()
             {
-                config::Configuration::sMaxHeight = 0;
+                config::Configuration::mMaxHeight = 0;
                 aircraft::Aircraft ac;
                 assert(helper::parsAprs.unpack("FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz", ac), false, helper::eqb);
-                config::Configuration::sMaxHeight = INT32_MAX;
+                config::Configuration::mMaxHeight = INT32_MAX;
             });
 
     describe<parser::SensorParser>("unpack", runner)->test("valid msg", []()

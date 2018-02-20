@@ -112,6 +112,8 @@ namespace config
 /// @def KV_KEY_LOGIN
 #define KV_KEY_LOGIN "login"
 
+/// @typedef FeedMapping
+/// List of pairs with feed name and key-values
 using FeedMapping = std::list<std::pair<std::string, KeyValueMap> >;
 
 /**
@@ -163,7 +165,7 @@ private:
      * @param rStream The input stream
      * @return true on success and at least one feed was registered, else false
      */
-    bool init(std::istream& rStream);
+    void init(const PropertyMap& crProperties);
 
     /**
      * @fn setFallbacks
@@ -171,7 +173,7 @@ private:
      * @param crProperties The properties
      * @return whether all fallbacks could be set
      */
-    bool setFallbacks(const PropertyMap& crProperties);
+    void setFallbacks(const PropertyMap& crProperties);
 
     /**
      * @fn resolveServerPort
@@ -215,6 +217,8 @@ private:
                                         const std::string& crSection,
                                         const std::string& crKey) const;
 
+    std::string& trimString(std::string& rStr) const;
+
     /**
      * @fn dumpInfo
      * @brief Dump the current config state using info logs.
@@ -223,39 +227,39 @@ private:
 
     /// @var sBaseLatitude
     /// Base latitude
-    double sBaseLatitude;
+    double mFbLatitude;
 
     /// @var sBaseLongitude
     /// Base longitude
-    double sBaseLongitude;
+    double mFbLongitude;
 
     /// @var sBaseAltitude
     /// Base altitude
-    std::int32_t sBaseAltitude;
+    std::int32_t mFbAltitude;
 
     /// @var sBaseGeoid
     /// Base geoid separation
-    double sBaseGeoid;
+    double mFbGeoid;
 
     /// @var sBaseAtmPressure
     /// Atmospheric pressure at base
-    double sBaseAtmPressure;
+    double mFbAtmPressure;
 
     /// @var sMaxHeight
     /// Maximum height for reported Aircrafts
-    std::int32_t sMaxHeight;
+    std::int32_t mMaxHeight;
 
     /// @var sMaxDistance
     /// Maximum distance for reported Aircrafts
-    std::int32_t sMaxDistance;
+    std::int32_t mMaxDistance;
 
     /// @var sServerPort
     /// Port where to serve reports
-    std::uint16_t sServerPort;
+    std::uint16_t mServerPort;
 
     bool mGndMode;
 
-FeedMapping sRegisteredFeeds;
+FeedMapping mFeedsWithMap;
 };
 
 }  // namespace config
