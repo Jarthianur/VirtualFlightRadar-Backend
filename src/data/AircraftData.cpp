@@ -29,7 +29,6 @@
 
 #include "../util/Logger.h"
 #include "../util/Position.h"
-#include "Aircraft.h"
 
 #ifndef ESTIMATED_TRAFFIC
 #define ESTIMATED_TRAFFIC 1
