@@ -26,7 +26,6 @@
 #include <boost/thread/lock_guard.hpp>
 
 #include "../config/Configuration.h"
-#include "../data/GpsData.h"
 #include "../network/client/GpsdClient.h"
 #include "../util/Logger.h"
 #include "../util/Position.h"

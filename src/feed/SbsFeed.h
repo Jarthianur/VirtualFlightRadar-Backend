@@ -27,12 +27,8 @@
 
 #include "../config/PropertyMap.h"
 #include "../parser/SbsParser.h"
+#include "../data/AircraftData.h"
 #include "Feed.h"
-
-namespace data
-{
-class AircraftData;
-}
 
 namespace feed
 {

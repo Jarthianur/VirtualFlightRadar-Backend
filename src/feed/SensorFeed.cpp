@@ -26,8 +26,6 @@
 #include <boost/thread/lock_guard.hpp>
 
 #include "../config/Configuration.h"
-#include "../data/AtmosphereData.h"
-#include "../data/WindData.h"
 #include "../network/client/SensorClient.h"
 #include "../util/Sensor.h"
 

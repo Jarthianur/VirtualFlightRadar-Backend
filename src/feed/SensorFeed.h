@@ -27,13 +27,9 @@
 
 #include "../config/PropertyMap.h"
 #include "../parser/SensorParser.h"
+#include "../data/AtmosphereData.h"
+#include "../data/WindData.h"
 #include "Feed.h"
-
-namespace data
-{
-class WindData;
-class AtmosphereData;
-}
 
 namespace feed
 {

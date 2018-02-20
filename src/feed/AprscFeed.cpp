@@ -28,7 +28,7 @@
 #include <boost/thread/lock_guard.hpp>
 #include "../aircraft/Aircraft.h"
 #include "../config/Configuration.h"
-#include "../data/AircraftData.h"
+
 #include "../network/client/AprscClient.h"
 #include "../util/Logger.h"
 

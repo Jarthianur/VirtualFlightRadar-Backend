@@ -29,7 +29,6 @@
 
 #include "../aircraft/Aircraft.h"
 #include "../config/Configuration.h"
-#include "../data/AircraftData.h"
 #include "../network/client/SbsClient.h"
 
 using namespace util;

@@ -27,12 +27,8 @@
 
 #include "../config/PropertyMap.h"
 #include "../parser/GpsParser.h"
+#include "../data/GpsData.h"
 #include "Feed.h"
-
-namespace data
-{
-class GpsData;
-}
 
 namespace feed
 {
