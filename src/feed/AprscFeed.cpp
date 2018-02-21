@@ -24,12 +24,12 @@
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
-
 #include <boost/thread/lock_guard.hpp>
+
 #include "../aircraft/Aircraft.h"
 #include "../config/Configuration.h"
-
 #include "../network/client/AprscClient.h"
+
 #include "../util/Logger.h"
 
 using namespace util;
@@ -43,7 +43,7 @@ AprscFeed::AprscFeed(const std::string& cr_name, const config::KeyValueMap& cr_k
     auto it = mKvMap.find(KV_KEY_LOGIN);
     if(it == mKvMap.end())
     {
-        Logger::warn("(AprscFeed) could not find: ", mName + "." KV_KEY_LOGIN);
+        Logger::warn({"(AprscFeed) could not find: ", mName, "." KV_KEY_LOGIN});
         throw std::logic_error("No login given");
     }
     else

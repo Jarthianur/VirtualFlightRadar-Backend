@@ -83,7 +83,7 @@ void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
     }
     else
     {
-        Logger::error("(AprscClient) resolve host: ", cr_ec.message());
+        Logger::error({"(AprscClient) resolve host: ", cr_ec.message()});
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -106,7 +106,7 @@ void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
     }
     else
     {
-        Logger::error("(AprscClient) connect: ", cr_ec.message());
+        Logger::error({"(AprscClient) connect: ", cr_ec.message()});
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -134,12 +134,12 @@ noexcept
 {
     if (!cr_ec)
     {
-        Logger::info("(AprscClient) connected to: ", mHost + ":" + mPort);
+        Logger::info({"(AprscClient) connected to: ", mHost , ":" , mPort});
         read();
     }
     else
     {
-        Logger::error("(AprscClient) send login: ", cr_ec.message());
+        Logger::error({"(AprscClient) send login: ", cr_ec.message()});
     }
 }
 
@@ -148,7 +148,7 @@ void AprscClient::handleSendKaBeacon(const boost::system::error_code& cr_ec,
 {
     if (cr_ec)
     {
-        Logger::error("(AprscClient) send beacon:", cr_ec.message());
+        Logger::error({"(AprscClient) send beacon:", cr_ec.message()});
     }
 }
 

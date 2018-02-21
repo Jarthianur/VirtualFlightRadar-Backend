@@ -23,55 +23,79 @@
 
 #include <chrono>
 #include <ctime>
-#include <iostream>
-#include <boost/thread/lock_guard.hpp>
 #include <boost/chrono.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 namespace util
 {
-
 Logger::Logger()
-{
-}
+{}
 
 Logger::~Logger() noexcept
-{
-}
+{}
 
 boost::mutex Logger::mMutex;
+std::ostream* Logger::mpOutStream = &std::cout;
+std::ostream* Logger::mpErrStream = &std::cerr;
 
-const std::string Logger::getTime()
+std::string Logger::getTime()
 {
-    std::time_t tt = boost::chrono::system_clock::to_time_t(
-            boost::chrono::system_clock::now());
+    std::time_t tt
+        = boost::chrono::system_clock::to_time_t(boost::chrono::system_clock::now());
     std::string time(asctime(gmtime(&tt)));
     time.pop_back();
     return time;
 }
 
-void Logger::info(const std::string& cr_subj, const std::string& cr_msg)
+void Logger::info(Message crMsg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cout << "[INFO]  " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
+    *mpOutStream << "[INFO]  " << getTime() << ":: ";
+    for(const auto& it : crMsg)
+    {
+        *mpOutStream << it;
+    }
+    *mpOutStream << std::endl;
 }
 
 // cppcheck-suppress unusedFunction
-void Logger::debug(const std::string& cr_subj, const std::string& cr_msg)
+void Logger::debug(Message crMsg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cout << "[DEBUG] " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
+    *mpOutStream << "[DEBUG] " << getTime() << ":: ";
+    for(const auto& it : crMsg)
+    {
+        *mpOutStream << it;
+    }
+    *mpOutStream << std::endl;
 }
 
-void Logger::warn(const std::string& cr_subj, const std::string& cr_msg)
+void Logger::warn(Message crMsg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cout << "[WARN]  " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
+    *mpOutStream << "[WARN]  " << getTime() << ":: ";
+    for(const auto& it : crMsg)
+    {
+        *mpOutStream << it;
+    }
+    *mpOutStream << std::endl;
 }
 
-void Logger::error(const std::string& cr_subj, const std::string& cr_msg)
+void Logger::error(Message crMsg)
 {
     boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cerr << "[ERROR] " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
+    *mpErrStream << "[ERROR] " << getTime() << ":: ";
+    for(const auto& it : crMsg)
+    {
+        *mpErrStream << it;
+    }
+    *mpErrStream << std::endl;
+}
+
+void Logger::setLogFile(std::ostream* pOut)
+{
+    Logger::mpOutStream = pOut;
+    Logger::mpErrStream = pOut;
 }
 
 }  // namespace util

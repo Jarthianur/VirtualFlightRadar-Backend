@@ -22,11 +22,14 @@
 #ifndef SRC_UTIL_LOGGER_H_
 #define SRC_UTIL_LOGGER_H_
 
+#include <iostream>
 #include <string>
+#include <initializer_list>
 #include <boost/thread/mutex.hpp>
 
 namespace util
 {
+using Message = const std::initializer_list<std::string>&;
 
 /**
  * @class Logger
@@ -45,6 +48,7 @@ public:
      * @brief Destructor
      */
     virtual ~Logger() noexcept;
+
     /**
      * @fn info
      * @brief Log informations to stdout.
@@ -52,7 +56,8 @@ public:
      * @param cr_msg  The msg, default empty
      * @threadsafe
      */
-    static void info(const std::string& cr_subj, const std::string& cr_msg = "");
+    static void info(Message crMsg);
+
     /**
      * @fn debug
      * @brief Log debug informations to stdout.
@@ -60,7 +65,8 @@ public:
      * @param cr_msg  The msg, default empty
      * @threadsafe
      */
-    static void debug(const std::string& cr_subj, const std::string& cr_msg = "");
+    static void debug(Message crMsg);
+
     /**
      * @fn warn
      * @brief Log warnings to stdout.
@@ -68,7 +74,8 @@ public:
      * @param cr_msg  The msg, default empty
      * @threadsafe
      */
-    static void warn(const std::string& cr_subj, const std::string& cr_msg = "");
+    static void warn(Message crMsg);
+
     /**
      * @fn error
      * @brief Log fatal errors to stderr.
@@ -76,18 +83,23 @@ public:
      * @param cr_msg  The msg, default empty
      * @threadsafe
      */
-    static void error(const std::string& cr_subj, const std::string& cr_msg = "");
+    static void error(Message crMsg);
+
+    static void setLogFile(std::ostream* pOut);
 
 private:
     /// Mutex
     static boost::mutex mMutex;
+
+    static std::ostream* mpOutStream;
+    static std::ostream* mpErrStream;
 
     /**
      * @fn getTime
      * @brief Get current date-time as string.
      * @return the date-time-string
      */
-    static const std::string getTime();
+    static std::string getTime();
 };
 
 }  // namespace util

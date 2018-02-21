@@ -88,7 +88,7 @@ public:
      * @threadsafe
      */
     std::string processAircrafts(const struct util::GpsPosition& crBasePos,
-                                 double vAtmPress);
+                                 double vAtmPress) noexcept;
 
 protected:
     friend class feed::AprscFeed;

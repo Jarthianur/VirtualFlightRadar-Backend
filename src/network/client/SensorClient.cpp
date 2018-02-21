@@ -73,7 +73,7 @@ void SensorClient::checkDeadline()
     }
     if (mTimeout.expires_at() <= boost::asio::deadline_timer::traits_type::now())
     {
-        Logger::warn("(WindClient) timed out: reconnect...");
+        Logger::warn({"(WindClient) timed out: reconnect..."});
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -104,7 +104,7 @@ void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
     }
     else
     {
-        Logger::error("(SensorClient) resolve host: ", cr_ec.message());
+        Logger::error({"(SensorClient) resolve host: ", cr_ec.message()});
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -119,12 +119,12 @@ void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(SensorClient) connected to: ", mHost + ":" + mPort);
+        Logger::info({"(SensorClient) connected to: ", mHost , ":" , mPort});
         read();
     }
     else
     {
-        Logger::error("(SensorClient) connect: ", cr_ec.message());
+        Logger::error({"(SensorClient) connect: ", cr_ec.message()});
         if (mSocket.is_open())
         {
             mSocket.close();

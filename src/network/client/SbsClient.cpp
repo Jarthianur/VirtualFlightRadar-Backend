@@ -68,7 +68,7 @@ void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
     }
     else
     {
-        Logger::error("(SbsClient) resolve host: ", cr_ec.message());
+        Logger::error({"(SbsClient) resolve host: ", cr_ec.message()});
         if (mSocket.is_open())
         {
             mSocket.close();
@@ -83,12 +83,12 @@ void SbsClient::handleConnect(const boost::system::error_code& cr_ec,
     if (!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(SbsClient) connected to: ", mHost + ":" + mPort);
+        Logger::info({"(SbsClient) connected to: ", mHost, ":", mPort});
         read();
     }
     else
     {
-        Logger::error("(SbsClient) connect: ", cr_ec.message());
+        Logger::error({"(SbsClient) connect: ", cr_ec.message()});
         if (mSocket.is_open())
         {
             mSocket.close();

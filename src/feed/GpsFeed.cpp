@@ -41,11 +41,13 @@ namespace feed
 {
 GpsFeed::GpsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
                  std::shared_ptr<data::GpsData> pData, bool vGndMode)
-    : Feed(cr_name, cr_kvmap), mUpdateAttempts(0), mpData(pData), mGndModeEnabled(vGndMode)
+    : Feed(cr_name, cr_kvmap),
+      mUpdateAttempts(0),
+      mpData(pData),
+      mGndModeEnabled(vGndMode)
 {
     mpClient = std::unique_ptr<network::client::Client>(new network::client::GpsdClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
-
 }
 
 GpsFeed::~GpsFeed() noexcept
@@ -57,17 +59,20 @@ void GpsFeed::process(const std::string& cr_res) noexcept
     if(mParser.unpack(cr_res, pos))
     {
         boost::lock_guard<boost::mutex> lock(mpData->mMutex);
-        try {
-        mpData->update(pos, getPriority(), mUpdateAttempts);
-        } catch(const std::runtime_error& e) {
-            Logger::info("(GpsFeed) " + mName + ": ", e.what());
+        try
+        {
+            mpData->update(pos, getPriority(), mUpdateAttempts);
+        }
+        catch(const std::runtime_error& e)
+        {
+            Logger::info({"(GpsFeed) ", mName, ": ", e.what()});
             mpClient->stop();
             return;
         }
-        if(mGndModeEnabled && pos.nrSats >= GPS_NR_SATS_GOOD
-           && pos.fixQa >= GPS_FIX_GOOD && pos.dilution <= GPS_HOR_DILUTION_GOOD)
+        if(mGndModeEnabled && pos.nrSats >= GPS_NR_SATS_GOOD && pos.fixQa >= GPS_FIX_GOOD
+           && pos.dilution <= GPS_HOR_DILUTION_GOOD)
         {
-            Logger::info("(GpsFeed) " + mName, ": received good position -> stop");
+            Logger::info({"(GpsFeed) ", mName, ": received good position -> stop"});
             mpData->lockPosition();
             mpClient->stop();
         }

@@ -27,7 +27,6 @@
 #include <utility>
 #include <boost/thread/lock_guard.hpp>
 
-#include "../util/Logger.h"
 #include "../util/Position.h"
 
 #ifndef ESTIMATED_TRAFFIC
@@ -62,7 +61,7 @@ std::vector<Aircraft>::iterator AircraftData::find(const std::string& crId)
 }
 
 std::string AircraftData::processAircrafts(const struct util::GpsPosition& crBasePos,
-                                           double vAtmPress)
+                                           double vAtmPress) noexcept
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     std::string dest_str;
@@ -100,9 +99,8 @@ std::string AircraftData::processAircrafts(const struct util::GpsPosition& crBas
                 mIndexMap.at(it->getId()) = index;
             }
         }
-        catch(const std::exception& e)
+        catch(const std::exception&)
         {
-            Logger::warn("(AircraftData) processAircrafts: ", e.what());
         }
     }
     return dest_str;

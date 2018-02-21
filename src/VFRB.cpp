@@ -75,7 +75,7 @@ VFRB::~VFRB() noexcept
 // only start threads with components here
 void VFRB::run() noexcept
 {
-    Logger::info("(VFRB) startup");
+    Logger::info({"(VFRB) startup"});
     // store start time
     boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
 
@@ -90,7 +90,7 @@ void VFRB::run() noexcept
 #endif  // defined(SIGQUIT)
 
     signal_set.async_wait([this](const boost::system::error_code&, const int) {
-        Logger::info("(VFRB) caught signal: ", "shutdown");
+        Logger::info({"(VFRB) caught signal: ", "shutdown"});
         global_run_status = false;
     });
 
@@ -98,7 +98,7 @@ void VFRB::run() noexcept
 
     // init server and run handler
     boost::thread server_thread([this, &signal_set]() {
-        Logger::info("(Server) start server.");
+        Logger::info({"(Server) start server."});
         mServer.run(signal_set);
         global_run_status = false;
     });
@@ -108,7 +108,7 @@ void VFRB::run() noexcept
     for(const auto& it : mFeeds)
     {
         feed_threads.create_thread([&]() {
-            Logger::info("(VFRB) run feed: ", it->getName());
+            Logger::info({"(VFRB) run feed: ", it->getName()});
             it->run(signal_set);
         });
     }
@@ -142,7 +142,7 @@ void VFRB::run() noexcept
         }
         catch(const std::exception& e)
         {
-            Logger::error("(VFRB) error: ", e.what());
+            Logger::error({"(VFRB) error: ", e.what()});
             global_run_status = false;
         }
     }
@@ -163,7 +163,7 @@ void VFRB::run() noexcept
     time_str += std::to_string(runtime.count() % 60);
     time_str += " mins";
 
-    Logger::info("EXITING / runtime: ", time_str);
+    Logger::info({"EXITING / runtime: ", time_str});
 }
 
 void VFRB::registerFeeds(const config::Configuration& crConfig)
@@ -194,15 +194,15 @@ void VFRB::registerFeeds(const config::Configuration& crConfig)
             }
             else
             {
-                Logger::warn(
-                    "(Config) create feed " + feed.first,
+                Logger::warn({
+                    "(Config) create feed ", feed.first,
                     ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                    ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
+                    ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS});
             }
         }
         catch(const std::exception& e)
         {
-            Logger::warn("(Config) create feed " + feed.first + ": ", e.what());
+            Logger::warn({"(Config) create feed ", feed.first, ": ", e.what()});
         }
     }
 }
