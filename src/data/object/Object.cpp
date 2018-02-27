@@ -29,6 +29,23 @@ Object::Object(std::uint32_t vPriority) : mLastPriority(vPriority)
 Object::~Object() noexcept
 {}
 
+bool Object::tryUpdate(const Object& crOther, std::uint64_t& rAttempts)
+{
+    if((mUpdated = crOther.canUpdate(*this, ++rAttempts)))
+    {
+        *this     = crOther;
+        rAttempts = 0;
+    }
+    return mUpdated;
+}
+
+bool Object::canUpdate(const Object& crOther, std::uint64_t vAttempts) const
+{
+    return this->mLastPriority >= crOther.mLastPriority
+           || (!crOther.mUpdated
+               && (this->mLastPriority * vAttempts >= crOther.mLastPriority));
+}
+
 void Object::setLastPriority(std::uint32_t vPriority)
 {
     mLastPriority = vPriority;

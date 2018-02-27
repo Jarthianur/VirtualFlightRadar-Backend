@@ -24,23 +24,24 @@ namespace object
 ExtGpsPosition::ExtGpsPosition() : Object(0)
 {}
 
-ExtGpsPosition::ExtGpsPosition(std::uint32_t vPriority) : Object(vPriority)
+ExtGpsPosition::ExtGpsPosition(std::uint32_t vPriority, bool vGround)
+    : Object(vPriority), ground(vGround)
 {}
 
 ExtGpsPosition::~ExtGpsPosition() noexcept
 {}
 
-Object& ExtGpsPosition::
-operator=(const boost::tuple<const Object&, std::uint32_t>& crOther)
+Object& ExtGpsPosition::operator=(const Object& crOther)
 {
-    const ExtGpsPosition& crUpdate = static_cast<const ExtGpsPosition&>(crOther.get<0>());
+    const ExtGpsPosition& crUpdate = static_cast<const ExtGpsPosition&>(crOther);
     this->position                 = crUpdate.position;
     this->nrSats                   = crUpdate.nrSats;
     this->fixQa                    = crUpdate.fixQa;
     this->geoid                    = crUpdate.geoid;
     this->dilution                 = crUpdate.dilution;
+    this->ground                   = crUpdate.ground;
+    this->mLastPriority            = crUpdate.mLastPriority;
     return *this;
 }
-
 }
 }

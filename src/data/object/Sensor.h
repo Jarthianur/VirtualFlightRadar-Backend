@@ -37,7 +37,7 @@ public:
     Atmosphere();
     explicit Atmosphere(std::uint32_t vPriority);
     virtual ~Atmosphere() noexcept;
-    Object& operator=(const boost::tuple<const Object&, std::uint32_t>& crOther);
+    Object& operator=(const Object& crOther);
     const std::string& getMdaStr() const;
     double getPressure() const;
 
@@ -53,7 +53,7 @@ public:
     Wind();
     explicit Wind(std::uint32_t vPriority);
     virtual ~Wind() noexcept;
-    Object& operator=(const boost::tuple<const Object&, std::uint32_t>& crOther);
+    Object& operator=(const Object& crOther);
     const std::string& getMwvStr() const;
 
 private:

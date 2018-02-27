@@ -47,15 +47,15 @@ struct Wrapper
      * @param cr_nv The new value
      * @param prio  The attempts priority
      */
-    inline bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
-                            std::uint64_t& rAttempts)
+    inline bool trySetValue(const T& crNewValue, std::uint64_t& rAttempts)
     {
-        mUpdated = (vPriority >= mValue.getLastPriority())
-                   || (!mUpdated && vPriority * ++rAttempts >= mValue.getLastPriority());
+        mUpdated = (crNewValue.getLastPriority() >= mValue.getLastPriority())
+                   || (!mUpdated
+                       && crNewValue.getLastPriority() * ++rAttempts
+                              >= mValue.getLastPriority());
         if(mUpdated)
         {
             mValue = crNewValue;
-            mValue.setLastPriority(vPriority);
         }
         return mUpdated;
     }
@@ -97,15 +97,15 @@ struct TmpWrapper
      * @param cr_nv The new value
      * @param prio  The attempts priority
      */
-    inline bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
-                            std::uint64_t& rAttempts)
+    inline bool trySetValue(const T& crNewValue, std::uint64_t& rAttempts)
     {
-        mUpdated = (vPriority >= mValue.getLastPriority())
-                   || (!mUpdated && vPriority * ++rAttempts >= mValue.getLastPriority());
+        mUpdated = (crNewValue.getLastPriority() >= mValue.getLastPriority())
+                   || (!mUpdated
+                       && crNewValue.getLastPriority() * ++rAttempts
+                              >= mValue.getLastPriority());
         if(mUpdated)
         {
-            mValue = crNewValue;
-            mValue.setLastPriority(vPriority);
+            mValue       = crNewValue;
             isValueValid = true;
         }
         return mUpdated;

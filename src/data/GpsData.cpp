@@ -24,47 +24,51 @@
 #include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
+/// Define GPS metrics
+#define GPS_NR_SATS_GOOD 7
+#define GPS_FIX_GOOD 1
+#define GPS_HOR_DILUTION_GOOD 1.0
+
+using namespace data::object;
+
 namespace data
 {
-GpsData::GpsData(struct util::ExtGpsPosition vPosition)
-{
-    std::uint64_t dummy = 0;
-    mBasePos.trySetValue(vPosition, 0, dummy);
-}
+GpsData::GpsData() : Data()
+{}
+
+GpsData::GpsData(const ExtGpsPosition& crPosition) : Data(), mBasePos(crPosition)
+{}
 
 GpsData::~GpsData() noexcept
 {}
 
-void GpsData::update(const struct util::ExtGpsPosition& crPosition,
-                     std::uint32_t vPriority, std::uint64_t& rAttempts)
+std::string GpsData::getSerialized()
 {
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    return mGpsModule.genGprmcStr(mBasePos) + mGpsModule.genGpggaStr(mBasePos);
+}
+
+bool GpsData::update(const Object& crPosition, std::uint64_t& rAttempts)
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
     if(mPosLocked)
     {
         throw std::runtime_error("Position was locked before.");
     }
-    if(mBasePos.trySetValue(crPosition, vPriority, rAttempts))
+    if(mBasePos.tryUpdate(crPosition, rAttempts))
     {
-        rAttempts = 0;
+        mPosLocked
+            = mBasePos.ground
+              && (mBasePos.nrSats >= GPS_NR_SATS_GOOD && mBasePos.fixQa >= GPS_FIX_GOOD
+                  && mBasePos.dilution <= GPS_HOR_DILUTION_GOOD);
     }
+    return mPosLocked;
 }
 
-std::string GpsData::getGpsStr()
+GpsPosition GpsData::getGpsPosition()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    std::string gps = mGpsModule.genGprmcStr(mBasePos.getValue());
-    gps.append(mGpsModule.genGpggaStr(mBasePos.getValue()));
-    return gps;
-}
-
-struct util::GpsPosition GpsData::getBasePos()
-{
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    return mBasePos.getValue().position;
-}
-
-void GpsData::lockPosition()
-{
-    mPosLocked = true;
+    return mBasePos.position;
 }
 
 }  // namespace data

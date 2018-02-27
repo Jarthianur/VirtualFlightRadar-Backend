@@ -26,13 +26,6 @@
 #include "object/Sensor.h"
 #include "object/Wrapper.hpp"
 
-using namespace data::object;
-
-namespace feed
-{
-class SensorFeed;
-}
-
 /// @namespace data
 namespace data
 {
@@ -49,6 +42,8 @@ public:
      */
     WindData();
 
+    explicit WindData(const object::Wind& crWind);
+
     /**
      * @fn ~WindData
      * @brief Destructor
@@ -64,9 +59,6 @@ public:
      */
     std::string getSerialized() override;
 
-protected:
-    friend class feed::SensorFeed;
-
     /**
      * @fn update
      * @brief Try to update the sensor information.
@@ -74,12 +66,13 @@ protected:
      * @param vPriority The attempts priority
      * @param rAttempts The update attempts
      */
-    void update(const Object& crWind, std::uint64_t& rAttempts) override;
+    bool update(const object::Object& crWind, std::uint64_t& rAttempts) override;
 
 private:
     /// @var mWind
     /// Holding MDA sentence
-    object::TmpWrapper<object::Wind> mWind;
+    object::Wind mWind;
+    bool isValueValid = false;
 };
 
 }  // namespace data

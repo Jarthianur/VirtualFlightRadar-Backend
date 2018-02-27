@@ -163,7 +163,7 @@ public:
      * @param crUpdate  Other Aircraft with new data
      * @param vPriority Priority of the update
      */
-    Object& operator=(const boost::tuple<const Object&, std::uint32_t>& crOther) override;
+    Object& operator=(const Object& crOther) override;
 
     /**
      * @fn getId

@@ -30,11 +30,6 @@
 #include "../util/Logger.h"
 #include "../util/Position.h"
 
-/// Define GPS metrics
-#define GPS_NR_SATS_GOOD 7
-#define GPS_FIX_GOOD 1
-#define GPS_HOR_DILUTION_GOOD 1.0
-
 using namespace util;
 
 namespace feed
@@ -55,26 +50,21 @@ GpsFeed::~GpsFeed() noexcept
 
 void GpsFeed::process(const std::string& cr_res) noexcept
 {
-    struct ExtGpsPosition pos;
+    struct ExtGpsPosition pos(getPriority(), mGndModeEnabled);
     if(mParser.unpack(cr_res, pos))
     {
-        boost::lock_guard<boost::mutex> lock(mpData->mMutex);
         try
         {
-            mpData->update(pos, getPriority(), mUpdateAttempts);
+            if(mpData->update(pos, getPriority(), mUpdateAttempts))
+            {
+                throw std::runtime_error("received good position -> stop");
+            }
         }
         catch(const std::runtime_error& e)
         {
             Logger::info({"(GpsFeed) ", mName, ": ", e.what()});
             mpClient->stop();
             return;
-        }
-        if(mGndModeEnabled && pos.nrSats >= GPS_NR_SATS_GOOD && pos.fixQa >= GPS_FIX_GOOD
-           && pos.dilution <= GPS_HOR_DILUTION_GOOD)
-        {
-            Logger::info({"(GpsFeed) ", mName, ": received good position -> stop"});
-            mpData->lockPosition();
-            mpClient->stop();
         }
     }
 }

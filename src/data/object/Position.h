@@ -50,19 +50,20 @@ class ExtGpsPosition : public Object
 {
 public:
     ExtGpsPosition();
-    explicit ExtGpsPosition(std::uint32_t vPriority);
+    explicit ExtGpsPosition(std::uint32_t vPriority, bool vGround = false);
     virtual ~ExtGpsPosition() noexcept;
-    Object& operator=(const boost::tuple<const Object&, std::uint32_t>& crOther) override;
+    Object& operator=(const Object& crOther) override;
 
     /// Position
     struct GpsPosition position;
     /// Number of satellites
-    std::int32_t nrSats;
+    std::int32_t nrSats = 0;
     /// GPS fix quality
-    std::int32_t fixQa;
+    std::int32_t fixQa = 0;
     /// Geoid separation
-    double geoid;
-    double dilution;
+    double geoid = 0.0;
+    double dilution = 0.0;
+    bool ground = false;
 };
 }  // namespace object
 }  // namespace data

@@ -21,18 +21,10 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include <boost/thread/mutex.hpp>
+#include "Data.h"
 
-#include "../util/GpsModule.h"
-#include "../util/Position.h"
-#include "../util/Wrapper.hpp"
-
-namespace feed
-{
-class GpsFeed;
-}
+#include "object/Position.h"
+#include "object/Wrapper.hpp"
 
 /// @namespace data
 namespace data
@@ -41,15 +33,18 @@ namespace data
  * @class GpsData
  * @brief Manage GPS information.
  */
-class GpsData
+class GpsData: public Data
 {
 public:
+
+    GpsData();
+
     /**
      * @fn GpsData
      * @brief Constructor
      * @param vPosition The initial info
      */
-    explicit GpsData(struct util::ExtGpsPosition vPosition);
+    explicit GpsData(const object::ExtGpsPosition& crPosition);
 
     /**
      * @fn ~GpsData
@@ -64,7 +59,7 @@ public:
      * @return the NMEA string
      * @threadsafe
      */
-    std::string getGpsStr();
+    std::string getSerialized() override;
 
     /**
      * @fn getBasePos
@@ -72,39 +67,26 @@ public:
      * @return the position
      * @threadsafe
      */
-    struct util::GpsPosition getBasePos();
+    object::GpsPosition getGpsPosition();
 
-protected:
-    friend class feed::GpsFeed;
-
-    /// @var mMutex
-    /// Used for RW on this data
-    boost::mutex mMutex;
-
-    /**
-     * @fn lockPosition
-     * @brief Set the current position to locked
-     */
-    void lockPosition();
-
-    /**
+        /**
      * @fn update
      * @brief Try to update the base position.
      * @param crPosition The new position
      * @param vPriority  The attempts priority
      * @param rAttempts  The update attempts
      */
-    void update(const struct util::ExtGpsPosition& crPosition, std::uint32_t vPriority,
-                std::uint64_t& rAttempts);
+    bool update(const object::Object& crPosition,
+                std::uint64_t& rAttempts) override;
 
 private:
     /// @var mBasePos
     /// Wrapper holding the base position
-    struct util::Wrapper<struct util::ExtGpsPosition> mBasePos;
+    object::ExtGpsPosition mBasePos;
 
     /// @var mGpsModule
     /// GpsModule providing functionality to build GPS sentences
-    util::GpsModule mGpsModule;
+    processing::GpsModule mGpsModule;
 
     /// @var mPosLocked
     /// Locking state of the current position

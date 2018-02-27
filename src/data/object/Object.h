@@ -18,7 +18,6 @@
 #pragma once
 
 #include <cstdint>
-#include <boost/tuple/tuple.hpp>
 
 namespace data
 {
@@ -33,9 +32,10 @@ public:
 
     virtual ~Object() noexcept;
 
-    virtual Object& operator=(const boost::tuple<const Object&, std::uint32_t>& crOther) = 0;
+    virtual Object& operator=(const Object& crOther) = 0;
 
-protected:
+    virtual bool tryUpdate(const Object& crOther, std::uint64_t& rAttempts);
+
     /**
      * @fn setLastPriority
      * @brief Set the lastly updating priority.
@@ -50,9 +50,12 @@ protected:
      */
     std::uint32_t getLastPriority() const;
 
+protected:
+    virtual bool canUpdate(const Object& crOther, std::uint64_t vAttempts) const;
     /// @var mLastPriority
     /// Got last update with this priority.
     std::uint32_t mLastPriority;
+    bool mUpdated;
 };
 }
 }

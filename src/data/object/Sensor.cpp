@@ -30,12 +30,12 @@ Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)
 Atmosphere::~Atmosphere() noexcept
 {}
 
-Object& Atmosphere::operator=(const boost::tuple<const Object&, std::uint32_t>& crOther)
+Object& Atmosphere::operator=(const Object& crOther)
 {
-    const Atmosphere& crUpdate = static_cast<const Atmosphere&>(crOther.get<0>());
+    const Atmosphere& crUpdate = static_cast<const Atmosphere&>(crOther);
     this->mMdaStr              = crUpdate.mMdaStr;
     this->mPressure            = crUpdate.mPressure;
-    this->mLastPriority        = crOther.get<1>();
+    this->mLastPriority        = crUpdate.mLastPriority;
     return *this;
 }
 
@@ -58,11 +58,11 @@ Wind::Wind(std::uint32_t vPriority) : Object(vPriority)
 Wind::~Wind() noexcept
 {}
 
-Object& Wind::operator=(const boost::tuple<const Object&, std::uint32_t>& crOther)
+Object& Wind::operator=(const Object& crOther)
 {
-    const Wind& crUpdate = static_cast<const Wind&>(crOther.get<0>());
+    const Wind& crUpdate = static_cast<const Wind&>(crOther);
     this->mMwvStr        = crUpdate.mMwvStr;
-    this->mLastPriority  = crOther.get<1>();
+    this->mLastPriority  = crUpdate.mLastPriority;
     return *this;
 }
 

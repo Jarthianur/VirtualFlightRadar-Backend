@@ -23,36 +23,35 @@
 
 #include <boost/thread/lock_guard.hpp>
 
+using namespace data::object;
+
 namespace data
 {
-WindData::WindData()
-{
-    std::uint64_t dummy = 0;
-    mWind.trySetValue(, 0, dummy);
-}
+WindData::WindData() : Data()
+{}
+
+WindData::WindData(const object::Wind& crWind) : Data(), mWind(crWind)
+{}
 
 WindData::~WindData() noexcept
 {}
 
-void WindData::update(const Object& crWind, std::uint64_t& rAttempts)
-{
-    if(mWind.trySetValue(crWind, vPriority, rAttempts))
-    {
-        rAttempts = 0;
-    }
-}
-
 std::string WindData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    if(mWind.isValueValid)
+    isValueValid = false;
+    return isValueValid ? mWind.getMwvStr() + "\n" : "";
+}
+
+bool WindData::update(const Object& crWind, std::uint64_t& rAttempts)
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    if(mWind.tryUpdate(crWind, rAttempts))
     {
-        return mWind.getValue().mwvStr + "\n";
+        isValueValid = true;
+        return true;
     }
-    else
-    {
-        return "";
-    }
+    return false;
 }
 
 }  // namespace data

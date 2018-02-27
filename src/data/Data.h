@@ -33,10 +33,10 @@ class Data
 public:
     Data();
     virtual ~Data() noexcept;
-    virtual std::string getSerialized() = 0;
+    virtual std::string getSerialized()                                     = 0;
+    virtual bool update(const object::Object& _1, std::uint64_t& rAttempts) = 0;
 
 protected:
-    virtual void update(const object::Object& _1, std::uint64_t& rAttempts) = 0;
     /// @var mMutex
     /// Used for RW on this data
     boost::mutex mMutex;
