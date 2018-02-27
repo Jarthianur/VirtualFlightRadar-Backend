@@ -104,8 +104,7 @@ protected:
      * @param rUpdate
      * @param vPriority
      */
-    void update(const aircraft::Aircraft& crUpdate, std::uint32_t vPriority,
-                std::uint64_t&);
+    void update(const aircraft::Aircraft& crUpdate, std::uint32_t vPriority);
 
 private:
     /**

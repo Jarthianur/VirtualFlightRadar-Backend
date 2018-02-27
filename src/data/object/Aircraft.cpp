@@ -21,17 +21,17 @@
 
 #include "Aircraft.h"
 
-using namespace util;
-
-namespace aircraft
+namespace data
 {
-Aircraft::Aircraft()
+namespace object
+{
+Aircraft::Aircraft() : Object()
 {}
 
-Aircraft::Aircraft(std::uint32_t vPriority) : mLastPriority(vPriority)
+Aircraft::Aircraft(std::uint32_t vPriority) : Object(vPriority)
 {}
 
-Aircraft::Aircraft(std::string& rId, struct GpsPosition& rPos)
+Aircraft::Aircraft(std::string& rId, GpsPosition& rPos)
     : mId(rId),
       mIdType(IdType::ICAO),
       mAircraftType(AircraftType::POWERED_AIRCRAFT),
@@ -40,7 +40,7 @@ Aircraft::Aircraft(std::string& rId, struct GpsPosition& rPos)
 {}
 
 Aircraft::Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
-                   struct GpsPosition& rPos, struct Movement& rMove)
+                   GpsPosition& rPos, Movement& rMove)
     : mId(rId),
       mIdType(vIdType),
       mAircraftType(vAircraftType),
@@ -100,11 +100,6 @@ std::uint64_t& Aircraft::getUpdateAge()
     return mUpdateAge;
 }
 
-std::uint32_t Aircraft::getLastPriority() const
-{
-    return mLastPriority;
-}
-
 double Aircraft::getLatitude() const
 {
     return mPosition.latitude;
@@ -145,7 +140,7 @@ void Aircraft::setId(const std::string& crId)
     mId = crId;
 }
 
-void Aircraft::setPosition(const struct util::GpsPosition& crPos)
+void Aircraft::setPosition(const GpsPosition& crPos)
 {
     mPosition = crPos;
 }
@@ -188,9 +183,5 @@ void Aircraft::setFullInfo(bool vInfo)
     mFullInfo = vInfo;
 }
 
-void Aircraft::setLastPriority(std::uint32_t vPriority)
-{
-    mLastPriority = vPriority;
-}
-
-}  // namespace aircraft
+}  // namespace object
+}  // namespace data

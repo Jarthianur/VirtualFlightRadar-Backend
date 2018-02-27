@@ -21,17 +21,20 @@
 
 #pragma once
 
-#include <cstdint>
 #include <string>
 
-#include "../util/Position.h"
+#include "Object.h"
+#include "Position.h"
 
 /// @def A_VALUE_NA
 /// Indicate a double value is not available.
 #define A_VALUE_NA -1024.0
 
-/// @namespace aircraft
-namespace aircraft
+/// @namespace data
+namespace data
+{
+/// @namespace object
+namespace object
 {
 /**
  * @struct Movement
@@ -56,7 +59,7 @@ struct Movement
  * @class Aircraft
  * @brief Respresents an aircraft.
  */
-class Aircraft
+class Aircraft : public Object
 {
 public:
     /**
@@ -126,7 +129,7 @@ public:
      * @param rId  The id
      * @param rPos The position
      */
-    Aircraft(std::string& rId, struct util::GpsPosition& rPos);
+    Aircraft(std::string& rId, GpsPosition& rPos);
 
     /**
      * @fn Aircraft
@@ -138,7 +141,7 @@ public:
      * @param rMove         The aircrafts movement
      */
     Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
-             struct util::GpsPosition& rPos, struct Movement& rMove);
+             GpsPosition& rPos, Movement& rMove);
 
     /**
      * @fn ~Aircraft
@@ -208,13 +211,6 @@ public:
     std::uint64_t& getUpdateAge();
 
     /**
-     * @fn getLastPriority
-     * @brief Get last written priority.
-     * @return the last priority
-     */
-    std::uint32_t getLastPriority() const;
-
-    /**
      * @fn getLatitude
      * @brief Get the last known latitude.
      * @return the latitude
@@ -275,7 +271,7 @@ public:
      * @brief Set the GPS position.
      * @param crPos The new position
      */
-    void setPosition(const struct util::GpsPosition& crPos);
+    void setPosition(const GpsPosition& crPos);
 
     /**
      * @fn setAircraftType
@@ -329,13 +325,6 @@ public:
      */
     void setFullInfo(bool vInfo = true);
 
-    /**
-     * @fn setLastPriority
-     * @brief Set the lastly updating priority.
-     * @param vPriority
-     */
-    void setLastPriority(std::uint32_t vPriority);
-
 private:
     /// @var mId
     /// Aircraft identifier
@@ -354,11 +343,11 @@ private:
 
     /// @var mPosition
     /// Currently known position.
-    struct util::GpsPosition mPosition;
+    GpsPosition mPosition;
 
     /// @var mMovement
     /// Currently known movement.
-    struct Movement mMovement;
+    Movement mMovement;
 
     /// @var mFullInfo
     /// Is full set of information available?
@@ -368,13 +357,10 @@ private:
     /// Times processed without update.
     std::uint64_t mUpdateAge = 0;
 
-    /// @var mLastPriority
-    /// Got last update with this priority.
-    std::uint32_t mLastPriority = 0;
-
     /// @var mUpdateAttempts
     /// Number of unsuccessfull update attempts.
     std::uint64_t mUpdateAttempts = 0;
 };
 
-}  // namespace aircraft
+}  // namespace object
+}  // namespace data

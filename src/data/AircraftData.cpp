@@ -106,8 +106,7 @@ std::string AircraftData::processAircrafts(const struct util::GpsPosition& crBas
     return dest_str;
 }
 
-void AircraftData::update(const Aircraft& rUpdate, std::uint32_t vPriority,
-                          std::uint64_t&)
+void AircraftData::update(const Aircraft& rUpdate, std::uint32_t vPriority)
 {
     auto known_ac = find(rUpdate.getId());
     if(known_ac != mContainer.end())

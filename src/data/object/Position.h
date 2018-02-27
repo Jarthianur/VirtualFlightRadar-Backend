@@ -19,45 +19,44 @@
  }
  */
 
-#ifndef UTIL_SENSOR_H_
-#define UTIL_SENSOR_H_
+#pragma once
 
-#include <string>
+#include <cstdint>
+#include "Object.h"
 
-/// ICAO standard atmospheric pressure at MSL
-#define ICAO_STD_A 1013.25
-
-namespace util
+namespace data
 {
-
-struct Atmosphere
+namespace object
 {
-    std::string mdaStr;
-    double pressure;
-    /* Humidity and temperature are not important for us.*/
+/**
+ * @class GpsPosition
+ * @brief Minimal information for a position.
+ */
+struct GpsPosition
+{
+    /// Latitude; deg
+    double latitude;
+    /// Longitude; deg
+    double longitude;
+    /// Altitude; m
+    std::int32_t altitude;
 };
 
-struct Wind
+/**
+ * @class ExtGpsPosition
+ * @brief GPS position and meta information.
+ */
+class ExtGpsPosition : public Object
 {
-    std::string mwvStr;
+public:
+    /// Position
+    struct GpsPosition position;
+    /// Number of satellites
+    std::int32_t nrSats,
+        /// GPS fix quality
+        fixQa;
+    /// Geoid separation
+    double geoid, dilution;
 };
-
-struct Climate
-{
-	struct Wind mWind;
-	struct Atmosphere mAtmosphere;
-
-	inline bool hasAtmosphere()
-	{
-        return !mAtmosphere.mdaStr.empty();
-	}
-
-	inline bool hasWind()
-	{
-        return !mWind.mwvStr.empty();
-	}
-};
-
-}  // namespace util
-
-#endif /* UTIL_SENSOR_H_ */
+}  // namespace object
+}  // namespace data

@@ -25,8 +25,9 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
-#include "../util/Sensor.h"
-#include "../util/Wrapper.hpp"
+#include "object/Sensor.h"
+#include "object/Wrapper.hpp"
+#include "Data.h"
 
 namespace feed
 {
@@ -40,7 +41,7 @@ namespace data
  * @class WindData
  * @brief Manage sensor information.
  */
-class WindData
+class WindData : public Data
 {
 public:
     /**
@@ -78,8 +79,8 @@ protected:
      * @param vPriority The attempts priority
      * @param rAttempts The update attempts
      */
-    void update(const struct util::Wind& crWind, std::uint32_t vPriority,
-                std::uint64_t& rAttempts);
+    void update(const struct util::Wind* crWind, std::uint32_t vPriority,
+                std::uint64_t& rAttempts) override;
 
 private:
     /// @var mWind
