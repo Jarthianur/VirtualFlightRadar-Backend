@@ -15,28 +15,13 @@
  }
  */
 
-#include "Object.h"
+#include "Data.h"
+
 namespace data
 {
-namespace object
-{
-Object::Object() : mLastPriority(0)
+Data::Data()
 {}
 
-Object::Object(std::uint32_t vPriority) : mLastPriority(vPriority)
+Data::~Data() noexcept
 {}
-
-Object::~Object() noexcept
-{}
-
-void Object::setLastPriority(std::uint32_t vPriority)
-{
-    mLastPriority = vPriority;
-}
-
-std::uint32_t Object::getLastPriority() const
-{
-    return mLastPriority;
-}
-}
 }

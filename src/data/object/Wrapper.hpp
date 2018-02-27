@@ -23,54 +23,56 @@
 
 #include <cstdint>
 #include <string>
+#include <type_traits>
 
 #include "Object.h"
 
 namespace data
 {
-namespace object {
-
-
+namespace object
+{
 /**
  * @class Wrapper
  * @brief Store any value and provide per Wrapper meta-data and mutex.
  * @tparam T The type of value to hold
  */
+template<typename T,
+         typename std::enable_if<std::is_base_of<Object, T>::value>::type* = nullptr>
 struct Wrapper
 {
-            /**
-	 * @fn trySetValue
-	 * @brief Try to set the value, fails if attempts priority is less.
-	 * @note Succeeds always if attempt is valid.
-	 * @param cr_nv The new value
-	 * @param prio  The attempts priority
-	 */
-    bool trySetValue(const Object& crNewValue, std::uint32_t vPriority,
-	        std::uint64_t& rAttempts)
-	{
+    /**
+     * @fn trySetValue
+     * @brief Try to set the value, fails if attempts priority is less.
+     * @note Succeeds always if attempt is valid.
+     * @param cr_nv The new value
+     * @param prio  The attempts priority
+     */
+    inline bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
+                            std::uint64_t& rAttempts)
+    {
         mUpdated = (vPriority >= mValue.getLastPriority())
-                || (!mUpdated && vPriority * ++rAttempts >= mValue.getLastPriority());
-		if (mUpdated)
-		{
-			mValue = crNewValue;
+                   || (!mUpdated && vPriority * ++rAttempts >= mValue.getLastPriority());
+        if(mUpdated)
+        {
+            mValue = crNewValue;
             mValue.setLastPriority(vPriority);
-		}
-		return mUpdated;
-	}
+        }
+        return mUpdated;
+    }
 
-	/**
-	 * @fn getValue
-	 * @brief Get the value.
-	 * @return the value
-	 */
+    /**
+     * @fn getValue
+     * @brief Get the value.
+     * @return the value
+     */
     inline const Object& getValue()
-	{
-		return mValue;
-	}
+    {
+        return mValue;
+    }
 
 private:
     /// The value
-    Object mValue;
+    T mValue;
 
     ///
     bool mUpdated = false;
@@ -81,43 +83,44 @@ private:
  * @brief Pseudo temporary Wrapper; value is invalid after read and valid after write.
  * @tparam T the type of value to hold
  */
-template<typename T>
+template<typename T,
+         typename std::enable_if<std::is_base_of<Object, T>::value>::type* = nullptr>
 struct TmpWrapper
 {
-	/// Is the value valid?
+    /// Is the value valid?
     bool isValueValid = false;
 
-	/**
-	 * @fn trySetValue
-	 * @brief Try to set the value, fails if attempts priority is less.
-	 * @note Succeeds always if attempt is valid.
-	 * @param cr_nv The new value
-	 * @param prio  The attempts priority
-	 */
-	bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
-	        std::uint64_t& rAttempts)
-	{
-		mUpdated = (vPriority >= mLastPriority)
-		        || (!mUpdated && vPriority * ++rAttempts >= mLastPriority);
-		if (mUpdated)
-		{
-			mValue = crNewValue;
-			mLastPriority = vPriority;
-			isValueValid = true;
-		}
-		return mUpdated;
-	}
+    /**
+     * @fn trySetValue
+     * @brief Try to set the value, fails if attempts priority is less.
+     * @note Succeeds always if attempt is valid.
+     * @param cr_nv The new value
+     * @param prio  The attempts priority
+     */
+    inline bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
+                            std::uint64_t& rAttempts)
+    {
+        mUpdated = (vPriority >= mValue.getLastPriority())
+                   || (!mUpdated && vPriority * ++rAttempts >= mValue.getLastPriority());
+        if(mUpdated)
+        {
+            mValue = crNewValue;
+            mValue.setLastPriority(vPriority);
+            isValueValid = true;
+        }
+        return mUpdated;
+    }
 
-	/**
-	 * @fn getValue
-	 * @brief Get the value and invalidate it.
-	 * @return the value
-	 */
-	inline const T& getValue()
-	{
-		isValueValid = false;
-		return mValue;
-	}
+    /**
+     * @fn getValue
+     * @brief Get the value and invalidate it.
+     * @return the value
+     */
+    inline const T& getValue()
+    {
+        isValueValid = false;
+        return mValue;
+    }
 
 private:
     /// The value

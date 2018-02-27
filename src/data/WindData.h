@@ -21,13 +21,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include <boost/thread/mutex.hpp>
+#include "Data.h"
 
 #include "object/Sensor.h"
 #include "object/Wrapper.hpp"
-#include "Data.h"
+
+using namespace data::object;
 
 namespace feed
 {
@@ -63,14 +62,10 @@ public:
      * @return the MWV sentence, if valid, else empty string
      * @threadsafe
      */
-    std::string getMwvStr();
+    std::string getSerialized() override;
 
 protected:
     friend class feed::SensorFeed;
-
-    /// @var mMutex
-    /// Used for RW on this data
-    boost::mutex mMutex;
 
     /**
      * @fn update
@@ -79,13 +74,12 @@ protected:
      * @param vPriority The attempts priority
      * @param rAttempts The update attempts
      */
-    void update(const struct util::Wind* crWind, std::uint32_t vPriority,
-                std::uint64_t& rAttempts) override;
+    void update(const Object& crWind, std::uint64_t& rAttempts) override;
 
 private:
     /// @var mWind
     /// Holding MDA sentence
-    struct util::TmpWrapper<util::Wind> mWind;
+    object::TmpWrapper<object::Wind> mWind;
 };
 
 }  // namespace data

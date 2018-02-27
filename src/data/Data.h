@@ -15,28 +15,30 @@
  }
  */
 
-#include "Object.h"
+#pragma once
+
+#include <cstdint>
+#include <string>
+#include <boost/thread/mutex.hpp>
+
 namespace data
 {
 namespace object
 {
-Object::Object() : mLastPriority(0)
-{}
+class Object;
+}
 
-Object::Object(std::uint32_t vPriority) : mLastPriority(vPriority)
-{}
-
-Object::~Object() noexcept
-{}
-
-void Object::setLastPriority(std::uint32_t vPriority)
+class Data
 {
-    mLastPriority = vPriority;
-}
+public:
+    Data();
+    virtual ~Data() noexcept;
+    virtual std::string getSerialized() = 0;
 
-std::uint32_t Object::getLastPriority() const
-{
-    return mLastPriority;
-}
-}
+protected:
+    virtual void update(const object::Object& _1, std::uint64_t& rAttempts) = 0;
+    /// @var mMutex
+    /// Used for RW on this data
+    boost::mutex mMutex;
+};
 }
