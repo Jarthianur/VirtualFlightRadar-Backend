@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <boost/tuple/tuple.hpp>
 
 namespace data
 {
@@ -14,6 +15,8 @@ public:
     explicit Object(std::uint32_t vPriority);
 
     virtual ~Object() noexcept;
+
+    virtual Object& operator=(const boost::tuple<const Object&, std::uint32_t>& crOther) = 0;
 
 protected:
     /**

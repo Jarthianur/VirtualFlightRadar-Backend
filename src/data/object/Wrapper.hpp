@@ -19,21 +19,23 @@
  }
  */
 
-#ifndef SRC_UTIL_WRAPPER_HPP_
-#define SRC_UTIL_WRAPPER_HPP_
+#pragma once
 
 #include <cstdint>
 #include <string>
 
-namespace util
+#include "Object.h"
+
+namespace data
 {
+namespace object {
+
 
 /**
  * @class Wrapper
  * @brief Store any value and provide per Wrapper meta-data and mutex.
  * @tparam T The type of value to hold
  */
-template<typename T>
 struct Wrapper
 {
             /**
@@ -43,15 +45,15 @@ struct Wrapper
 	 * @param cr_nv The new value
 	 * @param prio  The attempts priority
 	 */
-	bool trySetValue(const T& crNewValue, std::uint32_t vPriority,
+    bool trySetValue(const Object& crNewValue, std::uint32_t vPriority,
 	        std::uint64_t& rAttempts)
 	{
-		mUpdated = (vPriority >= mLastPriority)
-		        || (!mUpdated && vPriority * ++rAttempts >= mLastPriority);
+        mUpdated = (vPriority >= mValue.getLastPriority())
+                || (!mUpdated && vPriority * ++rAttempts >= mValue.getLastPriority());
 		if (mUpdated)
 		{
 			mValue = crNewValue;
-			mLastPriority = vPriority;
+            mValue.setLastPriority(vPriority);
 		}
 		return mUpdated;
 	}
@@ -61,17 +63,14 @@ struct Wrapper
 	 * @brief Get the value.
 	 * @return the value
 	 */
-	inline const T& getValue()
+    inline const Object& getValue()
 	{
 		return mValue;
 	}
 
 private:
     /// The value
-    T mValue;
-
-    /// Last written priority
-    std::uint32_t mLastPriority = 0;
+    Object mValue;
 
     ///
     bool mUpdated = false;
@@ -124,13 +123,9 @@ private:
     /// The value
     T mValue;
 
-	/// Last written priority
-    std::uint32_t mLastPriority = 0;
-
     ///
     bool mUpdated = false;
 };
 
 }  // namespace util
-
-#endif /* SRC_UTIL_WRAPPER_HPP_ */
+}

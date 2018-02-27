@@ -35,26 +35,28 @@ class Atmosphere : public Object
 {
 public:
     Atmosphere();
+    explicit Atmosphere(std::uint32_t vPriority);
     virtual ~Atmosphere() noexcept;
     const std::string& getMdaStr() const;
     double getPressure() const;
 
 private:
     friend struct Climate;
-    std::string mdaStr;
-    double pressure;
+    std::string mMdaStr;
+    double mPressure = ICAO_STD_A;
 };
 
 class Wind : public Object
 {
 public:
     Wind();
+    explicit Wind(std::uint32_t vPriority);
     virtual ~Wind() noexcept;
     const std::string& getMwvStr() const;
 
 private:
     friend struct Climate;
-    std::string mwvStr;
+    std::string mMwvStr;
 };
 
 struct Climate
@@ -64,12 +66,12 @@ struct Climate
 
     inline bool hasAtmosphere()
     {
-        return !mAtmosphere.mdaStr.empty();
+        return !mAtmosphere.mMdaStr.empty();
     }
 
     inline bool hasWind()
     {
-        return !mWind.mwvStr.empty();
+        return !mWind.mMwvStr.empty();
     }
 };
 

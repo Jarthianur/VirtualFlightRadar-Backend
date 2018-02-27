@@ -57,8 +57,9 @@ bool Aircraft::operator==(const Aircraft& crOther) const
     return this->mId == crOther.mId;
 }
 
-void Aircraft::update(const Aircraft& crUpdate, std::uint32_t vPriority)
+Object& Aircraft::operator=(const boost::tuple<const Object&, std::uint32_t>& crOther)
 {
+    const Aircraft& crUpdate = static_cast<const Aircraft&>(crOther.get<0>());
     this->mIdType         = crUpdate.mIdType;
     this->mAircraftType   = crUpdate.mAircraftType;
     this->mTargetType     = crUpdate.mTargetType;
@@ -66,8 +67,9 @@ void Aircraft::update(const Aircraft& crUpdate, std::uint32_t vPriority)
     this->mMovement       = crUpdate.mMovement;
     this->mFullInfo       = crUpdate.mFullInfo;
     this->mUpdateAge      = 0;
-    this->mLastPriority   = vPriority;
+    this->mLastPriority   = crOther.get<1>();
     this->mUpdateAttempts = 0;
+    return *this;
 }
 
 const std::string& Aircraft::getId() const
