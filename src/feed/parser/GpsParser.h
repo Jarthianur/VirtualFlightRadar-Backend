@@ -28,6 +28,8 @@
 #include "../data/object/Position.h"
 #include "Parser.hpp"
 
+namespace feed
+{
 namespace parser
 {
 /**
@@ -61,5 +63,5 @@ private:
     /// Regular expression to parse GGA
     static const boost::regex msGpggaRe;
 };
-
+}
 }  // namespace parser

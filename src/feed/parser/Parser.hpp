@@ -19,19 +19,14 @@
  }
  */
 
-#ifndef SRC_PARSER_PARSER_HPP_
-#define SRC_PARSER_PARSER_HPP_
+#pragma once
 
 #include <string>
 
-namespace aircraft
+namespace feed
 {
-class Aircraft;
-}
-
 namespace parser
 {
-
 /**
  * @class Parser
  * @brief Interface for parsers.
@@ -46,15 +41,13 @@ public:
      * @brief Constructor
      */
     inline Parser()
-    {
-    }
+    {}
     /**
      * @fn ~Parser
      * @brief Destructor
      */
     inline virtual ~Parser() noexcept
-    {
-    }
+    {}
     /**
      * @fn unpack
      * @brief Unpack a given string into the templated object.
@@ -67,5 +60,4 @@ public:
 };
 
 }  // namespace parser
-
-#endif /* SRC_PARSER_PARSER_HPP_ */
+}

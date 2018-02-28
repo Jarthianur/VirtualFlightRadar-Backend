@@ -29,6 +29,8 @@
 #define GPS_FIX_GOOD 1
 #define GPS_HOR_DILUTION_GOOD 1.0
 
+namespace feed
+{
 using namespace data::object;
 
 namespace data
@@ -78,5 +80,5 @@ GpsPosition GpsData::getGpsPosition()
     boost::lock_guard<boost::mutex> lock(mMutex);
     return mBasePos.position;
 }
-
+}
 }  // namespace data

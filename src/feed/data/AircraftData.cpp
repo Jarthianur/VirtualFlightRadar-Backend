@@ -31,6 +31,8 @@
 #define ESTIMATED_TRAFFIC 1
 #endif
 
+namespace feed
+{
 using namespace data::object;
 
 namespace data
@@ -146,5 +148,5 @@ void AircraftData::insert(const object::Aircraft& crAircraft)
          {mContainer.size(), std::vector<std::uint64_t>(nrOfRegisteredFeeds, 0)}});
     mContainer.push_back(crAircraft);
 }
-
+}
 }  // namespace aircraft

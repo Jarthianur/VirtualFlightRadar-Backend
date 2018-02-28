@@ -19,37 +19,32 @@
  }
  */
 
-#include "../../network/server/Server.h"
+#include "Server.h"
 
+#include <algorithm>
+#include <iterator>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/system/error_code.hpp>
-#include <algorithm>
-#include <iterator>
 #include <boost/thread/lock_guard.hpp>
 
-#include "../../util/Logger.h"
+#include "../util/Logger.h"
 
 using namespace util;
 
-namespace network
-{
 namespace server
 {
-
 Server::Server(std::uint16_t port)
-        : mIOservice(),
-          mAcceptor(mIOservice,
-                  boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
-                  boost::asio::ip::tcp::acceptor::reuse_address(true)),
-          mSocket(mIOservice)
-{
-    }
+    : mIOservice(),
+      mAcceptor(mIOservice,
+                boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
+                boost::asio::ip::tcp::acceptor::reuse_address(true)),
+      mSocket(mIOservice)
+{}
 
 Server::~Server() noexcept
-{
-}
+{}
 
 void Server::run(boost::asio::signal_set& r_sigset)
 {
@@ -60,12 +55,16 @@ void Server::run(boost::asio::signal_set& r_sigset)
 
 void Server::writeToAll(const std::string& cr_msg)
 {
+    if(cr_msg.empty())
+    {
+        return;
+    }
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     boost::system::error_code ec;
-    for (auto it = mClients.begin(); it != mClients.end();)
+    for(auto it = mClients.begin(); it != mClients.end();)
     {
         boost::asio::write(it->get()->getSocket(), boost::asio::buffer(cr_msg), ec);
-        if (ec)
+        if(ec)
         {
             Logger::warn({"(Server) lost connection to: ", it->get()->getIp()});
             mClients.erase(it);
@@ -79,14 +78,13 @@ void Server::writeToAll(const std::string& cr_msg)
 
 void Server::accept()
 {
-    mAcceptor.async_accept(mSocket,
-            boost::bind(&Server::handleAccept, this, boost::asio::placeholders::error));
+    mAcceptor.async_accept(mSocket, boost::bind(&Server::handleAccept, this,
+                                                boost::asio::placeholders::error));
 }
 
 void Server::awaitStop(boost::asio::signal_set& r_sigset)
 {
-    r_sigset.async_wait([this](const boost::system::error_code&, int)
-    {
+    r_sigset.async_wait([this](const boost::system::error_code&, int) {
         mAcceptor.close();
         stopAll();
     });
@@ -101,9 +99,9 @@ void Server::stopAll()
 
 bool Server::isConnected(const std::string& cr_ip)
 {
-    for (auto it = mClients.cbegin(); it != mClients.cend(); it++)
+    for(auto it = mClients.cbegin(); it != mClients.cend(); it++)
     {
-        if (it->get()->getIp() == cr_ip)
+        if(it->get()->getIp() == cr_ip)
         {
             return true;
         }
@@ -113,15 +111,15 @@ bool Server::isConnected(const std::string& cr_ip)
 
 void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
 {
-    if (!mAcceptor.is_open())
+    if(!mAcceptor.is_open())
     {
         return;
     }
-    if (!cr_ec)
+    if(!cr_ec)
     {
         boost::lock_guard<boost::mutex> lock(this->mMutex);
         auto client = Connection::start(std::move(mSocket));
-        if (mClients.size() < S_MAX_CLIENTS && !isConnected(client->getIp()))
+        if(mClients.size() < S_MAX_CLIENTS && !isConnected(client->getIp()))
         {
             mClients.push_back(client);
             Logger::info({"(Server) connection from: ", client->getIp()});
@@ -131,7 +129,7 @@ void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
             Logger::info({"(Server) refused connection to ", client->getIp()});
         }
     }
-    else if (cr_ec != boost::system::errc::bad_file_descriptor)
+    else if(cr_ec != boost::system::errc::bad_file_descriptor)
     {
         Logger::warn({"(Server) accept: ", cr_ec.message()});
     }
@@ -139,4 +137,3 @@ void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
 }
 
 }  // namespace server
-}  // namespace network

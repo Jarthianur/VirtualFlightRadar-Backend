@@ -23,8 +23,8 @@
 
 #include <stdexcept>
 
-#include "../config/Configuration.h"
-#include "../util/Math.hpp"
+#include "../../config/Configuration.h"
+#include "../../util/Math.hpp"
 
 /// Define regex match groups for APRS
 //#define RE_APRS_TIME 1
@@ -41,6 +41,8 @@
 #define RE_APRS_COM_CR 3
 #define RE_APRS_COM_TR 4
 
+namespace feed
+{
 using namespace data::object;
 
 namespace parser
@@ -172,5 +174,5 @@ bool AprsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
     }
     return true;
 }
-
+}
 }  // namespace parser

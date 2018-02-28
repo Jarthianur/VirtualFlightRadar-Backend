@@ -24,8 +24,8 @@
 #include <memory>
 
 #include "../config/Configuration.h"
-#include "../data/object/Sensor.h"
-#include "../network/client/SensorClient.h"
+#include "client/SensorClient.h"
+#include "data/object/Sensor.h"
 
 namespace feed
 {
@@ -35,7 +35,7 @@ SensorFeed::SensorFeed(const std::string& crName, const config::KeyValueMap& crK
     : Feed(crName, crKvMap), mpWindData(pWindData), mpAtmosphereData(pAtmosData)
 
 {
-    mpClient = std::unique_ptr<network::client::Client>(new network::client::SensorClient(
+    mpClient   = std::unique_ptr<client::Client>(new client::SensorClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
     mWindSlot  = mpWindData->registerFeed();
     mAtmosSlot = mpAtmosphereData->registerFeed();

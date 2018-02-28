@@ -19,18 +19,17 @@
  }
  */
 
-#ifndef SRC_NETWORK_SERVER_SERVER_H_
-#define SRC_NETWORK_SERVER_SERVER_H_
+#pragma once
 
-#include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
 #include <cstdint>
-#include <boost/thread/mutex.hpp>
 #include <string>
 #include <vector>
+#include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
-#include "../../config/Parameters.h"
-#include "../../network/server/Connection.h"
+#include "../config/Parameters.h"
+#include "Connection.h"
 
 #ifdef SERVER_MAX_CLIENTS
 #define S_MAX_CLIENTS SERVER_MAX_CLIENTS
@@ -38,11 +37,8 @@
 #define S_MAX_CLIENTS 5
 #endif
 
-namespace network
-{
 namespace server
 {
-
 /**
  * @class Server
  * @brief A TCP server to serve the same reports to all clients.
@@ -129,6 +125,3 @@ private:
 };
 
 }  // namespace server
-}  // namespace network
-
-#endif /* SRC_NETWORK_SERVER_SERVER_H_ */

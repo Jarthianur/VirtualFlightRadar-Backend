@@ -19,6 +19,8 @@
 
 #include <cstdint>
 
+namespace feed
+{
 namespace data
 {
 namespace object
@@ -56,5 +58,6 @@ protected:
     /// Got last update with this priority.
     std::uint32_t mLastPriority;
 };
+}
 }
 }

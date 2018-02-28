@@ -18,6 +18,8 @@
 #include "Data.h"
 #include <algorithm>
 
+namespace feed
+{
 namespace data
 {
 Data::Data()
@@ -35,5 +37,6 @@ std::size_t Data::registerFeed()
 void Data::clearAttempts(std::vector<std::uint64_t>& rVec)
 {
     std::fill(rVec.begin(), rVec.end(), 0);
+}
 }
 }

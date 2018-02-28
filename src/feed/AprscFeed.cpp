@@ -25,8 +25,8 @@
 #include <stdexcept>
 
 #include "../config/Configuration.h"
-#include "../data/object/Aircraft.h"
-#include "../network/client/AprscClient.h"
+#include "client/AprscClient.h"
+#include "data/object/Aircraft.h"
 
 #include "../util/Logger.h"
 
@@ -44,9 +44,9 @@ AprscFeed::AprscFeed(const std::string& cr_name, const config::KeyValueMap& cr_k
         Logger::warn({"(AprscFeed) could not find: ", mName, "." KV_KEY_LOGIN});
         throw std::logic_error("No login given");
     }
-    mpClient  = std::unique_ptr<network::client::Client>(new network::client::AprscClient(
-        mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, it->second,
-        *this));
+    mpClient = std::unique_ptr<client::Client>(
+        new client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
+                                mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
     mDataSlot = mpData->registerFeed();
 }
 

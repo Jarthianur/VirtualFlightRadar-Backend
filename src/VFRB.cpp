@@ -31,39 +31,33 @@
 #include <boost/thread.hpp>
 
 #include "config/Configuration.h"
-#include "data/AircraftData.h"
-#include "data/AtmosphereData.h"
-#include "data/GpsData.h"
-#include "data/WindData.h"
 #include "feed/AprscFeed.h"
 #include "feed/Feed.h"
 #include "feed/GpsFeed.h"
 #include "feed/SbsFeed.h"
 #include "feed/SensorFeed.h"
-#include "network/client/AprscClient.h"
-#include "network/client/SbsClient.h"
-#include "network/client/SensorClient.h"
+#include "feed/data/AircraftData.h"
+#include "feed/data/AtmosphereData.h"
+#include "feed/data/GpsData.h"
+#include "feed/data/WindData.h"
 
 #include "util/Logger.h"
-#include "util/Position.h"
-#include "util/Sensor.h"
 
 using namespace util;
+using namespace feed::data;
 
 #define SYNC_TIME (1)
 
 std::atomic<bool> VFRB::global_run_status(true);
 
 VFRB::VFRB(const config::Configuration& config)
-    : mpAircraftData(new data::AircraftData(config.getMaxDistance())),
-      mpAtmosphereData(new data::AtmosphereData({"", config.getAtmPressure()})),
-      mpWindData(new data::WindData()),
-      mpGpsData(new data::GpsData({{config.getLatitude(), config.getLongitude(),
-                                    config.getAltitude()},
-                                   1,
-                                   5,
-                                   config.getGeoid(),
-                                   0.0})),
+    : mpAircraftData(new AircraftData(config.getMaxDistance())),
+      mpAtmosphereData(new AtmosphereData(object::Atmosphere(config.getAtmPressure()))),
+
+      mpGpsData(new GpsData(object::ExtGpsPosition(
+          {config.getLatitude(), config.getLongitude(), config.getAltitude()},
+          config.getGeoid()))),
+      mpWindData(new WindData()),
       mServer(config.getServerPort())
 {
     registerFeeds(config);
@@ -119,23 +113,16 @@ void VFRB::run() noexcept
         try
         {
             // write Aircrafts to clients
-            std::string str = mpAircraftData->processAircrafts(
-                mpGpsData->getBasePos(), mpAtmosphereData->getAtmPress());
-
-            if(str.length() > 0)
-            {
-                mServer.writeToAll(str);
-            }
+            mpAircraftData->processAircrafts(mpGpsData->getGpsPosition(),
+                                             mpAtmosphereData->getAtmPress());
+            mServer.writeToAll(mpAircraftData->getSerialized());
 
             // write GPS position to clients
-            mServer.writeToAll(mpGpsData->getGpsStr());
+            mServer.writeToAll(mpGpsData->getSerialized());
 
             // write climate info to clients
-            str = mpAtmosphereData->getMdaStr() + mpWindData->getMwvStr();
-            if(str.length() > 0)
-            {
-                mServer.writeToAll(str);
-            }
+            mServer.writeToAll(mpAtmosphereData->getSerialized()
+                               + mpWindData->getSerialized());
 
             // synchronise cycles to ~SYNC_TIME sec
             boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
@@ -194,10 +181,10 @@ void VFRB::registerFeeds(const config::Configuration& crConfig)
             }
             else
             {
-                Logger::warn({
-                    "(Config) create feed ", feed.first,
-                    ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                    ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS});
+                Logger::warn(
+                    {"(Config) create feed ", feed.first,
+                     ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
+                     ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS});
             }
         }
         catch(const std::exception& e)

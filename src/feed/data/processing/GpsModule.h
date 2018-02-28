@@ -27,6 +27,8 @@
 #define GPSM_BUFF_S 8191
 #define GPSM_L_BUFF_S 128
 
+namespace feed
+{
 namespace data
 {
 namespace processing
@@ -71,4 +73,5 @@ private:
 };
 
 }  // namespace util
+}
 }

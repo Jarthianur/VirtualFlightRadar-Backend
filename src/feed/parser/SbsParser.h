@@ -26,6 +26,8 @@
 #include "../data/object/Aircraft.h"
 #include "Parser.hpp"
 
+namespace feed
+{
 namespace parser
 {
 /**
@@ -58,5 +60,5 @@ public:
 private:
     const std::int32_t mMaxHeight;
 };
-
+}
 }  // namespace parser

@@ -25,6 +25,8 @@
 
 #include "object/Sensor.h"
 
+namespace feed
+{
 /// @namespace data
 namespace data
 {
@@ -79,5 +81,5 @@ private:
     /// Holding atmospheric pressure
     object::Atmosphere mAtmosphere;
 };
-
+}
 }  // namespace data

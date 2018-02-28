@@ -25,9 +25,9 @@
 #include <stdexcept>
 
 #include "../config/Configuration.h"
-#include "../data/object/Position.h"
-#include "../network/client/GpsdClient.h"
 #include "../util/Logger.h"
+#include "client/GpsdClient.h"
+#include "data/object/Position.h"
 
 using namespace util;
 
@@ -37,7 +37,7 @@ GpsFeed::GpsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap
                  std::shared_ptr<data::GpsData> pData, bool vGndMode)
     : Feed(cr_name, cr_kvmap), mpData(pData), mGndModeEnabled(vGndMode)
 {
-    mpClient  = std::unique_ptr<network::client::Client>(new network::client::GpsdClient(
+    mpClient  = std::unique_ptr<client::Client>(new client::GpsdClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
     mDataSlot = mpData->registerFeed();
 }

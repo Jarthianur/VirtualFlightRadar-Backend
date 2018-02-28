@@ -21,14 +21,14 @@
 
 #pragma once
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "../parser/SensorParser.h"
-#include "../data/AtmosphereData.h"
-#include "../data/WindData.h"
+#include "data/AtmosphereData.h"
+#include "data/WindData.h"
+#include "parser/SensorParser.h"
 #include "Feed.h"
 
 namespace feed

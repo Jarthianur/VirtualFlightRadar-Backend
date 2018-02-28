@@ -28,6 +28,8 @@
 #include "../data/object/Aircraft.h"
 #include "Parser.hpp"
 
+namespace feed
+{
 namespace parser
 {
 /**
@@ -64,5 +66,5 @@ private:
     static const boost::regex msAprsComRe;
     const std::int32_t mMaxHeight;
 };
-
+}
 }  // namespace parser

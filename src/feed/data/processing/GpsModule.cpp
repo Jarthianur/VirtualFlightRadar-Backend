@@ -22,12 +22,13 @@
 #include "GpsModule.h"
 
 #include <cmath>
-#include <cstdint>
 #include <cstdio>
 #include <ctime>
 
-#include "../../util/Math.hpp"
+#include "../../../util/Math.hpp"
 
+namespace feed
+{
 using namespace data::object;
 
 namespace data
@@ -98,4 +99,5 @@ std::string GpsModule::genGprmcStr(const ExtGpsPosition& cr_pos)
 }
 
 }  // namespace util
+}
 }

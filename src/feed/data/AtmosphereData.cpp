@@ -23,6 +23,8 @@
 
 #include <boost/thread/lock_guard.hpp>
 
+namespace feed
+{
 using namespace data::object;
 
 namespace data
@@ -65,5 +67,5 @@ double AtmosphereData::getAtmPress()
     boost::lock_guard<boost::mutex> lock(mMutex);
     return mAtmosphere.getPressure();
 }
-
+}
 }  // namespace data

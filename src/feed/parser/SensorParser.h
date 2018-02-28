@@ -26,6 +26,8 @@
 #include "../data/object/Sensor.h"
 #include "Parser.hpp"
 
+namespace feed
+{
 namespace parser
 {
 /**
@@ -55,5 +57,5 @@ public:
     bool unpack(const std::string& crMsg,
                 data::object::Climate& rClimate) noexcept override;
 };
-
+}
 }  // namespace parser

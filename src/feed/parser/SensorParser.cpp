@@ -23,9 +23,10 @@
 
 #include <stdexcept>
 
-#include "../data/AtmosphereData.h"
-#include "../util/Math.hpp"
+#include "../../util/Math.hpp"
 
+namespace feed
+{
 namespace parser
 {
 SensorParser::SensorParser() : Parser()
@@ -77,5 +78,5 @@ bool SensorParser::unpack(const std::string& cr_msg,
     }
     return true;
 }
-
+}
 }  // namespace parser

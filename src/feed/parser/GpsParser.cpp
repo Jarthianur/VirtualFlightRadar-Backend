@@ -23,7 +23,7 @@
 
 #include <stdexcept>
 
-#include "../util/Math.hpp"
+#include "../../util/Math.hpp"
 
 /// Define regex match groups for GGA
 #define RE_GGA_LAT 1
@@ -36,6 +36,8 @@
 #define RE_GGA_ALT 8
 #define RE_GGA_GEOID 9
 
+namespace feed
+{
 namespace parser
 {
 const boost::regex GpsParser::msGpggaRe(
@@ -101,5 +103,5 @@ bool GpsParser::unpack(const std::string& cr_msg,
     }
     return true;
 }
-
+}
 }  // namespace parser

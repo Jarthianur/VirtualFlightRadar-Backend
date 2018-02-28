@@ -19,26 +19,24 @@
  }
  */
 
-#ifndef SRC_NETWORK_CLIENT_GPSDCLIENT_H_
-#define SRC_NETWORK_CLIENT_GPSDCLIENT_H_
+#pragma once
 
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <string>
 
-#include "../../network/client/Client.h"
+#include "Client.h"
 
-namespace network
+namespace feed
 {
 namespace client
 {
-
 /**
  * @class GpsdClient extends Client.
  * @brief Handle connections to a GPSD server.
  * @see Client.h
  */
-class GpsdClient: public Client
+class GpsdClient : public Client
 {
 public:
     /**
@@ -100,5 +98,3 @@ private:
 
 }  // namespace client
 }  // namespace network
-
-#endif /* SRC_NETWORK_CLIENT_GPSDCLIENT_H_ */

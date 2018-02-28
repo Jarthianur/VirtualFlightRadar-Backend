@@ -19,27 +19,22 @@
  }
  */
 
-#include "../../network/server/Connection.h"
+#include "Connection.h"
 
+#include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <algorithm>
 
-namespace network
-{
 namespace server
 {
-
 boost::shared_ptr<Connection> Connection::start(boost::asio::ip::tcp::socket socket)
 {
     return boost::shared_ptr<Connection>(new Connection(std::move(socket)));
 }
 
 Connection::Connection(boost::asio::ip::tcp::socket socket)
-        : mSocket(std::move(socket)),
-          mIp(mSocket.remote_endpoint().address().to_string())
-{
-}
+    : mSocket(std::move(socket)), mIp(mSocket.remote_endpoint().address().to_string())
+{}
 
 Connection::~Connection() noexcept
 {
@@ -50,7 +45,7 @@ void Connection::stop()
 {
     boost::system::error_code ignored_ec;
     mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
-    if (mSocket.is_open())
+    if(mSocket.is_open())
     {
         mSocket.close();
     }
@@ -67,4 +62,3 @@ const std::string& Connection::getIp()
 }
 
 }  // namespace server
-}  // namespace network

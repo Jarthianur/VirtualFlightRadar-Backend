@@ -33,10 +33,6 @@
 #include "../util/Math.hpp"
 #include "PropertyMap.h"
 
-namespace feed
-{
-class Feed;
-}
 
 /// @namespace config
 namespace config

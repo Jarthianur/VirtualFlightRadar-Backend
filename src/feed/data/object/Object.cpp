@@ -16,6 +16,9 @@
  */
 
 #include "Object.h"
+
+namespace feed
+{
 namespace data
 {
 namespace object
@@ -52,6 +55,7 @@ void Object::setLastPriority(std::uint32_t vPriority)
 std::uint32_t Object::getLastPriority() const
 {
     return mLastPriority;
+}
 }
 }
 }

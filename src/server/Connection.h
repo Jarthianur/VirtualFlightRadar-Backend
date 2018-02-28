@@ -19,24 +19,20 @@
  }
  */
 
-#ifndef SRC_NETWORK_SERVER_CONNECTION_H_
-#define SRC_NETWORK_SERVER_CONNECTION_H_
+#pragma once
 
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace network
-{
 namespace server
 {
-
 /**
  * @class Connection
  * @brief Represents a TCP connection opened by the Server.
  * @see Server.h
  */
-class Connection: public boost::enable_shared_from_this<Connection>
+class Connection : public boost::enable_shared_from_this<Connection>
 {
 public:
     /**
@@ -91,6 +87,3 @@ private:
 };
 
 }  // namespace server
-}  // namespace network
-
-#endif /* SRC_NETWORK_SERVER_CONNECTION_H_ */

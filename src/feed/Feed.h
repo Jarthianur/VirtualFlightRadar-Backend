@@ -29,16 +29,12 @@
 
 #include "../config/PropertyMap.h"
 
-namespace network
+namespace feed
 {
 namespace client
 {
 class Client;
 }
-}
-
-namespace feed
-{
 /**
  * @class Feed
  * @brief Incomplete base-class representing an input feed.
@@ -104,7 +100,7 @@ protected:
     const config::KeyValueMap mKvMap;
 
     /// Client, later resolved according to InpuType
-    std::unique_ptr<network::client::Client> mpClient;
+    std::unique_ptr<client::Client> mpClient;
 
 private:
     void initPriority();

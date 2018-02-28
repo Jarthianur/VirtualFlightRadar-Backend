@@ -22,13 +22,14 @@
 #include "SbsParser.h"
 
 #include <cstddef>
-#include <cstdint>
 #include <stdexcept>
 
-#include "../config/Configuration.h"
+#include "../../config/Configuration.h"
+#include "../../util/Math.hpp"
 #include "../data/object/Position.h"
-#include "../util/Math.hpp"
 
+namespace feed
+{
 using namespace data::object;
 
 namespace parser
@@ -107,5 +108,5 @@ bool SbsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
     r_ac.setIdType(Aircraft::IdType::ICAO);
     return true;
 }
-
+}
 }  // namespace parser

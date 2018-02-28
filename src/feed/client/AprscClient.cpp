@@ -19,48 +19,45 @@
  }
  */
 
-#include "../../network/client/AprscClient.h"
+#include "AprscClient.h"
 
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/date_time.hpp>
-#include <boost/operators.hpp>
 #include <cstddef>
 #include <iostream>
-#include "../../feed/Feed.h"
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/date_time.hpp>
+#include <boost/operators.hpp>
+#include <boost/system/error_code.hpp>
 #include "../../util/Logger.h"
+#include "../Feed.h"
 
 using namespace util;
 
-namespace network
+namespace feed
 {
 namespace client
 {
-
 AprscClient::AprscClient(const std::string& cr_host, const std::string& cr_port,
                          const std::string& cr_login, feed::Feed& r_feed)
-        : Client(cr_host, cr_port, "(AprscClient)", r_feed),
-          mLoginStr(cr_login),
-          mStopped(false),
-          mTimeout(mIoService, boost::posix_time::minutes(10))
+    : Client(cr_host, cr_port, "(AprscClient)", r_feed),
+      mLoginStr(cr_login),
+      mStopped(false),
+      mTimeout(mIoService, boost::posix_time::minutes(10))
 {
     mLoginStr.append("\r\n");
     connect();
 }
 
 AprscClient::~AprscClient() noexcept
-{
-}
+{}
 
 void AprscClient::connect()
 {
-    boost::asio::ip::tcp::resolver::query query(mHost, mPort,
-            boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(query,
-            boost::bind(&AprscClient::handleResolve, this,
-                    boost::asio::placeholders::error,
-                    boost::asio::placeholders::iterator));
+    boost::asio::ip::tcp::resolver::query query(
+        mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(query, boost::bind(&AprscClient::handleResolve, this,
+                                               boost::asio::placeholders::error,
+                                               boost::asio::placeholders::iterator));
 }
 
 void AprscClient::stop()
@@ -74,17 +71,17 @@ void AprscClient::stop()
 void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
                                 boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
-    if (!cr_ec)
+    if(!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
-                boost::bind(&AprscClient::handleConnect, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::iterator));
+                                   boost::bind(&AprscClient::handleConnect, this,
+                                               boost::asio::placeholders::error,
+                                               boost::asio::placeholders::iterator));
     }
     else
     {
         Logger::error({"(AprscClient) resolve host: ", cr_ec.message()});
-        if (mSocket.is_open())
+        if(mSocket.is_open())
         {
             mSocket.close();
         }
@@ -95,19 +92,19 @@ void AprscClient::handleResolve(const boost::system::error_code& cr_ec,
 void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
                                 boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
-    if (!cr_ec)
+    if(!cr_ec)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        boost::asio::async_write(mSocket, boost::asio::buffer(mLoginStr),
-                boost::bind(&AprscClient::handleLogin, this,
-                        boost::asio::placeholders::error,
+        boost::asio::async_write(
+            mSocket, boost::asio::buffer(mLoginStr),
+            boost::bind(&AprscClient::handleLogin, this, boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
         mTimeout.async_wait(boost::bind(&AprscClient::sendKaBeacon, this));
     }
     else
     {
         Logger::error({"(AprscClient) connect: ", cr_ec.message()});
-        if (mSocket.is_open())
+        if(mSocket.is_open())
         {
             mSocket.close();
         }
@@ -117,24 +114,24 @@ void AprscClient::handleConnect(const boost::system::error_code& cr_ec,
 
 void AprscClient::sendKaBeacon()
 {
-    if (mStopped)
+    if(mStopped)
     {
         return;
     }
     boost::asio::async_write(mSocket, boost::asio::buffer("#keep-alive beacon\r\n"),
-            boost::bind(&AprscClient::handleSendKaBeacon, this,
-                    boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred));
+                             boost::bind(&AprscClient::handleSendKaBeacon, this,
+                                         boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred));
     mTimeout.expires_from_now(boost::posix_time::minutes(10));
     mTimeout.async_wait(boost::bind(&AprscClient::sendKaBeacon, this));
 }
 
-void AprscClient::handleLogin(const boost::system::error_code& cr_ec, std::size_t s)
-noexcept
+void AprscClient::handleLogin(const boost::system::error_code& cr_ec,
+                              std::size_t s) noexcept
 {
-    if (!cr_ec)
+    if(!cr_ec)
     {
-        Logger::info({"(AprscClient) connected to: ", mHost , ":" , mPort});
+        Logger::info({"(AprscClient) connected to: ", mHost, ":", mPort});
         read();
     }
     else
@@ -146,7 +143,7 @@ noexcept
 void AprscClient::handleSendKaBeacon(const boost::system::error_code& cr_ec,
                                      std::size_t s) noexcept
 {
-    if (cr_ec)
+    if(cr_ec)
     {
         Logger::error({"(AprscClient) send beacon:", cr_ec.message()});
     }

@@ -19,26 +19,24 @@
  }
  */
 
-#ifndef SRC_NETWORK_CLIENT_APRSCCLIENT_H_
-#define SRC_NETWORK_CLIENT_APRSCCLIENT_H_
+#pragma once
 
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <string>
 
-#include "../../network/client/Client.h"
+#include "Client.h"
 
-namespace network
+namespace feed
 {
 namespace client
 {
-
 /**
  * @class AprscClient extends Client
  * @brief Handle connections to APRSC server.
  * @see Client.h
  */
-class AprscClient: public Client
+class AprscClient : public Client
 {
 public:
     /**
@@ -107,8 +105,8 @@ private:
      * @param cr_ec The error code
      * @param s     The sent bytes
      */
-    void handleSendKaBeacon(const boost::system::error_code& cr_ec, std::size_t s)
-            noexcept;
+    void handleSendKaBeacon(const boost::system::error_code& cr_ec,
+                            std::size_t s) noexcept;
 
     /// Login string
     std::string mLoginStr;
@@ -120,5 +118,3 @@ private:
 
 }  // namespace client
 }  // namespace network
-
-#endif /* SRC_NETWORK_CLIENT_APRSCCLIENT_H_ */

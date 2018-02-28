@@ -30,6 +30,8 @@
 /// Indicate a double value is not available.
 #define A_VALUE_NA -1024.0
 
+namespace feed
+{
 /// @namespace data
 namespace data
 {
@@ -165,7 +167,7 @@ public:
      */
     Object& operator=(const Object& crOther) override;
 
-        /**
+    /**
      * @fn getId
      * @brief Get the Id.
      * @return the Id
@@ -358,6 +360,6 @@ private:
 
     std::string mSerialized;
 };
-
+}
 }  // namespace object
 }  // namespace data

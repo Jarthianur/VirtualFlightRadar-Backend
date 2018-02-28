@@ -19,15 +19,14 @@
  }
  */
 
-#ifndef SRC_NETWORK_CLIENT_SENSORCLIENT_H_
-#define SRC_NETWORK_CLIENT_SENSORCLIENT_H_
+#pragma once
 
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <string>
 
 #include "../../config/Parameters.h"
-#include "../../network/client/Client.h"
+#include "Client.h"
 
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
@@ -35,17 +34,17 @@
 #define WC_RCV_TIMEOUT 5
 #endif
 
-namespace network
+namespace feed
 {
 namespace client
 {
-
 /**
  * @class SensorClient extends Client
- * @brief Handle connections to a server sending sensor information in NMEA MDA,WMV sentences.
+ * @brief Handle connections to a server sending sensor information in NMEA MDA,WMV
+ * sentences.
  * @see Client.h
  */
-class SensorClient: public Client
+class SensorClient : public Client
 {
 public:
     /**
@@ -116,5 +115,3 @@ private:
 
 }  // namespace client
 }  // namespace network
-
-#endif /* SRC_NETWORK_CLIENT_SENSORCLIENT_H_ */

@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
 #include "../object/Aircraft.h"
 #include "../object/Position.h"
 
@@ -33,6 +31,9 @@
 /// @def AP_L_BUFF_S
 /// Internal buffer less size
 #define AP_L_BUFF_S 128
+
+namespace feed
+{
 namespace data
 {
 /// @namespace aircraft
@@ -166,4 +167,5 @@ private:
 };
 
 }  // namespace aircraft
+}
 }

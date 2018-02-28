@@ -22,6 +22,8 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
+namespace feed
+{
 namespace data
 {
 namespace object
@@ -45,4 +47,5 @@ protected:
     boost::mutex mMutex;
     std::vector<std::uint64_t> mFeedAttempts;
 };
+}
 }

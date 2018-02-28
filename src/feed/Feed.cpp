@@ -28,8 +28,8 @@
 
 #include "../VFRB.h"
 #include "../config/Configuration.h"
-#include "../network/client/Client.h"
 #include "../util/Logger.h"
+#include "client/Client.h"
 
 using namespace util;
 
@@ -101,8 +101,8 @@ void Feed::initPriority()
     }
     if(priority == 0)
     {
-        Logger::warn({"(Config) create feed " , mName,
-                     ": Priority is 0; this feed cannot update higher ones."});
+        Logger::warn({"(Config) create feed ", mName,
+                      ": Priority is 0; this feed cannot update higher ones."});
     }
     mPriority = static_cast<std::uint32_t>(priority);
 }

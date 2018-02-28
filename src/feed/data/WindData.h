@@ -25,6 +25,8 @@
 
 #include "object/Sensor.h"
 
+namespace feed
+{
 /// @namespace data
 namespace data
 {
@@ -72,5 +74,5 @@ private:
     /// Holding MDA sentence
     object::Wind mWind;
 };
-
+}
 }  // namespace data

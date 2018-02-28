@@ -24,10 +24,6 @@
 #include <iterator>
 #include <stdexcept>
 
-#include "../feed/AprscFeed.h"
-#include "../feed/GpsFeed.h"
-#include "../feed/SbsFeed.h"
-#include "../feed/SensorFeed.h"
 #include "../util/Logger.h"
 #include "../util/Math.hpp"
 #include "ConfigReader.h"

@@ -19,57 +19,54 @@
  }
  */
 
-#include "../../network/client/GpsdClient.h"
+#include "GpsdClient.h"
 
+#include <cstddef>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <cstddef>
 #include "../../config/Configuration.h"
-#include "../../feed/Feed.h"
 #include "../../util/Logger.h"
+#include "../Feed.h"
 
 using namespace util;
 
-namespace network
+namespace feed
 {
 namespace client
 {
-
 GpsdClient::GpsdClient(const std::string& cr_host, const std::string& cr_port,
                        feed::Feed& r_feed)
-        : Client(cr_host, cr_port, "(GpsdClient)", r_feed)
+    : Client(cr_host, cr_port, "(GpsdClient)", r_feed)
 {
     connect();
 }
 
 GpsdClient::~GpsdClient() noexcept
-{
-}
+{}
 
 void GpsdClient::connect()
 {
-    boost::asio::ip::tcp::resolver::query query(mHost, mPort,
-            boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(query,
-            boost::bind(&GpsdClient::handleResolve, this,
-                    boost::asio::placeholders::error,
-                    boost::asio::placeholders::iterator));
+    boost::asio::ip::tcp::resolver::query query(
+        mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(query, boost::bind(&GpsdClient::handleResolve, this,
+                                               boost::asio::placeholders::error,
+                                               boost::asio::placeholders::iterator));
 }
 
 void GpsdClient::handleResolve(const boost::system::error_code& cr_ec,
                                boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
-    if (!cr_ec)
+    if(!cr_ec)
     {
         boost::asio::async_connect(mSocket, it,
-                boost::bind(&GpsdClient::handleConnect, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::iterator));
+                                   boost::bind(&GpsdClient::handleConnect, this,
+                                               boost::asio::placeholders::error,
+                                               boost::asio::placeholders::iterator));
     }
     else
     {
         Logger::error({"(GpsdClient) resolve host: ", cr_ec.message()});
-        if (mSocket.is_open())
+        if(mSocket.is_open())
         {
             mSocket.close();
         }
@@ -80,19 +77,18 @@ void GpsdClient::handleResolve(const boost::system::error_code& cr_ec,
 void GpsdClient::handleConnect(const boost::system::error_code& cr_ec,
                                boost::asio::ip::tcp::resolver::iterator it) noexcept
 {
-    if (!cr_ec)
+    if(!cr_ec)
     {
-        mSocket.set_option(boost::asio::socket_base::keep_alive(true)); // necessary?
-        boost::asio::async_write(mSocket,
-                boost::asio::buffer("?WATCH={\"enable\":true,\"nmea\":true}\r\n"),
-                boost::bind(&GpsdClient::handleWatch, this,
-                        boost::asio::placeholders::error,
+        mSocket.set_option(boost::asio::socket_base::keep_alive(true));  // necessary?
+        boost::asio::async_write(
+            mSocket, boost::asio::buffer("?WATCH={\"enable\":true,\"nmea\":true}\r\n"),
+            boost::bind(&GpsdClient::handleWatch, this, boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
     }
     else
     {
         Logger::error({"(GpsdClient) connect: ", cr_ec.message()});
-        if (mSocket.is_open())
+        if(mSocket.is_open())
         {
             mSocket.close();
         }
@@ -102,31 +98,30 @@ void GpsdClient::handleConnect(const boost::system::error_code& cr_ec,
 
 void GpsdClient::stop()
 {
-    if (mSocket.is_open())
+    if(mSocket.is_open())
     {
-        boost::asio::async_write(mSocket,
-                boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
-                [this](const boost::system::error_code& ec, std::size_t s)
+        boost::asio::async_write(
+            mSocket, boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
+            [this](const boost::system::error_code& ec, std::size_t s) {
+                if(!ec)
                 {
-                    if (!ec)
-                    {
-                        Logger::info({"(GpsdClient) stopped watch"});
-                    }
-                    else
-                    {
-                        Logger::error({"(GpsdClient) send un-watch request: ", ec.message()});
-                    }
-                });
+                    Logger::info({"(GpsdClient) stopped watch"});
+                }
+                else
+                {
+                    Logger::error({"(GpsdClient) send un-watch request: ", ec.message()});
+                }
+            });
     }
     Client::stop();
 }
 
-void GpsdClient::handleWatch(const boost::system::error_code& cr_ec, std::size_t s)
-noexcept
+void GpsdClient::handleWatch(const boost::system::error_code& cr_ec,
+                             std::size_t s) noexcept
 {
-    if (!cr_ec)
+    if(!cr_ec)
     {
-        Logger::info({"(GpsdClient) connected to: ", mHost , ":" , mPort});
+        Logger::info({"(GpsdClient) connected to: ", mHost, ":", mPort});
         read();
     }
     else

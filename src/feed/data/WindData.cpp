@@ -23,6 +23,8 @@
 
 #include <boost/thread/lock_guard.hpp>
 
+namespace feed
+{
 using namespace data::object;
 
 namespace data
@@ -61,5 +63,5 @@ bool WindData::update(const Object& crWind, std::size_t vSlot)
         return false;
     }
 }
-
+}
 }  // namespace data

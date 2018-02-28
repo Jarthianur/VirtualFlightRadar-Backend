@@ -24,8 +24,10 @@
 #include <cmath>
 #include <cstdio>
 
-#include "../../util/Math.hpp"
+#include "../../../util/Math.hpp"
 
+namespace feed
+{
 using namespace data::object;
 
 namespace data
@@ -129,4 +131,5 @@ void AircraftProcessor::finishSentence(std::string& rDestStr)
 }
 
 }  // namespace aircraft
+}
 }

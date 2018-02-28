@@ -19,25 +19,20 @@
  }
  */
 
-#ifndef SRC_NETWORK_CLIENT_CLIENT_H_
-#define SRC_NETWORK_CLIENT_CLIENT_H_
+#pragma once
 
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <string>
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
 #include "../../config/Parameters.h"
 
 namespace feed
 {
 class Feed;
-}
 
-namespace network
-{
 namespace client
 {
-
 /// Wait for (re-)connect timeout
 #ifdef CLIENT_CONNECT_WAIT_TIMEVAL
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
@@ -127,7 +122,8 @@ protected:
      * @param it    The resolve iterator
      */
     virtual void handleResolve(const boost::system::error_code& cr_ec,
-                               boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
+                               boost::asio::ip::tcp::resolver::iterator it) noexcept
+        = 0;
     /**
      * @fn handleConnect
      * @brief Handler for connect.
@@ -136,7 +132,8 @@ protected:
      * @param it    The resolve iterator
      */
     virtual void handleConnect(const boost::system::error_code& cr_ec,
-                               boost::asio::ip::tcp::resolver::iterator it) noexcept = 0;
+                               boost::asio::ip::tcp::resolver::iterator it) noexcept
+        = 0;
 
     /// Internal IO-service
     boost::asio::io_service mIoService;
@@ -164,5 +161,3 @@ private:
 
 }  // namespace client
 }  // namespace network
-
-#endif /* SRC_NETWORK_CLIENT_CLIENT_H_ */

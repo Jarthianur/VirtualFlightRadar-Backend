@@ -26,7 +26,8 @@
 
 /// ICAO standard atmospheric pressure at MSL
 #define ICAO_STD_A 1013.25
-
+namespace feed
+{
 namespace data
 {
 namespace object
@@ -36,8 +37,11 @@ class Atmosphere : public Object
 public:
     Atmosphere();
     explicit Atmosphere(std::uint32_t vPriority);
+    explicit Atmosphere(double vPress);
     virtual ~Atmosphere() noexcept;
+
     Object& operator=(const Object& crOther);
+
     const std::string& getMdaStr() const;
     double getPressure() const;
     void setMdaStr(const std::string& crStr);
@@ -55,7 +59,9 @@ public:
     Wind();
     explicit Wind(std::uint32_t vPriority);
     virtual ~Wind() noexcept;
+
     Object& operator=(const Object& crOther);
+
     const std::string& getMwvStr() const;
     void setMwvStr(const std::string& crStr);
 
@@ -81,4 +87,5 @@ struct Climate
 };
 
 }  // namespace util
+}
 }

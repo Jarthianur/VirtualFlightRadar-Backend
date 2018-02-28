@@ -21,9 +21,10 @@
 
 #pragma once
 
-#include <cstdint>
 #include "Object.h"
 
+namespace feed
+{
 namespace data
 {
 namespace object
@@ -51,19 +52,21 @@ class ExtGpsPosition : public Object
 public:
     ExtGpsPosition();
     explicit ExtGpsPosition(std::uint32_t vPriority, bool vGround = false);
+    explicit ExtGpsPosition(const GpsPosition& crPosition, double vGeoid);
     virtual ~ExtGpsPosition() noexcept;
     Object& operator=(const Object& crOther) override;
 
     /// Position
-    struct GpsPosition position;
+    GpsPosition position;
     /// Number of satellites
-    std::int32_t nrSats = 0;
+    std::int32_t nrSats = 1;
     /// GPS fix quality
-    std::int32_t fixQa = 0;
+    std::int32_t fixQa = 5;
     /// Geoid separation
-    double geoid = 0.0;
+    double geoid    = 0.0;
     double dilution = 0.0;
-    bool ground = false;
+    bool ground     = false;
 };
 }  // namespace object
 }  // namespace data
+}

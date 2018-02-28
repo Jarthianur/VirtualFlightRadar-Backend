@@ -21,13 +21,13 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
-#include <cstddef>
 
 #include "../config/PropertyMap.h"
-#include "../parser/SbsParser.h"
-#include "../data/AircraftData.h"
+#include "data/AircraftData.h"
+#include "parser/SbsParser.h"
 #include "Feed.h"
 
 namespace feed
@@ -48,7 +48,7 @@ public:
      * @param cr_kvmap The properties map
      */
     SbsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
-            std::shared_ptr<data::AircraftData> pData,std::int32_t vMaxHeight);
+            std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
     /**
      * @fn ~SbsFeed
      * @brief Destructor

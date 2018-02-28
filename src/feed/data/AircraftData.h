@@ -28,7 +28,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../config/Parameters.h"
+#include "../../config/Parameters.h"
 #include "object/Aircraft.h"
 #include "object/Position.h"
 #include "processing/AircraftProcessor.h"
@@ -45,6 +45,8 @@
 /// Times until FLARM status is removed
 #define AC_NO_FLARM_THRESHOLD AC_OUTDATED
 
+namespace feed
+{
 /// @namespace data
 namespace data
 {
@@ -112,5 +114,5 @@ private:
 
     std::size_t nrOfRegisteredFeeds = 0;
 };
-
+}
 }  // namespace data

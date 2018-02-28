@@ -22,37 +22,31 @@
 #pragma once
 
 #include <atomic>
-#include <memory>
 #include <list>
+#include <memory>
 #include <boost/asio/signal_set.hpp>
 #include <boost/system/error_code.hpp>
-#include "network/server/Server.h"
+#include "server/Server.h"
 
-
-namespace config {
+namespace config
+{
 class Configuration;
 }
+namespace feed
+{
+class Feed;
 namespace data
 {
 class AircraftData;
 class WindData;
 class AtmosphereData;
 class GpsData;
-class Data;
 }
-
-namespace feed
-{
-class Feed;
-}
-namespace aircraft
+namespace object
 {
 class Aircraft;
+class ExtGpsPosition;
 }
-namespace util
-{
-struct ExtGpsPosition;
-struct SensorInfo;
 }
 
 /**
@@ -90,7 +84,7 @@ public:
     static std::atomic<bool> global_run_status;
 
 private:
-       /**
+    /**
      * @fn registerFeeds
      * @brief Register all input feeds found from ConfigReader.
      * @note Only correctly configured feeds get registered.
@@ -99,19 +93,19 @@ private:
      */
     void registerFeeds(const config::Configuration& crFeeds);
 
-       /// Container holding all registered Aircrafts
-    std::shared_ptr<data::AircraftData> mpAircraftData;
-
-    /// Container holding sensor and climate information.
-    std::shared_ptr<data::WindData> mpWindData;
+    /// Container holding all registered Aircrafts
+    std::shared_ptr<feed::data::AircraftData> mpAircraftData;
 
     ///
-    std::shared_ptr<data::AtmosphereData> mpAtmosphereData;
+    std::shared_ptr<feed::data::AtmosphereData> mpAtmosphereData;
 
     /// Container holding GPS information
-    std::shared_ptr<data::GpsData> mpGpsData;
+    std::shared_ptr<feed::data::GpsData> mpGpsData;
 
-    network::server::Server mServer;
+    /// Container holding sensor and climate information.
+    std::shared_ptr<feed::data::WindData> mpWindData;
 
-    std::list<std::shared_ptr<feed::Feed> > mFeeds;
+    server::Server mServer;
+
+    std::list<std::shared_ptr<feed::Feed>> mFeeds;
 };

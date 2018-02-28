@@ -17,6 +17,8 @@
 
 #include "Sensor.h"
 
+namespace feed
+{
 namespace data
 {
 namespace object
@@ -25,6 +27,9 @@ Atmosphere::Atmosphere() : Object(0)
 {}
 
 Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)
+{}
+
+Atmosphere::Atmosphere(double vPress) : Object(0), mPressure(vPress)
 {}
 
 Atmosphere::~Atmosphere() noexcept
@@ -84,6 +89,7 @@ const std::string& Wind::getMwvStr() const
 void Wind::setMwvStr(const std::string& crStr)
 {
     mMwvStr = crStr;
+}
 }
 }
 }

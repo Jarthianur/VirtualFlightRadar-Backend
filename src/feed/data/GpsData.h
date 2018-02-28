@@ -26,6 +26,8 @@
 #include "object/Position.h"
 #include "processing/GpsModule.h"
 
+namespace feed
+{
 /// @namespace data
 namespace data
 {
@@ -90,5 +92,5 @@ private:
     /// Locking state of the current position
     bool mPosLocked = false;
 };
-
+}
 }  // namespace data

@@ -19,26 +19,24 @@
  }
  */
 
-#ifndef SRC_NETWORK_CLIENT_SBSCLIENT_H_
-#define SRC_NETWORK_CLIENT_SBSCLIENT_H_
+#pragma once
 
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <string>
 
-#include "../../network/client/Client.h"
+#include "Client.h"
 
-namespace network
+namespace feed
 {
 namespace client
 {
-
 /**
  * @class SbsClient extends Client
  * @brief Handle connections to a SBS server.
  * @see Client.h
  */
-class SbsClient: public Client
+class SbsClient : public Client
 {
 public:
     /**
@@ -86,5 +84,3 @@ private:
 
 }  // namespace client
 }  // namespace network
-
-#endif /* SRC_NETWORK_CLIENT_SBSCLIENT_H_ */

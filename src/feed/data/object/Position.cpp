@@ -17,6 +17,8 @@
 
 #include "Position.h"
 
+namespace feed
+{
 namespace data
 {
 namespace object
@@ -26,6 +28,10 @@ ExtGpsPosition::ExtGpsPosition() : Object(0)
 
 ExtGpsPosition::ExtGpsPosition(std::uint32_t vPriority, bool vGround)
     : Object(vPriority), ground(vGround)
+{}
+
+ExtGpsPosition::ExtGpsPosition(const GpsPosition& crPosition, double vGeoid)
+    : Object(0), position(crPosition), geoid(vGeoid)
 {}
 
 ExtGpsPosition::~ExtGpsPosition() noexcept
@@ -42,6 +48,7 @@ Object& ExtGpsPosition::operator=(const Object& crOther)
     this->ground                   = crUpdate.ground;
     this->mLastPriority            = crUpdate.mLastPriority;
     return *this;
+}
 }
 }
 }
