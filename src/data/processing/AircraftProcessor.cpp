@@ -30,6 +30,10 @@
 
 namespace aircraft
 {
+AircraftProcessor::AircraftProcessor()
+    : mMaxDistance(std::numeric_limits<std::int32_t>::max())
+{}
+
 AircraftProcessor::AircraftProcessor(std::int32_t vMaxDist) : mMaxDistance(vMaxDist)
 {}
 

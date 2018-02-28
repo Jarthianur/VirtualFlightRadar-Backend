@@ -165,7 +165,7 @@ public:
      */
     Object& operator=(const Object& crOther) override;
 
-    /**
+        /**
      * @fn getId
      * @brief Get the Id.
      * @return the Id
@@ -259,6 +259,8 @@ public:
      */
     std::uint64_t& getUpdateAttempts();
 
+    const std::string& getSerialized() const;
+
     /**
      * @fn setId
      * @brief Set the Id.
@@ -325,7 +327,11 @@ public:
      */
     void setFullInfo(bool vInfo = true);
 
+    void setSerialized(const std::string& crSerial);
+
 private:
+    bool canUpdate(const Object& crOther, std::uint64_t vAttempts) const override;
+
     /// @var mId
     /// Aircraft identifier
     std::string mId;
@@ -360,6 +366,8 @@ private:
     /// @var mUpdateAttempts
     /// Number of unsuccessfull update attempts.
     std::uint64_t mUpdateAttempts = 0;
+
+    std::string mSerialized;
 };
 
 }  // namespace object

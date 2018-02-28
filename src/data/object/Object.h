@@ -34,7 +34,7 @@ public:
 
     virtual Object& operator=(const Object& crOther) = 0;
 
-    virtual bool tryUpdate(const Object& crOther, std::uint64_t& rAttempts);
+    virtual bool tryUpdate(const Object& crOther, std::uint64_t vAttempts);
 
     /**
      * @fn setLastPriority
@@ -55,7 +55,6 @@ protected:
     /// @var mLastPriority
     /// Got last update with this priority.
     std::uint32_t mLastPriority;
-    bool mUpdated;
 };
 }
 }

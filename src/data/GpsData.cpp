@@ -48,21 +48,29 @@ std::string GpsData::getSerialized()
     return mGpsModule.genGprmcStr(mBasePos) + mGpsModule.genGpggaStr(mBasePos);
 }
 
-bool GpsData::update(const Object& crPosition, std::uint64_t& rAttempts)
+bool GpsData::update(const Object& crPosition, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     if(mPosLocked)
     {
         throw std::runtime_error("Position was locked before.");
     }
-    if(mBasePos.tryUpdate(crPosition, rAttempts))
+    try
     {
-        mPosLocked
-            = mBasePos.ground
-              && (mBasePos.nrSats >= GPS_NR_SATS_GOOD && mBasePos.fixQa >= GPS_FIX_GOOD
-                  && mBasePos.dilution <= GPS_HOR_DILUTION_GOOD);
+        bool updated = mBasePos.tryUpdate(crPosition, ++mFeedAttempts.at(vSlot));
+        if(updated)
+        {
+            clearAttempts(mFeedAttempts);
+        }
+        return (mPosLocked = updated && mBasePos.ground
+                             && (mBasePos.nrSats >= GPS_NR_SATS_GOOD
+                                 && mBasePos.fixQa >= GPS_FIX_GOOD
+                                 && mBasePos.dilution <= GPS_HOR_DILUTION_GOOD));
     }
-    return mPosLocked;
+    catch(const std::out_of_range&)
+    {
+        return false;
+    }
 }
 
 GpsPosition GpsData::getGpsPosition()

@@ -49,6 +49,8 @@ class Aircraft;
 class AircraftProcessor
 {
 public:
+
+    AircraftProcessor();
     /**
      * @fn AircraftProcessor
      * @brief Constructor

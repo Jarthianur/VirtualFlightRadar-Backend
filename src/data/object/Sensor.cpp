@@ -66,7 +66,7 @@ Object& Wind::operator=(const Object& crOther)
     return *this;
 }
 
-const std::string& Wind::getMwvStr() const
+std::string& Wind::getMwvStr()
 {
     return mMwvStr;
 }

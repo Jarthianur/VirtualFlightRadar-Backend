@@ -27,17 +27,17 @@
 #include <utility>
 #include <boost/thread/lock_guard.hpp>
 
-#include "../util/Position.h"
-
 #ifndef ESTIMATED_TRAFFIC
 #define ESTIMATED_TRAFFIC 1
 #endif
 
-using namespace util;
-using namespace aircraft;
+using namespace data::object;
 
 namespace data
 {
+AircraftData::AircraftData() : Data()
+{}
+
 AircraftData::AircraftData(std::int32_t vMaxDist) : mProcessor(vMaxDist)
 {
     mContainer.reserve(ESTIMATED_TRAFFIC);
@@ -47,24 +47,58 @@ AircraftData::AircraftData(std::int32_t vMaxDist) : mProcessor(vMaxDist)
 AircraftData::~AircraftData() noexcept
 {}
 
-std::vector<Aircraft>::iterator AircraftData::find(const std::string& crId)
+std::string AircraftData::getSerialized()
 {
-    const auto it = mIndexMap.find(crId);
-    if(it == mIndexMap.cend())
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::string tmp;
+    for(auto& it : mContainer)
     {
-        return mContainer.end();
+        tmp += it.getUpdateAge() < AC_OUTDATED ? it.getSerialized() : "";
     }
-    else
-    {
-        return mContainer.begin() + static_cast<std::int64_t>(it->second);
-    }
+    return tmp;
 }
 
-std::string AircraftData::processAircrafts(const struct util::GpsPosition& crBasePos,
-                                           double vAtmPress) noexcept
+bool AircraftData::update(const Object& crAircraft, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    std::string dest_str;
+    const Aircraft& crUpdate = static_cast<const Aircraft&>(crAircraft);
+    const auto& index        = mIndexMap.find(crUpdate.getId());
+    if(index != mIndexMap.end())
+    {
+        try
+        {
+            bool updated = mContainer[index->second.first].tryUpdate(
+                crAircraft, index->second.second.at(vSlot));
+            if(updated)
+            {
+                clearAttempts(index->second.second);
+            }
+            return updated;
+        }
+        catch(const std::out_of_range&)
+        {
+            return false;
+        }
+    }
+    insert(crUpdate);
+    return true;
+}
+
+std::size_t AircraftData::registerFeed()
+{
+    ++nrOfRegisteredFeeds;
+    // Just to be sure, but this should never happen.
+    for(auto& it : mIndexMap)
+    {
+        it.second.second.assign(nrOfRegisteredFeeds, 0);
+    }
+    return nrOfRegisteredFeeds - 1;
+}
+
+void AircraftData::processAircrafts(const GpsPosition& crBasePos,
+                                    double vAtmPress) noexcept
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
     std::size_t index = 0;
     bool del          = false;
     auto it           = mContainer.begin();
@@ -87,45 +121,30 @@ std::string AircraftData::processAircrafts(const struct util::GpsPosition& crBas
             }
             else
             {
-                if(it->getUpdateAge() < AC_OUTDATED)
+                if(it->getUpdateAge() == 1)
                 {
-                    dest_str += mProcessor.process(*it, crBasePos, vAtmPress);
+                    mProcessor.process(*it, crBasePos, vAtmPress);
                 }
                 ++it;
                 ++index;
             }
             if(del && it != mContainer.end())
             {
-                mIndexMap.at(it->getId()) = index;
+                mIndexMap.at(it->getId()).first = index;
             }
         }
         catch(const std::exception&)
         {
         }
     }
-    return dest_str;
 }
 
-void AircraftData::update(const Aircraft& rUpdate, std::uint32_t vPriority)
+void AircraftData::insert(const object::Aircraft& crAircraft)
 {
-    auto known_ac = find(rUpdate.getId());
-    if(known_ac != mContainer.end())
-    {
-        if(known_ac->getTargetType() == Aircraft::TargetType::TRANSPONDER
-           || rUpdate.getTargetType() == Aircraft::TargetType::FLARM)
-        {
-            if(vPriority * ++(known_ac->getUpdateAttempts())
-               >= known_ac->getLastPriority())
-            {
-                known_ac->update(rUpdate, vPriority);
-            }
-        }
-    }
-    else
-    {
-        mIndexMap.insert({rUpdate.getId(), mContainer.size()});
-        mContainer.push_back(rUpdate);
-    }
+    mIndexMap.insert(
+        {crAircraft.getId(),
+         {mContainer.size(), std::vector<std::uint64_t>(nrOfRegisteredFeeds, 0)}});
+    mContainer.push_back(crAircraft);
 }
 
 }  // namespace aircraft

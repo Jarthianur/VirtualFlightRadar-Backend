@@ -54,7 +54,7 @@ public:
     explicit Wind(std::uint32_t vPriority);
     virtual ~Wind() noexcept;
     Object& operator=(const Object& crOther);
-    const std::string& getMwvStr() const;
+    std::string& getMwvStr();
 
 private:
     friend struct Climate;

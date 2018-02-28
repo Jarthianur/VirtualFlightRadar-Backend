@@ -20,40 +20,50 @@
  */
 
 #include "AtmosphereData.h"
+
 #include <boost/thread/lock_guard.hpp>
 
-using namespace util;
+using namespace data::object;
 
 namespace data
 {
-AtmosphereData::AtmosphereData(struct Atmosphere vAtmos)
-{
-    std::uint64_t dummy = 0;
-    mAtmosphere.trySetValue(vAtmos, 0, dummy);
-}
+AtmosphereData::AtmosphereData() : Data()
+{}
+
+AtmosphereData::AtmosphereData(const Atmosphere& crAtmos) : Data(), mAtmosphere(crAtmos)
+{}
 
 AtmosphereData::~AtmosphereData() noexcept
 {}
 
-void AtmosphereData::update(const struct Atmosphere& crAtmos, std::uint32_t vPriority,
-                            std::uint64_t& rAttempts)
-{
-    if(mAtmosphere.trySetValue(crAtmos, vPriority, rAttempts))
-    {
-        rAttempts = 0;
-    }
-}
-
-std::string AtmosphereData::getMdaStr()
+std::string AtmosphereData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mAtmosphere.getValue().mdaStr + "\n";
+    return mAtmosphere.getMdaStr();
+}
+
+bool AtmosphereData::update(const Object& crAtmos, std::size_t vSlot)
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    try
+    {
+        bool updated = mAtmosphere.tryUpdate(crAtmos, ++mFeedAttempts.at(vSlot));
+        if(updated)
+        {
+            clearAttempts(mFeedAttempts);
+        }
+        return updated;
+    }
+    catch(const std::out_of_range&)
+    {
+        return false;
+    }
 }
 
 double AtmosphereData::getAtmPress()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mAtmosphere.getValue().pressure;
+    return mAtmosphere.getPressure();
 }
 
 }  // namespace data

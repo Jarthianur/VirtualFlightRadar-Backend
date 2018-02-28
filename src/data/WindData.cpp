@@ -39,19 +39,27 @@ WindData::~WindData() noexcept
 std::string WindData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    isValueValid = false;
-    return isValueValid ? mWind.getMwvStr() + "\n" : "";
+    std::string tmp(mWind.getMwvStr());
+    mWind.getMwvStr().clear();
+    return tmp;
 }
 
-bool WindData::update(const Object& crWind, std::uint64_t& rAttempts)
+bool WindData::update(const Object& crWind, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    if(mWind.tryUpdate(crWind, rAttempts))
+    try
     {
-        isValueValid = true;
-        return true;
+        bool updated = mWind.tryUpdate(crWind, ++mFeedAttempts.at(vSlot));
+        if(updated)
+        {
+            clearAttempts(mFeedAttempts);
+        }
+        return updated;
     }
-    return false;
+    catch(const std::out_of_range&)
+    {
+        return false;
+    }
 }
 
 }  // namespace data

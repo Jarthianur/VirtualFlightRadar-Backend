@@ -24,7 +24,6 @@
 #include "Data.h"
 
 #include "object/Position.h"
-#include "object/Wrapper.hpp"
 
 /// @namespace data
 namespace data
@@ -77,7 +76,7 @@ public:
      * @param rAttempts  The update attempts
      */
     bool update(const object::Object& crPosition,
-                std::uint64_t& rAttempts) override;
+                std::size_t vSlot) override;
 
 private:
     /// @var mBasePos

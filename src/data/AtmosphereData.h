@@ -21,17 +21,9 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include <boost/thread/mutex.hpp>
+#include "Data.h"
 
-#include "../util/Sensor.h"
-#include "../util/Wrapper.hpp"
-
-namespace feed
-{
-class SensorFeed;
-}
+#include "object/Sensor.h"
 
 /// @namespace data
 namespace data
@@ -40,15 +32,16 @@ namespace data
  * @class AtmosphereData
  * @brief Manage sensor information.
  */
-class AtmosphereData
+class AtmosphereData : public Data
 {
 public:
+    AtmosphereData();
     /**
      * @fn AtmosphereData
      * @brief Constructor
      * @param vAtmos The initial info
      */
-    explicit AtmosphereData(struct util::Atmosphere vAtmos);
+    explicit AtmosphereData(const object::Atmosphere& crAtmos);
 
     /**
      * @fn ~AtmosphereData
@@ -62,7 +55,16 @@ public:
      * @return the MDA sentence
      * @threadsafe
      */
-    std::string getMdaStr();
+    std::string getSerialized() override;
+
+    /**
+     * @fn update
+     * @brief Try to update the sensor information.
+     * @param crAtmos   The new data.
+     * @param vPriority The priority
+     * @param rAttempts The update attempts
+     */
+    bool update(const object::Object& crAtmos, std::size_t vSlot) override;
 
     /**
      * @fn getPress
@@ -72,27 +74,10 @@ public:
      */
     double getAtmPress();
 
-protected:
-    friend class feed::SensorFeed;
-
-    /// @var mMutex
-    /// Used for RW on this data
-    boost::mutex mMutex;
-
-    /**
-     * @fn update
-     * @brief Try to update the sensor information.
-     * @param crAtmos   The new data.
-     * @param vPriority The priority
-     * @param rAttempts The update attempts
-     */
-    void update(const struct util::Atmosphere& crAtmos, std::uint32_t vPriority,
-                std::uint64_t& rAttempts);
-
 private:
     /// @var mAtmosphere
     /// Holding atmospheric pressure
-    struct util::Wrapper<util::Atmosphere> mAtmosphere;
+    object::Atmosphere mAtmosphere;
 };
 
 }  // namespace data

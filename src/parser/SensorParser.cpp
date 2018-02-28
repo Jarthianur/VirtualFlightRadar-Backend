@@ -58,7 +58,7 @@ noexcept
             double tmpPress = std::stod(cr_msg.substr(tmpS, subLen), &numIdx) * 1000.0;
             if (numIdx == subLen)
             {
-                rClimate.mAtmosphere.mdaStr = cr_msg;
+                rClimate.mAtmosphere.mdaStr = cr_msg + "\n";
                 rClimate.mAtmosphere.pressure = tmpPress;
             }
             else
@@ -69,7 +69,7 @@ noexcept
         }
         else if (cr_msg.find("MWV") != std::string::npos)
         {
-            rClimate.mWind.mwvStr = cr_msg;
+            rClimate.mWind.mwvStr = cr_msg + "\n";
         }
         else
         {

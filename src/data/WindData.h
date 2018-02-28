@@ -24,7 +24,6 @@
 #include "Data.h"
 
 #include "object/Sensor.h"
-#include "object/Wrapper.hpp"
 
 /// @namespace data
 namespace data
@@ -66,13 +65,12 @@ public:
      * @param vPriority The attempts priority
      * @param rAttempts The update attempts
      */
-    bool update(const object::Object& crWind, std::uint64_t& rAttempts) override;
+    bool update(const object::Object& crWind, std::size_t vSlot) override;
 
 private:
     /// @var mWind
     /// Holding MDA sentence
     object::Wind mWind;
-    bool isValueValid = false;
 };
 
 }  // namespace data

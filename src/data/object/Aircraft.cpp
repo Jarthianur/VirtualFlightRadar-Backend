@@ -32,7 +32,8 @@ Aircraft::Aircraft(std::uint32_t vPriority) : Object(vPriority)
 {}
 
 Aircraft::Aircraft(std::string& rId, GpsPosition& rPos)
-    : mId(rId),
+    : Object(),
+      mId(rId),
       mIdType(IdType::ICAO),
       mAircraftType(AircraftType::POWERED_AIRCRAFT),
       mTargetType(TargetType::TRANSPONDER),
@@ -41,7 +42,8 @@ Aircraft::Aircraft(std::string& rId, GpsPosition& rPos)
 
 Aircraft::Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
                    GpsPosition& rPos, Movement& rMove)
-    : mId(rId),
+    : Object(),
+      mId(rId),
       mIdType(vIdType),
       mAircraftType(vAircraftType),
       mTargetType(TargetType::FLARM),
@@ -60,16 +62,24 @@ bool Aircraft::operator==(const Aircraft& crOther) const
 Object& Aircraft::operator=(const Object& crOther)
 {
     const Aircraft& crUpdate = static_cast<const Aircraft&>(crOther);
-    this->mIdType         = crUpdate.mIdType;
-    this->mAircraftType   = crUpdate.mAircraftType;
-    this->mTargetType     = crUpdate.mTargetType;
-    this->mPosition       = crUpdate.mPosition;
-    this->mMovement       = crUpdate.mMovement;
-    this->mFullInfo       = crUpdate.mFullInfo;
-    this->mUpdateAge      = 0;
-    this->mLastPriority   = crUpdate.mLastPriority;
-    this->mUpdateAttempts = 0;
+    this->mIdType            = crUpdate.mIdType;
+    this->mAircraftType      = crUpdate.mAircraftType;
+    this->mTargetType        = crUpdate.mTargetType;
+    this->mPosition          = crUpdate.mPosition;
+    this->mMovement          = crUpdate.mMovement;
+    this->mFullInfo          = crUpdate.mFullInfo;
+    this->mUpdateAge         = 0;
+    this->mLastPriority      = crUpdate.mLastPriority;
+    this->mUpdateAttempts    = 0;
     return *this;
+}
+
+bool Aircraft::canUpdate(const Object& crOther, std::uint64_t vAttempts) const
+{
+    const Aircraft& crKnown = static_cast<const Aircraft&>(crOther);
+    return (crKnown.mTargetType == TargetType::TRANSPONDER
+            || this->mTargetType == TargetType::FLARM)
+           && (this->mLastPriority * vAttempts >= crKnown.mLastPriority);
 }
 
 const std::string& Aircraft::getId() const
@@ -137,6 +147,11 @@ std::uint64_t& Aircraft::getUpdateAttempts()
     return mUpdateAttempts;
 }
 
+const std::string& Aircraft::getSerialized() const
+{
+    return mSerialized;
+}
+
 void Aircraft::setId(const std::string& crId)
 {
     mId = crId;
@@ -183,6 +198,11 @@ void Aircraft::setTargetType(Aircraft::TargetType vType)
 void Aircraft::setFullInfo(bool vInfo)
 {
     mFullInfo = vInfo;
+}
+
+void Aircraft::setSerialized(const std::string& crSerial)
+{
+    mSerialized = crSerial;
 }
 
 }  // namespace object

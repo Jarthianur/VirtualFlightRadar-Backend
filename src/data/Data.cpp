@@ -16,6 +16,7 @@
  */
 
 #include "Data.h"
+#include <algorithm>
 
 namespace data
 {
@@ -24,4 +25,15 @@ Data::Data()
 
 Data::~Data() noexcept
 {}
+
+std::size_t Data::registerFeed()
+{
+    mFeedAttempts.push_back(0);
+    return mFeedAttempts.size() - 1;
+}
+
+void Data::clearAttempts(std::vector<std::uint64_t>& rVec)
+{
+    std::fill(rVec.begin(), rVec.end(), 0);
+}
 }
