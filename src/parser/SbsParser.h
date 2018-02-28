@@ -19,24 +19,22 @@
  }
  */
 
-#ifndef SRC_PARSER_SBSPARSER_H_
-#define SRC_PARSER_SBSPARSER_H_
+#pragma once
 
 #include <string>
 
-#include "../aircraft/Aircraft.h"
+#include "../data/object/Aircraft.h"
 #include "Parser.hpp"
 
 namespace parser
 {
-
 /**
  * @class SbsParser implements Parser
  * @brief Provide unpacking method for SBS sentences.
  * @see Parser.hpp
  * @see ../aircraft/Aircraft.hpp
  */
-class SbsParser: public Parser<aircraft::Aircraft>
+class SbsParser : public Parser<data::object::Aircraft>
 {
 public:
     /**
@@ -54,12 +52,11 @@ public:
      * @brief Unpack into Aircraft.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noexcept override;
+    bool unpack(const std::string& cr_msg,
+                data::object::Aircraft& r_ac) noexcept override;
 
 private:
-const    std::int32_t mMaxHeight;
+    const std::int32_t mMaxHeight;
 };
 
 }  // namespace parser
-
-#endif /* SRC_PARSER_SBSPARSER_H_ */

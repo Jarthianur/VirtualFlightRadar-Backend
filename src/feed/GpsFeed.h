@@ -19,15 +19,15 @@
  }
  */
 
-#ifndef SRC_FEED_GPSFEED_H_
-#define SRC_FEED_GPSFEED_H_
+#pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "../parser/GpsParser.h"
 #include "../data/GpsData.h"
+#include "../parser/GpsParser.h"
 #include "Feed.h"
 
 namespace feed
@@ -66,7 +66,7 @@ private:
     /// Parser to unpack response from Client
     parser::GpsParser mParser;
     ///
-    std::uint64_t mUpdateAttempts;
+    std::size_t mDataSlot;
 
     std::shared_ptr<data::GpsData> mpData;
 
@@ -74,5 +74,3 @@ private:
 };
 
 }  // namespace feed
-
-#endif /* SRC_FEED_GPSFEED_H_ */

@@ -40,6 +40,8 @@ public:
     Object& operator=(const Object& crOther);
     const std::string& getMdaStr() const;
     double getPressure() const;
+    void setMdaStr(const std::string& crStr);
+    void setPressure(double vPress);
 
 private:
     friend struct Climate;
@@ -54,7 +56,8 @@ public:
     explicit Wind(std::uint32_t vPriority);
     virtual ~Wind() noexcept;
     Object& operator=(const Object& crOther);
-    std::string& getMwvStr();
+    const std::string& getMwvStr() const;
+    void setMwvStr(const std::string& crStr);
 
 private:
     friend struct Climate;

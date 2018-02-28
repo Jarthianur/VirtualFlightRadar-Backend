@@ -49,6 +49,16 @@ double Atmosphere::getPressure() const
     return mPressure;
 }
 
+void Atmosphere::setMdaStr(const std::string& crStr)
+{
+    mMdaStr = crStr;
+}
+
+void Atmosphere::setPressure(double vPress)
+{
+    mPressure = vPress;
+}
+
 Wind::Wind() : Object(0)
 {}
 
@@ -66,9 +76,14 @@ Object& Wind::operator=(const Object& crOther)
     return *this;
 }
 
-std::string& Wind::getMwvStr()
+const std::string& Wind::getMwvStr() const
 {
     return mMwvStr;
+}
+
+void Wind::setMwvStr(const std::string& crStr)
+{
+    mMwvStr = crStr;
 }
 }
 }

@@ -22,13 +22,12 @@
 #include "GpsFeed.h"
 
 #include <memory>
-#include <unordered_map>
-#include <boost/thread/lock_guard.hpp>
+#include <stdexcept>
 
 #include "../config/Configuration.h"
+#include "../data/object/Position.h"
 #include "../network/client/GpsdClient.h"
 #include "../util/Logger.h"
-#include "../util/Position.h"
 
 using namespace util;
 
@@ -36,13 +35,11 @@ namespace feed
 {
 GpsFeed::GpsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
                  std::shared_ptr<data::GpsData> pData, bool vGndMode)
-    : Feed(cr_name, cr_kvmap),
-      mUpdateAttempts(0),
-      mpData(pData),
-      mGndModeEnabled(vGndMode)
+    : Feed(cr_name, cr_kvmap), mpData(pData), mGndModeEnabled(vGndMode)
 {
-    mpClient = std::unique_ptr<network::client::Client>(new network::client::GpsdClient(
+    mpClient  = std::unique_ptr<network::client::Client>(new network::client::GpsdClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
+    mDataSlot = mpData->registerFeed();
 }
 
 GpsFeed::~GpsFeed() noexcept
@@ -50,12 +47,12 @@ GpsFeed::~GpsFeed() noexcept
 
 void GpsFeed::process(const std::string& cr_res) noexcept
 {
-    struct ExtGpsPosition pos(getPriority(), mGndModeEnabled);
+    data::object::ExtGpsPosition pos(getPriority(), mGndModeEnabled);
     if(mParser.unpack(cr_res, pos))
     {
         try
         {
-            if(mpData->update(pos, getPriority(), mUpdateAttempts))
+            if(mpData->update(pos, mDataSlot))
             {
                 throw std::runtime_error("received good position -> stop");
             }

@@ -19,11 +19,11 @@
  }
  */
 
-#ifndef SRC_FEED_SBSFEED_H_
-#define SRC_FEED_SBSFEED_H_
+#pragma once
 
 #include <cstdint>
 #include <string>
+#include <cstddef>
 
 #include "../config/PropertyMap.h"
 #include "../parser/SbsParser.h"
@@ -66,9 +66,9 @@ private:
     /// Parser to unpack response from Client
     parser::SbsParser mParser;
 
+    std::size_t mDataSlot;
+
     std::shared_ptr<data::AircraftData> mpData;
 };
 
 }  // namespace feed
-
-#endif /* SRC_FEED_SBSFEED_H_ */

@@ -26,23 +26,20 @@
 #include <stdexcept>
 
 #include "../config/Configuration.h"
+#include "../data/object/Position.h"
 #include "../util/Math.hpp"
-#include "../util/Position.h"
+
+using namespace data::object;
 
 namespace parser
 {
-
-SbsParser::SbsParser(std::int32_t vMaxHeight)
-        : Parser(),mMaxHeight(vMaxHeight)
-{
-}
+SbsParser::SbsParser(std::int32_t vMaxHeight) : Parser(), mMaxHeight(vMaxHeight)
+{}
 
 SbsParser::~SbsParser() noexcept
-{
-}
+{}
 
-bool SbsParser::unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac)
-noexcept
+bool SbsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
 {
     /*
      * fields:
@@ -54,22 +51,22 @@ noexcept
      */
     std::size_t p = 6;
 
-    if (cr_msg.find(',', p) == std::string::npos
-            || !(cr_msg.size() > 4 && cr_msg.at(4) == '3'))
+    if(cr_msg.find(',', p) == std::string::npos
+       || !(cr_msg.size() > 4 && cr_msg.at(4) == '3'))
     {
         return false;
     }
     std::size_t delim;
     std::uint32_t i = 2;
-    struct util::GpsPosition pos;
+    GpsPosition pos;
     try
     {
-        while ((delim = cr_msg.find(',', p)) != std::string::npos && i < 16)
+        while((delim = cr_msg.find(',', p)) != std::string::npos && i < 16)
         {
-            switch (i)
+            switch(i)
             {
                 case 4:
-                    if (delim - p > 0)
+                    if(delim - p > 0)
                     {
                         r_ac.setId(cr_msg.substr(p, delim - p));
                     }
@@ -78,11 +75,10 @@ noexcept
                         return false;
                     }
                     break;
-                                   case 11:
-                    pos.altitude = util::math::dToI(
-                            std::stod(cr_msg.substr(p, delim - p))
-                                    * util::math::FEET_2_M);
-                    if (pos.altitude > mMaxHeight)
+                case 11:
+                    pos.altitude = util::math::dToI(std::stod(cr_msg.substr(p, delim - p))
+                                                    * util::math::FEET_2_M);
+                    if(pos.altitude > mMaxHeight)
                     {
                         return false;
                     }
@@ -99,15 +95,16 @@ noexcept
             i++;
             p = delim + 1;
         }
-    } catch (const std::logic_error&)
+    }
+    catch(const std::logic_error&)
     {
         return false;
     }
     r_ac.setPosition(pos);
     r_ac.setFullInfo(false);
-    r_ac.setTargetType(aircraft::Aircraft::TargetType::TRANSPONDER);
-    r_ac.setAircraftType(aircraft::Aircraft::AircraftType::POWERED_AIRCRAFT);
-    r_ac.setIdType(aircraft::Aircraft::IdType::ICAO);
+    r_ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
+    r_ac.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
+    r_ac.setIdType(Aircraft::IdType::ICAO);
     return true;
 }
 

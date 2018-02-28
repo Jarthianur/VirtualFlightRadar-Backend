@@ -19,15 +19,15 @@
  }
  */
 
-#ifndef SRC_FEED_APRSCFEED_H_
-#define SRC_FEED_APRSCFEED_H_
+#pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "../parser/AprsParser.h"
 #include "../data/AircraftData.h"
+#include "../parser/AprsParser.h"
 #include "Feed.h"
 
 namespace feed
@@ -67,9 +67,9 @@ private:
     /// Parser to unpack response from Client
     parser::AprsParser mParser;
 
+    std::size_t mDataSlot;
+
     std::shared_ptr<data::AircraftData> mpData;
 };
 
 }  // namespace feed
-
-#endif /* SRC_FEED_APRSCFEED_H_ */

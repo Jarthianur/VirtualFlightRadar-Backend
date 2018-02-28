@@ -40,7 +40,7 @@ std::string WindData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     std::string tmp(mWind.getMwvStr());
-    mWind.getMwvStr().clear();
+    mWind.setMwvStr("");
     return tmp;
 }
 

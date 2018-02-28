@@ -22,29 +22,23 @@
 #include "SensorFeed.h"
 
 #include <memory>
-#include <unordered_map>
-#include <boost/thread/lock_guard.hpp>
 
 #include "../config/Configuration.h"
+#include "../data/object/Sensor.h"
 #include "../network/client/SensorClient.h"
-#include "../util/Sensor.h"
-
-using namespace util;
 
 namespace feed
 {
 SensorFeed::SensorFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
                        std::shared_ptr<data::WindData> pWindData,
                        std::shared_ptr<data::AtmosphereData> pAtmosData)
-    : Feed(crName, crKvMap),
-      mWindUpdateAttempts(0),
-      mAtmosUpdateAttempts(0),
-      mpWindData(pWindData),
-      mpAtmosphereData(pAtmosData)
+    : Feed(crName, crKvMap), mpWindData(pWindData), mpAtmosphereData(pAtmosData)
 
 {
     mpClient = std::unique_ptr<network::client::Client>(new network::client::SensorClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
+    mWindSlot  = mpWindData->registerFeed();
+    mAtmosSlot = mpAtmosphereData->registerFeed();
 }
 
 SensorFeed::~SensorFeed() noexcept
@@ -52,19 +46,17 @@ SensorFeed::~SensorFeed() noexcept
 
 void SensorFeed::process(const std::string& crResponse) noexcept
 {
-    struct Climate climate;
+    data::object::Climate climate{data::object::Wind(getPriority()),
+                                  data::object::Atmosphere(getPriority())};
     if(mParser.unpack(crResponse, climate))
     {
         if(climate.hasWind())
         {
-            boost::lock_guard<boost::mutex> lock(mpWindData->mMutex);
-            mpWindData->update(climate.mWind, getPriority(), mWindUpdateAttempts);
+            mpWindData->update(climate.mWind, mWindSlot);
         }
         if(climate.hasAtmosphere())
         {
-            boost::lock_guard<boost::mutex> lock(mpAtmosphereData->mMutex);
-            mpAtmosphereData->update(climate.mAtmosphere, getPriority(),
-                                     mAtmosUpdateAttempts);
+            mpAtmosphereData->update(climate.mAtmosphere, mAtmosSlot);
         }
     }
 }

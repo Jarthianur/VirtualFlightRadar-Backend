@@ -70,7 +70,6 @@ Object& Aircraft::operator=(const Object& crOther)
     this->mFullInfo          = crUpdate.mFullInfo;
     this->mUpdateAge         = 0;
     this->mLastPriority      = crUpdate.mLastPriority;
-    this->mUpdateAttempts    = 0;
     return *this;
 }
 
@@ -140,11 +139,6 @@ double Aircraft::getHeading() const
 double Aircraft::getClimbRate() const
 {
     return mMovement.climbRate;
-}
-
-std::uint64_t& Aircraft::getUpdateAttempts()
-{
-    return mUpdateAttempts;
 }
 
 const std::string& Aircraft::getSerialized() const

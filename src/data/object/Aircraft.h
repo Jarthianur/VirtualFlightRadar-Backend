@@ -252,13 +252,6 @@ public:
      */
     double getClimbRate() const;
 
-    /**
-     * @fn getUpdateAttempts
-     * @brief Get the update attempt count.
-     * @return the update attempt count by reference
-     */
-    std::uint64_t& getUpdateAttempts();
-
     const std::string& getSerialized() const;
 
     /**
@@ -362,10 +355,6 @@ private:
     /// @var mUpdateAge
     /// Times processed without update.
     std::uint64_t mUpdateAge = 0;
-
-    /// @var mUpdateAttempts
-    /// Number of unsuccessfull update attempts.
-    std::uint64_t mUpdateAttempts = 0;
 
     std::string mSerialized;
 };

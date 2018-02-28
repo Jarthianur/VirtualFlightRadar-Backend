@@ -23,11 +23,9 @@
 
 #include <memory>
 #include <stdexcept>
-#include <unordered_map>
-#include <boost/thread/lock_guard.hpp>
 
-#include "../aircraft/Aircraft.h"
 #include "../config/Configuration.h"
+#include "../data/object/Aircraft.h"
 #include "../network/client/AprscClient.h"
 
 #include "../util/Logger.h"
@@ -38,7 +36,7 @@ namespace feed
 {
 AprscFeed::AprscFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
                      std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
-    : Feed(cr_name, cr_kvmap),mParser(vMaxHeight), mpData(pData)
+    : Feed(cr_name, cr_kvmap), mParser(vMaxHeight), mpData(pData)
 {
     auto it = mKvMap.find(KV_KEY_LOGIN);
     if(it == mKvMap.end())
@@ -46,13 +44,10 @@ AprscFeed::AprscFeed(const std::string& cr_name, const config::KeyValueMap& cr_k
         Logger::warn({"(AprscFeed) could not find: ", mName, "." KV_KEY_LOGIN});
         throw std::logic_error("No login given");
     }
-    else
-    {
-        mpClient
-            = std::unique_ptr<network::client::Client>(new network::client::AprscClient(
-                mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second,
-                it->second, *this));
-    }
+    mpClient  = std::unique_ptr<network::client::Client>(new network::client::AprscClient(
+        mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, it->second,
+        *this));
+    mDataSlot = mpData->registerFeed();
 }
 
 AprscFeed::~AprscFeed() noexcept
@@ -60,11 +55,10 @@ AprscFeed::~AprscFeed() noexcept
 
 void AprscFeed::process(const std::string& cr_res) noexcept
 {
-    aircraft::Aircraft ac(getPriority());
+    data::object::Aircraft ac(getPriority());
     if(mParser.unpack(cr_res, ac))
     {
-        boost::lock_guard<boost::mutex> lock(mpData->mMutex);
-        mpData->update(ac, getPriority(), ac.getUpdateAttempts());
+        mpData->update(ac, mDataSlot);
     }
 }
 

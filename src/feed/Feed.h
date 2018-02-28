@@ -19,8 +19,7 @@
  }
  */
 
-#ifndef SRC_FEED_FEED_H_
-#define SRC_FEED_FEED_H_
+#pragma once
 
 #include <cstdint>
 #include <memory>
@@ -115,5 +114,3 @@ private:
 };
 
 }  // namespace feed
-
-#endif /* SRC_FEED_FEED_H_ */

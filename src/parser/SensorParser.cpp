@@ -28,54 +28,50 @@
 
 namespace parser
 {
-
-SensorParser::SensorParser()
-        : Parser()
-{
-}
+SensorParser::SensorParser() : Parser()
+{}
 
 SensorParser::~SensorParser() noexcept
-{
-}
+{}
 
-bool SensorParser::unpack(const std::string& cr_msg, struct util::Climate& rClimate)
-noexcept
+bool SensorParser::unpack(const std::string& cr_msg,
+                          data::object::Climate& rClimate) noexcept
 {
     try
     {
-        std::int32_t csum = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr,
-                16);
-        if (csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
+        std::int32_t csum
+            = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16);
+        if(csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return false;
         }
-        if (cr_msg.find("MDA") != std::string::npos)
+        if(cr_msg.find("MDA") != std::string::npos)
         {
-            std::size_t tmpB = cr_msg.find('B') - 1;
-            std::size_t tmpS = cr_msg.substr(0, tmpB).find_last_of(',') + 1;
+            std::size_t tmpB   = cr_msg.find('B') - 1;
+            std::size_t tmpS   = cr_msg.substr(0, tmpB).find_last_of(',') + 1;
             std::size_t subLen = tmpB - tmpS;
             std::size_t numIdx;
             double tmpPress = std::stod(cr_msg.substr(tmpS, subLen), &numIdx) * 1000.0;
-            if (numIdx == subLen)
+            if(numIdx == subLen)
             {
-                rClimate.mAtmosphere.mdaStr = cr_msg + "\n";
-                rClimate.mAtmosphere.pressure = tmpPress;
+                rClimate.mAtmosphere.setMdaStr(cr_msg + "\n");
+                rClimate.mAtmosphere.setPressure(tmpPress);
             }
             else
             {
                 return false;
             }
-
         }
-        else if (cr_msg.find("MWV") != std::string::npos)
+        else if(cr_msg.find("MWV") != std::string::npos)
         {
-            rClimate.mWind.mwvStr = cr_msg + "\n";
+            rClimate.mWind.setMwvStr(cr_msg + "\n");
         }
         else
         {
             return false;
         }
-    } catch (const std::logic_error& e)
+    }
+    catch(const std::logic_error&)
     {
         return false;
     }

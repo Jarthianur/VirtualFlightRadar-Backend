@@ -19,10 +19,10 @@
  }
  */
 
-#ifndef SRC_FEED_SENSORFEED_H_
-#define SRC_FEED_SENSORFEED_H_
+#pragma once
 
 #include <cstdint>
+#include <cstddef>
 #include <string>
 
 #include "../config/PropertyMap.h"
@@ -56,6 +56,7 @@ public:
      * @brief Destructor
      */
     virtual ~SensorFeed() noexcept;
+
     /**
      * @fn process
      * @brief Handle SensorClients response.
@@ -69,10 +70,10 @@ private:
     parser::SensorParser mParser;
 
     ///
-    std::uint64_t mWindUpdateAttempts;
+    std::size_t mWindSlot;
 
     ///
-    std::uint64_t mAtmosUpdateAttempts;
+    std::size_t mAtmosSlot;
 
     std::shared_ptr<data::WindData> mpWindData;
 
@@ -80,5 +81,3 @@ private:
 };
 
 }  // namespace feed
-
-#endif /* SRC_FEED_SENSORFEED_H_ */

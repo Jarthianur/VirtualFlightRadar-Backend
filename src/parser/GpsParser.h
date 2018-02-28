@@ -19,26 +19,24 @@
  }
  */
 
-#ifndef SRC_PARSER_GPSPARSER_H_
-#define SRC_PARSER_GPSPARSER_H_
+#pragma once
 
 #include <cstdint>
 #include <string>
 #include <boost/regex.hpp>
 
-#include "../util/Position.h"
+#include "../data/object/Position.h"
 #include "Parser.hpp"
 
 namespace parser
 {
-
 /**
  * @class GpsParser implements Parser
  * @brief Provide unpacking method for NMEA sentences from GPS sensors.
  * @see Parser.hpp
  * @see ../util/Position.h
  */
-class GpsParser: public Parser<struct util::ExtGpsPosition>
+class GpsParser : public Parser<data::object::ExtGpsPosition>
 {
 public:
     /**
@@ -56,8 +54,8 @@ public:
      * @brief Unpack into ExtGpsPosition.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& cr_msg, struct util::ExtGpsPosition& r_pos)
-            noexcept override;
+    bool unpack(const std::string& cr_msg,
+                data::object::ExtGpsPosition& r_pos) noexcept override;
 
 private:
     /// Regular expression to parse GGA
@@ -65,5 +63,3 @@ private:
 };
 
 }  // namespace parser
-
-#endif /* SRC_PARSER_GPSPARSER_H_ */

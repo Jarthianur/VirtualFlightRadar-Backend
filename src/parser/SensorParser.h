@@ -19,24 +19,22 @@
  }
  */
 
-#ifndef SRC_PARSER_SENSORPARSER_H_
-#define SRC_PARSER_SENSORPARSER_H_
+#pragma once
 
 #include <string>
 
-#include "../util/Sensor.h"
+#include "../data/object/Sensor.h"
 #include "Parser.hpp"
 
 namespace parser
 {
-
 /**
  * @class SensorParser implements Parser
  * @brief Provide unpacking method for NMEA sentences from sensors.
  * @see Parser.hpp
  * @see ../util/SensorInfo.h
  */
-class SensorParser: public Parser<struct util::Climate>
+class SensorParser : public Parser<data::object::Climate>
 {
 public:
     /**
@@ -54,10 +52,8 @@ public:
      * @brief Unpack into SensorInfo.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& crMsg, struct util::Climate& rClimate)
-            noexcept override;
+    bool unpack(const std::string& crMsg,
+                data::object::Climate& rClimate) noexcept override;
 };
 
 }  // namespace parser
-
-#endif /* SRC_PARSER_SENSORPARSER_H_ */

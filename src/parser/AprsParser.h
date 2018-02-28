@@ -19,26 +19,24 @@
  }
  */
 
-#ifndef SRC_PARSER_APRSPARSER_H_
-#define SRC_PARSER_APRSPARSER_H_
+#pragma once
 
-#include <boost/regex.hpp>
 #include <cstdint>
 #include <string>
+#include <boost/regex.hpp>
 
-#include "../aircraft/Aircraft.h"
+#include "../data/object/Aircraft.h"
 #include "Parser.hpp"
 
 namespace parser
 {
-
 /**
  * @class AprsParser implements Parser
  * @brief Provide unpacking method for APRS sentences.
  * @see Parser.hpp
  * @see ../aircraft/Aircraft.hpp
  */
-class AprsParser: public Parser<aircraft::Aircraft>
+class AprsParser : public Parser<data::object::Aircraft>
 {
 public:
     /**
@@ -56,7 +54,8 @@ public:
      * @brief Unpack into Aircraft.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& cr_msg, aircraft::Aircraft& r_ac) noexcept override;
+    bool unpack(const std::string& cr_msg,
+                data::object::Aircraft& r_ac) noexcept override;
 
 private:
     /// Regular expression for APRS protocol
@@ -67,5 +66,3 @@ private:
 };
 
 }  // namespace parser
-
-#endif /* SRC_PARSER_APRSPARSER_H_ */

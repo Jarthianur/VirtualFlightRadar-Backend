@@ -22,7 +22,6 @@
 #include "AprsParser.h"
 
 #include <stdexcept>
-#include <boost/regex.hpp>
 
 #include "../config/Configuration.h"
 #include "../util/Math.hpp"
@@ -42,7 +41,7 @@
 #define RE_APRS_COM_CR 3
 #define RE_APRS_COM_TR 4
 
-using namespace aircraft;
+using namespace data::object;
 
 namespace parser
 {
@@ -55,7 +54,7 @@ const boost::regex AprsParser::msAprsComRe(
     "^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
     boost::regex::optimize | boost::regex::icase);
 
-AprsParser::AprsParser(std::int32_t vMaxHeight) : Parser(),mMaxHeight(vMaxHeight)
+AprsParser::AprsParser(std::int32_t vMaxHeight) : Parser(), mMaxHeight(vMaxHeight)
 {}
 
 AprsParser::~AprsParser() noexcept
@@ -68,7 +67,7 @@ bool AprsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
         return false;
     }
     bool fullInfo = true;
-    struct util::GpsPosition pos;
+    GpsPosition pos;
     boost::smatch match;
     if(boost::regex_match(cr_msg, match, msAprsRe))
     {
