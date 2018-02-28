@@ -19,8 +19,7 @@
  }
  */
 
-#ifndef SRC_VFRB_H_
-#define SRC_VFRB_H_
+#pragma once
 
 #include <atomic>
 #include <memory>
@@ -116,5 +115,3 @@ private:
 
     std::list<std::shared_ptr<feed::Feed> > mFeeds;
 };
-
-#endif /* SRC_VFRB_H_ */
