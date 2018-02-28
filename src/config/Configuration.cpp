@@ -24,14 +24,13 @@
 #include <iterator>
 #include <stdexcept>
 
-#include "../util/Logger.h"
-#include "../util/Math.hpp"
+#include "../Logger.h"
 #include "ConfigReader.h"
-
-using namespace util;
 
 namespace config
 {
+using namespace util;
+
 Configuration::Configuration(std::istream& rStream)
 {
     try
@@ -65,23 +64,23 @@ void Configuration::init(const PropertyMap& crProperties)
 void Configuration::setFallbacks(const PropertyMap& crProperties)
 {
     mLatitude = boost::get<double>(
-        checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+        checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "")),
                          SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
     mLongitude = boost::get<double>(
-        checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+        checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "")),
                          SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
     mAltitude = boost::get<std::int32_t>(
-        checkNumberValue(math::stringToNumber<std::int32_t>(crProperties.getProperty(
+        checkNumberValue(stringToNumber<std::int32_t>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "")),
                          SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
     mGeoid = boost::get<double>(
-        checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+        checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
                          SECT_KEY_FALLBACK, KV_KEY_GEOID));
     mAtmPressure = boost::get<double>(
-        checkNumberValue(math::stringToNumber<double>(crProperties.getProperty(
+        checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
                          SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
 }
@@ -91,7 +90,7 @@ std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) 
     try
     {
         std::uint64_t port = boost::get<std::uint64_t>(
-            checkNumberValue(math::stringToNumber<std::uint64_t>(crProperties.getProperty(
+            checkNumberValue(stringToNumber<std::uint64_t>(crProperties.getProperty(
                                  SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353")),
                              SECT_KEY_GENERAL, KV_KEY_SERVER_PORT));
         if(port > std::numeric_limits<std::uint16_t>::max())
@@ -126,7 +125,7 @@ std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
     try
     {
         std::int32_t tmp = boost::get<std::int32_t>(
-            checkNumberValue(math::stringToNumber<std::int32_t>(
+            checkNumberValue(stringToNumber<std::int32_t>(
                                  crProperties.getProperty(SECT_KEY_FILTER, crKey, "-1")),
                              SECT_KEY_FILTER, crKey));
         return tmp < 0 ? std::numeric_limits<std::int32_t>::max() : tmp;
@@ -149,9 +148,9 @@ FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties)
     return mapping;
 }
 
-math::Number Configuration::checkNumberValue(const math::OptNumber& crOptNumber,
-                                             const std::string& crSection,
-                                             const std::string& crKey) const
+Number Configuration::checkNumberValue(const OptNumber& crOptNumber,
+                                       const std::string& crSection,
+                                       const std::string& crKey) const
 {
     if(!crOptNumber.get<0>())
     {
@@ -159,21 +158,6 @@ math::Number Configuration::checkNumberValue(const math::OptNumber& crOptNumber,
         throw std::invalid_argument("");
     }
     return crOptNumber.get<1>();
-}
-
-std::string& Configuration::trimString(std::string& rStr) const
-{
-    std::size_t f = rStr.find_first_not_of(' ');
-    if(f != std::string::npos)
-    {
-        rStr = rStr.substr(f);
-    }
-    std::size_t l = rStr.find_last_not_of(' ');
-    if(l != std::string::npos)
-    {
-        rStr = rStr.substr(0, l + 1);
-    }
-    return rStr;
 }
 
 void Configuration::dumpInfo() const

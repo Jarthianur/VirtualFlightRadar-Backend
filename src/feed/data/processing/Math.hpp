@@ -27,8 +27,7 @@
 #include <cstdint>
 #include <sstream>
 #include <string>
-#include <boost/tuple/tuple.hpp>
-#include <boost/variant.hpp>
+
 
 namespace util
 {
@@ -50,9 +49,6 @@ const double FPM_2_MS  = 0.00508;
 const double FEET_2_M  = 0.3048;
 const double M_2_FEET  = 3.28084;
 const double PI        = std::acos(-1.0);
-
-using Number = boost::variant<std::int32_t, std::uint64_t, double>;
-using OptNumber = boost::tuple<bool, Number>;
 
 /**
  * @fn radian
@@ -129,15 +125,6 @@ inline std::int32_t checksum(const char* sentence, std::size_t size)
         csum ^= (std::int32_t) sentence[i++];
     }
     return csum;
-}
-
-template<typename T>
-inline OptNumber stringToNumber(const std::string& crStr)
-{
-    std::stringstream ss(crStr);
-    T result;
-    bool suc = ss >> result;
-    return boost::make_tuple(suc, Number(result));
 }
 
 }  // namespace math

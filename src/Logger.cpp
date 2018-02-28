@@ -26,8 +26,6 @@
 #include <boost/chrono.hpp>
 #include <boost/thread/lock_guard.hpp>
 
-namespace util
-{
 Logger::Logger()
 {}
 
@@ -97,5 +95,3 @@ void Logger::setLogFile(std::ostream* pOut)
     Logger::mpOutStream = pOut;
     Logger::mpErrStream = pOut;
 }
-
-}  // namespace util

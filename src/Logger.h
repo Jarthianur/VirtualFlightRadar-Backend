@@ -27,8 +27,6 @@
 #include <initializer_list>
 #include <boost/thread/mutex.hpp>
 
-namespace util
-{
 using Message = const std::initializer_list<std::string>&;
 
 /**
@@ -101,7 +99,5 @@ private:
      */
     static std::string getTime();
 };
-
-}  // namespace util
 
 #endif /* SRC_UTIL_LOGGER_H_ */

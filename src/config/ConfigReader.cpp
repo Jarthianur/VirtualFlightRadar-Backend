@@ -22,8 +22,6 @@
 #include "ConfigReader.h"
 
 #include <stdexcept>
-#include <string>
-#include <utility>
 
 #include "../util/Logger.h"
 

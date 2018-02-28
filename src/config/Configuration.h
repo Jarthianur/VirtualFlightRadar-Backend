@@ -22,17 +22,13 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <istream>
 #include <list>
 #include <memory>
-#include <string>
-#include <type_traits>
 #include <vector>
 
-#include "../util/Math.hpp"
 #include "PropertyMap.h"
-
+#include "Util.h"
 
 /// @namespace config
 namespace config
@@ -270,17 +266,9 @@ private:
      * @return the number value
      * @throw std::invalid_argument if the value is invalid
      */
-    util::math::Number checkNumberValue(const util::math::OptNumber& crOptNumber,
-                                        const std::string& crSection,
-                                        const std::string& crKey) const;
-
-    /**
-     * @fn trimString
-     * @brief Trim a string on both sides.
-     * @param rStr The string
-     * @return the trimmed string
-     */
-    std::string& trimString(std::string& rStr) const;
+    util::Number checkNumberValue(const util::OptNumber& crOptNumber,
+                                  const std::string& crSection,
+                                  const std::string& crKey) const;
 
     /**
      * @fn dumpInfo
