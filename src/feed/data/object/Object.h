@@ -34,7 +34,7 @@ public:
 
     virtual ~Object() noexcept;
 
-    virtual Object& operator=(const Object& crOther) = 0;
+    virtual void assign(const Object& crOther) = 0;
 
     virtual bool tryUpdate(const Object& crOther, std::uint64_t vAttempts);
 

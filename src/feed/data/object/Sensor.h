@@ -40,7 +40,7 @@ public:
     explicit Atmosphere(double vPress);
     virtual ~Atmosphere() noexcept;
 
-    Object& operator=(const Object& crOther);
+    void assign(const Object& crOther);
 
     const std::string& getMdaStr() const;
     double getPressure() const;
@@ -60,7 +60,7 @@ public:
     explicit Wind(std::uint32_t vPriority);
     virtual ~Wind() noexcept;
 
-    Object& operator=(const Object& crOther);
+    void assign(const Object& crOther);
 
     const std::string& getMwvStr() const;
     void setMwvStr(const std::string& crStr);

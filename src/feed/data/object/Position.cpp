@@ -37,7 +37,7 @@ ExtGpsPosition::ExtGpsPosition(const GpsPosition& crPosition, double vGeoid)
 ExtGpsPosition::~ExtGpsPosition() noexcept
 {}
 
-Object& ExtGpsPosition::operator=(const Object& crOther)
+void ExtGpsPosition::assign(const Object& crOther)
 {
     const ExtGpsPosition& crUpdate = static_cast<const ExtGpsPosition&>(crOther);
     this->position                 = crUpdate.position;
@@ -47,7 +47,6 @@ Object& ExtGpsPosition::operator=(const Object& crOther)
     this->dilution                 = crUpdate.dilution;
     this->ground                   = crUpdate.ground;
     this->mLastPriority            = crUpdate.mLastPriority;
-    return *this;
 }
 }
 }

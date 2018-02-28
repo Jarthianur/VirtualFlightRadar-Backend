@@ -35,13 +35,12 @@ Atmosphere::Atmosphere(double vPress) : Object(0), mPressure(vPress)
 Atmosphere::~Atmosphere() noexcept
 {}
 
-Object& Atmosphere::operator=(const Object& crOther)
+void Atmosphere::assign(const Object& crOther)
 {
     const Atmosphere& crUpdate = static_cast<const Atmosphere&>(crOther);
     this->mMdaStr              = crUpdate.mMdaStr;
     this->mPressure            = crUpdate.mPressure;
     this->mLastPriority        = crUpdate.mLastPriority;
-    return *this;
 }
 
 const std::string& Atmosphere::getMdaStr() const
@@ -73,12 +72,11 @@ Wind::Wind(std::uint32_t vPriority) : Object(vPriority)
 Wind::~Wind() noexcept
 {}
 
-Object& Wind::operator=(const Object& crOther)
+void Wind::assign(const Object& crOther)
 {
     const Wind& crUpdate = static_cast<const Wind&>(crOther);
     this->mMwvStr        = crUpdate.mMwvStr;
     this->mLastPriority  = crUpdate.mLastPriority;
-    return *this;
 }
 
 const std::string& Wind::getMwvStr() const

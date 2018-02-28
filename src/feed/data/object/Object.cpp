@@ -36,7 +36,7 @@ bool Object::tryUpdate(const Object& crOther, std::uint64_t vAttempts)
 {
     if(crOther.canUpdate(*this, vAttempts))
     {
-        *this = crOther;
+        this->assign(crOther);
         return true;
     }
     return false;

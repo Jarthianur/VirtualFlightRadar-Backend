@@ -21,14 +21,20 @@
 
 #include "Aircraft.h"
 
+namespace feed
+{
 namespace data
 {
 namespace object
 {
-Aircraft::Aircraft() : Object()
+Aircraft::Aircraft() : Aircraft(0)
 {}
 
-Aircraft::Aircraft(std::uint32_t vPriority) : Object(vPriority)
+Aircraft::Aircraft(std::uint32_t vPriority)
+    : Object(vPriority),
+      mIdType(IdType::ICAO),
+      mAircraftType(AircraftType::POWERED_AIRCRAFT),
+      mTargetType(TargetType::TRANSPONDER)
 {}
 
 Aircraft::Aircraft(std::string& rId, GpsPosition& rPos)
@@ -59,7 +65,7 @@ bool Aircraft::operator==(const Aircraft& crOther) const
     return this->mId == crOther.mId;
 }
 
-Object& Aircraft::operator=(const Object& crOther)
+void Aircraft::assign(const Object& crOther)
 {
     const Aircraft& crUpdate = static_cast<const Aircraft&>(crOther);
     this->mIdType            = crUpdate.mIdType;
@@ -70,7 +76,6 @@ Object& Aircraft::operator=(const Object& crOther)
     this->mFullInfo          = crUpdate.mFullInfo;
     this->mUpdateAge         = 0;
     this->mLastPriority      = crUpdate.mLastPriority;
-    return *this;
 }
 
 bool Aircraft::canUpdate(const Object& crOther, std::uint64_t vAttempts) const
@@ -198,6 +203,6 @@ void Aircraft::setSerialized(const std::string& crSerial)
 {
     mSerialized = crSerial;
 }
-
+}
 }  // namespace object
 }  // namespace data

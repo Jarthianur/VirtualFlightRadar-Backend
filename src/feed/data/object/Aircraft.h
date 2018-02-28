@@ -165,7 +165,7 @@ public:
      * @param crUpdate  Other Aircraft with new data
      * @param vPriority Priority of the update
      */
-    Object& operator=(const Object& crOther) override;
+    void assign(const Object& crOther) override;
 
     /**
      * @fn getId
