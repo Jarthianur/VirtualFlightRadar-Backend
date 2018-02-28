@@ -24,6 +24,7 @@
 #include "Data.h"
 
 #include "object/Position.h"
+#include "processing/GpsModule.h"
 
 /// @namespace data
 namespace data
@@ -32,10 +33,9 @@ namespace data
  * @class GpsData
  * @brief Manage GPS information.
  */
-class GpsData: public Data
+class GpsData : public Data
 {
 public:
-
     GpsData();
 
     /**
@@ -68,15 +68,14 @@ public:
      */
     object::GpsPosition getGpsPosition();
 
-        /**
+    /**
      * @fn update
      * @brief Try to update the base position.
      * @param crPosition The new position
      * @param vPriority  The attempts priority
      * @param rAttempts  The update attempts
      */
-    bool update(const object::Object& crPosition,
-                std::size_t vSlot) override;
+    bool update(const object::Object& crPosition, std::size_t vSlot) override;
 
 private:
     /// @var mBasePos

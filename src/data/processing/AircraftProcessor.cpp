@@ -24,11 +24,13 @@
 #include <cmath>
 #include <cstdio>
 
-#include "../util/Math.hpp"
-#include "../util/Position.h"
-#include "Aircraft.h"
+#include "../../util/Math.hpp"
 
-namespace aircraft
+using namespace data::object;
+
+namespace data
+{
+namespace processing
 {
 AircraftProcessor::AircraftProcessor()
     : mMaxDistance(std::numeric_limits<std::int32_t>::max())
@@ -40,26 +42,26 @@ AircraftProcessor::AircraftProcessor(std::int32_t vMaxDist) : mMaxDistance(vMaxD
 AircraftProcessor::~AircraftProcessor() noexcept
 {}
 
-std::string AircraftProcessor::process(const Aircraft& crAircraft,
-                                       const struct util::GpsPosition& crRelPos,
-                                       double vAtmPress)
+void AircraftProcessor::process(Aircraft& crAircraft, const GpsPosition& crRelPos,
+                                double vAtmPress)
 {
     calcRelativePosition(crAircraft, crRelPos, vAtmPress);
 
     if(mtDist > mMaxDistance)
     {
-        return "";
+        crAircraft.setSerialized("");
+        return;
     }
 
     std::string nmea_str;
     buildPflauStr(crAircraft, nmea_str);
     buildPflaaStr(crAircraft, nmea_str);
 
-    return nmea_str;
+    crAircraft.setSerialized(nmea_str);
 }
 
 void AircraftProcessor::calcRelativePosition(const Aircraft& crAircraft,
-                                             const struct util::GpsPosition& crRelPos,
+                                             const GpsPosition& crRelPos,
                                              double vAtmPress)
 {
     mtRadLatB   = util::math::radian(crRelPos.latitude);
@@ -127,3 +129,4 @@ void AircraftProcessor::finishSentence(std::string& rDestStr)
 }
 
 }  // namespace aircraft
+}

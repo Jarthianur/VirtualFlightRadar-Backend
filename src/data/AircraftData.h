@@ -99,7 +99,7 @@ private:
 
     /// @var mProcessor
     /// Providing functionality to process Aircrafts
-    aircraft::AircraftProcessor mProcessor;
+    processing::AircraftProcessor mProcessor;
 
     /// @var mContainer
     /// Vector holding the Aircrafts

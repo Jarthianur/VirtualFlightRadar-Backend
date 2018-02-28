@@ -19,17 +19,18 @@
  }
  */
 
-#ifndef SRC_UTIL_GPSMODULE_H_
-#define SRC_UTIL_GPSMODULE_H_
+#pragma once
 
 #include <string>
+#include "../object/Position.h"
 
-#define GPSM_BUFF_S   8191
+#define GPSM_BUFF_S 8191
 #define GPSM_L_BUFF_S 128
 
-namespace util
+namespace data
 {
-
+namespace processing
+{
 /**
  * @class GpsModule
  * @brief Provides functionalities to build NMEA GGA and RMC sentences.
@@ -54,7 +55,7 @@ public:
      * @param cr_pos The extended GPS information
      * @return the GPGGA sentence
      */
-    std::string genGpggaStr(const struct ExtGpsPosition& cr_pos);
+    std::string genGpggaStr(const object::ExtGpsPosition& cr_pos);
     /**
      * @fn genGprmcStr
      * @brief Build a GPRMC sentence.
@@ -62,7 +63,7 @@ public:
      * @param cr_pos The extended GPS information
      * @return the GPRMC sentence
      */
-    std::string genGprmcStr(const struct ExtGpsPosition& cr_pos);
+    std::string genGprmcStr(const object::ExtGpsPosition& cr_pos);
 
 private:
     /// Formatstring buffer
@@ -70,5 +71,4 @@ private:
 };
 
 }  // namespace util
-
-#endif /* SRC_UTIL_GPSMODULE_H_ */
+}

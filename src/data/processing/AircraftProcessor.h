@@ -23,6 +23,8 @@
 
 #include <cstdint>
 #include <string>
+#include "../object/Aircraft.h"
+#include "../object/Position.h"
 
 /// @def AP_BUFF_S
 /// Internal buffer size
@@ -31,17 +33,11 @@
 /// @def AP_L_BUFF_S
 /// Internal buffer less size
 #define AP_L_BUFF_S 128
-
-namespace util
+namespace data
 {
-struct GpsPosition;
-}
-
 /// @namespace aircraft
-namespace aircraft
+namespace processing
 {
-class Aircraft;
-
 /**
  * @class AircraftProcessor
  * @brief Process Aircrafts relative to the base position.
@@ -49,7 +45,6 @@ class Aircraft;
 class AircraftProcessor
 {
 public:
-
     AircraftProcessor();
     /**
      * @fn AircraftProcessor
@@ -74,8 +69,8 @@ public:
      * @param vMaxDist   The max distance
      * @return the NMEA string
      */
-    std::string process(const Aircraft& crAircraft,
-                        const struct util::GpsPosition& crRelPos, double vAtmPress);
+    void process(object::Aircraft& crAircraft, const object::GpsPosition& crRelPos,
+                 double vAtmPress);
 
 private:
     /**
@@ -85,8 +80,8 @@ private:
      * @param crRelPos   The position to relate
      * @param vAtmPress  The atmospheric pressure
      */
-    void calcRelativePosition(const Aircraft& crAircraft,
-                              const struct util::GpsPosition& crRelPos, double vAtmPress);
+    void calcRelativePosition(const object::Aircraft& crAircraft,
+                              const object::GpsPosition& crRelPos, double vAtmPress);
 
     /**
      * @fn buildPflauStr
@@ -94,7 +89,7 @@ private:
      * @param crAircraft The Aircaft
      * @param rDestStr   The destination string
      */
-    void buildPflauStr(const Aircraft& crAircraft, std::string& rDestStr);
+    void buildPflauStr(const object::Aircraft& crAircraft, std::string& rDestStr);
 
     /**
      * @fn buildPflaaStr
@@ -102,7 +97,7 @@ private:
      * @param crAircraft The Aircaft
      * @param rDestStr   The destination string
      */
-    void buildPflaaStr(const Aircraft& crAircraft, std::string& rDestStr);
+    void buildPflaaStr(const object::Aircraft& crAircraft, std::string& rDestStr);
 
     /**
      * @fn appendChecksum
@@ -171,3 +166,4 @@ private:
 };
 
 }  // namespace aircraft
+}
