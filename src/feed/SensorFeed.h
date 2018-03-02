@@ -26,8 +26,8 @@
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "data/AtmosphereData.h"
-#include "data/WindData.h"
+#include "../data/AtmosphereData.h"
+#include "../data/WindData.h"
 #include "parser/SensorParser.h"
 #include "Feed.h"
 

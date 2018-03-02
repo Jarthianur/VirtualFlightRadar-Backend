@@ -27,12 +27,12 @@
 
 namespace server
 {
-boost::shared_ptr<Connection> Connection::start(boost::asio::ip::tcp::socket socket)
+boost::shared_ptr<Connection> Connection::start(boost::asio::ip::tcp::socket&& socket)
 {
     return boost::shared_ptr<Connection>(new Connection(std::move(socket)));
 }
 
-Connection::Connection(boost::asio::ip::tcp::socket socket)
+Connection::Connection(boost::asio::ip::tcp::socket&& socket)
     : mSocket(std::move(socket)), mIp(mSocket.remote_endpoint().address().to_string())
 {}
 

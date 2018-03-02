@@ -26,7 +26,7 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../data/object/Position.h"
+#include "../../data/object/Position.h"
 
 namespace feed
 {

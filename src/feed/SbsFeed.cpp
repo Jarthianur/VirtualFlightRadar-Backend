@@ -26,9 +26,7 @@
 
 #include "../config/Configuration.h"
 #include "client/SbsClient.h"
-#include "data/object/Aircraft.h"
-
-using namespace util;
+#include "../data/object/Aircraft.h"
 
 namespace feed
 {

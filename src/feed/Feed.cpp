@@ -28,10 +28,8 @@
 
 #include "../VFRB.h"
 #include "../config/Configuration.h"
-#include "../util/Logger.h"
+#include "../Logger.h"
 #include "client/Client.h"
-
-using namespace util;
 
 namespace feed
 {

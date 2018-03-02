@@ -25,11 +25,9 @@
 #include <stdexcept>
 
 #include "../config/Configuration.h"
-#include "../util/Logger.h"
+#include "../Logger.h"
 #include "client/GpsdClient.h"
-#include "data/object/Position.h"
-
-using namespace util;
+#include "../data/object/Position.h"
 
 namespace feed
 {

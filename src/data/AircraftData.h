@@ -28,7 +28,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../config/Parameters.h"
+#include "../config/Parameters.h"
 #include "object/Aircraft.h"
 #include "object/Position.h"
 #include "processor/AircraftProcessor.h"

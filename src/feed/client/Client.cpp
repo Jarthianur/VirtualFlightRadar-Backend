@@ -25,10 +25,8 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
-#include "../../util/Logger.h"
-#include "..//Feed.h"
-
-using namespace util;
+#include "../../Logger.h"
+#include "../Feed.h"
 
 namespace feed
 {

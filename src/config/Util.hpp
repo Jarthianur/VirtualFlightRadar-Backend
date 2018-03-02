@@ -28,7 +28,7 @@ inline OptNumber stringToNumber(const std::string& crStr)
  * @param rStr The string
  * @return the trimmed string
  */
-std::string& trimString(std::string& rStr)
+inline std::string& trimString(std::string& rStr)
 {
     std::size_t f = rStr.find_first_not_of(' ');
     if(f != std::string::npos)

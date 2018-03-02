@@ -26,7 +26,7 @@
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "data/AircraftData.h"
+#include "../data/AircraftData.h"
 #include "parser/SbsParser.h"
 #include "Feed.h"
 

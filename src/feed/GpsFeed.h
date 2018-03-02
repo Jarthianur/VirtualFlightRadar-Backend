@@ -26,7 +26,7 @@
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "data/GpsData.h"
+#include "../data/GpsData.h"
 #include "parser/GpsParser.h"
 #include "Feed.h"
 

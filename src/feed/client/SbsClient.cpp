@@ -26,10 +26,8 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/system/error_code.hpp>
-#include "../../util/Logger.h"
+#include "../../Logger.h"
 #include "../Feed.h"
-
-using namespace util;
 
 namespace feed
 {

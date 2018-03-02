@@ -54,7 +54,7 @@ public:
      * @param socket The socket
      * @return a shared ptr to the Connection object
      */
-    static boost::shared_ptr<Connection> start(boost::asio::ip::tcp::socket socket);
+    static boost::shared_ptr<Connection> start(boost::asio::ip::tcp::socket&& socket);
     /**
      * @fn stop
      * @brief Stop the connection, shutdown and close socket.
@@ -79,7 +79,7 @@ private:
      * @brief Constructor
      * @param socket The socket
      */
-    Connection(boost::asio::ip::tcp::socket socket);
+    Connection(boost::asio::ip::tcp::socket&& socket);
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
     /// IP address

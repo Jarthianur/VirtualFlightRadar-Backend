@@ -26,11 +26,9 @@
 
 #include "../config/Configuration.h"
 #include "client/AprscClient.h"
-#include "data/object/Aircraft.h"
+#include "../data/object/Aircraft.h"
 
-#include "../util/Logger.h"
-
-using namespace util;
+#include "../Logger.h"
 
 namespace feed
 {
