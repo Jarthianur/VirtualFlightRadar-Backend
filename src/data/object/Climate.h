@@ -21,8 +21,10 @@
 
 #pragma once
 
-#include "Wind.h"
+#include <string>
+
 #include "Atmosphere.h"
+#include "Wind.h"
 
 namespace data
 {

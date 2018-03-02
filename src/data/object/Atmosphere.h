@@ -21,7 +21,9 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
+
 #include "Object.h"
 
 /// ICAO standard atmospheric pressure at MSL

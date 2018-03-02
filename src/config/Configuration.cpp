@@ -21,6 +21,10 @@
 
 #include "Configuration.h"
 
+#include <boost/tuple/tuple.hpp>
+#include <boost/variant.hpp>
+#include <limits>
+#include <sstream>
 #include <stdexcept>
 
 #include "../Logger.h"

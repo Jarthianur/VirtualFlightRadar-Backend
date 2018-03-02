@@ -21,8 +21,9 @@
 
 #include "GpsData.h"
 
-#include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
+#include <stdexcept>
+#include <vector>
 
 /// Define GPS metrics
 #define GPS_NR_SATS_GOOD 7

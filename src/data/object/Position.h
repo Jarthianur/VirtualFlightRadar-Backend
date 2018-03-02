@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "Object.h"
 
 namespace data

@@ -21,8 +21,10 @@
 
 #pragma once
 
-#include "Data.h"
+#include <cstddef>
+#include <string>
 
+#include "Data.h"
 #include "object/Atmosphere.h"
 
 /// @namespace data

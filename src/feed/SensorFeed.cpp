@@ -25,7 +25,7 @@
 
 #include "../config/Configuration.h"
 #include "client/SensorClient.h"
-#include "../data/object/Sensor.h"
+#include "../data/object/Climate.h"
 
 namespace feed
 {

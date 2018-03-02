@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <cstdint>
 #include <boost/regex.hpp>
 
 #include "../../data/object/Aircraft.h"

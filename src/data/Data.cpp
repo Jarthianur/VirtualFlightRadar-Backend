@@ -16,6 +16,7 @@
  */
 
 #include "Data.h"
+
 #include <algorithm>
 
 namespace data

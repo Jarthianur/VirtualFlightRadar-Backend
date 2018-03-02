@@ -22,9 +22,7 @@
 #include "Feed.h"
 
 #include <algorithm>
-#include <atomic>
 #include <stdexcept>
-#include <unordered_map>
 
 #include "../VFRB.h"
 #include "../config/Configuration.h"

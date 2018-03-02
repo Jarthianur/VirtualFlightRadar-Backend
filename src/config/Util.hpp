@@ -1,10 +1,11 @@
 #pragma once
 
+#include <boost/tuple/tuple.hpp>
+#include <boost/variant.hpp>
+#include <cstddef>
 #include <cstdint>
 #include <sstream>
 #include <string>
-#include <boost/tuple/tuple.hpp>
-#include <boost/variant.hpp>
 
 namespace config
 {

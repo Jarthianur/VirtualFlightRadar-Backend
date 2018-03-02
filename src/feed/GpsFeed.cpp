@@ -21,7 +21,6 @@
 
 #include "GpsFeed.h"
 
-#include <memory>
 #include <stdexcept>
 
 #include "../config/Configuration.h"

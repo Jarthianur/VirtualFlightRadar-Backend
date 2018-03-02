@@ -21,10 +21,6 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <string>
-
 #include "../config/PropertyMap.h"
 #include "../data/AircraftData.h"
 #include "parser/SbsParser.h"

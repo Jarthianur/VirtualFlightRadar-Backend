@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "../../data/object/Sensor.h"
+#include "../../data/object/Climate.h"
 #include "Parser.hpp"
 
 namespace feed

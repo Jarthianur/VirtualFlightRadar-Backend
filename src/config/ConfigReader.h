@@ -21,10 +21,12 @@
 
 #pragma once
 
-#include <cstddef>
-#include <istream>
 #include <boost/regex.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <cstddef>
+#include <istream>
+#include <string>
+
 #include "PropertyMap.h"
 
 /// @namespace config

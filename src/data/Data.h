@@ -17,10 +17,11 @@
 
 #pragma once
 
+#include <boost/thread/mutex.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <string>
-#include <boost/thread/mutex.hpp>
+#include <vector>
 
 namespace data
 {

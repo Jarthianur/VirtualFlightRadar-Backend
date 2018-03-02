@@ -21,13 +21,11 @@
 
 #include "AprscFeed.h"
 
-#include <memory>
 #include <stdexcept>
 
 #include "../config/Configuration.h"
 #include "client/AprscClient.h"
 #include "../data/object/Aircraft.h"
-
 #include "../Logger.h"
 
 namespace feed

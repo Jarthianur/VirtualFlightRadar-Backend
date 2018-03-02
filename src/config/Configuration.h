@@ -21,11 +21,11 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstdint>
 #include <istream>
 #include <list>
-#include <memory>
-#include <vector>
+#include <string>
+#include <utility>
 
 #include "PropertyMap.h"
 #include "Util.hpp"

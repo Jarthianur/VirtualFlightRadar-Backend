@@ -21,16 +21,15 @@
 
 #pragma once
 
-#include "Data.h"
-
 #include <cstddef>
-#include <typeindex>
+#include <cstdint>
+#include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
-#include "../config/Parameters.h"
+#include "Data.h"
 #include "object/Aircraft.h"
-#include "object/Position.h"
 #include "processor/AircraftProcessor.h"
 
 /// @def AC_OUTDATED

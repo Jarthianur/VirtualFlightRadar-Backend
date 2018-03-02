@@ -21,9 +21,12 @@
 
 #pragma once
 
-#include "Processor.hpp"
+#include <cstdint>
+#include <string>
+
 #include "../object/Aircraft.h"
 #include "../object/Position.h"
+#include "Processor.hpp"
 
 namespace data
 {

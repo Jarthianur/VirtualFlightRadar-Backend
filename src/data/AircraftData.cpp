@@ -21,11 +21,10 @@
 
 #include "AircraftData.h"
 
-#include <algorithm>
-#include <exception>
-#include <iterator>
-#include <utility>
 #include <boost/thread/lock_guard.hpp>
+#include <iterator>
+#include <stdexcept>
+#include <system_error>
 
 #ifndef ESTIMATED_TRAFFIC
 #define ESTIMATED_TRAFFIC 1

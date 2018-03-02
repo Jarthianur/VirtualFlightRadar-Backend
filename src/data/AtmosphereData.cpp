@@ -22,6 +22,8 @@
 #include "AtmosphereData.h"
 
 #include <boost/thread/lock_guard.hpp>
+#include <stdexcept>
+#include <vector>
 
 using namespace data::object;
 

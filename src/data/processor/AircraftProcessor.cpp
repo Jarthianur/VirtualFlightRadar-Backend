@@ -20,7 +20,12 @@
  */
 
 #include "AircraftProcessor.h"
+
+#include <cmath>
+#include <cstdio>
 #include <limits>
+
+#include "../../Math.hpp"
 
 using namespace data::object;
 

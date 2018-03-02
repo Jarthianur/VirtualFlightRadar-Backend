@@ -21,7 +21,6 @@
 
 #include "SbsParser.h"
 
-#include <cstddef>
 #include <limits>
 #include <stdexcept>
 
