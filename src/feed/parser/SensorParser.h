@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "../../data/object/Climate.h"
 #include "Parser.hpp"
 

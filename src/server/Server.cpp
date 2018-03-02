@@ -21,13 +21,10 @@
 
 #include "Server.h"
 
+#include <boost/bind.hpp>
+#include <boost/thread/lock_guard.hpp>
 #include <algorithm>
 #include <iterator>
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/thread/lock_guard.hpp>
 
 #include "../Logger.h"
 

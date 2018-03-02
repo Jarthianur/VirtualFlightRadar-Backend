@@ -21,10 +21,17 @@
 
 #pragma once
 
+#include <cstddef>
+#include <memory>
+#include <string>
+
 #include "../config/PropertyMap.h"
-#include "../data/GpsData.h"
-#include "parser/GpsParser.h"
 #include "Feed.h"
+#include "parser/GpsParser.h"
+
+namespace data {
+class GpsData;
+} /* namespace data */
 
 namespace feed
 {

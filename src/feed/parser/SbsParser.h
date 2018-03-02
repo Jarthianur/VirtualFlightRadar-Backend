@@ -21,6 +21,9 @@
 
 #pragma once
 
+#include <cstdint>
+#include <string>
+
 #include "../../data/object/Aircraft.h"
 #include "Parser.hpp"
 

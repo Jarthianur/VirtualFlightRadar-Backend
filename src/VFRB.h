@@ -24,30 +24,23 @@
 #include <atomic>
 #include <list>
 #include <memory>
-#include <boost/asio/signal_set.hpp>
-#include <boost/system/error_code.hpp>
+
 #include "server/Server.h"
 
-namespace config
-{
+namespace config {
 class Configuration;
-}
-namespace feed
-{
-class Feed;
-namespace object
-{
-class Aircraft;
-class ExtGpsPosition;
-}
-}
-namespace data
-{
+} /* namespace config */
+namespace data {
 class AircraftData;
-class WindData;
 class AtmosphereData;
 class GpsData;
-}
+class WindData;
+} /* namespace data */
+namespace feed {
+class Feed;
+} /* namespace feed */
+
+
 
 /**
  * @class VFRB

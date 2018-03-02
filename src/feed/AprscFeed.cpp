@@ -22,11 +22,13 @@
 #include "AprscFeed.h"
 
 #include <stdexcept>
+#include <unordered_map>
 
 #include "../config/Configuration.h"
-#include "client/AprscClient.h"
+#include "../data/AircraftData.h"
 #include "../data/object/Aircraft.h"
 #include "../Logger.h"
+#include "client/AprscClient.h"
 
 namespace feed
 {

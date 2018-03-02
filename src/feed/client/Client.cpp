@@ -21,10 +21,10 @@
 
 #include "Client.h"
 
-#include <iostream>
-#include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
+#include <iostream>
+
 #include "../../Logger.h"
 #include "../Feed.h"
 

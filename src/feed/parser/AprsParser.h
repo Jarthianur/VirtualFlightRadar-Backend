@@ -22,6 +22,8 @@
 #pragma once
 
 #include <boost/regex.hpp>
+#include <cstdint>
+#include <string>
 
 #include "../../data/object/Aircraft.h"
 #include "Parser.hpp"

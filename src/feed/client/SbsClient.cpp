@@ -21,13 +21,9 @@
 
 #include "SbsClient.h"
 
-#include <cstddef>
-#include <iostream>
-#include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/system/error_code.hpp>
+
 #include "../../Logger.h"
-#include "../Feed.h"
 
 namespace feed
 {

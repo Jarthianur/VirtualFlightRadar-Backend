@@ -22,14 +22,17 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
+#include <memory>
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "../data/AtmosphereData.h"
-#include "../data/WindData.h"
-#include "parser/SensorParser.h"
 #include "Feed.h"
+#include "parser/SensorParser.h"
+
+namespace data {
+class AtmosphereData;
+class WindData;
+} /* namespace data */
 
 namespace feed
 {

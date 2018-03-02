@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
 #include <boost/asio/signal_set.hpp>
 #include <boost/move/core.hpp>
+#include <cstdint>
+#include <memory>
+#include <string>
 
 #include "../config/PropertyMap.h"
 

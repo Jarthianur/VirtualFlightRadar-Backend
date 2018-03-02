@@ -21,10 +21,18 @@
 
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+
 #include "../config/PropertyMap.h"
-#include "../data/AircraftData.h"
-#include "parser/AprsParser.h"
 #include "Feed.h"
+#include "parser/AprsParser.h"
+
+namespace data {
+class AircraftData;
+} /* namespace data */
 
 namespace feed
 {

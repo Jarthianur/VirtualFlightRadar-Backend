@@ -21,12 +21,12 @@
 
 #include "SbsFeed.h"
 
-#include <memory>
-#include <stdexcept>
+#include <unordered_map>
 
 #include "../config/Configuration.h"
-#include "client/SbsClient.h"
+#include "../data/AircraftData.h"
 #include "../data/object/Aircraft.h"
+#include "client/SbsClient.h"
 
 namespace feed
 {

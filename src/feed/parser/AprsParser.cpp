@@ -21,8 +21,10 @@
 
 #include "AprsParser.h"
 
+#include <limits>
 #include <stdexcept>
 
+#include "../../data/object/Position.h"
 #include "../../Math.hpp"
 
 /// Define regex match groups for APRS

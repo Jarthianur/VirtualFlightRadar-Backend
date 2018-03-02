@@ -21,12 +21,15 @@
 
 #pragma once
 
-#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
+#include <string>
 
-#include "../../config/Parameters.h"
 #include "Client.h"
+
+namespace feed {
+class Feed;
+} /* namespace feed */
 
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT

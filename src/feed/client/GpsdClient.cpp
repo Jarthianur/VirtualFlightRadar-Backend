@@ -21,12 +21,9 @@
 
 #include "GpsdClient.h"
 
-#include <cstddef>
-#include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include "../../config/Configuration.h"
+
 #include "../../Logger.h"
-#include "../Feed.h"
 
 namespace feed
 {

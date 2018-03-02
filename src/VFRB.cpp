@@ -21,22 +21,23 @@
 
 #include "VFRB.h"
 
-#include <exception>
-#include <functional>
-#include <string>
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
 #include <boost/chrono.hpp>
-#include <boost/move/move.hpp>
+#include <boost/system/error_code.hpp>
 #include <boost/thread.hpp>
+#include <csignal>
+#include <exception>
+#include <string>
+#include <utility>
 
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
 #include "data/GpsData.h"
+#include "data/object/Atmosphere.h"
+#include "data/object/Position.h"
 #include "data/WindData.h"
 #include "feed/AprscFeed.h"
-#include "feed/Feed.h"
 #include "feed/GpsFeed.h"
 #include "feed/SbsFeed.h"
 #include "feed/SensorFeed.h"

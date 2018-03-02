@@ -22,6 +22,7 @@
 #pragma once
 
 #include <boost/regex.hpp>
+#include <string>
 
 #include "../../data/object/Position.h"
 #include "Parser.hpp"

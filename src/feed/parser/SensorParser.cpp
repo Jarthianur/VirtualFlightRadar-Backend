@@ -21,8 +21,11 @@
 
 #include "SensorParser.h"
 
+#include <cstddef>
 #include <stdexcept>
 
+#include "../../data/object/Atmosphere.h"
+#include "../../data/object/Wind.h"
 #include "../../Math.hpp"
 
 namespace feed

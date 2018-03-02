@@ -21,12 +21,11 @@
 
 #include "SensorClient.h"
 
-#include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/operators.hpp>
+
 #include "../../Logger.h"
-#include "../Feed.h"
 
 namespace feed
 {

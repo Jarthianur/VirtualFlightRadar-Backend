@@ -21,14 +21,14 @@
 
 #pragma once
 
+#include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/system/error_code.hpp>
+#include <boost/thread/mutex.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
-#include "../config/Parameters.h"
 #include "Connection.h"
 
 #ifdef SERVER_MAX_CLIENTS

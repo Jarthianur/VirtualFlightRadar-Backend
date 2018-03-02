@@ -22,11 +22,14 @@
 #include "Feed.h"
 
 #include <algorithm>
+#include <atomic>
+#include <limits>
 #include <stdexcept>
+#include <unordered_map>
 
-#include "../VFRB.h"
 #include "../config/Configuration.h"
 #include "../Logger.h"
+#include "../VFRB.h"
 #include "client/Client.h"
 
 namespace feed

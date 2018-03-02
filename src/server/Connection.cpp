@@ -22,7 +22,6 @@
 #include "Connection.h"
 
 #include <algorithm>
-#include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
 namespace server

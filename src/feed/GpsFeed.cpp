@@ -22,11 +22,13 @@
 #include "GpsFeed.h"
 
 #include <stdexcept>
+#include <unordered_map>
 
 #include "../config/Configuration.h"
+#include "../data/GpsData.h"
+#include "../data/object/Position.h"
 #include "../Logger.h"
 #include "client/GpsdClient.h"
-#include "../data/object/Position.h"
 
 namespace feed
 {

@@ -21,11 +21,15 @@
 
 #include "SensorFeed.h"
 
-#include <memory>
+#include <unordered_map>
 
 #include "../config/Configuration.h"
-#include "client/SensorClient.h"
+#include "../data/AtmosphereData.h"
+#include "../data/object/Atmosphere.h"
 #include "../data/object/Climate.h"
+#include "../data/object/Wind.h"
+#include "../data/WindData.h"
+#include "client/SensorClient.h"
 
 namespace feed
 {
