@@ -21,22 +21,21 @@
 
 #include "VFRB.h"
 
-#include <boost/asio.hpp>
-#include <boost/chrono.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/thread.hpp>
 #include <csignal>
 #include <exception>
 #include <string>
 #include <utility>
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
+#include <boost/thread.hpp>
 
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
 #include "data/GpsData.h"
+#include "data/WindData.h"
 #include "data/object/Atmosphere.h"
 #include "data/object/Position.h"
-#include "data/WindData.h"
 #include "feed/AprscFeed.h"
 #include "feed/GpsFeed.h"
 #include "feed/SbsFeed.h"
@@ -59,44 +58,27 @@ VFRB::VFRB(const config::Configuration& config)
       mpWindData(new WindData()),
       mServer(config.getServerPort())
 {
-    registerFeeds(config);
+    createFeeds(config);
 }
 
 VFRB::~VFRB() noexcept
 {}
 
-// only start threads with components here
 void VFRB::run() noexcept
 {
     Logger::info({"(VFRB) startup"});
-    // store start time
     boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
 
-    // register signals and run handler
     boost::asio::io_service io_service;
     boost::asio::signal_set signal_set(io_service);
-
-    signal_set.add(SIGINT);
-    signal_set.add(SIGTERM);
-#if defined(SIGQUIT)
-    signal_set.add(SIGQUIT);
-#endif  // defined(SIGQUIT)
-
-    signal_set.async_wait([this](const boost::system::error_code&, const int) {
-        Logger::info({"(VFRB) caught signal: ", "shutdown"});
-        global_run_status = false;
-    });
-
+    setupSignals(signal_set);
     boost::thread signal_thread([&io_service]() { io_service.run(); });
 
-    // init server and run handler
     boost::thread server_thread([this, &signal_set]() {
         Logger::info({"(Server) start server."});
         mServer.run(signal_set);
         global_run_status = false;
     });
-
-    // init input threads
     boost::thread_group feed_threads;
     for(const auto& it : mFeeds)
     {
@@ -105,54 +87,17 @@ void VFRB::run() noexcept
             it->run(signal_set);
         });
     }
-    // mFeeds.clear();
 
-    while(global_run_status)
-    {
-        try
-        {
-            // write Aircrafts to clients
-            mpAircraftData->processAircrafts(mpGpsData->getGpsPosition(),
-                                             mpAtmosphereData->getAtmPress());
-            mServer.writeToAll(mpAircraftData->getSerialized());
+    serve();
 
-            // write GPS position to clients
-            mServer.writeToAll(mpGpsData->getSerialized());
-
-            // write climate info to clients
-            mServer.writeToAll(mpAtmosphereData->getSerialized()
-                               + mpWindData->getSerialized());
-
-            // synchronise cycles to ~SYNC_TIME sec
-            boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
-        }
-        catch(const std::exception& e)
-        {
-            Logger::error({"(VFRB) error: ", e.what()});
-            global_run_status = false;
-        }
-    }
-
-    // exit sequence, join threads
     server_thread.join();
     feed_threads.join_all();
     signal_thread.join();
 
-    // eval end time
-    boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
-    boost::chrono::minutes runtime
-        = boost::chrono::duration_cast<boost::chrono::minutes>(end - start);
-    std::string time_str(std::to_string(runtime.count() / 60 / 24));
-    time_str += " days, ";
-    time_str += std::to_string(runtime.count() / 60);
-    time_str += " hours, ";
-    time_str += std::to_string(runtime.count() % 60);
-    time_str += " mins";
-
-    Logger::info({"EXITING / runtime: ", time_str});
+    Logger::info({"EXITING / runtime: ", getDuration(start)});
 }
 
-void VFRB::registerFeeds(const config::Configuration& crConfig)
+void VFRB::createFeeds(const config::Configuration& crConfig)
 {
     for(const auto& feed : crConfig.getFeedMapping())
     {
@@ -191,4 +136,61 @@ void VFRB::registerFeeds(const config::Configuration& crConfig)
             Logger::warn({"(Config) create feed ", feed.first, ": ", e.what()});
         }
     }
+}
+
+void VFRB::setupSignals(boost::asio::signal_set& rSigSet)
+{
+    rSigSet.add(SIGINT);
+    rSigSet.add(SIGTERM);
+#if defined(SIGQUIT)
+    rSigSet.add(SIGQUIT);
+#endif  // defined(SIGQUIT)
+
+    rSigSet.async_wait([this](const boost::system::error_code&, const int) {
+        Logger::info({"(VFRB) caught signal: ", "shutdown"});
+        global_run_status = false;
+    });
+}
+
+void VFRB::serve()
+{
+    while(global_run_status)
+    {
+        try
+        {
+            // write Aircrafts to clients
+            mpAircraftData->processAircrafts(mpGpsData->getGpsPosition(),
+                                             mpAtmosphereData->getAtmPress());
+            mServer.writeToAll(mpAircraftData->getSerialized());
+
+            // write GPS position to clients
+            mServer.writeToAll(mpGpsData->getSerialized());
+
+            // write climate info to clients
+            mServer.writeToAll(mpAtmosphereData->getSerialized()
+                               + mpWindData->getSerialized());
+
+            // synchronise cycles to ~SYNC_TIME sec
+            boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
+        }
+        catch(const std::exception& e)
+        {
+            Logger::error({"(VFRB) error: ", e.what()});
+            global_run_status = false;
+        }
+    }
+}
+
+std::string VFRB::getDuration(boost::chrono::steady_clock::time_point vStart) const
+{
+    boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
+    boost::chrono::minutes runtime
+        = boost::chrono::duration_cast<boost::chrono::minutes>(end - vStart);
+    std::string time_str(std::to_string(runtime.count() / 60 / 24));
+    time_str += " days, ";
+    time_str += std::to_string(runtime.count() / 60);
+    time_str += " hours, ";
+    time_str += std::to_string(runtime.count() % 60);
+    time_str += " mins";
+    return time_str;
 }

@@ -24,23 +24,25 @@
 #include <atomic>
 #include <list>
 #include <memory>
+#include <boost/chrono.hpp>
 
 #include "server/Server.h"
 
-namespace config {
+namespace config
+{
 class Configuration;
 } /* namespace config */
-namespace data {
+namespace data
+{
 class AircraftData;
 class AtmosphereData;
 class GpsData;
 class WindData;
 } /* namespace data */
-namespace feed {
+namespace feed
+{
 class Feed;
 } /* namespace feed */
-
-
 
 /**
  * @class VFRB
@@ -84,7 +86,13 @@ private:
      * @param crProperties The PropertyMap holding read properties
      * @return the number of registered feeds
      */
-    void registerFeeds(const config::Configuration& crFeeds);
+    void createFeeds(const config::Configuration& crFeeds);
+
+    void setupSignals(boost::asio::signal_set& rSigSet);
+
+    void serve();
+
+    std::string getDuration(boost::chrono::steady_clock::time_point vStart) const;
 
     /// Container holding all registered Aircrafts
     std::shared_ptr<data::AircraftData> mpAircraftData;
