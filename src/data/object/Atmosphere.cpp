@@ -15,7 +15,7 @@
  }
  */
 
-#include "Sensor.h"
+#include "Atmosphere.h"
 
 namespace data
 {
@@ -59,32 +59,6 @@ void Atmosphere::setMdaStr(const std::string& crStr)
 void Atmosphere::setPressure(double vPress)
 {
     mPressure = vPress;
-}
-
-Wind::Wind() : Object(0)
-{}
-
-Wind::Wind(std::uint32_t vPriority) : Object(vPriority)
-{}
-
-Wind::~Wind() noexcept
-{}
-
-void Wind::assign(const Object& crOther)
-{
-    const Wind& crUpdate = static_cast<const Wind&>(crOther);
-    this->mMwvStr        = crUpdate.mMwvStr;
-    this->mLastPriority  = crUpdate.mLastPriority;
-}
-
-const std::string& Wind::getMwvStr() const
-{
-    return mMwvStr;
-}
-
-void Wind::setMwvStr(const std::string& crStr)
-{
-    mMwvStr = crStr;
 }
 
 }

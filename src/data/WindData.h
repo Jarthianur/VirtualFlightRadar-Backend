@@ -23,7 +23,7 @@
 
 #include "Data.h"
 
-#include "object/Sensor.h"
+#include "object/Wind.h"
 
 /// @namespace data
 namespace data

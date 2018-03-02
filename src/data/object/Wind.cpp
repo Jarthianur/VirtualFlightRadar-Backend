@@ -1,50 +1,51 @@
 /*
  Copyright_License {
-
  Copyright (C) 2016 VirtualFlightRadar-Backend
  A detailed list of copyright holders can be found in the file "AUTHORS".
-
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License version 3
  as published by the Free Software Foundation.
-
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
-
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  }
  */
 
-#pragma once
-
 #include "Wind.h"
-#include "Atmosphere.h"
 
 namespace data
 {
 namespace object
 {
+Wind::Wind() : Object(0)
+{}
 
-struct Climate
+Wind::Wind(std::uint32_t vPriority) : Object(vPriority)
+{}
+
+Wind::~Wind() noexcept
+{}
+
+void Wind::assign(const Object& crOther)
 {
-    Wind mWind;
-    Atmosphere mAtmosphere;
+    const Wind& crUpdate = static_cast<const Wind&>(crOther);
+    this->mMwvStr        = crUpdate.mMwvStr;
+    this->mLastPriority  = crUpdate.mLastPriority;
+}
 
-    inline bool hasAtmosphere()
-    {
-        return !mAtmosphere.mMdaStr.empty();
-    }
+const std::string& Wind::getMwvStr() const
+{
+    return mMwvStr;
+}
 
-    inline bool hasWind()
-    {
-        return !mWind.mMwvStr.empty();
-    }
-};
+void Wind::setMwvStr(const std::string& crStr)
+{
+    mMwvStr = crStr;
+}
 
-}  // namespace util
-
+}
 }

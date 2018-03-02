@@ -21,28 +21,37 @@
 
 #pragma once
 
-#include "Wind.h"
-#include "Atmosphere.h"
+#include <string>
+#include "Object.h"
+
+/// ICAO standard atmospheric pressure at MSL
+#define ICAO_STD_A 1013.25
 
 namespace data
 {
 namespace object
 {
+struct Climate;
 
-struct Climate
+class Atmosphere : public Object
 {
-    Wind mWind;
-    Atmosphere mAtmosphere;
+public:
+    Atmosphere();
+    explicit Atmosphere(std::uint32_t vPriority);
+    explicit Atmosphere(double vPress);
+    virtual ~Atmosphere() noexcept;
 
-    inline bool hasAtmosphere()
-    {
-        return !mAtmosphere.mMdaStr.empty();
-    }
+    void assign(const Object& crOther);
 
-    inline bool hasWind()
-    {
-        return !mWind.mMwvStr.empty();
-    }
+    const std::string& getMdaStr() const;
+    double getPressure() const;
+    void setMdaStr(const std::string& crStr);
+    void setPressure(double vPress);
+
+private:
+    friend struct Climate;
+    std::string mMdaStr;
+    double mPressure = ICAO_STD_A;
 };
 
 }  // namespace util

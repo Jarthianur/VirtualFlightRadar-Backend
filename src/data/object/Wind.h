@@ -21,28 +21,30 @@
 
 #pragma once
 
-#include "Wind.h"
-#include "Atmosphere.h"
+#include <string>
+#include "Object.h"
 
 namespace data
 {
 namespace object
 {
+struct Climate;
 
-struct Climate
+class Wind : public Object
 {
-    Wind mWind;
-    Atmosphere mAtmosphere;
+public:
+    Wind();
+    explicit Wind(std::uint32_t vPriority);
+    virtual ~Wind() noexcept;
 
-    inline bool hasAtmosphere()
-    {
-        return !mAtmosphere.mMdaStr.empty();
-    }
+    void assign(const Object& crOther);
 
-    inline bool hasWind()
-    {
-        return !mWind.mMwvStr.empty();
-    }
+    const std::string& getMwvStr() const;
+    void setMwvStr(const std::string& crStr);
+
+private:
+    friend struct Climate;
+    std::string mMwvStr;
 };
 
 }  // namespace util
