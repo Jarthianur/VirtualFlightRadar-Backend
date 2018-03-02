@@ -21,7 +21,6 @@
 
 #include "Configuration.h"
 
-#include <iterator>
 #include <stdexcept>
 
 #include "../Logger.h"

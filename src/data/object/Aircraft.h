@@ -30,8 +30,6 @@
 /// Indicate a double value is not available.
 #define A_VALUE_NA -1024.0
 
-namespace feed
-{
 /// @namespace data
 namespace data
 {
@@ -360,6 +358,6 @@ private:
 
     std::string mSerialized;
 };
-}
+
 }  // namespace object
 }  // namespace data

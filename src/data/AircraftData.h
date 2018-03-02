@@ -31,7 +31,7 @@
 #include "../../config/Parameters.h"
 #include "object/Aircraft.h"
 #include "object/Position.h"
-#include "processing/AircraftProcessor.h"
+#include "processor/AircraftProcessor.h"
 
 /// @def AC_OUTDATED
 /// Times until aircraft is outdated
@@ -45,14 +45,12 @@
 /// Times until FLARM status is removed
 #define AC_NO_FLARM_THRESHOLD AC_OUTDATED
 
-namespace feed
-{
 /// @namespace data
 namespace data
 {
 /**
  * @class AircraftData
- * @brief Store Aircrafts and trigger processing.
+ * @brief Store Aircrafts and trigger processor.
  */
 class AircraftData : public Data
 {
@@ -101,7 +99,7 @@ private:
 
     /// @var mProcessor
     /// Providing functionality to process Aircrafts
-    processing::AircraftProcessor mProcessor;
+    processor::AircraftProcessor mProcessor;
 
     /// @var mContainer
     /// Vector holding the Aircrafts
@@ -114,5 +112,5 @@ private:
 
     std::size_t nrOfRegisteredFeeds = 0;
 };
-}
+
 }  // namespace data

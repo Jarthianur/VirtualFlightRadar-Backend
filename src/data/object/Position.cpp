@@ -17,8 +17,6 @@
 
 #include "Position.h"
 
-namespace feed
-{
 namespace data
 {
 namespace object
@@ -47,7 +45,7 @@ void ExtGpsPosition::assign(const Object& crOther)
     this->dilution                 = crUpdate.dilution;
     this->ground                   = crUpdate.ground;
     this->mLastPriority            = crUpdate.mLastPriority;
-}
+
 }
 }
 }

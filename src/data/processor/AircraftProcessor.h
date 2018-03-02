@@ -21,29 +21,20 @@
 
 #pragma once
 
+#include "Processor.hpp"
 #include "../object/Aircraft.h"
 #include "../object/Position.h"
 
-/// @def AP_BUFF_S
-/// Internal buffer size
-#define AP_BUFF_S 8191
-
-/// @def AP_L_BUFF_S
-/// Internal buffer less size
-#define AP_L_BUFF_S 128
-
-namespace feed
-{
 namespace data
 {
 /// @namespace aircraft
-namespace processing
+namespace processor
 {
 /**
  * @class AircraftProcessor
  * @brief Process Aircrafts relative to the base position.
  */
-class AircraftProcessor
+class AircraftProcessor:public Processor<object::Aircraft>
 {
 public:
     AircraftProcessor();
@@ -70,8 +61,10 @@ public:
      * @param vMaxDist   The max distance
      * @return the NMEA string
      */
-    void process(object::Aircraft& crAircraft, const object::GpsPosition& crRelPos,
-                 double vAtmPress);
+    std::string process(const object::Aircraft& crAircraft) override;
+
+    void setRelatives(const object::GpsPosition& crRelPos,
+                      double vAtmPress);
 
 private:
     /**
@@ -81,8 +74,7 @@ private:
      * @param crRelPos   The position to relate
      * @param vAtmPress  The atmospheric pressure
      */
-    void calcRelativePosition(const object::Aircraft& crAircraft,
-                              const object::GpsPosition& crRelPos, double vAtmPress);
+    void calcRelativePosition(const object::Aircraft& crAircraft);
 
     /**
      * @fn buildPflauStr
@@ -90,7 +82,7 @@ private:
      * @param crAircraft The Aircaft
      * @param rDestStr   The destination string
      */
-    void buildPflauStr(const object::Aircraft& crAircraft, std::string& rDestStr);
+    std::string genPflauStr(const object::Aircraft& crAircraft);
 
     /**
      * @fn buildPflaaStr
@@ -98,24 +90,15 @@ private:
      * @param crAircraft The Aircaft
      * @param rDestStr   The destination string
      */
-    void buildPflaaStr(const object::Aircraft& crAircraft, std::string& rDestStr);
-
-    /**
-     * @fn appendChecksum
-     * @brief Append the checksum and line ending <cr><lf>
-     *        and write the buffered sentence.
-     * @note The checksum is computed upon the internal buffer.
-     * @param rDestStr The destination string
-     */
-    void finishSentence(std::string& rDestStr);
+    std::string genPflaaStr(const object::Aircraft& crAircraft);
 
     /// @var mMaxDistance
     /// Max distance to process an aircraft
-    std::int32_t mMaxDistance;
+    const std::int32_t mMaxDistance;
 
-    /// @var mBuffer
-    /// Internal buffer
-    char mBuffer[AP_BUFF_S + 1];
+    object::GpsPosition mtRelPosition;
+
+    double mtAtmPressure = 1013.25;
 
     /// @var mtRadLatB
     /// Base latitude as radian
@@ -167,5 +150,5 @@ private:
 };
 
 }  // namespace aircraft
-}
+
 }

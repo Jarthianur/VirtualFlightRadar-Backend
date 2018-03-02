@@ -19,55 +19,40 @@
  }
  */
 
-#include "GpsData.h"
+#include "AtmosphereData.h"
 
-#include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
-/// Define GPS metrics
-#define GPS_NR_SATS_GOOD 7
-#define GPS_FIX_GOOD 1
-#define GPS_HOR_DILUTION_GOOD 1.0
-
-namespace feed
-{
 using namespace data::object;
 
 namespace data
 {
-GpsData::GpsData() : Data()
+AtmosphereData::AtmosphereData() : Data()
 {}
 
-GpsData::GpsData(const ExtGpsPosition& crPosition) : Data(), mBasePos(crPosition)
+AtmosphereData::AtmosphereData(const Atmosphere& crAtmos) : Data(), mAtmosphere(crAtmos)
 {}
 
-GpsData::~GpsData() noexcept
+AtmosphereData::~AtmosphereData() noexcept
 {}
 
-std::string GpsData::getSerialized()
+std::string AtmosphereData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mGpsModule.genGprmcStr(mBasePos) + mGpsModule.genGpggaStr(mBasePos);
+    return mAtmosphere.getMdaStr();
 }
 
-bool GpsData::update(const Object& crPosition, std::size_t vSlot)
+bool AtmosphereData::update(const Object& crAtmos, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    if(mPosLocked)
-    {
-        throw std::runtime_error("Position was locked before.");
-    }
     try
     {
-        bool updated = mBasePos.tryUpdate(crPosition, ++mFeedAttempts.at(vSlot));
+        bool updated = mAtmosphere.tryUpdate(crAtmos, ++mFeedAttempts.at(vSlot));
         if(updated)
         {
             clearAttempts(mFeedAttempts);
         }
-        return (mPosLocked = updated && mBasePos.ground
-                             && (mBasePos.nrSats >= GPS_NR_SATS_GOOD
-                                 && mBasePos.fixQa >= GPS_FIX_GOOD
-                                 && mBasePos.dilution <= GPS_HOR_DILUTION_GOOD));
+        return updated;
     }
     catch(const std::out_of_range&)
     {
@@ -75,10 +60,10 @@ bool GpsData::update(const Object& crPosition, std::size_t vSlot)
     }
 }
 
-GpsPosition GpsData::getGpsPosition()
+double AtmosphereData::getAtmPress()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mBasePos.position;
+    return mAtmosphere.getPressure();
 }
-}
+
 }  // namespace data

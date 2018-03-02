@@ -25,36 +25,35 @@
 
 #include "object/Sensor.h"
 
-namespace feed
-{
 /// @namespace data
 namespace data
 {
 /**
- * @class AtmosphereData
+ * @class WindData
  * @brief Manage sensor information.
  */
-class AtmosphereData : public Data
+class WindData : public Data
 {
 public:
-    AtmosphereData();
     /**
-     * @fn AtmosphereData
+     * @fn WindData
      * @brief Constructor
-     * @param vAtmos The initial info
      */
-    explicit AtmosphereData(const object::Atmosphere& crAtmos);
+    WindData();
+
+    explicit WindData(const object::Wind& crWind);
 
     /**
-     * @fn ~AtmosphereData
+     * @fn ~WindData
      * @brief Destructor
      */
-    virtual ~AtmosphereData() noexcept;
+    virtual ~WindData() noexcept;
 
     /**
-     * @fn getMdaStr
-     * @brief Get the MDA sentence.
-     * @return the MDA sentence
+     * @fn getMwvStr
+     * @brief Get the MWV sentence.
+     * @note MWV is invalid after this operation.
+     * @return the MWV sentence, if valid, else empty string
      * @threadsafe
      */
     std::string getSerialized() override;
@@ -62,24 +61,16 @@ public:
     /**
      * @fn update
      * @brief Try to update the sensor information.
-     * @param crAtmos   The new data.
-     * @param vPriority The priority
+     * @param crWind    The new wind information.
+     * @param vPriority The attempts priority
      * @param rAttempts The update attempts
      */
-    bool update(const object::Object& crAtmos, std::size_t vSlot) override;
-
-    /**
-     * @fn getPress
-     * @brief Get pressure.
-     * @return the pressure
-     * @threadsafe
-     */
-    double getAtmPress();
+    bool update(const object::Object& crWind, std::size_t vSlot) override;
 
 private:
-    /// @var mAtmosphere
-    /// Holding atmospheric pressure
-    object::Atmosphere mAtmosphere;
+    /// @var mWind
+    /// Holding MDA sentence
+    object::Wind mWind;
 };
-}
+
 }  // namespace data

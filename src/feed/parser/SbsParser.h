@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include <string>
-
-#include "../data/object/Aircraft.h"
+#include "../../data/object/Aircraft.h"
 #include "Parser.hpp"
 
 namespace feed
@@ -39,6 +37,7 @@ namespace parser
 class SbsParser : public Parser<data::object::Aircraft>
 {
 public:
+    SbsParser();
     /**
      * @fn SbsParser
      * @brief Constructor

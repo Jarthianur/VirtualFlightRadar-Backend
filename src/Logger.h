@@ -19,8 +19,7 @@
  }
  */
 
-#ifndef SRC_UTIL_LOGGER_H_
-#define SRC_UTIL_LOGGER_H_
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -99,5 +98,3 @@ private:
      */
     static std::string getTime();
 };
-
-#endif /* SRC_UTIL_LOGGER_H_ */

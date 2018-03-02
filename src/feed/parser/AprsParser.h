@@ -22,10 +22,9 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 #include <boost/regex.hpp>
 
-#include "../data/object/Aircraft.h"
+#include "../../data/object/Aircraft.h"
 #include "Parser.hpp"
 
 namespace feed
@@ -41,6 +40,7 @@ namespace parser
 class AprsParser : public Parser<data::object::Aircraft>
 {
 public:
+    AprsParser();
     /**
      * @fn AprsParser
      * @brief Constructor

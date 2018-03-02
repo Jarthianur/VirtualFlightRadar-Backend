@@ -19,49 +19,40 @@
  }
  */
 
-#include "WindData.h"
+#pragma once
 
-#include <boost/thread/lock_guard.hpp>
+#include <cstdio>
+#include <string>
 
-namespace feed
-{
-using namespace data::object;
+#include "../../Math.hpp"
+
+#define PROC_BUFF_S 4096
 
 namespace data
 {
-WindData::WindData() : Data()
-{}
-
-WindData::WindData(const object::Wind& crWind) : Data(), mWind(crWind)
-{}
-
-WindData::~WindData() noexcept
-{}
-
-std::string WindData::getSerialized()
+/// @namespace processor
+namespace processor
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    std::string tmp(mWind.getMwvStr());
-    mWind.setMwvStr("");
-    return tmp;
-}
-
-bool WindData::update(const Object& crWind, std::size_t vSlot)
+template<typename T>
+class Processor
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    try
+public:
+    Processor()
+    {}
+    virtual ~Processor() noexcept
+    {}
+
+    virtual std::string process(const T& _1) = 0;
+
+protected:
+    void finishSentence(std::string& rDestStr)
     {
-        bool updated = mWind.tryUpdate(crWind, ++mFeedAttempts.at(vSlot));
-        if(updated)
-        {
-            clearAttempts(mFeedAttempts);
-        }
-        return updated;
+        std::snprintf(mBuffer, sizeof(mBuffer), "%02x\r\n",
+                      math::checksum(mBuffer, sizeof(mBuffer)));
+        rDestStr.append(mBuffer);
     }
-    catch(const std::out_of_range&)
-    {
-        return false;
-    }
+
+    char mBuffer[PROC_BUFF_S];
+};
 }
 }
-}  // namespace data

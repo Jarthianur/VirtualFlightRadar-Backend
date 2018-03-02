@@ -21,8 +21,6 @@
 
 #include "Aircraft.h"
 
-namespace feed
-{
 namespace data
 {
 namespace object
@@ -203,6 +201,6 @@ void Aircraft::setSerialized(const std::string& crSerial)
 {
     mSerialized = crSerial;
 }
-}
+
 }  // namespace object
 }  // namespace data

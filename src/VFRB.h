@@ -35,18 +35,18 @@ class Configuration;
 namespace feed
 {
 class Feed;
+namespace object
+{
+class Aircraft;
+class ExtGpsPosition;
+}
+}
 namespace data
 {
 class AircraftData;
 class WindData;
 class AtmosphereData;
 class GpsData;
-}
-namespace object
-{
-class Aircraft;
-class ExtGpsPosition;
-}
 }
 
 /**
@@ -94,16 +94,16 @@ private:
     void registerFeeds(const config::Configuration& crFeeds);
 
     /// Container holding all registered Aircrafts
-    std::shared_ptr<feed::data::AircraftData> mpAircraftData;
+    std::shared_ptr<data::AircraftData> mpAircraftData;
 
     ///
-    std::shared_ptr<feed::data::AtmosphereData> mpAtmosphereData;
+    std::shared_ptr<data::AtmosphereData> mpAtmosphereData;
 
     /// Container holding GPS information
-    std::shared_ptr<feed::data::GpsData> mpGpsData;
+    std::shared_ptr<data::GpsData> mpGpsData;
 
     /// Container holding sensor and climate information.
-    std::shared_ptr<feed::data::WindData> mpWindData;
+    std::shared_ptr<data::WindData> mpWindData;
 
     server::Server mServer;
 

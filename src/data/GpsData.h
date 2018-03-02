@@ -24,10 +24,8 @@
 #include "Data.h"
 
 #include "object/Position.h"
-#include "processing/GpsModule.h"
+#include "processor/GpsProcessor.h"
 
-namespace feed
-{
 /// @namespace data
 namespace data
 {
@@ -86,11 +84,11 @@ private:
 
     /// @var mGpsModule
     /// GpsModule providing functionality to build GPS sentences
-    processing::GpsModule mGpsModule;
+    processor::GpsProcessor mProcessor;
 
     /// @var mPosLocked
     /// Locking state of the current position
     bool mPosLocked = false;
 };
-}
+
 }  // namespace data

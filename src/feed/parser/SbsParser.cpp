@@ -22,10 +22,10 @@
 #include "SbsParser.h"
 
 #include <cstddef>
+#include <limits>
 #include <stdexcept>
 
-#include "../../config/Configuration.h"
-#include "../../util/Math.hpp"
+#include "../../Math.hpp"
 #include "../data/object/Position.h"
 
 namespace feed
@@ -34,7 +34,11 @@ using namespace data::object;
 
 namespace parser
 {
-SbsParser::SbsParser(std::int32_t vMaxHeight) : Parser(), mMaxHeight(vMaxHeight)
+SbsParser::SbsParser() : SbsParser(std::numeric_limits<std::int32_t>::max())
+{}
+
+SbsParser::SbsParser(std::int32_t vMaxHeight)
+    : Parser<data::object::Aircraft>(), mMaxHeight(vMaxHeight)
 {}
 
 SbsParser::~SbsParser() noexcept
@@ -77,8 +81,8 @@ bool SbsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
                     }
                     break;
                 case 11:
-                    pos.altitude = util::math::dToI(std::stod(cr_msg.substr(p, delim - p))
-                                                    * util::math::FEET_2_M);
+                    pos.altitude = math::doubleToInt(
+                        std::stod(cr_msg.substr(p, delim - p)) * math::FEET_2_M);
                     if(pos.altitude > mMaxHeight)
                     {
                         return false;

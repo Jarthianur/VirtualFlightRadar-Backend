@@ -26,8 +26,7 @@
 
 /// ICAO standard atmospheric pressure at MSL
 #define ICAO_STD_A 1013.25
-namespace feed
-{
+
 namespace data
 {
 namespace object
@@ -87,5 +86,5 @@ struct Climate
 };
 
 }  // namespace util
-}
+
 }

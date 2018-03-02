@@ -23,8 +23,6 @@
 
 #include "Object.h"
 
-namespace feed
-{
 namespace data
 {
 namespace object
@@ -69,4 +67,4 @@ public:
 };
 }  // namespace object
 }  // namespace data
-}
+

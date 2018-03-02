@@ -21,35 +21,35 @@
 
 #pragma once
 
-#include <string>
 #include "../object/Position.h"
+#include "Processor.hpp"
 
-#define GPSM_BUFF_S 8191
-#define GPSM_L_BUFF_S 128
-
-namespace feed
-{
 namespace data
 {
-namespace processing
+namespace processor
 {
 /**
  * @class GpsModule
  * @brief Provides functionalities to build NMEA GGA and RMC sentences.
  */
-class GpsModule
+class GpsProcessor : public Processor<object::ExtGpsPosition>
 {
 public:
     /**
      * @fn GpsModule
      * @brief Constructor
      */
-    GpsModule();
+    GpsProcessor();
+
     /**
      * @fn ~GpsModule
      * @brief Destructor
      */
-    virtual ~GpsModule() noexcept;
+    virtual ~GpsProcessor() noexcept;
+
+    std::string process(const object::ExtGpsPosition& crPosition) override;
+
+private:
     /**
      * @fn genGpggaStr
      * @brief Build a GPGGA sentence.
@@ -58,6 +58,7 @@ public:
      * @return the GPGGA sentence
      */
     std::string genGpggaStr(const object::ExtGpsPosition& cr_pos);
+
     /**
      * @fn genGprmcStr
      * @brief Build a GPRMC sentence.
@@ -67,11 +68,15 @@ public:
      */
     std::string genGprmcStr(const object::ExtGpsPosition& cr_pos);
 
-private:
-    /// Formatstring buffer
-    char mBuffer[GPSM_BUFF_S + 1];
+    void evalPosition(double vLatitude, double vLongitude);
+
+    char mtLatStr    = 'x';
+    char mtLongStr   = 'x';
+    double mtLatDeg  = 0.0;
+    double mtLongDeg = 0.0;
+    double mtLatMin  = 0.0;
+    double mtLongMin = 0.0;
 };
 
 }  // namespace util
-}
 }

@@ -19,37 +19,37 @@
  }
  */
 
-#include "AtmosphereData.h"
+#include "WindData.h"
 
 #include <boost/thread/lock_guard.hpp>
 
-namespace feed
-{
 using namespace data::object;
 
 namespace data
 {
-AtmosphereData::AtmosphereData() : Data()
+WindData::WindData() : Data()
 {}
 
-AtmosphereData::AtmosphereData(const Atmosphere& crAtmos) : Data(), mAtmosphere(crAtmos)
+WindData::WindData(const object::Wind& crWind) : Data(), mWind(crWind)
 {}
 
-AtmosphereData::~AtmosphereData() noexcept
+WindData::~WindData() noexcept
 {}
 
-std::string AtmosphereData::getSerialized()
+std::string WindData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mAtmosphere.getMdaStr();
+    std::string tmp(mWind.getMwvStr());
+    mWind.setMwvStr("");
+    return tmp;
 }
 
-bool AtmosphereData::update(const Object& crAtmos, std::size_t vSlot)
+bool WindData::update(const Object& crWind, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     try
     {
-        bool updated = mAtmosphere.tryUpdate(crAtmos, ++mFeedAttempts.at(vSlot));
+        bool updated = mWind.tryUpdate(crWind, ++mFeedAttempts.at(vSlot));
         if(updated)
         {
             clearAttempts(mFeedAttempts);
@@ -62,10 +62,4 @@ bool AtmosphereData::update(const Object& crAtmos, std::size_t vSlot)
     }
 }
 
-double AtmosphereData::getAtmPress()
-{
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    return mAtmosphere.getPressure();
-}
-}
 }  // namespace data

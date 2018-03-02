@@ -23,7 +23,7 @@
 
 #include <stdexcept>
 
-#include "../../util/Math.hpp"
+#include "../../Math.hpp"
 
 /// Define regex match groups for GGA
 #define RE_GGA_LAT 1
@@ -55,9 +55,8 @@ bool GpsParser::unpack(const std::string& cr_msg,
 {
     try
     {
-        std::int32_t csum
-            = std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16);
-        if(csum != util::math::checksum(cr_msg.c_str(), cr_msg.length()))
+        if(std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16)
+           != math::checksum(cr_msg.c_str(), cr_msg.length()))
         {
             return false;
         }
@@ -66,16 +65,14 @@ bool GpsParser::unpack(const std::string& cr_msg,
         if(boost::regex_match(cr_msg, match, msGpggaRe))
         {
             // latitude
-            r_pos.position.latitude
-                = util::math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
+            r_pos.position.latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
             if(match.str(RE_GGA_LAT_DIR).compare("S") == 0)
             {
                 r_pos.position.latitude = -r_pos.position.latitude;
             }
 
             // longitude
-            r_pos.position.longitude
-                = util::math::dmToDeg(std::stod(match.str(RE_GGA_LONG)));
+            r_pos.position.longitude = math::dmToDeg(std::stod(match.str(RE_GGA_LONG)));
             if(match.str(RE_GGA_LONG_DIR).compare("W") == 0)
             {
                 r_pos.position.longitude = -r_pos.position.longitude;
@@ -88,7 +85,7 @@ bool GpsParser::unpack(const std::string& cr_msg,
             // dilution
             r_pos.dilution = std::stod(match.str(RE_GGA_DIL));
             // altitude
-            r_pos.position.altitude = util::math::dToI(std::stod(match.str(RE_GGA_ALT)));
+            r_pos.position.altitude = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
             // geoid
             r_pos.geoid = std::stod(match.str(RE_GGA_GEOID));
         }

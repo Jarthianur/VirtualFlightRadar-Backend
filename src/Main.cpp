@@ -22,17 +22,14 @@
 #include <cstdint>
 #include <fstream>
 #include <stdexcept>
-#include <string>
 
 #include "config/Configuration.h"
-#include "util/Logger.h"
+#include "Logger.h"
 #include "VFRB.h"
 
 #ifndef VERSION
 #define VERSION "DEMO"
 #endif
-
-using namespace util;
 
 /**
  * @fn evalArgs

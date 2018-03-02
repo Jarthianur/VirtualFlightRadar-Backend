@@ -19,24 +19,17 @@
  }
  */
 
-#ifndef SRC_UTIL_MATH_H_
-#define SRC_UTIL_MATH_H_
+#pragma once
 
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <sstream>
-#include <string>
 
-
-namespace util
-{
 /**
  * @brief Provide several functions and constants under this namespace.
  */
 namespace math
 {
-/// TODO make as MACRO
 /// Unit conversion constants
 const double KTS_2_KMH = 1.852;
 const double KMH_2_KTS = 0.539957;
@@ -78,9 +71,10 @@ inline double degree(double rad)
  * @param d The floating point value
  * @return the rounded integer
  */
-inline std::int32_t dToI(double d)
+inline std::int32_t doubleToInt(double d)
 {
-    return (d >= 0.0) ? (std::int32_t)(d + 0.5) : (std::int32_t)(d - 0.5);
+    return (d >= 0.0) ? static_cast<std::int32_t>(d + 0.5)
+                      : static_cast<std::int32_t>(d - 0.5);
 }
 
 /**
@@ -104,9 +98,9 @@ inline double dmToDeg(double dm)
  * @param press The air pressure
  * @return the height difference to QNE
  */
-inline std::int32_t calcIcaoHeight(double press)
+inline std::int32_t icaoHeight(double press)
 {
-    return dToI(288.15 * (1.0 - std::pow((press / 1013.25), 0.190295)) / 0.0065);
+    return doubleToInt(288.15 * (1.0 - std::pow((press / 1013.25), 0.190295)) / 0.0065);
 }
 
 /**
@@ -122,12 +116,9 @@ inline std::int32_t checksum(const char* sentence, std::size_t size)
     std::size_t i     = 1;  // $ in nmea str not included
     while(i < size && sentence[i] != '*' && sentence[i] != '\0')
     {
-        csum ^= (std::int32_t) sentence[i++];
+        csum ^= static_cast<std::int32_t>(sentence[i++]);
     }
     return csum;
 }
 
 }  // namespace math
-}  // namespace util
-
-#endif /* SRC_UTIL_MATH_H_ */

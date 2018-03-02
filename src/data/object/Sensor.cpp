@@ -17,8 +17,6 @@
 
 #include "Sensor.h"
 
-namespace feed
-{
 namespace data
 {
 namespace object
@@ -88,6 +86,6 @@ void Wind::setMwvStr(const std::string& crStr)
 {
     mMwvStr = crStr;
 }
-}
+
 }
 }

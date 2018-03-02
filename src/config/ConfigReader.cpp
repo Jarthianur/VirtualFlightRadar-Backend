@@ -23,9 +23,7 @@
 
 #include <stdexcept>
 
-#include "../util/Logger.h"
-
-using namespace util;
+#include "../Logger.h"
 
 namespace config
 {

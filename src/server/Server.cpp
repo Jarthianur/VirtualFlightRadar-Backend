@@ -29,9 +29,7 @@
 #include <boost/system/error_code.hpp>
 #include <boost/thread/lock_guard.hpp>
 
-#include "../util/Logger.h"
-
-using namespace util;
+#include "../Logger.h"
 
 namespace server
 {

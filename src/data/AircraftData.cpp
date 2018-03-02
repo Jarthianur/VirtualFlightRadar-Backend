@@ -31,16 +31,14 @@
 #define ESTIMATED_TRAFFIC 1
 #endif
 
-namespace feed
-{
 using namespace data::object;
 
 namespace data
 {
-AircraftData::AircraftData() : Data()
+AircraftData::AircraftData() : AircraftData(0)
 {}
 
-AircraftData::AircraftData(std::int32_t vMaxDist) : mProcessor(vMaxDist)
+AircraftData::AircraftData(std::int32_t vMaxDist) : Data(), mProcessor(vMaxDist)
 {
     mContainer.reserve(ESTIMATED_TRAFFIC);
     mIndexMap.reserve(ESTIMATED_TRAFFIC * 2);
@@ -125,7 +123,8 @@ void AircraftData::processAircrafts(const GpsPosition& crBasePos,
             {
                 if(it->getUpdateAge() == 1)
                 {
-                    mProcessor.process(*it, crBasePos, vAtmPress);
+                    mProcessor.setRelatives(crBasePos, vAtmPress);
+                    it->setSerialized(mProcessor.process(*it));
                 }
                 ++it;
                 ++index;
@@ -147,6 +146,5 @@ void AircraftData::insert(const object::Aircraft& crAircraft)
         {crAircraft.getId(),
          {mContainer.size(), std::vector<std::uint64_t>(nrOfRegisteredFeeds, 0)}});
     mContainer.push_back(crAircraft);
-}
 }
 }  // namespace aircraft

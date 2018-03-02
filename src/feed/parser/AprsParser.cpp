@@ -23,8 +23,7 @@
 
 #include <stdexcept>
 
-#include "../../config/Configuration.h"
-#include "../../util/Math.hpp"
+#include "../../Math.hpp"
 
 /// Define regex match groups for APRS
 //#define RE_APRS_TIME 1
@@ -56,7 +55,11 @@ const boost::regex AprsParser::msAprsComRe(
     "^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
     boost::regex::optimize | boost::regex::icase);
 
-AprsParser::AprsParser(std::int32_t vMaxHeight) : Parser(), mMaxHeight(vMaxHeight)
+AprsParser::AprsParser() : AprsParser(std::numeric_limits<std::int32_t>::max())
+{}
+
+AprsParser::AprsParser(std::int32_t vMaxHeight)
+    : Parser<data::object::Aircraft>(), mMaxHeight(vMaxHeight)
 {}
 
 AprsParser::~AprsParser() noexcept
@@ -71,27 +74,28 @@ bool AprsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
     bool fullInfo = true;
     GpsPosition pos;
     boost::smatch match;
+
     if(boost::regex_match(cr_msg, match, msAprsRe))
     {
         try
         {
             // latitude
-            pos.latitude = util::math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
+            pos.latitude = math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
             if(match.str(RE_APRS_LAT_DIR).compare("S") == 0)
             {
                 pos.latitude = -pos.latitude;
             }
 
             // longitude
-            pos.longitude = util::math::dmToDeg(std::stod(match.str(RE_APRS_LONG)));
+            pos.longitude = math::dmToDeg(std::stod(match.str(RE_APRS_LONG)));
             if(match.str(RE_APRS_LONG_DIR).compare("W") == 0)
             {
                 pos.longitude = -pos.longitude;
             }
 
             // altitude
-            pos.altitude = util::math::dToI(std::stod(match.str(RE_APRS_ALT))
-                                            * util::math::FEET_2_M);
+            pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT))
+                                            * math::FEET_2_M);
             if(pos.altitude > mMaxHeight)
             {
                 return false;
@@ -106,7 +110,7 @@ bool AprsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
         if(match.str(RE_APRS_COM).size() > 0)
         {
             std::string comm = match.str(
-                RE_APRS_COM);  // regex bug ! cannot work inplace, need to copy submatch.
+                RE_APRS_COM);  // regex bug ? Need to copy submatch.
             boost::smatch com_match;
             if(boost::regex_match(comm, com_match, msAprsComRe))
             {
@@ -126,7 +130,7 @@ bool AprsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
                 try
                 {
                     r_ac.setClimbRate(std::stod(com_match.str(RE_APRS_COM_CR))
-                                      * util::math::FPM_2_MS);
+                                      * math::FPM_2_MS);
                 }
                 catch(const std::logic_error&)
                 {
@@ -157,7 +161,7 @@ bool AprsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
         try
         {
             r_ac.setGndSpeed(std::stod(match.str(RE_APRS_GND_SPD))
-                             * util::math::KTS_2_MS);
+                             * math::KTS_2_MS);
         }
         catch(const std::logic_error&)
         {

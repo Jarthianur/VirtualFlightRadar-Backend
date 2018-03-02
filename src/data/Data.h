@@ -15,28 +15,35 @@
  }
  */
 
-#include "Data.h"
-#include <algorithm>
+#pragma once
 
-namespace feed
-{
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <boost/thread/mutex.hpp>
+
 namespace data
 {
-Data::Data()
-{}
-
-Data::~Data() noexcept
-{}
-
-std::size_t Data::registerFeed()
+namespace object
 {
-    mFeedAttempts.push_back(0);
-    return mFeedAttempts.size() - 1;
+class Object;
 }
 
-void Data::clearAttempts(std::vector<std::uint64_t>& rVec)
+class Data
 {
-    std::fill(rVec.begin(), rVec.end(), 0);
-}
-}
+public:
+    Data();
+    virtual ~Data() noexcept;
+    virtual std::string getSerialized()                              = 0;
+    virtual bool update(const object::Object& _1, std::size_t vSlot) = 0;
+    virtual std::size_t registerFeed();
+
+protected:
+    virtual void clearAttempts(std::vector<std::uint64_t>& rVec);
+    /// @var mMutex
+    /// Used for RW on this data
+    boost::mutex mMutex;
+    std::vector<std::uint64_t> mFeedAttempts;
+};
+
 }

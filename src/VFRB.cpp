@@ -31,20 +31,18 @@
 #include <boost/thread.hpp>
 
 #include "config/Configuration.h"
+#include "data/AircraftData.h"
+#include "data/AtmosphereData.h"
+#include "data/GpsData.h"
+#include "data/WindData.h"
 #include "feed/AprscFeed.h"
 #include "feed/Feed.h"
 #include "feed/GpsFeed.h"
 #include "feed/SbsFeed.h"
 #include "feed/SensorFeed.h"
-#include "feed/data/AircraftData.h"
-#include "feed/data/AtmosphereData.h"
-#include "feed/data/GpsData.h"
-#include "feed/data/WindData.h"
+#include "Logger.h"
 
-#include "util/Logger.h"
-
-using namespace util;
-using namespace feed::data;
+using namespace data;
 
 #define SYNC_TIME (1)
 

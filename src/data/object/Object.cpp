@@ -17,8 +17,6 @@
 
 #include "Object.h"
 
-namespace feed
-{
 namespace data
 {
 namespace object
@@ -57,5 +55,5 @@ std::uint32_t Object::getLastPriority() const
     return mLastPriority;
 }
 }
-}
+
 }
