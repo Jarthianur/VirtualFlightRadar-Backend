@@ -47,13 +47,8 @@ AircraftProcessor::~AircraftProcessor() noexcept
 std::string AircraftProcessor::process(const Aircraft& crAircraft)
 {
     calcRelativePosition(crAircraft);
-
-    if(mtDist > mMaxDistance)
-    {
-        return "";
-    }
-
-    return genPflauStr(crAircraft) + genPflaaStr(crAircraft);
+    return mtDist <= mMaxDistance ? genPflauStr(crAircraft) + genPflaaStr(crAircraft)
+                                  : "";
 }
 
 void AircraftProcessor::setRelatives(const GpsPosition& crRelPos, double vAtmPress)

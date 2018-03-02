@@ -158,19 +158,13 @@ void VFRB::serve()
     {
         try
         {
-            // write Aircrafts to clients
             mpAircraftData->processAircrafts(mpGpsData->getGpsPosition(),
                                              mpAtmosphereData->getAtmPress());
             mServer.writeToAll(mpAircraftData->getSerialized());
-
-            // write GPS position to clients
             mServer.writeToAll(mpGpsData->getSerialized());
-
-            // write climate info to clients
             mServer.writeToAll(mpAtmosphereData->getSerialized()
                                + mpWindData->getSerialized());
 
-            // synchronise cycles to ~SYNC_TIME sec
             boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
         }
         catch(const std::exception& e)

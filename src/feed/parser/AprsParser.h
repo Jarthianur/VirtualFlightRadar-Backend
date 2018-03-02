@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include <boost/regex.hpp>
 #include <cstdint>
 #include <string>
+#include <boost/regex.hpp>
 
 #include "../../data/object/Aircraft.h"
 #include "Parser.hpp"
@@ -61,6 +61,12 @@ public:
                 data::object::Aircraft& r_ac) noexcept override;
 
 private:
+    bool parsePosition(const boost::smatch& crMatch, data::object::Aircraft& rAircraft);
+
+    bool parseComment(const boost::smatch& crMatch, data::object::Aircraft& rAircraft);
+
+    bool parseMovement(const boost::smatch& crMatch, data::object::Aircraft& rAircraft);
+
     /// Regular expression for APRS protocol
     static const boost::regex msAprsRe;
     /// Regular expression for OGN specific APRS extension

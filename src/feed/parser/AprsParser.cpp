@@ -24,8 +24,8 @@
 #include <limits>
 #include <stdexcept>
 
-#include "../../data/object/Position.h"
 #include "../../Math.hpp"
+#include "../../data/object/Position.h"
 
 /// Define regex match groups for APRS
 //#define RE_APRS_TIME 1
@@ -69,113 +69,96 @@ AprsParser::~AprsParser() noexcept
 
 bool AprsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
 {
-    if(cr_msg.size() > 0 && cr_msg.at(0) == '#')
+    boost::smatch match;
+    boost::smatch com_match;
+
+    if((cr_msg.size() > 0 && cr_msg.at(0) == '#')
+       || !(boost::regex_match(cr_msg, match, msAprsRe) && parsePosition(match, r_ac)))
     {
         return false;
     }
-    bool fullInfo = true;
-    GpsPosition pos;
-    boost::smatch match;
+    std::string comm(match.str(RE_APRS_COM));
 
-    if(boost::regex_match(cr_msg, match, msAprsRe))
+    if(!(boost::regex_match(comm, com_match, msAprsComRe)
+         && parseComment(com_match, r_ac)))
     {
-        try
-        {
-            // latitude
-            pos.latitude = math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
-            if(match.str(RE_APRS_LAT_DIR).compare("S") == 0)
-            {
-                pos.latitude = -pos.latitude;
-            }
-
-            // longitude
-            pos.longitude = math::dmToDeg(std::stod(match.str(RE_APRS_LONG)));
-            if(match.str(RE_APRS_LONG_DIR).compare("W") == 0)
-            {
-                pos.longitude = -pos.longitude;
-            }
-
-            // altitude
-            pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT))
-                                            * math::FEET_2_M);
-            if(pos.altitude > mMaxHeight)
-            {
-                return false;
-            }
-        }
-        catch(const std::logic_error&)
-        {
-            return false;
-        }
-        // comment
-        // climbrate / address / id / type
-        if(match.str(RE_APRS_COM).size() > 0)
-        {
-            std::string comm = match.str(
-                RE_APRS_COM);  // regex bug ? Need to copy submatch.
-            boost::smatch com_match;
-            if(boost::regex_match(comm, com_match, msAprsComRe))
-            {
-                r_ac.setId(com_match.str(RE_APRS_COM_ID));
-                try
-                {
-                    r_ac.setIdType(static_cast<Aircraft::IdType>(
-                        std::stoi(com_match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03));
-                    r_ac.setAircraftType(static_cast<Aircraft::AircraftType>(
-                        (std::stoi(com_match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C)
-                        >> 2));
-                }
-                catch(const std::logic_error&)
-                {
-                    return false;
-                }
-                try
-                {
-                    r_ac.setClimbRate(std::stod(com_match.str(RE_APRS_COM_CR))
-                                      * math::FPM_2_MS);
-                }
-                catch(const std::logic_error&)
-                {
-                    r_ac.setClimbRate();
-                    fullInfo = false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-
-        // track/gnd_speed
-        try
-        {
-            r_ac.setHeading(std::stod(match.str(RE_APRS_HEAD)));
-        }
-        catch(const std::logic_error&)
-        {
-            r_ac.setHeading();
-            fullInfo = false;
-        }
-        try
-        {
-            r_ac.setGndSpeed(std::stod(match.str(RE_APRS_GND_SPD))
-                             * math::KTS_2_MS);
-        }
-        catch(const std::logic_error&)
-        {
-            r_ac.setGndSpeed();
-            fullInfo = false;
-        }
-        r_ac.setPosition(pos);
-        r_ac.setFullInfo(fullInfo);
-        r_ac.setTargetType(Aircraft::TargetType::FLARM);
+        return false;
     }
-    else
+    parseMovement(match, r_ac);
+    r_ac.setTargetType(Aircraft::TargetType::FLARM);
+    return true;
+}
+
+bool AprsParser::parsePosition(const boost::smatch& crMatch,
+                               data::object::Aircraft& rAircraft)
+{
+    bool valid = false;
+    try
     {
+        GpsPosition pos;
+        pos.latitude = math::dmToDeg(std::stod(crMatch.str(RE_APRS_LAT)));
+        if(crMatch.str(RE_APRS_LAT_DIR).compare("S") == 0)
+        {
+            pos.latitude = -pos.latitude;
+        }
+        pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_APRS_LONG)));
+        if(crMatch.str(RE_APRS_LONG_DIR).compare("W") == 0)
+        {
+            pos.longitude = -pos.longitude;
+        }
+        pos.altitude
+            = math::doubleToInt(std::stod(crMatch.str(RE_APRS_ALT)) * math::FEET_2_M);
+
+        rAircraft.setPosition(pos);
+        valid = pos.altitude <= mMaxHeight;
+    }
+    catch(const std::logic_error&)
+    {
+    }
+    return valid;
+}
+
+bool AprsParser::parseComment(const boost::smatch& crMatch,
+                              data::object::Aircraft& rAircraft)
+{
+    bool valid = true;
+    rAircraft.setId(crMatch.str(RE_APRS_COM_ID));
+    try
+    {
+        rAircraft.setIdType(static_cast<Aircraft::IdType>(
+            std::stoi(crMatch.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03));
+        rAircraft.setAircraftType(static_cast<Aircraft::AircraftType>(
+            (std::stoi(crMatch.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2));
+    }
+    catch(const std::logic_error&)
+    {
+        valid = false;
+    }
+    try
+    {
+        rAircraft.setClimbRate(std::stod(crMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS);
+    }
+    catch(const std::logic_error&)
+    {
+        rAircraft.setClimbRate();
+        rAircraft.setFullInfo(false);
+    }
+    return valid;
+}
+
+bool AprsParser::parseMovement(const boost::smatch& crMatch,
+                               data::object::Aircraft& rAircraft)
+{
+    try
+    {
+        rAircraft.setHeading(std::stod(crMatch.str(RE_APRS_HEAD)));
+        rAircraft.setGndSpeed(std::stod(crMatch.str(RE_APRS_GND_SPD)) * math::KTS_2_MS);
+    }
+    catch(const std::logic_error&)
+    {
+        rAircraft.setHeading();
+        rAircraft.setGndSpeed();
+        rAircraft.setFullInfo(false);
         return false;
     }
     return true;
