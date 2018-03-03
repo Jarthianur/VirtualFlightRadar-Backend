@@ -24,9 +24,9 @@
 #include <cstddef>
 #include <stdexcept>
 
+#include "../../Math.hpp"
 #include "../../data/object/Atmosphere.h"
 #include "../../data/object/Wind.h"
-#include "../../Math.hpp"
 
 namespace feed
 {
@@ -38,47 +38,42 @@ SensorParser::SensorParser() : Parser<data::object::Climate>()
 SensorParser::~SensorParser() noexcept
 {}
 
-bool SensorParser::unpack(const std::string& cr_msg,
+bool SensorParser::unpack(const std::string& crStr,
                           data::object::Climate& rClimate) noexcept
 {
     try
     {
-        if(std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16)
-           != math::checksum(cr_msg.c_str(), cr_msg.length()))
-        {
-            return false;
-        }
-        if(cr_msg.find("MDA") != std::string::npos)
-        {
-            std::size_t tmpB   = cr_msg.find('B') - 1;
-            std::size_t tmpS   = cr_msg.substr(0, tmpB).find_last_of(',') + 1;
-            std::size_t subLen = tmpB - tmpS;
-            std::size_t numIdx;
-            double tmpPress = std::stod(cr_msg.substr(tmpS, subLen), &numIdx) * 1000.0;
-            if(numIdx == subLen)
-            {
-                rClimate.mAtmosphere.setMdaStr(cr_msg + "\n");
-                rClimate.mAtmosphere.setPressure(tmpPress);
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else if(cr_msg.find("MWV") != std::string::npos)
-        {
-            rClimate.mWind.setMwvStr(cr_msg + "\n");
-        }
-        else
-        {
-            return false;
-        }
+        return std::stoi(crStr.substr(crStr.rfind('*') + 1, 2), nullptr, 16)
+                   == math::checksum(crStr.c_str(), crStr.length())
+               && parseClimate(crStr, rClimate);
     }
     catch(const std::logic_error&)
     {
         return false;
     }
-    return true;
+}
+
+bool SensorParser::parseClimate(const std::string& crStr, data::object::Climate& rClimate)
+{
+    bool valid = true;
+    if(crStr.find("MDA") != std::string::npos)
+    {
+        std::size_t tmpB   = crStr.find('B') - 1;
+        std::size_t tmpS   = crStr.substr(0, tmpB).find_last_of(',') + 1;
+        std::size_t subLen = tmpB - tmpS;
+        std::size_t numIdx;
+        double tmpPress = std::stod(crStr.substr(tmpS, subLen), &numIdx) * 1000.0;
+        if((valid = numIdx == subLen))
+        {
+            rClimate.mAtmosphere.setMdaStr(crStr + "\n");
+            rClimate.mAtmosphere.setPressure(tmpPress);
+        }
+    }
+    else if(crStr.find("MWV") != std::string::npos)
+    {
+        rClimate.mWind.setMwvStr(crStr + "\n");
+    }
+    return valid;
 }
 }
 }  // namespace parser

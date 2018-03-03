@@ -54,8 +54,11 @@ public:
      * @brief Unpack into SensorInfo.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& crMsg,
+    bool unpack(const std::string& crStr,
                 data::object::Climate& rClimate) noexcept override;
+
+private:
+    bool parseClimate(const std::string& crStr, data::object::Climate& rClimate);
 };
 }
 }  // namespace parser

@@ -59,6 +59,8 @@ public:
                 data::object::ExtGpsPosition& r_pos) noexcept override;
 
 private:
+    bool parsePosition(const boost::smatch& crMatch, data::object::ExtGpsPosition& rPosition);
+
     /// Regular expression to parse GGA
     static const boost::regex msGpggaRe;
 };

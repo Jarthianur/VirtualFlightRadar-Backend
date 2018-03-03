@@ -55,49 +55,36 @@ bool GpsParser::unpack(const std::string& cr_msg,
 {
     try
     {
-        if(std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16)
-           != math::checksum(cr_msg.c_str(), cr_msg.length()))
-        {
-            return false;
-        }
-
         boost::smatch match;
-        if(boost::regex_match(cr_msg, match, msGpggaRe))
-        {
-            // latitude
-            r_pos.position.latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
-            if(match.str(RE_GGA_LAT_DIR).compare("S") == 0)
-            {
-                r_pos.position.latitude = -r_pos.position.latitude;
-            }
-
-            // longitude
-            r_pos.position.longitude = math::dmToDeg(std::stod(match.str(RE_GGA_LONG)));
-            if(match.str(RE_GGA_LONG_DIR).compare("W") == 0)
-            {
-                r_pos.position.longitude = -r_pos.position.longitude;
-            }
-
-            // fix
-            r_pos.fixQa = std::stoi(match.str(RE_GGA_FIX));
-            // sats
-            r_pos.nrSats = std::stoi(match.str(RE_GGA_SAT));
-            // dilution
-            r_pos.dilution = std::stod(match.str(RE_GGA_DIL));
-            // altitude
-            r_pos.position.altitude = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
-            // geoid
-            r_pos.geoid = std::stod(match.str(RE_GGA_GEOID));
-        }
-        else
-        {
-            return false;
-        }
+        return std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16)
+                   == math::checksum(cr_msg.c_str(), cr_msg.length())
+               && boost::regex_match(cr_msg, match, msGpggaRe)
+               && parsePosition(match, r_pos);
     }
     catch(const std::logic_error&)
     {
         return false;
     }
+}
+
+bool GpsParser::parsePosition(const boost::smatch& crMatch,
+                              data::object::ExtGpsPosition& rPosition)
+{
+    rPosition.position.latitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LAT)));
+    if(crMatch.str(RE_GGA_LAT_DIR).compare("S") == 0)
+    {
+        rPosition.position.latitude = -rPosition.position.latitude;
+    }
+    rPosition.position.longitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LONG)));
+    if(crMatch.str(RE_GGA_LONG_DIR).compare("W") == 0)
+    {
+        rPosition.position.longitude = -rPosition.position.longitude;
+    }
+    rPosition.fixQa             = std::stoi(crMatch.str(RE_GGA_FIX));
+    rPosition.nrSats            = std::stoi(crMatch.str(RE_GGA_SAT));
+    rPosition.dilution          = std::stod(crMatch.str(RE_GGA_DIL));
+    rPosition.position.altitude = math::doubleToInt(std::stod(crMatch.str(RE_GGA_ALT)));
+    rPosition.geoid             = std::stod(crMatch.str(RE_GGA_GEOID));
     return true;
 }
 }

@@ -69,10 +69,9 @@ AprsParser::~AprsParser() noexcept
 
 bool AprsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
 {
-    boost::smatch match;
-    boost::smatch com_match;
+    boost::smatch match, com_match;
 
-    if((cr_msg.size() > 0 && cr_msg.at(0) == '#')
+    if((!cr_msg.empty() && cr_msg.front() == '#')
        || !(boost::regex_match(cr_msg, match, msAprsRe) && parsePosition(match, r_ac)))
     {
         return false;

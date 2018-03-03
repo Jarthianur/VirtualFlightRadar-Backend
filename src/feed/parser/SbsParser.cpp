@@ -21,12 +21,17 @@
 
 #include "SbsParser.h"
 
-#include <cstddef>
 #include <limits>
 #include <stdexcept>
 
-#include "../../data/object/Position.h"
 #include "../../Math.hpp"
+#include "../../data/object/Position.h"
+
+#define SBS_FIELD_ID 4
+#define SBS_FIELD_TIME 7
+#define SBS_FIELD_ALT 11
+#define SBS_FIELD_LAT 14
+#define SBS_FIELD_LON 15
 
 namespace feed
 {
@@ -46,71 +51,63 @@ SbsParser::~SbsParser() noexcept
 
 bool SbsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
 {
-    /*
-     * fields:
-     * 4 : id
-     * 7 : time
-     * 11: altitude
-     * 14: latitude
-     * 15: longitude
-     */
-    std::size_t p = 6;
+    std::size_t p   = 6, delim;
+    std::uint32_t i = 2;
 
     if(cr_msg.find(',', p) == std::string::npos
-       || !(cr_msg.size() > 4 && cr_msg.at(4) == '3'))
+       || !(cr_msg.size() > 4 && cr_msg[4] == '3'))
     {
         return false;
     }
-    std::size_t delim;
-    std::uint32_t i = 2;
+    while((delim = cr_msg.find(',', p)) != std::string::npos && i < 16)
+    {
+        if(!parseField(i++, cr_msg.substr(p, delim - p), r_ac))
+        {
+            return false;
+        }
+        p = delim + 1;
+    }
+    r_ac.setFullInfo(false);
+    r_ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
+    r_ac.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
+    r_ac.setIdType(Aircraft::IdType::ICAO);
+    return true;
+}
+
+bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
+                           Aircraft& rAircraft)
+{
+    if(crStr.empty())
+    {
+        return false;
+    }
     GpsPosition pos;
     try
     {
-        while((delim = cr_msg.find(',', p)) != std::string::npos && i < 16)
+        switch(vField)
         {
-            switch(i)
-            {
-                case 4:
-                    if(delim - p > 0)
-                    {
-                        r_ac.setId(cr_msg.substr(p, delim - p));
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                    break;
-                case 11:
-                    pos.altitude = math::doubleToInt(
-                        std::stod(cr_msg.substr(p, delim - p)) * math::FEET_2_M);
-                    if(pos.altitude > mMaxHeight)
-                    {
-                        return false;
-                    }
-                    break;
-                case 14:
-                    pos.latitude = std::stod(cr_msg.substr(p, delim - p));
-                    break;
-                case 15:
-                    pos.longitude = std::stod(cr_msg.substr(p, delim - p));
-                    break;
-                default:
-                    break;
-            }
-            i++;
-            p = delim + 1;
+            case SBS_FIELD_ID:
+                rAircraft.setId(crStr);
+                break;
+            case SBS_FIELD_ALT:
+                pos.altitude = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
+                break;
+            case SBS_FIELD_LAT:
+                pos.latitude = std::stod(crStr);
+                break;
+            case SBS_FIELD_LON:
+                pos.longitude = std::stod(crStr);
+                break;
+            default:
+                break;
         }
     }
     catch(const std::logic_error&)
     {
         return false;
     }
-    r_ac.setPosition(pos);
-    r_ac.setFullInfo(false);
-    r_ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-    r_ac.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
-    r_ac.setIdType(Aircraft::IdType::ICAO);
-    return true;
+    rAircraft.setPosition(pos);
+    return pos.altitude <= mMaxHeight;
 }
 }
 }  // namespace parser
