@@ -23,7 +23,6 @@
 
 #include <cstdint>
 #include <istream>
-#include <list>
 #include <string>
 #include <utility>
 
@@ -230,14 +229,6 @@ private:
      * @return the port
      */
     std::uint16_t resolveServerPort(const PropertyMap& crProperties) const;
-
-    /**
-     * @fn resolveFeeds
-     * @brief Resolve all Feed names.
-     * @param crFeeds The feeds string
-     * @return all feed names
-     */
-    std::list<std::string> resolveFeedList(const std::string& crFeeds) const;
 
     /**
      * @fn resolveFeeds

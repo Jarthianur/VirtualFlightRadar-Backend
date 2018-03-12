@@ -60,7 +60,7 @@ public:
      * @param r_sigset The signal set
      * @param port     The port
      */
-    Server(std::uint16_t port);
+    explicit Server(std::uint16_t port);
     /**
      * @fn ~Server
      * @brief Destructor

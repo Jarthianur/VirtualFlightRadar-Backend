@@ -41,8 +41,8 @@ SensorFeed::SensorFeed(const std::string& crName, const config::KeyValueMap& crK
 {
     mpClient   = std::unique_ptr<client::Client>(new client::SensorClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
-    mWindSlot  = mpWindData->registerFeed();
-    mAtmosSlot = mpAtmosphereData->registerFeed();
+    mWindSlot  = mpWindData->registerSlot();
+    mAtmosSlot = mpAtmosphereData->registerSlot();
 }
 
 SensorFeed::~SensorFeed() noexcept

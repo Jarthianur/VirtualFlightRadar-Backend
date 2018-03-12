@@ -24,6 +24,7 @@
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/move/core.hpp>
 #include <string>
 
 namespace server
@@ -55,7 +56,7 @@ public:
      * @param socket The socket
      * @return a shared ptr to the Connection object
      */
-    static boost::shared_ptr<Connection> start(boost::asio::ip::tcp::socket&& socket);
+    static boost::shared_ptr<Connection> start(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket);
     /**
      * @fn stop
      * @brief Stop the connection, shutdown and close socket.
@@ -80,7 +81,7 @@ private:
      * @brief Constructor
      * @param socket The socket
      */
-    Connection(boost::asio::ip::tcp::socket&& socket);
+    explicit Connection(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket);
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
     /// IP address

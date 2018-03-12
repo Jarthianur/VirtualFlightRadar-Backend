@@ -23,16 +23,17 @@
 
 #include <algorithm>
 #include <boost/system/error_code.hpp>
+#include <boost/move/move.hpp>
 
 namespace server
 {
-boost::shared_ptr<Connection> Connection::start(boost::asio::ip::tcp::socket&& socket)
+boost::shared_ptr<Connection> Connection::start(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket)
 {
-    return boost::shared_ptr<Connection>(new Connection(std::move(socket)));
+    return boost::shared_ptr<Connection>(new Connection(boost::move(socket)));
 }
 
-Connection::Connection(boost::asio::ip::tcp::socket&& socket)
-    : mSocket(std::move(socket)), mIp(mSocket.remote_endpoint().address().to_string())
+Connection::Connection(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket)
+    : mSocket(boost::move(socket)), mIp(mSocket.remote_endpoint().address().to_string())
 {}
 
 Connection::~Connection() noexcept

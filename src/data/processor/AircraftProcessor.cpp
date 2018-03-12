@@ -53,14 +53,14 @@ std::string AircraftProcessor::process(const Aircraft& crAircraft)
 
 void AircraftProcessor::setRelatives(const GpsPosition& crRelPos, double vAtmPress)
 {
-    mtRelPosition = crRelPos;
+    mtReferedPosition = crRelPos;
     mtAtmPressure = vAtmPress;
 }
 
 void AircraftProcessor::calcRelativePosition(const Aircraft& crAircraft)
 {
-    mtRadLatB   = math::radian(mtRelPosition.latitude);
-    mtRadLongB  = math::radian(mtRelPosition.longitude);
+    mtRadLatB   = math::radian(mtReferedPosition.latitude);
+    mtRadLongB  = math::radian(mtReferedPosition.longitude);
     mtRadLongAc = math::radian(crAircraft.getLongitude());
     mtRadLatAc  = math::radian(crAircraft.getLatitude());
     mtLongDist  = mtRadLongAc - mtRadLongB;
@@ -83,7 +83,7 @@ void AircraftProcessor::calcRelativePosition(const Aircraft& crAircraft)
     mtRelE = math::doubleToInt(std::sin(math::radian(mtBearingAbs)) * mtDist);
     mtRelV = crAircraft.getTargetType() == Aircraft::TargetType::TRANSPONDER
                  ? crAircraft.getAltitude() - math::icaoHeight(mtAtmPressure)
-                 : crAircraft.getAltitude() - mtRelPosition.altitude;
+                 : crAircraft.getAltitude() - mtReferedPosition.altitude;
 }
 
 std::string AircraftProcessor::genPflauStr(const Aircraft& crAircraft)

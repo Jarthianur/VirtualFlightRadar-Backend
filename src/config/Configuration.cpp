@@ -108,20 +108,6 @@ std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) 
     }
 }
 
-std::list<std::string> Configuration::resolveFeedList(const std::string& crFeeds) const
-{
-    std::list<std::string> feeds;
-    std::stringstream ss;
-    ss.str(crFeeds);
-    std::string item;
-
-    while(std::getline(ss, item, ','))
-    {
-        feeds.push_back(trimString(item));
-    }
-    return feeds;
-}
-
 std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
                                           const std::string& crKey) const
 {
@@ -142,7 +128,7 @@ std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
 FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties)
 {
     std::list<std::string> list
-        = resolveFeedList(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+        = splitCommaSeparated(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
     FeedMapping mapping;
     for(auto& it : list)
     {

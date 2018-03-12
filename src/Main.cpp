@@ -87,7 +87,7 @@ config::Configuration evalArgs(std::int32_t argc, char** argv)
         if(std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
         {
             ini_file = std::string(argv[++i]);
-            if(!(cfg_found = ini_file.rfind(".ini") != std::string::npos))
+            if(!(cfg_found = (ini_file.rfind(".ini") != std::string::npos)))
             {
                 throw std::runtime_error(ini_file + " is not a .ini file.");
             }

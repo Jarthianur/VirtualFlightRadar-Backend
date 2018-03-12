@@ -21,10 +21,11 @@
 
 #include "Server.h"
 
-#include <boost/bind.hpp>
-#include <boost/thread/lock_guard.hpp>
 #include <algorithm>
 #include <iterator>
+#include <boost/bind.hpp>
+#include <boost/move/move.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../Logger.h"
 
@@ -113,7 +114,7 @@ void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
     if(!cr_ec)
     {
         boost::lock_guard<boost::mutex> lock(this->mMutex);
-        auto client = Connection::start(std::move(mSocket));
+        auto client = Connection::start(boost::move(mSocket));
         if(mClients.size() < S_MAX_CLIENTS && !isConnected(client->getIp()))
         {
             mClients.push_back(client);

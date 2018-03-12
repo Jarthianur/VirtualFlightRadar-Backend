@@ -43,9 +43,9 @@ bool SensorParser::unpack(const std::string& crStr,
 {
     try
     {
-        return std::stoi(crStr.substr(crStr.rfind('*') + 1, 2), nullptr, 16)
-                   == math::checksum(crStr.c_str(), crStr.length())
-               && parseClimate(crStr, rClimate);
+        return (std::stoi(crStr.substr(crStr.rfind('*') + 1, 2), nullptr, 16)
+                    == math::checksum(crStr.c_str(), crStr.length())
+                && parseClimate(crStr, rClimate));
     }
     catch(const std::logic_error&)
     {
@@ -63,7 +63,7 @@ bool SensorParser::parseClimate(const std::string& crStr, data::object::Climate&
         std::size_t subLen = tmpB - tmpS;
         std::size_t numIdx;
         double tmpPress = std::stod(crStr.substr(tmpS, subLen), &numIdx) * 1000.0;
-        if((valid = numIdx == subLen))
+        if((valid = (numIdx == subLen)))
         {
             rClimate.mAtmosphere.setMdaStr(crStr + "\n");
             rClimate.mAtmosphere.setPressure(tmpPress);

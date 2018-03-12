@@ -36,7 +36,7 @@ SbsFeed::SbsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap
 {
     mpClient  = std::unique_ptr<client::Client>(new client::SbsClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
-    mDataSlot = mpData->registerFeed();
+    mDataSlot = mpData->registerSlot();
 }
 
 SbsFeed::~SbsFeed() noexcept

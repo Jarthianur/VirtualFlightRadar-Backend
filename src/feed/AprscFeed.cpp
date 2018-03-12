@@ -45,7 +45,7 @@ AprscFeed::AprscFeed(const std::string& cr_name, const config::KeyValueMap& cr_k
     mpClient = std::unique_ptr<client::Client>(
         new client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
                                 mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
-    mDataSlot = mpData->registerFeed();
+    mDataSlot = mpData->registerSlot();
 }
 
 AprscFeed::~AprscFeed() noexcept

@@ -82,7 +82,7 @@ public:
      * @param rKeyValue The key-value pair
      * @return true on success, else false
      */
-    bool addProperty(const std::string& rSection, const KeyValue& rKeyValue = {});
+    bool addProperty(const std::string& crSection, const KeyValue& crKeyValue = {});
 
 private:
     /// @var mPropertiesMap

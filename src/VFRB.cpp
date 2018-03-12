@@ -164,7 +164,6 @@ void VFRB::serve()
             mServer.writeToAll(mpGpsData->getSerialized());
             mServer.writeToAll(mpAtmosphereData->getSerialized()
                                + mpWindData->getSerialized());
-
             boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
         }
         catch(const std::exception& e)

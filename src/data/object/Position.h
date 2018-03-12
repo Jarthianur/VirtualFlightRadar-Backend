@@ -57,7 +57,7 @@ public:
     void assign(const Object& crOther) override;
 
     /// Position
-    GpsPosition position;
+    GpsPosition position{0.0, 0.0, 0};
     /// Number of satellites
     std::int32_t nrSats = 1;
     /// GPS fix quality
@@ -69,4 +69,3 @@ public:
 };
 }  // namespace object
 }  // namespace data
-

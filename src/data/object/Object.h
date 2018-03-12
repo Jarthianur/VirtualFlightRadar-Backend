@@ -36,20 +36,6 @@ public:
 
     virtual bool tryUpdate(const Object& crOther, std::uint64_t vAttempts);
 
-    /**
-     * @fn setLastPriority
-     * @brief Set the lastly updating priority.
-     * @param vPriority
-     */
-    void setLastPriority(std::uint32_t vPriority);
-
-    /**
-     * @fn getLastPriority
-     * @brief Get last written priority.
-     * @return the last priority
-     */
-    std::uint32_t getLastPriority() const;
-
 protected:
     virtual bool canUpdate(const Object& crOther, std::uint64_t vAttempts) const;
     /// @var mLastPriority

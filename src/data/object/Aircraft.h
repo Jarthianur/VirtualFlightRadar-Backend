@@ -122,7 +122,7 @@ public:
      * @brief Constructor
      * @param vPriority The initial priority
      */
-    Aircraft(std::uint32_t vPriority);
+    explicit Aircraft(std::uint32_t vPriority);
 
     /**
      * @fn Aircraft
@@ -343,7 +343,7 @@ private:
 
     /// @var mPosition
     /// Currently known position.
-    GpsPosition mPosition;
+    GpsPosition mPosition{0.0, 0.0, 0};
 
     /// @var mMovement
     /// Currently known movement.

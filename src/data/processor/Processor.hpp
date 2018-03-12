@@ -52,7 +52,7 @@ protected:
         rDestStr.append(mBuffer);
     }
 
-    char mBuffer[PROC_BUFF_S];
+    char mBuffer[PROC_BUFF_S] = "";
 };
 }
 }

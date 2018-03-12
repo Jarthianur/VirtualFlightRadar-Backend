@@ -37,7 +37,7 @@ namespace processor
  * @class AircraftProcessor
  * @brief Process Aircrafts relative to the base position.
  */
-class AircraftProcessor:public Processor<object::Aircraft>
+class AircraftProcessor : public Processor<object::Aircraft>
 {
 public:
     AircraftProcessor();
@@ -66,8 +66,7 @@ public:
      */
     std::string process(const object::Aircraft& crAircraft) override;
 
-    void setRelatives(const object::GpsPosition& crRelPos,
-                      double vAtmPress);
+    void setRelatives(const object::GpsPosition& crRelPos, double vAtmPress);
 
 private:
     /**
@@ -99,7 +98,7 @@ private:
     /// Max distance to process an aircraft
     const std::int32_t mMaxDistance;
 
-    object::GpsPosition mtRelPosition;
+    object::GpsPosition mtReferedPosition{0.0, 0.0, 0};
 
     double mtAtmPressure = 1013.25;
 
@@ -153,5 +152,4 @@ private:
 };
 
 }  // namespace aircraft
-
 }

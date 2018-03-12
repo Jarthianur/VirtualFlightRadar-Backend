@@ -63,6 +63,7 @@ bool AircraftData::update(const Object& crAircraft, std::size_t vSlot)
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     const Aircraft& crUpdate = static_cast<const Aircraft&>(crAircraft);
     const auto& index        = mIndexMap.find(crUpdate.getId());
+
     if(index != mIndexMap.end())
     {
         try

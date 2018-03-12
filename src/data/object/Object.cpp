@@ -45,15 +45,6 @@ bool Object::canUpdate(const Object& crOther, std::uint64_t vAttempts) const
     return this->mLastPriority * vAttempts >= crOther.mLastPriority;
 }
 
-void Object::setLastPriority(std::uint32_t vPriority)
-{
-    mLastPriority = vPriority;
-}
-
-std::uint32_t Object::getLastPriority() const
-{
-    return mLastPriority;
-}
 }
 
 }

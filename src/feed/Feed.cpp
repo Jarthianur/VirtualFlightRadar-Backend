@@ -26,6 +26,7 @@
 #include <limits>
 #include <stdexcept>
 #include <unordered_map>
+#include <boost/move/move.hpp>
 
 #include "../config/Configuration.h"
 #include "../Logger.h"
@@ -54,9 +55,9 @@ Feed::~Feed() noexcept
 {}
 
 Feed::Feed(BOOST_RV_REF(Feed) other)
-    : mName(std::move(other.mName)),
-      mKvMap(std::move(other.mKvMap)),
-      mpClient(std::move(other.mpClient)),
+    : mName(boost::move(other.mName)),
+      mKvMap(boost::move(other.mKvMap)),
+      mpClient(boost::move(other.mpClient)),
       mPriority(other.mPriority)
 {}
 
