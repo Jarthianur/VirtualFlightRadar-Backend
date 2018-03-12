@@ -79,7 +79,7 @@ public:
      */
     bool update(const object::Object& crAircraft, std::size_t vSlot) override;
 
-    std::size_t registerFeed() override;
+    std::size_t registerSlot() override;
 
     /**
      * @fn processAircrafts
@@ -106,7 +106,7 @@ private:
 
     /// @var mIndexMap
     /// Map IDs to vector indices to make find efficient
-    std::unordered_map<std::string, std::pair<std::size_t, std::vector<std::uint64_t>>>
+    std::unordered_map<std::string, std::pair<std::size_t, std::vector<std::uint32_t>>>
         mIndexMap;
 
     std::size_t nrOfRegisteredFeeds = 0;

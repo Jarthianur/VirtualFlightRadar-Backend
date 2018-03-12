@@ -22,10 +22,12 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
+#include <vector>
 
-#include "Data.h"
 #include "object/Atmosphere.h"
+#include "Data.h"
 
 /// @namespace data
 namespace data
@@ -67,6 +69,7 @@ public:
      * @param rAttempts The update attempts
      */
     bool update(const object::Object& crAtmos, std::size_t vSlot) override;
+    std::size_t registerSlot() override;
 
     /**
      * @fn getPress
@@ -80,5 +83,6 @@ private:
     /// @var mAtmosphere
     /// Holding atmospheric pressure
     object::Atmosphere mAtmosphere;
+    std::vector<std::uint32_t> mAttempts;
 };
 }  // namespace data

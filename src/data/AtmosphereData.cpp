@@ -21,9 +21,9 @@
 
 #include "AtmosphereData.h"
 
-#include <boost/thread/lock_guard.hpp>
+#include <algorithm>
 #include <stdexcept>
-#include <vector>
+#include <boost/thread/lock_guard.hpp>
 
 using namespace data::object;
 
@@ -49,10 +49,10 @@ bool AtmosphereData::update(const Object& crAtmos, std::size_t vSlot)
     boost::lock_guard<boost::mutex> lock(mMutex);
     try
     {
-        bool updated = mAtmosphere.tryUpdate(crAtmos, ++mFeedAttempts.at(vSlot));
+        bool updated = mAtmosphere.tryUpdate(crAtmos, ++mAttempts.at(vSlot));
         if(updated)
         {
-            clearAttempts(mFeedAttempts);
+            std::fill(mAttempts.begin(), mAttempts.end(), 0);
         }
         return updated;
     }
@@ -60,6 +60,12 @@ bool AtmosphereData::update(const Object& crAtmos, std::size_t vSlot)
     {
         return false;
     }
+}
+
+std::size_t AtmosphereData::registerSlot()
+{
+    mAttempts.push_back(0);
+    return mAttempts.size() - 1;
 }
 
 double AtmosphereData::getAtmPress()

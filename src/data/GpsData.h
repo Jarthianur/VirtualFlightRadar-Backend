@@ -22,11 +22,13 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
+#include <vector>
 
-#include "Data.h"
 #include "object/Position.h"
 #include "processor/GpsProcessor.h"
+#include "Data.h"
 
 /// @namespace data
 namespace data
@@ -78,6 +80,7 @@ public:
      * @param rAttempts  The update attempts
      */
     bool update(const object::Object& crPosition, std::size_t vSlot) override;
+    std::size_t registerSlot() override;
 
 private:
     /// @var mBasePos
@@ -91,6 +94,8 @@ private:
     /// @var mPosLocked
     /// Locking state of the current position
     bool mPosLocked = false;
+
+    std::vector<std::uint32_t> mAttempts;
 };
 
 }  // namespace data

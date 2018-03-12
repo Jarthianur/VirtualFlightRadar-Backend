@@ -22,6 +22,8 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
+#include <vector>
 #include <string>
 
 #include "Data.h"
@@ -69,10 +71,14 @@ public:
      */
     bool update(const object::Object& crWind, std::size_t vSlot) override;
 
+    std::size_t registerSlot() override;
+
 private:
     /// @var mWind
     /// Holding MDA sentence
     object::Wind mWind;
+
+    std::vector<std::uint32_t> mAttempts;
 };
 
 }  // namespace data

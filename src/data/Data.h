@@ -17,11 +17,9 @@
 
 #pragma once
 
-#include <boost/thread/mutex.hpp>
 #include <cstddef>
-#include <cstdint>
 #include <string>
-#include <vector>
+#include <boost/thread/mutex.hpp>
 
 namespace data
 {
@@ -37,14 +35,11 @@ public:
     virtual ~Data() noexcept;
     virtual std::string getSerialized()                              = 0;
     virtual bool update(const object::Object& _1, std::size_t vSlot) = 0;
-    virtual std::size_t registerFeed();
+    virtual std::size_t registerSlot()                               = 0;
 
 protected:
-    virtual void clearAttempts(std::vector<std::uint64_t>& rVec);
     /// @var mMutex
     /// Used for RW on this data
     boost::mutex mMutex;
-    std::vector<std::uint64_t> mFeedAttempts;
 };
-
 }

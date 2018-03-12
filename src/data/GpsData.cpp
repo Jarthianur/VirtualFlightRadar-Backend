@@ -21,9 +21,9 @@
 
 #include "GpsData.h"
 
-#include <boost/thread/lock_guard.hpp>
 #include <stdexcept>
-#include <vector>
+#include <algorithm>
+#include <boost/thread/lock_guard.hpp>
 
 /// Define GPS metrics
 #define GPS_NR_SATS_GOOD 7
@@ -58,10 +58,10 @@ bool GpsData::update(const Object& crPosition, std::size_t vSlot)
     }
     try
     {
-        bool updated = mBasePos.tryUpdate(crPosition, ++mFeedAttempts.at(vSlot));
+        bool updated = mBasePos.tryUpdate(crPosition, ++mAttempts.at(vSlot));
         if(updated)
         {
-            clearAttempts(mFeedAttempts);
+            std::fill(mAttempts.begin(), mAttempts.end(), 0);
         }
         return (mPosLocked = updated && mBasePos.ground
                              && (mBasePos.nrSats >= GPS_NR_SATS_GOOD
@@ -72,6 +72,12 @@ bool GpsData::update(const Object& crPosition, std::size_t vSlot)
     {
         return false;
     }
+}
+
+std::size_t GpsData::registerSlot()
+{
+    mAttempts.push_back(0);
+    return mAttempts.size() - 1;
 }
 
 GpsPosition GpsData::getGpsPosition()

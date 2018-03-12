@@ -21,10 +21,11 @@
 
 #include "AircraftData.h"
 
-#include <boost/thread/lock_guard.hpp>
+#include <algorithm>
 #include <iterator>
 #include <stdexcept>
 #include <system_error>
+#include <boost/thread/lock_guard.hpp>
 
 #ifndef ESTIMATED_TRAFFIC
 #define ESTIMATED_TRAFFIC 1
@@ -70,7 +71,7 @@ bool AircraftData::update(const Object& crAircraft, std::size_t vSlot)
                 crAircraft, index->second.second.at(vSlot));
             if(updated)
             {
-                clearAttempts(index->second.second);
+                std::fill(index->second.second.begin(), index->second.second.end(), 0);
             }
             return updated;
         }
@@ -83,7 +84,7 @@ bool AircraftData::update(const Object& crAircraft, std::size_t vSlot)
     return true;
 }
 
-std::size_t AircraftData::registerFeed()
+std::size_t AircraftData::registerSlot()
 {
     ++nrOfRegisteredFeeds;
     // Just to be sure, but this should never happen.
@@ -143,7 +144,7 @@ void AircraftData::insert(const object::Aircraft& crAircraft)
 {
     mIndexMap.insert(
         {crAircraft.getId(),
-         {mContainer.size(), std::vector<std::uint64_t>(nrOfRegisteredFeeds, 0)}});
+         {mContainer.size(), std::vector<std::uint32_t>(nrOfRegisteredFeeds, 0)}});
     mContainer.push_back(crAircraft);
 }
 }  // namespace aircraft

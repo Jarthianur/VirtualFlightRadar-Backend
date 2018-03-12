@@ -21,9 +21,9 @@
 
 #include "WindData.h"
 
-#include <boost/thread/lock_guard.hpp>
 #include <stdexcept>
-#include <vector>
+#include <algorithm>
+#include <boost/thread/lock_guard.hpp>
 
 using namespace data::object;
 
@@ -51,10 +51,10 @@ bool WindData::update(const Object& crWind, std::size_t vSlot)
     boost::lock_guard<boost::mutex> lock(mMutex);
     try
     {
-        bool updated = mWind.tryUpdate(crWind, ++mFeedAttempts.at(vSlot));
+        bool updated = mWind.tryUpdate(crWind, ++mAttempts.at(vSlot));
         if(updated)
         {
-            clearAttempts(mFeedAttempts);
+            std::fill(mAttempts.begin(), mAttempts.end(), 0);
         }
         return updated;
     }
@@ -62,6 +62,12 @@ bool WindData::update(const Object& crWind, std::size_t vSlot)
     {
         return false;
     }
+}
+
+std::size_t WindData::registerSlot()
+{
+    mAttempts.push_back(0);
+    return mAttempts.size() - 1;
 }
 
 }  // namespace data
