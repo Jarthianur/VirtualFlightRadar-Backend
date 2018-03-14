@@ -21,9 +21,9 @@
 
 #pragma once
 
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <string>
 
 #include "Client.h"
 
@@ -43,10 +43,12 @@ public:
      * Non-copyable
      */
     SbsClient(const SbsClient&) = delete;
+
     /**
      * Not assignable
      */
     SbsClient& operator=(const SbsClient&) = delete;
+
     /**
      * @fn SbsClient
      * @brief Constructor
@@ -55,7 +57,8 @@ public:
      * @param cr_login The login string to transmit
      * @param r_feed   The handler Feed reference
      */
-    SbsClient(const std::string& cr_host, const std::string& cr_port, feed::Feed& r_feed);
+    SbsClient(const std::string& crHost, const std::string& crPort, feed::Feed& rFeed);
+
     /**
      * @fn ~SbsClient
      * @brief Destructor
@@ -68,18 +71,22 @@ private:
      * @override Client::connect
      */
     void connect() override;
+
     /**
      * @fn handleResolve
      * @override Client::handleResolve
      */
-    void handleResolve(const boost::system::error_code& cr_ec,
-                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    void
+    handleResolve(const boost::system::error_code& crError,
+                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+
     /**
      * @fn handleConnect
      * @override Client::handleConnect
      */
-    void handleConnect(const boost::system::error_code& cr_ec,
-                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    void
+    handleConnect(const boost::system::error_code& crError,
+                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 };
 
 }  // namespace client

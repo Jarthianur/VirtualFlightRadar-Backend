@@ -46,7 +46,7 @@ using namespace data;
 
 #define SYNC_TIME (1)
 
-std::atomic<bool> VFRB::global_run_status(true);
+std::atomic<bool> VFRB::vRunStatus(true);
 
 VFRB::VFRB(const config::Configuration& config)
     : mpAircraftData(new AircraftData(config.getMaxDistance())),
@@ -74,7 +74,7 @@ void VFRB::run() noexcept
     boost::thread server_thread([this, &signal_set]() {
         Logger::info("(Server) start server.");
         mServer.run(signal_set);
-        global_run_status = false;
+        vRunStatus = false;
     });
     boost::thread_group feed_threads;
     for(const auto& it : mFeeds)
@@ -124,8 +124,8 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
             {
                 Logger::warn(
                     "(Config) create feed ", feed.first,
-                     ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                     ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
+                    ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
+                    ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
             }
         }
         catch(const std::exception& e)
@@ -145,28 +145,27 @@ void VFRB::setupSignals(boost::asio::signal_set& rSigSet)
 
     rSigSet.async_wait([this](const boost::system::error_code&, const int) {
         Logger::info("(VFRB) caught signal: ", "shutdown");
-        global_run_status = false;
+        vRunStatus = false;
     });
 }
 
 void VFRB::serve()
 {
-    while(global_run_status)
+    while(vRunStatus)
     {
         try
         {
             mpAircraftData->processAircrafts(mpGpsData->getGpsPosition(),
-                                             mpAtmosphereData->getAtmPress());
-            mServer.writeToAll(mpAircraftData->getSerialized());
-            mServer.writeToAll(mpGpsData->getSerialized());
-            mServer.writeToAll(mpAtmosphereData->getSerialized()
-                               + mpWindData->getSerialized());
+                                             mpAtmosphereData->getAtmPressure());
+            mServer.send(mpAircraftData->getSerialized());
+            mServer.send(mpGpsData->getSerialized());
+            mServer.send(mpAtmosphereData->getSerialized() + mpWindData->getSerialized());
             boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
         }
         catch(const std::exception& e)
         {
             Logger::error("(VFRB) error: ", e.what());
-            global_run_status = false;
+            vRunStatus = false;
         }
     }
 }

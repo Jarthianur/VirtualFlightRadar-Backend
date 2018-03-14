@@ -40,11 +40,11 @@ std::string GpsProcessor::process(const object::ExtGpsPosition& crPosition)
     return genGpggaStr(crPosition) + genGprmcStr(crPosition);
 }
 
-std::string GpsProcessor::genGpggaStr(const ExtGpsPosition& cr_pos)
+std::string GpsProcessor::genGpggaStr(const ExtGpsPosition& crPosition)
 {
     std::time_t now = std::time(0);
     std::tm* utc    = std::gmtime(&now);
-    evalPosition(cr_pos.position.latitude, cr_pos.position.longitude);
+    evalPosition(crPosition.position.latitude, crPosition.position.longitude);
 
     // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
     // support others.
@@ -53,8 +53,8 @@ std::string GpsProcessor::genGpggaStr(const ExtGpsPosition& cr_pos)
         /*"$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"*/
         "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02d,1,%d,M,%.1lf,M,,*",
         utc->tm_hour, utc->tm_min, utc->tm_sec, mtLatDeg, mtLatMin, mtLatStr, mtLongDeg,
-        mtLongMin, mtLongStr, /*pos.fixQa,*/ cr_pos.nrSats, cr_pos.position.altitude,
-        cr_pos.geoid);
+        mtLongMin, mtLongStr, /*pos.fixQa,*/ crPosition.nrSats,
+        crPosition.position.altitude, crPosition.geoid);
 
     std::string nmea_str(mBuffer);
     finishSentence(nmea_str);
@@ -62,11 +62,11 @@ std::string GpsProcessor::genGpggaStr(const ExtGpsPosition& cr_pos)
     return nmea_str;
 }
 
-std::string GpsProcessor::genGprmcStr(const ExtGpsPosition& cr_pos)
+std::string GpsProcessor::genGprmcStr(const ExtGpsPosition& crPosition)
 {
     std::time_t now = std::time(0);
     std::tm* utc    = std::gmtime(&now);
-    evalPosition(cr_pos.position.latitude, cr_pos.position.longitude);
+    evalPosition(crPosition.position.latitude, crPosition.position.longitude);
 
     std::snprintf(
         mBuffer, sizeof(mBuffer),

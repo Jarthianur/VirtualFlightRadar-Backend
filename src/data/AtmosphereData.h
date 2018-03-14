@@ -45,7 +45,7 @@ public:
      * @brief Constructor
      * @param vAtmos The initial info
      */
-    explicit AtmosphereData(const object::Atmosphere& crAtmos);
+    explicit AtmosphereData(const object::Atmosphere& crAtmosphere);
 
     /**
      * @fn ~AtmosphereData
@@ -68,7 +68,8 @@ public:
      * @param vPriority The priority
      * @param rAttempts The update attempts
      */
-    bool update(const object::Object& crAtmos, std::size_t vSlot) override;
+    bool update(const object::Object& crAtmosphere, std::size_t vSlot) override;
+
     std::size_t registerSlot() override;
 
     /**
@@ -77,12 +78,13 @@ public:
      * @return the pressure
      * @threadsafe
      */
-    double getAtmPress();
+    double getAtmPressure();
 
 private:
     /// @var mAtmosphere
     /// Holding atmospheric pressure
     object::Atmosphere mAtmosphere;
+
     std::vector<std::uint32_t> mAttempts;
 };
 }  // namespace data

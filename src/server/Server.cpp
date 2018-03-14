@@ -31,10 +31,10 @@
 
 namespace server
 {
-Server::Server(std::uint16_t port)
+Server::Server(std::uint16_t vPort)
     : mIOservice(),
       mAcceptor(mIOservice,
-                boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
+                boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), vPort),
                 boost::asio::ip::tcp::acceptor::reuse_address(true)),
       mSocket(mIOservice)
 {}
@@ -42,27 +42,27 @@ Server::Server(std::uint16_t port)
 Server::~Server() noexcept
 {}
 
-void Server::run(boost::asio::signal_set& r_sigset)
+void Server::run(boost::asio::signal_set& rSigset)
 {
-	    awaitStop(r_sigset);
+    awaitStop(rSigset);
     accept();
     mIOservice.run();
 }
 
-void Server::writeToAll(const std::string& cr_msg)
+void Server::send(const std::string& crStr)
 {
-    if(cr_msg.empty())
+    if(crStr.empty())
     {
         return;
     }
-    boost::lock_guard<boost::mutex> lock(this->mMutex);
+    boost::lock_guard<boost::mutex> lock(mMutex);
     boost::system::error_code ec;
     for(auto it = mClients.begin(); it != mClients.end();)
     {
-        boost::asio::write(it->get()->getSocket(), boost::asio::buffer(cr_msg), ec);
+        boost::asio::write(it->get()->getSocket(), boost::asio::buffer(crStr), ec);
         if(ec)
         {
-            Logger::warn("(Server) lost connection to: ", it->get()->getIp());
+            Logger::warn("(Server) lost connection to: ", it->get()->getIpAddress());
             mClients.erase(it);
         }
         else
@@ -78,9 +78,9 @@ void Server::accept()
                                                 boost::asio::placeholders::error));
 }
 
-void Server::awaitStop(boost::asio::signal_set& r_sigset)
+void Server::awaitStop(boost::asio::signal_set& rSigset)
 {
-    r_sigset.async_wait([this](const boost::system::error_code&, int) {
+    rSigset.async_wait([this](const boost::system::error_code&, int) {
         mAcceptor.close();
         stopAll();
     });
@@ -88,16 +88,16 @@ void Server::awaitStop(boost::asio::signal_set& r_sigset)
 
 void Server::stopAll()
 {
-    boost::lock_guard<boost::mutex> lock(this->mMutex);
+    boost::lock_guard<boost::mutex> lock(mMutex);
     Logger::info("(Server) stopping all clients...");
     mClients.clear();
 }
 
-bool Server::isConnected(const std::string& cr_ip)
+bool Server::isConnected(const std::string& crIpAddress)
 {
     for(auto it = mClients.cbegin(); it != mClients.cend(); it++)
     {
-        if(it->get()->getIp() == cr_ip)
+        if(it->get()->getIpAddress() == crIpAddress)
         {
             return true;
         }
@@ -105,29 +105,29 @@ bool Server::isConnected(const std::string& cr_ip)
     return false;
 }
 
-void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
+void Server::handleAccept(const boost::system::error_code& crError) noexcept
 {
     if(!mAcceptor.is_open())
     {
         return;
     }
-    if(!cr_ec)
+    if(!crError)
     {
-        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         auto client = Connection::start(boost::move(mSocket));
-        if(mClients.size() < S_MAX_CLIENTS && !isConnected(client->getIp()))
+        if(mClients.size() < S_MAX_CLIENTS && !isConnected(client->getIpAddress()))
         {
             mClients.push_back(client);
-            Logger::info("(Server) connection from: ", client->getIp());
+            Logger::info("(Server) connection from: ", client->getIpAddress());
         }
         else
         {
-            Logger::info("(Server) refused connection to ", client->getIp());
+            Logger::info("(Server) refused connection to ", client->getIpAddress());
         }
     }
-    else if(cr_ec != boost::system::errc::bad_file_descriptor)
+    else if(crError != boost::system::errc::bad_file_descriptor)
     {
-        Logger::warn("(Server) accept: ", cr_ec.message());
+        Logger::warn("(Server) accept: ", crError.message());
     }
     accept();
 }

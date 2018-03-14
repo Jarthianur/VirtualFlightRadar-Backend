@@ -22,18 +22,20 @@
 #include "Connection.h"
 
 #include <algorithm>
-#include <boost/system/error_code.hpp>
 #include <boost/move/move.hpp>
+#include <boost/system/error_code.hpp>
 
 namespace server
 {
-boost::shared_ptr<Connection> Connection::start(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket)
+boost::shared_ptr<Connection> Connection::start(BOOST_RV_REF(boost::asio::ip::tcp::socket)
+                                                    rvSocket)
 {
-    return boost::shared_ptr<Connection>(new Connection(boost::move(socket)));
+    return boost::shared_ptr<Connection>(new Connection(boost::move(rvSocket)));
 }
 
-Connection::Connection(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket)
-    : mSocket(boost::move(socket)), mIp(mSocket.remote_endpoint().address().to_string())
+Connection::Connection(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
+    : mSocket(boost::move(rvSocket)),
+      mIpAddress(mSocket.remote_endpoint().address().to_string())
 {}
 
 Connection::~Connection() noexcept
@@ -56,9 +58,9 @@ boost::asio::ip::tcp::socket& Connection::getSocket()
     return mSocket;
 }
 
-const std::string& Connection::getIp()
+const std::string& Connection::getIpAddress() const
 {
-    return mIp;
+    return mIpAddress;
 }
 
 }  // namespace server

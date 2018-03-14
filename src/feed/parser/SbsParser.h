@@ -47,18 +47,20 @@ public:
      * @brief Constructor
      */
     explicit SbsParser(std::int32_t vMaxHeight);
+
     /**
      * @fn ~SbsParser
      * @brief Destructor
      */
     virtual ~SbsParser() noexcept;
+
     /**
      * @fn unpack
      * @brief Unpack into Aircraft.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& cr_msg,
-                data::object::Aircraft& r_ac) noexcept override;
+    bool unpack(const std::string& crStr,
+                data::object::Aircraft& rAircraft) noexcept override;
 
 private:
     // cppcheck-suppress unusedPrivateFunction

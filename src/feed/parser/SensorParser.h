@@ -44,11 +44,13 @@ public:
      * @brief Constructor
      */
     SensorParser();
+
     /**
      * @fn ~SensorParser
      * @brief Destructor
      */
     virtual ~SensorParser() noexcept;
+
     /**
      * @fn unpack
      * @brief Unpack into SensorInfo.

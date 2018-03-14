@@ -58,13 +58,9 @@ Aircraft::Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
 Aircraft::~Aircraft() noexcept
 {}
 
-bool Aircraft::operator==(const Aircraft& crOther) const
-{
-    return this->mId == crOther.mId;
-}
-
 void Aircraft::assign(const Object& crOther)
 {
+    Object::assign(crOther);
     const Aircraft& crUpdate = static_cast<const Aircraft&>(crOther);
     this->mIdType            = crUpdate.mIdType;
     this->mAircraftType      = crUpdate.mAircraftType;
@@ -73,15 +69,14 @@ void Aircraft::assign(const Object& crOther)
     this->mMovement          = crUpdate.mMovement;
     this->mFullInfo          = crUpdate.mFullInfo;
     this->mUpdateAge         = 0;
-    this->mLastPriority      = crUpdate.mLastPriority;
 }
 
-bool Aircraft::canUpdate(const Object& crOther, std::uint64_t vAttempts) const
+bool Aircraft::canUpdate(const Object& crOther, std::uint32_t vAttempts) const
 {
-    const Aircraft& crKnown = static_cast<const Aircraft&>(crOther);
-    return (crKnown.mTargetType == TargetType::TRANSPONDER
+    const Aircraft& crUpdate = static_cast<const Aircraft&>(crOther);
+    return (crUpdate.mTargetType == TargetType::TRANSPONDER
             || this->mTargetType == TargetType::FLARM)
-           && (this->mLastPriority * vAttempts >= crKnown.mLastPriority);
+           && (this->mLastPriority * vAttempts >= crUpdate.mLastPriority);
 }
 
 const std::string& Aircraft::getId() const
@@ -109,7 +104,7 @@ bool Aircraft::hasFullInfo() const
     return mFullInfo;
 }
 
-std::uint64_t& Aircraft::getUpdateAge()
+std::uint32_t& Aircraft::getUpdateAge()
 {
     return mUpdateAge;
 }
@@ -142,11 +137,6 @@ double Aircraft::getHeading() const
 double Aircraft::getClimbRate() const
 {
     return mMovement.climbRate;
-}
-
-const std::string& Aircraft::getSerialized() const
-{
-    return mSerialized;
 }
 
 void Aircraft::setId(const std::string& crId)
@@ -195,11 +185,6 @@ void Aircraft::setTargetType(Aircraft::TargetType vType)
 void Aircraft::setFullInfo(bool vInfo)
 {
     mFullInfo = vInfo;
-}
-
-void Aircraft::setSerialized(const std::string& crSerial)
-{
-    mSerialized = crSerial;
 }
 
 }  // namespace object

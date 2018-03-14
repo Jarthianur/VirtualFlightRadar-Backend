@@ -67,24 +67,25 @@ AprsParser::AprsParser(std::int32_t vMaxHeight)
 AprsParser::~AprsParser() noexcept
 {}
 
-bool AprsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
+bool AprsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
 {
     boost::smatch match, com_match;
 
-    if((!cr_msg.empty() && cr_msg.front() == '#')
-       || !(boost::regex_match(cr_msg, match, msAprsRe) && parsePosition(match, r_ac)))
+    if((!crStr.empty() && crStr.front() == '#')
+       || !(boost::regex_match(crStr, match, msAprsRe)
+            && parsePosition(match, rAircraft)))
     {
         return false;
     }
     std::string comm(match.str(RE_APRS_COM));
 
     if(!(boost::regex_match(comm, com_match, msAprsComRe)
-         && parseComment(com_match, r_ac)))
+         && parseComment(com_match, rAircraft)))
     {
         return false;
     }
-    parseMovement(match, r_ac);
-    r_ac.setTargetType(Aircraft::TargetType::FLARM);
+    parseMovement(match, rAircraft);
+    rAircraft.setTargetType(Aircraft::TargetType::FLARM);
     return true;
 }
 

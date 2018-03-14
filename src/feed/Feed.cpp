@@ -28,9 +28,9 @@
 #include <unordered_map>
 #include <boost/move/move.hpp>
 
-#include "../config/Configuration.h"
 #include "../Logger.hpp"
 #include "../VFRB.h"
+#include "../config/Configuration.h"
 #include "client/Client.h"
 
 namespace feed
@@ -68,7 +68,7 @@ Feed& Feed::operator=(BOOST_RV_REF(Feed))
 
 void Feed::run(boost::asio::signal_set& rSigset) noexcept
 {
-    if(VFRB::global_run_status)
+    if(VFRB::vRunStatus)
     {
         mpClient->run(rSigset);
     }
@@ -102,7 +102,7 @@ void Feed::initPriority()
     if(priority == 0)
     {
         Logger::warn("(Config) create feed ", mName,
-                      ": Priority is 0; this feed cannot update higher ones.");
+                     ": Priority is 0; this feed cannot update higher ones.");
     }
     mPriority = static_cast<std::uint32_t>(priority);
 }

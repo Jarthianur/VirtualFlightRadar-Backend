@@ -21,9 +21,9 @@
 
 #include "Client.h"
 
+#include <iostream>
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
-#include <iostream>
 
 #include "../../Logger.hpp"
 #include "../Feed.h"
@@ -32,15 +32,15 @@ namespace feed
 {
 namespace client
 {
-Client::Client(const std::string& cr_host, const std::string& cr_port,
-               const std::string& cr_comp, feed::Feed& r_feed)
+Client::Client(const std::string& crHost, const std::string& crPort,
+               const std::string& crComponent, feed::Feed& rFeed)
     : mIoService(),
       mSocket(mIoService),
       mResolver(mIoService),
-      mHost(cr_host),
-      mPort(cr_port),
-      mComponent(cr_comp),
-      mrFeed(r_feed),
+      mHost(crHost),
+      mPort(crPort),
+      mComponent(crComponent),
+      mrFeed(rFeed),
       mConnectTimer(mIoService)
 
 {}
@@ -48,9 +48,9 @@ Client::Client(const std::string& cr_host, const std::string& cr_port,
 Client::~Client() noexcept
 {}
 
-void Client::run(boost::asio::signal_set& r_sigset)
+void Client::run(boost::asio::signal_set& rSigset)
 {
-    r_sigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
+    rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
     mIoService.run();
 }
 
@@ -82,39 +82,39 @@ void Client::read()
                     boost::asio::placeholders::bytes_transferred));
 }
 
-void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
+void Client::handleTimedConnect(const boost::system::error_code& crError) noexcept
 {
-    if(!cr_ec)
+    if(!crError)
     {
         Logger::info(mComponent, " try connect to: ", mHost, ":", mPort);
         connect();
     }
     else
     {
-        Logger::error(mComponent, " cancel connect: ", cr_ec.message());
-        if(cr_ec != boost::asio::error::operation_aborted)
+        Logger::error(mComponent, " cancel connect: ", crError.message());
+        if(crError != boost::asio::error::operation_aborted)
         {
             stop();
         }
     }
 }
 
-void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t) noexcept
+void Client::handleRead(const boost::system::error_code& crError, std::size_t) noexcept
 {
-    if(!cr_ec)
+    if(!crError)
     {
         std::istream is(&mBuffer);
         std::getline(is, mResponse);
         mrFeed.process(mResponse);
         read();
     }
-    else if(cr_ec != boost::system::errc::bad_file_descriptor)
+    else if(crError != boost::system::errc::bad_file_descriptor)
     {
-        Logger::error(mComponent, " read: ", cr_ec.message());
-        if(cr_ec != boost::asio::error::operation_aborted)
+        Logger::error(mComponent, " read: ", crError.message());
+        if(crError != boost::asio::error::operation_aborted)
         {
             stop();
-            if(cr_ec == boost::asio::error::eof)
+            if(crError == boost::asio::error::eof)
             {
                 timedConnect();
             }

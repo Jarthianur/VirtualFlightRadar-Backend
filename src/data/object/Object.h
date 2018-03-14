@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace data
 {
@@ -32,16 +33,20 @@ public:
 
     virtual ~Object() noexcept;
 
-    virtual void assign(const Object& crOther) = 0;
+    virtual void assign(const Object& crOther);
 
-    virtual bool tryUpdate(const Object& crOther, std::uint64_t vAttempts);
+    virtual bool tryUpdate(const Object& crOther, std::uint32_t vAttempts);
+
+    virtual void setSerialized(const std::string& crSerialized);
+
+    virtual const std::string& getSerialized() const;
 
 protected:
-    virtual bool canUpdate(const Object& crOther, std::uint64_t vAttempts) const;
+    virtual bool canUpdate(const Object& crOther, std::uint32_t vAttempts) const;
     /// @var mLastPriority
     /// Got last update with this priority.
     std::uint32_t mLastPriority;
+    std::string mSerialized;
 };
-
 }
 }

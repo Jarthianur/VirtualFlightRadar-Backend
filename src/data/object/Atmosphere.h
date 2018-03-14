@@ -22,7 +22,6 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 
 #include "Object.h"
 
@@ -43,19 +42,15 @@ public:
     explicit Atmosphere(double vPress);
     virtual ~Atmosphere() noexcept;
 
-    void assign(const Object& crOther);
+    void assign(const Object& crOther) override;
 
-    const std::string& getMdaStr() const;
     double getPressure() const;
-    void setMdaStr(const std::string& crStr);
     void setPressure(double vPress);
 
 private:
     friend struct Climate;
-    std::string mMdaStr;
     double mPressure = ICAO_STD_A;
 };
 
 }  // namespace util
-
 }

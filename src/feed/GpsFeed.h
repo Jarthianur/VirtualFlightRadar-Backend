@@ -26,10 +26,11 @@
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "Feed.h"
 #include "parser/GpsParser.h"
+#include "Feed.h"
 
-namespace data {
+namespace data
+{
 class GpsData;
 } /* namespace data */
 
@@ -50,24 +51,27 @@ public:
      * @param prio     The priority
      * @param cr_kvmap The properties map
      */
-    GpsFeed(const std::string& /*cr_name*/, const config::KeyValueMap& /*cr_kvmap*/,
+    GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
             std::shared_ptr<data::GpsData> pData, bool vGndMode);
+
     /**
      * @fn ~GpsFeed
      * @brief Destructor
      */
     virtual ~GpsFeed() noexcept;
+
     /**
      * @fn process
      * @brief Handle GpsdClients response.
      * @param cr_res The response to process
      * @override Feed::process
      */
-    void process(const std::string& cr_res) noexcept override;
+    void process(const std::string& crResponse) noexcept override;
 
 private:
     /// Parser to unpack response from Client
     parser::GpsParser mParser;
+
     ///
     std::size_t mDataSlot;
 

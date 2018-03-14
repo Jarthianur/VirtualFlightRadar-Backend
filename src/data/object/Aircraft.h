@@ -151,14 +151,6 @@ public:
     virtual ~Aircraft() noexcept;
 
     /**
-     * @fn operator==
-     * @brief Compare two aircrafts by their Id.
-     * @param crOther The Aircraft to compare
-     * @return true, if Id's are equal, else false
-     */
-    bool operator==(const Aircraft& crOther) const;
-
-    /**
      * @fn update
      * @brief Update this Aircraft.
      * @param crUpdate  Other Aircraft with new data
@@ -209,7 +201,7 @@ public:
      * @brief Get the current update age.
      * @return the update age by reference
      */
-    std::uint64_t& getUpdateAge();
+    std::uint32_t& getUpdateAge();
 
     /**
      * @fn getLatitude
@@ -252,8 +244,6 @@ public:
      * @return the climb rate
      */
     double getClimbRate() const;
-
-    const std::string& getSerialized() const;
 
     /**
      * @fn setId
@@ -321,10 +311,8 @@ public:
      */
     void setFullInfo(bool vInfo = true);
 
-    void setSerialized(const std::string& crSerial);
-
 private:
-    bool canUpdate(const Object& crOther, std::uint64_t vAttempts) const override;
+    bool canUpdate(const Object& crOther, std::uint32_t vAttempts) const override;
 
     /// @var mId
     /// Aircraft identifier
@@ -355,9 +343,7 @@ private:
 
     /// @var mUpdateAge
     /// Times processed without update.
-    std::uint64_t mUpdateAge = 0;
-
-    std::string mSerialized;
+    std::uint32_t mUpdateAge = 0;
 };
 
 }  // namespace object

@@ -76,7 +76,7 @@ public:
     void run() noexcept;
 
     /// Atomic run-status. By this, every component may determine if the VFRB stops.
-    static std::atomic<bool> global_run_status;
+    static std::atomic<bool> vRunStatus;
 
 private:
     /**

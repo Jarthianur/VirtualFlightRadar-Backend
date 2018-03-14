@@ -30,7 +30,6 @@ namespace data
 {
 namespace object
 {
-
 struct Climate
 {
     Wind mWind;
@@ -38,15 +37,14 @@ struct Climate
 
     inline bool hasAtmosphere()
     {
-        return !mAtmosphere.mMdaStr.empty();
+        return !mAtmosphere.mSerialized.empty();
     }
 
     inline bool hasWind()
     {
-        return !mWind.mMwvStr.empty();
+        return !mWind.mSerialized.empty();
     }
 };
 
 }  // namespace util
-
 }

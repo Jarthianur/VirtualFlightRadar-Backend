@@ -21,11 +21,10 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <string>
-
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
 
 namespace feed
 {
@@ -52,22 +51,26 @@ public:
      * Non-copyable
      */
     Client(const Client&) = delete;
+
     /**
      * Not assignable
      */
     Client& operator=(const Client&) = delete;
+
     /**
      * @fn ~Client
      * @brief Destructor
      */
     virtual ~Client() noexcept;
+
     /**
      * @fn run
      * @brief Run the Client.
      * @note Returns after all queued handlers have returned.
      * @param r_sigset The signal set reference to register handler
      */
-    void run(boost::asio::signal_set& r_sigset);
+    void run(boost::asio::signal_set& rSigset);
+
     /**
      * @fn stop
      * @brief Stop the Client and close the connection.
@@ -83,37 +86,44 @@ protected:
      * @param cr_comp  The component name
      * @param r_feed   The handler Feed reference
      */
-    Client(const std::string& cr_host, const std::string& cr_port,
-           const std::string& cr_comp, feed::Feed& r_feed);
+    Client(const std::string& crHost, const std::string& crPort,
+           const std::string& crComponent, feed::Feed& rFeed);
+
     /**
      * @fn timedConnect
      * @brief Connect after timeout.
      */
     void timedConnect();
+
     /**
      * @fn read
      * @brief Read from remote endpoint.
      */
     virtual void read();
+
     /**
      * @fn connect
      * @brief Connect to host.
      * @note To be implemented.
      */
     virtual void connect() = 0;
+
     /**
      * @fn handleTimedConnect
      * @brief Handler for timedConnect.
      * @param cr_ec The error code
      */
-    void handleTimedConnect(const boost::system::error_code& cr_ec) noexcept;
+    void handleTimedConnect(const boost::system::error_code& crError) noexcept;
+
     /**
      * @fn handleRead
      * @brief Handler for read.
      * @param cr_ec The error code
      * @param s     The sent bytes
      */
-    void handleRead(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
+    void handleRead(const boost::system::error_code& crError,
+                    std::size_t vBytes) noexcept;
+
     /**
      * @fn handleResolve
      * @brief Handler for resolve host.
@@ -121,9 +131,11 @@ protected:
      * @param cr_ec The error code
      * @param it    The resolve iterator
      */
-    virtual void handleResolve(const boost::system::error_code& cr_ec,
-                               boost::asio::ip::tcp::resolver::iterator it) noexcept
+    virtual void
+    handleResolve(const boost::system::error_code& crError,
+                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
         = 0;
+
     /**
      * @fn handleConnect
      * @brief Handler for connect.
@@ -131,26 +143,35 @@ protected:
      * @param cr_ec The error code
      * @param it    The resolve iterator
      */
-    virtual void handleConnect(const boost::system::error_code& cr_ec,
-                               boost::asio::ip::tcp::resolver::iterator it) noexcept
+    virtual void
+    handleConnect(const boost::system::error_code& crError,
+                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
         = 0;
 
     /// Internal IO-service
     boost::asio::io_service mIoService;
+
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
+
     /// Resolver
     boost::asio::ip::tcp::resolver mResolver;
+
     /// Response string
     std::string mResponse;
+
     /// Read buffer
     boost::asio::streambuf mBuffer;
+
     /// Hostname
     const std::string mHost;
+
     /// Port
     const std::string mPort;
+
     /// Component string used for logging
     const std::string mComponent;
+
     /// Handler Feed reference
     feed::Feed& mrFeed;
 

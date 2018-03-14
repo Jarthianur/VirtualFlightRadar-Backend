@@ -32,7 +32,7 @@ namespace data
 AtmosphereData::AtmosphereData() : Data()
 {}
 
-AtmosphereData::AtmosphereData(const Atmosphere& crAtmos) : Data(), mAtmosphere(crAtmos)
+AtmosphereData::AtmosphereData(const Atmosphere& crAtmosphere) : Data(), mAtmosphere(crAtmosphere)
 {}
 
 AtmosphereData::~AtmosphereData() noexcept
@@ -41,15 +41,15 @@ AtmosphereData::~AtmosphereData() noexcept
 std::string AtmosphereData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mAtmosphere.getMdaStr();
+    return mAtmosphere.getSerialized();
 }
 
-bool AtmosphereData::update(const Object& crAtmos, std::size_t vSlot)
+bool AtmosphereData::update(const Object& crAtmosphere, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     try
     {
-        bool updated = mAtmosphere.tryUpdate(crAtmos, ++mAttempts.at(vSlot));
+        bool updated = mAtmosphere.tryUpdate(crAtmosphere, ++mAttempts.at(vSlot));
         if(updated)
         {
             std::fill(mAttempts.begin(), mAttempts.end(), 0);
@@ -68,7 +68,7 @@ std::size_t AtmosphereData::registerSlot()
     return mAttempts.size() - 1;
 }
 
-double AtmosphereData::getAtmPress()
+double AtmosphereData::getAtmPressure()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     return mAtmosphere.getPressure();

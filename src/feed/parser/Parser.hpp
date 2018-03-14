@@ -42,12 +42,14 @@ public:
      */
     inline Parser()
     {}
+
     /**
      * @fn ~Parser
      * @brief Destructor
      */
     inline virtual ~Parser() noexcept
     {}
+
     /**
      * @fn unpack
      * @brief Unpack a given string into the templated object.
@@ -56,7 +58,7 @@ public:
      * @tparam T     The object where to unpack into
      * @return true on success, else false
      */
-    virtual bool unpack(const std::string& cr_msg, T&) noexcept = 0;
+    virtual bool unpack(const std::string& crStr, T&) noexcept = 0;
 };
 
 }  // namespace parser

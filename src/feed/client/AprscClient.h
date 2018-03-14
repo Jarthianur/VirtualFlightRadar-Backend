@@ -21,10 +21,10 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <string>
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "Client.h"
 
@@ -44,10 +44,12 @@ public:
      * Non-copyable
      */
     AprscClient(const AprscClient&) = delete;
+
     /**
      * Not assignable
      */
     AprscClient& operator=(const AprscClient&) = delete;
+
     /**
      * @fn AprscClient
      * @brief Constructor
@@ -56,8 +58,8 @@ public:
      * @param cr_login The login string to transmit
      * @param r_feed   The handler Feed reference
      */
-    AprscClient(const std::string& cr_host, const std::string& cr_port,
-                const std::string& cr_login, feed::Feed& r_feed);
+    AprscClient(const std::string& crHost, const std::string& crPort,
+                const std::string& crLogin, feed::Feed& rFeed);
     /**
      * @fn ~AprscClient
      * @brief Destructor
@@ -70,49 +72,60 @@ private:
      * @override Client::connect
      */
     void connect() override;
+
     /**
      * @fn stop
      * @brief Cancel timer before stop.
      * @override Client::stop
      */
     void stop() override;
+
     /**
      * @fn sendKaBeacon
      * @brief Send a keep-alive beacon to APRSC every 10 minutes.
      */
-    void sendKaBeacon();
+    void sendKeepAliveBeacon();
+
     /**
      * @fn handleResolve
      * @override Client::handleResolve
      */
-    void handleResolve(const boost::system::error_code& cr_ec,
-                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    void
+    handleResolve(const boost::system::error_code& crError,
+                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+
     /**
      * @fn handleConnect
      * @override Client::handleConnect
      */
-    void handleConnect(const boost::system::error_code& cr_ec,
-                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    void
+    handleConnect(const boost::system::error_code& crError,
+                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+
     /**
      * @fn handleLogin
      * @brief Handler fro send login string.
      * @param cr_ec The error code
      * @param s     The sent bytes
      */
-    void handleLogin(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
+    void handleLogin(const boost::system::error_code& crError,
+                     std::size_t vBytes) noexcept;
+
     /**
      * @fn handleSendKaBeacon
      * @brief Handler for sendKaBeacon
      * @param cr_ec The error code
      * @param s     The sent bytes
      */
-    void handleSendKaBeacon(const boost::system::error_code& cr_ec,
-                            std::size_t s) noexcept;
+    void handleSendKaBeacon(const boost::system::error_code& crError,
+                            std::size_t vBytes) noexcept;
 
     /// Login string
     std::string mLoginStr;
+
     /// Client stopped?
     bool mStopped;
+
     /// Beacon timer
     boost::asio::deadline_timer mTimeout;
 };

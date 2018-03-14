@@ -66,7 +66,7 @@ public:
      */
     std::string process(const object::Aircraft& crAircraft) override;
 
-    void setRelatives(const object::GpsPosition& crRelPos, double vAtmPress);
+    void setRefered(const object::GpsPosition& crRefPosition, double vAtmPress);
 
 private:
     /**
@@ -104,27 +104,27 @@ private:
 
     /// @var mtRadLatB
     /// Base latitude as radian
-    double mtRadLatB = 0.0;
+    double mtReferedLatRad = 0.0;
 
     ///@var mtRadLatAc
     /// Aircraft latitude as radian
-    double mtRadLatAc = 0.0;
+    double mtAircraftLatRad = 0.0;
 
     /// @var mtLatDist
     /// Distance/Difference between Aircrafts and bases latitude
-    double mtLatDist = 0.0;
+    double mtLatDistance = 0.0;
 
     /// @var mtRadLongB
     /// Base longitude as radian
-    double mtRadLongB = 0.0;
+    double mtReferedLonRad = 0.0;
 
     ///@var mtRadLongAc
     /// Aircraft longitude as radian
-    double mtRadLongAc = 0.0;
+    double mtAircraftLonRad = 0.0;
 
     /// @var mtLongDist
     /// Distance/Difference between Aircraft and base longitude
-    double mtLongDist = 0.0;
+    double mtLonDistance = 0.0;
 
     /// @var mtBearingRel
     /// Relative bearing
@@ -136,19 +136,19 @@ private:
 
     /// @var mtRelN
     /// Relative distance in northern direction; m
-    std::int32_t mtRelN = 0;
+    std::int32_t mtRelNorth = 0;
 
     /// @var mtRelE
     /// Relative distance in eastern direction; m
-    std::int32_t mtRelE = 0;
+    std::int32_t mtRelEast = 0;
 
     /// @var mtRelV
     /// Relative vertical distance; m
-    std::int32_t mtRelV = 0;
+    std::int32_t mtRelVertical = 0;
 
     /// @var mtDist
     /// Distance between Aircraft and base; m
-    std::int32_t mtDist = 0;
+    std::int32_t mtDistance = 0;
 };
 
 }  // namespace aircraft

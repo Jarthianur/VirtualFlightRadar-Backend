@@ -24,17 +24,17 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include "../Logger.hpp"
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../data/object/Aircraft.h"
-#include "../Logger.hpp"
 #include "client/AprscClient.h"
 
 namespace feed
 {
-AprscFeed::AprscFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
+AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
                      std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
-    : Feed(cr_name, cr_kvmap), mParser(vMaxHeight), mpData(pData)
+    : Feed(crName, crKvMap), mParser(vMaxHeight), mpData(pData)
 {
     auto it = mKvMap.find(KV_KEY_LOGIN);
     if(it == mKvMap.end())
@@ -51,10 +51,10 @@ AprscFeed::AprscFeed(const std::string& cr_name, const config::KeyValueMap& cr_k
 AprscFeed::~AprscFeed() noexcept
 {}
 
-void AprscFeed::process(const std::string& cr_res) noexcept
+void AprscFeed::process(const std::string& crResponse) noexcept
 {
     data::object::Aircraft ac(getPriority());
-    if(mParser.unpack(cr_res, ac))
+    if(mParser.unpack(crResponse, ac))
     {
         mpData->update(ac, mDataSlot);
     }

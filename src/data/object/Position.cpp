@@ -37,6 +37,7 @@ ExtGpsPosition::~ExtGpsPosition() noexcept
 
 void ExtGpsPosition::assign(const Object& crOther)
 {
+    Object::assign(crOther);
     const ExtGpsPosition& crUpdate = static_cast<const ExtGpsPosition&>(crOther);
     this->position                 = crUpdate.position;
     this->nrSats                   = crUpdate.nrSats;
@@ -44,8 +45,6 @@ void ExtGpsPosition::assign(const Object& crOther)
     this->geoid                    = crUpdate.geoid;
     this->dilution                 = crUpdate.dilution;
     this->ground                   = crUpdate.ground;
-    this->mLastPriority            = crUpdate.mLastPriority;
-
 }
 }
 }

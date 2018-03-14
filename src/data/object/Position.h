@@ -54,6 +54,7 @@ public:
     explicit ExtGpsPosition(std::uint32_t vPriority, bool vGround = false);
     explicit ExtGpsPosition(const GpsPosition& crPosition, double vGeoid, bool vGround);
     virtual ~ExtGpsPosition() noexcept;
+
     void assign(const Object& crOther) override;
 
     /// Position

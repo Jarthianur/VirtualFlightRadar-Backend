@@ -29,9 +29,9 @@ namespace feed
 {
 namespace client
 {
-SbsClient::SbsClient(const std::string& cr_host, const std::string& cr_port,
-                     feed::Feed& r_feed)
-    : Client(cr_host, cr_port, "(SbsClient)", r_feed)
+SbsClient::SbsClient(const std::string& crHost, const std::string& crPort,
+                     feed::Feed& rFeed)
+    : Client(crHost, crPort, "(SbsClient)", rFeed)
 {
     connect();
 }
@@ -48,19 +48,20 @@ void SbsClient::connect()
                                                boost::asio::placeholders::iterator));
 }
 
-void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
-                              boost::asio::ip::tcp::resolver::iterator it) noexcept
+void SbsClient::handleResolve(
+    const boost::system::error_code& crError,
+    boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
 {
-    if(!cr_ec)
+    if(!crError)
     {
-        boost::asio::async_connect(mSocket, it,
+        boost::asio::async_connect(mSocket, vResolverIt,
                                    boost::bind(&SbsClient::handleConnect, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
     }
     else
     {
-        Logger::error("(SbsClient) resolve host: ", cr_ec.message());
+        Logger::error("(SbsClient) resolve host: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -69,10 +70,10 @@ void SbsClient::handleResolve(const boost::system::error_code& cr_ec,
     }
 }
 
-void SbsClient::handleConnect(const boost::system::error_code& cr_ec,
-                              boost::asio::ip::tcp::resolver::iterator it) noexcept
+void SbsClient::handleConnect(const boost::system::error_code& crError,
+                              boost::asio::ip::tcp::resolver::iterator) noexcept
 {
-    if(!cr_ec)
+    if(!crError)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
         Logger::info("(SbsClient) connected to: ", mHost, ":", mPort);
@@ -80,7 +81,7 @@ void SbsClient::handleConnect(const boost::system::error_code& cr_ec,
     }
     else
     {
-        Logger::error("(SbsClient) connect: ", cr_ec.message());
+        Logger::error("(SbsClient) connect: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();

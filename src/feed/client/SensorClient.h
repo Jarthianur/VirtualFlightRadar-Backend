@@ -21,13 +21,14 @@
 
 #pragma once
 
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <string>
 
 #include "Client.h"
 
-namespace feed {
+namespace feed
+{
 class Feed;
 } /* namespace feed */
 
@@ -54,10 +55,12 @@ public:
      * Non-copyable
      */
     SensorClient(const SensorClient&) = delete;
+
     /**
      * Not assignable
      */
     SensorClient& operator=(const SensorClient&) = delete;
+
     /**
      * @fn SensorClient
      * @brief Constructor
@@ -66,8 +69,8 @@ public:
      * @param cr_login The login string to transmit
      * @param r_feed   The handler Feed reference
      */
-    SensorClient(const std::string& cr_host, const std::string& cr_port,
-                 feed::Feed& r_feed);
+    SensorClient(const std::string& crHost, const std::string& crPort, feed::Feed& rFeed);
+
     /**
      * @fn ~SensorClient
      * @brief Destructor
@@ -81,37 +84,45 @@ private:
      * @override Client::read
      */
     void read() override;
+
     /**
      * @fn connect
      * @override Client::connect
      */
     void connect() override;
+
     /**
      * @fn checkDeadline
      * @brief Check read timeout deadline reached.
      */
     void checkDeadline();
+
     /**
      * @fn stop
      * @brief Cancel timer before stop.
      * @override Client::stop
      */
     void stop() override;
+
     /**
      * @fn handleResolve
      * @override Client::handleResolve
      */
-    void handleResolve(const boost::system::error_code& cr_ec,
-                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    void
+    handleResolve(const boost::system::error_code& crError,
+                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+
     /**
      * @fn handleConnect
      * @override Client::handleConnect
      */
-    void handleConnect(const boost::system::error_code& cr_ec,
-                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    void
+    handleConnect(const boost::system::error_code& crError,
+                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 
     /// Client stopped?
     bool mStopped;
+
     /// Read timer
     boost::asio::deadline_timer mTimeout;
 };

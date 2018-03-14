@@ -49,28 +49,27 @@ SbsParser::SbsParser(std::int32_t vMaxHeight)
 SbsParser::~SbsParser() noexcept
 {}
 
-bool SbsParser::unpack(const std::string& cr_msg, Aircraft& r_ac) noexcept
+bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
 {
     std::size_t p   = 6, delim;
     std::uint32_t i = 2;
 
-    if(cr_msg.find(',', p) == std::string::npos
-       || !(cr_msg.size() > 4 && cr_msg[4] == '3'))
+    if(crStr.find(',', p) == std::string::npos || !(crStr.size() > 4 && crStr[4] == '3'))
     {
         return false;
     }
-    while((delim = cr_msg.find(',', p)) != std::string::npos && i < 16)
+    while((delim = crStr.find(',', p)) != std::string::npos && i < 16)
     {
-        if(!parseField(i++, cr_msg.substr(p, delim - p), r_ac))
+        if(!parseField(i++, crStr.substr(p, delim - p), rAircraft))
         {
             return false;
         }
         p = delim + 1;
     }
-    r_ac.setFullInfo(false);
-    r_ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-    r_ac.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
-    r_ac.setIdType(Aircraft::IdType::ICAO);
+    rAircraft.setFullInfo(false);
+    rAircraft.setTargetType(Aircraft::TargetType::TRANSPONDER);
+    rAircraft.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
+    rAircraft.setIdType(Aircraft::IdType::ICAO);
     return true;
 }
 

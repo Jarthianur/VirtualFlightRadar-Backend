@@ -24,17 +24,17 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include "../Logger.hpp"
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
 #include "../data/object/Position.h"
-#include "../Logger.hpp"
 #include "client/GpsdClient.h"
 
 namespace feed
 {
-GpsFeed::GpsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
+GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
                  std::shared_ptr<data::GpsData> pData, bool vGndMode)
-    : Feed(cr_name, cr_kvmap), mpData(pData), mGndModeEnabled(vGndMode)
+    : Feed(crName, crKvMap), mpData(pData), mGndModeEnabled(vGndMode)
 {
     mpClient  = std::unique_ptr<client::Client>(new client::GpsdClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
@@ -44,10 +44,10 @@ GpsFeed::GpsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap
 GpsFeed::~GpsFeed() noexcept
 {}
 
-void GpsFeed::process(const std::string& cr_res) noexcept
+void GpsFeed::process(const std::string& crResponse) noexcept
 {
     data::object::ExtGpsPosition pos(getPriority(), mGndModeEnabled);
-    if(mParser.unpack(cr_res, pos))
+    if(mParser.unpack(crResponse, pos))
     {
         try
         {

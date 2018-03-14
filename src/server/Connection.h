@@ -21,11 +21,11 @@
 
 #pragma once
 
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/move/core.hpp>
-#include <string>
+#include <boost/shared_ptr.hpp>
 
 namespace server
 {
@@ -41,39 +41,46 @@ public:
      * Non-copyable
      */
     Connection(const Connection&) = delete;
+
     /**
      * Not assignable
      */
     Connection& operator=(const Connection&) = delete;
+
     /**
      * @fn ~Connection
      * @brief Destructor
      */
     virtual ~Connection() noexcept;
+
     /**
      * @fn start
      * @brief Start a Connection.
      * @param socket The socket
      * @return a shared ptr to the Connection object
      */
-    static boost::shared_ptr<Connection> start(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket);
+    static boost::shared_ptr<Connection> start(BOOST_RV_REF(boost::asio::ip::tcp::socket)
+                                                   rvSocket);
+
     /**
      * @fn stop
      * @brief Stop the connection, shutdown and close socket.
      */
     void stop();
+
     /**
      * @fn getSocket
      * @brief Get the socket as reference.
      * @return the socket ref
      */
     boost::asio::ip::tcp::socket& getSocket();
+
     /**
      * @fn getIp
      * @brief Get the endpoints IP address.
      * @return the IP address
      */
-    const std::string& getIp();
+    const std::string& getIpAddress() const;
 
 private:
     /**
@@ -81,11 +88,13 @@ private:
      * @brief Constructor
      * @param socket The socket
      */
-    explicit Connection(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket);
+    explicit Connection(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket);
+
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
+
     /// IP address
-    const std::string mIp;
+    const std::string mIpAddress;
 };
 
 }  // namespace server

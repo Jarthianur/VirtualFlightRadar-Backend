@@ -21,8 +21,8 @@
 
 #include "GpsData.h"
 
-#include <stdexcept>
 #include <algorithm>
+#include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
 /// Define GPS metrics
@@ -37,7 +37,7 @@ namespace data
 GpsData::GpsData() : Data()
 {}
 
-GpsData::GpsData(const ExtGpsPosition& crPosition) : Data(), mBasePos(crPosition)
+GpsData::GpsData(const ExtGpsPosition& crPosition) : Data(), mPosition(crPosition)
 {}
 
 GpsData::~GpsData() noexcept
@@ -46,27 +46,28 @@ GpsData::~GpsData() noexcept
 std::string GpsData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mProcessor.process(mBasePos);
+    return mPosition.getSerialized();
 }
 
 bool GpsData::update(const Object& crPosition, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    if(mPosLocked)
+    if(mPositionLocked)
     {
         throw std::runtime_error("Position was locked before.");
     }
     try
     {
-        bool updated = mBasePos.tryUpdate(crPosition, ++mAttempts.at(vSlot));
+        bool updated = mPosition.tryUpdate(crPosition, ++mAttempts.at(vSlot));
         if(updated)
         {
             std::fill(mAttempts.begin(), mAttempts.end(), 0);
+            mPosition.setSerialized(mProcessor.process(mPosition));
         }
-        return (mPosLocked = updated && mBasePos.ground
-                             && (mBasePos.nrSats >= GPS_NR_SATS_GOOD
-                                 && mBasePos.fixQa >= GPS_FIX_GOOD
-                                 && mBasePos.dilution <= GPS_HOR_DILUTION_GOOD));
+        return (mPositionLocked = updated && mPosition.ground
+                                  && (mPosition.nrSats >= GPS_NR_SATS_GOOD
+                                      && mPosition.fixQa >= GPS_FIX_GOOD
+                                      && mPosition.dilution <= GPS_HOR_DILUTION_GOOD));
     }
     catch(const std::out_of_range&)
     {
@@ -83,7 +84,7 @@ std::size_t GpsData::registerSlot()
 GpsPosition GpsData::getGpsPosition()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mBasePos.position;
+    return mPosition.position;
 }
 
 }  // namespace data

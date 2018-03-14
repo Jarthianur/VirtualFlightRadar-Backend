@@ -80,12 +80,13 @@ public:
      * @param rAttempts  The update attempts
      */
     bool update(const object::Object& crPosition, std::size_t vSlot) override;
+
     std::size_t registerSlot() override;
 
 private:
     /// @var mBasePos
     /// Wrapper holding the base position
-    object::ExtGpsPosition mBasePos;
+    object::ExtGpsPosition mPosition;
 
     /// @var mGpsModule
     /// GpsModule providing functionality to build GPS sentences
@@ -93,7 +94,7 @@ private:
 
     /// @var mPosLocked
     /// Locking state of the current position
-    bool mPosLocked = false;
+    bool mPositionLocked = false;
 
     std::vector<std::uint32_t> mAttempts;
 };

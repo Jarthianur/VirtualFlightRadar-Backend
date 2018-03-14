@@ -21,13 +21,13 @@
 
 #pragma once
 
+#include <cstdint>
+#include <string>
+#include <vector>
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/thread/mutex.hpp>
-#include <cstdint>
-#include <string>
-#include <vector>
 
 #include "Connection.h"
 
@@ -50,35 +50,40 @@ public:
      * Non-copyable
      */
     Server(const Server&) = delete;
+
     /**
      * Not assignable
      */
     Server& operator=(const Server&) = delete;
+
     /**
      * @fn Server
      * @brief Constructor
      * @param r_sigset The signal set
      * @param port     The port
      */
-    explicit Server(std::uint16_t port);
+    explicit Server(std::uint16_t vPort);
+
     /**
      * @fn ~Server
      * @brief Destructor
      */
     virtual ~Server() noexcept;
+
     /**
      * @fn run
      * @brief Run the Server.
      * @note Returns after all operations in the queue have returned.
      */
-    void run(boost::asio::signal_set& r_sigset);
+    void run(boost::asio::signal_set& rSigset);
+
     /**
      * @fn writeToAll
      * @brief Write a message to all clients.
      * @param cr_msg The msg to write
      * @threadsafe
      */
-    void writeToAll(const std::string& cr_msg);
+    void send(const std::string& crStr);
 
 private:
     /**
@@ -86,40 +91,48 @@ private:
      * @brief Accept connections.
      */
     void accept();
+
     /**
      * @fn awaitStop
      * @brief Register stop-handler to signal set.
      */
-    void awaitStop(boost::asio::signal_set& r_sigset);
+    void awaitStop(boost::asio::signal_set& rSigset);
+
     /**
      * @fn stopAll
      * @brief Stop all connections.
      * @threadsafe
      */
     void stopAll();
+
     /**
      * @fn isConnected
      * @brief Check whether an ip address already exists in the Connection container.
      * @param cr_ip The ip address to check
      * @return true if the ip is already registered, else false
      */
-    bool isConnected(const std::string& cr_ip);
+    bool isConnected(const std::string& crIpAddress);
+
     /**
      * @fn handleAccept
      * @brief Handler for accept
      * @param cr_ec The error code
      * @threadsafe
      */
-    void handleAccept(const boost::system::error_code& cr_ec) noexcept;
+    void handleAccept(const boost::system::error_code& crError) noexcept;
 
     /// Mutex
     boost::mutex mMutex;
+
     /// Internal IO-service
     boost::asio::io_service mIOservice;
+
     /// Acceptor
     boost::asio::ip::tcp::acceptor mAcceptor;
+
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
+
     /// Vector holding Connections
     std::vector<boost::shared_ptr<Connection>> mClients;
 };

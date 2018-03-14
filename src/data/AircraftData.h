@@ -28,9 +28,9 @@
 #include <utility>
 #include <vector>
 
-#include "Data.h"
 #include "object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
+#include "Data.h"
 
 /// @def AC_OUTDATED
 /// Times until aircraft is outdated
@@ -90,7 +90,7 @@ public:
      * @return the string with all NMEA reports
      * @threadsafe
      */
-    void processAircrafts(const object::GpsPosition& crBasePos,
+    void processAircrafts(const object::GpsPosition& crRefPosition,
                           double vAtmPress) noexcept;
 
 private:

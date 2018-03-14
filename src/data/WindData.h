@@ -23,11 +23,11 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "Data.h"
 #include "object/Wind.h"
+#include "Data.h"
 
 /// @namespace data
 namespace data

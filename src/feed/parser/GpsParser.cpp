@@ -50,16 +50,16 @@ GpsParser::GpsParser() : Parser()
 GpsParser::~GpsParser() noexcept
 {}
 
-bool GpsParser::unpack(const std::string& cr_msg,
-                       data::object::ExtGpsPosition& r_pos) noexcept
+bool GpsParser::unpack(const std::string& crStr,
+                       data::object::ExtGpsPosition& rPosition) noexcept
 {
     try
     {
         boost::smatch match;
-        return std::stoi(cr_msg.substr(cr_msg.rfind('*') + 1, 2), nullptr, 16)
-                   == math::checksum(cr_msg.c_str(), cr_msg.length())
-               && boost::regex_match(cr_msg, match, msGpggaRe)
-               && parsePosition(match, r_pos);
+        return std::stoi(crStr.substr(crStr.rfind('*') + 1, 2), nullptr, 16)
+                   == math::checksum(crStr.c_str(), crStr.length())
+               && boost::regex_match(crStr, match, msGpggaRe)
+               && parsePosition(match, rPosition);
     }
     catch(const std::logic_error&)
     {

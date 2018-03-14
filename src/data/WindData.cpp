@@ -21,8 +21,8 @@
 
 #include "WindData.h"
 
-#include <stdexcept>
 #include <algorithm>
+#include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
 using namespace data::object;
@@ -41,8 +41,8 @@ WindData::~WindData() noexcept
 std::string WindData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    std::string tmp(mWind.getMwvStr());
-    mWind.setMwvStr("");
+    std::string tmp(mWind.getSerialized());
+    mWind.setSerialized("");
     return tmp;
 }
 

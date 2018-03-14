@@ -25,10 +25,10 @@
 
 #include "../config/Configuration.h"
 #include "../data/AtmosphereData.h"
+#include "../data/WindData.h"
 #include "../data/object/Atmosphere.h"
 #include "../data/object/Climate.h"
 #include "../data/object/Wind.h"
-#include "../data/WindData.h"
 #include "client/SensorClient.h"
 
 namespace feed

@@ -30,9 +30,9 @@
 
 namespace feed
 {
-SbsFeed::SbsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
+SbsFeed::SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
                  std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
-    : Feed(cr_name, cr_kvmap), mParser(vMaxHeight), mpData(pData)
+    : Feed(crName, crKvMap), mParser(vMaxHeight), mpData(pData)
 {
     mpClient  = std::unique_ptr<client::Client>(new client::SbsClient(
         mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
@@ -42,10 +42,10 @@ SbsFeed::SbsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap
 SbsFeed::~SbsFeed() noexcept
 {}
 
-void SbsFeed::process(const std::string& cr_res) noexcept
+void SbsFeed::process(const std::string& crResponse) noexcept
 {
     data::object::Aircraft ac(getPriority());
-    if(mParser.unpack(cr_res, ac))
+    if(mParser.unpack(crResponse, ac))
     {
         mpData->update(ac, mDataSlot);
     }

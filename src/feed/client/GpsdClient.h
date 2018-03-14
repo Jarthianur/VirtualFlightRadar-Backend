@@ -21,10 +21,10 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <string>
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "Client.h"
 
@@ -44,10 +44,12 @@ public:
      * Non-copyable
      */
     GpsdClient(const GpsdClient&) = delete;
+
     /**
      * Not assignable
      */
     GpsdClient& operator=(const GpsdClient&) = delete;
+
     /**
      * @fn GpsdClient
      * @brief Constructor
@@ -56,8 +58,8 @@ public:
      * @param cr_login The login string to transmit
      * @param r_feed   The handler Feed reference
      */
-    GpsdClient(const std::string& cr_host, const std::string& cr_port,
-               feed::Feed& r_feed);
+    GpsdClient(const std::string& crHost, const std::string& crPort, feed::Feed& rFeed);
+
     /**
      * @fn ~GpsdClient
      * @brief Destructor
@@ -70,31 +72,38 @@ private:
      * @override Client::connect
      */
     void connect() override;
+
     /**
      * @fn stop
      * @brief Send unwatch-request to server before stop.
      * @override Client::stop
      */
     void stop() override;
+
     /**
      * @fn handleResolve
      * @override Client::handleResolve
      */
-    void handleResolve(const boost::system::error_code& cr_ec,
-                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    void
+    handleResolve(const boost::system::error_code& crError,
+                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+
     /**
      * @fn handleConnect
      * @override Client::handleConnect
      */
-    void handleConnect(const boost::system::error_code& cr_ec,
-                       boost::asio::ip::tcp::resolver::iterator it) noexcept override;
+    void
+    handleConnect(const boost::system::error_code& crError,
+                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+
     /**
      * @fn handleWatch
      * @brief Handler for send watch-reques
      * @param cr_ec The error code
      * @param s     The sent bytes
      */
-    void handleWatch(const boost::system::error_code& cr_ec, std::size_t s) noexcept;
+    void handleWatch(const boost::system::error_code& crError,
+                     std::size_t vBytes) noexcept;
 };
 
 }  // namespace client

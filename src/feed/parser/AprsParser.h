@@ -42,23 +42,26 @@ class AprsParser : public Parser<data::object::Aircraft>
 {
 public:
     AprsParser();
+
     /**
      * @fn AprsParser
      * @brief Constructor
      */
     explicit AprsParser(std::int32_t vMaxHeight);
+
     /**
      * @fn ~AprsParser
      * @brief Destructor
      */
     virtual ~AprsParser() noexcept;
+
     /**
      * @fn unpack
      * @brief Unpack into Aircraft.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& cr_msg,
-                data::object::Aircraft& r_ac) noexcept override;
+    bool unpack(const std::string& crStr,
+                data::object::Aircraft& rAircraft) noexcept override;
 
 private:
     // cppcheck-suppress unusedPrivateFunction
@@ -74,6 +77,7 @@ private:
     static const boost::regex msAprsRe;
     /// Regular expression for OGN specific APRS extension
     static const boost::regex msAprsComRe;
+
     const std::int32_t mMaxHeight;
 };
 }

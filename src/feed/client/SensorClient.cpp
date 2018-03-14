@@ -31,9 +31,9 @@ namespace feed
 {
 namespace client
 {
-SensorClient::SensorClient(const std::string& cr_host, const std::string& cr_port,
-                           feed::Feed& r_feed)
-    : Client(cr_host, cr_port, "(SensorClient)", r_feed),
+SensorClient::SensorClient(const std::string& crHost, const std::string& crPort,
+                           feed::Feed& rFeed)
+    : Client(crHost, crPort, "(SensorClient)", rFeed),
       mStopped(false),
       mTimeout(mIoService)
 {
@@ -86,19 +86,20 @@ void SensorClient::stop()
     mTimeout.cancel();
 }
 
-void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
-                                 boost::asio::ip::tcp::resolver::iterator it) noexcept
+void SensorClient::handleResolve(
+    const boost::system::error_code& crError,
+    boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
 {
-    if(!cr_ec)
+    if(!crError)
     {
-        boost::asio::async_connect(mSocket, it,
+        boost::asio::async_connect(mSocket, vResolverIt,
                                    boost::bind(&SensorClient::handleConnect, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
     }
     else
     {
-        Logger::error("(SensorClient) resolve host: ", cr_ec.message());
+        Logger::error("(SensorClient) resolve host: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -107,10 +108,10 @@ void SensorClient::handleResolve(const boost::system::error_code& cr_ec,
     }
 }
 
-void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
-                                 boost::asio::ip::tcp::resolver::iterator it) noexcept
+void SensorClient::handleConnect(const boost::system::error_code& crError,
+                                 boost::asio::ip::tcp::resolver::iterator) noexcept
 {
-    if(!cr_ec)
+    if(!crError)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
         Logger::info("(SensorClient) connected to: ", mHost, ":", mPort);
@@ -118,7 +119,7 @@ void SensorClient::handleConnect(const boost::system::error_code& cr_ec,
     }
     else
     {
-        Logger::error("(SensorClient) connect: ", cr_ec.message());
+        Logger::error("(SensorClient) connect: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();

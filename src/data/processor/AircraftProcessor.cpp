@@ -47,49 +47,49 @@ AircraftProcessor::~AircraftProcessor() noexcept
 std::string AircraftProcessor::process(const Aircraft& crAircraft)
 {
     calcRelativePosition(crAircraft);
-    return mtDist <= mMaxDistance ? genPflauStr(crAircraft) + genPflaaStr(crAircraft)
-                                  : "";
+    return mtDistance <= mMaxDistance ? genPflauStr(crAircraft) + genPflaaStr(crAircraft)
+                                      : "";
 }
 
-void AircraftProcessor::setRelatives(const GpsPosition& crRelPos, double vAtmPress)
+void AircraftProcessor::setRefered(const GpsPosition& crRefPosition, double vAtmPress)
 {
-    mtReferedPosition = crRelPos;
-    mtAtmPressure = vAtmPress;
+    mtReferedPosition = crRefPosition;
+    mtAtmPressure     = vAtmPress;
 }
 
 void AircraftProcessor::calcRelativePosition(const Aircraft& crAircraft)
 {
-    mtRadLatB   = math::radian(mtReferedPosition.latitude);
-    mtRadLongB  = math::radian(mtReferedPosition.longitude);
-    mtRadLongAc = math::radian(crAircraft.getLongitude());
-    mtRadLatAc  = math::radian(crAircraft.getLatitude());
-    mtLongDist  = mtRadLongAc - mtRadLongB;
-    mtLatDist   = mtRadLatAc - mtRadLatB;
+    mtReferedLatRad  = math::radian(mtReferedPosition.latitude);
+    mtReferedLonRad  = math::radian(mtReferedPosition.longitude);
+    mtAircraftLonRad = math::radian(crAircraft.getLongitude());
+    mtAircraftLatRad = math::radian(crAircraft.getLatitude());
+    mtLonDistance    = mtAircraftLonRad - mtReferedLonRad;
+    mtLatDistance    = mtAircraftLatRad - mtReferedLatRad;
 
-    double a = std::pow(std::sin(mtLatDist / 2.0), 2.0)
-               + std::cos(mtRadLatB) * std::cos(mtRadLatAc)
-                     * std::pow(std::sin(mtLongDist / 2.0), 2.0);
-    mtDist = math::doubleToInt(6371000.0
-                               * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
+    double a = std::pow(std::sin(mtLatDistance / 2.0), 2.0)
+               + std::cos(mtReferedLatRad) * std::cos(mtAircraftLatRad)
+                     * std::pow(std::sin(mtLonDistance / 2.0), 2.0);
+    mtDistance = math::doubleToInt(
+        6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
 
-    mtBearingRel = math::degree(
-        std::atan2(std::sin(mtRadLongAc - mtRadLongB) * std::cos(mtRadLatAc),
-                   std::cos(mtRadLatB) * std::sin(mtRadLatAc)
-                       - std::sin(mtRadLatB) * std::cos(mtRadLatAc)
-                             * std::cos(mtRadLongAc - mtRadLongB)));
+    mtBearingRel = math::degree(std::atan2(
+        std::sin(mtAircraftLonRad - mtReferedLonRad) * std::cos(mtAircraftLatRad),
+        std::cos(mtReferedLatRad) * std::sin(mtAircraftLatRad)
+            - std::sin(mtReferedLatRad) * std::cos(mtAircraftLatRad)
+                  * std::cos(mtAircraftLonRad - mtReferedLonRad)));
     mtBearingAbs = std::fmod((mtBearingRel + 360.0), 360.0);
 
-    mtRelN = math::doubleToInt(std::cos(math::radian(mtBearingAbs)) * mtDist);
-    mtRelE = math::doubleToInt(std::sin(math::radian(mtBearingAbs)) * mtDist);
-    mtRelV = crAircraft.getTargetType() == Aircraft::TargetType::TRANSPONDER
-                 ? crAircraft.getAltitude() - math::icaoHeight(mtAtmPressure)
-                 : crAircraft.getAltitude() - mtReferedPosition.altitude;
+    mtRelNorth    = math::doubleToInt(std::cos(math::radian(mtBearingAbs)) * mtDistance);
+    mtRelEast     = math::doubleToInt(std::sin(math::radian(mtBearingAbs)) * mtDistance);
+    mtRelVertical = crAircraft.getTargetType() == Aircraft::TargetType::TRANSPONDER
+                        ? crAircraft.getAltitude() - math::icaoHeight(mtAtmPressure)
+                        : crAircraft.getAltitude() - mtReferedPosition.altitude;
 }
 
 std::string AircraftProcessor::genPflauStr(const Aircraft& crAircraft)
 {
     std::snprintf(mBuffer, sizeof(mBuffer), "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
-                  math::doubleToInt(mtBearingRel), mtRelV, mtDist,
+                  math::doubleToInt(mtBearingRel), mtRelVertical, mtDistance,
                   crAircraft.getId().c_str());
     std::string tmp(mBuffer);
     finishSentence(tmp);
@@ -102,16 +102,17 @@ std::string AircraftProcessor::genPflaaStr(const Aircraft& crAircraft)
     {
         std::snprintf(
             mBuffer, sizeof(mBuffer), "$PFLAA,0,%d,%d,%d,%d,%s,%03d,,%d,%3.1lf,%1x*",
-            mtRelN, mtRelE, mtRelV, static_cast<std::int32_t>(crAircraft.getIdType()),
-            crAircraft.getId().c_str(), math::doubleToInt(crAircraft.getHeading()),
+            mtRelNorth, mtRelEast, mtRelVertical,
+            static_cast<std::int32_t>(crAircraft.getIdType()), crAircraft.getId().c_str(),
+            math::doubleToInt(crAircraft.getHeading()),
             math::doubleToInt(crAircraft.getGndSpeed() * math::MS_2_KMH),
             crAircraft.getClimbRate(),
             static_cast<std::uint32_t>(crAircraft.getAircraftType()));
     }
     else
     {
-        std::snprintf(mBuffer, sizeof(mBuffer), "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", mtRelN,
-                      mtRelE, mtRelV, crAircraft.getId().c_str(),
+        std::snprintf(mBuffer, sizeof(mBuffer), "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*",
+                      mtRelNorth, mtRelEast, mtRelVertical, crAircraft.getId().c_str(),
                       static_cast<std::uint32_t>(crAircraft.getAircraftType()));
     }
     std::string tmp(mBuffer);

@@ -65,13 +65,13 @@ bool SensorParser::parseClimate(const std::string& crStr, data::object::Climate&
         double tmpPress = std::stod(crStr.substr(tmpS, subLen), &numIdx) * 1000.0;
         if((valid = (numIdx == subLen)))
         {
-            rClimate.mAtmosphere.setMdaStr(crStr + "\n");
+            rClimate.mAtmosphere.setSerialized(crStr + "\n");
             rClimate.mAtmosphere.setPressure(tmpPress);
         }
     }
     else if(crStr.find("MWV") != std::string::npos)
     {
-        rClimate.mWind.setMwvStr(crStr + "\n");
+        rClimate.mWind.setSerialized(crStr + "\n");
     }
     return valid;
 }

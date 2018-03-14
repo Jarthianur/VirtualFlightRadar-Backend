@@ -21,11 +21,11 @@
 
 #pragma once
 
-#include <boost/asio/signal_set.hpp>
-#include <boost/move/core.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <boost/asio/signal_set.hpp>
+#include <boost/move/core.hpp>
 
 #include "../config/PropertyMap.h"
 
@@ -82,6 +82,7 @@ public:
     virtual void process(const std::string& crResponse) noexcept = 0;
 
     const std::string& getName() const;
+
     std::uint32_t getPriority() const;
 
 protected:

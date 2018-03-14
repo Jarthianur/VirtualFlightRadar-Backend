@@ -27,10 +27,11 @@
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "Feed.h"
 #include "parser/SbsParser.h"
+#include "Feed.h"
 
-namespace data {
+namespace data
+{
 class AircraftData;
 } /* namespace data */
 
@@ -51,20 +52,22 @@ public:
      * @param prio     The priority
      * @param cr_kvmap The properties map
      */
-    SbsFeed(const std::string& cr_name, const config::KeyValueMap& cr_kvmap,
+    SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
             std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
+
     /**
      * @fn ~SbsFeed
      * @brief Destructor
      */
     virtual ~SbsFeed() noexcept;
+
     /**
      * @fn process
      * @brief Handle SbsClients response.
      * @param cr_res The response to process
      * @override Feed::process
      */
-    void process(const std::string& cr_res) noexcept override;
+    void process(const std::string& crResponse) noexcept override;
 
 private:
     /// Parser to unpack response from Client

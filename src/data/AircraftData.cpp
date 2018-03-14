@@ -51,6 +51,7 @@ std::string AircraftData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     std::string tmp;
+    tmp.reserve(mContainer.size() * 128);
     for(auto& it : mContainer)
     {
         tmp += it.getUpdateAge() < AC_OUTDATED ? it.getSerialized() : "";
@@ -96,7 +97,7 @@ std::size_t AircraftData::registerSlot()
     return nrOfRegisteredFeeds - 1;
 }
 
-void AircraftData::processAircrafts(const GpsPosition& crBasePos,
+void AircraftData::processAircrafts(const GpsPosition& crRefPosition,
                                     double vAtmPress) noexcept
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
@@ -113,7 +114,6 @@ void AircraftData::processAircrafts(const GpsPosition& crBasePos,
             {
                 it->setTargetType(Aircraft::TargetType::TRANSPONDER);
             }
-
             if(it->getUpdateAge() >= AC_DELETE_THRESHOLD)
             {
                 del = true;
@@ -124,7 +124,7 @@ void AircraftData::processAircrafts(const GpsPosition& crBasePos,
             {
                 if(it->getUpdateAge() == 1)
                 {
-                    mProcessor.setRelatives(crBasePos, vAtmPress);
+                    mProcessor.setRefered(crRefPosition, vAtmPress);
                     it->setSerialized(mProcessor.process(*it));
                 }
                 ++it;

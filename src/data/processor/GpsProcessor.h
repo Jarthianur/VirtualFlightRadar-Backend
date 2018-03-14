@@ -59,7 +59,7 @@ private:
      * @param cr_pos The extended GPS information
      * @return the GPGGA sentence
      */
-    std::string genGpggaStr(const object::ExtGpsPosition& cr_pos);
+    std::string genGpggaStr(const object::ExtGpsPosition& crPosition);
 
     /**
      * @fn genGprmcStr
@@ -68,7 +68,7 @@ private:
      * @param cr_pos The extended GPS information
      * @return the GPRMC sentence
      */
-    std::string genGprmcStr(const object::ExtGpsPosition& cr_pos);
+    std::string genGprmcStr(const object::ExtGpsPosition& crPosition);
 
     void evalPosition(double vLatitude, double vLongitude);
 

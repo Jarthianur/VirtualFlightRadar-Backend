@@ -35,15 +35,9 @@ Atmosphere::~Atmosphere() noexcept
 
 void Atmosphere::assign(const Object& crOther)
 {
+    Object::assign(crOther);
     const Atmosphere& crUpdate = static_cast<const Atmosphere&>(crOther);
-    this->mMdaStr              = crUpdate.mMdaStr;
     this->mPressure            = crUpdate.mPressure;
-    this->mLastPriority        = crUpdate.mLastPriority;
-}
-
-const std::string& Atmosphere::getMdaStr() const
-{
-    return mMdaStr;
 }
 
 double Atmosphere::getPressure() const
@@ -51,15 +45,9 @@ double Atmosphere::getPressure() const
     return mPressure;
 }
 
-void Atmosphere::setMdaStr(const std::string& crStr)
-{
-    mMdaStr = crStr;
-}
-
 void Atmosphere::setPressure(double vPress)
 {
     mPressure = vPress;
 }
-
 }
 }

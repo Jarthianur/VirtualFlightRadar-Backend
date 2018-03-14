@@ -37,6 +37,7 @@ public:
      * @brief Constructor
      */
     Logger();
+
     /**
      * @fn ~Logger
      * @brief Destructor
@@ -131,7 +132,7 @@ public:
         log(mpErrStream, std::forward<T>(crMsg));
     }
 
-    static void setLogFile(std::ostream* pOut);
+    // static void setLogFile(std::ostream* pOut);
 
 private:
     /// Mutex
@@ -153,7 +154,6 @@ private:
         *pOut << std::forward<T>(head);
         log(pOut, std::forward<TRest>(tail)...);
     }
-
     template<typename T>
     static void log(std::ostream* pOut, T last)
     {

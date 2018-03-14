@@ -26,10 +26,11 @@
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "Feed.h"
 #include "parser/SensorParser.h"
+#include "Feed.h"
 
-namespace data {
+namespace data
+{
 class AtmosphereData;
 class WindData;
 } /* namespace data */

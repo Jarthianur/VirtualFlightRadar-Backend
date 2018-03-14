@@ -22,7 +22,6 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 
 #include "Object.h"
 
@@ -39,16 +38,9 @@ public:
     explicit Wind(std::uint32_t vPriority);
     virtual ~Wind() noexcept;
 
-    void assign(const Object& crOther);
-
-    const std::string& getMwvStr() const;
-    void setMwvStr(const std::string& crStr);
-
 private:
     friend struct Climate;
-    std::string mMwvStr;
 };
 
 }  // namespace util
-
 }
