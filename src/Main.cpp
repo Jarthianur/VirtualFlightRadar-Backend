@@ -55,10 +55,10 @@ int main(int argc, char** argv)
     {
         Logger::info(
             "usage: ./VirtualFlightRadar-Backend [OPTIONS] [-c | --config] path_to_file.ini\n"
-             "Run VFR-B with given config file.\n"
-             "The config file must be in valid '.ini' format!\n"
-             "OPTIONS:\n"
-             "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received.");
+            "Run VFR-B with given config file.\n"
+            "The config file must be in valid '.ini' format!\n"
+            "OPTIONS:\n"
+            "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received.");
         return -1;
     }
 

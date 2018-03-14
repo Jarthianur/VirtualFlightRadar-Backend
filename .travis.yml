@@ -9,6 +9,8 @@ addons:
     - g++-4.9
     - libboost-dev
     - libboost-all-dev
+    - cppcheck
+    - clang-format-5.0
 
 compiler:
     - g++-4.9
@@ -40,7 +42,10 @@ before_script:
     - popd
 
 script:
-    #- cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
+    # check codestyle
+    - cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
+    - for f in `find src/ -type f`; do diff -u <(cat "$f") <(clang-format-5.0 -style=file "$f"); done 2>&1 > format.diff
+    - if [ "`wc -l format.diff | cut -d' ' -f1`" -gt 0 ]; then $(exit 1); fi
     # initialize lines
     - lcov --initial --directory test/build --capture --output-file test_base.info
     - lcov --initial --directory target --capture --output-file vfrb_base.info
