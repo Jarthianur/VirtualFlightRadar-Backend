@@ -21,9 +21,9 @@
 
 #include "Logger.hpp"
 
-#include <chrono>
-#include <ctime>
 #include <boost/chrono.hpp>
+#include <ctime>
+#include <string>
 
 Logger::Logger()
 {}
@@ -39,9 +39,9 @@ std::string Logger::getTime()
 {
     std::time_t tt
         = boost::chrono::system_clock::to_time_t(boost::chrono::system_clock::now());
-    std::string time(asctime(gmtime(&tt)));
-    time.pop_back();
-    return time;
+    char time[32] = "";
+    std::strftime(time, 32, "%c", gmtime(&tt));
+        return std::string(time);
 }
 
 void Logger::setLogFile(std::ostream* pOut)

@@ -58,6 +58,7 @@ public:
                 data::object::Climate& rClimate) noexcept override;
 
 private:
+    // cppcheck-suppress unusedPrivateFunction
     bool parseClimate(const std::string& crStr, data::object::Climate& rClimate);
 };
 }

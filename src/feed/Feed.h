@@ -56,6 +56,7 @@ public:
      * @brief Move-constructor
      * @param The Feed to move
      */
+    // cppcheck-suppress noExplicitConstructor
     Feed(BOOST_RV_REF(Feed));
 
     /**

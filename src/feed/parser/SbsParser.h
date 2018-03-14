@@ -61,6 +61,7 @@ public:
                 data::object::Aircraft& r_ac) noexcept override;
 
 private:
+    // cppcheck-suppress unusedPrivateFunction
     bool parseField(std::uint32_t vField, const std::string& crStr,
                     data::object::Aircraft& rAircraft);
 

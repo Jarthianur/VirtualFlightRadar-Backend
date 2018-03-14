@@ -61,10 +61,13 @@ public:
                 data::object::Aircraft& r_ac) noexcept override;
 
 private:
+    // cppcheck-suppress unusedPrivateFunction
     bool parsePosition(const boost::smatch& crMatch, data::object::Aircraft& rAircraft);
 
+    // cppcheck-suppress unusedPrivateFunction
     bool parseComment(const boost::smatch& crMatch, data::object::Aircraft& rAircraft);
 
+    // cppcheck-suppress unusedPrivateFunction
     bool parseMovement(const boost::smatch& crMatch, data::object::Aircraft& rAircraft);
 
     /// Regular expression for APRS protocol
