@@ -29,7 +29,7 @@
 namespace config
 {
 /// @typedef KeyValueMap
-/// Map of key-value pairs
+/// Map key to value
 using KeyValueMap = std::unordered_map<std::string, std::string>;
 
 /// @typedef KeyValue
