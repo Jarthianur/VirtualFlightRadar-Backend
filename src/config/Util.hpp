@@ -26,7 +26,7 @@
 #include <list>
 #include <sstream>
 #include <string>
-#include <boost/tuple/tuple.hpp>
+#include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
 namespace config
@@ -34,15 +34,18 @@ namespace config
 namespace util
 {
 using Number    = boost::variant<std::int32_t, std::uint64_t, double>;
-using OptNumber = boost::tuple<bool, Number>;
+using OptNumber = boost::optional<Number>;
 
 template<typename T>
 inline OptNumber stringToNumber(const std::string& crStr)
 {
     std::stringstream ss(crStr);
     T result;
-    bool suc = ss >> result;
-    return boost::make_tuple(suc, Number(result));
+    if(ss >> result)
+    {
+        return Number(result);
+    }
+    return boost::none;
 }
 
 /**

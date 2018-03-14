@@ -26,13 +26,10 @@
 #include <string>
 #include <utility>
 
-#include "PropertyMap.h"
 #include "../data/object/Position.h"
+#include "PropertyMap.h"
 #include "Util.hpp"
 
-/// @namespace config
-namespace config
-{
 /**
  * Configuration section keys
  */
@@ -105,6 +102,9 @@ namespace config
 /// @def KV_KEY_LOGIN
 #define KV_KEY_LOGIN "login"
 
+/// @namespace config
+namespace config
+{
 /// @typedef FeedMapping
 /// List of pairs with feed name and key-values
 using FeedMapping = std::list<std::pair<std::string, KeyValueMap>>;
@@ -135,7 +135,7 @@ public:
      * @brief Get the latitude.
      * @return mLatitude
      */
-    data::object::ExtGpsPosition getPosition() const;
+    const data::object::ExtGpsPosition& getPosition() const;
 
     /**
      * @fn getAtmPressure
