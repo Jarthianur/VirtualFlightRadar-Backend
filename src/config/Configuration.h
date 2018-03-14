@@ -55,7 +55,7 @@
 #define SECT_KEY_SENS "sens"
 
 /**
- * Per section keys
+ * Per section key-value keys
  */
 /// @def KV_KEY_FEEDS
 #define KV_KEY_FEEDS "feeds"
@@ -111,7 +111,9 @@ using FeedMapping = std::list<std::pair<std::string, KeyValueMap>>;
 
 /**
  * @class Configuration
- * @brief Evaluate and store configuration for VFR-B.
+ * @brief Represents a VFRB configuration.
+ *
+ * Evaluate and store a configuration for the VFRB.
  */
 class Configuration
 {
@@ -119,7 +121,7 @@ public:
     /**
      * @fn Configuration
      * @brief Constructor
-     * @param rStream The config file as stream
+     * @param rStream The input stream
      * @throw std::runtime_error if any error occures
      */
     explicit Configuration(std::istream& rStream);
@@ -131,9 +133,9 @@ public:
     virtual ~Configuration() noexcept;
 
     /**
-     * @fn getLatitude
-     * @brief Get the latitude.
-     * @return mLatitude
+     * @fn getPosition
+     * @brief Get the position.
+     * @return mPosition
      */
     const data::object::ExtGpsPosition& getPosition() const;
 
@@ -168,7 +170,7 @@ public:
     /**
      * @fn isGndModeEnabled
      * @brief Is the ground mode enabled?
-     * @return mGndMode
+     * @return true if enabled, else false
      */
     bool isGndModeEnabled() const;
 
@@ -194,6 +196,12 @@ private:
      */
     void init(const PropertyMap& crProperties);
 
+    /**
+     * @fn resolvePosition
+     * @brief Resolve the fallback position.
+     * @param crProperties The properties
+     * @return the position
+     */
     data::object::ExtGpsPosition resolvePosition(const PropertyMap& crProperties) const;
 
     /**
@@ -208,13 +216,14 @@ private:
      * @fn resolveFeeds
      * @brief Resolve the feeds and their config.
      * @param crProperties The properties
-     * @return a list of all feeds with their config
+     * @return a list of all feeds with their sections
      */
     FeedMapping resolveFeeds(const PropertyMap& crProperties);
 
     /**
      * @fn resolveFilter
-     * @brief Resolve a filter from the properties.
+     * @brief Resolve a filter.
+     * @note An invalid/negative value results in the max value which means disabled.
      * @param crProperties The properties
      * @param crKey        The filter key
      * @return the filter value
@@ -225,11 +234,11 @@ private:
     /**
      * @fn checkNumberValue
      * @brief Check a Number.
-     * @param crOptNumber The Number
+     * @param crOptNumber The optinonal Number
      * @param crSection   The section name
      * @param crKey       The key
      * @return the number value
-     * @throw std::invalid_argument if the value is invalid
+     * @throw std::invalid_argument if the Number is invalid
      */
     util::Number checkNumberValue(const util::OptNumber& crOptNumber,
                                   const std::string& crSection,
@@ -237,24 +246,24 @@ private:
 
     /**
      * @fn dumpInfo
-     * @brief Dump the current config state using info logs.
+     * @brief Dump the current config state using info log.
      */
     void dumpInfo() const;
 
-    /// @var mLatitude
-    /// Base latitude
+    /// @var mPosition
+    /// Fallback position
     data::object::ExtGpsPosition mPosition;
 
     /// @var mAtmPressure
-    /// Atmospheric pressure at base
+    /// Atmospheric fallback pressure
     double mAtmPressure;
 
     /// @var mMaxHeight
-    /// Maximum height for reported Aircrafts
+    /// Maximum height for reported aircrafts
     std::int32_t mMaxHeight;
 
     /// @var mMaxDistance
-    /// Maximum distance for reported Aircrafts
+    /// Maximum distance for reported aircrafts
     std::int32_t mMaxDistance;
 
     /// @var mServerPort

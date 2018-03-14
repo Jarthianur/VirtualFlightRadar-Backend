@@ -29,13 +29,31 @@
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
+/// @namespace config
 namespace config
 {
+/// @namespace util
 namespace util
 {
-using Number    = boost::variant<std::int32_t, std::uint64_t, double>;
+/// @typedef Number
+/// A variant number, which can have one of multiple representations
+using Number = boost::variant<std::int32_t, std::uint64_t, double>;
+
+/// @typedef OptNumber
+/// @see Number
+/// An optional number, which may be invalid
 using OptNumber = boost::optional<Number>;
 
+/**
+ * @fn stringToNumber
+ * @brief Convert a string to number.
+ *
+ * The returned optional number is invalid, if the conversion fails.
+ *
+ * @tparam T    The number type
+ * @param crStr The given string
+ * @return an optional number, which may be invalid
+ */
 template<typename T>
 inline OptNumber stringToNumber(const std::string& crStr)
 {
@@ -69,6 +87,12 @@ inline std::string& trimString(std::string& rStr)
     return rStr;
 }
 
+/**
+ * @fn splitCommaSeparated
+ * @brief Split a string, separated at commata.
+ * @param crStr The given string
+ * @return a list of strings
+ */
 inline std::list<std::string> splitCommaSeparated(const std::string& crStr)
 {
     std::list<std::string> list;
@@ -82,5 +106,5 @@ inline std::list<std::string> splitCommaSeparated(const std::string& crStr)
     }
     return list;
 }
-}
-}
+}  // namespace util
+}  // namespace config
