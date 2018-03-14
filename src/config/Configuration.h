@@ -27,6 +27,7 @@
 #include <utility>
 
 #include "PropertyMap.h"
+#include "../data/object/Position.h"
 #include "Util.hpp"
 
 /// @namespace config
@@ -134,28 +135,7 @@ public:
      * @brief Get the latitude.
      * @return mLatitude
      */
-    double getLatitude() const;
-
-    /**
-     * @fn getLongitude
-     * @brief Get the longitude.
-     * @return mLongitude
-     */
-    double getLongitude() const;
-
-    /**
-     * @fn getAltitude
-     * @brief Get the altitude.
-     * @return mAltitude
-     */
-    std::int32_t getAltitude() const;
-
-    /**
-     * @fn getGeoid
-     * @brief Get the geoid sepparatioon.
-     * @return mGeoid
-     */
-    double getGeoid() const;
+    data::object::ExtGpsPosition getPosition() const;
 
     /**
      * @fn getAtmPressure
@@ -214,13 +194,7 @@ private:
      */
     void init(const PropertyMap& crProperties);
 
-    /**
-     * @fn setFallbacks
-     * @brief Set all fallback values from the properties.
-     * @param crProperties The properties
-     * @return whether all fallbacks could be set
-     */
-    void setFallbacks(const PropertyMap& crProperties);
+    data::object::ExtGpsPosition resolvePosition(const PropertyMap& crProperties) const;
 
     /**
      * @fn resolveServerPort
@@ -269,19 +243,7 @@ private:
 
     /// @var mLatitude
     /// Base latitude
-    double mLatitude;
-
-    /// @var mLongitude
-    /// Base longitude
-    double mLongitude;
-
-    /// @var mAltitude
-    /// Base altitude
-    std::int32_t mAltitude;
-
-    /// @var mGeoid
-    /// Base geoid separation
-    double mGeoid;
+    data::object::ExtGpsPosition mPosition;
 
     /// @var mAtmPressure
     /// Atmospheric pressure at base
@@ -298,10 +260,6 @@ private:
     /// @var mServerPort
     /// Port where to serve reports
     std::uint16_t mServerPort;
-
-    /// @var mGndMode
-    /// Enabling state of ground mode
-    bool mGndMode;
 
     /// @var mFeedMapping
     /// List of feeds with their key-value map

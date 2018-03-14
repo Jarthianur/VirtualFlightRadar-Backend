@@ -28,8 +28,8 @@ ExtGpsPosition::ExtGpsPosition(std::uint32_t vPriority, bool vGround)
     : Object(vPriority), ground(vGround)
 {}
 
-ExtGpsPosition::ExtGpsPosition(const GpsPosition& crPosition, double vGeoid)
-    : Object(0), position(crPosition), geoid(vGeoid)
+ExtGpsPosition::ExtGpsPosition(const GpsPosition& crPosition, double vGeoid, bool vGround)
+    : Object(0), position(crPosition), geoid(vGeoid), ground(vGround)
 {}
 
 ExtGpsPosition::~ExtGpsPosition() noexcept

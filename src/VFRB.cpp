@@ -51,10 +51,7 @@ std::atomic<bool> VFRB::global_run_status(true);
 VFRB::VFRB(const config::Configuration& config)
     : mpAircraftData(new AircraftData(config.getMaxDistance())),
       mpAtmosphereData(new AtmosphereData(object::Atmosphere(config.getAtmPressure()))),
-
-      mpGpsData(new GpsData(object::ExtGpsPosition(
-          {config.getLatitude(), config.getLongitude(), config.getAltitude()},
-          config.getGeoid()))),
+      mpGpsData(new GpsData(config.getPosition())),
       mpWindData(new WindData()),
       mServer(config.getServerPort())
 {
