@@ -29,7 +29,7 @@
 #include <boost/move/move.hpp>
 
 #include "../config/Configuration.h"
-#include "../Logger.h"
+#include "../Logger.hpp"
 #include "../VFRB.h"
 #include "client/Client.h"
 
@@ -41,12 +41,12 @@ Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap)
     initPriority();
     if(mKvMap.find(KV_KEY_HOST) == mKvMap.end())
     {
-        Logger::warn({"(Feed) could not find: ", mName, "." KV_KEY_HOST});
+        Logger::warn("(Feed) could not find: ", mName, "." KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
     if(mKvMap.find(KV_KEY_PORT) == mKvMap.end())
     {
-        Logger::warn({"(Feed) could not find: ", mName, "." KV_KEY_PORT});
+        Logger::warn("(Feed) could not find: ", mName, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
 }
@@ -97,12 +97,12 @@ void Feed::initPriority()
     }
     catch(const std::logic_error&)
     {
-        Logger::warn({"(Config) create feed ", mName, ": Invalid priority given."});
+        Logger::warn("(Config) create feed ", mName, ": Invalid priority given.");
     }
     if(priority == 0)
     {
-        Logger::warn({"(Config) create feed ", mName,
-                      ": Priority is 0; this feed cannot update higher ones."});
+        Logger::warn("(Config) create feed ", mName,
+                      ": Priority is 0; this feed cannot update higher ones.");
     }
     mPriority = static_cast<std::uint32_t>(priority);
 }

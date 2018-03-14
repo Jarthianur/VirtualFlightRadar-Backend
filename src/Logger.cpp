@@ -19,12 +19,11 @@
  }
  */
 
-#include "Logger.h"
+#include "Logger.hpp"
 
 #include <chrono>
 #include <ctime>
 #include <boost/chrono.hpp>
-#include <boost/thread/lock_guard.hpp>
 
 Logger::Logger()
 {}
@@ -43,51 +42,6 @@ std::string Logger::getTime()
     std::string time(asctime(gmtime(&tt)));
     time.pop_back();
     return time;
-}
-
-void Logger::info(Message crMsg)
-{
-    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    *mpOutStream << "[INFO]  " << getTime() << ":: ";
-    for(const auto& it : crMsg)
-    {
-        *mpOutStream << it;
-    }
-    *mpOutStream << std::endl;
-}
-
-// cppcheck-suppress unusedFunction
-void Logger::debug(Message crMsg)
-{
-    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    *mpOutStream << "[DEBUG] " << getTime() << ":: ";
-    for(const auto& it : crMsg)
-    {
-        *mpOutStream << it;
-    }
-    *mpOutStream << std::endl;
-}
-
-void Logger::warn(Message crMsg)
-{
-    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    *mpOutStream << "[WARN]  " << getTime() << ":: ";
-    for(const auto& it : crMsg)
-    {
-        *mpOutStream << it;
-    }
-    *mpOutStream << std::endl;
-}
-
-void Logger::error(Message crMsg)
-{
-    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    *mpErrStream << "[ERROR] " << getTime() << ":: ";
-    for(const auto& it : crMsg)
-    {
-        *mpErrStream << it;
-    }
-    *mpErrStream << std::endl;
 }
 
 void Logger::setLogFile(std::ostream* pOut)

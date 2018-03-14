@@ -40,7 +40,7 @@
 #include "feed/GpsFeed.h"
 #include "feed/SbsFeed.h"
 #include "feed/SensorFeed.h"
-#include "Logger.h"
+#include "Logger.hpp"
 
 using namespace data;
 
@@ -63,7 +63,7 @@ VFRB::~VFRB() noexcept
 
 void VFRB::run() noexcept
 {
-    Logger::info({"(VFRB) startup"});
+    Logger::info("(VFRB) startup");
     boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
 
     boost::asio::io_service io_service;
@@ -72,7 +72,7 @@ void VFRB::run() noexcept
     boost::thread signal_thread([&io_service]() { io_service.run(); });
 
     boost::thread server_thread([this, &signal_set]() {
-        Logger::info({"(Server) start server."});
+        Logger::info("(Server) start server.");
         mServer.run(signal_set);
         global_run_status = false;
     });
@@ -80,7 +80,7 @@ void VFRB::run() noexcept
     for(const auto& it : mFeeds)
     {
         feed_threads.create_thread([&]() {
-            Logger::info({"(VFRB) run feed: ", it->getName()});
+            Logger::info("(VFRB) run feed: ", it->getName());
             it->run(signal_set);
         });
     }
@@ -91,7 +91,7 @@ void VFRB::run() noexcept
     feed_threads.join_all();
     signal_thread.join();
 
-    Logger::info({"EXITING / runtime: ", getDuration(start)});
+    Logger::info("EXITING / runtime: ", getDuration(start));
 }
 
 void VFRB::createFeeds(const config::Configuration& crConfig)
@@ -123,14 +123,14 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
             else
             {
                 Logger::warn(
-                    {"(Config) create feed ", feed.first,
+                    "(Config) create feed ", feed.first,
                      ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                     ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS});
+                     ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
             }
         }
         catch(const std::exception& e)
         {
-            Logger::warn({"(Config) create feed ", feed.first, ": ", e.what()});
+            Logger::warn("(Config) create feed ", feed.first, ": ", e.what());
         }
     }
 }
@@ -144,7 +144,7 @@ void VFRB::setupSignals(boost::asio::signal_set& rSigSet)
 #endif  // defined(SIGQUIT)
 
     rSigSet.async_wait([this](const boost::system::error_code&, const int) {
-        Logger::info({"(VFRB) caught signal: ", "shutdown"});
+        Logger::info("(VFRB) caught signal: ", "shutdown");
         global_run_status = false;
     });
 }
@@ -165,7 +165,7 @@ void VFRB::serve()
         }
         catch(const std::exception& e)
         {
-            Logger::error({"(VFRB) error: ", e.what()});
+            Logger::error("(VFRB) error: ", e.what());
             global_run_status = false;
         }
     }

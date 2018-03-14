@@ -27,7 +27,7 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../data/object/Aircraft.h"
-#include "../Logger.h"
+#include "../Logger.hpp"
 #include "client/AprscClient.h"
 
 namespace feed
@@ -39,7 +39,7 @@ AprscFeed::AprscFeed(const std::string& cr_name, const config::KeyValueMap& cr_k
     auto it = mKvMap.find(KV_KEY_LOGIN);
     if(it == mKvMap.end())
     {
-        Logger::warn({"(AprscFeed) could not find: ", mName, "." KV_KEY_LOGIN});
+        Logger::warn("(AprscFeed) could not find: ", mName, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
     mpClient = std::unique_ptr<client::Client>(

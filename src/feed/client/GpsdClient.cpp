@@ -23,7 +23,7 @@
 
 #include <boost/bind.hpp>
 
-#include "../../Logger.h"
+#include "../../Logger.hpp"
 
 namespace feed
 {
@@ -60,7 +60,7 @@ void GpsdClient::handleResolve(const boost::system::error_code& cr_ec,
     }
     else
     {
-        Logger::error({"(GpsdClient) resolve host: ", cr_ec.message()});
+        Logger::error("(GpsdClient) resolve host: ", cr_ec.message());
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -82,7 +82,7 @@ void GpsdClient::handleConnect(const boost::system::error_code& cr_ec,
     }
     else
     {
-        Logger::error({"(GpsdClient) connect: ", cr_ec.message()});
+        Logger::error("(GpsdClient) connect: ", cr_ec.message());
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -100,11 +100,11 @@ void GpsdClient::stop()
             [this](const boost::system::error_code& ec, std::size_t s) {
                 if(!ec)
                 {
-                    Logger::info({"(GpsdClient) stopped watch"});
+                    Logger::info("(GpsdClient) stopped watch");
                 }
                 else
                 {
-                    Logger::error({"(GpsdClient) send un-watch request: ", ec.message()});
+                    Logger::error("(GpsdClient) send un-watch request: ", ec.message());
                 }
             });
     }
@@ -116,12 +116,12 @@ void GpsdClient::handleWatch(const boost::system::error_code& cr_ec,
 {
     if(!cr_ec)
     {
-        Logger::info({"(GpsdClient) connected to: ", mHost, ":", mPort});
+        Logger::info("(GpsdClient) connected to: ", mHost, ":", mPort);
         read();
     }
     else
     {
-        Logger::error({"(GpsdClient) send watch request: ", cr_ec.message()});
+        Logger::error("(GpsdClient) send watch request: ", cr_ec.message());
     }
 }
 

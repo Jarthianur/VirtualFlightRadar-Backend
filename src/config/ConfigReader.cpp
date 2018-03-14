@@ -24,7 +24,7 @@
 #include <stdexcept>
 #include <utility>
 
-#include "../Logger.h"
+#include "../Logger.hpp"
 
 namespace config
 {
@@ -65,8 +65,8 @@ void ConfigReader::read(std::istream& rStream, PropertyMap& rMap)
         }
         else
         {
-            Logger::error({"(ConfigReader) malformed param [", std::to_string(lineNr),
-                           "]: ", currentLine});
+            Logger::error("(ConfigReader) malformed param [", std::to_string(lineNr),
+                           "]: ", currentLine);
         }
     }
 }
@@ -115,8 +115,8 @@ void ConfigReader::addSection(const std::string& crSection, std::size_t vLineNr,
 {
     if(!rMap.addProperty(crSection))
     {
-        Logger::warn({"(ConfigReader) could not add section [", std::to_string(vLineNr),
-                      "]: ", crSection});
+        Logger::warn("(ConfigReader) could not add section [", std::to_string(vLineNr),
+                      "]: ", crSection);
     }
 }
 
@@ -125,8 +125,8 @@ void ConfigReader::addKeyValue(const std::string& crSection, const KeyValue& crK
 {
     if(!rMap.addProperty(crSection, crKeyValue))
     {
-        Logger::warn({"(ConfigReader) could not add property [", std::to_string(vLineNr),
-                      "]: ", crKeyValue.first});
+        Logger::warn("(ConfigReader) could not add property [", std::to_string(vLineNr),
+                      "]: ", crKeyValue.first);
     }
 }
 

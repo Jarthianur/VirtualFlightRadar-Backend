@@ -25,7 +25,7 @@
 #include <boost/date_time.hpp>
 #include <iostream>
 
-#include "../../Logger.h"
+#include "../../Logger.hpp"
 #include "../Feed.h"
 
 namespace feed
@@ -63,7 +63,7 @@ void Client::timedConnect()
 
 void Client::stop()
 {
-    Logger::info({mComponent, " stop connection to: ", mHost, ":", mPort});
+    Logger::info(mComponent, " stop connection to: ", mHost, ":", mPort);
     mConnectTimer.expires_at(boost::posix_time::pos_infin);
     mConnectTimer.cancel();
     boost::system::error_code ec;
@@ -86,12 +86,12 @@ void Client::handleTimedConnect(const boost::system::error_code& cr_ec) noexcept
 {
     if(!cr_ec)
     {
-        Logger::info({mComponent, " try connect to: ", mHost, ":", mPort});
+        Logger::info(mComponent, " try connect to: ", mHost, ":", mPort);
         connect();
     }
     else
     {
-        Logger::error({mComponent, " cancel connect: ", cr_ec.message()});
+        Logger::error(mComponent, " cancel connect: ", cr_ec.message());
         if(cr_ec != boost::asio::error::operation_aborted)
         {
             stop();
@@ -110,7 +110,7 @@ void Client::handleRead(const boost::system::error_code& cr_ec, std::size_t) noe
     }
     else if(cr_ec != boost::system::errc::bad_file_descriptor)
     {
-        Logger::error({mComponent, " read: ", cr_ec.message()});
+        Logger::error(mComponent, " read: ", cr_ec.message());
         if(cr_ec != boost::asio::error::operation_aborted)
         {
             stop();

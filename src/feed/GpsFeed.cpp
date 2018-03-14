@@ -27,7 +27,7 @@
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
 #include "../data/object/Position.h"
-#include "../Logger.h"
+#include "../Logger.hpp"
 #include "client/GpsdClient.h"
 
 namespace feed
@@ -58,7 +58,7 @@ void GpsFeed::process(const std::string& cr_res) noexcept
         }
         catch(const std::runtime_error& e)
         {
-            Logger::info({"(GpsFeed) ", mName, ": ", e.what()});
+            Logger::info("(GpsFeed) ", mName, ": ", e.what());
             mpClient->stop();
             return;
         }

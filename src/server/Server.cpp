@@ -27,7 +27,7 @@
 #include <boost/move/move.hpp>
 #include <boost/thread/lock_guard.hpp>
 
-#include "../Logger.h"
+#include "../Logger.hpp"
 
 namespace server
 {
@@ -44,7 +44,7 @@ Server::~Server() noexcept
 
 void Server::run(boost::asio::signal_set& r_sigset)
 {
-    awaitStop(r_sigset);
+	    awaitStop(r_sigset);
     accept();
     mIOservice.run();
 }
@@ -62,7 +62,7 @@ void Server::writeToAll(const std::string& cr_msg)
         boost::asio::write(it->get()->getSocket(), boost::asio::buffer(cr_msg), ec);
         if(ec)
         {
-            Logger::warn({"(Server) lost connection to: ", it->get()->getIp()});
+            Logger::warn("(Server) lost connection to: ", it->get()->getIp());
             mClients.erase(it);
         }
         else
@@ -89,7 +89,7 @@ void Server::awaitStop(boost::asio::signal_set& r_sigset)
 void Server::stopAll()
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    Logger::info({"(Server) stopping all clients..."});
+    Logger::info("(Server) stopping all clients...");
     mClients.clear();
 }
 
@@ -118,16 +118,16 @@ void Server::handleAccept(const boost::system::error_code& cr_ec) noexcept
         if(mClients.size() < S_MAX_CLIENTS && !isConnected(client->getIp()))
         {
             mClients.push_back(client);
-            Logger::info({"(Server) connection from: ", client->getIp()});
+            Logger::info("(Server) connection from: ", client->getIp());
         }
         else
         {
-            Logger::info({"(Server) refused connection to ", client->getIp()});
+            Logger::info("(Server) refused connection to ", client->getIp());
         }
     }
     else if(cr_ec != boost::system::errc::bad_file_descriptor)
     {
-        Logger::warn({"(Server) accept: ", cr_ec.message()});
+        Logger::warn("(Server) accept: ", cr_ec.message());
     }
     accept();
 }
