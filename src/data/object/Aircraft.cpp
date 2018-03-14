@@ -25,9 +25,6 @@ namespace data
 {
 namespace object
 {
-Aircraft::Aircraft() : Aircraft(0)
-{}
-
 Aircraft::Aircraft(std::uint32_t vPriority)
     : Object(vPriority),
       mIdType(IdType::ICAO),

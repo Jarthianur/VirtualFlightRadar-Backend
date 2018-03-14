@@ -59,6 +59,7 @@ struct Movement
 /**
  * @class Aircraft
  * @brief Respresents an aircraft.
+ * @extends Object
  */
 class Aircraft : public Object
 {
@@ -114,15 +115,9 @@ public:
     /**
      * @fn Aircraft
      * @brief Constructor
+     * @param vPriority The initial priority (default: 0)
      */
-    Aircraft();
-
-    /**
-     * @fn Aircraft
-     * @brief Constructor
-     * @param vPriority The initial priority
-     */
-    explicit Aircraft(std::uint32_t vPriority);
+    explicit Aircraft(std::uint32_t vPriority = 0);
 
     /**
      * @fn Aircraft
@@ -151,17 +146,16 @@ public:
     virtual ~Aircraft() noexcept;
 
     /**
-     * @fn update
-     * @brief Update this Aircraft.
-     * @param crUpdate  Other Aircraft with new data
-     * @param vPriority Priority of the update
+     * @fn assign
+     * @brief Assign an other Aircrafts values to this.
+     * @param crOther The other Aircraft
      */
     void assign(const Object& crOther) override;
 
     /**
      * @fn getId
      * @brief Get the Id.
-     * @return the Id
+     * @return mId
      */
     const std::string& getId() const;
 
@@ -169,29 +163,29 @@ public:
      * @fn getIdType
      * @brief Get the Id type.
      * @see IdType
-     * @return the Id type
+     * @return mIdType
      */
     IdType getIdType() const;
 
     /**
-     * @fn getTargetT
+     * @fn getTargetType
      * @brief Get the target type.
      * @see TargetType
-     * @return the target type
+     * @return mTargetType
      */
     TargetType getTargetType() const;
 
     /**
-     * @fn getAircraftT
+     * @fn getAircraftType
      * @brief Get the aircraft type.
      * @see AircraftType
-     * @return the aircraft type
+     * @return mAircraftType
      */
     AircraftType getAircraftType() const;
 
     /**
      * @fn hasFullInfo
-     * @brief Are position and movement informations given?
+     * @brief Are all position and movement informations given?
      * @return true, if full info is available, else false
      */
     bool hasFullInfo() const;
@@ -199,63 +193,63 @@ public:
     /**
      * @fn getUpdateAge
      * @brief Get the current update age.
-     * @return the update age by reference
+     * @return mUpdateAge by reference
      */
     std::uint32_t& getUpdateAge();
 
     /**
      * @fn getLatitude
-     * @brief Get the last known latitude.
-     * @return the latitude
+     * @brief Get the latitude.
+     * @return mPosition.latitude
      */
     double getLatitude() const;
 
     /**
      * @fn getLongitude
-     * @brief Get the last known longitude.
-     * @return the longitude
+     * @brief Get the longitude.
+     * @return mPosition.longitude
      */
     double getLongitude() const;
 
     /**
      * @fn getAltitude
-     * @brief Get the last known altitude.
-     * @return the altitude.
+     * @brief Get the altitude.
+     * @return mPosition.altitude.
      */
     std::int32_t getAltitude() const;
 
     /**
      * @fn getGndSpeed
-     * @brief Get the last known speed over ground.
-     * @return the ground speed
+     * @brief Get the speed over ground.
+     * @return mMovement.gndSpeed
      */
     double getGndSpeed() const;
 
     /**
      * @fn getHeading
-     * @brief Get the last known heading.
-     * @return the heading
+     * @brief Get the heading.
+     * @return mMovement.heading
      */
     double getHeading() const;
 
     /**
      * @fn getClimbRate
-     * @brief Get the last known climb rate.
-     * @return the climb rate
+     * @brief Get the climb rate.
+     * @return mMovement.climbRate
      */
     double getClimbRate() const;
 
     /**
      * @fn setId
      * @brief Set the Id.
-     * @param crId The new Id
+     * @param crId The Id
      */
     void setId(const std::string& crId);
 
     /**
      * @fn setPosition
-     * @brief Set the GPS position.
-     * @param crPos The new position
+     * @brief Set the new position.
+     * @param crPos The position
      */
     void setPosition(const GpsPosition& crPos);
 
@@ -263,7 +257,7 @@ public:
      * @fn setAircraftType
      * @brief Set the Aircraft type.
      * @see AircraftType
-     * @param vType The new Aircraft type
+     * @param vType The aircraft type
      */
     void setAircraftType(AircraftType vType);
 
@@ -271,7 +265,7 @@ public:
      * @fn setIdType
      * @brief Set the Id type.
      * @see IdType
-     * @param vType The new Id type
+     * @param vType The Id type
      */
     void setIdType(IdType vType);
 
@@ -312,6 +306,13 @@ public:
     void setFullInfo(bool vInfo = true);
 
 private:
+    /**
+     * @fn canUpdate
+     * @brief Check whether this Aircraft can update the other one.
+     * @param crOther   The other Aircraft
+     * @param vAttempts The update attempt count
+     * @return true if yes, else false
+     */
     bool canUpdate(const Object& crOther, std::uint32_t vAttempts) const override;
 
     /// @var mId
@@ -326,7 +327,8 @@ private:
     /// @see AircraftType
     AircraftType mAircraftType;
 
-    /// Target type; Got the last update from which device.
+    /// @var mTargetType
+    /// @see TargetType
     TargetType mTargetType;
 
     /// @var mPosition
