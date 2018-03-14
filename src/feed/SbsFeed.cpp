@@ -21,42 +21,34 @@
 
 #include "SbsFeed.h"
 
-#include <boost/optional.hpp>
-#include <memory>
-#include <stdexcept>
 #include <unordered_map>
 
-#include "../aircraft/Aircraft.hpp"
-#include "../aircraft/AircraftContainer.h"
 #include "../config/Configuration.h"
-#include "../network/client/SbsClient.h"
-#include "../VFRB.h"
-
-using namespace util;
+#include "../data/AircraftData.h"
+#include "../data/object/Aircraft.h"
+#include "client/SbsClient.h"
 
 namespace feed
 {
-
-SbsFeed::SbsFeed(const std::string& cr_name, std::uint32_t prio,
-        const config::keyValueMap& cr_kvmap)
-        : Feed(cr_name, prio, cr_kvmap)
+SbsFeed::SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+                 std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
+    : Feed(crName, crKvMap), mParser(vMaxHeight), mpData(pData)
 {
-    mpClient = std::unique_ptr<network::client::Client>(
-            new network::client::SbsClient(mKvMap.find(KV_KEY_HOST)->second,
-                    mKvMap.find(KV_KEY_PORT)->second, *this));
+    mpClient  = std::unique_ptr<client::Client>(new client::SbsClient(
+        mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
+    mDataSlot = mpData->registerSlot();
 }
 
 SbsFeed::~SbsFeed() noexcept
-{
-}
+{}
 
-void SbsFeed::process(const std::string& cr_res) noexcept
+void SbsFeed::process(const std::string& crResponse) noexcept
 {
-    aircraft::Aircraft ac;
-    if (mParser.unpack(cr_res, ac))
+    data::object::Aircraft ac(getPriority());
+    if(mParser.unpack(crResponse, ac))
     {
-        VFRB::msAcCont.upsert(ac, mPriority);
+        mpData->update(ac, mDataSlot);
     }
 }
 
-} // namespace feed
+}  // namespace feed

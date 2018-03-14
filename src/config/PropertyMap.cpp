@@ -25,42 +25,39 @@
 
 namespace config
 {
-
 PropertyMap::PropertyMap()
-{
-}
+{}
 
-PropertyMap::~PropertyMap()
-{
-}
+PropertyMap::~PropertyMap() noexcept
+{}
 
-const std::string PropertyMap::getProperty(const std::string& cr_section,
-                                           const std::string& cr_key,
-                                           const std::string& cr_def_val) const
+const std::string PropertyMap::getProperty(const std::string& crSection,
+                                           const std::string& crKey,
+                                           const std::string& crDefault) const
 {
-    auto s_it = mPropertiesMap.find(cr_section);
-    if (s_it != mPropertiesMap.end())
+    auto sectionIt = mPropertiesMap.find(crSection);
+    if(sectionIt != mPropertiesMap.end())
     {
-        auto it = s_it->second.find(cr_key);
-        if (it != s_it->second.end() && !it->second.empty())
+        auto kvIt = sectionIt->second.find(crKey);
+        if(kvIt != sectionIt->second.end() && !kvIt->second.empty())
         {
-            return it->second;
+            return kvIt->second;
         }
         else
         {
-            return cr_def_val;
+            return crDefault;
         }
     }
     else
     {
-        return cr_def_val;
+        return crDefault;
     }
 }
 
-const keyValueMap& PropertyMap::getSectionKv(const std::string& cr_section) const
+const KeyValueMap& PropertyMap::getSectionKeyValue(const std::string& crSection) const
 {
-    auto it = mPropertiesMap.find(cr_section);
-    if (it != mPropertiesMap.end())
+    auto it = mPropertiesMap.find(crSection);
+    if(it != mPropertiesMap.end())
     {
         return it->second;
     }
@@ -70,9 +67,10 @@ const keyValueMap& PropertyMap::getSectionKv(const std::string& cr_section) cons
     }
 }
 
-bool config::PropertyMap::addProperty(const std::string& r_section, const keyValue& r_kv)
+bool config::PropertyMap::addProperty(const std::string& crSection,
+                                      const KeyValue& crKeyValue)
 {
-    return mPropertiesMap[r_section].emplace(r_kv).second;
+    return mPropertiesMap[crSection].emplace(crKeyValue).second;
 }
 
 } /* namespace config */

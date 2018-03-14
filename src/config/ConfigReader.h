@@ -19,17 +19,19 @@
  }
  */
 
-#ifndef SRC_CONFIG_CONFIGREADER_H_
-#define SRC_CONFIG_CONFIGREADER_H_
+#pragma once
 
-#include <boost/regex.hpp>
+#include <cstddef>
 #include <istream>
+#include <string>
+#include <boost/optional.hpp>
+#include <boost/regex.hpp>
 
+#include "PropertyMap.h"
+
+/// @namespace config
 namespace config
 {
-
-class PropertyMap;
-
 /**
  * @class ConfigReader
  * @brief Provide functions to read properties from an input stream into a map.
@@ -42,24 +44,62 @@ public:
      * @brief Constructor
      */
     ConfigReader();
+
     /**
      * @fn ~ConfigReader
      * @brief Destructor
      */
     virtual ~ConfigReader() noexcept;
+
     /**
      * @fn read
      * @brief Read the given stream and store valid properties in a map.
-     * @param r_stream The stream to read
-     * @param r_map  The map to store the properties in
+     * @param rStream The stream to read
+     * @param rMap  The map to store the properties in
      */
-    void read(std::istream& r_stream, PropertyMap& r_map);
+    void read(std::istream& rStream, PropertyMap& rMap);
 
 private:
-    /// The regular expression for 'key = value' lines
+    /**
+     * @fn parseSection
+     * @brief Parse a section.
+     * @param crLine The string to parse
+     * @return an optional section name
+     */
+    boost::optional<std::string> parseSection(const std::string& crLine);
+
+    /**
+     * @fn parseKeyValue
+     * @brief Parse a key-value pair.
+     * @see mConfRe
+     * @param crLine The string to parse
+     * @return an optional KeyValue
+     */
+    boost::optional<KeyValue> parseKeyValue(const std::string& crLine);
+
+    /**
+     * @fn addKeyValue
+     * @brief Add a key-value pair to the properties.
+     * @param crSection  The section name
+     * @param crKeyValue The key-value pair
+     * @param vLineNr    The corresponding line number
+     * @param rMap       The properties
+     */
+    void addKeyValue(const std::string& crSection, const KeyValue& crKeyValue,
+                     std::size_t vLineNr, PropertyMap& rMap);
+
+    /**
+     * @fn addSection
+     * @brief Add a section to the properties.
+     * @param crSection The section name
+     * @param vLineNr   The corresponding line number
+     * @param rMap      The properties
+     */
+    void addSection(const std::string& crSection, std::size_t vLineNr, PropertyMap& rMap);
+
+    /// @var mConfRe
+    /// Regular expression for 'key = value'
     const boost::regex mConfRe;
 };
 
 }  // namespace config
-
-#endif /* SRC_CONFIG_CONFIGREADER_H_ */

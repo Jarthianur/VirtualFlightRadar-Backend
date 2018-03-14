@@ -19,25 +19,30 @@
  }
  */
 
-#ifndef SRC_FEED_APRSCFEED_H_
-#define SRC_FEED_APRSCFEED_H_
+#pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "../parser/AprsParser.h"
+#include "parser/AprsParser.h"
 #include "Feed.h"
+
+namespace data
+{
+class AircraftData;
+} /* namespace data */
 
 namespace feed
 {
-
 /**
  * @class AprscFeed extends Feed
  * @brief Represents an APRSC input feed.
  * @see Feed.h
  */
-class AprscFeed: public Feed
+class AprscFeed : public Feed
 {
 public:
     /**
@@ -48,8 +53,8 @@ public:
      * @param cr_kvmap The properties map
      * @throws std::logic_error if login is not given in cr_kvmap
      */
-    AprscFeed(const std::string& /*cr_name*/, std::uint32_t /*prio*/,
-            const config::keyValueMap& /*cr_kvmap*/);
+    AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+              std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
     /**
      * @fn ~AprscFeed
      * @brief Destructor
@@ -61,13 +66,15 @@ public:
      * @param cr_res The response to process
      * @override Feed::process
      */
-    void process(const std::string& cr_res) noexcept override;
+    void process(const std::string& crResponse) noexcept override;
 
 private:
     /// Parser to unpack response from Client
     parser::AprsParser mParser;
+
+    std::size_t mDataSlot;
+
+    std::shared_ptr<data::AircraftData> mpData;
 };
 
-} // namespace feed
-
-#endif /* SRC_FEED_APRSCFEED_H_ */
+}  // namespace feed

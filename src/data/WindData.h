@@ -19,74 +19,66 @@
  }
  */
 
-#ifndef SRC_DATA_WINDDATA_H_
-#define SRC_DATA_WINDDATA_H_
+#pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
+#include <vector>
 
-#include "../util/Sensor.h"
-#include "Data.hpp"
-#include "../util/Wrapper.hpp"
+#include "object/Wind.h"
+#include "Data.h"
 
+/// @namespace data
 namespace data
 {
-
 /**
- * @class WindData implements Data
+ * @class WindData
  * @brief Manage sensor information.
- * @see Data.hpp
  */
-class WindData: public Data<struct util::Wind>
+class WindData : public Data
 {
 public:
-	/**
-	 * @fn WindData
-	 * @brief Constructor
-	 */
-	WindData();
+    /**
+     * @fn WindData
+     * @brief Constructor
+     */
+    WindData();
 
-	/**
-	 * @fn ~WindData
-	 * @brief Destructor
-	 */
-	virtual ~WindData() noexcept;
+    explicit WindData(const object::Wind& crWind);
 
-	/**
-	 * @fn init
-	 * @brief Initialize the sensor information.
-	 * @param info The initial data
-	 * @override Data::init
-	 */
-	void init(struct util::Wind vWind) override;
+    /**
+     * @fn ~WindData
+     * @brief Destructor
+     */
+    virtual ~WindData() noexcept;
 
-	/**
-	 * @fn update
-	 * @brief Try to update the sensor information.
-	 * @note Splits the given info, using setters.
-	 * @param cr_info The new sensor information.
-	 * @param prio    The attempts priority
-	 * @override Data::update
-	 * @threadsafe
-	 */
-	void update(const struct util::Wind& crWind, std::uint32_t vPriority,
-	        std::uint64_t& rAttempts) override;
+    /**
+     * @fn getMwvStr
+     * @brief Get the MWV sentence.
+     * @note MWV is invalid after this operation.
+     * @return the MWV sentence, if valid, else empty string
+     * @threadsafe
+     */
+    std::string getSerialized() override;
 
-	/**
-	 * @fn getMwvStr
-	 * @brief Get the MWV sentence.
-	 * @note MWV is invalid after this operation.
-	 * @return the MWV sentence, if valid, else empty string
-	 * @threadsafe
-	 */
-	std::string getMwvStr();
+    /**
+     * @fn update
+     * @brief Try to update the sensor information.
+     * @param crWind    The new wind information.
+     * @param vPriority The attempts priority
+     * @param rAttempts The update attempts
+     */
+    bool update(const object::Object& crWind, std::size_t vSlot) override;
+
+    std::size_t registerSlot() override;
 
 private:
+    /// @var mWind
+    /// Holding MDA sentence
+    object::Wind mWind;
 
-	/// Holding MDA sentence
-	struct util::TmpWrapper<util::Wind> mWind;
+    std::vector<std::uint32_t> mAttempts;
 };
 
-} // namespace data
-
-#endif /* SRC_DATA_WINDDATA_H_ */
+}  // namespace data

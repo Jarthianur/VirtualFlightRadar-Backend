@@ -19,99 +19,84 @@
  }
  */
 
-#ifndef SRC_DATA_GPSDATA_H_
-#define SRC_DATA_GPSDATA_H_
+#pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
+#include <vector>
 
-#include "../util/GpsModule.h"
-#include "../util/Position.h"
-#include "Data.hpp"
-#include "../util/Wrapper.hpp"
+#include "object/Position.h"
+#include "processor/GpsProcessor.h"
+#include "Data.h"
 
+/// @namespace data
 namespace data
 {
-
 /**
- * @class GpsData implements Data
+ * @class GpsData
  * @brief Manage GPS information.
- * @see Data.hpp
  */
-class GpsData: public Data<struct util::ExtGpsPosition>
+class GpsData : public Data
 {
 public:
-	/**
-	 * @fn GpsData
-	 * @brief Constructor
-	 */
-	GpsData();
-	/**
-	 * @fn ~GpsData
-	 * @brief Destructor
-	 */
-	virtual ~GpsData() noexcept;
-	/**
-	 * @fn init
-	 * @brief Initialize the GPS information.
-	 * @param pos The initial position
-	 * @override Data::init
-	 */
-	void init(struct util::ExtGpsPosition pos) override;
-	/**
-	 * @fn update
-	 * @brief Try to update the base position.
-	 * @param cr_pos The new position
-	 * @param prio   The attempts priority
-	 * @override Data::update
-	 * @threadsafe
-	 */
-	void update(const struct util::ExtGpsPosition& cr_pos, std::uint32_t vPriority,
-	        std::uint64_t& rAttempts) override;
-	/**
-	 * @fn getGpsStr
-	 * @brief Get a full NMEA GPS report.
-	 * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
-	 * @return the NMEA string
-	 * @threadsafe
-	 */
-	std::string getGpsStr();
-	/**
-	 * @fn getBasePos
-	 * @brief Get the base GPS position.
-	 * @return the position
-	 * @threadsafe
-	 */
-	struct util::ExtGpsPosition getBasePos();
-	/**
-	 * @fn getBaseLat
-	 * @brief Get the base latitude.
-	 * @return the latitude
-	 * @threadsafe
-	 */
-	double getBaseLat();
-	/**
-	 * @fn getBaseLong
-	 * @brief Get the base longitude.
-	 * @return the longitude
-	 * @threadsafe
-	 */
-	double getBaseLong();
-	/**
-	 * @fn getBaseAlt
-	 * @brief Get the base altitude.
-	 * @return the altitude
-	 * @threadsafe
-	 */
-	std::int32_t getBaseAlt();
+    GpsData();
+
+    /**
+     * @fn GpsData
+     * @brief Constructor
+     * @param vPosition The initial info
+     */
+    explicit GpsData(const object::ExtGpsPosition& crPosition);
+
+    /**
+     * @fn ~GpsData
+     * @brief Destructor
+     */
+    virtual ~GpsData() noexcept;
+
+    /**
+     * @fn getGpsStr
+     * @brief Get a full NMEA GPS report.
+     * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
+     * @return the NMEA string
+     * @threadsafe
+     */
+    std::string getSerialized() override;
+
+    /**
+     * @fn getBasePos
+     * @brief Get the base GPS position.
+     * @return the position
+     * @threadsafe
+     */
+    object::GpsPosition getGpsPosition();
+
+    /**
+     * @fn update
+     * @brief Try to update the base position.
+     * @param crPosition The new position
+     * @param vPriority  The attempts priority
+     * @param rAttempts  The update attempts
+     */
+    bool update(const object::Object& crPosition, std::size_t vSlot) override;
+
+    std::size_t registerSlot() override;
 
 private:
-	/// Wrapper holding the base position.
-	struct util::Wrapper<struct util::ExtGpsPosition> mBasePos;
-	/// GpsModule providing functionality to build GPS sentences.
-	util::GpsModule mGpsMod;
+    /// @var mBasePos
+    /// Wrapper holding the base position
+    object::ExtGpsPosition mPosition;
+
+    /// @var mGpsModule
+    /// GpsModule providing functionality to build GPS sentences
+    processor::GpsProcessor mProcessor;
+
+    /// @var mPosLocked
+    /// Locking state of the current position
+    bool mPositionLocked = false;
+
+    std::vector<std::uint32_t> mAttempts;
 };
 
 }  // namespace data
-
-#endif /* SRC_DATA_GPSDATA_H_ */

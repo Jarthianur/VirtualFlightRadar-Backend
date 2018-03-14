@@ -6,13 +6,17 @@
 !/src/
 !/service/
 !/docs/
+!/.ide/
+!/.ide/**
 !/service/**
 !/docs/_includes/**
 !/docs/assets/**
+!/.ide/**
 !LICENSE
 !.gitattributes
 !.gitignore
 !.gitmodules
+!.clang-format
 !makefile
 !*.mk
 !*.sh
@@ -25,5 +29,6 @@
 !*.h
 !*.html
 !*.yml
+!*.yaml
 !*.css
-
+!*.xml

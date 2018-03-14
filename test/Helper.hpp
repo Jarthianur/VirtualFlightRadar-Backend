@@ -25,7 +25,7 @@
 #include <boost/regex.hpp>
 #include <string>
 
-#include "../src/aircraft/Aircraft.hpp"
+#include "../src/aircraft/Aircraft.h"
 #include "../src/aircraft/AircraftContainer.h"
 #include "../src/config/Configuration.h"
 #include "../src/data/AtmosphereData.h"

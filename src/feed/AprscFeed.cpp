@@ -21,50 +21,43 @@
 
 #include "AprscFeed.h"
 
-#include <memory>
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../aircraft/Aircraft.hpp"
-#include "../aircraft/AircraftContainer.h"
+#include "../Logger.hpp"
 #include "../config/Configuration.h"
-#include "../network/client/AprscClient.h"
-#include "../util/Logger.h"
-#include "../VFRB.h"
-
-using namespace util;
+#include "../data/AircraftData.h"
+#include "../data/object/Aircraft.h"
+#include "client/AprscClient.h"
 
 namespace feed
 {
-
-AprscFeed::AprscFeed(const std::string& cr_name, std::uint32_t prio,
-        const config::keyValueMap& cr_kvmap)
-        : Feed(cr_name, prio, cr_kvmap)
+AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+                     std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
+    : Feed(crName, crKvMap), mParser(vMaxHeight), mpData(pData)
 {
     auto it = mKvMap.find(KV_KEY_LOGIN);
-    if (it == mKvMap.end())
+    if(it == mKvMap.end())
     {
-        Logger::warn("(AprscFeed) could not find: ", mName + "." KV_KEY_LOGIN);
+        Logger::warn("(AprscFeed) could not find: ", mName, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
-    } else
-    {
-        mpClient = std::unique_ptr<network::client::Client>(
-                new network::client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
-                        mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
     }
+    mpClient = std::unique_ptr<client::Client>(
+        new client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
+                                mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
+    mDataSlot = mpData->registerSlot();
 }
 
 AprscFeed::~AprscFeed() noexcept
-{
-}
+{}
 
-void AprscFeed::process(const std::string& cr_res) noexcept
+void AprscFeed::process(const std::string& crResponse) noexcept
 {
-    aircraft::Aircraft ac;
-    if (mParser.unpack(cr_res, ac))
+    data::object::Aircraft ac(getPriority());
+    if(mParser.unpack(crResponse, ac))
     {
-        VFRB::msAcCont.upsert(ac, mPriority);
+        mpData->update(ac, mDataSlot);
     }
 }
 
-} // namespace feed
+}  // namespace feed

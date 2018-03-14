@@ -19,60 +19,69 @@
  }
  */
 
-#ifndef SRC_FEED_SENSORFEED_H_
-#define SRC_FEED_SENSORFEED_H_
+#pragma once
 
-#include <cstdint>
+#include <cstddef>
+#include <memory>
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "../parser/SensorParser.h"
+#include "parser/SensorParser.h"
 #include "Feed.h"
+
+namespace data
+{
+class AtmosphereData;
+class WindData;
+} /* namespace data */
 
 namespace feed
 {
-
 /**
  * @class SensorFeed extends Feed
  * @brief Represents a sensor input feed.
  * @see Feed.h
  */
-class SensorFeed: public Feed
+class SensorFeed : public Feed
 {
 public:
-	/**
-	 * @fn SensorFeed
-	 * @brief Constructor
-	 * @param cr_name  The SensorFeeds unique name
-	 * @param prio     The priority
-	 * @param cr_kvmap The properties map
-	 */
-	SensorFeed(const std::string& crName, std::uint32_t vPriority,
-	        const config::keyValueMap& crKvMap);
-	/**
-	 * @fn ~SensorFeed
-	 * @brief Destructor
-	 */
-	virtual ~SensorFeed() noexcept;
-	/**
-	 * @fn process
-	 * @brief Handle SensorClients response.
-	 * @param cr_res The response to process
-	 * @override Feed::process
-	 */
-	void process(const std::string& crResponse) noexcept override;
+    /**
+     * @fn SensorFeed
+     * @brief Constructor
+     * @param cr_name  The SensorFeeds unique name
+     * @param prio     The priority
+     * @param cr_kvmap The properties map
+     */
+    SensorFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+               std::shared_ptr<data::WindData> pWindData,
+               std::shared_ptr<data::AtmosphereData> pAtmosData);
+    /**
+     * @fn ~SensorFeed
+     * @brief Destructor
+     */
+    virtual ~SensorFeed() noexcept;
+
+    /**
+     * @fn process
+     * @brief Handle SensorClients response.
+     * @param cr_res The response to process
+     * @override Feed::process
+     */
+    void process(const std::string& crResponse) noexcept override;
 
 private:
-	/// Parser to unpack response from Client
-	parser::SensorParser mParser;
+    /// Parser to unpack response from Client
+    parser::SensorParser mParser;
 
-	///
-	std::uint64_t mWindUpdateAttempts;
+    ///
+    std::size_t mWindSlot;
 
-	///
-	std::uint64_t mAtmosUpdateAttempts;
+    ///
+    std::size_t mAtmosSlot;
+
+    std::shared_ptr<data::WindData> mpWindData;
+
+    std::shared_ptr<data::AtmosphereData> mpAtmosphereData;
 };
 
-} // namespace feed
-
-#endif /* SRC_FEED_SENSORFEED_H_ */
+}  // namespace feed

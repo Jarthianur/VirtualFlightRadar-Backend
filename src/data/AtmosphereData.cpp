@@ -19,49 +19,59 @@
  }
  */
 
-#include <boost/thread/lock_guard.hpp>
 #include "AtmosphereData.h"
 
-using namespace util;
+#include <algorithm>
+#include <stdexcept>
+#include <boost/thread/lock_guard.hpp>
+
+using namespace data::object;
 
 namespace data
 {
+AtmosphereData::AtmosphereData() : Data()
+{}
 
-AtmosphereData::AtmosphereData()
-		: Data<struct Atmosphere>()
-{
-}
+AtmosphereData::AtmosphereData(const Atmosphere& crAtmosphere) : Data(), mAtmosphere(crAtmosphere)
+{}
 
 AtmosphereData::~AtmosphereData() noexcept
+{}
+
+std::string AtmosphereData::getSerialized()
 {
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    return mAtmosphere.getSerialized();
 }
 
-void AtmosphereData::update(const struct Atmosphere& crAtmos, std::uint32_t vPriority,
-        std::uint64_t& rAttempts)
+bool AtmosphereData::update(const Object& crAtmosphere, std::size_t vSlot)
 {
-	boost::lock_guard<boost::mutex> lock(mAtmosphere.mutex);
-	if (mAtmosphere.trySetValue(crAtmos, vPriority, rAttempts))
-	{
-		rAttempts = 0;
-	}
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    try
+    {
+        bool updated = mAtmosphere.tryUpdate(crAtmosphere, ++mAttempts.at(vSlot));
+        if(updated)
+        {
+            std::fill(mAttempts.begin(), mAttempts.end(), 0);
+        }
+        return updated;
+    }
+    catch(const std::out_of_range&)
+    {
+        return false;
+    }
 }
 
-std::string AtmosphereData::getMdaStr()
+std::size_t AtmosphereData::registerSlot()
 {
-	boost::lock_guard<boost::mutex> lock(mAtmosphere.mutex);
-	return mAtmosphere.getValue().mdaStr + "\n";
+    mAttempts.push_back(0);
+    return mAttempts.size() - 1;
 }
 
-double AtmosphereData::getAtmPress()
+double AtmosphereData::getAtmPressure()
 {
-	boost::lock_guard<boost::mutex> lock(mAtmosphere.mutex);
-	return mAtmosphere.getValue().pressure;
-}
-
-void AtmosphereData::init(struct util::Atmosphere vAtmos)
-{
-	std::uint64_t dummy = 0;
-	mAtmosphere.trySetValue(vAtmos, 0, dummy);
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    return mAtmosphere.getPressure();
 }
 
 }  // namespace data

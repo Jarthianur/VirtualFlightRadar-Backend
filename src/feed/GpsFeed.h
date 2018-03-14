@@ -19,25 +19,29 @@
  }
  */
 
-#ifndef SRC_FEED_GPSFEED_H_
-#define SRC_FEED_GPSFEED_H_
+#pragma once
 
-#include <cstdint>
+#include <cstddef>
+#include <memory>
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "../parser/GpsParser.h"
+#include "parser/GpsParser.h"
 #include "Feed.h"
+
+namespace data
+{
+class GpsData;
+} /* namespace data */
 
 namespace feed
 {
-
 /**
  * @class GpsFeed extends Feed
  * @brief Represents a GPS input feed.
  * @see Feed.h
  */
-class GpsFeed: public Feed
+class GpsFeed : public Feed
 {
 public:
     /**
@@ -47,28 +51,33 @@ public:
      * @param prio     The priority
      * @param cr_kvmap The properties map
      */
-    GpsFeed(const std::string& /*cr_name*/, std::uint32_t /*prio*/,
-            const config::keyValueMap& /*cr_kvmap*/);
+    GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+            std::shared_ptr<data::GpsData> pData, bool vGndMode);
+
     /**
      * @fn ~GpsFeed
      * @brief Destructor
      */
     virtual ~GpsFeed() noexcept;
+
     /**
      * @fn process
      * @brief Handle GpsdClients response.
      * @param cr_res The response to process
      * @override Feed::process
      */
-    void process(const std::string& cr_res) noexcept override;
+    void process(const std::string& crResponse) noexcept override;
 
 private:
     /// Parser to unpack response from Client
     parser::GpsParser mParser;
+
     ///
-    std::uint64_t mUpdateAttempts;
+    std::size_t mDataSlot;
+
+    std::shared_ptr<data::GpsData> mpData;
+
+    bool mGndModeEnabled;
 };
 
-} // namespace feed
-
-#endif /* SRC_FEED_GPSFEED_H_ */
+}  // namespace feed

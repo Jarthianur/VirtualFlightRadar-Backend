@@ -19,41 +19,30 @@
  }
  */
 
-#ifndef SRC_VFRB_H_
-#define SRC_VFRB_H_
+#pragma once
 
 #include <atomic>
-#include <boost/asio/signal_set.hpp>
-#include <boost/system/error_code.hpp>
+#include <list>
 #include <memory>
+#include <boost/chrono.hpp>
 
+#include "server/Server.h"
+
+namespace config
+{
+class Configuration;
+} /* namespace config */
 namespace data
 {
-class WindData;
+class AircraftData;
 class AtmosphereData;
 class GpsData;
-}
-namespace network
-{
-namespace server
-{
-class Server;
-}
-}
+class WindData;
+} /* namespace data */
 namespace feed
 {
 class Feed;
-}
-namespace aircraft
-{
-class Aircraft;
-class AircraftContainer;
-}
-namespace util
-{
-struct ExtGpsPosition;
-struct SensorInfo;
-}
+} /* namespace feed */
 
 /**
  * @class VFRB
@@ -62,69 +51,62 @@ struct SensorInfo;
 class VFRB
 {
 public:
-	/**
-	 * Non-copyable
-	 */
-	VFRB(const VFRB&) = delete;
-	/**
-	 * Not assignable
-	 */
-	VFRB& operator=(const VFRB&) = delete;
-	/**
-	 * @fn VFRB
-	 * @brief Constructor
-	 */
-	VFRB();
-	/**
-	 * @fn ~VFRB
-	 * @brief Destructor
-	 */
-	virtual ~VFRB() noexcept;
-	/**
-	 * @fn run
-	 * @brief The VFRB's main method, runs the VFR-B.
-	 */
-	static void run() noexcept;
+    /**
+     * Non-copyable
+     */
+    VFRB(const VFRB&) = delete;
+    /**
+     * Not assignable
+     */
+    VFRB& operator=(const VFRB&) = delete;
+    /**
+     * @fn VFRB
+     * @brief Constructor
+     */
+    explicit VFRB(const config::Configuration& crConfig);
+    /**
+     * @fn ~VFRB
+     * @brief Destructor
+     */
+    virtual ~VFRB() noexcept;
+    /**
+     * @fn run
+     * @brief The VFRB's main method, runs the VFR-B.
+     */
+    void run() noexcept;
 
-	/// Atomic run-status. By this, every component may determine if the VFRB stops.
-	static std::atomic<bool> global_run_status;
-
-	/// Container holding all registered Aircrafts
-	static aircraft::AircraftContainer msAcCont;
-
-	/// Container holding sensor and climate information.
-	static data::WindData msWindData;
-
-	///
-	static data::AtmosphereData msAtmosData;
-
-	/// Container holding GPS information
-	static data::GpsData msGpsData;
+    /// Atomic run-status. By this, every component may determine if the VFRB stops.
+    static std::atomic<bool> vRunStatus;
 
 private:
-	/**
-	 * @fn handleFeed
-	 * @brief Handler for an input Feed thread.
-	 * @param r_sigset The signal set to pass
-	 * @param p_feed   The Feed to handle
-	 */
-	static void handleFeed(boost::asio::signal_set& r_sigset,
-	        std::shared_ptr<feed::Feed> p_feed);
+    /**
+     * @fn registerFeeds
+     * @brief Register all input feeds found from ConfigReader.
+     * @note Only correctly configured feeds get registered.
+     * @param crProperties The PropertyMap holding read properties
+     * @return the number of registered feeds
+     */
+    void createFeeds(const config::Configuration& crFeeds);
 
-	/**
-	 * @fn handleServer
-	 * @brief Handler for an Server thread.
-	 * @param r_server The Server to handle
-	 */
-	static void handleServer(network::server::Server& r_server);
+    void setupSignals(boost::asio::signal_set& rSigSet);
 
-	/**
-	 * @fn handleSignals
-	 * @brief Handler for a signal interrupt thread.
-	 * @param cr_ec The error code
-	 * @param sig   The signal number
-	 */
-	static void handleSignals(const boost::system::error_code& cr_ec, const int sig);
+    void serve();
+
+    std::string getDuration(boost::chrono::steady_clock::time_point vStart) const;
+
+    /// Container holding all registered Aircrafts
+    std::shared_ptr<data::AircraftData> mpAircraftData;
+
+    ///
+    std::shared_ptr<data::AtmosphereData> mpAtmosphereData;
+
+    /// Container holding GPS information
+    std::shared_ptr<data::GpsData> mpGpsData;
+
+    /// Container holding sensor and climate information.
+    std::shared_ptr<data::WindData> mpWindData;
+
+    server::Server mServer;
+
+    std::list<std::shared_ptr<feed::Feed>> mFeeds;
 };
-
-#endif /* SRC_VFRB_H_ */

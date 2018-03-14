@@ -19,50 +19,95 @@
  }
  */
 
-#ifndef SRC_CONFIG_CONFIGURATION_H_
-#define SRC_CONFIG_CONFIGURATION_H_
+#pragma once
 
-#include <cstddef>
 #include <cstdint>
 #include <istream>
-#include <memory>
 #include <string>
-#include <vector>
+#include <utility>
 
-namespace feed
-{
-class Feed;
-}
+#include "../data/object/Position.h"
+#include "PropertyMap.h"
+#include "Util.hpp"
 
+/**
+ * Configuration section keys
+ */
+/// @def SECT_KEY_FALLBACK
+#define SECT_KEY_FALLBACK "fallback"
+
+/// @def SECT_KEY_GENERAL
+#define SECT_KEY_GENERAL "general"
+
+/// @def SECT_KEY_FILTER
+#define SECT_KEY_FILTER "filter"
+
+/// @def SECT_KEY_APRSC
+#define SECT_KEY_APRSC "aprs"
+
+/// @def SECT_KEY_SBS
+#define SECT_KEY_SBS "sbs"
+
+/// @def SECT_KEY_GPS
+#define SECT_KEY_GPS "gps"
+
+/// @def SECT_KEY_SENS
+#define SECT_KEY_SENS "sens"
+
+/**
+ * Per section keys
+ */
+/// @def KV_KEY_FEEDS
+#define KV_KEY_FEEDS "feeds"
+
+/// @def KV_KEY_GND_MODE
+#define KV_KEY_GND_MODE "gndMode"
+
+/// @def KV_KEY_LATITUDE
+#define KV_KEY_LATITUDE "latitude"
+
+/// @def KV_KEY_LONGITUDE
+#define KV_KEY_LONGITUDE "longitude"
+
+/// @def KV_KEY_ALTITUDE
+#define KV_KEY_ALTITUDE "altitude"
+
+/// @def KV_KEY_GEOID
+#define KV_KEY_GEOID "geoid"
+
+/// @def KV_KEY_PRESSURE
+#define KV_KEY_PRESSURE "pressure"
+
+/// @def KV_KEY_TEMPERATURE
+#define KV_KEY_TEMPERATURE "temperature"
+
+/// @def KV_KEY_MAX_DIST
+#define KV_KEY_MAX_DIST "maxDist"
+
+/// @def KV_KEY_MAX_HEIGHT
+#define KV_KEY_MAX_HEIGHT "maxHeight"
+
+/// @def KV_KEY_SERVER_PORT
+#define KV_KEY_SERVER_PORT "serverPort"
+
+/// @def KV_KEY_HOST
+#define KV_KEY_HOST "host"
+
+/// @def KV_KEY_PORT
+#define KV_KEY_PORT "port"
+
+/// @def KV_KEY_PRIORITY
+#define KV_KEY_PRIORITY "priority"
+
+/// @def KV_KEY_LOGIN
+#define KV_KEY_LOGIN "login"
+
+/// @namespace config
 namespace config
 {
-
-class PropertyMap;
-
-/// Configuration section keys
-#define SECT_KEY_FALLBACK   "fallback"
-#define SECT_KEY_GENERAL    "general"
-#define SECT_KEY_FILTER     "filter"
-#define SECT_KEY_APRSC      "aprs"
-#define SECT_KEY_SBS        "sbs"
-#define SECT_KEY_GPS        "gps"
-#define SECT_KEY_SENS       "sens"
-/// Per section keys
-#define KV_KEY_FEEDS        "feeds"
-#define KV_KEY_GND_MODE     "gndMode"
-#define KV_KEY_LATITUDE     "latitude"
-#define KV_KEY_LONGITUDE    "longitude"
-#define KV_KEY_ALTITUDE     "altitude"
-#define KV_KEY_GEOID        "geoid"
-#define KV_KEY_PRESSURE     "pressure"
-#define KV_KEY_TEMPERATURE  "temperature"
-#define KV_KEY_MAX_DIST     "maxDist"
-#define KV_KEY_MAX_HEIGHT   "maxHeight"
-#define KV_KEY_SERVER_PORT  "serverPort"
-#define KV_KEY_HOST         "host"
-#define KV_KEY_PORT         "port"
-#define KV_KEY_PRIORITY     "priority"
-#define KV_KEY_LOGIN        "login"
+/// @typedef FeedMapping
+/// List of pairs with feed name and key-values
+using FeedMapping = std::list<std::pair<std::string, KeyValueMap>>;
 
 /**
  * @class Configuration
@@ -74,58 +119,151 @@ public:
     /**
      * @fn Configuration
      * @brief Constructor
-     * @param r_stream The config file as stream
-     * @throws std::logic_error if any error occures or no feeds are given
+     * @param rStream The config file as stream
+     * @throw std::runtime_error if any error occures
      */
-    Configuration(std::istream& r_stream);
+    explicit Configuration(std::istream& rStream);
+
     /**
      * @fn ~Configuration
      * @brief Destructor
      */
     virtual ~Configuration() noexcept;
 
-    /// Bases altitude
-    static std::int32_t base_altitude;
-    /// Bases latitude
-    static double base_latitude;
-    /// Bases longitude
-    static double base_longitude;
-    /// Bases geoid separation
-    static double base_geoid;
-    /// Air pressure at base
-    static double base_pressure;
-    /// Maximum height for reported Aircrafts
-    static std::int32_t filter_maxHeight;
-    /// Maximum distance for reported Aircrafts
-    static std::int32_t filter_maxDist;
-    /// Port where to serve reports
-    static std::uint16_t global_server_port;
-    /// Ground mode enabled?
-    static bool global_gnd_mode;
-    /// All registered and correctly parsed input feeds
-    static std::vector<std::shared_ptr<feed::Feed>> global_feeds;
+    /**
+     * @fn getLatitude
+     * @brief Get the latitude.
+     * @return mLatitude
+     */
+    const data::object::ExtGpsPosition& getPosition() const;
+
+    /**
+     * @fn getAtmPressure
+     * @brief Get the atmospheric pressure.
+     * @return mAtmPressure
+     */
+    double getAtmPressure() const;
+
+    /**
+     * @fn getMaxHeight
+     * @brief Get the max height filter.
+     * @return mMaxHeight
+     */
+    std::int32_t getMaxHeight() const;
+
+    /**
+     * @fn getMaxDistance
+     * @brief Get the max distance filter.
+     * @return mMaxDistance
+     */
+    std::int32_t getMaxDistance() const;
+
+    /**
+     * @fn getServerPort
+     * @brief Get the server port.
+     * @return mServerPort
+     */
+    std::uint16_t getServerPort() const;
+
+    /**
+     * @fn isGndModeEnabled
+     * @brief Is the ground mode enabled?
+     * @return mGndMode
+     */
+    bool isGndModeEnabled() const;
+
+    /**
+     * @fn forceGndMode
+     * @brief Force ground mode to be enabled.
+     */
+    void forceGndMode();
+
+    /**
+     * @fn getFeedMapping
+     * @brief Get the list of feeds with their key-value maps.
+     * @return mFeedMapping
+     */
+    const FeedMapping& getFeedMapping() const;
 
 private:
     /**
      * @fn init
-     * @brief Initialize Configuration, read and unpack config file with ConfigReader.
-     * @param r_stream The input stream
-     * @return true on success and at least one feed was registered, else false
+     * @brief Unpack the given properties.
+     * @param crProperties The properties
+     * @throw std::invalid_argument from invoked statements
      */
-    bool init(std::istream& r_stream);
-    /**
-     * @fn registerFeeds
-     * @brief Register all input feeds found from ConfigReader.
-     * @note Only correctly configured feeds get registered.
-     * @param cr_map The PropertyMap holding read properties
-     * @return the number of registered feeds
-     */
-    std::size_t registerFeeds(const PropertyMap& cr_map);
+    void init(const PropertyMap& crProperties);
 
-    void resolveFallbacks(const PropertyMap& cr_map);
-    void resolveFilters(const PropertyMap& cr_map);
+    data::object::ExtGpsPosition resolvePosition(const PropertyMap& crProperties) const;
+
+    /**
+     * @fn resolveServerPort
+     * @brief Resolve the server port.
+     * @param crProperties The properties
+     * @return the port
+     */
+    std::uint16_t resolveServerPort(const PropertyMap& crProperties) const;
+
+    /**
+     * @fn resolveFeeds
+     * @brief Resolve the feeds and their config.
+     * @param crProperties The properties
+     * @return a list of all feeds with their config
+     */
+    FeedMapping resolveFeeds(const PropertyMap& crProperties);
+
+    /**
+     * @fn resolveFilter
+     * @brief Resolve a filter from the properties.
+     * @param crProperties The properties
+     * @param crKey        The filter key
+     * @return the filter value
+     */
+    std::int32_t resolveFilter(const PropertyMap& crProperties,
+                               const std::string& crKey) const;
+
+    /**
+     * @fn checkNumberValue
+     * @brief Check a Number.
+     * @param crOptNumber The Number
+     * @param crSection   The section name
+     * @param crKey       The key
+     * @return the number value
+     * @throw std::invalid_argument if the value is invalid
+     */
+    util::Number checkNumberValue(const util::OptNumber& crOptNumber,
+                                  const std::string& crSection,
+                                  const std::string& crKey) const;
+
+    /**
+     * @fn dumpInfo
+     * @brief Dump the current config state using info logs.
+     */
+    void dumpInfo() const;
+
+    /// @var mLatitude
+    /// Base latitude
+    data::object::ExtGpsPosition mPosition;
+
+    /// @var mAtmPressure
+    /// Atmospheric pressure at base
+    double mAtmPressure;
+
+    /// @var mMaxHeight
+    /// Maximum height for reported Aircrafts
+    std::int32_t mMaxHeight;
+
+    /// @var mMaxDistance
+    /// Maximum distance for reported Aircrafts
+    std::int32_t mMaxDistance;
+
+    /// @var mServerPort
+    /// Port where to serve reports
+    std::uint16_t mServerPort;
+
+    /// @var mFeedMapping
+    /// List of feeds with their key-value map
+    FeedMapping mFeedMapping;
 };
 
 }  // namespace config
-
-#endif /* SRC_CONFIG_CONFIGURATION_H_ */

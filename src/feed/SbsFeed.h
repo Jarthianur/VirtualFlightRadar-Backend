@@ -19,25 +19,30 @@
  }
  */
 
-#ifndef SRC_FEED_SBSFEED_H_
-#define SRC_FEED_SBSFEED_H_
+#pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 
 #include "../config/PropertyMap.h"
-#include "../parser/SbsParser.h"
+#include "parser/SbsParser.h"
 #include "Feed.h"
+
+namespace data
+{
+class AircraftData;
+} /* namespace data */
 
 namespace feed
 {
-
 /**
  * @class SbsFeed extends Feed
  * @brief Represents a SBS input feed.
  * @see Feed.h
  */
-class SbsFeed: public Feed
+class SbsFeed : public Feed
 {
 public:
     /**
@@ -47,26 +52,30 @@ public:
      * @param prio     The priority
      * @param cr_kvmap The properties map
      */
-    SbsFeed(const std::string& cr_name, std::uint32_t prio,
-            const config::keyValueMap& cr_kvmap);
+    SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+            std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
+
     /**
      * @fn ~SbsFeed
      * @brief Destructor
      */
     virtual ~SbsFeed() noexcept;
+
     /**
      * @fn process
      * @brief Handle SbsClients response.
      * @param cr_res The response to process
      * @override Feed::process
      */
-    void process(const std::string& cr_res) noexcept override;
+    void process(const std::string& crResponse) noexcept override;
 
 private:
     /// Parser to unpack response from Client
     parser::SbsParser mParser;
+
+    std::size_t mDataSlot;
+
+    std::shared_ptr<data::AircraftData> mpData;
 };
 
-} // namespace feed
-
-#endif /* SRC_FEED_SBSFEED_H_ */
+}  // namespace feed

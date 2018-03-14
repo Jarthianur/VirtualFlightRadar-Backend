@@ -23,7 +23,7 @@
 #include <string>
 #include <boost/regex.hpp>
 
-#include "../../src/aircraft/Aircraft.hpp"
+#include "../../src/aircraft/Aircraft.h"
 #include "../../src/aircraft/AircraftProcessor.h"
 #include "../../src/config/Configuration.h"
 #include "../../src/aircraft/AircraftContainer.h"
@@ -47,8 +47,8 @@ void test_aircraft(TestSuitesRunner& runner)
 {
     describe<aircraft::AircraftProcessor>("Process Aircrafts", runner)->test("Aircraft at,above base pos", []()
     {
-        config::Configuration::filter_maxDist = INT32_MAX;
-        config::Configuration::filter_maxHeight = INT32_MAX;
+        config::Configuration::mMaxDistance = INT32_MAX;
+        config::Configuration::mMaxHeight = INT32_MAX;
         struct GpsPosition pos =
         {   49.0, 8.0, math::dToI(math::FEET_2_M * 3281)};
         double press = 1013.25;
@@ -57,7 +57,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -80,8 +80,8 @@ void test_aircraft(TestSuitesRunner& runner)
         assert(match.str(9), std::string("8"), helper::eqs);
     })->test("filter distance", []()
     {
-        config::Configuration::filter_maxDist = 10000;
-        config::Configuration::filter_maxHeight = INT32_MAX;
+        config::Configuration::mMaxDistance = 10000;
+        config::Configuration::mMaxHeight = INT32_MAX;
         struct GpsPosition pos =
         {   49.1, 8.1, math::dToI(math::FEET_2_M * 3281)};
         double press = 1013.25;
@@ -90,10 +90,10 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         assert(container.processAircrafts(base, press), std::string(""), helper::eqs);
-        config::Configuration::filter_maxDist = INT32_MAX;
+        config::Configuration::mMaxDistance = INT32_MAX;
     });
 
     describeParallel<aircraft::AircraftProcessor>("process relative positions", runner)->test("Cross Equator S to N", []()
@@ -106,7 +106,7 @@ void test_aircraft(TestSuitesRunner& runner)
         double press = 1013.25;
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -131,7 +131,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -156,7 +156,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -181,7 +181,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -206,7 +206,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -231,7 +231,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -256,7 +256,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -281,7 +281,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -306,7 +306,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -331,7 +331,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -356,7 +356,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -381,7 +381,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -406,7 +406,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -431,7 +431,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -456,7 +456,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -481,7 +481,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;
@@ -506,7 +506,7 @@ void test_aircraft(TestSuitesRunner& runner)
         std::string id("BBBBBB");
         Aircraft ac(id, pos);
         ac.setFullInfo(false);
-        ac.setTargetT(Aircraft::TargetType::TRANSPONDER);
+        ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
         container.upsert(ac, 0);
         std::string proc = container.processAircrafts(base, press);
         boost::smatch match;

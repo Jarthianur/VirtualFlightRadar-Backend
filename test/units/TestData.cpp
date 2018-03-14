@@ -22,7 +22,7 @@
 #include <boost/regex.hpp>
 #include <string>
 
-#include "../../src/aircraft/Aircraft.hpp"
+#include "../../src/aircraft/Aircraft.h"
 #include "../../src/aircraft/AircraftContainer.h"
 #include "../../src/config/Configuration.h"
 #include "../../src/data/AtmosphereData.h"
@@ -58,7 +58,7 @@ void test_data(TestSuitesRunner& runner)
 
         helper::parsSbs.unpack("MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0", ac);
         container.upsert(ac, 0);
-        for (int i = 0; i < AC_INVALIDATE; ++i)
+        for (int i = 0; i < AC_OUTDATED; ++i)
         {
             container.processAircrafts(pos, press);
         }
@@ -80,8 +80,8 @@ void test_data(TestSuitesRunner& runner)
     })->test("prefer FLARM, accept again if no input",
              []()
     {
-        config::Configuration::filter_maxDist = INT32_MAX;
-        config::Configuration::filter_maxHeight = INT32_MAX;
+        config::Configuration::mMaxDistance = INT32_MAX;
+        config::Configuration::mMaxHeight = INT32_MAX;
         GpsPosition pos =
         {   49.0, 8.0, 0};
         double press = 1013.25;
@@ -114,8 +114,8 @@ void test_data(TestSuitesRunner& runner)
     })->test("write after attempt",
              []()
     {
-        config::Configuration::filter_maxDist = INT32_MAX;
-        config::Configuration::filter_maxHeight = INT32_MAX;
+        config::Configuration::mMaxDistance = INT32_MAX;
+        config::Configuration::mMaxHeight = INT32_MAX;
         GpsPosition pos =
         {   49.0, 8.0, 0};
         double press = 1013.25;
@@ -243,7 +243,7 @@ void test_data(TestSuitesRunner& runner)
         atm.init(info.mAtmosphere);
         assert(info.hasAtmosphere(), true, helper::eqb);
         assert(atm.getMdaStr(), std::string("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"), helper::eqs);
-        assert(atm.getAtmPress(), 1009.1, helper::eqd);
+        assert(atm.getAtmPressure(), 1009.1, helper::eqd);
     })->test("write higher priority", []()
     {
         struct Climate info =
@@ -253,13 +253,13 @@ void test_data(TestSuitesRunner& runner)
         std::uint64_t dummy = 0;
         data::AtmosphereData atm;
         atm.init(info.mAtmosphere);
-        assert(atm.getAtmPress(), 900.0, helper::eqd);
+        assert(atm.getAtmPressure(), 900.0, helper::eqd);
         info.mAtmosphere.pressure = 1000.0;
         atm.update(info.mAtmosphere, 2, dummy);
-        assert(atm.getAtmPress(), 1000.0, helper::eqd);
+        assert(atm.getAtmPressure(), 1000.0, helper::eqd);
         info.mAtmosphere.pressure = 950.0;
         atm.update(info.mAtmosphere, 1, dummy);
-        assert(atm.getAtmPress(), 1000.0, helper::eqd);
+        assert(atm.getAtmPressure(), 1000.0, helper::eqd);
     })->test("write after attempt", []()
     {
         struct Climate info =
@@ -269,19 +269,19 @@ void test_data(TestSuitesRunner& runner)
         std::uint64_t dummy = 0;
         data::AtmosphereData atm;
         atm.init(info.mAtmosphere);
-        assert(atm.getAtmPress(), 900.0, helper::eqd);
+        assert(atm.getAtmPressure(), 900.0, helper::eqd);
         info.mAtmosphere.pressure = 1000.0;
         atm.update(info.mAtmosphere, 2, dummy);
-        assert(atm.getAtmPress(), 1000.0, helper::eqd);
+        assert(atm.getAtmPressure(), 1000.0, helper::eqd);
         assert(dummy, (std::uint64_t) 0, helper::equl);
         info.mAtmosphere.pressure = 950.0;
         atm.update(info.mAtmosphere, 1, dummy);
         assert(dummy, (std::uint64_t) 0, helper::equl);
-        assert(atm.getAtmPress(), 1000.0, helper::eqd);
+        assert(atm.getAtmPressure(), 1000.0, helper::eqd);
         atm.update(info.mAtmosphere, 1, dummy);
         assert(dummy, (std::uint64_t) 1, helper::equl);
         atm.update(info.mAtmosphere, 1, dummy);
         assert(dummy, (std::uint64_t) 0, helper::equl);
-        assert(atm.getAtmPress(), 950.0, helper::eqd);
+        assert(atm.getAtmPressure(), 950.0, helper::eqd);
     });
 }

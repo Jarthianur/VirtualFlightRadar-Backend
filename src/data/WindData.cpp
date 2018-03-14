@@ -19,50 +19,55 @@
  }
  */
 
-#include <boost/thread/lock_guard.hpp>
 #include "WindData.h"
 
-using namespace util;
+#include <algorithm>
+#include <stdexcept>
+#include <boost/thread/lock_guard.hpp>
+
+using namespace data::object;
 
 namespace data
 {
+WindData::WindData() : Data()
+{}
 
-WindData::WindData()
-		: Data<struct Wind>()
-{
-}
+WindData::WindData(const object::Wind& crWind) : Data(), mWind(crWind)
+{}
 
 WindData::~WindData() noexcept
+{}
+
+std::string WindData::getSerialized()
 {
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::string tmp(mWind.getSerialized());
+    mWind.setSerialized("");
+    return tmp;
 }
 
-void WindData::update(const struct Wind& crWind, std::uint32_t vPriority,
-        std::uint64_t& rAttempts)
+bool WindData::update(const Object& crWind, std::size_t vSlot)
 {
-	boost::lock_guard<boost::mutex> lock(mWind.mutex);
-	if (mWind.trySetValue(crWind, vPriority, rAttempts))
-	{
-		rAttempts = 0;
-	}
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    try
+    {
+        bool updated = mWind.tryUpdate(crWind, ++mAttempts.at(vSlot));
+        if(updated)
+        {
+            std::fill(mAttempts.begin(), mAttempts.end(), 0);
+        }
+        return updated;
+    }
+    catch(const std::out_of_range&)
+    {
+        return false;
+    }
 }
 
-std::string WindData::getMwvStr()
+std::size_t WindData::registerSlot()
 {
-	boost::lock_guard<boost::mutex> lock(mWind.mutex);
-	if (mWind.isValueValid)
-	{
-		return mWind.getValue().mwvStr + "\n";
-	}
-	else
-	{
-		return "";
-	}
-}
-
-void WindData::init(struct Wind vWind)
-{
-	std::uint64_t dummy = 0;
-	mWind.trySetValue(vWind, 0, dummy);
+    mAttempts.push_back(0);
+    return mAttempts.size() - 1;
 }
 
 }  // namespace data

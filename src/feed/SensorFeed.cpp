@@ -21,52 +21,48 @@
 
 #include "SensorFeed.h"
 
-#include <memory>
 #include <unordered_map>
 
 #include "../config/Configuration.h"
 #include "../data/AtmosphereData.h"
 #include "../data/WindData.h"
-#include "../network/client/SensorClient.h"
-#include "../util/Sensor.h"
-#include "../VFRB.h"
-
-using namespace util;
+#include "../data/object/Atmosphere.h"
+#include "../data/object/Climate.h"
+#include "../data/object/Wind.h"
+#include "client/SensorClient.h"
 
 namespace feed
 {
-
-SensorFeed::SensorFeed(const std::string& crName, std::uint32_t vPriority,
-        const config::keyValueMap& crKvMap)
-		: Feed(crName, vPriority, crKvMap),
-		  mWindUpdateAttempts(0),
-		  mAtmosUpdateAttempts(0)
+SensorFeed::SensorFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+                       std::shared_ptr<data::WindData> pWindData,
+                       std::shared_ptr<data::AtmosphereData> pAtmosData)
+    : Feed(crName, crKvMap), mpWindData(pWindData), mpAtmosphereData(pAtmosData)
 
 {
-	mpClient = std::unique_ptr<network::client::Client>(
-	        new network::client::SensorClient(mKvMap.find(KV_KEY_HOST)->second,
-	                mKvMap.find(KV_KEY_PORT)->second, *this));
+    mpClient   = std::unique_ptr<client::Client>(new client::SensorClient(
+        mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
+    mWindSlot  = mpWindData->registerSlot();
+    mAtmosSlot = mpAtmosphereData->registerSlot();
 }
 
 SensorFeed::~SensorFeed() noexcept
-{
-}
+{}
 
 void SensorFeed::process(const std::string& crResponse) noexcept
 {
-	struct Climate climate;
-	if (mParser.unpack(crResponse, climate))
-	{
-		if (climate.hasWind())
-		{
-			VFRB::msWindData.update(climate.mWind, mPriority, mWindUpdateAttempts);
-		}
-		if (climate.hasAtmosphere())
-		{
-			VFRB::msAtmosData.update(climate.mAtmosphere, mPriority,
-			        mAtmosUpdateAttempts);
-		}
-	}
+    data::object::Climate climate{data::object::Wind(getPriority()),
+                                  data::object::Atmosphere(getPriority())};
+    if(mParser.unpack(crResponse, climate))
+    {
+        if(climate.hasWind())
+        {
+            mpWindData->update(climate.mWind, mWindSlot);
+        }
+        if(climate.hasAtmosphere())
+        {
+            mpAtmosphereData->update(climate.mAtmosphere, mAtmosSlot);
+        }
+    }
 }
 
-} // namespace feed
+}  // namespace feed
