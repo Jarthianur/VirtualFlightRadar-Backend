@@ -21,11 +21,11 @@
 
 #pragma once
 
-#include <boost/regex.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <cstddef>
 #include <istream>
 #include <string>
+#include <boost/optional.hpp>
+#include <boost/regex.hpp>
 
 #include "PropertyMap.h"
 
@@ -64,18 +64,18 @@ private:
      * @fn parseSection
      * @brief Parse a section.
      * @param crLine The string to parse
-     * @return a tuple with the section and a valid flag
+     * @return an optional section name
      */
-    boost::tuple<bool, std::string> parseSection(const std::string& crLine);
+    boost::optional<std::string> parseSection(const std::string& crLine);
 
     /**
      * @fn parseKeyValue
      * @brief Parse a key-value pair.
      * @see mConfRe
      * @param crLine The string to parse
-     * @return a tuple with the KeyValue and a valid flag
+     * @return an optional KeyValue
      */
-    boost::tuple<bool, KeyValue> parseKeyValue(const std::string& crLine);
+    boost::optional<KeyValue> parseKeyValue(const std::string& crLine);
 
     /**
      * @fn addKeyValue

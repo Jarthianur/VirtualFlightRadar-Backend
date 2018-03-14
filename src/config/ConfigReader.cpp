@@ -50,64 +50,58 @@ void ConfigReader::read(std::istream& rStream, PropertyMap& rMap)
             continue;
         }
 
-        auto section = parseSection(currentLine);
-        if(section.get<0>())
+        boost::optional<std::string> section = parseSection(currentLine);
+        if(section)
         {
-            currentSection = section.get<1>();
+            currentSection = *section;
             addSection(currentSection, lineNr, rMap);
             continue;
         }
 
-        auto keyValue = parseKeyValue(currentLine);
-        if(keyValue.get<0>())
+        boost::optional<KeyValue> keyValue = parseKeyValue(currentLine);
+        if(keyValue)
         {
-            addKeyValue(currentSection, keyValue.get<1>(), lineNr, rMap);
+            addKeyValue(currentSection, *keyValue, lineNr, rMap);
         }
         else
         {
             Logger::error("(ConfigReader) malformed param [", std::to_string(lineNr),
-                           "]: ", currentLine);
+                          "]: ", currentLine);
         }
     }
 }
 
-boost::tuple<bool, std::string> ConfigReader::parseSection(const std::string& crLine)
+boost::optional<std::string> ConfigReader::parseSection(const std::string& crLine)
 {
-    std::string section;
-    bool valid = false;
     if(crLine.at(0) == '[')
     {
         try
         {
-            section = crLine.substr(1, crLine.rfind(']') - 1);
-            valid   = true;
+            return crLine.substr(1, crLine.rfind(']') - 1);
         }
         catch(const std::out_of_range&)
         {
         }
     }
-    return boost::make_tuple(valid, section);
+    return boost::none;
 }
 
-boost::tuple<bool, KeyValue> ConfigReader::parseKeyValue(const std::string& crLine)
+boost::optional<KeyValue> ConfigReader::parseKeyValue(const std::string& crLine)
 {
-    std::string key;
-    std::string value;
     boost::smatch match;
-    bool valid = boost::regex_match(crLine, match, mConfRe);
 
-    if(valid)
+    if(boost::regex_match(crLine, match, mConfRe))
     {
-        key           = match.str(1);
-        value         = match.str(2);
-        std::size_t l = value.find_last_not_of(' ');
+        std::string value = match.str(2);
+        std::size_t l     = value.find_last_not_of(' ');
 
         if(l != std::string::npos)
         {
             value = value.substr(0, l + 1);
         }
+        return std::make_pair(match.str(1), value);
     }
-    return boost::make_tuple(valid, std::make_pair(key, value));
+    return boost::none;
 }
 
 void ConfigReader::addSection(const std::string& crSection, std::size_t vLineNr,
@@ -116,7 +110,7 @@ void ConfigReader::addSection(const std::string& crSection, std::size_t vLineNr,
     if(!rMap.addProperty(crSection))
     {
         Logger::warn("(ConfigReader) could not add section [", std::to_string(vLineNr),
-                      "]: ", crSection);
+                     "]: ", crSection);
     }
 }
 
@@ -126,7 +120,7 @@ void ConfigReader::addKeyValue(const std::string& crSection, const KeyValue& crK
     if(!rMap.addProperty(crSection, crKeyValue))
     {
         Logger::warn("(ConfigReader) could not add property [", std::to_string(vLineNr),
-                      "]: ", crKeyValue.first);
+                     "]: ", crKeyValue.first);
     }
 }
 
