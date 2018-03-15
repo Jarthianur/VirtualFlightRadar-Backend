@@ -37,9 +37,6 @@ using namespace data::object;
 
 namespace data
 {
-AircraftData::AircraftData() : AircraftData(0)
-{}
-
 AircraftData::AircraftData(std::int32_t vMaxDist) : Data(), mProcessor(vMaxDist)
 {
     mContainer.reserve(ESTIMATED_TRAFFIC);
@@ -90,13 +87,13 @@ bool AircraftData::update(const Object& crAircraft, std::size_t vSlot)
 
 std::size_t AircraftData::registerSlot()
 {
-    ++nrOfRegisteredFeeds;
+    ++mNrOfRegisteredFeeds;
     // Just to be sure, but this should never happen.
     for(auto& it : mIndexMap)
     {
-        it.second.second.assign(nrOfRegisteredFeeds, 0);
+        it.second.second.assign(mNrOfRegisteredFeeds, 0);
     }
-    return nrOfRegisteredFeeds - 1;
+    return mNrOfRegisteredFeeds - 1;
 }
 
 void AircraftData::processAircrafts(const Position& crRefPosition,
@@ -147,7 +144,7 @@ void AircraftData::insert(const object::Aircraft& crAircraft)
 {
     mIndexMap.insert(
         {crAircraft.getId(),
-         {mContainer.size(), std::vector<std::uint32_t>(nrOfRegisteredFeeds, 0)}});
+         {mContainer.size(), std::vector<std::uint32_t>(mNrOfRegisteredFeeds, 0)}});
     mContainer.push_back(crAircraft);
 }
-}  // namespace aircraft
+}  // namespace data

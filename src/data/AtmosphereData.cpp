@@ -32,7 +32,8 @@ namespace data
 AtmosphereData::AtmosphereData() : Data()
 {}
 
-AtmosphereData::AtmosphereData(const Atmosphere& crAtmosphere) : Data(), mAtmosphere(crAtmosphere)
+AtmosphereData::AtmosphereData(const Atmosphere& crAtmosphere)
+    : Data(), mAtmosphere(crAtmosphere)
 {}
 
 AtmosphereData::~AtmosphereData() noexcept

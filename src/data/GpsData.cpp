@@ -64,10 +64,11 @@ bool GpsData::update(const Object& crPosition, std::size_t vSlot)
             std::fill(mAttempts.begin(), mAttempts.end(), 0);
             mPosition.setSerialized(mProcessor.process(mPosition));
         }
-        return (mPositionLocked = updated && mPosition.ground
-                                  && (mPosition.nrSats >= GPS_NR_SATS_GOOD
-                                      && mPosition.fixQa >= GPS_FIX_GOOD
-                                      && mPosition.dilution <= GPS_HOR_DILUTION_GOOD));
+        return (mPositionLocked
+                = updated && mPosition.getGround()
+                  && (mPosition.getNrOfSatellites() >= GPS_NR_SATS_GOOD
+                      && mPosition.getFixQuality() >= GPS_FIX_GOOD
+                      && mPosition.getDilution() <= GPS_HOR_DILUTION_GOOD));
     }
     catch(const std::out_of_range&)
     {
@@ -84,7 +85,7 @@ std::size_t GpsData::registerSlot()
 Position GpsData::getGpsPosition()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mPosition.position;
+    return mPosition.getPosition();
 }
 
 }  // namespace data

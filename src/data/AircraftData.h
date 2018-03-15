@@ -49,19 +49,18 @@ namespace data
 {
 /**
  * @class AircraftData
- * @brief Store Aircrafts and trigger processor.
+ * @brief Store Aircrafts.
+ * @implements Data
  */
 class AircraftData : public Data
 {
 public:
-    AircraftData();
-
     /**
      * @fn AircraftData
      * @brief Constructor
      * @param vMaxDist The max distance filter
      */
-    explicit AircraftData(std::int32_t vMaxDist);
+    explicit AircraftData(std::int32_t vMaxDist = 0);
 
     /**
      * @fn ~AircraftData
@@ -69,31 +68,46 @@ public:
      */
     virtual ~AircraftData() noexcept;
 
+    /**
+     * @fn getSerialized
+     * @brief Get the reports for all processed Aircrafts
+     * @return the report
+     * @threadsafe
+     */
     std::string getSerialized() override;
 
     /**
-     * @fn upsert
-     * @brief Insert or update an Aircraft, if priority is high enough.
-     * @param rUpdate
-     * @param vPriority
+     * @fn update
+     * @brief Insert or update an Aircraft.
+     * @note The success depends on the registered attempts and the update priority.
+     * @param crAircraft The update
+     * @param vSlot      The attempt slot
+     * @return true on success, else false
+     * @threadsafe
      */
     bool update(const object::Object& crAircraft, std::size_t vSlot) override;
 
+    /**
+     * @see Data#registerSlot
+     */
     std::size_t registerSlot() override;
 
     /**
      * @fn processAircrafts
-     * @brief Process all Aircrafts and get the reports.
-     * @param crBasePos The base position to relate
+     * @brief Process all Aircrafts.
+     * @param crRefPosition The refered position
      * @param vAtmPress The atmospheric pressure
-     * @param vMaxDist  The max distance
-     * @return the string with all NMEA reports
      * @threadsafe
      */
     void processAircrafts(const object::Position& crRefPosition,
                           double vAtmPress) noexcept;
 
 private:
+    /**
+     * @fn insert
+     * @brief Insert an Aircraft in the internal container.
+     * @param crAircraft The aircraft
+     */
     void insert(const object::Aircraft& crAircraft);
 
     /// @var mProcessor
@@ -105,11 +119,13 @@ private:
     std::vector<object::Aircraft> mContainer;
 
     /// @var mIndexMap
-    /// Map IDs to vector indices to make find efficient
+    /// Map aircraft Id's to index and attempt counters.
     std::unordered_map<std::string, std::pair<std::size_t, std::vector<std::uint32_t>>>
         mIndexMap;
 
-    std::size_t nrOfRegisteredFeeds = 0;
+    /// @var mNrOfRegisteredFeeds
+    /// The number of registered Feeds
+    std::size_t mNrOfRegisteredFeeds = 0;
 };
 
 }  // namespace data

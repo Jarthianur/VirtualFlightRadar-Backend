@@ -35,17 +35,22 @@ namespace data
 {
 /**
  * @class GpsData
- * @brief Manage GPS information.
+ * @brief Store GPS information.
+ * @implements Data
  */
 class GpsData : public Data
 {
 public:
+    /**
+     * @fn GpsData
+     * @brief Constructor
+     */
     GpsData();
 
     /**
      * @fn GpsData
      * @brief Constructor
-     * @param vPosition The initial info
+     * @param crPosition The initial info
      */
     explicit GpsData(const object::GpsPosition& crPosition);
 
@@ -56,17 +61,16 @@ public:
     virtual ~GpsData() noexcept;
 
     /**
-     * @fn getGpsStr
-     * @brief Get a full NMEA GPS report.
-     * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
+     * @fn getSerialized
+     * @brief Get NMEA GPS report.
      * @return the NMEA string
      * @threadsafe
      */
     std::string getSerialized() override;
 
     /**
-     * @fn getBasePos
-     * @brief Get the base GPS position.
+     * @fn getGpsPosition
+     * @brief Get the GPS position.
      * @return the position
      * @threadsafe
      */
@@ -76,26 +80,32 @@ public:
      * @fn update
      * @brief Try to update the base position.
      * @param crPosition The new position
-     * @param vPriority  The attempts priority
-     * @param rAttempts  The update attempts
+     * @param vSlot      The attempt slot
+     * @return true on success, else false
+     * @threadsafe
      */
     bool update(const object::Object& crPosition, std::size_t vSlot) override;
 
+    /**
+     * @see Data#registerSlot
+     */
     std::size_t registerSlot() override;
 
 private:
-    /// @var mBasePos
-    /// Wrapper holding the base position
+    /// @var mPosition
+    /// The position
     object::GpsPosition mPosition;
 
-    /// @var mGpsModule
-    /// GpsModule providing functionality to build GPS sentences
+    /// @var mProcessor
+    /// Processor for GPS information
     processor::GpsProcessor mProcessor;
 
-    /// @var mPosLocked
+    /// @var mPositionLocked
     /// Locking state of the current position
     bool mPositionLocked = false;
 
+    /// @var mAttempts
+    /// Store update attempts
     std::vector<std::uint32_t> mAttempts;
 };
 
