@@ -44,7 +44,7 @@ std::string GpsProcessor::genGpggaStr(const GpsPosition& crPosition)
 {
     std::time_t now = std::time(0);
     std::tm* utc    = std::gmtime(&now);
-    evalPosition(crPosition.position.latitude, crPosition.position.longitude);
+    evalPosition(crPosition.getPosition().latitude, crPosition.getPosition().longitude);
 
     // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
     // support others.
@@ -52,10 +52,9 @@ std::string GpsProcessor::genGpggaStr(const GpsPosition& crPosition)
         mBuffer, sizeof(mBuffer),
         /*"$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"*/
         "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02d,1,%d,M,%.1lf,M,,*",
-        utc->tm_hour, utc->tm_min, utc->tm_sec, mtLatDeg, mtLatMin, mtLatStr, mtLongDeg,
-        mtLongMin, mtLongStr, /*pos.fixQa,*/ crPosition.nrSats,
-        crPosition.position.altitude, crPosition.geoid);
-
+        utc->tm_hour, utc->tm_min, utc->tm_sec, mtLatDeg, mtLatMin, mtLatStr, mtLonDeg,
+        mtLonMin, mtLonStr, /*pos.fixQa,*/ crPosition.getNrOfSatellites(),
+        crPosition.getPosition().altitude, crPosition.getGeoid());
     std::string nmea_str(mBuffer);
     finishSentence(nmea_str);
 
@@ -66,14 +65,13 @@ std::string GpsProcessor::genGprmcStr(const GpsPosition& crPosition)
 {
     std::time_t now = std::time(0);
     std::tm* utc    = std::gmtime(&now);
-    evalPosition(crPosition.position.latitude, crPosition.position.longitude);
+    evalPosition(crPosition.getPosition().latitude, crPosition.getPosition().longitude);
 
     std::snprintf(
         mBuffer, sizeof(mBuffer),
         "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
-        utc->tm_hour, utc->tm_min, utc->tm_sec, mtLatDeg, mtLatMin, mtLatStr, mtLongDeg,
-        mtLongMin, mtLongStr, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
-
+        utc->tm_hour, utc->tm_min, utc->tm_sec, mtLatDeg, mtLatMin, mtLatStr, mtLonDeg,
+        mtLonMin, mtLonStr, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
     std::string nmea_str(mBuffer);
     finishSentence(nmea_str);
 
@@ -82,13 +80,13 @@ std::string GpsProcessor::genGprmcStr(const GpsPosition& crPosition)
 
 void GpsProcessor::evalPosition(double vLatitude, double vLongitude)
 {
-    mtLatStr  = (vLatitude < 0) ? 'S' : 'N';
-    mtLongStr = (vLongitude < 0) ? 'W' : 'E';
-    mtLatDeg  = std::abs(std::floor(vLatitude));
-    mtLatMin  = std::abs(60.0 * (vLatitude - mtLatDeg));
-    mtLongDeg = std::abs(std::floor(vLongitude));
-    mtLongMin = std::abs(60.0 * (vLongitude - mtLongDeg));
+    mtLatStr = (vLatitude < 0) ? 'S' : 'N';
+    mtLonStr = (vLongitude < 0) ? 'W' : 'E';
+    mtLatDeg = std::abs(std::floor(vLatitude));
+    mtLatMin = std::abs(60.0 * (vLatitude - mtLatDeg));
+    mtLonDeg = std::abs(std::floor(vLongitude));
+    mtLonMin = std::abs(60.0 * (vLongitude - mtLonDeg));
 }
 
-}  // namespace util
-}
+}  // namespace processor
+}  // namespace data

@@ -99,7 +99,7 @@ std::string AircraftProcessor::genPflauStr(const Aircraft& crAircraft)
 
 std::string AircraftProcessor::genPflaaStr(const Aircraft& crAircraft)
 {
-    if(crAircraft.hasFullInfo())
+    if(crAircraft.getFullInfoAvailable())
     {
         std::snprintf(
             mBuffer, sizeof(mBuffer), "$PFLAA,0,%d,%d,%d,%d,%s,%03d,,%d,%3.1lf,%1x*",
@@ -121,5 +121,5 @@ std::string AircraftProcessor::genPflaaStr(const Aircraft& crAircraft)
     return tmp;
 }
 
-}  // namespace aircraft
-}
+}  // namespace processor
+}  // namespace data

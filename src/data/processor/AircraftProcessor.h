@@ -28,19 +28,26 @@
 #include "../object/Position.h"
 #include "Processor.hpp"
 
+/// @namespace data
 namespace data
 {
-/// @namespace aircraft
+/// @namespace processor
 namespace processor
 {
 /**
  * @class AircraftProcessor
- * @brief Process Aircrafts relative to the base position.
+ * @brief Process Aircrafts relative to the refered position.
+ * @extends Processor
  */
 class AircraftProcessor : public Processor<object::Aircraft>
 {
 public:
+    /**
+     * @fn AircraftProcessor
+     * @brief Constructor
+     */
     AircraftProcessor();
+
     /**
      * @fn AircraftProcessor
      * @brief Constructor
@@ -56,41 +63,44 @@ public:
 
     /**
      * @fn process
-     * @brief Generate NMEA report for an Aircraft with relative position etc.
+     * @brief Generate NMEA report for an Aircraft.
      * @note Resulting string has trailing <cr><lf>.
      * @param crAircraft The Aircraft to process
-     * @param crRelPos   The position to relate
-     * @param vAtmPress  The atmospheric pressure
-     * @param vMaxDist   The max distance
      * @return the NMEA string
      */
     std::string process(const object::Aircraft& crAircraft) override;
 
+    /**
+     * @fn setRefered
+     * @brief Set the refered position and atmospheric pressure.
+     * @note This method must be called before process, in order to process an Aircraft
+     * for the latest state.
+     * @param crRefPosition The position
+     * @param vAtmPress     The pressure
+     */
     void setRefered(const object::Position& crRefPosition, double vAtmPress);
 
 private:
     /**
-     * @fn calcRelPosToBase
-     * @brief Calcutale an Aircrafts position relative to the base.
+     * @fn calcRelativePosition
+     * @brief Calcutale an Aircrafts position relative to the refered one.
      * @param crAircraft The Aircraft to calculate for
-     * @param crRelPos   The position to relate
-     * @param vAtmPress  The atmospheric pressure
      */
     void calcRelativePosition(const object::Aircraft& crAircraft);
 
     /**
-     * @fn buildPflauStr
-     * @brief Build PFLAU sentence for an aircraft.
+     * @fn genPflauStr
+     * @brief Generate PFLAU sentence for an Aircraft.
      * @param crAircraft The Aircaft
-     * @param rDestStr   The destination string
+     * @return the sentence
      */
     std::string genPflauStr(const object::Aircraft& crAircraft);
 
     /**
-     * @fn buildPflaaStr
-     * @brief Build PFLAA sentence for an aircraft.
+     * @fn genPflaaStr
+     * @brief Generate PFLAA sentence for an Aircraft.
      * @param crAircraft The Aircaft
-     * @param rDestStr   The destination string
+     * @return the sentence
      */
     std::string genPflaaStr(const object::Aircraft& crAircraft);
 
@@ -98,32 +108,34 @@ private:
     /// Max distance to process an aircraft
     const std::int32_t mMaxDistance;
 
+    /// @var mtReferedPosition
+    /// The refered position
     object::Position mtReferedPosition{0.0, 0.0, 0};
 
     double mtAtmPressure = 1013.25;
 
-    /// @var mtRadLatB
-    /// Base latitude as radian
+    /// @var mtReferedLatRad
+    /// Refered latitude as radian
     double mtReferedLatRad = 0.0;
 
-    ///@var mtRadLatAc
+    /// @var mtAircraftLatRad
     /// Aircraft latitude as radian
     double mtAircraftLatRad = 0.0;
 
-    /// @var mtLatDist
-    /// Distance/Difference between Aircrafts and bases latitude
+    /// @var mtLatDistance
+    /// Distance/Difference between Aircraft's and refered latitude
     double mtLatDistance = 0.0;
 
-    /// @var mtRadLongB
-    /// Base longitude as radian
+    /// @var mtReferedLonRad
+    /// Refered longitude as radian
     double mtReferedLonRad = 0.0;
 
-    ///@var mtRadLongAc
-    /// Aircraft longitude as radian
+    /// @var mtAircraftLonRad
+    /// Aircraft's longitude as radian
     double mtAircraftLonRad = 0.0;
 
-    /// @var mtLongDist
-    /// Distance/Difference between Aircraft and base longitude
+    /// @var mtLonDistance
+    /// Distance/Difference between Aircraft's and refered longitude
     double mtLonDistance = 0.0;
 
     /// @var mtBearingRel
@@ -134,22 +146,22 @@ private:
     /// Absolute bearing
     double mtBearingAbs = 0.0;
 
-    /// @var mtRelN
+    /// @var mtRelNorth
     /// Relative distance in northern direction; m
     std::int32_t mtRelNorth = 0;
 
-    /// @var mtRelE
+    /// @var mtRelEast
     /// Relative distance in eastern direction; m
     std::int32_t mtRelEast = 0;
 
-    /// @var mtRelV
+    /// @var mtRelVertical
     /// Relative vertical distance; m
     std::int32_t mtRelVertical = 0;
 
-    /// @var mtDist
-    /// Distance between Aircraft and base; m
+    /// @var mtDistance
+    /// Distance between Aircraft and refered position; m
     std::int32_t mtDistance = 0;
 };
 
-}  // namespace aircraft
-}
+}  // namespace processor
+}  // namespace data
