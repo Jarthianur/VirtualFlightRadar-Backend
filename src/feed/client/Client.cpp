@@ -123,4 +123,4 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
 }
 
 }  // namespace client
-}  // namespace network
+}  // namespace feed

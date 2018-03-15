@@ -28,8 +28,10 @@
 
 #include "Client.h"
 
+/// @namespace feed
 namespace feed
 {
+/// @namespace client
 namespace client
 {
 /**
@@ -131,4 +133,4 @@ private:
 };
 
 }  // namespace client
-}  // namespace network
+}  // namespace feed
