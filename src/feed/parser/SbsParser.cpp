@@ -67,51 +67,46 @@ bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
         }
         p = delim + 1;
     }
-    if(i < 15)
-    {
-        return false;
-    }
     rAircraft.setPosition(pos);
-    rAircraft.setFullInfoAvailable(false);
     rAircraft.setTargetType(Aircraft::TargetType::TRANSPONDER);
     rAircraft.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
     rAircraft.setIdType(Aircraft::IdType::ICAO);
-
-    return pos.altitude <= mMaxHeight;
+    return i == 15 && pos.altitude <= mMaxHeight;
 }
 
 bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
                            Position& rPosition, Aircraft& rAircraft)
 {
-    if(crStr.empty())
+    bool valid = !crStr.empty();
+    if(valid)
     {
-        return false;
-    }
-    try
-    {
-        switch(vField)
+        try
         {
-            case SBS_FIELD_ID:
-                rAircraft.setId(crStr);
-                break;
-            case SBS_FIELD_ALT:
-                rPosition.altitude = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
-                break;
-            case SBS_FIELD_LAT:
-                rPosition.latitude = std::stod(crStr);
-                break;
-            case SBS_FIELD_LON:
-                rPosition.longitude = std::stod(crStr);
-                break;
-            default:
-                break;
+            switch(vField)
+            {
+                case SBS_FIELD_ID:
+                    rAircraft.setId(crStr);
+                    break;
+                case SBS_FIELD_ALT:
+                    rPosition.altitude
+                        = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
+                    break;
+                case SBS_FIELD_LAT:
+                    rPosition.latitude = std::stod(crStr);
+                    break;
+                case SBS_FIELD_LON:
+                    rPosition.longitude = std::stod(crStr);
+                    break;
+                default:
+                    break;
+            }
+        }
+        catch(const std::logic_error&)
+        {
+            valid = false;
         }
     }
-    catch(const std::logic_error&)
-    {
-        return false;
-    }
-    return true;
+    return valid;
 }
 }
 }  // namespace parser
