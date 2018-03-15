@@ -61,8 +61,8 @@ void AircraftProcessor::calcRelativePosition(const Aircraft& crAircraft)
 {
     mtReferedLatRad  = math::radian(mtReferedPosition.latitude);
     mtReferedLonRad  = math::radian(mtReferedPosition.longitude);
-    mtAircraftLonRad = math::radian(crAircraft.getLongitude());
-    mtAircraftLatRad = math::radian(crAircraft.getLatitude());
+    mtAircraftLonRad = math::radian(crAircraft.getPosition().longitude);
+    mtAircraftLatRad = math::radian(crAircraft.getPosition().latitude);
     mtLonDistance    = mtAircraftLonRad - mtReferedLonRad;
     mtLatDistance    = mtAircraftLatRad - mtReferedLatRad;
 
@@ -79,11 +79,12 @@ void AircraftProcessor::calcRelativePosition(const Aircraft& crAircraft)
                   * std::cos(mtAircraftLonRad - mtReferedLonRad)));
     mtBearingAbs = std::fmod((mtBearingRel + 360.0), 360.0);
 
-    mtRelNorth    = math::doubleToInt(std::cos(math::radian(mtBearingAbs)) * mtDistance);
-    mtRelEast     = math::doubleToInt(std::sin(math::radian(mtBearingAbs)) * mtDistance);
-    mtRelVertical = crAircraft.getTargetType() == Aircraft::TargetType::TRANSPONDER
-                        ? crAircraft.getAltitude() - math::icaoHeight(mtAtmPressure)
-                        : crAircraft.getAltitude() - mtReferedPosition.altitude;
+    mtRelNorth = math::doubleToInt(std::cos(math::radian(mtBearingAbs)) * mtDistance);
+    mtRelEast  = math::doubleToInt(std::sin(math::radian(mtBearingAbs)) * mtDistance);
+    mtRelVertical
+        = crAircraft.getTargetType() == Aircraft::TargetType::TRANSPONDER
+              ? crAircraft.getPosition().altitude - math::icaoHeight(mtAtmPressure)
+              : crAircraft.getPosition().altitude - mtReferedPosition.altitude;
 }
 
 std::string AircraftProcessor::genPflauStr(const Aircraft& crAircraft)
@@ -104,9 +105,9 @@ std::string AircraftProcessor::genPflaaStr(const Aircraft& crAircraft)
             mBuffer, sizeof(mBuffer), "$PFLAA,0,%d,%d,%d,%d,%s,%03d,,%d,%3.1lf,%1x*",
             mtRelNorth, mtRelEast, mtRelVertical,
             static_cast<std::int32_t>(crAircraft.getIdType()), crAircraft.getId().c_str(),
-            math::doubleToInt(crAircraft.getHeading()),
-            math::doubleToInt(crAircraft.getGndSpeed() * math::MS_2_KMH),
-            crAircraft.getClimbRate(),
+            math::doubleToInt(crAircraft.getMovement().heading),
+            math::doubleToInt(crAircraft.getMovement().gndSpeed * math::MS_2_KMH),
+            crAircraft.getMovement().climbRate,
             static_cast<std::uint32_t>(crAircraft.getAircraftType()));
     }
     else

@@ -106,34 +106,14 @@ std::uint32_t& Aircraft::getUpdateAge()
     return mUpdateAge;
 }
 
-double Aircraft::getLatitude() const
+const GpsPosition& Aircraft::getPosition() const
 {
-    return mPosition.latitude;
+    return mPosition;
 }
 
-double Aircraft::getLongitude() const
+const Movement& Aircraft::getMovement() const
 {
-    return mPosition.longitude;
-}
-
-std::int32_t Aircraft::getAltitude() const
-{
-    return mPosition.altitude;
-}
-
-double Aircraft::getGndSpeed() const
-{
-    return mMovement.gndSpeed;
-}
-
-double Aircraft::getHeading() const
-{
-    return mMovement.heading;
-}
-
-double Aircraft::getClimbRate() const
-{
-    return mMovement.climbRate;
+    return mMovement;
 }
 
 void Aircraft::setId(const std::string& crId)
@@ -141,9 +121,9 @@ void Aircraft::setId(const std::string& crId)
     mId = crId;
 }
 
-void Aircraft::setPosition(const GpsPosition& crPos)
+void Aircraft::setPosition(const GpsPosition& crPosition)
 {
-    mPosition = crPos;
+    mPosition = crPosition;
 }
 
 void Aircraft::setAircraftType(Aircraft::AircraftType vType)
@@ -159,19 +139,9 @@ void Aircraft::setIdType(Aircraft::IdType vType)
                                                                   : vType;
 }
 
-void Aircraft::setClimbRate(double vRate)
+void Aircraft::setMovement(const Movement& crMovement)
 {
-    mMovement.climbRate = vRate;
-}
-
-void Aircraft::setHeading(double vHeading)
-{
-    mMovement.heading = vHeading;
-}
-
-void Aircraft::setGndSpeed(double vGndSpd)
-{
-    mMovement.gndSpeed = vGndSpd;
+    mMovement = crMovement;
 }
 
 void Aircraft::setTargetType(Aircraft::TargetType vType)

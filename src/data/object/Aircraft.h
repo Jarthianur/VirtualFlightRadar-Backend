@@ -198,46 +198,18 @@ public:
     std::uint32_t& getUpdateAge();
 
     /**
-     * @fn getLatitude
-     * @brief Get the latitude.
-     * @return mPosition.latitude
+     * @fn getPosition
+     * @brief Get the position.
+     * @return mPosition
      */
-    double getLatitude() const;
+    const GpsPosition& getPosition() const;
 
     /**
-     * @fn getLongitude
-     * @brief Get the longitude.
-     * @return mPosition.longitude
+     * @fn getMovement
+     * @brief Get the movement data.
+     * @return mMovement
      */
-    double getLongitude() const;
-
-    /**
-     * @fn getAltitude
-     * @brief Get the altitude.
-     * @return mPosition.altitude.
-     */
-    std::int32_t getAltitude() const;
-
-    /**
-     * @fn getGndSpeed
-     * @brief Get the speed over ground.
-     * @return mMovement.gndSpeed
-     */
-    double getGndSpeed() const;
-
-    /**
-     * @fn getHeading
-     * @brief Get the heading.
-     * @return mMovement.heading
-     */
-    double getHeading() const;
-
-    /**
-     * @fn getClimbRate
-     * @brief Get the climb rate.
-     * @return mMovement.climbRate
-     */
-    double getClimbRate() const;
+    const Movement& getMovement() const;
 
     /**
      * @fn setId
@@ -249,9 +221,9 @@ public:
     /**
      * @fn setPosition
      * @brief Set the new position.
-     * @param crPos The position
+     * @param crPosition The position
      */
-    void setPosition(const GpsPosition& crPos);
+    void setPosition(const GpsPosition& crPosition);
 
     /**
      * @fn setAircraftType
@@ -270,25 +242,12 @@ public:
     void setIdType(IdType vType);
 
     /**
-     * @fn setClimbRate
-     * @brief Set the climb rate.
-     * @param vRate The new climb rate (default: A_VALUE_NA)
+     * @fn setMovement
+     * @brief Set the movement data.
+     * @note A_VALUE_NA indicates a value to be not available.
+     * @param crMovement The movement data
      */
-    void setClimbRate(double vRate = A_VALUE_NA);
-
-    /**
-     * @fn setHeading
-     * @brief Set the heading.
-     * @param vHeading The new heading (default: A_VALUE_NA)
-     */
-    void setHeading(double vHeading = A_VALUE_NA);
-
-    /**
-     * @fn setGndSpeed
-     * @brief Set the ground speed.
-     * @param vGndSpd The new ground speed (default: A_VALUE_NA)
-     */
-    void setGndSpeed(double vGndSpd = A_VALUE_NA);
+    void setMovement(const Movement& crMovement);
 
     /**
      * @fn setTargetType

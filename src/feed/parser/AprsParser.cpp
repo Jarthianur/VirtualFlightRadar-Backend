@@ -84,7 +84,7 @@ bool AprsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     {
         return false;
     }
-    parseMovement(match, rAircraft);
+    parseMovement(match, com_match, rAircraft);
     rAircraft.setTargetType(Aircraft::TargetType::FLARM);
     return true;
 }
@@ -134,34 +134,29 @@ bool AprsParser::parseComment(const boost::smatch& crMatch,
     {
         valid = false;
     }
-    try
-    {
-        rAircraft.setClimbRate(std::stod(crMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS);
-    }
-    catch(const std::logic_error&)
-    {
-        rAircraft.setClimbRate();
-        rAircraft.setFullInfo(false);
-    }
     return valid;
 }
 
 bool AprsParser::parseMovement(const boost::smatch& crMatch,
+                               const boost::smatch& crCommMatch,
                                data::object::Aircraft& rAircraft)
 {
+    Movement move;
+    bool valid = true;
+    // This needs to be split later to parse independently.
     try
     {
-        rAircraft.setHeading(std::stod(crMatch.str(RE_APRS_HEAD)));
-        rAircraft.setGndSpeed(std::stod(crMatch.str(RE_APRS_GND_SPD)) * math::KTS_2_MS);
+        move.heading   = std::stod(crMatch.str(RE_APRS_HEAD));
+        move.gndSpeed  = std::stod(crMatch.str(RE_APRS_GND_SPD)) * math::KTS_2_MS;
+        move.climbRate = std::stod(crCommMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS;
     }
     catch(const std::logic_error&)
     {
-        rAircraft.setHeading();
-        rAircraft.setGndSpeed();
+        valid = false;
         rAircraft.setFullInfo(false);
-        return false;
     }
-    return true;
+    rAircraft.setMovement(move);
+    return valid;
 }
 }
 }  // namespace parser
