@@ -27,6 +27,8 @@
 #include <system_error>
 #include <boost/thread/lock_guard.hpp>
 
+#include "../Parameters.h"
+
 #ifndef ESTIMATED_TRAFFIC
 #define ESTIMATED_TRAFFIC 1
 #endif

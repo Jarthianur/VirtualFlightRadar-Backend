@@ -25,6 +25,8 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "../../Parameters.h"
+
 #include "Client.h"
 
 namespace feed

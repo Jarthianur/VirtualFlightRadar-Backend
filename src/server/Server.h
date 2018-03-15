@@ -29,6 +29,7 @@
 #include <boost/system/error_code.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include "../Parameters.h"
 #include "Connection.h"
 
 #ifdef SERVER_MAX_CLIENTS

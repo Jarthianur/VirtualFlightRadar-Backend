@@ -58,23 +58,89 @@ struct Position
 class GpsPosition : public Object
 {
 public:
+    /**
+     * @brief GpsPosition
+     */
     GpsPosition();
+
+    /**
+     * @brief GpsPosition
+     * @param vPriority
+     * @param vGround
+     */
     explicit GpsPosition(std::uint32_t vPriority, bool vGround = false);
+
+    /**
+     * @brief GpsPosition
+     * @param crPosition
+     * @param vGeoid
+     * @param vGround
+     */
     GpsPosition(const Position& crPosition, double vGeoid, bool vGround);
+
+    /**
+     * @brief ~GpsPosition
+     */
     virtual ~GpsPosition() noexcept;
 
+    /**
+     * @brief assign
+     * @param crOther
+     */
     void assign(const Object& crOther) override;
 
+    /**
+     * @brief getPosition
+     * @return
+     */
+    const Position& getPosition() const;
+
+    /**
+     * @brief getNrOfSatellites
+     * @return
+     */
+    std::int32_t getNrOfSatellites() const;
+
+    /**
+     * @brief getFixQuality
+     * @return
+     */
+    std::int32_t getFixQuality() const;
+
+    /**
+         * @brief getGeoid
+         * @return
+         */
+        double getGeoid() const;
+
+
+        double getDilution() const;
+
+private:
+
+    ///
     /// Position
     Position position{0.0, 0.0, 0};
+
+    ///
     /// Number of satellites
     std::int32_t nrSats = 1;
+
+    ///
     /// GPS fix quality
     std::int32_t fixQa = 5;
+
+    ///
     /// Geoid separation
-    double geoid    = 0.0;
+    double geoid = 0.0;
+
+    ///
+    ///
     double dilution = 0.0;
-    bool ground     = false;
+
+    ///
+    ///
+    bool ground = false;
 };
 }  // namespace object
 }  // namespace data
