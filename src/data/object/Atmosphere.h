@@ -75,7 +75,7 @@ public:
     /**
      * Define and declare getters and setters.
      */
-    GETTER_V(double, mPressure, Pressure)
+    GETSET_V(double, mPressure, Pressure)
 
 private:
     friend struct Climate;

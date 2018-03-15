@@ -65,7 +65,7 @@ public:
 private:
     // cppcheck-suppress unusedPrivateFunction
     bool parseField(std::uint32_t vField, const std::string& crStr,
-                    data::object::Aircraft& rAircraft);
+                    data::object::Position& rPosition, data::object::Aircraft& rAircraft);
 
     const std::int32_t mMaxHeight;
 };

@@ -53,6 +53,7 @@ bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
 {
     std::size_t p   = 6, delim;
     std::uint32_t i = 2;
+    Position pos;
 
     if(crStr.find(',', p) == std::string::npos || !(crStr.size() > 4 && crStr[4] == '3'))
     {
@@ -60,27 +61,32 @@ bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     }
     while((delim = crStr.find(',', p)) != std::string::npos && i < 16)
     {
-        if(!parseField(i++, crStr.substr(p, delim - p), rAircraft))
+        if(!parseField(i++, crStr.substr(p, delim - p), pos, rAircraft))
         {
             return false;
         }
         p = delim + 1;
     }
-    rAircraft.setFullInfo(false);
+    if(i < 15)
+    {
+        return false;
+    }
+    rAircraft.setPosition(pos);
+    rAircraft.setFullInfoAvailable(false);
     rAircraft.setTargetType(Aircraft::TargetType::TRANSPONDER);
     rAircraft.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
     rAircraft.setIdType(Aircraft::IdType::ICAO);
-    return true;
+
+    return pos.altitude <= mMaxHeight;
 }
 
 bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
-                           Aircraft& rAircraft)
+                           Position& rPosition, Aircraft& rAircraft)
 {
     if(crStr.empty())
     {
         return false;
     }
-    Position pos;
     try
     {
         switch(vField)
@@ -89,13 +95,13 @@ bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
                 rAircraft.setId(crStr);
                 break;
             case SBS_FIELD_ALT:
-                pos.altitude = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
+                rPosition.altitude = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
                 break;
             case SBS_FIELD_LAT:
-                pos.latitude = std::stod(crStr);
+                rPosition.latitude = std::stod(crStr);
                 break;
             case SBS_FIELD_LON:
-                pos.longitude = std::stod(crStr);
+                rPosition.longitude = std::stod(crStr);
                 break;
             default:
                 break;
@@ -105,8 +111,7 @@ bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
     {
         return false;
     }
-    rAircraft.setPosition(pos);
-    return pos.altitude <= mMaxHeight;
+    return true;
 }
 }
 }  // namespace parser

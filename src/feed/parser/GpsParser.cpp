@@ -70,21 +70,23 @@ bool GpsParser::unpack(const std::string& crStr,
 bool GpsParser::parsePosition(const boost::smatch& crMatch,
                               data::object::GpsPosition& rPosition)
 {
-    rPosition.position.latitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LAT)));
+    data::object::Position pos;
+    pos.latitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LAT)));
     if(crMatch.str(RE_GGA_LAT_DIR).compare("S") == 0)
     {
-        rPosition.position.latitude = -rPosition.position.latitude;
+        pos.latitude = -pos.latitude;
     }
-    rPosition.position.longitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LONG)));
+    pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LONG)));
     if(crMatch.str(RE_GGA_LONG_DIR).compare("W") == 0)
     {
-        rPosition.position.longitude = -rPosition.position.longitude;
+        pos.longitude = -pos.longitude;
     }
-    rPosition.fixQa             = std::stoi(crMatch.str(RE_GGA_FIX));
-    rPosition.nrSats            = std::stoi(crMatch.str(RE_GGA_SAT));
-    rPosition.dilution          = std::stod(crMatch.str(RE_GGA_DIL));
-    rPosition.position.altitude = math::doubleToInt(std::stod(crMatch.str(RE_GGA_ALT)));
-    rPosition.geoid             = std::stod(crMatch.str(RE_GGA_GEOID));
+    pos.altitude = math::doubleToInt(std::stod(crMatch.str(RE_GGA_ALT)));
+    rPosition.setPosition(pos);
+    rPosition.setFixQuality(std::stoi(crMatch.str(RE_GGA_FIX)));
+    rPosition.setNrOfSatellites(std::stoi(crMatch.str(RE_GGA_SAT)));
+    rPosition.setDilution(std::stod(crMatch.str(RE_GGA_DIL)));
+    rPosition.setGeoid(std::stod(crMatch.str(RE_GGA_GEOID)));
     return true;
 }
 }

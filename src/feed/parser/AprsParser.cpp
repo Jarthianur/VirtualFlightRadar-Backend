@@ -84,7 +84,7 @@ bool AprsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     {
         return false;
     }
-    parseMovement(match, com_match, rAircraft);
+    rAircraft.setFullInfoAvailable(parseMovement(match, com_match, rAircraft));
     rAircraft.setTargetType(Aircraft::TargetType::FLARM);
     return true;
 }
@@ -153,7 +153,6 @@ bool AprsParser::parseMovement(const boost::smatch& crMatch,
     catch(const std::logic_error&)
     {
         valid = false;
-        rAircraft.setFullInfo(false);
     }
     rAircraft.setMovement(move);
     return valid;
