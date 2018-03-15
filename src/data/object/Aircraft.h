@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <string>
 
+#include "../../Defines.h"
 #include "Object.h"
 #include "Position.h"
 
@@ -136,8 +137,8 @@ public:
      * @param rPos          The prosition
      * @param rMove         The aircrafts movement
      */
-    Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
-             Position& rPos, Movement& rMove);
+    Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType, Position& rPos,
+             Movement& rMove);
 
     /**
      * @fn ~Aircraft
@@ -153,116 +154,37 @@ public:
     void assign(const Object& crOther) override;
 
     /**
-     * @fn getId
-     * @brief Get the Id.
-     * @return mId
+     * Define and declare getters and setters.
      */
-    const std::string& getId() const;
-
-    /**
-     * @fn getIdType
-     * @brief Get the Id type.
-     * @see IdType
-     * @return mIdType
-     */
-    IdType getIdType() const;
-
-    /**
-     * @fn getTargetType
-     * @brief Get the target type.
-     * @see TargetType
-     * @return mTargetType
-     */
-    TargetType getTargetType() const;
-
-    /**
-     * @fn getAircraftType
-     * @brief Get the aircraft type.
-     * @see AircraftType
-     * @return mAircraftType
-     */
-    AircraftType getAircraftType() const;
-
-    /**
-     * @fn hasFullInfo
-     * @brief Are all position and movement informations given?
-     * @return true, if full info is available, else false
-     */
-    bool hasFullInfo() const;
-
-    /**
-     * @fn getUpdateAge
-     * @brief Get the current update age.
-     * @return mUpdateAge by reference
-     */
-    std::uint32_t& getUpdateAge();
-
-    /**
-     * @fn getPosition
-     * @brief Get the position.
-     * @return mPosition
-     */
-    const Position& getPosition() const;
-
-    /**
-     * @fn getMovement
-     * @brief Get the movement data.
-     * @return mMovement
-     */
-    const Movement& getMovement() const;
-
-    /**
-     * @fn setId
-     * @brief Set the Id.
-     * @param crId The Id
-     */
-    void setId(const std::string& crId);
-
-    /**
-     * @fn setPosition
-     * @brief Set the new position.
-     * @param crPosition The position
-     */
-    void setPosition(const Position& crPosition);
+    GETSET_CR(std::string, mId, Id)
+    GETTER_V(IdType, mIdType, IdType)
+    GETSET_V(TargetType, mTargetType, TargetType)
+    GETTER_V(AircraftType, mAircraftType, AircraftType)
+    GETSET_V(bool, mFullInfo, FullInfoAvailable)
+    GETTER_R(std::uint32_t, mUpdateAge, UpdateAge)
+    GETSET_CR(Position, mPosition, Position)
+    GETSET_CR(Movement, mMovement, Movement)
 
     /**
      * @fn setAircraftType
-     * @brief Set the Aircraft type.
-     * @see AircraftType
-     * @param vType The aircraft type
+     * @brief Set the aircraft type.
+     *
+     * The type is set to UNKNOWN, if the new type value is not in range of AircraftType.
+     *
+     * @param vType The type
      */
     void setAircraftType(AircraftType vType);
 
     /**
      * @fn setIdType
-     * @brief Set the Id type.
-     * @see IdType
-     * @param vType The Id type
+     * @brief Set the id type.
+     *
+     * The id type is set to UNRECOGNIZED, if the new type value is not in range of
+     * IdType.
+     *
+     * @param vType The type
      */
     void setIdType(IdType vType);
-
-    /**
-     * @fn setMovement
-     * @brief Set the movement data.
-     * @note A_VALUE_NA indicates a value to be not available.
-     * @param crMovement The movement data
-     */
-    void setMovement(const Movement& crMovement);
-
-    /**
-     * @fn setTargetType
-     * @brief Set the target type.
-     * @see TargetType
-     * @param vType The new target type
-     */
-    void setTargetType(TargetType vType);
-
-    /**
-     * @fn setFullInfo
-     * @brief Set full information to be available.
-     * @param vInfo Is available, or not (default: true)
-     */
-    void setFullInfo(bool vInfo = true);
 
 private:
     /**

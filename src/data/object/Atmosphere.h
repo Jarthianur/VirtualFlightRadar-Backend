@@ -23,6 +23,7 @@
 
 #include <cstdint>
 
+#include "../../Defines.h"
 #include "Object.h"
 
 /// ICAO standard atmospheric pressure at MSL
@@ -72,18 +73,9 @@ public:
     void assign(const Object& crOther) override;
 
     /**
-     * @fn getPressure
-     * @brief Get the atmospheric pressure.
-     * @return mPressure
+     * Define and declare getters and setters.
      */
-    double getPressure() const;
-
-    /**
-     * @fn setPressure
-     * @brief Set the atmospheric pressure.
-     * @param vPressure The pressure
-     */
-    void setPressure(double vPressure);
+    GETTER_V(double, mPressure, Pressure)
 
 private:
     friend struct Climate;

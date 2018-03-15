@@ -25,11 +25,11 @@ GpsPosition::GpsPosition() : Object(0)
 {}
 
 GpsPosition::GpsPosition(std::uint32_t vPriority, bool vGround)
-    : Object(vPriority), ground(vGround)
+    : Object(vPriority), mGround(vGround)
 {}
 
 GpsPosition::GpsPosition(const Position& crPosition, double vGeoid, bool vGround)
-    : Object(0), position(crPosition), geoid(vGeoid), ground(vGround)
+    : Object(0), mPosition(crPosition), mGeoid(vGeoid), mGround(vGround)
 {}
 
 GpsPosition::~GpsPosition() noexcept
@@ -39,12 +39,12 @@ void GpsPosition::assign(const Object& crOther)
 {
     Object::assign(crOther);
     const GpsPosition& crUpdate = static_cast<const GpsPosition&>(crOther);
-    this->position                 = crUpdate.position;
-    this->nrSats                   = crUpdate.nrSats;
-    this->fixQa                    = crUpdate.fixQa;
-    this->geoid                    = crUpdate.geoid;
-    this->dilution                 = crUpdate.dilution;
-    this->ground                   = crUpdate.ground;
+    this->mPosition             = crUpdate.mPosition;
+    this->mNrOfSatellites       = crUpdate.mNrOfSatellites;
+    this->mFixQuality           = crUpdate.mFixQuality;
+    this->mGeoid                = crUpdate.mGeoid;
+    this->mDilution             = crUpdate.mDilution;
+    this->mGround               = crUpdate.mGround;
 }
-}
-}
+}  // namespace object
+}  // namespace data

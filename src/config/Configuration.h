@@ -26,6 +26,7 @@
 #include <string>
 #include <utility>
 
+#include "../Defines.h"
 #include "../data/object/Position.h"
 #include "PropertyMap.h"
 #include "Util.hpp"
@@ -133,39 +134,14 @@ public:
     virtual ~Configuration() noexcept;
 
     /**
-     * @fn getPosition
-     * @brief Get the position.
-     * @return mPosition
+     * Define and declare getters.
      */
-    const data::object::GpsPosition& getPosition() const;
-
-    /**
-     * @fn getAtmPressure
-     * @brief Get the atmospheric pressure.
-     * @return mAtmPressure
-     */
-    double getAtmPressure() const;
-
-    /**
-     * @fn getMaxHeight
-     * @brief Get the max height filter.
-     * @return mMaxHeight
-     */
-    std::int32_t getMaxHeight() const;
-
-    /**
-     * @fn getMaxDistance
-     * @brief Get the max distance filter.
-     * @return mMaxDistance
-     */
-    std::int32_t getMaxDistance() const;
-
-    /**
-     * @fn getServerPort
-     * @brief Get the server port.
-     * @return mServerPort
-     */
-    std::uint16_t getServerPort() const;
+    GETTER_CR(data::object::GpsPosition, mPosition, Position)
+    GETTER_V(double, mAtmPressure, AtmPressure)
+    GETTER_V(std::int32_t, mMaxHeight, MaxHeight)
+    GETTER_V(std::int32_t, mMaxDistance, MaxDistance)
+    GETTER_V(std::uint16_t, mServerPort, ServerPort)
+    GETTER_CR(FeedMapping, mFeedMapping, FeedMapping)
 
     /**
      * @fn isGndModeEnabled
@@ -179,13 +155,6 @@ public:
      * @brief Force ground mode to be enabled.
      */
     void forceGndMode();
-
-    /**
-     * @fn getFeedMapping
-     * @brief Get the list of feeds with their key-value maps.
-     * @return mFeedMapping
-     */
-    const FeedMapping& getFeedMapping() const;
 
 private:
     /**

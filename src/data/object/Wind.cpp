@@ -21,13 +21,10 @@ namespace data
 {
 namespace object
 {
-Wind::Wind() : Object(0)
-{}
-
 Wind::Wind(std::uint32_t vPriority) : Object(vPriority)
 {}
 
 Wind::~Wind() noexcept
 {}
-}
-}
+}  // namespace object
+}  // namespace data

@@ -23,6 +23,7 @@
 
 #include <cstdint>
 
+#include "../../Defines.h"
 #include "Object.h"
 
 /// @namespace data
@@ -90,57 +91,39 @@ public:
     void assign(const Object& crOther) override;
 
     /**
-     * @brief getPosition
-     * @return
+     * Define and declare getters and setters.
      */
-    const Position& getPosition() const;
-
-    /**
-     * @brief getNrOfSatellites
-     * @return
-     */
-    std::int32_t getNrOfSatellites() const;
-
-    /**
-     * @brief getFixQuality
-     * @return
-     */
-    std::int32_t getFixQuality() const;
-
-    /**
-         * @brief getGeoid
-         * @return
-         */
-        double getGeoid() const;
-
-
-        double getDilution() const;
+    GETSET_CR(Position, mPosition, Position)
+    GETSET_V(double, mGeoid, Geoid)
+    GETSET_V(std::int32_t, mNrOfSatellites, NrOfSatellites)
+    GETSET_V(std::int32_t, mFixQuality, FixQuality)
+    GETSET_V(double, mDilution, Dilution)
+    GETSET_V(bool, mGround, Ground)
 
 private:
+    /// @var mPosition
+    /// The position
+    Position mPosition{0.0, 0.0, 0};
 
-    ///
-    /// Position
-    Position position{0.0, 0.0, 0};
+    /// @var mGeoid
+    /// The geoid separation
+    double mGeoid = 0.0;
 
-    ///
-    /// Number of satellites
-    std::int32_t nrSats = 1;
+    /// @var mNrOfSatellites
+    /// The number of satellites
+    std::int32_t mNrOfSatellites = 1;
 
-    ///
-    /// GPS fix quality
-    std::int32_t fixQa = 5;
+    /// @var mFixQuality
+    /// The GPS fix quality
+    std::int32_t mFixQuality = 5;
 
-    ///
-    /// Geoid separation
-    double geoid = 0.0;
+    /// @var mDilution
+    /// The position dilution
+    double mDilution = 0.0;
 
-    ///
-    ///
-    double dilution = 0.0;
-
-    ///
-    ///
-    bool ground = false;
+    /// @var mGround
+    /// Is the position fixed on ground
+    bool mGround = false;
 };
 }  // namespace object
 }  // namespace data

@@ -26,3 +26,53 @@
  *
  * This header contains come common macros, used throughout the software.
  */
+
+#define GETTER_V(TYPE, MEMBER, NAME) \
+    inline TYPE get##NAME() const    \
+    {                                \
+        return MEMBER;               \
+    }
+
+#define GETTER_R(TYPE, MEMBER, NAME) \
+    inline TYPE& get##NAME()         \
+    {                                \
+        return MEMBER;               \
+    }
+
+#define GETTER_CR(TYPE, MEMBER, NAME)    \
+    inline const TYPE& get##NAME() const \
+    {                                    \
+        return MEMBER;                   \
+    }
+
+#define SETTER_V(TYPE, MEMBER, NAME) \
+    inline void set##NAME(TYPE vNew) \
+    {                                \
+        MEMBER = vNew;               \
+    }
+
+#define SETTER_CR(TYPE, MEMBER, NAME)        \
+    inline void set##NAME(const TYPE& crNew) \
+    {                                        \
+        MEMBER = crNew;                      \
+    }
+
+#define GETSET_V(TYPE, MEMBER, NAME) \
+    inline TYPE get##NAME() const    \
+    {                                \
+        return MEMBER;               \
+    }                                \
+    inline void set##NAME(TYPE vNew) \
+    {                                \
+        MEMBER = vNew;               \
+    }
+
+#define GETSET_CR(TYPE, MEMBER, NAME)        \
+    inline const TYPE& get##NAME() const     \
+    {                                        \
+        return MEMBER;                       \
+    }                                        \
+    inline void set##NAME(const TYPE& crNew) \
+    {                                        \
+        MEMBER = crNew;                      \
+    }

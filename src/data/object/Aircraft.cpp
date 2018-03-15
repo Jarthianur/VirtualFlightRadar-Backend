@@ -76,56 +76,6 @@ bool Aircraft::canUpdate(const Object& crOther, std::uint32_t vAttempts) const
            && (this->mLastPriority * vAttempts >= crUpdate.mLastPriority);
 }
 
-const std::string& Aircraft::getId() const
-{
-    return mId;
-}
-
-Aircraft::IdType Aircraft::getIdType() const
-{
-    return mIdType;
-}
-
-Aircraft::TargetType Aircraft::getTargetType() const
-{
-    return mTargetType;
-}
-
-Aircraft::AircraftType Aircraft::getAircraftType() const
-{
-    return mAircraftType;
-}
-
-bool Aircraft::hasFullInfo() const
-{
-    return mFullInfo;
-}
-
-std::uint32_t& Aircraft::getUpdateAge()
-{
-    return mUpdateAge;
-}
-
-const Position& Aircraft::getPosition() const
-{
-    return mPosition;
-}
-
-const Movement& Aircraft::getMovement() const
-{
-    return mMovement;
-}
-
-void Aircraft::setId(const std::string& crId)
-{
-    mId = crId;
-}
-
-void Aircraft::setPosition(const Position& crPosition)
-{
-    mPosition = crPosition;
-}
-
 void Aircraft::setAircraftType(Aircraft::AircraftType vType)
 {
     mAircraftType = vType < AircraftType::UNKNOWN || vType > AircraftType::STATIC_OBJECT
@@ -137,21 +87,6 @@ void Aircraft::setIdType(Aircraft::IdType vType)
 {
     mIdType = vType < IdType::UNRECOGNIZED || vType > IdType::OGN ? IdType::UNRECOGNIZED
                                                                   : vType;
-}
-
-void Aircraft::setMovement(const Movement& crMovement)
-{
-    mMovement = crMovement;
-}
-
-void Aircraft::setTargetType(Aircraft::TargetType vType)
-{
-    mTargetType = vType;
-}
-
-void Aircraft::setFullInfo(bool vInfo)
-{
-    mFullInfo = vInfo;
 }
 
 }  // namespace object

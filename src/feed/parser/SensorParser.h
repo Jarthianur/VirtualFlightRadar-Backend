@@ -23,7 +23,7 @@
 
 #include <string>
 
-#include "../../data/object/Climate.h"
+#include "../../data/object/Climate.hpp"
 #include "Parser.hpp"
 
 namespace feed

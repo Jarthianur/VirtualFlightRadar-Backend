@@ -25,22 +25,36 @@
 
 #include "Object.h"
 
+/// @namespace data
 namespace data
 {
+/// @namespace object
 namespace object
 {
 struct Climate;
 
+/**
+ * @class Wind
+ * @brief Respresent wind information.
+ * @extends Object
+ */
 class Wind : public Object
 {
 public:
-    Wind();
-    explicit Wind(std::uint32_t vPriority);
+    /**
+     * @fn Wind
+     * @brief Constructor
+     */
+    explicit Wind(std::uint32_t vPriority = 0);
+
+    /**
+     * @fn ~Wind
+     * @brief Destructor
+     */
     virtual ~Wind() noexcept;
 
-private:
     friend struct Climate;
 };
 
-}  // namespace util
-}
+}  // namespace object
+}  // namespace data

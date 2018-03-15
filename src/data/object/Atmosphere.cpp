@@ -37,14 +37,5 @@ void Atmosphere::assign(const Object& crOther)
     this->mPressure            = crUpdate.mPressure;
 }
 
-double Atmosphere::getPressure() const
-{
-    return mPressure;
-}
-
-void Atmosphere::setPressure(double vPressure)
-{
-    mPressure = vPressure;
-}
 }  // namespace object
 }  // namespace data
