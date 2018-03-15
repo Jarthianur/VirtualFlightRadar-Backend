@@ -137,7 +137,7 @@ public:
      * @brief Get the position.
      * @return mPosition
      */
-    const data::object::ExtGpsPosition& getPosition() const;
+    const data::object::GpsPosition& getPosition() const;
 
     /**
      * @fn getAtmPressure
@@ -202,7 +202,7 @@ private:
      * @param crProperties The properties
      * @return the position
      */
-    data::object::ExtGpsPosition resolvePosition(const PropertyMap& crProperties) const;
+    data::object::GpsPosition resolvePosition(const PropertyMap& crProperties) const;
 
     /**
      * @fn resolveServerPort
@@ -252,7 +252,7 @@ private:
 
     /// @var mPosition
     /// Fallback position
-    data::object::ExtGpsPosition mPosition;
+    data::object::GpsPosition mPosition;
 
     /// @var mAtmPressure
     /// Atmospheric fallback pressure

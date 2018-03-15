@@ -125,7 +125,7 @@ public:
      * @param rId  The id
      * @param rPos The position
      */
-    Aircraft(std::string& rId, GpsPosition& rPos);
+    Aircraft(std::string& rId, Position& rPos);
 
     /**
      * @fn Aircraft
@@ -137,7 +137,7 @@ public:
      * @param rMove         The aircrafts movement
      */
     Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
-             GpsPosition& rPos, Movement& rMove);
+             Position& rPos, Movement& rMove);
 
     /**
      * @fn ~Aircraft
@@ -202,7 +202,7 @@ public:
      * @brief Get the position.
      * @return mPosition
      */
-    const GpsPosition& getPosition() const;
+    const Position& getPosition() const;
 
     /**
      * @fn getMovement
@@ -223,7 +223,7 @@ public:
      * @brief Set the new position.
      * @param crPosition The position
      */
-    void setPosition(const GpsPosition& crPosition);
+    void setPosition(const Position& crPosition);
 
     /**
      * @fn setAircraftType
@@ -292,7 +292,7 @@ private:
 
     /// @var mPosition
     /// Currently known position.
-    GpsPosition mPosition{0.0, 0.0, 0};
+    Position mPosition{0.0, 0.0, 0};
 
     /// @var mMovement
     /// Currently known movement.

@@ -51,7 +51,7 @@ GpsParser::~GpsParser() noexcept
 {}
 
 bool GpsParser::unpack(const std::string& crStr,
-                       data::object::ExtGpsPosition& rPosition) noexcept
+                       data::object::GpsPosition& rPosition) noexcept
 {
     try
     {
@@ -68,7 +68,7 @@ bool GpsParser::unpack(const std::string& crStr,
 }
 
 bool GpsParser::parsePosition(const boost::smatch& crMatch,
-                              data::object::ExtGpsPosition& rPosition)
+                              data::object::GpsPosition& rPosition)
 {
     rPosition.position.latitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LAT)));
     if(crMatch.str(RE_GGA_LAT_DIR).compare("S") == 0)

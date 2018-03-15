@@ -80,7 +80,7 @@ bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
     {
         return false;
     }
-    GpsPosition pos;
+    Position pos;
     try
     {
         switch(vField)

@@ -90,7 +90,7 @@ public:
      * @return the string with all NMEA reports
      * @threadsafe
      */
-    void processAircrafts(const object::GpsPosition& crRefPosition,
+    void processAircrafts(const object::Position& crRefPosition,
                           double vAtmPress) noexcept;
 
 private:

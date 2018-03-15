@@ -37,7 +37,7 @@ namespace data
 GpsData::GpsData() : Data()
 {}
 
-GpsData::GpsData(const ExtGpsPosition& crPosition) : Data(), mPosition(crPosition)
+GpsData::GpsData(const GpsPosition& crPosition) : Data(), mPosition(crPosition)
 {}
 
 GpsData::~GpsData() noexcept
@@ -81,7 +81,7 @@ std::size_t GpsData::registerSlot()
     return mAttempts.size() - 1;
 }
 
-GpsPosition GpsData::getGpsPosition()
+Position GpsData::getGpsPosition()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     return mPosition.position;

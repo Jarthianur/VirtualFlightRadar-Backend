@@ -34,7 +34,7 @@ namespace processor
  * @class GpsModule
  * @brief Provides functionalities to build NMEA GGA and RMC sentences.
  */
-class GpsProcessor : public Processor<object::ExtGpsPosition>
+class GpsProcessor : public Processor<object::GpsPosition>
 {
 public:
     /**
@@ -49,7 +49,7 @@ public:
      */
     virtual ~GpsProcessor() noexcept;
 
-    std::string process(const object::ExtGpsPosition& crPosition) override;
+    std::string process(const object::GpsPosition& crPosition) override;
 
 private:
     /**
@@ -59,7 +59,7 @@ private:
      * @param cr_pos The extended GPS information
      * @return the GPGGA sentence
      */
-    std::string genGpggaStr(const object::ExtGpsPosition& crPosition);
+    std::string genGpggaStr(const object::GpsPosition& crPosition);
 
     /**
      * @fn genGprmcStr
@@ -68,7 +68,7 @@ private:
      * @param cr_pos The extended GPS information
      * @return the GPRMC sentence
      */
-    std::string genGprmcStr(const object::ExtGpsPosition& crPosition);
+    std::string genGprmcStr(const object::GpsPosition& crPosition);
 
     void evalPosition(double vLatitude, double vLongitude);
 

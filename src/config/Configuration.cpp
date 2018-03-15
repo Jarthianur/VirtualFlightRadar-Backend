@@ -67,10 +67,10 @@ void Configuration::init(const PropertyMap& crProperties)
     dumpInfo();
 }
 
-data::object::ExtGpsPosition
+data::object::GpsPosition
 Configuration::resolvePosition(const PropertyMap& crProperties) const
 {
-    data::object::GpsPosition pos;
+    data::object::Position pos;
     pos.latitude = boost::get<double>(
         checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "")),
@@ -87,7 +87,7 @@ Configuration::resolvePosition(const PropertyMap& crProperties) const
         checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
                          SECT_KEY_FALLBACK, KV_KEY_GEOID));
-    return data::object::ExtGpsPosition(
+    return data::object::GpsPosition(
         pos, geoid, !crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty());
 }
 
@@ -195,7 +195,7 @@ double Configuration::getAtmPressure() const
     return mAtmPressure;
 }
 
-const data::object::ExtGpsPosition& Configuration::getPosition() const
+const data::object::GpsPosition& Configuration::getPosition() const
 {
     return mPosition;
 }

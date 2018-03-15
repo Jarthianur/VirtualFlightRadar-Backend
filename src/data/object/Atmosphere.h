@@ -28,29 +28,70 @@
 /// ICAO standard atmospheric pressure at MSL
 #define ICAO_STD_A 1013.25
 
+/// @namespace data
 namespace data
 {
+/// @namespace object
 namespace object
 {
 struct Climate;
 
+/**
+ *@class Atmosphere
+ * @brief Represent atmospheric information.
+ * @extends Object
+ */
 class Atmosphere : public Object
 {
 public:
-    Atmosphere();
-    explicit Atmosphere(std::uint32_t vPriority);
-    explicit Atmosphere(double vPress);
+    /**
+     * @fn Atmosphere
+     * @brief Constructor
+     * @param vPriority The initial priority (default: 0)
+     */
+    explicit Atmosphere(std::uint32_t vPriority = 0);
+
+    /**
+     * @fn Atmosphere
+     * @brief Constructor
+     * @param vPressure The pressure value
+     */
+    explicit Atmosphere(double vPressure);
+
+    /**
+     * @fn ~Atmosphere
+     * @brief Destructor
+     */
     virtual ~Atmosphere() noexcept;
 
+    /**
+     * @fn assign
+     * @brief Assign other Atmosphere's values to this.
+     * @param crOther The other Atmosphere
+     */
     void assign(const Object& crOther) override;
 
+    /**
+     * @fn getPressure
+     * @brief Get the atmospheric pressure.
+     * @return mPressure
+     */
     double getPressure() const;
-    void setPressure(double vPress);
+
+    /**
+     * @fn setPressure
+     * @brief Set the atmospheric pressure.
+     * @param vPressure The pressure
+     */
+    void setPressure(double vPressure);
 
 private:
     friend struct Climate;
+
+    /// @var mPressure
+    /// The atmospheric pressure
     double mPressure = ICAO_STD_A;
 };
 
-}  // namespace util
-}
+}  // namespace object
+}  // namespace data

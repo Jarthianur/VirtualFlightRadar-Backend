@@ -47,7 +47,7 @@ public:
      * @brief Constructor
      * @param vPosition The initial info
      */
-    explicit GpsData(const object::ExtGpsPosition& crPosition);
+    explicit GpsData(const object::GpsPosition& crPosition);
 
     /**
      * @fn ~GpsData
@@ -70,7 +70,7 @@ public:
      * @return the position
      * @threadsafe
      */
-    object::GpsPosition getGpsPosition();
+    object::Position getGpsPosition();
 
     /**
      * @fn update
@@ -86,7 +86,7 @@ public:
 private:
     /// @var mBasePos
     /// Wrapper holding the base position
-    object::ExtGpsPosition mPosition;
+    object::GpsPosition mPosition;
 
     /// @var mGpsModule
     /// GpsModule providing functionality to build GPS sentences

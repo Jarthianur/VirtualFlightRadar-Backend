@@ -26,25 +26,48 @@
 #include "Atmosphere.h"
 #include "Wind.h"
 
+/// @namespace data
 namespace data
 {
+/// @namespace object
 namespace object
 {
+/**
+ *@struct Climate
+ * @brief Combine Wind and Atmosphere.
+ * @see Wind
+ * @see Atmosphere
+ */
 struct Climate
 {
-    Wind mWind;
-    Atmosphere mAtmosphere;
+    /// @var wind
+    /// The Wind object
+    Wind wind;
 
+    /// @var atmosphere
+    /// The Atmosphere object
+    Atmosphere atmosphere;
+
+    /**
+     * @fn hasAtmosphere
+     * @brief Is the Atmosphere object set?
+     * @return true if yes, else false
+     */
     inline bool hasAtmosphere()
     {
-        return !mAtmosphere.mSerialized.empty();
+        return !atmosphere.mSerialized.empty();
     }
 
+    /**
+     * @fn hasWind
+     * @brief Is the Wind object set?
+     * @return true if yes, else false
+     */
     inline bool hasWind()
     {
-        return !mWind.mSerialized.empty();
+        return !wind.mSerialized.empty();
     }
 };
 
-}  // namespace util
-}
+}  // namespace object
+}  // namespace data

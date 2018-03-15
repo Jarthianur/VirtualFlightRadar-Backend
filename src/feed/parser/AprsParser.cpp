@@ -95,7 +95,7 @@ bool AprsParser::parsePosition(const boost::smatch& crMatch,
     bool valid = false;
     try
     {
-        GpsPosition pos;
+        Position pos;
         pos.latitude = math::dmToDeg(std::stod(crMatch.str(RE_APRS_LAT)));
         if(crMatch.str(RE_APRS_LAT_DIR).compare("S") == 0)
         {

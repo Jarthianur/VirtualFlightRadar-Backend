@@ -37,7 +37,7 @@ namespace parser
  * @see Parser.hpp
  * @see ../util/Position.h
  */
-class GpsParser : public Parser<data::object::ExtGpsPosition>
+class GpsParser : public Parser<data::object::GpsPosition>
 {
 public:
     /**
@@ -58,12 +58,12 @@ public:
      * @override Parser::unpack
      */
     bool unpack(const std::string& crStr,
-                data::object::ExtGpsPosition& rPosition) noexcept override;
+                data::object::GpsPosition& rPosition) noexcept override;
 
 private:
     // cppcheck-suppress unusedPrivateFunction
     bool parsePosition(const boost::smatch& crMatch,
-                       data::object::ExtGpsPosition& rPosition);
+                       data::object::GpsPosition& rPosition);
 
     /// Regular expression to parse GGA
     static const boost::regex msGpggaRe;

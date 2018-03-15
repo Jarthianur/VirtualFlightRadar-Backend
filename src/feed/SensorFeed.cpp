@@ -56,11 +56,11 @@ void SensorFeed::process(const std::string& crResponse) noexcept
     {
         if(climate.hasWind())
         {
-            mpWindData->update(climate.mWind, mWindSlot);
+            mpWindData->update(climate.wind, mWindSlot);
         }
         if(climate.hasAtmosphere())
         {
-            mpAtmosphereData->update(climate.mAtmosphere, mAtmosSlot);
+            mpAtmosphereData->update(climate.atmosphere, mAtmosSlot);
         }
     }
 }

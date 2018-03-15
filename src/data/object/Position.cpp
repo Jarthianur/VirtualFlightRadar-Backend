@@ -21,24 +21,24 @@ namespace data
 {
 namespace object
 {
-ExtGpsPosition::ExtGpsPosition() : Object(0)
+GpsPosition::GpsPosition() : Object(0)
 {}
 
-ExtGpsPosition::ExtGpsPosition(std::uint32_t vPriority, bool vGround)
+GpsPosition::GpsPosition(std::uint32_t vPriority, bool vGround)
     : Object(vPriority), ground(vGround)
 {}
 
-ExtGpsPosition::ExtGpsPosition(const GpsPosition& crPosition, double vGeoid, bool vGround)
+GpsPosition::GpsPosition(const Position& crPosition, double vGeoid, bool vGround)
     : Object(0), position(crPosition), geoid(vGeoid), ground(vGround)
 {}
 
-ExtGpsPosition::~ExtGpsPosition() noexcept
+GpsPosition::~GpsPosition() noexcept
 {}
 
-void ExtGpsPosition::assign(const Object& crOther)
+void GpsPosition::assign(const Object& crOther)
 {
     Object::assign(crOther);
-    const ExtGpsPosition& crUpdate = static_cast<const ExtGpsPosition&>(crOther);
+    const GpsPosition& crUpdate = static_cast<const GpsPosition&>(crOther);
     this->position                 = crUpdate.position;
     this->nrSats                   = crUpdate.nrSats;
     this->fixQa                    = crUpdate.fixQa;

@@ -21,13 +21,10 @@ namespace data
 {
 namespace object
 {
-Atmosphere::Atmosphere() : Object(0)
-{}
-
 Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)
 {}
 
-Atmosphere::Atmosphere(double vPress) : Object(0), mPressure(vPress)
+Atmosphere::Atmosphere(double vPressure) : Object(0), mPressure(vPressure)
 {}
 
 Atmosphere::~Atmosphere() noexcept
@@ -45,9 +42,9 @@ double Atmosphere::getPressure() const
     return mPressure;
 }
 
-void Atmosphere::setPressure(double vPress)
+void Atmosphere::setPressure(double vPressure)
 {
-    mPressure = vPress;
+    mPressure = vPressure;
 }
-}
-}
+}  // namespace object
+}  // namespace data

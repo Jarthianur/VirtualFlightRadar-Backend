@@ -29,18 +29,18 @@ namespace data
 {
 namespace processor
 {
-GpsProcessor::GpsProcessor() : Processor<object::ExtGpsPosition>()
+GpsProcessor::GpsProcessor() : Processor<object::GpsPosition>()
 {}
 
 GpsProcessor::~GpsProcessor() noexcept
 {}
 
-std::string GpsProcessor::process(const object::ExtGpsPosition& crPosition)
+std::string GpsProcessor::process(const object::GpsPosition& crPosition)
 {
     return genGpggaStr(crPosition) + genGprmcStr(crPosition);
 }
 
-std::string GpsProcessor::genGpggaStr(const ExtGpsPosition& crPosition)
+std::string GpsProcessor::genGpggaStr(const GpsPosition& crPosition)
 {
     std::time_t now = std::time(0);
     std::tm* utc    = std::gmtime(&now);
@@ -62,7 +62,7 @@ std::string GpsProcessor::genGpggaStr(const ExtGpsPosition& crPosition)
     return nmea_str;
 }
 
-std::string GpsProcessor::genGprmcStr(const ExtGpsPosition& crPosition)
+std::string GpsProcessor::genGprmcStr(const GpsPosition& crPosition)
 {
     std::time_t now = std::time(0);
     std::tm* utc    = std::gmtime(&now);

@@ -46,7 +46,7 @@ GpsFeed::~GpsFeed() noexcept
 
 void GpsFeed::process(const std::string& crResponse) noexcept
 {
-    data::object::ExtGpsPosition pos(getPriority(), mGndModeEnabled);
+    data::object::GpsPosition pos(getPriority(), mGndModeEnabled);
     if(mParser.unpack(crResponse, pos))
     {
         try

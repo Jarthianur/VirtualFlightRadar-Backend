@@ -97,7 +97,7 @@ std::size_t AircraftData::registerSlot()
     return nrOfRegisteredFeeds - 1;
 }
 
-void AircraftData::processAircrafts(const GpsPosition& crRefPosition,
+void AircraftData::processAircrafts(const Position& crRefPosition,
                                     double vAtmPress) noexcept
 {
     boost::lock_guard<boost::mutex> lock(mMutex);

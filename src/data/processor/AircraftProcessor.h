@@ -66,7 +66,7 @@ public:
      */
     std::string process(const object::Aircraft& crAircraft) override;
 
-    void setRefered(const object::GpsPosition& crRefPosition, double vAtmPress);
+    void setRefered(const object::Position& crRefPosition, double vAtmPress);
 
 private:
     /**
@@ -98,7 +98,7 @@ private:
     /// Max distance to process an aircraft
     const std::int32_t mMaxDistance;
 
-    object::GpsPosition mtReferedPosition{0.0, 0.0, 0};
+    object::Position mtReferedPosition{0.0, 0.0, 0};
 
     double mtAtmPressure = 1013.25;
 

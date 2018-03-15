@@ -25,40 +25,48 @@
 
 #include "Object.h"
 
+/// @namespace data
 namespace data
 {
+/// @namespace object
 namespace object
 {
 /**
- * @class GpsPosition
- * @brief Minimal information for a position.
+ * @struct Position
+ * @brief Represent a position on earth.
  */
-struct GpsPosition
+struct Position
 {
+    /// @var latitude
     /// Latitude; deg
     double latitude;
+
+    /// @var longitude
     /// Longitude; deg
     double longitude;
+
+    /// @var altitude
     /// Altitude; m
     std::int32_t altitude;
 };
 
 /**
- * @class ExtGpsPosition
- * @brief GPS position and meta information.
+ * @class GpsPosition
+ * @brief Represent a position and provide GPS information.
+ * @extends Object
  */
-class ExtGpsPosition : public Object
+class GpsPosition : public Object
 {
 public:
-    ExtGpsPosition();
-    explicit ExtGpsPosition(std::uint32_t vPriority, bool vGround = false);
-    explicit ExtGpsPosition(const GpsPosition& crPosition, double vGeoid, bool vGround);
-    virtual ~ExtGpsPosition() noexcept;
+    GpsPosition();
+    explicit GpsPosition(std::uint32_t vPriority, bool vGround = false);
+    GpsPosition(const Position& crPosition, double vGeoid, bool vGround);
+    virtual ~GpsPosition() noexcept;
 
     void assign(const Object& crOther) override;
 
     /// Position
-    GpsPosition position{0.0, 0.0, 0};
+    Position position{0.0, 0.0, 0};
     /// Number of satellites
     std::int32_t nrSats = 1;
     /// GPS fix quality

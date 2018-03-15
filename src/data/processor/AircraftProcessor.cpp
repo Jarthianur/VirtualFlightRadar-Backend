@@ -51,7 +51,7 @@ std::string AircraftProcessor::process(const Aircraft& crAircraft)
                                       : "";
 }
 
-void AircraftProcessor::setRefered(const GpsPosition& crRefPosition, double vAtmPress)
+void AircraftProcessor::setRefered(const Position& crRefPosition, double vAtmPress)
 {
     mtReferedPosition = crRefPosition;
     mtAtmPressure     = vAtmPress;

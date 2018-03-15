@@ -32,7 +32,7 @@ Aircraft::Aircraft(std::uint32_t vPriority)
       mTargetType(TargetType::TRANSPONDER)
 {}
 
-Aircraft::Aircraft(std::string& rId, GpsPosition& rPos)
+Aircraft::Aircraft(std::string& rId, Position& rPos)
     : Object(),
       mId(rId),
       mIdType(IdType::ICAO),
@@ -42,7 +42,7 @@ Aircraft::Aircraft(std::string& rId, GpsPosition& rPos)
 {}
 
 Aircraft::Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
-                   GpsPosition& rPos, Movement& rMove)
+                   Position& rPos, Movement& rMove)
     : Object(),
       mId(rId),
       mIdType(vIdType),
@@ -106,7 +106,7 @@ std::uint32_t& Aircraft::getUpdateAge()
     return mUpdateAge;
 }
 
-const GpsPosition& Aircraft::getPosition() const
+const Position& Aircraft::getPosition() const
 {
     return mPosition;
 }
@@ -121,7 +121,7 @@ void Aircraft::setId(const std::string& crId)
     mId = crId;
 }
 
-void Aircraft::setPosition(const GpsPosition& crPosition)
+void Aircraft::setPosition(const Position& crPosition)
 {
     mPosition = crPosition;
 }
