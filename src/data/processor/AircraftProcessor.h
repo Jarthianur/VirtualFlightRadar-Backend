@@ -24,8 +24,8 @@
 #include <cstdint>
 #include <string>
 
-#include "../object/Aircraft.h"
-#include "../object/Position.h"
+#include "../../object/Aircraft.h"
+#include "../../object/Position.h"
 #include "Processor.hpp"
 
 /// @namespace data

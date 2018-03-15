@@ -50,8 +50,7 @@ GpsParser::GpsParser() : Parser()
 GpsParser::~GpsParser() noexcept
 {}
 
-bool GpsParser::unpack(const std::string& crStr,
-                       data::object::GpsPosition& rPosition) noexcept
+bool GpsParser::unpack(const std::string& crStr, object::GpsPosition& rPosition) noexcept
 {
     try
     {
@@ -68,15 +67,17 @@ bool GpsParser::unpack(const std::string& crStr,
 }
 
 bool GpsParser::parsePosition(const boost::smatch& crMatch,
-                              data::object::GpsPosition& rPosition)
+                              object::GpsPosition& rPosition)
 {
-    data::object::Position pos;
+    object::Position pos;
     pos.latitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LAT)));
+
     if(crMatch.str(RE_GGA_LAT_DIR).compare("S") == 0)
     {
         pos.latitude = -pos.latitude;
     }
     pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LONG)));
+
     if(crMatch.str(RE_GGA_LONG_DIR).compare("W") == 0)
     {
         pos.longitude = -pos.longitude;

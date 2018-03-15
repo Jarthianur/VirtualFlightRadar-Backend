@@ -17,8 +17,6 @@
 
 #include "Position.h"
 
-namespace data
-{
 namespace object
 {
 GpsPosition::GpsPosition() : Object(0)
@@ -47,4 +45,3 @@ void GpsPosition::assign(const Object& crOther)
     this->mGround               = crUpdate.mGround;
 }
 }  // namespace object
-}  // namespace data

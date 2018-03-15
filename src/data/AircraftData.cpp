@@ -33,7 +33,7 @@
 #define ESTIMATED_TRAFFIC 1
 #endif
 
-using namespace data::object;
+using namespace object;
 
 namespace data
 {

@@ -24,7 +24,7 @@
 #include <string>
 #include <boost/regex.hpp>
 
-#include "../../data/object/Position.h"
+#include "../../object/Position.h"
 #include "Parser.hpp"
 
 namespace feed
@@ -37,7 +37,7 @@ namespace parser
  * @see Parser.hpp
  * @see ../util/Position.h
  */
-class GpsParser : public Parser<data::object::GpsPosition>
+class GpsParser : public Parser<object::GpsPosition>
 {
 public:
     /**
@@ -58,12 +58,11 @@ public:
      * @override Parser::unpack
      */
     bool unpack(const std::string& crStr,
-                data::object::GpsPosition& rPosition) noexcept override;
+                object::GpsPosition& rPosition) noexcept override;
 
 private:
     // cppcheck-suppress unusedPrivateFunction
-    bool parsePosition(const boost::smatch& crMatch,
-                       data::object::GpsPosition& rPosition);
+    bool parsePosition(const boost::smatch& crMatch, object::GpsPosition& rPosition);
 
     /// Regular expression to parse GGA
     static const boost::regex msGpggaRe;

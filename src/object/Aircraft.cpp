@@ -21,8 +21,6 @@
 
 #include "Aircraft.h"
 
-namespace data
-{
 namespace object
 {
 Aircraft::Aircraft(std::uint32_t vPriority)
@@ -90,4 +88,3 @@ void Aircraft::setIdType(Aircraft::IdType vType)
 }
 
 }  // namespace object
-}  // namespace data

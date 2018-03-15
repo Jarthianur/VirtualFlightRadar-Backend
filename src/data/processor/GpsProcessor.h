@@ -23,7 +23,7 @@
 
 #include <string>
 
-#include "../object/Position.h"
+#include "../../object/Position.h"
 #include "Processor.hpp"
 
 /// @namespace data

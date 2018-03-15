@@ -25,7 +25,7 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../data/object/Position.h"
+#include "../../object/Position.h"
 
 #define SBS_FIELD_ID 4
 #define SBS_FIELD_TIME 7
@@ -33,17 +33,16 @@
 #define SBS_FIELD_LAT 14
 #define SBS_FIELD_LON 15
 
+using namespace object;
+
 namespace feed
 {
-using namespace data::object;
-
 namespace parser
 {
 SbsParser::SbsParser() : SbsParser(std::numeric_limits<std::int32_t>::max())
 {}
 
-SbsParser::SbsParser(std::int32_t vMaxHeight)
-    : Parser<data::object::Aircraft>(), mMaxHeight(vMaxHeight)
+SbsParser::SbsParser(std::int32_t vMaxHeight) : Parser<Aircraft>(), mMaxHeight(vMaxHeight)
 {}
 
 SbsParser::~SbsParser() noexcept

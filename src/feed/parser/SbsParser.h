@@ -25,7 +25,7 @@
 #include <cstdint>
 #include <string>
 
-#include "../../data/object/Aircraft.h"
+#include "../../object/Aircraft.h"
 #include "Parser.hpp"
 
 namespace feed
@@ -38,7 +38,7 @@ namespace parser
  * @see Parser.hpp
  * @see ../aircraft/Aircraft.hpp
  */
-class SbsParser : public Parser<data::object::Aircraft>
+class SbsParser : public Parser<object::Aircraft>
 {
 public:
     SbsParser();
@@ -59,13 +59,12 @@ public:
      * @brief Unpack into Aircraft.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& crStr,
-                data::object::Aircraft& rAircraft) noexcept override;
+    bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
 
 private:
     // cppcheck-suppress unusedPrivateFunction
     bool parseField(std::uint32_t vField, const std::string& crStr,
-                    data::object::Position& rPosition, data::object::Aircraft& rAircraft);
+                    object::Position& rPosition, object::Aircraft& rAircraft);
 
     const std::int32_t mMaxHeight;
 };

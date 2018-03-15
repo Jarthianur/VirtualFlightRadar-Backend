@@ -27,7 +27,7 @@
 #include <utility>
 
 #include "../Defines.h"
-#include "../data/object/Position.h"
+#include "../object/Position.h"
 #include "PropertyMap.h"
 #include "Util.hpp"
 
@@ -136,7 +136,7 @@ public:
     /**
      * Define and declare getters.
      */
-    GETTER_CR(data::object::GpsPosition, mPosition, Position)
+    GETTER_CR(object::GpsPosition, mPosition, Position)
     GETTER_V(double, mAtmPressure, AtmPressure)
     GETTER_V(std::int32_t, mMaxHeight, MaxHeight)
     GETTER_V(std::int32_t, mMaxDistance, MaxDistance)
@@ -171,7 +171,7 @@ private:
      * @param crProperties The properties
      * @return the position
      */
-    data::object::GpsPosition resolvePosition(const PropertyMap& crProperties) const;
+    object::GpsPosition resolvePosition(const PropertyMap& crProperties) const;
 
     /**
      * @fn resolveServerPort
@@ -221,7 +221,7 @@ private:
 
     /// @var mPosition
     /// Fallback position
-    data::object::GpsPosition mPosition;
+    object::GpsPosition mPosition;
 
     /// @var mAtmPressure
     /// Atmospheric fallback pressure

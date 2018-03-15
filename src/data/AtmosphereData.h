@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-#include "object/Atmosphere.h"
+#include "../object/Atmosphere.h"
 #include "Data.h"
 
 /// @namespace data

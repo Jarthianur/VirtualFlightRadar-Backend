@@ -67,10 +67,9 @@ void Configuration::init(const PropertyMap& crProperties)
     dumpInfo();
 }
 
-data::object::GpsPosition
-Configuration::resolvePosition(const PropertyMap& crProperties) const
+object::GpsPosition Configuration::resolvePosition(const PropertyMap& crProperties) const
 {
-    data::object::Position pos;
+    object::Position pos;
     pos.latitude = boost::get<double>(
         checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "")),
@@ -87,7 +86,7 @@ Configuration::resolvePosition(const PropertyMap& crProperties) const
         checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
                          SECT_KEY_FALLBACK, KV_KEY_GEOID));
-    return data::object::GpsPosition(
+    return object::GpsPosition(
         pos, geoid, !crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty());
 }
 

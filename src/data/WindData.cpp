@@ -25,7 +25,7 @@
 #include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
-using namespace data::object;
+using namespace object;
 
 namespace data
 {

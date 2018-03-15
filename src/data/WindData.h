@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-#include "object/Wind.h"
+#include "../object/Wind.h"
 #include "Data.h"
 
 /// @namespace data

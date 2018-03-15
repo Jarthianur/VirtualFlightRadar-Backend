@@ -21,15 +21,15 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
-/// @namespace data
-namespace data
-{
 /// @namespace  object
 namespace object
 {
 class Object;
 }
 
+/// @namespace data
+namespace data
+{
 /**
  * @class Data
  * @brief The Data interface.

@@ -30,7 +30,7 @@
 #define GPS_FIX_GOOD 1
 #define GPS_HOR_DILUTION_GOOD 1.0
 
-using namespace data::object;
+using namespace object;
 
 namespace data
 {

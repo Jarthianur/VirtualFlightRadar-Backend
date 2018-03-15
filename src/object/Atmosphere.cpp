@@ -15,16 +15,24 @@
  }
  */
 
-#include "Wind.h"
+#include "Atmosphere.h"
 
-namespace data
-{
 namespace object
 {
-Wind::Wind(std::uint32_t vPriority) : Object(vPriority)
+Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)
 {}
 
-Wind::~Wind() noexcept
+Atmosphere::Atmosphere(double vPressure) : Object(0), mPressure(vPressure)
 {}
+
+Atmosphere::~Atmosphere() noexcept
+{}
+
+void Atmosphere::assign(const Object& crOther)
+{
+    Object::assign(crOther);
+    const Atmosphere& crUpdate = static_cast<const Atmosphere&>(crOther);
+    this->mPressure            = crUpdate.mPressure;
+}
+
 }  // namespace object
-}  // namespace data

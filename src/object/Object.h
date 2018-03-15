@@ -20,9 +20,6 @@
 #include <cstdint>
 #include <string>
 
-/// @namespace data
-namespace data
-{
 /// @namespace object
 namespace object
 {
@@ -99,4 +96,3 @@ protected:
     std::string mSerialized;
 };
 }  // namespace object
-}  // namespace data

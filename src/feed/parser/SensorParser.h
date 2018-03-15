@@ -23,7 +23,7 @@
 
 #include <string>
 
-#include "../../data/object/Climate.hpp"
+#include "../../object/Climate.hpp"
 #include "Parser.hpp"
 
 namespace feed
@@ -36,7 +36,7 @@ namespace parser
  * @see Parser.hpp
  * @see ../util/SensorInfo.h
  */
-class SensorParser : public Parser<data::object::Climate>
+class SensorParser : public Parser<object::Climate>
 {
 public:
     /**
@@ -56,12 +56,11 @@ public:
      * @brief Unpack into SensorInfo.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& crStr,
-                data::object::Climate& rClimate) noexcept override;
+    bool unpack(const std::string& crStr, object::Climate& rClimate) noexcept override;
 
 private:
     // cppcheck-suppress unusedPrivateFunction
-    bool parseClimate(const std::string& crStr, data::object::Climate& rClimate);
+    bool parseClimate(const std::string& crStr, object::Climate& rClimate);
 };
 }
 }  // namespace parser

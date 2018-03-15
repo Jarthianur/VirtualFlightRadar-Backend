@@ -25,7 +25,7 @@
 #include <string>
 #include <boost/regex.hpp>
 
-#include "../../data/object/Aircraft.h"
+#include "../../object/Aircraft.h"
 #include "Parser.hpp"
 
 namespace feed
@@ -38,7 +38,7 @@ namespace parser
  * @see Parser.hpp
  * @see ../aircraft/Aircraft.hpp
  */
-class AprsParser : public Parser<data::object::Aircraft>
+class AprsParser : public Parser<object::Aircraft>
 {
 public:
     AprsParser();
@@ -60,19 +60,18 @@ public:
      * @brief Unpack into Aircraft.
      * @override Parser::unpack
      */
-    bool unpack(const std::string& crStr,
-                data::object::Aircraft& rAircraft) noexcept override;
+    bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
 
 private:
     // cppcheck-suppress unusedPrivateFunction
-    bool parsePosition(const boost::smatch& crMatch, data::object::Aircraft& rAircraft);
+    bool parsePosition(const boost::smatch& crMatch, object::Aircraft& rAircraft);
 
     // cppcheck-suppress unusedPrivateFunction
-    bool parseComment(const boost::smatch& crMatch, data::object::Aircraft& rAircraft);
+    bool parseComment(const boost::smatch& crMatch, object::Aircraft& rAircraft);
 
     // cppcheck-suppress unusedPrivateFunction
     bool parseMovement(const boost::smatch& crMatch, const boost::smatch& crCommMatch,
-                       data::object::Aircraft& rAircraft);
+                       object::Aircraft& rAircraft);
 
     /// Regular expression for APRS protocol
     static const boost::regex msAprsRe;

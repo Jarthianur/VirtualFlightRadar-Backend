@@ -34,12 +34,12 @@
 #include "data/AtmosphereData.h"
 #include "data/GpsData.h"
 #include "data/WindData.h"
-#include "data/object/Atmosphere.h"
-#include "data/object/Position.h"
 #include "feed/AprscFeed.h"
 #include "feed/GpsFeed.h"
 #include "feed/SbsFeed.h"
 #include "feed/SensorFeed.h"
+#include "object/Atmosphere.h"
+#include "object/Position.h"
 #include "Logger.hpp"
 
 using namespace data;

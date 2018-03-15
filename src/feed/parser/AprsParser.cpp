@@ -25,7 +25,7 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../data/object/Position.h"
+#include "../../object/Position.h"
 
 /// Define regex match groups for APRS
 //#define RE_APRS_TIME 1
@@ -44,7 +44,7 @@
 
 namespace feed
 {
-using namespace data::object;
+using namespace object;
 
 namespace parser
 {
@@ -61,7 +61,7 @@ AprsParser::AprsParser() : AprsParser(std::numeric_limits<std::int32_t>::max())
 {}
 
 AprsParser::AprsParser(std::int32_t vMaxHeight)
-    : Parser<data::object::Aircraft>(), mMaxHeight(vMaxHeight)
+    : Parser<Aircraft>(), mMaxHeight(vMaxHeight)
 {}
 
 AprsParser::~AprsParser() noexcept
@@ -89,8 +89,7 @@ bool AprsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     return true;
 }
 
-bool AprsParser::parsePosition(const boost::smatch& crMatch,
-                               data::object::Aircraft& rAircraft)
+bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft)
 {
     bool valid = false;
     try
@@ -118,8 +117,7 @@ bool AprsParser::parsePosition(const boost::smatch& crMatch,
     return valid;
 }
 
-bool AprsParser::parseComment(const boost::smatch& crMatch,
-                              data::object::Aircraft& rAircraft)
+bool AprsParser::parseComment(const boost::smatch& crMatch, Aircraft& rAircraft)
 {
     bool valid = true;
     rAircraft.setId(crMatch.str(RE_APRS_COM_ID));
@@ -138,8 +136,7 @@ bool AprsParser::parseComment(const boost::smatch& crMatch,
 }
 
 bool AprsParser::parseMovement(const boost::smatch& crMatch,
-                               const boost::smatch& crCommMatch,
-                               data::object::Aircraft& rAircraft)
+                               const boost::smatch& crCommMatch, Aircraft& rAircraft)
 {
     Movement move;
     bool valid = true;

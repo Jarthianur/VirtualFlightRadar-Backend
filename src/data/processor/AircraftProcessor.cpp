@@ -27,7 +27,7 @@
 
 #include "../../Math.hpp"
 
-using namespace data::object;
+using namespace object;
 
 namespace data
 {

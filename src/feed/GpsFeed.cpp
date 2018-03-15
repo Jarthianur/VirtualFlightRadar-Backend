@@ -27,7 +27,7 @@
 #include "../Logger.hpp"
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
-#include "../data/object/Position.h"
+#include "../object/Position.h"
 #include "client/GpsdClient.h"
 
 namespace feed
@@ -46,7 +46,7 @@ GpsFeed::~GpsFeed() noexcept
 
 void GpsFeed::process(const std::string& crResponse) noexcept
 {
-    data::object::GpsPosition pos(getPriority(), mGndModeEnabled);
+    object::GpsPosition pos(getPriority(), mGndModeEnabled);
     if(mParser.unpack(crResponse, pos))
     {
         try

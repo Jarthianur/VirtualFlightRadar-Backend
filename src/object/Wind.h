@@ -21,53 +21,36 @@
 
 #pragma once
 
-#include <string>
+#include <cstdint>
 
-#include "Atmosphere.h"
-#include "Wind.h"
+#include "Object.h"
 
-/// @namespace data
-namespace data
-{
 /// @namespace object
 namespace object
 {
+struct Climate;
+
 /**
- *@struct Climate
- * @brief Combine Wind and Atmosphere.
- * @see Wind
- * @see Atmosphere
+ * @class Wind
+ * @brief Respresent wind information.
+ * @extends Object
  */
-struct Climate
+class Wind : public Object
 {
-    /// @var wind
-    /// The Wind object
-    Wind wind;
-
-    /// @var atmosphere
-    /// The Atmosphere object
-    Atmosphere atmosphere;
+public:
+    /**
+     * @fn Wind
+     * @brief Constructor
+     */
+    explicit Wind(std::uint32_t vPriority = 0);
 
     /**
-     * @fn hasAtmosphere
-     * @brief Is the Atmosphere object set?
-     * @return true if yes, else false
+     * @fn ~Wind
+     * @brief Destructor
      */
-    inline bool hasAtmosphere()
-    {
-        return !atmosphere.mSerialized.empty();
-    }
+    virtual ~Wind() noexcept;
 
-    /**
-     * @fn hasWind
-     * @brief Is the Wind object set?
-     * @return true if yes, else false
-     */
-    inline bool hasWind()
-    {
-        return !wind.mSerialized.empty();
-    }
+    friend struct Climate;
 };
 
 }  // namespace object
-}  // namespace data

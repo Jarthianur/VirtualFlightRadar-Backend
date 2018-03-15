@@ -17,8 +17,6 @@
 
 #include "Object.h"
 
-namespace data
-{
 namespace object
 {
 Object::Object(std::uint32_t vPriority) : mLastPriority(vPriority)
@@ -58,4 +56,3 @@ const std::string& Object::getSerialized() const
     return mSerialized;
 }
 }  // namespace object
-}  // namespace data

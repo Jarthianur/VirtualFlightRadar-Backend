@@ -23,12 +23,9 @@
 
 #include <cstdint>
 
-#include "../../Defines.h"
+#include "../Defines.h"
 #include "Object.h"
 
-/// @namespace data
-namespace data
-{
 /// @namespace object
 namespace object
 {
@@ -126,4 +123,3 @@ private:
     bool mGround = false;
 };
 }  // namespace object
-}  // namespace data

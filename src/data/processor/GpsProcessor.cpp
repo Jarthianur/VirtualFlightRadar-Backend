@@ -23,7 +23,7 @@
 
 #include <ctime>
 
-using namespace data::object;
+using namespace object;
 
 namespace data
 {

@@ -25,21 +25,20 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../data/object/Atmosphere.h"
-#include "../../data/object/Wind.h"
+#include "../../object/Atmosphere.h"
+#include "../../object/Wind.h"
 
 namespace feed
 {
 namespace parser
 {
-SensorParser::SensorParser() : Parser<data::object::Climate>()
+SensorParser::SensorParser() : Parser<object::Climate>()
 {}
 
 SensorParser::~SensorParser() noexcept
 {}
 
-bool SensorParser::unpack(const std::string& crStr,
-                          data::object::Climate& rClimate) noexcept
+bool SensorParser::unpack(const std::string& crStr, object::Climate& rClimate) noexcept
 {
     try
     {
@@ -53,7 +52,7 @@ bool SensorParser::unpack(const std::string& crStr,
     }
 }
 
-bool SensorParser::parseClimate(const std::string& crStr, data::object::Climate& rClimate)
+bool SensorParser::parseClimate(const std::string& crStr, object::Climate& rClimate)
 {
     bool valid = true;
     if(crStr.find("MDA") != std::string::npos)

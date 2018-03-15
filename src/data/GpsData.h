@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-#include "object/Position.h"
+#include "../object/Position.h"
 #include "processor/GpsProcessor.h"
 #include "Data.h"
 

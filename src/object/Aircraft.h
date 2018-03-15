@@ -24,7 +24,7 @@
 #include <cstdint>
 #include <string>
 
-#include "../../Defines.h"
+#include "../Defines.h"
 #include "Object.h"
 #include "Position.h"
 
@@ -32,9 +32,6 @@
 /// Indicate a double value is not available.
 #define A_VALUE_NA -1024.0
 
-/// @namespace data
-namespace data
-{
 /// @namespace object
 namespace object
 {
@@ -230,4 +227,3 @@ private:
 };
 
 }  // namespace object
-}  // namespace data
