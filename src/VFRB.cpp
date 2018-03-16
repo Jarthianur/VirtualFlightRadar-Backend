@@ -34,10 +34,8 @@
 #include "data/AtmosphereData.h"
 #include "data/GpsData.h"
 #include "data/WindData.h"
-#include "feed/AprscFeed.h"
-#include "feed/GpsFeed.h"
-#include "feed/SbsFeed.h"
-#include "feed/SensorFeed.h"
+#include "feed/Feed.h"
+#include "feed/FeedFactory.h"
 #include "object/Atmosphere.h"
 #include "object/Position.h"
 #include "Logger.hpp"
@@ -96,41 +94,28 @@ void VFRB::run() noexcept
 
 void VFRB::createFeeds(const config::Configuration& crConfig)
 {
+    feed::FeedFactory factory(crConfig, mpAircraftData, mpAtmosphereData, mpGpsData,
+                              mpWindData);
     for(const auto& feed : crConfig.getFeedMapping())
     {
         try
         {
-            if(feed.first.find(SECT_KEY_APRSC) != std::string::npos)
+            auto optFeedPtr = factory.createFeed(feed.first, feed.second);
+            if(optFeedPtr)
             {
-                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::AprscFeed(
-                    feed.first, feed.second, mpAircraftData, crConfig.getMaxHeight())));
-            }
-            else if(feed.first.find(SECT_KEY_SBS) != std::string::npos)
-            {
-                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::SbsFeed(
-                    feed.first, feed.second, mpAircraftData, crConfig.getMaxHeight())));
-            }
-            else if(feed.first.find(SECT_KEY_GPS) != std::string::npos)
-            {
-                mFeeds.push_back(std::unique_ptr<feed::Feed>(
-                    new feed::GpsFeed(feed.first, feed.second, mpGpsData)));
-            }
-            else if(feed.first.find(SECT_KEY_SENS) != std::string::npos)
-            {
-                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::SensorFeed(
-                    feed.first, feed.second, mpWindData, mpAtmosphereData)));
+                mFeeds.push_back(std::move(*optFeedPtr));
             }
             else
             {
                 Logger::warn(
-                    "(Config) create feed ", feed.first,
+                    "(VFRB) create feed ", feed.first,
                     ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
                     ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
             }
         }
         catch(const std::exception& e)
         {
-            Logger::warn("(Config) create feed ", feed.first, ": ", e.what());
+            Logger::warn("(VFRB) create feed ", feed.first, ": ", e.what());
         }
     }
 }
