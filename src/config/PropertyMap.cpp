@@ -73,4 +73,4 @@ bool config::PropertyMap::addProperty(const std::string& crSection,
     return mPropertiesMap[crSection].emplace(crKeyValue).second;
 }
 
-} /* namespace config */
+}  // namespace config

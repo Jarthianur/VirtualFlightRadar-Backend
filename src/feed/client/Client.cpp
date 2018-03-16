@@ -42,7 +42,6 @@ Client::Client(const std::string& crHost, const std::string& crPort,
       mComponent(crComponent),
       mrFeed(rFeed),
       mConnectTimer(mIoService)
-
 {}
 
 Client::~Client() noexcept
@@ -123,4 +122,4 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
 }
 
 }  // namespace client
-}  // namespace network
+}  // namespace feed

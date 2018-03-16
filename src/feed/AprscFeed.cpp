@@ -27,7 +27,7 @@
 #include "../Logger.hpp"
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
-#include "../data/object/Aircraft.h"
+#include "../object/Aircraft.h"
 #include "client/AprscClient.h"
 
 namespace feed
@@ -53,7 +53,7 @@ AprscFeed::~AprscFeed() noexcept
 
 void AprscFeed::process(const std::string& crResponse) noexcept
 {
-    data::object::Aircraft ac(getPriority());
+    object::Aircraft ac(getPriority());
     if(mParser.unpack(crResponse, ac))
     {
         mpData->update(ac, mDataSlot);

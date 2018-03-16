@@ -25,26 +25,61 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../data/object/Position.h"
+#include "../../object/Position.h"
 
-/// Define regex match groups for APRS
 //#define RE_APRS_TIME 1
+
+/// @var RE_APRS_LAT
+/// APRS regex match group of latitude
 #define RE_APRS_LAT 1
+
+/// @var RE_APRS_LAT_DIR
+/// APRS regex match group of latitude orientation
 #define RE_APRS_LAT_DIR 2
-#define RE_APRS_LONG 3
-#define RE_APRS_LONG_DIR 4
+
+/// @var RE_APRS_LON
+/// APRS regex match group of longitude
+#define RE_APRS_LON 3
+
+/// @var RE_APRS_LON_DIR
+/// APRS regex match group of longitude orientation
+#define RE_APRS_LON_DIR 4
+
+/// @var RE_APRS_HEAD
+/// APRS regex match group of heading
 #define RE_APRS_HEAD 5
+
+/// @var RE_APRS_GND_SPD
+/// APRS regex match group of ground speed
 #define RE_APRS_GND_SPD 6
+
+/// @var RE_APRS_ALT
+/// APRS regex match group of altitude
 #define RE_APRS_ALT 7
+
+/// @var RE_APRS_COM
+/// APRS regex match group of comment
 #define RE_APRS_COM 8
+
+/// @var RE_APRS_COM_TYPE
+/// APRS regex match group of id and aircraft type
 #define RE_APRS_COM_TYPE 1
+
+/// @var RE_APRS_COM_ID
+/// APRS regex match group of aircraft id
 #define RE_APRS_COM_ID 2
+
+/// @var RE_APRS_COM_CR
+/// APRS regex match group of climb rate
 #define RE_APRS_COM_CR 3
+
+/// @var RE_APRS_COM_TR
+/// APRS regex match group of turn rate
 #define RE_APRS_COM_TR 4
 
 namespace feed
 {
-using namespace data::object;
+using namespace object;
 
 namespace parser
 {
@@ -61,7 +96,7 @@ AprsParser::AprsParser() : AprsParser(std::numeric_limits<std::int32_t>::max())
 {}
 
 AprsParser::AprsParser(std::int32_t vMaxHeight)
-    : Parser<data::object::Aircraft>(), mMaxHeight(vMaxHeight)
+    : Parser<Aircraft>(), mMaxHeight(vMaxHeight)
 {}
 
 AprsParser::~AprsParser() noexcept
@@ -84,25 +119,24 @@ bool AprsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     {
         return false;
     }
-    parseMovement(match, rAircraft);
+    rAircraft.setFullInfoAvailable(parseMovement(match, com_match, rAircraft));
     rAircraft.setTargetType(Aircraft::TargetType::FLARM);
     return true;
 }
 
-bool AprsParser::parsePosition(const boost::smatch& crMatch,
-                               data::object::Aircraft& rAircraft)
+bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft) noexcept
 {
     bool valid = false;
     try
     {
-        GpsPosition pos;
+        Position pos;
         pos.latitude = math::dmToDeg(std::stod(crMatch.str(RE_APRS_LAT)));
         if(crMatch.str(RE_APRS_LAT_DIR).compare("S") == 0)
         {
             pos.latitude = -pos.latitude;
         }
-        pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_APRS_LONG)));
-        if(crMatch.str(RE_APRS_LONG_DIR).compare("W") == 0)
+        pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_APRS_LON)));
+        if(crMatch.str(RE_APRS_LON_DIR).compare("W") == 0)
         {
             pos.longitude = -pos.longitude;
         }
@@ -118,8 +152,7 @@ bool AprsParser::parsePosition(const boost::smatch& crMatch,
     return valid;
 }
 
-bool AprsParser::parseComment(const boost::smatch& crMatch,
-                              data::object::Aircraft& rAircraft)
+bool AprsParser::parseComment(const boost::smatch& crMatch, Aircraft& rAircraft) noexcept
 {
     bool valid = true;
     rAircraft.setId(crMatch.str(RE_APRS_COM_ID));
@@ -134,34 +167,28 @@ bool AprsParser::parseComment(const boost::smatch& crMatch,
     {
         valid = false;
     }
-    try
-    {
-        rAircraft.setClimbRate(std::stod(crMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS);
-    }
-    catch(const std::logic_error&)
-    {
-        rAircraft.setClimbRate();
-        rAircraft.setFullInfo(false);
-    }
     return valid;
 }
 
 bool AprsParser::parseMovement(const boost::smatch& crMatch,
-                               data::object::Aircraft& rAircraft)
+                               const boost::smatch& crCommMatch,
+                               Aircraft& rAircraft) noexcept
 {
+    Movement move;
+    bool valid = true;
+    // This needs to be split later to parse independently.
     try
     {
-        rAircraft.setHeading(std::stod(crMatch.str(RE_APRS_HEAD)));
-        rAircraft.setGndSpeed(std::stod(crMatch.str(RE_APRS_GND_SPD)) * math::KTS_2_MS);
+        move.heading   = std::stod(crMatch.str(RE_APRS_HEAD));
+        move.gndSpeed  = std::stod(crMatch.str(RE_APRS_GND_SPD)) * math::KTS_2_MS;
+        move.climbRate = std::stod(crCommMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS;
     }
     catch(const std::logic_error&)
     {
-        rAircraft.setHeading();
-        rAircraft.setGndSpeed();
-        rAircraft.setFullInfo(false);
-        return false;
+        valid = false;
     }
-    return true;
-}
+    rAircraft.setMovement(move);
+    return valid;
 }
 }  // namespace parser
+}  // namespace feed

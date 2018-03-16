@@ -24,27 +24,44 @@
 #include <cstdio>
 #include <string>
 
+#include "../../Defines.h"
 #include "../../Math.hpp"
 
+/// @def PROC_BUFF_S
+/// The internal buffer size
 #define PROC_BUFF_S 4096
 
+/// @namespace data
 namespace data
 {
 /// @namespace processor
 namespace processor
 {
+/**
+ * @class Processor
+ * @brief Processor base class/interface.
+ * @tparam T The type of object to process
+ */
 template<typename T>
 class Processor
 {
 public:
-    Processor()
-    {}
-    virtual ~Processor() noexcept
-    {}
+    DEFAULT_CTOR_DTOR_INLINE(Processor)
 
+    /**
+     * @fn process
+     * @brief Process a given object.
+     * @param _1 The object of type T
+     * @return the resulting string
+     */
     virtual std::string process(const T& _1) = 0;
 
 protected:
+    /**
+     * @fn finishSentence
+     * @brief End a given string with checksum and CRLF.
+     * @param rDestStr The target string
+     */
     void finishSentence(std::string& rDestStr)
     {
         std::snprintf(mBuffer, sizeof(mBuffer), "%02x\r\n",
@@ -52,7 +69,9 @@ protected:
         rDestStr.append(mBuffer);
     }
 
+    /// @var mBuffer
+    /// The internal buffer for format strings
     char mBuffer[PROC_BUFF_S] = "";
 };
-}
-}
+}  // namespace processor
+}  // namespace data

@@ -25,6 +25,8 @@
 #include <unordered_map>
 #include <utility>
 
+#include "../Defines.h"
+
 /// @namespace config
 namespace config
 {
@@ -43,24 +45,14 @@ using KeyValue = std::pair<std::string, std::string>;
 class PropertyMap
 {
 public:
-    /**
-     * @fn PropertyMap
-     * @brief Constructor
-     */
-    PropertyMap();
-
-    /**
-     * @fn ~PropertyMap
-     * @brief Destructor
-     */
-    virtual ~PropertyMap() noexcept;
+    DEFAULT_CTOR_DTOR(PropertyMap)
 
     /**
      * @fn getProperty
      * @brief Get the value under a section for the given key.
      * @param crSection The section of the property
      * @param crKey     The key to get the value for
-     * @param crDefault The default value; defaults to empty string
+     * @param crDefault The default value (default: empty)
      * @return the value for key in section if found, else the default value
      */
     const std::string getProperty(const std::string& crSection, const std::string& crKey,
@@ -71,6 +63,7 @@ public:
      * @brief Get the key-value-map for a section.
      * @param crSection The section to get the kv-map for
      * @return the kv-map if found, else an empty one
+     * @throw std::out_of_range if the section is not found
      */
     const KeyValueMap& getSectionKeyValue(const std::string& crSection) const;
 
@@ -79,7 +72,7 @@ public:
      * @brief Add a key-value pair for a section.
      * @note If the section does not exist, it gets created.
      * @param rSection  The section name
-     * @param rKeyValue The key-value pair
+     * @param rKeyValue The key-value pair (default: empty)
      * @return true on success, else false
      */
     bool addProperty(const std::string& crSection, const KeyValue& crKeyValue = {});
@@ -90,4 +83,4 @@ private:
     std::unordered_map<std::string, KeyValueMap> mPropertiesMap;
 };
 
-} /* namespace config */
+}  // namespace config

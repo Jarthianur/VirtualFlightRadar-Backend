@@ -34,24 +34,24 @@
 #include "data/AtmosphereData.h"
 #include "data/GpsData.h"
 #include "data/WindData.h"
-#include "data/object/Atmosphere.h"
-#include "data/object/Position.h"
 #include "feed/AprscFeed.h"
 #include "feed/GpsFeed.h"
 #include "feed/SbsFeed.h"
 #include "feed/SensorFeed.h"
+#include "object/Atmosphere.h"
+#include "object/Position.h"
 #include "Logger.hpp"
 
 using namespace data;
 
-#define SYNC_TIME (1)
+#define SYNC_TIME 1
 
 std::atomic<bool> VFRB::vRunStatus(true);
 
 VFRB::VFRB(const config::Configuration& config)
     : mpAircraftData(new AircraftData(config.getMaxDistance())),
       mpAtmosphereData(new AtmosphereData(object::Atmosphere(config.getAtmPressure()))),
-      mpGpsData(new GpsData(config.getPosition())),
+      mpGpsData(new GpsData(config.getPosition(), config.getGroundMode())),
       mpWindData(new WindData()),
       mServer(config.getServerPort())
 {
@@ -102,22 +102,22 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
         {
             if(feed.first.find(SECT_KEY_APRSC) != std::string::npos)
             {
-                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::AprscFeed(
+                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::AprscFeed(
                     feed.first, feed.second, mpAircraftData, crConfig.getMaxHeight())));
             }
             else if(feed.first.find(SECT_KEY_SBS) != std::string::npos)
             {
-                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::SbsFeed(
+                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::SbsFeed(
                     feed.first, feed.second, mpAircraftData, crConfig.getMaxHeight())));
             }
             else if(feed.first.find(SECT_KEY_GPS) != std::string::npos)
             {
-                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::GpsFeed(
-                    feed.first, feed.second, mpGpsData, crConfig.isGndModeEnabled())));
+                mFeeds.push_back(std::unique_ptr<feed::Feed>(
+                    new feed::GpsFeed(feed.first, feed.second, mpGpsData)));
             }
             else if(feed.first.find(SECT_KEY_SENS) != std::string::npos)
             {
-                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::SensorFeed(
+                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::SensorFeed(
                     feed.first, feed.second, mpWindData, mpAtmosphereData)));
             }
             else

@@ -25,21 +25,20 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../data/object/Atmosphere.h"
-#include "../../data/object/Wind.h"
+#include "../../object/Atmosphere.h"
+#include "../../object/Wind.h"
 
 namespace feed
 {
 namespace parser
 {
-SensorParser::SensorParser() : Parser<data::object::Climate>()
+SensorParser::SensorParser() : Parser<object::Climate>()
 {}
 
 SensorParser::~SensorParser() noexcept
 {}
 
-bool SensorParser::unpack(const std::string& crStr,
-                          data::object::Climate& rClimate) noexcept
+bool SensorParser::unpack(const std::string& crStr, object::Climate& rClimate) noexcept
 {
     try
     {
@@ -53,7 +52,7 @@ bool SensorParser::unpack(const std::string& crStr,
     }
 }
 
-bool SensorParser::parseClimate(const std::string& crStr, data::object::Climate& rClimate)
+bool SensorParser::parseClimate(const std::string& crStr, object::Climate& rClimate)
 {
     bool valid = true;
     if(crStr.find("MDA") != std::string::npos)
@@ -65,15 +64,15 @@ bool SensorParser::parseClimate(const std::string& crStr, data::object::Climate&
         double tmpPress = std::stod(crStr.substr(tmpS, subLen), &numIdx) * 1000.0;
         if((valid = (numIdx == subLen)))
         {
-            rClimate.mAtmosphere.setSerialized(crStr + "\n");
-            rClimate.mAtmosphere.setPressure(tmpPress);
+            rClimate.atmosphere.setSerialized(crStr + "\n");
+            rClimate.atmosphere.setPressure(tmpPress);
         }
     }
     else if(crStr.find("MWV") != std::string::npos)
     {
-        rClimate.mWind.setSerialized(crStr + "\n");
+        rClimate.wind.setSerialized(crStr + "\n");
     }
     return valid;
 }
-}
 }  // namespace parser
+}  // namespace feed

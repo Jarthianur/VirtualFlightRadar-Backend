@@ -93,7 +93,7 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
             mSocket, boost::asio::buffer(mLoginStr),
             boost::bind(&AprscClient::handleLogin, this, boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
-        mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAliveBeacon, this));
+        mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAlive, this));
     }
     else
     {
@@ -106,18 +106,18 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
     }
 }
 
-void AprscClient::sendKeepAliveBeacon()
+void AprscClient::sendKeepAlive()
 {
     if(mStopped)
     {
         return;
     }
     boost::asio::async_write(mSocket, boost::asio::buffer("#keep-alive beacon\r\n"),
-                             boost::bind(&AprscClient::handleSendKaBeacon, this,
+                             boost::bind(&AprscClient::handleSendKeepAlive, this,
                                          boost::asio::placeholders::error,
                                          boost::asio::placeholders::bytes_transferred));
     mTimeout.expires_from_now(boost::posix_time::minutes(10));
-    mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAliveBeacon, this));
+    mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAlive, this));
 }
 
 void AprscClient::handleLogin(const boost::system::error_code& crError,
@@ -134,8 +134,8 @@ void AprscClient::handleLogin(const boost::system::error_code& crError,
     }
 }
 
-void AprscClient::handleSendKaBeacon(const boost::system::error_code& crError,
-                                     std::size_t) noexcept
+void AprscClient::handleSendKeepAlive(const boost::system::error_code& crError,
+                                      std::size_t) noexcept
 {
     if(crError)
     {
@@ -144,4 +144,4 @@ void AprscClient::handleSendKaBeacon(const boost::system::error_code& crError,
 }
 
 }  // namespace client
-}  // namespace network
+}  // namespace feed

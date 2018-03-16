@@ -25,15 +25,40 @@
 
 #include "../../Math.hpp"
 
-/// Define regex match groups for GGA
+/// @def RE_GGA_LAT
+/// GGA regex match capture group of latitude
 #define RE_GGA_LAT 1
+
+/// @def RE_GGA_LAT_DIR
+/// GGA regex match capture group of latitude orientation
 #define RE_GGA_LAT_DIR 2
-#define RE_GGA_LONG 3
-#define RE_GGA_LONG_DIR 4
+
+/// @def RE_GGA_LON
+/// GGA regex match capture group of longitude
+#define RE_GGA_LON 3
+
+/// @def RE_GGA_LON_DIR
+/// GGA regex match capture group of longitude orientation
+#define RE_GGA_LON_DIR 4
+
+/// @def RE_GGA_FIX
+/// GGA regex match capture group of fix quality
 #define RE_GGA_FIX 5
+
+/// @def RE_GGA_SAT
+/// GGA regex match capture group of sitallite count
 #define RE_GGA_SAT 6
+
+/// @def RE_GGA_DIL
+/// GGA regex match capture group of dilution
 #define RE_GGA_DIL 7
+
+/// @def RE_GGA_ALT
+/// GGA regex match capture group of altitude
 #define RE_GGA_ALT 8
+
+/// @def RE_GGA_GEOID
+/// GGA regex match capture group of geoid separation
 #define RE_GGA_GEOID 9
 
 namespace feed
@@ -50,8 +75,7 @@ GpsParser::GpsParser() : Parser()
 GpsParser::~GpsParser() noexcept
 {}
 
-bool GpsParser::unpack(const std::string& crStr,
-                       data::object::ExtGpsPosition& rPosition) noexcept
+bool GpsParser::unpack(const std::string& crStr, object::GpsPosition& rPosition) noexcept
 {
     try
     {
@@ -68,24 +92,28 @@ bool GpsParser::unpack(const std::string& crStr,
 }
 
 bool GpsParser::parsePosition(const boost::smatch& crMatch,
-                              data::object::ExtGpsPosition& rPosition)
+                              object::GpsPosition& rPosition)
 {
-    rPosition.position.latitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LAT)));
+    object::Position pos;
+    pos.latitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LAT)));
+
     if(crMatch.str(RE_GGA_LAT_DIR).compare("S") == 0)
     {
-        rPosition.position.latitude = -rPosition.position.latitude;
+        pos.latitude = -pos.latitude;
     }
-    rPosition.position.longitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LONG)));
-    if(crMatch.str(RE_GGA_LONG_DIR).compare("W") == 0)
+    pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LON)));
+
+    if(crMatch.str(RE_GGA_LON_DIR).compare("W") == 0)
     {
-        rPosition.position.longitude = -rPosition.position.longitude;
+        pos.longitude = -pos.longitude;
     }
-    rPosition.fixQa             = std::stoi(crMatch.str(RE_GGA_FIX));
-    rPosition.nrSats            = std::stoi(crMatch.str(RE_GGA_SAT));
-    rPosition.dilution          = std::stod(crMatch.str(RE_GGA_DIL));
-    rPosition.position.altitude = math::doubleToInt(std::stod(crMatch.str(RE_GGA_ALT)));
-    rPosition.geoid             = std::stod(crMatch.str(RE_GGA_GEOID));
+    pos.altitude = math::doubleToInt(std::stod(crMatch.str(RE_GGA_ALT)));
+    rPosition.setPosition(pos);
+    rPosition.setFixQuality(std::stoi(crMatch.str(RE_GGA_FIX)));
+    rPosition.setNrOfSatellites(std::stoi(crMatch.str(RE_GGA_SAT)));
+    rPosition.setDilution(std::stod(crMatch.str(RE_GGA_DIL)));
+    rPosition.setGeoid(std::stod(crMatch.str(RE_GGA_GEOID)));
     return true;
 }
-}
 }  // namespace parser
+}  // namespace feed

@@ -17,17 +17,15 @@
 
 #include "Atmosphere.h"
 
-namespace data
-{
 namespace object
 {
-Atmosphere::Atmosphere() : Object(0)
+Atmosphere::Atmosphere() : Atmosphere(ICAO_STD_A)
 {}
 
 Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)
 {}
 
-Atmosphere::Atmosphere(double vPress) : Object(0), mPressure(vPress)
+Atmosphere::Atmosphere(double vPressure) : Object(0), mPressure(vPressure)
 {}
 
 Atmosphere::~Atmosphere() noexcept
@@ -40,14 +38,4 @@ void Atmosphere::assign(const Object& crOther)
     this->mPressure            = crUpdate.mPressure;
 }
 
-double Atmosphere::getPressure() const
-{
-    return mPressure;
-}
-
-void Atmosphere::setPressure(double vPress)
-{
-    mPressure = vPress;
-}
-}
-}
+}  // namespace object

@@ -25,6 +25,9 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "../../Defines.h"
+#include "../../Parameters.h"
+
 #include "Client.h"
 
 namespace feed
@@ -38,36 +41,28 @@ class Feed;
 #define WC_RCV_TIMEOUT 5
 #endif
 
+//// @namespace feed
 namespace feed
 {
+/// @namespace client
 namespace client
 {
 /**
- * @class SensorClient extends Client
- * @brief Handle connections to a server sending sensor information in NMEA MDA,WMV
- * sentences.
- * @see Client.h
+ * @class SensorClient
+ * @brief Connect to a sender of sensoric information.
+ * @extends Client
  */
 class SensorClient : public Client
 {
 public:
-    /**
-     * Non-copyable
-     */
-    SensorClient(const SensorClient&) = delete;
-
-    /**
-     * Not assignable
-     */
-    SensorClient& operator=(const SensorClient&) = delete;
+    NON_COPYABLE(SensorClient)
 
     /**
      * @fn SensorClient
      * @brief Constructor
-     * @param cr_host  The hostname
-     * @param cr_port  The port
-     * @param cr_login The login string to transmit
-     * @param r_feed   The handler Feed reference
+     * @param crHost The hostname
+     * @param crPort The port
+     * @param rFeed  The handler Feed reference
      */
     SensorClient(const std::string& crHost, const std::string& crPort, feed::Feed& rFeed);
 
@@ -81,13 +76,13 @@ private:
     /**
      * @fn read
      * @brief Read with timeout.
-     * @override Client::read
+     * @see Client#read
      */
     void read() override;
 
     /**
      * @fn connect
-     * @override Client::connect
+     * @see Client#connect
      */
     void connect() override;
 
@@ -100,32 +95,32 @@ private:
     /**
      * @fn stop
      * @brief Cancel timer before stop.
-     * @override Client::stop
+     * @see Client#stop
      */
     void stop() override;
 
     /**
-     * @fn handleResolve
-     * @override Client::handleResolve
+     * @see Client#handleResolve
      */
     void
     handleResolve(const boost::system::error_code& crError,
                   boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 
     /**
-     * @fn handleConnect
-     * @override Client::handleConnect
+     * @see Client#handleConnect
      */
     void
     handleConnect(const boost::system::error_code& crError,
                   boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 
-    /// Client stopped?
+    /// @var mStopped
+    /// The run state
     bool mStopped;
 
+    /// @var mTimeout
     /// Read timer
     boost::asio::deadline_timer mTimeout;
 };
 
 }  // namespace client
-}  // namespace network
+}  // namespace feed

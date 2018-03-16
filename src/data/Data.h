@@ -21,25 +21,52 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
-namespace data
-{
+#include "../Defines.h"
+
+/// @namespace object
 namespace object
 {
 class Object;
-}
+}  // namespace object
 
+/// @namespace data
+namespace data
+{
+/**
+ * @class Data
+ * @brief The Data interface.
+ */
 class Data
 {
 public:
-    Data();
-    virtual ~Data() noexcept;
-    virtual std::string getSerialized()                              = 0;
+    DEFAULT_CTOR_DTOR(Data)
+
+    /**
+     * @fn getSerialized
+     * @brief Get the serialized data.
+     * @return the string
+     */
+    virtual std::string getSerialized() = 0;
+
+    /**
+     * @fn update
+     * @brief Attempt to update this data.
+     * @param _1    The new Object
+     * @param vSlot The slot for registered attempts
+     * @return true on success, else false
+     */
     virtual bool update(const object::Object& _1, std::size_t vSlot) = 0;
-    virtual std::size_t registerSlot()                               = 0;
+
+    /**
+     * @fn registerSlot
+     * @brief Register an attempt slot.
+     * @return the slot number
+     */
+    virtual std::size_t registerSlot() = 0;
 
 protected:
     /// @var mMutex
     /// Used for RW on this data
     boost::mutex mMutex;
 };
-}
+}  // namespace data

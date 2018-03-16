@@ -26,7 +26,8 @@
 #include <string>
 #include <utility>
 
-#include "../data/object/Position.h"
+#include "../Defines.h"
+#include "../object/Position.h"
 #include "PropertyMap.h"
 #include "Util.hpp"
 
@@ -55,7 +56,7 @@
 #define SECT_KEY_SENS "sens"
 
 /**
- * Per section keys
+ * Per section key-value keys
  */
 /// @def KV_KEY_FEEDS
 #define KV_KEY_FEEDS "feeds"
@@ -111,7 +112,9 @@ using FeedMapping = std::list<std::pair<std::string, KeyValueMap>>;
 
 /**
  * @class Configuration
- * @brief Evaluate and store configuration for VFR-B.
+ * @brief Represents a VFRB configuration.
+ *
+ * Evaluate and store a configuration for the VFRB.
  */
 class Configuration
 {
@@ -119,7 +122,7 @@ public:
     /**
      * @fn Configuration
      * @brief Constructor
-     * @param rStream The config file as stream
+     * @param rStream The input stream
      * @throw std::runtime_error if any error occures
      */
     explicit Configuration(std::istream& rStream);
@@ -131,59 +134,15 @@ public:
     virtual ~Configuration() noexcept;
 
     /**
-     * @fn getLatitude
-     * @brief Get the latitude.
-     * @return mLatitude
+     * Define and declare getters.
      */
-    const data::object::ExtGpsPosition& getPosition() const;
-
-    /**
-     * @fn getAtmPressure
-     * @brief Get the atmospheric pressure.
-     * @return mAtmPressure
-     */
-    double getAtmPressure() const;
-
-    /**
-     * @fn getMaxHeight
-     * @brief Get the max height filter.
-     * @return mMaxHeight
-     */
-    std::int32_t getMaxHeight() const;
-
-    /**
-     * @fn getMaxDistance
-     * @brief Get the max distance filter.
-     * @return mMaxDistance
-     */
-    std::int32_t getMaxDistance() const;
-
-    /**
-     * @fn getServerPort
-     * @brief Get the server port.
-     * @return mServerPort
-     */
-    std::uint16_t getServerPort() const;
-
-    /**
-     * @fn isGndModeEnabled
-     * @brief Is the ground mode enabled?
-     * @return mGndMode
-     */
-    bool isGndModeEnabled() const;
-
-    /**
-     * @fn forceGndMode
-     * @brief Force ground mode to be enabled.
-     */
-    void forceGndMode();
-
-    /**
-     * @fn getFeedMapping
-     * @brief Get the list of feeds with their key-value maps.
-     * @return mFeedMapping
-     */
-    const FeedMapping& getFeedMapping() const;
+    GETTER_CR(object::GpsPosition, mPosition, Position)
+    GETTER_V(double, mAtmPressure, AtmPressure)
+    GETTER_V(std::int32_t, mMaxHeight, MaxHeight)
+    GETTER_V(std::int32_t, mMaxDistance, MaxDistance)
+    GETTER_V(std::uint16_t, mServerPort, ServerPort)
+    GETSET_V(bool, mGroundMode, GroundMode)
+    GETTER_CR(FeedMapping, mFeedMapping, FeedMapping)
 
 private:
     /**
@@ -194,7 +153,13 @@ private:
      */
     void init(const PropertyMap& crProperties);
 
-    data::object::ExtGpsPosition resolvePosition(const PropertyMap& crProperties) const;
+    /**
+     * @fn resolvePosition
+     * @brief Resolve the fallback position.
+     * @param crProperties The properties
+     * @return the position
+     */
+    object::GpsPosition resolvePosition(const PropertyMap& crProperties) const;
 
     /**
      * @fn resolveServerPort
@@ -208,13 +173,14 @@ private:
      * @fn resolveFeeds
      * @brief Resolve the feeds and their config.
      * @param crProperties The properties
-     * @return a list of all feeds with their config
+     * @return a list of all feeds with their sections
      */
     FeedMapping resolveFeeds(const PropertyMap& crProperties);
 
     /**
      * @fn resolveFilter
-     * @brief Resolve a filter from the properties.
+     * @brief Resolve a filter.
+     * @note An invalid/negative value results in the max value which means disabled.
      * @param crProperties The properties
      * @param crKey        The filter key
      * @return the filter value
@@ -225,11 +191,11 @@ private:
     /**
      * @fn checkNumberValue
      * @brief Check a Number.
-     * @param crOptNumber The Number
+     * @param crOptNumber The optinonal Number
      * @param crSection   The section name
      * @param crKey       The key
      * @return the number value
-     * @throw std::invalid_argument if the value is invalid
+     * @throw std::invalid_argument if the Number is invalid
      */
     util::Number checkNumberValue(const util::OptNumber& crOptNumber,
                                   const std::string& crSection,
@@ -237,29 +203,33 @@ private:
 
     /**
      * @fn dumpInfo
-     * @brief Dump the current config state using info logs.
+     * @brief Dump the current config state using info log.
      */
     void dumpInfo() const;
 
-    /// @var mLatitude
-    /// Base latitude
-    data::object::ExtGpsPosition mPosition;
+    /// @var mPosition
+    /// Fallback position
+    object::GpsPosition mPosition;
 
     /// @var mAtmPressure
-    /// Atmospheric pressure at base
+    /// Atmospheric fallback pressure
     double mAtmPressure;
 
     /// @var mMaxHeight
-    /// Maximum height for reported Aircrafts
+    /// Maximum height for reported aircrafts
     std::int32_t mMaxHeight;
 
     /// @var mMaxDistance
-    /// Maximum distance for reported Aircrafts
+    /// Maximum distance for reported aircrafts
     std::int32_t mMaxDistance;
 
     /// @var mServerPort
     /// Port where to serve reports
     std::uint16_t mServerPort;
+
+    /// @var mGroundMode
+    /// Ground mode state
+    bool mGroundMode;
 
     /// @var mFeedMapping
     /// List of feeds with their key-value map

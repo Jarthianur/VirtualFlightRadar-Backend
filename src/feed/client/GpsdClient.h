@@ -26,37 +26,32 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "../../Defines.h"
+
 #include "Client.h"
 
+/// @namespace feed
 namespace feed
 {
+/// @namespace client
 namespace client
 {
 /**
- * @class GpsdClient extends Client.
- * @brief Handle connections to a GPSD server.
- * @see Client.h
+ * @class GpsdClient
+ * @brief Connect to a GPSD server.
+ * @extends Client
  */
 class GpsdClient : public Client
 {
 public:
-    /**
-     * Non-copyable
-     */
-    GpsdClient(const GpsdClient&) = delete;
-
-    /**
-     * Not assignable
-     */
-    GpsdClient& operator=(const GpsdClient&) = delete;
+    NON_COPYABLE(GpsdClient)
 
     /**
      * @fn GpsdClient
      * @brief Constructor
-     * @param cr_host  The hostname
-     * @param cr_port  The port
-     * @param cr_login The login string to transmit
-     * @param r_feed   The handler Feed reference
+     * @param crHost The hostname
+     * @param crPort The port
+     * @param rFeed  The handler Feed reference
      */
     GpsdClient(const std::string& crHost, const std::string& crPort, feed::Feed& rFeed);
 
@@ -68,29 +63,26 @@ public:
 
 private:
     /**
-     * @fn connect.
-     * @override Client::connect
+     * @see Client#connect
      */
     void connect() override;
 
     /**
      * @fn stop
-     * @brief Send unwatch-request to server before stop.
-     * @override Client::stop
+     * @brief Send unwatch-request before stop.
+     * @see Client#stop
      */
     void stop() override;
 
     /**
-     * @fn handleResolve
-     * @override Client::handleResolve
+     * @see Client#handleResolve
      */
     void
     handleResolve(const boost::system::error_code& crError,
                   boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 
     /**
-     * @fn handleConnect
-     * @override Client::handleConnect
+     * @see Client#handleConnect
      */
     void
     handleConnect(const boost::system::error_code& crError,
@@ -98,13 +90,13 @@ private:
 
     /**
      * @fn handleWatch
-     * @brief Handler for send watch-reques
-     * @param cr_ec The error code
-     * @param s     The sent bytes
+     * @brief Handler for watch-request sending
+     * @param crError The error code
+     * @param vBytes  The sent bytes
      */
     void handleWatch(const boost::system::error_code& crError,
                      std::size_t vBytes) noexcept;
 };
 
 }  // namespace client
-}  // namespace network
+}  // namespace feed

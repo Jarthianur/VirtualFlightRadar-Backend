@@ -27,6 +27,7 @@
 #include <boost/chrono.hpp>
 
 #include "server/Server.h"
+#include "Defines.h"
 
 namespace config
 {
@@ -51,62 +52,81 @@ class Feed;
 class VFRB
 {
 public:
-    /**
-     * Non-copyable
-     */
-    VFRB(const VFRB&) = delete;
-    /**
-     * Not assignable
-     */
-    VFRB& operator=(const VFRB&) = delete;
+    NON_COPYABLE(VFRB)
+
     /**
      * @fn VFRB
      * @brief Constructor
+     * @param crConfig The configuration
      */
     explicit VFRB(const config::Configuration& crConfig);
+
     /**
      * @fn ~VFRB
      * @brief Destructor
      */
     virtual ~VFRB() noexcept;
+
     /**
      * @fn run
      * @brief The VFRB's main method, runs the VFR-B.
      */
     void run() noexcept;
 
+    /// @var vRunStatus
     /// Atomic run-status. By this, every component may determine if the VFRB stops.
     static std::atomic<bool> vRunStatus;
 
 private:
     /**
-     * @fn registerFeeds
-     * @brief Register all input feeds found from ConfigReader.
-     * @note Only correctly configured feeds get registered.
-     * @param crProperties The PropertyMap holding read properties
-     * @return the number of registered feeds
+     * @fn createFeeds
+     * @brief Register all input Feeds.
+     * @param crConfig The Configuration
      */
-    void createFeeds(const config::Configuration& crFeeds);
+    void createFeeds(const config::Configuration& crConfig);
 
+    /**
+     * @fn setupSignals
+     * @brief Setup the signal set.
+     * @param rSigSet
+     */
     void setupSignals(boost::asio::signal_set& rSigSet);
 
+    /**
+     * @fn serve
+     * @brief Serve the data frequently every second using the Server.
+     */
     void serve();
 
+    /**
+     * @fn getDuration
+     * @brief Get the duration from given start value as formatted string.
+     * @param vStart The start value
+     * @return the duration string
+     */
     std::string getDuration(boost::chrono::steady_clock::time_point vStart) const;
 
-    /// Container holding all registered Aircrafts
+    /// @var mpAircraftData
+    /// Manage aircrafts
     std::shared_ptr<data::AircraftData> mpAircraftData;
 
-    ///
+    /// @var mpAtmosphereData
+    /// Manage atmospheric data
     std::shared_ptr<data::AtmosphereData> mpAtmosphereData;
 
-    /// Container holding GPS information
+    /// @var mpGpsData
+    /// Manage GPS data
     std::shared_ptr<data::GpsData> mpGpsData;
 
-    /// Container holding sensor and climate information.
+    /// @var mpWindData
+    /// Manage wind data
     std::shared_ptr<data::WindData> mpWindData;
 
+    /// @var mServer
+    /// Manage clients and sending of data
     server::Server mServer;
 
-    std::list<std::shared_ptr<feed::Feed>> mFeeds;
+    /// @var mFeeds
+    /// List of all active feeds
+    std::list<std::unique_ptr<feed::Feed>> mFeeds;
 };

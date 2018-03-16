@@ -26,8 +26,10 @@
 #include <string>
 #include <vector>
 
-#include "object/Position.h"
+#include "../Defines.h"
+#include "../object/Position.h"
 #include "processor/GpsProcessor.h"
+
 #include "Data.h"
 
 /// @namespace data
@@ -35,67 +37,78 @@ namespace data
 {
 /**
  * @class GpsData
- * @brief Manage GPS information.
+ * @brief Store GPS information.
+ * @implements Data
  */
 class GpsData : public Data
 {
 public:
-    GpsData();
+    DEFAULT_CTOR_DTOR(GpsData)
 
     /**
      * @fn GpsData
      * @brief Constructor
-     * @param vPosition The initial info
+     * @param crPosition The initial info
      */
-    explicit GpsData(const object::ExtGpsPosition& crPosition);
+    explicit GpsData(const object::GpsPosition& crPosition, bool vGround);
 
     /**
-     * @fn ~GpsData
-     * @brief Destructor
-     */
-    virtual ~GpsData() noexcept;
-
-    /**
-     * @fn getGpsStr
-     * @brief Get a full NMEA GPS report.
-     * @note A full report contains GPGGA and GPRMC and includes trailing <cr><lf>.
+     * @fn getSerialized
+     * @brief Get NMEA GPS report.
      * @return the NMEA string
      * @threadsafe
      */
     std::string getSerialized() override;
 
     /**
-     * @fn getBasePos
-     * @brief Get the base GPS position.
+     * @fn getGpsPosition
+     * @brief Get the GPS position.
      * @return the position
      * @threadsafe
      */
-    object::GpsPosition getGpsPosition();
+    object::Position getGpsPosition();
 
     /**
      * @fn update
      * @brief Try to update the base position.
      * @param crPosition The new position
-     * @param vPriority  The attempts priority
-     * @param rAttempts  The update attempts
+     * @param vSlot      The attempt slot
+     * @return true on success, else false
+     * @threadsafe
      */
     bool update(const object::Object& crPosition, std::size_t vSlot) override;
 
+    /**
+     * @see Data#registerSlot
+     */
     std::size_t registerSlot() override;
 
 private:
-    /// @var mBasePos
-    /// Wrapper holding the base position
-    object::ExtGpsPosition mPosition;
+    /**
+     * @fn isPositionGood
+     * @brief Check whether the position is good enough.
+     * @return true if yes, else false
+     */
+    bool isPositionGood();
 
-    /// @var mGpsModule
-    /// GpsModule providing functionality to build GPS sentences
+    /// @var mPosition
+    /// The position
+    object::GpsPosition mPosition;
+
+    /// @var mProcessor
+    /// Processor for GPS information
     processor::GpsProcessor mProcessor;
 
-    /// @var mPosLocked
+    /// @var mPositionLocked
     /// Locking state of the current position
     bool mPositionLocked = false;
 
+    /// @var mGroundMode
+    /// Ground mode state
+    bool mGroundMode = false;
+
+    /// @var mAttempts
+    /// Store update attempts
     std::vector<std::uint32_t> mAttempts;
 };
 

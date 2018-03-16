@@ -23,45 +23,45 @@
 
 #include <string>
 
-#include "../../data/object/Climate.h"
+#include "../../Defines.h"
+#include "../../object/Climate.hpp"
+
 #include "Parser.hpp"
 
+/// @namespace feed
 namespace feed
 {
+/// @namespace parser
 namespace parser
 {
 /**
- * @class SensorParser implements Parser
- * @brief Provide unpacking method for NMEA sentences from sensors.
- * @see Parser.hpp
- * @see ../util/SensorInfo.h
+ * @class SensorParser
+ * @brief Unpack NMEA sentences from sensors.
+ * @implements Parser
  */
-class SensorParser : public Parser<data::object::Climate>
+class SensorParser : public Parser<object::Climate>
 {
 public:
-    /**
-     * @fn SensorParser
-     * @brief Constructor
-     */
-    SensorParser();
-
-    /**
-     * @fn ~SensorParser
-     * @brief Destructor
-     */
-    virtual ~SensorParser() noexcept;
+    DEFAULT_CTOR_DTOR(SensorParser)
 
     /**
      * @fn unpack
-     * @brief Unpack into SensorInfo.
-     * @override Parser::unpack
+     * @brief Unpack into Climate.
+     * @see Parser#unpack
      */
-    bool unpack(const std::string& crStr,
-                data::object::Climate& rClimate) noexcept override;
+    bool unpack(const std::string& crStr, object::Climate& rClimate) noexcept override;
 
 private:
+    /**
+     * @fn parseClimate
+     * @brief Parse a sentence and unpack into Climate.
+     * @param crStr    The string to parse
+     * @param rClimate The target object
+     * @return true on success, else false
+     * @throw std::out_of_range, std::invalid_argument from invoked functions
+     */
     // cppcheck-suppress unusedPrivateFunction
-    bool parseClimate(const std::string& crStr, data::object::Climate& rClimate);
+    bool parseClimate(const std::string& crStr, object::Climate& rClimate);
 };
-}
 }  // namespace parser
+}  // namespace feed

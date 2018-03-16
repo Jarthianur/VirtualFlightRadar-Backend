@@ -26,31 +26,39 @@
 #include <memory>
 #include <string>
 
+#include "../Defines.h"
 #include "../config/PropertyMap.h"
 #include "parser/SbsParser.h"
+
 #include "Feed.h"
 
+/// @namespace data
 namespace data
 {
 class AircraftData;
 } /* namespace data */
 
+/// @namespace feed
 namespace feed
 {
 /**
- * @class SbsFeed extends Feed
- * @brief Represents a SBS input feed.
- * @see Feed.h
+ * @class SbsFeed
+ * @brief SBS input feed.
+ * @extends Feed
  */
 class SbsFeed : public Feed
 {
 public:
+    NON_COPYABLE(SbsFeed)
+
     /**
      * @fn SbsFeed
      * @brief Constructor
-     * @param cr_name  The SbsFeeds unique name
-     * @param prio     The priority
-     * @param cr_kvmap The properties map
+     * @param crName     The unique name
+     * @param crKvMap    The properties map
+     * @param pData      The AircraftData pointer
+     * @param vMaxHeight The max height filter
+     * @throw std::logic_error from parent constructor
      */
     SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
             std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
@@ -62,19 +70,21 @@ public:
     virtual ~SbsFeed() noexcept;
 
     /**
-     * @fn process
-     * @brief Handle SbsClients response.
-     * @param cr_res The response to process
-     * @override Feed::process
+     * @see Feed#process
      */
     void process(const std::string& crResponse) noexcept override;
 
 private:
+    /// @var mParser
     /// Parser to unpack response from Client
     parser::SbsParser mParser;
 
+    /// @var mDataSlot
+    /// Data attempt slot
     std::size_t mDataSlot;
 
+    /// @var mpData
+    /// AircraftData to update for input
     std::shared_ptr<data::AircraftData> mpData;
 };
 

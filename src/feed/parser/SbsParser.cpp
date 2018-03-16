@@ -25,25 +25,38 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../data/object/Position.h"
+#include "../../object/Position.h"
 
+/// @def SBS_FIELD_ID
+/// Field number of aircraft id
 #define SBS_FIELD_ID 4
+
+/// @def SBS_FIELD_TIME
+/// Field number of time
 #define SBS_FIELD_TIME 7
+
+/// @var SBS_FIELD_ALT
+/// Field number of altitude
 #define SBS_FIELD_ALT 11
+
+/// @def BS_FIELD_LAT
+/// Field number of latitude
 #define SBS_FIELD_LAT 14
+
+/// @def SBS_FIELD_LON
+/// Field number of longitude
 #define SBS_FIELD_LON 15
+
+using namespace object;
 
 namespace feed
 {
-using namespace data::object;
-
 namespace parser
 {
 SbsParser::SbsParser() : SbsParser(std::numeric_limits<std::int32_t>::max())
 {}
 
-SbsParser::SbsParser(std::int32_t vMaxHeight)
-    : Parser<data::object::Aircraft>(), mMaxHeight(vMaxHeight)
+SbsParser::SbsParser(std::int32_t vMaxHeight) : Parser<Aircraft>(), mMaxHeight(vMaxHeight)
 {}
 
 SbsParser::~SbsParser() noexcept
@@ -53,6 +66,7 @@ bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
 {
     std::size_t p   = 6, delim;
     std::uint32_t i = 2;
+    Position pos;
 
     if(crStr.find(',', p) == std::string::npos || !(crStr.size() > 4 && crStr[4] == '3'))
     {
@@ -60,53 +74,52 @@ bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     }
     while((delim = crStr.find(',', p)) != std::string::npos && i < 16)
     {
-        if(!parseField(i++, crStr.substr(p, delim - p), rAircraft))
+        if(!parseField(i++, crStr.substr(p, delim - p), pos, rAircraft))
         {
             return false;
         }
         p = delim + 1;
     }
-    rAircraft.setFullInfo(false);
+    rAircraft.setPosition(pos);
     rAircraft.setTargetType(Aircraft::TargetType::TRANSPONDER);
     rAircraft.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
     rAircraft.setIdType(Aircraft::IdType::ICAO);
-    return true;
+    return i == 15 && pos.altitude <= mMaxHeight;
 }
 
 bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
-                           Aircraft& rAircraft)
+                           Position& rPosition, Aircraft& rAircraft) noexcept
 {
-    if(crStr.empty())
+    bool valid = !crStr.empty();
+    if(valid)
     {
-        return false;
-    }
-    GpsPosition pos;
-    try
-    {
-        switch(vField)
+        try
         {
-            case SBS_FIELD_ID:
-                rAircraft.setId(crStr);
-                break;
-            case SBS_FIELD_ALT:
-                pos.altitude = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
-                break;
-            case SBS_FIELD_LAT:
-                pos.latitude = std::stod(crStr);
-                break;
-            case SBS_FIELD_LON:
-                pos.longitude = std::stod(crStr);
-                break;
-            default:
-                break;
+            switch(vField)
+            {
+                case SBS_FIELD_ID:
+                    rAircraft.setId(crStr);
+                    break;
+                case SBS_FIELD_ALT:
+                    rPosition.altitude
+                        = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
+                    break;
+                case SBS_FIELD_LAT:
+                    rPosition.latitude = std::stod(crStr);
+                    break;
+                case SBS_FIELD_LON:
+                    rPosition.longitude = std::stod(crStr);
+                    break;
+                default:
+                    break;
+            }
+        }
+        catch(const std::logic_error&)
+        {
+            valid = false;
         }
     }
-    catch(const std::logic_error&)
-    {
-        return false;
-    }
-    rAircraft.setPosition(pos);
-    return pos.altitude <= mMaxHeight;
-}
+    return valid;
 }
 }  // namespace parser
+}  // namespace feed

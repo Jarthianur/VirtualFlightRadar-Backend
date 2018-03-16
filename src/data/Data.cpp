@@ -24,4 +24,4 @@ Data::Data()
 
 Data::~Data() noexcept
 {}
-}
+}  // namespace data

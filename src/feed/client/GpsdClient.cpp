@@ -128,4 +128,4 @@ void GpsdClient::handleWatch(const boost::system::error_code& crError,
 }
 
 }  // namespace client
-}  // namespace network
+}  // namespace feed

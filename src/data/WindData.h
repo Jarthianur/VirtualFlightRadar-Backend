@@ -26,7 +26,9 @@
 #include <string>
 #include <vector>
 
-#include "object/Wind.h"
+#include "../Defines.h"
+#include "../object/Wind.h"
+
 #include "Data.h"
 
 /// @namespace data
@@ -34,29 +36,25 @@ namespace data
 {
 /**
  * @class WindData
- * @brief Manage sensor information.
+ * @brief Store wind information.
+ * @implements Data
  */
 class WindData : public Data
 {
 public:
+    DEFAULT_CTOR_DTOR(WindData)
+
     /**
      * @fn WindData
      * @brief Constructor
+     * @param crWind The initial wind information
      */
-    WindData();
-
     explicit WindData(const object::Wind& crWind);
 
     /**
-     * @fn ~WindData
-     * @brief Destructor
-     */
-    virtual ~WindData() noexcept;
-
-    /**
-     * @fn getMwvStr
+     * @fn getSerialized
      * @brief Get the MWV sentence.
-     * @note MWV is invalid after this operation.
+     * @note The wind info is invalid after this operation.
      * @return the MWV sentence, if valid, else empty string
      * @threadsafe
      */
@@ -64,20 +62,26 @@ public:
 
     /**
      * @fn update
-     * @brief Try to update the sensor information.
-     * @param crWind    The new wind information.
-     * @param vPriority The attempts priority
-     * @param rAttempts The update attempts
+     * @brief Attempt to update the wind information.
+     * @param crWind The new wind information.
+     * @param vSlot  The attempt slot
+     * @return true on success, else false
+     * @threadsafe
      */
     bool update(const object::Object& crWind, std::size_t vSlot) override;
 
+    /**
+     * @see Data#registerSlot
+     */
     std::size_t registerSlot() override;
 
 private:
     /// @var mWind
-    /// Holding MDA sentence
+    /// The Wind information
     object::Wind mWind;
 
+    /// @var mAttempts
+    /// Store update attempts
     std::vector<std::uint32_t> mAttempts;
 };
 

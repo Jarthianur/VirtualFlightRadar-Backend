@@ -26,7 +26,9 @@
 #include <string>
 #include <vector>
 
-#include "object/Atmosphere.h"
+#include "../Defines.h"
+#include "../object/Atmosphere.h"
+
 #include "Data.h"
 
 /// @namespace data
@@ -34,27 +36,23 @@ namespace data
 {
 /**
  * @class AtmosphereData
- * @brief Manage sensor information.
+ * @brief Store atmospheric information.
+ * @implements Data
  */
 class AtmosphereData : public Data
 {
 public:
-    AtmosphereData();
+    DEFAULT_CTOR_DTOR(AtmosphereData)
+
     /**
      * @fn AtmosphereData
      * @brief Constructor
-     * @param vAtmos The initial info
+     * @param vAtmosphere The initial info
      */
     explicit AtmosphereData(const object::Atmosphere& crAtmosphere);
 
     /**
-     * @fn ~AtmosphereData
-     * @brief Destructor
-     */
-    virtual ~AtmosphereData() noexcept;
-
-    /**
-     * @fn getMdaStr
+     * @fn getSerialized
      * @brief Get the MDA sentence.
      * @return the MDA sentence
      * @threadsafe
@@ -63,18 +61,22 @@ public:
 
     /**
      * @fn update
-     * @brief Try to update the sensor information.
-     * @param crAtmos   The new data.
-     * @param vPriority The priority
-     * @param rAttempts The update attempts
+     * @brief Attempt to update.
+     * @param crAtmosphere The new data.
+     * @param vSlot        The attempt slot
+     * @return true on success, else false
+     * @threadsafe
      */
     bool update(const object::Object& crAtmosphere, std::size_t vSlot) override;
 
+    /**
+     * @see Data#registerSlot
+     */
     std::size_t registerSlot() override;
 
     /**
-     * @fn getPress
-     * @brief Get pressure.
+     * @fn getAtmPressure
+     * @brief Get the atmospheric pressure.
      * @return the pressure
      * @threadsafe
      */
@@ -82,9 +84,11 @@ public:
 
 private:
     /// @var mAtmosphere
-    /// Holding atmospheric pressure
+    /// Holding atmospheric information
     object::Atmosphere mAtmosphere;
 
+    /// @var mAttempts
+    /// Store update attempts per Feed
     std::vector<std::uint32_t> mAttempts;
 };
 }  // namespace data

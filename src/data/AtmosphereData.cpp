@@ -25,14 +25,15 @@
 #include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
-using namespace data::object;
+using namespace object;
 
 namespace data
 {
 AtmosphereData::AtmosphereData() : Data()
 {}
 
-AtmosphereData::AtmosphereData(const Atmosphere& crAtmosphere) : Data(), mAtmosphere(crAtmosphere)
+AtmosphereData::AtmosphereData(const Atmosphere& crAtmosphere)
+    : Data(), mAtmosphere(crAtmosphere)
 {}
 
 AtmosphereData::~AtmosphereData() noexcept

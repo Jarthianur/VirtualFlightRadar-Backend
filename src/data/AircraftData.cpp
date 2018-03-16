@@ -27,11 +27,15 @@
 #include <system_error>
 #include <boost/thread/lock_guard.hpp>
 
+#include "../Parameters.h"
+
 #ifndef ESTIMATED_TRAFFIC
+/// @def ESTIMATED_TRAFFIC
+/// Amount of aircrafts estimated, for initial container size
 #define ESTIMATED_TRAFFIC 1
 #endif
 
-using namespace data::object;
+using namespace object;
 
 namespace data
 {
@@ -88,16 +92,16 @@ bool AircraftData::update(const Object& crAircraft, std::size_t vSlot)
 
 std::size_t AircraftData::registerSlot()
 {
-    ++nrOfRegisteredFeeds;
+    ++mNrOfRegisteredFeeds;
     // Just to be sure, but this should never happen.
     for(auto& it : mIndexMap)
     {
-        it.second.second.assign(nrOfRegisteredFeeds, 0);
+        it.second.second.assign(mNrOfRegisteredFeeds, 0);
     }
-    return nrOfRegisteredFeeds - 1;
+    return mNrOfRegisteredFeeds - 1;
 }
 
-void AircraftData::processAircrafts(const GpsPosition& crRefPosition,
+void AircraftData::processAircrafts(const Position& crRefPosition,
                                     double vAtmPress) noexcept
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
@@ -145,7 +149,7 @@ void AircraftData::insert(const object::Aircraft& crAircraft)
 {
     mIndexMap.insert(
         {crAircraft.getId(),
-         {mContainer.size(), std::vector<std::uint32_t>(nrOfRegisteredFeeds, 0)}});
+         {mContainer.size(), std::vector<std::uint32_t>(mNrOfRegisteredFeeds, 0)}});
     mContainer.push_back(crAircraft);
 }
-}  // namespace aircraft
+}  // namespace data

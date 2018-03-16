@@ -26,9 +26,9 @@
 #include "../config/Configuration.h"
 #include "../data/AtmosphereData.h"
 #include "../data/WindData.h"
-#include "../data/object/Atmosphere.h"
-#include "../data/object/Climate.h"
-#include "../data/object/Wind.h"
+#include "../object/Atmosphere.h"
+#include "../object/Climate.hpp"
+#include "../object/Wind.h"
 #include "client/SensorClient.h"
 
 namespace feed
@@ -50,17 +50,17 @@ SensorFeed::~SensorFeed() noexcept
 
 void SensorFeed::process(const std::string& crResponse) noexcept
 {
-    data::object::Climate climate{data::object::Wind(getPriority()),
-                                  data::object::Atmosphere(getPriority())};
+    object::Climate climate{object::Wind(getPriority()),
+                            object::Atmosphere(getPriority())};
     if(mParser.unpack(crResponse, climate))
     {
         if(climate.hasWind())
         {
-            mpWindData->update(climate.mWind, mWindSlot);
+            mpWindData->update(climate.wind, mWindSlot);
         }
         if(climate.hasAtmosphere())
         {
-            mpAtmosphereData->update(climate.mAtmosphere, mAtmosSlot);
+            mpAtmosphereData->update(climate.atmosphere, mAtmosSlot);
         }
     }
 }

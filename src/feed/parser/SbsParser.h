@@ -25,49 +25,58 @@
 #include <cstdint>
 #include <string>
 
-#include "../../data/object/Aircraft.h"
+#include "../../Defines.h"
+#include "../../object/Aircraft.h"
+
 #include "Parser.hpp"
 
+/// @namespace feed
 namespace feed
 {
+/// @namespace parser
 namespace parser
 {
 /**
- * @class SbsParser implements Parser
- * @brief Provide unpacking method for SBS sentences.
- * @see Parser.hpp
- * @see ../aircraft/Aircraft.hpp
+ * @class SbsParser
+ * @brief Unpack SBS sentences.
+ * @implements Parser
  */
-class SbsParser : public Parser<data::object::Aircraft>
+class SbsParser : public Parser<object::Aircraft>
 {
 public:
-    SbsParser();
+    DEFAULT_CTOR_DTOR(SbsParser)
+
     /**
      * @fn SbsParser
      * @brief Constructor
+     * @param vMaxHeight The max height filter
      */
     explicit SbsParser(std::int32_t vMaxHeight);
 
     /**
-     * @fn ~SbsParser
-     * @brief Destructor
-     */
-    virtual ~SbsParser() noexcept;
-
-    /**
      * @fn unpack
      * @brief Unpack into Aircraft.
-     * @override Parser::unpack
+     * @see Parser#unpack
      */
-    bool unpack(const std::string& crStr,
-                data::object::Aircraft& rAircraft) noexcept override;
+    bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
 
 private:
+    /**
+     * @fn parseField
+     * @brief Parse a field in SBS and set respective values.
+     * @param vField    The field number
+     * @param crStr     The field string
+     * @param rPosition The target position
+     * @param rAircraft The target aircraft
+     * @return true on success, else false
+     */
     // cppcheck-suppress unusedPrivateFunction
     bool parseField(std::uint32_t vField, const std::string& crStr,
-                    data::object::Aircraft& rAircraft);
+                    object::Position& rPosition, object::Aircraft& rAircraft) noexcept;
 
+    /// @var mMaxHeight
+    /// The max height filter
     const std::int32_t mMaxHeight;
 };
-}
 }  // namespace parser
+}  // namespace feed

@@ -73,15 +73,15 @@ void ConfigReader::read(std::istream& rStream, PropertyMap& rMap)
 
 boost::optional<std::string> ConfigReader::parseSection(const std::string& crLine)
 {
-    if(crLine.at(0) == '[')
+    try
     {
-        try
+        if(crLine.at(0) == '[')
         {
             return crLine.substr(1, crLine.rfind(']') - 1);
         }
-        catch(const std::out_of_range&)
-        {
-        }
+    }
+    catch(const std::out_of_range&)
+    {
     }
     return boost::none;
 }

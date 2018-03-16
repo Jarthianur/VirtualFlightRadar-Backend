@@ -24,20 +24,21 @@
 #include <string>
 #include <boost/regex.hpp>
 
-#include "../../data/object/Position.h"
+#include "../../object/Position.h"
 #include "Parser.hpp"
 
+/// @namespace feed
 namespace feed
 {
+/// @namespace parser
 namespace parser
 {
 /**
- * @class GpsParser implements Parser
- * @brief Provide unpacking method for NMEA sentences from GPS sensors.
- * @see Parser.hpp
- * @see ../util/Position.h
+ * @class GpsParser
+ * @brief Unpacking NMEA sentences from GPSD.
+ * @implements Parser
  */
-class GpsParser : public Parser<data::object::ExtGpsPosition>
+class GpsParser : public Parser<object::GpsPosition>
 {
 public:
     /**
@@ -54,19 +55,29 @@ public:
 
     /**
      * @fn unpack
-     * @brief Unpack into ExtGpsPosition.
-     * @override Parser::unpack
+     * @brief Unpack into GpsPosition.
+     * @see Parser#unpack
+     * @param crStr     The string to unpack
+     * @param rPosition The target position
+     * @return true on success, else false
      */
     bool unpack(const std::string& crStr,
-                data::object::ExtGpsPosition& rPosition) noexcept override;
+                object::GpsPosition& rPosition) noexcept override;
 
 private:
+    /**
+     * @fn parsePosition
+     * @brief Parse a Position.
+     * @param crMatch   The regex match
+     * @param rPosition The target position
+     * @return true on success, else false
+     */
     // cppcheck-suppress unusedPrivateFunction
-    bool parsePosition(const boost::smatch& crMatch,
-                       data::object::ExtGpsPosition& rPosition);
+    bool parsePosition(const boost::smatch& crMatch, object::GpsPosition& rPosition);
 
+    /// @var msGpggaRe
     /// Regular expression to parse GGA
     static const boost::regex msGpggaRe;
 };
-}
 }  // namespace parser
+}  // namespace feed

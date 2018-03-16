@@ -17,34 +17,29 @@
 
 #include "Position.h"
 
-namespace data
-{
 namespace object
 {
-ExtGpsPosition::ExtGpsPosition() : Object(0)
+GpsPosition::GpsPosition() : Object(0)
 {}
 
-ExtGpsPosition::ExtGpsPosition(std::uint32_t vPriority, bool vGround)
-    : Object(vPriority), ground(vGround)
+GpsPosition::GpsPosition(std::uint32_t vPriority) : Object(vPriority)
 {}
 
-ExtGpsPosition::ExtGpsPosition(const GpsPosition& crPosition, double vGeoid, bool vGround)
-    : Object(0), position(crPosition), geoid(vGeoid), ground(vGround)
+GpsPosition::GpsPosition(const Position& crPosition, double vGeoid)
+    : Object(0), mPosition(crPosition), mGeoid(vGeoid)
 {}
 
-ExtGpsPosition::~ExtGpsPosition() noexcept
+GpsPosition::~GpsPosition() noexcept
 {}
 
-void ExtGpsPosition::assign(const Object& crOther)
+void GpsPosition::assign(const Object& crOther)
 {
     Object::assign(crOther);
-    const ExtGpsPosition& crUpdate = static_cast<const ExtGpsPosition&>(crOther);
-    this->position                 = crUpdate.position;
-    this->nrSats                   = crUpdate.nrSats;
-    this->fixQa                    = crUpdate.fixQa;
-    this->geoid                    = crUpdate.geoid;
-    this->dilution                 = crUpdate.dilution;
-    this->ground                   = crUpdate.ground;
+    const GpsPosition& crUpdate = static_cast<const GpsPosition&>(crOther);
+    this->mPosition             = crUpdate.mPosition;
+    this->mNrOfSatellites       = crUpdate.mNrOfSatellites;
+    this->mFixQuality           = crUpdate.mFixQuality;
+    this->mGeoid                = crUpdate.mGeoid;
+    this->mDilution             = crUpdate.mDilution;
 }
-}
-}
+}  // namespace object

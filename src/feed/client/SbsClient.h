@@ -25,37 +25,31 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "../../Defines.h"
 #include "Client.h"
 
+/// @namespace feed
 namespace feed
 {
+/// @namespace client
 namespace client
 {
 /**
- * @class SbsClient extends Client
- * @brief Handle connections to a SBS server.
- * @see Client.h
+ * @class SbsClient
+ * @brief Connect to a SBS server.
+ * @extends Client
  */
 class SbsClient : public Client
 {
 public:
-    /**
-     * Non-copyable
-     */
-    SbsClient(const SbsClient&) = delete;
-
-    /**
-     * Not assignable
-     */
-    SbsClient& operator=(const SbsClient&) = delete;
+    NON_COPYABLE(SbsClient)
 
     /**
      * @fn SbsClient
      * @brief Constructor
-     * @param cr_host  The hostname
-     * @param cr_port  The port
-     * @param cr_login The login string to transmit
-     * @param r_feed   The handler Feed reference
+     * @param crHost  The hostname
+     * @param crPort  The port
+     * @param rFeed   The handler Feed reference
      */
     SbsClient(const std::string& crHost, const std::string& crPort, feed::Feed& rFeed);
 
@@ -67,22 +61,19 @@ public:
 
 private:
     /**
-     * @fn connect
-     * @override Client::connect
+     * @see Client#connect
      */
     void connect() override;
 
     /**
-     * @fn handleResolve
-     * @override Client::handleResolve
+     * @see Client#handleResolve
      */
     void
     handleResolve(const boost::system::error_code& crError,
                   boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 
     /**
-     * @fn handleConnect
-     * @override Client::handleConnect
+     * @see Client#handleConnect
      */
     void
     handleConnect(const boost::system::error_code& crError,
@@ -90,4 +81,4 @@ private:
 };
 
 }  // namespace client
-}  // namespace network
+}  // namespace feed

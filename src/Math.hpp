@@ -25,98 +25,127 @@
 #include <cstddef>
 #include <cstdint>
 
-/**
- * @brief Provide several functions and constants under this namespace.
- */
+/// @namespace math
 namespace math
 {
-/// Unit conversion constants
+/// @var KTS_2_KMH
+/// Convert knots to km/h
 const double KTS_2_KMH = 1.852;
+
+/// @var
+/// Convert km/h to knots
 const double KMH_2_KTS = 0.539957;
-const double KTS_2_MS  = 0.514444;
-const double MS_2_KTS  = 1.94384;
-const double KMH_2_MS  = 0.277778;
-const double MS_2_KMH  = 3.6;
-const double MS_2_FPM  = 196.85;
-const double FPM_2_MS  = 0.00508;
-const double FEET_2_M  = 0.3048;
-const double M_2_FEET  = 3.28084;
-const double PI        = std::acos(-1.0);
+/// @var
+/// Convert knots to m/s
+const double KTS_2_MS = 0.514444;
+
+/// @var
+/// Convert m/s to knots
+const double MS_2_KTS = 1.94384;
+
+/// @var
+/// Convert km/h to m/s
+const double KMH_2_MS = 0.277778;
+
+/// @var
+/// Convert m/s to km/h
+const double MS_2_KMH = 3.6;
+
+/// @var
+/// Convert m/s to fpm
+const double MS_2_FPM = 196.85;
+
+/// @var
+/// Convert fpm to m/s
+const double FPM_2_MS = 0.00508;
+
+/// @var
+/// Convert feet to m
+const double FEET_2_M = 0.3048;
+
+/// @var
+/// Convert m to feet
+const double M_2_FEET = 3.28084;
+
+/// @var PI
+/// The circular number
+const double PI = std::acos(-1.0);
 
 /**
  * @fn radian
  * @brief Convert degree to radian.
- * @param deg The degrees
+ * @param vDegree The degrees
  * @return the radian
  */
-inline double radian(double deg)
+inline double radian(double vDegree)
 {
-    return ((deg * PI) / 180.0);
+    return ((vDegree * PI) / 180.0);
 }
 
 /**
  * @fn degree
  * @brief Convert radian to degree.
- * @param rad The radian
+ * @param vRadian The radian
  * @return the degrees
  */
-inline double degree(double rad)
+inline double degree(double vRadian)
 {
-    return (rad * 180.0) / PI;
+    return (vRadian * 180.0) / PI;
 }
 
 /**
- * @fn dToI
+ * @fn doubleToInt
  * @brief Convert double to int, round to nearest number.
- * @param d The floating point value
+ * @param vDouble The floating point value
  * @return the rounded integer
  */
-inline std::int32_t doubleToInt(double d)
+inline std::int32_t doubleToInt(double vDouble)
 {
-    return (d >= 0.0) ? static_cast<std::int32_t>(d + 0.5)
-                      : static_cast<std::int32_t>(d - 0.5);
+    return (vDouble >= 0.0) ? static_cast<std::int32_t>(vDouble + 0.5)
+                            : static_cast<std::int32_t>(vDouble - 0.5);
 }
 
 /**
  * @fn dmToDeg
  * @brief Convert ( degree, minute-as-decimal ) to degree.
- * @param dm The degree-minute value
+ * @param vDegMin The degree-minute value
  * @return the degree value
  */
-inline double dmToDeg(double dm)
+inline double dmToDeg(double vDegMin)
 {
-    double absDm = std::abs(dm / 100.0);
+    double absDm = std::abs(vDegMin / 100.0);
     double d     = std::floor(absDm);
     double m     = (absDm - d) * 100.0 / 60.0;
     return d + m;
 }
 
 /**
- * @fn calcIcaoHeight
+ * @fn icaoHeight
  * @brief Calculate height difference from QNE to Pressure in meters with ICAO height
  * formula.
- * @param press The air pressure
+ * @param vPressure The air pressure
  * @return the height difference to QNE
  */
-inline std::int32_t icaoHeight(double press)
+inline std::int32_t icaoHeight(double vPressure)
 {
-    return doubleToInt(288.15 * (1.0 - std::pow((press / 1013.25), 0.190295)) / 0.0065);
+    return doubleToInt(288.15 * (1.0 - std::pow((vPressure / 1013.25), 0.190295))
+                       / 0.0065);
 }
 
 /**
  * @fn checksum
  * @brief Compute checksum of nmea string.
- * @param sentence The sentence to eval
- * @param size     The sentences size
+ * @param cpSentence The sentence to eval
+ * @param vSize      The sentences size
  * @return the checksum
  */
-inline std::int32_t checksum(const char* sentence, std::size_t size)
+inline std::int32_t checksum(const char* cpSentence, std::size_t vSize)
 {
     std::int32_t csum = 0;
     std::size_t i     = 1;  // $ in nmea str not included
-    while(i < size && sentence[i] != '*' && sentence[i] != '\0')
+    while(i < vSize && cpSentence[i] != '*' && cpSentence[i] != '\0')
     {
-        csum ^= static_cast<std::int32_t>(sentence[i++]);
+        csum ^= static_cast<std::int32_t>(cpSentence[i++]);
     }
     return csum;
 }

@@ -62,15 +62,15 @@ void Configuration::init(const PropertyMap& crProperties)
     mMaxDistance = resolveFilter(crProperties, KV_KEY_MAX_DIST);
     mMaxHeight   = resolveFilter(crProperties, KV_KEY_MAX_HEIGHT);
     mServerPort  = resolveServerPort(crProperties);
+    mGroundMode  = !crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
     mFeedMapping = resolveFeeds(crProperties);
 
     dumpInfo();
 }
 
-data::object::ExtGpsPosition
-Configuration::resolvePosition(const PropertyMap& crProperties) const
+object::GpsPosition Configuration::resolvePosition(const PropertyMap& crProperties) const
 {
-    data::object::GpsPosition pos;
+    object::Position pos;
     pos.latitude = boost::get<double>(
         checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "")),
@@ -87,8 +87,7 @@ Configuration::resolvePosition(const PropertyMap& crProperties) const
         checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
                          SECT_KEY_FALLBACK, KV_KEY_GEOID));
-    return data::object::ExtGpsPosition(
-        pos, geoid, !crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty());
+    return object::GpsPosition(pos, geoid);
 }
 
 std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) const
@@ -155,13 +154,13 @@ Number Configuration::checkNumberValue(const OptNumber& crOptNumber,
 void Configuration::dumpInfo() const
 {
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_LATITUDE ": ",
-                 std::to_string(mPosition.position.latitude));
+                 std::to_string(mPosition.getPosition().latitude));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_LONGITUDE ": ",
-                 std::to_string(mPosition.position.longitude));
+                 std::to_string(mPosition.getPosition().longitude));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_ALTITUDE ": ",
-                 std::to_string(mPosition.position.altitude));
+                 std::to_string(mPosition.getPosition().altitude));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_GEOID ": ",
-                 std::to_string(mPosition.geoid));
+                 std::to_string(mPosition.getGeoid()));
     Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_PRESSURE ": ",
                  std::to_string(mAtmPressure));
     Logger::info("(Config) " SECT_KEY_FILTER "." KV_KEY_MAX_HEIGHT ": ",
@@ -171,48 +170,8 @@ void Configuration::dumpInfo() const
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_SERVER_PORT ": ",
                  std::to_string(mServerPort));
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ",
-                 mPosition.ground ? "Yes" : "No");
+                 mGroundMode ? "Yes" : "No");
     Logger::info("(Config) number of feeds: ", std::to_string(mFeedMapping.size()));
-}
-
-std::uint16_t Configuration::getServerPort() const
-{
-    return mServerPort;
-}
-
-std::int32_t Configuration::getMaxDistance() const
-{
-    return mMaxDistance;
-}
-
-std::int32_t Configuration::getMaxHeight() const
-{
-    return mMaxHeight;
-}
-
-double Configuration::getAtmPressure() const
-{
-    return mAtmPressure;
-}
-
-const data::object::ExtGpsPosition& Configuration::getPosition() const
-{
-    return mPosition;
-}
-
-bool Configuration::isGndModeEnabled() const
-{
-    return mPosition.ground;
-}
-
-void Configuration::forceGndMode()
-{
-    mPosition.ground = true;
-}
-
-const FeedMapping& Configuration::getFeedMapping() const
-{
-    return mFeedMapping;
 }
 
 }  // namespace config

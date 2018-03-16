@@ -27,6 +27,7 @@
 #include <boost/optional.hpp>
 #include <boost/regex.hpp>
 
+#include "../Defines.h"
 #include "PropertyMap.h"
 
 /// @namespace config
@@ -34,35 +35,30 @@ namespace config
 {
 /**
  * @class ConfigReader
- * @brief Provide functions to read properties from an input stream into a map.
+ * @brief Read a config in INI format.
+ *
+ * Provide methods to read any input, in INI format, and store those properties.
  */
 class ConfigReader
 {
 public:
-    /**
-     * @fn ConfigReader
-     * @brief Constructor
-     */
-    ConfigReader();
-
-    /**
-     * @fn ~ConfigReader
-     * @brief Destructor
-     */
-    virtual ~ConfigReader() noexcept;
+    DEFAULT_CTOR_DTOR(ConfigReader)
 
     /**
      * @fn read
      * @brief Read the given stream and store valid properties in a map.
      * @param rStream The stream to read
-     * @param rMap  The map to store the properties in
+     * @param rMap    The map to store the properties in
      */
     void read(std::istream& rStream, PropertyMap& rMap);
 
 private:
     /**
      * @fn parseSection
-     * @brief Parse a section.
+     * @brief Parse a section header.
+     *
+     * A section begins with '[name]', which is the header.
+     *
      * @param crLine The string to parse
      * @return an optional section name
      */

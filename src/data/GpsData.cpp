@@ -25,19 +25,27 @@
 #include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
-/// Define GPS metrics
+/// @def GPS_NR_SATS_GOOD
+/// Good number of satellites
 #define GPS_NR_SATS_GOOD 7
+
+/// @def GPS_FIX_GOOD
+/// Good fix quality
 #define GPS_FIX_GOOD 1
+
+/// @def GPS_HOR_DILUTION_GOOD
+/// Good horizontal dilution
 #define GPS_HOR_DILUTION_GOOD 1.0
 
-using namespace data::object;
+using namespace object;
 
 namespace data
 {
 GpsData::GpsData() : Data()
 {}
 
-GpsData::GpsData(const ExtGpsPosition& crPosition) : Data(), mPosition(crPosition)
+GpsData::GpsData(const GpsPosition& crPosition, bool vGround)
+    : Data(), mPosition(crPosition), mGroundMode(vGround)
 {}
 
 GpsData::~GpsData() noexcept
@@ -64,10 +72,7 @@ bool GpsData::update(const Object& crPosition, std::size_t vSlot)
             std::fill(mAttempts.begin(), mAttempts.end(), 0);
             mPosition.setSerialized(mProcessor.process(mPosition));
         }
-        return (mPositionLocked = updated && mPosition.ground
-                                  && (mPosition.nrSats >= GPS_NR_SATS_GOOD
-                                      && mPosition.fixQa >= GPS_FIX_GOOD
-                                      && mPosition.dilution <= GPS_HOR_DILUTION_GOOD));
+        return (mPositionLocked = updated && mGroundMode && isPositionGood());
     }
     catch(const std::out_of_range&)
     {
@@ -81,10 +86,17 @@ std::size_t GpsData::registerSlot()
     return mAttempts.size() - 1;
 }
 
-GpsPosition GpsData::getGpsPosition()
+Position GpsData::getGpsPosition()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mPosition.position;
+    return mPosition.getPosition();
+}
+
+bool GpsData::isPositionGood()
+{
+    return mPosition.getNrOfSatellites() >= GPS_NR_SATS_GOOD
+           && mPosition.getFixQuality() >= GPS_FIX_GOOD
+           && mPosition.getDilution() <= GPS_HOR_DILUTION_GOOD;
 }
 
 }  // namespace data

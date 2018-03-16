@@ -91,4 +91,4 @@ void SbsClient::handleConnect(const boost::system::error_code& crError,
 }
 
 }  // namespace client
-}  // namespace network
+}  // namespace feed

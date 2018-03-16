@@ -21,8 +21,6 @@
 
 #include "Aircraft.h"
 
-namespace data
-{
 namespace object
 {
 Aircraft::Aircraft() : Aircraft(0)
@@ -35,7 +33,7 @@ Aircraft::Aircraft(std::uint32_t vPriority)
       mTargetType(TargetType::TRANSPONDER)
 {}
 
-Aircraft::Aircraft(std::string& rId, GpsPosition& rPos)
+Aircraft::Aircraft(std::string& rId, Position& rPos)
     : Object(),
       mId(rId),
       mIdType(IdType::ICAO),
@@ -45,7 +43,7 @@ Aircraft::Aircraft(std::string& rId, GpsPosition& rPos)
 {}
 
 Aircraft::Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
-                   GpsPosition& rPos, Movement& rMove)
+                   Position& rPos, Movement& rMove)
     : Object(),
       mId(rId),
       mIdType(vIdType),
@@ -79,76 +77,6 @@ bool Aircraft::canUpdate(const Object& crOther, std::uint32_t vAttempts) const
            && (this->mLastPriority * vAttempts >= crUpdate.mLastPriority);
 }
 
-const std::string& Aircraft::getId() const
-{
-    return mId;
-}
-
-Aircraft::IdType Aircraft::getIdType() const
-{
-    return mIdType;
-}
-
-Aircraft::TargetType Aircraft::getTargetType() const
-{
-    return mTargetType;
-}
-
-Aircraft::AircraftType Aircraft::getAircraftType() const
-{
-    return mAircraftType;
-}
-
-bool Aircraft::hasFullInfo() const
-{
-    return mFullInfo;
-}
-
-std::uint32_t& Aircraft::getUpdateAge()
-{
-    return mUpdateAge;
-}
-
-double Aircraft::getLatitude() const
-{
-    return mPosition.latitude;
-}
-
-double Aircraft::getLongitude() const
-{
-    return mPosition.longitude;
-}
-
-std::int32_t Aircraft::getAltitude() const
-{
-    return mPosition.altitude;
-}
-
-double Aircraft::getGndSpeed() const
-{
-    return mMovement.gndSpeed;
-}
-
-double Aircraft::getHeading() const
-{
-    return mMovement.heading;
-}
-
-double Aircraft::getClimbRate() const
-{
-    return mMovement.climbRate;
-}
-
-void Aircraft::setId(const std::string& crId)
-{
-    mId = crId;
-}
-
-void Aircraft::setPosition(const GpsPosition& crPos)
-{
-    mPosition = crPos;
-}
-
 void Aircraft::setAircraftType(Aircraft::AircraftType vType)
 {
     mAircraftType = vType < AircraftType::UNKNOWN || vType > AircraftType::STATIC_OBJECT
@@ -162,30 +90,4 @@ void Aircraft::setIdType(Aircraft::IdType vType)
                                                                   : vType;
 }
 
-void Aircraft::setClimbRate(double vRate)
-{
-    mMovement.climbRate = vRate;
-}
-
-void Aircraft::setHeading(double vHeading)
-{
-    mMovement.heading = vHeading;
-}
-
-void Aircraft::setGndSpeed(double vGndSpd)
-{
-    mMovement.gndSpeed = vGndSpd;
-}
-
-void Aircraft::setTargetType(Aircraft::TargetType vType)
-{
-    mTargetType = vType;
-}
-
-void Aircraft::setFullInfo(bool vInfo)
-{
-    mFullInfo = vInfo;
-}
-
 }  // namespace object
-}  // namespace data

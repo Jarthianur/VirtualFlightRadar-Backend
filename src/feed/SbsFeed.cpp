@@ -25,7 +25,7 @@
 
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
-#include "../data/object/Aircraft.h"
+#include "../object/Aircraft.h"
 #include "client/SbsClient.h"
 
 namespace feed
@@ -44,7 +44,7 @@ SbsFeed::~SbsFeed() noexcept
 
 void SbsFeed::process(const std::string& crResponse) noexcept
 {
-    data::object::Aircraft ac(getPriority());
+    object::Aircraft ac(getPriority());
     if(mParser.unpack(crResponse, ac))
     {
         mpData->update(ac, mDataSlot);
