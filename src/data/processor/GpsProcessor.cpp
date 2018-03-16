@@ -35,9 +35,9 @@ GpsProcessor::GpsProcessor() : Processor<object::GpsPosition>()
 GpsProcessor::~GpsProcessor() noexcept
 {}
 
-std::string GpsProcessor::process(const object::GpsPosition& crPosition)
+void GpsProcessor::process(object::GpsPosition& rPosition)
 {
-    return genGpggaStr(crPosition) + genGprmcStr(crPosition);
+    rPosition.setSerialized(genGpggaStr(rPosition) + genGprmcStr(rPosition));
 }
 
 std::string GpsProcessor::genGpggaStr(const GpsPosition& crPosition)

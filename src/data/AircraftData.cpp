@@ -129,7 +129,7 @@ void AircraftData::processAircrafts(const Position& crRefPosition,
                 if(it->getUpdateAge() == 1)
                 {
                     mProcessor.setRefered(crRefPosition, vAtmPress);
-                    it->setSerialized(mProcessor.process(*it));
+                    mProcessor.process(*it);
                 }
                 ++it;
                 ++index;

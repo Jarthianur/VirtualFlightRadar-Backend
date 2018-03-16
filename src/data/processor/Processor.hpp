@@ -52,9 +52,8 @@ public:
      * @fn process
      * @brief Process a given object.
      * @param _1 The object of type T
-     * @return the resulting string
      */
-    virtual std::string process(const T& _1) = 0;
+    virtual void process(T& _1) = 0;
 
 protected:
     /**
