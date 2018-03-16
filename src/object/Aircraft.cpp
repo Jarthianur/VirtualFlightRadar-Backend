@@ -33,40 +33,20 @@ Aircraft::Aircraft(std::uint32_t vPriority)
       mTargetType(TargetType::TRANSPONDER)
 {}
 
-Aircraft::Aircraft(std::string& rId, Position& rPos)
-    : Object(),
-      mId(rId),
-      mIdType(IdType::ICAO),
-      mAircraftType(AircraftType::POWERED_AIRCRAFT),
-      mTargetType(TargetType::TRANSPONDER),
-      mPosition(rPos)
-{}
-
-Aircraft::Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType,
-                   Position& rPos, Movement& rMove)
-    : Object(),
-      mId(rId),
-      mIdType(vIdType),
-      mAircraftType(vAircraftType),
-      mTargetType(TargetType::FLARM),
-      mPosition(rPos),
-      mMovement(rMove)
-{}
-
 Aircraft::~Aircraft() noexcept
 {}
 
-void Aircraft::assign(const Object& crOther)
+void Aircraft::assign(Object&& rvOther)
 {
-    Object::assign(crOther);
-    const Aircraft& crUpdate = static_cast<const Aircraft&>(crOther);
-    this->mIdType            = crUpdate.mIdType;
-    this->mAircraftType      = crUpdate.mAircraftType;
-    this->mTargetType        = crUpdate.mTargetType;
-    this->mPosition          = crUpdate.mPosition;
-    this->mMovement          = crUpdate.mMovement;
-    this->mFullInfo          = crUpdate.mFullInfo;
-    this->mUpdateAge         = 0;
+    Object::assign(std::move(rvOther));
+    Aircraft&& rvUpdate = static_cast<Aircraft&&>(rvOther);
+    this->mIdType       = rvUpdate.mIdType;
+    this->mAircraftType = rvUpdate.mAircraftType;
+    this->mTargetType   = rvUpdate.mTargetType;
+    this->mPosition     = rvUpdate.mPosition;
+    this->mMovement     = rvUpdate.mMovement;
+    this->mFullInfo     = rvUpdate.mFullInfo;
+    this->mUpdateAge    = 0;
 }
 
 bool Aircraft::canUpdate(const Object& crOther, std::uint32_t vAttempts) const

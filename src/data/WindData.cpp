@@ -46,12 +46,12 @@ std::string WindData::getSerialized()
     return tmp;
 }
 
-bool WindData::update(const Object& crWind, std::size_t vSlot)
+bool WindData::update(Object&& rvWind, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     try
     {
-        bool updated = mWind.tryUpdate(crWind, ++mAttempts.at(vSlot));
+        bool updated = mWind.tryUpdate(std::move(rvWind), ++mAttempts.at(vSlot));
         if(updated)
         {
             std::fill(mAttempts.begin(), mAttempts.end(), 0);

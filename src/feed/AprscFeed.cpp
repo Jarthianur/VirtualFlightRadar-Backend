@@ -56,7 +56,7 @@ void AprscFeed::process(const std::string& crResponse) noexcept
     object::Aircraft ac(getPriority());
     if(mParser.unpack(crResponse, ac))
     {
-        mpData->update(ac, mDataSlot);
+        mpData->update(std::move(ac), mDataSlot);
     }
 }
 

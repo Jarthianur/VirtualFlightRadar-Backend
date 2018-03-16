@@ -31,11 +31,11 @@ Atmosphere::Atmosphere(double vPressure) : Object(0), mPressure(vPressure)
 Atmosphere::~Atmosphere() noexcept
 {}
 
-void Atmosphere::assign(const Object& crOther)
+void Atmosphere::assign(Object&& rvOther)
 {
-    Object::assign(crOther);
-    const Atmosphere& crUpdate = static_cast<const Atmosphere&>(crOther);
-    this->mPressure            = crUpdate.mPressure;
+    Object::assign(std::move(rvOther));
+    Atmosphere&& crUpdate = static_cast<Atmosphere&&>(rvOther);
+    this->mPressure       = crUpdate.mPressure;
 }
 
 }  // namespace object

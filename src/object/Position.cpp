@@ -32,14 +32,14 @@ GpsPosition::GpsPosition(const Position& crPosition, double vGeoid)
 GpsPosition::~GpsPosition() noexcept
 {}
 
-void GpsPosition::assign(const Object& crOther)
+void GpsPosition::assign(Object&& rvOther)
 {
-    Object::assign(crOther);
-    const GpsPosition& crUpdate = static_cast<const GpsPosition&>(crOther);
-    this->mPosition             = crUpdate.mPosition;
-    this->mNrOfSatellites       = crUpdate.mNrOfSatellites;
-    this->mFixQuality           = crUpdate.mFixQuality;
-    this->mGeoid                = crUpdate.mGeoid;
-    this->mDilution             = crUpdate.mDilution;
+    Object::assign(std::move(rvOther));
+    GpsPosition&& rvUpdate = static_cast<GpsPosition&&>(rvOther);
+    this->mPosition        = rvUpdate.mPosition;
+    this->mNrOfSatellites  = rvUpdate.mNrOfSatellites;
+    this->mFixQuality      = rvUpdate.mFixQuality;
+    this->mGeoid           = rvUpdate.mGeoid;
+    this->mDilution        = rvUpdate.mDilution;
 }
 }  // namespace object

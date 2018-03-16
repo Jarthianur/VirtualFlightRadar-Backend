@@ -55,7 +55,7 @@ public:
      * @param vSlot The slot for registered attempts
      * @return true on success, else false
      */
-    virtual bool update(const object::Object& _1, std::size_t vSlot) = 0;
+    virtual bool update(object::Object&& _1, std::size_t vSlot) = 0;
 
     /**
      * @fn registerSlot
