@@ -120,33 +120,6 @@ public:
     explicit Aircraft(std::uint32_t vPriority);
 
     /**
-     * @fn Aircraft
-     * @brief Constructor
-     * @param rId  The id
-     * @param rPos The position
-     */
-    Aircraft(std::string& rId, Position& rPos);
-
-    /**
-     * @fn Aircraft
-     * @brief Constructor
-     * @param rId           The Id
-     * @param vIdType       The Id type
-     * @param vAircraftType The aircraft type
-     * @param rPos          The prosition
-     * @param rMove         The aircrafts movement
-     */
-    Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType, Position& rPos,
-             Movement& rMove);
-
-    /**
-     * @fn assign
-     * @brief Assign an other Aircrafts values to this.
-     * @param crOther The other Aircraft
-     */
-    void assign(const Object& crOther) override;
-
-    /**
      * Define and declare getters and setters.
      */
     GETSET_CR(std::string, mId, Id)
@@ -180,6 +153,13 @@ public:
     void setIdType(IdType vType);
 
 private:
+    /**
+     * @fn assign
+     * @brief Assign an other Aircrafts values to this.
+     * @param rvOther The other Aircraft
+     */
+    void assign(Object&& rvOther) override;
+
     /**
      * @fn canUpdate
      * @brief Check whether this Aircraft can update the other one.

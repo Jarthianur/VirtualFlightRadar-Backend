@@ -45,12 +45,13 @@ std::string AtmosphereData::getSerialized()
     return mAtmosphere.getSerialized();
 }
 
-bool AtmosphereData::update(const Object& crAtmosphere, std::size_t vSlot)
+bool AtmosphereData::update(Object&& rvAtmosphere, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     try
     {
-        bool updated = mAtmosphere.tryUpdate(crAtmosphere, ++mAttempts.at(vSlot));
+        bool updated
+            = mAtmosphere.tryUpdate(std::move(rvAtmosphere), ++mAttempts.at(vSlot));
         if(updated)
         {
             std::fill(mAttempts.begin(), mAttempts.end(), 0);

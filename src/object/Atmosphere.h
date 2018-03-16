@@ -60,18 +60,16 @@ public:
     explicit Atmosphere(double vPressure);
 
     /**
-     * @fn assign
-     * @brief Assign other Atmosphere's values to this.
-     * @param crOther The other Atmosphere
-     */
-    void assign(const Object& crOther) override;
-
-    /**
      * Define and declare getters and setters.
      */
     GETSET_V(double, mPressure, Pressure)
 
 private:
+    /**
+     * @see Object#assign
+     */
+    void assign(Object&& rvOther) override;
+
     friend struct Climate;
 
     /// @var mPressure

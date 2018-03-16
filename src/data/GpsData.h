@@ -71,12 +71,12 @@ public:
     /**
      * @fn update
      * @brief Try to update the base position.
-     * @param crPosition The new position
+     * @param rvPosition The new position
      * @param vSlot      The attempt slot
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(const object::Object& crPosition, std::size_t vSlot) override;
+    bool update(object::Object&& rvPosition, std::size_t vSlot) override;
 
     /**
      * @see Data#registerSlot

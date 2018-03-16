@@ -62,12 +62,12 @@ public:
     /**
      * @fn update
      * @brief Attempt to update.
-     * @param crAtmosphere The new data.
+     * @param rvAtmosphere The new data.
      * @param vSlot        The attempt slot
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(const object::Object& crAtmosphere, std::size_t vSlot) override;
+    bool update(object::Object&& rvAtmosphere, std::size_t vSlot) override;
 
     /**
      * @see Data#registerSlot

@@ -75,11 +75,6 @@ public:
     GpsPosition(const Position& crPosition, double vGeoid);
 
     /**
-     * @see Object#assign
-     */
-    void assign(const Object& crOther) override;
-
-    /**
      * Define and declare getters and setters.
      */
     GETSET_CR(Position, mPosition, Position)
@@ -89,6 +84,11 @@ public:
     GETSET_V(double, mDilution, Dilution)
 
 private:
+    /**
+     * @see Object#assign
+     */
+    void assign(Object&& rvOther) override;
+
     /// @var mPosition
     /// The position
     Position mPosition{0.0, 0.0, 0};

@@ -63,18 +63,18 @@ std::string AircraftData::getSerialized()
     return tmp;
 }
 
-bool AircraftData::update(const Object& crAircraft, std::size_t vSlot)
+bool AircraftData::update(Object&& rvAircraft, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
-    const Aircraft& crUpdate = static_cast<const Aircraft&>(crAircraft);
-    const auto& index        = mIndexMap.find(crUpdate.getId());
+    Aircraft&& rvUpdate = static_cast<Aircraft&&>(rvAircraft);
+    const auto& index   = mIndexMap.find(rvUpdate.getId());
 
     if(index != mIndexMap.end())
     {
         try
         {
             bool updated = mContainer[index->second.first].tryUpdate(
-                crAircraft, index->second.second.at(vSlot));
+                std::move(rvAircraft), index->second.second.at(vSlot));
             if(updated)
             {
                 std::fill(index->second.second.begin(), index->second.second.end(), 0);
@@ -86,7 +86,7 @@ bool AircraftData::update(const Object& crAircraft, std::size_t vSlot)
             return false;
         }
     }
-    insert(crUpdate);
+    insert(rvUpdate);
     return true;
 }
 

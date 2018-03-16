@@ -28,17 +28,17 @@ Object::Object(std::uint32_t vPriority) : mLastPriority(vPriority)
 Object::~Object() noexcept
 {}
 
-void Object::assign(const Object& crOther)
+void Object::assign(Object&& crOther)
 {
-    this->mSerialized   = crOther.mSerialized;
+    this->mSerialized   = std::move(crOther.mSerialized);
     this->mLastPriority = crOther.mLastPriority;
 }
 
-bool Object::tryUpdate(const Object& crOther, std::uint32_t vAttempts)
+bool Object::tryUpdate(Object&& rvOther, std::uint32_t vAttempts)
 {
-    if(crOther.canUpdate(*this, vAttempts))
+    if(rvOther.canUpdate(*this, vAttempts))
     {
-        this->assign(crOther);
+        this->assign(std::move(rvOther));
         return true;
     }
     return false;
@@ -49,9 +49,9 @@ bool Object::canUpdate(const Object& crOther, std::uint32_t vAttempts) const
     return this->mLastPriority * vAttempts >= crOther.mLastPriority;
 }
 
-void Object::setSerialized(const std::string& crSerialized)
+void Object::setSerialized(std::string&& rvSerialized)
 {
-    mSerialized = crSerialized;
+    mSerialized = std::move(rvSerialized);
 }
 
 const std::string& Object::getSerialized() const

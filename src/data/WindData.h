@@ -63,12 +63,12 @@ public:
     /**
      * @fn update
      * @brief Attempt to update the wind information.
-     * @param crWind The new wind information.
+     * @param rvWind The new wind information.
      * @param vSlot  The attempt slot
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(const object::Object& crWind, std::size_t vSlot) override;
+    bool update(object::Object&& rvWind, std::size_t vSlot) override;
 
     /**
      * @see Data#registerSlot

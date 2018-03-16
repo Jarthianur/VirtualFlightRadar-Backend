@@ -59,7 +59,7 @@ std::string GpsData::getSerialized()
     return mPosition.getSerialized();
 }
 
-bool GpsData::update(const Object& crPosition, std::size_t vSlot)
+bool GpsData::update(Object&& rvPosition, std::size_t vSlot)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     if(mPositionLocked)
@@ -68,7 +68,7 @@ bool GpsData::update(const Object& crPosition, std::size_t vSlot)
     }
     try
     {
-        bool updated = mPosition.tryUpdate(crPosition, ++mAttempts.at(vSlot));
+        bool updated = mPosition.tryUpdate(std::move(rvPosition), ++mAttempts.at(vSlot));
         if(updated)
         {
             std::fill(mAttempts.begin(), mAttempts.end(), 0);

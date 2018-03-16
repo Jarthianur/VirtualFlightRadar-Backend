@@ -78,12 +78,12 @@ public:
      * @fn update
      * @brief Insert or update an Aircraft.
      * @note The success depends on the registered attempts and the update priority.
-     * @param crAircraft The update
+     * @param rvAircraft The update
      * @param vSlot      The attempt slot
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(const object::Object& crAircraft, std::size_t vSlot) override;
+    bool update(object::Object&& rvAircraft, std::size_t vSlot) override;
 
     /**
      * @see Data#registerSlot

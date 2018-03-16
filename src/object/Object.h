@@ -44,29 +44,22 @@ public:
     explicit Object(std::uint32_t vPriority);
 
     /**
-     * @fn assign
-     * @brief Assign other objects values to this.
-     * @param crOther The other Object
-     */
-    virtual void assign(const Object& crOther);
-
-    /**
      * @fn tryUpdate
      * @brief Try to update this Object.
      * @note If the other Object cannot update this, nothing happens.
      * @see canUpdate
-     * @param crOther   The other Object
+     * @param rvOther   The other Object
      * @param vAttempts The update attempt count
      * @return true on success, else false
      */
-    virtual bool tryUpdate(const Object& crOther, std::uint32_t vAttempts);
+    virtual bool tryUpdate(Object&& rvOther, std::uint32_t vAttempts);
 
     /**
      * @fn setSerialized
      * @brief Set the string representation of this Objects data.
-     * @param crSerialized The string representation
+     * @param rvSerialized The string representation
      */
-    virtual void setSerialized(const std::string& crSerialized);
+    virtual void setSerialized(std::string&& rvSerialized);
 
     /**
      * @fn getSerialized
@@ -76,6 +69,13 @@ public:
     virtual const std::string& getSerialized() const;
 
 protected:
+    /**
+     * @fn assign
+     * @brief Assign other objects values to this.
+     * @param rvOther The other Object
+     */
+    virtual void assign(Object&& rvOther);
+
     /**
      * @fn canUpdate
      * @brief Check whether this Object can update the other one.
