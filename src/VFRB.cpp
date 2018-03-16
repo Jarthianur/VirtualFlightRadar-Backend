@@ -102,22 +102,22 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
         {
             if(feed.first.find(SECT_KEY_APRSC) != std::string::npos)
             {
-                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::AprscFeed(
+                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::AprscFeed(
                     feed.first, feed.second, mpAircraftData, crConfig.getMaxHeight())));
             }
             else if(feed.first.find(SECT_KEY_SBS) != std::string::npos)
             {
-                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::SbsFeed(
+                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::SbsFeed(
                     feed.first, feed.second, mpAircraftData, crConfig.getMaxHeight())));
             }
             else if(feed.first.find(SECT_KEY_GPS) != std::string::npos)
             {
-                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::GpsFeed(
+                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::GpsFeed(
                     feed.first, feed.second, mpGpsData, crConfig.isGndModeEnabled())));
             }
             else if(feed.first.find(SECT_KEY_SENS) != std::string::npos)
             {
-                mFeeds.push_back(std::shared_ptr<feed::Feed>(new feed::SensorFeed(
+                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::SensorFeed(
                     feed.first, feed.second, mpWindData, mpAtmosphereData)));
             }
             else

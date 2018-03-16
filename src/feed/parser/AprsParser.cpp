@@ -27,19 +27,54 @@
 #include "../../Math.hpp"
 #include "../../object/Position.h"
 
-/// Define regex match groups for APRS
 //#define RE_APRS_TIME 1
+
+/// @var RE_APRS_LAT
+/// APRS regex match group of latitude
 #define RE_APRS_LAT 1
+
+/// @var RE_APRS_LAT_DIR
+/// APRS regex match group of latitude orientation
 #define RE_APRS_LAT_DIR 2
-#define RE_APRS_LONG 3
-#define RE_APRS_LONG_DIR 4
+
+/// @var RE_APRS_LON
+/// APRS regex match group of longitude
+#define RE_APRS_LON 3
+
+/// @var RE_APRS_LON_DIR
+/// APRS regex match group of longitude orientation
+#define RE_APRS_LON_DIR 4
+
+/// @var RE_APRS_HEAD
+/// APRS regex match group of heading
 #define RE_APRS_HEAD 5
+
+/// @var RE_APRS_GND_SPD
+/// APRS regex match group of ground speed
 #define RE_APRS_GND_SPD 6
+
+/// @var RE_APRS_ALT
+/// APRS regex match group of altitude
 #define RE_APRS_ALT 7
+
+/// @var RE_APRS_COM
+/// APRS regex match group of comment
 #define RE_APRS_COM 8
+
+/// @var RE_APRS_COM_TYPE
+/// APRS regex match group of id and aircraft type
 #define RE_APRS_COM_TYPE 1
+
+/// @var RE_APRS_COM_ID
+/// APRS regex match group of aircraft id
 #define RE_APRS_COM_ID 2
+
+/// @var RE_APRS_COM_CR
+/// APRS regex match group of climb rate
 #define RE_APRS_COM_CR 3
+
+/// @var RE_APRS_COM_TR
+/// APRS regex match group of turn rate
 #define RE_APRS_COM_TR 4
 
 namespace feed
@@ -89,7 +124,7 @@ bool AprsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     return true;
 }
 
-bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft)
+bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft) noexcept
 {
     bool valid = false;
     try
@@ -100,8 +135,8 @@ bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft
         {
             pos.latitude = -pos.latitude;
         }
-        pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_APRS_LONG)));
-        if(crMatch.str(RE_APRS_LONG_DIR).compare("W") == 0)
+        pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_APRS_LON)));
+        if(crMatch.str(RE_APRS_LON_DIR).compare("W") == 0)
         {
             pos.longitude = -pos.longitude;
         }
@@ -117,7 +152,7 @@ bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft
     return valid;
 }
 
-bool AprsParser::parseComment(const boost::smatch& crMatch, Aircraft& rAircraft)
+bool AprsParser::parseComment(const boost::smatch& crMatch, Aircraft& rAircraft) noexcept
 {
     bool valid = true;
     rAircraft.setId(crMatch.str(RE_APRS_COM_ID));
@@ -136,7 +171,8 @@ bool AprsParser::parseComment(const boost::smatch& crMatch, Aircraft& rAircraft)
 }
 
 bool AprsParser::parseMovement(const boost::smatch& crMatch,
-                               const boost::smatch& crCommMatch, Aircraft& rAircraft)
+                               const boost::smatch& crCommMatch,
+                               Aircraft& rAircraft) noexcept
 {
     Movement move;
     bool valid = true;
@@ -154,5 +190,5 @@ bool AprsParser::parseMovement(const boost::smatch& crMatch,
     rAircraft.setMovement(move);
     return valid;
 }
-}
 }  // namespace parser
+}  // namespace feed

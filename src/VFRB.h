@@ -108,5 +108,5 @@ private:
 
     server::Server mServer;
 
-    std::list<std::shared_ptr<feed::Feed>> mFeeds;
+    std::list<std::unique_ptr<feed::Feed>> mFeeds;
 };

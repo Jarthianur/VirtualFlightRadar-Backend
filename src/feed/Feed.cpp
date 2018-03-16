@@ -26,7 +26,6 @@
 #include <limits>
 #include <stdexcept>
 #include <unordered_map>
-#include <boost/move/move.hpp>
 
 #include "../Logger.hpp"
 #include "../VFRB.h"
@@ -54,18 +53,6 @@ Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap)
 Feed::~Feed() noexcept
 {}
 
-Feed::Feed(BOOST_RV_REF(Feed) other)
-    : mName(boost::move(other.mName)),
-      mKvMap(boost::move(other.mKvMap)),
-      mpClient(boost::move(other.mpClient)),
-      mPriority(other.mPriority)
-{}
-
-Feed& Feed::operator=(BOOST_RV_REF(Feed))
-{
-    return *this;
-}
-
 void Feed::run(boost::asio::signal_set& rSigset) noexcept
 {
     if(VFRB::vRunStatus)
@@ -74,17 +61,7 @@ void Feed::run(boost::asio::signal_set& rSigset) noexcept
     }
 }
 
-const std::string& Feed::getName() const
-{
-    return mName;
-}
-
-std::uint32_t Feed::getPriority() const
-{
-    return mPriority;
-}
-
-void Feed::initPriority()
+void Feed::initPriority() noexcept
 {
     std::uint64_t priority = 0;
     try

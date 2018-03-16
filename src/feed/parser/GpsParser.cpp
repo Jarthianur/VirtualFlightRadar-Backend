@@ -25,15 +25,40 @@
 
 #include "../../Math.hpp"
 
-/// Define regex match groups for GGA
+/// @def RE_GGA_LAT
+/// GGA regex match capture group of latitude
 #define RE_GGA_LAT 1
+
+/// @def RE_GGA_LAT_DIR
+/// GGA regex match capture group of latitude orientation
 #define RE_GGA_LAT_DIR 2
-#define RE_GGA_LONG 3
-#define RE_GGA_LONG_DIR 4
+
+/// @def RE_GGA_LON
+/// GGA regex match capture group of longitude
+#define RE_GGA_LON 3
+
+/// @def RE_GGA_LON_DIR
+/// GGA regex match capture group of longitude orientation
+#define RE_GGA_LON_DIR 4
+
+/// @def RE_GGA_FIX
+/// GGA regex match capture group of fix quality
 #define RE_GGA_FIX 5
+
+/// @def RE_GGA_SAT
+/// GGA regex match capture group of sitallite count
 #define RE_GGA_SAT 6
+
+/// @def RE_GGA_DIL
+/// GGA regex match capture group of dilution
 #define RE_GGA_DIL 7
+
+/// @def RE_GGA_ALT
+/// GGA regex match capture group of altitude
 #define RE_GGA_ALT 8
+
+/// @def RE_GGA_GEOID
+/// GGA regex match capture group of geoid separation
 #define RE_GGA_GEOID 9
 
 namespace feed
@@ -76,9 +101,9 @@ bool GpsParser::parsePosition(const boost::smatch& crMatch,
     {
         pos.latitude = -pos.latitude;
     }
-    pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LONG)));
+    pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LON)));
 
-    if(crMatch.str(RE_GGA_LONG_DIR).compare("W") == 0)
+    if(crMatch.str(RE_GGA_LON_DIR).compare("W") == 0)
     {
         pos.longitude = -pos.longitude;
     }
@@ -90,5 +115,5 @@ bool GpsParser::parsePosition(const boost::smatch& crMatch,
     rPosition.setGeoid(std::stod(crMatch.str(RE_GGA_GEOID)));
     return true;
 }
-}
 }  // namespace parser
+}  // namespace feed

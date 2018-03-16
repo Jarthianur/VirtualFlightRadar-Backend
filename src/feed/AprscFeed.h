@@ -26,54 +26,65 @@
 #include <memory>
 #include <string>
 
+#include "../Defines.h"
 #include "../config/PropertyMap.h"
 #include "parser/AprsParser.h"
+
 #include "Feed.h"
 
+/// @namespace data
 namespace data
 {
 class AircraftData;
 } /* namespace data */
 
+/// @namespace feed
 namespace feed
 {
 /**
- * @class AprscFeed extends Feed
- * @brief Represents an APRSC input feed.
- * @see Feed.h
+ * @class AprscFeed
+ * @brief APRSC input feed.
+ * @extends Feed
  */
 class AprscFeed : public Feed
 {
 public:
+    NON_COPYABLE(AprscFeed)
+
     /**
      * @fn AprscFeed
      * @brief Constructor
-     * @param cr_name  The AprscFeeds unique name
-     * @param prio     The priority
-     * @param cr_kvmap The properties map
-     * @throws std::logic_error if login is not given in cr_kvmap
+     * @param crName     The unique name
+     * @param crKvMap    The properties map
+     * @param pData      The AircraftData pointer
+     * @param vMaxHeight The max height filter
+     * @throw std::logic_error if login is not given or from parent constructor
      */
     AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
               std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
+
     /**
      * @fn ~AprscFeed
      * @brief Destructor
      */
     virtual ~AprscFeed() noexcept;
+
     /**
-     * @fn process
-     * @brief Handle AprscClients response.
-     * @param cr_res The response to process
-     * @override Feed::process
+     * @see Feed#process
      */
     void process(const std::string& crResponse) noexcept override;
 
 private:
+    /// @var mParser
     /// Parser to unpack response from Client
     parser::AprsParser mParser;
 
+    /// @var mDataSlot
+    /// Data attempt slot
     std::size_t mDataSlot;
 
+    /// @var mpData
+    /// AircraftData to update for input.
     std::shared_ptr<data::AircraftData> mpData;
 };
 

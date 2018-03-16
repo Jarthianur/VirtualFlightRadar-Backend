@@ -30,15 +30,16 @@
 
 #include "Parser.hpp"
 
+/// @namespace feed
 namespace feed
 {
+/// @namespace parser
 namespace parser
 {
 /**
- * @class AprsParser implements Parser
- * @brief Provide unpacking method for APRS sentences.
- * @see Parser.hpp
- * @see ../aircraft/Aircraft.hpp
+ * @class AprsParser
+ * @brief Unpacking APRS sentences.
+ * @implements Parser
  */
 class AprsParser : public Parser<object::Aircraft>
 {
@@ -48,33 +49,63 @@ public:
     /**
      * @fn AprsParser
      * @brief Constructor
+     * @param vMaxHeight The max height filter
      */
     explicit AprsParser(std::int32_t vMaxHeight);
 
     /**
      * @fn unpack
      * @brief Unpack into Aircraft.
-     * @override Parser::unpack
+     * @see Parser#unpack
+     * @return true on success, else false
      */
     bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
 
 private:
+    /**
+     * @fn parsePosition
+     * @brief Parse a Position.
+     * @param crMatch   The regex match
+     * @param rAircraft The target Aircraft
+     * @return true on success, else false
+     */
     // cppcheck-suppress unusedPrivateFunction
-    bool parsePosition(const boost::smatch& crMatch, object::Aircraft& rAircraft);
+    bool parsePosition(const boost::smatch& crMatch,
+                       object::Aircraft& rAircraft) noexcept;
 
+    /**
+     * @fn parseComment
+     * @brief Parse the APRS comment.
+     * @param crMatch   The regex match
+     * @param rAircraft The target Aircraft
+     * @return true on success, else false
+     */
     // cppcheck-suppress unusedPrivateFunction
-    bool parseComment(const boost::smatch& crMatch, object::Aircraft& rAircraft);
+    bool parseComment(const boost::smatch& crMatch, object::Aircraft& rAircraft) noexcept;
 
+    /**
+     * @fn parse
+     * @brief Parse the Movement information.
+     * @param crMatch     The regex match
+     * @param crCommMatch The comment regex match
+     * @param rAircraft   The target Aircraft
+     * @return true on success, else false
+     */
     // cppcheck-suppress unusedPrivateFunction
     bool parseMovement(const boost::smatch& crMatch, const boost::smatch& crCommMatch,
-                       object::Aircraft& rAircraft);
+                       object::Aircraft& rAircraft) noexcept;
 
+    /// @var msAprsRe
     /// Regular expression for APRS protocol
     static const boost::regex msAprsRe;
+
+    /// @var msAprsComRe
     /// Regular expression for OGN specific APRS extension
     static const boost::regex msAprsComRe;
 
+    /// @var mMaxHeight
+    /// The max height filter
     const std::int32_t mMaxHeight;
 };
-}
 }  // namespace parser
+}  // namespace feed

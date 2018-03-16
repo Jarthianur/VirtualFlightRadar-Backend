@@ -25,26 +25,28 @@
 #include <memory>
 #include <string>
 #include <boost/asio/signal_set.hpp>
-#include <boost/move/core.hpp>
 
+#include "../Defines.h"
 #include "../config/PropertyMap.h"
 
+/// @namespace feed
 namespace feed
 {
+/// @namespace client
 namespace client
 {
 class Client;
-}
+}  // namespace client
+
 /**
  * @class Feed
- * @brief Incomplete base-class representing an input feed.
- * @note A Feed is unique and only movable.
+ * @brief Base class representing an input feed.
  */
 class Feed
 {
-    BOOST_MOVABLE_BUT_NOT_COPYABLE(Feed)
-
 public:
+    NON_COPYABLE(Feed)
+
     /**
      * @fn ~Feed
      * @brief Destructor
@@ -52,62 +54,56 @@ public:
     virtual ~Feed() noexcept;
 
     /**
-     * @fn Feed
-     * @brief Move-constructor
-     * @param The Feed to move
-     */
-    // cppcheck-suppress noExplicitConstructor
-    Feed(BOOST_RV_REF(Feed));
-
-    /**
-     * @fn operator=
-     * @brief Move-assignment
-     * @param The Feed to assign
-     */
-    Feed& operator=(BOOST_RV_REF(Feed));
-
-    /**
      * @fn run
      * @brief Run a Feed.
-     * @param r_sigset The signal set to pass to the Client
+     * @param rSigset The signal set to pass to the Client
      */
     void run(boost::asio::signal_set& rSigset) noexcept;
 
     /**
      * @fn process
-     * @brief Handle Clients response.
-     * @note To be implemented.
-     * @param cr_res The response to process
+     * @brief Handle Client's response.
+     * @param crResponse The response
      */
     virtual void process(const std::string& crResponse) noexcept = 0;
 
-    const std::string& getName() const;
-
-    std::uint32_t getPriority() const;
+    /**
+     * Define and declare getters.
+     */
+    GETTER_CR(std::string, mName, Name)
+    GETTER_V(std::uint32_t, mPriority, Priority)
 
 protected:
     /**
      * @fn Feed
      * @brief Constructor
-     * @param cr_name  The Feeds unique name
-     * @param cr_kvmap The properties map
-     * @throws std::logic_error if host or port are not given
+     * @param crName  The Feeds unique name
+     * @param crKvMap The properties map
+     * @throw std::logic_error if host or port are not given
      */
     Feed(const std::string& crName, const config::KeyValueMap& crKvMap);
 
+    /// @var mName
     /// Unique name
     const std::string mName;
 
+    /// @var mKvMap
     /// Key-value-map holding the properties.
     const config::KeyValueMap mKvMap;
 
-    /// Client, later resolved according to InpuType
+    /// @var mpClient
+    /// Client, later resolved in child class
     std::unique_ptr<client::Client> mpClient;
 
 private:
-    void initPriority();
+    /**
+     * @fn initPriority
+     * @brief Initialize the priority from the given properties.
+     */
+    void initPriority() noexcept;
 
-    /// Priority to write data
+    /// @var mPriority
+    /// The priority
     std::uint32_t mPriority;
 };
 
