@@ -62,6 +62,7 @@ void Configuration::init(const PropertyMap& crProperties)
     mMaxDistance = resolveFilter(crProperties, KV_KEY_MAX_DIST);
     mMaxHeight   = resolveFilter(crProperties, KV_KEY_MAX_HEIGHT);
     mServerPort  = resolveServerPort(crProperties);
+    mGroundMode  = !crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
     mFeedMapping = resolveFeeds(crProperties);
 
     dumpInfo();
@@ -86,8 +87,7 @@ object::GpsPosition Configuration::resolvePosition(const PropertyMap& crProperti
         checkNumberValue(stringToNumber<double>(crProperties.getProperty(
                              SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
                          SECT_KEY_FALLBACK, KV_KEY_GEOID));
-    return object::GpsPosition(
-        pos, geoid, !crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty());
+    return object::GpsPosition(pos, geoid);
 }
 
 std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) const
@@ -170,18 +170,8 @@ void Configuration::dumpInfo() const
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_SERVER_PORT ": ",
                  std::to_string(mServerPort));
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ",
-                 mPosition.getGround() ? "Yes" : "No");
+                 mGroundMode ? "Yes" : "No");
     Logger::info("(Config) number of feeds: ", std::to_string(mFeedMapping.size()));
-}
-
-bool Configuration::isGndModeEnabled() const
-{
-    return mPosition.getGround();
-}
-
-void Configuration::forceGndMode()
-{
-    mPosition.setGround(true);
 }
 
 }  // namespace config

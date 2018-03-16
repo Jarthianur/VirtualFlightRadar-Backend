@@ -110,12 +110,14 @@ public:
         OGN          = 3
     };
 
+    DEFAULT_CTOR_DTOR(Aircraft)
+
     /**
      * @fn Aircraft
      * @brief Constructor
-     * @param vPriority The initial priority (default: 0)
+     * @param vPriority The initial priority
      */
-    explicit Aircraft(std::uint32_t vPriority = 0);
+    explicit Aircraft(std::uint32_t vPriority);
 
     /**
      * @fn Aircraft
@@ -136,12 +138,6 @@ public:
      */
     Aircraft(std::string& rId, IdType vIdType, AircraftType vAircraftType, Position& rPos,
              Movement& rMove);
-
-    /**
-     * @fn ~Aircraft
-     * @brief Destructor
-     */
-    virtual ~Aircraft() noexcept;
 
     /**
      * @fn assign

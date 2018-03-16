@@ -50,7 +50,7 @@ public:
      * @brief Constructor
      * @param crPosition The initial info
      */
-    explicit GpsData(const object::GpsPosition& crPosition);
+    explicit GpsData(const object::GpsPosition& crPosition, bool vGround);
 
     /**
      * @fn getSerialized
@@ -84,6 +84,13 @@ public:
     std::size_t registerSlot() override;
 
 private:
+    /**
+     * @fn isPositionGood
+     * @brief Check whether the position is good enough.
+     * @return true if yes, else false
+     */
+    bool isPositionGood();
+
     /// @var mPosition
     /// The position
     object::GpsPosition mPosition;
@@ -95,6 +102,10 @@ private:
     /// @var mPositionLocked
     /// Locking state of the current position
     bool mPositionLocked = false;
+
+    /// @var mGroundMode
+    /// Ground mode state
+    bool mGroundMode = false;
 
     /// @var mAttempts
     /// Store update attempts

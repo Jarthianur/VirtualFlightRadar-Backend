@@ -51,7 +51,7 @@ std::atomic<bool> VFRB::vRunStatus(true);
 VFRB::VFRB(const config::Configuration& config)
     : mpAircraftData(new AircraftData(config.getMaxDistance())),
       mpAtmosphereData(new AtmosphereData(object::Atmosphere(config.getAtmPressure()))),
-      mpGpsData(new GpsData(config.getPosition())),
+      mpGpsData(new GpsData(config.getPosition(), config.getGroundMode())),
       mpWindData(new WindData()),
       mServer(config.getServerPort())
 {
@@ -113,7 +113,7 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
             else if(feed.first.find(SECT_KEY_GPS) != std::string::npos)
             {
                 mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::GpsFeed(
-                    feed.first, feed.second, mpGpsData, crConfig.isGndModeEnabled())));
+                    feed.first, feed.second, mpGpsData, crConfig.getGroundMode())));
             }
             else if(feed.first.find(SECT_KEY_SENS) != std::string::npos)
             {

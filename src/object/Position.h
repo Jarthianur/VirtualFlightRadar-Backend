@@ -24,6 +24,7 @@
 #include <cstdint>
 
 #include "../Defines.h"
+
 #include "Object.h"
 
 /// @namespace object
@@ -56,34 +57,25 @@ struct Position
 class GpsPosition : public Object
 {
 public:
-    /**
-     * @brief GpsPosition
-     */
-    GpsPosition();
+    DEFAULT_CTOR_DTOR(GpsPosition)
 
     /**
-     * @brief GpsPosition
-     * @param vPriority
-     * @param vGround
+     * @fn GpsPosition
+     * @brief Constructor
+     * @param vPriority The initial priority
      */
-    explicit GpsPosition(std::uint32_t vPriority, bool vGround = false);
+    explicit GpsPosition(std::uint32_t vPriority);
 
     /**
-     * @brief GpsPosition
-     * @param crPosition
-     * @param vGeoid
-     * @param vGround
+     * @fn GpsPosition
+     * @brief Constructor
+     * @param crPosition The position
+     * @param vGeoid     The geoid
      */
-    GpsPosition(const Position& crPosition, double vGeoid, bool vGround);
+    GpsPosition(const Position& crPosition, double vGeoid);
 
     /**
-     * @brief ~GpsPosition
-     */
-    virtual ~GpsPosition() noexcept;
-
-    /**
-     * @brief assign
-     * @param crOther
+     * @see Object#assign
      */
     void assign(const Object& crOther) override;
 
@@ -95,7 +87,6 @@ public:
     GETSET_V(std::int32_t, mNrOfSatellites, NrOfSatellites)
     GETSET_V(std::int32_t, mFixQuality, FixQuality)
     GETSET_V(double, mDilution, Dilution)
-    GETSET_V(bool, mGround, Ground)
 
 private:
     /// @var mPosition
@@ -117,9 +108,5 @@ private:
     /// @var mDilution
     /// The position dilution
     double mDilution = 0.0;
-
-    /// @var mGround
-    /// Is the position fixed on ground
-    bool mGround = false;
 };
 }  // namespace object

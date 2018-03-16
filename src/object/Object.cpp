@@ -19,6 +19,9 @@
 
 namespace object
 {
+Object::Object() : mLastPriority(0)
+{}
+
 Object::Object(std::uint32_t vPriority) : mLastPriority(vPriority)
 {}
 

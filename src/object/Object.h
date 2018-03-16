@@ -20,6 +20,8 @@
 #include <cstdint>
 #include <string>
 
+#include "../Defines.h"
+
 /// @namespace object
 namespace object
 {
@@ -32,18 +34,14 @@ namespace object
 class Object
 {
 public:
+    DEFAULT_CTOR_DTOR(Object)
+
     /**
      * @fn Object
      * @brief Constructor
-     * @param vPriority The initial priority (default: 0)
+     * @param vPriority The initial priority
      */
-    explicit Object(std::uint32_t vPriority = 0);
-
-    /**
-     * @fn ~Object
-     * @brief Destructor
-     */
-    virtual ~Object() noexcept;
+    explicit Object(std::uint32_t vPriority);
 
     /**
      * @fn assign

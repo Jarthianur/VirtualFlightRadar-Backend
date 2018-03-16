@@ -26,6 +26,7 @@
 #include "../Defines.h"
 #include "Object.h"
 
+/// @def ICAO_STD_A
 /// ICAO standard atmospheric pressure at MSL
 #define ICAO_STD_A 1013.25
 
@@ -42,12 +43,14 @@ struct Climate;
 class Atmosphere : public Object
 {
 public:
+    DEFAULT_CTOR_DTOR(Atmosphere)
+
     /**
      * @fn Atmosphere
      * @brief Constructor
-     * @param vPriority The initial priority (default: 0)
+     * @param vPriority The initial priority
      */
-    explicit Atmosphere(std::uint32_t vPriority = 0);
+    explicit Atmosphere(std::uint32_t vPriority);
 
     /**
      * @fn Atmosphere
@@ -55,12 +58,6 @@ public:
      * @param vPressure The pressure value
      */
     explicit Atmosphere(double vPressure);
-
-    /**
-     * @fn ~Atmosphere
-     * @brief Destructor
-     */
-    virtual ~Atmosphere() noexcept;
 
     /**
      * @fn assign

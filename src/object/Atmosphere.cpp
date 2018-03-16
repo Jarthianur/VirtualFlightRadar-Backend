@@ -19,6 +19,9 @@
 
 namespace object
 {
+Atmosphere::Atmosphere() : Atmosphere(ICAO_STD_A)
+{}
+
 Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)
 {}
 

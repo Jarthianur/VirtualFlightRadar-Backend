@@ -22,12 +22,11 @@ namespace object
 GpsPosition::GpsPosition() : Object(0)
 {}
 
-GpsPosition::GpsPosition(std::uint32_t vPriority, bool vGround)
-    : Object(vPriority), mGround(vGround)
+GpsPosition::GpsPosition(std::uint32_t vPriority) : Object(vPriority)
 {}
 
-GpsPosition::GpsPosition(const Position& crPosition, double vGeoid, bool vGround)
-    : Object(0), mPosition(crPosition), mGeoid(vGeoid), mGround(vGround)
+GpsPosition::GpsPosition(const Position& crPosition, double vGeoid)
+    : Object(0), mPosition(crPosition), mGeoid(vGeoid)
 {}
 
 GpsPosition::~GpsPosition() noexcept
@@ -42,6 +41,5 @@ void GpsPosition::assign(const Object& crOther)
     this->mFixQuality           = crUpdate.mFixQuality;
     this->mGeoid                = crUpdate.mGeoid;
     this->mDilution             = crUpdate.mDilution;
-    this->mGround               = crUpdate.mGround;
 }
 }  // namespace object

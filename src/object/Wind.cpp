@@ -19,6 +19,9 @@
 
 namespace object
 {
+Wind::Wind() : Object()
+{}
+
 Wind::Wind(std::uint32_t vPriority) : Object(vPriority)
 {}
 

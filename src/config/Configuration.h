@@ -141,20 +141,8 @@ public:
     GETTER_V(std::int32_t, mMaxHeight, MaxHeight)
     GETTER_V(std::int32_t, mMaxDistance, MaxDistance)
     GETTER_V(std::uint16_t, mServerPort, ServerPort)
+    GETSET_V(bool, mGroundMode, GroundMode)
     GETTER_CR(FeedMapping, mFeedMapping, FeedMapping)
-
-    /**
-     * @fn isGndModeEnabled
-     * @brief Is the ground mode enabled?
-     * @return true if enabled, else false
-     */
-    bool isGndModeEnabled() const;
-
-    /**
-     * @fn forceGndMode
-     * @brief Force ground mode to be enabled.
-     */
-    void forceGndMode();
 
 private:
     /**
@@ -238,6 +226,10 @@ private:
     /// @var mServerPort
     /// Port where to serve reports
     std::uint16_t mServerPort;
+
+    /// @var mGroundMode
+    /// Ground mode state
+    bool mGroundMode;
 
     /// @var mFeedMapping
     /// List of feeds with their key-value map
