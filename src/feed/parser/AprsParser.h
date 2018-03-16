@@ -25,7 +25,9 @@
 #include <string>
 #include <boost/regex.hpp>
 
+#include "../../Defines.h"
 #include "../../object/Aircraft.h"
+
 #include "Parser.hpp"
 
 namespace feed
@@ -41,19 +43,13 @@ namespace parser
 class AprsParser : public Parser<object::Aircraft>
 {
 public:
-    AprsParser();
+    DEFAULT_CTOR_DTOR(AprsParser)
 
     /**
      * @fn AprsParser
      * @brief Constructor
      */
     explicit AprsParser(std::int32_t vMaxHeight);
-
-    /**
-     * @fn ~AprsParser
-     * @brief Destructor
-     */
-    virtual ~AprsParser() noexcept;
 
     /**
      * @fn unpack

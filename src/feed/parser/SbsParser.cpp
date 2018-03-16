@@ -27,10 +27,24 @@
 #include "../../Math.hpp"
 #include "../../object/Position.h"
 
+/// @def SBS_FIELD_ID
+/// Field number of aircraft id
 #define SBS_FIELD_ID 4
+
+/// @def SBS_FIELD_TIME
+/// Field number of time
 #define SBS_FIELD_TIME 7
+
+/// @var SBS_FIELD_ALT
+/// Field number of altitude
 #define SBS_FIELD_ALT 11
+
+/// @def BS_FIELD_LAT
+/// Field number of latitude
 #define SBS_FIELD_LAT 14
+
+/// @def SBS_FIELD_LON
+/// Field number of longitude
 #define SBS_FIELD_LON 15
 
 using namespace object;
@@ -74,7 +88,7 @@ bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
 }
 
 bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
-                           Position& rPosition, Aircraft& rAircraft)
+                           Position& rPosition, Aircraft& rAircraft) noexcept
 {
     bool valid = !crStr.empty();
     if(valid)
@@ -107,5 +121,5 @@ bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
     }
     return valid;
 }
-}
 }  // namespace parser
+}  // namespace feed

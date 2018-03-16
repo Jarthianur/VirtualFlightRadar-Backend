@@ -23,43 +23,34 @@
 
 #include <string>
 
+#include "../../Defines.h"
+
+/// @namespace feed
 namespace feed
 {
+/// @namespace parser
 namespace parser
 {
 /**
  * @class Parser
  * @brief Interface for parsers.
- * @tparam T The corresponding data type
+ * @tparam T The corresponding object type
  */
 template<typename T>
 class Parser
 {
 public:
-    /**
-     * @fn Parser
-     * @brief Constructor
-     */
-    inline Parser()
-    {}
-
-    /**
-     * @fn ~Parser
-     * @brief Destructor
-     */
-    inline virtual ~Parser() noexcept
-    {}
+    DEFAULT_CTOR_DTOR_INLINE(Parser)
 
     /**
      * @fn unpack
      * @brief Unpack a given string into the templated object.
-     * @note To be impemented.
-     * @param cr_msg The msg to unpack
-     * @tparam T     The object where to unpack into
+     * @param crStr The msg to unpack
+     * @param _1    The target object
      * @return true on success, else false
      */
-    virtual bool unpack(const std::string& crStr, T&) noexcept = 0;
+    virtual bool unpack(const std::string& crStr, T& _1) noexcept = 0;
 };
 
 }  // namespace parser
-}
+}  // namespace feed

@@ -30,6 +30,8 @@
 #include "../Parameters.h"
 
 #ifndef ESTIMATED_TRAFFIC
+/// @def ESTIMATED_TRAFFIC
+/// Amount of aircrafts estimated, for initial container size
 #define ESTIMATED_TRAFFIC 1
 #endif
 
@@ -37,6 +39,9 @@ using namespace object;
 
 namespace data
 {
+AircraftData::AircraftData() : AircraftData(0)
+{}
+
 AircraftData::AircraftData(std::int32_t vMaxDist) : Data(), mProcessor(vMaxDist)
 {
     mContainer.reserve(ESTIMATED_TRAFFIC);

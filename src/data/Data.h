@@ -21,11 +21,13 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
-/// @namespace  object
+#include "../Defines.h"
+
+/// @namespace object
 namespace object
 {
 class Object;
-}
+}  // namespace object
 
 /// @namespace data
 namespace data
@@ -37,15 +39,7 @@ namespace data
 class Data
 {
 public:
-    /**
-     * @brief Data
-     */
-    Data();
-
-    /**
-     * @brief ~Data
-     */
-    virtual ~Data() noexcept;
+    DEFAULT_CTOR_DTOR(Data)
 
     /**
      * @fn getSerialized

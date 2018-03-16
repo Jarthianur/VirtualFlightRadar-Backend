@@ -26,7 +26,9 @@
 #include <string>
 #include <vector>
 
+#include "../Defines.h"
 #include "../object/Atmosphere.h"
+
 #include "Data.h"
 
 /// @namespace data
@@ -40,11 +42,7 @@ namespace data
 class AtmosphereData : public Data
 {
 public:
-    /**
-     * @fn AtmosphereData
-     * @brief Constructor
-     */
-    AtmosphereData();
+    DEFAULT_CTOR_DTOR(AtmosphereData)
 
     /**
      * @fn AtmosphereData
@@ -52,12 +50,6 @@ public:
      * @param vAtmosphere The initial info
      */
     explicit AtmosphereData(const object::Atmosphere& crAtmosphere);
-
-    /**
-     * @fn ~AtmosphereData
-     * @brief Destructor
-     */
-    virtual ~AtmosphereData() noexcept;
 
     /**
      * @fn getSerialized

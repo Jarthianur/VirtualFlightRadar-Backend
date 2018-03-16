@@ -28,8 +28,10 @@
 #include <utility>
 #include <vector>
 
+#include "../Defines.h"
 #include "../object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
+
 #include "Data.h"
 
 /// @def AC_OUTDATED
@@ -55,18 +57,14 @@ namespace data
 class AircraftData : public Data
 {
 public:
+    DEFAULT_CTOR_DTOR(AircraftData)
+
     /**
      * @fn AircraftData
      * @brief Constructor
      * @param vMaxDist The max distance filter
      */
-    explicit AircraftData(std::int32_t vMaxDist = 0);
-
-    /**
-     * @fn ~AircraftData
-     * @brief Destructor
-     */
-    virtual ~AircraftData() noexcept;
+    explicit AircraftData(std::int32_t vMaxDist);
 
     /**
      * @fn getSerialized

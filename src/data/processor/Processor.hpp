@@ -24,8 +24,11 @@
 #include <cstdio>
 #include <string>
 
+#include "../../Defines.h"
 #include "../../Math.hpp"
 
+/// @def PROC_BUFF_S
+/// The internal buffer size
 #define PROC_BUFF_S 4096
 
 /// @namespace data
@@ -43,19 +46,7 @@ template<typename T>
 class Processor
 {
 public:
-    /**
-     * @fn Processor
-     * @brief Constructor
-     */
-    Processor()
-    {}
-
-    /**
-     * @fn ~Processor
-     * @brief Destructor
-     */
-    virtual ~Processor() noexcept
-    {}
+    DEFAULT_CTOR_DTOR_INLINE(Processor)
 
     /**
      * @fn process

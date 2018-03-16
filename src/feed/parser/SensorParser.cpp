@@ -74,5 +74,5 @@ bool SensorParser::parseClimate(const std::string& crStr, object::Climate& rClim
     }
     return valid;
 }
-}
 }  // namespace parser
+}  // namespace feed

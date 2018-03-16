@@ -80,3 +80,13 @@
 #define NON_COPYABLE(TYPE)      \
     TYPE(const TYPE&) = delete; \
     TYPE& operator=(const TYPE&) = delete;
+
+#define DEFAULT_CTOR_DTOR(TYPE) \
+    TYPE();                     \
+    virtual ~TYPE() noexcept;
+
+#define DEFAULT_CTOR_DTOR_INLINE(TYPE) \
+    TYPE()                             \
+    {}                                 \
+    virtual ~TYPE() noexcept           \
+    {}

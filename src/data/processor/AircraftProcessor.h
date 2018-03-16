@@ -24,8 +24,10 @@
 #include <cstdint>
 #include <string>
 
+#include "../../Defines.h"
 #include "../../object/Aircraft.h"
 #include "../../object/Position.h"
+
 #include "Processor.hpp"
 
 /// @namespace data
@@ -42,11 +44,7 @@ namespace processor
 class AircraftProcessor : public Processor<object::Aircraft>
 {
 public:
-    /**
-     * @fn AircraftProcessor
-     * @brief Constructor
-     */
-    AircraftProcessor();
+    DEFAULT_CTOR_DTOR(AircraftProcessor)
 
     /**
      * @fn AircraftProcessor
@@ -54,12 +52,6 @@ public:
      * @param vMaxDist The max distance filter
      */
     explicit AircraftProcessor(std::int32_t vMaxDist);
-
-    /**
-     * @fn ~AircraftProcessor
-     * @brief Destructor
-     */
-    virtual ~AircraftProcessor() noexcept;
 
     /**
      * @fn process
