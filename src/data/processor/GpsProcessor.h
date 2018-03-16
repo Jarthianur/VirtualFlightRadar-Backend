@@ -46,10 +46,9 @@ public:
     /**
      * @fn process
      * @brief Process a GPS position.
-     * @param crPosition The position
-     * @return the GGA and RMC sentences
+     * @param rPosition The position
      */
-    std::string process(const object::GpsPosition& crPosition) override;
+    void process(object::GpsPosition& rPosition) override;
 
 private:
     /**

@@ -57,10 +57,9 @@ public:
      * @fn process
      * @brief Generate NMEA report for an Aircraft.
      * @note Resulting string has trailing <cr><lf>.
-     * @param crAircraft The Aircraft to process
-     * @return the NMEA string
+     * @param rAircraft The Aircraft to process
      */
-    std::string process(const object::Aircraft& crAircraft) override;
+    void process(object::Aircraft& rAircraft) override;
 
     /**
      * @fn setRefered

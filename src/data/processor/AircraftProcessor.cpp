@@ -44,11 +44,12 @@ AircraftProcessor::AircraftProcessor(std::int32_t vMaxDist)
 AircraftProcessor::~AircraftProcessor() noexcept
 {}
 
-std::string AircraftProcessor::process(const Aircraft& crAircraft)
+void AircraftProcessor::process(Aircraft& rAircraft)
 {
-    calcRelativePosition(crAircraft);
-    return mtDistance <= mMaxDistance ? genPflauStr(crAircraft) + genPflaaStr(crAircraft)
-                                      : "";
+    calcRelativePosition(rAircraft);
+    rAircraft.setSerialized((mtDistance <= mMaxDistance
+                                 ? genPflauStr(rAircraft) + genPflaaStr(rAircraft)
+                                 : ""));
 }
 
 void AircraftProcessor::setRefered(const Position& crRefPosition, double vAtmPress)

@@ -46,7 +46,9 @@ GpsData::GpsData() : Data()
 
 GpsData::GpsData(const GpsPosition& crPosition, bool vGround)
     : Data(), mPosition(crPosition), mGroundMode(vGround)
-{}
+{
+    mProcessor.process(mPosition);
+}
 
 GpsData::~GpsData() noexcept
 {}
@@ -70,7 +72,7 @@ bool GpsData::update(const Object& crPosition, std::size_t vSlot)
         if(updated)
         {
             std::fill(mAttempts.begin(), mAttempts.end(), 0);
-            mPosition.setSerialized(mProcessor.process(mPosition));
+            mProcessor.process(mPosition);
         }
         return (mPositionLocked = updated && mGroundMode && isPositionGood());
     }
