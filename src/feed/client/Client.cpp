@@ -42,7 +42,6 @@ Client::Client(const std::string& crHost, const std::string& crPort,
       mComponent(crComponent),
       mrFeed(rFeed),
       mConnectTimer(mIoService)
-
 {}
 
 Client::~Client() noexcept

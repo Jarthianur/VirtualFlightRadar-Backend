@@ -76,3 +76,7 @@
     {                                        \
         MEMBER = crNew;                      \
     }
+
+#define NON_COPYABLE(TYPE)      \
+    TYPE(const TYPE&) = delete; \
+    TYPE& operator=(const TYPE&) = delete;

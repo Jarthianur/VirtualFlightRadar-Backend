@@ -26,6 +26,7 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "../../Defines.h"
 #include "../../Parameters.h"
 
 /// @namespace feed
@@ -52,11 +53,7 @@ namespace client
 class Client
 {
 public:
-    /// No copy construction
-    Client(const Client&) = delete;
-
-    /// No copy assignment
-    Client& operator=(const Client&) = delete;
+    NON_COPYABLE(Client)
 
     /**
      * @fn ~Client
