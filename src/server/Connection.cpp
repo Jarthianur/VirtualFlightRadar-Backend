@@ -58,9 +58,4 @@ boost::asio::ip::tcp::socket& Connection::getSocket()
     return mSocket;
 }
 
-const std::string& Connection::getIpAddress() const
-{
-    return mIpAddress;
-}
-
 }  // namespace server

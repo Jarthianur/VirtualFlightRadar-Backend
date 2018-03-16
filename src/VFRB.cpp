@@ -44,7 +44,7 @@
 
 using namespace data;
 
-#define SYNC_TIME (1)
+#define SYNC_TIME 1
 
 std::atomic<bool> VFRB::vRunStatus(true);
 
@@ -112,8 +112,8 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
             }
             else if(feed.first.find(SECT_KEY_GPS) != std::string::npos)
             {
-                mFeeds.push_back(std::unique_ptr<feed::Feed>(new feed::GpsFeed(
-                    feed.first, feed.second, mpGpsData, crConfig.getGroundMode())));
+                mFeeds.push_back(std::unique_ptr<feed::Feed>(
+                    new feed::GpsFeed(feed.first, feed.second, mpGpsData)));
             }
             else if(feed.first.find(SECT_KEY_SENS) != std::string::npos)
             {

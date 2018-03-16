@@ -25,6 +25,8 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include "Defines.h"
+
 /**
  * @class Logger
  * @brief Provides static functions for threadsafe logging.
@@ -32,23 +34,13 @@
 class Logger
 {
 public:
-    /**
-     * @fn Logger
-     * @brief Constructor
-     */
-    Logger();
-
-    /**
-     * @fn ~Logger
-     * @brief Destructor
-     */
-    virtual ~Logger() noexcept;
+    DEFAULT_CTOR_DTOR(Logger)
 
     /**
      * @fn info
-     * @brief Log informations to stdout.
-     * @param cr_subj The subject
-     * @param cr_msg  The msg, default empty
+     * @brief Log on INFO level to stdout.
+     * @tparam T     The first argument
+     * @tparam TRest The rest of arguments
      * @threadsafe
      */
     template<typename T, typename... TRest>
@@ -68,9 +60,9 @@ public:
 
     /**
      * @fn debug
-     * @brief Log debug informations to stdout.
-     * @param cr_subj The subject
-     * @param cr_msg  The msg, default empty
+     * @brief Log on DEBUG level to stdout.
+     * @tparam T     The first argument
+     * @tparam TRest The rest of arguments
      * @threadsafe
      */
     template<typename T, typename... TRest>
@@ -90,9 +82,9 @@ public:
 
     /**
      * @fn warn
-     * @brief Log warnings to stdout.
-     * @param cr_subj The subject
-     * @param cr_msg  The msg, default empty
+     * @brief Log on WARN level to stdout.
+     * @tparam T     The first argument
+     * @tparam TRest The rest of arguments
      * @threadsafe
      */
     template<typename T, typename... TRest>
@@ -112,9 +104,9 @@ public:
 
     /**
      * @fn error
-     * @brief Log fatal errors to stderr.
-     * @param cr_subj The subject
-     * @param cr_msg  The msg, default empty
+     * @brief Log on ERROR level to stderr.
+     * @tparam T     The first argument
+     * @tparam TRest The rest of arguments
      * @threadsafe
      */
     template<typename T, typename... TRest>
@@ -132,13 +124,17 @@ public:
         log(mpErrStream, std::forward<T>(crMsg));
     }
 
-    // static void setLogFile(std::ostream* pOut);
-
 private:
-    /// Mutex
+    /// @var mMutex
+    /// Mutex for threadsafe logging
     static boost::mutex mMutex;
 
+    /// @var mpOutStream
+    /// Stream to log INFO,DEBUG,WARN
     static std::ostream* mpOutStream;
+
+    /// @var mpErrStream
+    /// Stream to log ERROR
     static std::ostream* mpErrStream;
 
     /**
@@ -148,6 +144,13 @@ private:
      */
     static std::string getTime();
 
+    /**
+     * @fn log
+     * @brief Write to the given stream.
+     * @param pOut   The stream
+     * @tparam T     The first argument
+     * @tparam TRest The rest of arguments
+     */
     template<typename T, typename... TRest>
     static void log(std::ostream* pOut, T head, TRest... tail)
     {

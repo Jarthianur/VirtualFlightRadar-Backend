@@ -31,12 +31,15 @@
 
 namespace server
 {
+Server::Server() : Server(4353)
+{}
+
 Server::Server(std::uint16_t vPort)
-    : mIOservice(),
-      mAcceptor(mIOservice,
+    : mIoService(),
+      mAcceptor(mIoService,
                 boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), vPort),
                 boost::asio::ip::tcp::acceptor::reuse_address(true)),
-      mSocket(mIOservice)
+      mSocket(mIoService)
 {}
 
 Server::~Server() noexcept
@@ -46,7 +49,7 @@ void Server::run(boost::asio::signal_set& rSigset)
 {
     awaitStop(rSigset);
     accept();
-    mIOservice.run();
+    mIoService.run();
 }
 
 void Server::send(const std::string& crStr)
@@ -82,11 +85,11 @@ void Server::awaitStop(boost::asio::signal_set& rSigset)
 {
     rSigset.async_wait([this](const boost::system::error_code&, int) {
         mAcceptor.close();
-        stopAll();
+        stop();
     });
 }
 
-void Server::stopAll()
+void Server::stop()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     Logger::info("(Server) stopping all clients...");

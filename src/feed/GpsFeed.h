@@ -31,7 +31,6 @@
 
 #include "Feed.h"
 
-/// @namespace data
 namespace data
 {
 class GpsData;
@@ -56,11 +55,10 @@ public:
      * @param crName   The unique name
      * @param crKvMap  The properties map
      * @param pData    The GpsData pointer
-     * @param vGndMode The ground mode state
      * @throw std::logic_error from parent constructor
      */
     GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-            std::shared_ptr<data::GpsData> pData, bool vGndMode);
+            std::shared_ptr<data::GpsData> pData);
 
     /**
      * @fn ~GpsFeed
@@ -85,10 +83,6 @@ private:
     /// @var mpData
     /// GpsData to update for input
     std::shared_ptr<data::GpsData> mpData;
-
-    /// @var mGndModeEnabled
-    /// Ground mode state
-    bool mGndModeEnabled;
 };
 
 }  // namespace feed

@@ -43,9 +43,3 @@ std::string Logger::getTime()
     std::strftime(time, 32, "%c", gmtime(&tt));
     return std::string(time);
 }
-
-/*void Logger::setLogFile(std::ostream* pOut)
-{
-    Logger::mpOutStream = pOut;
-    Logger::mpErrStream = pOut;
-}*/
