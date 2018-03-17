@@ -75,8 +75,18 @@ function confirm() {
     return 0
 }
 
+function prepare_path() {
+    set -e
+    if [ -e "$1" ]; then
+        log -w "\"$1\"" already exists.
+        confirm Replace the existing one\?
+        rm -rf "$1"
+    else
+        mkdir -p "$(dirname $1)"
+    fi
+}
+
 function resolve_pkg_manager() {
-    set +e
     error=0
     if [ "$(which 2>&1)" == "" ]; then
         APT="$(which apt-get)"
@@ -113,14 +123,14 @@ function install_deps() {
         SETUP=""
         BOOST='libboost-dev libboost-all-dev'
         PYTHON='python python-pip'
-        GCC='g++ g++-multilib'
+        GCC='g++ g++-multilib make'
     ;;
     yum)
         UPDATE='yum clean all'
         SETUP="yum -y install epel-release"
         BOOST='boost boost-devel'
         PYTHON='python python-pip'
-        GCC='gcc-c++'
+        GCC='gcc-c++ make'
     ;;
     esac
     ALL="$GCC $PYTHON"
@@ -133,18 +143,6 @@ function install_deps() {
     $SUDO $PKG_MANAGER -y install $ALL
     pip install --upgrade pip
     pip install spline
-    return $error
-}
-
-function prepare_path() {
-    set -e
-    if [ -e "$1" ]; then
-        log -w "\"$1\"" already exists.
-        confirm Replace the existing one\?
-        rm -rf "$1"
-    else
-        mkdir -p "$(dirname $1)"
-    fi
 }
 
 function build() {
@@ -199,5 +197,85 @@ function install() {
         sed "s|%VERSION%|${VFRB_VERSION}|" <"$VFRB_ROOT/vfrb.ini" >"$VFRB_INI_PATH"
         log -i "$VFRB_INI_PATH" created.
     fi
-    install_service
+}
+
+function install_test_deps() {
+    set -e
+    log -i INSTALL TEST DEPENDENCIES
+    resolve_pkg_manager
+    require PKG_MANAGER
+    case $PKG_MANAGER in
+    apt-get)
+        TOOLS='cppcheck clang-format-5.0 wget'
+    ;;
+    *)
+        log -w Tests currently only run under ubuntu/debian systems.
+        return 1
+    ;;
+    esac
+    ALL="$TOOLS"
+    log -i "$SUDO" "$PKG_MANAGER" -y install "$ALL"
+    $SUDO $PKG_MANAGER -y install $ALL
+    wget 'http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz'
+    tar xf lcov_1.11.orig.tar.gz
+    make -C lcov-1.11/ install
+}
+
+function buid_test() {
+    set -eE
+    log -i BUILD VFRB TESTS
+    require VFRB_ROOT VFRB_COMPILER
+    if [ ! -z "$CUSTOM_BOOST" ]; then
+        require BOOST_LIBS_L BOOST_ROOT_I
+    fi
+    export VFRB_DEBUG="-g --coverage"
+    export VFRB_OPT="0"
+    trap "fail popd Build has failed!" ERR
+    pushd "$VFRB_ROOT/test/build/"
+    make all -j2
+    popd
+    trap - ERR
+}
+
+function static_analysis() {
+    set -e
+    log -i Run static code analysis.
+    cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
+    for f in `find src/ -type f`; do
+        diff -u <(cat "$f") <(clang-format-5.0 -style=file "$f")
+    done &> format.diff
+    if [ "`wc -l format.diff | cut -d' ' -f1`" -gt 0 ]; then
+        log -w Code format does not comply to the specification.
+        return 1
+    fi
+}
+
+function run_unit_test() {
+    log -i Run unit tests.
+    require VFRB_ROOT
+    lcov --initial --directory "$VFRB_ROOT/test/build" --capture --output-file test_base.info
+    lcov --initial --directory "$VFRB_ROOT/target" --capture --output-file vfrb_base.info
+    "$VFRB_ROOT/test/build/VFR-Test"
+}
+
+function run_regression() {
+    if ! target/vfrb-$(cat version.txt); then $(exit 0); fi
+    if ! target/vfrb-$(cat version.txt) -g -c bla.txt; then $(exit 0); fi
+    pushd test
+    ./regression.sh serve
+    ../target/vfrb-$(cat ../version.txt) -c resources/test.ini &
+    ./regression.sh receive
+    ./regression.sh receive
+    sleep 20
+    sudo pkill -2 -f vfrb-$(cat ../version.txt) | true
+    ./regression.sh check
+    popd
+}
+
+function publish_coverage() {
+    lcov --directory test/build --capture --output-file test.info
+    lcov --directory target --capture --output-file vfrb.info
+    lcov -a test_base.info -a test.info -a vfrb_base.info -a vfrb.info -o all.info
+    lcov --remove all.info 'test/*' '/usr/*' -o cov.info
+    lcov --list cov.info
 }

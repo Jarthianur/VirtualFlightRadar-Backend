@@ -25,6 +25,12 @@ for arg in $@; do
     --install)
         DO_INSTALL=1
     ;;
+    --test)
+        DO_TEST=1
+    ;;
+    -y | --confirm-yes)
+        export AUTO_CONFIRM=1
+    ;;
     -h | --help | *)
         echo TODO
     ;;
@@ -49,9 +55,23 @@ if [ ! -z "$BOOST_ROOT" ]; then
 fi
 
 if [ ! -z "$DO_BUILD" ]; then
+    install_deps
     build
 fi
+
+if [ ! -z "$DO_TEST" ]; then
+    install_deps
+    install_test_deps
+    static_analysis
+    build_test
+    run_unit_test
+    run_regression
+    publish_coverage
+fi
+
 if [ ! -z "$DO_INSTALL" ]; then
     install
+    install_service
 fi
+
 log -i FINISHED
