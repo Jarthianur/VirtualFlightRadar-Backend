@@ -1,5 +1,5 @@
 [Unit]
-Description=%VFRB_NAME%
+Description=VirtualFlightRadar-Backend
 
 [Service]
 Type=simple
