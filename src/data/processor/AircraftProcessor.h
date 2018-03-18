@@ -26,7 +26,7 @@
 
 #include "../../Defines.h"
 #include "../../object/Aircraft.h"
-#include "../../object/Position.h"
+#include "../../object/GpsPosition.h"
 
 #include "Processor.hpp"
 

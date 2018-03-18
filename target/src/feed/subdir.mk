@@ -8,21 +8,24 @@ CPP_SRCS += \
 ../src/feed/Feed.cpp \
 ../src/feed/GpsFeed.cpp \
 ../src/feed/SbsFeed.cpp \
-../src/feed/SensorFeed.cpp 
+../src/feed/SensorFeed.cpp \
+../src/feed/FeedFactory.cpp
 
 OBJS += \
 ./src/feed/AprscFeed.o \
 ./src/feed/Feed.o \
 ./src/feed/GpsFeed.o \
 ./src/feed/SbsFeed.o \
-./src/feed/SensorFeed.o 
+./src/feed/SensorFeed.o \
+./src/feed/FeedFactory.o
 
 CPP_DEPS += \
 ./src/feed/AprscFeed.d \
 ./src/feed/Feed.d \
 ./src/feed/GpsFeed.d \
 ./src/feed/SbsFeed.d \
-./src/feed/SensorFeed.d 
+./src/feed/SensorFeed.d \
+./src/feed/FeedFactory.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

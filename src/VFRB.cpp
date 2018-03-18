@@ -37,7 +37,7 @@
 #include "feed/Feed.h"
 #include "feed/FeedFactory.h"
 #include "object/Atmosphere.h"
-#include "object/Position.h"
+#include "object/GpsPosition.h"
 #include "Logger.hpp"
 
 using namespace data;

@@ -27,7 +27,7 @@
 #include "../Logger.hpp"
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
-#include "../object/Position.h"
+#include "../object/GpsPosition.h"
 #include "client/GpsdClient.h"
 
 namespace feed

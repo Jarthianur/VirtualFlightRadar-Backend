@@ -25,7 +25,7 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../object/Position.h"
+#include "../../object/GpsPosition.h"
 
 //#define RE_APRS_TIME 1
 

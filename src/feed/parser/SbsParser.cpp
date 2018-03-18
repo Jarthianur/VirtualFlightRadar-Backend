@@ -25,7 +25,7 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../object/Position.h"
+#include "../../object/GpsPosition.h"
 
 /// @def SBS_FIELD_ID
 /// Field number of aircraft id

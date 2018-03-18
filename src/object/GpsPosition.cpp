@@ -15,7 +15,7 @@
  }
  */
 
-#include "Position.h"
+#include "GpsPosition.h"
 
 namespace object
 {

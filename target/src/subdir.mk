@@ -5,15 +5,18 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/Main.cpp \
-../src/VFRB.cpp 
+../src/VFRB.cpp \
+../src/Logger.cpp
 
 OBJS += \
 ./src/Main.o \
-./src/VFRB.o 
+./src/VFRB.o \
+./src/Logger.o
 
 CPP_DEPS += \
 ./src/Main.d \
-./src/VFRB.d 
+./src/VFRB.d \
+./src/Logger.d
 
 V_VERSION := ${VFRB_VERSION}
 

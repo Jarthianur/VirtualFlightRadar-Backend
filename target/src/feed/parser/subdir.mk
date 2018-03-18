@@ -4,26 +4,26 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/parser/AprsParser.cpp \
-../src/parser/GpsParser.cpp \
-../src/parser/SbsParser.cpp \
-../src/parser/SensorParser.cpp 
+../src/feed/parser/AprsParser.cpp \
+../src/feed/parser/GpsParser.cpp \
+../src/feed/parser/SbsParser.cpp \
+../src/feed/parser/SensorParser.cpp 
 
 OBJS += \
-./src/parser/AprsParser.o \
-./src/parser/GpsParser.o \
-./src/parser/SbsParser.o \
-./src/parser/SensorParser.o 
+./src/feed/parser/AprsParser.o \
+./src/feed/parser/GpsParser.o \
+./src/feed/parser/SbsParser.o \
+./src/feed/parser/SensorParser.o 
 
 CPP_DEPS += \
-./src/parser/AprsParser.d \
-./src/parser/GpsParser.d \
-./src/parser/SbsParser.d \
-./src/parser/SensorParser.d 
+./src/feed/parser/AprsParser.d \
+./src/feed/parser/GpsParser.d \
+./src/feed/parser/SbsParser.d \
+./src/feed/parser/SensorParser.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/parser/%.o: ../src/parser/%.cpp
+src/feed/parser/%.o: ../src/feed/parser/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	$(CXX) -std=c++0x $(BOOST_I) -O$(OPT_LVL) $(DBG) -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
