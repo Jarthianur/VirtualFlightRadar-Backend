@@ -16,7 +16,6 @@ function ifelse() {
 export PROMPT="$(basename $0)"
 
 function log() {
-    PROMPT="$PROMPT"$(ifelse "'${FUNCNAME[1]}' == ''" '' "->${FUNCNAME[1]}")
     TIME=`date +"%T"`
     case $1 in
     -i)
@@ -30,7 +29,7 @@ function log() {
     ;;
     esac
     shift
-    echo " $TIME $PROMPT:: $*"
+    echo " $TIME $PROMPT$(ifelse "'${FUNCNAME[1]}' == ''" '' "->${FUNCNAME[1]}"):: $*"
 }
 
 function require() {
@@ -87,8 +86,8 @@ function prepare_path() {
 function resolve_pkg_manager() {
     error=0
     if [ "$(which 2>&1)" == "" ]; then
-        APT="$(which apt-get)"
-        YUM="$(which yum)"
+        APT="$(which apt-get || true)"
+        YUM="$(which yum || true)"
     else
         RELEASE="$(cat /etc/*-release)"
         if [ "$(echo $RELEASE | grep -oiP '(ubuntu|debian)')" != "" ]; then
@@ -116,21 +115,22 @@ function install_deps() {
     resolve_pkg_manager
     require PKG_MANAGER
     case $PKG_MANAGER in
-    apt-get)
-        UPDATE="apt-get update"
-        SETUP=''
-        BOOST='libboost-dev libboost-all-dev'
-        PYTHON='python python-pip'
-        GCC='g++ g++-multilib make'
+    *apt-get)
+        local UPDATE="apt-get update"
+        local SETUP=''
+        local BOOST='libboost-dev libboost-all-dev'
+        local PYTHON='python python-pip'
+        local GCC='g++ g++-multilib make'
     ;;
-    yum)
-        UPDATE='yum clean all'
-        SETUP='yum -y install epel-release'
-        BOOST='boost boost-devel'
-        PYTHON='python python-pip'
-        GCC='gcc-c++ make'
+    *yum)
+        local UPDATE='yum clean all'
+        local SETUP='yum -y install epel-release'
+        local BOOST='boost boost-devel'
+        local PYTHON='python python-pip'
+        local GCC='gcc-c++ make'
     ;;
     esac
+    require GCC PYTHON BOOST UPDATE
     ALL="$GCC $PYTHON"
     if [ -z "$CUSTOM_BOOST" ]; then
         ALL="$ALL $BOOST"
@@ -191,7 +191,7 @@ function install() {
         log -e "$VFRB_TARGET" does not exist!
         return 1
     fi
-    if [ $[REPLACE_INI] -eq 0 ]; then
+    if [ $REPLACE_INI -eq 0 ]; then
         sed "s|%VERSION%|${VFRB_VERSION}|" <"$VFRB_ROOT/vfrb.ini" >"$VFRB_INI_PATH"
         log -i "$VFRB_INI_PATH" created.
     fi
@@ -232,7 +232,7 @@ function buid_test() {
     pushd "$VFRB_ROOT/test/build/"
     make all -j2
     popd
-    pushd "$VFRB_ROOT/target/"    
+    pushd "$VFRB_ROOT/target/"
     make all -j2
     popd
     trap - ERR
@@ -257,7 +257,8 @@ function run_unit_test() {
     require VFRB_ROOT
     lcov --initial --directory "$VFRB_ROOT/test/build" --capture --output-file test_base.info
     lcov --initial --directory "$VFRB_ROOT/target" --capture --output-file vfrb_base.info
-    "$VFRB_ROOT/test/build/VFR-Test"
+    "$VFRB_ROOT/test/build/VFR-Test" &> "$VFRB_ROOT/reports/unittests.xml"
+    cat "$VFRB_ROOT/reports/unittests.xml"
 }
 
 function run_regression() {

@@ -11,7 +11,28 @@ VFRB_EXEC_PATH=${VFRB_EXEC_PATH:-"$VFRB_ROOT/target/$VFRB_TARGET"}
 VFRB_INI_PATH=${VFRB_INI_PATH:-"$VFRB_ROOT/target/vfrb.ini"}
 
 function print_help() {
-    echo HELP
+    echo 'VirtualFlightRadar-Backend install script.'
+    echo ''
+    echo 'Usage: ./run.sh [OPTIONS] <TASKS>'
+    echo ''
+    echo 'OPTIONS:'
+    echo '  --path=<PATH/NAME>     : Set a custom path, including filename, where to install the executable.'
+    echo '  --ini-path=<PATH/NAME> : Set a custom path, including filename, where to install the config file.'
+    echo '  -y | --confirm-yes     : Automatically confirm all decisions. (dangerous)'
+    echo '  -h | --help            : Display this message'
+    echo ''
+    echo 'TASKS:'
+    echo '  build   : Build the VFRB executable.'
+    echo '  install : Build and install the VFRB executable, config file and service.'
+    echo '  test    : Build and run the unit, regression tests and code analysis.'
+    echo '            Also generate test/coverage report.'
+    echo ''
+    echo 'ENVIRONMENT:'
+    echo 'Following adjustments can be made with environment variables.'
+    echo '  BOOST_ROOT     : Assume boost manually installed at this path.'
+    echo '  VFRB_COMPILER  : Use this compiler.'
+    echo '  VFRB_EXEC_PATH : Same as "--path=".'
+    echo '  VFRB_INI_PATH  : Same as "--ini-path=".'
 }
 
 if [ $# -eq 0 ]; then
@@ -27,17 +48,18 @@ for arg in $@; do
     --ini-path=*)
         VFRB_INI_PATH="${arg#*=}"
     ;;
-    --build)
-        DO_BUILD=1
-    ;;
-    --install)
-        DO_INSTALL=1
-    ;;
-    --test)
-        DO_TEST=1
-    ;;
     -y | --confirm-yes)
         export AUTO_CONFIRM=1
+    ;;
+    build)
+        DO_BUILD=1
+    ;;
+    install)
+        DO_INSTALL=1
+        DO_BUILD=1
+    ;;
+    test)
+        DO_TEST=1
     ;;
     -h | --help | *)
         print_help
@@ -45,6 +67,8 @@ for arg in $@; do
     ;;
     esac
 done
+
+#require DO_BUILD DO_INSTALL DO_TEST
 
 if [ "$(basename $VFRB_INI_PATH | grep -o '.ini')" == "" ]; then
     log -e "\"$VFRB_INI_PATH\"" is not a valid path to an ini file!
@@ -73,6 +97,7 @@ fi
 if [ ! -z "$DO_TEST" ]; then
     install_deps
     install_test_deps
+    prepare_path "$VFRB_ROOT/reports/"
     static_analysis
     build_test
     run_unit_test
