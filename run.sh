@@ -102,7 +102,7 @@ if [ ! -z "$DO_TEST" ]; then
     build_test
     run_unit_test
     run_regression
-    publish_coverage
+    gen_coverage
 fi
 
 if [ ! -z "$DO_INSTALL" ]; then

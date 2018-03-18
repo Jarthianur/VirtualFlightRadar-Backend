@@ -1,10 +1,13 @@
 #!/bin/bash
 
+# working
 if [ "$(whoami)" != 'root' ]; then
     SUDO='sudo'
 fi
 export SUDO="${SUDO:-}"
+export PROMPT="$(basename $0)"
 
+# working
 function ifelse() {
     if [ $1 ]; then
         printf '%s' "$2"
@@ -13,8 +16,7 @@ function ifelse() {
     fi
 }
 
-export PROMPT="$(basename $0)"
-
+# working
 function log() {
     TIME=`date +"%T"`
     case $1 in
@@ -32,6 +34,7 @@ function log() {
     echo " $TIME $PROMPT$(ifelse "'${FUNCNAME[1]}' == ''" '' "->${FUNCNAME[1]}"):: $*"
 }
 
+# working
 function require() {
     error=0
     for v in $*; do
@@ -43,18 +46,32 @@ function require() {
     return $error
 }
 
+# working
 function retval() {
     "$*" &> /dev/null
     echo $?
 }
 
+# working
 function fail() {
-    $1
-    shift
-    log -e $*
+    local MSG=''
+    while [ $# -gt 0 ]; do
+        case $1 in
+        -e)
+            $2
+            shift
+        ;;
+        *)
+            MSG="$MSG $1"
+        ;;
+        esac
+        shift
+    done
+    log -e $MSG
     exit 1
 }
 
+# working
 function confirm() {
     log -i $*
     if [ -z "$AUTO_CONFIRM" ]; then
@@ -72,6 +89,7 @@ function confirm() {
     return 0
 }
 
+# working
 function prepare_path() {
     set -e
     if [ -e "$1" ]; then
@@ -83,6 +101,7 @@ function prepare_path() {
     fi
 }
 
+# working
 function resolve_pkg_manager() {
     error=0
     if [ "$(which 2>&1)" == "" ]; then
@@ -109,6 +128,7 @@ function resolve_pkg_manager() {
     return $error
 }
 
+# working
 function install_deps() {
     set -e
     log -i INSTALL DEPENDENCIES
@@ -152,7 +172,7 @@ function build() {
     fi
     export VFRB_OPT=${VFRB_OPT:-"3"}
     export VFRB_DEBUG=""
-    trap "fail popd Build has failed!" ERR
+    trap "fail -e popd Build has failed!" ERR
     pushd "$VFRB_ROOT/target/"    
     make all -j2
     popd
@@ -164,7 +184,7 @@ function install_service() {
     log -i INSTALL VFRB SERVICE
     require VFRB_ROOT VFRB_EXEC_PATH VFRB_INI_PATH
     SYSD_PATH="/etc/systemd/system"
-    trap "fail popd Service installation has failed!" ERR
+    trap "fail -e popd Service installation has failed!" ERR
     pushd "$SYSD_PATH"
     if [ ! -z "$CUSTOM_BOOST" ]; then
         require BOOST_ROOT
@@ -219,7 +239,7 @@ function install_test_deps() {
     make -C lcov-1.11/ install
 }
 
-function buid_test() {
+function build_test() {
     set -eE
     log -i BUILD VFRB TESTS
     require VFRB_ROOT VFRB_COMPILER
@@ -228,7 +248,7 @@ function buid_test() {
     fi
     export VFRB_DEBUG="-g --coverage"
     export VFRB_OPT="0"
-    trap "fail popd Build has failed!" ERR
+    trap "fail -e popd Build has failed!" ERR
     pushd "$VFRB_ROOT/test/build/"
     make all -j2
     popd
@@ -267,7 +287,7 @@ function run_regression() {
     VFRB_UUT="vfrb-$(cat version.txt)"
     if ! target/$VFRB_UUT; then $(exit 0); fi
     if ! target/$VFRB_UUT -g -c bla.txt; then $(exit 0); fi
-    trap "fail 'popd; $SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
+    trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
     pushd test
     ./regression.sh serve
     ../target/$VFRB_UUT -c resources/test.ini &
@@ -280,7 +300,7 @@ function run_regression() {
     trap - ERR
 }
 
-function publish_coverage() {
+function gen_coverage() {
     set -e
     log -i PUBLISH COEVRAGE
     lcov --directory test/build --capture --output-file test.info
