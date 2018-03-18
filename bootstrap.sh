@@ -6,32 +6,31 @@ fi
 export SUDO="${SUDO:-}"
 
 function ifelse() {
-    error=0
     if [ $1 ]; then
         printf '%s' "$2"
     else
         printf '%s' "$3"
-        error=1
     fi
-    return $error
 }
 
-export PROMPT="$(basename $0)`ifelse "-z $1" '' "->$1"`"
+export PROMPT="$(basename $0)"
 
 function log() {
+    PROMPT="$PROMPT"$(ifelse "'${FUNCNAME[1]}' == ''" '' "->${FUNCNAME[1]}")
     TIME=`date +"%T"`
-    case $1 in -i)
-        echo -en "\033[0;32m[INFO]\033[0m"
+    case $1 in
+    -i)
+        echo -en "\033[0;32m[INFO ]\033[0m"
     ;;
     -w)
-        echo -en "\033[0;33m[WARN]\033[0m"
+        echo -en "\033[0;33m[WARN ]\033[0m"
     ;;
     -e)
-        echo -en "\033[0;31m[WARN]\033[0m"
+        echo -en "\033[0;31m[ERROR]\033[0m"
     ;;
     esac
     shift
-    echo ' '"$TIME $PROMPT:: $*"
+    echo " $TIME $PROMPT:: $*"
 }
 
 function require() {
@@ -59,9 +58,8 @@ function fail() {
 
 function confirm() {
     log -i $*
-    if [ ! -z "$AUTO_CONFIRM" ]; then
+    if [ -z "$AUTO_CONFIRM" ]; then
         read -r -p "Confirm? [yes|no]: " READ
-        echo ''
         case $READ in
         [yY] | yes | YES)
             return 0
@@ -120,14 +118,14 @@ function install_deps() {
     case $PKG_MANAGER in
     apt-get)
         UPDATE="apt-get update"
-        SETUP=""
+        SETUP=''
         BOOST='libboost-dev libboost-all-dev'
         PYTHON='python python-pip'
         GCC='g++ g++-multilib make'
     ;;
     yum)
         UPDATE='yum clean all'
-        SETUP="yum -y install epel-release"
+        SETUP='yum -y install epel-release'
         BOOST='boost boost-devel'
         PYTHON='python python-pip'
         GCC='gcc-c++ make'
@@ -234,12 +232,15 @@ function buid_test() {
     pushd "$VFRB_ROOT/test/build/"
     make all -j2
     popd
+    pushd "$VFRB_ROOT/target/"    
+    make all -j2
+    popd
     trap - ERR
 }
 
 function static_analysis() {
     set -e
-    log -i Run static code analysis.
+    log -i RUN STATIC CODE ANALYSIS
     cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
     for f in `find src/ -type f`; do
         diff -u <(cat "$f") <(clang-format-5.0 -style=file "$f")
@@ -251,7 +252,8 @@ function static_analysis() {
 }
 
 function run_unit_test() {
-    log -i Run unit tests.
+    set -e
+    log -i RUN UNIT TESTS
     require VFRB_ROOT
     lcov --initial --directory "$VFRB_ROOT/test/build" --capture --output-file test_base.info
     lcov --initial --directory "$VFRB_ROOT/target" --capture --output-file vfrb_base.info
@@ -259,20 +261,27 @@ function run_unit_test() {
 }
 
 function run_regression() {
-    if ! target/vfrb-$(cat version.txt); then $(exit 0); fi
-    if ! target/vfrb-$(cat version.txt) -g -c bla.txt; then $(exit 0); fi
+    set -eE
+    log -i RUN REGRESSION TESTS
+    VFRB_UUT="vfrb-$(cat version.txt)"
+    if ! target/$VFRB_UUT; then $(exit 0); fi
+    if ! target/$VFRB_UUT -g -c bla.txt; then $(exit 0); fi
+    trap "fail 'popd; $SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
     pushd test
     ./regression.sh serve
-    ../target/vfrb-$(cat ../version.txt) -c resources/test.ini &
+    ../target/$VFRB_UUT -c resources/test.ini &
     ./regression.sh receive
     ./regression.sh receive
     sleep 20
-    sudo pkill -2 -f vfrb-$(cat ../version.txt) | true
+    sudo pkill -2 -f $VFRB_UUT || true
     ./regression.sh check
     popd
+    trap - ERR
 }
 
 function publish_coverage() {
+    set -e
+    log -i PUBLISH COEVRAGE
     lcov --directory test/build --capture --output-file test.info
     lcov --directory target --capture --output-file vfrb.info
     lcov -a test_base.info -a test.info -a vfrb_base.info -a vfrb.info -o all.info

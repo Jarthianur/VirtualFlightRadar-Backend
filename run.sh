@@ -10,14 +10,22 @@ export VFRB_TARGET="vfrb-$VFRB_VERSION"
 VFRB_EXEC_PATH=${VFRB_EXEC_PATH:-"$VFRB_ROOT/target/$VFRB_TARGET"}
 VFRB_INI_PATH=${VFRB_INI_PATH:-"$VFRB_ROOT/target/vfrb.ini"}
 
+function print_help() {
+    echo HELP
+}
+
+if [ $# -eq 0 ]; then
+    print_help
+    exit 1
+fi
+
 for arg in $@; do
     case $arg in
     --path=*)
-        VFRB_EXEC_PATH=${arg#*=:-"$VFRB_EXEC_PATH"}
-        VFRB_INI_PATH=${arg#*=:-"$VFRB_INI_PATH"}
+        VFRB_EXEC_PATH="${arg#*=}"
     ;;
     --ini-path=*)
-        VFRB_INI_PATH=${arg#*=:-"$VFRB_INI_PATH"}
+        VFRB_INI_PATH="${arg#*=}"
     ;;
     --build)
         DO_BUILD=1
@@ -32,7 +40,8 @@ for arg in $@; do
         export AUTO_CONFIRM=1
     ;;
     -h | --help | *)
-        echo TODO
+        print_help
+        exit 1
     ;;
     esac
 done
@@ -42,8 +51,10 @@ if [ "$(basename $VFRB_INI_PATH | grep -o '.ini')" == "" ]; then
     exit 1
 fi
 prepare_path "$VFRB_EXEC_PATH"
-prepare_path "$VFRB_INI_PATH" || true
+set +e
+prepare_path "$VFRB_INI_PATH"
 export REPLACE_INI=$?
+set -e
 log -i VFRB executable will be at "$VFRB_EXEC_PATH"
 log -i VFRB ini file will be at "$VFRB_INI_PATH"
 
