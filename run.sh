@@ -93,7 +93,7 @@ fi
 if [ ! -z "$DO_TEST" ]; then
     install_deps
     install_test_deps
-    prepare_path "$VFRB_ROOT/reports/"
+    $(ifelse "-d $VFRB_ROOT/reports/" '' "mkdir $VFRB_ROOT/reports/")
     static_analysis
     build_test
     run_unit_test

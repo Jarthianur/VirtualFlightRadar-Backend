@@ -18,7 +18,7 @@ function ifelse() {
 
 # working
 function log() {
-    TIME=`date +"%T"`
+    local TIME=`date +"%T"`
     case $1 in
     -i)
         echo -en "\033[0;32m[INFO ]\033[0m"
@@ -36,7 +36,7 @@ function log() {
 
 # working
 function require() {
-    error=0
+    local error=0
     for v in $*; do
         if [ -z "${!v}" ]; then
             log -e Env. $v is not set!
@@ -44,12 +44,6 @@ function require() {
         fi
     done
     return $error
-}
-
-# working
-function retval() {
-    "$*" &> /dev/null
-    echo $?
 }
 
 # working
@@ -92,7 +86,7 @@ function confirm() {
 # working
 function prepare_path() {
     set -e
-    error=0
+    local error=0
     if [ -e "$1" ]; then
         log -w "\"$1\"" already exists.
         confirm Replace the existing one\?
@@ -107,7 +101,7 @@ function prepare_path() {
 
 # working
 function resolve_pkg_manager() {
-    error=0
+    local error=0
     if [ "$(which 2>&1)" == "" ]; then
         APT="$(which apt-get || true)"
         YUM="$(which yum || true)"
@@ -134,8 +128,9 @@ function resolve_pkg_manager() {
 
 # working
 function install_deps() {
-    set -e
+    set -eE
     log -i INSTALL DEPENDENCIES
+    trap "fail Failed to install dependencies!" ERR
     resolve_pkg_manager
     require PKG_MANAGER
     case $PKG_MANAGER in
@@ -163,6 +158,7 @@ function install_deps() {
     $SUDO $UPDATE
     log -i "$SUDO" "$PKG_MANAGER" -y install "$ALL"
     $SUDO $PKG_MANAGER -y install $ALL
+    trap - ERR
     #pip install --upgrade pip
     #pip install spline
 }
@@ -190,7 +186,7 @@ function install_service() {
     set -eE
     log -i INSTALL VFRB SERVICE
     require VFRB_ROOT VFRB_EXEC_PATH VFRB_INI_PATH
-    SYSD_PATH="/etc/systemd/system"
+    local SYSD_PATH="/etc/systemd/system"
     trap "fail -e popd Service installation has failed!" ERR
     pushd "$SYSD_PATH"
     if [ ! -z "$CUSTOM_BOOST" ]; then
@@ -209,8 +205,9 @@ function install_service() {
 
 # working
 function install() {
-    set -e
+    set -eE
     log -i INSTALL VFRB
+    trap "fail Failed to install VFRB!" ERR
     require VFRB_TARGET VFRB_ROOT VFRB_EXEC_PATH VFRB_INI_PATH VFRB_VERSION REPLACE_INI
     if [ -x "$VFRB_ROOT/target/$VFRB_TARGET" ]; then
         mv "$VFRB_ROOT/target/$VFRB_TARGET" "$VFRB_EXEC_PATH"
@@ -219,33 +216,40 @@ function install() {
         log -e "$VFRB_TARGET" does not exist!
         return 1
     fi
-    log -i REPLACE_INI $REPLACE_INI
     if [ $REPLACE_INI -eq 0 ]; then
         sed "s|%VERSION%|${VFRB_VERSION}|" <"$VFRB_ROOT/vfrb.ini" >"$VFRB_INI_PATH"
         log -i "$VFRB_INI_PATH" created.
     fi
+    trap - ERR
 }
 
+# working
 function install_test_deps() {
-    set -e
+    set -eE
     log -i INSTALL TEST DEPENDENCIES
+    trap "fail Failed to install test dependencies!" ERR
     resolve_pkg_manager
     require PKG_MANAGER
     case $PKG_MANAGER in
     *apt-get)
-        TOOLS='cppcheck clang-format-5.0 wget'
+        local TOOLS='cppcheck clang-format-5.0 wget'
     ;;
     *)
         log -w Tests currently only run under ubuntu/debian systems.
         return 1
     ;;
     esac
+    require TOOLS
     ALL="$TOOLS"
     log -i "$SUDO" "$PKG_MANAGER" -y install "$ALL"
     $SUDO $PKG_MANAGER -y install $ALL
-    wget 'http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz'
-    tar xf lcov_1.11.orig.tar.gz
-    make -C lcov-1.11/ install
+    if [ "$(lcov --version | grep -o '1.11')" != '1.11' ]; then
+        wget 'http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz'
+        tar xf lcov_1.11.orig.tar.gz
+        make -C lcov-1.11/ install
+        rm lcov_1.11.orig.tar.gz
+    fi
+    trap - ERR
 }
 
 function build_test() {
@@ -268,18 +272,24 @@ function build_test() {
 }
 
 function static_analysis() {
-    set -e
+    set -eE
     log -i RUN STATIC CODE ANALYSIS
-    cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
-    for f in `find src/ -type f`; do
+    trap "fail Static code analysis failed!" ERR
+    #cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
+    log -i got here
+    for f in "$(find src/ -type f || true)"; do
+        log -i $f
         diff -u <(cat "$f") <(clang-format-5.0 -style=file "$f")
     done &> format.diff
-    if [ "`wc -l format.diff | cut -d' ' -f1`" -gt 0 ]; then
+    log -i got here
+    if [ "$(wc -l format.diff | cut -d' ' -f1)" -gt 0 ]; then
         log -w Code format does not comply to the specification.
         rm format.diff
         return 1
     fi
     rm format.diff
+    log -i got here
+    trap - ERR
 }
 
 function run_unit_test() {
