@@ -2,9 +2,9 @@
 set -e
 source bootstrap.sh
 
-VFRB_VERSION=$(cat version.txt)
 BOOST_ROOT=${BOOST_ROOT:-}
 VFRB_ROOT=$PWD
+export VFRB_VERSION=$(cat "$VFRB_ROOT/version.txt")
 export VFRB_COMPILER=${VFRB_COMPILER:-g++}
 export VFRB_TARGET="vfrb-$VFRB_VERSION"
 VFRB_EXEC_PATH=${VFRB_EXEC_PATH:-"$VFRB_ROOT/target/$VFRB_TARGET"}
@@ -67,8 +67,6 @@ for arg in $@; do
     ;;
     esac
 done
-
-#require DO_BUILD DO_INSTALL DO_TEST
 
 if [ "$(basename $VFRB_INI_PATH | grep -o '.ini')" == "" ]; then
     log -e "\"$VFRB_INI_PATH\"" is not a valid path to an ini file!

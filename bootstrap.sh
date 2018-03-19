@@ -139,30 +139,32 @@ function install_deps() {
         local UPDATE="apt-get update"
         local SETUP=''
         local BOOST='libboost-dev libboost-all-dev'
-        local PYTHON='python python-pip'
+        #local PYTHON='python python-pip'
         local GCC='g++ g++-multilib make'
     ;;
     *yum)
         local UPDATE='yum clean all'
         local SETUP='yum -y install epel-release'
         local BOOST='boost boost-devel'
-        local PYTHON='python python-pip'
+        #local PYTHON='python python-pip'
         local GCC='gcc-c++ make'
     ;;
     esac
-    require GCC PYTHON BOOST UPDATE
-    ALL="$GCC $PYTHON"
+    require GCC BOOST UPDATE
+    ALL="$GCC"
     if [ -z "$CUSTOM_BOOST" ]; then
         ALL="$ALL $BOOST"
     fi
-    $SUDO $SETUP
+    $(ifelse "-z '$SETUP'" "$SUDO $SETUP" '')
     $SUDO $UPDATE
     log -i "$SUDO" "$PKG_MANAGER" -y install "$ALL"
     $SUDO $PKG_MANAGER -y install $ALL
-    pip install --upgrade pip
-    pip install spline
+    #pip install --upgrade pip
+    #pip install spline
 }
 
+# test for custom boost
+# working
 function build() {
     set -eE
     log -i BUILD VFRB
