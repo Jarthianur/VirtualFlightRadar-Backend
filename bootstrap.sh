@@ -92,13 +92,17 @@ function confirm() {
 # working
 function prepare_path() {
     set -e
+    error=0
     if [ -e "$1" ]; then
         log -w "\"$1\"" already exists.
         confirm Replace the existing one\?
-        rm -rf "$1"
+        error=$?
+        $(ifelse "$error -eq 0" "rm -rf '$1'" '')
     else
         mkdir -p "$(dirname $1)"
+        error=$?
     fi
+    return $error
 }
 
 # working
@@ -181,6 +185,7 @@ function build() {
     trap - ERR
 }
 
+# working
 function install_service() {
     set -eE
     log -i INSTALL VFRB SERVICE
@@ -202,6 +207,7 @@ function install_service() {
     trap - ERR
 }
 
+# working
 function install() {
     set -e
     log -i INSTALL VFRB
@@ -213,6 +219,7 @@ function install() {
         log -e "$VFRB_TARGET" does not exist!
         return 1
     fi
+    log -i REPLACE_INI $REPLACE_INI
     if [ $REPLACE_INI -eq 0 ]; then
         sed "s|%VERSION%|${VFRB_VERSION}|" <"$VFRB_ROOT/vfrb.ini" >"$VFRB_INI_PATH"
         log -i "$VFRB_INI_PATH" created.
@@ -225,7 +232,7 @@ function install_test_deps() {
     resolve_pkg_manager
     require PKG_MANAGER
     case $PKG_MANAGER in
-    apt-get)
+    *apt-get)
         TOOLS='cppcheck clang-format-5.0 wget'
     ;;
     *)
@@ -269,8 +276,10 @@ function static_analysis() {
     done &> format.diff
     if [ "`wc -l format.diff | cut -d' ' -f1`" -gt 0 ]; then
         log -w Code format does not comply to the specification.
+        rm format.diff
         return 1
     fi
+    rm format.diff
 }
 
 function run_unit_test() {

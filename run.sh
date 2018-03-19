@@ -73,10 +73,8 @@ if [ "$(basename $VFRB_INI_PATH | grep -o '.ini')" == "" ]; then
     exit 1
 fi
 prepare_path "$VFRB_EXEC_PATH"
-set +e
-prepare_path "$VFRB_INI_PATH"
-export REPLACE_INI=$?
-set -e
+! prepare_path "$VFRB_INI_PATH"
+export REPLACE_INI=$(ifelse "$? -eq 1" '0' '1')
 log -i VFRB executable will be at "$VFRB_EXEC_PATH"
 log -i VFRB ini file will be at "$VFRB_INI_PATH"
 
