@@ -271,24 +271,22 @@ function build_test() {
     trap - ERR
 }
 
+# working
 function static_analysis() {
     set -eE
     log -i RUN STATIC CODE ANALYSIS
     trap "fail Static code analysis failed!" ERR
-    #cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
-    log -i got here
-    for f in "$(find src/ -type f || true)"; do
-        log -i $f
-        diff -u <(cat "$f") <(clang-format-5.0 -style=file "$f")
+    cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
+    for f in $(find src/ -type f); do
+        diff -u <(cat $f) <(clang-format-5.0 -style=file $f) || true
     done &> format.diff
-    log -i got here
     if [ "$(wc -l format.diff | cut -d' ' -f1)" -gt 0 ]; then
-        log -w Code format does not comply to the specification.
+        log -e Code format does not comply to the specification.
+        cat format.diff
         rm format.diff
         return 1
     fi
     rm format.diff
-    log -i got here
     trap - ERR
 }
 

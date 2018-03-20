@@ -25,8 +25,8 @@
 #include <string>
 
 #include "../Defines.h"
-#include "Object.h"
 #include "GpsPosition.h"
+#include "Object.h"
 
 /// @def A_VALUE_NA
 /// Indicate a double value is not available.
