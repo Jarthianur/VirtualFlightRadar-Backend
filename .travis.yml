@@ -19,6 +19,7 @@ before_script:
 
 script:
     - docker exec -it vfrb ls -la /workspace
+    - docker exec -it vfrb ./run.sh build test -y
 
 after_success:
 
