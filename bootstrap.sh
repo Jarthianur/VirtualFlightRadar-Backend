@@ -328,7 +328,7 @@ function run_regression() {
 
 function gen_coverage() {
     set -e
-    log -i PUBLISH COEVRAGE
+    log -i PUBLISH COVERAGE
     lcov --directory test/build --capture --output-file test.info
     lcov --directory target --capture --output-file vfrb.info
     lcov -a test_base.info -a test.info -a vfrb_base.info -a vfrb.info -o all.info
