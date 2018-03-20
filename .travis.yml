@@ -1,78 +1,24 @@
-language: cpp
+sudo: required
 
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - gcc-4.9
-    - g++-4.9
-    - libboost-dev
-    - libboost-all-dev
-    - cppcheck
-    - clang-format-5.0
+services:
+    - docker
 
-compiler:
-    - g++-4.9
-
-#branches:
-#    only:
-#        - master
-        
 git:
     submodules: true
 
 before_install:
+    - docker pull debian:sid
+    - docker run -v $TRAVIS_BUILD_DIR:/workspace --name vfrb -dit debian:sid bash
+    - docker ps -a
 
 install:
-    - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
-    - tar xf lcov_1.11.orig.tar.gz
-    - sudo make -C lcov-1.11/ install
-    - gem install coveralls-lcov
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 90
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 90
-    - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-4.9 90
 
 before_script:
-    - export VFRB_DEBUG="-g --coverage"
-    - export VFRB_OPT="0"
-    - ./install.sh
-    - pushd test/build
-    - make all -j2
-    - popd
 
 script:
-    # check codestyle
-    - cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
-    - for f in `find src/ -type f`; do diff -u <(cat "$f") <(clang-format-5.0 -style=file "$f"); done 2>&1 > format.diff
-    - if [ "`wc -l format.diff | cut -d' ' -f1`" -gt 0 ]; then $(exit 1); fi
-    # initialize lines
-    - lcov --initial --directory test/build --capture --output-file test_base.info
-    - lcov --initial --directory target --capture --output-file vfrb_base.info
-    # start tests
-    - test/build/VFR-Test
-    - if ! target/vfrb-$(cat version.txt); then $(exit 0); fi
-    - if ! target/vfrb-$(cat version.txt) -g -c bla.txt; then $(exit 0); fi
-    - pushd test
-    - ./regression.sh serve
-    - ../target/vfrb-$(cat ../version.txt) -c resources/test.ini &
-    - ./regression.sh receive
-    - ./regression.sh receive
-    - sleep 20
-    - sudo pkill -2 -f vfrb-$(cat ../version.txt) | true
-    - ./regression.sh check
-    - popd
+    - ls -la /workspace
 
 after_success:
-    # gather coverage
-    - lcov --directory test/build --capture --output-file test.info
-    - lcov --directory target --capture --output-file vfrb.info
-    # combine and filter
-    - lcov -a test_base.info -a test.info -a vfrb_base.info -a vfrb.info -o all.info
-    - lcov --remove all.info 'test/*' '/usr/*' -o cov.info
-    - lcov --list cov.info
-    # push to coveralls
-    - coveralls-lcov --repo-token ${COVERALLS_TOKEN} cov.info
 
 
 notifications:
