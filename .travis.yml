@@ -10,7 +10,7 @@ git:
 
 before_install:
     - docker pull debian:sid
-    - docker run -v $TRAVIS_BUILD_DIR:/workspace --name vfrb -dit debian:sid bash
+    - docker run -v $TRAVIS_BUILD_DIR:/workspace -e "WORKSPACE=/workspace" --name vfrb -dit debian:sid bash
     - docker ps -a
 
 install:

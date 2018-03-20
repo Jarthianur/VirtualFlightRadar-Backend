@@ -244,10 +244,14 @@ function install_test_deps() {
     log -i "$SUDO" "$PKG_MANAGER" -y install "$ALL"
     $SUDO $PKG_MANAGER -y install $ALL
     if [ "$(lcov --version | grep -o '1.11')" != '1.11' ]; then
+        require VFRB_ROOT
+        trap "fail -e popd Failed to install test dependencies!" ERR
+        pushd $VFRB_ROOT
         wget 'http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz'
         tar xf lcov_1.11.orig.tar.gz
         make -C lcov-1.11/ install
         rm lcov_1.11.orig.tar.gz
+        popd
     fi
     trap - ERR
 }
@@ -275,7 +279,9 @@ function build_test() {
 function static_analysis() {
     set -eE
     log -i RUN STATIC CODE ANALYSIS
-    trap "fail Static code analysis failed!" ERR
+    require VFRB_ROOT
+    trap "fail -e popd Static code analysis failed!" ERR
+    pushd $VFRB_ROOT
     cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
     for f in $(find src/ -type f); do
         diff -u <(cat $f) <(clang-format-5.0 -style=file $f) || true
@@ -287,6 +293,7 @@ function static_analysis() {
         return 1
     fi
     rm format.diff
+    popd
     trap - ERR
 }
 

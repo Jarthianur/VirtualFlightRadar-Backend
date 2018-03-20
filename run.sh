@@ -1,14 +1,15 @@
 #!/bin/bash
 set -e
-source bootstrap.sh
 
-BOOST_ROOT=${BOOST_ROOT:-}
-VFRB_ROOT=$PWD
+VFRB_ROOT=${WORKSPACE:-$PWD}
+export BOOST_ROOT=${BOOST_ROOT:-}
 export VFRB_VERSION=$(cat "$VFRB_ROOT/version.txt")
 export VFRB_COMPILER=${VFRB_COMPILER:-g++}
 export VFRB_TARGET="vfrb-$VFRB_VERSION"
 VFRB_EXEC_PATH=${VFRB_EXEC_PATH:-"$VFRB_ROOT/target/$VFRB_TARGET"}
 VFRB_INI_PATH=${VFRB_INI_PATH:-"$VFRB_ROOT/target/vfrb.ini"}
+
+source "$VFRB_ROOT/bootstrap.sh"
 
 function print_help() {
     echo 'VirtualFlightRadar-Backend install script.'
@@ -33,6 +34,7 @@ function print_help() {
     echo '  VFRB_COMPILER  : Use this compiler.'
     echo '  VFRB_EXEC_PATH : Same as "--path=".'
     echo '  VFRB_INI_PATH  : Same as "--ini-path=".'
+    echo ''
 }
 
 if [ $# -eq 0 ]; then
