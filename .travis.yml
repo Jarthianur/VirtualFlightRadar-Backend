@@ -16,7 +16,7 @@ install:
 before_script:
 
 script:
-    - ls -la /workspace
+    - docker exec -it vfrb "ls -la /workspace"
 
 after_success:
 
