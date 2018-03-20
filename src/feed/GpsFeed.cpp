@@ -33,7 +33,7 @@
 namespace feed
 {
 GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                 std::shared_ptr<data::GpsData> pData)
+                 std::shared_ptr<data::GpsData>& pData)
     : Feed(crName, crKvMap), mpData(pData)
 {
     mpClient  = std::unique_ptr<client::Client>(new client::GpsdClient(

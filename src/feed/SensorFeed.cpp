@@ -34,8 +34,8 @@
 namespace feed
 {
 SensorFeed::SensorFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                       std::shared_ptr<data::WindData> pWindData,
-                       std::shared_ptr<data::AtmosphereData> pAtmosData)
+                       std::shared_ptr<data::WindData>& pWindData,
+                       std::shared_ptr<data::AtmosphereData>& pAtmosData)
     : Feed(crName, crKvMap), mpWindData(pWindData), mpAtmosphereData(pAtmosData)
 
 {

@@ -33,7 +33,7 @@
 namespace feed
 {
 AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                     std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
+                     std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight)
     : Feed(crName, crKvMap), mParser(vMaxHeight), mpData(pData)
 {
     auto it = mKvMap.find(KV_KEY_LOGIN);

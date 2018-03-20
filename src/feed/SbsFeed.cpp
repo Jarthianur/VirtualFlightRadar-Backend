@@ -31,7 +31,7 @@
 namespace feed
 {
 SbsFeed::SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                 std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
+                 std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight)
     : Feed(crName, crKvMap), mParser(vMaxHeight), mpData(pData)
 {
     mpClient  = std::unique_ptr<client::Client>(new client::SbsClient(

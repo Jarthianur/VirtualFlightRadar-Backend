@@ -36,10 +36,10 @@ using namespace data;
 namespace feed
 {
 FeedFactory::FeedFactory(const Configuration& crConfig,
-                         std::shared_ptr<AircraftData> pAircraftData,
-                         std::shared_ptr<AtmosphereData> pAtmosData,
-                         std::shared_ptr<GpsData> pGpsData,
-                         std::shared_ptr<WindData> pWindData)
+                         std::shared_ptr<AircraftData>& pAircraftData,
+                         std::shared_ptr<AtmosphereData>& pAtmosData,
+                         std::shared_ptr<GpsData>& pGpsData,
+                         std::shared_ptr<WindData>& pWindData)
     : mrConfig(crConfig),
       mpAircraftData(pAircraftData),
       mpAtmosData(pAtmosData),
