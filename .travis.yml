@@ -3,6 +3,8 @@ sudo: required
 services:
     - docker
 
+language: minimal
+
 git:
     submodules: true
 
@@ -16,7 +18,7 @@ install:
 before_script:
 
 script:
-    - docker exec -it vfrb "ls -la /workspace"
+    - docker exec -it vfrb ls -la /workspace
 
 after_success:
 
