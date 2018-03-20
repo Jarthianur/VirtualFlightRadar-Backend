@@ -21,9 +21,6 @@
 
 #include <boost/regex.hpp>
 
-#include "../../src/util/GpsModule.h"
-#include "../../src/util/Math.hpp"
-#include "../../src/util/Position.h"
 #include "../framework/src/comparator/ComparatorStrategy.hpp"
 #include "../framework/src/testsuite/TestSuite.hpp"
 #include "../framework/src/testsuite/TestSuitesRunner.hpp"
@@ -34,7 +31,6 @@
 #undef assert
 #endif
 
-using namespace util;
 using namespace testsuite;
 using namespace comparator;
 

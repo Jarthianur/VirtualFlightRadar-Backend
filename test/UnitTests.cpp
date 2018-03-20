@@ -21,7 +21,6 @@
 
 #include <cstdint>
 
-#include "../src/config/Configuration.h"
 #include "framework/src/framework.h"
 
 using namespace testsuite;
@@ -30,25 +29,24 @@ using namespace testsuite;
 #undef assert
 #endif
 
-extern void test_util(TestSuitesRunner&);
 extern void test_config(TestSuitesRunner&);
 extern void test_data(TestSuitesRunner&);
-extern void test_aircraft(TestSuitesRunner&);
-extern void test_parser(TestSuitesRunner&);
+extern void test_data_processor(TestSuitesRunner&);
+extern void test_feed_parser(TestSuitesRunner&);
+extern void test_object(TestSuitesRunner&);
+extern void test_math(TestSuitesRunner&);
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     auto rep = reporter::createXmlReporter();
     TestSuitesRunner runner;
 
-    config::Configuration::mMaxHeight = INT32_MAX;
-    config::Configuration::mMaxDistance = INT32_MAX;
-
-    test_util(runner);
     test_config(runner);
-    test_aircraft(runner);
     test_data(runner);
-    test_parser(runner);
+    test_data_processor(runner);
+    test_feed_parser(runner);
+    test_object(runner);
+    test_math(runner);
 
     return rep->report(runner);
 }
