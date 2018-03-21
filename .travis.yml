@@ -26,7 +26,6 @@ after_success:
     - docker stop vfrb
     - coveralls-lcov --repo-token ${COVERALLS_TOKEN} cov.info
 
-
 notifications:
     email:
         recipients:

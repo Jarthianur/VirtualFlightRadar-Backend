@@ -298,23 +298,28 @@ function static_analysis() {
 }
 
 function run_unit_test() {
-    set -e
+    set -eE
     log -i RUN UNIT TESTS
     require VFRB_ROOT
-    lcov --initial --directory "$VFRB_ROOT/test/build" --capture --output-file test_base.info
-    lcov --initial --directory "$VFRB_ROOT/target" --capture --output-file vfrb_base.info
-    "$VFRB_ROOT/test/build/VFR-Test" &> "$VFRB_ROOT/reports/unittests.xml"
-    cat "$VFRB_ROOT/reports/unittests.xml"
+    trap "fail -e popd Unit tests failed!" ERR
+    pushd $VFRB_ROOT
+    lcov --initial --directory test/build --capture --output-file reports/test_base.info
+    lcov --initial --directory target --capture --output-file reports/vfrb_base.info
+    test/build/VFR-Test &> reports/unittests.xml
+    cat reports/unittests.xml
+    popd
+    trap - ERR
 }
 
 function run_regression() {
     set -eE
     log -i RUN REGRESSION TESTS
-    VFRB_UUT="vfrb-$(cat version.txt)"
-    if ! target/$VFRB_UUT; then $(exit 0); fi
-    if ! target/$VFRB_UUT -g -c bla.txt; then $(exit 0); fi
+    require VFRB_ROOT
+    VFRB_UUT="vfrb-$(cat $VFRB_ROOT/version.txt)"
+    if ! $VFRB_ROOT/target/$VFRB_UUT; then $(exit 0); fi
+    if ! $VFRB_ROOT/target/$VFRB_UUT -g -c bla.txt; then $(exit 0); fi
     trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
-    pushd test
+    pushd $VFRB_ROOT/test
     ./regression.sh serve
     ../target/$VFRB_UUT -c resources/test.ini &
     ./regression.sh receive
@@ -327,11 +332,17 @@ function run_regression() {
 }
 
 function gen_coverage() {
-    set -e
-    log -i PUBLISH COVERAGE
-    lcov --directory test/build --capture --output-file test.info
-    lcov --directory target --capture --output-file vfrb.info
-    lcov -a test_base.info -a test.info -a vfrb_base.info -a vfrb.info -o all.info
-    lcov --remove all.info 'test/*' '/usr/*' -o cov.info
-    lcov --list cov.info
+    set -eE
+    log -i GENERATE COVERAGE REPORT
+    require VFRB_ROOT
+    trap "fail -e popd Coverage report generation failed!" ERR
+    pushd $VFRB_ROOT
+    lcov --directory test/build --capture --output-file reports/test.info
+    lcov --directory target --capture --output-file reports/vfrb.info
+    lcov -a reports/test_base.info -a reports/test.info -a reports/vfrb_base.info -a reports/vfrb.info \
+        -o reports/all.info
+    lcov --remove reports/all.info 'test/*' '/usr/*' -o reports/cov.info
+    lcov --list reports/cov.info
+    popd
+    trap - ERR
 }
