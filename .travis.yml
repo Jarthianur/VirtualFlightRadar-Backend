@@ -10,19 +10,22 @@ git:
 
 before_install:
     - docker pull debian:sid
-    - docker run -v $TRAVIS_BUILD_DIR:/workspace -e "WORKSPACE=/workspace" --name vfrb -dit debian:sid bash
+    - docker run -e "WORKSPACE=/workspace" -e "UID=$(id -u)" -e "GID=$(id -g)"
+      -v $TRAVIS_BUILD_DIR:/workspace --name vfrb -dit debian:sid bash
     - docker ps -a
 
 install:
+    - gem install coveralls-lcov
 
 before_script:
-    - chmod +x run.sh
 
 script:
-    - docker exec -it vfrb ls -la /workspace
     - docker exec -it vfrb /workspace/run.sh build test -y
+    - docker exec -it vfrb chown $UID:$GID -R /workspace
 
 after_success:
+    - docker stop vfrb
+    - coveralls-lcov --repo-token ${COVERALLS_TOKEN} cov.info
 
 
 notifications:
