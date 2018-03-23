@@ -41,13 +41,11 @@ using namespace comparator;
 
 void test_data(TestSuitesRunner& runner)
 {
-    feed::parser::SbsParser sbsParser;
-    feed::parser::AprsParser aprsParser;
-
     describe<AircraftData>("Container functions", runner)
         ->test(
             "invalidate aircraft",
-            [&]() {
+            []() {
+                feed::parser::SbsParser sbsParser;
                 AircraftData data;
                 object::Aircraft ac;
                 object::Position pos{49.0, 8.0, 0};
@@ -65,7 +63,8 @@ void test_data(TestSuitesRunner& runner)
             })
         ->test(
             "delete aircraft",
-            [&]() {
+            []() {
+                feed::parser::SbsParser sbsParser;
                 AircraftData data;
                 object::Aircraft ac;
                 object::Position pos{49.0, 8.0, 0};
@@ -82,7 +81,9 @@ void test_data(TestSuitesRunner& runner)
             })
         ->test(
             "prefer FLARM, accept again if no input",
-            [&]() {
+            []() {
+                feed::parser::SbsParser sbsParser;
+                feed::parser::AprsParser aprsParser;
                 AircraftData data;
                 boost::smatch match;
                 object::Aircraft ac;
@@ -123,7 +124,8 @@ void test_data(TestSuitesRunner& runner)
                 assert(matched, true, helper::equalsBool);
                 assert(match.str(2), std::string("1000"), helper::equalsStr);
             })
-        ->test("write after attempt", [&]() {
+        ->test("write after attempt", []() {
+            feed::parser::AprsParser aprsParser;
             object::Aircraft ac2(2);
             AircraftData data;
             object::Position pos{49.0, 8.0, 0};
@@ -245,7 +247,7 @@ void test_data(TestSuitesRunner& runner)
 
     describeParallel<AtmosphereData>("atmosphere data", runner)
         ->test("get WIMDA, pressure",
-               [&]() {
+               []() {
                    AtmosphereData data;
                    object::Atmosphere atm;
                    std::size_t slot = data.registerSlot();

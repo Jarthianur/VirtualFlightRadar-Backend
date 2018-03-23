@@ -43,15 +43,11 @@ using namespace comparator;
 
 void test_feed_parser(TestSuitesRunner& runner)
 {
-    AprsParser aprsParser;
-    SbsParser sbsParser;
-    SensorParser sensorParser;
-    GpsParser gpsParser;
-
     describe<SbsParser>("unpack", runner)
         ->test(
             "valid msg",
-            [&]() {
+            []() {
+                SbsParser sbsParser;
                 object::Aircraft ac;
                 sbsParser.unpack(
                     "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
@@ -67,7 +63,8 @@ void test_feed_parser(TestSuitesRunner& runner)
             })
         ->test(
             "invalid msg",
-            [&]() {
+            []() {
+                SbsParser sbsParser;
                 object::Aircraft ac;
                 assert(
                     sbsParser.unpack(
@@ -112,7 +109,8 @@ void test_feed_parser(TestSuitesRunner& runner)
     describe<AprsParser>("unpack", runner)
         ->test(
             "valid msg",
-            [&]() {
+            []() {
+                AprsParser aprsParser;
                 object::Aircraft ac;
                 assert(
                     aprsParser.unpack(
@@ -144,7 +142,8 @@ void test_feed_parser(TestSuitesRunner& runner)
             })
         ->test(
             "invalid msg",
-            [&]() {
+            []() {
+                AprsParser aprsParser;
                 object::Aircraft ac;
                 assert(
                     aprsParser.unpack(
@@ -175,7 +174,8 @@ void test_feed_parser(TestSuitesRunner& runner)
 
     describe<SensorParser>("unpack", runner)
         ->test("valid msg",
-               [&]() {
+               []() {
+                   SensorParser sensorParser;
                    object::Climate info;
                    std::string mda(
                        "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
@@ -186,7 +186,8 @@ void test_feed_parser(TestSuitesRunner& runner)
                    assert(info.atmosphere.getSerialized(), mda, helper::equalsStr);
                    assert(info.wind.getSerialized(), mwv, helper::equalsStr);
                })
-        ->test("invalid msg", [&]() {
+        ->test("invalid msg", []() {
+            SensorParser sensorParser;
             object::Climate info;
             assert(sensorParser.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75", info),
                    false, helper::equalsBool);
@@ -205,7 +206,8 @@ void test_feed_parser(TestSuitesRunner& runner)
     describe<GpsParser>("unpack", runner)
         ->test(
             "valid msg",
-            [&]() {
+            []() {
+                GpsParser gpsParser;
                 object::GpsPosition pos;
                 assert(
                     gpsParser.unpack(
@@ -232,7 +234,8 @@ void test_feed_parser(TestSuitesRunner& runner)
                        helper::equalsD);
                 assert(pos.getPosition().altitude, 105, helper::equalsInt);
             })
-        ->test("invalid msg", [&]() {
+        ->test("invalid msg", []() {
+            GpsParser gpsParser;
             object::GpsPosition pos;
             assert(
                 gpsParser.unpack(

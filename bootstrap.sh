@@ -305,8 +305,10 @@ function run_unit_test() {
     pushd $VFRB_ROOT
     lcov --initial --directory test/build --capture --output-file reports/test_base.info
     lcov --initial --directory target --capture --output-file reports/vfrb_base.info
-    test/build/VFR-Test &> reports/unittests.xml
+    ! test/build/VFR-Test &> reports/unittests.xml
+    local error=$(ifelse "$? -eq 1" '0' '1')
     cat reports/unittests.xml
+    $(exit $error)
     popd
     trap - ERR
 }
