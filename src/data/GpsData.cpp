@@ -88,7 +88,7 @@ std::size_t GpsData::registerSlot()
     return mAttempts.size() - 1;
 }
 
-Position GpsData::getGpsPosition()
+Position GpsData::getPosition()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     return mPosition.getPosition();

@@ -61,12 +61,12 @@ public:
     std::string getSerialized() override;
 
     /**
-     * @fn getGpsPosition
-     * @brief Get the GPS position.
+     * @fn getPosition
+     * @brief Get the position.
      * @return the position
      * @threadsafe
      */
-    object::Position getGpsPosition();
+    object::Position getPosition();
 
     /**
      * @fn update

@@ -19,13 +19,10 @@
 
 namespace object
 {
-Atmosphere::Atmosphere() : Atmosphere(ICAO_STD_A)
+Atmosphere::Atmosphere() : Atmosphere(0)
 {}
 
 Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)
-{}
-
-Atmosphere::Atmosphere(double vPressure) : Object(0), mPressure(vPressure)
 {}
 
 Atmosphere::~Atmosphere() noexcept

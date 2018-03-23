@@ -21,32 +21,24 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <boost/regex.hpp>
 
+#include "../src/object/Aircraft.h"
 #include "framework/src/framework.h"
 
 #define TEST_FUNCTION(NAME) extern void NAME(TestSuitesRunner&);
 
 namespace helper
 {
-static testsuite::comparator::Comparator<std::int32_t> equalsInt
-    = testsuite::comparator::EQUALS<std::int32_t>();
-
-static testsuite::comparator::Comparator<std::uint32_t> equalsUInt
-    = testsuite::comparator::EQUALS<std::uint32_t>();
-
-static testsuite::comparator::Comparator<std::uint64_t> equalsULong
-    = testsuite::comparator::EQUALS<std::uint64_t>();
-
-static testsuite::comparator::Comparator<double> equalsD
-    = testsuite::comparator::EQUALS<double>();
-
-static testsuite::comparator::Comparator<std::string> equalsStr
-    = testsuite::comparator::EQUALS<std::string>();
-
-static testsuite::comparator::Comparator<bool> equalsBool
-    = testsuite::comparator::EQUALS<bool>();
+PROVIDE_COMPARATOR(std::int32_t, EQUALS, equalsInt)
+PROVIDE_COMPARATOR(std::uint32_t, EQUALS, equalsUInt)
+PROVIDE_COMPARATOR(std::uint64_t, EQUALS, equalsULong)
+PROVIDE_COMPARATOR(double, EQUALS, equalsD)
+PROVIDE_COMPARATOR(std::string, EQUALS, equalsStr)
+PROVIDE_COMPARATOR(bool, EQUALS, equalsBool)
+PROVIDE_COMPARATOR(object::Aircraft::TargetType, EQUALS, equalsAtt)
 
 static boost::regex
     pflauRe("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
