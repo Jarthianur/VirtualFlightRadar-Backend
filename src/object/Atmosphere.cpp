@@ -25,6 +25,10 @@ Atmosphere::Atmosphere() : Atmosphere(0)
 Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)
 {}
 
+Atmosphere::Atmosphere(double vPressure, std::uint32_t vPriority)
+    : Object(vPriority), mPressure(vPressure)
+{}
+
 Atmosphere::~Atmosphere() noexcept
 {}
 

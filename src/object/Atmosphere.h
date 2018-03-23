@@ -53,6 +53,14 @@ public:
     explicit Atmosphere(std::uint32_t vPriority);
 
     /**
+     * @fn Atmosphere
+     * @brief Constructor
+     * @param vPressure The initial pressure
+     * @param vPriority The initial priority
+     */
+    Atmosphere(double vPressure, std::uint32_t vPriority);
+
+    /**
      * Define and declare getters and setters.
      */
     GETSET_V(double, mPressure, Pressure)
