@@ -245,11 +245,11 @@ function install_test_deps() {
     $SUDO $PKG_MANAGER -y install $ALL
     if [ "$(lcov --version | grep -o '1.11')" != '1.11' ]; then
         require VFRB_ROOT
-        trap "fail -e popd Failed to install test dependencies!" ERR
+        trap "fail -e 'rm lcov_1.11.orig.tar.gz' -e popd Failed to install test dependencies!" ERR
         pushd $VFRB_ROOT
         wget 'http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz'
         tar xf lcov_1.11.orig.tar.gz
-        make -C lcov-1.11/ install
+        $SUDO make -C lcov-1.11/ install
         rm lcov_1.11.orig.tar.gz
         popd
     fi

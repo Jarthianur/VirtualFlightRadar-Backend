@@ -30,6 +30,18 @@
 
 #define TEST_FUNCTION(NAME) extern void NAME(TestSuitesRunner&);
 
+namespace testsuite
+{
+namespace util
+{
+template<>
+inline std::string serialize(const object::Aircraft::TargetType& crTargetType)
+{
+    return std::to_string(static_cast<std::uint32_t>(crTargetType));
+}
+}
+}
+
 namespace helper
 {
 PROVIDE_COMPARATOR(std::int32_t, EQUALS, equalsInt)
