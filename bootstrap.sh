@@ -137,7 +137,7 @@ function install_deps() {
     *apt-get)
         local UPDATE="apt-get update"
         local SETUP=''
-        local BOOST='libboost1.63-dev libboost1.63-all-dev'
+        local BOOST='libboost-dev libboost-all-dev'
         #local PYTHON='python python-pip'
         local GCC='g++ g++-multilib make'
     ;;
@@ -256,6 +256,7 @@ function install_test_deps() {
     trap - ERR
 }
 
+#working
 function build_test() {
     set -eE
     log -i BUILD VFRB TESTS
@@ -297,6 +298,7 @@ function static_analysis() {
     trap - ERR
 }
 
+# working
 function run_unit_test() {
     set -eE
     log -i RUN UNIT TESTS
@@ -323,7 +325,9 @@ function run_regression() {
     trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
     pushd $VFRB_ROOT/test
     ./regression.sh serve
+    sleep 2
     ../target/$VFRB_UUT -c resources/test.ini &
+    sleep 2
     ./regression.sh receive
     ./regression.sh receive
     sleep 20
@@ -333,6 +337,7 @@ function run_regression() {
     trap - ERR
 }
 
+# working
 function gen_coverage() {
     set -eE
     log -i GENERATE COVERAGE REPORT
