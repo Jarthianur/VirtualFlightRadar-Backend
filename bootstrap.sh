@@ -338,6 +338,7 @@ function run_regression() {
     log -i Stop vfrb and run check
     $SUDO pkill -2 -f $VFRB_UUT || true
     ./regression.sh check
+    sleep 4
     popd
     trap - ERR
 }
