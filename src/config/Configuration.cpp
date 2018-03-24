@@ -73,19 +73,19 @@ object::GpsPosition Configuration::resolvePosition(const PropertyMap& crProperti
     object::Position pos;
     pos.latitude = boost::get<double>(
         checkNumberValue(stringToNumber<double>(crProperties.getProperty(
-                             SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "")),
+                             SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0")),
                          SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
     pos.longitude = boost::get<double>(
         checkNumberValue(stringToNumber<double>(crProperties.getProperty(
-                             SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "")),
+                             SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0")),
                          SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
     pos.altitude = boost::get<std::int32_t>(
         checkNumberValue(stringToNumber<std::int32_t>(crProperties.getProperty(
-                             SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "")),
+                             SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0")),
                          SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
     double geoid = boost::get<double>(
         checkNumberValue(stringToNumber<double>(crProperties.getProperty(
-                             SECT_KEY_FALLBACK, KV_KEY_GEOID, "")),
+                             SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0")),
                          SECT_KEY_FALLBACK, KV_KEY_GEOID));
     return object::GpsPosition(pos, geoid);
 }
@@ -134,7 +134,14 @@ FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties)
     FeedMapping mapping;
     for(auto& it : list)
     {
-        mapping.push_back(std::make_pair(it, crProperties.getSectionKeyValue(it)));
+        try
+        {
+            mapping.push_back(std::make_pair(it, crProperties.getSectionKeyValue(it)));
+        }
+        catch(const std::out_of_range& e)
+        {
+            Logger::warn("(Config) resolveFeeds: ", e.what(), " for ", it);
+        }
     }
     return mapping;
 }
