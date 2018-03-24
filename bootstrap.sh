@@ -137,7 +137,7 @@ function install_deps() {
     *apt-get)
         local UPDATE="apt-get update"
         local SETUP=''
-        local BOOST='libboost-dev libboost-all-dev'
+        local BOOST='libboost1.63-dev libboost1.63-all-dev'
         #local PYTHON='python python-pip'
         local GCC='g++ g++-multilib make'
     ;;
@@ -327,7 +327,7 @@ function run_regression() {
     ./regression.sh receive
     ./regression.sh receive
     sleep 20
-    sudo pkill -2 -f $VFRB_UUT || true
+    $SUDO pkill -2 -f $VFRB_UUT || true
     ./regression.sh check
     popd
     trap - ERR
