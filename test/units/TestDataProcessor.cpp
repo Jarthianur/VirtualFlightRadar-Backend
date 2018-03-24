@@ -79,7 +79,7 @@ void test_data_processor(TestSuitesRunner& runner)
             ac.setFullInfoAvailable(false);
             ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
             ac.setPosition({49.0, 8.0, math::doubleToInt(math::FEET_2_M * 3281)});
-            proc.setRefered({49.0, 8.0, 0}, 1013.25);
+            proc.setRefered({49.1, 8.1, 0}, 1013.25);
             proc.process(ac);
             assert(ac.getSerialized(), std::string(""), helper::equalsStr);
         });
