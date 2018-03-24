@@ -22,11 +22,13 @@ before_script:
 script:
     - docker exec -it vfrb ls -la
     - docker exec -it vfrb ls -la /travis
-    - docker exec -it vfrb ls -la /workspace
     - docker exec -it vfrb cp -r /travis /workspace
+    - docker exec -it vfrb ls -la /workspace
     - docker exec -it vfrb /workspace/run.sh build test -y
     - docker exec -it vfrb cp -r /workspace/reports /travis/
     - docker exec -it vfrb chown $(id -u):$(id -g) -R /travis/reports
+    - ls -la
+    - ls -la reports
 
 after_success:
     - docker stop vfrb
