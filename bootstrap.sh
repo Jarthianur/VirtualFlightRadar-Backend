@@ -324,13 +324,17 @@ function run_regression() {
     if ! $VFRB_ROOT/target/$VFRB_UUT -g -c bla.txt; then $(exit 0); fi
     trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
     pushd $VFRB_ROOT/test
+    log -i Start mocking servers
     ./regression.sh serve
     sleep 2
+    log -i Start vfrb
     ../target/$VFRB_UUT -c resources/test.ini &
     sleep 2
+    log -i Connect to vfrb
     ./regression.sh receive
     ./regression.sh receive
     sleep 20
+    log -i Stop vfrb and run check
     $SUDO pkill -2 -f $VFRB_UUT || true
     ./regression.sh check
     popd
