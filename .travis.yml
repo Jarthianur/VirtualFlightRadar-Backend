@@ -15,10 +15,14 @@ install:
     - gem install coveralls-lcov
 
 before_script:
+    - ls -la
     - docker run -e "WORKSPACE=/workspace" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:sid bash
     - docker ps -a
 
 script:
+    - docker exec -it vfrb ls -la
+    - docker exec -it vfrb ls -la /travis
+    - docker exec -it vfrb ls -la /workspace
     - docker exec -it vfrb cp -r /travis /workspace
     - docker exec -it vfrb /workspace/run.sh build test -y
     - docker exec -it vfrb cp -r /workspace/reports /travis/
