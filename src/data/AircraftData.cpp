@@ -74,7 +74,7 @@ bool AircraftData::update(Object&& rvAircraft, std::size_t vSlot)
         try
         {
             bool updated = mContainer[index->second.first].tryUpdate(
-                std::move(rvAircraft), index->second.second.at(vSlot));
+                std::move(rvAircraft), ++(index->second.second.at(vSlot)));
             if(updated)
             {
                 std::fill(index->second.second.begin(), index->second.second.end(), 0);

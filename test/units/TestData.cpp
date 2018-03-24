@@ -126,6 +126,7 @@ void test_data(TestSuitesRunner& runner)
             })
         ->test("write after attempt", []() {
             feed::parser::AprsParser aprsParser;
+            object::Aircraft ac1(1);
             object::Aircraft ac2(2);
             AircraftData data;
             object::Position pos{49.0, 8.0, 0};
@@ -135,25 +136,22 @@ void test_data(TestSuitesRunner& runner)
             aprsParser.unpack(
                 "FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot",
                 ac2);
-            data.update(std::move(ac2), slot);
-            object::Aircraft ac1(1);
             aprsParser.unpack(
                 "FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot",
                 ac1);
-            data.update(std::move(ac1), slot);
+            assert(data.update(std::move(ac2), slot), true, helper::equalsBool);
+            assert(data.update(std::move(ac1), slot), false, helper::equalsBool);
             data.processAircrafts(pos, press);
             std::string proc = data.getSerialized();
-            bool matched     = boost::regex_search(proc, match, helper::pflauRe);
-            assert(matched, true, helper::equalsBool);
+            assert(boost::regex_search(proc, match, helper::pflauRe), true,
+                   helper::equalsBool);
             assert(match.str(2), std::string("610"), helper::equalsStr);
-            aprsParser.unpack(
-                "FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot",
-                ac1);
-            data.update(std::move(ac1), slot);
+
+            assert(data.update(std::move(ac1), slot), true, helper::equalsBool);
             data.processAircrafts(pos, press);
-            proc    = data.getSerialized();
-            matched = boost::regex_search(proc, match, helper::pflauRe);
-            assert(matched, true, helper::equalsBool);
+            proc = data.getSerialized();
+            assert(boost::regex_search(proc, match, helper::pflauRe), true,
+                   helper::equalsBool);
             assert(match.str(2), std::string("305"), helper::equalsStr);
         });
 
