@@ -54,7 +54,7 @@ bool SensorParser::unpack(const std::string& crStr, object::Climate& rClimate) n
 
 bool SensorParser::parseClimate(const std::string& crStr, object::Climate& rClimate)
 {
-    bool valid = true;
+    bool valid = false;
     if(crStr.find("MDA") != std::string::npos)
     {
         std::size_t tmpB   = crStr.find('B') - 1;
@@ -68,7 +68,7 @@ bool SensorParser::parseClimate(const std::string& crStr, object::Climate& rClim
             rClimate.atmosphere.setPressure(tmpPress);
         }
     }
-    else if(crStr.find("MWV") != std::string::npos)
+    else if((valid = (crStr.find("MWV") != std::string::npos)))
     {
         rClimate.wind.setSerialized(crStr + "\n");
     }

@@ -177,14 +177,13 @@ void test_feed_parser(TestSuitesRunner& runner)
                []() {
                    SensorParser sensorParser;
                    object::Climate info;
-                   std::string mda(
-                       "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
-                   std::string mwv("$WIMWV,242.8,R,6.9,N,A*20");
+                   std::string mda("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r");
+                   std::string mwv("$WIMWV,242.8,R,6.9,N,A*20\r");
                    assert(sensorParser.unpack(mda, info), true, helper::equalsBool);
                    assert(sensorParser.unpack(mwv, info), true, helper::equalsBool);
                    assert(info.atmosphere.getPressure(), 1009.1, helper::equalsD);
-                   assert(info.atmosphere.getSerialized(), mda, helper::equalsStr);
-                   assert(info.wind.getSerialized(), mwv, helper::equalsStr);
+                   assert(info.atmosphere.getSerialized(), mda + "\n", helper::equalsStr);
+                   assert(info.wind.getSerialized(), mwv + "\n", helper::equalsStr);
                })
         ->test("invalid msg", []() {
             SensorParser sensorParser;
