@@ -215,21 +215,21 @@ void test_data(TestSuitesRunner& runner)
                           helper::equalsStr);
                    assert(data.getSerialized(), std::string(""), helper::equalsStr);
                })
-        ->test(
-            "write higher priority",
-            []() {
-                WindData data;
-                object::Wind wind0(0);
-                object::Wind wind1(1);
-                std::size_t slot = data.registerSlot();
-                wind0.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
-                wind1.setSerialized("updated");
-                data.update(std::move(wind0), slot);
-                data.update(std::move(wind1), slot);
-                assert(data.getSerialized(), std::string("updated"), helper::equalsStr);
-                data.update(std::move(wind0), slot);
-                assert(data.getSerialized(), std::string("updated"), helper::equalsStr);
-            })
+        ->test("write higher priority",
+               []() {
+                   WindData data;
+                   object::Wind wind0(0);
+                   object::Wind wind1(1);
+                   std::size_t slot = data.registerSlot();
+                   wind0.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
+                   wind1.setSerialized("updated");
+                   assert(data.update(std::move(wind0), slot), true, helper::equalsBool);
+                   assert(data.update(std::move(wind1), slot), true, helper::equalsBool);
+                   assert(data.getSerialized(), std::string("updated"),
+                          helper::equalsStr);
+                   wind0.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
+                   assert(data.update(std::move(wind0), slot), false, helper::equalsBool);
+               })
         ->test("write after attempt", []() {
             WindData data;
             object::Wind wind1(1);
