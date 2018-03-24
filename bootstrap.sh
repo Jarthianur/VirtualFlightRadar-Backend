@@ -268,9 +268,11 @@ function build_test() {
     export VFRB_OPT="0"
     trap "fail -e popd Build has failed!" ERR
     pushd "$VFRB_ROOT/test/build/"
+    make clean
     make all -j2
     popd
     pushd "$VFRB_ROOT/target/"
+    make clean
     make all -j2
     popd
     trap - ERR
