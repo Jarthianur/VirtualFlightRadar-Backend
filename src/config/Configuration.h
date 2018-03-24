@@ -27,7 +27,7 @@
 #include <utility>
 
 #include "../Defines.h"
-#include "../object/Position.h"
+#include "../object/GpsPosition.h"
 #include "PropertyMap.h"
 #include "Util.hpp"
 

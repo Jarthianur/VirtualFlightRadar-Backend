@@ -7,19 +7,22 @@ CPP_SRCS += \
 ../src/data/GpsData.cpp \
 ../src/data/WindData.cpp \
 ../src/data/AtmosphereData.cpp \
-../src/data/AircraftData.cpp
+../src/data/AircraftData.cpp \
+../src/data/Data.cpp
 
 OBJS += \
 ./src/data/GpsData.o \
 ./src/data/WindData.o \
 ./src/data/AtmosphereData.o \
-./src/data/AircraftData.o
+./src/data/AircraftData.o \
+./src/data/Data.o
 
 CPP_DEPS += \
 ./src/data/GpsData.d \
 ./src/data/WindData.d \
 ./src/data/AtmosphereData.d \
-./src/data/AircraftData.d
+./src/data/AircraftData.d \
+./src/data/Data.d
 
 
 # Each subdirectory must supply rules for building sources it contributes

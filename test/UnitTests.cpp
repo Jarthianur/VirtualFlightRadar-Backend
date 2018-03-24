@@ -19,10 +19,8 @@
  }
  */
 
-#include <cstdint>
-
-#include "../src/config/Configuration.h"
 #include "framework/src/framework.h"
+#include "Helper.hpp"
 
 using namespace testsuite;
 
@@ -30,25 +28,24 @@ using namespace testsuite;
 #undef assert
 #endif
 
-extern void test_util(TestSuitesRunner&);
-extern void test_config(TestSuitesRunner&);
-extern void test_data(TestSuitesRunner&);
-extern void test_aircraft(TestSuitesRunner&);
-extern void test_parser(TestSuitesRunner&);
+TEST_FUNCTION(test_config)
+TEST_FUNCTION(test_data)
+TEST_FUNCTION(test_data_processor)
+TEST_FUNCTION(test_feed_parser)
+TEST_FUNCTION(test_object)
+TEST_FUNCTION(test_math)
 
-int main(int argc, char *argv[])
+int main(int, char**)
 {
     auto rep = reporter::createXmlReporter();
     TestSuitesRunner runner;
 
-    config::Configuration::mMaxHeight = INT32_MAX;
-    config::Configuration::mMaxDistance = INT32_MAX;
-
-    test_util(runner);
     test_config(runner);
-    test_aircraft(runner);
     test_data(runner);
-    test_parser(runner);
+    test_data_processor(runner);
+    test_feed_parser(runner);
+    test_object(runner);
+    test_math(runner);
 
     return rep->report(runner);
 }

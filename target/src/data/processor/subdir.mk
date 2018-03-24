@@ -4,26 +4,23 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../../src/aircraft/Aircraft.cpp \
-../../src/aircraft/AircraftContainer.cpp \
-../../src/aircraft/AircraftProcessor.cpp 
+../src/data/processor/GpsProcessor.cpp \
+../src/data/processor/AircraftProcessor.cpp
 
 OBJS += \
-./src/aircraft/Aircraft.o \
-./src/aircraft/AircraftContainer.o \
-./src/aircraft/AircraftProcessor.o 
+./src/data/processor/GpsProcessor.o \
+./src/data/processor/AircraftProcessor.o
 
 CPP_DEPS += \
-./src/aircraft/Aircraft.d \
-./src/aircraft/AircraftContainer.d \
-./src/aircraft/AircraftProcessor.d 
+./src/data/processor/GpsProcessor.d \
+./src/data/processor/AircraftProcessor.d
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/aircraft/%.o: ../../src/aircraft/%.cpp
+src/data/processor/%.o: ../src/data/processor/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -std=c++0x -O0 -g3 -Wall -c -fmessage-length=0 -fprofile-arcs -ftest-coverage -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	$(CXX) -std=c++0x $(BOOST_I) -O$(OPT_LVL) $(DBG) -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

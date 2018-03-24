@@ -25,7 +25,7 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../object/Position.h"
+#include "../../object/GpsPosition.h"
 
 /// @def SBS_FIELD_ID
 /// Field number of aircraft id
@@ -84,42 +84,37 @@ bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     rAircraft.setTargetType(Aircraft::TargetType::TRANSPONDER);
     rAircraft.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
     rAircraft.setIdType(Aircraft::IdType::ICAO);
-    return i == 15 && pos.altitude <= mMaxHeight;
+    return i == 16 && pos.altitude <= mMaxHeight;
 }
 
 bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
                            Position& rPosition, Aircraft& rAircraft) noexcept
 {
-    bool valid = !crStr.empty();
-    if(valid)
+    try
     {
-        try
+        switch(vField)
         {
-            switch(vField)
-            {
-                case SBS_FIELD_ID:
-                    rAircraft.setId(crStr);
-                    break;
-                case SBS_FIELD_ALT:
-                    rPosition.altitude
-                        = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
-                    break;
-                case SBS_FIELD_LAT:
-                    rPosition.latitude = std::stod(crStr);
-                    break;
-                case SBS_FIELD_LON:
-                    rPosition.longitude = std::stod(crStr);
-                    break;
-                default:
-                    break;
-            }
-        }
-        catch(const std::logic_error&)
-        {
-            valid = false;
+            case SBS_FIELD_ID:
+                rAircraft.setId(crStr);
+                break;
+            case SBS_FIELD_ALT:
+                rPosition.altitude = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
+                break;
+            case SBS_FIELD_LAT:
+                rPosition.latitude = std::stod(crStr);
+                break;
+            case SBS_FIELD_LON:
+                rPosition.longitude = std::stod(crStr);
+                break;
+            default:
+                break;
         }
     }
-    return valid;
+    catch(const std::logic_error&)
+    {
+        return false;
+    }
+    return true;
 }
 }  // namespace parser
 }  // namespace feed

@@ -24,7 +24,7 @@
 #include <string>
 #include <boost/regex.hpp>
 
-#include "../../object/Position.h"
+#include "../../object/GpsPosition.h"
 #include "Parser.hpp"
 
 /// @namespace feed

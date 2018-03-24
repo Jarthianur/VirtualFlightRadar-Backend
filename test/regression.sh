@@ -12,7 +12,7 @@ function serve {
     sleep 1
     count=$[count+1]
     cat $1
-    done | nc -C -l $2 > $3 &
+    done | nc -C -nlvp $2 > $3 &
 }
 
 case "$1" in

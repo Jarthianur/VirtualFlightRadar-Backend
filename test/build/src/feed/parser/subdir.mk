@@ -4,32 +4,26 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../../src/feed/AprscFeed.cpp \
-../../src/feed/Feed.cpp \
-../../src/feed/GpsFeed.cpp \
-../../src/feed/SbsFeed.cpp \
-../../src/feed/SensorFeed.cpp \
-../../src/feed/FeedFactory.cpp
+../../src/feed/parser/AprsParser.cpp \
+../../src/feed/parser/GpsParser.cpp \
+../../src/feed/parser/SbsParser.cpp \
+../../src/feed/parser/SensorParser.cpp 
 
 OBJS += \
-./src/feed/AprscFeed.o \
-./src/feed/Feed.o \
-./src/feed/GpsFeed.o \
-./src/feed/SbsFeed.o \
-./src/feed/SensorFeed.o \
-./src/feed/FeedFactory.o
+./src/feed/parser/AprsParser.o \
+./src/feed/parser/GpsParser.o \
+./src/feed/parser/SbsParser.o \
+./src/feed/parser/SensorParser.o 
 
 CPP_DEPS += \
-./src/feed/AprscFeed.d \
-./src/feed/Feed.d \
-./src/feed/GpsFeed.d \
-./src/feed/SbsFeed.d \
-./src/feed/SensorFeed.d \
-./src/feed/FeedFactory.d 
+./src/feed/parser/AprsParser.d \
+./src/feed/parser/GpsParser.d \
+./src/feed/parser/SbsParser.d \
+./src/feed/parser/SensorParser.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/feed/%.o: ../../src/feed/%.cpp
+src/feed/parser/%.o: ../../src/feed/parser/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	$(CXX) -std=c++0x $(BOOST_I) -O0 -g3 -Wall -c -fmessage-length=0 -fprofile-arcs -ftest-coverage -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"

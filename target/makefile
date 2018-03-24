@@ -14,14 +14,14 @@ BOOST_I := ${BOOST_ROOT_I}
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/util/subdir.mk
--include src/network/server/subdir.mk
--include src/network/client/subdir.mk
--include src/parser/subdir.mk
+-include src/server/subdir.mk
+-include src/object/subdir.mk
+-include src/feed/parser/subdir.mk
+-include src/feed/client/subdir.mk
 -include src/feed/subdir.mk
+-include src/data/processor/subdir.mk
 -include src/data/subdir.mk
 -include src/config/subdir.mk
--include src/aircraft/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk

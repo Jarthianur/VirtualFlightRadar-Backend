@@ -24,14 +24,13 @@ C_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 src \
-src/aircraft \
 src/config \
 src/data \
+src/data/processor \
 src/feed \
-src/parser \
-src/network/client \
-src/network/server \
-src/util \
+src/feed/client \
+src/feed/parser \
+src/object \
+src/server \
 test \
-test/units \
-
+test/units

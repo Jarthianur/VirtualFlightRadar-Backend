@@ -37,7 +37,7 @@
 #include "feed/Feed.h"
 #include "feed/FeedFactory.h"
 #include "object/Atmosphere.h"
-#include "object/Position.h"
+#include "object/GpsPosition.h"
 #include "Logger.hpp"
 
 using namespace data;
@@ -48,7 +48,8 @@ std::atomic<bool> VFRB::vRunStatus(true);
 
 VFRB::VFRB(const config::Configuration& config)
     : mpAircraftData(new AircraftData(config.getMaxDistance())),
-      mpAtmosphereData(new AtmosphereData(object::Atmosphere(config.getAtmPressure()))),
+      mpAtmosphereData(
+          new AtmosphereData(object::Atmosphere(config.getAtmPressure(), 0))),
       mpGpsData(new GpsData(config.getPosition(), config.getGroundMode())),
       mpWindData(new WindData()),
       mServer(config.getServerPort())
@@ -140,7 +141,7 @@ void VFRB::serve()
     {
         try
         {
-            mpAircraftData->processAircrafts(mpGpsData->getGpsPosition(),
+            mpAircraftData->processAircrafts(mpGpsData->getPosition(),
                                              mpAtmosphereData->getAtmPressure());
             mServer.send(mpAircraftData->getSerialized());
             mServer.send(mpGpsData->getSerialized());
