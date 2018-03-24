@@ -315,6 +315,7 @@ function run_unit_test() {
     trap - ERR
 }
 
+# working
 function run_regression() {
     set -eE
     log -i RUN REGRESSION TESTS
