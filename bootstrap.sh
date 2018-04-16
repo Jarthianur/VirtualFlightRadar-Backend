@@ -233,7 +233,7 @@ function install_test_deps() {
     require PKG_MANAGER
     case $PKG_MANAGER in
     *apt-get)
-        local TOOLS='cppcheck clang-format-5.0 wget netcat procps'
+        local TOOLS='cppcheck clang-format-5.0 wget netcat procps perl'
     ;;
     *)
         log -w Tests currently only run under ubuntu/debian systems.
