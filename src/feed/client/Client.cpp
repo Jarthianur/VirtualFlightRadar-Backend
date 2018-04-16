@@ -104,6 +104,7 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
     {
         std::istream is(&mBuffer);
         std::getline(is, mResponse);
+        mResponse.append("\n");
         mrFeed.process(mResponse);
         read();
     }
