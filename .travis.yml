@@ -17,6 +17,7 @@ install:
 before_script:
     - docker run -e "WORKSPACE=$TRAVIS_BUILD_DIR" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:sid bash
     - docker ps -a
+    - ifconfig
 
 script:
     - docker exec -it vfrb mkdir -p $TRAVIS_BUILD_DIR
@@ -24,9 +25,9 @@ script:
     - docker exec -it vfrb $TRAVIS_BUILD_DIR/run.sh build test -y
     - docker exec -it vfrb cp -r $TRAVIS_BUILD_DIR/reports /travis/
     - docker exec -it vfrb chown $(id -u):$(id -g) -R /travis/reports
+    - docker stop vfrb
 
 after_success:
-    - docker stop vfrb
     - coveralls-lcov --repo-token ${COVERALLS_TOKEN} reports/cov.info
 
 notifications:
