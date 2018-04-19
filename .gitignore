@@ -13,6 +13,7 @@
 !/docs/assets/**
 !/.ide/**
 !LICENSE
+!CODEOWNERS
 !.gitattributes
 !.gitignore
 !.gitmodules
