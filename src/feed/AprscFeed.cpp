@@ -30,6 +30,8 @@
 #include "../object/Aircraft.h"
 #include "client/AprscClient.h"
 
+#define COMPONENT "(AprscFeed)"
+
 namespace feed
 {
 AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
@@ -39,7 +41,7 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
     auto it = mKvMap.find(KV_KEY_LOGIN);
     if(it == mKvMap.end())
     {
-        Logger::warn("(AprscFeed) could not find: ", mName, "." KV_KEY_LOGIN);
+        Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
     mpClient = std::unique_ptr<client::Client>(

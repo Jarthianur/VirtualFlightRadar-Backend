@@ -19,14 +19,14 @@
 
 namespace object
 {
-GpsPosition::GpsPosition() : Object(0)
+GpsPosition::GpsPosition() : Object()
 {}
 
 GpsPosition::GpsPosition(std::uint32_t vPriority) : Object(vPriority)
 {}
 
 GpsPosition::GpsPosition(const Position& crPosition, double vGeoid)
-    : Object(0), mPosition(crPosition), mGeoid(vGeoid)
+    : Object(), mPosition(crPosition), mGeoid(vGeoid)
 {}
 
 GpsPosition::~GpsPosition() noexcept

@@ -30,20 +30,16 @@
 
 #include "Client.h"
 
-namespace feed
-{
-class Feed;
-} /* namespace feed */
-
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
 #else
 #define WC_RCV_TIMEOUT 5
 #endif
 
-//// @namespace feed
+/// @namespace feed
 namespace feed
 {
+class Feed;
 /// @namespace client
 namespace client
 {

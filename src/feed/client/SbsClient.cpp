@@ -25,13 +25,15 @@
 
 #include "../../Logger.hpp"
 
+#define COMPONENT "(SbsClient)"
+
 namespace feed
 {
 namespace client
 {
 SbsClient::SbsClient(const std::string& crHost, const std::string& crPort,
                      feed::Feed& rFeed)
-    : Client(crHost, crPort, "(SbsClient)", rFeed)
+    : Client(crHost, crPort, COMPONENT, rFeed)
 {
     connect();
 }
@@ -61,7 +63,7 @@ void SbsClient::handleResolve(
     }
     else
     {
-        Logger::error("(SbsClient) resolve host: ", crError.message());
+        Logger::error(COMPONENT " resolve host: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -76,12 +78,12 @@ void SbsClient::handleConnect(const boost::system::error_code& crError,
     if(!crError)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(SbsClient) connected to: ", mHost, ":", mPort);
+        Logger::info(COMPONENT " connected to: ", mHost, ":", mPort);
         read();
     }
     else
     {
-        Logger::error("(SbsClient) connect: ", crError.message());
+        Logger::error(COMPONENT " connect: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();

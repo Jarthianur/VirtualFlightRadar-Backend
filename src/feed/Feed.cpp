@@ -32,6 +32,8 @@
 #include "../config/Configuration.h"
 #include "client/Client.h"
 
+#define COMPONENT "(Feed)"
+
 namespace feed
 {
 Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap)
@@ -40,12 +42,12 @@ Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap)
     initPriority();
     if(mKvMap.find(KV_KEY_HOST) == mKvMap.end())
     {
-        Logger::warn("(Feed) could not find: ", mName, "." KV_KEY_HOST);
+        Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
     if(mKvMap.find(KV_KEY_PORT) == mKvMap.end())
     {
-        Logger::warn("(Feed) could not find: ", mName, "." KV_KEY_PORT);
+        Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
 }
@@ -63,25 +65,21 @@ void Feed::run(boost::asio::signal_set& rSigset) noexcept
 
 void Feed::initPriority() noexcept
 {
-    std::uint64_t priority = 0;
     try
     {
-        priority = std::stoul(mKvMap.at(KV_KEY_PRIORITY));
-        if(priority > std::numeric_limits<std::uint32_t>::max())
-        {
-            priority = std::numeric_limits<std::uint32_t>::max();
-        }
+        mPriority = static_cast<std::uint32_t>(std::max<std::uint64_t>(
+            0, std::min<std::uint64_t>(std::stoul(mKvMap.at(KV_KEY_PRIORITY)),
+                                       std::numeric_limits<std::uint32_t>::max())));
     }
     catch(const std::logic_error&)
     {
-        Logger::warn("(Config) create feed ", mName, ": Invalid priority given.");
+        Logger::warn(COMPONENT " create ", mName, ": Invalid priority given.");
     }
-    if(priority == 0)
+    if(mPriority == 0)
     {
-        Logger::warn("(Config) create feed ", mName,
+        Logger::warn(COMPONENT " create ", mName,
                      ": Priority is 0; this feed cannot update higher ones.");
     }
-    mPriority = static_cast<std::uint32_t>(priority);
 }
 
 }  // namespace feed

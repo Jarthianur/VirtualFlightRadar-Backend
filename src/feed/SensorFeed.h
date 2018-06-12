@@ -36,7 +36,7 @@ namespace data
 {
 class AtmosphereData;
 class WindData;
-} /* namespace data */
+}  // namespace data
 
 /// @namespace feed
 namespace feed

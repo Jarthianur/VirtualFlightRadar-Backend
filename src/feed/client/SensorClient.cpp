@@ -27,15 +27,15 @@
 
 #include "../../Logger.hpp"
 
+#define COMPONENT "(SensorClient)"
+
 namespace feed
 {
 namespace client
 {
 SensorClient::SensorClient(const std::string& crHost, const std::string& crPort,
                            feed::Feed& rFeed)
-    : Client(crHost, crPort, "(SensorClient)", rFeed),
-      mStopped(false),
-      mTimeout(mIoService)
+    : Client(crHost, crPort, COMPONENT, rFeed), mStopped(false), mTimeout(mIoService)
 {
     connect();
     mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
@@ -67,7 +67,7 @@ void SensorClient::checkDeadline()
     }
     if(mTimeout.expires_at() <= boost::asio::deadline_timer::traits_type::now())
     {
-        Logger::warn("(WindClient) timed out: reconnect...");
+        Logger::warn(COMPONENT " timed out: reconnect...");
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -99,7 +99,7 @@ void SensorClient::handleResolve(
     }
     else
     {
-        Logger::error("(SensorClient) resolve host: ", crError.message());
+        Logger::error(COMPONENT " resolve host: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -114,12 +114,12 @@ void SensorClient::handleConnect(const boost::system::error_code& crError,
     if(!crError)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info("(SensorClient) connected to: ", mHost, ":", mPort);
+        Logger::info(COMPONENT " connected to: ", mHost, ":", mPort);
         read();
     }
     else
     {
-        Logger::error("(SensorClient) connect: ", crError.message());
+        Logger::error(COMPONENT " connect: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();

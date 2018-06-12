@@ -39,7 +39,7 @@ namespace client
 {
 #ifdef CLIENT_CONNECT_WAIT_TIMEVAL
 /// @def C_CON_WAIT_TIMEVAL
-/// /// Wait for (re-)connect timeout
+/// Wait for (re-)connect timeout
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
 #else
 #define C_CON_WAIT_TIMEVAL 120

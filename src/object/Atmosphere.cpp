@@ -19,7 +19,7 @@
 
 namespace object
 {
-Atmosphere::Atmosphere() : Atmosphere(0)
+Atmosphere::Atmosphere() : Object()
 {}
 
 Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)

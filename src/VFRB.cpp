@@ -71,7 +71,7 @@ void VFRB::run() noexcept
     boost::thread signal_thread([&io_service]() { io_service.run(); });
 
     boost::thread server_thread([this, &signal_set]() {
-        Logger::info("(Server) start server.");
+        Logger::info("(Server) start server");
         mServer.run(signal_set);
         vRunStatus = false;
     });

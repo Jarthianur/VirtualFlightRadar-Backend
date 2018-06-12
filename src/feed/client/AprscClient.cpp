@@ -26,13 +26,15 @@
 
 #include "../../Logger.hpp"
 
+#define COMPONENT "(AprscClient)"
+
 namespace feed
 {
 namespace client
 {
 AprscClient::AprscClient(const std::string& crHost, const std::string& crPort,
                          const std::string& crLogin, feed::Feed& rFeed)
-    : Client(crHost, crPort, "(AprscClient)", rFeed),
+    : Client(crHost, crPort, COMPONENT, rFeed),
       mLoginStr(crLogin),
       mStopped(false),
       mTimeout(mIoService, boost::posix_time::minutes(10))
@@ -74,7 +76,7 @@ void AprscClient::handleResolve(
     }
     else
     {
-        Logger::error("(AprscClient) resolve host: ", crError.message());
+        Logger::error(COMPONENT " resolve host: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -97,7 +99,7 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
     }
     else
     {
-        Logger::error("(AprscClient) connect: ", crError.message());
+        Logger::error(COMPONENT " connect: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -125,12 +127,12 @@ void AprscClient::handleLogin(const boost::system::error_code& crError,
 {
     if(!crError)
     {
-        Logger::info("(AprscClient) connected to: ", mHost, ":", mPort);
+        Logger::info(COMPONENT " connected to: ", mHost, ":", mPort);
         read();
     }
     else
     {
-        Logger::error("(AprscClient) send login: ", crError.message());
+        Logger::error(COMPONENT " send login: ", crError.message());
     }
 }
 
@@ -139,7 +141,7 @@ void AprscClient::handleSendKeepAlive(const boost::system::error_code& crError,
 {
     if(crError)
     {
-        Logger::error("(AprscClient) send beacon:", crError.message());
+        Logger::error(COMPONENT " send beacon:", crError.message());
     }
 }
 

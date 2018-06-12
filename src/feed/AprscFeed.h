@@ -36,7 +36,7 @@
 namespace data
 {
 class AircraftData;
-} /* namespace data */
+}  // namespace data
 
 /// @namespace feed
 namespace feed

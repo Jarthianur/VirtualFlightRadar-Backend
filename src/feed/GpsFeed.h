@@ -34,7 +34,7 @@
 namespace data
 {
 class GpsData;
-} /* namespace data */
+}  // namespace data
 
 /// @namespace feed
 namespace feed

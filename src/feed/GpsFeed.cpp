@@ -30,6 +30,8 @@
 #include "../object/GpsPosition.h"
 #include "client/GpsdClient.h"
 
+#define COMPONENT "(GpsFeed)"
+
 namespace feed
 {
 GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
@@ -58,7 +60,7 @@ void GpsFeed::process(const std::string& crResponse) noexcept
         }
         catch(const std::runtime_error& e)
         {
-            Logger::info("(GpsFeed) ", mName, ": ", e.what());
+            Logger::info(COMPONENT " ", mName, ": ", e.what());
             mpClient->stop();
             return;
         }

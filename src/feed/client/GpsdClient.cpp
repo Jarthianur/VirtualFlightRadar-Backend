@@ -25,13 +25,15 @@
 
 #include "../../Logger.hpp"
 
+#define COMPONENT "(GpsdClient)"
+
 namespace feed
 {
 namespace client
 {
 GpsdClient::GpsdClient(const std::string& crHost, const std::string& crPort,
                        feed::Feed& rFeed)
-    : Client(crHost, crPort, "(GpsdClient)", rFeed)
+    : Client(crHost, crPort, COMPONENT, rFeed)
 {
     connect();
 }
@@ -61,7 +63,7 @@ void GpsdClient::handleResolve(
     }
     else
     {
-        Logger::error("(GpsdClient) resolve host: ", crError.message());
+        Logger::error(COMPONENT " resolve host: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -83,7 +85,7 @@ void GpsdClient::handleConnect(const boost::system::error_code& crError,
     }
     else
     {
-        Logger::error("(GpsdClient) connect: ", crError.message());
+        Logger::error(COMPONENT " connect: ", crError.message());
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -101,11 +103,11 @@ void GpsdClient::stop()
             [this](const boost::system::error_code& crError, std::size_t) {
                 if(!crError)
                 {
-                    Logger::info("(GpsdClient) stopped watch");
+                    Logger::info(COMPONENT " stopped watch");
                 }
                 else
                 {
-                    Logger::error("(GpsdClient) send un-watch request: ",
+                    Logger::error(COMPONENT " send un-watch request: ",
                                   crError.message());
                 }
             });
@@ -118,12 +120,12 @@ void GpsdClient::handleWatch(const boost::system::error_code& crError,
 {
     if(!crError)
     {
-        Logger::info("(GpsdClient) connected to: ", mHost, ":", mPort);
+        Logger::info(COMPONENT " connected to: ", mHost, ":", mPort);
         read();
     }
     else
     {
-        Logger::error("(GpsdClient) send watch request: ", crError.message());
+        Logger::error(COMPONENT " send watch request: ", crError.message());
     }
 }
 
