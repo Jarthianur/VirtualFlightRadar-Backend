@@ -65,12 +65,15 @@ TimeStamp::TimeStamp(const std::string& crValue, Format vFormat)
     mValue = static_cast<std::uint32_t>(h * 3600000 + m * 60000 + s * 1000 + f);
 }
 
+TimeStamp::TimeStamp(const TimeStamp& crOther) : mValue(crOther.mValue)
+{}
+
 TimeStamp::~TimeStamp() noexcept
 {}
 
-TimeStamp& TimeStamp::operator=(const TimeStamp& rOther)
+TimeStamp& TimeStamp::operator=(const TimeStamp& crOther)
 {
-    this->mValue = rOther.mValue;
+    this->mValue = crOther.mValue;
     return *this;
 }
 

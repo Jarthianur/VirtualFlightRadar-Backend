@@ -62,12 +62,22 @@ public:
     TimeStamp(const std::string& crValue, Format vFormat);
 
     /**
+     * @fn TimeStamp
+     * @brief Constructor
+     *
+     * Copy constructor
+     *
+     * @param crOther The other TimeStamp
+     */
+    TimeStamp(const TimeStamp& crOther);
+
+    /**
      * @fn operator =
      * @brief Assign other TimeStamps value.
-     * @param rOther The other TimeStamp
+     * @param crOther The other TimeStamp
      * @return this
      */
-    TimeStamp& operator=(const TimeStamp& rOther);
+    TimeStamp& operator=(const TimeStamp& crOther);
 
     /**
      * @fn operator <
