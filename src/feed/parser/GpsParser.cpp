@@ -25,48 +25,52 @@
 
 #include "../../Math.hpp"
 
+/// @def RE_GGA_TIME
+/// GGA regex match capture group of time
+#define RE_GGA_TIME 1
+
 /// @def RE_GGA_LAT
 /// GGA regex match capture group of latitude
-#define RE_GGA_LAT 1
+#define RE_GGA_LAT 2
 
 /// @def RE_GGA_LAT_DIR
 /// GGA regex match capture group of latitude orientation
-#define RE_GGA_LAT_DIR 2
+#define RE_GGA_LAT_DIR 3
 
 /// @def RE_GGA_LON
 /// GGA regex match capture group of longitude
-#define RE_GGA_LON 3
+#define RE_GGA_LON 4
 
 /// @def RE_GGA_LON_DIR
 /// GGA regex match capture group of longitude orientation
-#define RE_GGA_LON_DIR 4
+#define RE_GGA_LON_DIR 5
 
 /// @def RE_GGA_FIX
 /// GGA regex match capture group of fix quality
-#define RE_GGA_FIX 5
+#define RE_GGA_FIX 6
 
 /// @def RE_GGA_SAT
 /// GGA regex match capture group of sitallite count
-#define RE_GGA_SAT 6
+#define RE_GGA_SAT 7
 
 /// @def RE_GGA_DIL
 /// GGA regex match capture group of dilution
-#define RE_GGA_DIL 7
+#define RE_GGA_DIL 8
 
 /// @def RE_GGA_ALT
 /// GGA regex match capture group of altitude
-#define RE_GGA_ALT 8
+#define RE_GGA_ALT 9
 
 /// @def RE_GGA_GEOID
 /// GGA regex match capture group of geoid separation
-#define RE_GGA_GEOID 9
+#define RE_GGA_GEOID 10
 
 namespace feed
 {
 namespace parser
 {
 const boost::regex GpsParser::msGpggaRe(
-    "^\\$[A-Z]{2}GGA,\\d{6},(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
+    "^\\$[A-Z]{2}GGA,(\\d{6}),(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
     boost::regex::optimize | boost::regex::icase);
 
 GpsParser::GpsParser() : Parser()
@@ -109,11 +113,14 @@ bool GpsParser::parsePosition(const boost::smatch& crMatch,
     }
     pos.altitude = math::doubleToInt(std::stod(crMatch.str(RE_GGA_ALT)));
     rPosition.setPosition(pos);
+    rPosition.setTimeStamp(
+        object::TimeStamp(crMatch.str(RE_GGA_TIME), object::TimeStamp::Format::HHMMSS));
     rPosition.setFixQuality(std::stoi(crMatch.str(RE_GGA_FIX)));
     rPosition.setNrOfSatellites(std::stoi(crMatch.str(RE_GGA_SAT)));
     rPosition.setDilution(std::stod(crMatch.str(RE_GGA_DIL)));
     rPosition.setGeoid(std::stod(crMatch.str(RE_GGA_GEOID)));
     return true;
 }
+
 }  // namespace parser
 }  // namespace feed

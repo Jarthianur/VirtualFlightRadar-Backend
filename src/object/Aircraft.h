@@ -27,6 +27,7 @@
 #include "../Defines.h"
 #include "GpsPosition.h"
 #include "Object.h"
+#include "TimeStamp.h"
 
 /// @def A_VALUE_NA
 /// Indicate a double value is not available.
@@ -130,6 +131,7 @@ public:
     GETTER_R(std::uint32_t, mUpdateAge, UpdateAge)
     GETSET_CR(Position, mPosition, Position)
     GETSET_CR(Movement, mMovement, Movement)
+    GETSET_V(TimeStamp, mTimeStamp, TimeStamp)
 
     /**
      * @fn setAircraftType
@@ -192,6 +194,10 @@ private:
     /// @var mMovement
     /// Currently known movement.
     Movement mMovement;
+
+    /// @var mTimeStamp
+    /// The timestamp of the last report.
+    TimeStamp mTimeStamp;
 
     /// @var mFullInfo
     /// Is full set of information available?

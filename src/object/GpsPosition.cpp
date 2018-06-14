@@ -37,6 +37,7 @@ void GpsPosition::assign(Object&& rvOther)
     Object::assign(std::move(rvOther));
     GpsPosition&& rvUpdate = static_cast<GpsPosition&&>(rvOther);
     this->mPosition        = rvUpdate.mPosition;
+    this->mTimeStamp       = rvUpdate.mTimeStamp;
     this->mNrOfSatellites  = rvUpdate.mNrOfSatellites;
     this->mFixQuality      = rvUpdate.mFixQuality;
     this->mGeoid           = rvUpdate.mGeoid;

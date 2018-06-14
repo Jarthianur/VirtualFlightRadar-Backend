@@ -84,7 +84,7 @@ private:
     bool parseComment(const boost::smatch& crMatch, object::Aircraft& rAircraft) noexcept;
 
     /**
-     * @fn parse
+     * @fn parseMovement
      * @brief Parse the Movement information.
      * @param crMatch     The regex match
      * @param crCommMatch The comment regex match
@@ -94,6 +94,17 @@ private:
     // cppcheck-suppress unusedPrivateFunction
     bool parseMovement(const boost::smatch& crMatch, const boost::smatch& crCommMatch,
                        object::Aircraft& rAircraft) noexcept;
+
+    /**
+     * @fn parseTimeStamp
+     * @brief Parse the TimeStamp information.
+     * @param crMatch     The regex match
+     * @param rAircraft   The target Aircraft
+     * @return true on success, else false
+     */
+    // cppcheck-suppress unusedPrivateFunction
+    bool parseTimeStamp(const boost::smatch& crMatch,
+                        object::Aircraft& rAircraft) noexcept;
 
     /// @var msAprsRe
     /// Regular expression for APRS protocol
