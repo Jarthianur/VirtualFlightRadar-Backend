@@ -6,8 +6,8 @@ export BOOST_ROOT=${BOOST_ROOT:-}
 export VFRB_VERSION=$(cat "$VFRB_ROOT/version.txt")
 export VFRB_COMPILER=${VFRB_COMPILER:-g++}
 export VFRB_TARGET="vfrb-$VFRB_VERSION"
-VFRB_EXEC_PATH=${VFRB_EXEC_PATH:-"$VFRB_ROOT/target/$VFRB_TARGET"}
-VFRB_INI_PATH=${VFRB_INI_PATH:-"$VFRB_ROOT/target/vfrb.ini"}
+VFRB_EXEC_PATH=${VFRB_EXEC_PATH:-"$VFRB_ROOT/build/$VFRB_TARGET"}
+VFRB_INI_PATH=${VFRB_INI_PATH:-"$VFRB_ROOT/build/vfrb.ini"}
 
 source "$VFRB_ROOT/bootstrap.sh"
 

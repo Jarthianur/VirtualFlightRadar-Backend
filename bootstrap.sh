@@ -175,7 +175,7 @@ function build() {
     export VFRB_OPT=${VFRB_OPT:-"3"}
     export VFRB_DEBUG=""
     trap "fail -e popd Build has failed!" ERR
-    pushd "$VFRB_ROOT/target/"
+    pushd "$VFRB_ROOT/build/"
     make clean 
     make all -j2
     popd
@@ -210,8 +210,8 @@ function install() {
     log -i INSTALL VFRB
     trap "fail Failed to install VFRB!" ERR
     require VFRB_TARGET VFRB_ROOT VFRB_EXEC_PATH VFRB_INI_PATH VFRB_VERSION REPLACE_INI
-    if [ -x "$VFRB_ROOT/target/$VFRB_TARGET" ]; then
-        mv "$VFRB_ROOT/target/$VFRB_TARGET" "$VFRB_EXEC_PATH"
+    if [ -x "$VFRB_ROOT/build/$VFRB_TARGET" ]; then
+        mv "$VFRB_ROOT/build/$VFRB_TARGET" "$VFRB_EXEC_PATH"
         log -i "$VFRB_EXEC_PATH" created.
     else
         log -e "$VFRB_TARGET" does not exist!
@@ -272,7 +272,7 @@ function build_test() {
     make clean
     make all -j2
     popd
-    pushd "$VFRB_ROOT/target/"
+    pushd "$VFRB_ROOT/build/"
     make clean
     make all -j2
     popd
@@ -309,7 +309,7 @@ function run_unit_test() {
     trap "fail -e popd Unit tests failed!" ERR
     pushd $VFRB_ROOT
     lcov --initial --directory test/build --capture --output-file reports/test_base.info
-    lcov --initial --directory target --capture --output-file reports/vfrb_base.info
+    lcov --initial --directory build --capture --output-file reports/vfrb_base.info
     ! test/build/VFR-Test &> reports/unittests.xml
     local error=$(ifelse "$? -eq 1" '0' '1')
     cat reports/unittests.xml
@@ -324,15 +324,15 @@ function run_regression() {
     log -i RUN REGRESSION TESTS
     require VFRB_ROOT
     VFRB_UUT="vfrb-$(cat $VFRB_ROOT/version.txt)"
-    if ! $VFRB_ROOT/target/$VFRB_UUT; then $(exit 0); fi
-    if ! $VFRB_ROOT/target/$VFRB_UUT -g -c bla.txt; then $(exit 0); fi
+    if ! $VFRB_ROOT/build/$VFRB_UUT; then $(exit 0); fi
+    if ! $VFRB_ROOT/build/$VFRB_UUT -g -c bla.txt; then $(exit 0); fi
     trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
     pushd $VFRB_ROOT/test
     log -i Start mocking servers
     ./regression.sh serve
     sleep 2
     log -i Start vfrb
-    ../target/$VFRB_UUT -c resources/test.ini &
+    ../build/$VFRB_UUT -c resources/test.ini &
     sleep 2
     log -i Connect to vfrb
     ./regression.sh receive
@@ -354,7 +354,7 @@ function gen_coverage() {
     trap "fail -e popd Coverage report generation failed!" ERR
     pushd $VFRB_ROOT
     lcov --directory test/build --capture --output-file reports/test.info
-    lcov --directory target --capture --output-file reports/vfrb.info
+    lcov --directory build --capture --output-file reports/vfrb.info
     lcov -a reports/test_base.info -a reports/test.info -a reports/vfrb_base.info -a reports/vfrb.info \
         -o reports/all.info
     lcov --remove reports/all.info 'test/*' '/usr/*' -o reports/cov.info
