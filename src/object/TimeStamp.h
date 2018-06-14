@@ -67,7 +67,7 @@ public:
      * @param rOther The other TimeStamp
      * @return this
      */
-    TimeStamp& operator=(TimeStamp& rOther);
+    TimeStamp& operator=(const TimeStamp& rOther);
 
     /**
      * @fn operator <

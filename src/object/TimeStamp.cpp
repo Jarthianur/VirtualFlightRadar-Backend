@@ -68,7 +68,7 @@ TimeStamp::TimeStamp(const std::string& crValue, Format vFormat)
 TimeStamp::~TimeStamp() noexcept
 {}
 
-TimeStamp& TimeStamp::operator=(TimeStamp& rOther)
+TimeStamp& TimeStamp::operator=(const TimeStamp& rOther)
 {
     this->mValue = rOther.mValue;
     return *this;
