@@ -27,53 +27,55 @@
 #include "../../Math.hpp"
 #include "../../object/GpsPosition.h"
 
-//#define RE_APRS_TIME 1
+/// @def RE_APRS_TIME
+/// APRS regex match group of time
+#define RE_APRS_TIME 1
 
-/// @var RE_APRS_LAT
+/// @def RE_APRS_LAT
 /// APRS regex match group of latitude
-#define RE_APRS_LAT 1
+#define RE_APRS_LAT 2
 
-/// @var RE_APRS_LAT_DIR
+/// @def RE_APRS_LAT_DIR
 /// APRS regex match group of latitude orientation
-#define RE_APRS_LAT_DIR 2
+#define RE_APRS_LAT_DIR 3
 
-/// @var RE_APRS_LON
+/// @def RE_APRS_LON
 /// APRS regex match group of longitude
-#define RE_APRS_LON 3
+#define RE_APRS_LON 4
 
-/// @var RE_APRS_LON_DIR
+/// @def RE_APRS_LON_DIR
 /// APRS regex match group of longitude orientation
-#define RE_APRS_LON_DIR 4
+#define RE_APRS_LON_DIR 5
 
-/// @var RE_APRS_HEAD
+/// @def RE_APRS_HEAD
 /// APRS regex match group of heading
-#define RE_APRS_HEAD 5
+#define RE_APRS_HEAD 6
 
-/// @var RE_APRS_GND_SPD
+/// @def RE_APRS_GND_SPD
 /// APRS regex match group of ground speed
-#define RE_APRS_GND_SPD 6
+#define RE_APRS_GND_SPD 7
 
-/// @var RE_APRS_ALT
+/// @def RE_APRS_ALT
 /// APRS regex match group of altitude
-#define RE_APRS_ALT 7
+#define RE_APRS_ALT 8
 
-/// @var RE_APRS_COM
+/// @def RE_APRS_COM
 /// APRS regex match group of comment
-#define RE_APRS_COM 8
+#define RE_APRS_COM 9
 
-/// @var RE_APRS_COM_TYPE
+/// @def RE_APRS_COM_TYPE
 /// APRS regex match group of id and aircraft type
 #define RE_APRS_COM_TYPE 1
 
-/// @var RE_APRS_COM_ID
+/// @def RE_APRS_COM_ID
 /// APRS regex match group of aircraft id
 #define RE_APRS_COM_ID 2
 
-/// @var RE_APRS_COM_CR
+/// @def RE_APRS_COM_CR
 /// APRS regex match group of climb rate
 #define RE_APRS_COM_CR 3
 
-/// @var RE_APRS_COM_TR
+/// @def RE_APRS_COM_TR
 /// APRS regex match group of turn rate
 #define RE_APRS_COM_TR 4
 
@@ -84,8 +86,7 @@ using namespace object;
 namespace parser
 {
 const boost::regex AprsParser::msAprsRe(
-    //"^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
-    "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/\\d{6}h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
+    "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
     boost::regex::optimize | boost::regex::icase);
 
 const boost::regex AprsParser::msAprsComRe(
@@ -107,8 +108,8 @@ bool AprsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     boost::smatch match, com_match;
 
     if((!crStr.empty() && crStr.front() == '#')
-       || !(boost::regex_match(crStr, match, msAprsRe)
-            && parsePosition(match, rAircraft)))
+       || !(boost::regex_match(crStr, match, msAprsRe) && parsePosition(match, rAircraft)
+            && parseTimeStamp(match, rAircraft)))
     {
         return false;
     }
@@ -190,5 +191,21 @@ bool AprsParser::parseMovement(const boost::smatch& crMatch,
     rAircraft.setMovement(move);
     return valid;
 }
+
+bool AprsParser::parseTimeStamp(const boost::smatch& crMatch,
+                                Aircraft& rAircraft) noexcept
+{
+    try
+    {
+        rAircraft.setTimeStamp(
+            TimeStamp(crMatch.str(RE_APRS_TIME), TimeStamp::Format::HHMMSS));
+    }
+    catch(const std::invalid_argument&)
+    {
+        return false;
+    }
+    return true;
+}
+
 }  // namespace parser
 }  // namespace feed

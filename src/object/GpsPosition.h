@@ -26,6 +26,7 @@
 #include "../Defines.h"
 
 #include "Object.h"
+#include "TimeStamp.h"
 
 /// @namespace object
 namespace object
@@ -79,6 +80,7 @@ public:
      */
     GETSET_CR(Position, mPosition, Position)
     GETSET_V(double, mGeoid, Geoid)
+    GETSET_V(TimeStamp, mTimeStamp, TimeStamp)
     GETSET_V(std::int32_t, mNrOfSatellites, NrOfSatellites)
     GETSET_V(std::int32_t, mFixQuality, FixQuality)
     GETSET_V(double, mDilution, Dilution)
@@ -96,6 +98,10 @@ private:
     /// @var mGeoid
     /// The geoid separation
     double mGeoid = 0.0;
+
+    /// @var mTimeStamp
+    /// The timestamp of this position
+    TimeStamp mTimeStamp;
 
     /// @var mNrOfSatellites
     /// The number of satellites

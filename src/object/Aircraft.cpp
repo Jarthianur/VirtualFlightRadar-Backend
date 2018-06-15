@@ -45,6 +45,7 @@ void Aircraft::assign(Object&& rvOther)
     this->mTargetType   = rvUpdate.mTargetType;
     this->mPosition     = rvUpdate.mPosition;
     this->mMovement     = rvUpdate.mMovement;
+    this->mTimeStamp    = rvUpdate.mTimeStamp;
     this->mFullInfo     = rvUpdate.mFullInfo;
     this->mUpdateAge    = 0;
 }

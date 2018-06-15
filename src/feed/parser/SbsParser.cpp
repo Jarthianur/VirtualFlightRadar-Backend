@@ -97,6 +97,9 @@ bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
             case SBS_FIELD_ID:
                 rAircraft.setId(crStr);
                 break;
+            case SBS_FIELD_TIME:
+                rAircraft.setTimeStamp(TimeStamp(crStr, TimeStamp::Format::HH_MM_SS_FFF));
+                break;
             case SBS_FIELD_ALT:
                 rPosition.altitude = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
                 break;
