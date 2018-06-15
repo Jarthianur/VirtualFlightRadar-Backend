@@ -8,21 +8,24 @@ CPP_SRCS += \
 ../../src/object/Atmosphere.cpp \
 ../../src/object/Object.cpp \
 ../../src/object/GpsPosition.cpp \
-../../src/object/Wind.cpp
+../../src/object/Wind.cpp \
+../../src/object/TimeStamp.cpp
 
 OBJS += \
 ./src/object/Aircraft.o \
 ./src/object/Atmosphere.o \
 ./src/object/Object.o \
 ./src/object/GpsPosition.o \
-./src/object/Wind.o
+./src/object/Wind.o \
+./src/object/TimeStamp.o
 
 CPP_DEPS += \
 ./src/object/Aircraft.d \
 ./src/object/Atmosphere.d \
 ./src/object/Object.d \
 ./src/object/GpsPosition.d \
-./src/object/Wind.d
+./src/object/Wind.d \
+./src/object/TimeStamp.d
 
 # Each subdirectory must supply rules for building sources it contributes
 src/object/%.o: ../../src/object/%.cpp
