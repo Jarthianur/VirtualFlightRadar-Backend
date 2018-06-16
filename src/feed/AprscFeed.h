@@ -74,6 +74,8 @@ public:
      */
     void process(const std::string& crResponse) noexcept override;
 
+    const std::string& getLoginStr() const;
+
 private:
     /// @var mParser
     /// Parser to unpack response from Client
@@ -82,6 +84,8 @@ private:
     /// @var mDataSlot
     /// Data attempt slot
     std::size_t mDataSlot;
+
+    config::KeyValueMap::const_iterator mLoginStrIt;
 
     /// @var mpData
     /// AircraftData to update for input.

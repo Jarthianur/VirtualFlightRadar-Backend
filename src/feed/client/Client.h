@@ -92,6 +92,8 @@ public:
 
     virtual std::size_t hash() const;
 
+    void subscribe(std::shared_ptr<Feed>& rpFeed);
+
 protected:
     /**
      * @fn Client
@@ -198,8 +200,8 @@ private:
     /// Handler Feed references
     std::vector<std::shared_ptr<feed::Feed>> mrFeeds;
 
-    //friend struct ClientHasher;
-    //friend struct ClientComparator;
+    // friend struct ClientHasher;
+    // friend struct ClientComparator;
 };
 
 struct ClientHasher

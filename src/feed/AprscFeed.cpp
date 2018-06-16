@@ -38,15 +38,15 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
                      std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight)
     : Feed(crName, crKvMap), mParser(vMaxHeight), mpData(pData)
 {
-    auto it = mKvMap.find(KV_KEY_LOGIN);
-    if(it == mKvMap.end())
+    mLoginStrIt = mKvMap.find(KV_KEY_LOGIN);
+    if(mLoginStrIt == mKvMap.end())
     {
         Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
-    mpClient = std::unique_ptr<client::Client>(
-        new client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
-                                mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
+    mpClient  = std::unique_ptr<client::Client>(new client::AprscClient(
+        mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second,
+        mLoginStrIt->second, *this));
     mDataSlot = mpData->registerSlot();
 }
 
@@ -60,6 +60,11 @@ void AprscFeed::process(const std::string& crResponse) noexcept
     {
         mpData->update(std::move(ac), mDataSlot);
     }
+}
+
+const std::string& AprscFeed::getLoginStr() const
+{
+    return mLoginStrIt->second;
 }
 
 }  // namespace feed

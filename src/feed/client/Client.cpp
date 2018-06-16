@@ -71,6 +71,11 @@ std::size_t Client::hash() const
     return seed;
 }
 
+void Client::subscribe(std::shared_ptr<Feed>& rpFeed)
+{
+    mrFeeds.push_back(rpFeed);
+}
+
 void Client::timedConnect()
 {
     mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));

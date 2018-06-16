@@ -20,7 +20,12 @@
  */
 
 #include "ClientManager.h"
+#include "../AprscFeed.h"
 #include "../Feed.h"
+#include "AprscClient.h"
+#include "GpsdClient.h"
+#include "SbsClient.h"
+#include "SensorClient.h"
 
 namespace feed
 {
@@ -32,25 +37,38 @@ ClientManager::ClientManager()
 ClientManager::~ClientManager() noexcept
 {}
 
-void ClientManager::subscribe(Feed& rFeed, const Endpoint& crEndpoint, Protocol vProtocol)
+void ClientManager::subscribe(std::shared_ptr<Feed>& rpFeed, const Endpoint& crEndpoint,
+                              Protocol vProtocol)
 {
-    auto it = mClients.find(crEndpoint);
-    if(it == mClients.end())
+    auto it = mClients.end();
+    switch(vProtocol)
     {
-        switch(vProtocol)
+        case Protocol::APRS:
         {
-            case Protocol::APRS:
-            it = mClients.insert({crEndpoint,std::make_unique<Client>(crEndpoint.getAddress(), crEndpoint.getPort(),)});
-                break;
-            case Protocol::SBS:
-                break;
-            case Protocol::GPS:
-                break;
-            case Protocol::SENS:
-                break;
+            if(AprscFeed* feed = dynamic_cast<AprscFeed*>(rpFeed.get()))
+            {
+                it = mClients
+                         .insert(std::make_unique<AprscClient>(crEndpoint,
+                                                               feed->getLoginStr()))
+                         .first;
+            }
+            else
+            {
+                throw std::invalid_argument("wrong protocol");
+            }
         }
+        break;
+        case Protocol::SBS:
+            it = mClients.insert(std::make_unique<SbsClient>(crEndpoint)).first;
+            break;
+        case Protocol::GPS:
+            it = mClients.insert(std::make_unique<GpsdClient>(crEndpoint)).first;
+            break;
+        case Protocol::SENS:
+            it = mClients.insert(std::make_unique<SensorClient>(crEndpoint)).first;
+            break;
     }
-    it->second->mrFeeds.push_back(rFeed);
+    (*it)->subscribe(rpFeed);
 }
 
 }  // namespace client
