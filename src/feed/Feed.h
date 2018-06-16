@@ -24,25 +24,19 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <boost/asio/signal_set.hpp>
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
+#include "client/ClientManager.h"
 
 /// @namespace feed
 namespace feed
 {
-/// @namespace client
-namespace client
-{
-class Client;
-}  // namespace client
-
 /**
  * @class Feed
  * @brief Base class representing an input feed.
  */
-class Feed
+class Feed : public std::enable_shared_from_this<Feed>
 {
 public:
     NON_COPYABLE(Feed)
@@ -53,12 +47,7 @@ public:
      */
     virtual ~Feed() noexcept;
 
-    /**
-     * @fn run
-     * @brief Run a Feed.
-     * @param rSigset The signal set to pass to the Client
-     */
-    void run(boost::asio::signal_set& rSigset) noexcept;
+    virtual void registerClient(client::ClientManager& rManager) = 0;
 
     /**
      * @fn process
@@ -91,9 +80,7 @@ protected:
     /// Key-value-map holding the properties.
     const config::KeyValueMap mKvMap;
 
-    /// @var mpClient
-    /// Client, later resolved in child class
-    std::unique_ptr<client::Client> mpClient;
+    client::ClientSet::iterator mSubsribedClient;
 
 private:
     /**

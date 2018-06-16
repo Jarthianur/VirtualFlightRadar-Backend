@@ -26,7 +26,6 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
-#include "client/SbsClient.h"
 
 namespace feed
 {
@@ -34,13 +33,19 @@ SbsFeed::SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
                  std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight)
     : Feed(crName, crKvMap), mParser(vMaxHeight), mpData(pData)
 {
-    mpClient  = std::unique_ptr<client::Client>(new client::SbsClient(
-        mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
     mDataSlot = mpData->registerSlot();
 }
 
 SbsFeed::~SbsFeed() noexcept
 {}
+
+void SbsFeed::registerClient(client::ClientManager& rManager)
+{
+    mSubsribedClient = rManager.subscribe(
+        shared_from_this(),
+        {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
+        client::ClientManager::Protocol::SBS);
+}
 
 void SbsFeed::process(const std::string& crResponse) noexcept
 {

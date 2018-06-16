@@ -28,8 +28,11 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
-#include "client/AprscClient.h"
+#include "client/ClientManager.h"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
 #define COMPONENT "(AprscFeed)"
 
 namespace feed
@@ -44,14 +47,19 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
         Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
-    mpClient  = std::unique_ptr<client::Client>(new client::AprscClient(
-        mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second,
-        mLoginStrIt->second, *this));
     mDataSlot = mpData->registerSlot();
 }
 
 AprscFeed::~AprscFeed() noexcept
 {}
+
+void AprscFeed::registerClient(client::ClientManager& rManager)
+{
+    mSubsribedClient = rManager.subscribe(
+        shared_from_this(),
+        {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
+        client::ClientManager::Protocol::APRS);
+}
 
 void AprscFeed::process(const std::string& crResponse) noexcept
 {

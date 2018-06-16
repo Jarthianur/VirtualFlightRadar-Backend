@@ -21,17 +21,26 @@
 
 #pragma once
 
+#include <iterator>
 #include <memory>
 #include <unordered_set>
 
 #include "../../Defines.h"
 #include "Client.h"
 
+namespace boost
+{
+class thread_group;
+}  // namespace boost
+
 namespace feed
 {
 class Feed;
 namespace client
 {
+using ClientSet
+    = std::unordered_set<std::unique_ptr<Client>, ClientHasher, ClientComparator>;
+
 class ClientManager
 {
 public:
@@ -45,10 +54,13 @@ public:
 
     DEFAULT_CTOR_DTOR(ClientManager)
 
-    void subscribe(std::shared_ptr<Feed>& rpFeed, const Endpoint& crEndpoint, Protocol vProtocol);
+    ClientSet::iterator subscribe(std::shared_ptr<Feed> rpFeed,
+                                  const Endpoint& crEndpoint, Protocol vProtocol);
+
+    void run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset)
 
 private:
-    std::unordered_set<std::unique_ptr<Client>, ClientHasher, ClientComparator> mClients;
+    ClientSet mClients;
 };
 }  // namespace client
 }  // namespace feed

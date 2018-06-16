@@ -28,10 +28,12 @@
 #include <unordered_map>
 
 #include "../Logger.hpp"
-#include "../VFRB.h"
 #include "../config/Configuration.h"
 #include "client/Client.h"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
 #define COMPONENT "(Feed)"
 
 namespace feed
@@ -54,14 +56,6 @@ Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap)
 
 Feed::~Feed() noexcept
 {}
-
-void Feed::run(boost::asio::signal_set& rSigset) noexcept
-{
-    if(VFRB::vRunStatus)
-    {
-        mpClient->run(rSigset);
-    }
-}
 
 void Feed::initPriority() noexcept
 {

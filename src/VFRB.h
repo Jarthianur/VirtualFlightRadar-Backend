@@ -27,6 +27,7 @@
 #include <boost/chrono.hpp>
 
 #include "server/Server.h"
+#include "feed/client/ClientManager.h"
 #include "Defines.h"
 
 namespace config
@@ -125,6 +126,8 @@ private:
     /// @var mServer
     /// Manage clients and sending of data
     server::Server mServer;
+
+    feed::client::ClientManager mClientManager;
 
     /// @var mFeeds
     /// List of all active feeds

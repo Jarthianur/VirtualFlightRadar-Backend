@@ -66,6 +66,8 @@ public:
      */
     virtual ~GpsFeed() noexcept;
 
+    void registerClient(client::ClientManager& rManager) override;
+
     /**
      * @see Feed#process
      */

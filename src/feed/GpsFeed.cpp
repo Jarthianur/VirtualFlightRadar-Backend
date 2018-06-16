@@ -30,6 +30,9 @@
 #include "../object/GpsPosition.h"
 #include "client/GpsdClient.h"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
 #define COMPONENT "(GpsFeed)"
 
 namespace feed
@@ -38,13 +41,19 @@ GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
                  std::shared_ptr<data::GpsData>& pData)
     : Feed(crName, crKvMap), mpData(pData)
 {
-    mpClient  = std::unique_ptr<client::Client>(new client::GpsdClient(
-        mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second, *this));
     mDataSlot = mpData->registerSlot();
 }
 
 GpsFeed::~GpsFeed() noexcept
 {}
+
+void GpsFeed::registerClient(client::ClientManager& rManager)
+{
+    mSubsribedClient = rManager.subscribe(
+        shared_from_this(),
+        {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
+        client::ClientManager::Protocol::GPS);
+}
 
 void GpsFeed::process(const std::string& crResponse) noexcept
 {
@@ -61,7 +70,7 @@ void GpsFeed::process(const std::string& crResponse) noexcept
         catch(const std::runtime_error& e)
         {
             Logger::info(COMPONENT " ", mName, ": ", e.what());
-            mpClient->stop();
+            (*mSubsribedClient)->stop();
             return;
         }
     }

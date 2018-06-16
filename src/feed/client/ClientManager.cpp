@@ -19,10 +19,13 @@
  }
  */
 
-#include "ClientManager.h"
+#include <boost/asio.hpp>
+#include <boost/thread.hpp>
+
 #include "../AprscFeed.h"
 #include "../Feed.h"
 #include "AprscClient.h"
+#include "ClientManager.h"
 #include "GpsdClient.h"
 #include "SbsClient.h"
 #include "SensorClient.h"
@@ -37,10 +40,11 @@ ClientManager::ClientManager()
 ClientManager::~ClientManager() noexcept
 {}
 
-void ClientManager::subscribe(std::shared_ptr<Feed>& rpFeed, const Endpoint& crEndpoint,
-                              Protocol vProtocol)
+ClientSet::iterator ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
+                                             const Endpoint& crEndpoint,
+                                             Protocol vProtocol)
 {
-    auto it = mClients.end();
+    ClientSet::iterator it;
     switch(vProtocol)
     {
         case Protocol::APRS:
@@ -69,6 +73,15 @@ void ClientManager::subscribe(std::shared_ptr<Feed>& rpFeed, const Endpoint& crE
             break;
     }
     (*it)->subscribe(rpFeed);
+    return it;
+}
+
+void ClientManager::run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset)
+{
+    for(auto& it : mClients)
+    {
+        rThdGroup.create_thread([&]() { it->run(rSigset); });
+    }
 }
 
 }  // namespace client
