@@ -27,6 +27,9 @@
 
 #include "../../Logger.hpp"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
 #define COMPONENT "(AprscClient)"
 
 namespace feed
@@ -34,14 +37,12 @@ namespace feed
 namespace client
 {
 AprscClient::AprscClient(const std::string& crHost, const std::string& crPort,
-                         const std::string& crLogin, feed::Feed& rFeed)
-    : Client(crHost, crPort, COMPONENT, rFeed),
+                         const std::string& crLogin)
+    : Client({crHost, crPort}, COMPONENT),
       mLoginStr(crLogin),
-      mStopped(false),
       mTimeout(mIoService, boost::posix_time::minutes(10))
 {
     mLoginStr.append("\r\n");
-    connect();
 }
 
 AprscClient::~AprscClient() noexcept
@@ -70,7 +71,8 @@ std::size_t AprscClient::hash() const
 void AprscClient::connect()
 {
     boost::asio::ip::tcp::resolver::query query(
-        mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
+        mEndpoint.host, mEndpoint.port,
+        boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(query, boost::bind(&AprscClient::handleResolve, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
@@ -79,7 +81,6 @@ void AprscClient::connect()
 void AprscClient::stop()
 {
     Client::stop();
-    mStopped = true;
     mTimeout.expires_at(boost::posix_time::pos_infin);
     mTimeout.cancel();
 }
@@ -131,7 +132,7 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
 
 void AprscClient::sendKeepAlive()
 {
-    if(mStopped)
+    if(!mRunning)
     {
         return;
     }
@@ -148,7 +149,7 @@ void AprscClient::handleLogin(const boost::system::error_code& crError,
 {
     if(!crError)
     {
-        Logger::info(COMPONENT " connected to: ", mHost, ":", mPort);
+        Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
         read();
     }
     else

@@ -49,13 +49,12 @@ namespace client
 
 struct Endpoint
 {
-    const std::string hostName;
+    const std::string host;
     const std::string port;
-    std::string ipAddress;
 
     bool operator==(const Endpoint& crOther) const
     {
-        return ipAddress == crOther.ipAddress && port == crOther.port;
+        return host == crOther.host && port == crOther.port;
     }
 };
 
@@ -102,8 +101,7 @@ protected:
      * @param crComponent  The component name
      * @param rFeed        The handler Feed reference
      */
-    Client(const std::string& crHost, const std::string& crPort,
-           const std::string& crComponent);
+    Client(const Endpoint& crEndpoint, const std::string& crComponent);
 
     /**
      * @fn timedConnect
@@ -189,6 +187,8 @@ protected:
     /// Component string used for logging
     const std::string mComponent;
 
+    bool mRunning = false;
+
     /// @var mrFeeds
     /// Handler Feed references
     std::vector<std::shared_ptr<feed::Feed>> mrFeeds;
@@ -199,6 +199,7 @@ private:
     boost::asio::deadline_timer mConnectTimer;
 
     friend struct ClientHasher;
+    friend struct ClientComparator;
 };
 
 struct ClientHasher

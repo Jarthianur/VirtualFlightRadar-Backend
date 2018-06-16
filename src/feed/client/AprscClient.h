@@ -55,7 +55,7 @@ public:
      * @param rFeed   The handler Feed reference
      */
     AprscClient(const std::string& crHost, const std::string& crPort,
-                const std::string& crLogin, feed::Feed& rFeed);
+                const std::string& crLogin);
 
     /**
      * @fn ~AprscClient
@@ -119,10 +119,6 @@ private:
     /// @var mLoginStr
     /// Login string
     std::string mLoginStr;
-
-    /// @var mStopped
-    /// The run state
-    bool mStopped;
 
     /// @var mTimeout
     /// Beacon timer

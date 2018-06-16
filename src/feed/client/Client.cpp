@@ -33,24 +33,29 @@ namespace feed
 {
 namespace client
 {
-Client::Client(const std::string& crHost, const std::string& crPort,
-               const std::string& crComponent)
+Client::Client(const Endpoint& crEndpoint, const std::string& crComponent)
     : mIoService(),
       mSocket(mIoService),
       mResolver(mIoService),
-      mHost(crHost),
-      mPort(crPort),
+      mEndpoint(crEndpoint),
       mComponent(crComponent),
       mConnectTimer(mIoService)
 {}
 
 Client::~Client() noexcept
-{}
+{
+    stop();
+}
 
 void Client::run(boost::asio::signal_set& rSigset)
 {
-    rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
-    mIoService.run();
+    if(!mRunning)
+    {
+        mRunning = true;
+        rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
+        connect();
+        mIoService.run();
+    }
 }
 
 bool Client::equals(const Client& crOther) const
@@ -61,7 +66,7 @@ bool Client::equals(const Client& crOther) const
 std::size_t Client::hash() const
 {
     std::size_t seed = 0;
-    boost::hash_combine(seed, boost::hash_value(mEndpoint.ipAddress));
+    boost::hash_combine(seed, boost::hash_value(mEndpoint.host));
     boost::hash_combine(seed, boost::hash_value(mEndpoint.port));
     return seed;
 }
@@ -75,14 +80,19 @@ void Client::timedConnect()
 
 void Client::stop()
 {
-    Logger::info(mComponent, " stop connection to: ", mHost, ":", mPort);
-    mConnectTimer.expires_at(boost::posix_time::pos_infin);
-    mConnectTimer.cancel();
-    boost::system::error_code ec;
-    mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-    if(mSocket.is_open())
+    if(mRunning)
     {
-        mSocket.close();
+        mRunning = false;
+        Logger::info(mComponent, " stop connection to: ", mEndpoint.host, ":",
+                     mEndpoint.port);
+        mConnectTimer.expires_at(boost::posix_time::pos_infin);
+        mConnectTimer.cancel();
+        boost::system::error_code ec;
+        mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        if(mSocket.is_open())
+        {
+            mSocket.close();
+        }
     }
 }
 
@@ -98,7 +108,8 @@ void Client::handleTimedConnect(const boost::system::error_code& crError) noexce
 {
     if(!crError)
     {
-        Logger::info(mComponent, " try connect to: ", mHost, ":", mPort);
+        Logger::info(mComponent, " try connect to: ", mEndpoint.host, ":",
+                     mEndpoint.port);
         connect();
     }
     else

@@ -25,18 +25,18 @@
 
 #include "../../Logger.hpp"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
 #define COMPONENT "(GpsdClient)"
 
 namespace feed
 {
 namespace client
 {
-GpsdClient::GpsdClient(const std::string& crHost, const std::string& crPort,
-                       feed::Feed& rFeed)
-    : Client(crHost, crPort, COMPONENT, rFeed)
-{
-    connect();
-}
+GpsdClient::GpsdClient(const std::string& crHost, const std::string& crPort)
+    : Client({crHost, crPort}, COMPONENT)
+{}
 
 GpsdClient::~GpsdClient() noexcept
 {}
@@ -44,7 +44,8 @@ GpsdClient::~GpsdClient() noexcept
 void GpsdClient::connect()
 {
     boost::asio::ip::tcp::resolver::query query(
-        mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
+        mEndpoint.host, mEndpoint.port,
+        boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(query, boost::bind(&GpsdClient::handleResolve, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
@@ -120,7 +121,7 @@ void GpsdClient::handleWatch(const boost::system::error_code& crError,
 {
     if(!crError)
     {
-        Logger::info(COMPONENT " connected to: ", mHost, ":", mPort);
+        Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
         read();
     }
     else

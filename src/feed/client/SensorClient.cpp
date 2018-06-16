@@ -27,19 +27,18 @@
 
 #include "../../Logger.hpp"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
 #define COMPONENT "(SensorClient)"
 
 namespace feed
 {
 namespace client
 {
-SensorClient::SensorClient(const std::string& crHost, const std::string& crPort,
-                           feed::Feed& rFeed)
-    : Client(crHost, crPort, COMPONENT, rFeed), mStopped(false), mTimeout(mIoService)
-{
-    connect();
-    mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
-}
+SensorClient::SensorClient(const std::string& crHost, const std::string& crPort)
+    : Client({crHost, crPort}, COMPONENT), mTimeout(mIoService)
+{}
 
 SensorClient::~SensorClient() noexcept
 {}
@@ -52,8 +51,10 @@ void SensorClient::read()
 
 void SensorClient::connect()
 {
+    mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
     boost::asio::ip::tcp::resolver::query query(
-        mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
+        mEndpoint.host, mEndpoint.port,
+        boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(query, boost::bind(&SensorClient::handleResolve, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
@@ -61,7 +62,7 @@ void SensorClient::connect()
 
 void SensorClient::checkDeadline()
 {
-    if(mStopped)
+    if(!mRunning)
     {
         return;
     }
@@ -81,7 +82,6 @@ void SensorClient::checkDeadline()
 void SensorClient::stop()
 {
     Client::stop();
-    mStopped = true;
     mTimeout.expires_at(boost::posix_time::pos_infin);
     mTimeout.cancel();
 }
@@ -114,7 +114,7 @@ void SensorClient::handleConnect(const boost::system::error_code& crError,
     if(!crError)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info(COMPONENT " connected to: ", mHost, ":", mPort);
+        Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
         read();
     }
     else

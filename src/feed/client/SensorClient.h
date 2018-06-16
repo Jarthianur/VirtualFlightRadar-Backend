@@ -60,7 +60,7 @@ public:
      * @param crPort The port
      * @param rFeed  The handler Feed reference
      */
-    SensorClient(const std::string& crHost, const std::string& crPort, feed::Feed& rFeed);
+    SensorClient(const std::string& crHost, const std::string& crPort);
 
     /**
      * @fn ~SensorClient
@@ -108,10 +108,6 @@ private:
     void
     handleConnect(const boost::system::error_code& crError,
                   boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
-
-    /// @var mStopped
-    /// The run state
-    bool mStopped;
 
     /// @var mTimeout
     /// Read timer
