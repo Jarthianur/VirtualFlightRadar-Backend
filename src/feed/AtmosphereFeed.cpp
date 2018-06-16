@@ -42,6 +42,14 @@ AtmosphereFeed::AtmosphereFeed(const std::string& crName,
 AtmosphereFeed::~AtmosphereFeed() noexcept
 {}
 
+void AtmosphereFeed::registerClient(client::ClientManager& rManager)
+{
+    mSubsribedClient = rManager.subscribe(
+        shared_from_this(),
+        {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
+        client::ClientManager::Protocol::SENSOR);
+}
+
 void AtmosphereFeed::process(const std::string& crResponse) noexcept
 {
     object::Atmosphere atmos(getPriority());

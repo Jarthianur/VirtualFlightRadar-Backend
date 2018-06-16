@@ -40,6 +40,14 @@ WindFeed::WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap
 WindFeed::~WindFeed() noexcept
 {}
 
+void WindFeed::registerClient(client::ClientManager& rManager)
+{
+    mSubsribedClient = rManager.subscribe(
+        shared_from_this(),
+        {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
+        client::ClientManager::Protocol::SENSOR);
+}
+
 void WindFeed::process(const std::string& crResponse) noexcept
 {
     object::Wind wind(getPriority());

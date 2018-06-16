@@ -68,7 +68,7 @@ ClientSet::iterator ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
         case Protocol::GPS:
             it = mClients.insert(std::make_unique<GpsdClient>(crEndpoint)).first;
             break;
-        case Protocol::SENS:
+        case Protocol::SENSOR:
             it = mClients.insert(std::make_unique<SensorClient>(crEndpoint)).first;
             break;
     }

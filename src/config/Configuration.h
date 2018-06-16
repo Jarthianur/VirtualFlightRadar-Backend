@@ -52,8 +52,11 @@
 /// @def SECT_KEY_GPS
 #define SECT_KEY_GPS "gps"
 
-/// @def SECT_KEY_SENS
-#define SECT_KEY_SENS "sens"
+/// @def SECT_KEY_WIND
+#define SECT_KEY_WIND "wind"
+
+/// @def SECT_KEY_ATMOS
+#define SECT_KEY_ATMOS "atmos"
 
 /**
  * Per section key-value keys

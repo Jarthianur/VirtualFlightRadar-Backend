@@ -49,7 +49,7 @@ public:
         APRS,
         SBS,
         GPS,
-        SENS
+        SENSOR
     };
 
     DEFAULT_CTOR_DTOR(ClientManager)
@@ -57,7 +57,7 @@ public:
     ClientSet::iterator subscribe(std::shared_ptr<Feed> rpFeed,
                                   const Endpoint& crEndpoint, Protocol vProtocol);
 
-    void run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset)
+    void run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset);
 
 private:
     ClientSet mClients;

@@ -68,6 +68,8 @@ public:
      */
     virtual ~AtmosphereFeed() noexcept;
 
+    void registerClient(client::ClientManager& rManager) override;
+
     /**
      * @see Feed#process
      */

@@ -68,6 +68,8 @@ public:
      */
     virtual ~WindFeed() noexcept;
 
+    void registerClient(client::ClientManager& rManager) override;
+
     /**
      * @see Feed#process
      */
