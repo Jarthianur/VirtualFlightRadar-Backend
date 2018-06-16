@@ -199,9 +199,6 @@ private:
     /// @var mrFeeds
     /// Handler Feed references
     std::vector<std::shared_ptr<feed::Feed>> mrFeeds;
-
-    // friend struct ClientHasher;
-    // friend struct ClientComparator;
 };
 
 struct ClientHasher

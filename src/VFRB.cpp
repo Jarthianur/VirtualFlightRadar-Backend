@@ -75,19 +75,18 @@ void VFRB::run() noexcept
         mServer.run(signal_set);
         vRunStatus = false;
     });
-    boost::thread_group feed_threads;
+    boost::thread_group client_threads;
+    mClientManager.run(client_threads, signal_set);
+
     for(const auto& it : mFeeds)
     {
-        feed_threads.create_thread([&]() {
-            Logger::info("(VFRB) run feed: ", it->getName());
-            it->run(signal_set);
-        });
+        Logger::info("(VFRB) run feed: ", it->getName());
     }
 
     serve();
 
     server_thread.join();
-    feed_threads.join_all();
+    client_threads.join_all();
     signal_thread.join();
 
     Logger::info("EXITING / runtime: ", getDuration(start));
@@ -111,7 +110,8 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
                 Logger::warn(
                     "(VFRB) create feed ", feed.first,
                     ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                    ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
+                    ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS
+                    ", " SECT_KEY_GPS);
             }
         }
         catch(const std::exception& e)
