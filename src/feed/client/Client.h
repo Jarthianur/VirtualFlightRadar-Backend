@@ -22,7 +22,9 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 #include <string>
+#include <vector>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
@@ -44,6 +46,18 @@ namespace client
 #else
 #define C_CON_WAIT_TIMEVAL 120
 #endif
+
+struct Endpoint
+{
+    const std::string hostName;
+    const std::string port;
+    std::string ipAddress;
+
+    bool operator==(const Endpoint& crOther) const
+    {
+        return ipAddress == crOther.ipAddress && port == crOther.port;
+    }
+};
 
 /**
  * @class Client
@@ -75,6 +89,10 @@ public:
      */
     virtual void stop();
 
+    virtual bool equals(const Client& crOther) const;
+
+    virtual std::size_t hash() const;
+
 protected:
     /**
      * @fn Client
@@ -85,7 +103,7 @@ protected:
      * @param rFeed        The handler Feed reference
      */
     Client(const std::string& crHost, const std::string& crPort,
-           const std::string& crComponent, feed::Feed& rFeed);
+           const std::string& crComponent);
 
     /**
      * @fn timedConnect
@@ -165,24 +183,39 @@ protected:
 
     /// @var mHost
     /// Hostname
-    const std::string mHost;
-
-    /// @var mPort
-    /// Port
-    const std::string mPort;
+    Endpoint mEndpoint;
 
     /// @var mComponent
     /// Component string used for logging
     const std::string mComponent;
 
-    /// @var mrFeed
-    /// Handler Feed reference
-    feed::Feed& mrFeed;
+    /// @var mrFeeds
+    /// Handler Feed references
+    std::vector<std::shared_ptr<feed::Feed>> mrFeeds;
 
 private:
     /// @var mConnectTimer
     /// Connection timer
     boost::asio::deadline_timer mConnectTimer;
+
+    friend struct ClientHasher;
+};
+
+struct ClientHasher
+{
+    std::size_t operator()(const std::unique_ptr<Client>& crClient) const
+    {
+        return crClient->hash();
+    }
+};
+
+struct ClientComparator
+{
+    bool operator()(const std::unique_ptr<Client>& crClient1,
+                    const std::unique_ptr<Client>& crClient2) const
+    {
+        return crClient1->equals(*crClient2);
+    }
 };
 
 }  // namespace client

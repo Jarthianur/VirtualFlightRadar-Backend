@@ -78,24 +78,24 @@ SensorFeed* FeedFactory::makeFeed<SensorFeed>(const std::string& crName,
     return new SensorFeed(crName, crKvMap, mpWindData, mpAtmosData);
 }
 
-boost::optional<std::unique_ptr<Feed>> FeedFactory::createFeed(const std::string& crName,
+boost::optional<std::shared_ptr<Feed>> FeedFactory::createFeed(const std::string& crName,
                                                                const KeyValueMap& crKvMap)
 {
     if(crName.find(SECT_KEY_APRSC) != std::string::npos)
     {
-        return std::unique_ptr<Feed>(makeFeed<AprscFeed>(crName, crKvMap));
+        return std::shared_ptr<Feed>(makeFeed<AprscFeed>(crName, crKvMap));
     }
     else if(crName.find(SECT_KEY_SBS) != std::string::npos)
     {
-        return std::unique_ptr<Feed>(makeFeed<SbsFeed>(crName, crKvMap));
+        return std::shared_ptr<Feed>(makeFeed<SbsFeed>(crName, crKvMap));
     }
     else if(crName.find(SECT_KEY_GPS) != std::string::npos)
     {
-        return std::unique_ptr<Feed>(makeFeed<GpsFeed>(crName, crKvMap));
+        return std::shared_ptr<Feed>(makeFeed<GpsFeed>(crName, crKvMap));
     }
     else if(crName.find(SECT_KEY_SENS) != std::string::npos)
     {
-        return std::unique_ptr<Feed>(makeFeed<SensorFeed>(crName, crKvMap));
+        return std::shared_ptr<Feed>(makeFeed<SensorFeed>(crName, crKvMap));
     }
     return boost::none;
 }

@@ -23,6 +23,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
+#include <boost/functional/hash.hpp>
 
 #include "../../Logger.hpp"
 
@@ -45,6 +46,26 @@ AprscClient::AprscClient(const std::string& crHost, const std::string& crPort,
 
 AprscClient::~AprscClient() noexcept
 {}
+
+bool AprscClient::equals(const Client& crOther) const
+{
+    try
+    {
+        const AprscClient& crAOther = dynamic_cast<const AprscClient&>(crOther);
+        return Client::equals(crOther) && this->mLoginStr == crAOther.mLoginStr;
+    }
+    catch(const std::bad_cast&)
+    {
+        return false;
+    }
+}
+
+std::size_t AprscClient::hash() const
+{
+    std::size_t seed = Client::hash();
+    boost::hash_combine(seed, boost::hash_value(mLoginStr));
+    return seed;
+}
 
 void AprscClient::connect()
 {

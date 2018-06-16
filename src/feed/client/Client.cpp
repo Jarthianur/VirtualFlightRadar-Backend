@@ -24,6 +24,7 @@
 #include <iostream>
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
+#include <boost/functional/hash.hpp>
 
 #include "../../Logger.hpp"
 #include "../Feed.h"
@@ -33,14 +34,13 @@ namespace feed
 namespace client
 {
 Client::Client(const std::string& crHost, const std::string& crPort,
-               const std::string& crComponent, feed::Feed& rFeed)
+               const std::string& crComponent)
     : mIoService(),
       mSocket(mIoService),
       mResolver(mIoService),
       mHost(crHost),
       mPort(crPort),
       mComponent(crComponent),
-      mrFeed(rFeed),
       mConnectTimer(mIoService)
 {}
 
@@ -51,6 +51,19 @@ void Client::run(boost::asio::signal_set& rSigset)
 {
     rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
     mIoService.run();
+}
+
+bool Client::equals(const Client& crOther) const
+{
+    return this->mEndpoint == crOther.mEndpoint;
+}
+
+std::size_t Client::hash() const
+{
+    std::size_t seed = 0;
+    boost::hash_combine(seed, boost::hash_value(mEndpoint.ipAddress));
+    boost::hash_combine(seed, boost::hash_value(mEndpoint.port));
+    return seed;
 }
 
 void Client::timedConnect()
@@ -105,7 +118,10 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
         std::istream is(&mBuffer);
         std::getline(is, mResponse);
         mResponse.append("\n");
-        mrFeed.process(mResponse);
+        for(auto& it : mrFeeds)
+        {
+            it->process(mResponse);
+        }
         read();
     }
     else if(crError != boost::system::errc::bad_file_descriptor)

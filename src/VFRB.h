@@ -128,5 +128,5 @@ private:
 
     /// @var mFeeds
     /// List of all active feeds
-    std::list<std::unique_ptr<feed::Feed>> mFeeds;
+    std::list<std::shared_ptr<feed::Feed>> mFeeds;
 };

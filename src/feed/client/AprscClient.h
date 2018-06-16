@@ -63,6 +63,10 @@ public:
      */
     virtual ~AprscClient() noexcept;
 
+    bool equals(const Client& crOther) const override;
+
+    std::size_t hash() const override;
+
 private:
     /**
      * @see Client#connect

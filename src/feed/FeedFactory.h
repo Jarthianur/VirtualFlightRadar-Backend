@@ -75,7 +75,7 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    boost::optional<std::unique_ptr<Feed>> createFeed(const std::string& crName,
+    boost::optional<std::shared_ptr<Feed>> createFeed(const std::string& crName,
                                                       const config::KeyValueMap& crKvMap);
 
 private:
