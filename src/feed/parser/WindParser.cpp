@@ -28,8 +28,10 @@ namespace feed
 {
 namespace parser
 {
-WindParser::WindParser()
+WindParser::WindParser():Parser<object::Wind>()
 {}
+
+WindParser::~WindParser() noexcept{}
 
 bool WindParser::unpack(const std::string& crStr, object::Wind& rWind) noexcept
 {
