@@ -28,7 +28,7 @@
 #include "AprscFeed.h"
 #include "GpsFeed.h"
 #include "SbsFeed.h"
-#include "SensorFeed.h"
+#include "AtmosphereFeed.h"
 
 using namespace config;
 using namespace data;
