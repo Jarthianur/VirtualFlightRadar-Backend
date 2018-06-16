@@ -36,8 +36,8 @@ namespace feed
 {
 namespace client
 {
-SensorClient::SensorClient(const std::string& crHost, const std::string& crPort)
-    : Client({crHost, crPort}, COMPONENT), mTimeout(mIoService)
+SensorClient::SensorClient(const Endpoint& crEndpoint)
+    : Client(crEndpoint, COMPONENT), mTimeout(mIoService)
 {}
 
 SensorClient::~SensorClient() noexcept

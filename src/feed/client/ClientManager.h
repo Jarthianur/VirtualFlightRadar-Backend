@@ -45,7 +45,7 @@ public:
 
     DEFAULT_CTOR_DTOR(ClientManager)
 
-    void subscribe(Feed& rFeed, const Endpoint& crEndpoint, Protocol vProtocol);
+    void subscribe(std::shared_ptr<Feed>& rpFeed, const Endpoint& crEndpoint, Protocol vProtocol);
 
 private:
     std::unordered_set<std::unique_ptr<Client>, ClientHasher, ClientComparator> mClients;

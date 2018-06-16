@@ -34,8 +34,7 @@ namespace feed
 {
 namespace client
 {
-SbsClient::SbsClient(const std::string& crHost, const std::string& crPort)
-    : Client({crHost, crPort}, COMPONENT)
+SbsClient::SbsClient(const Endpoint& crEndpoint) : Client(crEndpoint, COMPONENT)
 {}
 
 SbsClient::~SbsClient() noexcept

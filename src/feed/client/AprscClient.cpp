@@ -36,9 +36,8 @@ namespace feed
 {
 namespace client
 {
-AprscClient::AprscClient(const std::string& crHost, const std::string& crPort,
-                         const std::string& crLogin)
-    : Client({crHost, crPort}, COMPONENT),
+AprscClient::AprscClient(const Endpoint& crEndpoint, const std::string& crLogin)
+    : Client(crEndpoint, COMPONENT),
       mLoginStr(crLogin),
       mTimeout(mIoService, boost::posix_time::minutes(10))
 {

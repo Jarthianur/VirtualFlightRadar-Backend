@@ -189,17 +189,17 @@ protected:
 
     bool mRunning = false;
 
-    /// @var mrFeeds
-    /// Handler Feed references
-    std::vector<std::shared_ptr<feed::Feed>> mrFeeds;
-
 private:
     /// @var mConnectTimer
     /// Connection timer
     boost::asio::deadline_timer mConnectTimer;
 
-    friend struct ClientHasher;
-    friend struct ClientComparator;
+    /// @var mrFeeds
+    /// Handler Feed references
+    std::vector<std::shared_ptr<feed::Feed>> mrFeeds;
+
+    //friend struct ClientHasher;
+    //friend struct ClientComparator;
 };
 
 struct ClientHasher

@@ -34,8 +34,7 @@ namespace feed
 {
 namespace client
 {
-GpsdClient::GpsdClient(const std::string& crHost, const std::string& crPort)
-    : Client({crHost, crPort}, COMPONENT)
+GpsdClient::GpsdClient(const Endpoint& crEndpoint) : Client(crEndpoint, COMPONENT)
 {}
 
 GpsdClient::~GpsdClient() noexcept

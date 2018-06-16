@@ -54,8 +54,7 @@ public:
      * @param crLogin The login string to transmit
      * @param rFeed   The handler Feed reference
      */
-    AprscClient(const std::string& crHost, const std::string& crPort,
-                const std::string& crLogin);
+    AprscClient(const Endpoint& crEndpoint, const std::string& crLogin);
 
     /**
      * @fn ~AprscClient
