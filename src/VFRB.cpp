@@ -75,13 +75,16 @@ void VFRB::run() noexcept
         mServer.run(signal_set);
         vRunStatus = false;
     });
-    boost::thread_group client_threads;
-    mClientManager.run(client_threads, signal_set);
 
     for(const auto& it : mFeeds)
     {
         Logger::info("(VFRB) run feed: ", it->getName());
+        it->registerClient(mClientManager);
     }
+    mFeeds.clear();
+
+    boost::thread_group client_threads;
+    mClientManager.run(client_threads, signal_set);
 
     serve();
 
