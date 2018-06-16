@@ -26,7 +26,7 @@
 #include "../../src/feed/parser/AprsParser.h"
 #include "../../src/feed/parser/GpsParser.h"
 #include "../../src/feed/parser/SbsParser.h"
-#include "../../src/feed/parser/SensorParser.h"
+#include "../../src/feed/parser/AtmosphereParser.h"
 #include "../../src/object/Aircraft.h"
 #include "../../src/object/Climate.hpp"
 #include "../../src/object/GpsPosition.h"

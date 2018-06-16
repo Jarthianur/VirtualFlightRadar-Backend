@@ -24,32 +24,24 @@
 #include <string>
 
 #include "../../Defines.h"
-#include "../../object/Climate.hpp"
+#include "../../object/Wind.h"
 
 #include "Parser.hpp"
 
-/// @namespace feed
 namespace feed
 {
-/// @namespace parser
 namespace parser
 {
-/**
- * @class SensorParser
- * @brief Unpack NMEA sentences from sensors.
- * @implements Parser
- */
-class SensorParser : public Parser<object::Climate>
+class WindParser : public Parser<object::Wind>
 {
 public:
-    DEFAULT_CTOR_DTOR(SensorParser)
-
+    DEFAULT_CTOR_DTOR(WindParser)
     /**
      * @fn unpack
      * @brief Unpack into Climate.
      * @see Parser#unpack
      */
-    bool unpack(const std::string& crStr, object::Climate& rClimate) noexcept override;
+    bool unpack(const std::string& crStr, object::Wind& rWind) noexcept override;
 
 private:
     /**
@@ -61,7 +53,7 @@ private:
      * @throw std::out_of_range, std::invalid_argument from invoked functions
      */
     // cppcheck-suppress unusedPrivateFunction
-    bool parseClimate(const std::string& crStr, object::Climate& rClimate);
+    bool parseWind(const std::string& crStr, object::Wind& rWind);
 };
 }  // namespace parser
 }  // namespace feed

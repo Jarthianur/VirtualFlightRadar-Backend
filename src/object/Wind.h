@@ -47,8 +47,6 @@ public:
      * @brief Constructor
      */
     explicit Wind(std::uint32_t vPriority);
-
-    friend struct Climate;
 };
 
 }  // namespace object

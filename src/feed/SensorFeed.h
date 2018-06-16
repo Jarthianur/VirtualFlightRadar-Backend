@@ -27,7 +27,7 @@
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/SensorParser.h"
+#include "parser/AtmosphereParser.h"
 
 #include "Feed.h"
 
