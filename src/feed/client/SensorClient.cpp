@@ -41,54 +41,62 @@ SensorClient::SensorClient(const Endpoint& crEndpoint)
 {}
 
 SensorClient::~SensorClient() noexcept
-{}
+{
+    stop();
+}
 
 void SensorClient::read()
 {
-    mTimeout.expires_from_now(boost::posix_time::seconds(WC_RCV_TIMEOUT));
+    if(mRunning)
+    {
+        mTimeout.expires_from_now(boost::posix_time::seconds(WC_RCV_TIMEOUT));
+    }
     Client::read();
 }
 
 void SensorClient::connect()
 {
-    mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
-    boost::asio::ip::tcp::resolver::query query(
-        mEndpoint.host, mEndpoint.port,
-        boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(query, boost::bind(&SensorClient::handleResolve, this,
-                                               boost::asio::placeholders::error,
-                                               boost::asio::placeholders::iterator));
+    if(mRunning)
+    {
+        mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
+        boost::asio::ip::tcp::resolver::query query(
+            mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
+        mResolver.async_resolve(query, boost::bind(&SensorClient::handleResolve, this,
+                                                   boost::asio::placeholders::error,
+                                                   boost::asio::placeholders::iterator));
+    }
 }
 
 void SensorClient::checkDeadline()
 {
-    if(!mRunning)
+    if(mRunning)
     {
-        return;
-    }
-    if(mTimeout.expires_at() <= boost::asio::deadline_timer::traits_type::now())
-    {
-        Logger::warn(COMPONENT " timed out: reconnect...");
-        if(mSocket.is_open())
+        if(mTimeout.expires_at() <= boost::asio::deadline_timer::traits_type::now())
         {
-            mSocket.close();
+            Logger::warn(COMPONENT " timed out: reconnect...");
+            if(mSocket.is_open())
+            {
+                mSocket.close();
+            }
+            mTimeout.expires_at(boost::posix_time::pos_infin);
+            connect();
         }
-        mTimeout.expires_at(boost::posix_time::pos_infin);
-        connect();
+        mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
     }
-    mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
 }
 
 void SensorClient::stop()
 {
+    if(mRunning)
+    {
+        mTimeout.expires_at(boost::posix_time::pos_infin);
+        mTimeout.cancel();
+    }
     Client::stop();
-    mTimeout.expires_at(boost::posix_time::pos_infin);
-    mTimeout.cancel();
 }
 
-void SensorClient::handleResolve(
-    const boost::system::error_code& crError,
-    boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+void SensorClient::handleResolve(const boost::system::error_code& crError,
+                                 boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
 {
     if(!crError)
     {

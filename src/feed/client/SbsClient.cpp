@@ -42,17 +42,18 @@ SbsClient::~SbsClient() noexcept
 
 void SbsClient::connect()
 {
-    boost::asio::ip::tcp::resolver::query query(
-        mEndpoint.host, mEndpoint.port,
-        boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(query, boost::bind(&SbsClient::handleResolve, this,
-                                               boost::asio::placeholders::error,
-                                               boost::asio::placeholders::iterator));
+    if(mRunning)
+    {
+        boost::asio::ip::tcp::resolver::query query(
+            mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
+        mResolver.async_resolve(query, boost::bind(&SbsClient::handleResolve, this,
+                                                   boost::asio::placeholders::error,
+                                                   boost::asio::placeholders::iterator));
+    }
 }
 
-void SbsClient::handleResolve(
-    const boost::system::error_code& crError,
-    boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+void SbsClient::handleResolve(const boost::system::error_code& crError,
+                              boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
 {
     if(!crError)
     {

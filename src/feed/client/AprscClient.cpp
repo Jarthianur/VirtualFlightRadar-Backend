@@ -45,7 +45,9 @@ AprscClient::AprscClient(const Endpoint& crEndpoint, const std::string& crLogin)
 }
 
 AprscClient::~AprscClient() noexcept
-{}
+{
+    stop();
+}
 
 bool AprscClient::equals(const Client& crOther) const
 {
@@ -69,24 +71,28 @@ std::size_t AprscClient::hash() const
 
 void AprscClient::connect()
 {
-    boost::asio::ip::tcp::resolver::query query(
-        mEndpoint.host, mEndpoint.port,
-        boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(query, boost::bind(&AprscClient::handleResolve, this,
-                                               boost::asio::placeholders::error,
-                                               boost::asio::placeholders::iterator));
+    if(mRunning)
+    {
+        boost::asio::ip::tcp::resolver::query query(
+            mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
+        mResolver.async_resolve(query, boost::bind(&AprscClient::handleResolve, this,
+                                                   boost::asio::placeholders::error,
+                                                   boost::asio::placeholders::iterator));
+    }
 }
 
 void AprscClient::stop()
 {
+    if(mRunning)
+    {
+        mTimeout.expires_at(boost::posix_time::pos_infin);
+        mTimeout.cancel();
+    }
     Client::stop();
-    mTimeout.expires_at(boost::posix_time::pos_infin);
-    mTimeout.cancel();
 }
 
-void AprscClient::handleResolve(
-    const boost::system::error_code& crError,
-    boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+void AprscClient::handleResolve(const boost::system::error_code& crError,
+                                boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
 {
     if(!crError)
     {
@@ -112,10 +118,10 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
     if(!crError)
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        boost::asio::async_write(
-            mSocket, boost::asio::buffer(mLoginStr),
-            boost::bind(&AprscClient::handleLogin, this, boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+        boost::asio::async_write(mSocket, boost::asio::buffer(mLoginStr),
+                                 boost::bind(&AprscClient::handleLogin, this,
+                                             boost::asio::placeholders::error,
+                                             boost::asio::placeholders::bytes_transferred));
         mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAlive, this));
     }
     else
@@ -131,20 +137,18 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
 
 void AprscClient::sendKeepAlive()
 {
-    if(!mRunning)
+    if(mRunning)
     {
-        return;
+        boost::asio::async_write(mSocket, boost::asio::buffer("#keep-alive beacon\r\n"),
+                                 boost::bind(&AprscClient::handleSendKeepAlive, this,
+                                             boost::asio::placeholders::error,
+                                             boost::asio::placeholders::bytes_transferred));
+        mTimeout.expires_from_now(boost::posix_time::minutes(10));
+        mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAlive, this));
     }
-    boost::asio::async_write(mSocket, boost::asio::buffer("#keep-alive beacon\r\n"),
-                             boost::bind(&AprscClient::handleSendKeepAlive, this,
-                                         boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred));
-    mTimeout.expires_from_now(boost::posix_time::minutes(10));
-    mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAlive, this));
 }
 
-void AprscClient::handleLogin(const boost::system::error_code& crError,
-                              std::size_t) noexcept
+void AprscClient::handleLogin(const boost::system::error_code& crError, std::size_t) noexcept
 {
     if(!crError)
     {

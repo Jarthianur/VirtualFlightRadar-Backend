@@ -78,9 +78,12 @@ void Client::subscribe(std::shared_ptr<Feed>& rpFeed)
 
 void Client::timedConnect()
 {
-    mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
-    mConnectTimer.async_wait(
-        boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
+    if(mRunning)
+    {
+        mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
+        mConnectTimer.async_wait(
+            boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
+    }
 }
 
 void Client::stop()
@@ -88,8 +91,7 @@ void Client::stop()
     if(mRunning)
     {
         mRunning = false;
-        Logger::info(mComponent, " stop connection to: ", mEndpoint.host, ":",
-                     mEndpoint.port);
+        Logger::info(mComponent, " stop connection to: ", mEndpoint.host, ":", mEndpoint.port);
         mConnectTimer.expires_at(boost::posix_time::pos_infin);
         mConnectTimer.cancel();
         boost::system::error_code ec;
@@ -98,23 +100,26 @@ void Client::stop()
         {
             mSocket.close();
         }
+        mIoService.stop();
     }
 }
 
 void Client::read()
 {
-    boost::asio::async_read_until(
-        mSocket, mBuffer, "\r\n",
-        boost::bind(&Client::handleRead, this, boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred));
+    if(mRunning)
+    {
+        boost::asio::async_read_until(mSocket, mBuffer, "\r\n",
+                                      boost::bind(&Client::handleRead, this,
+                                                  boost::asio::placeholders::error,
+                                                  boost::asio::placeholders::bytes_transferred));
+    }
 }
 
 void Client::handleTimedConnect(const boost::system::error_code& crError) noexcept
 {
     if(!crError)
     {
-        Logger::info(mComponent, " try connect to: ", mEndpoint.host, ":",
-                     mEndpoint.port);
+        Logger::info(mComponent, " try connect to: ", mEndpoint.host, ":", mEndpoint.port);
         connect();
     }
     else

@@ -38,21 +38,24 @@ GpsdClient::GpsdClient(const Endpoint& crEndpoint) : Client(crEndpoint, COMPONEN
 {}
 
 GpsdClient::~GpsdClient() noexcept
-{}
+{
+    stop();
+}
 
 void GpsdClient::connect()
 {
-    boost::asio::ip::tcp::resolver::query query(
-        mEndpoint.host, mEndpoint.port,
-        boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(query, boost::bind(&GpsdClient::handleResolve, this,
-                                               boost::asio::placeholders::error,
-                                               boost::asio::placeholders::iterator));
+    if(mRunning)
+    {
+        boost::asio::ip::tcp::resolver::query query(
+            mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
+        mResolver.async_resolve(query, boost::bind(&GpsdClient::handleResolve, this,
+                                                   boost::asio::placeholders::error,
+                                                   boost::asio::placeholders::iterator));
+    }
 }
 
-void GpsdClient::handleResolve(
-    const boost::system::error_code& crError,
-    boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+void GpsdClient::handleResolve(const boost::system::error_code& crError,
+                               boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
 {
     if(!crError)
     {
@@ -96,27 +99,25 @@ void GpsdClient::handleConnect(const boost::system::error_code& crError,
 
 void GpsdClient::stop()
 {
-    if(mSocket.is_open())
+    if(mRunning && mSocket.is_open())
     {
-        boost::asio::async_write(
-            mSocket, boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
-            [this](const boost::system::error_code& crError, std::size_t) {
-                if(!crError)
-                {
-                    Logger::info(COMPONENT " stopped watch");
-                }
-                else
-                {
-                    Logger::error(COMPONENT " send un-watch request: ",
-                                  crError.message());
-                }
-            });
+        boost::asio::async_write(mSocket, boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
+                                 [this](const boost::system::error_code& crError, std::size_t) {
+                                     if(!crError)
+                                     {
+                                         Logger::info(COMPONENT " stopped watch");
+                                     }
+                                     else
+                                     {
+                                         Logger::error(COMPONENT " send un-watch request: ",
+                                                       crError.message());
+                                     }
+                                 });
     }
     Client::stop();
 }
 
-void GpsdClient::handleWatch(const boost::system::error_code& crError,
-                             std::size_t) noexcept
+void GpsdClient::handleWatch(const boost::system::error_code& crError, std::size_t) noexcept
 {
     if(!crError)
     {
