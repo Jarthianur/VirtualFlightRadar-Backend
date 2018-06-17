@@ -30,6 +30,8 @@
 #include "SbsClient.h"
 #include "SensorClient.h"
 
+#include "../../Logger.hpp"
+
 namespace feed
 {
 namespace client
@@ -41,19 +43,16 @@ ClientManager::~ClientManager() noexcept
 {}
 
 ClientSet::iterator ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
-                                             const Endpoint& crEndpoint,
-                                             Protocol vProtocol)
+                                             const Endpoint& crEndpoint, Protocol vProtocol)
 {
     ClientSet::iterator it;
     switch(vProtocol)
     {
         case Protocol::APRS:
         {
-            if(AprscFeed* feed = dynamic_cast<AprscFeed*>(rpFeed.get()))
+            if(std::shared_ptr<AprscFeed> feed = std::dynamic_pointer_cast<AprscFeed>(rpFeed))
             {
-                it = mClients
-                         .insert(std::make_unique<AprscClient>(crEndpoint,
-                                                               feed->getLoginStr()))
+                it = mClients.insert(std::make_unique<AprscClient>(crEndpoint, feed->getLoginStr()))
                          .first;
             }
             else
@@ -78,9 +77,15 @@ ClientSet::iterator ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
 
 void ClientManager::run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset)
 {
-    for(auto& it : mClients)
+    for(const auto& it : mClients)
     {
-        rThdGroup.create_thread([&]() { it->run(rSigset); });
+        Logger::debug("create thread for ", it->hash());
+        rThdGroup.create_thread([&]() {
+            Logger::debug("run client ", it->hash());
+            it->run(rSigset);
+            Logger::debug("returned from client run call");
+            mClients.erase(it);
+        });
     }
 }
 

@@ -48,8 +48,7 @@ std::atomic<bool> VFRB::vRunStatus(true);
 
 VFRB::VFRB(const config::Configuration& config)
     : mpAircraftData(new AircraftData(config.getMaxDistance())),
-      mpAtmosphereData(
-          new AtmosphereData(object::Atmosphere(config.getAtmPressure(), 0))),
+      mpAtmosphereData(new AtmosphereData(object::Atmosphere(config.getAtmPressure(), 0))),
       mpGpsData(new GpsData(config.getPosition(), config.getGroundMode())),
       mpWindData(new WindData()),
       mServer(config.getServerPort())
@@ -68,7 +67,6 @@ void VFRB::run() noexcept
     boost::asio::io_service io_service;
     boost::asio::signal_set signal_set(io_service);
     setupSignals(signal_set);
-    boost::thread signal_thread([&io_service]() { io_service.run(); });
 
     boost::thread server_thread([this, &signal_set]() {
         Logger::info("(Server) start server");
@@ -76,15 +74,16 @@ void VFRB::run() noexcept
         vRunStatus = false;
     });
 
-    for(const auto& it : mFeeds)
+    for(auto& it : mFeeds)
     {
         Logger::info("(VFRB) run feed: ", it->getName());
         it->registerClient(mClientManager);
     }
-    mFeeds.clear();
 
     boost::thread_group client_threads;
     mClientManager.run(client_threads, signal_set);
+    boost::thread signal_thread([&io_service]() { io_service.run(); });
+    mFeeds.clear();
 
     serve();
 
@@ -97,8 +96,7 @@ void VFRB::run() noexcept
 
 void VFRB::createFeeds(const config::Configuration& crConfig)
 {
-    feed::FeedFactory factory(crConfig, mpAircraftData, mpAtmosphereData, mpGpsData,
-                              mpWindData);
+    feed::FeedFactory factory(crConfig, mpAircraftData, mpAtmosphereData, mpGpsData, mpWindData);
     for(const auto& feed : crConfig.getFeedMapping())
     {
         try
@@ -113,8 +111,7 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
                 Logger::warn(
                     "(VFRB) create feed ", feed.first,
                     ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                    ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS
-                    ", " SECT_KEY_GPS);
+                    ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS ", " SECT_KEY_GPS);
             }
         }
         catch(const std::exception& e)

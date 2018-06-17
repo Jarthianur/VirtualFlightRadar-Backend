@@ -44,7 +44,7 @@ namespace feed
  * @brief GPS input feed.
  * @extends Feed
  */
-class GpsFeed : public Feed
+class GpsFeed : public Feed, public std::enable_shared_from_this<GpsFeed>
 {
 public:
     NON_COPYABLE(GpsFeed)

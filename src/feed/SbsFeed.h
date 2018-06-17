@@ -46,7 +46,7 @@ namespace feed
  * @brief SBS input feed.
  * @extends Feed
  */
-class SbsFeed : public Feed
+class SbsFeed : public Feed, public std::enable_shared_from_this<SbsFeed>
 {
 public:
     NON_COPYABLE(SbsFeed)

@@ -30,6 +30,8 @@
 #include "../object/GpsPosition.h"
 #include "client/GpsdClient.h"
 
+#include "../Logger.hpp"
+
 #ifdef COMPONENT
 #undef COMPONENT
 #endif
@@ -45,7 +47,9 @@ GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
 {}
 
 GpsFeed::~GpsFeed() noexcept
-{}
+{
+    Logger::debug("destructed gpsfeed");
+}
 
 void GpsFeed::registerClient(client::ClientManager& rManager)
 {
@@ -70,6 +74,7 @@ void GpsFeed::process(const std::string& crResponse) noexcept
         {
             Logger::info(COMPONENT " ", mName, ": ", e.what());
             (*mSubsribedClient)->stop();
+            Logger::debug("returned from gpsfeed stop call");
             return;
         }
     }

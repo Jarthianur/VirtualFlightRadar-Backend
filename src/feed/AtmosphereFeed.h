@@ -45,7 +45,7 @@ namespace feed
  * @brief Sensor input feed.
  * @extends Feed
  */
-class AtmosphereFeed : public Feed
+class AtmosphereFeed : public Feed, public std::enable_shared_from_this<AtmosphereFeed>
 {
 public:
     NON_COPYABLE(AtmosphereFeed)

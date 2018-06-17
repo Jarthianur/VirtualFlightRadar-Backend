@@ -46,7 +46,7 @@ namespace feed
  * @brief APRSC input feed.
  * @extends Feed
  */
-class AprscFeed : public Feed
+class AprscFeed : public Feed, public std::enable_shared_from_this<AprscFeed>
 {
 public:
     NON_COPYABLE(AprscFeed)

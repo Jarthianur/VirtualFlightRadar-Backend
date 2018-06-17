@@ -141,6 +141,10 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
         mResponse.append("\n");
         for(auto& it : mrFeeds)
         {
+            if(!mRunning)
+            {
+                break;
+            }
             it->process(mResponse);
         }
         read();

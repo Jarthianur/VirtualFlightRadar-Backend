@@ -27,8 +27,8 @@
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "client/ClientManager.h"
 #include "../data/Data.h"
+#include "client/ClientManager.h"
 
 /// @namespace feed
 namespace feed
@@ -37,7 +37,7 @@ namespace feed
  * @class Feed
  * @brief Base class representing an input feed.
  */
-class Feed : public std::enable_shared_from_this<Feed>
+class Feed
 {
 public:
     NON_COPYABLE(Feed)
@@ -71,7 +71,8 @@ protected:
      * @param crKvMap The properties map
      * @throw std::logic_error if host or port are not given
      */
-    Feed(const std::string& crName, const config::KeyValueMap& crKvMap, std::shared_ptr<data::Data> pData);
+    Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
+         std::shared_ptr<data::Data> pData);
 
     /// @var mName
     /// Unique name
