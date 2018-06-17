@@ -61,7 +61,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-            std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight);
+            std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
 
     /**
      * @fn ~SbsFeed
@@ -79,15 +79,7 @@ public:
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    parser::SbsParser mParser;
-
-    /// @var mDataSlot
-    /// Data attempt slot
-    std::size_t mDataSlot;
-
-    /// @var mpData
-    /// AircraftData to update for input
-    std::shared_ptr<data::AircraftData> mpData;
+    static parser::SbsParser smParser;
 };
 
 }  // namespace feed

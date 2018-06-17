@@ -61,7 +61,7 @@ public:
      * @throw std::logic_error if login is not given or from parent constructor
      */
     AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-              std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight);
+              std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
 
     /**
      * @fn ~AprscFeed
@@ -81,17 +81,9 @@ public:
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    parser::AprsParser mParser;
-
-    /// @var mDataSlot
-    /// Data attempt slot
-    std::size_t mDataSlot;
+    static parser::AprsParser smParser;
 
     config::KeyValueMap::const_iterator mLoginStrIt;
-
-    /// @var mpData
-    /// AircraftData to update for input.
-    std::shared_ptr<data::AircraftData> mpData;
 };
 
 }  // namespace feed

@@ -58,7 +58,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-            std::shared_ptr<data::GpsData>& pData);
+            std::shared_ptr<data::GpsData> pData);
 
     /**
      * @fn ~GpsFeed
@@ -76,15 +76,7 @@ public:
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    parser::GpsParser mParser;
-
-    /// @var mDataSlot
-    /// Data attempt slot
-    std::size_t mDataSlot;
-
-    /// @var mpData
-    /// GpsData to update for input
-    std::shared_ptr<data::GpsData> mpData;
+    static parser::GpsParser smParser;
 };
 
 }  // namespace feed

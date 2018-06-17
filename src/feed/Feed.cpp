@@ -38,8 +38,9 @@
 
 namespace feed
 {
-Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap)
-    : mName(crName), mKvMap(crKvMap)
+Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
+           std::shared_ptr<data::Data> pData)
+    : mName(crName), mKvMap(crKvMap), mpData(pData)
 {
     initPriority();
     if(mKvMap.find(KV_KEY_HOST) == mKvMap.end())
@@ -52,6 +53,7 @@ Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap)
         Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
+    mDataSlot = mpData->registerSlot();
 }
 
 Feed::~Feed() noexcept

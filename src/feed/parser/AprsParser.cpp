@@ -93,11 +93,9 @@ const boost::regex AprsParser::msAprsComRe(
     "^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
     boost::regex::optimize | boost::regex::icase);
 
-AprsParser::AprsParser() : AprsParser(std::numeric_limits<std::int32_t>::max())
-{}
+std::int32_t AprsParser::smMaxHeight = std::numeric_limits<std::int32_t>::max();
 
-AprsParser::AprsParser(std::int32_t vMaxHeight)
-    : Parser<Aircraft>(), mMaxHeight(vMaxHeight)
+AprsParser::AprsParser() : Parser<Aircraft>()
 {}
 
 AprsParser::~AprsParser() noexcept
@@ -115,8 +113,7 @@ bool AprsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     }
     std::string comm(match.str(RE_APRS_COM));
 
-    if(!(boost::regex_match(comm, com_match, msAprsComRe)
-         && parseComment(com_match, rAircraft)))
+    if(!(boost::regex_match(comm, com_match, msAprsComRe) && parseComment(com_match, rAircraft)))
     {
         return false;
     }
@@ -141,11 +138,10 @@ bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft
         {
             pos.longitude = -pos.longitude;
         }
-        pos.altitude
-            = math::doubleToInt(std::stod(crMatch.str(RE_APRS_ALT)) * math::FEET_2_M);
+        pos.altitude = math::doubleToInt(std::stod(crMatch.str(RE_APRS_ALT)) * math::FEET_2_M);
 
         rAircraft.setPosition(pos);
-        valid = pos.altitude <= mMaxHeight;
+        valid = pos.altitude <= smMaxHeight;
     }
     catch(const std::logic_error&)
     {
@@ -171,8 +167,7 @@ bool AprsParser::parseComment(const boost::smatch& crMatch, Aircraft& rAircraft)
     return valid;
 }
 
-bool AprsParser::parseMovement(const boost::smatch& crMatch,
-                               const boost::smatch& crCommMatch,
+bool AprsParser::parseMovement(const boost::smatch& crMatch, const boost::smatch& crCommMatch,
                                Aircraft& rAircraft) noexcept
 {
     Movement move;
@@ -192,13 +187,11 @@ bool AprsParser::parseMovement(const boost::smatch& crMatch,
     return valid;
 }
 
-bool AprsParser::parseTimeStamp(const boost::smatch& crMatch,
-                                Aircraft& rAircraft) noexcept
+bool AprsParser::parseTimeStamp(const boost::smatch& crMatch, Aircraft& rAircraft) noexcept
 {
     try
     {
-        rAircraft.setTimeStamp(
-            TimeStamp(crMatch.str(RE_APRS_TIME), TimeStamp::Format::HHMMSS));
+        rAircraft.setTimeStamp(TimeStamp(crMatch.str(RE_APRS_TIME), TimeStamp::Format::HHMMSS));
     }
     catch(const std::invalid_argument&)
     {

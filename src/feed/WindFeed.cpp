@@ -29,13 +29,13 @@
 
 namespace feed
 {
-WindFeed::WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                   std::shared_ptr<data::WindData>& pData)
-    : Feed(crName, crKvMap), mpData(pData)
+parser::WindParser WindFeed::smParser;
 
-{
-    mDataSlot = mpData->registerSlot();
-}
+WindFeed::WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+                   std::shared_ptr<data::WindData> pData)
+    : Feed(crName, crKvMap, pData)
+
+{}
 
 WindFeed::~WindFeed() noexcept
 {}
@@ -43,15 +43,14 @@ WindFeed::~WindFeed() noexcept
 void WindFeed::registerClient(client::ClientManager& rManager)
 {
     mSubsribedClient = rManager.subscribe(
-        shared_from_this(),
-        {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
+        shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
         client::ClientManager::Protocol::SENSOR);
 }
 
 void WindFeed::process(const std::string& crResponse) noexcept
 {
     object::Wind wind(getPriority());
-    if(mParser.unpack(crResponse, wind))
+    if(smParser.unpack(crResponse, wind))
     {
         mpData->update(std::move(wind), mDataSlot);
     }

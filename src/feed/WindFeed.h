@@ -60,7 +60,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-             std::shared_ptr<data::WindData>& pData);
+             std::shared_ptr<data::WindData> pData);
 
     /**
      * @fn ~WindFeed
@@ -78,15 +78,7 @@ public:
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    parser::WindParser mParser;
-
-    /// @var mWindSlot
-    /// WindData attempt slot
-    std::size_t mDataSlot;
-
-    /// @var mpWindData
-    /// WindData to update for wind input
-    std::shared_ptr<data::WindData> mpData;
+    static parser::WindParser smParser;
 };
 
 }  // namespace feed

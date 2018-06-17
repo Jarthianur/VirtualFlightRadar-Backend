@@ -60,7 +60,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     AtmosphereFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                   std::shared_ptr<data::AtmosphereData>& pData);
+                   std::shared_ptr<data::AtmosphereData> pData);
 
     /**
      * @fn ~AtmosphereFeed
@@ -78,15 +78,7 @@ public:
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    parser::AtmosphereParser mParser;
-
-    /// @var mAtmosSlot
-    /// AtmosphereData attempt slot
-    std::size_t mDataSlot;
-
-    /// @var mpAtmosphereData
-    /// AtmosphereData to update for atmospheric input
-    std::shared_ptr<data::AtmosphereData> mpData;
+    static parser::AtmosphereParser smParser;
 };
 
 }  // namespace feed

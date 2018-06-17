@@ -37,17 +37,19 @@
 
 namespace feed
 {
+parser::AprsParser AprscFeed::smParser;
+
 AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                     std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight)
-    : Feed(crName, crKvMap), mParser(vMaxHeight), mpData(pData)
+                     std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
+    : Feed(crName, crKvMap, pData)
 {
+    smParser.setMaxHeight(vMaxHeight);
     mLoginStrIt = mKvMap.find(KV_KEY_LOGIN);
     if(mLoginStrIt == mKvMap.end())
     {
         Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
-    mDataSlot = mpData->registerSlot();
 }
 
 AprscFeed::~AprscFeed() noexcept
@@ -56,15 +58,14 @@ AprscFeed::~AprscFeed() noexcept
 void AprscFeed::registerClient(client::ClientManager& rManager)
 {
     mSubsribedClient = rManager.subscribe(
-        shared_from_this(),
-        {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
+        shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
         client::ClientManager::Protocol::APRS);
 }
 
 void AprscFeed::process(const std::string& crResponse) noexcept
 {
     object::Aircraft ac(getPriority());
-    if(mParser.unpack(crResponse, ac))
+    if(smParser.unpack(crResponse, ac))
     {
         mpData->update(std::move(ac), mDataSlot);
     }

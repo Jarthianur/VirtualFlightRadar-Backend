@@ -28,6 +28,7 @@
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
 #include "client/ClientManager.h"
+#include "../data/Data.h"
 
 /// @namespace feed
 namespace feed
@@ -70,7 +71,7 @@ protected:
      * @param crKvMap The properties map
      * @throw std::logic_error if host or port are not given
      */
-    Feed(const std::string& crName, const config::KeyValueMap& crKvMap);
+    Feed(const std::string& crName, const config::KeyValueMap& crKvMap, std::shared_ptr<data::Data> pData);
 
     /// @var mName
     /// Unique name
@@ -81,6 +82,12 @@ protected:
     const config::KeyValueMap mKvMap;
 
     client::ClientSet::iterator mSubsribedClient;
+
+    /// @var mAtmosSlot
+    /// AtmosphereData attempt slot
+    std::size_t mDataSlot;
+
+    std::shared_ptr<data::Data> mpData;
 
 private:
     /**

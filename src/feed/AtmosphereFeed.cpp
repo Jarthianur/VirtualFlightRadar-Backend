@@ -30,14 +30,12 @@
 
 namespace feed
 {
-AtmosphereFeed::AtmosphereFeed(const std::string& crName,
-                               const config::KeyValueMap& crKvMap,
-                               std::shared_ptr<data::AtmosphereData>& pData)
-    : Feed(crName, crKvMap), mpData(pData)
+parser::AtmosphereParser AtmosphereFeed::smParser;
 
-{
-    mDataSlot = mpData->registerSlot();
-}
+AtmosphereFeed::AtmosphereFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+                               std::shared_ptr<data::AtmosphereData> pData)
+    : Feed(crName, crKvMap, pData)
+{}
 
 AtmosphereFeed::~AtmosphereFeed() noexcept
 {}
@@ -45,15 +43,14 @@ AtmosphereFeed::~AtmosphereFeed() noexcept
 void AtmosphereFeed::registerClient(client::ClientManager& rManager)
 {
     mSubsribedClient = rManager.subscribe(
-        shared_from_this(),
-        {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
+        shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
         client::ClientManager::Protocol::SENSOR);
 }
 
 void AtmosphereFeed::process(const std::string& crResponse) noexcept
 {
     object::Atmosphere atmos(getPriority());
-    if(mParser.unpack(crResponse, atmos))
+    if(smParser.unpack(crResponse, atmos))
     {
         mpData->update(std::move(atmos), mDataSlot);
     }

@@ -37,12 +37,12 @@
 
 namespace feed
 {
+parser::GpsParser GpsFeed::smParser;
+
 GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                 std::shared_ptr<data::GpsData>& pData)
-    : Feed(crName, crKvMap), mpData(pData)
-{
-    mDataSlot = mpData->registerSlot();
-}
+                 std::shared_ptr<data::GpsData> pData)
+    : Feed(crName, crKvMap, pData)
+{}
 
 GpsFeed::~GpsFeed() noexcept
 {}
@@ -50,15 +50,14 @@ GpsFeed::~GpsFeed() noexcept
 void GpsFeed::registerClient(client::ClientManager& rManager)
 {
     mSubsribedClient = rManager.subscribe(
-        shared_from_this(),
-        {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
+        shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
         client::ClientManager::Protocol::GPS);
 }
 
 void GpsFeed::process(const std::string& crResponse) noexcept
 {
     object::GpsPosition pos(getPriority());
-    if(mParser.unpack(crResponse, pos))
+    if(smParser.unpack(crResponse, pos))
     {
         try
         {

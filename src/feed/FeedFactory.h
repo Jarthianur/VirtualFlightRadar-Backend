@@ -90,7 +90,7 @@ private:
      * @throw std::logic_error from invoked constructors
      */
     template<typename T>
-    T* makeFeed(const std::string& crName, const config::KeyValueMap& crKvMap);
+    std::shared_ptr<T> makeFeed(const std::string& crName, const config::KeyValueMap& crKvMap);
 
     /// @var mrConfig
     /// Reference to the Configuration
