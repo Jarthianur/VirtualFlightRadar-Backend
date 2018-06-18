@@ -86,8 +86,7 @@ bool GpsParser::unpack(const std::string& crStr, object::GpsPosition& rPosition)
         boost::smatch match;
         return std::stoi(crStr.substr(crStr.rfind('*') + 1, 2), nullptr, 16)
                    == math::checksum(crStr.c_str(), crStr.length())
-               && boost::regex_match(crStr, match, msGpggaRe)
-               && parsePosition(match, rPosition);
+               && boost::regex_match(crStr, match, msGpggaRe) && parsePosition(match, rPosition);
     }
     catch(const std::logic_error&)
     {
@@ -95,8 +94,7 @@ bool GpsParser::unpack(const std::string& crStr, object::GpsPosition& rPosition)
     }
 }
 
-bool GpsParser::parsePosition(const boost::smatch& crMatch,
-                              object::GpsPosition& rPosition)
+bool GpsParser::parsePosition(const boost::smatch& crMatch, object::GpsPosition& rPosition)
 {
     object::Position pos;
     pos.latitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LAT)));

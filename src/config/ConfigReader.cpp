@@ -104,8 +104,7 @@ boost::optional<KeyValue> ConfigReader::parseKeyValue(const std::string& crLine)
     return boost::none;
 }
 
-void ConfigReader::addSection(const std::string& crSection, std::size_t vLineNr,
-                              PropertyMap& rMap)
+void ConfigReader::addSection(const std::string& crSection, std::size_t vLineNr, PropertyMap& rMap)
 {
     if(!rMap.addProperty(crSection))
     {

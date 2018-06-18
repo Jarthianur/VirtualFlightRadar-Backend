@@ -19,32 +19,30 @@
  }
  */
 
-#include "SensorParser.h"
+#include "AtmosphereParser.h"
 
 #include <cstddef>
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../object/Atmosphere.h"
-#include "../../object/Wind.h"
 
 namespace feed
 {
 namespace parser
 {
-SensorParser::SensorParser() : Parser<object::Climate>()
+AtmosphereParser::AtmosphereParser() : Parser<object::Atmosphere>()
 {}
 
-SensorParser::~SensorParser() noexcept
+AtmosphereParser::~AtmosphereParser() noexcept
 {}
 
-bool SensorParser::unpack(const std::string& crStr, object::Climate& rClimate) noexcept
+bool AtmosphereParser::unpack(const std::string& crStr, object::Atmosphere& rAtmos) noexcept
 {
     try
     {
         return (std::stoi(crStr.substr(crStr.rfind('*') + 1, 2), nullptr, 16)
                     == math::checksum(crStr.c_str(), crStr.length())
-                && parseClimate(crStr, rClimate));
+                && parseAtmosphere(crStr, rAtmos));
     }
     catch(const std::logic_error&)
     {
@@ -52,7 +50,7 @@ bool SensorParser::unpack(const std::string& crStr, object::Climate& rClimate) n
     }
 }
 
-bool SensorParser::parseClimate(const std::string& crStr, object::Climate& rClimate)
+bool AtmosphereParser::parseAtmosphere(const std::string& crStr, object::Atmosphere& rAtmos)
 {
     bool valid = false;
     if(crStr.find("MDA") != std::string::npos)
@@ -64,13 +62,9 @@ bool SensorParser::parseClimate(const std::string& crStr, object::Climate& rClim
         double tmpPress = std::stod(crStr.substr(tmpS, subLen), &numIdx) * 1000.0;
         if((valid = (numIdx == subLen)))
         {
-            rClimate.atmosphere.setSerialized(std::string(crStr));
-            rClimate.atmosphere.setPressure(tmpPress);
+            rAtmos.setSerialized(std::string(crStr));
+            rAtmos.setPressure(tmpPress);
         }
-    }
-    else if((valid = (crStr.find("MWV") != std::string::npos)))
-    {
-        rClimate.wind.setSerialized(std::string(crStr));
     }
     return valid;
 }

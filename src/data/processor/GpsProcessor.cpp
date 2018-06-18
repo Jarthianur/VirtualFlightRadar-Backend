@@ -52,9 +52,9 @@ std::string GpsProcessor::genGpggaStr(const GpsPosition& crPosition)
         mBuffer, sizeof(mBuffer),
         /*"$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"*/
         "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02d,1,%d,M,%.1lf,M,,*",
-        utc->tm_hour, utc->tm_min, utc->tm_sec, mtLatDeg, mtLatMin, mtLatStr, mtLonDeg,
-        mtLonMin, mtLonStr, /*pos.fixQa,*/ crPosition.getNrOfSatellites(),
-        crPosition.getPosition().altitude, crPosition.getGeoid());
+        utc->tm_hour, utc->tm_min, utc->tm_sec, mtLatDeg, mtLatMin, mtLatStr, mtLonDeg, mtLonMin,
+        mtLonStr, /*pos.fixQa,*/ crPosition.getNrOfSatellites(), crPosition.getPosition().altitude,
+        crPosition.getGeoid());
     std::string nmea_str(mBuffer);
     finishSentence(nmea_str);
 
@@ -70,8 +70,8 @@ std::string GpsProcessor::genGprmcStr(const GpsPosition& crPosition)
     std::snprintf(
         mBuffer, sizeof(mBuffer),
         "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
-        utc->tm_hour, utc->tm_min, utc->tm_sec, mtLatDeg, mtLatMin, mtLatStr, mtLonDeg,
-        mtLonMin, mtLonStr, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
+        utc->tm_hour, utc->tm_min, utc->tm_sec, mtLatDeg, mtLatMin, mtLatStr, mtLonDeg, mtLonMin,
+        mtLonStr, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
     std::string nmea_str(mBuffer);
     finishSentence(nmea_str);
 

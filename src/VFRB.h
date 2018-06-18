@@ -26,6 +26,7 @@
 #include <memory>
 #include <boost/chrono.hpp>
 
+#include "feed/client/ClientManager.h"
 #include "server/Server.h"
 #include "Defines.h"
 
@@ -126,7 +127,9 @@ private:
     /// Manage clients and sending of data
     server::Server mServer;
 
+    feed::client::ClientManager mClientManager;
+
     /// @var mFeeds
     /// List of all active feeds
-    std::list<std::unique_ptr<feed::Feed>> mFeeds;
+    std::list<std::shared_ptr<feed::Feed>> mFeeds;
 };

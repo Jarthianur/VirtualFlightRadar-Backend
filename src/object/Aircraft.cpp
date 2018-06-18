@@ -67,8 +67,7 @@ void Aircraft::setAircraftType(Aircraft::AircraftType vType)
 
 void Aircraft::setIdType(Aircraft::IdType vType)
 {
-    mIdType = vType < IdType::UNRECOGNIZED || vType > IdType::OGN ? IdType::UNRECOGNIZED
-                                                                  : vType;
+    mIdType = vType < IdType::UNRECOGNIZED || vType > IdType::OGN ? IdType::UNRECOGNIZED : vType;
 }
 
 }  // namespace object

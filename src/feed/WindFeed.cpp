@@ -19,41 +19,40 @@
  }
  */
 
-#include "SbsFeed.h"
+#include "WindFeed.h"
 
 #include <unordered_map>
 
 #include "../config/Configuration.h"
-#include "../data/AircraftData.h"
-#include "../object/Aircraft.h"
+#include "../data/WindData.h"
+#include "../object/Wind.h"
 
 namespace feed
 {
-parser::SbsParser SbsFeed::smParser;
+parser::WindParser WindFeed::smParser;
 
-SbsFeed::SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                 std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight)
+WindFeed::WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+                   std::shared_ptr<data::WindData>& pData)
     : Feed(crName, crKvMap, pData)
-{
-    smParser.setMaxHeight(vMaxHeight);
-}
 
-SbsFeed::~SbsFeed() noexcept
 {}
 
-void SbsFeed::registerClient(client::ClientManager& rManager)
+WindFeed::~WindFeed() noexcept
+{}
+
+void WindFeed::registerClient(client::ClientManager& rManager)
 {
     mSubsribedClient = rManager.subscribe(
         shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
-        client::ClientManager::Protocol::SBS);
+        client::ClientManager::Protocol::SENSOR);
 }
 
-void SbsFeed::process(const std::string& crResponse) noexcept
+void WindFeed::process(const std::string& crResponse) noexcept
 {
-    object::Aircraft ac(getPriority());
-    if(smParser.unpack(crResponse, ac))
+    object::Wind wind(getPriority());
+    if(smParser.unpack(crResponse, wind))
     {
-        mpData->update(std::move(ac), mDataSlot);
+        mpData->update(std::move(wind), mDataSlot);
     }
 }
 

@@ -8,7 +8,8 @@ CPP_SRCS += \
 ../src/feed/Feed.cpp \
 ../src/feed/GpsFeed.cpp \
 ../src/feed/SbsFeed.cpp \
-../src/feed/SensorFeed.cpp \
+../src/feed/AtmosphereFeed.cpp \
+../src/feed/WindFeed.cpp \
 ../src/feed/FeedFactory.cpp
 
 OBJS += \
@@ -16,7 +17,8 @@ OBJS += \
 ./src/feed/Feed.o \
 ./src/feed/GpsFeed.o \
 ./src/feed/SbsFeed.o \
-./src/feed/SensorFeed.o \
+./src/feed/AtmosphereFeed.o \
+./src/feed/WindFeed.o \
 ./src/feed/FeedFactory.o
 
 CPP_DEPS += \
@@ -24,7 +26,8 @@ CPP_DEPS += \
 ./src/feed/Feed.d \
 ./src/feed/GpsFeed.d \
 ./src/feed/SbsFeed.d \
-./src/feed/SensorFeed.d \
+./src/feed/AtmosphereFeed.d \
+./src/feed/WindFeed.d \
 ./src/feed/FeedFactory.d 
 
 
@@ -32,7 +35,7 @@ CPP_DEPS += \
 src/feed/%.o: ../src/feed/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	$(CXX) -std=c++0x $(BOOST_I) -O$(OPT_LVL) $(DBG) -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	$(CXX) -std=c++1y $(BOOST_I) -O$(OPT_LVL) $(DBG) -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

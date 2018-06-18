@@ -27,14 +27,13 @@
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/SensorParser.h"
+#include "parser/WindParser.h"
 
 #include "Feed.h"
 
 /// @namespace data
 namespace data
 {
-class AtmosphereData;
 class WindData;
 }  // namespace data
 
@@ -42,17 +41,17 @@ class WindData;
 namespace feed
 {
 /**
- * @class SensorFeed
+ * @class WindFeed
  * @brief Sensor input feed.
  * @extends Feed
  */
-class SensorFeed : public Feed
+class WindFeed : public Feed, public std::enable_shared_from_this<WindFeed>
 {
 public:
-    NON_COPYABLE(SensorFeed)
+    NON_COPYABLE(WindFeed)
 
     /**
-     * @fn SensorFeed
+     * @fn WindFeed
      * @brief Constructor
      * @param crName     The SensorFeeds unique name
      * @param crKvMap    The properties map
@@ -60,15 +59,16 @@ public:
      * @param pAtmosData The AtmosphereData pointer
      * @throw std::logic_error from parent constructor
      */
-    SensorFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-               std::shared_ptr<data::WindData>& pWindData,
-               std::shared_ptr<data::AtmosphereData>& pAtmosData);
+    WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+             std::shared_ptr<data::WindData>& pData);
 
     /**
-     * @fn ~SensorFeed
+     * @fn ~WindFeed
      * @brief Destructor
      */
-    virtual ~SensorFeed() noexcept;
+    virtual ~WindFeed() noexcept;
+
+    void registerClient(client::ClientManager& rManager) override;
 
     /**
      * @see Feed#process
@@ -78,23 +78,7 @@ public:
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    parser::SensorParser mParser;
-
-    /// @var mWindSlot
-    /// WindData attempt slot
-    std::size_t mWindSlot;
-
-    /// @var mAtmosSlot
-    /// AtmosphereData attempt slot
-    std::size_t mAtmosSlot;
-
-    /// @var mpWindData
-    /// WindData to update for wind input
-    std::shared_ptr<data::WindData> mpWindData;
-
-    /// @var mpAtmosphereData
-    /// AtmosphereData to update for atmospheric input
-    std::shared_ptr<data::AtmosphereData> mpAtmosphereData;
+    static parser::WindParser smParser;
 };
 
 }  // namespace feed

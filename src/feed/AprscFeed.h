@@ -46,7 +46,7 @@ namespace feed
  * @brief APRSC input feed.
  * @extends Feed
  */
-class AprscFeed : public Feed
+class AprscFeed : public Feed, public std::enable_shared_from_this<AprscFeed>
 {
 public:
     NON_COPYABLE(AprscFeed)
@@ -69,23 +69,21 @@ public:
      */
     virtual ~AprscFeed() noexcept;
 
+    void registerClient(client::ClientManager& rManager) override;
+
     /**
      * @see Feed#process
      */
     void process(const std::string& crResponse) noexcept override;
 
+    const std::string& getLoginStr() const;
+
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    parser::AprsParser mParser;
+    static parser::AprsParser smParser;
 
-    /// @var mDataSlot
-    /// Data attempt slot
-    std::size_t mDataSlot;
-
-    /// @var mpData
-    /// AircraftData to update for input.
-    std::shared_ptr<data::AircraftData> mpData;
+    config::KeyValueMap::const_iterator mLoginStrIt;
 };
 
 }  // namespace feed

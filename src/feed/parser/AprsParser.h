@@ -47,19 +47,14 @@ public:
     DEFAULT_CTOR_DTOR(AprsParser)
 
     /**
-     * @fn AprsParser
-     * @brief Constructor
-     * @param vMaxHeight The max height filter
-     */
-    explicit AprsParser(std::int32_t vMaxHeight);
-
-    /**
      * @fn unpack
      * @brief Unpack into Aircraft.
      * @see Parser#unpack
      * @return true on success, else false
      */
     bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
+
+    SETTER_V(std::int32_t, smMaxHeight, MaxHeight)
 
 private:
     /**
@@ -69,9 +64,7 @@ private:
      * @param rAircraft The target Aircraft
      * @return true on success, else false
      */
-    // cppcheck-suppress unusedPrivateFunction
-    bool parsePosition(const boost::smatch& crMatch,
-                       object::Aircraft& rAircraft) noexcept;
+    bool parsePosition(const boost::smatch& crMatch, object::Aircraft& rAircraft) noexcept;
 
     /**
      * @fn parseComment
@@ -80,7 +73,6 @@ private:
      * @param rAircraft The target Aircraft
      * @return true on success, else false
      */
-    // cppcheck-suppress unusedPrivateFunction
     bool parseComment(const boost::smatch& crMatch, object::Aircraft& rAircraft) noexcept;
 
     /**
@@ -91,7 +83,6 @@ private:
      * @param rAircraft   The target Aircraft
      * @return true on success, else false
      */
-    // cppcheck-suppress unusedPrivateFunction
     bool parseMovement(const boost::smatch& crMatch, const boost::smatch& crCommMatch,
                        object::Aircraft& rAircraft) noexcept;
 
@@ -102,9 +93,7 @@ private:
      * @param rAircraft   The target Aircraft
      * @return true on success, else false
      */
-    // cppcheck-suppress unusedPrivateFunction
-    bool parseTimeStamp(const boost::smatch& crMatch,
-                        object::Aircraft& rAircraft) noexcept;
+    bool parseTimeStamp(const boost::smatch& crMatch, object::Aircraft& rAircraft) noexcept;
 
     /// @var msAprsRe
     /// Regular expression for APRS protocol
@@ -116,7 +105,7 @@ private:
 
     /// @var mMaxHeight
     /// The max height filter
-    const std::int32_t mMaxHeight;
+    static std::int32_t smMaxHeight;
 };
 }  // namespace parser
 }  // namespace feed

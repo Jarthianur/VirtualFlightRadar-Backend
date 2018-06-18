@@ -22,48 +22,56 @@
 #include "GpsdClient.h"
 
 #include <boost/bind.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../../Logger.hpp"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
 #define COMPONENT "(GpsdClient)"
 
 namespace feed
 {
 namespace client
 {
-GpsdClient::GpsdClient(const std::string& crHost, const std::string& crPort,
-                       feed::Feed& rFeed)
-    : Client(crHost, crPort, COMPONENT, rFeed)
+GpsdClient::GpsdClient(const Endpoint& crEndpoint) : Client(crEndpoint, COMPONENT)
 {
-    connect();
+    Logger::debug(COMPONENT " constructed");
 }
 
 GpsdClient::~GpsdClient() noexcept
-{}
+{
+    Logger::debug(COMPONENT " destructed");
+}
 
 void GpsdClient::connect()
 {
+    Logger::debug(COMPONENT " connect called");
+    mRunning = true;
+    Logger::debug(COMPONENT " is running");
     boost::asio::ip::tcp::resolver::query query(
-        mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
+        mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(query, boost::bind(&GpsdClient::handleResolve, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
 }
 
-void GpsdClient::handleResolve(
-    const boost::system::error_code& crError,
-    boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+void GpsdClient::handleResolve(const boost::system::error_code& crError,
+                               boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         boost::asio::async_connect(mSocket, vResolverIt,
                                    boost::bind(&GpsdClient::handleConnect, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
     }
-    else
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -77,15 +85,17 @@ void GpsdClient::handleConnect(const boost::system::error_code& crError,
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
         boost::asio::async_write(
             mSocket, boost::asio::buffer("?WATCH={\"enable\":true,\"nmea\":true}\r\n"),
             boost::bind(&GpsdClient::handleWatch, this, boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
     }
-    else
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " connect: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -96,31 +106,32 @@ void GpsdClient::handleConnect(const boost::system::error_code& crError,
 
 void GpsdClient::stop()
 {
-    if(mSocket.is_open())
+    Logger::debug(COMPONENT " stop called");
+    if(mRunning && mSocket.is_open())
     {
-        boost::asio::async_write(
-            mSocket, boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
-            [this](const boost::system::error_code& crError, std::size_t) {
-                if(!crError)
-                {
-                    Logger::info(COMPONENT " stopped watch");
-                }
-                else
-                {
-                    Logger::error(COMPONENT " send un-watch request: ",
-                                  crError.message());
-                }
-            });
+        Logger::debug(COMPONENT " is running");
+        boost::asio::async_write(mSocket, boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
+                                 [this](const boost::system::error_code& crError, std::size_t) {
+                                     if(!crError)
+                                     {
+                                         Logger::info(COMPONENT " stopped watch");
+                                     }
+                                     else
+                                     {
+                                         Logger::error(COMPONENT " send un-watch request: ",
+                                                       crError.message());
+                                     }
+                                 });
     }
     Client::stop();
 }
 
-void GpsdClient::handleWatch(const boost::system::error_code& crError,
-                             std::size_t) noexcept
+void GpsdClient::handleWatch(const boost::system::error_code& crError, std::size_t) noexcept
 {
     if(!crError)
     {
-        Logger::info(COMPONENT " connected to: ", mHost, ":", mPort);
+        Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         read();
     }
     else

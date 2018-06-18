@@ -53,10 +53,9 @@ namespace feed
 {
 namespace parser
 {
-SbsParser::SbsParser() : SbsParser(std::numeric_limits<std::int32_t>::max())
-{}
+std::int32_t SbsParser::smMaxHeight = std::numeric_limits<std::int32_t>::max();
 
-SbsParser::SbsParser(std::int32_t vMaxHeight) : Parser<Aircraft>(), mMaxHeight(vMaxHeight)
+SbsParser::SbsParser() : Parser<Aircraft>()
 {}
 
 SbsParser::~SbsParser() noexcept
@@ -84,11 +83,11 @@ bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     rAircraft.setTargetType(Aircraft::TargetType::TRANSPONDER);
     rAircraft.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
     rAircraft.setIdType(Aircraft::IdType::ICAO);
-    return i == 16 && pos.altitude <= mMaxHeight;
+    return i == 16 && pos.altitude <= smMaxHeight;
 }
 
-bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr,
-                           Position& rPosition, Aircraft& rAircraft) noexcept
+bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr, Position& rPosition,
+                           Aircraft& rAircraft) noexcept
 {
     try
     {

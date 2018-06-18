@@ -47,14 +47,14 @@ public:
     static void info(T crMsg, TRest... tail)
     {
         boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-        *mpOutStream << "[INFO]  " << getTime() << ":: ";
+        *mpOutStream << "\r[INFO]  " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
     }
     template<typename T>
     static void info(T crMsg)
     {
         boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-        *mpOutStream << "[INFO]  " << getTime() << ":: ";
+        *mpOutStream << "\r[INFO]  " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg));
     }
 
@@ -69,14 +69,14 @@ public:
     static void debug(T crMsg, TRest... tail)
     {
         boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-        *mpOutStream << "[DEBUG] " << getTime() << ":: ";
+        *mpOutStream << "\r[DEBUG] " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
     }
     template<typename T>
     static void debug(T crMsg)
     {
         boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-        *mpOutStream << "[DEBUG] " << getTime() << ":: ";
+        *mpOutStream << "\r[DEBUG] " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg));
     }
 
@@ -91,14 +91,14 @@ public:
     static void warn(T crMsg, TRest... tail)
     {
         boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-        *mpOutStream << "[WARN]  " << getTime() << ":: ";
+        *mpOutStream << "\r[WARN]  " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
     }
     template<typename T>
     static void warn(T crMsg)
     {
         boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-        *mpOutStream << "[WARN]  " << getTime() << ":: ";
+        *mpOutStream << "\r[WARN]  " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg));
     }
 
@@ -113,14 +113,14 @@ public:
     static void error(T crMsg, TRest... tail)
     {
         boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-        *mpErrStream << "[ERROR] " << getTime() << ":: ";
+        *mpErrStream << "\r[ERROR] " << getTime() << ":: ";
         log(mpErrStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
     }
     template<typename T>
     static void error(T crMsg)
     {
         boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-        *mpErrStream << "[ERROR] " << getTime() << ":: ";
+        *mpErrStream << "\r[ERROR] " << getTime() << ":: ";
         log(mpErrStream, std::forward<T>(crMsg));
     }
 

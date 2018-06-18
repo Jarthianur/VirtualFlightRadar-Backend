@@ -31,8 +31,7 @@ PropertyMap::PropertyMap()
 PropertyMap::~PropertyMap() noexcept
 {}
 
-const std::string PropertyMap::getProperty(const std::string& crSection,
-                                           const std::string& crKey,
+const std::string PropertyMap::getProperty(const std::string& crSection, const std::string& crKey,
                                            const std::string& crDefault) const
 {
     auto sectionIt = mPropertiesMap.find(crSection);
@@ -67,8 +66,7 @@ const KeyValueMap& PropertyMap::getSectionKeyValue(const std::string& crSection)
     }
 }
 
-bool config::PropertyMap::addProperty(const std::string& crSection,
-                                      const KeyValue& crKeyValue)
+bool config::PropertyMap::addProperty(const std::string& crSection, const KeyValue& crKeyValue)
 {
     return mPropertiesMap[crSection].emplace(crKeyValue).second;
 }

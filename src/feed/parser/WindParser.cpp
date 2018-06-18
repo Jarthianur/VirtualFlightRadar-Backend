@@ -19,51 +19,44 @@
  }
  */
 
-#pragma once
+#include <stdexcept>
+#include "../../Math.hpp"
 
-#include <string>
+#include "WindParser.h"
 
-#include "Atmosphere.h"
-#include "Wind.h"
-
-/// @namespace object
-namespace object
+namespace feed
 {
-/**
- *@struct Climate
- * @brief Combine Wind and Atmosphere.
- * @see Wind
- * @see Atmosphere
- */
-struct Climate
+namespace parser
 {
-    /// @var wind
-    /// The Wind object
-    Wind wind;
+WindParser::WindParser() : Parser<object::Wind>()
+{}
 
-    /// @var atmosphere
-    /// The Atmosphere object
-    Atmosphere atmosphere;
+WindParser::~WindParser() noexcept
+{}
 
-    /**
-     * @fn hasAtmosphere
-     * @brief Is the Atmosphere object set?
-     * @return true if yes, else false
-     */
-    inline bool hasAtmosphere()
+bool WindParser::unpack(const std::string& crStr, object::Wind& rWind) noexcept
+{
+    try
     {
-        return !atmosphere.mSerialized.empty();
+        return (std::stoi(crStr.substr(crStr.rfind('*') + 1, 2), nullptr, 16)
+                    == math::checksum(crStr.c_str(), crStr.length())
+                && parseWind(crStr, rWind));
     }
-
-    /**
-     * @fn hasWind
-     * @brief Is the Wind object set?
-     * @return true if yes, else false
-     */
-    inline bool hasWind()
+    catch(const std::logic_error&)
     {
-        return !wind.mSerialized.empty();
+        return false;
     }
-};
+}
 
-}  // namespace object
+bool WindParser::parseWind(const std::string& crStr, object::Wind& rWind)
+{
+    bool valid;
+    if((valid = (crStr.find("MWV") != std::string::npos)))
+    {
+        rWind.setSerialized(std::string(crStr));
+    }
+    return valid;
+}
+
+}  // namespace parser
+}  // namespace feed

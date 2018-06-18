@@ -22,52 +22,51 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <memory>
 #include <string>
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/SbsParser.h"
+#include "parser/AtmosphereParser.h"
 
 #include "Feed.h"
 
 /// @namespace data
 namespace data
 {
-class AircraftData;
+class AtmosphereData;
 }  // namespace data
 
 /// @namespace feed
 namespace feed
 {
 /**
- * @class SbsFeed
- * @brief SBS input feed.
+ * @class AtmosphereFeed
+ * @brief Sensor input feed.
  * @extends Feed
  */
-class SbsFeed : public Feed, public std::enable_shared_from_this<SbsFeed>
+class AtmosphereFeed : public Feed, public std::enable_shared_from_this<AtmosphereFeed>
 {
 public:
-    NON_COPYABLE(SbsFeed)
+    NON_COPYABLE(AtmosphereFeed)
 
     /**
-     * @fn SbsFeed
+     * @fn AtmosphereFeed
      * @brief Constructor
-     * @param crName     The unique name
+     * @param crName     The SensorFeeds unique name
      * @param crKvMap    The properties map
-     * @param pData      The AircraftData pointer
-     * @param vMaxHeight The max height filter
+     * @param pWindData  The WindData pointer
+     * @param pAtmosData The AtmosphereData pointer
      * @throw std::logic_error from parent constructor
      */
-    SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-            std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight);
+    AtmosphereFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
+                   std::shared_ptr<data::AtmosphereData>& pData);
 
     /**
-     * @fn ~SbsFeed
+     * @fn ~AtmosphereFeed
      * @brief Destructor
      */
-    virtual ~SbsFeed() noexcept;
+    virtual ~AtmosphereFeed() noexcept;
 
     void registerClient(client::ClientManager& rManager) override;
 
@@ -79,7 +78,7 @@ public:
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    static parser::SbsParser smParser;
+    static parser::AtmosphereParser smParser;
 };
 
 }  // namespace feed

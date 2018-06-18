@@ -24,6 +24,8 @@
 #include <iostream>
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../../Logger.hpp"
 #include "../Feed.h"
@@ -32,29 +34,60 @@ namespace feed
 {
 namespace client
 {
-Client::Client(const std::string& crHost, const std::string& crPort,
-               const std::string& crComponent, feed::Feed& rFeed)
+Client::Client(const Endpoint& crEndpoint, const std::string& crComponent)
     : mIoService(),
       mSocket(mIoService),
       mResolver(mIoService),
-      mHost(crHost),
-      mPort(crPort),
+      mEndpoint(crEndpoint),
       mComponent(crComponent),
-      mrFeed(rFeed),
       mConnectTimer(mIoService)
-{}
+{
+    Logger::debug("Client construct ", mComponent);
+}
 
 Client::~Client() noexcept
-{}
-
-void Client::run(boost::asio::signal_set& rSigset)
 {
-    rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
-    mIoService.run();
+    Logger::debug("Client destruct ", mComponent);
+}
+
+void Client::run()
+{
+    Logger::debug("Client run called ", mComponent);
+    if(!mRunning)
+    {
+        Logger::debug("Client is running ", mComponent);
+        {
+            boost::lock_guard<boost::mutex> lock(mMutex);
+            connect();
+        }
+        mIoService.run();
+    }
+}
+
+bool Client::equals(const Client& crOther) const
+{
+    return this->mEndpoint == crOther.mEndpoint;
+}
+
+std::size_t Client::hash() const
+{
+    std::size_t seed = 0;
+    boost::hash_combine(seed, boost::hash_value(mEndpoint.host));
+    boost::hash_combine(seed, boost::hash_value(mEndpoint.port));
+    return seed;
+}
+
+void Client::subscribe(std::shared_ptr<Feed>& rpFeed)
+{
+    Logger::debug(mComponent, " Client subscribed from ", rpFeed->getName());
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    mrFeeds.push_back(rpFeed);
 }
 
 void Client::timedConnect()
 {
+    Logger::debug("Client timedConnect called ", mComponent);
+    Logger::debug("Client is running ", mComponent);
     mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
     mConnectTimer.async_wait(
         boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
@@ -62,30 +95,49 @@ void Client::timedConnect()
 
 void Client::stop()
 {
-    Logger::info(mComponent, " stop connection to: ", mHost, ":", mPort);
-    mConnectTimer.expires_at(boost::posix_time::pos_infin);
-    mConnectTimer.cancel();
-    boost::system::error_code ec;
-    mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-    if(mSocket.is_open())
+    Logger::debug("Client stop called ", mComponent);
+    if(mRunning)
     {
-        mSocket.close();
+        Logger::debug("Client is running ", mComponent);
+        mRunning = false;
+        Logger::info(mComponent, " stop connection to: ", mEndpoint.host, ":", mEndpoint.port);
+        mConnectTimer.expires_at(boost::posix_time::pos_infin);
+        mConnectTimer.cancel();
+        boost::system::error_code ec;
+        mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        if(mSocket.is_open())
+        {
+            mSocket.close();
+        }
     }
+}
+
+void Client::lockAndStop()
+{
+    Logger::debug(mComponent, " Client lockandstop called");
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    stop();
 }
 
 void Client::read()
 {
-    boost::asio::async_read_until(
-        mSocket, mBuffer, "\r\n",
-        boost::bind(&Client::handleRead, this, boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred));
+    Logger::debug("Client read called ", mComponent);
+    if(mRunning)
+    {
+        Logger::debug("Client is running ", mComponent);
+        boost::asio::async_read_until(mSocket, mBuffer, "\r\n",
+                                      boost::bind(&Client::handleRead, this,
+                                                  boost::asio::placeholders::error,
+                                                  boost::asio::placeholders::bytes_transferred));
+    }
 }
 
 void Client::handleTimedConnect(const boost::system::error_code& crError) noexcept
 {
     if(!crError)
     {
-        Logger::info(mComponent, " try connect to: ", mHost, ":", mPort);
+        boost::lock_guard<boost::mutex> lock(mMutex);
+        Logger::info(mComponent, " try connect to: ", mEndpoint.host, ":", mEndpoint.port);
         connect();
     }
     else
@@ -93,6 +145,7 @@ void Client::handleTimedConnect(const boost::system::error_code& crError) noexce
         Logger::error(mComponent, " cancel connect: ", crError.message());
         if(crError != boost::asio::error::operation_aborted)
         {
+            boost::lock_guard<boost::mutex> lock(mMutex);
             stop();
         }
     }
@@ -102,10 +155,18 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         std::istream is(&mBuffer);
         std::getline(is, mResponse);
         mResponse.append("\n");
-        mrFeed.process(mResponse);
+        for(auto& it : mrFeeds)
+        {
+            if(!mRunning)
+            {
+                break;
+            }
+            it->process(mResponse);
+        }
         read();
     }
     else if(crError != boost::system::errc::bad_file_descriptor)
@@ -113,6 +174,7 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
         Logger::error(mComponent, " read: ", crError.message());
         if(crError != boost::asio::error::operation_aborted)
         {
+            boost::lock_guard<boost::mutex> lock(mMutex);
             stop();
             if(crError == boost::asio::error::eof)
             {

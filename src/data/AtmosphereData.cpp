@@ -32,8 +32,7 @@ namespace data
 AtmosphereData::AtmosphereData() : Data()
 {}
 
-AtmosphereData::AtmosphereData(const Atmosphere& crAtmosphere)
-    : Data(), mAtmosphere(crAtmosphere)
+AtmosphereData::AtmosphereData(const Atmosphere& crAtmosphere) : Data(), mAtmosphere(crAtmosphere)
 {}
 
 AtmosphereData::~AtmosphereData() noexcept
@@ -50,8 +49,7 @@ bool AtmosphereData::update(Object&& rvAtmosphere, std::size_t vSlot)
     boost::lock_guard<boost::mutex> lock(mMutex);
     try
     {
-        bool updated
-            = mAtmosphere.tryUpdate(std::move(rvAtmosphere), ++mAttempts.at(vSlot));
+        bool updated = mAtmosphere.tryUpdate(std::move(rvAtmosphere), ++mAttempts.at(vSlot));
         if(updated)
         {
             std::fill(mAttempts.begin(), mAttempts.end(), 0);

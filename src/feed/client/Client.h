@@ -22,9 +22,12 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 #include <string>
+#include <vector>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "../../Defines.h"
 #include "../../Parameters.h"
@@ -44,6 +47,17 @@ namespace client
 #else
 #define C_CON_WAIT_TIMEVAL 120
 #endif
+
+struct Endpoint
+{
+    const std::string host;
+    const std::string port;
+
+    bool operator==(const Endpoint& crOther) const
+    {
+        return host == crOther.host && port == crOther.port;
+    }
+};
 
 /**
  * @class Client
@@ -67,13 +81,21 @@ public:
      * @note Returns after all queued handlers have returned.
      * @param rSigset The signal set reference to register handler
      */
-    void run(boost::asio::signal_set& rSigset);
+    void run();
 
     /**
      * @fn stop
      * @brief Stop the Client and close the connection.
      */
     virtual void stop();
+
+    void lockAndStop();
+
+    virtual bool equals(const Client& crOther) const;
+
+    virtual std::size_t hash() const;
+
+    void subscribe(std::shared_ptr<Feed>& rpFeed);
 
 protected:
     /**
@@ -84,8 +106,7 @@ protected:
      * @param crComponent  The component name
      * @param rFeed        The handler Feed reference
      */
-    Client(const std::string& crHost, const std::string& crPort,
-           const std::string& crComponent, feed::Feed& rFeed);
+    Client(const Endpoint& crEndpoint, const std::string& crComponent);
 
     /**
      * @fn timedConnect
@@ -118,8 +139,7 @@ protected:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleRead(const boost::system::error_code& crError,
-                    std::size_t vBytes) noexcept;
+    void handleRead(const boost::system::error_code& crError, std::size_t vBytes) noexcept;
 
     /**
      * @fn handleResolve
@@ -127,9 +147,8 @@ protected:
      * @param crError     The error code
      * @param vResloverIt The resolve iterator
      */
-    virtual void
-    handleResolve(const boost::system::error_code& crError,
-                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+    virtual void handleResolve(const boost::system::error_code& crError,
+                               boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
         = 0;
 
     /**
@@ -138,9 +157,8 @@ protected:
      * @param crError     The error code
      * @param vResolverIt The resolve iterator
      */
-    virtual void
-    handleConnect(const boost::system::error_code& crError,
-                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+    virtual void handleConnect(const boost::system::error_code& crError,
+                               boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
         = 0;
 
     /// @var mIoService
@@ -165,24 +183,24 @@ protected:
 
     /// @var mHost
     /// Hostname
-    const std::string mHost;
-
-    /// @var mPort
-    /// Port
-    const std::string mPort;
+    Endpoint mEndpoint;
 
     /// @var mComponent
     /// Component string used for logging
     const std::string mComponent;
 
-    /// @var mrFeed
-    /// Handler Feed reference
-    feed::Feed& mrFeed;
+    bool mRunning = false;
+
+    boost::mutex mMutex;
 
 private:
     /// @var mConnectTimer
     /// Connection timer
     boost::asio::deadline_timer mConnectTimer;
+
+    /// @var mrFeeds
+    /// Handler Feed references
+    std::vector<std::shared_ptr<feed::Feed>> mrFeeds;
 };
 
 }  // namespace client

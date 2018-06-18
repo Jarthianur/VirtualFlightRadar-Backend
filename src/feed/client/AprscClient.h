@@ -54,14 +54,17 @@ public:
      * @param crLogin The login string to transmit
      * @param rFeed   The handler Feed reference
      */
-    AprscClient(const std::string& crHost, const std::string& crPort,
-                const std::string& crLogin, feed::Feed& rFeed);
+    AprscClient(const Endpoint& crEndpoint, const std::string& crLogin);
 
     /**
      * @fn ~AprscClient
      * @brief Destructor
      */
     virtual ~AprscClient() noexcept;
+
+    bool equals(const Client& crOther) const override;
+
+    std::size_t hash() const override;
 
 private:
     /**
@@ -83,16 +86,14 @@ private:
     /**
      * @see Client#handleResolve
      */
-    void
-    handleResolve(const boost::system::error_code& crError,
-                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+    void handleResolve(const boost::system::error_code& crError,
+                       boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 
     /**
      * @see Client#handleConnect
      */
-    void
-    handleConnect(const boost::system::error_code& crError,
-                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+    void handleConnect(const boost::system::error_code& crError,
+                       boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 
     /**
      * @fn handleLogin
@@ -100,8 +101,7 @@ private:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleLogin(const boost::system::error_code& crError,
-                     std::size_t vBytes) noexcept;
+    void handleLogin(const boost::system::error_code& crError, std::size_t vBytes) noexcept;
 
     /**
      * @fn handleSendKeepAlive
@@ -109,16 +109,11 @@ private:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleSendKeepAlive(const boost::system::error_code& crError,
-                             std::size_t vBytes) noexcept;
+    void handleSendKeepAlive(const boost::system::error_code& crError, std::size_t vBytes) noexcept;
 
     /// @var mLoginStr
     /// Login string
     std::string mLoginStr;
-
-    /// @var mStopped
-    /// The run state
-    bool mStopped;
 
     /// @var mTimeout
     /// Beacon timer

@@ -22,48 +22,50 @@
 #include "SbsClient.h"
 
 #include <boost/bind.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../../Logger.hpp"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
 #define COMPONENT "(SbsClient)"
 
 namespace feed
 {
 namespace client
 {
-SbsClient::SbsClient(const std::string& crHost, const std::string& crPort,
-                     feed::Feed& rFeed)
-    : Client(crHost, crPort, COMPONENT, rFeed)
-{
-    connect();
-}
+SbsClient::SbsClient(const Endpoint& crEndpoint) : Client(crEndpoint, COMPONENT)
+{}
 
 SbsClient::~SbsClient() noexcept
 {}
 
 void SbsClient::connect()
 {
+    mRunning = true;
     boost::asio::ip::tcp::resolver::query query(
-        mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
+        mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(query, boost::bind(&SbsClient::handleResolve, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
 }
 
-void SbsClient::handleResolve(
-    const boost::system::error_code& crError,
-    boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+void SbsClient::handleResolve(const boost::system::error_code& crError,
+                              boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         boost::asio::async_connect(mSocket, vResolverIt,
                                    boost::bind(&SbsClient::handleConnect, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
     }
-    else
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -77,13 +79,15 @@ void SbsClient::handleConnect(const boost::system::error_code& crError,
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info(COMPONENT " connected to: ", mHost, ":", mPort);
+        Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
         read();
     }
-    else
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " connect: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();

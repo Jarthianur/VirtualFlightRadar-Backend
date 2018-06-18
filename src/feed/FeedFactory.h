@@ -75,7 +75,7 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    boost::optional<std::unique_ptr<Feed>> createFeed(const std::string& crName,
+    boost::optional<std::shared_ptr<Feed>> createFeed(const std::string& crName,
                                                       const config::KeyValueMap& crKvMap);
 
 private:
@@ -90,7 +90,7 @@ private:
      * @throw std::logic_error from invoked constructors
      */
     template<typename T>
-    T* makeFeed(const std::string& crName, const config::KeyValueMap& crKvMap);
+    std::shared_ptr<T> makeFeed(const std::string& crName, const config::KeyValueMap& crKvMap);
 
     /// @var mrConfig
     /// Reference to the Configuration

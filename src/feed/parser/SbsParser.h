@@ -47,18 +47,13 @@ public:
     DEFAULT_CTOR_DTOR(SbsParser)
 
     /**
-     * @fn SbsParser
-     * @brief Constructor
-     * @param vMaxHeight The max height filter
-     */
-    explicit SbsParser(std::int32_t vMaxHeight);
-
-    /**
      * @fn unpack
      * @brief Unpack into Aircraft.
      * @see Parser#unpack
      */
     bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
+
+    SETTER_V(std::int32_t, smMaxHeight, MaxHeight)
 
 private:
     /**
@@ -70,13 +65,12 @@ private:
      * @param rAircraft The target aircraft
      * @return true on success, else false
      */
-    // cppcheck-suppress unusedPrivateFunction
-    bool parseField(std::uint32_t vField, const std::string& crStr,
-                    object::Position& rPosition, object::Aircraft& rAircraft) noexcept;
+    bool parseField(std::uint32_t vField, const std::string& crStr, object::Position& rPosition,
+                    object::Aircraft& rAircraft) noexcept;
 
     /// @var mMaxHeight
     /// The max height filter
-    const std::int32_t mMaxHeight;
+    static std::int32_t smMaxHeight;
 };
 }  // namespace parser
 }  // namespace feed

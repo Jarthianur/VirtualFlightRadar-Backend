@@ -21,32 +21,38 @@
 
 #pragma once
 
-#include <cstdint>
+#include <string>
 
-#include "../Defines.h"
+#include "../../Defines.h"
+#include "../../object/Wind.h"
 
-#include "Object.h"
+#include "Parser.hpp"
 
-/// @namespace object
-namespace object
+namespace feed
 {
-struct Climate;
-
-/**
- * @class Wind
- * @brief Respresent wind information.
- * @extends Object
- */
-class Wind : public Object
+namespace parser
+{
+class WindParser : public Parser<object::Wind>
 {
 public:
-    DEFAULT_CTOR_DTOR(Wind)
-
+    DEFAULT_CTOR_DTOR(WindParser)
     /**
-     * @fn Wind
-     * @brief Constructor
+     * @fn unpack
+     * @brief Unpack into Climate.
+     * @see Parser#unpack
      */
-    explicit Wind(std::uint32_t vPriority);
-};
+    bool unpack(const std::string& crStr, object::Wind& rWind) noexcept override;
 
-}  // namespace object
+private:
+    /**
+     * @fn parseClimate
+     * @brief Parse a sentence and unpack into Climate.
+     * @param crStr    The string to parse
+     * @param rClimate The target object
+     * @return true on success, else false
+     * @throw std::out_of_range, std::invalid_argument from invoked functions
+     */
+    bool parseWind(const std::string& crStr, object::Wind& rWind);
+};
+}  // namespace parser
+}  // namespace feed

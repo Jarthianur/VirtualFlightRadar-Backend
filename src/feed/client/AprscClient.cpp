@@ -23,33 +23,61 @@
 
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../../Logger.hpp"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
 #define COMPONENT "(AprscClient)"
 
 namespace feed
 {
 namespace client
 {
-AprscClient::AprscClient(const std::string& crHost, const std::string& crPort,
-                         const std::string& crLogin, feed::Feed& rFeed)
-    : Client(crHost, crPort, COMPONENT, rFeed),
+AprscClient::AprscClient(const Endpoint& crEndpoint, const std::string& crLogin)
+    : Client(crEndpoint, COMPONENT),
       mLoginStr(crLogin),
-      mStopped(false),
       mTimeout(mIoService, boost::posix_time::minutes(10))
 {
     mLoginStr.append("\r\n");
-    connect();
+    Logger::debug("construct: " COMPONENT);
 }
 
 AprscClient::~AprscClient() noexcept
-{}
+{
+    Logger::debug("destruct: " COMPONENT);
+}
+
+bool AprscClient::equals(const Client& crOther) const
+{
+    try
+    {
+        const AprscClient& crAOther = dynamic_cast<const AprscClient&>(crOther);
+        return Client::equals(crOther) && this->mLoginStr == crAOther.mLoginStr;
+    }
+    catch(const std::bad_cast&)
+    {
+        return false;
+    }
+}
+
+std::size_t AprscClient::hash() const
+{
+    std::size_t seed = Client::hash();
+    boost::hash_combine(seed, boost::hash_value(mLoginStr));
+    return seed;
+}
 
 void AprscClient::connect()
 {
+    Logger::debug(COMPONENT " connect called");
+    mRunning = true;
+    Logger::debug(COMPONENT " is running");
     boost::asio::ip::tcp::resolver::query query(
-        mHost, mPort, boost::asio::ip::tcp::resolver::query::canonical_name);
+        mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(query, boost::bind(&AprscClient::handleResolve, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
@@ -57,26 +85,31 @@ void AprscClient::connect()
 
 void AprscClient::stop()
 {
+    Logger::debug(COMPONENT " stop called");
+    if(mRunning)
+    {
+        Logger::debug(COMPONENT " is running");
+        mTimeout.expires_at(boost::posix_time::pos_infin);
+        mTimeout.cancel();
+    }
     Client::stop();
-    mStopped = true;
-    mTimeout.expires_at(boost::posix_time::pos_infin);
-    mTimeout.cancel();
 }
 
-void AprscClient::handleResolve(
-    const boost::system::error_code& crError,
-    boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+void AprscClient::handleResolve(const boost::system::error_code& crError,
+                                boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         boost::asio::async_connect(mSocket, vResolverIt,
                                    boost::bind(&AprscClient::handleConnect, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
     }
-    else
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -90,16 +123,18 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        boost::asio::async_write(
-            mSocket, boost::asio::buffer(mLoginStr),
-            boost::bind(&AprscClient::handleLogin, this, boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+        boost::asio::async_write(mSocket, boost::asio::buffer(mLoginStr),
+                                 boost::bind(&AprscClient::handleLogin, this,
+                                             boost::asio::placeholders::error,
+                                             boost::asio::placeholders::bytes_transferred));
         mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAlive, this));
     }
-    else
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " connect: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -110,24 +145,26 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
 
 void AprscClient::sendKeepAlive()
 {
-    if(mStopped)
+    Logger::debug(COMPONENT " sendKA called");
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    if(mRunning)
     {
-        return;
+        Logger::debug(COMPONENT " is running");
+        boost::asio::async_write(mSocket, boost::asio::buffer("#keep-alive beacon\r\n"),
+                                 boost::bind(&AprscClient::handleSendKeepAlive, this,
+                                             boost::asio::placeholders::error,
+                                             boost::asio::placeholders::bytes_transferred));
+        mTimeout.expires_from_now(boost::posix_time::minutes(10));
+        mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAlive, this));
     }
-    boost::asio::async_write(mSocket, boost::asio::buffer("#keep-alive beacon\r\n"),
-                             boost::bind(&AprscClient::handleSendKeepAlive, this,
-                                         boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred));
-    mTimeout.expires_from_now(boost::posix_time::minutes(10));
-    mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAlive, this));
 }
 
-void AprscClient::handleLogin(const boost::system::error_code& crError,
-                              std::size_t) noexcept
+void AprscClient::handleLogin(const boost::system::error_code& crError, std::size_t) noexcept
 {
     if(!crError)
     {
-        Logger::info(COMPONENT " connected to: ", mHost, ":", mPort);
+        Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         read();
     }
     else

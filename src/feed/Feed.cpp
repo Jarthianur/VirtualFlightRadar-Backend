@@ -28,17 +28,21 @@
 #include <unordered_map>
 
 #include "../Logger.hpp"
-#include "../VFRB.h"
 #include "../config/Configuration.h"
 #include "client/Client.h"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
 #define COMPONENT "(Feed)"
 
 namespace feed
 {
-Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap)
-    : mName(crName), mKvMap(crKvMap)
+Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
+           std::shared_ptr<data::Data> pData)
+    : mName(crName), mKvMap(crKvMap), mpData(pData)
 {
+    Logger::debug(crName, " constructed ", COMPONENT);
     initPriority();
     if(mKvMap.find(KV_KEY_HOST) == mKvMap.end())
     {
@@ -50,17 +54,12 @@ Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap)
         Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
+    mDataSlot = mpData->registerSlot();
 }
 
 Feed::~Feed() noexcept
-{}
-
-void Feed::run(boost::asio::signal_set& rSigset) noexcept
 {
-    if(VFRB::vRunStatus)
-    {
-        mpClient->run(rSigset);
-    }
+    Logger::debug(mName, " destructed ", COMPONENT);
 }
 
 void Feed::initPriority() noexcept

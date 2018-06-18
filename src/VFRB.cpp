@@ -48,8 +48,7 @@ std::atomic<bool> VFRB::vRunStatus(true);
 
 VFRB::VFRB(const config::Configuration& config)
     : mpAircraftData(new AircraftData(config.getMaxDistance())),
-      mpAtmosphereData(
-          new AtmosphereData(object::Atmosphere(config.getAtmPressure(), 0))),
+      mpAtmosphereData(new AtmosphereData(object::Atmosphere(config.getAtmPressure(), 0))),
       mpGpsData(new GpsData(config.getPosition(), config.getGroundMode())),
       mpWindData(new WindData()),
       mServer(config.getServerPort())
@@ -68,26 +67,27 @@ void VFRB::run() noexcept
     boost::asio::io_service io_service;
     boost::asio::signal_set signal_set(io_service);
     setupSignals(signal_set);
-    boost::thread signal_thread([&io_service]() { io_service.run(); });
 
     boost::thread server_thread([this, &signal_set]() {
         Logger::info("(Server) start server");
         mServer.run(signal_set);
         vRunStatus = false;
     });
-    boost::thread_group feed_threads;
     for(const auto& it : mFeeds)
     {
-        feed_threads.create_thread([&]() {
-            Logger::info("(VFRB) run feed: ", it->getName());
-            it->run(signal_set);
-        });
+        Logger::info("(VFRB) run feed: ", it->getName());
+        it->registerClient(mClientManager);
     }
+    boost::thread_group client_threads;
+    mClientManager.run(client_threads, signal_set);
+    boost::thread signal_thread([&io_service]() { io_service.run(); });
+    mFeeds.clear();
 
     serve();
+    mClientManager.stop();
 
     server_thread.join();
-    feed_threads.join_all();
+    client_threads.join_all();
     signal_thread.join();
 
     Logger::info("EXITING / runtime: ", getDuration(start));
@@ -95,8 +95,7 @@ void VFRB::run() noexcept
 
 void VFRB::createFeeds(const config::Configuration& crConfig)
 {
-    feed::FeedFactory factory(crConfig, mpAircraftData, mpAtmosphereData, mpGpsData,
-                              mpWindData);
+    feed::FeedFactory factory(crConfig, mpAircraftData, mpAtmosphereData, mpGpsData, mpWindData);
     for(const auto& feed : crConfig.getFeedMapping())
     {
         try
@@ -104,14 +103,14 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
             auto optFeedPtr = factory.createFeed(feed.first, feed.second);
             if(optFeedPtr)
             {
-                mFeeds.push_back(std::move(*optFeedPtr));
+                mFeeds.push_back(*optFeedPtr);
             }
             else
             {
                 Logger::warn(
                     "(VFRB) create feed ", feed.first,
                     ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                    ", " SECT_KEY_SBS ", " SECT_KEY_SENS ", " SECT_KEY_GPS);
+                    ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS ", " SECT_KEY_GPS);
             }
         }
         catch(const std::exception& e)

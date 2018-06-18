@@ -71,8 +71,6 @@ private:
      */
     void assign(Object&& rvOther) override;
 
-    friend struct Climate;
-
     /// @var mPressure
     /// The atmospheric pressure
     double mPressure = ICAO_STD_A;

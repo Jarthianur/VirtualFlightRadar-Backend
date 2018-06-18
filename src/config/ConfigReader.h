@@ -81,8 +81,8 @@ private:
      * @param vLineNr    The corresponding line number
      * @param rMap       The properties
      */
-    void addKeyValue(const std::string& crSection, const KeyValue& crKeyValue,
-                     std::size_t vLineNr, PropertyMap& rMap);
+    void addKeyValue(const std::string& crSection, const KeyValue& crKeyValue, std::size_t vLineNr,
+                     PropertyMap& rMap);
 
     /**
      * @fn addSection

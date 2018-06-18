@@ -24,20 +24,15 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <boost/asio/signal_set.hpp>
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
+#include "../data/Data.h"
+#include "client/ClientManager.h"
 
 /// @namespace feed
 namespace feed
 {
-/// @namespace client
-namespace client
-{
-class Client;
-}  // namespace client
-
 /**
  * @class Feed
  * @brief Base class representing an input feed.
@@ -53,12 +48,7 @@ public:
      */
     virtual ~Feed() noexcept;
 
-    /**
-     * @fn run
-     * @brief Run a Feed.
-     * @param rSigset The signal set to pass to the Client
-     */
-    void run(boost::asio::signal_set& rSigset) noexcept;
+    virtual void registerClient(client::ClientManager& rManager) = 0;
 
     /**
      * @fn process
@@ -81,7 +71,8 @@ protected:
      * @param crKvMap The properties map
      * @throw std::logic_error if host or port are not given
      */
-    Feed(const std::string& crName, const config::KeyValueMap& crKvMap);
+    Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
+         std::shared_ptr<data::Data> pData);
 
     /// @var mName
     /// Unique name
@@ -91,9 +82,13 @@ protected:
     /// Key-value-map holding the properties.
     const config::KeyValueMap mKvMap;
 
-    /// @var mpClient
-    /// Client, later resolved in child class
-    std::unique_ptr<client::Client> mpClient;
+    std::weak_ptr<client::Client> mSubsribedClient;
+
+    /// @var mAtmosSlot
+    /// AtmosphereData attempt slot
+    std::size_t mDataSlot;
+
+    std::shared_ptr<data::Data> mpData;
 
 private:
     /**
