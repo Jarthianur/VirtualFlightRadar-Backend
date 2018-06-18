@@ -68,7 +68,7 @@ void GpsFeed::process(const std::string& crResponse) noexcept
     {
         try
         {
-            if(!mpData->update(std::move(pos), mDataSlot)) // UNDO !
+            if(mpData->update(std::move(pos), mDataSlot))
             {
                 throw std::runtime_error("received good position -> stop");
             }
