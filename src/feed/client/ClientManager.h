@@ -78,6 +78,8 @@ public:
 
     void run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset);
 
+    void stop();
+
 private:
     ClientSet mClients;
 

@@ -80,13 +80,7 @@ std::weak_ptr<Client> ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
 
 void ClientManager::run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset)
 {
-    rSigset.async_wait([this](const boost::system::error_code&, int) {
-        boost::lock_guard<boost::mutex> lock(mMutex);
-        for(const auto& it : mClients)
-        {
-            it->lockAndStop();
-        }
-    });
+    rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
     for(const auto& it : mClients)
     {
         Logger::debug("CM create thread for ", it->hash());
@@ -97,6 +91,15 @@ void ClientManager::run(boost::thread_group& rThdGroup, boost::asio::signal_set&
             boost::lock_guard<boost::mutex> lock(mMutex);
             mClients.erase(it);
         });
+    }
+}
+
+void ClientManager::stop()
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    for(const auto& it : mClients)
+    {
+        it->lockAndStop();
     }
 }
 

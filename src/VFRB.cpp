@@ -84,6 +84,7 @@ void VFRB::run() noexcept
     mFeeds.clear();
 
     serve();
+    mClientManager.stop();
 
     server_thread.join();
     client_threads.join_all();
