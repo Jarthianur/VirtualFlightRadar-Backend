@@ -24,6 +24,7 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/operators.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../../Logger.hpp"
 
@@ -41,9 +42,7 @@ SensorClient::SensorClient(const Endpoint& crEndpoint)
 {}
 
 SensorClient::~SensorClient() noexcept
-{
-    stop();
-}
+{}
 
 void SensorClient::read()
 {
@@ -56,29 +55,24 @@ void SensorClient::read()
 
 void SensorClient::connect()
 {
-    if(mRunning)
-    {
-        mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
-        boost::asio::ip::tcp::resolver::query query(
-            mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
-        mResolver.async_resolve(query, boost::bind(&SensorClient::handleResolve, this,
-                                                   boost::asio::placeholders::error,
-                                                   boost::asio::placeholders::iterator));
-    }
+    mRunning = true;
+    mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
+    boost::asio::ip::tcp::resolver::query query(
+        mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(query, boost::bind(&SensorClient::handleResolve, this,
+                                               boost::asio::placeholders::error,
+                                               boost::asio::placeholders::iterator));
 }
 
 void SensorClient::checkDeadline()
 {
+    boost::lock_guard<boost::mutex> lock(mMutex);
     if(mRunning)
     {
         if(mTimeout.expires_at() <= boost::asio::deadline_timer::traits_type::now())
         {
             Logger::warn(COMPONENT " timed out: reconnect...");
-            if(mSocket.is_open())
-            {
-                mSocket.close();
-            }
-            mTimeout.expires_at(boost::posix_time::pos_infin);
+            stop();
             connect();
         }
         mTimeout.async_wait(boost::bind(&SensorClient::checkDeadline, this));
@@ -100,14 +94,16 @@ void SensorClient::handleResolve(const boost::system::error_code& crError,
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         boost::asio::async_connect(mSocket, vResolverIt,
                                    boost::bind(&SensorClient::handleConnect, this,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
     }
-    else
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -121,13 +117,15 @@ void SensorClient::handleConnect(const boost::system::error_code& crError,
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
         Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
         read();
     }
-    else
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " connect: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();

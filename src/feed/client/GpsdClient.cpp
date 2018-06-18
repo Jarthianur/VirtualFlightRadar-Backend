@@ -48,15 +48,13 @@ GpsdClient::~GpsdClient() noexcept
 void GpsdClient::connect()
 {
     Logger::debug(COMPONENT " connect called");
-    if(mRunning)
-    {
-        Logger::debug(COMPONENT " is running");
-        boost::asio::ip::tcp::resolver::query query(
-            mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
-        mResolver.async_resolve(query, boost::bind(&GpsdClient::handleResolve, this,
-                                                   boost::asio::placeholders::error,
-                                                   boost::asio::placeholders::iterator));
-    }
+    mRunning = true;
+    Logger::debug(COMPONENT " is running");
+    boost::asio::ip::tcp::resolver::query query(
+        mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(query, boost::bind(&GpsdClient::handleResolve, this,
+                                               boost::asio::placeholders::error,
+                                               boost::asio::placeholders::iterator));
 }
 
 void GpsdClient::handleResolve(const boost::system::error_code& crError,
@@ -70,7 +68,7 @@ void GpsdClient::handleResolve(const boost::system::error_code& crError,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
     }
-    else
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
@@ -94,7 +92,7 @@ void GpsdClient::handleConnect(const boost::system::error_code& crError,
             boost::bind(&GpsdClient::handleWatch, this, boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
     }
-    else
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " connect: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);

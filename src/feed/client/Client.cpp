@@ -58,7 +58,6 @@ void Client::run()
         Logger::debug("Client is running ", mComponent);
         {
             boost::lock_guard<boost::mutex> lock(mMutex);
-            mRunning = true;
             connect();
         }
         mIoService.run();
@@ -81,19 +80,17 @@ std::size_t Client::hash() const
 void Client::subscribe(std::shared_ptr<Feed>& rpFeed)
 {
     Logger::debug(mComponent, " Client subscribed from ", rpFeed->getName());
+    boost::lock_guard<boost::mutex> lock(mMutex);
     mrFeeds.push_back(rpFeed);
 }
 
 void Client::timedConnect()
 {
     Logger::debug("Client timedConnect called ", mComponent);
-    if(mRunning)
-    {
         Logger::debug("Client is running ", mComponent);
         mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
         mConnectTimer.async_wait(
             boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
-    }
 }
 
 void Client::stop()
@@ -111,10 +108,6 @@ void Client::stop()
         if(mSocket.is_open())
         {
             mSocket.close();
-        }
-        if(!mIoService.stopped())
-        {
-            mIoService.stop();
         }
     }
 }

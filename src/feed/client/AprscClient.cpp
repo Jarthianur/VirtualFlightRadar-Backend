@@ -74,15 +74,13 @@ std::size_t AprscClient::hash() const
 void AprscClient::connect()
 {
     Logger::debug(COMPONENT " connect called");
-    if(mRunning)
-    {
-        Logger::debug(COMPONENT " is running");
-        boost::asio::ip::tcp::resolver::query query(
-            mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
-        mResolver.async_resolve(query, boost::bind(&AprscClient::handleResolve, this,
-                                                   boost::asio::placeholders::error,
-                                                   boost::asio::placeholders::iterator));
-    }
+    mRunning = true;
+    Logger::debug(COMPONENT " is running");
+    boost::asio::ip::tcp::resolver::query query(
+        mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(query, boost::bind(&AprscClient::handleResolve, this,
+                                               boost::asio::placeholders::error,
+                                               boost::asio::placeholders::iterator));
 }
 
 void AprscClient::stop()
@@ -108,7 +106,7 @@ void AprscClient::handleResolve(const boost::system::error_code& crError,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
     }
-    else
+    else if (crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
@@ -133,7 +131,7 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
                                              boost::asio::placeholders::bytes_transferred));
         mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAlive, this));
     }
-    else
+    else if (crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " connect: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
@@ -148,6 +146,7 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
 void AprscClient::sendKeepAlive()
 {
     Logger::debug(COMPONENT " sendKA called");
+    boost::lock_guard<boost::mutex> lock(mMutex);
     if(mRunning)
     {
         Logger::debug(COMPONENT " is running");
