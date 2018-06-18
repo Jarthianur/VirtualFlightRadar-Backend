@@ -65,7 +65,6 @@ private:
      * @param rAircraft The target aircraft
      * @return true on success, else false
      */
-    // cppcheck-suppress unusedPrivateFunction
     bool parseField(std::uint32_t vField, const std::string& crStr, object::Position& rPosition,
                     object::Aircraft& rAircraft) noexcept;
 

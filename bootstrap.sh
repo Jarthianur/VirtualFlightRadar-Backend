@@ -286,7 +286,7 @@ function static_analysis() {
     require VFRB_ROOT
     trap "fail -e popd Static code analysis failed!" ERR
     pushd $VFRB_ROOT
-    cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ --error-exitcode=1 --inline-suppr -q src/
+    cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ -q src/
     for f in $(find src/ -type f); do
         diff -u <(cat $f) <(clang-format-5.0 -style=file $f) || true
     done &> format.diff

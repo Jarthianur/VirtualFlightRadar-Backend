@@ -60,7 +60,6 @@ private:
      * @return true on success, else false
      * @throw std::out_of_range, std::invalid_argument from invoked functions
      */
-    // cppcheck-suppress unusedPrivateFunction
     bool parseAtmosphere(const std::string& crStr, object::Atmosphere& rAtmos);
 };
 }  // namespace parser

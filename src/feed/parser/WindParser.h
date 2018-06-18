@@ -52,7 +52,6 @@ private:
      * @return true on success, else false
      * @throw std::out_of_range, std::invalid_argument from invoked functions
      */
-    // cppcheck-suppress unusedPrivateFunction
     bool parseWind(const std::string& crStr, object::Wind& rWind);
 };
 }  // namespace parser

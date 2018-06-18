@@ -72,7 +72,6 @@ private:
      * @param rPosition The target position
      * @return true on success, else false
      */
-    // cppcheck-suppress unusedPrivateFunction
     bool parsePosition(const boost::smatch& crMatch, object::GpsPosition& rPosition);
 
     /// @var msGpggaRe
