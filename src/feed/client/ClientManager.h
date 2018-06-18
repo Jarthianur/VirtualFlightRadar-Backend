@@ -38,8 +38,26 @@ namespace feed
 class Feed;
 namespace client
 {
+
+struct ClientHasher
+{
+    std::size_t operator()(const std::shared_ptr<Client>& crClient) const
+    {
+        return crClient->hash();
+    }
+};
+
+struct ClientComparator
+{
+    bool operator()(const std::shared_ptr<Client>& crClient1,
+                    const std::shared_ptr<Client>& crClient2) const
+    {
+        return crClient1->equals(*crClient2);
+    }
+};
+
 using ClientSet
-    = std::unordered_set<std::unique_ptr<Client>, ClientHasher, ClientComparator>;
+    = std::unordered_set<std::shared_ptr<Client>, ClientHasher, ClientComparator>;
 
 class ClientManager
 {
@@ -54,7 +72,7 @@ public:
 
     DEFAULT_CTOR_DTOR(ClientManager)
 
-    ClientSet::iterator subscribe(std::shared_ptr<Feed> rpFeed,
+    std::weak_ptr<Client> subscribe(std::shared_ptr<Feed> rpFeed,
                                   const Endpoint& crEndpoint, Protocol vProtocol);
 
     void run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset);

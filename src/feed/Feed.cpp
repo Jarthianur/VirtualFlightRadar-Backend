@@ -42,6 +42,7 @@ Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
            std::shared_ptr<data::Data> pData)
     : mName(crName), mKvMap(crKvMap), mpData(pData)
 {
+    Logger::debug(crName, " constructed ", COMPONENT);
     initPriority();
     if(mKvMap.find(KV_KEY_HOST) == mKvMap.end())
     {
@@ -57,7 +58,9 @@ Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
 }
 
 Feed::~Feed() noexcept
-{}
+{
+    Logger::debug(mName, " destructed ", COMPONENT);
+}
 
 void Feed::initPriority() noexcept
 {

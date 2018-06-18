@@ -42,17 +42,17 @@ ClientManager::ClientManager()
 ClientManager::~ClientManager() noexcept
 {}
 
-ClientSet::iterator ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
-                                             const Endpoint& crEndpoint, Protocol vProtocol)
+std::weak_ptr<Client> ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
+                                               const Endpoint& crEndpoint, Protocol vProtocol)
 {
-    ClientSet::iterator it;
+    ClientSet::iterator it = mClients.end();
     switch(vProtocol)
     {
         case Protocol::APRS:
         {
             if(std::shared_ptr<AprscFeed> feed = std::dynamic_pointer_cast<AprscFeed>(rpFeed))
             {
-                it = mClients.insert(std::make_unique<AprscClient>(crEndpoint, feed->getLoginStr()))
+                it = mClients.insert(std::make_shared<AprscClient>(crEndpoint, feed->getLoginStr()))
                          .first;
             }
             else
@@ -62,28 +62,29 @@ ClientSet::iterator ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
         }
         break;
         case Protocol::SBS:
-            it = mClients.insert(std::make_unique<SbsClient>(crEndpoint)).first;
+            it = mClients.insert(std::make_shared<SbsClient>(crEndpoint)).first;
             break;
         case Protocol::GPS:
-            it = mClients.insert(std::make_unique<GpsdClient>(crEndpoint)).first;
+            it = mClients.insert(std::make_shared<GpsdClient>(crEndpoint)).first;
             break;
         case Protocol::SENSOR:
-            it = mClients.insert(std::make_unique<SensorClient>(crEndpoint)).first;
+            it = mClients.insert(std::make_shared<SensorClient>(crEndpoint)).first;
             break;
     }
+    Logger::debug("CM subscribed from ", rpFeed->getName(), " to ", (*it)->hash());
     (*it)->subscribe(rpFeed);
-    return it;
+    return std::weak_ptr<Client>(*it);
 }
 
 void ClientManager::run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset)
 {
     for(const auto& it : mClients)
     {
-        Logger::debug("create thread for ", it->hash());
+        Logger::debug("CM create thread for ", it->hash());
         rThdGroup.create_thread([&]() {
-            Logger::debug("run client ", it->hash());
+            Logger::debug("CM run client ", it->hash());
             it->run(rSigset);
-            Logger::debug("returned from client run call");
+            Logger::debug("CM returned from client run call -> erase");
             mClients.erase(it);
         });
     }

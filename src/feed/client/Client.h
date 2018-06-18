@@ -201,22 +201,5 @@ private:
     std::vector<std::shared_ptr<feed::Feed>> mrFeeds;
 };
 
-struct ClientHasher
-{
-    std::size_t operator()(const std::unique_ptr<Client>& crClient) const
-    {
-        return crClient->hash();
-    }
-};
-
-struct ClientComparator
-{
-    bool operator()(const std::unique_ptr<Client>& crClient1,
-                    const std::unique_ptr<Client>& crClient2) const
-    {
-        return crClient1->equals(*crClient2);
-    }
-};
-
 }  // namespace client
 }  // namespace feed

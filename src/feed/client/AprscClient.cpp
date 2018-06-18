@@ -42,10 +42,12 @@ AprscClient::AprscClient(const Endpoint& crEndpoint, const std::string& crLogin)
       mTimeout(mIoService, boost::posix_time::minutes(10))
 {
     mLoginStr.append("\r\n");
+    Logger::debug("construct: " COMPONENT);
 }
 
 AprscClient::~AprscClient() noexcept
 {
+    Logger::debug("destruct: " COMPONENT);
     stop();
 }
 
@@ -71,8 +73,10 @@ std::size_t AprscClient::hash() const
 
 void AprscClient::connect()
 {
+    Logger::debug(COMPONENT " connect called");
     if(mRunning)
     {
+        Logger::debug(COMPONENT " is running");
         boost::asio::ip::tcp::resolver::query query(
             mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
         mResolver.async_resolve(query, boost::bind(&AprscClient::handleResolve, this,
@@ -83,8 +87,10 @@ void AprscClient::connect()
 
 void AprscClient::stop()
 {
+    Logger::debug(COMPONENT " stop called");
     if(mRunning)
     {
+        Logger::debug(COMPONENT " is running");
         mTimeout.expires_at(boost::posix_time::pos_infin);
         mTimeout.cancel();
     }
@@ -137,8 +143,10 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
 
 void AprscClient::sendKeepAlive()
 {
+    Logger::debug(COMPONENT " sendKA called");
     if(mRunning)
     {
+        Logger::debug(COMPONENT " is running");
         boost::asio::async_write(mSocket, boost::asio::buffer("#keep-alive beacon\r\n"),
                                  boost::bind(&AprscClient::handleSendKeepAlive, this,
                                              boost::asio::placeholders::error,

@@ -44,11 +44,13 @@ parser::GpsParser GpsFeed::smParser;
 GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
                  std::shared_ptr<data::GpsData> pData)
     : Feed(crName, crKvMap, pData)
-{}
+{
+    Logger::debug(crName, " constructed ", COMPONENT);
+}
 
 GpsFeed::~GpsFeed() noexcept
 {
-    Logger::debug("destructed gpsfeed");
+    Logger::debug(mName, " destructed ", COMPONENT);
 }
 
 void GpsFeed::registerClient(client::ClientManager& rManager)
@@ -60,12 +62,13 @@ void GpsFeed::registerClient(client::ClientManager& rManager)
 
 void GpsFeed::process(const std::string& crResponse) noexcept
 {
+    Logger::debug(mName, " process called");
     object::GpsPosition pos(getPriority());
     if(smParser.unpack(crResponse, pos))
     {
         try
         {
-            if(mpData->update(std::move(pos), mDataSlot))
+            if(!mpData->update(std::move(pos), mDataSlot))
             {
                 throw std::runtime_error("received good position -> stop");
             }
@@ -73,7 +76,8 @@ void GpsFeed::process(const std::string& crResponse) noexcept
         catch(const std::runtime_error& e)
         {
             Logger::info(COMPONENT " ", mName, ": ", e.what());
-            (*mSubsribedClient)->stop();
+            auto client = std::shared_ptr<client::Client>(mSubsribedClient);
+            client->stop();
             Logger::debug("returned from gpsfeed stop call");
             return;
         }

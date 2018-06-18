@@ -43,6 +43,7 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
                      std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
     : Feed(crName, crKvMap, pData)
 {
+    Logger::debug(crName, " constructed ", COMPONENT);
     smParser.setMaxHeight(vMaxHeight);
     mLoginStrIt = mKvMap.find(KV_KEY_LOGIN);
     if(mLoginStrIt == mKvMap.end())
@@ -53,7 +54,7 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
 }
 
 AprscFeed::~AprscFeed() noexcept
-{}
+{ Logger::debug(mName, " destructed ", COMPONENT);}
 
 void AprscFeed::registerClient(client::ClientManager& rManager)
 {
@@ -64,6 +65,7 @@ void AprscFeed::registerClient(client::ClientManager& rManager)
 
 void AprscFeed::process(const std::string& crResponse) noexcept
 {
+    Logger::debug(mName, " process called");
     object::Aircraft ac(getPriority());
     if(smParser.unpack(crResponse, ac))
     {

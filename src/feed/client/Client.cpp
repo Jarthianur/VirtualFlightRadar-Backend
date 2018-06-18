@@ -40,17 +40,22 @@ Client::Client(const Endpoint& crEndpoint, const std::string& crComponent)
       mEndpoint(crEndpoint),
       mComponent(crComponent),
       mConnectTimer(mIoService)
-{}
+{
+    Logger::debug("Client construct");
+}
 
 Client::~Client() noexcept
 {
+    Logger::debug("Client destruct");
     stop();
 }
 
 void Client::run(boost::asio::signal_set& rSigset)
 {
+    Logger::debug("Client run called");
     if(!mRunning)
     {
+        Logger::debug("Client is running");
         mRunning = true;
         rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
         connect();
@@ -73,13 +78,16 @@ std::size_t Client::hash() const
 
 void Client::subscribe(std::shared_ptr<Feed>& rpFeed)
 {
+    Logger::debug("Client subscribed from ", rpFeed->getName());
     mrFeeds.push_back(rpFeed);
 }
 
 void Client::timedConnect()
 {
+    Logger::debug("Client timedConnect called");
     if(mRunning)
     {
+        Logger::debug("Client is running");
         mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
         mConnectTimer.async_wait(
             boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
@@ -88,8 +96,10 @@ void Client::timedConnect()
 
 void Client::stop()
 {
+    Logger::debug("Client stop called");
     if(mRunning)
     {
+        Logger::debug("Client is running");
         mRunning = false;
         Logger::info(mComponent, " stop connection to: ", mEndpoint.host, ":", mEndpoint.port);
         mConnectTimer.expires_at(boost::posix_time::pos_infin);
@@ -100,14 +110,19 @@ void Client::stop()
         {
             mSocket.close();
         }
-        mIoService.stop();
+        if(!mIoService.stopped())
+        {
+            mIoService.stop();
+        }
     }
 }
 
 void Client::read()
 {
+    Logger::debug("Client read called");
     if(mRunning)
     {
+        Logger::debug("Client is running");
         boost::asio::async_read_until(mSocket, mBuffer, "\r\n",
                                       boost::bind(&Client::handleRead, this,
                                                   boost::asio::placeholders::error,

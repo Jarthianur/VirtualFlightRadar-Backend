@@ -82,7 +82,7 @@ protected:
     /// Key-value-map holding the properties.
     const config::KeyValueMap mKvMap;
 
-    client::ClientSet::iterator mSubsribedClient;
+    std::weak_ptr<client::Client> mSubsribedClient;
 
     /// @var mAtmosSlot
     /// AtmosphereData attempt slot

@@ -35,17 +35,22 @@ namespace feed
 namespace client
 {
 GpsdClient::GpsdClient(const Endpoint& crEndpoint) : Client(crEndpoint, COMPONENT)
-{}
+{
+    Logger::debug(COMPONENT " constructed");
+}
 
 GpsdClient::~GpsdClient() noexcept
 {
+    Logger::debug(COMPONENT " destructed");
     stop();
 }
 
 void GpsdClient::connect()
 {
+    Logger::debug(COMPONENT " connect called");
     if(mRunning)
     {
+        Logger::debug(COMPONENT " is running");
         boost::asio::ip::tcp::resolver::query query(
             mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
         mResolver.async_resolve(query, boost::bind(&GpsdClient::handleResolve, this,
@@ -99,8 +104,10 @@ void GpsdClient::handleConnect(const boost::system::error_code& crError,
 
 void GpsdClient::stop()
 {
+    Logger::debug(COMPONENT " stop called");
     if(mRunning && mSocket.is_open())
     {
+        Logger::debug(COMPONENT " is running");
         boost::asio::async_write(mSocket, boost::asio::buffer("?WATCH={\"enable\":false}\r\n"),
                                  [this](const boost::system::error_code& crError, std::size_t) {
                                      if(!crError)

@@ -73,13 +73,11 @@ void VFRB::run() noexcept
         mServer.run(signal_set);
         vRunStatus = false;
     });
-
-    for(auto& it : mFeeds)
+    for(const auto& it : mFeeds)
     {
         Logger::info("(VFRB) run feed: ", it->getName());
         it->registerClient(mClientManager);
     }
-
     boost::thread_group client_threads;
     mClientManager.run(client_threads, signal_set);
     boost::thread signal_thread([&io_service]() { io_service.run(); });
@@ -104,7 +102,7 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
             auto optFeedPtr = factory.createFeed(feed.first, feed.second);
             if(optFeedPtr)
             {
-                mFeeds.push_back(std::move(*optFeedPtr));
+                mFeeds.push_back(*optFeedPtr);
             }
             else
             {
