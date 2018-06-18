@@ -32,7 +32,7 @@ namespace feed
 parser::WindParser WindFeed::smParser;
 
 WindFeed::WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                   std::shared_ptr<data::WindData> pData)
+                   std::shared_ptr<data::WindData>& pData)
     : Feed(crName, crKvMap, pData)
 
 {}

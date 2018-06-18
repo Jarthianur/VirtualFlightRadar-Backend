@@ -60,7 +60,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-             std::shared_ptr<data::WindData> pData);
+             std::shared_ptr<data::WindData>& pData);
 
     /**
      * @fn ~WindFeed
