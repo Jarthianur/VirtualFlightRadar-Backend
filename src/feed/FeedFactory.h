@@ -56,9 +56,10 @@ public:
      * @param pWindData     The WindData pointer
      */
     FeedFactory(const config::Configuration& crConfig,
-                std::shared_ptr<data::AircraftData> pAircraftData,
-                std::shared_ptr<data::AtmosphereData> pAtmosData,
-                std::shared_ptr<data::GpsData> pGpsData, std::shared_ptr<data::WindData> pWindData);
+                std::shared_ptr<data::AircraftData>& pAircraftData,
+                std::shared_ptr<data::AtmosphereData>& pAtmosData,
+                std::shared_ptr<data::GpsData>& pGpsData,
+                std::shared_ptr<data::WindData>& pWindData);
 
     /**
      * @fn ~FeedFactory

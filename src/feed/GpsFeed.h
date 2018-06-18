@@ -58,7 +58,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-            std::shared_ptr<data::GpsData> pData);
+            std::shared_ptr<data::GpsData>& pData);
 
     /**
      * @fn ~GpsFeed

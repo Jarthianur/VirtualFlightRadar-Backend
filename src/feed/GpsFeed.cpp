@@ -42,7 +42,7 @@ namespace feed
 parser::GpsParser GpsFeed::smParser;
 
 GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                 std::shared_ptr<data::GpsData> pData)
+                 std::shared_ptr<data::GpsData>& pData)
     : Feed(crName, crKvMap, pData)
 {
     Logger::debug(crName, " constructed ", COMPONENT);

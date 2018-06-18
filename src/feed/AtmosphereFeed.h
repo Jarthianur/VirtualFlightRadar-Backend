@@ -60,7 +60,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     AtmosphereFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                   std::shared_ptr<data::AtmosphereData> pData);
+                   std::shared_ptr<data::AtmosphereData>& pData);
 
     /**
      * @fn ~AtmosphereFeed

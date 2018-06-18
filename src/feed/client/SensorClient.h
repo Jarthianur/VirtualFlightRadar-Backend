@@ -60,7 +60,7 @@ public:
      * @param crPort The port
      * @param rFeed  The handler Feed reference
      */
-    SensorClient(const Endpoint& crEndpoint);
+    explicit SensorClient(const Endpoint& crEndpoint);
 
     /**
      * @fn ~SensorClient

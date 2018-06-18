@@ -71,6 +71,7 @@ protected:
      * @param crKvMap The properties map
      * @throw std::logic_error if host or port are not given
      */
+    // cppcheck-suppress passedByValue
     Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
          std::shared_ptr<data::Data> pData);
 

@@ -61,7 +61,7 @@ public:
      * @throw std::logic_error if login is not given or from parent constructor
      */
     AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-              std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
+              std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight);
 
     /**
      * @fn ~AprscFeed

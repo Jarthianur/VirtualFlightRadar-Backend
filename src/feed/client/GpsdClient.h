@@ -53,7 +53,7 @@ public:
      * @param crPort The port
      * @param rFeed  The handler Feed reference
      */
-    GpsdClient(const Endpoint& crEndpoint);
+    explicit GpsdClient(const Endpoint& crEndpoint);
 
     /**
      * @fn ~GpsdClient

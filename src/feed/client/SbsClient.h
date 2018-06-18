@@ -51,7 +51,7 @@ public:
      * @param crPort  The port
      * @param rFeed   The handler Feed reference
      */
-    SbsClient(const Endpoint& crEndpoint);
+    explicit SbsClient(const Endpoint& crEndpoint);
 
     /**
      * @fn ~SbsClient
