@@ -39,7 +39,6 @@ namespace feed
 class Feed;
 namespace client
 {
-
 struct ClientHasher
 {
     std::size_t operator()(const std::shared_ptr<Client>& crClient) const
@@ -57,8 +56,7 @@ struct ClientComparator
     }
 };
 
-using ClientSet
-    = std::unordered_set<std::shared_ptr<Client>, ClientHasher, ClientComparator>;
+using ClientSet = std::unordered_set<std::shared_ptr<Client>, ClientHasher, ClientComparator>;
 
 class ClientManager
 {
@@ -73,8 +71,8 @@ public:
 
     DEFAULT_CTOR_DTOR(ClientManager)
 
-    std::weak_ptr<Client> subscribe(std::shared_ptr<Feed> rpFeed,
-                                  const Endpoint& crEndpoint, Protocol vProtocol);
+    std::weak_ptr<Client> subscribe(std::shared_ptr<Feed> rpFeed, const Endpoint& crEndpoint,
+                                    Protocol vProtocol);
 
     void run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset);
 

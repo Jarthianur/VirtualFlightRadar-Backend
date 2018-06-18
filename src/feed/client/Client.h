@@ -26,8 +26,8 @@
 #include <string>
 #include <vector>
 #include <boost/asio.hpp>
-#include<boost/thread/mutex.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "../../Defines.h"
 #include "../../Parameters.h"
@@ -139,8 +139,7 @@ protected:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleRead(const boost::system::error_code& crError,
-                    std::size_t vBytes) noexcept;
+    void handleRead(const boost::system::error_code& crError, std::size_t vBytes) noexcept;
 
     /**
      * @fn handleResolve
@@ -148,9 +147,8 @@ protected:
      * @param crError     The error code
      * @param vResloverIt The resolve iterator
      */
-    virtual void
-    handleResolve(const boost::system::error_code& crError,
-                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+    virtual void handleResolve(const boost::system::error_code& crError,
+                               boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
         = 0;
 
     /**
@@ -159,9 +157,8 @@ protected:
      * @param crError     The error code
      * @param vResolverIt The resolve iterator
      */
-    virtual void
-    handleConnect(const boost::system::error_code& crError,
-                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
+    virtual void handleConnect(const boost::system::error_code& crError,
+                               boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
         = 0;
 
     /// @var mIoService

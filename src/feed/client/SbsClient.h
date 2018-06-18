@@ -68,16 +68,14 @@ private:
     /**
      * @see Client#handleResolve
      */
-    void
-    handleResolve(const boost::system::error_code& crError,
-                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+    void handleResolve(const boost::system::error_code& crError,
+                       boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 
     /**
      * @see Client#handleConnect
      */
-    void
-    handleConnect(const boost::system::error_code& crError,
-                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+    void handleConnect(const boost::system::error_code& crError,
+                       boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 };
 
 }  // namespace client

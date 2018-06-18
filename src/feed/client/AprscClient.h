@@ -86,16 +86,14 @@ private:
     /**
      * @see Client#handleResolve
      */
-    void
-    handleResolve(const boost::system::error_code& crError,
-                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+    void handleResolve(const boost::system::error_code& crError,
+                       boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 
     /**
      * @see Client#handleConnect
      */
-    void
-    handleConnect(const boost::system::error_code& crError,
-                  boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+    void handleConnect(const boost::system::error_code& crError,
+                       boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
 
     /**
      * @fn handleLogin
@@ -103,8 +101,7 @@ private:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleLogin(const boost::system::error_code& crError,
-                     std::size_t vBytes) noexcept;
+    void handleLogin(const boost::system::error_code& crError, std::size_t vBytes) noexcept;
 
     /**
      * @fn handleSendKeepAlive
@@ -112,8 +109,7 @@ private:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleSendKeepAlive(const boost::system::error_code& crError,
-                             std::size_t vBytes) noexcept;
+    void handleSendKeepAlive(const boost::system::error_code& crError, std::size_t vBytes) noexcept;
 
     /// @var mLoginStr
     /// Login string

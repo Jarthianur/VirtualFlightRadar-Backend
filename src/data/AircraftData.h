@@ -97,8 +97,7 @@ public:
      * @param vAtmPress The atmospheric pressure
      * @threadsafe
      */
-    void processAircrafts(const object::Position& crRefPosition,
-                          double vAtmPress) noexcept;
+    void processAircrafts(const object::Position& crRefPosition, double vAtmPress) noexcept;
 
 private:
     /**
@@ -118,8 +117,7 @@ private:
 
     /// @var mIndexMap
     /// Map aircraft Id's to index and attempt counters.
-    std::unordered_map<std::string, std::pair<std::size_t, std::vector<std::uint32_t>>>
-        mIndexMap;
+    std::unordered_map<std::string, std::pair<std::size_t, std::vector<std::uint32_t>>> mIndexMap;
 
     /// @var mNrOfRegisteredFeeds
     /// The number of registered Feeds

@@ -128,8 +128,7 @@ inline double dmToDeg(double vDegMin)
  */
 inline std::int32_t icaoHeight(double vPressure)
 {
-    return doubleToInt(288.15 * (1.0 - std::pow((vPressure / 1013.25), 0.190295))
-                       / 0.0065);
+    return doubleToInt(288.15 * (1.0 - std::pow((vPressure / 1013.25), 0.190295)) / 0.0065);
 }
 
 /**

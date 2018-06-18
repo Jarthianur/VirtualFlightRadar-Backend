@@ -61,8 +61,7 @@ public:
      * @param rPosition The target position
      * @return true on success, else false
      */
-    bool unpack(const std::string& crStr,
-                object::GpsPosition& rPosition) noexcept override;
+    bool unpack(const std::string& crStr, object::GpsPosition& rPosition) noexcept override;
 
 private:
     /**

@@ -54,8 +54,7 @@ public:
      * @param rvSocket The socket
      * @return a shared ptr to the Connection object
      */
-    static boost::shared_ptr<Connection> start(BOOST_RV_REF(boost::asio::ip::tcp::socket)
-                                                   rvSocket);
+    static boost::shared_ptr<Connection> start(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket);
 
     /**
      * @fn stop

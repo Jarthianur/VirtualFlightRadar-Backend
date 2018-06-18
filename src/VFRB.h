@@ -26,8 +26,8 @@
 #include <memory>
 #include <boost/chrono.hpp>
 
-#include "server/Server.h"
 #include "feed/client/ClientManager.h"
+#include "server/Server.h"
 #include "Defines.h"
 
 namespace config

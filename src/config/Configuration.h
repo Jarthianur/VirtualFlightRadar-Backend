@@ -188,8 +188,7 @@ private:
      * @param crKey        The filter key
      * @return the filter value
      */
-    std::int32_t resolveFilter(const PropertyMap& crProperties,
-                               const std::string& crKey) const;
+    std::int32_t resolveFilter(const PropertyMap& crProperties, const std::string& crKey) const;
 
     /**
      * @fn checkNumberValue
@@ -200,8 +199,7 @@ private:
      * @return the number value
      * @throw std::invalid_argument if the Number is invalid
      */
-    util::Number checkNumberValue(const util::OptNumber& crOptNumber,
-                                  const std::string& crSection,
+    util::Number checkNumberValue(const util::OptNumber& crOptNumber, const std::string& crSection,
                                   const std::string& crKey) const;
 
     /**
