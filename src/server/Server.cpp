@@ -36,8 +36,7 @@ Server::Server() : Server(4353)
 
 Server::Server(std::uint16_t vPort)
     : mIoService(),
-      mAcceptor(mIoService,
-                boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), vPort),
+      mAcceptor(mIoService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), vPort),
                 boost::asio::ip::tcp::acceptor::reuse_address(true)),
       mSocket(mIoService)
 {}
@@ -77,8 +76,8 @@ void Server::send(const std::string& crStr)
 
 void Server::accept()
 {
-    mAcceptor.async_accept(mSocket, boost::bind(&Server::handleAccept, this,
-                                                boost::asio::placeholders::error));
+    mAcceptor.async_accept(
+        mSocket, boost::bind(&Server::handleAccept, this, boost::asio::placeholders::error));
 }
 
 void Server::awaitStop(boost::asio::signal_set& rSigset)

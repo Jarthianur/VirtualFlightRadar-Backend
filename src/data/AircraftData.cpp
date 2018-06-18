@@ -101,8 +101,7 @@ std::size_t AircraftData::registerSlot()
     return mNrOfRegisteredFeeds - 1;
 }
 
-void AircraftData::processAircrafts(const Position& crRefPosition,
-                                    double vAtmPress) noexcept
+void AircraftData::processAircrafts(const Position& crRefPosition, double vAtmPress) noexcept
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     std::size_t index = 0;
@@ -147,9 +146,8 @@ void AircraftData::processAircrafts(const Position& crRefPosition,
 
 void AircraftData::insert(const object::Aircraft& crAircraft)
 {
-    mIndexMap.insert(
-        {crAircraft.getId(),
-         {mContainer.size(), std::vector<std::uint32_t>(mNrOfRegisteredFeeds, 0)}});
+    mIndexMap.insert({crAircraft.getId(),
+                      {mContainer.size(), std::vector<std::uint32_t>(mNrOfRegisteredFeeds, 0)}});
     mContainer.push_back(crAircraft);
 }
 }  // namespace data

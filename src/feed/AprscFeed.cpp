@@ -54,7 +54,9 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
 }
 
 AprscFeed::~AprscFeed() noexcept
-{ Logger::debug(mName, " destructed ", COMPONENT);}
+{
+    Logger::debug(mName, " destructed ", COMPONENT);
+}
 
 void AprscFeed::registerClient(client::ClientManager& rManager)
 {

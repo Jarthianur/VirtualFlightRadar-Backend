@@ -87,10 +87,10 @@ void Client::subscribe(std::shared_ptr<Feed>& rpFeed)
 void Client::timedConnect()
 {
     Logger::debug("Client timedConnect called ", mComponent);
-        Logger::debug("Client is running ", mComponent);
-        mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
-        mConnectTimer.async_wait(
-            boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
+    Logger::debug("Client is running ", mComponent);
+    mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
+    mConnectTimer.async_wait(
+        boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
 }
 
 void Client::stop()

@@ -106,7 +106,7 @@ void AprscClient::handleResolve(const boost::system::error_code& crError,
                                                boost::asio::placeholders::error,
                                                boost::asio::placeholders::iterator));
     }
-    else if (crError != boost::asio::error::operation_aborted)
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
@@ -131,7 +131,7 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
                                              boost::asio::placeholders::bytes_transferred));
         mTimeout.async_wait(boost::bind(&AprscClient::sendKeepAlive, this));
     }
-    else if (crError != boost::asio::error::operation_aborted)
+    else if(crError != boost::asio::error::operation_aborted)
     {
         Logger::error(COMPONENT " connect: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);

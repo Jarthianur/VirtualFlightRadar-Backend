@@ -54,10 +54,10 @@ Configuration::~Configuration() noexcept
 
 void Configuration::init(const PropertyMap& crProperties)
 {
-    mAtmPressure = boost::get<double>(
-        checkNumberValue(stringToNumber<double>(crProperties.getProperty(
-                             SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
-                         SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
+    mAtmPressure
+        = boost::get<double>(checkNumberValue(stringToNumber<double>(crProperties.getProperty(
+                                                  SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
+                                              SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
     mPosition    = resolvePosition(crProperties);
     mMaxDistance = resolveFilter(crProperties, KV_KEY_MAX_DIST);
     mMaxHeight   = resolveFilter(crProperties, KV_KEY_MAX_HEIGHT);
@@ -71,22 +71,20 @@ void Configuration::init(const PropertyMap& crProperties)
 object::GpsPosition Configuration::resolvePosition(const PropertyMap& crProperties) const
 {
     object::Position pos;
-    pos.latitude = boost::get<double>(
-        checkNumberValue(stringToNumber<double>(crProperties.getProperty(
-                             SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0")),
-                         SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
-    pos.longitude = boost::get<double>(
-        checkNumberValue(stringToNumber<double>(crProperties.getProperty(
-                             SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0")),
-                         SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
+    pos.latitude = boost::get<double>(checkNumberValue(
+        stringToNumber<double>(crProperties.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0")),
+        SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
+    pos.longitude
+        = boost::get<double>(checkNumberValue(stringToNumber<double>(crProperties.getProperty(
+                                                  SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0")),
+                                              SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
     pos.altitude = boost::get<std::int32_t>(
-        checkNumberValue(stringToNumber<std::int32_t>(crProperties.getProperty(
-                             SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0")),
+        checkNumberValue(stringToNumber<std::int32_t>(
+                             crProperties.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0")),
                          SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
-    double geoid = boost::get<double>(
-        checkNumberValue(stringToNumber<double>(crProperties.getProperty(
-                             SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0")),
-                         SECT_KEY_FALLBACK, KV_KEY_GEOID));
+    double geoid = boost::get<double>(checkNumberValue(
+        stringToNumber<double>(crProperties.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0")),
+        SECT_KEY_FALLBACK, KV_KEY_GEOID));
     return object::GpsPosition(pos, geoid);
 }
 
@@ -115,10 +113,9 @@ std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
 {
     try
     {
-        std::int32_t filter = boost::get<std::int32_t>(
-            checkNumberValue(stringToNumber<std::int32_t>(
-                                 crProperties.getProperty(SECT_KEY_FILTER, crKey, "-1")),
-                             SECT_KEY_FILTER, crKey));
+        std::int32_t filter = boost::get<std::int32_t>(checkNumberValue(
+            stringToNumber<std::int32_t>(crProperties.getProperty(SECT_KEY_FILTER, crKey, "-1")),
+            SECT_KEY_FILTER, crKey));
         return filter < 0 ? std::numeric_limits<std::int32_t>::max() : filter;
     }
     catch(const std::invalid_argument&)
@@ -146,8 +143,7 @@ FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties)
     return mapping;
 }
 
-Number Configuration::checkNumberValue(const OptNumber& crOptNumber,
-                                       const std::string& crSection,
+Number Configuration::checkNumberValue(const OptNumber& crOptNumber, const std::string& crSection,
                                        const std::string& crKey) const
 {
     if(!crOptNumber)
@@ -176,8 +172,7 @@ void Configuration::dumpInfo() const
                  std::to_string(mMaxDistance));
     Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_SERVER_PORT ": ",
                  std::to_string(mServerPort));
-    Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ",
-                 mGroundMode ? "Yes" : "No");
+    Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ", mGroundMode ? "Yes" : "No");
     Logger::info("(Config) number of feeds: ", std::to_string(mFeedMapping.size()));
 }
 

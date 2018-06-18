@@ -36,8 +36,7 @@ AtmosphereParser::AtmosphereParser() : Parser<object::Atmosphere>()
 AtmosphereParser::~AtmosphereParser() noexcept
 {}
 
-bool AtmosphereParser::unpack(const std::string& crStr,
-                              object::Atmosphere& rAtmos) noexcept
+bool AtmosphereParser::unpack(const std::string& crStr, object::Atmosphere& rAtmos) noexcept
 {
     try
     {
@@ -51,8 +50,7 @@ bool AtmosphereParser::unpack(const std::string& crStr,
     }
 }
 
-bool AtmosphereParser::parseAtmosphere(const std::string& crStr,
-                                       object::Atmosphere& rAtmos)
+bool AtmosphereParser::parseAtmosphere(const std::string& crStr, object::Atmosphere& rAtmos)
 {
     bool valid = false;
     if(crStr.find("MDA") != std::string::npos)
