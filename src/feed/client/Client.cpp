@@ -25,6 +25,7 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../../Logger.hpp"
 #include "../Feed.h"
@@ -41,24 +42,25 @@ Client::Client(const Endpoint& crEndpoint, const std::string& crComponent)
       mComponent(crComponent),
       mConnectTimer(mIoService)
 {
-    Logger::debug("Client construct");
+    Logger::debug("Client construct ", mComponent);
 }
 
 Client::~Client() noexcept
 {
-    Logger::debug("Client destruct");
-    stop();
+    Logger::debug("Client destruct ", mComponent);
 }
 
-void Client::run(boost::asio::signal_set& rSigset)
+void Client::run()
 {
-    Logger::debug("Client run called");
+    Logger::debug("Client run called ", mComponent);
     if(!mRunning)
     {
-        Logger::debug("Client is running");
-        mRunning = true;
-        rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
-        connect();
+        Logger::debug("Client is running ", mComponent);
+        {
+            boost::lock_guard<boost::mutex> lock(mMutex);
+            mRunning = true;
+            connect();
+        }
         mIoService.run();
     }
 }
@@ -78,16 +80,16 @@ std::size_t Client::hash() const
 
 void Client::subscribe(std::shared_ptr<Feed>& rpFeed)
 {
-    Logger::debug("Client subscribed from ", rpFeed->getName());
+    Logger::debug(mComponent, " Client subscribed from ", rpFeed->getName());
     mrFeeds.push_back(rpFeed);
 }
 
 void Client::timedConnect()
 {
-    Logger::debug("Client timedConnect called");
+    Logger::debug("Client timedConnect called ", mComponent);
     if(mRunning)
     {
-        Logger::debug("Client is running");
+        Logger::debug("Client is running ", mComponent);
         mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
         mConnectTimer.async_wait(
             boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
@@ -96,10 +98,10 @@ void Client::timedConnect()
 
 void Client::stop()
 {
-    Logger::debug("Client stop called");
+    Logger::debug("Client stop called ", mComponent);
     if(mRunning)
     {
-        Logger::debug("Client is running");
+        Logger::debug("Client is running ", mComponent);
         mRunning = false;
         Logger::info(mComponent, " stop connection to: ", mEndpoint.host, ":", mEndpoint.port);
         mConnectTimer.expires_at(boost::posix_time::pos_infin);
@@ -117,12 +119,19 @@ void Client::stop()
     }
 }
 
+void Client::lockAndStop()
+{
+    Logger::debug(mComponent, " Client lockandstop called");
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    stop();
+}
+
 void Client::read()
 {
-    Logger::debug("Client read called");
+    Logger::debug("Client read called ", mComponent);
     if(mRunning)
     {
-        Logger::debug("Client is running");
+        Logger::debug("Client is running ", mComponent);
         boost::asio::async_read_until(mSocket, mBuffer, "\r\n",
                                       boost::bind(&Client::handleRead, this,
                                                   boost::asio::placeholders::error,
@@ -134,6 +143,7 @@ void Client::handleTimedConnect(const boost::system::error_code& crError) noexce
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         Logger::info(mComponent, " try connect to: ", mEndpoint.host, ":", mEndpoint.port);
         connect();
     }
@@ -142,6 +152,7 @@ void Client::handleTimedConnect(const boost::system::error_code& crError) noexce
         Logger::error(mComponent, " cancel connect: ", crError.message());
         if(crError != boost::asio::error::operation_aborted)
         {
+            boost::lock_guard<boost::mutex> lock(mMutex);
             stop();
         }
     }
@@ -151,6 +162,7 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         std::istream is(&mBuffer);
         std::getline(is, mResponse);
         mResponse.append("\n");
@@ -169,6 +181,7 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
         Logger::error(mComponent, " read: ", crError.message());
         if(crError != boost::asio::error::operation_aborted)
         {
+            boost::lock_guard<boost::mutex> lock(mMutex);
             stop();
             if(crError == boost::asio::error::eof)
             {

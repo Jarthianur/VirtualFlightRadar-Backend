@@ -22,6 +22,7 @@
 #include "GpsdClient.h"
 
 #include <boost/bind.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../../Logger.hpp"
 
@@ -42,7 +43,6 @@ GpsdClient::GpsdClient(const Endpoint& crEndpoint) : Client(crEndpoint, COMPONEN
 GpsdClient::~GpsdClient() noexcept
 {
     Logger::debug(COMPONENT " destructed");
-    stop();
 }
 
 void GpsdClient::connect()
@@ -64,6 +64,7 @@ void GpsdClient::handleResolve(const boost::system::error_code& crError,
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         boost::asio::async_connect(mSocket, vResolverIt,
                                    boost::bind(&GpsdClient::handleConnect, this,
                                                boost::asio::placeholders::error,
@@ -72,6 +73,7 @@ void GpsdClient::handleResolve(const boost::system::error_code& crError,
     else
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -85,6 +87,7 @@ void GpsdClient::handleConnect(const boost::system::error_code& crError,
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
         boost::asio::async_write(
             mSocket, boost::asio::buffer("?WATCH={\"enable\":true,\"nmea\":true}\r\n"),
@@ -94,6 +97,7 @@ void GpsdClient::handleConnect(const boost::system::error_code& crError,
     else
     {
         Logger::error(COMPONENT " connect: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -129,6 +133,7 @@ void GpsdClient::handleWatch(const boost::system::error_code& crError, std::size
     if(!crError)
     {
         Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         read();
     }
     else

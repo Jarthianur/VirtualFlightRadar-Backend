@@ -24,6 +24,7 @@
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../../Logger.hpp"
 
@@ -48,7 +49,6 @@ AprscClient::AprscClient(const Endpoint& crEndpoint, const std::string& crLogin)
 AprscClient::~AprscClient() noexcept
 {
     Logger::debug("destruct: " COMPONENT);
-    stop();
 }
 
 bool AprscClient::equals(const Client& crOther) const
@@ -102,6 +102,7 @@ void AprscClient::handleResolve(const boost::system::error_code& crError,
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         boost::asio::async_connect(mSocket, vResolverIt,
                                    boost::bind(&AprscClient::handleConnect, this,
                                                boost::asio::placeholders::error,
@@ -110,6 +111,7 @@ void AprscClient::handleResolve(const boost::system::error_code& crError,
     else
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -123,6 +125,7 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
 {
     if(!crError)
     {
+        boost::lock_guard<boost::mutex> lock(mMutex);
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
         boost::asio::async_write(mSocket, boost::asio::buffer(mLoginStr),
                                  boost::bind(&AprscClient::handleLogin, this,
@@ -133,6 +136,7 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
     else
     {
         Logger::error(COMPONENT " connect: ", crError.message());
+        boost::lock_guard<boost::mutex> lock(mMutex);
         if(mSocket.is_open())
         {
             mSocket.close();
@@ -161,6 +165,7 @@ void AprscClient::handleLogin(const boost::system::error_code& crError, std::siz
     if(!crError)
     {
         Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         read();
     }
     else

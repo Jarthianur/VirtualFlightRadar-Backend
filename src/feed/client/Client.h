@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <boost/asio.hpp>
+#include<boost/thread/mutex.hpp>
 #include <boost/system/error_code.hpp>
 
 #include "../../Defines.h"
@@ -80,13 +81,15 @@ public:
      * @note Returns after all queued handlers have returned.
      * @param rSigset The signal set reference to register handler
      */
-    void run(boost::asio::signal_set& rSigset);
+    void run();
 
     /**
      * @fn stop
      * @brief Stop the Client and close the connection.
      */
     virtual void stop();
+
+    void lockAndStop();
 
     virtual bool equals(const Client& crOther) const;
 
@@ -190,6 +193,8 @@ protected:
     const std::string mComponent;
 
     bool mRunning = false;
+
+    boost::mutex mMutex;
 
 private:
     /// @var mConnectTimer

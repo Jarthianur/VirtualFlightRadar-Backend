@@ -21,6 +21,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 #include "../AprscFeed.h"
 #include "../Feed.h"
@@ -45,6 +46,7 @@ ClientManager::~ClientManager() noexcept
 std::weak_ptr<Client> ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
                                                const Endpoint& crEndpoint, Protocol vProtocol)
 {
+    boost::lock_guard<boost::mutex> lock(mMutex);
     ClientSet::iterator it = mClients.end();
     switch(vProtocol)
     {
@@ -78,13 +80,21 @@ std::weak_ptr<Client> ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
 
 void ClientManager::run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset)
 {
+    rSigset.async_wait([this](const boost::system::error_code&, int) {
+        boost::lock_guard<boost::mutex> lock(mMutex);
+        for(const auto& it : mClients)
+        {
+            it->lockAndStop();
+        }
+    });
     for(const auto& it : mClients)
     {
         Logger::debug("CM create thread for ", it->hash());
         rThdGroup.create_thread([&]() {
             Logger::debug("CM run client ", it->hash());
-            it->run(rSigset);
+            it->run();
             Logger::debug("CM returned from client run call -> erase");
+            boost::lock_guard<boost::mutex> lock(mMutex);
             mClients.erase(it);
         });
     }

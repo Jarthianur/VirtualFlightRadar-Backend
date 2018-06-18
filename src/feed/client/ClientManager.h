@@ -24,6 +24,7 @@
 #include <iterator>
 #include <memory>
 #include <unordered_set>
+#include <boost/thread/mutex.hpp>
 
 #include "../../Defines.h"
 #include "Client.h"
@@ -79,6 +80,8 @@ public:
 
 private:
     ClientSet mClients;
+
+    boost::mutex mMutex;
 };
 }  // namespace client
 }  // namespace feed
