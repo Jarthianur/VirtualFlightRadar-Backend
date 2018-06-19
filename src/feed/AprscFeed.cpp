@@ -22,13 +22,14 @@
 #include "AprscFeed.h"
 
 #include <stdexcept>
-#include <unordered_map>
 
-#include "../Logger.hpp"
 #include "../config/Configuration.h"
-#include "../data/AircraftData.h"
+#include "../Logger.hpp"
 #include "../object/Aircraft.h"
+#include "client/Client.h"
 #include "client/ClientManager.h"
+#include "parser/AprsParser.h"
+#include "../data/AircraftData.h"
 
 #ifdef COMPONENT
 #undef COMPONENT
@@ -40,7 +41,7 @@ namespace feed
 parser::AprsParser AprscFeed::smParser;
 
 AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                     std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight)
+                     std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
     : Feed(crName, crKvMap, pData)
 {
     Logger::debug(crName, " constructed ", COMPONENT);

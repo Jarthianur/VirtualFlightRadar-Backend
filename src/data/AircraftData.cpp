@@ -21,10 +21,8 @@
 
 #include "AircraftData.h"
 
-#include <algorithm>
 #include <iterator>
 #include <stdexcept>
-#include <system_error>
 #include <boost/thread/lock_guard.hpp>
 
 #include "../Parameters.h"

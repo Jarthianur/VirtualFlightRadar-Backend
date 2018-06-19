@@ -22,6 +22,7 @@
 #include "SbsParser.h"
 
 #include <limits>
+#include <cstddef>
 #include <stdexcept>
 
 #include "../../Math.hpp"

@@ -22,7 +22,6 @@
 #include "Logger.hpp"
 
 #include <ctime>
-#include <string>
 #include <boost/chrono.hpp>
 
 Logger::Logger()

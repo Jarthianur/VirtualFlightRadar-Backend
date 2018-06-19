@@ -24,7 +24,6 @@
 #include <cstdint>
 
 #include "../Defines.h"
-
 #include "Object.h"
 
 /// @namespace object

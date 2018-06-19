@@ -25,15 +25,17 @@
 
 #include "../config/Configuration.h"
 #include "../data/AtmosphereData.h"
-#include "../data/WindData.h"
 #include "../object/Atmosphere.h"
+#include "client/Client.h"
+#include "client/ClientManager.h"
+#include "parser/AtmosphereParser.h"
 
 namespace feed
 {
 parser::AtmosphereParser AtmosphereFeed::smParser;
 
 AtmosphereFeed::AtmosphereFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                               std::shared_ptr<data::AtmosphereData>& pData)
+                               std::shared_ptr<data::AtmosphereData> pData)
     : Feed(crName, crKvMap, pData)
 {}
 

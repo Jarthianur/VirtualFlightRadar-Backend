@@ -21,7 +21,6 @@
 
 #include "GpsData.h"
 
-#include <algorithm>
 #include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 

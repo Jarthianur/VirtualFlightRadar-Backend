@@ -21,15 +21,18 @@
 
 #pragma once
 
-#include <cstddef>
 #include <memory>
 #include <string>
 
-#include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/WindParser.h"
-
+#include "../Defines.h"
 #include "Feed.h"
+
+namespace feed {
+namespace parser {
+class WindParser;
+} /* namespace parser */
+} /* namespace feed */
 
 /// @namespace data
 namespace data
@@ -60,7 +63,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-             std::shared_ptr<data::WindData>& pData);
+             std::shared_ptr<data::WindData> pData);
 
     /**
      * @fn ~WindFeed

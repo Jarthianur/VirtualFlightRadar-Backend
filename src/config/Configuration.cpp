@@ -21,11 +21,11 @@
 
 #include "Configuration.h"
 
-#include <limits>
-#include <sstream>
-#include <stdexcept>
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
+#include <limits>
+#include <stdexcept>
+#include <utility>
 
 #include "../Logger.hpp"
 #include "ConfigReader.h"

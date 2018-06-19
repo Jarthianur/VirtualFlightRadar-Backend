@@ -21,16 +21,12 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
 #include <string>
-#include <vector>
 
 #include "../Defines.h"
 #include "../object/GpsPosition.h"
-#include "processor/GpsProcessor.h"
-
 #include "Data.h"
+#include "processor/GpsProcessor.h"
 
 /// @namespace data
 namespace data

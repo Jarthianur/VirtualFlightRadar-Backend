@@ -21,7 +21,6 @@
 
 #include "Connection.h"
 
-#include <algorithm>
 #include <boost/move/move.hpp>
 #include <boost/system/error_code.hpp>
 

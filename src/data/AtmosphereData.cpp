@@ -21,8 +21,6 @@
 
 #include "AtmosphereData.h"
 
-#include <algorithm>
-#include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
 using namespace object;

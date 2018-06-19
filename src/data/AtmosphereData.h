@@ -21,14 +21,10 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
 #include <string>
-#include <vector>
 
 #include "../Defines.h"
 #include "../object/Atmosphere.h"
-
 #include "Data.h"
 
 /// @namespace data

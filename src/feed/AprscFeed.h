@@ -21,16 +21,20 @@
 
 #pragma once
 
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
-#include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/AprsParser.h"
-
+#include "../Defines.h"
 #include "Feed.h"
+
+namespace feed {
+namespace parser {
+class AprsParser;
+} /* namespace parser */
+} /* namespace feed */
 
 /// @namespace data
 namespace data
@@ -61,7 +65,7 @@ public:
      * @throw std::logic_error if login is not given or from parent constructor
      */
     AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-              std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight);
+              std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
 
     /**
      * @fn ~AprscFeed

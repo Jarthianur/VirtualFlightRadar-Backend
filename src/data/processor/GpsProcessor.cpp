@@ -21,6 +21,8 @@
 
 #include "GpsProcessor.h"
 
+#include <cmath>
+#include <cstdio>
 #include <ctime>
 
 using namespace object;

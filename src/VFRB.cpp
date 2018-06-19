@@ -124,9 +124,9 @@ void VFRB::setupSignals(boost::asio::signal_set& rSigSet)
 {
     rSigSet.add(SIGINT);
     rSigSet.add(SIGTERM);
-#if defined(SIGQUIT)
+#ifdef SIGQUIT
     rSigSet.add(SIGQUIT);
-#endif  // defined(SIGQUIT)
+#endif
 
     rSigSet.async_wait([this](const boost::system::error_code&, const int) {
         Logger::info("(VFRB) caught signal: ", "shutdown");

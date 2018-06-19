@@ -24,13 +24,13 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../Logger.hpp"
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
-#include "../object/GpsPosition.h"
-#include "client/GpsdClient.h"
-
 #include "../Logger.hpp"
+#include "../object/GpsPosition.h"
+#include "client/Client.h"
+#include "client/ClientManager.h"
+#include "parser/GpsParser.h"
 
 #ifdef COMPONENT
 #undef COMPONENT
@@ -42,7 +42,7 @@ namespace feed
 parser::GpsParser GpsFeed::smParser;
 
 GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                 std::shared_ptr<data::GpsData>& pData)
+                 std::shared_ptr<data::GpsData> pData)
     : Feed(crName, crKvMap, pData)
 {
     Logger::debug(crName, " constructed ", COMPONENT);

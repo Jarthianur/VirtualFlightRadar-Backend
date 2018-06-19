@@ -21,13 +21,10 @@
 
 #pragma once
 
-#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
 #include "../../Defines.h"
-#include "../../Parameters.h"
-
 #include "Client.h"
 
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT
@@ -39,7 +36,7 @@
 /// @namespace feed
 namespace feed
 {
-class Feed;
+
 /// @namespace client
 namespace client
 {

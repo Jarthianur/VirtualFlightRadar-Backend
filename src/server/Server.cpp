@@ -21,7 +21,6 @@
 
 #include "Server.h"
 
-#include <algorithm>
 #include <iterator>
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
@@ -83,6 +82,7 @@ void Server::accept()
 void Server::awaitStop(boost::asio::signal_set& rSigset)
 {
     rSigset.async_wait([this](const boost::system::error_code&, int) {
+    	boost::lock_guard<boost::mutex> lock(mMutex);
         mAcceptor.close();
         stop();
     });
@@ -90,7 +90,6 @@ void Server::awaitStop(boost::asio::signal_set& rSigset)
 
 void Server::stop()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
     Logger::info("(Server) stopping all clients...");
     mClients.clear();
 }
@@ -109,13 +108,13 @@ bool Server::isConnected(const std::string& crIpAddress)
 
 void Server::handleAccept(const boost::system::error_code& crError) noexcept
 {
+    boost::lock_guard<boost::mutex> lock(mMutex);
     if(!mAcceptor.is_open())
     {
         return;
     }
     if(!crError)
     {
-        boost::lock_guard<boost::mutex> lock(mMutex);
         auto client = Connection::start(boost::move(mSocket));
         if(mClients.size() < S_MAX_CLIENTS && !isConnected(client->getIpAddress()))
         {

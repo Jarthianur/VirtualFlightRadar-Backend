@@ -19,19 +19,21 @@
  }
  */
 
+#include "ClientManager.h"
+
 #include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/lock_guard.hpp>
+#include <stdexcept>
 
+#include "../../Logger.hpp"
 #include "../AprscFeed.h"
 #include "../Feed.h"
 #include "AprscClient.h"
-#include "ClientManager.h"
 #include "GpsdClient.h"
 #include "SbsClient.h"
 #include "SensorClient.h"
-
-#include "../../Logger.hpp"
 
 namespace feed
 {

@@ -25,7 +25,6 @@
 
 #include "../../Defines.h"
 #include "../../object/Atmosphere.h"
-
 #include "Parser.hpp"
 
 /// @namespace feed

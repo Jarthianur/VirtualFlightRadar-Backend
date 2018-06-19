@@ -25,14 +25,12 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include "../Defines.h"
 #include "../object/Aircraft.h"
-#include "processor/AircraftProcessor.h"
-
 #include "Data.h"
+#include "processor/AircraftProcessor.h"
 
 ///  @def AC_DELETE_THRESHOLD
 /// Times until aircraft gets deleted

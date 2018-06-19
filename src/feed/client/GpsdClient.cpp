@@ -21,6 +21,7 @@
 
 #include "GpsdClient.h"
 
+#include <string>
 #include <boost/bind.hpp>
 #include <boost/thread/lock_guard.hpp>
 

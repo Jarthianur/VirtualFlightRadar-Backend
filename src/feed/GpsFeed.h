@@ -21,15 +21,18 @@
 
 #pragma once
 
-#include <cstddef>
 #include <memory>
 #include <string>
 
-#include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/GpsParser.h"
-
+#include "../Defines.h"
 #include "Feed.h"
+
+namespace feed {
+namespace parser {
+class GpsParser;
+} /* namespace parser */
+} /* namespace feed */
 
 namespace data
 {
@@ -58,7 +61,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-            std::shared_ptr<data::GpsData>& pData);
+            std::shared_ptr<data::GpsData> pData);
 
     /**
      * @fn ~GpsFeed

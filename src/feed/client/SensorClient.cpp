@@ -21,6 +21,7 @@
 
 #include "SensorClient.h"
 
+#include <string>
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/operators.hpp>

@@ -26,13 +26,16 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
+#include "client/Client.h"
+#include "client/ClientManager.h"
+#include "parser/SbsParser.h"
 
 namespace feed
 {
 parser::SbsParser SbsFeed::smParser;
 
 SbsFeed::SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                 std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight)
+                 std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
     : Feed(crName, crKvMap, pData)
 {
     smParser.setMaxHeight(vMaxHeight);

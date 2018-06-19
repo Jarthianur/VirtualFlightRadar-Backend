@@ -23,8 +23,8 @@
 
 #include <cstdint>
 #include <istream>
+#include <list>
 #include <string>
-#include <utility>
 
 #include "../Defines.h"
 #include "../object/GpsPosition.h"

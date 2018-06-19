@@ -22,14 +22,13 @@
 #include "Feed.h"
 
 #include <algorithm>
-#include <atomic>
 #include <limits>
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../Logger.hpp"
 #include "../config/Configuration.h"
-#include "client/Client.h"
+#include "../Logger.hpp"
+#include "../data/Data.h"
 
 #ifdef COMPONENT
 #undef COMPONENT
