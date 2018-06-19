@@ -36,7 +36,6 @@
 /// @namespace feed
 namespace feed
 {
-
 /// @namespace client
 namespace client
 {

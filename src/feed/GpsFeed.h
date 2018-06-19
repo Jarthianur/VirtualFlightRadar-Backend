@@ -24,12 +24,14 @@
 #include <memory>
 #include <string>
 
-#include "../config/PropertyMap.h"
 #include "../Defines.h"
+#include "../config/PropertyMap.h"
 #include "Feed.h"
 
-namespace feed {
-namespace parser {
+namespace feed
+{
+namespace parser
+{
 class GpsParser;
 } /* namespace parser */
 } /* namespace feed */

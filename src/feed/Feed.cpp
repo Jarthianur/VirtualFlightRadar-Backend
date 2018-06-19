@@ -26,8 +26,8 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../config/Configuration.h"
 #include "../Logger.hpp"
+#include "../config/Configuration.h"
 #include "../data/Data.h"
 
 #ifdef COMPONENT

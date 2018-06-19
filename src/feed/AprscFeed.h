@@ -26,12 +26,14 @@
 #include <string>
 #include <unordered_map>
 
-#include "../config/PropertyMap.h"
 #include "../Defines.h"
+#include "../config/PropertyMap.h"
 #include "Feed.h"
 
-namespace feed {
-namespace parser {
+namespace feed
+{
+namespace parser
+{
 class AprsParser;
 } /* namespace parser */
 } /* namespace feed */

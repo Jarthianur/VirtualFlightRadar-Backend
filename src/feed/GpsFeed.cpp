@@ -24,9 +24,9 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include "../Logger.hpp"
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
-#include "../Logger.hpp"
 #include "../object/GpsPosition.h"
 #include "client/Client.h"
 #include "client/ClientManager.h"

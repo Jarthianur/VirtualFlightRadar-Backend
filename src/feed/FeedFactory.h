@@ -21,13 +21,14 @@
 
 #pragma once
 
-#include <boost/optional.hpp>
 #include <memory>
 #include <string>
+#include <boost/optional.hpp>
 
 #include "../config/PropertyMap.h"
 
-namespace config {
+namespace config
+{
 class Configuration;
 } /* namespace config */
 

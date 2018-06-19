@@ -23,13 +23,13 @@
 
 #include <stdexcept>
 
-#include "../config/Configuration.h"
 #include "../Logger.hpp"
+#include "../config/Configuration.h"
+#include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
 #include "client/Client.h"
 #include "client/ClientManager.h"
 #include "parser/AprsParser.h"
-#include "../data/AircraftData.h"
 
 #ifdef COMPONENT
 #undef COMPONENT

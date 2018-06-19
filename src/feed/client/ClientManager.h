@@ -21,12 +21,12 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/thread/mutex.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <unordered_set>
+#include <boost/asio.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "../../Defines.h"
 #include "Client.h"

@@ -21,11 +21,11 @@
 
 #include "ClientManager.h"
 
+#include <stdexcept>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/lock_guard.hpp>
-#include <stdexcept>
 
 #include "../../Logger.hpp"
 #include "../AprscFeed.h"

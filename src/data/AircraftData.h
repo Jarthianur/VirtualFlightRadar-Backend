@@ -29,8 +29,8 @@
 
 #include "../Defines.h"
 #include "../object/Aircraft.h"
-#include "Data.h"
 #include "processor/AircraftProcessor.h"
+#include "Data.h"
 
 ///  @def AC_DELETE_THRESHOLD
 /// Times until aircraft gets deleted

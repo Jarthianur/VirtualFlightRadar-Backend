@@ -90,7 +90,7 @@ private:
      */
     void assign(Object&& rvOther) override;
 
-        /**
+    /**
      * @fn canUpdate
      * @brief Check whether this Aircraft can update the other one.
      * @param crOther   The other Aircraft

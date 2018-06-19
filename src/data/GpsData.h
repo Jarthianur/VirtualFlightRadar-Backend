@@ -25,8 +25,8 @@
 
 #include "../Defines.h"
 #include "../object/GpsPosition.h"
-#include "Data.h"
 #include "processor/GpsProcessor.h"
+#include "Data.h"
 
 /// @namespace data
 namespace data

@@ -25,14 +25,17 @@
 #include <memory>
 #include <string>
 
-#include "../config/PropertyMap.h"
 #include "../Defines.h"
+#include "../config/PropertyMap.h"
 
-namespace data {
+namespace data
+{
 class Data;
 } /* namespace data */
-namespace feed {
-namespace client {
+namespace feed
+{
+namespace client
+{
 class Client;
 class ClientManager;
 } /* namespace client */

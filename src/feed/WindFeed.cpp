@@ -24,11 +24,11 @@
 #include <unordered_map>
 
 #include "../config/Configuration.h"
+#include "../data/WindData.h"
 #include "../object/Wind.h"
 #include "client/Client.h"
 #include "client/ClientManager.h"
 #include "parser/WindParser.h"
-#include "../data/WindData.h"
 
 namespace feed
 {

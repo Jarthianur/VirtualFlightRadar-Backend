@@ -21,8 +21,8 @@
 
 #include "SbsClient.h"
 
-#include <boost/bind.hpp>
 #include <string>
+#include <boost/bind.hpp>
 #include <boost/thread/lock_guard.hpp>
 
 #include "../../Logger.hpp"
