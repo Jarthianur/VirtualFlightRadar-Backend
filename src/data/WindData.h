@@ -68,21 +68,12 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvWind, std::size_t vSlot) override;
-
-    /**
-     * @see Data#registerSlot
-     */
-    std::size_t registerSlot() override;
+    bool update(object::Object&& rvWind) override;
 
 private:
     /// @var mWind
     /// The Wind information
     object::Wind mWind;
-
-    /// @var mAttempts
-    /// Store update attempts
-    std::vector<std::uint32_t> mAttempts;
 };
 
 }  // namespace data

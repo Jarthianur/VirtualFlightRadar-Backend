@@ -50,7 +50,7 @@ public:
      * @brief Constructor
      * @param crPosition The initial info
      */
-    explicit GpsData(const object::GpsPosition& crPosition, bool vGround);
+    GpsData(const object::GpsPosition& crPosition, bool vGround);
 
     /**
      * @fn getSerialized
@@ -76,12 +76,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvPosition, std::size_t vSlot) override;
-
-    /**
-     * @see Data#registerSlot
-     */
-    std::size_t registerSlot() override;
+    bool update(object::Object&& rvPosition) override;
 
 private:
     /**
@@ -106,10 +101,6 @@ private:
     /// @var mGroundMode
     /// Ground mode state
     bool mGroundMode = false;
-
-    /// @var mAttempts
-    /// Store update attempts
-    std::vector<std::uint32_t> mAttempts;
 };
 
 }  // namespace data

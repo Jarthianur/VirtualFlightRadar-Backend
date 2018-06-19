@@ -67,12 +67,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvAtmosphere, std::size_t vSlot) override;
-
-    /**
-     * @see Data#registerSlot
-     */
-    std::size_t registerSlot() override;
+    bool update(object::Object&& rvAtmosphere) override;
 
     /**
      * @fn getAtmPressure
@@ -86,9 +81,5 @@ private:
     /// @var mAtmosphere
     /// Holding atmospheric information
     object::Atmosphere mAtmosphere;
-
-    /// @var mAttempts
-    /// Store update attempts per Feed
-    std::vector<std::uint32_t> mAttempts;
 };
 }  // namespace data

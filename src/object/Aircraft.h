@@ -128,7 +128,6 @@ public:
     GETSET_V(TargetType, mTargetType, TargetType)
     GETTER_V(AircraftType, mAircraftType, AircraftType)
     GETSET_V(bool, mFullInfo, FullInfoAvailable)
-    GETTER_R(std::uint32_t, mUpdateAge, UpdateAge)
     GETSET_CR(Position, mPosition, Position)
     GETSET_CR(Movement, mMovement, Movement)
     GETSET_V(TimeStamp, mTimeStamp, TimeStamp)
@@ -169,7 +168,7 @@ private:
      * @param vAttempts The update attempt count
      * @return true if yes, else false
      */
-    bool canUpdate(const Object& crOther, std::uint32_t vAttempts) const override;
+    bool canUpdate(const Object& crOther) const override;
 
     /// @var mId
     /// Aircraft identifier
@@ -202,10 +201,6 @@ private:
     /// @var mFullInfo
     /// Is full set of information available?
     bool mFullInfo = false;
-
-    /// @var mUpdateAge
-    /// Times processed without update.
-    std::uint32_t mUpdateAge = 0;
 };
 
 }  // namespace object

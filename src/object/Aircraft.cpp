@@ -47,15 +47,15 @@ void Aircraft::assign(Object&& rvOther)
     this->mMovement     = rvUpdate.mMovement;
     this->mTimeStamp    = rvUpdate.mTimeStamp;
     this->mFullInfo     = rvUpdate.mFullInfo;
-    this->mUpdateAge    = 0;
 }
 
-bool Aircraft::canUpdate(const Object& crOther, std::uint32_t vAttempts) const
+bool Aircraft::canUpdate(const Object& crOther) const
 {
-    const Aircraft& crUpdate = static_cast<const Aircraft&>(crOther);
-    return (crUpdate.mTargetType == TargetType::TRANSPONDER
-            || this->mTargetType == TargetType::FLARM)
-           && (this->mLastPriority * vAttempts >= crUpdate.mLastPriority);
+    const Aircraft& crToUpdate = static_cast<const Aircraft&>(crOther);
+    return (this->mTimeStamp > crToUpdate.mTimeStamp)
+           && (crToUpdate.mTargetType == TargetType::TRANSPONDER
+               || this->mTargetType == TargetType::FLARM)
+           && Object::canUpdate(crOther);
 }
 
 void Aircraft::setAircraftType(Aircraft::AircraftType vType)

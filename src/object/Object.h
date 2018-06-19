@@ -22,6 +22,10 @@
 
 #include "../Defines.h"
 
+/// @def AC_OUTDATED
+/// Times until aircraft is outdated
+#define OBJ_OUTDATED 4
+
 /// @namespace object
 namespace object
 {
@@ -52,7 +56,7 @@ public:
      * @param vAttempts The update attempt count
      * @return true on success, else false
      */
-    virtual bool tryUpdate(Object&& rvOther, std::uint32_t vAttempts);
+    virtual bool tryUpdate(Object&& rvOther);
 
     /**
      * @fn setSerialized
@@ -67,6 +71,10 @@ public:
      * @return mSerialized
      */
     virtual const std::string& getSerialized() const;
+
+    Object& operator++();
+
+    GETTER_V(std::uint32_t, mUpdateAge, UpdateAge)
 
 protected:
     /**
@@ -83,7 +91,7 @@ protected:
      * @param vAttempts The update attempt count
      * @return true if yes, else false
      */
-    virtual bool canUpdate(const Object& crOther, std::uint32_t vAttempts) const;
+    virtual bool canUpdate(const Object& crOther) const;
 
     /// @var mLastPriority
     /// Got last update with this priority.
@@ -92,5 +100,9 @@ protected:
     /// @var mSerialized
     /// The string representation of this Objects data.
     std::string mSerialized;
+
+    /// @var mUpdateAge
+    /// Times processed without update.
+    std::uint32_t mUpdateAge = 0;
 };
 }  // namespace object

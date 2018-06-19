@@ -34,17 +34,13 @@
 
 #include "Data.h"
 
-/// @def AC_OUTDATED
-/// Times until aircraft is outdated
-#define AC_OUTDATED 4
-
 ///  @def AC_DELETE_THRESHOLD
 /// Times until aircraft gets deleted
 #define AC_DELETE_THRESHOLD 120
 
 /// @def AC_NO_FLARM_THRESHOLD
 /// Times until FLARM status is removed
-#define AC_NO_FLARM_THRESHOLD AC_OUTDATED
+#define AC_NO_FLARM_THRESHOLD OBJ_OUTDATED
 
 /// @namespace data
 namespace data
@@ -83,12 +79,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvAircraft, std::size_t vSlot) override;
-
-    /**
-     * @see Data#registerSlot
-     */
-    std::size_t registerSlot() override;
+    bool update(object::Object&& rvAircraft) override;
 
     /**
      * @fn processAircrafts
@@ -117,11 +108,7 @@ private:
 
     /// @var mIndexMap
     /// Map aircraft Id's to index and attempt counters.
-    std::unordered_map<std::string, std::pair<std::size_t, std::vector<std::uint32_t>>> mIndexMap;
-
-    /// @var mNrOfRegisteredFeeds
-    /// The number of registered Feeds
-    std::size_t mNrOfRegisteredFeeds = 0;
+    std::unordered_map<std::string, std::size_t> mIndexMap;
 };
 
 }  // namespace data

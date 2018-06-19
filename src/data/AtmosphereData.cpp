@@ -41,31 +41,13 @@ AtmosphereData::~AtmosphereData() noexcept
 std::string AtmosphereData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mAtmosphere.getSerialized();
+    return (++mAtmosphere).getSerialized();
 }
 
-bool AtmosphereData::update(Object&& rvAtmosphere, std::size_t vSlot)
+bool AtmosphereData::update(Object&& rvAtmosphere)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    try
-    {
-        bool updated = mAtmosphere.tryUpdate(std::move(rvAtmosphere), ++mAttempts.at(vSlot));
-        if(updated)
-        {
-            std::fill(mAttempts.begin(), mAttempts.end(), 0);
-        }
-        return updated;
-    }
-    catch(const std::out_of_range&)
-    {
-        return false;
-    }
-}
-
-std::size_t AtmosphereData::registerSlot()
-{
-    mAttempts.push_back(0);
-    return mAttempts.size() - 1;
+    return mAtmosphere.tryUpdate(std::move(rvAtmosphere));
 }
 
 double AtmosphereData::getAtmPressure()

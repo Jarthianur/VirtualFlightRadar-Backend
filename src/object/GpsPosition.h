@@ -91,6 +91,15 @@ private:
      */
     void assign(Object&& rvOther) override;
 
+        /**
+     * @fn canUpdate
+     * @brief Check whether this Aircraft can update the other one.
+     * @param crOther   The other Aircraft
+     * @param vAttempts The update attempt count
+     * @return true if yes, else false
+     */
+    bool canUpdate(const Object& crOther) const override;
+
     /// @var mPosition
     /// The position
     Position mPosition{0.0, 0.0, 0};
