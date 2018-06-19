@@ -64,7 +64,8 @@ TimeStamp::TimeStamp(const std::string& crValue, Format vFormat)
     mYesterday = mValue >= now();
 }
 
-TimeStamp::TimeStamp(const TimeStamp& crOther) : mValue(crOther.mValue)
+TimeStamp::TimeStamp(const TimeStamp& crOther)
+    : mValue(crOther.mValue), mYesterday(crOther.mYesterday)
 {}
 
 TimeStamp::~TimeStamp() noexcept
