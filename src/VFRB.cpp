@@ -76,7 +76,7 @@ void VFRB::run() noexcept
     for(const auto& it : mFeeds)
     {
         Logger::info("(VFRB) run feed: ", it->getName());
-        it->registerClient(mClientManager);
+        it->registerToClient(mClientManager);
     }
     boost::thread_group client_threads;
     mClientManager.run(client_threads, signal_set);

@@ -48,7 +48,7 @@ public:
      */
     virtual ~Feed() noexcept;
 
-    virtual void registerClient(client::ClientManager& rManager) = 0;
+    virtual void registerToClient(client::ClientManager& rManager) = 0;
 
     /**
      * @fn process
@@ -83,10 +83,6 @@ protected:
     const config::KeyValueMap mKvMap;
 
     std::weak_ptr<client::Client> mSubsribedClient;
-
-    /// @var mAtmosSlot
-    /// AtmosphereData attempt slot
-    std::size_t mDataSlot;
 
     std::shared_ptr<data::Data> mpData;
 

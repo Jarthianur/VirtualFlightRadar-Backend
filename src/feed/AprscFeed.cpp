@@ -58,7 +58,7 @@ AprscFeed::~AprscFeed() noexcept
     Logger::debug(mName, " destructed ", COMPONENT);
 }
 
-void AprscFeed::registerClient(client::ClientManager& rManager)
+void AprscFeed::registerToClient(client::ClientManager& rManager)
 {
     mSubsribedClient = rManager.subscribe(
         shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
@@ -71,7 +71,7 @@ void AprscFeed::process(const std::string& crResponse) noexcept
     object::Aircraft ac(getPriority());
     if(smParser.unpack(crResponse, ac))
     {
-        mpData->update(std::move(ac), mDataSlot);
+        mpData->update(std::move(ac));
     }
 }
 

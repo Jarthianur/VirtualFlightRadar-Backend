@@ -54,7 +54,6 @@ Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
         Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
-    mDataSlot = mpData->registerSlot();
 }
 
 Feed::~Feed() noexcept

@@ -53,7 +53,7 @@ GpsFeed::~GpsFeed() noexcept
     Logger::debug(mName, " destructed ", COMPONENT);
 }
 
-void GpsFeed::registerClient(client::ClientManager& rManager)
+void GpsFeed::registerToClient(client::ClientManager& rManager)
 {
     mSubsribedClient = rManager.subscribe(
         shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
@@ -68,7 +68,7 @@ void GpsFeed::process(const std::string& crResponse) noexcept
     {
         try
         {
-            if(mpData->update(std::move(pos), mDataSlot))
+            if(mpData->update(std::move(pos)))
             {
                 throw std::runtime_error("received good position -> stop");
             }

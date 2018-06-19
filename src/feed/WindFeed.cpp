@@ -34,13 +34,12 @@ parser::WindParser WindFeed::smParser;
 WindFeed::WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
                    std::shared_ptr<data::WindData>& pData)
     : Feed(crName, crKvMap, pData)
-
 {}
 
 WindFeed::~WindFeed() noexcept
 {}
 
-void WindFeed::registerClient(client::ClientManager& rManager)
+void WindFeed::registerToClient(client::ClientManager& rManager)
 {
     mSubsribedClient = rManager.subscribe(
         shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
@@ -52,7 +51,7 @@ void WindFeed::process(const std::string& crResponse) noexcept
     object::Wind wind(getPriority());
     if(smParser.unpack(crResponse, wind))
     {
-        mpData->update(std::move(wind), mDataSlot);
+        mpData->update(std::move(wind));
     }
 }
 
