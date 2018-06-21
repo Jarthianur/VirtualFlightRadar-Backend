@@ -20,8 +20,10 @@
  */
 
 #include "../../src/object/Aircraft.h"
-#include "../../src/object/Climate.hpp"
+#include "../../src/object/Atmosphere.h"
 #include "../../src/object/GpsPosition.h"
+#include "../../src/object/TimeStamp.h"
+#include "../../src/object/Wind.h"
 #include "../Helper.hpp"
 #include "../framework/src/framework.h"
 

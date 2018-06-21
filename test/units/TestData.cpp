@@ -49,13 +49,12 @@ void test_data(TestSuitesRunner& runner)
                 AircraftData data;
                 object::Aircraft ac;
                 object::Position pos{49.0, 8.0, 0};
-                double press     = 1013.25;
-                std::size_t slot = data.registerSlot();
+                double press = 1013.25;
                 sbsParser.unpack(
                     "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0",
                     ac);
-                data.update(std::move(ac), slot);
-                for(int i = 0; i < AC_OUTDATED; ++i)
+                data.update(std::move(ac));
+                for(int i = 0; i < OBJ_OUTDATED; ++i)
                 {
                     data.processAircrafts(pos, press);
                 }
@@ -68,12 +67,11 @@ void test_data(TestSuitesRunner& runner)
                 AircraftData data;
                 object::Aircraft ac;
                 object::Position pos{49.0, 8.0, 0};
-                double press     = 1013.25;
-                std::size_t slot = data.registerSlot();
+                double press = 1013.25;
                 sbsParser.unpack(
                     "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0",
                     ac);
-                data.update(std::move(ac), slot);
+                data.update(std::move(ac));
                 for(int i = 0; i < AC_DELETE_THRESHOLD; ++i)
                 {
                     data.processAircrafts(pos, press);
@@ -88,23 +86,22 @@ void test_data(TestSuitesRunner& runner)
                 boost::smatch match;
                 object::Aircraft ac;
                 object::Position pos{49.0, 8.0, 0};
-                double press     = 1013.25;
-                std::size_t slot = data.registerSlot();
+                double press = 1013.25;
 
                 sbsParser.unpack(
                     "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0",
                     ac);
-                data.update(std::move(ac), slot);
+                data.update(std::move(ac));
                 data.processAircrafts(pos, press);
                 aprsParser.unpack(
                     "FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot",
                     ac);
-                data.update(std::move(ac), slot);
+                data.update(std::move(ac));
                 data.processAircrafts(pos, press);
                 sbsParser.unpack(
                     "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0",
                     ac);
-                data.update(std::move(ac), slot);
+                data.update(std::move(ac));
                 data.processAircrafts(pos, press);
                 std::string proc = data.getSerialized();
                 bool matched     = boost::regex_search(proc, match, helper::pflauRe);
@@ -117,7 +114,7 @@ void test_data(TestSuitesRunner& runner)
                 sbsParser.unpack(
                     "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0",
                     ac);
-                data.update(std::move(ac), slot);
+                data.update(std::move(ac));
                 data.processAircrafts(pos, press);
                 proc    = data.getSerialized();
                 matched = boost::regex_search(proc, match, helper::pflauRe);
@@ -132,26 +129,23 @@ void test_data(TestSuitesRunner& runner)
             object::Position pos{49.0, 8.0, 0};
             double press = 1013.25;
             boost::smatch match;
-            std::size_t slot = data.registerSlot();
             aprsParser.unpack(
                 "FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot",
                 ac2);
             aprsParser.unpack(
                 "FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot",
                 ac1);
-            assert(data.update(std::move(ac2), slot), true, helper::equalsBool);
-            assert(data.update(std::move(ac1), slot), false, helper::equalsBool);
+            assert(data.update(std::move(ac2)), true, helper::equalsBool);
+            assert(data.update(std::move(ac1)), false, helper::equalsBool);
             data.processAircrafts(pos, press);
             std::string proc = data.getSerialized();
-            assert(boost::regex_search(proc, match, helper::pflauRe), true,
-                   helper::equalsBool);
+            assert(boost::regex_search(proc, match, helper::pflauRe), true, helper::equalsBool);
             assert(match.str(2), std::string("610"), helper::equalsStr);
 
-            assert(data.update(std::move(ac1), slot), true, helper::equalsBool);
+            assert(data.update(std::move(ac1)), true, helper::equalsBool);
             data.processAircrafts(pos, press);
             proc = data.getSerialized();
-            assert(boost::regex_search(proc, match, helper::pflauRe), true,
-                   helper::equalsBool);
+            assert(boost::regex_search(proc, match, helper::pflauRe), true, helper::equalsBool);
             assert(match.str(2), std::string("305"), helper::equalsStr);
         });
 
@@ -159,9 +153,8 @@ void test_data(TestSuitesRunner& runner)
         ->test("correct gps position",
                []() {
                    GpsData data;
-                   std::size_t slot = data.registerSlot();
                    object::GpsPosition pos({10.0, 85.0, 100}, 40.0);
-                   data.update(std::move(pos), slot);
+                   data.update(std::move(pos));
                    assert(data.getPosition().latitude, 10.0, helper::equalsD);
                    assert(data.getPosition().longitude, 85.0, helper::equalsD);
                    assert(data.getPosition().altitude, 100, helper::equalsInt);
@@ -173,30 +166,28 @@ void test_data(TestSuitesRunner& runner)
         ->test("write higher priority",
                []() {
                    GpsData data;
-                   std::size_t slot = data.registerSlot();
                    object::GpsPosition pos0(0);
                    object::GpsPosition pos1(1);
                    pos0.setPosition({0.0, 0.0, 1000});
                    pos1.setPosition({0.0, 0.0, 2000});
-                   data.update(std::move(pos0), slot);
+                   data.update(std::move(pos0));
                    assert(data.getPosition().altitude, 1000, helper::equalsInt);
-                   data.update(std::move(pos1), slot);
+                   data.update(std::move(pos1));
                    assert(data.getPosition().altitude, 2000, helper::equalsInt);
-                   data.update(std::move(pos0), slot);
+                   data.update(std::move(pos0));
                    assert(data.getPosition().altitude, 2000, helper::equalsInt);
                })
         ->test("write after attempts", []() {
             GpsData data;
-            std::size_t slot = data.registerSlot();
             object::GpsPosition pos1(1);
             object::GpsPosition pos2(2);
             pos1.setPosition({0.0, 0.0, 1000});
             pos2.setPosition({0.0, 0.0, 2000});
-            data.update(std::move(pos2), slot);
+            data.update(std::move(pos2));
             assert(data.getPosition().altitude, 2000, helper::equalsInt);
-            data.update(std::move(pos1), slot);
+            data.update(std::move(pos1));
             assert(data.getPosition().altitude, 2000, helper::equalsInt);
-            data.update(std::move(pos1), slot);
+            data.update(std::move(pos1));
             assert(data.getPosition().altitude, 1000, helper::equalsInt);
         });
 
@@ -205,11 +196,9 @@ void test_data(TestSuitesRunner& runner)
                []() {
                    WindData data;
                    object::Wind wind;
-                   std::size_t slot = data.registerSlot();
                    wind.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
-                   data.update(std::move(wind), slot);
-                   assert(data.getSerialized(),
-                          std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"),
+                   data.update(std::move(wind));
+                   assert(data.getSerialized(), std::string("$WIMWV,242.8,R,6.9,N,A*20\r\n"),
                           helper::equalsStr);
                    assert(data.getSerialized(), std::string(""), helper::equalsStr);
                })
@@ -218,28 +207,25 @@ void test_data(TestSuitesRunner& runner)
                    WindData data;
                    object::Wind wind0(0);
                    object::Wind wind1(1);
-                   std::size_t slot = data.registerSlot();
                    wind0.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
                    wind1.setSerialized("updated");
-                   assert(data.update(std::move(wind0), slot), true, helper::equalsBool);
-                   assert(data.update(std::move(wind1), slot), true, helper::equalsBool);
-                   assert(data.getSerialized(), std::string("updated"),
-                          helper::equalsStr);
+                   assert(data.update(std::move(wind0)), true, helper::equalsBool);
+                   assert(data.update(std::move(wind1)), true, helper::equalsBool);
+                   assert(data.getSerialized(), std::string("updated"), helper::equalsStr);
                    wind0.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
-                   assert(data.update(std::move(wind0), slot), false, helper::equalsBool);
+                   assert(data.update(std::move(wind0)), false, helper::equalsBool);
                })
         ->test("write after attempt", []() {
             WindData data;
             object::Wind wind1(1);
             object::Wind wind2(2);
-            std::size_t slot = data.registerSlot();
             wind1.setSerialized("lower");
             wind2.setSerialized("higher");
-            data.update(std::move(wind2), slot);
+            data.update(std::move(wind2));
             assert(data.getSerialized(), std::string("higher"), helper::equalsStr);
-            data.update(std::move(wind1), slot);
+            data.update(std::move(wind1));
             assert(data.getSerialized(), std::string(""), helper::equalsStr);
-            data.update(std::move(wind1), slot);
+            data.update(std::move(wind1));
             assert(data.getSerialized(), std::string("lower"), helper::equalsStr);
         });
 
@@ -248,14 +234,11 @@ void test_data(TestSuitesRunner& runner)
                []() {
                    AtmosphereData data;
                    object::Atmosphere atm;
-                   std::size_t slot = data.registerSlot();
                    atm.setPressure(1009.1);
-                   atm.setSerialized(
-                       "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
-                   data.update(std::move(atm), slot);
+                   atm.setSerialized("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
+                   data.update(std::move(atm));
                    assert(data.getSerialized(),
-                          std::string(
-                              "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"),
+                          std::string("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n"),
                           helper::equalsStr);
                    assert(data.getAtmPressure(), 1009.1, helper::equalsD);
                })
@@ -264,26 +247,24 @@ void test_data(TestSuitesRunner& runner)
                    AtmosphereData data;
                    object::Atmosphere atm0(0);
                    object::Atmosphere atm1(1);
-                   std::size_t slot = data.registerSlot();
                    atm0.setPressure(1009.1);
                    atm1.setPressure(900.0);
-                   data.update(std::move(atm0), slot);
+                   data.update(std::move(atm0));
                    assert(data.getAtmPressure(), 1009.1, helper::equalsD);
-                   data.update(std::move(atm1), slot);
+                   data.update(std::move(atm1));
                    assert(data.getAtmPressure(), 900.0, helper::equalsD);
                })
         ->test("write after attempt", []() {
             AtmosphereData data;
             object::Atmosphere atm1(1);
             object::Atmosphere atm2(2);
-            std::size_t slot = data.registerSlot();
             atm1.setPressure(1009.1);
             atm2.setPressure(900.0);
-            data.update(std::move(atm2), slot);
+            data.update(std::move(atm2));
             assert(data.getAtmPressure(), 900.0, helper::equalsD);
-            data.update(std::move(atm1), slot);
+            data.update(std::move(atm1));
             assert(data.getAtmPressure(), 900.0, helper::equalsD);
-            data.update(std::move(atm1), slot);
+            data.update(std::move(atm1));
             assert(data.getAtmPressure(), 1009.1, helper::equalsD);
         });
 }

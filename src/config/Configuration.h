@@ -56,7 +56,7 @@
 #define SECT_KEY_WIND "wind"
 
 /// @def SECT_KEY_ATMOS
-#define SECT_KEY_ATMOS "atmos"
+#define SECT_KEY_ATMOS "atm"
 
 /**
  * Per section key-value keys
