@@ -43,13 +43,10 @@ AprscClient::AprscClient(const Endpoint& crEndpoint, const std::string& crLogin)
       mTimeout(mIoService, boost::posix_time::minutes(10))
 {
     mLoginStr.append("\r\n");
-    Logger::debug("construct: " COMPONENT);
 }
 
 AprscClient::~AprscClient() noexcept
-{
-    Logger::debug("destruct: " COMPONENT);
-}
+{}
 
 bool AprscClient::equals(const Client& crOther) const
 {
@@ -73,9 +70,7 @@ std::size_t AprscClient::hash() const
 
 void AprscClient::connect()
 {
-    Logger::debug(COMPONENT " connect called");
     mRunning = true;
-    Logger::debug(COMPONENT " is running");
     boost::asio::ip::tcp::resolver::query query(
         mEndpoint.host, mEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
     mResolver.async_resolve(query, boost::bind(&AprscClient::handleResolve, this,
@@ -85,10 +80,8 @@ void AprscClient::connect()
 
 void AprscClient::stop()
 {
-    Logger::debug(COMPONENT " stop called");
     if(mRunning)
     {
-        Logger::debug(COMPONENT " is running");
         mTimeout.expires_at(boost::posix_time::pos_infin);
         mTimeout.cancel();
     }
@@ -110,10 +103,7 @@ void AprscClient::handleResolve(const boost::system::error_code& crError,
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
-        if(mSocket.is_open())
-        {
-            mSocket.close();
-        }
+        closeSocket();
         timedConnect();
     }
 }
@@ -135,21 +125,16 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
     {
         Logger::error(COMPONENT " connect: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
-        if(mSocket.is_open())
-        {
-            mSocket.close();
-        }
+        closeSocket();
         timedConnect();
     }
 }
 
 void AprscClient::sendKeepAlive()
 {
-    Logger::debug(COMPONENT " sendKA called");
     boost::lock_guard<boost::mutex> lock(mMutex);
     if(mRunning)
     {
-        Logger::debug(COMPONENT " is running");
         boost::asio::async_write(mSocket, boost::asio::buffer("#keep-alive beacon\r\n"),
                                  boost::bind(&AprscClient::handleSendKeepAlive, this,
                                              boost::asio::placeholders::error,

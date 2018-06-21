@@ -41,21 +41,15 @@ Client::Client(const Endpoint& crEndpoint, const std::string& crComponent)
       mEndpoint(crEndpoint),
       mComponent(crComponent),
       mConnectTimer(mIoService)
-{
-    Logger::debug("Client construct ", mComponent);
-}
+{}
 
 Client::~Client() noexcept
-{
-    Logger::debug("Client destruct ", mComponent);
-}
+{}
 
 void Client::run()
 {
-    Logger::debug("Client run called ", mComponent);
     if(!mRunning)
     {
-        Logger::debug("Client is running ", mComponent);
         {
             boost::lock_guard<boost::mutex> lock(mMutex);
             connect();
@@ -79,15 +73,12 @@ std::size_t Client::hash() const
 
 void Client::subscribe(std::shared_ptr<Feed>& rpFeed)
 {
-    Logger::debug(mComponent, " Client subscribed from ", rpFeed->getName());
     boost::lock_guard<boost::mutex> lock(mMutex);
     mrFeeds.push_back(rpFeed);
 }
 
 void Client::timedConnect()
 {
-    Logger::debug("Client timedConnect called ", mComponent);
-    Logger::debug("Client is running ", mComponent);
     mConnectTimer.expires_from_now(boost::posix_time::seconds(C_CON_WAIT_TIMEVAL));
     mConnectTimer.async_wait(
         boost::bind(&Client::handleTimedConnect, this, boost::asio::placeholders::error));
@@ -95,36 +86,28 @@ void Client::timedConnect()
 
 void Client::stop()
 {
-    Logger::debug("Client stop called ", mComponent);
     if(mRunning)
     {
-        Logger::debug("Client is running ", mComponent);
         mRunning = false;
         Logger::info(mComponent, " stop connection to: ", mEndpoint.host, ":", mEndpoint.port);
         mConnectTimer.expires_at(boost::posix_time::pos_infin);
         mConnectTimer.cancel();
         boost::system::error_code ec;
         mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-        if(mSocket.is_open())
-        {
-            mSocket.close();
-        }
+        closeSocket();
     }
 }
 
 void Client::lockAndStop()
 {
-    Logger::debug(mComponent, " Client lockandstop called");
     boost::lock_guard<boost::mutex> lock(mMutex);
     stop();
 }
 
 void Client::read()
 {
-    Logger::debug("Client read called ", mComponent);
     if(mRunning)
     {
-        Logger::debug("Client is running ", mComponent);
         boost::asio::async_read_until(mSocket, mBuffer, "\r\n",
                                       boost::bind(&Client::handleRead, this,
                                                   boost::asio::placeholders::error,
@@ -181,6 +164,14 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
                 timedConnect();
             }
         }
+    }
+}
+
+void Client::closeSocket()
+{
+    if(mSocket.is_open())
+    {
+        mSocket.close();
     }
 }
 

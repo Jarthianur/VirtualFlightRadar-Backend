@@ -27,7 +27,6 @@
 #include <boost/thread.hpp>
 #include <boost/thread/lock_guard.hpp>
 
-#include "../../Logger.hpp"
 #include "../AprscFeed.h"
 #include "../Feed.h"
 #include "AprscClient.h"
@@ -75,7 +74,6 @@ std::weak_ptr<Client> ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
             it = mClients.insert(std::make_shared<SensorClient>(crEndpoint)).first;
             break;
     }
-    Logger::debug("CM subscribed from ", rpFeed->getName(), " to ", (*it)->hash());
     (*it)->subscribe(rpFeed);
     return std::weak_ptr<Client>(*it);
 }
@@ -85,11 +83,8 @@ void ClientManager::run(boost::thread_group& rThdGroup, boost::asio::signal_set&
     rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
     for(const auto& it : mClients)
     {
-        Logger::debug("CM create thread for ", it->hash());
         rThdGroup.create_thread([&]() {
-            Logger::debug("CM run client ", it->hash());
             it->run();
-            Logger::debug("CM returned from client run call -> erase");
             boost::lock_guard<boost::mutex> lock(mMutex);
             mClients.erase(it);
         });

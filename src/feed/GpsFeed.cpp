@@ -44,14 +44,10 @@ parser::GpsParser GpsFeed::smParser;
 GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
                  std::shared_ptr<data::GpsData> pData)
     : Feed(crName, crKvMap, pData)
-{
-    Logger::debug(crName, " constructed ", COMPONENT);
-}
+{}
 
 GpsFeed::~GpsFeed() noexcept
-{
-    Logger::debug(mName, " destructed ", COMPONENT);
-}
+{}
 
 void GpsFeed::registerToClient(client::ClientManager& rManager)
 {
@@ -62,7 +58,6 @@ void GpsFeed::registerToClient(client::ClientManager& rManager)
 
 void GpsFeed::process(const std::string& crResponse) noexcept
 {
-    Logger::debug(mName, " process called");
     object::GpsPosition pos(getPriority());
     if(smParser.unpack(crResponse, pos))
     {
@@ -78,7 +73,6 @@ void GpsFeed::process(const std::string& crResponse) noexcept
             Logger::info(COMPONENT " ", mName, ": ", e.what());
             auto client = std::shared_ptr<client::Client>(mSubsribedClient);
             client->stop();
-            Logger::debug("returned from gpsfeed stop call");
             return;
         }
     }

@@ -160,6 +160,8 @@ protected:
                                boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
         = 0;
 
+    void closeSocket();
+
     /// @var mIoService
     /// Internal IO-service
     boost::asio::io_service mIoService;
