@@ -24,10 +24,6 @@
 #include "../Helper.hpp"
 #include "../framework/src/framework.h"
 
-#ifdef assert
-#undef assert
-#endif
-
 using namespace data::processor;
 using namespace object;
 using namespace testsuite;

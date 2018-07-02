@@ -24,11 +24,14 @@
 #include <cstdint>
 #include <string>
 #include <boost/regex.hpp>
+#include <iostream>
 
 #include "../src/object/Aircraft.h"
 #include "framework/src/framework.h"
 
 #define TEST_FUNCTION(NAME) extern void NAME(TestSuitesRunner&);
+
+#define syso(M) std::cout << M << std::endl;
 
 namespace testsuite
 {
@@ -52,8 +55,7 @@ PROVIDE_COMPARATOR(std::string, EQUALS, equalsStr)
 PROVIDE_COMPARATOR(bool, EQUALS, equalsBool)
 PROVIDE_COMPARATOR(object::Aircraft::TargetType, EQUALS, equalsAtt)
 
-static boost::regex
-    pflauRe("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
+static boost::regex pflauRe("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
 static boost::regex pflaaRe(
     "\\$PFLAA,0,([-]?\\d+?),([-]?\\d+?),([-]?\\d+?),(\\d+?),(\\S{6}),(\\d{3})?,,(\\d+?)?,([-]?\\d+?\\.\\d+?)?,([0-9A-F])\\*(?:\\S{2})");
 static boost::regex gpsRe(

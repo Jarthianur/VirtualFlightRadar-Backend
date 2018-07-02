@@ -29,10 +29,6 @@
 #include "../Helper.hpp"
 #include "../framework/src/framework.h"
 
-#ifdef assert
-#undef assert
-#endif
-
 using namespace config;
 using namespace testsuite;
 using namespace comparator;
@@ -46,15 +42,15 @@ void test_config(TestSuitesRunner& runner)
         ConfigReader cr;
         PropertyMap map;
         cr.read(conf, map);
-        assert(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"),
-               std::string("0.000000"), helper::equalsStr);
-        assert(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"),
-               std::string("invalid"), helper::equalsStr);
-        assert(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), std::string("1000"),
-               helper::equalsStr);
-        assert(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "invalid"), std::string("invalid"),
-               helper::equalsStr);
-        assert(map.getProperty("nothing", ""), std::string(""), helper::equalsStr);
+        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), "0.000000",
+                helper::equalsStr, std::string);
+        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"), "invalid",
+                helper::equalsStr, std::string);
+        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), "1000",
+                helper::equalsStr, std::string);
+        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "invalid"), "invalid",
+                helper::equalsStr, std::string);
+        assertT(map.getProperty("nothing", ""), "", helper::equalsStr, std::string);
     });
 
     describe<Configuration>("initialize configuration", runner)
@@ -73,9 +69,9 @@ void test_config(TestSuitesRunner& runner)
                 conf_in << KV_KEY_PORT "=3456\n" << KV_KEY_PRIORITY "=1\n";
                 Configuration config(conf_in);
                 const auto feed_it = config.getFeedMapping().cbegin();
-                assert(feed_it->first, std::string(SECT_KEY_ATMOS "1"), helper::equalsStr);
-                assert(feed_it->second.at(KV_KEY_PRIORITY), std::string("1"), helper::equalsStr);
-                assert(static_cast<std::int32_t>(config.getServerPort()), 1234, helper::equalsInt);
+                assertT(feed_it->first, SECT_KEY_ATMOS "1", helper::equalsStr, std::string);
+                assertT(feed_it->second.at(KV_KEY_PRIORITY), "1", helper::equalsStr, std::string);
+                assertT(config.getServerPort(), 1234, helper::equalsInt, int);
                 assert(config.getGroundMode(), true, helper::equalsBool);
                 assert(config.getPosition().getPosition().latitude, 77.777777, helper::equalsD);
                 assert(config.getPosition().getPosition().longitude, -12.121212, helper::equalsD);

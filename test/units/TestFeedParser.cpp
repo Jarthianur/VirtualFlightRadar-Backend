@@ -36,10 +36,6 @@
 #include "../Helper.hpp"
 #include "../framework/src/framework.h"
 
-#ifdef assert
-#undef assert
-#endif
-
 using namespace feed::parser;
 using namespace testsuite;
 using namespace comparator;

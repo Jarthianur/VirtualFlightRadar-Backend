@@ -27,10 +27,6 @@
 #include "../Helper.hpp"
 #include "../framework/src/framework.h"
 
-#ifdef assert
-#undef assert
-#endif
-
 using namespace object;
 using namespace testsuite;
 using namespace comparator;

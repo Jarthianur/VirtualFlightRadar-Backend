@@ -24,10 +24,6 @@
 
 using namespace testsuite;
 
-#ifdef assert
-#undef assert
-#endif
-
 TEST_FUNCTION(test_config)
 TEST_FUNCTION(test_data)
 TEST_FUNCTION(test_data_processor)
