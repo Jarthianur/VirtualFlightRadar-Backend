@@ -47,12 +47,10 @@ inline std::string serialize(const object::Aircraft::TargetType& crTargetType)
 
 namespace helper
 {
-PROVIDE_COMPARATOR(std::int32_t, EQUALS, equalsInt)
 PROVIDE_COMPARATOR(std::uint32_t, EQUALS, equalsUInt)
 PROVIDE_COMPARATOR(std::uint64_t, EQUALS, equalsULong)
 PROVIDE_COMPARATOR(double, EQUALS, equalsD)
 PROVIDE_COMPARATOR(std::string, EQUALS, equalsStr)
-PROVIDE_COMPARATOR(bool, EQUALS, equalsBool)
 PROVIDE_COMPARATOR(object::Aircraft::TargetType, EQUALS, equalsAtt)
 
 static boost::regex pflauRe("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");

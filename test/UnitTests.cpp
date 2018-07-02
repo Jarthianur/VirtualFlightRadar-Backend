@@ -33,7 +33,8 @@ TEST_FUNCTION(test_math)
 
 int main(int, char**)
 {
-    auto rep = reporter::createXmlReporter();
+    //auto rep = reporter::createXmlReporter();
+    auto rep = reporter::createColoredReporter();
     TestSuitesRunner runner;
 
     test_config(runner);

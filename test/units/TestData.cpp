@@ -101,7 +101,7 @@ void test_data(TestSuitesRunner& runner)
                 data.processAircrafts(pos, press);
                 std::string proc = data.getSerialized();
                 bool matched     = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::equalsBool);
+                assertTrue(matched);
                 assertT(match.str(2), "610", helper::equalsStr, std::string);
                 for(int i = 0; i < AC_NO_FLARM_THRESHOLD; ++i)
                 {
@@ -114,7 +114,7 @@ void test_data(TestSuitesRunner& runner)
                 data.processAircrafts(pos, press);
                 proc    = data.getSerialized();
                 matched = boost::regex_search(proc, match, helper::pflauRe);
-                assert(matched, true, helper::equalsBool);
+                assertTrue(matched);
                 assertT(match.str(2), "1000", helper::equalsStr, std::string);
             })
         ->test("write after outdated", []() {
@@ -130,25 +130,25 @@ void test_data(TestSuitesRunner& runner)
             aprsParser.unpack(
                 "FLRBBBBBB>APRS,qAS,XXXX:/201132h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot",
                 ac1);
-            assert(data.update(std::move(ac2)), true, helper::equalsBool);
+            assertTrue(data.update(std::move(ac2)));
 
             for(int i = 0; i < OBJ_OUTDATED - 1; ++i)
             {
-                assert(data.update(std::move(ac1)), false, helper::equalsBool);
+                assert(data.update(std::move(ac1)), false, defaultEqualsBool);
                 data.processAircrafts(pos, press);
                 std::string proc = data.getSerialized();
                 boost::smatch match;
-                assert(boost::regex_search(proc, match, helper::pflauRe), true, helper::equalsBool);
+                assertTrue(boost::regex_search(proc, match, helper::pflauRe));
                 assertT(match.str(2), "610", helper::equalsStr, std::string);
             }
             data.processAircrafts(pos, press);
             assertT(data.getSerialized().size(), 0, helper::equalsULong, unsigned long);
 
-            assert(data.update(std::move(ac1)), true, helper::equalsBool);
+            assertTrue(data.update(std::move(ac1)));
             data.processAircrafts(pos, press);
             std::string proc = data.getSerialized();
             boost::smatch match;
-            assert(boost::regex_search(proc, match, helper::pflauRe), true, helper::equalsBool);
+            assertTrue(boost::regex_search(proc, match, helper::pflauRe));
             assert(match.str(2), std::string("305"), helper::equalsStr);
         });
 
@@ -157,40 +157,51 @@ void test_data(TestSuitesRunner& runner)
                []() {
                    GpsData data;
                    object::GpsPosition pos({10.0, 85.0, 100}, 40.0);
+                   pos.setTimeStamp(object::TimeStamp("000001", object::TimeStamp::Format::HHMMSS));
                    data.update(std::move(pos));
                    assert(data.getPosition().latitude, 10.0, helper::equalsD);
                    assert(data.getPosition().longitude, 85.0, helper::equalsD);
-                   assert(data.getPosition().altitude, 100, helper::equalsInt);
+                   assert(data.getPosition().altitude, 100, defaultEqualsInt);
                    std::string fix = data.getSerialized();
                    boost::smatch match;
                    bool matched = boost::regex_search(fix, match, helper::gpsRe);
-                   assert(matched, true, helper::equalsBool);
+                   assertTrue(matched);
                })
-        ->test("write higher priority",
-               []() {
-                   GpsData data;
-                   object::GpsPosition pos0(0);
-                   object::GpsPosition pos1(1);
-                   pos0.setPosition({0.0, 0.0, 1000});
-                   pos1.setPosition({0.0, 0.0, 2000});
-                   data.update(std::move(pos0));
-                   assert(data.getPosition().altitude, 1000, helper::equalsInt);
-                   data.update(std::move(pos1));
-                   assert(data.getPosition().altitude, 2000, helper::equalsInt);
-                   data.update(std::move(pos0));
-                   assert(data.getPosition().altitude, 2000, helper::equalsInt);
-               })
-        ->test("write after attempts", []() {
+        ->test(
+            "write higher priority",
+            []() {
+                GpsData data;
+                object::GpsPosition pos0(0);
+                object::GpsPosition pos1(1);
+                pos0.setPosition({0.0, 0.0, 1000});
+                pos1.setPosition({0.0, 0.0, 2000});
+                pos1.setTimeStamp(object::TimeStamp("000001", object::TimeStamp::Format::HHMMSS));
+                assertTrue(data.update(std::move(pos0)));
+                assert(data.getPosition().altitude, 1000, defaultEqualsInt);
+                data.update(std::move(pos1));
+                assert(data.getPosition().altitude, 2000, defaultEqualsInt);
+                pos0.setTimeStamp(object::TimeStamp("000002", object::TimeStamp::Format::HHMMSS));
+                data.update(std::move(pos0));
+                assert(data.getPosition().altitude, 2000, defaultEqualsInt);
+            })
+        ->test("write after outdated", []() {
             GpsData data;
             object::GpsPosition pos1(1);
             object::GpsPosition pos2(2);
             pos1.setPosition({0.0, 0.0, 1000});
             pos2.setPosition({0.0, 0.0, 2000});
-            data.update(std::move(pos2));
+            pos1.setTimeStamp(object::TimeStamp("000001", object::TimeStamp::Format::HHMMSS));
+            assert(data.update(std::move(pos2)), true, helper::equalsBool);
             assert(data.getPosition().altitude, 2000, helper::equalsInt);
-            data.update(std::move(pos1));
-            assert(data.getPosition().altitude, 2000, helper::equalsInt);
-            data.update(std::move(pos1));
+
+            for(int i = 0; i < OBJ_OUTDATED - 1; ++i)
+            {
+                assert(data.update(std::move(pos1)), false, helper::equalsBool);
+                assert(data.getPosition().altitude, 2000, helper::equalsInt);
+                data.getSerialized();
+            }
+            data.getSerialized();
+            assert(data.update(std::move(pos1)), true, helper::equalsBool);
             assert(data.getPosition().altitude, 1000, helper::equalsInt);
         });
 

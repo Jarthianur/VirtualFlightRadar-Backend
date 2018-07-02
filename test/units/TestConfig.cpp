@@ -71,15 +71,15 @@ void test_config(TestSuitesRunner& runner)
                 const auto feed_it = config.getFeedMapping().cbegin();
                 assertT(feed_it->first, SECT_KEY_ATMOS "1", helper::equalsStr, std::string);
                 assertT(feed_it->second.at(KV_KEY_PRIORITY), "1", helper::equalsStr, std::string);
-                assertT(config.getServerPort(), 1234, helper::equalsInt, int);
-                assert(config.getGroundMode(), true, helper::equalsBool);
+                assertT(config.getServerPort(), 1234, defaultEqualsInt, int);
+                assertTrue(config.getGroundMode());
                 assert(config.getPosition().getPosition().latitude, 77.777777, helper::equalsD);
                 assert(config.getPosition().getPosition().longitude, -12.121212, helper::equalsD);
-                assert(config.getPosition().getPosition().altitude, 1234, helper::equalsInt);
+                assert(config.getPosition().getPosition().altitude, 1234, defaultEqualsInt);
                 assert(config.getPosition().getGeoid(), 40.4, helper::equalsD);
                 assert(config.getAtmPressure(), 999.9, helper::equalsD);
-                assert(config.getMaxHeight(), INT32_MAX, helper::equalsInt);
-                assert(config.getMaxDistance(), 10000, helper::equalsInt);
+                assert(config.getMaxHeight(), INT32_MAX, defaultEqualsInt);
+                assert(config.getMaxDistance(), 10000, defaultEqualsInt);
             })
         ->test("only valid feeds", []() {
             std::stringstream conf_in;
