@@ -27,11 +27,11 @@
 #include "../../src/config/Configuration.h"
 #include "../../src/config/PropertyMap.h"
 #include "../Helper.hpp"
-#include "../framework/src/framework.h"
 
 using namespace config;
-using namespace testsuite;
-using namespace comparator;
+using namespace sctf;
+using namespace test;
+using namespace comp;
 
 void test_config(TestSuitesRunner& runner)
 {
@@ -42,45 +42,44 @@ void test_config(TestSuitesRunner& runner)
         ConfigReader cr;
         PropertyMap map;
         cr.read(conf, map);
-        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), "0.000000",
-                helper::equalsStr, std::string);
-        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"), "invalid",
-                helper::equalsStr, std::string);
-        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), "1000",
-                helper::equalsStr, std::string);
-        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "invalid"), "invalid",
-                helper::equalsStr, std::string);
-        assertT(map.getProperty("nothing", ""), "", helper::equalsStr, std::string);
+        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), "0.000000", EQUALS,
+                std::string);
+        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"), "invalid", EQUALS,
+                std::string);
+        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), "1000", EQUALS,
+                std::string);
+        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "invalid"), "invalid", EQUALS,
+                std::string);
+        assertTrue(map.getProperty("nothing", "").empty());
     });
 
     describe<Configuration>("initialize configuration", runner)
-        ->test(
-            "valid config - full, one feed",
-            []() {
-                std::stringstream conf_in;
-                conf_in << "[" SECT_KEY_GENERAL "]\n" << KV_KEY_FEEDS "=" SECT_KEY_ATMOS "1\n";
-                conf_in << KV_KEY_SERVER_PORT "=1234\n" << KV_KEY_GND_MODE "=y\n";
-                conf_in << "[" SECT_KEY_FALLBACK "]\n" << KV_KEY_LATITUDE "=77.777777\n";
-                conf_in << KV_KEY_LONGITUDE "=-12.121212\n" << KV_KEY_ALTITUDE "=1234\n";
-                conf_in << KV_KEY_GEOID "=40.4\n" << KV_KEY_PRESSURE "=999.9\n";
-                conf_in << "[" SECT_KEY_FILTER "]\n" << KV_KEY_MAX_HEIGHT "=-1\n";
-                conf_in << KV_KEY_MAX_DIST "=10000\n";
-                conf_in << "[" SECT_KEY_ATMOS "1]\n" << KV_KEY_HOST "=localhost\n";
-                conf_in << KV_KEY_PORT "=3456\n" << KV_KEY_PRIORITY "=1\n";
-                Configuration config(conf_in);
-                const auto feed_it = config.getFeedMapping().cbegin();
-                assertT(feed_it->first, SECT_KEY_ATMOS "1", helper::equalsStr, std::string);
-                assertT(feed_it->second.at(KV_KEY_PRIORITY), "1", helper::equalsStr, std::string);
-                assertT(config.getServerPort(), 1234, defaultEqualsInt, int);
-                assertTrue(config.getGroundMode());
-                assert(config.getPosition().getPosition().latitude, 77.777777, helper::equalsD);
-                assert(config.getPosition().getPosition().longitude, -12.121212, helper::equalsD);
-                assert(config.getPosition().getPosition().altitude, 1234, defaultEqualsInt);
-                assert(config.getPosition().getGeoid(), 40.4, helper::equalsD);
-                assert(config.getAtmPressure(), 999.9, helper::equalsD);
-                assert(config.getMaxHeight(), INT32_MAX, defaultEqualsInt);
-                assert(config.getMaxDistance(), 10000, defaultEqualsInt);
-            })
+        ->test("valid config - full, one feed",
+               []() {
+                   std::stringstream conf_in;
+                   conf_in << "[" SECT_KEY_GENERAL "]\n" << KV_KEY_FEEDS "=" SECT_KEY_ATMOS "1\n";
+                   conf_in << KV_KEY_SERVER_PORT "=1234\n" << KV_KEY_GND_MODE "=y\n";
+                   conf_in << "[" SECT_KEY_FALLBACK "]\n" << KV_KEY_LATITUDE "=77.777777\n";
+                   conf_in << KV_KEY_LONGITUDE "=-12.121212\n" << KV_KEY_ALTITUDE "=1234\n";
+                   conf_in << KV_KEY_GEOID "=40.4\n" << KV_KEY_PRESSURE "=999.9\n";
+                   conf_in << "[" SECT_KEY_FILTER "]\n" << KV_KEY_MAX_HEIGHT "=-1\n";
+                   conf_in << KV_KEY_MAX_DIST "=10000\n";
+                   conf_in << "[" SECT_KEY_ATMOS "1]\n" << KV_KEY_HOST "=localhost\n";
+                   conf_in << KV_KEY_PORT "=3456\n" << KV_KEY_PRIORITY "=1\n";
+                   Configuration config(conf_in);
+                   const auto feed_it = config.getFeedMapping().cbegin();
+                   assertT(feed_it->first, SECT_KEY_ATMOS "1", EQUALS, std::string);
+                   assertT(feed_it->second.at(KV_KEY_PRIORITY), "1", EQUALS, std::string);
+                   assertT(config.getServerPort(), 1234, EQUALS, int);
+                   assertTrue(config.getGroundMode());
+                   assertEquals(config.getPosition().getPosition().latitude, 77.777777);
+                   assertEquals(config.getPosition().getPosition().longitude, -12.121212);
+                   assertEquals(config.getPosition().getPosition().altitude, 1234);
+                   assertEquals(config.getPosition().getGeoid(), 40.4);
+                   assertEquals(config.getAtmPressure(), 999.9);
+                   assertEquals(config.getMaxHeight(), INT32_MAX);
+                   assertEquals(config.getMaxDistance(), 10000);
+               })
         ->test("only valid feeds", []() {
             std::stringstream conf_in;
             conf_in << "[" SECT_KEY_GENERAL "]\n"
@@ -101,6 +100,6 @@ void test_config(TestSuitesRunner& runner)
             {
                 result += it.first + ",";
             }
-            assert(result, valid, helper::equalsStr);
+            assertEquals(result, valid);
         });
 }

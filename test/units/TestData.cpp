@@ -29,11 +29,11 @@
 #include "../../src/feed/parser/AprsParser.h"
 #include "../../src/feed/parser/SbsParser.h"
 #include "../Helper.hpp"
-#include "../framework/src/framework.h"
 
 using namespace data;
-using namespace testsuite;
-using namespace comparator;
+using namespace sctf;
+using namespace test;
+using namespace comp;
 
 void test_data(TestSuitesRunner& runner)
 {
@@ -54,7 +54,7 @@ void test_data(TestSuitesRunner& runner)
                 {
                     data.processAircrafts(pos, press);
                 }
-                assertT(data.getSerialized(), "", helper::equalsStr, std::string);
+                assertTrue(data.getSerialized().empty());
             })
         ->test(
             "delete aircraft",
@@ -102,7 +102,7 @@ void test_data(TestSuitesRunner& runner)
                 std::string proc = data.getSerialized();
                 bool matched     = boost::regex_search(proc, match, helper::pflauRe);
                 assertTrue(matched);
-                assertT(match.str(2), "610", helper::equalsStr, std::string);
+                assertT(match.str(2), "610", EQUALS, std::string);
                 for(int i = 0; i < AC_NO_FLARM_THRESHOLD; ++i)
                 {
                     data.processAircrafts(pos, press);
@@ -115,7 +115,7 @@ void test_data(TestSuitesRunner& runner)
                 proc    = data.getSerialized();
                 matched = boost::regex_search(proc, match, helper::pflauRe);
                 assertTrue(matched);
-                assertT(match.str(2), "1000", helper::equalsStr, std::string);
+                assertT(match.str(2), "1000", EQUALS, std::string);
             })
         ->test("write after outdated", []() {
             feed::parser::AprsParser aprsParser;
@@ -134,22 +134,21 @@ void test_data(TestSuitesRunner& runner)
 
             for(int i = 0; i < OBJ_OUTDATED - 1; ++i)
             {
-                assert(data.update(std::move(ac1)), false, defaultEqualsBool);
+                assertFalse(data.update(std::move(ac1)));
                 data.processAircrafts(pos, press);
                 std::string proc = data.getSerialized();
                 boost::smatch match;
                 assertTrue(boost::regex_search(proc, match, helper::pflauRe));
-                assertT(match.str(2), "610", helper::equalsStr, std::string);
+                assertT(match.str(2), "610", EQUALS, std::string);
             }
             data.processAircrafts(pos, press);
-            assertT(data.getSerialized().size(), 0, helper::equalsULong, unsigned long);
-
+            assertZero(data.getSerialized().size());
             assertTrue(data.update(std::move(ac1)));
             data.processAircrafts(pos, press);
             std::string proc = data.getSerialized();
             boost::smatch match;
             assertTrue(boost::regex_search(proc, match, helper::pflauRe));
-            assert(match.str(2), std::string("305"), helper::equalsStr);
+            assertT(match.str(2), "305", EQUALS, std::string);
         });
 
     describeParallel<GpsData>("gps string", runner)
@@ -159,7 +158,7 @@ void test_data(TestSuitesRunner& runner)
                    object::GpsPosition pos({10.0, 85.0, 100}, 40.0);
                    pos.setTimeStamp(object::TimeStamp("000001", object::TimeStamp::Format::HHMMSS));
                    data.update(std::move(pos));
-                   assert(data.getPosition().latitude, 10.0, helper::equalsD);
+                   assertEquals(data.getPosition().latitude, 10.0);
                    assert(data.getPosition().longitude, 85.0, helper::equalsD);
                    assert(data.getPosition().altitude, 100, defaultEqualsInt);
                    std::string fix = data.getSerialized();
@@ -212,9 +211,9 @@ void test_data(TestSuitesRunner& runner)
                    object::Wind wind;
                    wind.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
                    data.update(std::move(wind));
-                   assertT(data.getSerialized(), "$WIMWV,242.8,R,6.9,N,A*20\r\n", helper::equalsStr,
+                   assertT(data.getSerialized(), "$WIMWV,242.8,R,6.9,N,A*20\r\n", EQUALS,
                            std::string);
-                   assertT(data.getSerialized(), "", helper::equalsStr, std::string);
+                   assertT(data.getSerialized(), "", EQUALS, std::string);
                })
         ->test("write higher priority",
                []() {
@@ -225,7 +224,7 @@ void test_data(TestSuitesRunner& runner)
                    wind1.setSerialized("updated");
                    assert(data.update(std::move(wind0)), true, helper::equalsBool);
                    assert(data.update(std::move(wind1)), true, helper::equalsBool);
-                   assertT(data.getSerialized(), "updated", helper::equalsStr, std::string);
+                   assertT(data.getSerialized(), "updated", EQUALS, std::string);
                    wind0.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
                    assert(data.update(std::move(wind0)), false, helper::equalsBool);
                })
@@ -236,11 +235,11 @@ void test_data(TestSuitesRunner& runner)
             wind1.setSerialized("lower");
             wind2.setSerialized("higher");
             data.update(std::move(wind2));
-            assertT(data.getSerialized(), "higher", helper::equalsStr, std::string);
+            assertT(data.getSerialized(), "higher", EQUALS, std::string);
             data.update(std::move(wind1));
-            assertT(data.getSerialized(), "", helper::equalsStr, std::string);
+            assertT(data.getSerialized(), "", EQUALS, std::string);
             data.update(std::move(wind1));
-            assertT(data.getSerialized(), "lower", helper::equalsStr, std::string);
+            assertT(data.getSerialized(), "lower", EQUALS, std::string);
         });
 
     describeParallel<AtmosphereData>("atmosphere data", runner)
@@ -252,8 +251,8 @@ void test_data(TestSuitesRunner& runner)
                    atm.setSerialized("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
                    data.update(std::move(atm));
                    assertT(data.getSerialized(),
-                           "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n",
-                           helper::equalsStr, std::string);
+                           "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n", EQUALS,
+                           std::string);
                    assert(data.getAtmPressure(), 1009.1, helper::equalsD);
                })
         ->test("write higher priority",

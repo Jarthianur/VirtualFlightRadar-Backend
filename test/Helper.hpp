@@ -33,7 +33,7 @@
 
 #define syso(M) std::cout << M << std::endl;
 
-namespace testsuite
+namespace sctf
 {
 namespace util
 {
@@ -47,11 +47,6 @@ inline std::string serialize(const object::Aircraft::TargetType& crTargetType)
 
 namespace helper
 {
-PROVIDE_COMPARATOR(std::uint32_t, EQUALS, equalsUInt)
-PROVIDE_COMPARATOR(std::uint64_t, EQUALS, equalsULong)
-PROVIDE_COMPARATOR(double, EQUALS, equalsD)
-PROVIDE_COMPARATOR(std::string, EQUALS, equalsStr)
-PROVIDE_COMPARATOR(object::Aircraft::TargetType, EQUALS, equalsAtt)
 
 static boost::regex pflauRe("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
 static boost::regex pflaaRe(

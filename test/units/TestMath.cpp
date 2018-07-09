@@ -23,50 +23,50 @@
 
 #include "../../src/Math.hpp"
 #include "../Helper.hpp"
-#include "../framework/src/framework.h"
 
-using namespace testsuite;
-using namespace comparator;
+using namespace sctf;
+using namespace test;
+using namespace comp;
 
 void test_math(TestSuitesRunner& runner)
 {
     describe("math utils", runner, "math")
         ->test("radian",
                []() {
-                   assert(math::radian(45.0), 0.785398, helper::equalsD);
-                   assert(math::radian(0.0), 0.0, helper::equalsD);
-                   assert(math::radian(360.0), 6.28319, helper::equalsD);
+                   assertEquals(math::radian(45.0), 0.785398);
+                   assertEquals(math::radian(0.0), 0.0);
+                   assertEquals(math::radian(360.0), 6.28319);
                })
         ->test("degree",
                []() {
-                   assert(math::degree(0.785398), 45.0, helper::equalsD);
-                   assert(math::degree(0.0), 0.0, helper::equalsD);
-                   assert(math::degree(6.28319), 360.0, helper::equalsD);
+                   assertEquals(math::degree(0.785398), 45.0);
+                   assertEquals(math::degree(0.0), 0.0);
+                   assertEquals(math::degree(6.28319), 360.0);
                })
         ->test("doubleToInt",
                []() {
-                   assert(math::doubleToInt(0.0), 0, helper::equalsInt);
-                   assert(math::doubleToInt(1.4), 1, helper::equalsInt);
-                   assert(math::doubleToInt(1.5), 2, helper::equalsInt);
-                   assert(math::doubleToInt(-1.4), -1, helper::equalsInt);
-                   assert(math::doubleToInt(-1.5), -2, helper::equalsInt);
+                   assertEquals(math::doubleToInt(0.0), 0);
+                   assertEquals(math::doubleToInt(1.4), 1);
+                   assertEquals(math::doubleToInt(1.5), 2);
+                   assertEquals(math::doubleToInt(-1.4), -1);
+                   assertEquals(math::doubleToInt(-1.5), -2);
                })
         ->test("dmToDeg",
                []() {
-                   assert(math::dmToDeg(0.0), 0.0, helper::equalsD);
-                   assert(math::dmToDeg(9030.50), 90.508333, helper::equalsD);
-                   assert(math::dmToDeg(18000.0), 180.0, helper::equalsD);
-                   assert(math::dmToDeg(-4512.3456), 45.205760, helper::equalsD);
+                   assertEquals(math::dmToDeg(0.0), 0.0);
+                   assertEquals(math::dmToDeg(9030.50), 90.508333);
+                   assertEquals(math::dmToDeg(18000.0), 180.0);
+                   assertEquals(math::dmToDeg(-4512.3456), 45.205760);
                })
         ->test("calcIcaoHeight",
                []() {
-                   assert(math::icaoHeight(0.0), 44331, helper::equalsInt);
-                   assert(math::icaoHeight(1013.25), 0, helper::equalsInt);
-                   assert(math::icaoHeight(980.0), 281, helper::equalsInt);
+                   assertEquals(math::icaoHeight(0.0), 44331);
+                   assertEquals(math::icaoHeight(1013.25), 0);
+                   assertEquals(math::icaoHeight(980.0), 281);
                })
         ->test("checksum", []() {
-            assert(math::checksum("", sizeof("")), 0, helper::equalsInt);
-            assert(math::checksum("\0", sizeof("\0")), 0, helper::equalsInt);
-            assert(math::checksum("$abc*", sizeof("$abc*")), 96, helper::equalsInt);
+            assertEquals(math::checksum("", sizeof("")), 0);
+            assertEquals(math::checksum("\0", sizeof("\0")), 0);
+            assertEquals(math::checksum("$abc*", sizeof("$abc*")), 96);
         });
 }
