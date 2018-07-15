@@ -56,7 +56,7 @@ public:
      * @fn ~SbsClient
      * @brief Destructor
      */
-    virtual ~SbsClient() noexcept;
+    ~SbsClient() noexcept;
 
 private:
     /**

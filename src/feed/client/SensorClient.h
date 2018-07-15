@@ -62,7 +62,7 @@ public:
      * @fn ~SensorClient
      * @brief Destructor
      */
-    virtual ~SensorClient() noexcept;
+    ~SensorClient() noexcept;
 
 private:
     /**

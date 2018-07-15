@@ -28,7 +28,6 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "../../Defines.h"
 #include "Client.h"
 
 namespace feed
@@ -66,7 +65,9 @@ public:
         SENSOR
     };
 
-    DEFAULT_CTOR_DTOR(ClientManager)
+    ClientManager();
+
+    ~ClientManager() noexcept;
 
     std::weak_ptr<Client> subscribe(std::shared_ptr<Feed> rpFeed, const Endpoint& crEndpoint,
                                     Protocol vProtocol);

@@ -58,7 +58,7 @@ public:
      * @fn ~GpsdClient
      * @brief Destructor
      */
-    virtual ~GpsdClient() noexcept;
+    ~GpsdClient() noexcept;
 
 private:
     /**

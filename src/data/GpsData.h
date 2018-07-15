@@ -23,7 +23,6 @@
 
 #include <string>
 
-#include "../Defines.h"
 #include "../object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
 #include "Data.h"
@@ -39,7 +38,7 @@ namespace data
 class GpsData : public Data
 {
 public:
-    DEFAULT_CTOR_DTOR(GpsData)
+    GpsData();
 
     /**
      * @fn GpsData
@@ -47,6 +46,8 @@ public:
      * @param crPosition The initial info
      */
     GpsData(const object::GpsPosition& crPosition, bool vGround);
+
+    ~GpsData() noexcept;
 
     /**
      * @fn getSerialized

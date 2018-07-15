@@ -23,7 +23,6 @@
 
 #include <string>
 
-#include "../Defines.h"
 #include "../object/Atmosphere.h"
 #include "Data.h"
 
@@ -38,7 +37,7 @@ namespace data
 class AtmosphereData : public Data
 {
 public:
-    DEFAULT_CTOR_DTOR(AtmosphereData)
+    AtmosphereData();
 
     /**
      * @fn AtmosphereData
@@ -46,6 +45,8 @@ public:
      * @param vAtmosphere The initial info
      */
     explicit AtmosphereData(const object::Atmosphere& crAtmosphere);
+
+    ~AtmosphereData() noexcept;
 
     /**
      * @fn getSerialized

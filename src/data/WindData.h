@@ -23,7 +23,6 @@
 
 #include <string>
 
-#include "../Defines.h"
 #include "../object/Wind.h"
 #include "Data.h"
 
@@ -38,7 +37,7 @@ namespace data
 class WindData : public Data
 {
 public:
-    DEFAULT_CTOR_DTOR(WindData)
+    WindData();
 
     /**
      * @fn WindData
@@ -46,6 +45,8 @@ public:
      * @param crWind The initial wind information
      */
     explicit WindData(const object::Wind& crWind);
+
+    ~WindData() noexcept;
 
     /**
      * @fn getSerialized

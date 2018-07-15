@@ -27,7 +27,6 @@
 #include <boost/optional.hpp>
 #include <boost/regex.hpp>
 
-#include "../Defines.h"
 #include "PropertyMap.h"
 
 /// @namespace config
@@ -42,7 +41,9 @@ namespace config
 class ConfigReader
 {
 public:
-    DEFAULT_CTOR_DTOR(ConfigReader)
+    ConfigReader();
+
+    ~ConfigReader() noexcept;
 
     /**
      * @fn read

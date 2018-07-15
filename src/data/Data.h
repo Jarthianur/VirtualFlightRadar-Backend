@@ -20,8 +20,6 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
-#include "../Defines.h"
-
 /// @namespace object
 namespace object
 {
@@ -38,7 +36,9 @@ namespace data
 class Data
 {
 public:
-    DEFAULT_CTOR_DTOR(Data)
+    Data();
+
+    virtual ~Data() noexcept;
 
     /**
      * @fn getSerialized

@@ -54,7 +54,7 @@ std::string AircraftData::getSerialized()
     boost::lock_guard<boost::mutex> lock(mMutex);
     std::string tmp;
     tmp.reserve(mContainer.size() * 128);
-    for(auto& it : mContainer)
+    for(const auto& it : mContainer)
     {
         tmp += it.getUpdateAge() < OBJ_OUTDATED ? it.getSerialized() : "";
     }
@@ -65,7 +65,7 @@ bool AircraftData::update(Object&& rvAircraft)
 {
     boost::lock_guard<boost::mutex> lock(this->mMutex);
     Aircraft&& rvUpdate = static_cast<Aircraft&&>(rvAircraft);
-    const auto& index   = mIndexMap.find(rvUpdate.getId());
+    const auto index    = mIndexMap.find(rvUpdate.getId());
 
     if(index != mIndexMap.end())
     {

@@ -60,7 +60,7 @@ public:
      * @fn ~AprscClient
      * @brief Destructor
      */
-    virtual ~AprscClient() noexcept;
+    ~AprscClient() noexcept;
 
     bool equals(const Client& crOther) const override;
 

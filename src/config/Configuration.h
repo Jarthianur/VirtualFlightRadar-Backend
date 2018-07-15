@@ -134,7 +134,7 @@ public:
      * @fn ~Configuration
      * @brief Destructor
      */
-    virtual ~Configuration() noexcept;
+    ~Configuration() noexcept;
 
     /**
      * Define and declare getters.

@@ -27,7 +27,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../Defines.h"
 #include "../object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
 #include "Data.h"
@@ -51,7 +50,7 @@ namespace data
 class AircraftData : public Data
 {
 public:
-    DEFAULT_CTOR_DTOR(AircraftData)
+    AircraftData();
 
     /**
      * @fn AircraftData
@@ -59,6 +58,8 @@ public:
      * @param vMaxDist The max distance filter
      */
     explicit AircraftData(std::int32_t vMaxDist);
+
+    ~AircraftData() noexcept;
 
     /**
      * @fn getSerialized
