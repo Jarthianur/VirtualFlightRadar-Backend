@@ -21,11 +21,11 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint>
+#include <memory>
 #include <string>
-#include <vector>
 #include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/thread/mutex.hpp>
 
@@ -130,9 +130,9 @@ private:
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
 
-    /// @var mClients
+    /// @var mConnections
     /// Vector holding Connections
-    std::vector<boost::shared_ptr<Connection>> mClients;
+    std::array<std::unique_ptr<Connection>, S_MAX_CLIENTS> mConnections;
 };
 
 }  // namespace server

@@ -21,11 +21,10 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <boost/asio.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/move/move.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "../Defines.h"
 
@@ -37,7 +36,7 @@ namespace server
  * @brief TCP connection opened by the Server.
  * @see Server.h
  */
-class Connection : public boost::enable_shared_from_this<Connection>
+class Connection final
 {
 public:
     NON_COPYABLE(Connection)
@@ -54,7 +53,7 @@ public:
      * @param rvSocket The socket
      * @return a shared ptr to the Connection object
      */
-    static boost::shared_ptr<Connection> start(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket);
+    static std::unique_ptr<Connection> start(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket);
 
     /**
      * @fn stop
