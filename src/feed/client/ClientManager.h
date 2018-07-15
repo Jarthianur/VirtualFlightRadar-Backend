@@ -25,7 +25,6 @@
 #include <cstdint>
 #include <memory>
 #include <unordered_set>
-#include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
@@ -72,7 +71,7 @@ public:
     std::weak_ptr<Client> subscribe(std::shared_ptr<Feed> rpFeed, const Endpoint& crEndpoint,
                                     Protocol vProtocol);
 
-    void run(boost::asio::signal_set& rSigset);
+    void run();
 
     void stop();
 

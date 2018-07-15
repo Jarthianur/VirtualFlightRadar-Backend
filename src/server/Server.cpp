@@ -80,16 +80,14 @@ void Server::accept()
 
 void Server::awaitStop(boost::asio::signal_set& rSigset)
 {
-    rSigset.async_wait([this](const boost::system::error_code&, int) {
-        boost::lock_guard<boost::mutex> lock(mMutex);
-        mAcceptor.close();
-        stop();
-    });
+    rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
 }
 
 void Server::stop()
 {
     Logger::info("(Server) stopping all connections...");
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    mAcceptor.close();
     for(auto& it : mConnections)
     {
         if(it)

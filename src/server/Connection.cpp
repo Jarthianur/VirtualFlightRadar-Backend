@@ -44,10 +44,10 @@ Connection::~Connection() noexcept
 
 void Connection::stop()
 {
-    boost::system::error_code ignored_ec;
-    mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
     if(mSocket.is_open())
     {
+        boost::system::error_code ignored_ec;
+        mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ignored_ec);
         mSocket.close();
     }
 }
