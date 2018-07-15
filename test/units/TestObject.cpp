@@ -25,11 +25,9 @@
 #include "../../src/object/TimeStamp.h"
 #include "../../src/object/Wind.h"
 #include "../Helper.hpp"
-#include "../framework/src/framework.h"
 
 using namespace object;
-using namespace testsuite;
-using namespace comparator;
+using namespace sctf;
 
-void test_object(TestSuitesRunner& runner)
+void test_object(test::TestSuitesRunner& runner)
 {}

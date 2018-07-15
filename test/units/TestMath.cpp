@@ -25,10 +25,8 @@
 #include "../Helper.hpp"
 
 using namespace sctf;
-using namespace test;
-using namespace comp;
 
-void test_math(TestSuitesRunner& runner)
+void test_math(test::TestSuitesRunner& runner)
 {
     describe("math utils", runner, "math")
         ->test("radian",

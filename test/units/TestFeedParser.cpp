@@ -34,13 +34,11 @@
 #include "../../src/object/TimeStamp.h"
 #include "../../src/object/Wind.h"
 #include "../Helper.hpp"
-#include "../framework/src/framework.h"
 
 using namespace feed::parser;
-using namespace testsuite;
-using namespace comparator;
+using namespace sctf;
 
-void test_feed_parser(TestSuitesRunner& runner)
+void test_feed_parser(test::TestSuitesRunner& runner)
 {
     describe<SbsParser>("unpack", runner)
         ->test(
@@ -51,58 +49,44 @@ void test_feed_parser(TestSuitesRunner& runner)
                 sbsParser.unpack(
                     "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
                     ac);
-                assert(ac.getId(), std::string("AAAAAA"), helper::equalsStr);
-                assert(ac.getTargetType(), object::Aircraft::TargetType::TRANSPONDER,
-                       helper::equalsAtt);
-                assert(ac.getPosition().altitude, math::doubleToInt(math::FEET_2_M * 1000),
-                       helper::equalsInt);
-                assert(ac.getPosition().latitude, 49.0, helper::equalsD);
-                assert(ac.getPosition().longitude, 8.0, helper::equalsD);
-                assert(ac.getFullInfoAvailable(), false, helper::equalsBool);
+                assertStr(ac.getId(), EQUALS, "AAAAAA");
+                assertEquals(ac.getTargetType(), object::Aircraft::TargetType::TRANSPONDER);
+                assertEquals(ac.getPosition().altitude, math::doubleToInt(math::FEET_2_M * 1000));
+                assertEquals(ac.getPosition().latitude, 49.0);
+                assertEquals(ac.getPosition().longitude, 8.0);
+                assertFalse(ac.getFullInfoAvailable());
             })
         ->test(
             "invalid msg",
             []() {
                 SbsParser sbsParser;
                 object::Aircraft ac;
-                assert(
-                    sbsParser.unpack(
-                        "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0",
-                        ac),
-                    false, helper::equalsBool);
-                assert(
-                    sbsParser.unpack(
-                        "MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0",
-                        ac),
-                    false, helper::equalsBool);
-                assert(
-                    sbsParser.unpack(
-                        "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0",
-                        ac),
-                    false, helper::equalsBool);
-                assert(sbsParser.unpack("MSG,someCrap in, here", ac), false, helper::equalsBool);
-                assert(sbsParser.unpack("MSG,4,0,,,,,,", ac), false, helper::equalsBool);
-                assert(
-                    sbsParser.unpack(
-                        "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0",
-                        ac),
-                    false, helper::equalsBool);
-                assert(
-                    sbsParser.unpack(
-                        "MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0",
-                        ac),
-                    false, helper::equalsBool);
-                assert(sbsParser.unpack("", ac), false, helper::equalsBool);
+                assertFalse(sbsParser.unpack(
+                    "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0",
+                    ac));
+                assertFalse(sbsParser.unpack(
+                    "MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0",
+                    ac));
+                assertFalse(sbsParser.unpack(
+                    "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0",
+                    ac));
+                assertFalse(sbsParser.unpack("MSG,someCrap in, here", ac));
+                assertFalse(sbsParser.unpack("MSG,4,0,,,,,,", ac));
+                assertFalse(sbsParser.unpack(
+                    "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0",
+                    ac));
+                assertFalse(sbsParser.unpack(
+                    "MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0",
+                    ac));
+                assertFalse(sbsParser.unpack("", ac));
             })
         ->test("filter height", []() {
             object::Aircraft ac;
             SbsParser tmpSbs;
             tmpSbs.setMaxHeight(0);
-            assert(
-                tmpSbs.unpack(
-                    "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
-                    ac),
-                false, helper::equalsBool);
+            assertFalse(tmpSbs.unpack(
+                "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
+                ac));
         });
 
     describe<AprsParser>("unpack", runner)
@@ -111,62 +95,47 @@ void test_feed_parser(TestSuitesRunner& runner)
             []() {
                 AprsParser aprsParser;
                 object::Aircraft ac;
-                assert(
-                    aprsParser.unpack(
-                        "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA",
-                        ac),
-                    true, helper::equalsBool);
-                assert(
-                    aprsParser.unpack(
-                        "ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4",
-                        ac),
-                    true, helper::equalsBool);
-                assert(
-                    aprsParser.unpack(
-                        "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4",
-                        ac),
-                    true, helper::equalsBool);
-                assert(
-                    aprsParser.unpack(
-                        "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
-                        ac),
-                    true, helper::equalsBool);
-                assert(ac.getId(), std::string("AAAAAA"), helper::equalsStr);
-                assert(ac.getTargetType(), object::Aircraft::TargetType::FLARM, helper::equalsAtt);
-                assert(ac.getPosition().altitude, 0, helper::equalsInt);
-                assert(ac.getPosition().latitude, 49.0, helper::equalsD);
-                assert(ac.getPosition().longitude, -8.0, helper::equalsD);
-                assert(ac.getFullInfoAvailable(), true, helper::equalsBool);
+                assertTrue(aprsParser.unpack(
+                    "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA",
+                    ac));
+                assertTrue(aprsParser.unpack(
+                    "ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4",
+                    ac));
+                assertTrue(aprsParser.unpack(
+                    "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4",
+                    ac));
+                assertTrue(aprsParser.unpack(
+                    "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
+                    ac));
+                assertEqStr(ac.getId(), "AAAAAA");
+                assertEquals(ac.getTargetType(), object::Aircraft::TargetType::FLARM);
+                assertEquals(ac.getPosition().altitude, 0);
+                assertEquals(ac.getPosition().latitude, 49.0);
+                assertEquals(ac.getPosition().longitude, -8.0);
+                assertTrue(ac.getFullInfoAvailable());
             })
         ->test(
             "invalid msg",
             []() {
                 AprsParser aprsParser;
                 object::Aircraft ac;
-                assert(
-                    aprsParser.unpack(
-                        "Valhalla>APRS,TCPIP*,qAC,GLIDERN2:/074555h4900.00NI00800.00E&/A=000000 CPU:4.0 RAM:242.7/458.8MB NTP:0.8ms/-28.6ppm +56.2C RF:+38+2.4ppm/+1.7dB",
-                        ac),
-                    false, helper::equalsBool);
-                assert(
-                    aprsParser.unpack(
-                        "# aprsc 2.0.14-g28c5a6a 29 Jun 2014 07:46:15 GMT SERVER1 00.000.00.000:14580",
-                        ac),
-                    false, helper::equalsBool);
-                assert(aprsParser.unpack("", ac), false, helper::equalsBool);
-                assert(aprsParser.unpack(
-                           "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 ", ac),
-                       false, helper::equalsBool);
+                assertFalse(aprsParser.unpack(
+                    "Valhalla>APRS,TCPIP*,qAC,GLIDERN2:/074555h4900.00NI00800.00E&/A=000000 CPU:4.0 RAM:242.7/458.8MB NTP:0.8ms/-28.6ppm +56.2C RF:+38+2.4ppm/+1.7dB",
+                    ac));
+                assertFalse(aprsParser.unpack(
+                    "# aprsc 2.0.14-g28c5a6a 29 Jun 2014 07:46:15 GMT SERVER1 00.000.00.000:14580",
+                    ac));
+                assertFalse(aprsParser.unpack("", ac));
+                assertFalse(aprsParser.unpack(
+                    "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 ", ac));
             })
         ->test("filter height", []() {
             AprsParser tmpAprs;
             tmpAprs.setMaxHeight(0);
             object::Aircraft ac;
-            assert(
-                tmpAprs.unpack(
-                    "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
-                    ac),
-                false, helper::equalsBool);
+            assertFalse(tmpAprs.unpack(
+                "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
+                ac));
         });
 
     describe<WindParser>("unpack", runner)
@@ -175,16 +144,15 @@ void test_feed_parser(TestSuitesRunner& runner)
                    WindParser windParser;
                    object::Wind wind;
                    std::string mwv("$WIMWV,242.8,R,6.9,N,A*20\r\n");
-                   assert(windParser.unpack(mwv, wind), true, helper::equalsBool);
-                   assert(wind.getSerialized(), mwv, helper::equalsStr);
+                   assertTrue(windParser.unpack(mwv, wind));
+                   assertEquals(wind.getSerialized(), mwv);
                })
         ->test("invalid msg", []() {
             WindParser windParser;
             object::Wind wind;
-            assert(windParser.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75", wind), false,
-                   helper::equalsBool);
-            assert(windParser.unpack("Someone sent other stuff", wind), false, helper::equalsBool);
-            assert(windParser.unpack("", wind), false, helper::equalsBool);
+            assertFalse(windParser.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75", wind));
+            assertFalse(windParser.unpack("Someone sent other stuff", wind));
+            assertFalse(windParser.unpack("", wind));
         });
 
     describe<AtmosphereParser>("unpack", runner)
@@ -193,61 +161,51 @@ void test_feed_parser(TestSuitesRunner& runner)
                    AtmosphereParser atmParser;
                    object::Atmosphere atm;
                    std::string mda("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
-                   assert(atmParser.unpack(mda, atm), true, helper::equalsBool);
-                   assert(atm.getPressure(), 1009.1, helper::equalsD);
-                   assert(atm.getSerialized(), mda, helper::equalsStr);
+                   assertTrue(atmParser.unpack(mda, atm));
+                   assertEquals(atm.getPressure(), 1009.1);
+                   assertEquals(atm.getSerialized(), mda);
                })
         ->test("invalid msg", []() {
             AtmosphereParser atmParser;
             object::Atmosphere atm;
-            assert(atmParser.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75", atm), false,
-                   helper::equalsBool);
-            assert(atmParser.unpack("Someone sent other stuff", atm), false, helper::equalsBool);
-            assert(atmParser.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3F", atm), false,
-                   helper::equalsBool);
-            assert(atmParser.unpack("$WIMDA,", atm), false, helper::equalsBool);
-            assert(atmParser.unpack("$WIMDA,29.7987,I,1.0#091,B,14.8,C,,,,,,,,,,,,,,*1d", atm),
-                   false, helper::equalsBool);
-            assert(atmParser.unpack("", atm), false, helper::equalsBool);
+            assertFalse(atmParser.unpack("$YXXDR,C,19.3,C,BRDT,U,11.99,V,BRDV*75", atm));
+            assertFalse(atmParser.unpack("Someone sent other stuff", atm));
+            assertFalse(atmParser.unpack("$WIMDA,29.7987,I,1.0091,14.8,,,,,,,,,,,,,,*3F", atm));
+            assertFalse(atmParser.unpack("$WIMDA,", atm));
+            assertFalse(
+                atmParser.unpack("$WIMDA,29.7987,I,1.0#091,B,14.8,C,,,,,,,,,,,,,,*1d", atm));
+            assertFalse(atmParser.unpack("", atm));
         });
 
     describe<GpsParser>("unpack", runner)
-        ->test(
-            "valid msg",
-            []() {
-                GpsParser gpsParser;
-                object::GpsPosition pos;
-                assert(gpsParser.unpack(
-                           "$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49", pos),
-                       true, helper::equalsBool);
-                assert(
-                    gpsParser.unpack(
-                        "$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49\r\n", pos),
-                    true, helper::equalsBool);
-                assert(
-                    gpsParser.unpack(
-                        "$GPGGA,183552,5000.0466,S,00815.7555,W,1,05,1,105,M,48.0,M,,*46\n", pos),
-                    true, helper::equalsBool);
-                assert(pos.getDilution(), 1.0, helper::equalsD);
-                assert(pos.getFixQuality(), 1, helper::equalsInt);
-                assert(pos.getNrOfSatellites(), 5, helper::equalsInt);
-                assert(pos.getGeoid(), 48.0, helper::equalsD);
-                assert(pos.getPosition().latitude, -math::dmToDeg(5000.0466), helper::equalsD);
-                assert(pos.getPosition().longitude, -math::dmToDeg(815.7555), helper::equalsD);
-                assert(pos.getPosition().altitude, 105, helper::equalsInt);
-            })
+        ->test("valid msg",
+               []() {
+                   GpsParser gpsParser;
+                   object::GpsPosition pos;
+                   assertTrue(gpsParser.unpack(
+                       "$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49", pos));
+                   assertTrue(gpsParser.unpack(
+                       "$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49\r\n", pos));
+                   assertTrue(gpsParser.unpack(
+                       "$GPGGA,183552,5000.0466,S,00815.7555,W,1,05,1,105,M,48.0,M,,*46\n", pos));
+                   assertEquals(pos.getDilution(), 1.0);
+                   assertEquals(pos.getFixQuality(), 1);
+                   assertEquals(pos.getNrOfSatellites(), 5);
+                   assertEquals(pos.getGeoid(), 48.0);
+                   assertEquals(pos.getPosition().latitude, -math::dmToDeg(5000.0466));
+                   assertEquals(pos.getPosition().longitude, -math::dmToDeg(815.7555));
+                   assertEquals(pos.getPosition().altitude, 105);
+               })
         ->test("invalid msg", []() {
             GpsParser gpsParser;
             object::GpsPosition pos;
-            assert(gpsParser.unpack(
-                       "$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*59\r\n", pos),
-                   false, helper::equalsBool);
-            assert(
-                gpsParser.unpack("$GPGGA,183552,N,00815.7555,E,1,05,1,105,M,48.0,M,,*59\r\n", pos),
-                false, helper::equalsBool);
-            assert(gpsParser.unpack("$GPGGA,\r\n", pos), false, helper::equalsBool);
-            assert(gpsParser.unpack("", pos), false, helper::equalsBool);
-            assert(gpsParser.unpack("$GPGGA,183552,N,00815.7555,E,1,05,1,105,M,48.0,M,,*\r\n", pos),
-                   false, helper::equalsBool);
+            assertFalse(gpsParser.unpack(
+                "$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*59\r\n", pos));
+            assertFalse(
+                gpsParser.unpack("$GPGGA,183552,N,00815.7555,E,1,05,1,105,M,48.0,M,,*59\r\n", pos));
+            assertFalse(gpsParser.unpack("$GPGGA,\r\n", pos));
+            assertFalse(gpsParser.unpack("", pos));
+            assertFalse(
+                gpsParser.unpack("$GPGGA,183552,N,00815.7555,E,1,05,1,105,M,48.0,M,,*\r\n", pos));
         });
 }

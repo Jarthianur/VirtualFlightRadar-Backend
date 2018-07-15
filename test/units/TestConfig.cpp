@@ -30,10 +30,8 @@
 
 using namespace config;
 using namespace sctf;
-using namespace test;
-using namespace comp;
 
-void test_config(TestSuitesRunner& runner)
+void test_config(test::TestSuitesRunner& runner)
 {
     describe<ConfigReader>("read config", runner)->test("read", []() {
         std::stringstream conf;
@@ -42,14 +40,10 @@ void test_config(TestSuitesRunner& runner)
         ConfigReader cr;
         PropertyMap map;
         cr.read(conf, map);
-        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), "0.000000", EQUALS,
-                std::string);
-        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"), "invalid", EQUALS,
-                std::string);
-        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), "1000", EQUALS,
-                std::string);
-        assertT(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "invalid"), "invalid", EQUALS,
-                std::string);
+        assertEqStr(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), "0.000000");
+        assertEqStr(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"), "invalid");
+        assertEqStr(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), "1000");
+        assertEqStr(map.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "invalid"), "invalid");
         assertTrue(map.getProperty("nothing", "").empty());
     });
 
@@ -68,9 +62,9 @@ void test_config(TestSuitesRunner& runner)
                    conf_in << KV_KEY_PORT "=3456\n" << KV_KEY_PRIORITY "=1\n";
                    Configuration config(conf_in);
                    const auto feed_it = config.getFeedMapping().cbegin();
-                   assertT(feed_it->first, SECT_KEY_ATMOS "1", EQUALS, std::string);
-                   assertT(feed_it->second.at(KV_KEY_PRIORITY), "1", EQUALS, std::string);
-                   assertT(config.getServerPort(), 1234, EQUALS, int);
+                   assertEqStr(feed_it->first, SECT_KEY_ATMOS "1");
+                   assertEqStr(feed_it->second.at(KV_KEY_PRIORITY), "1");
+                   assertT(config.getServerPort(), EQUALS, 1234, int);
                    assertTrue(config.getGroundMode());
                    assertEquals(config.getPosition().getPosition().latitude, 77.777777);
                    assertEquals(config.getPosition().getPosition().longitude, -12.121212);
