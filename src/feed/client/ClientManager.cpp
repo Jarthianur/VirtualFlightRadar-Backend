@@ -22,9 +22,7 @@
 #include "ClientManager.h"
 
 #include <stdexcept>
-#include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/thread.hpp>
 #include <boost/thread/lock_guard.hpp>
 
 #include "../AprscFeed.h"
@@ -78,12 +76,12 @@ std::weak_ptr<Client> ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
     return std::weak_ptr<Client>(*it);
 }
 
-void ClientManager::run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset)
+void ClientManager::run(boost::asio::signal_set& rSigset)
 {
     rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
-    for(const auto& it : mClients)
+    for(auto& it : mClients)
     {
-        rThdGroup.create_thread([&]() {
+        mThdGroup.create_thread([&]() {
             it->run();
             boost::lock_guard<boost::mutex> lock(mMutex);
             mClients.erase(it);
@@ -98,6 +96,7 @@ void ClientManager::stop()
     {
         it->lockAndStop();
     }
+    mThdGroup.join_all();
 }
 
 }  // namespace client

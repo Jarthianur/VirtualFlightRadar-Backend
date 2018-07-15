@@ -81,16 +81,15 @@ void VFRB::run() noexcept
         Logger::info("(VFRB) run feed: ", it->getName());
         it->registerToClient(mClientManager);
     }
-    boost::thread_group client_threads;
-    mClientManager.run(client_threads, signal_set);
+
+    mClientManager.run(signal_set);
     boost::thread signal_thread([&io_service]() { io_service.run(); });
     mFeeds.clear();
 
     serve();
-    mClientManager.stop();
 
+    mClientManager.stop();
     server_thread.join();
-    client_threads.join_all();
     signal_thread.join();
 
     Logger::info("Stopped after ", getDuration(start));

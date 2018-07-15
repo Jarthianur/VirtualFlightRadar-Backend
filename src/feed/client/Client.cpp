@@ -125,9 +125,9 @@ void Client::handleTimedConnect(const boost::system::error_code& crError) noexce
     }
     else
     {
-        Logger::error(mComponent, " cancel connect: ", crError.message());
         if(crError != boost::asio::error::operation_aborted)
         {
+            Logger::error(mComponent, " cancel connect: ", crError.message());
             boost::lock_guard<boost::mutex> lock(mMutex);
             stop();
         }

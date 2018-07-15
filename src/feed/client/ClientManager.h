@@ -26,15 +26,11 @@
 #include <memory>
 #include <unordered_set>
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
 #include "../../Defines.h"
 #include "Client.h"
-
-namespace boost
-{
-class thread_group;
-}  // namespace boost
 
 namespace feed
 {
@@ -76,12 +72,14 @@ public:
     std::weak_ptr<Client> subscribe(std::shared_ptr<Feed> rpFeed, const Endpoint& crEndpoint,
                                     Protocol vProtocol);
 
-    void run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset);
+    void run(boost::asio::signal_set& rSigset);
 
     void stop();
 
 private:
     ClientSet mClients;
+
+    boost::thread_group mThdGroup;
 
     boost::mutex mMutex;
 };

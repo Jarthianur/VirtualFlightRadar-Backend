@@ -127,9 +127,9 @@ void Server::handleAccept(const boost::system::error_code& crError) noexcept
             {
                 if(!it)
                 {
-                    it = Connection::start(boost::move(mSocket));
-                    Logger::info("(Server) connection from: ", it->getIpAddress());
                     success = true;
+                    it      = Connection::start(boost::move(mSocket));
+                    Logger::info("(Server) connection from: ", it->getIpAddress());
                     break;
                 }
             }
