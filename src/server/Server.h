@@ -22,13 +22,14 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "../Defines.h"
 #include "../Parameters.h"
@@ -110,6 +111,8 @@ private:
      */
     void handleAccept(const boost::system::error_code& crError) noexcept;
 
+    void attemptConnection() noexcept;
+
     boost::thread mThread;
 
     /// @var mMutex
@@ -131,6 +134,8 @@ private:
     /// @var mConnections
     /// Vector holding Connections
     std::array<std::unique_ptr<Connection>, S_MAX_CLIENTS> mConnections;
+
+    std::size_t mActiveConnections = 0;
 };
 
 }  // namespace server

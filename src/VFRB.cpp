@@ -24,10 +24,7 @@
 #include <csignal>
 #include <exception>
 #include <sstream>
-#include <string>
-#include <utility>
 #include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
 #include <boost/thread.hpp>
 
 #include "config/Configuration.h"

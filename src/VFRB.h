@@ -24,6 +24,7 @@
 #include <atomic>
 #include <list>
 #include <memory>
+#include <string>
 #include <boost/chrono.hpp>
 
 #include "server/Server.h"

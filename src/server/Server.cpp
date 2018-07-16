@@ -54,13 +54,13 @@ void Server::run()
 
 void Server::send(const std::string& crStr)
 {
-    if(crStr.empty())
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    if(crStr.empty() || mActiveConnections == 0)
     {
         return;
     }
     boost::system::error_code ec;
     auto buffer = boost::asio::buffer(crStr);
-    boost::lock_guard<boost::mutex> lock(mMutex);
     for(auto& it : mConnections)
     {
         if(it)
@@ -70,6 +70,7 @@ void Server::send(const std::string& crStr)
             {
                 Logger::warn("(Server) lost connection to: ", it.get()->getIpAddress());
                 it.reset();
+                --mActiveConnections;
             }
         }
     }
@@ -96,6 +97,7 @@ void Server::stop()
             it.reset();
         }
     }
+    mActiveConnections = 0;
     if(!mIoService.stopped())
     {
         mIoService.stop();
@@ -127,28 +129,7 @@ void Server::handleAccept(const boost::system::error_code& crError) noexcept
     }
     if(!crError)
     {
-        bool success = false;
-        if(!isConnected(mSocket.remote_endpoint().address().to_string()))
-        {
-            for(auto& it : mConnections)
-            {
-                if(!it)
-                {
-                    success = true;
-                    it      = Connection::start(boost::move(mSocket));
-                    Logger::info("(Server) connection from: ", it->getIpAddress());
-                    break;
-                }
-            }
-        }
-        if(!success)
-        {
-            Logger::info("(Server) refused connection to ",
-                         mSocket.remote_endpoint().address().to_string());
-            boost::system::error_code ec;
-            mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
-            mSocket.close();
-        }
+        attemptConnection();
     }
     else if(crError != boost::system::errc::bad_file_descriptor
             || crError != boost::asio::error::operation_aborted)
@@ -156,6 +137,32 @@ void Server::handleAccept(const boost::system::error_code& crError) noexcept
         Logger::warn("(Server) accept: ", crError.message());
     }
     accept();
+}
+
+void Server::attemptConnection() noexcept
+{
+    if(mActiveConnections < S_MAX_CLIENTS
+       && !isConnected(mSocket.remote_endpoint().address().to_string()))
+    {
+        for(auto& it : mConnections)
+        {
+            if(!it)
+            {
+                it = Connection::start(boost::move(mSocket));
+                ++mActiveConnections;
+                Logger::info("(Server) connection from: ", it->getIpAddress());
+                break;
+            }
+        }
+    }
+    else
+    {
+        Logger::info("(Server) refused connection to ",
+                     mSocket.remote_endpoint().address().to_string());
+        boost::system::error_code ec;
+        mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
+        mSocket.close();
+    }
 }
 
 }  // namespace server
