@@ -57,7 +57,7 @@ struct Position
 class GpsPosition : public Object
 {
 public:
-    DEFAULT_CTOR_DTOR(GpsPosition)
+    GpsPosition();
 
     /**
      * @fn GpsPosition
@@ -73,6 +73,8 @@ public:
      * @param vGeoid     The geoid
      */
     GpsPosition(const Position& crPosition, double vGeoid);
+
+    ~GpsPosition() noexcept;
 
     /**
      * Define and declare getters and setters.

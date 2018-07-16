@@ -71,7 +71,7 @@ public:
      * @fn ~WindFeed
      * @brief Destructor
      */
-    virtual ~WindFeed() noexcept;
+    ~WindFeed() noexcept;
 
     void registerToClient(client::ClientManager& rManager) override;
 

@@ -66,7 +66,7 @@ public:
      * @fn ~VFRB
      * @brief Destructor
      */
-    virtual ~VFRB() noexcept;
+    ~VFRB() noexcept;
 
     /**
      * @fn run

@@ -24,7 +24,6 @@
 #include <cstdint>
 #include <string>
 
-#include "../Defines.h"
 
 /// @namespace object
 namespace object
@@ -46,7 +45,7 @@ public:
         HH_MM_SS_FFF
     };
 
-    DEFAULT_CTOR_DTOR(TimeStamp)
+    TimeStamp();
 
     /**
      * @fn TimeStamp
@@ -69,6 +68,8 @@ public:
      * @param crOther The other TimeStamp
      */
     TimeStamp(const TimeStamp& crOther);
+
+    ~TimeStamp() noexcept;
 
     /**
      * @fn operator =

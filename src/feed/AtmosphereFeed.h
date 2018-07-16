@@ -71,7 +71,7 @@ public:
      * @fn ~AtmosphereFeed
      * @brief Destructor
      */
-    virtual ~AtmosphereFeed() noexcept;
+    ~AtmosphereFeed() noexcept;
 
     void registerToClient(client::ClientManager& rManager) override;
 

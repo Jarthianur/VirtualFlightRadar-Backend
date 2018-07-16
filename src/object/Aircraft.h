@@ -111,7 +111,7 @@ public:
         OGN          = 3
     };
 
-    DEFAULT_CTOR_DTOR(Aircraft)
+    Aircraft();
 
     /**
      * @fn Aircraft
@@ -119,6 +119,8 @@ public:
      * @param vPriority The initial priority
      */
     explicit Aircraft(std::uint32_t vPriority);
+
+    ~Aircraft() noexcept;
 
     /**
      * Define and declare getters and setters.

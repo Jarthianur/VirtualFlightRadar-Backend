@@ -23,7 +23,6 @@
 
 #include <string>
 
-#include "../../Defines.h"
 #include "../../object/Wind.h"
 
 #include "Parser.hpp"
@@ -35,7 +34,10 @@ namespace parser
 class WindParser : public Parser<object::Wind>
 {
 public:
-    DEFAULT_CTOR_DTOR(WindParser)
+    WindParser();
+
+    ~WindParser() noexcept;
+
     /**
      * @fn unpack
      * @brief Unpack into Climate.

@@ -43,7 +43,7 @@ struct Climate;
 class Atmosphere : public Object
 {
 public:
-    DEFAULT_CTOR_DTOR(Atmosphere)
+    Atmosphere();
 
     /**
      * @fn Atmosphere
@@ -59,6 +59,8 @@ public:
      * @param vPriority The initial priority
      */
     Atmosphere(double vPressure, std::uint32_t vPriority);
+
+    ~Atmosphere() noexcept;
 
     /**
      * Define and declare getters and setters.

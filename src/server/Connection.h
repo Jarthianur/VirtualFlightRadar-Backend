@@ -45,7 +45,7 @@ public:
      * @fn ~Connection
      * @brief Destructor
      */
-    virtual ~Connection() noexcept;
+    ~Connection() noexcept;
 
     /**
      * @fn start

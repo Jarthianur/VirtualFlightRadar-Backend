@@ -73,7 +73,7 @@ public:
      * @fn ~AprscFeed
      * @brief Destructor
      */
-    virtual ~AprscFeed() noexcept;
+    ~AprscFeed() noexcept;
 
     void registerToClient(client::ClientManager& rManager) override;
 

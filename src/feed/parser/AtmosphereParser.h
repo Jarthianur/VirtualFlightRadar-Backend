@@ -23,7 +23,6 @@
 
 #include <string>
 
-#include "../../Defines.h"
 #include "../../object/Atmosphere.h"
 #include "Parser.hpp"
 
@@ -41,7 +40,9 @@ namespace parser
 class AtmosphereParser : public Parser<object::Atmosphere>
 {
 public:
-    DEFAULT_CTOR_DTOR(AtmosphereParser)
+    AtmosphereParser();
+
+    ~AtmosphereParser() noexcept;
 
     /**
      * @fn unpack

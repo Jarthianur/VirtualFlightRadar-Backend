@@ -71,7 +71,7 @@ void GpsFeed::process(const std::string& crResponse) noexcept
         catch(const std::runtime_error& e)
         {
             Logger::info(COMPONENT " ", mName, ": ", e.what());
-            auto client = std::shared_ptr<client::Client>(mSubsribedClient);
+            std::shared_ptr<client::Client> client(mSubsribedClient);
             client->stop();
             return;
         }

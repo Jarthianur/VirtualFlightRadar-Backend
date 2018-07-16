@@ -69,7 +69,7 @@ public:
      * @fn ~GpsFeed
      * @brief Destructor
      */
-    virtual ~GpsFeed() noexcept;
+    ~GpsFeed() noexcept;
 
     void registerToClient(client::ClientManager& rManager) override;
 

@@ -72,7 +72,7 @@ public:
      * @fn ~SbsFeed
      * @brief Destructor
      */
-    virtual ~SbsFeed() noexcept;
+    ~SbsFeed() noexcept;
 
     void registerToClient(client::ClientManager& rManager) override;
 

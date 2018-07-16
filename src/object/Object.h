@@ -38,7 +38,7 @@ namespace object
 class Object
 {
 public:
-    DEFAULT_CTOR_DTOR(Object)
+    Object();
 
     /**
      * @fn Object
@@ -46,6 +46,8 @@ public:
      * @param vPriority The initial priority
      */
     explicit Object(std::uint32_t vPriority);
+
+    virtual ~Object() noexcept;
 
     /**
      * @fn tryUpdate

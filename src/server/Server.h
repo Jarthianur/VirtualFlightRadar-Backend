@@ -53,7 +53,7 @@ class Server
 public:
     NON_COPYABLE(Server)
 
-    DEFAULT_CTOR_DTOR(Server)
+    Server();
 
     /**
      * @fn Server
@@ -61,6 +61,8 @@ public:
      * @param vPort The port
      */
     explicit Server(std::uint16_t vPort);
+
+    ~Server() noexcept;
 
     /**
      * @fn run
