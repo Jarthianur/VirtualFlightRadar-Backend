@@ -26,7 +26,6 @@
 #include <memory>
 #include <boost/chrono.hpp>
 
-#include "feed/client/ClientManager.h"
 #include "server/Server.h"
 #include "Defines.h"
 
@@ -74,10 +73,6 @@ public:
      */
     void run() noexcept;
 
-    /// @var vRunStatus
-    /// Atomic run-status. By this, every component may determine if the VFRB stops.
-    static std::atomic<bool> vRunStatus;
-
 private:
     /**
      * @fn createFeeds
@@ -85,13 +80,6 @@ private:
      * @param crConfig The Configuration
      */
     void createFeeds(const config::Configuration& crConfig);
-
-    /**
-     * @fn setupSignals
-     * @brief Setup the signal set.
-     * @param rSigSet
-     */
-    void setupSignals(boost::asio::signal_set& rSigSet);
 
     /**
      * @fn serve
@@ -127,9 +115,11 @@ private:
     /// Manage clients and sending of data
     server::Server mServer;
 
-    feed::client::ClientManager mClientManager;
-
     /// @var mFeeds
     /// List of all active feeds
     std::list<std::shared_ptr<feed::Feed>> mFeeds;
+
+    /// @var vRunStatus
+    /// Atomic run-status.
+    std::atomic<bool> mRunStatus;
 };

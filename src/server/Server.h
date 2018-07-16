@@ -28,6 +28,7 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread.hpp>
 
 #include "../Defines.h"
 #include "../Parameters.h"
@@ -69,7 +70,14 @@ public:
      * @brief Run the Server.
      * @note Returns after all operations in the queue have returned.
      */
-    void run(boost::asio::signal_set& rSigset);
+    void run();
+
+    /**
+     * @fn stop
+     * @brief Stop all connections.
+     * @threadsafe
+     */
+    void stop();
 
     /**
      * @fn send
@@ -87,20 +95,6 @@ private:
     void accept();
 
     /**
-     * @fn awaitStop
-     * @brief Register stop-handler to signal set.
-     * @param rSigset The signal set
-     */
-    void awaitStop(boost::asio::signal_set& rSigset);
-
-    /**
-     * @fn stop
-     * @brief Stop all connections.
-     * @threadsafe
-     */
-    void stop();
-
-    /**
      * @fn isConnected
      * @brief Check whether an ip address already exists in the Connection container.
      * @param crIpAddress The ip address to check
@@ -115,6 +109,8 @@ private:
      * @threadsafe
      */
     void handleAccept(const boost::system::error_code& crError) noexcept;
+
+    boost::thread mThread;
 
     /// @var mMutex
     /// Mutex

@@ -42,11 +42,14 @@ Server::Server(std::uint16_t vPort)
 Server::~Server() noexcept
 {}
 
-void Server::run(boost::asio::signal_set& rSigset)
+void Server::run()
 {
-    awaitStop(rSigset);
-    accept();
-    mIoService.run();
+    Logger::info("(Server) start server");
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    mThread = boost::thread([this]() {
+        accept();
+        mIoService.run();
+    });
 }
 
 void Server::send(const std::string& crStr)
@@ -78,22 +81,28 @@ void Server::accept()
         mSocket, boost::bind(&Server::handleAccept, this, boost::asio::placeholders::error));
 }
 
-void Server::awaitStop(boost::asio::signal_set& rSigset)
-{
-    rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
-}
-
 void Server::stop()
 {
-    Logger::info("(Server) stopping all connections...");
+    Logger::info("(Server) stopping all connections ...");
     boost::lock_guard<boost::mutex> lock(mMutex);
-    mAcceptor.close();
+    if(mAcceptor.is_open())
+    {
+        mAcceptor.close();
+    }
     for(auto& it : mConnections)
     {
         if(it)
         {
             it.reset();
         }
+    }
+    if(!mIoService.stopped())
+    {
+        mIoService.stop();
+    }
+    if(mThread.joinable())
+    {
+        mThread.join();
     }
 }
 
@@ -141,7 +150,8 @@ void Server::handleAccept(const boost::system::error_code& crError) noexcept
             mSocket.close();
         }
     }
-    else if(crError != boost::system::errc::bad_file_descriptor)
+    else if(crError != boost::system::errc::bad_file_descriptor
+            || crError != boost::asio::error::operation_aborted)
     {
         Logger::warn("(Server) accept: ", crError.message());
     }
