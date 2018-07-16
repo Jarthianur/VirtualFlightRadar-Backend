@@ -22,10 +22,9 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
-
-#include "Defines.h"
 
 /**
  * @class Logger
@@ -34,7 +33,9 @@
 class Logger
 {
 public:
-    DEFAULT_CTOR_DTOR(Logger)
+    Logger();
+
+    ~Logger() noexcept;
 
     /**
      * @fn info

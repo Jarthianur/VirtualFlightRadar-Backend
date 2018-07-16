@@ -21,17 +21,17 @@
 
 #include "TimeStamp.h"
 
+#include <stdexcept>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 namespace object
 {
-TimeStamp::TimeStamp() : mValue(0)
+TimeStamp::TimeStamp() : mValue(0), mYesterday(false)
 {}
 
 TimeStamp::TimeStamp(const std::string& crValue, Format vFormat)
 {
-    std::int32_t h = 99;
-    std::int32_t m = 99;
-    std::int32_t s = 99;
-    std::int32_t f = 9999;
+    std::int32_t h = 99, m = 99, s = 99, f = 9999;
     try
     {
         switch(vFormat)
@@ -62,10 +62,12 @@ TimeStamp::TimeStamp(const std::string& crValue, Format vFormat)
     {
         throw std::invalid_argument("");
     }
-    mValue = static_cast<std::uint32_t>(h * 3600000 + m * 60000 + s * 1000 + f);
+    mValue     = static_cast<std::uint64_t>(h * 3600000 + m * 60000 + s * 1000 + f);
+    mYesterday = mValue >= now();
 }
 
-TimeStamp::TimeStamp(const TimeStamp& crOther) : mValue(crOther.mValue)
+TimeStamp::TimeStamp(const TimeStamp& crOther)
+    : mValue(crOther.mValue), mYesterday(crOther.mYesterday)
 {}
 
 TimeStamp::~TimeStamp() noexcept
@@ -77,18 +79,18 @@ TimeStamp& TimeStamp::operator=(const TimeStamp& crOther)
     return *this;
 }
 
-bool TimeStamp::operator<(const TimeStamp& crOther) const
+bool TimeStamp::operator>(const TimeStamp& crOther) const
 {
-    return this->mValue < crOther.mValue;
+    return (crOther.mYesterday && !this->mYesterday)
+           || ((!this->mYesterday || crOther.mYesterday) && this->mValue > crOther.mValue);
 }
 
-bool TimeStamp::operator<=(const TimeStamp& crOther) const
+std::uint64_t TimeStamp::now() const
 {
-    return this->mValue <= crOther.mValue;
+    return static_cast<std::uint64_t>(
+        boost::posix_time::time_duration(
+            boost::posix_time::microsec_clock::universal_time().time_of_day())
+            .total_milliseconds());
 }
 
-bool TimeStamp::operator==(const TimeStamp& crOther) const
-{
-    return this->mValue == crOther.mValue;
-}
-}
+}  // namespace object

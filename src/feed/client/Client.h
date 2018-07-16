@@ -30,7 +30,6 @@
 #include <boost/thread/mutex.hpp>
 
 #include "../../Defines.h"
-#include "../../Parameters.h"
 
 /// @namespace feed
 namespace feed
@@ -67,7 +66,7 @@ struct Endpoint
 class Client
 {
 public:
-    NON_COPYABLE(Client)
+    NOT_COPYABLE(Client)
 
     /**
      * @fn ~Client
@@ -160,6 +159,8 @@ protected:
     virtual void handleConnect(const boost::system::error_code& crError,
                                boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
         = 0;
+
+    void closeSocket();
 
     /// @var mIoService
     /// Internal IO-service

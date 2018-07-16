@@ -19,39 +19,45 @@
  }
  */
 
-#include "AtmosphereData.h"
-
 #include <boost/thread/lock_guard.hpp>
 
-using namespace object;
+#include "Signals.h"
 
-namespace data
+Signals::Signals() : mIoService(), mSigSet(mIoService)
 {
-AtmosphereData::AtmosphereData() : Data()
-{}
-
-AtmosphereData::AtmosphereData(const Atmosphere& crAtmosphere) : Data(), mAtmosphere(crAtmosphere)
-{}
-
-AtmosphereData::~AtmosphereData() noexcept
-{}
-
-std::string AtmosphereData::getSerialized()
-{
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    return (++mAtmosphere).getSerialized();
+    mSigSet.add(SIGINT);
+    mSigSet.add(SIGTERM);
+#ifdef SIGQUIT
+    mSigSet.add(SIGQUIT);
+#endif
 }
 
-bool AtmosphereData::update(Object&& rvAtmosphere)
+Signals::~Signals() noexcept
+{}
+
+void Signals::run()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mAtmosphere.tryUpdate(std::move(rvAtmosphere));
+    mThread = boost::thread([this]() { mIoService.run(); });
 }
 
-double AtmosphereData::getAtmPressure()
+void Signals::stop()
+{
+    {
+        boost::lock_guard<boost::mutex> lock(mMutex);
+        if(!mIoService.stopped())
+        {
+            mIoService.stop();
+        }
+    }
+    if(mThread.joinable())
+    {
+        mThread.join();
+    }
+}
+
+void Signals::addHandler(const SignalHandler& crHandler)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mAtmosphere.getPressure();
+    mSigSet.async_wait(crHandler);
 }
-
-}  // namespace data

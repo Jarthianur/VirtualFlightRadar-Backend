@@ -107,7 +107,7 @@
 
 /// @def NON_COPYABLE
 /// Make a class of TYPE non copyable.
-#define NON_COPYABLE(TYPE)      \
+#define NOT_COPYABLE(TYPE)      \
     TYPE(const TYPE&) = delete; \
     TYPE& operator=(const TYPE&) = delete;
 
@@ -118,17 +118,3 @@
     TYPE& operator=(const TYPE&) = delete; \
     TYPE(TYPE&&);                          \
     TYPE& operator=(TYPE&&);
-
-/// @def DEFAULT_CTOR_DTOR
-/// Define default constructor and destructor for a class of TYPE.
-#define DEFAULT_CTOR_DTOR(TYPE) \
-    TYPE();                     \
-    virtual ~TYPE() noexcept;
-
-/// @def DEFAULT_CTOR_DTOR_INLINE
-/// Define and declare default constructor and destructor for a class of TYPE.
-#define DEFAULT_CTOR_DTOR_INLINE(TYPE) \
-    TYPE()                             \
-    {}                                 \
-    virtual ~TYPE() noexcept           \
-    {}

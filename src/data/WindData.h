@@ -21,14 +21,9 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
 #include <string>
-#include <vector>
 
-#include "../Defines.h"
 #include "../object/Wind.h"
-
 #include "Data.h"
 
 /// @namespace data
@@ -42,7 +37,7 @@ namespace data
 class WindData : public Data
 {
 public:
-    DEFAULT_CTOR_DTOR(WindData)
+    WindData();
 
     /**
      * @fn WindData
@@ -50,6 +45,8 @@ public:
      * @param crWind The initial wind information
      */
     explicit WindData(const object::Wind& crWind);
+
+    ~WindData() noexcept;
 
     /**
      * @fn getSerialized
@@ -68,21 +65,12 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvWind, std::size_t vSlot) override;
-
-    /**
-     * @see Data#registerSlot
-     */
-    std::size_t registerSlot() override;
+    bool update(object::Object&& rvWind) override;
 
 private:
     /// @var mWind
     /// The Wind information
     object::Wind mWind;
-
-    /// @var mAttempts
-    /// Store update attempts
-    std::vector<std::uint32_t> mAttempts;
 };
 
 }  // namespace data

@@ -44,7 +44,9 @@ namespace parser
 class AprsParser : public Parser<object::Aircraft>
 {
 public:
-    DEFAULT_CTOR_DTOR(AprsParser)
+    AprsParser();
+
+    ~AprsParser() noexcept;
 
     /**
      * @fn unpack

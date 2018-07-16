@@ -21,16 +21,22 @@
 
 #pragma once
 
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/AprsParser.h"
-
 #include "Feed.h"
+
+namespace feed
+{
+namespace parser
+{
+class AprsParser;
+} /* namespace parser */
+} /* namespace feed */
 
 /// @namespace data
 namespace data
@@ -49,7 +55,7 @@ namespace feed
 class AprscFeed : public Feed, public std::enable_shared_from_this<AprscFeed>
 {
 public:
-    NON_COPYABLE(AprscFeed)
+    NOT_COPYABLE(AprscFeed)
 
     /**
      * @fn AprscFeed
@@ -61,15 +67,15 @@ public:
      * @throw std::logic_error if login is not given or from parent constructor
      */
     AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-              std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight);
+              std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
 
     /**
      * @fn ~AprscFeed
      * @brief Destructor
      */
-    virtual ~AprscFeed() noexcept;
+    ~AprscFeed() noexcept;
 
-    void registerClient(client::ClientManager& rManager) override;
+    void registerToClient(client::ClientManager& rManager) override;
 
     /**
      * @see Feed#process

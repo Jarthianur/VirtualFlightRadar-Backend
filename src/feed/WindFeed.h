@@ -21,15 +21,20 @@
 
 #pragma once
 
-#include <cstddef>
 #include <memory>
 #include <string>
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/WindParser.h"
-
 #include "Feed.h"
+
+namespace feed
+{
+namespace parser
+{
+class WindParser;
+} /* namespace parser */
+} /* namespace feed */
 
 /// @namespace data
 namespace data
@@ -48,7 +53,7 @@ namespace feed
 class WindFeed : public Feed, public std::enable_shared_from_this<WindFeed>
 {
 public:
-    NON_COPYABLE(WindFeed)
+    NOT_COPYABLE(WindFeed)
 
     /**
      * @fn WindFeed
@@ -60,15 +65,15 @@ public:
      * @throw std::logic_error from parent constructor
      */
     WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-             std::shared_ptr<data::WindData>& pData);
+             std::shared_ptr<data::WindData> pData);
 
     /**
      * @fn ~WindFeed
      * @brief Destructor
      */
-    virtual ~WindFeed() noexcept;
+    ~WindFeed() noexcept;
 
-    void registerClient(client::ClientManager& rManager) override;
+    void registerToClient(client::ClientManager& rManager) override;
 
     /**
      * @see Feed#process

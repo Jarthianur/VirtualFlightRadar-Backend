@@ -21,15 +21,20 @@
 
 #pragma once
 
-#include <cstddef>
 #include <memory>
 #include <string>
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/AtmosphereParser.h"
-
 #include "Feed.h"
+
+namespace feed
+{
+namespace parser
+{
+class AtmosphereParser;
+} /* namespace parser */
+} /* namespace feed */
 
 /// @namespace data
 namespace data
@@ -48,7 +53,7 @@ namespace feed
 class AtmosphereFeed : public Feed, public std::enable_shared_from_this<AtmosphereFeed>
 {
 public:
-    NON_COPYABLE(AtmosphereFeed)
+    NOT_COPYABLE(AtmosphereFeed)
 
     /**
      * @fn AtmosphereFeed
@@ -60,15 +65,15 @@ public:
      * @throw std::logic_error from parent constructor
      */
     AtmosphereFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                   std::shared_ptr<data::AtmosphereData>& pData);
+                   std::shared_ptr<data::AtmosphereData> pData);
 
     /**
      * @fn ~AtmosphereFeed
      * @brief Destructor
      */
-    virtual ~AtmosphereFeed() noexcept;
+    ~AtmosphereFeed() noexcept;
 
-    void registerClient(client::ClientManager& rManager) override;
+    void registerToClient(client::ClientManager& rManager) override;
 
     /**
      * @see Feed#process

@@ -21,16 +21,21 @@
 
 #pragma once
 
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/SbsParser.h"
-
 #include "Feed.h"
+
+namespace feed
+{
+namespace parser
+{
+class SbsParser;
+} /* namespace parser */
+} /* namespace feed */
 
 /// @namespace data
 namespace data
@@ -49,7 +54,7 @@ namespace feed
 class SbsFeed : public Feed, public std::enable_shared_from_this<SbsFeed>
 {
 public:
-    NON_COPYABLE(SbsFeed)
+    NOT_COPYABLE(SbsFeed)
 
     /**
      * @fn SbsFeed
@@ -61,15 +66,15 @@ public:
      * @throw std::logic_error from parent constructor
      */
     SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-            std::shared_ptr<data::AircraftData>& pData, std::int32_t vMaxHeight);
+            std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
 
     /**
      * @fn ~SbsFeed
      * @brief Destructor
      */
-    virtual ~SbsFeed() noexcept;
+    ~SbsFeed() noexcept;
 
-    void registerClient(client::ClientManager& rManager) override;
+    void registerToClient(client::ClientManager& rManager) override;
 
     /**
      * @see Feed#process

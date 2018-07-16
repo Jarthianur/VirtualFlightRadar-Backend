@@ -19,14 +19,9 @@
  }
  */
 
-#include "framework/src/framework.h"
 #include "Helper.hpp"
 
-using namespace testsuite;
-
-#ifdef assert
-#undef assert
-#endif
+using namespace sctf;
 
 TEST_FUNCTION(test_config)
 TEST_FUNCTION(test_data)
@@ -37,8 +32,9 @@ TEST_FUNCTION(test_math)
 
 int main(int, char**)
 {
-    auto rep = reporter::createXmlReporter();
-    TestSuitesRunner runner;
+    // auto rep = createXmlReporter();
+    auto rep = createPlainTextReporter(true);
+    test::TestSuitesRunner runner;
 
     test_config(runner);
     test_data(runner);

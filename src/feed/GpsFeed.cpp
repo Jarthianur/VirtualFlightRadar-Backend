@@ -28,9 +28,9 @@
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
 #include "../object/GpsPosition.h"
-#include "client/GpsdClient.h"
-
-#include "../Logger.hpp"
+#include "client/Client.h"
+#include "client/ClientManager.h"
+#include "parser/GpsParser.h"
 
 #ifdef COMPONENT
 #undef COMPONENT
@@ -42,18 +42,14 @@ namespace feed
 parser::GpsParser GpsFeed::smParser;
 
 GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                 std::shared_ptr<data::GpsData>& pData)
+                 std::shared_ptr<data::GpsData> pData)
     : Feed(crName, crKvMap, pData)
-{
-    Logger::debug(crName, " constructed ", COMPONENT);
-}
+{}
 
 GpsFeed::~GpsFeed() noexcept
-{
-    Logger::debug(mName, " destructed ", COMPONENT);
-}
+{}
 
-void GpsFeed::registerClient(client::ClientManager& rManager)
+void GpsFeed::registerToClient(client::ClientManager& rManager)
 {
     mSubsribedClient = rManager.subscribe(
         shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
@@ -62,13 +58,12 @@ void GpsFeed::registerClient(client::ClientManager& rManager)
 
 void GpsFeed::process(const std::string& crResponse) noexcept
 {
-    Logger::debug(mName, " process called");
     object::GpsPosition pos(getPriority());
     if(smParser.unpack(crResponse, pos))
     {
         try
         {
-            if(mpData->update(std::move(pos), mDataSlot))
+            if(mpData->update(std::move(pos)))
             {
                 throw std::runtime_error("received good position -> stop");
             }
@@ -76,9 +71,8 @@ void GpsFeed::process(const std::string& crResponse) noexcept
         catch(const std::runtime_error& e)
         {
             Logger::info(COMPONENT " ", mName, ": ", e.what());
-            auto client = std::shared_ptr<client::Client>(mSubsribedClient);
+            std::shared_ptr<client::Client> client(mSubsribedClient);
             client->stop();
-            Logger::debug("returned from gpsfeed stop call");
             return;
         }
     }

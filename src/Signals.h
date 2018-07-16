@@ -21,40 +21,31 @@
 
 #pragma once
 
-#include <string>
+#include <functional>
+#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
-#include "../../object/Wind.h"
+#include "Defines.h"
 
-#include "Parser.hpp"
+using SignalHandler = std::function<void(const boost::system::error_code&, const int)>;
 
-namespace feed
-{
-namespace parser
-{
-class WindParser : public Parser<object::Wind>
+class Signals
 {
 public:
-    WindParser();
+    NOT_COPYABLE(Signals)
 
-    ~WindParser() noexcept;
+    Signals();
+    ~Signals() noexcept;
 
-    /**
-     * @fn unpack
-     * @brief Unpack into Climate.
-     * @see Parser#unpack
-     */
-    bool unpack(const std::string& crStr, object::Wind& rWind) noexcept override;
+    void run();
+    void stop();
+    void addHandler(const SignalHandler& crHandler);
 
 private:
-    /**
-     * @fn parseClimate
-     * @brief Parse a sentence and unpack into Climate.
-     * @param crStr    The string to parse
-     * @param rClimate The target object
-     * @return true on success, else false
-     * @throw std::out_of_range, std::invalid_argument from invoked functions
-     */
-    bool parseWind(const std::string& crStr, object::Wind& rWind);
+    boost::asio::io_service mIoService;
+    boost::asio::signal_set mSigSet;
+    boost::thread mThread;
+    boost::mutex mMutex;
 };
-}  // namespace parser
-}  // namespace feed

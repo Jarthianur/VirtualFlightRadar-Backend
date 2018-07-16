@@ -22,20 +22,25 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 #include <string>
 #include <boost/regex.hpp>
 
 #include "../src/object/Aircraft.h"
-#include "framework/src/framework.h"
+#include "framework/src/sctf.h"
 
-#define TEST_FUNCTION(NAME) extern void NAME(TestSuitesRunner&);
+#define TEST_FUNCTION(NAME) extern void NAME(test::TestSuitesRunner&);
 
-namespace testsuite
+#define syso(M) std::cout << M << std::endl;
+
+#define assertEqStr(V, E) assertT(V, EQUALS, E, std::string)
+
+namespace sctf
 {
 namespace util
 {
 template<>
-inline std::string serialize(const object::Aircraft::TargetType& crTargetType)
+inline std::string serialize<object::Aircraft::TargetType>(const object::Aircraft::TargetType& crTargetType)
 {
     return std::to_string(static_cast<std::uint32_t>(crTargetType));
 }
@@ -44,16 +49,7 @@ inline std::string serialize(const object::Aircraft::TargetType& crTargetType)
 
 namespace helper
 {
-PROVIDE_COMPARATOR(std::int32_t, EQUALS, equalsInt)
-PROVIDE_COMPARATOR(std::uint32_t, EQUALS, equalsUInt)
-PROVIDE_COMPARATOR(std::uint64_t, EQUALS, equalsULong)
-PROVIDE_COMPARATOR(double, EQUALS, equalsD)
-PROVIDE_COMPARATOR(std::string, EQUALS, equalsStr)
-PROVIDE_COMPARATOR(bool, EQUALS, equalsBool)
-PROVIDE_COMPARATOR(object::Aircraft::TargetType, EQUALS, equalsAtt)
-
-static boost::regex
-    pflauRe("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
+static boost::regex pflauRe("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
 static boost::regex pflaaRe(
     "\\$PFLAA,0,([-]?\\d+?),([-]?\\d+?),([-]?\\d+?),(\\d+?),(\\S{6}),(\\d{3})?,,(\\d+?)?,([-]?\\d+?\\.\\d+?)?,([0-9A-F])\\*(?:\\S{2})");
 static boost::regex gpsRe(

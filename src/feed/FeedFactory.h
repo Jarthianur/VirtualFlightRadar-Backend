@@ -22,9 +22,16 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <type_traits>
 #include <boost/optional.hpp>
 
-#include "../config/Configuration.h"
+#include "../config/PropertyMap.h"
+
+namespace config
+{
+class Configuration;
+} /* namespace config */
 
 namespace data
 {
@@ -65,7 +72,7 @@ public:
      * @fn ~FeedFactory
      * @brief Destructor
      */
-    virtual ~FeedFactory() noexcept;
+    ~FeedFactory() noexcept;
 
     /**
      * @fn createFeed
@@ -89,7 +96,7 @@ private:
      * @return a pointer to the concrete Feed
      * @throw std::logic_error from invoked constructors
      */
-    template<typename T>
+    template<typename T, typename std::enable_if<std::is_base_of<Feed, T>::value>::type* = nullptr>
     std::shared_ptr<T> makeFeed(const std::string& crName, const config::KeyValueMap& crKvMap);
 
     /// @var mrConfig

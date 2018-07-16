@@ -22,10 +22,8 @@
 #pragma once
 
 #include <cstdint>
-#include <stdexcept>
 #include <string>
 
-#include "../Defines.h"
 
 /// @namespace object
 namespace object
@@ -47,7 +45,7 @@ public:
         HH_MM_SS_FFF
     };
 
-    DEFAULT_CTOR_DTOR(TimeStamp)
+    TimeStamp();
 
     /**
      * @fn TimeStamp
@@ -71,6 +69,8 @@ public:
      */
     TimeStamp(const TimeStamp& crOther);
 
+    ~TimeStamp() noexcept;
+
     /**
      * @fn operator =
      * @brief Assign other TimeStamps value.
@@ -80,32 +80,20 @@ public:
     TimeStamp& operator=(const TimeStamp& crOther);
 
     /**
-     * @fn operator <
-     * @brief Compare this value to be less than others.
-     * @param crOther The other TimeStamp
-     * @return true if less, else false
-     */
-    bool operator<(const TimeStamp& crOther) const;
-
-    /**
      * @fn operator <=
      * @brief Compare this value to be less than, or equals others.
      * @param crOther The other TimeStamp
      * @return true if less, or equals, else false
      */
-    bool operator<=(const TimeStamp& crOther) const;
-
-    /**
-     * @fn operator ==
-     * @brief Compare this value to be equals others.
-     * @param crOther The other TimeStamp
-     * @return true if equals, else false
-     */
-    bool operator==(const TimeStamp& crOther) const;
+    bool operator>(const TimeStamp& crOther) const;
 
 private:
+    std::uint64_t now() const;
+
     /// @var mValue
     /// The time in milliseconds
-    std::uint32_t mValue;
+    std::uint64_t mValue;
+
+    bool mYesterday;
 };
 }  // namespace object

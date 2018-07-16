@@ -21,20 +21,21 @@
 
 #include "Connection.h"
 
-#include <algorithm>
 #include <boost/move/move.hpp>
 #include <boost/system/error_code.hpp>
 
 namespace server
 {
-boost::shared_ptr<Connection> Connection::start(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
+std::unique_ptr<Connection> Connection::start(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
 {
-    return boost::shared_ptr<Connection>(new Connection(boost::move(rvSocket)));
+    return std::unique_ptr<Connection>(new Connection(boost::move(rvSocket)));
 }
 
 Connection::Connection(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
     : mSocket(boost::move(rvSocket)), mIpAddress(mSocket.remote_endpoint().address().to_string())
-{}
+{
+    mSocket.non_blocking(true);
+}
 
 Connection::~Connection() noexcept
 {
@@ -43,10 +44,10 @@ Connection::~Connection() noexcept
 
 void Connection::stop()
 {
-    boost::system::error_code ignored_ec;
-    mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
     if(mSocket.is_open())
     {
+        boost::system::error_code ignored_ec;
+        mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ignored_ec);
         mSocket.close();
     }
 }

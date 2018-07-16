@@ -26,6 +26,7 @@
 
 #include "../../Math.hpp"
 #include "../../object/GpsPosition.h"
+#include "../../object/TimeStamp.h"
 
 /// @def RE_APRS_TIME
 /// APRS regex match group of time

@@ -21,12 +21,14 @@
 
 #pragma once
 
+#include <array>
+#include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
-#include <vector>
 #include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
 #include "../Defines.h"
@@ -51,9 +53,9 @@ namespace server
 class Server
 {
 public:
-    NON_COPYABLE(Server)
+    NOT_COPYABLE(Server)
 
-    DEFAULT_CTOR_DTOR(Server)
+    Server();
 
     /**
      * @fn Server
@@ -62,12 +64,21 @@ public:
      */
     explicit Server(std::uint16_t vPort);
 
+    ~Server() noexcept;
+
     /**
      * @fn run
      * @brief Run the Server.
      * @note Returns after all operations in the queue have returned.
      */
-    void run(boost::asio::signal_set& rSigset);
+    void run();
+
+    /**
+     * @fn stop
+     * @brief Stop all connections.
+     * @threadsafe
+     */
+    void stop();
 
     /**
      * @fn send
@@ -85,20 +96,6 @@ private:
     void accept();
 
     /**
-     * @fn awaitStop
-     * @brief Register stop-handler to signal set.
-     * @param rSigset The signal set
-     */
-    void awaitStop(boost::asio::signal_set& rSigset);
-
-    /**
-     * @fn stop
-     * @brief Stop all connections.
-     * @threadsafe
-     */
-    void stop();
-
-    /**
      * @fn isConnected
      * @brief Check whether an ip address already exists in the Connection container.
      * @param crIpAddress The ip address to check
@@ -113,6 +110,10 @@ private:
      * @threadsafe
      */
     void handleAccept(const boost::system::error_code& crError) noexcept;
+
+    void attemptConnection() noexcept;
+
+    boost::thread mThread;
 
     /// @var mMutex
     /// Mutex
@@ -130,9 +131,11 @@ private:
     /// Socket
     boost::asio::ip::tcp::socket mSocket;
 
-    /// @var mClients
+    /// @var mConnections
     /// Vector holding Connections
-    std::vector<boost::shared_ptr<Connection>> mClients;
+    std::array<std::unique_ptr<Connection>, S_MAX_CLIENTS> mConnections;
+
+    std::size_t mActiveConnections = 0;
 };
 
 }  // namespace server

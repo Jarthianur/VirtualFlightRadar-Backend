@@ -21,15 +21,20 @@
 
 #pragma once
 
-#include <cstddef>
 #include <memory>
 #include <string>
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "parser/GpsParser.h"
-
 #include "Feed.h"
+
+namespace feed
+{
+namespace parser
+{
+class GpsParser;
+} /* namespace parser */
+} /* namespace feed */
 
 namespace data
 {
@@ -47,7 +52,7 @@ namespace feed
 class GpsFeed : public Feed, public std::enable_shared_from_this<GpsFeed>
 {
 public:
-    NON_COPYABLE(GpsFeed)
+    NOT_COPYABLE(GpsFeed)
 
     /**
      * @fn GpsFeed
@@ -58,15 +63,15 @@ public:
      * @throw std::logic_error from parent constructor
      */
     GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-            std::shared_ptr<data::GpsData>& pData);
+            std::shared_ptr<data::GpsData> pData);
 
     /**
      * @fn ~GpsFeed
      * @brief Destructor
      */
-    virtual ~GpsFeed() noexcept;
+    ~GpsFeed() noexcept;
 
-    void registerClient(client::ClientManager& rManager) override;
+    void registerToClient(client::ClientManager& rManager) override;
 
     /**
      * @see Feed#process

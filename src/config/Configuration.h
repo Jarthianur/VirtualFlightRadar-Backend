@@ -23,8 +23,8 @@
 
 #include <cstdint>
 #include <istream>
+#include <list>
 #include <string>
-#include <utility>
 
 #include "../Defines.h"
 #include "../object/GpsPosition.h"
@@ -56,7 +56,7 @@
 #define SECT_KEY_WIND "wind"
 
 /// @def SECT_KEY_ATMOS
-#define SECT_KEY_ATMOS "atmos"
+#define SECT_KEY_ATMOS "atm"
 
 /**
  * Per section key-value keys
@@ -134,7 +134,7 @@ public:
      * @fn ~Configuration
      * @brief Destructor
      */
-    virtual ~Configuration() noexcept;
+    ~Configuration() noexcept;
 
     /**
      * Define and declare getters.

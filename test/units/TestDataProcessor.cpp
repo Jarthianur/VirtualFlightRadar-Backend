@@ -22,18 +22,12 @@
 #include "../../src/data/processor/AircraftProcessor.h"
 #include "../../src/data/processor/GpsProcessor.h"
 #include "../Helper.hpp"
-#include "../framework/src/framework.h"
-
-#ifdef assert
-#undef assert
-#endif
 
 using namespace data::processor;
 using namespace object;
-using namespace testsuite;
-using namespace comparator;
+using namespace sctf;
 
-void test_data_processor(TestSuitesRunner& runner)
+void test_data_processor(test::TestSuitesRunner& runner)
 {
     describe<GpsProcessor>("Process GPS data", runner)->test("process", []() {
         GpsProcessor gpsp;
@@ -41,7 +35,7 @@ void test_data_processor(TestSuitesRunner& runner)
         GpsPosition pos({0.0, 0.0, 0}, 48.0);
         gpsp.process(pos);
         bool matched = boost::regex_search(pos.getSerialized(), match, helper::gpsRe);
-        assert(matched, true, helper::equalsBool);
+        assertTrue(matched);
     });
 
     describe<AircraftProcessor>("Process Aircrafts", runner)
@@ -56,21 +50,19 @@ void test_data_processor(TestSuitesRunner& runner)
                    proc.setRefered({49.0, 8.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("0"), helper::equalsStr);
-                   assert(match.str(2), std::string("1000"), helper::equalsStr);
-                   assert(match.str(3), std::string("0"), helper::equalsStr);
-                   assert(match.str(4), std::string("BBBBBB"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("0"), helper::equalsStr);
-                   assert(match.str(2), std::string("0"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
-                   assert(match.str(5), std::string("BBBBBB"), helper::equalsStr);
-                   assert(match.str(9), std::string("8"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "0");
+                   assertEqStr(match.str(2), "1000");
+                   assertEqStr(match.str(3), "0");
+                   assertEqStr(match.str(4), "BBBBBB");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "0");
+                   assertEqStr(match.str(2), "0");
+                   assertEqStr(match.str(3), "1000");
+                   assertEqStr(match.str(5), "BBBBBB");
+                   assertEqStr(match.str(9), "8");
                })
         ->test("filter distance", []() {
             AircraftProcessor proc(0);
@@ -81,7 +73,7 @@ void test_data_processor(TestSuitesRunner& runner)
             ac.setPosition({49.0, 8.0, math::doubleToInt(math::FEET_2_M * 3281)});
             proc.setRefered({49.1, 8.1, 0}, 1013.25);
             proc.process(ac);
-            assert(ac.getSerialized(), std::string(""), helper::equalsStr);
+            assertEqStr(ac.getSerialized(), "");
         });
 
     describeParallel<AircraftProcessor>("process relative positions", runner)
@@ -96,17 +88,15 @@ void test_data_processor(TestSuitesRunner& runner)
                    proc.setRefered({-0.1, 0.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("0"), helper::equalsStr);
-                   assert(match.str(3), std::string("22239"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("22239"), helper::equalsStr);
-                   assert(match.str(2), std::string("0"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "0");
+                   assertEqStr(match.str(3), "22239");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "22239");
+                   assertEqStr(match.str(2), "0");
+                   assertEqStr(match.str(3), "1000");
                })
         ->test("Cross Equator N to S",
                []() {
@@ -119,17 +109,15 @@ void test_data_processor(TestSuitesRunner& runner)
                    proc.setRefered({0.1, 0.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("180"), helper::equalsStr);
-                   assert(match.str(3), std::string("22239"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-22239"), helper::equalsStr);
-                   assert(match.str(2), std::string("0"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "180");
+                   assertEqStr(match.str(3), "22239");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "-22239");
+                   assertEqStr(match.str(2), "0");
+                   assertEqStr(match.str(3), "1000");
                })
         ->test("Cross Northpole",
                []() {
@@ -142,17 +130,15 @@ void test_data_processor(TestSuitesRunner& runner)
                    proc.setRefered({89.9, 180.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("0"), helper::equalsStr);
-                   assert(match.str(3), std::string("22239"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("22239"), helper::equalsStr);
-                   assert(match.str(2), std::string("0"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "0");
+                   assertEqStr(match.str(3), "22239");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "22239");
+                   assertEqStr(match.str(2), "0");
+                   assertEqStr(match.str(3), "1000");
                })
         ->test("Cross Southpole",
                []() {
@@ -165,17 +151,15 @@ void test_data_processor(TestSuitesRunner& runner)
                    proc.setRefered({-89.9, 180.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-180"), helper::equalsStr);
-                   assert(match.str(3), std::string("22239"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-22239"), helper::equalsStr);
-                   assert(match.str(2), std::string("0"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "-180");
+                   assertEqStr(match.str(3), "22239");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "-22239");
+                   assertEqStr(match.str(2), "0");
+                   assertEqStr(match.str(3), "1000");
                })
         ->test("Cross 0-Meridian on Equator E to W",
                []() {
@@ -188,17 +172,15 @@ void test_data_processor(TestSuitesRunner& runner)
                    proc.setRefered({0.0, 0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-90"), helper::equalsStr);
-                   assert(match.str(3), std::string("22239"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("0"), helper::equalsStr);
-                   assert(match.str(2), std::string("-22239"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "-90");
+                   assertEqStr(match.str(3), "22239");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "0");
+                   assertEqStr(match.str(2), "-22239");
+                   assertEqStr(match.str(3), "1000");
                })
         ->test("Cross 0-Meridian on Equator W to E",
                []() {
@@ -211,17 +193,15 @@ void test_data_processor(TestSuitesRunner& runner)
                    proc.setRefered({0.0, -0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("90"), helper::equalsStr);
-                   assert(match.str(3), std::string("22239"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("0"), helper::equalsStr);
-                   assert(match.str(2), std::string("22239"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "90");
+                   assertEqStr(match.str(3), "22239");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "0");
+                   assertEqStr(match.str(2), "22239");
+                   assertEqStr(match.str(3), "1000");
                })
         ->test("Cross 0-Meridian on LAT(60) E to W",
                []() {
@@ -234,17 +214,15 @@ void test_data_processor(TestSuitesRunner& runner)
                    proc.setRefered({60.0, 0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-90"), helper::equalsStr);
-                   assert(match.str(3), std::string("11119"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("17"), helper::equalsStr);
-                   assert(match.str(2), std::string("-11119"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "-90");
+                   assertEqStr(match.str(3), "11119");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "17");
+                   assertEqStr(match.str(2), "-11119");
+                   assertEqStr(match.str(3), "1000");
                })
         ->test("Cross 0-Meridian on LAT(-60) W to E",
                []() {
@@ -257,41 +235,37 @@ void test_data_processor(TestSuitesRunner& runner)
                    proc.setRefered({-60.0, -0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("90"), helper::equalsStr);
-                   assert(match.str(3), std::string("11119"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-17"), helper::equalsStr);
-                   assert(match.str(2), std::string("11119"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "90");
+                   assertEqStr(match.str(3), "11119");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "-17");
+                   assertEqStr(match.str(2), "11119");
+                   assertEqStr(match.str(3), "1000");
                })
-        ->test(
-            "Cross 180-Meridian on Equator E to W",
-            []() {
-                AircraftProcessor proc;
-                Aircraft ac;
-                ac.setId("BBBBBB");
-                ac.setFullInfoAvailable(false);
-                ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                ac.setPosition({0.0, -179.9, math::doubleToInt(math::FEET_2_M * 3281)});
-                proc.setRefered({0.0, 179.9, 0}, 1013.25);
-                proc.process(ac);
-                boost::smatch match;
-                bool matched
-                    = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                assert(matched, true, helper::equalsBool);
-                assert(match.str(1), std::string("90"), helper::equalsStr);
-                assert(match.str(3), std::string("22239"), helper::equalsStr);
-                matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                assert(matched, true, helper::equalsBool);
-                assert(match.str(1), std::string("0"), helper::equalsStr);
-                assert(match.str(2), std::string("22239"), helper::equalsStr);
-                assert(match.str(3), std::string("1000"), helper::equalsStr);
-            })
+        ->test("Cross 180-Meridian on Equator E to W",
+               []() {
+                   AircraftProcessor proc;
+                   Aircraft ac;
+                   ac.setId("BBBBBB");
+                   ac.setFullInfoAvailable(false);
+                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.setPosition({0.0, -179.9, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.setRefered({0.0, 179.9, 0}, 1013.25);
+                   proc.process(ac);
+                   boost::smatch match;
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "90");
+                   assertEqStr(match.str(3), "22239");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "0");
+                   assertEqStr(match.str(2), "22239");
+                   assertEqStr(match.str(3), "1000");
+               })
         ->test("Cross 180-Meridian on Equator W to E",
                []() {
                    AircraftProcessor proc;
@@ -303,66 +277,60 @@ void test_data_processor(TestSuitesRunner& runner)
                    proc.setRefered({0.0, -179.9, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-90"), helper::equalsStr);
-                   assert(match.str(3), std::string("22239"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("0"), helper::equalsStr);
-                   assert(match.str(2), std::string("-22239"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "-90");
+                   assertEqStr(match.str(3), "22239");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "0");
+                   assertEqStr(match.str(2), "-22239");
+                   assertEqStr(match.str(3), "1000");
                })
-        ->test("North America",
-               []() {
-                   AircraftProcessor proc;
-                   Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({33.825808, -112.219232,
-                                   math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({33.653124, -112.692253, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("66"), helper::equalsStr);
-                   assert(match.str(3), std::string("47768"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("19302"), helper::equalsStr);
-                   assert(match.str(2), std::string("43695"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
-               })
-        ->test("South America",
-               []() {
-                   AircraftProcessor proc;
-                   Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({-34.699833, -58.791788,
-                                   math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({-34.680059, -58.818111, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("132"), helper::equalsStr);
-                   assert(match.str(3), std::string("3260"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-2199"), helper::equalsStr);
-                   assert(match.str(2), std::string("2407"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
-               })
+        ->test(
+            "North America",
+            []() {
+                AircraftProcessor proc;
+                Aircraft ac;
+                ac.setId("BBBBBB");
+                ac.setFullInfoAvailable(false);
+                ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
+                ac.setPosition({33.825808, -112.219232, math::doubleToInt(math::FEET_2_M * 3281)});
+                proc.setRefered({33.653124, -112.692253, 0}, 1013.25);
+                proc.process(ac);
+                boost::smatch match;
+                bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                assertTrue(matched);
+                assertEqStr(match.str(1), "66");
+                assertEqStr(match.str(3), "47768");
+                matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                assertTrue(matched);
+                assertEqStr(match.str(1), "19302");
+                assertEqStr(match.str(2), "43695");
+                assertEqStr(match.str(3), "1000");
+            })
+        ->test(
+            "South America",
+            []() {
+                AircraftProcessor proc;
+                Aircraft ac;
+                ac.setId("BBBBBB");
+                ac.setFullInfoAvailable(false);
+                ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
+                ac.setPosition({-34.699833, -58.791788, math::doubleToInt(math::FEET_2_M * 3281)});
+                proc.setRefered({-34.680059, -58.818111, 0}, 1013.25);
+                proc.process(ac);
+                boost::smatch match;
+                bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                assertTrue(matched);
+                assertEqStr(match.str(1), "132");
+                assertEqStr(match.str(3), "3260");
+                matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                assertTrue(matched);
+                assertEqStr(match.str(1), "-2199");
+                assertEqStr(match.str(2), "2407");
+                assertEqStr(match.str(3), "1000");
+            })
         ->test("North Africa",
                []() {
                    AircraftProcessor proc;
@@ -370,71 +338,64 @@ void test_data_processor(TestSuitesRunner& runner)
                    ac.setId("BBBBBB");
                    ac.setFullInfoAvailable(false);
                    ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition(
-                       {5.386705, -5.750365, math::doubleToInt(math::FEET_2_M * 3281)});
+                   ac.setPosition({5.386705, -5.750365, math::doubleToInt(math::FEET_2_M * 3281)});
                    proc.setRefered({5.392435, -5.748392, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-161"), helper::equalsStr);
-                   assert(match.str(3), std::string("674"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-638"), helper::equalsStr);
-                   assert(match.str(2), std::string("-219"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "-161");
+                   assertEqStr(match.str(3), "674");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "-638");
+                   assertEqStr(match.str(2), "-219");
+                   assertEqStr(match.str(3), "1000");
                })
-        ->test("South Africa",
-               []() {
-                   AircraftProcessor proc;
-                   Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition(
-                       {-23.229517, 15.049683, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({-26.069244, 15.484389, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-8"), helper::equalsStr);
-                   assert(match.str(3), std::string("318804"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("315692"), helper::equalsStr);
-                   assert(match.str(2), std::string("-44437"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
-               })
-        ->test("Australia",
-               []() {
-                   AircraftProcessor proc;
-                   Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({-26.152199, 133.376684,
-                                   math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({-25.278208, 133.366885, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("179"), helper::equalsStr);
-                   assert(match.str(3), std::string("97188"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-97183"), helper::equalsStr);
-                   assert(match.str(2), std::string("978"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
-               })
+        ->test(
+            "South Africa",
+            []() {
+                AircraftProcessor proc;
+                Aircraft ac;
+                ac.setId("BBBBBB");
+                ac.setFullInfoAvailable(false);
+                ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
+                ac.setPosition({-23.229517, 15.049683, math::doubleToInt(math::FEET_2_M * 3281)});
+                proc.setRefered({-26.069244, 15.484389, 0}, 1013.25);
+                proc.process(ac);
+                boost::smatch match;
+                bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                assertTrue(matched);
+                assertEqStr(match.str(1), "-8");
+                assertEqStr(match.str(3), "318804");
+                matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                assertTrue(matched);
+                assertEqStr(match.str(1), "315692");
+                assertEqStr(match.str(2), "-44437");
+                assertEqStr(match.str(3), "1000");
+            })
+        ->test(
+            "Australia",
+            []() {
+                AircraftProcessor proc;
+                Aircraft ac;
+                ac.setId("BBBBBB");
+                ac.setFullInfoAvailable(false);
+                ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
+                ac.setPosition({-26.152199, 133.376684, math::doubleToInt(math::FEET_2_M * 3281)});
+                proc.setRefered({-25.278208, 133.366885, 0}, 1013.25);
+                proc.process(ac);
+                boost::smatch match;
+                bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                assertTrue(matched);
+                assertEqStr(match.str(1), "179");
+                assertEqStr(match.str(3), "97188");
+                matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                assertTrue(matched);
+                assertEqStr(match.str(1), "-97183");
+                assertEqStr(match.str(2), "978");
+                assertEqStr(match.str(3), "1000");
+            })
         ->test("Central Europe",
                []() {
                    AircraftProcessor proc;
@@ -442,22 +403,19 @@ void test_data_processor(TestSuitesRunner& runner)
                    ac.setId("BBBBBB");
                    ac.setFullInfoAvailable(false);
                    ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition(
-                       {49.719445, 9.087646, math::doubleToInt(math::FEET_2_M * 3281)});
+                   ac.setPosition({49.719445, 9.087646, math::doubleToInt(math::FEET_2_M * 3281)});
                    proc.setRefered({49.719521, 9.083279, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("92"), helper::equalsStr);
-                   assert(match.str(3), std::string("314"), helper::equalsStr);
-                   matched
-                       = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-                   assert(matched, true, helper::equalsBool);
-                   assert(match.str(1), std::string("-8"), helper::equalsStr);
-                   assert(match.str(2), std::string("314"), helper::equalsStr);
-                   assert(match.str(3), std::string("1000"), helper::equalsStr);
+                   bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "92");
+                   assertEqStr(match.str(3), "314");
+                   matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
+                   assertTrue(matched);
+                   assertEqStr(match.str(1), "-8");
+                   assertEqStr(match.str(2), "314");
+                   assertEqStr(match.str(3), "1000");
                })
         ->test("Asia", []() {
             AircraftProcessor proc;
@@ -465,20 +423,18 @@ void test_data_processor(TestSuitesRunner& runner)
             ac.setId("BBBBBB");
             ac.setFullInfoAvailable(false);
             ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-            ac.setPosition(
-                {32.896360, 103.855837, math::doubleToInt(math::FEET_2_M * 3281)});
+            ac.setPosition({32.896360, 103.855837, math::doubleToInt(math::FEET_2_M * 3281)});
             proc.setRefered({65.900837, 101.570680, 0}, 1013.25);
             proc.process(ac);
             boost::smatch match;
-            bool matched
-                = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
-            assert(matched, true, helper::equalsBool);
-            assert(match.str(1), std::string("176"), helper::equalsStr);
-            assert(match.str(3), std::string("3673118"), helper::equalsStr);
+            bool matched = boost::regex_search(ac.getSerialized(), match, helper::pflauRe);
+            assertTrue(matched);
+            assertEqStr(match.str(1), "176");
+            assertEqStr(match.str(3), "3673118");
             matched = boost::regex_search(ac.getSerialized(), match, helper::pflaaRe);
-            assert(matched, true, helper::equalsBool);
-            assert(match.str(1), std::string("-3666184"), helper::equalsStr);
-            assert(match.str(2), std::string("225589"), helper::equalsStr);
-            assert(match.str(3), std::string("1000"), helper::equalsStr);
+            assertTrue(matched);
+            assertEqStr(match.str(1), "-3666184");
+            assertEqStr(match.str(2), "225589");
+            assertEqStr(match.str(3), "1000");
         });
 }

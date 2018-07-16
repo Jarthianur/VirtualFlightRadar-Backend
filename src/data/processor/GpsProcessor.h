@@ -23,7 +23,6 @@
 
 #include <string>
 
-#include "../../Defines.h"
 #include "../../object/GpsPosition.h"
 
 #include "Processor.hpp"
@@ -41,7 +40,9 @@ namespace processor
 class GpsProcessor : public Processor<object::GpsPosition>
 {
 public:
-    DEFAULT_CTOR_DTOR(GpsProcessor)
+    GpsProcessor();
+
+    ~GpsProcessor() noexcept;
 
     /**
      * @fn process

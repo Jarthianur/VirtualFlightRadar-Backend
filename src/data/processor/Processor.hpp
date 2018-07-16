@@ -24,7 +24,6 @@
 #include <cstdio>
 #include <string>
 
-#include "../../Defines.h"
 #include "../../Math.hpp"
 
 /// @def PROC_BUFF_S
@@ -46,7 +45,11 @@ template<typename T>
 class Processor
 {
 public:
-    DEFAULT_CTOR_DTOR_INLINE(Processor)
+    Processor()
+    {}
+
+    virtual ~Processor() noexcept
+    {}
 
     /**
      * @fn process

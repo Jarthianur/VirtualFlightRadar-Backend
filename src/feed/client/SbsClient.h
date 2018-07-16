@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
@@ -42,7 +41,7 @@ namespace client
 class SbsClient : public Client
 {
 public:
-    NON_COPYABLE(SbsClient)
+    NOT_COPYABLE(SbsClient)
 
     /**
      * @fn SbsClient
@@ -57,7 +56,7 @@ public:
      * @fn ~SbsClient
      * @brief Destructor
      */
-    virtual ~SbsClient() noexcept;
+    ~SbsClient() noexcept;
 
 private:
     /**

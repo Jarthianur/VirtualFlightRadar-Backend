@@ -22,7 +22,6 @@
 #pragma once
 
 #include <cstddef>
-#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
@@ -44,7 +43,7 @@ namespace client
 class GpsdClient : public Client
 {
 public:
-    NON_COPYABLE(GpsdClient)
+    NOT_COPYABLE(GpsdClient)
 
     /**
      * @fn GpsdClient
@@ -59,7 +58,7 @@ public:
      * @fn ~GpsdClient
      * @brief Destructor
      */
-    virtual ~GpsdClient() noexcept;
+    ~GpsdClient() noexcept;
 
 private:
     /**

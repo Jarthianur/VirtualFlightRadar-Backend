@@ -24,7 +24,6 @@
 #include <cstdint>
 
 #include "../Defines.h"
-
 #include "Object.h"
 #include "TimeStamp.h"
 
@@ -58,7 +57,7 @@ struct Position
 class GpsPosition : public Object
 {
 public:
-    DEFAULT_CTOR_DTOR(GpsPosition)
+    GpsPosition();
 
     /**
      * @fn GpsPosition
@@ -75,6 +74,8 @@ public:
      */
     GpsPosition(const Position& crPosition, double vGeoid);
 
+    ~GpsPosition() noexcept;
+
     /**
      * Define and declare getters and setters.
      */
@@ -90,6 +91,15 @@ private:
      * @see Object#assign
      */
     void assign(Object&& rvOther) override;
+
+    /**
+     * @fn canUpdate
+     * @brief Check whether this Aircraft can update the other one.
+     * @param crOther   The other Aircraft
+     * @param vAttempts The update attempt count
+     * @return true if yes, else false
+     */
+    bool canUpdate(const Object& crOther) const override;
 
     /// @var mPosition
     /// The position

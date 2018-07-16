@@ -21,6 +21,7 @@
 
 #include "SbsClient.h"
 
+#include <string>
 #include <boost/bind.hpp>
 #include <boost/thread/lock_guard.hpp>
 
@@ -66,10 +67,7 @@ void SbsClient::handleResolve(const boost::system::error_code& crError,
     {
         Logger::error(COMPONENT " resolve host: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
-        if(mSocket.is_open())
-        {
-            mSocket.close();
-        }
+        closeSocket();
         timedConnect();
     }
 }
@@ -88,10 +86,7 @@ void SbsClient::handleConnect(const boost::system::error_code& crError,
     {
         Logger::error(COMPONENT " connect: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
-        if(mSocket.is_open())
-        {
-            mSocket.close();
-        }
+        closeSocket();
         timedConnect();
     }
 }

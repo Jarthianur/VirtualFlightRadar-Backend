@@ -25,22 +25,24 @@
 
 #include "../config/Configuration.h"
 #include "../data/AtmosphereData.h"
-#include "../data/WindData.h"
 #include "../object/Atmosphere.h"
+#include "client/Client.h"
+#include "client/ClientManager.h"
+#include "parser/AtmosphereParser.h"
 
 namespace feed
 {
 parser::AtmosphereParser AtmosphereFeed::smParser;
 
 AtmosphereFeed::AtmosphereFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                               std::shared_ptr<data::AtmosphereData>& pData)
+                               std::shared_ptr<data::AtmosphereData> pData)
     : Feed(crName, crKvMap, pData)
 {}
 
 AtmosphereFeed::~AtmosphereFeed() noexcept
 {}
 
-void AtmosphereFeed::registerClient(client::ClientManager& rManager)
+void AtmosphereFeed::registerToClient(client::ClientManager& rManager)
 {
     mSubsribedClient = rManager.subscribe(
         shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
@@ -52,7 +54,7 @@ void AtmosphereFeed::process(const std::string& crResponse) noexcept
     object::Atmosphere atmos(getPriority());
     if(smParser.unpack(crResponse, atmos))
     {
-        mpData->update(std::move(atmos), mDataSlot);
+        mpData->update(std::move(atmos));
     }
 }
 

@@ -21,15 +21,10 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
 #include <string>
-#include <vector>
 
-#include "../Defines.h"
 #include "../object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
-
 #include "Data.h"
 
 /// @namespace data
@@ -43,14 +38,16 @@ namespace data
 class GpsData : public Data
 {
 public:
-    DEFAULT_CTOR_DTOR(GpsData)
+    GpsData();
 
     /**
      * @fn GpsData
      * @brief Constructor
      * @param crPosition The initial info
      */
-    explicit GpsData(const object::GpsPosition& crPosition, bool vGround);
+    GpsData(const object::GpsPosition& crPosition, bool vGround);
+
+    ~GpsData() noexcept;
 
     /**
      * @fn getSerialized
@@ -76,12 +73,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvPosition, std::size_t vSlot) override;
-
-    /**
-     * @see Data#registerSlot
-     */
-    std::size_t registerSlot() override;
+    bool update(object::Object&& rvPosition) override;
 
 private:
     /**
@@ -106,10 +98,6 @@ private:
     /// @var mGroundMode
     /// Ground mode state
     bool mGroundMode = false;
-
-    /// @var mAttempts
-    /// Store update attempts
-    std::vector<std::uint32_t> mAttempts;
 };
 
 }  // namespace data

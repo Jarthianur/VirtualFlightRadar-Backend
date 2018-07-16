@@ -21,13 +21,10 @@
 
 #pragma once
 
-#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
 #include "../../Defines.h"
-#include "../../Parameters.h"
-
 #include "Client.h"
 
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT
@@ -39,7 +36,6 @@
 /// @namespace feed
 namespace feed
 {
-class Feed;
 /// @namespace client
 namespace client
 {
@@ -51,7 +47,7 @@ namespace client
 class SensorClient : public Client
 {
 public:
-    NON_COPYABLE(SensorClient)
+    NOT_COPYABLE(SensorClient)
 
     /**
      * @fn SensorClient
@@ -66,7 +62,7 @@ public:
      * @fn ~SensorClient
      * @brief Destructor
      */
-    virtual ~SensorClient() noexcept;
+    ~SensorClient() noexcept;
 
 private:
     /**

@@ -22,8 +22,8 @@
 #include "Configuration.h"
 
 #include <limits>
-#include <sstream>
 #include <stdexcept>
+#include <utility>
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 

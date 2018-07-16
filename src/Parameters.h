@@ -63,7 +63,7 @@
  * Consider someone else wants surrounding traffic displayed from
  * somewhere else, like pilots and flight instructors.
  */
-#define SERVER_MAX_CLIENTS 5
+#define SERVER_MAX_CLIENTS 3
 
 /**
  * @def ESTIMATED_TRAFFIC

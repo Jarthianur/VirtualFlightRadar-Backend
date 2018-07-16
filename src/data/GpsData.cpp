@@ -21,7 +21,6 @@
 
 #include "GpsData.h"
 
-#include <algorithm>
 #include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
@@ -56,36 +55,22 @@ GpsData::~GpsData() noexcept
 std::string GpsData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    return mPosition.getSerialized();
+    return (++mPosition).getSerialized();
 }
 
-bool GpsData::update(Object&& rvPosition, std::size_t vSlot)
+bool GpsData::update(Object&& rvPosition)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     if(mPositionLocked)
     {
         throw std::runtime_error("Position was locked before.");
     }
-    try
+    bool updated = mPosition.tryUpdate(std::move(rvPosition));
+    if(updated)
     {
-        bool updated = mPosition.tryUpdate(std::move(rvPosition), ++mAttempts.at(vSlot));
-        if(updated)
-        {
-            std::fill(mAttempts.begin(), mAttempts.end(), 0);
-            mProcessor.process(mPosition);
-        }
-        return (mPositionLocked = updated && mGroundMode && isPositionGood());
+        mProcessor.process(mPosition);
     }
-    catch(const std::out_of_range&)
-    {
-        return false;
-    }
-}
-
-std::size_t GpsData::registerSlot()
-{
-    mAttempts.push_back(0);
-    return mAttempts.size() - 1;
+    return (mPositionLocked = updated && mGroundMode && isPositionGood());
 }
 
 Position GpsData::getPosition()

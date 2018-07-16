@@ -23,8 +23,6 @@
 
 #include <cstdint>
 
-#include "../Defines.h"
-
 #include "Object.h"
 
 /// @namespace object
@@ -40,13 +38,15 @@ struct Climate;
 class Wind : public Object
 {
 public:
-    DEFAULT_CTOR_DTOR(Wind)
+    Wind();
 
     /**
      * @fn Wind
      * @brief Constructor
      */
     explicit Wind(std::uint32_t vPriority);
+
+    ~Wind() noexcept;
 };
 
 }  // namespace object

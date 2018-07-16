@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -44,7 +43,9 @@ namespace parser
 class SbsParser : public Parser<object::Aircraft>
 {
 public:
-    DEFAULT_CTOR_DTOR(SbsParser)
+    SbsParser();
+
+    ~SbsParser() noexcept;
 
     /**
      * @fn unpack

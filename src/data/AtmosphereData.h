@@ -21,14 +21,9 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
 #include <string>
-#include <vector>
 
-#include "../Defines.h"
 #include "../object/Atmosphere.h"
-
 #include "Data.h"
 
 /// @namespace data
@@ -42,7 +37,7 @@ namespace data
 class AtmosphereData : public Data
 {
 public:
-    DEFAULT_CTOR_DTOR(AtmosphereData)
+    AtmosphereData();
 
     /**
      * @fn AtmosphereData
@@ -50,6 +45,8 @@ public:
      * @param vAtmosphere The initial info
      */
     explicit AtmosphereData(const object::Atmosphere& crAtmosphere);
+
+    ~AtmosphereData() noexcept;
 
     /**
      * @fn getSerialized
@@ -67,12 +64,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvAtmosphere, std::size_t vSlot) override;
-
-    /**
-     * @see Data#registerSlot
-     */
-    std::size_t registerSlot() override;
+    bool update(object::Object&& rvAtmosphere) override;
 
     /**
      * @fn getAtmPressure
@@ -86,9 +78,5 @@ private:
     /// @var mAtmosphere
     /// Holding atmospheric information
     object::Atmosphere mAtmosphere;
-
-    /// @var mAttempts
-    /// Store update attempts per Feed
-    std::vector<std::uint32_t> mAttempts;
 };
 }  // namespace data

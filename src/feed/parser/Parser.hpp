@@ -23,8 +23,6 @@
 
 #include <string>
 
-#include "../../Defines.h"
-
 /// @namespace feed
 namespace feed
 {
@@ -40,7 +38,11 @@ template<typename T>
 class Parser
 {
 public:
-    DEFAULT_CTOR_DTOR_INLINE(Parser)
+    Parser()
+    {}
+
+    virtual ~Parser() noexcept
+    {}
 
     /**
      * @fn unpack

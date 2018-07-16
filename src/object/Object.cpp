@@ -32,11 +32,12 @@ void Object::assign(Object&& crOther)
 {
     this->mSerialized   = std::move(crOther.mSerialized);
     this->mLastPriority = crOther.mLastPriority;
+    this->mUpdateAge    = 0;
 }
 
-bool Object::tryUpdate(Object&& rvOther, std::uint32_t vAttempts)
+bool Object::tryUpdate(Object&& rvOther)
 {
-    if(rvOther.canUpdate(*this, vAttempts))
+    if(rvOther.canUpdate(*this))
     {
         this->assign(std::move(rvOther));
         return true;
@@ -44,9 +45,9 @@ bool Object::tryUpdate(Object&& rvOther, std::uint32_t vAttempts)
     return false;
 }
 
-bool Object::canUpdate(const Object& crOther, std::uint32_t vAttempts) const
+bool Object::canUpdate(const Object& crOther) const
 {
-    return this->mLastPriority * vAttempts >= crOther.mLastPriority;
+    return this->mLastPriority >= crOther.mLastPriority || crOther.mUpdateAge >= OBJ_OUTDATED;
 }
 
 void Object::setSerialized(std::string&& rvSerialized)
@@ -58,4 +59,11 @@ const std::string& Object::getSerialized() const
 {
     return mSerialized;
 }
+
+Object& Object::operator++()
+{
+    ++mUpdateAge;
+    return *this;
+}
+
 }  // namespace object

@@ -19,19 +19,17 @@
  }
  */
 
-#include <boost/asio.hpp>
-#include <boost/thread.hpp>
+#include "ClientManager.h"
+
+#include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
 #include "../AprscFeed.h"
 #include "../Feed.h"
 #include "AprscClient.h"
-#include "ClientManager.h"
 #include "GpsdClient.h"
 #include "SbsClient.h"
 #include "SensorClient.h"
-
-#include "../../Logger.hpp"
 
 namespace feed
 {
@@ -73,21 +71,16 @@ std::weak_ptr<Client> ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
             it = mClients.insert(std::make_shared<SensorClient>(crEndpoint)).first;
             break;
     }
-    Logger::debug("CM subscribed from ", rpFeed->getName(), " to ", (*it)->hash());
     (*it)->subscribe(rpFeed);
     return std::weak_ptr<Client>(*it);
 }
 
-void ClientManager::run(boost::thread_group& rThdGroup, boost::asio::signal_set& rSigset)
+void ClientManager::run()
 {
-    rSigset.async_wait([this](const boost::system::error_code&, int) { stop(); });
-    for(const auto& it : mClients)
+    for(auto& it : mClients)
     {
-        Logger::debug("CM create thread for ", it->hash());
-        rThdGroup.create_thread([&]() {
-            Logger::debug("CM run client ", it->hash());
+        mThdGroup.create_thread([&]() {
             it->run();
-            Logger::debug("CM returned from client run call -> erase");
             boost::lock_guard<boost::mutex> lock(mMutex);
             mClients.erase(it);
         });
@@ -96,11 +89,14 @@ void ClientManager::run(boost::thread_group& rThdGroup, boost::asio::signal_set&
 
 void ClientManager::stop()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    for(const auto& it : mClients)
     {
-        it->lockAndStop();
+        boost::lock_guard<boost::mutex> lock(mMutex);
+        for(const auto& it : mClients)
+        {
+            it->lockAndStop();
+        }
     }
+    mThdGroup.join_all();
 }
 
 }  // namespace client

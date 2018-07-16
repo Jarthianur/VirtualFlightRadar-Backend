@@ -23,10 +23,8 @@
 
 #include <csignal>
 #include <exception>
-#include <string>
-#include <utility>
+#include <sstream>
 #include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
 #include <boost/thread.hpp>
 
 #include "config/Configuration.h"
@@ -36,22 +34,24 @@
 #include "data/WindData.h"
 #include "feed/Feed.h"
 #include "feed/FeedFactory.h"
+#include "feed/client/ClientManager.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
 #include "Logger.hpp"
+#include "Signals.h"
 
 using namespace data;
 
 #define SYNC_TIME 1
 
-std::atomic<bool> VFRB::vRunStatus(true);
-
 VFRB::VFRB(const config::Configuration& config)
-    : mpAircraftData(new AircraftData(config.getMaxDistance())),
-      mpAtmosphereData(new AtmosphereData(object::Atmosphere(config.getAtmPressure(), 0))),
-      mpGpsData(new GpsData(config.getPosition(), config.getGroundMode())),
-      mpWindData(new WindData()),
-      mServer(config.getServerPort())
+    : mpAircraftData(std::make_shared<AircraftData>(config.getMaxDistance())),
+      mpAtmosphereData(
+          std::make_shared<AtmosphereData>(object::Atmosphere(config.getAtmPressure(), 0))),
+      mpGpsData(std::make_shared<GpsData>(config.getPosition(), config.getGroundMode())),
+      mpWindData(std::make_shared<WindData>()),
+      mServer(config.getServerPort()),
+      mRunStatus(false)
 {
     createFeeds(config);
 }
@@ -63,34 +63,56 @@ void VFRB::run() noexcept
 {
     Logger::info("(VFRB) startup");
     boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
+    mRunStatus                                    = true;
 
-    boost::asio::io_service io_service;
-    boost::asio::signal_set signal_set(io_service);
-    setupSignals(signal_set);
+    Signals signals;
+    feed::client::ClientManager clientManager;
 
-    boost::thread server_thread([this, &signal_set]() {
-        Logger::info("(Server) start server");
-        mServer.run(signal_set);
-        vRunStatus = false;
+    signals.addHandler([this](const boost::system::error_code&, const int) {
+        Logger::info("(VFRB) caught signal to shutdown ...");
+        mRunStatus = false;
     });
+
     for(const auto& it : mFeeds)
     {
         Logger::info("(VFRB) run feed: ", it->getName());
-        it->registerClient(mClientManager);
+        it->registerToClient(clientManager);
     }
-    boost::thread_group client_threads;
-    mClientManager.run(client_threads, signal_set);
-    boost::thread signal_thread([&io_service]() { io_service.run(); });
     mFeeds.clear();
 
+    signals.run();
+    mServer.run();
+    clientManager.run();
+
     serve();
-    mClientManager.stop();
 
-    server_thread.join();
-    client_threads.join_all();
-    signal_thread.join();
+    signals.stop();
+    clientManager.stop();
+    mServer.stop();
 
-    Logger::info("EXITING / runtime: ", getDuration(start));
+    Logger::info("Stopped after ", getDuration(start));
+}
+
+void VFRB::serve()
+{
+    while(mRunStatus)
+    {
+        try
+        {
+            mpAircraftData->processAircrafts(mpGpsData->getPosition(),
+                                             mpAtmosphereData->getAtmPressure());
+            mServer.send(mpAircraftData->getSerialized());
+            mServer.send(mpGpsData->getSerialized());
+            mServer.send(mpAtmosphereData->getSerialized());
+            mServer.send(mpWindData->getSerialized());
+            boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
+        }
+        catch(const std::exception& e)
+        {
+            Logger::error("(VFRB) error: ", e.what());
+            mRunStatus = false;
+        }
+    }
 }
 
 void VFRB::createFeeds(const config::Configuration& crConfig)
@@ -120,51 +142,13 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
     }
 }
 
-void VFRB::setupSignals(boost::asio::signal_set& rSigSet)
-{
-    rSigSet.add(SIGINT);
-    rSigSet.add(SIGTERM);
-#if defined(SIGQUIT)
-    rSigSet.add(SIGQUIT);
-#endif  // defined(SIGQUIT)
-
-    rSigSet.async_wait([this](const boost::system::error_code&, const int) {
-        Logger::info("(VFRB) caught signal: ", "shutdown");
-        vRunStatus = false;
-    });
-}
-
-void VFRB::serve()
-{
-    while(vRunStatus)
-    {
-        try
-        {
-            mpAircraftData->processAircrafts(mpGpsData->getPosition(),
-                                             mpAtmosphereData->getAtmPressure());
-            mServer.send(mpAircraftData->getSerialized());
-            mServer.send(mpGpsData->getSerialized());
-            mServer.send(mpAtmosphereData->getSerialized() + mpWindData->getSerialized());
-            boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
-        }
-        catch(const std::exception& e)
-        {
-            Logger::error("(VFRB) error: ", e.what());
-            vRunStatus = false;
-        }
-    }
-}
-
 std::string VFRB::getDuration(boost::chrono::steady_clock::time_point vStart) const
 {
     boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
     boost::chrono::minutes runtime
         = boost::chrono::duration_cast<boost::chrono::minutes>(end - vStart);
-    std::string time_str(std::to_string(runtime.count() / 60 / 24));
-    time_str += " days, ";
-    time_str += std::to_string(runtime.count() / 60);
-    time_str += " hours, ";
-    time_str += std::to_string(runtime.count() % 60);
-    time_str += " mins";
-    return time_str;
+    std::stringstream ss;
+    ss << runtime.count() / 60 / 24 << " days, " << runtime.count() / 60 << " hours, "
+       << runtime.count() % 60 << " minutes";
+    return ss.str();
 }

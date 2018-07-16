@@ -23,9 +23,7 @@
 
 #include <string>
 #include <unordered_map>
-#include <utility>
 
-#include "../Defines.h"
 
 /// @namespace config
 namespace config
@@ -45,7 +43,9 @@ using KeyValue = std::pair<std::string, std::string>;
 class PropertyMap
 {
 public:
-    DEFAULT_CTOR_DTOR(PropertyMap)
+    PropertyMap();
+
+    ~PropertyMap() noexcept;
 
     /**
      * @fn getProperty

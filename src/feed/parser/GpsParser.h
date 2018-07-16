@@ -51,7 +51,7 @@ public:
      * @fn ~GpsParser
      * @brief Destructor
      */
-    virtual ~GpsParser() noexcept;
+    ~GpsParser() noexcept;
 
     /**
      * @fn unpack

@@ -21,8 +21,6 @@
 
 #include "WindData.h"
 
-#include <algorithm>
-#include <stdexcept>
 #include <boost/thread/lock_guard.hpp>
 
 using namespace object;
@@ -41,33 +39,15 @@ WindData::~WindData() noexcept
 std::string WindData::getSerialized()
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    std::string tmp(mWind.getSerialized());
+    std::string tmp((++mWind).getSerialized());
     mWind.setSerialized("");
     return tmp;
 }
 
-bool WindData::update(Object&& rvWind, std::size_t vSlot)
+bool WindData::update(Object&& rvWind)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
-    try
-    {
-        bool updated = mWind.tryUpdate(std::move(rvWind), ++mAttempts.at(vSlot));
-        if(updated)
-        {
-            std::fill(mAttempts.begin(), mAttempts.end(), 0);
-        }
-        return updated;
-    }
-    catch(const std::out_of_range&)
-    {
-        return false;
-    }
-}
-
-std::size_t WindData::registerSlot()
-{
-    mAttempts.push_back(0);
-    return mAttempts.size() - 1;
+    return mWind.tryUpdate(std::move(rvWind));
 }
 
 }  // namespace data

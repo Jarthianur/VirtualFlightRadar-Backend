@@ -43,4 +43,11 @@ void GpsPosition::assign(Object&& rvOther)
     this->mGeoid           = rvUpdate.mGeoid;
     this->mDilution        = rvUpdate.mDilution;
 }
+
+bool GpsPosition::canUpdate(const Object& crOther) const
+{
+    const GpsPosition& crToUpdate = static_cast<const GpsPosition&>(crOther);
+    return (this->mTimeStamp > crToUpdate.mTimeStamp) && Object::canUpdate(crOther);
+}
+
 }  // namespace object

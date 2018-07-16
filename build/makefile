@@ -5,10 +5,10 @@
 -include ../makefile.init
 
 RM := rm -rf
-OPT_LVL := ${VFRB_OPT}
+OPT_LVL := $(or ${VFRB_OPT},${VFRB_OPT},3)
 DBG := ${VFRB_DEBUG}
 TARGET := ${VFRB_TARGET}
-CXX := ${VFRB_COMPILER}
+CXX := $(or ${VFRB_COMPILER},${VFRB_COMPILER},g++)
 BOOST_L := ${BOOST_LIBS_L}
 BOOST_I := ${BOOST_ROOT_I}
 

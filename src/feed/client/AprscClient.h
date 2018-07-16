@@ -44,7 +44,7 @@ namespace client
 class AprscClient : public Client
 {
 public:
-    NON_COPYABLE(AprscClient)
+    NOT_COPYABLE(AprscClient)
 
     /**
      * @fn AprscClient
@@ -60,7 +60,7 @@ public:
      * @fn ~AprscClient
      * @brief Destructor
      */
-    virtual ~AprscClient() noexcept;
+    ~AprscClient() noexcept;
 
     bool equals(const Client& crOther) const override;
 
