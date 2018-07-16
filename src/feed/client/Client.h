@@ -66,7 +66,7 @@ struct Endpoint
 class Client
 {
 public:
-    NON_COPYABLE(Client)
+    NOT_COPYABLE(Client)
 
     /**
      * @fn ~Client

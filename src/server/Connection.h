@@ -39,7 +39,7 @@ namespace server
 class Connection final
 {
 public:
-    NON_COPYABLE(Connection)
+    NOT_COPYABLE(Connection)
 
     /**
      * @fn ~Connection

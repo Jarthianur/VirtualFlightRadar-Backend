@@ -107,7 +107,7 @@
 
 /// @def NON_COPYABLE
 /// Make a class of TYPE non copyable.
-#define NON_COPYABLE(TYPE)      \
+#define NOT_COPYABLE(TYPE)      \
     TYPE(const TYPE&) = delete; \
     TYPE& operator=(const TYPE&) = delete;
 

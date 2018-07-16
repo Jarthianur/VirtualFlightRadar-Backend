@@ -53,7 +53,7 @@ namespace server
 class Server
 {
 public:
-    NON_COPYABLE(Server)
+    NOT_COPYABLE(Server)
 
     Server();
 

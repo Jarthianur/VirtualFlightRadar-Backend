@@ -41,7 +41,7 @@ namespace client
 class SbsClient : public Client
 {
 public:
-    NON_COPYABLE(SbsClient)
+    NOT_COPYABLE(SbsClient)
 
     /**
      * @fn SbsClient

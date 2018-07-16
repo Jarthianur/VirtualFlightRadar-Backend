@@ -43,7 +43,7 @@ namespace client
 class GpsdClient : public Client
 {
 public:
-    NON_COPYABLE(GpsdClient)
+    NOT_COPYABLE(GpsdClient)
 
     /**
      * @fn GpsdClient

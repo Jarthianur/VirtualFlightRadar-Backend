@@ -47,7 +47,7 @@ namespace client
 class SensorClient : public Client
 {
 public:
-    NON_COPYABLE(SensorClient)
+    NOT_COPYABLE(SensorClient)
 
     /**
      * @fn SensorClient

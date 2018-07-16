@@ -49,6 +49,7 @@ void Server::run()
     mThread = boost::thread([this]() {
         accept();
         mIoService.run();
+        Logger::info("(Server) stopped");
     });
 }
 
@@ -85,22 +86,24 @@ void Server::accept()
 void Server::stop()
 {
     Logger::info("(Server) stopping all connections ...");
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    if(mAcceptor.is_open())
     {
-        mAcceptor.close();
-    }
-    for(auto& it : mConnections)
-    {
-        if(it)
+        boost::lock_guard<boost::mutex> lock(mMutex);
+        if(mAcceptor.is_open())
         {
-            it.reset();
+            mAcceptor.close();
         }
-    }
-    mActiveConnections = 0;
-    if(!mIoService.stopped())
-    {
-        mIoService.stop();
+        for(auto& it : mConnections)
+        {
+            if(it)
+            {
+                it.reset();
+            }
+        }
+        mActiveConnections = 0;
+        if(!mIoService.stopped())
+        {
+            mIoService.stop();
+        }
     }
     if(mThread.joinable())
     {

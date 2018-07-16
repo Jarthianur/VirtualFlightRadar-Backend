@@ -53,7 +53,7 @@ namespace feed
 class AtmosphereFeed : public Feed, public std::enable_shared_from_this<AtmosphereFeed>
 {
 public:
-    NON_COPYABLE(AtmosphereFeed)
+    NOT_COPYABLE(AtmosphereFeed)
 
     /**
      * @fn AtmosphereFeed

@@ -43,10 +43,12 @@ void Signals::run()
 
 void Signals::stop()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    if(!mIoService.stopped())
     {
-        mIoService.stop();
+        boost::lock_guard<boost::mutex> lock(mMutex);
+        if(!mIoService.stopped())
+        {
+            mIoService.stop();
+        }
     }
     if(mThread.joinable())
     {

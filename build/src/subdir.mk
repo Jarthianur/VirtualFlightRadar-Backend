@@ -6,16 +6,19 @@
 CPP_SRCS += \
 ../src/Main.cpp \
 ../src/VFRB.cpp \
+../src/Signals.cpp \
 ../src/Logger.cpp
 
 OBJS += \
 ./src/Main.o \
 ./src/VFRB.o \
+./src/Signals.o \
 ./src/Logger.o
 
 CPP_DEPS += \
 ./src/Main.d \
 ./src/VFRB.d \
+./src/Signals.d \
 ./src/Logger.d
 
 V_VERSION := ${VFRB_VERSION}

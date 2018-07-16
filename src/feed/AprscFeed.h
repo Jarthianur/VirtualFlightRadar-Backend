@@ -55,7 +55,7 @@ namespace feed
 class AprscFeed : public Feed, public std::enable_shared_from_this<AprscFeed>
 {
 public:
-    NON_COPYABLE(AprscFeed)
+    NOT_COPYABLE(AprscFeed)
 
     /**
      * @fn AprscFeed

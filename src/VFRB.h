@@ -53,7 +53,7 @@ class Feed;
 class VFRB
 {
 public:
-    NON_COPYABLE(VFRB)
+    NOT_COPYABLE(VFRB)
 
     /**
      * @fn VFRB

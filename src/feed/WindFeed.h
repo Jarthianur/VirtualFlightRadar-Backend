@@ -53,7 +53,7 @@ namespace feed
 class WindFeed : public Feed, public std::enable_shared_from_this<WindFeed>
 {
 public:
-    NON_COPYABLE(WindFeed)
+    NOT_COPYABLE(WindFeed)
 
     /**
      * @fn WindFeed

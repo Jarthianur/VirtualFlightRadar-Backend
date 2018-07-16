@@ -51,7 +51,7 @@ namespace feed
 class Feed
 {
 public:
-    NON_COPYABLE(Feed)
+    NOT_COPYABLE(Feed)
 
     /**
      * @fn ~Feed

@@ -34,7 +34,7 @@ using SignalHandler = std::function<void(const boost::system::error_code&, const
 class Signals
 {
 public:
-    NON_COPYABLE(Signals)
+    NOT_COPYABLE(Signals)
 
     Signals();
     ~Signals() noexcept;

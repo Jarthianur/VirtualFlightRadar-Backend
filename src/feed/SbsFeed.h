@@ -54,7 +54,7 @@ namespace feed
 class SbsFeed : public Feed, public std::enable_shared_from_this<SbsFeed>
 {
 public:
-    NON_COPYABLE(SbsFeed)
+    NOT_COPYABLE(SbsFeed)
 
     /**
      * @fn SbsFeed

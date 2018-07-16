@@ -44,7 +44,7 @@ namespace client
 class AprscClient : public Client
 {
 public:
-    NON_COPYABLE(AprscClient)
+    NOT_COPYABLE(AprscClient)
 
     /**
      * @fn AprscClient
