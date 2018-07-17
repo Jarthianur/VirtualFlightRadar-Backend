@@ -19,25 +19,28 @@
  }
  */
 
-#include "Connection.h"
-
-#include <boost/move/move.hpp>
 #include <boost/system/error_code.hpp>
-/*
+
+#include "SocketImplBoost.h"
+
 namespace server
 {
-std::unique_ptr<Connection> Connection::start(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
+SocketImplBoost::SocketImplBoost(SocketImplBoost&& rvOther) : mSocket(boost::move(rvOther.mSocket))
+{}
+
+SocketImplBoost& SocketImplBoost::operator=(SocketImplBoost&& rvOther)
 {
-    return std::unique_ptr<Connection>(new Connection(boost::move(rvSocket)));
+    mSocket = boost::move(rvOther.mSocket);
+    return *this;
 }
 
-Connection::Connection(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
-    : mSocket(boost::move(rvSocket)), mIpAddress(mSocket.remote_endpoint().address().to_string())
+SocketImplBoost::SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
+    : mSocket(boost::move(rvSocket))
 {
     mSocket.non_blocking(true);
 }
 
-Connection::~Connection() noexcept
+SocketImplBoost::~SocketImplBoost() noexcept
 {
     if(mSocket.is_open())
     {
@@ -47,10 +50,9 @@ Connection::~Connection() noexcept
     }
 }
 
-boost::asio::ip::tcp::socket& Connection::getSocket()
+std::string SocketImplBoost::address() const
 {
-    return mSocket;
+    return mSocket.remote_endpoint().address().to_string();
 }
 
 }  // namespace server
-*/
