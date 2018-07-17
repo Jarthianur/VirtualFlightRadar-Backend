@@ -19,10 +19,10 @@
  }
  */
 
+#include "TcpInterfaceImplBoost.h"
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
-
-#include "TcpInterfaceImplBoost.h"
+#include "../Logger.hpp"
 
 namespace server
 {
@@ -73,6 +73,10 @@ void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& crErro
 {
     if(mAcceptor.is_open())
     {
+        if(crError)
+        {
+            logger.debug("(Server) accept: ", crError.message());
+        }
         crCallback(!crError);
     }
 }

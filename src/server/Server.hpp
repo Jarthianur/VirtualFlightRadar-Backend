@@ -31,7 +31,6 @@
 #include <boost/thread/mutex.hpp>
 
 #include "../Logger.hpp"
-
 #include "../Defines.h"
 #include "../Parameters.h"
 #include "Connection.hpp"
@@ -41,7 +40,7 @@
 /// The max amount of client to accept at once
 #define S_MAX_CLIENTS SERVER_MAX_CLIENTS
 #else
-#define S_MAX_CLIENTS 5
+#define S_MAX_CLIENTS 2
 #endif
 
 /// @namespace server
@@ -83,7 +82,7 @@ public:
         mThread = boost::thread([this]() {
             accept();
             mTcpIf.run();
-            logger.info("(Server) stopped");
+            logger.debug("(Server) stopped");
         });
     }
 
