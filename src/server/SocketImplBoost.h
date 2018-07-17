@@ -36,6 +36,9 @@ public:
     explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket);
     ~SocketImplBoost() noexcept;
     std::string address() const;
+    bool write(const std::string& crStr);
+    void close();
+    boost::asio::ip::tcp::socket& get();
 
 private:
     boost::asio::ip::tcp::socket mSocket;

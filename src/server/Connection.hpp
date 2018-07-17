@@ -59,14 +59,9 @@ public:
         return std::unique_ptr<Connection<SocketT>>(new Connection(std::move(rvSocket)));
     }
 
-    /**
-     * @fn getSocket
-     * @brief Get the socket as reference.
-     * @return the socket ref
-     */
-    SocketT& getSocket()
+    bool write(const std::string& crStr)
     {
-        return mSocket;
+        return mSocket.write(crStr);
     }
 
     /**

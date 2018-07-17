@@ -37,10 +37,30 @@ SocketImplBoost& SocketImplBoost::operator=(SocketImplBoost&& rvOther)
 SocketImplBoost::SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
     : mSocket(boost::move(rvSocket))
 {
-    mSocket.non_blocking(true);
+    if(mSocket.is_open())
+    {
+        mSocket.non_blocking(true);
+    }
 }
 
 SocketImplBoost::~SocketImplBoost() noexcept
+{
+    close();
+}
+
+std::string SocketImplBoost::address() const
+{
+    return mSocket.remote_endpoint().address().to_string();
+}
+
+bool SocketImplBoost::write(const std::string& crStr)
+{
+    boost::system::error_code ec;
+    boost::asio::write(mSocket, boost::asio::buffer(crStr), ec);
+    return !ec;
+}
+
+void SocketImplBoost::close()
 {
     if(mSocket.is_open())
     {
@@ -50,9 +70,9 @@ SocketImplBoost::~SocketImplBoost() noexcept
     }
 }
 
-std::string SocketImplBoost::address() const
+boost::asio::ip::tcp::socket& SocketImplBoost::get()
 {
-    return mSocket.remote_endpoint().address().to_string();
+    return mSocket;
 }
 
 }  // namespace server

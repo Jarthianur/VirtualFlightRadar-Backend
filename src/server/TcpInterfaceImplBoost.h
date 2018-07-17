@@ -19,38 +19,39 @@
  }
  */
 
-#include "Connection.h"
+#pragma once
 
-#include <boost/move/move.hpp>
+#include <cstdint>
+#include <functional>
+#include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-/*
+#include "SocketImplBoost.h"
+
+#include "../Defines.h"
+
 namespace server
 {
-std::unique_ptr<Connection> Connection::start(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
+class TcpInterfaceImplBoost
 {
-    return std::unique_ptr<Connection>(new Connection(boost::move(rvSocket)));
-}
+public:
+    NOT_COPYABLE(TcpInterfaceImplBoost)
 
-Connection::Connection(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
-    : mSocket(boost::move(rvSocket)), mIpAddress(mSocket.remote_endpoint().address().to_string())
-{
-    mSocket.non_blocking(true);
-}
+    explicit TcpInterfaceImplBoost(std::uint16_t vPort);
+    ~TcpInterfaceImplBoost() noexcept;
 
-Connection::~Connection() noexcept
-{
-    if(mSocket.is_open())
-    {
-        boost::system::error_code ignored_ec;
-        mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ignored_ec);
-        mSocket.close();
-    }
-}
+    void run();
+    void stop();
+    void onAccept(const std::function<void(bool)>& crCallback);
+    void close();
+    SocketImplBoost& getSocket();
 
-boost::asio::ip::tcp::socket& Connection::getSocket()
-{
-    return mSocket;
-}
+private:
+    void handleAccept(const boost::system::error_code& crError,
+                      const std::function<void(bool)>& crCallback) noexcept;
+
+    boost::asio::io_service mIoService;
+    boost::asio::ip::tcp::acceptor mAcceptor;
+    SocketImplBoost mSocket;
+};
 
 }  // namespace server
-*/
