@@ -27,6 +27,7 @@
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
+#include "client/ConnectorImplBoost.h"
 
 namespace data
 {
@@ -36,6 +37,7 @@ namespace feed
 {
 namespace client
 {
+template<typename ConnectorT>
 class Client;
 class ClientManager;
 } /* namespace client */
@@ -93,7 +95,7 @@ protected:
     /// Key-value-map holding the properties.
     const config::KeyValueMap mKvMap;
 
-    std::weak_ptr<client::Client> mSubsribedClient;
+    std::weak_ptr<client::Client<client::ConnectorImplBoost>> mSubsribedClient;
 
     std::shared_ptr<data::Data> mpData;
 

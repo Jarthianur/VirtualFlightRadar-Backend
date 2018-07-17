@@ -34,7 +34,7 @@ namespace feed
 {
 namespace client
 {
-Client::Client(const Endpoint& crEndpoint, const std::string& crComponent)
+/*Client::Client(const Endpoint& crEndpoint, const std::string& crComponent)
     : mIoService(),
       mSocket(mIoService),
       mResolver(mIoService),
@@ -165,15 +165,7 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
             }
         }
     }
-}
-
-void Client::closeSocket()
-{
-    if(mSocket.is_open())
-    {
-        mSocket.close();
-    }
-}
+}*/
 
 }  // namespace client
 }  // namespace feed

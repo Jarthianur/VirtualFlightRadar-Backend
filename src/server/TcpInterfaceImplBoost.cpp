@@ -56,7 +56,7 @@ void TcpInterfaceImplBoost::stop()
     mSocket.close();
 }
 
-void TcpInterfaceImplBoost::onAccept(const std::function<void(bool)>& crCallback)
+void TcpInterfaceImplBoost::onAccept(const std::function<void(bool) noexcept>& crCallback)
 {
     mAcceptor.async_accept(mSocket.get(),
                            boost::bind(&TcpInterfaceImplBoost::handleAccept, this,
@@ -68,8 +68,9 @@ void TcpInterfaceImplBoost::close()
     mSocket.close();
 }
 
-void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& crError,
-                                         const std::function<void(bool)>& crCallback) noexcept
+void TcpInterfaceImplBoost::handleAccept(
+    const boost::system::error_code& crError,
+    const std::function<void(bool) noexcept>& crCallback) noexcept
 {
     if(mAcceptor.is_open())
     {

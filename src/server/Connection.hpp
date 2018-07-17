@@ -45,8 +45,7 @@ public:
      * @fn ~Connection
      * @brief Destructor
      */
-    ~Connection() noexcept
-    {}
+    ~Connection() noexcept;
 
     /**
      * @fn start
@@ -54,15 +53,9 @@ public:
      * @param rvSocket The socket
      * @return a shared ptr to the Connection object
      */
-    static std::unique_ptr<Connection<SocketT>> start(SocketT&& rvSocket)
-    {
-        return std::unique_ptr<Connection<SocketT>>(new Connection(std::move(rvSocket)));
-    }
+    static std::unique_ptr<Connection<SocketT>> start(SocketT&& rvSocket);
 
-    bool write(const std::string& crStr)
-    {
-        return mSocket.write(crStr);
-    }
+    bool write(const std::string& crStr);
 
     /**
      * Define and declare getters.
@@ -75,9 +68,7 @@ private:
      * @brief Constructor
      * @param rvSocket The socket
      */
-    explicit Connection(SocketT&& rvSocket)
-        : mSocket(std::move(rvSocket)), mIpAddress(mSocket.address())
-    {}
+    explicit Connection(SocketT&& rvSocket);
 
     /// @var mSocket
     /// Socket
@@ -87,5 +78,26 @@ private:
     /// IP address
     const std::string mIpAddress;
 };
+
+template<typename SocketT>
+Connection<SocketT>::~Connection<SocketT>() noexcept
+{}
+
+template<typename SocketT>
+std::unique_ptr<Connection<SocketT>> Connection<SocketT>::start(SocketT&& rvSocket)
+{
+    return std::unique_ptr<Connection<SocketT>>(new Connection<SocketT>(std::move(rvSocket)));
+}
+
+template<typename SocketT>
+bool Connection<SocketT>::write(const std::string& crStr)
+{
+    return mSocket.write(crStr);
+}
+
+template<typename SocketT>
+Connection<SocketT>::Connection(SocketT&& rvSocket)
+    : mSocket(std::move(rvSocket)), mIpAddress(mSocket.address())
+{}
 
 }  // namespace server

@@ -21,37 +21,44 @@
 
 #pragma once
 
-#include <cstdint>
-#include <functional>
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include "SocketImplBoost.h"
 
-#include "../Defines.h"
+#include "../../Defines.h"
 
-namespace server
+namespace feed
 {
-class TcpInterfaceImplBoost
+namespace client
+{
+class ConnectorImplBoost
 {
 public:
-    NOT_COPYABLE(TcpInterfaceImplBoost)
+    NOT_COPYABLE(ConnectorImplBoost)
 
-    explicit TcpInterfaceImplBoost(std::uint16_t vPort);
-    ~TcpInterfaceImplBoost() noexcept;
+    ConnectorImplBoost();
+    ~ConnectorImplBoost() noexcept;
 
     void run();
     void stop();
-    void onAccept(const std::function<void(bool) noexcept>& crCallback);
     void close();
-    SocketImplBoost& getSocket();
+    void onRead(const std::function<void(bool, const std::string&) noexcept>& crCallback);
+    void onTimeout(std::uint32_t vTimeout, const std::function<void(bool) noexcept>& crCallback);
 
 private:
-    void handleAccept(const boost::system::error_code& crError,
-                      const std::function<void(bool) noexcept>& crCallback) noexcept;
+    void handleTimeout(const boost::system::error_code& crError,
+                       const std::function<void(bool) noexcept>& crCallback) noexcept;
+    void
+    handleRead(const boost::system::error_code& crError, std::size_t vBytes,
+               const std::function<void(bool, const std::string&) noexcept>& crCallback) noexcept;
 
     boost::asio::io_service mIoService;
-    boost::asio::ip::tcp::acceptor mAcceptor;
-    SocketImplBoost mSocket;
+    boost::asio::ip::tcp::socket mSocket;
+    boost::asio::ip::tcp::resolver mResolver;
+    boost::asio::deadline_timer mConnectTimer;
+    boost::asio::streambuf mBuffer;
+    std::string mResponse;
 };
 
-}  // namespace server
+}  // namespace client
+}  // namespace feed

@@ -24,18 +24,20 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
+#include <boost/date_time.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
 #include "../../Defines.h"
+#include "../../Logger.hpp"
+#include "../Feed.h"
 
 /// @namespace feed
 namespace feed
 {
-class Feed;
-
 /// @namespace client
 namespace client
 {
@@ -63,6 +65,7 @@ struct Endpoint
  * @brief Base class representing a TCP client.
  * @note A Client is unique and only movable.
  */
+template<typename ConnectorT>
 class Client
 {
 public:
@@ -82,15 +85,9 @@ public:
      */
     void run();
 
-    /**
-     * @fn stop
-     * @brief Stop the Client and close the connection.
-     */
-    virtual void stop();
-
     void lockAndStop();
 
-    virtual bool equals(const Client& crOther) const;
+    virtual bool equals(const Client<ConnectorT>& crOther) const;
 
     virtual std::size_t hash() const;
 
@@ -106,6 +103,12 @@ protected:
      * @param rFeed        The handler Feed reference
      */
     Client(const Endpoint& crEndpoint, const std::string& crComponent);
+
+    /**
+     * @fn stop
+     * @brief Stop the Client and close the connection.
+     */
+    virtual void stop();
 
     /**
      * @fn timedConnect
@@ -130,7 +133,7 @@ protected:
      * @brief Handler for timedConnect.
      * @param crError The error code
      */
-    void handleTimedConnect(const boost::system::error_code& crError) noexcept;
+    void handleTimedConnect(bool vError) noexcept;
 
     /**
      * @fn handleRead
@@ -138,7 +141,7 @@ protected:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleRead(const boost::system::error_code& crError, std::size_t vBytes) noexcept;
+    void handleRead(bool vError, const std::string& crResponse) noexcept;
 
     /**
      * @fn handleResolve
@@ -160,49 +163,144 @@ protected:
                                boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
         = 0;
 
-    void closeSocket();
+    ConnectorT mConnector;
 
-    /// @var mIoService
-    /// Internal IO-service
-    boost::asio::io_service mIoService;
+    boost::mutex mMutex;
 
-    /// @var mSocket
-    /// Socket for connections
-    boost::asio::ip::tcp::socket mSocket;
-
-    /// @var mResolver
-    /// Endpoint resolver
-    boost::asio::ip::tcp::resolver mResolver;
-
-    /// @var mResponse
-    /// Response string
-    std::string mResponse;
-
-    /// @var mBuffer
-    /// Read buffer
-    boost::asio::streambuf mBuffer;
-
-    /// @var mHost
-    /// Hostname
-    Endpoint mEndpoint;
+    bool mRunning = false;
 
     /// @var mComponent
     /// Component string used for logging
     const std::string mComponent;
 
-    bool mRunning = false;
-
-    boost::mutex mMutex;
+    /// @var mHost
+    /// Hostname
+    Endpoint mEndpoint;
 
 private:
-    /// @var mConnectTimer
-    /// Connection timer
-    boost::asio::deadline_timer mConnectTimer;
-
     /// @var mrFeeds
     /// Handler Feed references
     std::vector<std::shared_ptr<feed::Feed>> mrFeeds;
 };
+
+template<typename ConnectorT>
+Client<ConnectorT>::Client(const Endpoint& crEndpoint, const std::string& crComponent)
+    : mEndpoint(crEndpoint), mComponent(crComponent)
+{}
+
+template<typename ConnectorT>
+Client<ConnectorT>::~Client() noexcept
+{}
+
+template<typename ConnectorT>
+void Client<ConnectorT>::run()
+{
+    if(!mRunning)
+    {
+        {
+            boost::lock_guard<boost::mutex> lock(mMutex);
+            connect();
+        }
+        mConnector.run();
+    }
+}
+
+template<typename ConnectorT>
+bool Client<ConnectorT>::equals(const Client& crOther) const
+{
+    return this->mEndpoint == crOther.mEndpoint;
+}
+
+template<typename ConnectorT>
+std::size_t Client<ConnectorT>::hash() const
+{
+    std::size_t seed = 0;
+    boost::hash_combine(seed, boost::hash_value(mEndpoint.host));
+    boost::hash_combine(seed, boost::hash_value(mEndpoint.port));
+    return seed;
+}
+
+template<typename ConnectorT>
+void Client<ConnectorT>::subscribe(std::shared_ptr<Feed>& rpFeed)
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    mrFeeds.push_back(rpFeed);
+}
+
+template<typename ConnectorT>
+void Client<ConnectorT>::timedConnect()
+{
+    mConnector.onTimeout(C_CON_WAIT_TIMEVAL,
+                         std::bind(&Client::handleTimedConnect, this, std::placeholders::_1));
+}
+
+template<typename ConnectorT>
+void Client<ConnectorT>::stop()
+{
+    if(mRunning)
+    {
+        mRunning = false;
+        logger.info(mComponent, " disconnect from ", mEndpoint.host, ":", mEndpoint.port);
+        mConnector.stop();
+    }
+}
+
+template<typename ConnectorT>
+void Client<ConnectorT>::lockAndStop()
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    stop();
+}
+
+template<typename ConnectorT>
+void Client<ConnectorT>::read()
+{
+    if(mRunning)
+    {
+        mConnector.onRead(std::bind(&Client::handleRead, this, std::placeholders::_1));
+    }
+}
+
+template<typename ConnectorT>
+void Client<ConnectorT>::handleTimedConnect(bool vError) noexcept
+{
+    if(vError)
+    {
+        boost::lock_guard<boost::mutex> lock(mMutex);
+        logger.info(mComponent, " try connect to ", mEndpoint.host, ":", mEndpoint.port);
+        connect();
+    }
+    else
+    {
+        logger.error(mComponent, " failed to connect after timeout");
+        lockAndStop();
+    }
+}
+
+template<typename ConnectorT>
+void Client<ConnectorT>::handleRead(bool vError, const std::string& crResponse) noexcept
+{
+    if(vError)
+    {
+        boost::lock_guard<boost::mutex> lock(mMutex);
+        for(auto& it : mrFeeds)
+        {
+            if(!mRunning)
+            {
+                break;
+            }
+            it->process(crResponse);
+        }
+        read();
+    }
+    else
+    {
+        logger.error(mComponent, " failed to read message");
+        boost::lock_guard<boost::mutex> lock(mMutex);
+        mConnector.close();
+        timedConnect();
+    }
+}
 
 }  // namespace client
 }  // namespace feed

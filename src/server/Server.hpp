@@ -30,8 +30,8 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "../Logger.hpp"
 #include "../Defines.h"
+#include "../Logger.hpp"
 #include "../Parameters.h"
 #include "Connection.hpp"
 
@@ -56,60 +56,30 @@ class Server
 public:
     NOT_COPYABLE(Server)
 
-    Server() : Server(4353)
-    {}
+    Server();
 
     /**
      * @fn Server
      * @brief Constructor
      * @param vPort The port
      */
-    explicit Server(std::uint16_t vPort) : mTcpIf(vPort)
-    {}
+    explicit Server(std::uint16_t vPort);
 
-    ~Server() noexcept
-    {}
+    ~Server() noexcept;
 
     /**
      * @fn run
      * @brief Run the Server.
      * @note Returns after all operations in the queue have returned.
      */
-    void run()
-    {
-        logger.info("(Server) start server");
-        boost::lock_guard<boost::mutex> lock(mMutex);
-        mThread = boost::thread([this]() {
-            accept();
-            mTcpIf.run();
-            logger.debug("(Server) stopped");
-        });
-    }
+    void run();
 
     /**
      * @fn stop
      * @brief Stop all connections.
      * @threadsafe
      */
-    void stop()
-    {
-        logger.info("(Server) stopping all connections ...");
-        {
-            boost::lock_guard<boost::mutex> lock(mMutex);
-            for(auto& it : mConnections)
-            {
-                if(it)
-                {
-                    it.reset();
-                }
-            }
-            mTcpIf.stop();
-        }
-        if(mThread.joinable())
-        {
-            mThread.join();
-        }
-    }
+    void stop();
 
     /**
      * @fn send
@@ -117,36 +87,14 @@ public:
      * @param crStr The msg to write
      * @threadsafe
      */
-    void send(const std::string& crStr)
-    {
-        boost::lock_guard<boost::mutex> lock(mMutex);
-        if(crStr.empty() || mActiveConnections == 0)
-        {
-            return;
-        }
-        for(auto& it : mConnections)
-        {
-            if(it)
-            {
-                if(!it.get()->write(crStr))
-                {
-                    logger.warn("(Server) lost connection to: ", it.get()->getIpAddress());
-                    it.reset();
-                    --mActiveConnections;
-                }
-            }
-        }
-    }
+    void send(const std::string& crStr);
 
 private:
     /**
      * @fn accept
      * @brief Accept connections.
      */
-    void accept()
-    {
-        mTcpIf.onAccept(std::bind(&Server::attemptConnection, this, std::placeholders::_1));
-    }
+    void accept();
 
     /**
      * @fn isConnected
@@ -154,48 +102,9 @@ private:
      * @param crIpAddress The ip address to check
      * @return true if the ip is already registered, else false
      */
-    bool isConnected(const std::string& crIpAddress)
-    {
-        for(const auto& it : mConnections)
-        {
-            if(it && it.get()->getIpAddress() == crIpAddress)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    bool isConnected(const std::string& crIpAddress);
 
-    void attemptConnection(bool vError) noexcept
-    {
-        boost::lock_guard<boost::mutex> lock(mMutex);
-        if(!vError)
-        {
-            if(mActiveConnections < S_MAX_CLIENTS && !isConnected(mTcpIf.getSocket().address()))
-            {
-                for(auto& it : mConnections)
-                {
-                    if(!it)
-                    {
-                        it = Connection<SocketT>::start(std::move(mTcpIf.getSocket()));
-                        ++mActiveConnections;
-                        logger.info("(Server) connection from: ", it->getIpAddress());
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                logger.info("(Server) refused connection to ", mTcpIf.getSocket().address());
-                mTcpIf.close();
-            }
-        }
-        else
-        {
-            logger.warn("(Server) Could not accept connection");
-        }
-        accept();
-    }
+    void attemptConnection(bool vError) noexcept;
 
     boost::thread mThread;
 
@@ -211,5 +120,124 @@ private:
 
     std::uint32_t mActiveConnections = 0;
 };
+
+template<typename TcpInterfaceT, typename SocketT>
+Server<TcpInterfaceT, SocketT>::Server(std::uint16_t vPort) : mTcpIf(vPort)
+{}
+
+template<typename TcpInterfaceT, typename SocketT>
+Server<TcpInterfaceT, SocketT>::Server() : Server<TcpInterfaceT, SocketT>(4353)
+{}
+
+template<typename TcpInterfaceT, typename SocketT>
+Server<TcpInterfaceT, SocketT>::~Server() noexcept
+{}
+
+template<typename TcpInterfaceT, typename SocketT>
+void Server<TcpInterfaceT, SocketT>::run()
+{
+    logger.info("(Server) start server");
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    mThread = boost::thread([this]() {
+        accept();
+        mTcpIf.run();
+        logger.debug("(Server) stopped");
+    });
+}
+
+template<typename TcpInterfaceT, typename SocketT>
+void Server<TcpInterfaceT, SocketT>::stop()
+{
+    logger.info("(Server) stopping all connections ...");
+    {
+        boost::lock_guard<boost::mutex> lock(mMutex);
+        for(auto& it : mConnections)
+        {
+            if(it)
+            {
+                it.reset();
+            }
+        }
+        mTcpIf.stop();
+    }
+    if(mThread.joinable())
+    {
+        mThread.join();
+    }
+}
+
+template<typename TcpInterfaceT, typename SocketT>
+void Server<TcpInterfaceT, SocketT>::send(const std::string& crStr)
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    if(crStr.empty() || mActiveConnections == 0)
+    {
+        return;
+    }
+    for(auto& it : mConnections)
+    {
+        if(it)
+        {
+            if(!it.get()->write(crStr))
+            {
+                logger.warn("(Server) lost connection to: ", it.get()->getIpAddress());
+                it.reset();
+                --mActiveConnections;
+            }
+        }
+    }
+}
+
+template<typename TcpInterfaceT, typename SocketT>
+void Server<TcpInterfaceT, SocketT>::accept()
+{
+    mTcpIf.onAccept(
+        std::bind(&Server<TcpInterfaceT, SocketT>::attemptConnection, this, std::placeholders::_1));
+}
+
+template<typename TcpInterfaceT, typename SocketT>
+bool Server<TcpInterfaceT, SocketT>::isConnected(const std::string& crIpAddress)
+{
+    for(const auto& it : mConnections)
+    {
+        if(it && it.get()->getIpAddress() == crIpAddress)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+template<typename TcpInterfaceT, typename SocketT>
+void Server<TcpInterfaceT, SocketT>::attemptConnection(bool vError) noexcept
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    if(!vError)
+    {
+        if(mActiveConnections < S_MAX_CLIENTS && !isConnected(mTcpIf.getSocket().address()))
+        {
+            for(auto& it : mConnections)
+            {
+                if(!it)
+                {
+                    it = Connection<SocketT>::start(std::move(mTcpIf.getSocket()));
+                    ++mActiveConnections;
+                    logger.info("(Server) connection from: ", it->getIpAddress());
+                    break;
+                }
+            }
+        }
+        else
+        {
+            logger.info("(Server) refused connection to ", mTcpIf.getSocket().address());
+            mTcpIf.close();
+        }
+    }
+    else
+    {
+        logger.warn("(Server) Could not accept connection");
+    }
+    accept();
+}
 
 }  // namespace server
