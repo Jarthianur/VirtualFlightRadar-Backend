@@ -22,7 +22,6 @@
 #pragma once
 
 #include <array>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -79,12 +78,12 @@ public:
      */
     void run()
     {
-        Logger::info("(Server) start server");
+        logger.info("(Server) start server");
         boost::lock_guard<boost::mutex> lock(mMutex);
         mThread = boost::thread([this]() {
             accept();
             mTcpIf.run();
-            Logger::info("(Server) stopped");
+            logger.info("(Server) stopped");
         });
     }
 
@@ -95,7 +94,7 @@ public:
      */
     void stop()
     {
-        Logger::info("(Server) stopping all connections ...");
+        logger.info("(Server) stopping all connections ...");
         {
             boost::lock_guard<boost::mutex> lock(mMutex);
             for(auto& it : mConnections)
@@ -132,7 +131,7 @@ public:
             {
                 if(!it.get()->write(crStr))
                 {
-                    Logger::warn("(Server) lost connection to: ", it.get()->getIpAddress());
+                    logger.warn("(Server) lost connection to: ", it.get()->getIpAddress());
                     it.reset();
                     --mActiveConnections;
                 }
@@ -181,20 +180,20 @@ private:
                     {
                         it = Connection<SocketT>::start(std::move(mTcpIf.getSocket()));
                         ++mActiveConnections;
-                        Logger::info("(Server) connection from: ", it->getIpAddress());
+                        logger.info("(Server) connection from: ", it->getIpAddress());
                         break;
                     }
                 }
             }
             else
             {
-                Logger::info("(Server) refused connection to ", mTcpIf.getSocket().address());
+                logger.info("(Server) refused connection to ", mTcpIf.getSocket().address());
                 mTcpIf.close();
             }
         }
         else
         {
-            Logger::warn("(Server) Could not accept connection");
+            logger.warn("(Server) Could not accept connection");
         }
         accept();
     }
@@ -211,7 +210,7 @@ private:
     /// Vector holding Connections
     std::array<std::unique_ptr<Connection<SocketT>>, S_MAX_CLIENTS> mConnections;
 
-    std::size_t mActiveConnections = 0;
+    std::uint32_t mActiveConnections = 0;
 };
 
 }  // namespace server

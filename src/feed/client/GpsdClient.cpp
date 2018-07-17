@@ -65,7 +65,7 @@ void GpsdClient::handleResolve(const boost::system::error_code& crError,
     }
     else if(crError != boost::asio::error::operation_aborted)
     {
-        Logger::error(COMPONENT " resolve host: ", crError.message());
+        logger.error(COMPONENT " resolve host: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
         closeSocket();
         timedConnect();
@@ -86,7 +86,7 @@ void GpsdClient::handleConnect(const boost::system::error_code& crError,
     }
     else if(crError != boost::asio::error::operation_aborted)
     {
-        Logger::error(COMPONENT " connect: ", crError.message());
+        logger.error(COMPONENT " connect: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
         closeSocket();
         timedConnect();
@@ -101,11 +101,11 @@ void GpsdClient::stop()
                                  [this](const boost::system::error_code& crError, std::size_t) {
                                      if(!crError)
                                      {
-                                         Logger::info(COMPONENT " stopped watch");
+                                         logger.info(COMPONENT " stopped watch");
                                      }
                                      else
                                      {
-                                         Logger::error(COMPONENT " send un-watch request: ",
+                                         logger.error(COMPONENT " send un-watch request: ",
                                                        crError.message());
                                      }
                                  });
@@ -117,13 +117,13 @@ void GpsdClient::handleWatch(const boost::system::error_code& crError, std::size
 {
     if(!crError)
     {
-        Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
+        logger.info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
         boost::lock_guard<boost::mutex> lock(mMutex);
         read();
     }
     else
     {
-        Logger::error(COMPONENT " send watch request: ", crError.message());
+        logger.error(COMPONENT " send watch request: ", crError.message());
     }
 }
 

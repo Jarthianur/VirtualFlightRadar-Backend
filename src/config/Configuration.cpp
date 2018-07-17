@@ -137,7 +137,7 @@ FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties)
         }
         catch(const std::out_of_range& e)
         {
-            Logger::warn("(Config) resolveFeeds: ", e.what(), " for ", it);
+            logger.warn("(Config) resolveFeeds: ", e.what(), " for ", it);
         }
     }
     return mapping;
@@ -148,7 +148,7 @@ Number Configuration::checkNumberValue(const OptNumber& crOptNumber, const std::
 {
     if(!crOptNumber)
     {
-        Logger::warn("(Config) ", crSection, ".", crKey, ": Could not resolve value.");
+        logger.warn("(Config) ", crSection, ".", crKey, ": Could not resolve value.");
         throw std::invalid_argument("");
     }
     return *crOptNumber;
@@ -156,24 +156,24 @@ Number Configuration::checkNumberValue(const OptNumber& crOptNumber, const std::
 
 void Configuration::dumpInfo() const
 {
-    Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_LATITUDE ": ",
+    logger.info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_LATITUDE ": ",
                  std::to_string(mPosition.getPosition().latitude));
-    Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_LONGITUDE ": ",
+    logger.info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_LONGITUDE ": ",
                  std::to_string(mPosition.getPosition().longitude));
-    Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_ALTITUDE ": ",
+    logger.info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_ALTITUDE ": ",
                  std::to_string(mPosition.getPosition().altitude));
-    Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_GEOID ": ",
+    logger.info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_GEOID ": ",
                  std::to_string(mPosition.getGeoid()));
-    Logger::info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_PRESSURE ": ",
+    logger.info("(Config) " SECT_KEY_FALLBACK "." KV_KEY_PRESSURE ": ",
                  std::to_string(mAtmPressure));
-    Logger::info("(Config) " SECT_KEY_FILTER "." KV_KEY_MAX_HEIGHT ": ",
+    logger.info("(Config) " SECT_KEY_FILTER "." KV_KEY_MAX_HEIGHT ": ",
                  std::to_string(mMaxHeight));
-    Logger::info("(Config) " SECT_KEY_FILTER "." KV_KEY_MAX_DIST ": ",
+    logger.info("(Config) " SECT_KEY_FILTER "." KV_KEY_MAX_DIST ": ",
                  std::to_string(mMaxDistance));
-    Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_SERVER_PORT ": ",
+    logger.info("(Config) " SECT_KEY_GENERAL "." KV_KEY_SERVER_PORT ": ",
                  std::to_string(mServerPort));
-    Logger::info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ", mGroundMode ? "Yes" : "No");
-    Logger::info("(Config) number of feeds: ", std::to_string(mFeedMapping.size()));
+    logger.info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ", mGroundMode ? "Yes" : "No");
+    logger.info("(Config) number of feeds: ", std::to_string(mFeedMapping.size()));
 }
 
 }  // namespace config

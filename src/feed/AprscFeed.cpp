@@ -48,7 +48,7 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
     mLoginStrIt = mKvMap.find(KV_KEY_LOGIN);
     if(mLoginStrIt == mKvMap.end())
     {
-        Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_LOGIN);
+        logger.warn(COMPONENT " could not find: ", mName, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
 }

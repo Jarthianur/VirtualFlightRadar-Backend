@@ -61,7 +61,7 @@ VFRB::~VFRB() noexcept
 
 void VFRB::run() noexcept
 {
-    Logger::info("(VFRB) startup");
+    logger.info("(VFRB) startup");
     boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
     mRunStatus                                    = true;
 
@@ -69,13 +69,13 @@ void VFRB::run() noexcept
     feed::client::ClientManager clientManager;
 
     signals.addHandler([this](const boost::system::error_code&, const int) {
-        Logger::info("(VFRB) caught signal to shutdown ...");
+        logger.info("(VFRB) caught signal to shutdown ...");
         mRunStatus = false;
     });
 
     for(const auto& it : mFeeds)
     {
-        Logger::info("(VFRB) run feed: ", it->getName());
+        logger.info("(VFRB) run feed: ", it->getName());
         it->registerToClient(clientManager);
     }
     mFeeds.clear();
@@ -90,7 +90,7 @@ void VFRB::run() noexcept
     clientManager.stop();
     mServer.stop();
 
-    Logger::info("Stopped after ", getDuration(start));
+    logger.info("Stopped after ", getDuration(start));
 }
 
 void VFRB::serve()
@@ -109,7 +109,7 @@ void VFRB::serve()
         }
         catch(const std::exception& e)
         {
-            Logger::error("(VFRB) error: ", e.what());
+            logger.error("(VFRB) error: ", e.what());
             mRunStatus = false;
         }
     }
@@ -129,7 +129,7 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
             }
             else
             {
-                Logger::warn(
+                logger.warn(
                     "(VFRB) create feed ", feed.first,
                     ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
                     ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS ", " SECT_KEY_GPS);
@@ -137,7 +137,7 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
         }
         catch(const std::exception& e)
         {
-            Logger::warn("(VFRB) create feed ", feed.first, ": ", e.what());
+            logger.warn("(VFRB) create feed ", feed.first, ": ", e.what());
         }
     }
 }

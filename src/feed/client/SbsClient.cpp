@@ -65,7 +65,7 @@ void SbsClient::handleResolve(const boost::system::error_code& crError,
     }
     else if(crError != boost::asio::error::operation_aborted)
     {
-        Logger::error(COMPONENT " resolve host: ", crError.message());
+        logger.error(COMPONENT " resolve host: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
         closeSocket();
         timedConnect();
@@ -79,12 +79,12 @@ void SbsClient::handleConnect(const boost::system::error_code& crError,
     {
         boost::lock_guard<boost::mutex> lock(mMutex);
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-        Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
+        logger.info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
         read();
     }
     else if(crError != boost::asio::error::operation_aborted)
     {
-        Logger::error(COMPONENT " connect: ", crError.message());
+        logger.error(COMPONENT " connect: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
         closeSocket();
         timedConnect();

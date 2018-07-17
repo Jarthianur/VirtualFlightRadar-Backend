@@ -89,7 +89,7 @@ void Client::stop()
     if(mRunning)
     {
         mRunning = false;
-        Logger::info(mComponent, " stop connection to: ", mEndpoint.host, ":", mEndpoint.port);
+        logger.info(mComponent, " stop connection to: ", mEndpoint.host, ":", mEndpoint.port);
         mConnectTimer.expires_at(boost::posix_time::pos_infin);
         mConnectTimer.cancel();
         boost::system::error_code ec;
@@ -120,14 +120,14 @@ void Client::handleTimedConnect(const boost::system::error_code& crError) noexce
     if(!crError)
     {
         boost::lock_guard<boost::mutex> lock(mMutex);
-        Logger::info(mComponent, " try connect to: ", mEndpoint.host, ":", mEndpoint.port);
+        logger.info(mComponent, " try connect to: ", mEndpoint.host, ":", mEndpoint.port);
         connect();
     }
     else
     {
         if(crError != boost::asio::error::operation_aborted)
         {
-            Logger::error(mComponent, " cancel connect: ", crError.message());
+            logger.error(mComponent, " cancel connect: ", crError.message());
             boost::lock_guard<boost::mutex> lock(mMutex);
             stop();
         }
@@ -154,7 +154,7 @@ void Client::handleRead(const boost::system::error_code& crError, std::size_t) n
     }
     else if(crError != boost::system::errc::bad_file_descriptor)
     {
-        Logger::error(mComponent, " read: ", crError.message());
+        logger.error(mComponent, " read: ", crError.message());
         if(crError != boost::asio::error::operation_aborted)
         {
             boost::lock_guard<boost::mutex> lock(mMutex);

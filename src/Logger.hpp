@@ -45,16 +45,16 @@ public:
      * @threadsafe
      */
     template<typename T, typename... TRest>
-    static void info(T crMsg, TRest... tail)
+    void info(T crMsg, TRest... tail)
     {
-        boost::lock_guard<boost::mutex> lock(Logger::mMutex);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         *mpOutStream << "\r[INFO]  " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
     }
     template<typename T>
-    static void info(T crMsg)
+    void info(T crMsg)
     {
-        boost::lock_guard<boost::mutex> lock(Logger::mMutex);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         *mpOutStream << "\r[INFO]  " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg));
     }
@@ -67,16 +67,16 @@ public:
      * @threadsafe
      */
     template<typename T, typename... TRest>
-    static void debug(T crMsg, TRest... tail)
+    void debug(T crMsg, TRest... tail)
     {
-        boost::lock_guard<boost::mutex> lock(Logger::mMutex);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         *mpOutStream << "\r[DEBUG] " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
     }
     template<typename T>
-    static void debug(T crMsg)
+    void debug(T crMsg)
     {
-        boost::lock_guard<boost::mutex> lock(Logger::mMutex);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         *mpOutStream << "\r[DEBUG] " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg));
     }
@@ -89,16 +89,16 @@ public:
      * @threadsafe
      */
     template<typename T, typename... TRest>
-    static void warn(T crMsg, TRest... tail)
+    void warn(T crMsg, TRest... tail)
     {
-        boost::lock_guard<boost::mutex> lock(Logger::mMutex);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         *mpOutStream << "\r[WARN]  " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
     }
     template<typename T>
-    static void warn(T crMsg)
+    void warn(T crMsg)
     {
-        boost::lock_guard<boost::mutex> lock(Logger::mMutex);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         *mpOutStream << "\r[WARN]  " << getTime() << ":: ";
         log(mpOutStream, std::forward<T>(crMsg));
     }
@@ -111,16 +111,16 @@ public:
      * @threadsafe
      */
     template<typename T, typename... TRest>
-    static void error(T crMsg, TRest... tail)
+    void error(T crMsg, TRest... tail)
     {
-        boost::lock_guard<boost::mutex> lock(Logger::mMutex);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         *mpErrStream << "\r[ERROR] " << getTime() << ":: ";
         log(mpErrStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
     }
     template<typename T>
-    static void error(T crMsg)
+    void error(T crMsg)
     {
-        boost::lock_guard<boost::mutex> lock(Logger::mMutex);
+        boost::lock_guard<boost::mutex> lock(mMutex);
         *mpErrStream << "\r[ERROR] " << getTime() << ":: ";
         log(mpErrStream, std::forward<T>(crMsg));
     }
@@ -128,15 +128,15 @@ public:
 private:
     /// @var mMutex
     /// Mutex for threadsafe logging
-    static boost::mutex mMutex;
+    boost::mutex mMutex;
 
     /// @var mpOutStream
     /// Stream to log INFO,DEBUG,WARN
-    static std::ostream* mpOutStream;
+    std::ostream* mpOutStream;
 
     /// @var mpErrStream
     /// Stream to log ERROR
-    static std::ostream* mpErrStream;
+    std::ostream* mpErrStream;
 
     /**
      * @fn getTime
@@ -153,14 +153,16 @@ private:
      * @tparam TRest The rest of arguments
      */
     template<typename T, typename... TRest>
-    static void log(std::ostream* pOut, T head, TRest... tail)
+    void log(std::ostream* pOut, T head, TRest... tail)
     {
         *pOut << std::forward<T>(head);
         log(pOut, std::forward<TRest>(tail)...);
     }
     template<typename T>
-    static void log(std::ostream* pOut, T last)
+    void log(std::ostream* pOut, T last)
     {
         *pOut << std::forward<T>(last) << std::endl;
     }
 };
+
+extern Logger logger;

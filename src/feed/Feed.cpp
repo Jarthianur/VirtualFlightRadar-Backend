@@ -44,12 +44,12 @@ Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
     initPriority();
     if(mKvMap.find(KV_KEY_HOST) == mKvMap.end())
     {
-        Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_HOST);
+        logger.warn(COMPONENT " could not find: ", mName, "." KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
     if(mKvMap.find(KV_KEY_PORT) == mKvMap.end())
     {
-        Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_PORT);
+        logger.warn(COMPONENT " could not find: ", mName, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
 }
@@ -67,11 +67,11 @@ void Feed::initPriority() noexcept
     }
     catch(const std::logic_error&)
     {
-        Logger::warn(COMPONENT " create ", mName, ": Invalid priority given.");
+        logger.warn(COMPONENT " create ", mName, ": Invalid priority given.");
     }
     if(mPriority == 0)
     {
-        Logger::warn(COMPONENT " create ", mName,
+        logger.warn(COMPONENT " create ", mName,
                      ": Priority is 0; this feed cannot update higher ones.");
     }
 }

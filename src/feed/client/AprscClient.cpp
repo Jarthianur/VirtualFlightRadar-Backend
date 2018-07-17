@@ -101,7 +101,7 @@ void AprscClient::handleResolve(const boost::system::error_code& crError,
     }
     else if(crError != boost::asio::error::operation_aborted)
     {
-        Logger::error(COMPONENT " resolve host: ", crError.message());
+        logger.error(COMPONENT " resolve host: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
         closeSocket();
         timedConnect();
@@ -123,7 +123,7 @@ void AprscClient::handleConnect(const boost::system::error_code& crError,
     }
     else if(crError != boost::asio::error::operation_aborted)
     {
-        Logger::error(COMPONENT " connect: ", crError.message());
+        logger.error(COMPONENT " connect: ", crError.message());
         boost::lock_guard<boost::mutex> lock(mMutex);
         closeSocket();
         timedConnect();
@@ -148,13 +148,13 @@ void AprscClient::handleLogin(const boost::system::error_code& crError, std::siz
 {
     if(!crError)
     {
-        Logger::info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
+        logger.info(COMPONENT " connected to: ", mEndpoint.host, ":", mEndpoint.port);
         boost::lock_guard<boost::mutex> lock(mMutex);
         read();
     }
     else
     {
-        Logger::error(COMPONENT " send login: ", crError.message());
+        logger.error(COMPONENT " send login: ", crError.message());
     }
 }
 
@@ -163,7 +163,7 @@ void AprscClient::handleSendKeepAlive(const boost::system::error_code& crError,
 {
     if(crError)
     {
-        Logger::error(COMPONENT " send beacon:", crError.message());
+        logger.error(COMPONENT " send beacon:", crError.message());
     }
 }
 

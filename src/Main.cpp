@@ -49,11 +49,11 @@ config::Configuration evalArgs(std::int32_t argc, char** argv);
  */
 int main(int argc, char** argv)
 {
-    Logger::info("VirtualFlightRadar-Backend -- " VERSION);
+    logger.info("VirtualFlightRadar-Backend -- " VERSION);
 
     if(argc < 3)
     {
-        Logger::info(
+        logger.info(
             "usage: ./VirtualFlightRadar-Backend [OPTIONS] [-c | --config] path_to_file.ini\n"
             "Run VFR-B with given config file.\n"
             "The config file must be in valid '.ini' format!\n"
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
     }
     catch(const std::exception& e)
     {
-        Logger::error("(VFRB) fatal: ", e.what());
+        logger.error("(VFRB) fatal: ", e.what());
         return -1;
     }
 
@@ -98,7 +98,7 @@ config::Configuration evalArgs(std::int32_t argc, char** argv)
         }
         else
         {
-            Logger::warn("(VFRB) unrecognized option: ", std::string(argv[i]));
+            logger.warn("(VFRB) unrecognized option: ", std::string(argv[i]));
         }
     }
 
@@ -109,7 +109,7 @@ config::Configuration evalArgs(std::int32_t argc, char** argv)
         if(gnd)
         {
             conf.setGroundMode(true);
-            Logger::info("(VFRB) Override ground mode: Yes");
+            logger.info("(VFRB) Override ground mode: Yes");
         }
         return conf;
     }

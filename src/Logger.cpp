@@ -24,15 +24,13 @@
 #include <ctime>
 #include <boost/chrono.hpp>
 
-Logger::Logger()
+Logger logger;
+
+Logger::Logger() : mpOutStream(&std::cout), mpErrStream(&std::cerr)
 {}
 
 Logger::~Logger() noexcept
 {}
-
-boost::mutex Logger::mMutex;
-std::ostream* Logger::mpOutStream = &std::cout;
-std::ostream* Logger::mpErrStream = &std::cerr;
 
 std::string Logger::getTime()
 {
