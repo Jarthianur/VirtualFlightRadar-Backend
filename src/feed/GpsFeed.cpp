@@ -28,7 +28,7 @@
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
 #include "../object/GpsPosition.h"
-#include "client/Client.h"
+#include "client/Client.hpp"
 #include "client/ClientManager.h"
 #include "parser/GpsParser.h"
 

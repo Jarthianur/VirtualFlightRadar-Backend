@@ -26,7 +26,7 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
-#include "client/Client.h"
+#include "client/Client.hpp"
 #include "client/ClientManager.h"
 #include "parser/SbsParser.h"
 

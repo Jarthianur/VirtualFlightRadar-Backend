@@ -26,7 +26,7 @@
 #include "../config/Configuration.h"
 #include "../data/WindData.h"
 #include "../object/Wind.h"
-#include "client/Client.h"
+#include "client/Client.hpp"
 #include "client/ClientManager.h"
 #include "parser/WindParser.h"
 

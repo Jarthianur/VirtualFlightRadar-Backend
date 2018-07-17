@@ -126,7 +126,7 @@ protected:
      * @fn connect
      * @brief Connect to host.
      */
-    virtual void connect() = 0;
+    void connect();
 
     /**
      * @fn handleTimedConnect
@@ -144,24 +144,12 @@ protected:
     void handleRead(bool vError, const std::string& crResponse) noexcept;
 
     /**
-     * @fn handleResolve
-     * @brief Handler for resolve host.
-     * @param crError     The error code
-     * @param vResloverIt The resolve iterator
-     */
-    virtual void handleResolve(const boost::system::error_code& crError,
-                               boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
-        = 0;
-
-    /**
      * @fn handleConnect
      * @brief Handler for connect.
      * @param crError     The error code
      * @param vResolverIt The resolve iterator
      */
-    virtual void handleConnect(const boost::system::error_code& crError,
-                               boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept
-        = 0;
+    virtual void handleConnect(bool vError) noexcept = 0;
 
     ConnectorT mConnector;
 
@@ -225,6 +213,13 @@ void Client<ConnectorT>::subscribe(std::shared_ptr<Feed>& rpFeed)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     mrFeeds.push_back(rpFeed);
+}
+
+template<typename ConnectorT>
+void Client<ConnectorT>::connect()
+{
+    mRunning = true;
+    mConnector.onConnect(mEndpoint, std::bind(&Client::handleConnect, this, std::placeholders::_1));
 }
 
 template<typename ConnectorT>

@@ -26,7 +26,7 @@
 #include "../config/Configuration.h"
 #include "../data/AtmosphereData.h"
 #include "../object/Atmosphere.h"
-#include "client/Client.h"
+#include "client/Client.hpp"
 #include "client/ClientManager.h"
 #include "parser/AtmosphereParser.h"
 

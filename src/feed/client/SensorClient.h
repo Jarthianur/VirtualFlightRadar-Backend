@@ -25,7 +25,7 @@
 #include <boost/system/error_code.hpp>
 
 #include "../../Defines.h"
-#include "Client.h"
+#include "Client.hpp"
 
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT

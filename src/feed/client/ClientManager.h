@@ -28,7 +28,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "Client.h"
+#include "Client.hpp"
 
 namespace feed
 {

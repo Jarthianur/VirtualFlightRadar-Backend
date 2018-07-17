@@ -25,7 +25,7 @@
 #include <boost/system/error_code.hpp>
 
 #include "../../Defines.h"
-#include "Client.h"
+#include "Client.hpp"
 
 /// @namespace feed
 namespace feed

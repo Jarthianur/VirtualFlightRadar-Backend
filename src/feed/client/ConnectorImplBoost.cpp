@@ -26,14 +26,17 @@
 #include <boost/move/move.hpp>
 
 #include "../../Logger.hpp"
+#include "Client.hpp"
 
 namespace feed
 {
 namespace client
 {
 ConnectorImplBoost::ConnectorImplBoost()
-    : mIoService(), mSocket(mIoService), mResolver(mIoService), mConnectTimer(mIoService)
-{}
+    : mIoService(), mSocket(mIoService), mResolver(mIoService), mTimer(mIoService)
+{
+    mSocket.set_option(boost::asio::socket_base::keep_alive(true));
+}
 
 ConnectorImplBoost::~ConnectorImplBoost() noexcept
 {}
@@ -54,8 +57,8 @@ void ConnectorImplBoost::stop()
 
 void ConnectorImplBoost::close()
 {
-    mConnectTimer.expires_at(boost::posix_time::pos_infin);
-    mConnectTimer.cancel();
+    mTimer.expires_at(boost::posix_time::pos_infin);
+    mTimer.cancel();
     if(mSocket.is_open())
     {
         boost::system::error_code ec;
@@ -64,8 +67,16 @@ void ConnectorImplBoost::close()
     }
 }
 
-void ConnectorImplBoost::onRead(
-    const std::function<void(bool, const std::string&) noexcept>& crCallback)
+void ConnectorImplBoost::onConnect(const Endpoint& crEndpoint, const Callback& crCallback)
+{
+    boost::asio::ip::tcp::resolver::query query(
+        crEndpoint.host, crEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
+    mResolver.async_resolve(query, boost::bind(&ConnectorImplBoost::handleResolve, this,
+                                               boost::asio::placeholders::error,
+                                               boost::asio::placeholders::iterator, crCallback));
+}
+
+void ConnectorImplBoost::onRead(const ReadCallback& crCallback)
 {
     boost::asio::async_read_until(
         mSocket, mBuffer, "\r\n",
@@ -73,17 +84,62 @@ void ConnectorImplBoost::onRead(
                     boost::asio::placeholders::bytes_transferred, crCallback));
 }
 
-void ConnectorImplBoost::onTimeout(std::uint32_t vTimeout,
-                                   const std::function<void(bool) noexcept>& crCallback)
+void ConnectorImplBoost::onWrite(const std::string& crStr, const Callback& crCallback)
 {
-    mConnectTimer.expires_from_now(boost::posix_time::seconds(vTimeout));
-    mConnectTimer.async_wait(boost::bind(&ConnectorImplBoost::handleTimeout, this,
-                                         boost::asio::placeholders::error, crCallback));
+    boost::asio::async_write(mSocket, boost::asio::buffer(crStr),
+                             boost::bind(&ConnectorImplBoost::handleWrite, this,
+                                         boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred, crCallback));
 }
 
-void ConnectorImplBoost::handleTimeout(
-    const boost::system::error_code& crError,
-    const std::function<void(bool) noexcept>& crCallback) noexcept
+void ConnectorImplBoost::onTimeout(std::uint32_t vTimeout, const Callback& crCallback)
+{
+    mTimer.expires_from_now(boost::posix_time::seconds(vTimeout));
+    mTimer.async_wait(boost::bind(&ConnectorImplBoost::handleTimeout, this,
+                                  boost::asio::placeholders::error, crCallback));
+}
+
+void ConnectorImplBoost::handleWrite(const boost::system::error_code& crError, std::size_t,
+                                     const Callback& crCallback) noexcept
+{
+    if(crError)
+    {
+        logger.debug("(Client) failed to write: ", crError.message());
+    }
+    crCallback(!crError);
+}
+
+void ConnectorImplBoost::handleResolve(const boost::system::error_code& crError,
+                                       boost::asio::ip::tcp::resolver::iterator vResolverIt,
+                                       const Callback& crCallback) noexcept
+{
+    if(!crError)
+    {
+        boost::asio::async_connect(mSocket, vResolverIt,
+                                   boost::bind(&ConnectorImplBoost::handleConnect, this,
+                                               boost::asio::placeholders::error,
+                                               boost::asio::placeholders::iterator, crCallback));
+    }
+    else
+    {
+        logger.debug("(Client) failed to resolve host: ", crError.message());
+        crCallback(false);
+    }
+}
+
+void ConnectorImplBoost::handleConnect(const boost::system::error_code& crError,
+                                       boost::asio::ip::tcp::resolver::iterator,
+                                       const Callback& crCallback) noexcept
+{
+    if(crError)
+    {
+        logger.debug("(Client) failed to connect: ", crError.message());
+    }
+    crCallback(!crError);
+}
+
+void ConnectorImplBoost::handleTimeout(const boost::system::error_code& crError,
+                                       const Callback& crCallback) noexcept
 {
     if(crError)
     {
@@ -92,9 +148,8 @@ void ConnectorImplBoost::handleTimeout(
     crCallback(!crError);
 }
 
-void ConnectorImplBoost::handleRead(
-    const boost::system::error_code& crError, std::size_t,
-    const std::function<void(bool, const std::string&) noexcept>& crCallback) noexcept
+void ConnectorImplBoost::handleRead(const boost::system::error_code& crError, std::size_t,
+                                    const ReadCallback& crCallback) noexcept
 {
     if(crError)
     {

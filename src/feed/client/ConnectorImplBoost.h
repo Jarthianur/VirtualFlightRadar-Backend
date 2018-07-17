@@ -31,6 +31,11 @@ namespace feed
 {
 namespace client
 {
+struct Endpoint;
+
+using Callback     = std::function<void(bool) noexcept>;
+using ReadCallback = std::function<void(bool, const std::string&) noexcept>;
+
 class ConnectorImplBoost
 {
 public:
@@ -42,20 +47,33 @@ public:
     void run();
     void stop();
     void close();
-    void onRead(const std::function<void(bool, const std::string&) noexcept>& crCallback);
-    void onTimeout(std::uint32_t vTimeout, const std::function<void(bool) noexcept>& crCallback);
+    void onConnect(const Endpoint& crEndpoint, const Callback& crCallback);
+    void onRead(const ReadCallback& crCallback);
+    void onWrite(const std::string& crStr, const Callback& crCallback);
+    void onTimeout(std::uint32_t vTimeout, const Callback& crCallback);
 
 private:
+    void handleResolve(const boost::system::error_code& crError,
+                       boost::asio::ip::tcp::resolver::iterator vResolverIt,
+                       const Callback& crCallback) noexcept;
+
+    void handleConnect(const boost::system::error_code& crError,
+                       boost::asio::ip::tcp::resolver::iterator vResolverIt,
+                       const Callback& crCallback) noexcept;
+
     void handleTimeout(const boost::system::error_code& crError,
-                       const std::function<void(bool) noexcept>& crCallback) noexcept;
-    void
-    handleRead(const boost::system::error_code& crError, std::size_t vBytes,
-               const std::function<void(bool, const std::string&) noexcept>& crCallback) noexcept;
+                       const Callback& crCallback) noexcept;
+
+    void handleRead(const boost::system::error_code& crError, std::size_t vBytes,
+                    const ReadCallback& crCallback) noexcept;
+
+    void handleWrite(const boost::system::error_code& crError, std::size_t vBytes,
+                     const Callback& crCallback) noexcept;
 
     boost::asio::io_service mIoService;
     boost::asio::ip::tcp::socket mSocket;
     boost::asio::ip::tcp::resolver mResolver;
-    boost::asio::deadline_timer mConnectTimer;
+    boost::asio::deadline_timer mTimer;
     boost::asio::streambuf mBuffer;
     std::string mResponse;
 };

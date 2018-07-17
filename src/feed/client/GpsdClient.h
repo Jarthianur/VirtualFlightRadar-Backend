@@ -27,7 +27,7 @@
 
 #include "../../Defines.h"
 
-#include "Client.h"
+#include "Client.hpp"
 
 /// @namespace feed
 namespace feed
