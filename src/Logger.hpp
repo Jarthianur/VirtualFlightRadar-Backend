@@ -69,16 +69,22 @@ public:
     template<typename T, typename... TRest>
     void debug(T crMsg, TRest... tail)
     {
-        boost::lock_guard<boost::mutex> lock(mMutex);
-        *mpOutStream << "\r[DEBUG] " << getTime() << ":: ";
-        log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
+        if(mDebugEnabled)
+        {
+            boost::lock_guard<boost::mutex> lock(mMutex);
+            *mpOutStream << "\r[DEBUG] " << getTime() << ":: ";
+            log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
+        }
     }
     template<typename T>
     void debug(T crMsg)
     {
-        boost::lock_guard<boost::mutex> lock(mMutex);
-        *mpOutStream << "\r[DEBUG] " << getTime() << ":: ";
-        log(mpOutStream, std::forward<T>(crMsg));
+        if(mDebugEnabled)
+        {
+            boost::lock_guard<boost::mutex> lock(mMutex);
+            *mpOutStream << "\r[DEBUG] " << getTime() << ":: ";
+            log(mpOutStream, std::forward<T>(crMsg));
+        }
     }
 
     /**
@@ -125,6 +131,8 @@ public:
         log(mpErrStream, std::forward<T>(crMsg));
     }
 
+    void setDebug(bool vEnable);
+
 private:
     /// @var mMutex
     /// Mutex for threadsafe logging
@@ -137,6 +145,8 @@ private:
     /// @var mpErrStream
     /// Stream to log ERROR
     std::ostream* mpErrStream;
+
+    bool mDebugEnabled = false;
 
     /**
      * @fn getTime

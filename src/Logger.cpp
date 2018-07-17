@@ -32,6 +32,12 @@ Logger::Logger() : mpOutStream(&std::cout), mpErrStream(&std::cerr)
 Logger::~Logger() noexcept
 {}
 
+void Logger::setDebug(bool vEnable)
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    mDebugEnabled = vEnable;
+}
+
 std::string Logger::getTime()
 {
     std::time_t tt = boost::chrono::system_clock::to_time_t(boost::chrono::system_clock::now());

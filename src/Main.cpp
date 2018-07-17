@@ -58,7 +58,8 @@ int main(int argc, char** argv)
             "Run VFR-B with given config file.\n"
             "The config file must be in valid '.ini' format!\n"
             "OPTIONS:\n"
-            "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received.");
+            "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received."
+            "-v              : Log more messages.");
         return -1;
     }
 
@@ -95,6 +96,10 @@ config::Configuration evalArgs(std::int32_t argc, char** argv)
         else if(std::string(argv[i]).find("-g") != std::string::npos)
         {
             gnd = true;
+        }
+        else if(std::string(argv[i]).find("-v") != std::string::npos)
+        {
+            logger.setDebug(true);
         }
         else
         {
