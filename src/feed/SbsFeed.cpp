@@ -26,7 +26,6 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
-#include "client/Client.hpp"
 #include "client/ClientManager.h"
 #include "parser/SbsParser.h"
 
@@ -46,18 +45,19 @@ SbsFeed::~SbsFeed() noexcept
 
 void SbsFeed::registerToClient(client::ClientManager& rManager)
 {
-    mSubsribedClient = rManager.subscribe(
+    rManager.subscribe(
         shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
         client::ClientManager::Protocol::SBS);
 }
 
-void SbsFeed::process(const std::string& crResponse) noexcept
+bool SbsFeed::process(const std::string& crResponse) noexcept
 {
     object::Aircraft ac(getPriority());
     if(smParser.unpack(crResponse, ac))
     {
         mpData->update(std::move(ac));
     }
+    return true;
 }
 
 }  // namespace feed

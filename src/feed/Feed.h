@@ -37,8 +37,6 @@ namespace feed
 {
 namespace client
 {
-template<typename ConnectorT>
-class Client;
 class ClientManager;
 } /* namespace client */
 } /* namespace feed */
@@ -68,7 +66,7 @@ public:
      * @brief Handle Client's response.
      * @param crResponse The response
      */
-    virtual void process(const std::string& crResponse) noexcept = 0;
+    virtual bool process(const std::string& crResponse) noexcept = 0;
 
     /**
      * Define and declare getters.
@@ -94,8 +92,6 @@ protected:
     /// @var mKvMap
     /// Key-value-map holding the properties.
     const config::KeyValueMap mKvMap;
-
-    std::weak_ptr<client::Client<client::ConnectorImplBoost>> mSubsribedClient;
 
     std::shared_ptr<data::Data> mpData;
 

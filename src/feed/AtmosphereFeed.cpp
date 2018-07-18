@@ -26,7 +26,6 @@
 #include "../config/Configuration.h"
 #include "../data/AtmosphereData.h"
 #include "../object/Atmosphere.h"
-#include "client/Client.hpp"
 #include "client/ClientManager.h"
 #include "parser/AtmosphereParser.h"
 
@@ -44,18 +43,19 @@ AtmosphereFeed::~AtmosphereFeed() noexcept
 
 void AtmosphereFeed::registerToClient(client::ClientManager& rManager)
 {
-    mSubsribedClient = rManager.subscribe(
+    rManager.subscribe(
         shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
         client::ClientManager::Protocol::SENSOR);
 }
 
-void AtmosphereFeed::process(const std::string& crResponse) noexcept
+bool AtmosphereFeed::process(const std::string& crResponse) noexcept
 {
     object::Atmosphere atmos(getPriority());
     if(smParser.unpack(crResponse, atmos))
     {
         mpData->update(std::move(atmos));
     }
+    return true;
 }
 
 }  // namespace feed

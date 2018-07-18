@@ -22,6 +22,7 @@
 #pragma once
 
 #include <string>
+#include <istream>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
@@ -76,6 +77,7 @@ private:
     boost::asio::deadline_timer mTimer;
     boost::asio::streambuf mBuffer;
     std::string mResponse;
+    std::istream mIStream;
 };
 
 }  // namespace client

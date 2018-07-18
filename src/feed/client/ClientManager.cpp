@@ -26,7 +26,7 @@
 
 #include "../AprscFeed.h"
 #include "../Feed.h"
-#include "AprscClient.h"
+#include "AprscClient.hpp"
 #include "GpsdClient.h"
 #include "SbsClient.h"
 #include "SensorClient.h"
@@ -41,8 +41,8 @@ ClientManager::ClientManager()
 ClientManager::~ClientManager() noexcept
 {}
 
-std::weak_ptr<Client> ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
-                                               const Endpoint& crEndpoint, Protocol vProtocol)
+void ClientManager::subscribe(std::shared_ptr<Feed> rpFeed, const Endpoint& crEndpoint,
+                              Protocol vProtocol)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     ClientSet::iterator it = mClients.end();
@@ -72,7 +72,6 @@ std::weak_ptr<Client> ClientManager::subscribe(std::shared_ptr<Feed> rpFeed,
             break;
     }
     (*it)->subscribe(rpFeed);
-    return std::weak_ptr<Client>(*it);
 }
 
 void ClientManager::run()

@@ -76,7 +76,7 @@ public:
     /**
      * @see Feed#process
      */
-    void process(const std::string& crResponse) noexcept override;
+    bool process(const std::string& crResponse) noexcept override;
 
 private:
     /// @var mParser

@@ -69,7 +69,7 @@ public:
 
     ~ClientManager() noexcept;
 
-    std::weak_ptr<Client> subscribe(std::shared_ptr<Feed> rpFeed, const Endpoint& crEndpoint,
+    void subscribe(std::shared_ptr<Feed> rpFeed, const Endpoint& crEndpoint,
                                     Protocol vProtocol);
 
     void run();

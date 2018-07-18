@@ -26,7 +26,6 @@
 #include "../config/Configuration.h"
 #include "../data/WindData.h"
 #include "../object/Wind.h"
-#include "client/Client.hpp"
 #include "client/ClientManager.h"
 #include "parser/WindParser.h"
 
@@ -44,18 +43,19 @@ WindFeed::~WindFeed() noexcept
 
 void WindFeed::registerToClient(client::ClientManager& rManager)
 {
-    mSubsribedClient = rManager.subscribe(
+    rManager.subscribe(
         shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
         client::ClientManager::Protocol::SENSOR);
 }
 
-void WindFeed::process(const std::string& crResponse) noexcept
+bool WindFeed::process(const std::string& crResponse) noexcept
 {
     object::Wind wind(getPriority());
     if(smParser.unpack(crResponse, wind))
     {
         mpData->update(std::move(wind));
     }
+    return true;
 }
 
 }  // namespace feed

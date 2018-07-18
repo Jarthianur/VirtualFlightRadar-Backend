@@ -80,7 +80,7 @@ public:
     /**
      * @see Feed#process
      */
-    void process(const std::string& crResponse) noexcept override;
+    bool process(const std::string& crResponse) noexcept override;
 
     const std::string& getLoginStr() const;
 

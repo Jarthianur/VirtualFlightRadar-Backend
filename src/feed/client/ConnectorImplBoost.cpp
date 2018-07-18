@@ -21,9 +21,9 @@
 
 #include "ConnectorImplBoost.h"
 
-#include <istream>
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
+#include <boost/date_time.hpp>
 
 #include "../../Logger.hpp"
 #include "Client.hpp"
@@ -33,7 +33,11 @@ namespace feed
 namespace client
 {
 ConnectorImplBoost::ConnectorImplBoost()
-    : mIoService(), mSocket(mIoService), mResolver(mIoService), mTimer(mIoService)
+    : mIoService(),
+      mSocket(mIoService),
+      mResolver(mIoService),
+      mTimer(mIoService),
+      mIStream(&mBuffer)
 {
     mSocket.set_option(boost::asio::socket_base::keep_alive(true));
 }
@@ -157,9 +161,10 @@ void ConnectorImplBoost::handleRead(const boost::system::error_code& crError, st
     }
     else
     {
-        std::istream is(&mBuffer);
-        std::getline(is, mResponse);
+        std::getline(mIStream, mResponse);
+        //mIStream.clear();
         mResponse.append("\n");
+        logger.debug("client got: ", mResponse);
     }
     crCallback(!crError, mResponse);
 }

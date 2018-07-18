@@ -26,7 +26,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <boost/date_time.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
@@ -128,6 +127,8 @@ protected:
      */
     void connect();
 
+    void reconnect();
+
     /**
      * @fn handleTimedConnect
      * @brief Handler for timedConnect.
@@ -178,17 +179,19 @@ Client<ConnectorT>::Client(const Endpoint& crEndpoint, const std::string& crComp
 
 template<typename ConnectorT>
 Client<ConnectorT>::~Client() noexcept
-{}
+{
+    stop();
+}
 
 template<typename ConnectorT>
 void Client<ConnectorT>::run()
 {
+    boost::unique_lock<boost::mutex> lock(mMutex);
     if(!mRunning)
     {
-        {
-            boost::lock_guard<boost::mutex> lock(mMutex);
-            connect();
-        }
+        mRunning = true;
+        connect();
+        lock.unlock();
         mConnector.run();
     }
 }
@@ -218,8 +221,18 @@ void Client<ConnectorT>::subscribe(std::shared_ptr<Feed>& rpFeed)
 template<typename ConnectorT>
 void Client<ConnectorT>::connect()
 {
-    mRunning = true;
     mConnector.onConnect(mEndpoint, std::bind(&Client::handleConnect, this, std::placeholders::_1));
+}
+
+template<typename ConnectorT>
+void Client<ConnectorT>::reconnect()
+{
+    boost::lock_guard<boost::mutex> lock(mMutex);
+    if(mRunning)
+    {
+        mConnector.close();
+        timedConnect();
+    }
 }
 
 template<typename ConnectorT>
@@ -250,10 +263,7 @@ void Client<ConnectorT>::lockAndStop()
 template<typename ConnectorT>
 void Client<ConnectorT>::read()
 {
-    if(mRunning)
-    {
-        mConnector.onRead(std::bind(&Client::handleRead, this, std::placeholders::_1));
-    }
+    mConnector.onRead(std::bind(&Client::handleRead, this, std::placeholders::_1));
 }
 
 template<typename ConnectorT>
@@ -280,20 +290,18 @@ void Client<ConnectorT>::handleRead(bool vError, const std::string& crResponse) 
         boost::lock_guard<boost::mutex> lock(mMutex);
         for(auto& it : mrFeeds)
         {
-            if(!mRunning)
+            if(!it->process(crResponse))
             {
-                break;
+                mRunning = false;
+                return;
             }
-            it->process(crResponse);
         }
         read();
     }
     else
     {
         logger.error(mComponent, " failed to read message");
-        boost::lock_guard<boost::mutex> lock(mMutex);
-        mConnector.close();
-        timedConnect();
+        reconnect();
     }
 }
 

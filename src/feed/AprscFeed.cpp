@@ -27,7 +27,6 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
-#include "client/Client.hpp"
 #include "client/ClientManager.h"
 #include "parser/AprsParser.h"
 
@@ -58,18 +57,19 @@ AprscFeed::~AprscFeed() noexcept
 
 void AprscFeed::registerToClient(client::ClientManager& rManager)
 {
-    mSubsribedClient = rManager.subscribe(
+    rManager.subscribe(
         shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
         client::ClientManager::Protocol::APRS);
 }
 
-void AprscFeed::process(const std::string& crResponse) noexcept
+bool AprscFeed::process(const std::string& crResponse) noexcept
 {
     object::Aircraft ac(getPriority());
     if(smParser.unpack(crResponse, ac))
     {
         mpData->update(std::move(ac));
     }
+    return true;
 }
 
 const std::string& AprscFeed::getLoginStr() const
