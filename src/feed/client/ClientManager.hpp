@@ -72,19 +72,11 @@ template<typename ConnectorT>
 class ClientManager
 {
 public:
-    enum class Protocol : std::uint32_t
-    {
-        APRS,
-        SBS,
-        GPS,
-        SENSOR
-    };
-
     ClientManager();
 
     ~ClientManager() noexcept;
 
-    void subscribe(std::shared_ptr<Feed> rpFeed, const Endpoint& crEndpoint, Protocol vProtocol);
+    void subscribe(std::shared_ptr<Feed> pFeed);
 
     void run();
 
@@ -107,39 +99,30 @@ ClientManager<ConnectorT>::~ClientManager() noexcept
 {}
 
 template<typename ConnectorT>
-void ClientManager<ConnectorT>::subscribe(std::shared_ptr<Feed> rpFeed, const Endpoint& crEndpoint,
-                                          Protocol vProtocol)
+void ClientManager<ConnectorT>::subscribe(std::shared_ptr<Feed> pFeed)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     ClientIter<ConnectorT> it = mClients.end();
-    switch(vProtocol)
+    Endpoint endpoint         = pFeed->getEndpoint();
+    switch(pFeed->getProtocol())
     {
-        case Protocol::APRS:
-        {
-            if(std::shared_ptr<AprscFeed> feed = std::dynamic_pointer_cast<AprscFeed>(rpFeed))
-            {
-                it = mClients
-                         .insert(std::make_shared<AprscClient<ConnectorT>>(crEndpoint,
-                                                                           feed->getLoginStr()))
-                         .first;
-            }
-            else
-            {
-                throw std::invalid_argument("wrong protocol");
-            }
-        }
-        break;
-        case Protocol::SBS:
-            it = mClients.insert(std::make_shared<SbsClient<ConnectorT>>(crEndpoint)).first;
+        case Feed::Protocol::APRS:
+            it = mClients
+                     .insert(std::make_shared<AprscClient<ConnectorT>>(
+                         endpoint, std::static_pointer_cast<AprscFeed>(pFeed)->getLoginStr()))
+                     .first;
             break;
-        case Protocol::GPS:
-            it = mClients.insert(std::make_shared<GpsdClient<ConnectorT>>(crEndpoint)).first;
+        case Feed::Protocol::SBS:
+            it = mClients.insert(std::make_shared<SbsClient<ConnectorT>>(endpoint)).first;
             break;
-        case Protocol::SENSOR:
-            it = mClients.insert(std::make_shared<SensorClient<ConnectorT>>(crEndpoint)).first;
+        case Feed::Protocol::GPS:
+            it = mClients.insert(std::make_shared<GpsdClient<ConnectorT>>(endpoint)).first;
+            break;
+        case Feed::Protocol::SENSOR:
+            it = mClients.insert(std::make_shared<SensorClient<ConnectorT>>(endpoint)).first;
             break;
     }
-    (*it)->subscribe(rpFeed);
+    (*it)->subscribe(pFeed);
 }
 
 template<typename ConnectorT>

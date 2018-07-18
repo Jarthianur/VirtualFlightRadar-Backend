@@ -26,7 +26,6 @@
 #include "../config/Configuration.h"
 #include "../data/AtmosphereData.h"
 #include "../object/Atmosphere.h"
-#include "client/ClientManager.hpp"
 #include "parser/AtmosphereParser.h"
 
 namespace feed
@@ -41,11 +40,9 @@ AtmosphereFeed::AtmosphereFeed(const std::string& crName, const config::KeyValue
 AtmosphereFeed::~AtmosphereFeed() noexcept
 {}
 
-void AtmosphereFeed::registerToClient(client::ClientManager<client::ConnectorImplBoost>& rManager)
+Feed::Protocol AtmosphereFeed::getProtocol() const
 {
-    rManager.subscribe(shared_from_this(),
-                       {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
-                       client::ClientManager<client::ConnectorImplBoost>::Protocol::SENSOR);
+    return Protocol::SENSOR;
 }
 
 bool AtmosphereFeed::process(const std::string& crResponse) noexcept

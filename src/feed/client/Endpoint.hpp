@@ -19,40 +19,24 @@
  }
  */
 
-#include "WindFeed.h"
+#pragma once
 
-#include <unordered_map>
-
-#include "../config/Configuration.h"
-#include "../data/WindData.h"
-#include "../object/Wind.h"
-#include "parser/WindParser.h"
+#include <string>
 
 namespace feed
 {
-parser::WindParser WindFeed::smParser;
-
-WindFeed::WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                   std::shared_ptr<data::WindData> pData)
-    : Feed(crName, crKvMap, pData)
-{}
-
-WindFeed::~WindFeed() noexcept
-{}
-
-Feed::Protocol WindFeed::getProtocol() const
+namespace client
 {
-    return Protocol::SENSOR;
-}
-
-bool WindFeed::process(const std::string& crResponse) noexcept
+struct Endpoint
 {
-    object::Wind wind(getPriority());
-    if(smParser.unpack(crResponse, wind))
+    const std::string host;
+    const std::string port;
+
+    bool operator==(const Endpoint& crOther) const
     {
-        mpData->update(std::move(wind));
+        return host == crOther.host && port == crOther.port;
     }
-    return true;
-}
+};
 
+}  // namespace client
 }  // namespace feed

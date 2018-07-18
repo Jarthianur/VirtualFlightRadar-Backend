@@ -51,7 +51,7 @@ namespace feed
  * @brief SBS input feed.
  * @extends Feed
  */
-class SbsFeed : public Feed, public std::enable_shared_from_this<SbsFeed>
+class SbsFeed : public Feed
 {
 public:
     NOT_COPYABLE(SbsFeed)
@@ -74,7 +74,7 @@ public:
      */
     ~SbsFeed() noexcept;
 
-    void registerToClient(client::ClientManager<client::ConnectorImplBoost>& rManager) override;
+    Protocol getProtocol() const override;
 
     /**
      * @see Feed#process

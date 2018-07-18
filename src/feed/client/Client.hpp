@@ -33,6 +33,7 @@
 #include "../../Defines.h"
 #include "../../Logger.hpp"
 #include "../Feed.h"
+#include "Endpoint.hpp"
 
 /// @namespace feed
 namespace feed
@@ -47,17 +48,6 @@ namespace client
 #else
 #define C_CON_WAIT_TIMEVAL 120
 #endif
-
-struct Endpoint
-{
-    const std::string host;
-    const std::string port;
-
-    bool operator==(const Endpoint& crOther) const
-    {
-        return host == crOther.host && port == crOther.port;
-    }
-};
 
 /**
  * @class Client

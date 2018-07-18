@@ -72,8 +72,13 @@ void Feed::initPriority() noexcept
     if(mPriority == 0)
     {
         logger.warn(COMPONENT " create ", mName,
-                     ": Priority is 0; this feed cannot update higher ones.");
+                    ": Priority is 0; this feed cannot update higher ones.");
     }
+}
+
+client::Endpoint Feed::getEndpoint() const
+{
+    return {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second};
 }
 
 }  // namespace feed

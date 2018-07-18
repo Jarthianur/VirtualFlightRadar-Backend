@@ -50,7 +50,7 @@ namespace feed
  * @brief Sensor input feed.
  * @extends Feed
  */
-class WindFeed : public Feed, public std::enable_shared_from_this<WindFeed>
+class WindFeed : public Feed
 {
 public:
     NOT_COPYABLE(WindFeed)
@@ -73,7 +73,7 @@ public:
      */
     ~WindFeed() noexcept;
 
-    void registerToClient(client::ClientManager<client::ConnectorImplBoost>& rManager) override;
+    Protocol getProtocol() const override;
 
     /**
      * @see Feed#process

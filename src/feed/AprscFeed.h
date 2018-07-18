@@ -52,7 +52,7 @@ namespace feed
  * @brief APRSC input feed.
  * @extends Feed
  */
-class AprscFeed : public Feed, public std::enable_shared_from_this<AprscFeed>
+class AprscFeed : public Feed
 {
 public:
     NOT_COPYABLE(AprscFeed)
@@ -75,7 +75,7 @@ public:
      */
     ~AprscFeed() noexcept;
 
-    void registerToClient(client::ClientManager<client::ConnectorImplBoost>& rManager) override;
+    Protocol getProtocol() const override;
 
     /**
      * @see Feed#process

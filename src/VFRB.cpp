@@ -76,7 +76,7 @@ void VFRB::run() noexcept
     for(const auto& it : mFeeds)
     {
         logger.info("(VFRB) run feed: ", it->getName());
-        it->registerToClient(clientManager);
+        clientManager.subscribe(it);
     }
     mFeeds.clear();
 
