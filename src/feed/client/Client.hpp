@@ -238,8 +238,8 @@ void Client<ConnectorT>::reconnect()
 template<typename ConnectorT>
 void Client<ConnectorT>::timedConnect()
 {
-    mConnector.onTimeout(C_CON_WAIT_TIMEVAL,
-                         std::bind(&Client::handleTimedConnect, this, std::placeholders::_1));
+    mConnector.onTimeout(std::bind(&Client::handleTimedConnect, this, std::placeholders::_1),
+                         C_CON_WAIT_TIMEVAL);
 }
 
 template<typename ConnectorT>

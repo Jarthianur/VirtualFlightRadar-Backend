@@ -51,7 +51,9 @@ public:
     void onConnect(const Endpoint& crEndpoint, const Callback& crCallback);
     void onRead(const ReadCallback& crCallback);
     void onWrite(const std::string& crStr, const Callback& crCallback);
-    void onTimeout(std::uint32_t vTimeout, const Callback& crCallback);
+    void onTimeout(const Callback& crCallback, std::uint32_t vTimeout = 0);
+    void resetTimer(std::uint32_t vTimeout);
+    bool timerExpired();
 
 private:
     void handleResolve(const boost::system::error_code& crError,

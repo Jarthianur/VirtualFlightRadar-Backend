@@ -22,8 +22,8 @@
 #include "ConnectorImplBoost.h"
 
 #include <boost/bind.hpp>
-#include <boost/move/move.hpp>
 #include <boost/date_time.hpp>
+#include <boost/move/move.hpp>
 
 #include "../../Logger.hpp"
 #include "Client.hpp"
@@ -96,11 +96,24 @@ void ConnectorImplBoost::onWrite(const std::string& crStr, const Callback& crCal
                                          boost::asio::placeholders::bytes_transferred, crCallback));
 }
 
-void ConnectorImplBoost::onTimeout(std::uint32_t vTimeout, const Callback& crCallback)
+void ConnectorImplBoost::onTimeout(const Callback& crCallback, std::uint32_t vTimeout)
 {
-    mTimer.expires_from_now(boost::posix_time::seconds(vTimeout));
+    if(vTimeout > 0)
+    {
+        resetTimer(vTimeout);
+    }
     mTimer.async_wait(boost::bind(&ConnectorImplBoost::handleTimeout, this,
                                   boost::asio::placeholders::error, crCallback));
+}
+
+void ConnectorImplBoost::resetTimer(std::uint32_t vTimeout)
+{
+    mTimer.expires_from_now(boost::posix_time::seconds(vTimeout));
+}
+
+bool ConnectorImplBoost::timerExpired()
+{
+    return mTimer.expires_at() <= boost::asio::deadline_timer::traits_type::now();
 }
 
 void ConnectorImplBoost::handleWrite(const boost::system::error_code& crError, std::size_t,
@@ -162,7 +175,7 @@ void ConnectorImplBoost::handleRead(const boost::system::error_code& crError, st
     else
     {
         std::getline(mIStream, mResponse);
-        //mIStream.clear();
+        // mIStream.clear();
         mResponse.append("\n");
         logger.debug("client got: ", mResponse);
     }

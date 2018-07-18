@@ -21,12 +21,6 @@
 
 #pragma once
 
-#include <cstddef>
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
-
-#include "../../Defines.h"
-
 #include "Client.hpp"
 
 /// @namespace feed
@@ -40,7 +34,8 @@ namespace client
  * @brief Connect to a GPSD server.
  * @extends Client
  */
-class GpsdClient : public Client
+template<typename ConnectorT>
+class GpsdClient : public Client<ConnectorT>
 {
 public:
     NOT_COPYABLE(GpsdClient)
@@ -62,11 +57,6 @@ public:
 
 private:
     /**
-     * @see Client#connect
-     */
-    void connect() override;
-
-    /**
      * @fn stop
      * @brief Send unwatch-request before stop.
      * @see Client#stop
@@ -74,16 +64,9 @@ private:
     void stop() override;
 
     /**
-     * @see Client#handleResolve
-     */
-    void handleResolve(const boost::system::error_code& crError,
-                       boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
-
-    /**
      * @see Client#handleConnect
      */
-    void handleConnect(const boost::system::error_code& crError,
-                       boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+    void handleConnect(bool vError) noexcept override;
 
     /**
      * @fn handleWatch
@@ -91,8 +74,61 @@ private:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleWatch(const boost::system::error_code& crError, std::size_t vBytes) noexcept;
+    void handleWatch(bool vError) noexcept;
 };
+
+template<typename ConnectorT>
+GpsdClient<ConnectorT>::GpsdClient(const Endpoint& crEndpoint)
+    : Client<ConnectorT>(crEndpoint, "(GpsdClient)")
+{}
+
+template<typename ConnectorT>
+GpsdClient<ConnectorT>::~GpsdClient() noexcept
+{}
+
+template<typename ConnectorT>
+void GpsdClient<ConnectorT>::handleConnect(bool vError) noexcept
+{
+    if(vError)
+    {
+        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        this->mConnector.onWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
+                                 std::bind(&GpsdClient::handleWatch, this, std::placeholders::_1));
+    }
+    else
+    {
+        logger.warn(this->mComponent, " failed to connect to ", this->mEndpoint.host, ":",
+                    this->mEndpoint.port);
+        this->reconnect();
+    }
+}
+
+template<typename ConnectorT>
+void GpsdClient<ConnectorT>::stop()
+{
+    if(this->mRunning)
+    {
+        this->mConnector.onWrite("?WATCH={\"enable\":false}\r\n",
+                                 [this](bool) { logger.info(this->mComponent, " stopped watch"); });
+    }
+    Client<ConnectorT>::stop();
+}
+
+template<typename ConnectorT>
+void GpsdClient<ConnectorT>::handleWatch(bool vError) noexcept
+{
+    if(vError)
+    {
+        logger.info(this->mComponent, " connected to ", this->mEndpoint.host, ":",
+                    this->mEndpoint.port);
+        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        this->read();
+    }
+    else
+    {
+        logger.error(this->mComponent, " send watch request failed");
+    }
+}
 
 }  // namespace client
 }  // namespace feed

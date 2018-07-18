@@ -149,7 +149,7 @@ template<typename ConnectorT>
 void AprscClient<ConnectorT>::sendKeepAlive()
 {
     this->mConnector.onTimeout(
-        600, std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1));
+        std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1), 600);
 }
 
 template<typename ConnectorT>
