@@ -21,10 +21,6 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
-
-#include "../../Defines.h"
 #include "Client.hpp"
 
 /// @namespace feed
@@ -38,7 +34,8 @@ namespace client
  * @brief Connect to a SBS server.
  * @extends Client
  */
-class SbsClient : public Client
+template<typename ConnectorT>
+class SbsClient : public Client<ConnectorT>
 {
 public:
     NOT_COPYABLE(SbsClient)
@@ -60,22 +57,35 @@ public:
 
 private:
     /**
-     * @see Client#connect
-     */
-    void connect() override;
-
-    /**
-     * @see Client#handleResolve
-     */
-    void handleResolve(const boost::system::error_code& crError,
-                       boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
-
-    /**
      * @see Client#handleConnect
      */
-    void handleConnect(const boost::system::error_code& crError,
-                       boost::asio::ip::tcp::resolver::iterator vResolverIt) noexcept override;
+    void handleConnect(bool vError) noexcept override;
 };
+
+template<typename ConnectorT>
+SbsClient<ConnectorT>::SbsClient(const Endpoint& crEndpoint)
+    : Client<ConnectorT>(crEndpoint, "(SbsClient)")
+{}
+
+template<typename ConnectorT>
+SbsClient<ConnectorT>::~SbsClient() noexcept
+{}
+
+template<typename ConnectorT>
+void SbsClient<ConnectorT>::handleConnect(bool vError) noexcept
+{
+    if(vError)
+    {
+        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        this->read();
+    }
+    else
+    {
+        logger.warn(this->mComponent, " failed to connect to ", this->mEndpoint.host, ":",
+                    this->mEndpoint.port);
+        this->reconnect();
+    }
+}
 
 }  // namespace client
 }  // namespace feed

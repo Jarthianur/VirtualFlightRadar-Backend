@@ -28,7 +28,7 @@
 #include "../Feed.h"
 #include "AprscClient.hpp"
 #include "GpsdClient.h"
-#include "SbsClient.h"
+#include "SbsClient.hpp"
 #include "SensorClient.h"
 
 namespace feed
