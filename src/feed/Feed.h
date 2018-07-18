@@ -37,6 +37,7 @@ namespace feed
 {
 namespace client
 {
+template<typename ConnectorT>
 class ClientManager;
 } /* namespace client */
 } /* namespace feed */
@@ -59,7 +60,7 @@ public:
      */
     virtual ~Feed() noexcept;
 
-    virtual void registerToClient(client::ClientManager& rManager) = 0;
+    virtual void registerToClient(client::ClientManager<client::ConnectorImplBoost>& rManager) = 0;
 
     /**
      * @fn process

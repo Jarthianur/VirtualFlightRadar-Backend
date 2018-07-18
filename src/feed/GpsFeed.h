@@ -71,7 +71,7 @@ public:
      */
     ~GpsFeed() noexcept;
 
-    void registerToClient(client::ClientManager& rManager) override;
+    void registerToClient(client::ClientManager<client::ConnectorImplBoost>& rManager) override;
 
     /**
      * @see Feed#process

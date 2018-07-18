@@ -24,7 +24,6 @@
 #include <csignal>
 #include <exception>
 #include <sstream>
-#include <boost/asio.hpp>
 #include <boost/thread.hpp>
 
 #include "config/Configuration.h"
@@ -34,7 +33,8 @@
 #include "data/WindData.h"
 #include "feed/Feed.h"
 #include "feed/FeedFactory.h"
-#include "feed/client/ClientManager.h"
+#include "feed/client/ClientManager.hpp"
+#include "feed/client/ConnectorImplBoost.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
 #include "Logger.hpp"
@@ -66,7 +66,7 @@ void VFRB::run() noexcept
     mRunStatus                                    = true;
 
     Signals signals;
-    feed::client::ClientManager clientManager;
+    feed::client::ClientManager<feed::client::ConnectorImplBoost> clientManager;
 
     signals.addHandler([this](const boost::system::error_code&, const int) {
         logger.info("(VFRB) caught signal to shutdown ...");
@@ -129,10 +129,10 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
             }
             else
             {
-                logger.warn(
-                    "(VFRB) create feed ", feed.first,
-                    ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                    ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS ", " SECT_KEY_GPS);
+                logger.warn("(VFRB) create feed ", feed.first,
+                            ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
+                            ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS
+                            ", " SECT_KEY_GPS);
             }
         }
         catch(const std::exception& e)

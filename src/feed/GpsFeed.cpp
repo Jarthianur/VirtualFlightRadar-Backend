@@ -28,7 +28,7 @@
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
 #include "../object/GpsPosition.h"
-#include "client/ClientManager.h"
+#include "client/ClientManager.hpp"
 #include "parser/GpsParser.h"
 
 #ifdef COMPONENT
@@ -48,11 +48,11 @@ GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
 GpsFeed::~GpsFeed() noexcept
 {}
 
-void GpsFeed::registerToClient(client::ClientManager& rManager)
+void GpsFeed::registerToClient(client::ClientManager<client::ConnectorImplBoost>& rManager)
 {
     rManager.subscribe(shared_from_this(),
                        {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
-                       client::ClientManager::Protocol::GPS);
+                       client::ClientManager<client::ConnectorImplBoost>::Protocol::GPS);
 }
 
 bool GpsFeed::process(const std::string& crResponse) noexcept

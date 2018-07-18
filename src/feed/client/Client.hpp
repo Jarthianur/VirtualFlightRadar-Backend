@@ -174,7 +174,7 @@ private:
 
 template<typename ConnectorT>
 Client<ConnectorT>::Client(const Endpoint& crEndpoint, const std::string& crComponent)
-    : mEndpoint(crEndpoint), mComponent(crComponent)
+    : mComponent(crComponent), mEndpoint(crEndpoint)
 {}
 
 template<typename ConnectorT>
@@ -263,7 +263,8 @@ void Client<ConnectorT>::lockAndStop()
 template<typename ConnectorT>
 void Client<ConnectorT>::read()
 {
-    mConnector.onRead(std::bind(&Client::handleRead, this, std::placeholders::_1));
+    mConnector.onRead(
+        std::bind(&Client::handleRead, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 template<typename ConnectorT>

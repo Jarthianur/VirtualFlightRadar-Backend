@@ -27,7 +27,7 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
-#include "client/ClientManager.h"
+#include "client/ClientManager.hpp"
 #include "parser/AprsParser.h"
 
 #ifdef COMPONENT
@@ -55,11 +55,11 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
 AprscFeed::~AprscFeed() noexcept
 {}
 
-void AprscFeed::registerToClient(client::ClientManager& rManager)
+void AprscFeed::registerToClient(client::ClientManager<client::ConnectorImplBoost>& rManager)
 {
-    rManager.subscribe(
-        shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
-        client::ClientManager::Protocol::APRS);
+    rManager.subscribe(shared_from_this(),
+                       {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
+                       client::ClientManager<client::ConnectorImplBoost>::Protocol::APRS);
 }
 
 bool AprscFeed::process(const std::string& crResponse) noexcept

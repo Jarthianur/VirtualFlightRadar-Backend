@@ -38,9 +38,7 @@ ConnectorImplBoost::ConnectorImplBoost()
       mResolver(mIoService),
       mTimer(mIoService),
       mIStream(&mBuffer)
-{
-    mSocket.set_option(boost::asio::socket_base::keep_alive(true));
-}
+{}
 
 ConnectorImplBoost::~ConnectorImplBoost() noexcept
 {}
@@ -151,6 +149,10 @@ void ConnectorImplBoost::handleConnect(const boost::system::error_code& crError,
     if(crError)
     {
         logger.debug("(Client) failed to connect: ", crError.message());
+    }
+    else
+    {
+        mSocket.set_option(boost::asio::socket_base::keep_alive(true));
     }
     crCallback(!crError);
 }
