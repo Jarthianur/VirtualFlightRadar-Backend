@@ -217,6 +217,7 @@ void Client<ConnectorT>::reconnect()
     boost::lock_guard<boost::mutex> lock(mMutex);
     if(mRunning)
     {
+    	logger.info(mComponent, " schedule reconnect to ", mEndpoint.host, ":", mEndpoint.port);
         mConnector.close();
         timedConnect();
     }
