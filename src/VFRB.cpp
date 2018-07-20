@@ -33,8 +33,8 @@
 #include "data/WindData.h"
 #include "feed/Feed.h"
 #include "feed/FeedFactory.h"
-#include "feed/client/ClientManager.hpp"
-#include "feed/client/ConnectorImplBoost.h"
+#include "client/ClientManager.hpp"
+#include "client/ConnectorImplBoost.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
 #include "Logger.hpp"
@@ -66,7 +66,7 @@ void VFRB::run() noexcept
     mRunStatus                                    = true;
 
     Signals signals;
-    feed::client::ClientManager<feed::client::ConnectorImplBoost> clientManager;
+    client::ClientManager<client::ConnectorImplBoost> clientManager;
 
     signals.addHandler([this](const boost::system::error_code&, const int) {
         logger.info("(VFRB) caught signal to shutdown ...");

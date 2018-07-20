@@ -30,16 +30,13 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "../AprscFeed.h"
-#include "../Feed.h"
+#include "../feed/AprscFeed.h"
+#include "../feed/Feed.h"
 #include "AprscClient.hpp"
 #include "GpsdClient.hpp"
 #include "SbsClient.hpp"
 #include "SensorClient.hpp"
 
-namespace feed
-{
-class Feed;
 namespace client
 {
 template<typename ConnectorT>
@@ -76,7 +73,7 @@ public:
 
     ~ClientManager() noexcept;
 
-    void subscribe(std::shared_ptr<Feed> pFeed);
+    void subscribe(std::shared_ptr<feed::Feed> pFeed);
 
     void run();
 
@@ -99,26 +96,26 @@ ClientManager<ConnectorT>::~ClientManager() noexcept
 {}
 
 template<typename ConnectorT>
-void ClientManager<ConnectorT>::subscribe(std::shared_ptr<Feed> pFeed)
+void ClientManager<ConnectorT>::subscribe(std::shared_ptr<feed::Feed> pFeed)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     ClientIter<ConnectorT> it = mClients.end();
     Endpoint endpoint         = pFeed->getEndpoint();
     switch(pFeed->getProtocol())
     {
-        case Feed::Protocol::APRS:
+        case feed::Feed::Protocol::APRS:
             it = mClients
                      .insert(std::make_shared<AprscClient<ConnectorT>>(
-                         endpoint, std::static_pointer_cast<AprscFeed>(pFeed)->getLoginStr()))
+                         endpoint, std::static_pointer_cast<feed::AprscFeed>(pFeed)->getLoginStr()))
                      .first;
             break;
-        case Feed::Protocol::SBS:
+        case feed::Feed::Protocol::SBS:
             it = mClients.insert(std::make_shared<SbsClient<ConnectorT>>(endpoint)).first;
             break;
-        case Feed::Protocol::GPS:
+        case feed::Feed::Protocol::GPS:
             it = mClients.insert(std::make_shared<GpsdClient<ConnectorT>>(endpoint)).first;
             break;
-        case Feed::Protocol::SENSOR:
+        case feed::Feed::Protocol::SENSOR:
             it = mClients.insert(std::make_shared<SensorClient<ConnectorT>>(endpoint)).first;
             break;
     }
@@ -152,4 +149,3 @@ void ClientManager<ConnectorT>::stop()
 }
 
 }  // namespace client
-}  // namespace feed

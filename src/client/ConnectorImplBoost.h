@@ -23,19 +23,18 @@
 
 #include <string>
 #include <istream>
+#include <functional>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "../../Defines.h"
+#include "../Defines.h"
 
-namespace feed
-{
 namespace client
 {
 struct Endpoint;
 
-using Callback     = std::function<void(bool) noexcept>;
-using ReadCallback = std::function<void(bool, const std::string&) noexcept>;
+using Callback     = std::function<void(bool)>;
+using ReadCallback = std::function<void(bool, const std::string&)>;
 
 class ConnectorImplBoost
 {
@@ -83,4 +82,3 @@ private:
 };
 
 }  // namespace client
-}  // namespace feed

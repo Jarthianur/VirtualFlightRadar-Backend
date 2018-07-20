@@ -27,7 +27,7 @@
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
-#include "client/Endpoint.hpp"
+#include "../client/Endpoint.hpp"
 
 namespace data
 {

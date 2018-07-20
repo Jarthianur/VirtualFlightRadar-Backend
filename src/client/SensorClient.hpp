@@ -30,9 +30,6 @@
 #define WC_RCV_TIMEOUT 5
 #endif
 
-/// @namespace feed
-namespace feed
-{
 /// @namespace client
 namespace client
 {
@@ -133,4 +130,3 @@ void SensorClient<ConnectorT>::handleConnect(bool vError) noexcept
 }
 
 }  // namespace client
-}  // namespace feed

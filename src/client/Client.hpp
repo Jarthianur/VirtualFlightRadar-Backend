@@ -30,14 +30,11 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "../../Defines.h"
-#include "../../Logger.hpp"
-#include "../Feed.h"
+#include "../Defines.h"
+#include "../Logger.hpp"
+#include "../feed/Feed.h"
 #include "Endpoint.hpp"
 
-/// @namespace feed
-namespace feed
-{
 /// @namespace client
 namespace client
 {
@@ -80,7 +77,7 @@ public:
 
     virtual std::size_t hash() const;
 
-    void subscribe(std::shared_ptr<Feed>& rpFeed);
+    void subscribe(std::shared_ptr<feed::Feed>& rpFeed);
 
 protected:
     /**
@@ -202,7 +199,7 @@ std::size_t Client<ConnectorT>::hash() const
 }
 
 template<typename ConnectorT>
-void Client<ConnectorT>::subscribe(std::shared_ptr<Feed>& rpFeed)
+void Client<ConnectorT>::subscribe(std::shared_ptr<feed::Feed>& rpFeed)
 {
     boost::lock_guard<boost::mutex> lock(mMutex);
     mrFeeds.push_back(rpFeed);
@@ -297,4 +294,3 @@ void Client<ConnectorT>::handleRead(bool vError, const std::string& crResponse) 
 }
 
 }  // namespace client
-}  // namespace feed

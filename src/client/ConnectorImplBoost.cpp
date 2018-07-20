@@ -25,11 +25,9 @@
 #include <boost/date_time.hpp>
 #include <boost/move/move.hpp>
 
-#include "../../Logger.hpp"
+#include "../Logger.hpp"
 #include "Client.hpp"
 
-namespace feed
-{
 namespace client
 {
 ConnectorImplBoost::ConnectorImplBoost()
@@ -185,4 +183,3 @@ void ConnectorImplBoost::handleRead(const boost::system::error_code& crError, st
 }
 
 }  // namespace client
-}  // namespace feed

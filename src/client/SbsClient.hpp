@@ -23,9 +23,6 @@
 
 #include "Client.hpp"
 
-/// @namespace feed
-namespace feed
-{
 /// @namespace client
 namespace client
 {
@@ -88,4 +85,3 @@ void SbsClient<ConnectorT>::handleConnect(bool vError) noexcept
 }
 
 }  // namespace client
-}  // namespace feed

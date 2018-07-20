@@ -24,9 +24,6 @@
 #include <stdexcept>
 #include "Client.hpp"
 
-/// @namespace feed
-namespace feed
-{
 /// @namespace client
 namespace client
 {
@@ -186,4 +183,3 @@ void AprscClient<ConnectorT>::handleSendKeepAlive(bool vError) noexcept
 }
 
 }  // namespace client
-}  // namespace feed

@@ -23,9 +23,6 @@
 
 #include "Client.hpp"
 
-/// @namespace feed
-namespace feed
-{
 /// @namespace client
 namespace client
 {
@@ -131,4 +128,3 @@ void GpsdClient<ConnectorT>::handleWatch(bool vError) noexcept
 }
 
 }  // namespace client
-}  // namespace feed

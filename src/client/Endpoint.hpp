@@ -23,8 +23,6 @@
 
 #include <string>
 
-namespace feed
-{
 namespace client
 {
 struct Endpoint
@@ -39,4 +37,3 @@ struct Endpoint
 };
 
 }  // namespace client
-}  // namespace feed
