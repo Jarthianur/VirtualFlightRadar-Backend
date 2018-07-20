@@ -137,7 +137,7 @@ function install_deps() {
     *apt-get)
         local UPDATE="apt-get update"
         local SETUP=''
-        local BOOST='libboost-dev libboost-all-dev'
+        local BOOST='libboost-dev libboost-system-dev libboost-regex-dev'
         #local PYTHON='python python-pip'
         local GCC='g++ g++-multilib make'
     ;;

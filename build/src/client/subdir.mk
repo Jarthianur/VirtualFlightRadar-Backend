@@ -4,20 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/server/SocketImplBoost.cpp \
-../src/server/TcpInterfaceImplBoost.cpp 
+../src/client/ConnectorImplBoost.cpp 
 
 OBJS += \
-./src/server/SocketImplBoost.o \
-./src/server/TcpInterfaceImplBoost.o 
+./src/client/ConnectorImplBoost.o
 
 CPP_DEPS += \
-./src/server/SocketImplBoost.d \
-./src/server/TcpInterfaceImplBoost.d 
+./src/client/ConnectorImplBoost.d
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/server/%.o: ../src/server/%.cpp
+src/client/%.o: ../src/client/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	$(CXX) -std=c++1y $(BOOST_I) -O$(OPT_LVL) $(DBG) -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"

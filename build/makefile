@@ -17,7 +17,7 @@ BOOST_I := ${BOOST_ROOT_I}
 -include src/server/subdir.mk
 -include src/object/subdir.mk
 -include src/feed/parser/subdir.mk
--include src/feed/client/subdir.mk
+-include src/client/subdir.mk
 -include src/feed/subdir.mk
 -include src/data/processor/subdir.mk
 -include src/data/subdir.mk
