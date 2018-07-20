@@ -28,8 +28,6 @@
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
 #include "../object/GpsPosition.h"
-#include "client/Client.h"
-#include "client/ClientManager.h"
 #include "parser/GpsParser.h"
 
 #ifdef COMPONENT
@@ -49,14 +47,12 @@ GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
 GpsFeed::~GpsFeed() noexcept
 {}
 
-void GpsFeed::registerToClient(client::ClientManager& rManager)
+Feed::Protocol GpsFeed::getProtocol() const
 {
-    mSubsribedClient = rManager.subscribe(
-        shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
-        client::ClientManager::Protocol::GPS);
+    return Protocol::GPS;
 }
 
-void GpsFeed::process(const std::string& crResponse) noexcept
+bool GpsFeed::process(const std::string& crResponse) noexcept
 {
     object::GpsPosition pos(getPriority());
     if(smParser.unpack(crResponse, pos))
@@ -70,12 +66,11 @@ void GpsFeed::process(const std::string& crResponse) noexcept
         }
         catch(const std::runtime_error& e)
         {
-            Logger::info(COMPONENT " ", mName, ": ", e.what());
-            std::shared_ptr<client::Client> client(mSubsribedClient);
-            client->stop();
-            return;
+            logger.info(COMPONENT " ", mName, ": ", e.what());
+            return false;
         }
     }
+    return true;
 }
 
 }  // namespace feed

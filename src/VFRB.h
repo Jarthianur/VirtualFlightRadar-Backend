@@ -27,7 +27,9 @@
 #include <string>
 #include <boost/chrono.hpp>
 
-#include "server/Server.h"
+#include "server/Server.hpp"
+#include "server/SocketImplBoost.h"
+#include "server/TcpInterfaceImplBoost.h"
 #include "Defines.h"
 
 namespace config
@@ -114,7 +116,7 @@ private:
 
     /// @var mServer
     /// Manage clients and sending of data
-    server::Server mServer;
+    server::Server<server::TcpInterfaceImplBoost, server::SocketImplBoost> mServer;
 
     /// @var mFeeds
     /// List of all active feeds

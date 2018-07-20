@@ -50,7 +50,7 @@ namespace feed
  * @brief Sensor input feed.
  * @extends Feed
  */
-class AtmosphereFeed : public Feed, public std::enable_shared_from_this<AtmosphereFeed>
+class AtmosphereFeed : public Feed
 {
 public:
     NOT_COPYABLE(AtmosphereFeed)
@@ -73,12 +73,12 @@ public:
      */
     ~AtmosphereFeed() noexcept;
 
-    void registerToClient(client::ClientManager& rManager) override;
+    Protocol getProtocol() const override;
 
     /**
      * @see Feed#process
      */
-    void process(const std::string& crResponse) noexcept override;
+    bool process(const std::string& crResponse) noexcept override;
 
 private:
     /// @var mParser

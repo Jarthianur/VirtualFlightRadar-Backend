@@ -49,7 +49,7 @@ namespace feed
  * @brief GPS input feed.
  * @extends Feed
  */
-class GpsFeed : public Feed, public std::enable_shared_from_this<GpsFeed>
+class GpsFeed : public Feed
 {
 public:
     NOT_COPYABLE(GpsFeed)
@@ -71,12 +71,12 @@ public:
      */
     ~GpsFeed() noexcept;
 
-    void registerToClient(client::ClientManager& rManager) override;
+    Protocol getProtocol() const override;
 
     /**
      * @see Feed#process
      */
-    void process(const std::string& crResponse) noexcept override;
+    bool process(const std::string& crResponse) noexcept override;
 
 private:
     /// @var mParser

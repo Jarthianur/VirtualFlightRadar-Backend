@@ -19,29 +19,29 @@
  }
  */
 
-#include "Logger.hpp"
+#pragma once
 
-#include <ctime>
-#include <boost/chrono.hpp>
+#include <string>
+#include <boost/asio.hpp>
+#include <boost/move/move.hpp>
+#include "../Defines.h"
 
-Logger logger;
-
-Logger::Logger() : mpOutStream(&std::cout), mpErrStream(&std::cerr)
-{}
-
-Logger::~Logger() noexcept
-{}
-
-void Logger::setDebug(bool vEnable)
+namespace server
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    mDebugEnabled = vEnable;
-}
-
-std::string Logger::getTime()
+class SocketImplBoost
 {
-    std::time_t tt = boost::chrono::system_clock::to_time_t(boost::chrono::system_clock::now());
-    char time[32]  = "";
-    std::strftime(time, 32, "%c", gmtime(&tt));
-    return std::string(time);
-}
+public:
+    MOVABLE_BUT_NOT_COPYABLE(SocketImplBoost)
+
+    explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket);
+    ~SocketImplBoost() noexcept;
+    std::string address() const;
+    bool write(const std::string& crStr);
+    void close();
+    boost::asio::ip::tcp::socket& get();
+
+private:
+    boost::asio::ip::tcp::socket mSocket;
+};
+
+}  // namespace server

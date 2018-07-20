@@ -27,8 +27,6 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
-#include "client/Client.h"
-#include "client/ClientManager.h"
 #include "parser/AprsParser.h"
 
 #ifdef COMPONENT
@@ -48,7 +46,7 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
     mLoginStrIt = mKvMap.find(KV_KEY_LOGIN);
     if(mLoginStrIt == mKvMap.end())
     {
-        Logger::warn(COMPONENT " could not find: ", mName, "." KV_KEY_LOGIN);
+        logger.warn(COMPONENT " could not find: ", mName, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
 }
@@ -56,20 +54,19 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
 AprscFeed::~AprscFeed() noexcept
 {}
 
-void AprscFeed::registerToClient(client::ClientManager& rManager)
+Feed::Protocol AprscFeed::getProtocol() const
 {
-    mSubsribedClient = rManager.subscribe(
-        shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
-        client::ClientManager::Protocol::APRS);
+    return Protocol::APRS;
 }
 
-void AprscFeed::process(const std::string& crResponse) noexcept
+bool AprscFeed::process(const std::string& crResponse) noexcept
 {
     object::Aircraft ac(getPriority());
     if(smParser.unpack(crResponse, ac))
     {
         mpData->update(std::move(ac));
     }
+    return true;
 }
 
 const std::string& AprscFeed::getLoginStr() const

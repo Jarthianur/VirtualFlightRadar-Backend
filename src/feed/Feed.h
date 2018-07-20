@@ -27,19 +27,12 @@
 
 #include "../Defines.h"
 #include "../config/PropertyMap.h"
+#include "../client/Endpoint.hpp"
 
 namespace data
 {
 class Data;
 } /* namespace data */
-namespace feed
-{
-namespace client
-{
-class Client;
-class ClientManager;
-} /* namespace client */
-} /* namespace feed */
 
 /// @namespace feed
 namespace feed
@@ -53,20 +46,30 @@ class Feed
 public:
     NOT_COPYABLE(Feed)
 
+    enum class Protocol : std::uint32_t
+    {
+        APRS,
+        SBS,
+        GPS,
+        SENSOR
+    };
+
     /**
      * @fn ~Feed
      * @brief Destructor
      */
     virtual ~Feed() noexcept;
 
-    virtual void registerToClient(client::ClientManager& rManager) = 0;
+    virtual Protocol getProtocol() const = 0;
+
+    client::Endpoint getEndpoint() const;
 
     /**
      * @fn process
      * @brief Handle Client's response.
      * @param crResponse The response
      */
-    virtual void process(const std::string& crResponse) noexcept = 0;
+    virtual bool process(const std::string& crResponse) noexcept = 0;
 
     /**
      * Define and declare getters.
@@ -92,8 +95,6 @@ protected:
     /// @var mKvMap
     /// Key-value-map holding the properties.
     const config::KeyValueMap mKvMap;
-
-    std::weak_ptr<client::Client> mSubsribedClient;
 
     std::shared_ptr<data::Data> mpData;
 

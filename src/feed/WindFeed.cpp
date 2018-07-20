@@ -26,8 +26,6 @@
 #include "../config/Configuration.h"
 #include "../data/WindData.h"
 #include "../object/Wind.h"
-#include "client/Client.h"
-#include "client/ClientManager.h"
 #include "parser/WindParser.h"
 
 namespace feed
@@ -42,20 +40,19 @@ WindFeed::WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap
 WindFeed::~WindFeed() noexcept
 {}
 
-void WindFeed::registerToClient(client::ClientManager& rManager)
+Feed::Protocol WindFeed::getProtocol() const
 {
-    mSubsribedClient = rManager.subscribe(
-        shared_from_this(), {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second},
-        client::ClientManager::Protocol::SENSOR);
+    return Protocol::SENSOR;
 }
 
-void WindFeed::process(const std::string& crResponse) noexcept
+bool WindFeed::process(const std::string& crResponse) noexcept
 {
     object::Wind wind(getPriority());
     if(smParser.unpack(crResponse, wind))
     {
         mpData->update(std::move(wind));
     }
+    return true;
 }
 
 }  // namespace feed

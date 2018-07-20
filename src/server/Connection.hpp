@@ -23,8 +23,7 @@
 
 #include <memory>
 #include <string>
-#include <boost/asio.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 
 #include "../Defines.h"
 
@@ -36,6 +35,7 @@ namespace server
  * @brief TCP connection opened by the Server.
  * @see Server.h
  */
+template<typename SocketT>
 class Connection final
 {
 public:
@@ -53,20 +53,9 @@ public:
      * @param rvSocket The socket
      * @return a shared ptr to the Connection object
      */
-    static std::unique_ptr<Connection> start(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket);
+    static std::unique_ptr<Connection<SocketT>> start(SocketT&& rvSocket);
 
-    /**
-     * @fn stop
-     * @brief Stop the connection, shutdown and close socket.
-     */
-    void stop();
-
-    /**
-     * @fn getSocket
-     * @brief Get the socket as reference.
-     * @return the socket ref
-     */
-    boost::asio::ip::tcp::socket& getSocket();
+    bool write(const std::string& crStr);
 
     /**
      * Define and declare getters.
@@ -79,15 +68,36 @@ private:
      * @brief Constructor
      * @param rvSocket The socket
      */
-    explicit Connection(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket);
+    explicit Connection(SocketT&& rvSocket);
 
     /// @var mSocket
     /// Socket
-    boost::asio::ip::tcp::socket mSocket;
+    SocketT mSocket;
 
     /// @var mIpAddress
     /// IP address
     const std::string mIpAddress;
 };
+
+template<typename SocketT>
+Connection<SocketT>::~Connection<SocketT>() noexcept
+{}
+
+template<typename SocketT>
+std::unique_ptr<Connection<SocketT>> Connection<SocketT>::start(SocketT&& rvSocket)
+{
+    return std::unique_ptr<Connection<SocketT>>(new Connection<SocketT>(std::move(rvSocket)));
+}
+
+template<typename SocketT>
+bool Connection<SocketT>::write(const std::string& crStr)
+{
+    return mSocket.write(crStr);
+}
+
+template<typename SocketT>
+Connection<SocketT>::Connection(SocketT&& rvSocket)
+    : mSocket(std::move(rvSocket)), mIpAddress(mSocket.address())
+{}
 
 }  // namespace server

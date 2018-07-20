@@ -19,29 +19,21 @@
  }
  */
 
-#include "Logger.hpp"
+#pragma once
 
-#include <ctime>
-#include <boost/chrono.hpp>
+#include <string>
 
-Logger logger;
-
-Logger::Logger() : mpOutStream(&std::cout), mpErrStream(&std::cerr)
-{}
-
-Logger::~Logger() noexcept
-{}
-
-void Logger::setDebug(bool vEnable)
+namespace client
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    mDebugEnabled = vEnable;
-}
-
-std::string Logger::getTime()
+struct Endpoint
 {
-    std::time_t tt = boost::chrono::system_clock::to_time_t(boost::chrono::system_clock::now());
-    char time[32]  = "";
-    std::strftime(time, 32, "%c", gmtime(&tt));
-    return std::string(time);
-}
+    const std::string host;
+    const std::string port;
+
+    bool operator==(const Endpoint& crOther) const
+    {
+        return host == crOther.host && port == crOther.port;
+    }
+};
+
+}  // namespace client
