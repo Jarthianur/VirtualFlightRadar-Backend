@@ -281,8 +281,7 @@ void Client<ConnectorT>::handleRead(bool vError, const std::string& crResponse) 
         {
             if(!it->process(crResponse))
             {
-                mRunning = false;
-                return;
+                stop();
             }
         }
         read();

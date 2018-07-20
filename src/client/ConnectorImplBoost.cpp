@@ -175,9 +175,7 @@ void ConnectorImplBoost::handleRead(const boost::system::error_code& crError, st
     else
     {
         std::getline(mIStream, mResponse);
-        // mIStream.clear();
         mResponse.append("\n");
-        logger.debug("client got: ", mResponse);
     }
     crCallback(!crError, mResponse);
 }
