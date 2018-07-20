@@ -24,11 +24,10 @@
 #include <array>
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <string>
+#include <thread>
 #include <utility>
-#include <boost/thread.hpp>
-#include <boost/thread/lock_guard.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "../Defines.h"
 #include "../Logger.hpp"
@@ -106,11 +105,11 @@ private:
 
     void attemptConnection(bool vError) noexcept;
 
-    boost::thread mThread;
+    std::thread mThread;
 
     /// @var mMutex
     /// Mutex
-    boost::mutex mMutex;
+    std::mutex mMutex;
 
     TcpInterfaceT mTcpIf;
 
@@ -137,8 +136,8 @@ template<typename TcpInterfaceT, typename SocketT>
 void Server<TcpInterfaceT, SocketT>::run()
 {
     logger.info("(Server) start server");
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    mThread = boost::thread([this]() {
+    std::lock_guard<std::mutex> lock(mMutex);
+    mThread = std::thread([this]() {
         accept();
         mTcpIf.run();
         logger.debug("(Server) stopped");
@@ -150,7 +149,7 @@ void Server<TcpInterfaceT, SocketT>::stop()
 {
     logger.info("(Server) stopping all connections ...");
     {
-        boost::lock_guard<boost::mutex> lock(mMutex);
+        std::lock_guard<std::mutex> lock(mMutex);
         for(auto& it : mConnections)
         {
             if(it)
@@ -169,7 +168,7 @@ void Server<TcpInterfaceT, SocketT>::stop()
 template<typename TcpInterfaceT, typename SocketT>
 void Server<TcpInterfaceT, SocketT>::send(const std::string& crStr)
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     if(crStr.empty() || mActiveConnections == 0)
     {
         return;
@@ -211,7 +210,7 @@ bool Server<TcpInterfaceT, SocketT>::isConnected(const std::string& crIpAddress)
 template<typename TcpInterfaceT, typename SocketT>
 void Server<TcpInterfaceT, SocketT>::attemptConnection(bool vError) noexcept
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     if(!vError)
     {
         if(mActiveConnections < S_MAX_CLIENTS && !isConnected(mTcpIf.getSocket().address()))

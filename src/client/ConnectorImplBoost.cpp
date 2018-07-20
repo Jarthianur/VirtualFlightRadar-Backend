@@ -26,7 +26,7 @@
 #include <boost/move/move.hpp>
 
 #include "../Logger.hpp"
-#include "Client.hpp"
+#include "Endpoint.hpp"
 
 namespace client
 {

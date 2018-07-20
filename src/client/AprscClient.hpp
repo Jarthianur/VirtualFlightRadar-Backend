@@ -129,7 +129,7 @@ void AprscClient<ConnectorT>::handleConnect(bool vError) noexcept
 {
     if(vError)
     {
-        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        std::lock_guard<std::mutex> lock(this->mMutex);
         this->mConnector.onWrite(mLoginStr,
                                  std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
         sendKeepAlive();
@@ -156,7 +156,7 @@ void AprscClient<ConnectorT>::handleLogin(bool vError) noexcept
     {
         logger.info(this->mComponent, " connected to ", this->mEndpoint.host, ":",
                     this->mEndpoint.port);
-        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        std::lock_guard<std::mutex> lock(this->mMutex);
         this->read();
     }
     else
@@ -170,7 +170,7 @@ void AprscClient<ConnectorT>::handleSendKeepAlive(bool vError) noexcept
 {
     if(vError)
     {
-        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        std::lock_guard<std::mutex> lock(this->mMutex);
         this->mConnector.onWrite("#keep-alive beacon\r\n", [this](bool vError) {
             if(!vError)
             {

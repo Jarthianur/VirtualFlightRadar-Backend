@@ -24,7 +24,6 @@
 #include <cstdint>
 #include <string>
 
-
 /// @namespace object
 namespace object
 {

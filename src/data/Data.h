@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include <mutex>
 #include <string>
-#include <boost/thread/mutex.hpp>
 
 /// @namespace object
 namespace object
@@ -59,6 +59,6 @@ public:
 protected:
     /// @var mMutex
     /// Used for RW on this data
-    boost::mutex mMutex;
+    std::mutex mMutex;
 };
 }  // namespace data

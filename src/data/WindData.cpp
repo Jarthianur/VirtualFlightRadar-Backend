@@ -21,8 +21,6 @@
 
 #include "WindData.h"
 
-#include <boost/thread/lock_guard.hpp>
-
 using namespace object;
 
 namespace data
@@ -38,7 +36,7 @@ WindData::~WindData() noexcept
 
 std::string WindData::getSerialized()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     std::string tmp((++mWind).getSerialized());
     mWind.setSerialized("");
     return tmp;
@@ -46,7 +44,7 @@ std::string WindData::getSerialized()
 
 bool WindData::update(Object&& rvWind)
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     return mWind.tryUpdate(std::move(rvWind));
 }
 

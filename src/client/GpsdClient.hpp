@@ -88,7 +88,7 @@ void GpsdClient<ConnectorT>::handleConnect(bool vError) noexcept
 {
     if(vError)
     {
-        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        std::lock_guard<std::mutex> lock(this->mMutex);
         this->mConnector.onWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
                                  std::bind(&GpsdClient::handleWatch, this, std::placeholders::_1));
     }
@@ -118,7 +118,7 @@ void GpsdClient<ConnectorT>::handleWatch(bool vError) noexcept
     {
         logger.info(this->mComponent, " connected to ", this->mEndpoint.host, ":",
                     this->mEndpoint.port);
-        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        std::lock_guard<std::mutex> lock(this->mMutex);
         this->read();
     }
     else

@@ -21,8 +21,8 @@
 
 #include "Logger.hpp"
 
+#include <chrono>
 #include <ctime>
-#include <boost/chrono.hpp>
 
 Logger logger;
 
@@ -34,13 +34,13 @@ Logger::~Logger() noexcept
 
 void Logger::setDebug(bool vEnable)
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     mDebugEnabled = vEnable;
 }
 
 std::string Logger::getTime()
 {
-    std::time_t tt = boost::chrono::system_clock::to_time_t(boost::chrono::system_clock::now());
+    std::time_t tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     char time[32]  = "";
     std::strftime(time, 32, "%c", gmtime(&tt));
     return std::string(time);

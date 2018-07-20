@@ -22,7 +22,6 @@
 #include "GpsData.h"
 
 #include <stdexcept>
-#include <boost/thread/lock_guard.hpp>
 
 /// @def GPS_NR_SATS_GOOD
 /// Good number of satellites
@@ -54,13 +53,13 @@ GpsData::~GpsData() noexcept
 
 std::string GpsData::getSerialized()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     return (++mPosition).getSerialized();
 }
 
 bool GpsData::update(Object&& rvPosition)
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     if(mPositionLocked)
     {
         throw std::runtime_error("Position was locked before.");
@@ -75,7 +74,7 @@ bool GpsData::update(Object&& rvPosition)
 
 Position GpsData::getPosition()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     return mPosition.getPosition();
 }
 

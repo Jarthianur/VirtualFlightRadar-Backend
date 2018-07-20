@@ -21,8 +21,6 @@
 
 #include "AtmosphereData.h"
 
-#include <boost/thread/lock_guard.hpp>
-
 using namespace object;
 
 namespace data
@@ -38,19 +36,19 @@ AtmosphereData::~AtmosphereData() noexcept
 
 std::string AtmosphereData::getSerialized()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     return (++mAtmosphere).getSerialized();
 }
 
 bool AtmosphereData::update(Object&& rvAtmosphere)
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     return mAtmosphere.tryUpdate(std::move(rvAtmosphere));
 }
 
 double AtmosphereData::getAtmPressure()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     return mAtmosphere.getPressure();
 }
 

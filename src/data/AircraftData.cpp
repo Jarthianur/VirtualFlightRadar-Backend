@@ -23,7 +23,6 @@
 
 #include <iterator>
 #include <stdexcept>
-#include <boost/thread/lock_guard.hpp>
 
 #include "../Parameters.h"
 
@@ -51,7 +50,7 @@ AircraftData::~AircraftData() noexcept
 
 std::string AircraftData::getSerialized()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     std::string tmp;
     tmp.reserve(mContainer.size() * 128);
     for(const auto& it : mContainer)
@@ -63,7 +62,7 @@ std::string AircraftData::getSerialized()
 
 bool AircraftData::update(Object&& rvAircraft)
 {
-    boost::lock_guard<boost::mutex> lock(this->mMutex);
+    std::lock_guard<std::mutex> lock(this->mMutex);
     Aircraft&& rvUpdate = static_cast<Aircraft&&>(rvAircraft);
     const auto index    = mIndexMap.find(rvUpdate.getId());
 
@@ -77,7 +76,7 @@ bool AircraftData::update(Object&& rvAircraft)
 
 void AircraftData::processAircrafts(const Position& crRefPosition, double vAtmPress) noexcept
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     std::size_t index = 0;
     bool del          = false;
     auto it           = mContainer.begin();

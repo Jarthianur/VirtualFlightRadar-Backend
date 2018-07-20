@@ -22,10 +22,10 @@
 #pragma once
 
 #include <functional>
+#include <mutex>
+#include <thread>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "Defines.h"
 
@@ -46,6 +46,6 @@ public:
 private:
     boost::asio::io_service mIoService;
     boost::asio::signal_set mSigSet;
-    boost::thread mThread;
-    boost::mutex mMutex;
+    std::thread mThread;
+    std::mutex mMutex;
 };

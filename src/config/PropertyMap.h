@@ -24,7 +24,6 @@
 #include <string>
 #include <unordered_map>
 
-
 /// @namespace config
 namespace config
 {

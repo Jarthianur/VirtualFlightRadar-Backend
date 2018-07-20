@@ -23,12 +23,11 @@
 
 #include <cstddef>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
 #include <boost/functional/hash.hpp>
-#include <boost/thread/lock_guard.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "../Defines.h"
 #include "../Logger.hpp"
@@ -141,7 +140,7 @@ protected:
 
     ConnectorT mConnector;
 
-    boost::mutex mMutex;
+    std::mutex mMutex;
 
     bool mRunning = false;
 
@@ -173,7 +172,7 @@ Client<ConnectorT>::~Client() noexcept
 template<typename ConnectorT>
 void Client<ConnectorT>::run()
 {
-    boost::unique_lock<boost::mutex> lock(mMutex);
+    std::unique_lock<std::mutex> lock(mMutex);
     if(!mRunning)
     {
         mRunning = true;
@@ -201,7 +200,7 @@ std::size_t Client<ConnectorT>::hash() const
 template<typename ConnectorT>
 void Client<ConnectorT>::subscribe(std::shared_ptr<feed::Feed>& rpFeed)
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     mrFeeds.push_back(rpFeed);
 }
 
@@ -214,10 +213,10 @@ void Client<ConnectorT>::connect()
 template<typename ConnectorT>
 void Client<ConnectorT>::reconnect()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     if(mRunning)
     {
-    	logger.info(mComponent, " schedule reconnect to ", mEndpoint.host, ":", mEndpoint.port);
+        logger.info(mComponent, " schedule reconnect to ", mEndpoint.host, ":", mEndpoint.port);
         mConnector.close();
         timedConnect();
     }
@@ -244,7 +243,7 @@ void Client<ConnectorT>::stop()
 template<typename ConnectorT>
 void Client<ConnectorT>::lockAndStop()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     stop();
 }
 
@@ -260,7 +259,7 @@ void Client<ConnectorT>::handleTimedConnect(bool vError) noexcept
 {
     if(vError)
     {
-        boost::lock_guard<boost::mutex> lock(mMutex);
+        std::lock_guard<std::mutex> lock(mMutex);
         logger.info(mComponent, " try connect to ", mEndpoint.host, ":", mEndpoint.port);
         connect();
     }
@@ -276,7 +275,7 @@ void Client<ConnectorT>::handleRead(bool vError, const std::string& crResponse) 
 {
     if(vError)
     {
-        boost::lock_guard<boost::mutex> lock(mMutex);
+        std::lock_guard<std::mutex> lock(mMutex);
         for(auto& it : mrFeeds)
         {
             if(!it->process(crResponse))

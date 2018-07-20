@@ -75,7 +75,8 @@ TimeStamp::~TimeStamp() noexcept
 
 TimeStamp& TimeStamp::operator=(const TimeStamp& crOther)
 {
-    this->mValue = crOther.mValue;
+    this->mValue     = crOther.mValue;
+    this->mYesterday = crOther.mYesterday;
     return *this;
 }
 

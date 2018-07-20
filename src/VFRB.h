@@ -22,10 +22,10 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <list>
 #include <memory>
 #include <string>
-#include <boost/chrono.hpp>
 
 #include "server/Server.hpp"
 #include "server/SocketImplBoost.h"
@@ -96,7 +96,7 @@ private:
      * @param vStart The start value
      * @return the duration string
      */
-    std::string getDuration(boost::chrono::steady_clock::time_point vStart) const;
+    std::string getDuration(std::chrono::steady_clock::time_point vStart) const;
 
     /// @var mpAircraftData
     /// Manage aircrafts

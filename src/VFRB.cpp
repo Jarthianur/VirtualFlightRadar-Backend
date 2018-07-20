@@ -24,8 +24,10 @@
 #include <csignal>
 #include <exception>
 #include <sstream>
-#include <boost/thread.hpp>
+#include <thread>
 
+#include "client/ClientManager.hpp"
+#include "client/ConnectorImplBoost.h"
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
@@ -33,8 +35,6 @@
 #include "data/WindData.h"
 #include "feed/Feed.h"
 #include "feed/FeedFactory.h"
-#include "client/ClientManager.hpp"
-#include "client/ConnectorImplBoost.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
 #include "Logger.hpp"
@@ -61,9 +61,9 @@ VFRB::~VFRB() noexcept
 
 void VFRB::run() noexcept
 {
+    mRunStatus = true;
     logger.info("(VFRB) startup");
-    boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
-    mRunStatus                                    = true;
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
     Signals signals;
     client::ClientManager<client::ConnectorImplBoost> clientManager;
@@ -105,7 +105,7 @@ void VFRB::serve()
             mServer.send(mpGpsData->getSerialized());
             mServer.send(mpAtmosphereData->getSerialized());
             mServer.send(mpWindData->getSerialized());
-            boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
+            std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
         catch(const std::exception& e)
         {
@@ -142,11 +142,10 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
     }
 }
 
-std::string VFRB::getDuration(boost::chrono::steady_clock::time_point vStart) const
+std::string VFRB::getDuration(std::chrono::steady_clock::time_point vStart) const
 {
-    boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
-    boost::chrono::minutes runtime
-        = boost::chrono::duration_cast<boost::chrono::minutes>(end - vStart);
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::chrono::minutes runtime = std::chrono::duration_cast<std::chrono::minutes>(end - vStart);
     std::stringstream ss;
     ss << runtime.count() / 60 / 24 << " days, " << runtime.count() / 60 << " hours, "
        << runtime.count() % 60 << " minutes";
