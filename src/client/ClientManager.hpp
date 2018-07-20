@@ -23,12 +23,13 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
+#include <list>
 #include <memory>
+#include <mutex>
 #include <stdexcept>
+#include <thread>
 #include <unordered_set>
-#include <boost/thread.hpp>
-#include <boost/thread/lock_guard.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "../feed/AprscFeed.h"
 #include "../feed/Feed.h"
@@ -36,6 +37,27 @@
 #include "GpsdClient.hpp"
 #include "SbsClient.hpp"
 #include "SensorClient.hpp"
+
+struct thread_group
+{
+    void create_thread(const std::function<void()>& crFunc)
+    {
+        _threads.push_back(std::thread(crFunc));
+    }
+
+    void join_all()
+    {
+        std::for_each(_threads.begin(), _threads.end(), [](std::thread& rThd) {
+            if(rThd.joinable())
+            {
+                rThd.join();
+            }
+        });
+    }
+
+private:
+    std::list<std::thread> _threads;
+};
 
 namespace client
 {
@@ -82,9 +104,9 @@ public:
 private:
     ClientSet<ConnectorT> mClients;
 
-    boost::thread_group mThdGroup;
+    thread_group mThdGroup;
 
-    boost::mutex mMutex;
+    std::mutex mMutex;
 };
 
 template<typename ConnectorT>
@@ -93,12 +115,14 @@ ClientManager<ConnectorT>::ClientManager()
 
 template<typename ConnectorT>
 ClientManager<ConnectorT>::~ClientManager() noexcept
-{}
+{
+    stop();
+}
 
 template<typename ConnectorT>
 void ClientManager<ConnectorT>::subscribe(std::shared_ptr<feed::Feed> pFeed)
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     ClientIter<ConnectorT> it = mClients.end();
     Endpoint endpoint         = pFeed->getEndpoint();
     switch(pFeed->getProtocol())
@@ -129,7 +153,7 @@ void ClientManager<ConnectorT>::run()
     {
         mThdGroup.create_thread([&]() {
             it->run();
-            boost::lock_guard<boost::mutex> lock(mMutex);
+            std::lock_guard<std::mutex> lock(mMutex);
             mClients.erase(it);
         });
     }
@@ -139,8 +163,8 @@ template<typename ConnectorT>
 void ClientManager<ConnectorT>::stop()
 {
     {
-        boost::lock_guard<boost::mutex> lock(mMutex);
-        for(const auto& it : mClients)
+        std::lock_guard<std::mutex> lock(mMutex);
+        for(auto& it : mClients)
         {
             it->lockAndStop();
         }

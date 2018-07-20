@@ -73,7 +73,7 @@ void SbsClient<ConnectorT>::handleConnect(bool vError) noexcept
 {
     if(vError)
     {
-        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        std::lock_guard<std::mutex> lock(this->mMutex);
         this->read();
     }
     else

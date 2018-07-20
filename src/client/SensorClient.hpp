@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <boost/operators.hpp>
 #include "Client.hpp"
 
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT
@@ -95,7 +94,7 @@ void SensorClient<ConnectorT>::checkDeadline(bool vError) noexcept
 {
     if(vError)
     {
-        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        std::lock_guard<std::mutex> lock(this->mMutex);
         if(this->mConnector.timerExpired())
         {
             logger.debug(this->mComponent, " timed out, reconnect ...");
@@ -114,7 +113,7 @@ void SensorClient<ConnectorT>::handleConnect(bool vError) noexcept
 {
     if(vError)
     {
-        boost::lock_guard<boost::mutex> lock(this->mMutex);
+        std::lock_guard<std::mutex> lock(this->mMutex);
         logger.info(this->mComponent, " connected to ", this->mEndpoint.host, ":",
                     this->mEndpoint.port);
         this->mConnector.onTimeout(

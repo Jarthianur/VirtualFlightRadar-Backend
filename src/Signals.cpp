@@ -19,8 +19,6 @@
  }
  */
 
-#include <boost/thread/lock_guard.hpp>
-
 #include "Signals.h"
 
 Signals::Signals() : mIoService(), mSigSet(mIoService)
@@ -33,18 +31,18 @@ Signals::Signals() : mIoService(), mSigSet(mIoService)
 }
 
 Signals::~Signals() noexcept
-{}
+{stop();}
 
 void Signals::run()
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
-    mThread = boost::thread([this]() { mIoService.run(); });
+    std::lock_guard<std::mutex> lock(mMutex);
+    mThread = std::thread([this]() { mIoService.run(); });
 }
 
 void Signals::stop()
 {
     {
-        boost::lock_guard<boost::mutex> lock(mMutex);
+        std::lock_guard<std::mutex> lock(mMutex);
         if(!mIoService.stopped())
         {
             mIoService.stop();
@@ -58,6 +56,6 @@ void Signals::stop()
 
 void Signals::addHandler(const SignalHandler& crHandler)
 {
-    boost::lock_guard<boost::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     mSigSet.async_wait(crHandler);
 }
