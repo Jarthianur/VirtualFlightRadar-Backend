@@ -22,10 +22,10 @@
 #pragma once
 
 #include <functional>
+#include <mutex>
+#include <thread>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
-#include <thread>
-#include <mutex>
 
 #include "Defines.h"
 

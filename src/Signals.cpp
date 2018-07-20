@@ -31,7 +31,9 @@ Signals::Signals() : mIoService(), mSigSet(mIoService)
 }
 
 Signals::~Signals() noexcept
-{stop();}
+{
+    stop();
+}
 
 void Signals::run()
 {

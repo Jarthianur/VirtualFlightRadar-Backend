@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include <string>
-#include <istream>
 #include <functional>
+#include <istream>
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 

@@ -22,8 +22,8 @@
 #pragma once
 
 #include <iostream>
-#include <string>
 #include <mutex>
+#include <string>
 
 /**
  * @class Logger

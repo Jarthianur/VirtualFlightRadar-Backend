@@ -24,10 +24,10 @@
 #include <array>
 #include <cstdint>
 #include <memory>
-#include <string>
-#include <utility>
-#include <thread>
 #include <mutex>
+#include <string>
+#include <thread>
+#include <utility>
 
 #include "../Defines.h"
 #include "../Logger.hpp"

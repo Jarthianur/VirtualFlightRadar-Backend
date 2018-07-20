@@ -23,11 +23,11 @@
 
 #include <cstddef>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
 #include <boost/functional/hash.hpp>
-#include <mutex>
 
 #include "../Defines.h"
 #include "../Logger.hpp"
@@ -216,7 +216,7 @@ void Client<ConnectorT>::reconnect()
     std::lock_guard<std::mutex> lock(mMutex);
     if(mRunning)
     {
-    	logger.info(mComponent, " schedule reconnect to ", mEndpoint.host, ":", mEndpoint.port);
+        logger.info(mComponent, " schedule reconnect to ", mEndpoint.host, ":", mEndpoint.port);
         mConnector.close();
         timedConnect();
     }

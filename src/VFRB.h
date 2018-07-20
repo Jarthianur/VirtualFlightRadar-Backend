@@ -22,10 +22,10 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <list>
 #include <memory>
 #include <string>
-#include <chrono>
 
 #include "server/Server.hpp"
 #include "server/SocketImplBoost.h"

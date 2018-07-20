@@ -26,6 +26,8 @@
 #include <sstream>
 #include <thread>
 
+#include "client/ClientManager.hpp"
+#include "client/ConnectorImplBoost.h"
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
@@ -33,8 +35,6 @@
 #include "data/WindData.h"
 #include "feed/Feed.h"
 #include "feed/FeedFactory.h"
-#include "client/ClientManager.hpp"
-#include "client/ConnectorImplBoost.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
 #include "Logger.hpp"
@@ -60,7 +60,8 @@ VFRB::~VFRB() noexcept
 {}
 
 void VFRB::run() noexcept
-{mRunStatus                                    = true;
+{
+    mRunStatus = true;
     logger.info("(VFRB) startup");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
@@ -144,8 +145,7 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
 std::string VFRB::getDuration(std::chrono::steady_clock::time_point vStart) const
 {
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::chrono::minutes runtime
-        = std::chrono::duration_cast<std::chrono::minutes>(end - vStart);
+    std::chrono::minutes runtime = std::chrono::duration_cast<std::chrono::minutes>(end - vStart);
     std::stringstream ss;
     ss << runtime.count() / 60 / 24 << " days, " << runtime.count() / 60 << " hours, "
        << runtime.count() % 60 << " minutes";

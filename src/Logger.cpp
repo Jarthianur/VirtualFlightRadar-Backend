@@ -21,8 +21,8 @@
 
 #include "Logger.hpp"
 
-#include <ctime>
 #include <chrono>
+#include <ctime>
 
 Logger logger;
 
