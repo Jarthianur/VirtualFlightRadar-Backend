@@ -15,7 +15,7 @@ install:
     - gem install coveralls-lcov
 
 before_script:
-    - docker run -e "WORKSPACE=$TRAVIS_BUILD_DIR" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:sid bash
+    - docker run -e "WORKSPACE=$TRAVIS_BUILD_DIR" -e "VFRB_COMPILER=g++-6" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:sid bash
     - docker ps -a
 
 script:

@@ -132,14 +132,18 @@ function install_deps() {
     log -i INSTALL DEPENDENCIES
     trap "fail Failed to install dependencies!" ERR
     resolve_pkg_manager
-    require PKG_MANAGER
+    require PKG_MANAGER VFRB_COMPILER
     case $PKG_MANAGER in
     *apt-get)
         local UPDATE="apt-get update"
         local SETUP=''
         local BOOST='libboost-dev libboost-system-dev libboost-regex-dev'
         #local PYTHON='python python-pip'
-        local GCC='g++ g++-multilib make'
+        ! $VFRB_COMPILER -v > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            local GCC="$(basename "$VFRB_COMPILER")"
+        fi
+        GCC="$GCC make"
     ;;
     *yum)
         local UPDATE='yum clean all'
