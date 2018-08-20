@@ -19,41 +19,20 @@
  }
  */
 
-#pragma once
-
-#include <cstdint>
-#include <functional>
-#include <mutex>
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
-#include "SocketImplBoost.h"
-
-#include "../Defines.h"
+#include "SocketException.h"
 
 namespace server
 {
-class TcpInterfaceImplBoost
+SocketException::SocketException(const std::string& crMessage)
+    : std::exception(), mMessage(crMessage)
+{}
+
+SocketException::~SocketException() noexcept
+{}
+
+const char* SocketException::what() const noexcept
 {
-public:
-    NOT_COPYABLE(TcpInterfaceImplBoost)
-
-    explicit TcpInterfaceImplBoost(std::uint16_t vPort);
-    ~TcpInterfaceImplBoost() noexcept;
-
-    void run();
-    void stop();
-    void onAccept(const std::function<void(bool)>& crCallback);
-    void close();
-    SocketImplBoost& getSocket();
-
-private:
-    void handleAccept(const boost::system::error_code& crError,
-                      const std::function<void(bool)>& crCallback) noexcept;
-
-    boost::asio::io_service mIoService;
-    boost::asio::ip::tcp::acceptor mAcceptor;
-    SocketImplBoost mSocket;
-    mutable std::mutex mMutex;
-};
+    return mMessage.c_str();
+}
 
 }  // namespace server

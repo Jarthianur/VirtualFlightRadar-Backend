@@ -21,6 +21,7 @@
 
 #include <boost/system/error_code.hpp>
 
+#include "SocketException.h"
 #include "SocketImplBoost.h"
 
 namespace server
@@ -50,11 +51,19 @@ SocketImplBoost::~SocketImplBoost() noexcept
 
 std::string SocketImplBoost::address() const
 {
+    if(!mSocket.is_open())
+    {
+        throw SocketException("cannot get address from closed socket");
+    }
     return mSocket.remote_endpoint().address().to_string();
 }
 
 bool SocketImplBoost::write(const std::string& crStr)
 {
+    if(!mSocket.is_open())
+    {
+        throw SocketException("cannot write on closed socket");
+    }
     boost::system::error_code ec;
     boost::asio::write(mSocket, boost::asio::buffer(crStr), ec);
     return !ec;

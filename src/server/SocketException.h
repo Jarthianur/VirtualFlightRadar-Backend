@@ -21,39 +21,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <functional>
-#include <mutex>
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
-#include "SocketImplBoost.h"
-
-#include "../Defines.h"
+#include <exception>
+#include <string>
 
 namespace server
 {
-class TcpInterfaceImplBoost
+class SocketException : public std::exception
 {
 public:
-    NOT_COPYABLE(TcpInterfaceImplBoost)
+    SocketException(const std::string& crMessage);
+    ~SocketException() noexcept;
 
-    explicit TcpInterfaceImplBoost(std::uint16_t vPort);
-    ~TcpInterfaceImplBoost() noexcept;
-
-    void run();
-    void stop();
-    void onAccept(const std::function<void(bool)>& crCallback);
-    void close();
-    SocketImplBoost& getSocket();
+    const char* what() const noexcept;
 
 private:
-    void handleAccept(const boost::system::error_code& crError,
-                      const std::function<void(bool)>& crCallback) noexcept;
-
-    boost::asio::io_service mIoService;
-    boost::asio::ip::tcp::acceptor mAcceptor;
-    SocketImplBoost mSocket;
-    mutable std::mutex mMutex;
+    const std::string mMessage;
 };
 
 }  // namespace server

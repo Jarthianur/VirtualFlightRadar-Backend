@@ -40,11 +40,23 @@ TcpInterfaceImplBoost::~TcpInterfaceImplBoost() noexcept
 
 void TcpInterfaceImplBoost::run()
 {
-    mIoService.run();
+    try
+    {
+        mIoService.run();
+    }
+    catch(const std::exception& crErr)
+    {
+        logger.error("TcpInterfaceImplBoost::run() caught: ", crErr.what());
+    }
+    catch(...)
+    {
+        logger.error("TcpInterfaceImplBoost::run() caught error");
+    }
 }
 
 void TcpInterfaceImplBoost::stop()
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     if(mAcceptor.is_open())
     {
         mAcceptor.close();
@@ -56,30 +68,31 @@ void TcpInterfaceImplBoost::stop()
     mSocket.close();
 }
 
-void TcpInterfaceImplBoost::onAccept(const std::function<void(bool) noexcept>& crCallback)
+void TcpInterfaceImplBoost::onAccept(const std::function<void(bool)>& crCallback)
 {
-    mAcceptor.async_accept(mSocket.get(),
-                           boost::bind(&TcpInterfaceImplBoost::handleAccept, this,
-                                       boost::asio::placeholders::error, crCallback));
+    std::lock_guard<std::mutex> lock(mMutex);
+    if(mAcceptor.is_open())
+    {
+        mAcceptor.async_accept(mSocket.get(),
+                               boost::bind(&TcpInterfaceImplBoost::handleAccept, this,
+                                           boost::asio::placeholders::error, crCallback));
+    }
 }
 
 void TcpInterfaceImplBoost::close()
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     mSocket.close();
 }
 
-void TcpInterfaceImplBoost::handleAccept(
-    const boost::system::error_code& crError,
-    const std::function<void(bool) noexcept>& crCallback) noexcept
+void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& crError,
+                                         const std::function<void(bool)>& crCallback) noexcept
 {
-    if(mAcceptor.is_open())
+    if(crError)
     {
-        if(crError)
-        {
-            logger.debug("(Server) accept: ", crError.message());
-        }
-        crCallback(!crError);
+        logger.debug("(Server) accept: ", crError.message());
     }
+    crCallback(!crError);
 }
 
 SocketImplBoost& TcpInterfaceImplBoost::getSocket()

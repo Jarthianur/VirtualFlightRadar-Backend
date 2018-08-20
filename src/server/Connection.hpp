@@ -26,6 +26,8 @@
 #include <utility>
 
 #include "../Defines.h"
+#include "../Logger.hpp"
+#include "SocketException.h"
 
 /// @namespace server
 namespace server
@@ -92,7 +94,15 @@ std::unique_ptr<Connection<SocketT>> Connection<SocketT>::start(SocketT&& rvSock
 template<typename SocketT>
 bool Connection<SocketT>::write(const std::string& crStr)
 {
-    return mSocket.write(crStr);
+    try
+    {
+        return mSocket.write(crStr);
+    }
+    catch(const SocketException& crSE)
+    {
+        logger.debug("(Connection) write: ", crSE.what());
+    }
+    return false;
 }
 
 template<typename SocketT>

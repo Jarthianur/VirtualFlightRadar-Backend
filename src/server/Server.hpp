@@ -109,7 +109,7 @@ private:
 
     /// @var mMutex
     /// Mutex
-    std::mutex mMutex;
+    mutable std::mutex mMutex;
 
     TcpInterfaceT mTcpIf;
 
@@ -118,6 +118,8 @@ private:
     std::array<std::unique_ptr<Connection<SocketT>>, S_MAX_CLIENTS> mConnections;
 
     std::uint32_t mActiveConnections = 0;
+
+    bool mRunning = false;
 };
 
 template<typename TcpInterfaceT, typename SocketT>
@@ -130,14 +132,17 @@ Server<TcpInterfaceT, SocketT>::Server() : Server<TcpInterfaceT, SocketT>(4353)
 
 template<typename TcpInterfaceT, typename SocketT>
 Server<TcpInterfaceT, SocketT>::~Server() noexcept
-{}
+{
+    stop();
+}
 
 template<typename TcpInterfaceT, typename SocketT>
 void Server<TcpInterfaceT, SocketT>::run()
 {
     logger.info("(Server) start server");
     std::lock_guard<std::mutex> lock(mMutex);
-    mThread = std::thread([this]() {
+    mRunning = true;
+    mThread  = std::thread([this]() {
         accept();
         mTcpIf.run();
         logger.debug("(Server) stopped");
@@ -147,9 +152,11 @@ void Server<TcpInterfaceT, SocketT>::run()
 template<typename TcpInterfaceT, typename SocketT>
 void Server<TcpInterfaceT, SocketT>::stop()
 {
-    logger.info("(Server) stopping all connections ...");
+    std::lock_guard<std::mutex> lock(mMutex);
+    if(mRunning)
     {
-        std::lock_guard<std::mutex> lock(mMutex);
+        mRunning = false;
+        logger.info("(Server) stopping all connections ...");
         for(auto& it : mConnections)
         {
             if(it)
@@ -157,11 +164,12 @@ void Server<TcpInterfaceT, SocketT>::stop()
                 it.reset();
             }
         }
+        mActiveConnections = 0;
         mTcpIf.stop();
-    }
-    if(mThread.joinable())
-    {
-        mThread.join();
+        if(mThread.joinable())
+        {
+            mThread.join();
+        }
     }
 }
 
@@ -210,25 +218,33 @@ bool Server<TcpInterfaceT, SocketT>::isConnected(const std::string& crIpAddress)
 template<typename TcpInterfaceT, typename SocketT>
 void Server<TcpInterfaceT, SocketT>::attemptConnection(bool vError) noexcept
 {
-    std::lock_guard<std::mutex> lock(mMutex);
     if(!vError)
     {
-        if(mActiveConnections < S_MAX_CLIENTS && !isConnected(mTcpIf.getSocket().address()))
+        std::lock_guard<std::mutex> lock(mMutex);
+        try
         {
-            for(auto& it : mConnections)
+            if(mActiveConnections < S_MAX_CLIENTS && !isConnected(mTcpIf.getSocket().address()))
             {
-                if(!it)
+                for(auto& it : mConnections)
                 {
-                    it = Connection<SocketT>::start(std::move(mTcpIf.getSocket()));
-                    ++mActiveConnections;
-                    logger.info("(Server) connection from: ", it->getIpAddress());
-                    break;
+                    if(!it)
+                    {
+                        it = Connection<SocketT>::start(std::move(mTcpIf.getSocket()));
+                        ++mActiveConnections;
+                        logger.info("(Server) connection from: ", it->getIpAddress());
+                        break;
+                    }
                 }
             }
+            else
+            {
+                logger.info("(Server) refused connection to ", mTcpIf.getSocket().address());
+                mTcpIf.close();
+            }
         }
-        else
+        catch(const SocketException& crSE)
         {
-            logger.info("(Server) refused connection to ", mTcpIf.getSocket().address());
+            logger.warn("(Server) connection failed: ", crSE.what());
             mTcpIf.close();
         }
     }
