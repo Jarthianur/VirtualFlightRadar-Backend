@@ -59,11 +59,6 @@ public:
 
     bool write(const std::string& crStr);
 
-    /**
-     * Define and declare getters.
-     */
-    GETTER_CR(std::string, mIpAddress, IpAddress)
-
 private:
     /**
      * @fn Connection
@@ -79,6 +74,12 @@ private:
     /// @var mIpAddress
     /// IP address
     const std::string mIpAddress;
+
+public:
+    /**
+     * Define and declare getters.
+     */
+    GETTER_CR(mIpAddress, IpAddress)
 };
 
 template<typename SocketT>

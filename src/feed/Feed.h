@@ -71,12 +71,6 @@ public:
      */
     virtual bool process(const std::string& crResponse) noexcept = 0;
 
-    /**
-     * Define and declare getters.
-     */
-    GETTER_CR(std::string, mName, Name)
-    GETTER_V(std::uint32_t, mPriority, Priority)
-
 protected:
     /**
      * @fn Feed
@@ -108,6 +102,13 @@ private:
     /// @var mPriority
     /// The priority
     std::uint32_t mPriority;
+
+public:
+    /**
+     * Define and declare getters.
+     */
+    GETTER_CR(mName, Name)
+    GETTER_V(mPriority, Priority)
 };
 
 }  // namespace feed

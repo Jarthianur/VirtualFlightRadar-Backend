@@ -62,11 +62,6 @@ public:
 
     ~Atmosphere() noexcept;
 
-    /**
-     * Define and declare getters and setters.
-     */
-    GETSET_V(double, mPressure, Pressure)
-
 private:
     /**
      * @see Object#assign
@@ -76,6 +71,12 @@ private:
     /// @var mPressure
     /// The atmospheric pressure
     double mPressure = ICAO_STD_A;
+
+public:
+    /**
+     * Define and declare getters and setters.
+     */
+    GETSET_V(mPressure, Pressure)
 };
 
 }  // namespace object

@@ -123,18 +123,6 @@ public:
     ~Aircraft() noexcept;
 
     /**
-     * Define and declare getters and setters.
-     */
-    GETSET_CR(std::string, mId, Id)
-    GETTER_V(IdType, mIdType, IdType)
-    GETSET_V(TargetType, mTargetType, TargetType)
-    GETTER_V(AircraftType, mAircraftType, AircraftType)
-    GETSET_V(bool, mFullInfo, FullInfoAvailable)
-    GETSET_CR(Position, mPosition, Position)
-    GETSET_CR(Movement, mMovement, Movement)
-    GETSET_V(TimeStamp, mTimeStamp, TimeStamp)
-
-    /**
      * @fn setAircraftType
      * @brief Set the aircraft type.
      *
@@ -203,6 +191,19 @@ private:
     /// @var mFullInfo
     /// Is full set of information available?
     bool mFullInfo = false;
+
+public:
+    /**
+     * Define and declare getters and setters.
+     */
+    GETSET_CR(mId, Id)
+    GETTER_V(mIdType, IdType)
+    GETSET_V(mTargetType, TargetType)
+    GETTER_V(mAircraftType, AircraftType)
+    GETSET_V(mFullInfo, FullInfoAvailable)
+    GETSET_CR(mPosition, Position)
+    GETSET_CR(mMovement, Movement)
+    GETSET_V(mTimeStamp, TimeStamp)
 };
 
 }  // namespace object

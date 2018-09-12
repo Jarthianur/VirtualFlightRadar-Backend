@@ -136,17 +136,6 @@ public:
      */
     ~Configuration() noexcept;
 
-    /**
-     * Define and declare getters.
-     */
-    GETTER_CR(object::GpsPosition, mPosition, Position)
-    GETTER_V(double, mAtmPressure, AtmPressure)
-    GETTER_V(std::int32_t, mMaxHeight, MaxHeight)
-    GETTER_V(std::int32_t, mMaxDistance, MaxDistance)
-    GETTER_V(std::uint16_t, mServerPort, ServerPort)
-    GETSET_V(bool, mGroundMode, GroundMode)
-    GETTER_CR(FeedMapping, mFeedMapping, FeedMapping)
-
 private:
     /**
      * @fn init
@@ -235,6 +224,18 @@ private:
     /// @var mFeedMapping
     /// List of feeds with their key-value map
     FeedMapping mFeedMapping;
+
+public:
+    /**
+     * Define and declare getters.
+     */
+    GETTER_CR(mPosition, Position)
+    GETTER_V(mAtmPressure, AtmPressure)
+    GETTER_V(mMaxHeight, MaxHeight)
+    GETTER_V(mMaxDistance, MaxDistance)
+    GETTER_V(mServerPort, ServerPort)
+    GETSET_V(mGroundMode, GroundMode)
+    GETTER_CR(mFeedMapping, FeedMapping)
 };
 
 }  // namespace config

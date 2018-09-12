@@ -56,8 +56,6 @@ public:
      */
     bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
 
-    SETTER_V(std::int32_t, smMaxHeight, MaxHeight)
-
 private:
     /**
      * @fn parsePosition
@@ -108,6 +106,9 @@ private:
     /// @var mMaxHeight
     /// The max height filter
     static std::int32_t smMaxHeight;
+
+public:
+    SETTER_V(smMaxHeight, MaxHeight)
 };
 }  // namespace parser
 }  // namespace feed

@@ -76,16 +76,6 @@ public:
 
     ~GpsPosition() noexcept;
 
-    /**
-     * Define and declare getters and setters.
-     */
-    GETSET_CR(Position, mPosition, Position)
-    GETSET_V(double, mGeoid, Geoid)
-    GETSET_V(TimeStamp, mTimeStamp, TimeStamp)
-    GETSET_V(std::int32_t, mNrOfSatellites, NrOfSatellites)
-    GETSET_V(std::int32_t, mFixQuality, FixQuality)
-    GETSET_V(double, mDilution, Dilution)
-
 private:
     /**
      * @see Object#assign
@@ -124,5 +114,16 @@ private:
     /// @var mDilution
     /// The position dilution
     double mDilution = 0.0;
+
+public:
+    /**
+     * Define and declare getters and setters.
+     */
+    GETSET_CR(mPosition, Position)
+    GETSET_V(mGeoid, Geoid)
+    GETSET_V(mTimeStamp, TimeStamp)
+    GETSET_V(mNrOfSatellites, NrOfSatellites)
+    GETSET_V(mFixQuality, FixQuality)
+    GETSET_V(mDilution, Dilution)
 };
 }  // namespace object

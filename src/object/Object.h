@@ -76,8 +76,6 @@ public:
 
     Object& operator++();
 
-    GETTER_V(std::uint32_t, mUpdateAge, UpdateAge)
-
 protected:
     /**
      * @fn assign
@@ -106,5 +104,8 @@ protected:
     /// @var mUpdateAge
     /// Times processed without update.
     std::uint32_t mUpdateAge = 0;
+
+public:
+    GETTER_V(mUpdateAge, UpdateAge)
 };
 }  // namespace object
