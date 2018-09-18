@@ -30,6 +30,7 @@
 #include <boost/functional/hash.hpp>
 
 #include "../Defines.h"
+#include "../Parameters.h"
 #include "../Logger.hpp"
 #include "../feed/Feed.h"
 #include "Endpoint.hpp"
@@ -76,7 +77,7 @@ public:
 
     virtual std::size_t hash() const;
 
-    void subscribe(std::shared_ptr<feed::Feed>& rpFeed);
+    void subscribe(std::shared_ptr<feed::Feed> rpFeed);
 
 protected:
     /**
@@ -140,7 +141,7 @@ protected:
 
     ConnectorT mConnector;
 
-    std::mutex mMutex;
+    mutable std::mutex mMutex;
 
     bool mRunning = false;
 
@@ -198,7 +199,7 @@ std::size_t Client<ConnectorT>::hash() const
 }
 
 template<typename ConnectorT>
-void Client<ConnectorT>::subscribe(std::shared_ptr<feed::Feed>& rpFeed)
+void Client<ConnectorT>::subscribe(std::shared_ptr<feed::Feed> rpFeed)
 {
     std::lock_guard<std::mutex> lock(mMutex);
     mrFeeds.push_back(rpFeed);

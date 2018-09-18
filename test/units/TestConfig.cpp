@@ -33,7 +33,7 @@ using namespace sctf;
 
 void test_config(test::TestSuitesRunner& runner)
 {
-    describe<ConfigReader>("read config", runner)->test("read", []() {
+    describe<ConfigReader>("read config", runner)->test("read", [] {
         std::stringstream conf;
         conf << "[" SECT_KEY_FALLBACK "]\n" << KV_KEY_LATITUDE "   = 0.000000\n";
         conf << KV_KEY_LONGITUDE " = \n" << KV_KEY_ALTITUDE "=1000; alt\n;ghsgd";
@@ -49,7 +49,7 @@ void test_config(test::TestSuitesRunner& runner)
 
     describe<Configuration>("initialize configuration", runner)
         ->test("valid config - full, one feed",
-               []() {
+               [] {
                    std::stringstream conf_in;
                    conf_in << "[" SECT_KEY_GENERAL "]\n" << KV_KEY_FEEDS "=" SECT_KEY_ATMOS "1\n";
                    conf_in << KV_KEY_SERVER_PORT "=1234\n" << KV_KEY_GND_MODE "=y\n";
@@ -74,7 +74,7 @@ void test_config(test::TestSuitesRunner& runner)
                    assertEquals(config.getMaxHeight(), INT32_MAX);
                    assertEquals(config.getMaxDistance(), 10000);
                })
-        ->test("only valid feeds", []() {
+        ->test("only valid feeds", [] {
             std::stringstream conf_in;
             conf_in << "[" SECT_KEY_GENERAL "]\n"
                     << KV_KEY_FEEDS "=" SECT_KEY_WIND "," SECT_KEY_SBS "1 , " SECT_KEY_SBS

@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <algorithm>
 #include <list>
 #include <memory>
 #include <mutex>

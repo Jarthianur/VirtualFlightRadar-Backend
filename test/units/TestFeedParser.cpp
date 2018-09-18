@@ -49,7 +49,7 @@ void test_feed_parser(test::TestSuitesRunner& runner)
                 sbsParser.unpack(
                     "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
                     ac);
-                assertStr(ac.getId(), EQUALS, "AAAAAA");
+                assertEqStr(ac.getId(), "AAAAAA");
                 assertEquals(ac.getTargetType(), object::Aircraft::TargetType::TRANSPONDER);
                 assertEquals(ac.getPosition().altitude, math::doubleToInt(math::FEET_2_M * 1000));
                 assertEquals(ac.getPosition().latitude, 49.0);
