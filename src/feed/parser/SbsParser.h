@@ -54,6 +54,10 @@ public:
      */
     bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
 
+    /// @var mMaxHeight
+    /// The max height filter
+    static std::int32_t s_maxHeight;
+
 private:
     /**
      * @fn parseField
@@ -66,13 +70,6 @@ private:
      */
     bool parseField(std::uint32_t vField, const std::string& crStr, object::Position& rPosition,
                     object::Aircraft& rAircraft) noexcept;
-
-    /// @var mMaxHeight
-    /// The max height filter
-    static std::int32_t smMaxHeight;
-
-public:
-    SETTER_V(smMaxHeight, MaxHeight)
 };
 }  // namespace parser
 }  // namespace feed

@@ -21,10 +21,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
-#include <algorithm>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -41,17 +41,17 @@
 
 struct thread_group
 {
-    void create_thread(const std::function<void()>& crFunc)
+    void create_thread(const std::function<void()>& func)
     {
-        _threads.push_back(std::thread(crFunc));
+        _threads.push_back(std::thread(func));
     }
 
     void join_all()
     {
-        std::for_each(_threads.begin(), _threads.end(), [](std::thread& rThd) {
-            if(rThd.joinable())
+        std::for_each(_threads.begin(), _threads.end(), [](std::thread& thd) {
+            if(thd.joinable())
             {
-                rThd.join();
+                thd.join();
             }
         });
     }
@@ -65,19 +65,19 @@ namespace client
 template<typename ConnectorT>
 struct ClientHasher
 {
-    std::size_t operator()(const std::shared_ptr<Client<ConnectorT>>& crClient) const
+    std::size_t operator()(const std::shared_ptr<Client<ConnectorT>>& client) const
     {
-        return crClient->hash();
+        return client->hash();
     }
 };
 
 template<typename ConnectorT>
 struct ClientComparator
 {
-    bool operator()(const std::shared_ptr<Client<ConnectorT>>& crClient1,
-                    const std::shared_ptr<Client<ConnectorT>>& crClient2) const
+    bool operator()(const std::shared_ptr<Client<ConnectorT>>& client1,
+                    const std::shared_ptr<Client<ConnectorT>>& client2) const
     {
-        return crClient1->equals(*crClient2);
+        return client1->equals(*client2);
     }
 };
 
@@ -96,18 +96,18 @@ public:
 
     ~ClientManager() noexcept;
 
-    void subscribe(std::shared_ptr<feed::Feed> pFeed);
+    void subscribe(std::shared_ptr<feed::Feed> feed);
 
     void run();
 
     void stop();
 
 private:
-    ClientSet<ConnectorT> mClients;
+    ClientSet<ConnectorT> m_clients;
 
-    thread_group mThdGroup;
+    thread_group m_thdGroup;
 
-    std::mutex mMutex;
+    mutable std::mutex m_mutex;
 };
 
 template<typename ConnectorT>
@@ -121,41 +121,41 @@ ClientManager<ConnectorT>::~ClientManager() noexcept
 }
 
 template<typename ConnectorT>
-void ClientManager<ConnectorT>::subscribe(std::shared_ptr<feed::Feed> pFeed)
+void ClientManager<ConnectorT>::subscribe(std::shared_ptr<feed::Feed> feed)
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    ClientIter<ConnectorT> it = mClients.end();
-    Endpoint endpoint         = pFeed->getEndpoint();
-    switch(pFeed->getProtocol())
+    std::lock_guard<std::mutex> lock(m_mutex);
+    ClientIter<ConnectorT> it = m_clients.end();
+    Endpoint endpoint         = feed->get_endpoint();
+    switch(feed->get_protocol())
     {
         case feed::Feed::Protocol::APRS:
-            it = mClients
+            it = m_clients
                      .insert(std::make_shared<AprscClient<ConnectorT>>(
-                         endpoint, std::static_pointer_cast<feed::AprscFeed>(pFeed)->getLoginStr()))
+                         endpoint, std::static_pointer_cast<feed::AprscFeed>(feed)->getLoginStr()))
                      .first;
             break;
         case feed::Feed::Protocol::SBS:
-            it = mClients.insert(std::make_shared<SbsClient<ConnectorT>>(endpoint)).first;
+            it = m_clients.insert(std::make_shared<SbsClient<ConnectorT>>(endpoint)).first;
             break;
         case feed::Feed::Protocol::GPS:
-            it = mClients.insert(std::make_shared<GpsdClient<ConnectorT>>(endpoint)).first;
+            it = m_clients.insert(std::make_shared<GpsdClient<ConnectorT>>(endpoint)).first;
             break;
         case feed::Feed::Protocol::SENSOR:
-            it = mClients.insert(std::make_shared<SensorClient<ConnectorT>>(endpoint)).first;
+            it = m_clients.insert(std::make_shared<SensorClient<ConnectorT>>(endpoint)).first;
             break;
     }
-    (*it)->subscribe(pFeed);
+    (*it)->subscribe(feed);
 }
 
 template<typename ConnectorT>
 void ClientManager<ConnectorT>::run()
 {
-    for(auto& it : mClients)
+    for(auto& it : m_clients)
     {
-        mThdGroup.create_thread([&]() {
+        m_thdGroup.create_thread([&]() {
             it->run();
-            std::lock_guard<std::mutex> lock(mMutex);
-            mClients.erase(it);
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_clients.erase(it);
         });
     }
 }
@@ -164,13 +164,13 @@ template<typename ConnectorT>
 void ClientManager<ConnectorT>::stop()
 {
     {
-        std::lock_guard<std::mutex> lock(mMutex);
-        for(auto& it : mClients)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        for(auto& it : m_clients)
         {
             it->lockAndStop();
         }
     }
-    mThdGroup.join_all();
+    m_thdGroup.join_all();
 }
 
 }  // namespace client

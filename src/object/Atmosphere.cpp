@@ -26,7 +26,7 @@ Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)
 {}
 
 Atmosphere::Atmosphere(double vPressure, std::uint32_t vPriority)
-    : Object(vPriority), mPressure(vPressure)
+    : Object(vPriority), m_pressure(vPressure)
 {}
 
 Atmosphere::~Atmosphere() noexcept
@@ -36,7 +36,7 @@ void Atmosphere::assign(Object&& rvOther)
 {
     Object::assign(std::move(rvOther));
     Atmosphere&& crUpdate = static_cast<Atmosphere&&>(rvOther);
-    this->mPressure       = crUpdate.mPressure;
+    this->m_pressure       = crUpdate.m_pressure;
 }
 
 }  // namespace object

@@ -55,7 +55,7 @@ template<>
 std::shared_ptr<AprscFeed> FeedFactory::makeFeed<AprscFeed>(const std::string& crName,
                                                             const KeyValueMap& crKvMap)
 {
-    return std::make_shared<AprscFeed>(crName, crKvMap, mpAircraftData, mrConfig.getMaxHeight());
+    return std::make_shared<AprscFeed>(crName, crKvMap, mpAircraftData, mrConfig.get_maxHeight());
 }
 
 template<>
@@ -69,7 +69,7 @@ template<>
 std::shared_ptr<SbsFeed> FeedFactory::makeFeed<SbsFeed>(const std::string& crName,
                                                         const KeyValueMap& crKvMap)
 {
-    return std::make_shared<SbsFeed>(crName, crKvMap, mpAircraftData, mrConfig.getMaxHeight());
+    return std::make_shared<SbsFeed>(crName, crKvMap, mpAircraftData, mrConfig.get_maxHeight());
 }
 
 template<>

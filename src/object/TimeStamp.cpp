@@ -26,7 +26,7 @@
 
 namespace object
 {
-TimeStamp::TimeStamp() : mValue(0), mYesterday(false)
+TimeStamp::TimeStamp() : m_value(0), m_yesterday(false)
 {}
 
 TimeStamp::TimeStamp(const std::string& crValue, Format vFormat)
@@ -62,12 +62,12 @@ TimeStamp::TimeStamp(const std::string& crValue, Format vFormat)
     {
         throw std::invalid_argument("");
     }
-    mValue     = static_cast<std::uint64_t>(h * 3600000 + m * 60000 + s * 1000 + f);
-    mYesterday = mValue >= now();
+    m_value     = static_cast<std::uint64_t>(h * 3600000 + m * 60000 + s * 1000 + f);
+    m_yesterday = m_value >= now();
 }
 
 TimeStamp::TimeStamp(const TimeStamp& crOther)
-    : mValue(crOther.mValue), mYesterday(crOther.mYesterday)
+    : m_value(crOther.m_value), m_yesterday(crOther.m_yesterday)
 {}
 
 TimeStamp::~TimeStamp() noexcept
@@ -75,15 +75,15 @@ TimeStamp::~TimeStamp() noexcept
 
 TimeStamp& TimeStamp::operator=(const TimeStamp& crOther)
 {
-    this->mValue     = crOther.mValue;
-    this->mYesterday = crOther.mYesterday;
+    this->m_value     = crOther.m_value;
+    this->m_yesterday = crOther.m_yesterday;
     return *this;
 }
 
 bool TimeStamp::operator>(const TimeStamp& crOther) const
 {
-    return (crOther.mYesterday && !this->mYesterday)
-           || ((!this->mYesterday || crOther.mYesterday) && this->mValue > crOther.mValue);
+    return (crOther.m_yesterday && !this->m_yesterday)
+           || ((!this->m_yesterday || crOther.m_yesterday) && this->m_value > crOther.m_value);
 }
 
 std::uint64_t TimeStamp::now() const

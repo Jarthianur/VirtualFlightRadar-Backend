@@ -50,7 +50,7 @@ public:
      * @param crPort The port
      * @param rFeed  The handler Feed reference
      */
-    explicit SensorClient(const Endpoint& crEndpoint);
+    explicit SensorClient(const Endpoint& endpoint);
 
     /**
      * @fn ~SensorClient
@@ -65,17 +65,17 @@ private:
      * @fn checkDeadline
      * @brief Check read timeout deadline reached.
      */
-    void checkDeadline(bool vError) noexcept;
+    void checkDeadline(bool error) noexcept;
 
     /**
      * @see Client#handleConnect
      */
-    void handleConnect(bool vError) noexcept override;
+    void handleConnect(bool error) noexcept override;
 };
 
 template<typename ConnectorT>
-SensorClient<ConnectorT>::SensorClient(const Endpoint& crEndpoint)
-    : Client<ConnectorT>(crEndpoint, "(SensorClient)")
+SensorClient<ConnectorT>::SensorClient(const Endpoint& endpoint)
+    : Client<ConnectorT>(endpoint, "(SensorClient)")
 {}
 
 template<typename ConnectorT>
@@ -85,45 +85,45 @@ SensorClient<ConnectorT>::~SensorClient() noexcept
 template<typename ConnectorT>
 void SensorClient<ConnectorT>::read()
 {
-    this->mConnector.resetTimer(WC_RCV_TIMEOUT);
+    this->m_connector.resetTimer(WC_RCV_TIMEOUT);
     Client<ConnectorT>::read();
 }
 
 template<typename ConnectorT>
-void SensorClient<ConnectorT>::checkDeadline(bool vError) noexcept
+void SensorClient<ConnectorT>::checkDeadline(bool error) noexcept
 {
-    if(vError)
+    if(!error)
     {
-        std::lock_guard<std::mutex> lock(this->mMutex);
-        if(this->mConnector.timerExpired())
+        std::lock_guard<std::mutex> lock(this->m_mutex);
+        if(this->m_connector.timerExpired())
         {
-            logger.debug(this->mComponent, " timed out, reconnect ...");
+            logger.debug(this->m_component, " timed out, reconnect ...");
             this->reconnect();
         }
         else
         {
-            this->mConnector.onTimeout(
+            this->m_connector.onTimeout(
                 std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1));
         }
     }
 }
 
 template<typename ConnectorT>
-void SensorClient<ConnectorT>::handleConnect(bool vError) noexcept
+void SensorClient<ConnectorT>::handleConnect(bool error) noexcept
 {
-    if(vError)
+    if(!error)
     {
-        std::lock_guard<std::mutex> lock(this->mMutex);
-        logger.info(this->mComponent, " connected to ", this->mEndpoint.host, ":",
-                    this->mEndpoint.port);
-        this->mConnector.onTimeout(
+        std::lock_guard<std::mutex> lock(this->m_mutex);
+        logger.info(this->m_component, " connected to ", this->m_endpoint.host, ":",
+                    this->m_endpoint.port);
+        this->m_connector.onTimeout(
             std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1), WC_RCV_TIMEOUT);
         read();
     }
     else
     {
-        logger.warn(this->mComponent, " failed to connect to ", this->mEndpoint.host, ":",
-                    this->mEndpoint.port);
+        logger.warn(this->m_component, " failed to connect to ", this->m_endpoint.host, ":",
+                    this->m_endpoint.port);
         this->reconnect();
     }
 }

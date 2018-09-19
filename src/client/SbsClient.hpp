@@ -44,7 +44,7 @@ public:
      * @param crPort  The port
      * @param rFeed   The handler Feed reference
      */
-    explicit SbsClient(const Endpoint& crEndpoint);
+    explicit SbsClient(const Endpoint& endpoint);
 
     /**
      * @fn ~SbsClient
@@ -56,12 +56,12 @@ private:
     /**
      * @see Client#handleConnect
      */
-    void handleConnect(bool vError) noexcept override;
+    void handleConnect(bool error) noexcept override;
 };
 
 template<typename ConnectorT>
-SbsClient<ConnectorT>::SbsClient(const Endpoint& crEndpoint)
-    : Client<ConnectorT>(crEndpoint, "(SbsClient)")
+SbsClient<ConnectorT>::SbsClient(const Endpoint& endpoint)
+    : Client<ConnectorT>(endpoint, "(SbsClient)")
 {}
 
 template<typename ConnectorT>
@@ -69,17 +69,17 @@ SbsClient<ConnectorT>::~SbsClient() noexcept
 {}
 
 template<typename ConnectorT>
-void SbsClient<ConnectorT>::handleConnect(bool vError) noexcept
+void SbsClient<ConnectorT>::handleConnect(bool error) noexcept
 {
-    if(vError)
+    if(!error)
     {
-        std::lock_guard<std::mutex> lock(this->mMutex);
+        std::lock_guard<std::mutex> lock(this->m_mutex);
         this->read();
     }
     else
     {
-        logger.warn(this->mComponent, " failed to connect to ", this->mEndpoint.host, ":",
-                    this->mEndpoint.port);
+        logger.warn(this->m_component, " failed to connect to ", this->m_endpoint.host, ":",
+                    this->m_endpoint.port);
         this->reconnect();
     }
 }

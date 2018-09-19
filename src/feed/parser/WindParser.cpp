@@ -53,7 +53,7 @@ bool WindParser::parseWind(const std::string& crStr, object::Wind& rWind)
     bool valid;
     if((valid = (crStr.find("MWV") != std::string::npos)))
     {
-        rWind.setSerialized(std::string(crStr));
+        rWind.set_serialized(std::string(crStr));
     }
     return valid;
 }

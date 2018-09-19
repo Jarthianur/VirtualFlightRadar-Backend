@@ -70,13 +70,13 @@ private:
 
     /// @var mPressure
     /// The atmospheric pressure
-    double mPressure = ICAO_STD_A;
+    double m_pressure = ICAO_STD_A;
 
 public:
     /**
      * Define and declare getters and setters.
      */
-    GETSET_V(mPressure, Pressure)
+    GETSET_V(pressure)
 };
 
 }  // namespace object

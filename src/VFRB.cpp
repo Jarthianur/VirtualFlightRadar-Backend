@@ -45,12 +45,12 @@ using namespace data;
 #define SYNC_TIME 1
 
 VFRB::VFRB(const config::Configuration& config)
-    : mpAircraftData(std::make_shared<AircraftData>(config.getMaxDistance())),
+    : mpAircraftData(std::make_shared<AircraftData>(config.get_maxDistance())),
       mpAtmosphereData(
-          std::make_shared<AtmosphereData>(object::Atmosphere(config.getAtmPressure(), 0))),
-      mpGpsData(std::make_shared<GpsData>(config.getPosition(), config.getGroundMode())),
+          std::make_shared<AtmosphereData>(object::Atmosphere(config.get_atmPressure(), 0))),
+      mpGpsData(std::make_shared<GpsData>(config.get_position(), config.get_groundMode())),
       mpWindData(std::make_shared<WindData>()),
-      mServer(config.getServerPort()),
+      mServer(config.get_serverPort()),
       mRunStatus(false)
 {
     createFeeds(config);
@@ -75,7 +75,7 @@ void VFRB::run() noexcept
 
     for(const auto& it : mFeeds)
     {
-        logger.info("(VFRB) run feed: ", it->getName());
+        logger.info("(VFRB) run feed: ", it->get_name());
         clientManager.subscribe(it);
     }
     mFeeds.clear();
@@ -118,7 +118,7 @@ void VFRB::serve()
 void VFRB::createFeeds(const config::Configuration& crConfig)
 {
     feed::FeedFactory factory(crConfig, mpAircraftData, mpAtmosphereData, mpGpsData, mpWindData);
-    for(const auto& feed : crConfig.getFeedMapping())
+    for(const auto& feed : crConfig.get_feedMapping())
     {
         try
         {

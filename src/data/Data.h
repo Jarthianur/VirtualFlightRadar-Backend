@@ -59,6 +59,6 @@ public:
 protected:
     /// @var mMutex
     /// Used for RW on this data
-    std::mutex mMutex;
+    mutable std::mutex mMutex;
 };
 }  // namespace data

@@ -65,14 +65,14 @@ public:
      * @brief Set the string representation of this Objects data.
      * @param rvSerialized The string representation
      */
-    virtual void setSerialized(std::string&& rvSerialized);
+    virtual void set_serialized(std::string&& rvSerialized);
 
     /**
      * @fn getSerialized
      * @brief Get the string representation of this Objects data.
      * @return mSerialized
      */
-    virtual const std::string& getSerialized() const;
+    virtual const std::string& get_serialized() const;
 
     Object& operator++();
 
@@ -103,9 +103,9 @@ protected:
 
     /// @var mUpdateAge
     /// Times processed without update.
-    std::uint32_t mUpdateAge = 0;
+    std::uint32_t m_updateAge = 0;
 
 public:
-    GETTER_V(mUpdateAge, UpdateAge)
+    GETTER_V(updateAge)
 };
 }  // namespace object

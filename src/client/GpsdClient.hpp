@@ -44,7 +44,7 @@ public:
      * @param crPort The port
      * @param rFeed  The handler Feed reference
      */
-    explicit GpsdClient(const Endpoint& crEndpoint);
+    explicit GpsdClient(const Endpoint& endpoint);
 
     /**
      * @fn ~GpsdClient
@@ -63,7 +63,7 @@ private:
     /**
      * @see Client#handleConnect
      */
-    void handleConnect(bool vError) noexcept override;
+    void handleConnect(bool error) noexcept override;
 
     /**
      * @fn handleWatch
@@ -71,12 +71,12 @@ private:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleWatch(bool vError) noexcept;
+    void handleWatch(bool error) noexcept;
 };
 
 template<typename ConnectorT>
-GpsdClient<ConnectorT>::GpsdClient(const Endpoint& crEndpoint)
-    : Client<ConnectorT>(crEndpoint, "(GpsdClient)")
+GpsdClient<ConnectorT>::GpsdClient(const Endpoint& endpoint)
+    : Client<ConnectorT>(endpoint, "(GpsdClient)")
 {}
 
 template<typename ConnectorT>
@@ -84,18 +84,18 @@ GpsdClient<ConnectorT>::~GpsdClient() noexcept
 {}
 
 template<typename ConnectorT>
-void GpsdClient<ConnectorT>::handleConnect(bool vError) noexcept
+void GpsdClient<ConnectorT>::handleConnect(bool error) noexcept
 {
-    if(vError)
+    if(!error)
     {
-        std::lock_guard<std::mutex> lock(this->mMutex);
-        this->mConnector.onWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
-                                 std::bind(&GpsdClient::handleWatch, this, std::placeholders::_1));
+        std::lock_guard<std::mutex> lock(this->m_mutex);
+        this->m_connector.onWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
+                                  std::bind(&GpsdClient::handleWatch, this, std::placeholders::_1));
     }
     else
     {
-        logger.warn(this->mComponent, " failed to connect to ", this->mEndpoint.host, ":",
-                    this->mEndpoint.port);
+        logger.warn(this->m_component, " failed to connect to ", this->m_endpoint.host, ":",
+                    this->m_endpoint.port);
         this->reconnect();
     }
 }
@@ -103,27 +103,28 @@ void GpsdClient<ConnectorT>::handleConnect(bool vError) noexcept
 template<typename ConnectorT>
 void GpsdClient<ConnectorT>::stop()
 {
-    if(this->mRunning)
+    if(this->m_running)
     {
-        this->mConnector.onWrite("?WATCH={\"enable\":false}\r\n",
-                                 [this](bool) { logger.info(this->mComponent, " stopped watch"); });
+        this->m_connector.onWrite("?WATCH={\"enable\":false}\r\n", [this](bool) {
+            logger.info(this->m_component, " stopped watch");
+        });
     }
     Client<ConnectorT>::stop();
 }
 
 template<typename ConnectorT>
-void GpsdClient<ConnectorT>::handleWatch(bool vError) noexcept
+void GpsdClient<ConnectorT>::handleWatch(bool error) noexcept
 {
-    if(vError)
+    if(!error)
     {
-        logger.info(this->mComponent, " connected to ", this->mEndpoint.host, ":",
-                    this->mEndpoint.port);
-        std::lock_guard<std::mutex> lock(this->mMutex);
+        logger.info(this->m_component, " connected to ", this->m_endpoint.host, ":",
+                    this->m_endpoint.port);
+        std::lock_guard<std::mutex> lock(this->m_mutex);
         this->read();
     }
     else
     {
-        logger.error(this->mComponent, " send watch request failed");
+        logger.error(this->m_component, " send watch request failed");
     }
 }
 

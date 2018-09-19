@@ -54,7 +54,7 @@ GpsData::~GpsData() noexcept
 std::string GpsData::getSerialized()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    return (++mPosition).getSerialized();
+    return (++mPosition).get_serialized();
 }
 
 bool GpsData::update(Object&& rvPosition)
@@ -75,14 +75,14 @@ bool GpsData::update(Object&& rvPosition)
 Position GpsData::getPosition()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    return mPosition.getPosition();
+    return mPosition.get_position();
 }
 
 bool GpsData::isPositionGood()
 {
-    return mPosition.getNrOfSatellites() >= GPS_NR_SATS_GOOD
-           && mPosition.getFixQuality() >= GPS_FIX_GOOD
-           && mPosition.getDilution() <= GPS_HOR_DILUTION_GOOD;
+    return mPosition.get_nrOfSatellites() >= GPS_NR_SATS_GOOD
+           && mPosition.get_fixQuality() >= GPS_FIX_GOOD
+           && mPosition.get_dilution() <= GPS_HOR_DILUTION_GOOD;
 }
 
 }  // namespace data

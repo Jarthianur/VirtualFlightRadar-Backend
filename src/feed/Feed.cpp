@@ -39,17 +39,17 @@ namespace feed
 {
 Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
            std::shared_ptr<data::Data> pData)
-    : mName(crName), mKvMap(crKvMap), mpData(pData)
+    : m_name(crName), m_properties(crKvMap), m_data(pData)
 {
     initPriority();
-    if(mKvMap.find(KV_KEY_HOST) == mKvMap.end())
+    if(m_properties.find(KV_KEY_HOST) == m_properties.end())
     {
-        logger.warn(COMPONENT " could not find: ", mName, "." KV_KEY_HOST);
+        logger.warn(COMPONENT " could not find: ", m_name, "." KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
-    if(mKvMap.find(KV_KEY_PORT) == mKvMap.end())
+    if(m_properties.find(KV_KEY_PORT) == m_properties.end())
     {
-        logger.warn(COMPONENT " could not find: ", mName, "." KV_KEY_PORT);
+        logger.warn(COMPONENT " could not find: ", m_name, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
 }
@@ -61,24 +61,24 @@ void Feed::initPriority() noexcept
 {
     try
     {
-        mPriority = static_cast<std::uint32_t>(std::max<std::uint64_t>(
-            0, std::min<std::uint64_t>(std::stoul(mKvMap.at(KV_KEY_PRIORITY)),
+        m_priority = static_cast<std::uint32_t>(std::max<std::uint64_t>(
+            0, std::min<std::uint64_t>(std::stoul(m_properties.at(KV_KEY_PRIORITY)),
                                        std::numeric_limits<std::uint32_t>::max())));
     }
     catch(const std::logic_error&)
     {
-        logger.warn(COMPONENT " create ", mName, ": Invalid priority given.");
+        logger.warn(COMPONENT " create ", m_name, ": Invalid priority given.");
     }
-    if(mPriority == 0)
+    if(m_priority == 0)
     {
-        logger.warn(COMPONENT " create ", mName,
+        logger.warn(COMPONENT " create ", m_name,
                     ": Priority is 0; this feed cannot update higher ones.");
     }
 }
 
-client::Endpoint Feed::getEndpoint() const
+client::Endpoint Feed::get_endpoint() const
 {
-    return {mKvMap.find(KV_KEY_HOST)->second, mKvMap.find(KV_KEY_PORT)->second};
+    return {m_properties.find(KV_KEY_HOST)->second, m_properties.find(KV_KEY_PORT)->second};
 }
 
 }  // namespace feed

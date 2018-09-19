@@ -207,7 +207,7 @@ void test_data(test::TestSuitesRunner& runner)
                []() {
                    WindData data;
                    object::Wind wind;
-                   wind.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
+                   wind.set_serialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
                    data.update(std::move(wind));
                    assertStr(data.getSerialized(), "$WIMWV,242.8,R,6.9,N,A*20\r\n", EQUALS);
                    assertStr(data.getSerialized(), "", EQUALS);
@@ -217,20 +217,20 @@ void test_data(test::TestSuitesRunner& runner)
                    WindData data;
                    object::Wind wind0(0);
                    object::Wind wind1(1);
-                   wind0.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
-                   wind1.setSerialized("updated");
+                   wind0.set_serialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
+                   wind1.set_serialized("updated");
                    assertTrue(data.update(std::move(wind0)));
                    assertTrue(data.update(std::move(wind1)));
                    assertStr(data.getSerialized(), "updated", EQUALS);
-                   wind0.setSerialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
+                   wind0.set_serialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
                    assertFalse(data.update(std::move(wind0)));
                })
         ->test("write after attempt", []() {
             WindData data;
             object::Wind wind1(1);
             object::Wind wind2(2);
-            wind1.setSerialized("lower");
-            wind2.setSerialized("higher");
+            wind1.set_serialized("lower");
+            wind2.set_serialized("higher");
             data.update(std::move(wind2));
             assertStr(data.getSerialized(), "higher", EQUALS);
             data.update(std::move(wind1));
@@ -245,7 +245,7 @@ void test_data(test::TestSuitesRunner& runner)
                    AtmosphereData data;
                    object::Atmosphere atm;
                    atm.setPressure(1009.1);
-                   atm.setSerialized("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
+                   atm.set_serialized("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
                    data.update(std::move(atm));
                    assertStr(data.getSerialized(),
                              "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n", EQUALS);

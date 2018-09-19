@@ -55,7 +55,7 @@ std::string AircraftData::getSerialized()
     tmp.reserve(mContainer.size() * 128);
     for(const auto& it : mContainer)
     {
-        tmp += it.getUpdateAge() < OBJ_OUTDATED ? it.getSerialized() : "";
+        tmp += it.get_updateAge() < OBJ_OUTDATED ? it.get_serialized() : "";
     }
     return tmp;
 }
@@ -64,7 +64,7 @@ bool AircraftData::update(Object&& rvAircraft)
 {
     std::lock_guard<std::mutex> lock(this->mMutex);
     Aircraft&& rvUpdate = static_cast<Aircraft&&>(rvAircraft);
-    const auto index    = mIndexMap.find(rvUpdate.getId());
+    const auto index    = mIndexMap.find(rvUpdate.get_id());
 
     if(index != mIndexMap.end())
     {
@@ -87,19 +87,19 @@ void AircraftData::processAircrafts(const Position& crRefPosition, double vAtmPr
         try
         {
             // if no FLARM msg received after x, assume target has Transponder
-            if(it->getUpdateAge() == AC_NO_FLARM_THRESHOLD)
+            if(it->get_updateAge() == AC_NO_FLARM_THRESHOLD)
             {
-                it->setTargetType(Aircraft::TargetType::TRANSPONDER);
+                it->set_targetType(Aircraft::TargetType::TRANSPONDER);
             }
-            if(it->getUpdateAge() >= AC_DELETE_THRESHOLD)
+            if(it->get_updateAge() >= AC_DELETE_THRESHOLD)
             {
                 del = true;
-                mIndexMap.erase(it->getId());
+                mIndexMap.erase(it->get_id());
                 it = mContainer.erase(it);
             }
             else
             {
-                if(it->getUpdateAge() == 1)
+                if(it->get_updateAge() == 1)
                 {
                     mProcessor.setRefered(crRefPosition, vAtmPress);
                     mProcessor.process(*it);
@@ -109,7 +109,7 @@ void AircraftData::processAircrafts(const Position& crRefPosition, double vAtmPr
             }
             if(del && it != mContainer.end())
             {
-                mIndexMap.at(it->getId()) = index;
+                mIndexMap.at(it->get_id()) = index;
             }
         }
         catch(const std::exception&)
@@ -120,7 +120,7 @@ void AircraftData::processAircrafts(const Position& crRefPosition, double vAtmPr
 
 void AircraftData::insert(const object::Aircraft& crAircraft)
 {
-    mIndexMap.insert({crAircraft.getId(), mContainer.size()});
+    mIndexMap.insert({crAircraft.get_id(), mContainer.size()});
     mContainer.push_back(crAircraft);
 }
 }  // namespace data

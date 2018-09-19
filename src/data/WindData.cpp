@@ -37,8 +37,8 @@ WindData::~WindData() noexcept
 std::string WindData::getSerialized()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    std::string tmp((++mWind).getSerialized());
-    mWind.setSerialized("");
+    std::string tmp((++mWind).get_serialized());
+    mWind.set_serialized("");
     return tmp;
 }
 

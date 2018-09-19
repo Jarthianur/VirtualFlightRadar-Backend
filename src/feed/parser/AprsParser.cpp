@@ -94,7 +94,7 @@ const boost::regex AprsParser::msAprsComRe(
     "^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
     boost::regex::optimize | boost::regex::icase);
 
-std::int32_t AprsParser::smMaxHeight = std::numeric_limits<std::int32_t>::max();
+std::int32_t AprsParser::s_maxHeight = std::numeric_limits<std::int32_t>::max();
 
 AprsParser::AprsParser() : Parser<Aircraft>()
 {}
@@ -118,8 +118,8 @@ bool AprsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
     {
         return false;
     }
-    rAircraft.setFullInfoAvailable(parseMovement(match, com_match, rAircraft));
-    rAircraft.setTargetType(Aircraft::TargetType::FLARM);
+    rAircraft.set_fullInfo(parseMovement(match, com_match, rAircraft));
+    rAircraft.set_targetType(Aircraft::TargetType::FLARM);
     return true;
 }
 
@@ -141,8 +141,8 @@ bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft
         }
         pos.altitude = math::doubleToInt(std::stod(crMatch.str(RE_APRS_ALT)) * math::FEET_2_M);
 
-        rAircraft.setPosition(pos);
-        valid = pos.altitude <= smMaxHeight;
+        rAircraft.set_position(pos);
+        valid = pos.altitude <= s_maxHeight;
     }
     catch(const std::logic_error&)
     {
@@ -153,12 +153,12 @@ bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft
 bool AprsParser::parseComment(const boost::smatch& crMatch, Aircraft& rAircraft) noexcept
 {
     bool valid = true;
-    rAircraft.setId(crMatch.str(RE_APRS_COM_ID));
+    rAircraft.set_id(crMatch.str(RE_APRS_COM_ID));
     try
     {
-        rAircraft.setIdType(static_cast<Aircraft::IdType>(
+        rAircraft.set_idType(static_cast<Aircraft::IdType>(
             std::stoi(crMatch.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03));
-        rAircraft.setAircraftType(static_cast<Aircraft::AircraftType>(
+        rAircraft.set_aircraftType(static_cast<Aircraft::AircraftType>(
             (std::stoi(crMatch.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2));
     }
     catch(const std::logic_error&)
@@ -184,7 +184,7 @@ bool AprsParser::parseMovement(const boost::smatch& crMatch, const boost::smatch
     {
         valid = false;
     }
-    rAircraft.setMovement(move);
+    rAircraft.set_movement(move);
     return valid;
 }
 
@@ -192,7 +192,7 @@ bool AprsParser::parseTimeStamp(const boost::smatch& crMatch, Aircraft& rAircraf
 {
     try
     {
-        rAircraft.setTimeStamp(TimeStamp(crMatch.str(RE_APRS_TIME), TimeStamp::Format::HHMMSS));
+        rAircraft.set_timeStamp(TimeStamp(crMatch.str(RE_APRS_TIME), TimeStamp::Format::HHMMSS));
     }
     catch(const std::invalid_argument&)
     {

@@ -30,73 +30,61 @@
 /// @def GETTER_V(MEMBER, NAME)
 /// Define and declare an inlined by-value-getter.
 /// NAME is the method suffix.
-#define GETTER_V(MEMBER, NAME)                \
-    inline decltype(MEMBER) get##NAME() const \
-    {                                         \
-        return MEMBER;                        \
+#define GETTER_V(MEMBER)                             \
+    inline decltype(m_##MEMBER) get_##MEMBER() const \
+    {                                                \
+        return m_##MEMBER;                           \
     }
 
 /// @def GETTER_R(MEMBER, NAME)
 /// Define and declare an inlined by-reference-getter.
 /// NAME is the method suffix.
-#define GETTER_R(MEMBER, NAME)           \
-    inline decltype(MEMBER)& get##NAME() \
-    {                                    \
-        return MEMBER;                   \
+#define GETTER_R(MEMBER)                        \
+    inline decltype(m_##MEMBER)& get_##MEMBER() \
+    {                                           \
+        return m_##MEMBER;                      \
     }
 
 /// @def GETTER_CR(MEMBER, NAME)
 /// Define and declare an inlined by-const_reference-getter.
 /// NAME is the method suffix.
-#define GETTER_CR(MEMBER, NAME)                      \
-    inline const decltype(MEMBER)& get##NAME() const \
-    {                                                \
-        return MEMBER;                               \
+#define GETTER_CR(MEMBER)                                   \
+    inline const decltype(m_##MEMBER)& get_##MEMBER() const \
+    {                                                       \
+        return m_##MEMBER;                                  \
     }
 
 /// @def SETTER_V(MEMBER, NAME)
 /// Define and declare an inlined by-value-setter.
 /// NAME is the method suffix.
-#define SETTER_V(MEMBER, NAME)                   \
-    inline void set##NAME(decltype(MEMBER) vNew) \
-    {                                            \
-        MEMBER = vNew;                           \
+#define SETTER_V(MEMBER)                               \
+    inline void set_##MEMBER(decltype(m_##MEMBER) val) \
+    {                                                  \
+        m_##MEMBER = val;                              \
     }
 
 /// @def SETTER_CR(MEMBER, NAME)
 /// Define and declare an inlined by-const_reference-setter.
 /// NAME is the method suffix.
-#define SETTER_CR(MEMBER, NAME)                          \
-    inline void set##NAME(const decltype(MEMBER)& crNew) \
-    {                                                    \
-        MEMBER = crNew;                                  \
+#define SETTER_CR(MEMBER)                                     \
+    inline void set_##MEMBER(const decltype(m_##MEMBER)& ref) \
+    {                                                         \
+        m_##MEMBER = ref;                                     \
     }
 
 /// @def GETSET_V(MEMBER, NAME)
 /// Define and declare inlined by-value-getter/setter.
 /// NAME is the method suffix.
-#define GETSET_V(MEMBER, NAME)                   \
-    inline decltype(MEMBER) get##NAME() const    \
-    {                                            \
-        return MEMBER;                           \
-    }                                            \
-    inline void set##NAME(decltype(MEMBER) vNew) \
-    {                                            \
-        MEMBER = vNew;                           \
-    }
+#define GETSET_V(MEMBER) \
+    GETTER_V(MEMBER)     \
+    SETTER_V(MEMBER)
 
 /// @def GETSET_CR(MEMBER, NAME)
 /// Define and declare inlined by-const_reference-getter/setter.
 /// NAME is the method suffix.
-#define GETSET_CR(MEMBER, NAME)                          \
-    inline const decltype(MEMBER)& get##NAME() const     \
-    {                                                    \
-        return MEMBER;                                   \
-    }                                                    \
-    inline void set##NAME(const decltype(MEMBER)& crNew) \
-    {                                                    \
-        MEMBER = crNew;                                  \
-    }
+#define GETSET_CR(MEMBER) \
+    GETTER_CR(MEMBER)     \
+    SETTER_CR(MEMBER)
 
 /// @def NON_COPYABLE
 /// Make a class of TYPE non copyable.

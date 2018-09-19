@@ -93,37 +93,37 @@ private:
 
     /// @var mPosition
     /// The position
-    Position mPosition{0.0, 0.0, 0};
+    Position m_position{0.0, 0.0, 0};
 
     /// @var mGeoid
     /// The geoid separation
-    double mGeoid = 0.0;
+    double m_geoid = 0.0;
 
     /// @var mTimeStamp
     /// The timestamp of this position
-    TimeStamp mTimeStamp;
+    TimeStamp m_timeStamp;
 
     /// @var mNrOfSatellites
     /// The number of satellites
-    std::int32_t mNrOfSatellites = 1;
+    std::int32_t m_nrOfSatellites = 1;
 
     /// @var mFixQuality
     /// The GPS fix quality
-    std::int32_t mFixQuality = 5;
+    std::int32_t m_fixQuality = 5;
 
     /// @var mDilution
     /// The position dilution
-    double mDilution = 0.0;
+    double m_dilution = 0.0;
 
 public:
     /**
      * Define and declare getters and setters.
      */
-    GETSET_CR(mPosition, Position)
-    GETSET_V(mGeoid, Geoid)
-    GETSET_V(mTimeStamp, TimeStamp)
-    GETSET_V(mNrOfSatellites, NrOfSatellites)
-    GETSET_V(mFixQuality, FixQuality)
-    GETSET_V(mDilution, Dilution)
+    GETSET_CR(position)
+    GETSET_V(geoid)
+    GETSET_V(timeStamp)
+    GETSET_V(nrOfSatellites)
+    GETSET_V(fixQuality)
+    GETSET_V(dilution)
 };
 }  // namespace object

@@ -111,13 +111,13 @@ bool GpsParser::parsePosition(const boost::smatch& crMatch, object::GpsPosition&
         pos.longitude = -pos.longitude;
     }
     pos.altitude = math::doubleToInt(std::stod(crMatch.str(RE_GGA_ALT)));
-    rPosition.setPosition(pos);
-    rPosition.setTimeStamp(
+    rPosition.set_position(pos);
+    rPosition.set_timeStamp(
         object::TimeStamp(crMatch.str(RE_GGA_TIME), object::TimeStamp::Format::HHMMSS));
-    rPosition.setFixQuality(std::stoi(crMatch.str(RE_GGA_FIX)));
-    rPosition.setNrOfSatellites(std::stoi(crMatch.str(RE_GGA_SAT)));
-    rPosition.setDilution(std::stod(crMatch.str(RE_GGA_DIL)));
-    rPosition.setGeoid(std::stod(crMatch.str(RE_GGA_GEOID)));
+    rPosition.set_fixQuality(std::stoi(crMatch.str(RE_GGA_FIX)));
+    rPosition.set_nrOfSatellites(std::stoi(crMatch.str(RE_GGA_SAT)));
+    rPosition.set_dilution(std::stod(crMatch.str(RE_GGA_DIL)));
+    rPosition.set_geoid(std::stod(crMatch.str(RE_GGA_GEOID)));
     return true;
 }
 

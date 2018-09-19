@@ -42,11 +42,11 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
                      std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
     : Feed(crName, crKvMap, pData)
 {
-    smParser.setMaxHeight(vMaxHeight);
-    mLoginStrIt = mKvMap.find(KV_KEY_LOGIN);
-    if(mLoginStrIt == mKvMap.end())
+    parser::AprsParser::s_maxHeight = vMaxHeight;
+    mLoginStrIt                     = m_properties.find(KV_KEY_LOGIN);
+    if(mLoginStrIt == m_properties.end())
     {
-        logger.warn(COMPONENT " could not find: ", mName, "." KV_KEY_LOGIN);
+        logger.warn(COMPONENT " could not find: ", m_name, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
 }
@@ -54,17 +54,17 @@ AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvM
 AprscFeed::~AprscFeed() noexcept
 {}
 
-Feed::Protocol AprscFeed::getProtocol() const
+Feed::Protocol AprscFeed::get_protocol() const
 {
     return Protocol::APRS;
 }
 
 bool AprscFeed::process(const std::string& crResponse) noexcept
 {
-    object::Aircraft ac(getPriority());
+    object::Aircraft ac(get_priority());
     if(smParser.unpack(crResponse, ac))
     {
-        mpData->update(std::move(ac));
+        m_data->update(std::move(ac));
     }
     return true;
 }

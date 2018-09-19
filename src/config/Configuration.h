@@ -199,43 +199,43 @@ private:
 
     /// @var mPosition
     /// Fallback position
-    object::GpsPosition mPosition;
+    object::GpsPosition m_position;
 
     /// @var mAtmPressure
     /// Atmospheric fallback pressure
-    double mAtmPressure;
+    double m_atmPressure;
 
     /// @var mMaxHeight
     /// Maximum height for reported aircrafts
-    std::int32_t mMaxHeight;
+    std::int32_t m_maxHeight;
 
     /// @var mMaxDistance
     /// Maximum distance for reported aircrafts
-    std::int32_t mMaxDistance;
+    std::int32_t m_maxDistance;
 
     /// @var mServerPort
     /// Port where to serve reports
-    std::uint16_t mServerPort;
+    std::uint16_t m_serverPort;
 
     /// @var mGroundMode
     /// Ground mode state
-    bool mGroundMode;
+    bool m_groundMode;
 
     /// @var mFeedMapping
     /// List of feeds with their key-value map
-    FeedMapping mFeedMapping;
+    FeedMapping m_feedMapping;
 
 public:
     /**
      * Define and declare getters.
      */
-    GETTER_CR(mPosition, Position)
-    GETTER_V(mAtmPressure, AtmPressure)
-    GETTER_V(mMaxHeight, MaxHeight)
-    GETTER_V(mMaxDistance, MaxDistance)
-    GETTER_V(mServerPort, ServerPort)
-    GETSET_V(mGroundMode, GroundMode)
-    GETTER_CR(mFeedMapping, FeedMapping)
+    GETTER_CR(position)
+    GETTER_V(atmPressure)
+    GETTER_V(maxHeight)
+    GETTER_V(maxDistance)
+    GETTER_V(serverPort)
+    GETSET_V(groundMode)
+    GETTER_CR(feedMapping)
 };
 
 }  // namespace config

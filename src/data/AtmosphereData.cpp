@@ -37,7 +37,7 @@ AtmosphereData::~AtmosphereData() noexcept
 std::string AtmosphereData::getSerialized()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    return (++mAtmosphere).getSerialized();
+    return (++mAtmosphere).get_serialized();
 }
 
 bool AtmosphereData::update(Object&& rvAtmosphere)
@@ -49,7 +49,7 @@ bool AtmosphereData::update(Object&& rvAtmosphere)
 double AtmosphereData::getAtmPressure()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    return mAtmosphere.getPressure();
+    return mAtmosphere.get_pressure();
 }
 
 }  // namespace data

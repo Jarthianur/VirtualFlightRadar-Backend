@@ -130,7 +130,7 @@ public:
      *
      * @param vType The type
      */
-    void setAircraftType(AircraftType vType);
+    void set_aircraftType(AircraftType vType);
 
     /**
      * @fn setIdType
@@ -141,7 +141,7 @@ public:
      *
      * @param vType The type
      */
-    void setIdType(IdType vType);
+    void set_idType(IdType vType);
 
 private:
     /**
@@ -162,48 +162,48 @@ private:
 
     /// @var mId
     /// Aircraft identifier
-    std::string mId;
+    std::string m_id;
 
     /// @var mIdType
     /// @see IdType
-    IdType mIdType;
+    IdType m_idType;
 
     /// @var mAircraftType
     /// @see AircraftType
-    AircraftType mAircraftType;
+    AircraftType m_aircraftType;
 
     /// @var mTargetType
     /// @see TargetType
-    TargetType mTargetType;
+    TargetType m_targetType;
 
     /// @var mPosition
     /// Currently known position.
-    Position mPosition{0.0, 0.0, 0};
+    Position m_position{0.0, 0.0, 0};
 
     /// @var mMovement
     /// Currently known movement.
-    Movement mMovement;
+    Movement m_movement;
 
     /// @var mTimeStamp
     /// The timestamp of the last report.
-    TimeStamp mTimeStamp;
+    TimeStamp m_timeStamp;
 
     /// @var mFullInfo
     /// Is full set of information available?
-    bool mFullInfo = false;
+    bool m_fullInfo = false;
 
 public:
     /**
      * Define and declare getters and setters.
      */
-    GETSET_CR(mId, Id)
-    GETTER_V(mIdType, IdType)
-    GETSET_V(mTargetType, TargetType)
-    GETTER_V(mAircraftType, AircraftType)
-    GETSET_V(mFullInfo, FullInfoAvailable)
-    GETSET_CR(mPosition, Position)
-    GETSET_CR(mMovement, Movement)
-    GETSET_V(mTimeStamp, TimeStamp)
+    GETSET_CR(id)
+    GETTER_V(idType)
+    GETSET_V(targetType)
+    GETTER_V(aircraftType)
+    GETSET_V(fullInfo)
+    GETSET_CR(position)
+    GETSET_CR(movement)
+    GETSET_V(timeStamp)
 };
 
 }  // namespace object

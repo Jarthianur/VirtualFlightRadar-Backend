@@ -69,17 +69,17 @@ private:
 
     /// @var mSocket
     /// Socket
-    SocketT mSocket;
+    SocketT m_socket;
 
     /// @var mIpAddress
     /// IP address
-    const std::string mIpAddress;
+    const std::string m_ipAddress;
 
 public:
     /**
      * Define and declare getters.
      */
-    GETTER_CR(mIpAddress, IpAddress)
+    GETTER_CR(ipAddress)
 };
 
 template<typename SocketT>
@@ -97,7 +97,7 @@ bool Connection<SocketT>::write(const std::string& crStr)
 {
     try
     {
-        return mSocket.write(crStr);
+        return m_socket.write(crStr);
     }
     catch(const SocketException& crSE)
     {
@@ -108,7 +108,7 @@ bool Connection<SocketT>::write(const std::string& crStr)
 
 template<typename SocketT>
 Connection<SocketT>::Connection(SocketT&& rvSocket)
-    : mSocket(std::move(rvSocket)), mIpAddress(mSocket.address())
+    : m_socket(std::move(rvSocket)), m_ipAddress(m_socket.address())
 {}
 
 }  // namespace server

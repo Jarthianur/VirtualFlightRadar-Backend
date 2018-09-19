@@ -28,9 +28,9 @@ Aircraft::Aircraft() : Aircraft(0)
 
 Aircraft::Aircraft(std::uint32_t vPriority)
     : Object(vPriority),
-      mIdType(IdType::ICAO),
-      mAircraftType(AircraftType::POWERED_AIRCRAFT),
-      mTargetType(TargetType::TRANSPONDER)
+      m_idType(IdType::ICAO),
+      m_aircraftType(AircraftType::POWERED_AIRCRAFT),
+      m_targetType(TargetType::TRANSPONDER)
 {}
 
 Aircraft::~Aircraft() noexcept
@@ -39,35 +39,35 @@ Aircraft::~Aircraft() noexcept
 void Aircraft::assign(Object&& rvOther)
 {
     Object::assign(std::move(rvOther));
-    Aircraft&& rvUpdate = static_cast<Aircraft&&>(rvOther);
-    this->mIdType       = rvUpdate.mIdType;
-    this->mAircraftType = rvUpdate.mAircraftType;
-    this->mTargetType   = rvUpdate.mTargetType;
-    this->mPosition     = rvUpdate.mPosition;
-    this->mMovement     = rvUpdate.mMovement;
-    this->mTimeStamp    = rvUpdate.mTimeStamp;
-    this->mFullInfo     = rvUpdate.mFullInfo;
+    Aircraft&& rvUpdate  = static_cast<Aircraft&&>(rvOther);
+    this->m_idType       = rvUpdate.m_idType;
+    this->m_aircraftType = rvUpdate.m_aircraftType;
+    this->m_targetType   = rvUpdate.m_targetType;
+    this->m_position     = rvUpdate.m_position;
+    this->m_movement     = rvUpdate.m_movement;
+    this->m_timeStamp    = rvUpdate.m_timeStamp;
+    this->m_fullInfo     = rvUpdate.m_fullInfo;
 }
 
 bool Aircraft::canUpdate(const Object& crOther) const
 {
     const Aircraft& crToUpdate = static_cast<const Aircraft&>(crOther);
-    return (this->mTimeStamp > crToUpdate.mTimeStamp)
-           && (crToUpdate.mTargetType == TargetType::TRANSPONDER
-               || this->mTargetType == TargetType::FLARM)
+    return (this->m_timeStamp > crToUpdate.m_timeStamp)
+           && (crToUpdate.m_targetType == TargetType::TRANSPONDER
+               || this->m_targetType == TargetType::FLARM)
            && Object::canUpdate(crOther);
 }
 
-void Aircraft::setAircraftType(Aircraft::AircraftType vType)
+void Aircraft::set_aircraftType(Aircraft::AircraftType vType)
 {
-    mAircraftType = vType < AircraftType::UNKNOWN || vType > AircraftType::STATIC_OBJECT
-                        ? AircraftType::UNKNOWN
-                        : vType;
+    m_aircraftType = vType < AircraftType::UNKNOWN || vType > AircraftType::STATIC_OBJECT
+                         ? AircraftType::UNKNOWN
+                         : vType;
 }
 
-void Aircraft::setIdType(Aircraft::IdType vType)
+void Aircraft::set_idType(Aircraft::IdType vType)
 {
-    mIdType = vType < IdType::UNRECOGNIZED || vType > IdType::OGN ? IdType::UNRECOGNIZED : vType;
+    m_idType = vType < IdType::UNRECOGNIZED || vType > IdType::OGN ? IdType::UNRECOGNIZED : vType;
 }
 
 }  // namespace object

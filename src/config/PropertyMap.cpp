@@ -34,8 +34,8 @@ PropertyMap::~PropertyMap() noexcept
 const std::string PropertyMap::getProperty(const std::string& crSection, const std::string& crKey,
                                            const std::string& crDefault) const
 {
-    auto sectionIt = mPropertiesMap.find(crSection);
-    if(sectionIt != mPropertiesMap.end())
+    auto sectionIt = m_propertiesMap.find(crSection);
+    if(sectionIt != m_propertiesMap.end())
     {
         auto kvIt = sectionIt->second.find(crKey);
         if(kvIt != sectionIt->second.end() && !kvIt->second.empty())
@@ -55,8 +55,8 @@ const std::string PropertyMap::getProperty(const std::string& crSection, const s
 
 const KeyValueMap& PropertyMap::getSectionKeyValue(const std::string& crSection) const
 {
-    auto it = mPropertiesMap.find(crSection);
-    if(it != mPropertiesMap.end())
+    auto it = m_propertiesMap.find(crSection);
+    if(it != m_propertiesMap.end())
     {
         return it->second;
     }
@@ -68,7 +68,7 @@ const KeyValueMap& PropertyMap::getSectionKeyValue(const std::string& crSection)
 
 bool config::PropertyMap::addProperty(const std::string& crSection, const KeyValue& crKeyValue)
 {
-    return mPropertiesMap[crSection].emplace(crKeyValue).second;
+    return m_propertiesMap[crSection].emplace(crKeyValue).second;
 }
 
 }  // namespace config

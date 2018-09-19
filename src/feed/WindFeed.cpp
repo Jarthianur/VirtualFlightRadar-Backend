@@ -40,17 +40,17 @@ WindFeed::WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap
 WindFeed::~WindFeed() noexcept
 {}
 
-Feed::Protocol WindFeed::getProtocol() const
+Feed::Protocol WindFeed::get_protocol() const
 {
     return Protocol::SENSOR;
 }
 
 bool WindFeed::process(const std::string& crResponse) noexcept
 {
-    object::Wind wind(getPriority());
+    object::Wind wind(get_priority());
     if(smParser.unpack(crResponse, wind))
     {
-        mpData->update(std::move(wind));
+        m_data->update(std::move(wind));
     }
     return true;
 }

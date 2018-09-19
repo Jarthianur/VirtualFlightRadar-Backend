@@ -113,7 +113,7 @@ config::Configuration evalArgs(std::int32_t argc, char** argv)
         config::Configuration conf(file);
         if(gnd)
         {
-            conf.setGroundMode(true);
+            conf.set_groundMode(true);
             logger.info("(VFRB) Override ground mode: Yes");
         }
         return conf;

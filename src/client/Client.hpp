@@ -30,26 +30,24 @@
 #include <boost/functional/hash.hpp>
 
 #include "../Defines.h"
-#include "../Parameters.h"
 #include "../Logger.hpp"
+#include "../Parameters.h"
 #include "../feed/Feed.h"
 #include "Endpoint.hpp"
 
-/// @namespace client
 namespace client
 {
-#ifdef CLIENT_CONNECT_WAIT_TIMEVAL
 /// @def C_CON_WAIT_TIMEVAL
 /// Wait for (re-)connect timeout
+#ifdef CLIENT_CONNECT_WAIT_TIMEVAL
 #define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
 #else
 #define C_CON_WAIT_TIMEVAL 120
 #endif
 
 /**
- * @class Client
  * @brief Base class representing a TCP client.
- * @note A Client is unique and only movable.
+ * @tparam ConnectorT The connector interface
  */
 template<typename ConnectorT>
 class Client
@@ -58,26 +56,23 @@ public:
     NOT_COPYABLE(Client)
 
     /**
-     * @fn ~Client
      * @brief Destructor
      */
     virtual ~Client() noexcept;
 
     /**
-     * @fn run
      * @brief Run the Client.
      * @note Returns after all queued handlers have returned.
-     * @param rSigset The signal set reference to register handler
      */
     void run();
 
     void lockAndStop();
 
-    virtual bool equals(const Client<ConnectorT>& crOther) const;
+    virtual bool equals(const Client<ConnectorT>& other) const;
 
     virtual std::size_t hash() const;
 
-    void subscribe(std::shared_ptr<feed::Feed> rpFeed);
+    void subscribe(std::shared_ptr<feed::Feed> feed);
 
 protected:
     /**
@@ -88,7 +83,7 @@ protected:
      * @param crComponent  The component name
      * @param rFeed        The handler Feed reference
      */
-    Client(const Endpoint& crEndpoint, const std::string& crComponent);
+    Client(const Endpoint& endpoint, const std::string& component);
 
     /**
      * @fn stop
@@ -121,7 +116,7 @@ protected:
      * @brief Handler for timedConnect.
      * @param crError The error code
      */
-    void handleTimedConnect(bool vError) noexcept;
+    void handleTimedConnect(bool error) noexcept;
 
     /**
      * @fn handleRead
@@ -129,7 +124,7 @@ protected:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleRead(bool vError, const std::string& crResponse) noexcept;
+    void handleRead(bool error, const std::string& response) noexcept;
 
     /**
      * @fn handleConnect
@@ -137,31 +132,31 @@ protected:
      * @param crError     The error code
      * @param vResolverIt The resolve iterator
      */
-    virtual void handleConnect(bool vError) noexcept = 0;
+    virtual void handleConnect(bool error) noexcept = 0;
 
-    ConnectorT mConnector;
+    ConnectorT m_connector;
 
-    mutable std::mutex mMutex;
-
-    bool mRunning = false;
+    bool m_running = false;
 
     /// @var mComponent
     /// Component string used for logging
-    const std::string mComponent;
+    const std::string m_component;
 
     /// @var mHost
     /// Hostname
-    Endpoint mEndpoint;
+    const Endpoint m_endpoint;
+
+    mutable std::mutex m_mutex;
 
 private:
     /// @var mrFeeds
     /// Handler Feed references
-    std::vector<std::shared_ptr<feed::Feed>> mrFeeds;
+    std::vector<std::shared_ptr<feed::Feed>> m_feeds;
 };
 
 template<typename ConnectorT>
-Client<ConnectorT>::Client(const Endpoint& crEndpoint, const std::string& crComponent)
-    : mComponent(crComponent), mEndpoint(crEndpoint)
+Client<ConnectorT>::Client(const Endpoint& endpoint, const std::string& component)
+    : m_component(component), m_endpoint(endpoint)
 {}
 
 template<typename ConnectorT>
@@ -173,52 +168,53 @@ Client<ConnectorT>::~Client() noexcept
 template<typename ConnectorT>
 void Client<ConnectorT>::run()
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-    if(!mRunning)
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if(!m_running)
     {
-        mRunning = true;
+        m_running = true;
         connect();
         lock.unlock();
-        mConnector.run();
+        m_connector.run();
     }
 }
 
 template<typename ConnectorT>
-bool Client<ConnectorT>::equals(const Client& crOther) const
+bool Client<ConnectorT>::equals(const Client& other) const
 {
-    return this->mEndpoint == crOther.mEndpoint;
+    return this->m_endpoint == other.m_endpoint;
 }
 
 template<typename ConnectorT>
 std::size_t Client<ConnectorT>::hash() const
 {
     std::size_t seed = 0;
-    boost::hash_combine(seed, boost::hash_value(mEndpoint.host));
-    boost::hash_combine(seed, boost::hash_value(mEndpoint.port));
+    boost::hash_combine(seed, boost::hash_value(m_endpoint.host));
+    boost::hash_combine(seed, boost::hash_value(m_endpoint.port));
     return seed;
 }
 
 template<typename ConnectorT>
-void Client<ConnectorT>::subscribe(std::shared_ptr<feed::Feed> rpFeed)
+void Client<ConnectorT>::subscribe(std::shared_ptr<feed::Feed> feed)
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    mrFeeds.push_back(rpFeed);
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_feeds.push_back(feed);
 }
 
 template<typename ConnectorT>
 void Client<ConnectorT>::connect()
 {
-    mConnector.onConnect(mEndpoint, std::bind(&Client::handleConnect, this, std::placeholders::_1));
+    m_connector.onConnect(m_endpoint,
+                          std::bind(&Client::handleConnect, this, std::placeholders::_1));
 }
 
 template<typename ConnectorT>
 void Client<ConnectorT>::reconnect()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    if(mRunning)
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if(m_running)
     {
-        logger.info(mComponent, " schedule reconnect to ", mEndpoint.host, ":", mEndpoint.port);
-        mConnector.close();
+        logger.info(m_component, " schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
+        m_connector.close();
         timedConnect();
     }
 }
@@ -226,60 +222,60 @@ void Client<ConnectorT>::reconnect()
 template<typename ConnectorT>
 void Client<ConnectorT>::timedConnect()
 {
-    mConnector.onTimeout(std::bind(&Client::handleTimedConnect, this, std::placeholders::_1),
-                         C_CON_WAIT_TIMEVAL);
+    m_connector.onTimeout(std::bind(&Client::handleTimedConnect, this, std::placeholders::_1),
+                          C_CON_WAIT_TIMEVAL);
 }
 
 template<typename ConnectorT>
 void Client<ConnectorT>::stop()
 {
-    if(mRunning)
+    if(m_running)
     {
-        mRunning = false;
-        logger.info(mComponent, " disconnect from ", mEndpoint.host, ":", mEndpoint.port);
-        mConnector.stop();
+        m_running = false;
+        logger.info(m_component, " disconnect from ", m_endpoint.host, ":", m_endpoint.port);
+        m_connector.stop();
     }
 }
 
 template<typename ConnectorT>
 void Client<ConnectorT>::lockAndStop()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     stop();
 }
 
 template<typename ConnectorT>
 void Client<ConnectorT>::read()
 {
-    mConnector.onRead(
+    m_connector.onRead(
         std::bind(&Client::handleRead, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 template<typename ConnectorT>
-void Client<ConnectorT>::handleTimedConnect(bool vError) noexcept
+void Client<ConnectorT>::handleTimedConnect(bool error) noexcept
 {
-    if(vError)
+    if(!error)
     {
-        std::lock_guard<std::mutex> lock(mMutex);
-        logger.info(mComponent, " try connect to ", mEndpoint.host, ":", mEndpoint.port);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        logger.info(m_component, " try connect to ", m_endpoint.host, ":", m_endpoint.port);
         connect();
     }
     else
     {
-        logger.error(mComponent, " failed to connect after timeout");
+        logger.error(m_component, " failed to connect after timeout");
         lockAndStop();
     }
 }
 
 template<typename ConnectorT>
-void Client<ConnectorT>::handleRead(bool vError, const std::string& crResponse) noexcept
+void Client<ConnectorT>::handleRead(bool error, const std::string& response) noexcept
 {
-    if(vError)
+    if(!error)
     {
-        std::lock_guard<std::mutex> lock(mMutex);
-        for(auto& it : mrFeeds)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        for(auto& it : m_feeds)
         {
-            if(!it->process(crResponse))
+            if(!it->process(response))
             {
                 stop();
             }
@@ -288,7 +284,7 @@ void Client<ConnectorT>::handleRead(bool vError, const std::string& crResponse) 
     }
     else
     {
-        logger.error(mComponent, " failed to read message");
+        logger.error(m_component, " failed to read message");
         reconnect();
     }
 }

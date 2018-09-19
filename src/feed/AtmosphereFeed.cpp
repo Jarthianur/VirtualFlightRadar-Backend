@@ -40,17 +40,17 @@ AtmosphereFeed::AtmosphereFeed(const std::string& crName, const config::KeyValue
 AtmosphereFeed::~AtmosphereFeed() noexcept
 {}
 
-Feed::Protocol AtmosphereFeed::getProtocol() const
+Feed::Protocol AtmosphereFeed::get_protocol() const
 {
     return Protocol::SENSOR;
 }
 
 bool AtmosphereFeed::process(const std::string& crResponse) noexcept
 {
-    object::Atmosphere atmos(getPriority());
+    object::Atmosphere atmos(get_priority());
     if(smParser.unpack(crResponse, atmos))
     {
-        mpData->update(std::move(atmos));
+        m_data->update(std::move(atmos));
     }
     return true;
 }

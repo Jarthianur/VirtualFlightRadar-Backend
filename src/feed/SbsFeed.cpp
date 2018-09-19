@@ -36,23 +36,23 @@ SbsFeed::SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
                  std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
     : Feed(crName, crKvMap, pData)
 {
-    smParser.setMaxHeight(vMaxHeight);
+    parser::SbsParser::s_maxHeight = vMaxHeight;
 }
 
 SbsFeed::~SbsFeed() noexcept
 {}
 
-Feed::Protocol SbsFeed::getProtocol() const
+Feed::Protocol SbsFeed::get_protocol() const
 {
     return Protocol::SBS;
 }
 
 bool SbsFeed::process(const std::string& crResponse) noexcept
 {
-    object::Aircraft ac(getPriority());
+    object::Aircraft ac(get_priority());
     if(smParser.unpack(crResponse, ac))
     {
-        mpData->update(std::move(ac));
+        m_data->update(std::move(ac));
     }
     return true;
 }

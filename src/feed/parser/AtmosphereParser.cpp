@@ -62,8 +62,8 @@ bool AtmosphereParser::parseAtmosphere(const std::string& crStr, object::Atmosph
         double tmpPress = std::stod(crStr.substr(tmpS, subLen), &numIdx) * 1000.0;
         if((valid = (numIdx == subLen)))
         {
-            rAtmos.setSerialized(std::string(crStr));
-            rAtmos.setPressure(tmpPress);
+            rAtmos.set_serialized(std::string(crStr));
+            rAtmos.set_pressure(tmpPress);
         }
     }
     return valid;

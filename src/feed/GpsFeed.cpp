@@ -47,26 +47,26 @@ GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
 GpsFeed::~GpsFeed() noexcept
 {}
 
-Feed::Protocol GpsFeed::getProtocol() const
+Feed::Protocol GpsFeed::get_protocol() const
 {
     return Protocol::GPS;
 }
 
 bool GpsFeed::process(const std::string& crResponse) noexcept
 {
-    object::GpsPosition pos(getPriority());
+    object::GpsPosition pos(get_priority());
     if(smParser.unpack(crResponse, pos))
     {
         try
         {
-            if(mpData->update(std::move(pos)))
+            if(m_data->update(std::move(pos)))
             {
                 throw std::runtime_error("received good position -> stop");
             }
         }
         catch(const std::runtime_error& e)
         {
-            logger.info(COMPONENT " ", mName, ": ", e.what());
+            logger.info(COMPONENT " ", m_name, ": ", e.what());
             return false;
         }
     }

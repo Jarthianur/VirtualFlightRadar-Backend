@@ -46,7 +46,7 @@ public:
      * @param crLogin The login string to transmit
      * @param rFeed   The handler Feed reference
      */
-    AprscClient(const Endpoint& crEndpoint, const std::string& crLogin);
+    AprscClient(const Endpoint& endpoint, const std::string& login);
 
     /**
      * @fn ~AprscClient
@@ -54,7 +54,7 @@ public:
      */
     ~AprscClient() noexcept;
 
-    bool equals(const Client<ConnectorT>& crOther) const override;
+    bool equals(const Client<ConnectorT>& other) const override;
 
     std::size_t hash() const override;
 
@@ -68,7 +68,7 @@ private:
     /**
      * @see Client#handleConnect
      */
-    void handleConnect(bool vError) noexcept override;
+    void handleConnect(bool error) noexcept override;
 
     /**
      * @fn handleLogin
@@ -76,7 +76,7 @@ private:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleLogin(bool vError) noexcept;
+    void handleLogin(bool error) noexcept;
 
     /**
      * @fn handleSendKeepAlive
@@ -84,18 +84,18 @@ private:
      * @param crError The error code
      * @param vBytes  The sent bytes
      */
-    void handleSendKeepAlive(bool vError) noexcept;
+    void handleSendKeepAlive(bool error) noexcept;
 
     /// @var mLoginStr
     /// Login string
-    std::string mLoginStr;
+    std::string m_login;
 };
 
 template<typename ConnectorT>
-AprscClient<ConnectorT>::AprscClient(const Endpoint& crEndpoint, const std::string& crLogin)
-    : Client<ConnectorT>(crEndpoint, "(AprscClient)"), mLoginStr(crLogin)
+AprscClient<ConnectorT>::AprscClient(const Endpoint& endpoint, const std::string& login)
+    : Client<ConnectorT>(endpoint, "(AprscClient)"), m_login(login)
 {
-    mLoginStr.append("\r\n");
+    m_login.append("\r\n");
 }
 
 template<typename ConnectorT>
@@ -103,12 +103,12 @@ AprscClient<ConnectorT>::~AprscClient() noexcept
 {}
 
 template<typename ConnectorT>
-bool AprscClient<ConnectorT>::equals(const Client<ConnectorT>& crOther) const
+bool AprscClient<ConnectorT>::equals(const Client<ConnectorT>& other) const
 {
     try
     {
-        const AprscClient& crAOther = dynamic_cast<const AprscClient&>(crOther);
-        return Client<ConnectorT>::equals(crOther) && this->mLoginStr == crAOther.mLoginStr;
+        const AprscClient& derived = dynamic_cast<const AprscClient&>(other);
+        return Client<ConnectorT>::equals(other) && this->m_login == derived.m_login;
     }
     catch(const std::bad_cast&)
     {
@@ -120,24 +120,24 @@ template<typename ConnectorT>
 std::size_t AprscClient<ConnectorT>::hash() const
 {
     std::size_t seed = Client<ConnectorT>::hash();
-    boost::hash_combine(seed, boost::hash_value(mLoginStr));
+    boost::hash_combine(seed, boost::hash_value(m_login));
     return seed;
 }
 
 template<typename ConnectorT>
-void AprscClient<ConnectorT>::handleConnect(bool vError) noexcept
+void AprscClient<ConnectorT>::handleConnect(bool error) noexcept
 {
-    if(vError)
+    if(!error)
     {
-        std::lock_guard<std::mutex> lock(this->mMutex);
-        this->mConnector.onWrite(mLoginStr,
-                                 std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
+        std::lock_guard<std::mutex> lock(this->m_mutex);
+        this->m_connector.onWrite(
+            m_login, std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
         sendKeepAlive();
     }
     else
     {
-        logger.warn(this->mComponent, " failed to connect to ", this->mEndpoint.host, ":",
-                    this->mEndpoint.port);
+        logger.warn(this->m_component, " failed to connect to ", this->m_endpoint.host, ":",
+                    this->m_endpoint.port);
         this->reconnect();
     }
 }
@@ -145,40 +145,43 @@ void AprscClient<ConnectorT>::handleConnect(bool vError) noexcept
 template<typename ConnectorT>
 void AprscClient<ConnectorT>::sendKeepAlive()
 {
-    this->mConnector.onTimeout(
+    this->m_connector.onTimeout(
         std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1), 600);
 }
 
 template<typename ConnectorT>
-void AprscClient<ConnectorT>::handleLogin(bool vError) noexcept
+void AprscClient<ConnectorT>::handleLogin(bool error) noexcept
 {
-    if(vError)
+    if(!error)
     {
-        logger.info(this->mComponent, " connected to ", this->mEndpoint.host, ":",
-                    this->mEndpoint.port);
-        std::lock_guard<std::mutex> lock(this->mMutex);
+        logger.info(this->m_component, " connected to ", this->m_endpoint.host, ":",
+                    this->m_endpoint.port);
+        std::lock_guard<std::mutex> lock(this->m_mutex);
         this->read();
     }
     else
     {
-        logger.error(this->mComponent, " send login failed");
+        logger.error(this->m_component, " send login failed");
     }
 }
 
 template<typename ConnectorT>
-void AprscClient<ConnectorT>::handleSendKeepAlive(bool vError) noexcept
+void AprscClient<ConnectorT>::handleSendKeepAlive(bool error) noexcept
 {
-    if(vError)
+    if(!error)
     {
-        std::lock_guard<std::mutex> lock(this->mMutex);
-        this->mConnector.onWrite("#keep-alive beacon\r\n", [this](bool vError) {
-            if(!vError)
+        std::lock_guard<std::mutex> lock(this->m_mutex);
+        this->m_connector.onWrite("#keep-alive beacon\r\n", [this](bool error) {
+            if(!error)
             {
-                logger.error(this->mComponent, " send keep-alive beacon failed");
+                sendKeepAlive();
+            }
+            else
+            {
+                logger.error(this->m_component, " send keep-alive beacon failed");
                 this->reconnect();
             }
         });
-        sendKeepAlive();
     }
 }
 

@@ -54,7 +54,7 @@ namespace feed
 {
 namespace parser
 {
-std::int32_t SbsParser::smMaxHeight = std::numeric_limits<std::int32_t>::max();
+std::int32_t SbsParser::s_maxHeight = std::numeric_limits<std::int32_t>::max();
 
 SbsParser::SbsParser() : Parser<Aircraft>()
 {}
@@ -80,11 +80,11 @@ bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
         }
         p = delim + 1;
     }
-    rAircraft.setPosition(pos);
-    rAircraft.setTargetType(Aircraft::TargetType::TRANSPONDER);
-    rAircraft.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
-    rAircraft.setIdType(Aircraft::IdType::ICAO);
-    return i == 16 && pos.altitude <= smMaxHeight;
+    rAircraft.set_position(pos);
+    rAircraft.set_targetType(Aircraft::TargetType::TRANSPONDER);
+    rAircraft.set_aircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
+    rAircraft.set_idType(Aircraft::IdType::ICAO);
+    return i == 16 && pos.altitude <= s_maxHeight;
 }
 
 bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr, Position& rPosition,
@@ -95,10 +95,10 @@ bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr, Posit
         switch(vField)
         {
             case SBS_FIELD_ID:
-                rAircraft.setId(crStr);
+                rAircraft.set_id(crStr);
                 break;
             case SBS_FIELD_TIME:
-                rAircraft.setTimeStamp(TimeStamp(crStr, TimeStamp::Format::HH_MM_SS_FFF));
+                rAircraft.set_timeStamp(TimeStamp(crStr, TimeStamp::Format::HH_MM_SS_FFF));
                 break;
             case SBS_FIELD_ALT:
                 rPosition.altitude = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);

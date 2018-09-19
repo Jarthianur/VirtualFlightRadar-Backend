@@ -75,7 +75,7 @@ public:
      */
     ~AprscFeed() noexcept;
 
-    Protocol getProtocol() const override;
+    Protocol get_protocol() const override;
 
     /**
      * @see Feed#process

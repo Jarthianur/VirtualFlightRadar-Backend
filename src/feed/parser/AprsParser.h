@@ -56,6 +56,10 @@ public:
      */
     bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
 
+    /// @var mMaxHeight
+    /// The max height filter
+    static std::int32_t s_maxHeight;
+
 private:
     /**
      * @fn parsePosition
@@ -102,13 +106,6 @@ private:
     /// @var msAprsComRe
     /// Regular expression for OGN specific APRS extension
     static const boost::regex msAprsComRe;
-
-    /// @var mMaxHeight
-    /// The max height filter
-    static std::int32_t smMaxHeight;
-
-public:
-    SETTER_V(smMaxHeight, MaxHeight)
 };
 }  // namespace parser
 }  // namespace feed

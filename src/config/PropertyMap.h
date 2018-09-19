@@ -79,7 +79,7 @@ public:
 private:
     /// @var mPropertiesMap
     /// The map of sections with kv-maps
-    std::unordered_map<std::string, KeyValueMap> mPropertiesMap;
+    std::unordered_map<std::string, KeyValueMap> m_propertiesMap;
 };
 
 }  // namespace config

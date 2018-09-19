@@ -145,7 +145,7 @@ void test_feed_parser(test::TestSuitesRunner& runner)
                    object::Wind wind;
                    std::string mwv("$WIMWV,242.8,R,6.9,N,A*20\r\n");
                    assertTrue(windParser.unpack(mwv, wind));
-                   assertEquals(wind.getSerialized(), mwv);
+                   assertEquals(wind.get_serialized(), mwv);
                })
         ->test("invalid msg", []() {
             WindParser windParser;
@@ -163,7 +163,7 @@ void test_feed_parser(test::TestSuitesRunner& runner)
                    std::string mda("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
                    assertTrue(atmParser.unpack(mda, atm));
                    assertEquals(atm.getPressure(), 1009.1);
-                   assertEquals(atm.getSerialized(), mda);
+                   assertEquals(atm.get_serialized(), mda);
                })
         ->test("invalid msg", []() {
             AtmosphereParser atmParser;

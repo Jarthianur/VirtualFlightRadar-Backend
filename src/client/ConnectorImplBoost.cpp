@@ -119,7 +119,7 @@ void ConnectorImplBoost::handleWrite(const boost::system::error_code& crError, s
     {
         logger.debug("(Client) failed to write: ", crError.message());
     }
-    crCallback(!crError);
+    crCallback(crError);
 }
 
 void ConnectorImplBoost::handleResolve(const boost::system::error_code& crError,
@@ -136,7 +136,7 @@ void ConnectorImplBoost::handleResolve(const boost::system::error_code& crError,
     else
     {
         logger.debug("(Client) failed to resolve host: ", crError.message());
-        crCallback(false);
+        crCallback(true);
     }
 }
 
@@ -152,7 +152,7 @@ void ConnectorImplBoost::handleConnect(const boost::system::error_code& crError,
     {
         mSocket.set_option(boost::asio::socket_base::keep_alive(true));
     }
-    crCallback(!crError);
+    crCallback(crError);
 }
 
 void ConnectorImplBoost::handleTimeout(const boost::system::error_code& crError,
@@ -162,7 +162,7 @@ void ConnectorImplBoost::handleTimeout(const boost::system::error_code& crError,
     {
         logger.debug("(Client) timeout: ", crError.message());
     }
-    crCallback(!crError);
+    crCallback(crError);
 }
 
 void ConnectorImplBoost::handleRead(const boost::system::error_code& crError, std::size_t,
@@ -177,7 +177,7 @@ void ConnectorImplBoost::handleRead(const boost::system::error_code& crError, st
         std::getline(mIStream, mResponse);
         mResponse.append("\n");
     }
-    crCallback(!crError, mResponse);
+    crCallback(crError, mResponse);
 }
 
 }  // namespace client

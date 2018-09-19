@@ -187,7 +187,7 @@ void Server<TcpInterfaceT, SocketT>::send(const std::string& crStr)
         {
             if(!it.get()->write(crStr))
             {
-                logger.warn("(Server) lost connection to: ", it.get()->getIpAddress());
+                logger.warn("(Server) lost connection to: ", it.get()->get_ipAddress());
                 it.reset();
                 --mActiveConnections;
             }
@@ -207,7 +207,7 @@ bool Server<TcpInterfaceT, SocketT>::isConnected(const std::string& crIpAddress)
 {
     for(const auto& it : mConnections)
     {
-        if(it && it.get()->getIpAddress() == crIpAddress)
+        if(it && it.get()->get_ipAddress() == crIpAddress)
         {
             return true;
         }
@@ -231,7 +231,7 @@ void Server<TcpInterfaceT, SocketT>::attemptConnection(bool vError) noexcept
                     {
                         it = Connection<SocketT>::start(std::move(mTcpIf.getSocket()));
                         ++mActiveConnections;
-                        logger.info("(Server) connection from: ", it->getIpAddress());
+                        logger.info("(Server) connection from: ", it->get_ipAddress());
                         break;
                     }
                 }

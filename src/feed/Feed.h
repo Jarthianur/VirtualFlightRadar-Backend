@@ -60,9 +60,9 @@ public:
      */
     virtual ~Feed() noexcept;
 
-    virtual Protocol getProtocol() const = 0;
+    virtual Protocol get_protocol() const = 0;
 
-    client::Endpoint getEndpoint() const;
+    client::Endpoint get_endpoint() const;
 
     /**
      * @fn process
@@ -84,13 +84,13 @@ protected:
 
     /// @var mName
     /// Unique name
-    const std::string mName;
+    const std::string m_name;
 
     /// @var mKvMap
     /// Key-value-map holding the properties.
-    const config::KeyValueMap mKvMap;
+    const config::KeyValueMap m_properties;
 
-    std::shared_ptr<data::Data> mpData;
+    std::shared_ptr<data::Data> m_data;
 
 private:
     /**
@@ -101,14 +101,14 @@ private:
 
     /// @var mPriority
     /// The priority
-    std::uint32_t mPriority;
+    std::uint32_t m_priority;
 
 public:
     /**
      * Define and declare getters.
      */
-    GETTER_CR(mName, Name)
-    GETTER_V(mPriority, Priority)
+    GETTER_CR(name)
+    GETTER_V(priority)
 };
 
 }  // namespace feed

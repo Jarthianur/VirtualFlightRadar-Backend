@@ -91,8 +91,8 @@ private:
 
     /// @var mValue
     /// The time in milliseconds
-    std::uint64_t mValue;
+    std::uint64_t m_value;
 
-    bool mYesterday;
+    bool m_yesterday;
 };
 }  // namespace object
