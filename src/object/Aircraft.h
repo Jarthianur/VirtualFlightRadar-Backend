@@ -69,7 +69,7 @@ public:
      * @note FLARM is preferred over TRANSPONDER,
      *       in case an aircraft has both available.
      */
-    enum class TargetType : std::uint32_t
+    enum class TargetType : std::int32_t
     {
         FLARM,
         TRANSPONDER
@@ -79,7 +79,7 @@ public:
      * @enum AircraftType
      * @brief Aircraft types with their protocol codes.
      */
-    enum class AircraftType : std::uint32_t
+    enum class AircraftType : std::int32_t
     {
         UNKNOWN               = 0,
         GLIDER                = 1,
@@ -118,7 +118,7 @@ public:
      * @brief Constructor
      * @param vPriority The initial priority
      */
-    explicit Aircraft(std::uint32_t vPriority);
+    explicit Aircraft(std::uint32_t priority);
 
     ~Aircraft() noexcept;
 
@@ -130,7 +130,7 @@ public:
      *
      * @param vType The type
      */
-    void set_aircraftType(AircraftType vType);
+    void set_aircraftType(AircraftType type);
 
     /**
      * @fn setIdType
@@ -141,7 +141,7 @@ public:
      *
      * @param vType The type
      */
-    void set_idType(IdType vType);
+    void set_idType(IdType type);
 
 private:
     /**
@@ -149,7 +149,7 @@ private:
      * @brief Assign an other Aircrafts values to this.
      * @param rvOther The other Aircraft
      */
-    void assign(Object&& rvOther) override;
+    void assign(Object&& other) override;
 
     /**
      * @fn canUpdate
@@ -158,7 +158,7 @@ private:
      * @param vAttempts The update attempt count
      * @return true if yes, else false
      */
-    bool canUpdate(const Object& crOther) const override;
+    bool canUpdate(const Object& other) const override;
 
     /// @var mId
     /// Aircraft identifier

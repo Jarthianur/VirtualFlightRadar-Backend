@@ -29,13 +29,13 @@ namespace server
 class SocketException : public std::exception
 {
 public:
-    SocketException(const std::string& crMessage);
+    SocketException(const std::string& msg);
     ~SocketException() noexcept;
 
     const char* what() const noexcept;
 
 private:
-    const std::string mMessage;
+    const std::string m_message;
 };
 
 }  // namespace server

@@ -99,7 +99,7 @@ config::Configuration evalArgs(std::int32_t argc, char** argv)
         }
         else if(std::string(argv[i]).find("-v") != std::string::npos)
         {
-            logger.setDebug(true);
+            logger.set_debug(true);
         }
         else
         {

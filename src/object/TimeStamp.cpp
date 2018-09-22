@@ -29,27 +29,27 @@ namespace object
 TimeStamp::TimeStamp() : m_value(0), m_yesterday(false)
 {}
 
-TimeStamp::TimeStamp(const std::string& crValue, Format vFormat)
+TimeStamp::TimeStamp(const std::string& value, Format format)
 {
     std::int32_t h = 99, m = 99, s = 99, f = 9999;
     try
     {
-        switch(vFormat)
+        switch(format)
         {
             case Format::HHMMSS:
             {
-                h = std::stoi(crValue.substr(0, 2));
-                m = std::stoi(crValue.substr(2, 2));
-                s = std::stoi(crValue.substr(4, 2));
+                h = std::stoi(value.substr(0, 2));
+                m = std::stoi(value.substr(2, 2));
+                s = std::stoi(value.substr(4, 2));
                 f = 0;
             }
             break;
             case Format::HH_MM_SS_FFF:
             {
-                h = std::stoi(crValue.substr(0, 2));
-                m = std::stoi(crValue.substr(3, 2));
-                s = std::stoi(crValue.substr(6, 2));
-                f = std::stoi(crValue.substr(9, 3));
+                h = std::stoi(value.substr(0, 2));
+                m = std::stoi(value.substr(3, 2));
+                s = std::stoi(value.substr(6, 2));
+                f = std::stoi(value.substr(9, 3));
             }
             break;
         }
@@ -66,24 +66,24 @@ TimeStamp::TimeStamp(const std::string& crValue, Format vFormat)
     m_yesterday = m_value >= now();
 }
 
-TimeStamp::TimeStamp(const TimeStamp& crOther)
-    : m_value(crOther.m_value), m_yesterday(crOther.m_yesterday)
+TimeStamp::TimeStamp(const TimeStamp& other)
+    : m_value(other.m_value), m_yesterday(other.m_yesterday)
 {}
 
 TimeStamp::~TimeStamp() noexcept
 {}
 
-TimeStamp& TimeStamp::operator=(const TimeStamp& crOther)
+TimeStamp& TimeStamp::operator=(const TimeStamp& other)
 {
-    this->m_value     = crOther.m_value;
-    this->m_yesterday = crOther.m_yesterday;
+    this->m_value     = other.m_value;
+    this->m_yesterday = other.m_yesterday;
     return *this;
 }
 
-bool TimeStamp::operator>(const TimeStamp& crOther) const
+bool TimeStamp::operator>(const TimeStamp& other) const
 {
-    return (crOther.m_yesterday && !this->m_yesterday)
-           || ((!this->m_yesterday || crOther.m_yesterday) && this->m_value > crOther.m_value);
+    return (other.m_yesterday && !this->m_yesterday)
+           || ((!this->m_yesterday || other.m_yesterday) && this->m_value > other.m_value);
 }
 
 std::uint64_t TimeStamp::now() const

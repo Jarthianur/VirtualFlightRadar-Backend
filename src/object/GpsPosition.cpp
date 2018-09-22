@@ -22,32 +22,32 @@ namespace object
 GpsPosition::GpsPosition() : Object()
 {}
 
-GpsPosition::GpsPosition(std::uint32_t vPriority) : Object(vPriority)
+GpsPosition::GpsPosition(std::uint32_t priority) : Object(priority)
 {}
 
-GpsPosition::GpsPosition(const Position& crPosition, double vGeoid)
-    : Object(), m_position(crPosition), m_geoid(vGeoid)
+GpsPosition::GpsPosition(const Position& position, double geoid)
+    : Object(), m_position(position), m_geoid(geoid)
 {}
 
 GpsPosition::~GpsPosition() noexcept
 {}
 
-void GpsPosition::assign(Object&& rvOther)
+void GpsPosition::assign(Object&& other)
 {
-    Object::assign(std::move(rvOther));
-    GpsPosition&& rvUpdate = static_cast<GpsPosition&&>(rvOther);
-    this->m_position        = rvUpdate.m_position;
-    this->m_timeStamp       = rvUpdate.m_timeStamp;
-    this->m_nrOfSatellites  = rvUpdate.m_nrOfSatellites;
-    this->m_fixQuality      = rvUpdate.m_fixQuality;
-    this->m_geoid           = rvUpdate.m_geoid;
-    this->m_dilution        = rvUpdate.m_dilution;
+    Object::assign(std::move(other));
+    GpsPosition&& update = static_cast<GpsPosition&&>(other);
+    this->m_position        = update.m_position;
+    this->m_timeStamp       = update.m_timeStamp;
+    this->m_nrOfSatellites  = update.m_nrOfSatellites;
+    this->m_fixQuality      = update.m_fixQuality;
+    this->m_geoid           = update.m_geoid;
+    this->m_dilution        = update.m_dilution;
 }
 
-bool GpsPosition::canUpdate(const Object& crOther) const
+bool GpsPosition::canUpdate(const Object& other) const
 {
-    const GpsPosition& crToUpdate = static_cast<const GpsPosition&>(crOther);
-    return (this->m_timeStamp > crToUpdate.m_timeStamp) && Object::canUpdate(crOther);
+    const GpsPosition& toUpdate = static_cast<const GpsPosition&>(other);
+    return (this->m_timeStamp > toUpdate.m_timeStamp) && Object::canUpdate(other);
 }
 
 }  // namespace object

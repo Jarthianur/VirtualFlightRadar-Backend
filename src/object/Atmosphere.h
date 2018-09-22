@@ -50,7 +50,7 @@ public:
      * @brief Constructor
      * @param vPriority The initial priority
      */
-    explicit Atmosphere(std::uint32_t vPriority);
+    explicit Atmosphere(std::uint32_t priority);
 
     /**
      * @fn Atmosphere
@@ -58,7 +58,7 @@ public:
      * @param vPressure The initial pressure
      * @param vPriority The initial priority
      */
-    Atmosphere(double vPressure, std::uint32_t vPriority);
+    Atmosphere(double pressure, std::uint32_t priority);
 
     ~Atmosphere() noexcept;
 
@@ -66,7 +66,7 @@ private:
     /**
      * @see Object#assign
      */
-    void assign(Object&& rvOther) override;
+    void assign(Object&& other) override;
 
     /// @var mPressure
     /// The atmospheric pressure

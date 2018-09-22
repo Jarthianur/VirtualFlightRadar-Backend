@@ -55,9 +55,9 @@ public:
      * @param rvSocket The socket
      * @return a shared ptr to the Connection object
      */
-    static std::unique_ptr<Connection<SocketT>> start(SocketT&& rvSocket);
+    static std::unique_ptr<Connection<SocketT>> start(SocketT&& socket);
 
-    bool write(const std::string& crStr);
+    bool write(const std::string& msg);
 
 private:
     /**
@@ -65,7 +65,7 @@ private:
      * @brief Constructor
      * @param rvSocket The socket
      */
-    explicit Connection(SocketT&& rvSocket);
+    explicit Connection(SocketT&& socket);
 
     /// @var mSocket
     /// Socket
@@ -73,13 +73,13 @@ private:
 
     /// @var mIpAddress
     /// IP address
-    const std::string m_ipAddress;
+    const std::string m_address;
 
 public:
     /**
      * Define and declare getters.
      */
-    GETTER_CR(ipAddress)
+    GETTER_CR(address)
 };
 
 template<typename SocketT>
@@ -87,28 +87,28 @@ Connection<SocketT>::~Connection<SocketT>() noexcept
 {}
 
 template<typename SocketT>
-std::unique_ptr<Connection<SocketT>> Connection<SocketT>::start(SocketT&& rvSocket)
+std::unique_ptr<Connection<SocketT>> Connection<SocketT>::start(SocketT&& socket)
 {
-    return std::unique_ptr<Connection<SocketT>>(new Connection<SocketT>(std::move(rvSocket)));
+    return std::unique_ptr<Connection<SocketT>>(new Connection<SocketT>(std::move(socket)));
 }
 
 template<typename SocketT>
-bool Connection<SocketT>::write(const std::string& crStr)
+bool Connection<SocketT>::write(const std::string& msg)
 {
     try
     {
-        return m_socket.write(crStr);
+        return m_socket.write(msg);
     }
-    catch(const SocketException& crSE)
+    catch(const SocketException& e)
     {
-        logger.debug("(Connection) write: ", crSE.what());
+        logger.debug("(Connection) write: ", e.what());
     }
     return false;
 }
 
 template<typename SocketT>
-Connection<SocketT>::Connection(SocketT&& rvSocket)
-    : m_socket(std::move(rvSocket)), m_ipAddress(m_socket.address())
+Connection<SocketT>::Connection(SocketT&& socket)
+    : m_socket(std::move(socket)), m_address(m_socket.get_address())
 {}
 
 }  // namespace server

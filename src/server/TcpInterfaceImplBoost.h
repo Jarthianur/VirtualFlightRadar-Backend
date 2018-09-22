@@ -37,22 +37,22 @@ class TcpInterfaceImplBoost
 public:
     NOT_COPYABLE(TcpInterfaceImplBoost)
 
-    explicit TcpInterfaceImplBoost(std::uint16_t vPort);
+    explicit TcpInterfaceImplBoost(std::uint16_t port);
     ~TcpInterfaceImplBoost() noexcept;
 
     void run(std::unique_lock<std::mutex>& lock);
     void stop();
-    void onAccept(const std::function<void(bool)>& crCallback);
+    void onAccept(const std::function<void(bool)>& callback);
     void close();
-    SocketImplBoost& getSocket();
+    SocketImplBoost& get_socket();
 
 private:
-    void handleAccept(const boost::system::error_code& crError,
-                      const std::function<void(bool)>& crCallback) noexcept;
+    void handleAccept(const boost::system::error_code& error,
+                      const std::function<void(bool)>& callback) noexcept;
 
-    boost::asio::io_service mIoService;
-    boost::asio::ip::tcp::acceptor mAcceptor;
-    SocketImplBoost mSocket;
+    boost::asio::io_service m_ioService;
+    boost::asio::ip::tcp::acceptor m_acceptor;
+    SocketImplBoost m_socket;
 };
 
 }  // namespace server

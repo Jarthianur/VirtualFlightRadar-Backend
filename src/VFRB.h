@@ -62,7 +62,7 @@ public:
      * @brief Constructor
      * @param crConfig The configuration
      */
-    explicit VFRB(const config::Configuration& crConfig);
+    explicit VFRB(const config::Configuration& config);
 
     /**
      * @fn ~VFRB
@@ -82,7 +82,7 @@ private:
      * @brief Register all input Feeds.
      * @param crConfig The Configuration
      */
-    void createFeeds(const config::Configuration& crConfig);
+    void createFeeds(const config::Configuration& config);
 
     /**
      * @fn serve
@@ -96,33 +96,33 @@ private:
      * @param vStart The start value
      * @return the duration string
      */
-    std::string getDuration(std::chrono::steady_clock::time_point vStart) const;
+    std::string get_duration(std::chrono::steady_clock::time_point start) const;
 
     /// @var mpAircraftData
     /// Manage aircrafts
-    std::shared_ptr<data::AircraftData> mpAircraftData;
+    std::shared_ptr<data::AircraftData> m_aircraftData;
 
     /// @var mpAtmosphereData
     /// Manage atmospheric data
-    std::shared_ptr<data::AtmosphereData> mpAtmosphereData;
+    std::shared_ptr<data::AtmosphereData> m_atmosphereData;
 
     /// @var mpGpsData
     /// Manage GPS data
-    std::shared_ptr<data::GpsData> mpGpsData;
+    std::shared_ptr<data::GpsData> m_gpsData;
 
     /// @var mpWindData
     /// Manage wind data
-    std::shared_ptr<data::WindData> mpWindData;
+    std::shared_ptr<data::WindData> m_windData;
 
     /// @var mServer
     /// Manage clients and sending of data
-    server::Server<server::TcpInterfaceImplBoost, server::SocketImplBoost> mServer;
+    server::Server<server::TcpInterfaceImplBoost, server::SocketImplBoost> m_server;
 
     /// @var mFeeds
     /// List of all active feeds
-    std::list<std::shared_ptr<feed::Feed>> mFeeds;
+    std::list<std::shared_ptr<feed::Feed>> m_feeds;
 
     /// @var vRunStatus
     /// Atomic run-status.
-    std::atomic<bool> mRunStatus;
+    std::atomic<bool> m_running;
 };

@@ -26,8 +26,8 @@ namespace object
 Aircraft::Aircraft() : Aircraft(0)
 {}
 
-Aircraft::Aircraft(std::uint32_t vPriority)
-    : Object(vPriority),
+Aircraft::Aircraft(std::uint32_t priority)
+    : Object(priority),
       m_idType(IdType::ICAO),
       m_aircraftType(AircraftType::POWERED_AIRCRAFT),
       m_targetType(TargetType::TRANSPONDER)
@@ -36,38 +36,38 @@ Aircraft::Aircraft(std::uint32_t vPriority)
 Aircraft::~Aircraft() noexcept
 {}
 
-void Aircraft::assign(Object&& rvOther)
+void Aircraft::assign(Object&& other)
 {
-    Object::assign(std::move(rvOther));
-    Aircraft&& rvUpdate  = static_cast<Aircraft&&>(rvOther);
-    this->m_idType       = rvUpdate.m_idType;
-    this->m_aircraftType = rvUpdate.m_aircraftType;
-    this->m_targetType   = rvUpdate.m_targetType;
-    this->m_position     = rvUpdate.m_position;
-    this->m_movement     = rvUpdate.m_movement;
-    this->m_timeStamp    = rvUpdate.m_timeStamp;
-    this->m_fullInfo     = rvUpdate.m_fullInfo;
+    Object::assign(std::move(other));
+    Aircraft&& update  = static_cast<Aircraft&&>(other);
+    this->m_idType       = update.m_idType;
+    this->m_aircraftType = update.m_aircraftType;
+    this->m_targetType   = update.m_targetType;
+    this->m_position     = update.m_position;
+    this->m_movement     = update.m_movement;
+    this->m_timeStamp    = update.m_timeStamp;
+    this->m_fullInfo     = update.m_fullInfo;
 }
 
-bool Aircraft::canUpdate(const Object& crOther) const
+bool Aircraft::canUpdate(const Object& other) const
 {
-    const Aircraft& crToUpdate = static_cast<const Aircraft&>(crOther);
-    return (this->m_timeStamp > crToUpdate.m_timeStamp)
-           && (crToUpdate.m_targetType == TargetType::TRANSPONDER
+    const Aircraft& toUpdate = static_cast<const Aircraft&>(other);
+    return (this->m_timeStamp > toUpdate.m_timeStamp)
+           && (toUpdate.m_targetType == TargetType::TRANSPONDER
                || this->m_targetType == TargetType::FLARM)
-           && Object::canUpdate(crOther);
+           && Object::canUpdate(other);
 }
 
-void Aircraft::set_aircraftType(Aircraft::AircraftType vType)
+void Aircraft::set_aircraftType(Aircraft::AircraftType type)
 {
-    m_aircraftType = vType < AircraftType::UNKNOWN || vType > AircraftType::STATIC_OBJECT
+    m_aircraftType = type < AircraftType::UNKNOWN || type > AircraftType::STATIC_OBJECT
                          ? AircraftType::UNKNOWN
-                         : vType;
+                         : type;
 }
 
-void Aircraft::set_idType(Aircraft::IdType vType)
+void Aircraft::set_idType(Aircraft::IdType type)
 {
-    m_idType = vType < IdType::UNRECOGNIZED || vType > IdType::OGN ? IdType::UNRECOGNIZED : vType;
+    m_idType = type < IdType::UNRECOGNIZED || type > IdType::OGN ? IdType::UNRECOGNIZED : type;
 }
 
 }  // namespace object

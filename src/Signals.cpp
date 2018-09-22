@@ -21,12 +21,12 @@
 
 #include "Signals.h"
 
-Signals::Signals() : mIoService(), mSigSet(mIoService)
+Signals::Signals() : m_ioService(), m_sigSet(m_ioService)
 {
-    mSigSet.add(SIGINT);
-    mSigSet.add(SIGTERM);
+    m_sigSet.add(SIGINT);
+    m_sigSet.add(SIGTERM);
 #ifdef SIGQUIT
-    mSigSet.add(SIGQUIT);
+    m_sigSet.add(SIGQUIT);
 #endif
 }
 
@@ -37,27 +37,27 @@ Signals::~Signals() noexcept
 
 void Signals::run()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    mThread = std::thread([this]() { mIoService.run(); });
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_thread = std::thread([this]() { m_ioService.run(); });
 }
 
 void Signals::stop()
 {
     {
-        std::lock_guard<std::mutex> lock(mMutex);
-        if(!mIoService.stopped())
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if(!m_ioService.stopped())
         {
-            mIoService.stop();
+            m_ioService.stop();
         }
     }
-    if(mThread.joinable())
+    if(m_thread.joinable())
     {
-        mThread.join();
+        m_thread.join();
     }
 }
 
-void Signals::addHandler(const SignalHandler& crHandler)
+void Signals::addHandler(const SignalHandler& handler)
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    mSigSet.async_wait(crHandler);
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_sigSet.async_wait(handler);
 }

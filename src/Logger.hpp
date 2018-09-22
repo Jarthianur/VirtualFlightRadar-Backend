@@ -24,6 +24,7 @@
 #include <iostream>
 #include <mutex>
 #include <string>
+#include <utility>
 
 /**
  * @class Logger
@@ -44,18 +45,18 @@ public:
      * @threadsafe
      */
     template<typename T, typename... TRest>
-    void info(T crMsg, TRest... tail)
+    void info(T&& msg, TRest&&... tail)
     {
-        std::lock_guard<std::mutex> lock(mMutex);
-        *mpOutStream << "\r[INFO]  " << getTime() << ":: ";
-        log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        *m_outStream << "\r[INFO]  " << get_time() << ":: ";
+        log(m_outStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
     }
     template<typename T>
-    void info(T crMsg)
+    void info(T&& msg)
     {
-        std::lock_guard<std::mutex> lock(mMutex);
-        *mpOutStream << "\r[INFO]  " << getTime() << ":: ";
-        log(mpOutStream, std::forward<T>(crMsg));
+        std::lock_guard<std::mutex> lock(m_mutex);
+        *m_outStream << "\r[INFO]  " << get_time() << ":: ";
+        log(m_outStream, std::forward<T>(msg));
     }
 
     /**
@@ -66,23 +67,23 @@ public:
      * @threadsafe
      */
     template<typename T, typename... TRest>
-    void debug(T crMsg, TRest... tail)
+    void debug(T&& msg, TRest&&... tail)
     {
-        if(mDebugEnabled)
+        if(m_debugEnabled)
         {
-            std::lock_guard<std::mutex> lock(mMutex);
-            *mpOutStream << "\r[DEBUG] " << getTime() << ":: ";
-            log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
+            std::lock_guard<std::mutex> lock(m_mutex);
+            *m_outStream << "\r[DEBUG] " << get_time() << ":: ";
+            log(m_outStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
         }
     }
     template<typename T>
-    void debug(T crMsg)
+    void debug(T&& msg)
     {
-        if(mDebugEnabled)
+        if(m_debugEnabled)
         {
-            std::lock_guard<std::mutex> lock(mMutex);
-            *mpOutStream << "\r[DEBUG] " << getTime() << ":: ";
-            log(mpOutStream, std::forward<T>(crMsg));
+            std::lock_guard<std::mutex> lock(m_mutex);
+            *m_outStream << "\r[DEBUG] " << get_time() << ":: ";
+            log(m_outStream, std::forward<T>(msg));
         }
     }
 
@@ -94,18 +95,18 @@ public:
      * @threadsafe
      */
     template<typename T, typename... TRest>
-    void warn(T crMsg, TRest... tail)
+    void warn(T&& msg, TRest&&... tail)
     {
-        std::lock_guard<std::mutex> lock(mMutex);
-        *mpOutStream << "\r[WARN]  " << getTime() << ":: ";
-        log(mpOutStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        *m_outStream << "\r[WARN]  " << get_time() << ":: ";
+        log(m_outStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
     }
     template<typename T>
-    void warn(T crMsg)
+    void warn(T&& msg)
     {
-        std::lock_guard<std::mutex> lock(mMutex);
-        *mpOutStream << "\r[WARN]  " << getTime() << ":: ";
-        log(mpOutStream, std::forward<T>(crMsg));
+        std::lock_guard<std::mutex> lock(m_mutex);
+        *m_outStream << "\r[WARN]  " << get_time() << ":: ";
+        log(m_outStream, std::forward<T>(msg));
     }
 
     /**
@@ -116,43 +117,43 @@ public:
      * @threadsafe
      */
     template<typename T, typename... TRest>
-    void error(T crMsg, TRest... tail)
+    void error(T&& msg, TRest&&... tail)
     {
-        std::lock_guard<std::mutex> lock(mMutex);
-        *mpErrStream << "\r[ERROR] " << getTime() << ":: ";
-        log(mpErrStream, std::forward<T>(crMsg), std::forward<TRest>(tail)...);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        *m_errStream << "\r[ERROR] " << get_time() << ":: ";
+        log(m_errStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
     }
     template<typename T>
-    void error(T crMsg)
+    void error(T&& msg)
     {
-        std::lock_guard<std::mutex> lock(mMutex);
-        *mpErrStream << "\r[ERROR] " << getTime() << ":: ";
-        log(mpErrStream, std::forward<T>(crMsg));
+        std::lock_guard<std::mutex> lock(m_mutex);
+        *m_errStream << "\r[ERROR] " << get_time() << ":: ";
+        log(m_errStream, std::forward<T>(msg));
     }
 
-    void setDebug(bool vEnable);
+    void set_debug(bool enable);
 
 private:
     /// @var mMutex
     /// Mutex for threadsafe logging
-    std::mutex mMutex;
+    mutable std::mutex m_mutex;
 
-    /// @var mpOutStream
+    /// @var m_outStream
     /// Stream to log INFO,DEBUG,WARN
-    std::ostream* mpOutStream;
+    std::ostream* m_outStream;
 
     /// @var mpErrStream
     /// Stream to log ERROR
-    std::ostream* mpErrStream;
+    std::ostream* m_errStream;
 
-    bool mDebugEnabled = false;
+    bool m_debugEnabled = false;
 
     /**
      * @fn getTime
      * @brief Get current date-time as string.
      * @return the date-time-string
      */
-    static std::string getTime();
+    static std::string get_time();
 
     /**
      * @fn log
@@ -162,15 +163,15 @@ private:
      * @tparam TRest The rest of arguments
      */
     template<typename T, typename... TRest>
-    void log(std::ostream* pOut, T head, TRest... tail)
+    void log(std::ostream* out, T&& head, TRest&&... tail)
     {
-        *pOut << std::forward<T>(head);
-        log(pOut, std::forward<TRest>(tail)...);
+        *out << std::forward<T>(head);
+        log(out, std::forward<TRest>(tail)...);
     }
     template<typename T>
-    void log(std::ostream* pOut, T last)
+    void log(std::ostream* out, T&& last)
     {
-        *pOut << std::forward<T>(last) << std::endl;
+        *out << std::forward<T>(last) << std::endl;
     }
 };
 

@@ -41,11 +41,11 @@ public:
 
     void run();
     void stop();
-    void addHandler(const SignalHandler& crHandler);
+    void addHandler(const SignalHandler& handler);
 
 private:
-    boost::asio::io_service mIoService;
-    boost::asio::signal_set mSigSet;
-    std::thread mThread;
-    std::mutex mMutex;
+    boost::asio::io_service m_ioService;
+    boost::asio::signal_set m_sigSet;
+    std::thread m_thread;
+    mutable std::mutex m_mutex;
 };

@@ -45,13 +45,13 @@ using namespace data;
 #define SYNC_TIME 1
 
 VFRB::VFRB(const config::Configuration& config)
-    : mpAircraftData(std::make_shared<AircraftData>(config.get_maxDistance())),
-      mpAtmosphereData(
+    : m_aircraftData(std::make_shared<AircraftData>(config.get_maxDistance())),
+      m_atmosphereData(
           std::make_shared<AtmosphereData>(object::Atmosphere(config.get_atmPressure(), 0))),
-      mpGpsData(std::make_shared<GpsData>(config.get_position(), config.get_groundMode())),
-      mpWindData(std::make_shared<WindData>()),
-      mServer(config.get_serverPort()),
-      mRunStatus(false)
+      m_gpsData(std::make_shared<GpsData>(config.get_position(), config.get_groundMode())),
+      m_windData(std::make_shared<WindData>()),
+      m_server(config.get_serverPort()),
+      m_running(false)
 {
     createFeeds(config);
 }
@@ -61,7 +61,7 @@ VFRB::~VFRB() noexcept
 
 void VFRB::run() noexcept
 {
-    mRunStatus = true;
+    m_running = true;
     logger.info("(VFRB) startup");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
@@ -70,62 +70,62 @@ void VFRB::run() noexcept
 
     signals.addHandler([this](const boost::system::error_code&, const int) {
         logger.info("(VFRB) caught signal to shutdown ...");
-        mRunStatus = false;
+        m_running = false;
     });
 
-    for(const auto& it : mFeeds)
+    for(const auto& it : m_feeds)
     {
         logger.info("(VFRB) run feed: ", it->get_name());
         clientManager.subscribe(it);
     }
-    mFeeds.clear();
+    m_feeds.clear();
 
     signals.run();
-    mServer.run();
+    m_server.run();
     clientManager.run();
 
     serve();
 
     signals.stop();
     clientManager.stop();
-    mServer.stop();
+    m_server.stop();
 
-    logger.info("Stopped after ", getDuration(start));
+    logger.info("Stopped after ", get_duration(start));
 }
 
 void VFRB::serve()
 {
-    while(mRunStatus)
+    while(m_running)
     {
         try
         {
-            mpAircraftData->processAircrafts(mpGpsData->get_position(),
-                                             mpAtmosphereData->get_atmPressure());
-            mServer.send(mpAircraftData->get_serialized());
-            mServer.send(mpGpsData->get_serialized());
-            mServer.send(mpAtmosphereData->get_serialized());
-            mServer.send(mpWindData->get_serialized());
+            m_aircraftData->processAircrafts(m_gpsData->get_position(),
+                                             m_atmosphereData->get_atmPressure());
+            m_server.send(m_aircraftData->get_serialized());
+            m_server.send(m_gpsData->get_serialized());
+            m_server.send(m_atmosphereData->get_serialized());
+            m_server.send(m_windData->get_serialized());
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
         catch(const std::exception& e)
         {
             logger.error("(VFRB) error: ", e.what());
-            mRunStatus = false;
+            m_running = false;
         }
     }
 }
 
-void VFRB::createFeeds(const config::Configuration& crConfig)
+void VFRB::createFeeds(const config::Configuration& config)
 {
-    feed::FeedFactory factory(crConfig, mpAircraftData, mpAtmosphereData, mpGpsData, mpWindData);
-    for(const auto& feed : crConfig.get_feedMapping())
+    feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
+    for(const auto& feed : config.get_feedProperties())
     {
         try
         {
             auto optFeedPtr = factory.createFeed(feed.first, feed.second);
             if(optFeedPtr)
             {
-                mFeeds.push_back(*optFeedPtr);
+                m_feeds.push_back(*optFeedPtr);
             }
             else
             {
@@ -142,10 +142,10 @@ void VFRB::createFeeds(const config::Configuration& crConfig)
     }
 }
 
-std::string VFRB::getDuration(std::chrono::steady_clock::time_point vStart) const
+std::string VFRB::get_duration(std::chrono::steady_clock::time_point start) const
 {
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::chrono::minutes runtime = std::chrono::duration_cast<std::chrono::minutes>(end - vStart);
+    std::chrono::minutes runtime = std::chrono::duration_cast<std::chrono::minutes>(end - start);
     std::stringstream ss;
     ss << runtime.count() / 60 / 24 << " days, " << runtime.count() / 60 << " hours, "
        << runtime.count() % 60 << " minutes";

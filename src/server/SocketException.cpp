@@ -23,8 +23,8 @@
 
 namespace server
 {
-SocketException::SocketException(const std::string& crMessage)
-    : std::exception(), mMessage(crMessage)
+SocketException::SocketException(const std::string& msg)
+    : std::exception(), m_message(msg)
 {}
 
 SocketException::~SocketException() noexcept
@@ -32,7 +32,7 @@ SocketException::~SocketException() noexcept
 
 const char* SocketException::what() const noexcept
 {
-    return mMessage.c_str();
+    return m_message.c_str();
 }
 
 }  // namespace server

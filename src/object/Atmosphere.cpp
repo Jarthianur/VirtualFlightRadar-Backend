@@ -22,21 +22,21 @@ namespace object
 Atmosphere::Atmosphere() : Object()
 {}
 
-Atmosphere::Atmosphere(std::uint32_t vPriority) : Object(vPriority)
+Atmosphere::Atmosphere(std::uint32_t priority) : Object(priority)
 {}
 
-Atmosphere::Atmosphere(double vPressure, std::uint32_t vPriority)
-    : Object(vPriority), m_pressure(vPressure)
+Atmosphere::Atmosphere(double pressure, std::uint32_t priority)
+    : Object(priority), m_pressure(pressure)
 {}
 
 Atmosphere::~Atmosphere() noexcept
 {}
 
-void Atmosphere::assign(Object&& rvOther)
+void Atmosphere::assign(Object&& other)
 {
-    Object::assign(std::move(rvOther));
-    Atmosphere&& crUpdate = static_cast<Atmosphere&&>(rvOther);
-    this->m_pressure       = crUpdate.m_pressure;
+    Object::assign(std::move(other));
+    Atmosphere&& update = static_cast<Atmosphere&&>(other);
+    this->m_pressure       = update.m_pressure;
 }
 
 }  // namespace object

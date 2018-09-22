@@ -64,7 +64,7 @@ public:
      * @brief Constructor
      * @param vPriority The initial priority
      */
-    explicit GpsPosition(std::uint32_t vPriority);
+    explicit GpsPosition(std::uint32_t priority);
 
     /**
      * @fn GpsPosition
@@ -72,7 +72,7 @@ public:
      * @param crPosition The position
      * @param vGeoid     The geoid
      */
-    GpsPosition(const Position& crPosition, double vGeoid);
+    GpsPosition(const Position& position, double geoid);
 
     ~GpsPosition() noexcept;
 
@@ -80,7 +80,7 @@ private:
     /**
      * @see Object#assign
      */
-    void assign(Object&& rvOther) override;
+    void assign(Object&& other) override;
 
     /**
      * @fn canUpdate
@@ -89,7 +89,7 @@ private:
      * @param vAttempts The update attempt count
      * @return true if yes, else false
      */
-    bool canUpdate(const Object& crOther) const override;
+    bool canUpdate(const Object& other) const override;
 
     /// @var mPosition
     /// The position

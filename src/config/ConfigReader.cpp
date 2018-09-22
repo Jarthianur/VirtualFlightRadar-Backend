@@ -50,7 +50,6 @@ void ConfigReader::read(std::istream& stream, Properties& properties)
         {
             continue;
         }
-
         boost::optional<std::string> section = parseSection(currentLine);
         if(section)
         {
@@ -58,11 +57,10 @@ void ConfigReader::read(std::istream& stream, Properties& properties)
             if(!properties.addProperty(currentSection))
                 {
                     logger.warn("(ConfigReader) could not add section [", std::to_string(lineNr),
-                                "]: ", section);
+                                "]: ", *section);
                 }
             continue;
         }
-
         boost::optional<KeyValue> keyValue = parseProperty(currentLine);
         if(keyValue)
         {

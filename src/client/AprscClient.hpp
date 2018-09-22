@@ -94,8 +94,7 @@ private:
 template<typename ConnectorT>
 AprscClient<ConnectorT>::AprscClient(const Endpoint& endpoint, const std::string& login)
     : Client<ConnectorT>(endpoint, "(AprscClient)"), m_login(login + "\r\n")
-{
-}
+{}
 
 template<typename ConnectorT>
 AprscClient<ConnectorT>::~AprscClient() noexcept

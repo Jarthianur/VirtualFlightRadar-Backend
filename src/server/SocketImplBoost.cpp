@@ -26,21 +26,21 @@
 
 namespace server
 {
-SocketImplBoost::SocketImplBoost(SocketImplBoost&& rvOther) : mSocket(boost::move(rvOther.mSocket))
+SocketImplBoost::SocketImplBoost(SocketImplBoost&& other) : m_socket(boost::move(other.m_socket))
 {}
 
-SocketImplBoost& SocketImplBoost::operator=(SocketImplBoost&& rvOther)
+SocketImplBoost& SocketImplBoost::operator=(SocketImplBoost&& other)
 {
-    mSocket = boost::move(rvOther.mSocket);
+    m_socket = boost::move(other.m_socket);
     return *this;
 }
 
-SocketImplBoost::SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) rvSocket)
-    : mSocket(boost::move(rvSocket))
+SocketImplBoost::SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket)
+    : m_socket(boost::move(socket))
 {
-    if(mSocket.is_open())
+    if(m_socket.is_open())
     {
-        mSocket.non_blocking(true);
+        m_socket.non_blocking(true);
     }
 }
 
@@ -49,39 +49,39 @@ SocketImplBoost::~SocketImplBoost() noexcept
     close();
 }
 
-std::string SocketImplBoost::address() const
+std::string SocketImplBoost::get_address() const
 {
-    if(!mSocket.is_open())
+    if(!m_socket.is_open())
     {
         throw SocketException("cannot get address from closed socket");
     }
-    return mSocket.remote_endpoint().address().to_string();
+    return m_socket.remote_endpoint().address().to_string();
 }
 
-bool SocketImplBoost::write(const std::string& crStr)
+bool SocketImplBoost::write(const std::string& msg)
 {
-    if(!mSocket.is_open())
+    if(!m_socket.is_open())
     {
         throw SocketException("cannot write on closed socket");
     }
     boost::system::error_code ec;
-    boost::asio::write(mSocket, boost::asio::buffer(crStr), ec);
+    boost::asio::write(m_socket, boost::asio::buffer(msg), ec);
     return !ec;
 }
 
 void SocketImplBoost::close()
 {
-    if(mSocket.is_open())
+    if(m_socket.is_open())
     {
         boost::system::error_code ignored_ec;
-        mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ignored_ec);
-        mSocket.close();
+        m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ignored_ec);
+        m_socket.close();
     }
 }
 
 boost::asio::ip::tcp::socket& SocketImplBoost::get()
 {
-    return mSocket;
+    return m_socket;
 }
 
 }  // namespace server

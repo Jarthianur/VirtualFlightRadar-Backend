@@ -26,19 +26,19 @@
 
 Logger logger;
 
-Logger::Logger() : mpOutStream(&std::cout), mpErrStream(&std::cerr)
+Logger::Logger() : m_outStream(&std::cout), m_errStream(&std::cerr)
 {}
 
 Logger::~Logger() noexcept
 {}
 
-void Logger::setDebug(bool vEnable)
+void Logger::set_debug(bool enable)
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    mDebugEnabled = vEnable;
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_debugEnabled = enable;
 }
 
-std::string Logger::getTime()
+std::string Logger::get_time()
 {
     std::time_t tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     char time[32]  = "";

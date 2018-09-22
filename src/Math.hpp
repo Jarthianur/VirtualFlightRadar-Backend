@@ -77,9 +77,9 @@ const double PI = std::acos(-1.0);
  * @param vDegree The degrees
  * @return the radian
  */
-inline double radian(double vDegree)
+inline double radian(double degree)
 {
-    return ((vDegree * PI) / 180.0);
+    return ((degree * PI) / 180.0);
 }
 
 /**
@@ -88,9 +88,9 @@ inline double radian(double vDegree)
  * @param vRadian The radian
  * @return the degrees
  */
-inline double degree(double vRadian)
+inline double degree(double radian)
 {
-    return (vRadian * 180.0) / PI;
+    return (radian * 180.0) / PI;
 }
 
 /**
@@ -99,10 +99,10 @@ inline double degree(double vRadian)
  * @param vDouble The floating point value
  * @return the rounded integer
  */
-inline std::int32_t doubleToInt(double vDouble)
+inline std::int32_t doubleToInt(double value)
 {
-    return (vDouble >= 0.0) ? static_cast<std::int32_t>(vDouble + 0.5)
-                            : static_cast<std::int32_t>(vDouble - 0.5);
+    return (value >= 0.0) ? static_cast<std::int32_t>(value + 0.5)
+                            : static_cast<std::int32_t>(value - 0.5);
 }
 
 /**
@@ -111,9 +111,9 @@ inline std::int32_t doubleToInt(double vDouble)
  * @param vDegMin The degree-minute value
  * @return the degree value
  */
-inline double dmToDeg(double vDegMin)
+inline double dmToDeg(double degMin)
 {
-    double absDm = std::abs(vDegMin / 100.0);
+    double absDm = std::abs(degMin / 100.0);
     double d     = std::floor(absDm);
     double m     = (absDm - d) * 100.0 / 60.0;
     return d + m;
@@ -126,9 +126,9 @@ inline double dmToDeg(double vDegMin)
  * @param vPressure The air pressure
  * @return the height difference to QNE
  */
-inline std::int32_t icaoHeight(double vPressure)
+inline std::int32_t icaoHeight(double pressure)
 {
-    return doubleToInt(288.15 * (1.0 - std::pow((vPressure / 1013.25), 0.190295)) / 0.0065);
+    return doubleToInt(288.15 * (1.0 - std::pow((pressure / 1013.25), 0.190295)) / 0.0065);
 }
 
 /**
@@ -138,13 +138,13 @@ inline std::int32_t icaoHeight(double vPressure)
  * @param vSize      The sentences size
  * @return the checksum
  */
-inline std::int32_t checksum(const char* cpSentence, std::size_t vSize)
+inline std::int32_t checksum(const char* sentence, std::size_t length)
 {
     std::int32_t csum = 0;
     std::size_t i     = 1;  // $ in nmea str not included
-    while(i < vSize && cpSentence[i] != '*' && cpSentence[i] != '\0')
+    while(i < length && sentence[i] != '*' && sentence[i] != '\0')
     {
-        csum ^= static_cast<std::int32_t>(cpSentence[i++]);
+        csum ^= static_cast<std::int32_t>(sentence[i++]);
     }
     return csum;
 }

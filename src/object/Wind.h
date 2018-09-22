@@ -44,7 +44,7 @@ public:
      * @fn Wind
      * @brief Constructor
      */
-    explicit Wind(std::uint32_t vPriority);
+    explicit Wind(std::uint32_t priority);
 
     ~Wind() noexcept;
 };

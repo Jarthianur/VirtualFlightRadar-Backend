@@ -26,11 +26,11 @@
 
 namespace server
 {
-TcpInterfaceImplBoost::TcpInterfaceImplBoost(std::uint16_t vPort)
-    : mIoService(),
-      mAcceptor(mIoService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), vPort),
+TcpInterfaceImplBoost::TcpInterfaceImplBoost(std::uint16_t port)
+    : m_ioService(),
+      m_acceptor(m_ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
                 boost::asio::ip::tcp::acceptor::reuse_address(true)),
-      mSocket(boost::move(boost::asio::ip::tcp::socket(mIoService)))
+      m_socket(boost::move(boost::asio::ip::tcp::socket(m_ioService)))
 {}
 
 TcpInterfaceImplBoost::~TcpInterfaceImplBoost() noexcept
@@ -42,15 +42,15 @@ void TcpInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
 {
     try
     {
-        if(mAcceptor.is_open())
+        if(m_acceptor.is_open())
         {
             lock.unlock();
-            mIoService.run();
+            m_ioService.run();
         }
     }
-    catch(const std::exception& crErr)
+    catch(const std::exception& e)
     {
-        logger.error("TcpInterfaceImplBoost::run() caught: ", crErr.what());
+        logger.error("TcpInterfaceImplBoost::run() caught: ", e.what());
     }
     catch(...)
     {
@@ -60,45 +60,45 @@ void TcpInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
 
 void TcpInterfaceImplBoost::stop()
 {
-    if(mAcceptor.is_open())
+    if(m_acceptor.is_open())
     {
-        mAcceptor.close();
+        m_acceptor.close();
     }
-    if(!mIoService.stopped())
+    if(!m_ioService.stopped())
     {
-        mIoService.stop();
+        m_ioService.stop();
     }
-    mSocket.close();
+    m_socket.close();
 }
 
-void TcpInterfaceImplBoost::onAccept(const std::function<void(bool)>& crCallback)
+void TcpInterfaceImplBoost::onAccept(const std::function<void(bool)>& callback)
 {
-    if(mAcceptor.is_open())
+    if(m_acceptor.is_open())
     {
-        mAcceptor.async_accept(mSocket.get(),
+        m_acceptor.async_accept(m_socket.get(),
                                boost::bind(&TcpInterfaceImplBoost::handleAccept, this,
-                                           boost::asio::placeholders::error, crCallback));
+                                           boost::asio::placeholders::error, callback));
     }
 }
 
 void TcpInterfaceImplBoost::close()
 {
-    mSocket.close();
+    m_socket.close();
 }
 
-void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& crError,
-                                         const std::function<void(bool)>& crCallback) noexcept
+void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
+                                         const std::function<void(bool)>& callback) noexcept
 {
-    if(crError)
+    if(error)
     {
-        logger.debug("(Server) accept: ", crError.message());
+        logger.debug("(Server) accept: ", error.message());
     }
-    crCallback(crError);
+    callback(error);
 }
 
-SocketImplBoost& TcpInterfaceImplBoost::getSocket()
+SocketImplBoost& TcpInterfaceImplBoost::get_socket()
 {
-    return mSocket;
+    return m_socket;
 }
 
 }  // namespace server

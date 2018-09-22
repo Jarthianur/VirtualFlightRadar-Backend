@@ -56,7 +56,7 @@ public:
      * @param vFormat The format
      * @throw std::invalid_argument if the time string is invalid
      */
-    TimeStamp(const std::string& crValue, Format vFormat);
+    TimeStamp(const std::string& value, Format format);
 
     /**
      * @fn TimeStamp
@@ -66,7 +66,7 @@ public:
      *
      * @param crOther The other TimeStamp
      */
-    TimeStamp(const TimeStamp& crOther);
+    TimeStamp(const TimeStamp& other);
 
     ~TimeStamp() noexcept;
 
@@ -76,7 +76,7 @@ public:
      * @param crOther The other TimeStamp
      * @return this
      */
-    TimeStamp& operator=(const TimeStamp& crOther);
+    TimeStamp& operator=(const TimeStamp& other);
 
     /**
      * @fn operator <=
@@ -84,7 +84,7 @@ public:
      * @param crOther The other TimeStamp
      * @return true if less, or equals, else false
      */
-    bool operator>(const TimeStamp& crOther) const;
+    bool operator>(const TimeStamp& other) const;
 
 private:
     std::uint64_t now() const;
