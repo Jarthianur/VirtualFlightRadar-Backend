@@ -38,11 +38,15 @@ TcpInterfaceImplBoost::~TcpInterfaceImplBoost() noexcept
     stop();
 }
 
-void TcpInterfaceImplBoost::run()
+void TcpInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
 {
     try
     {
-        mIoService.run();
+        if(mAcceptor.is_open())
+        {
+            lock.unlock();
+            mIoService.run();
+        }
     }
     catch(const std::exception& crErr)
     {
@@ -56,7 +60,6 @@ void TcpInterfaceImplBoost::run()
 
 void TcpInterfaceImplBoost::stop()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
     if(mAcceptor.is_open())
     {
         mAcceptor.close();
@@ -70,7 +73,6 @@ void TcpInterfaceImplBoost::stop()
 
 void TcpInterfaceImplBoost::onAccept(const std::function<void(bool)>& crCallback)
 {
-    std::lock_guard<std::mutex> lock(mMutex);
     if(mAcceptor.is_open())
     {
         mAcceptor.async_accept(mSocket.get(),
@@ -81,7 +83,6 @@ void TcpInterfaceImplBoost::onAccept(const std::function<void(bool)>& crCallback
 
 void TcpInterfaceImplBoost::close()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
     mSocket.close();
 }
 
@@ -92,7 +93,7 @@ void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& crErro
     {
         logger.debug("(Server) accept: ", crError.message());
     }
-    crCallback(!crError);
+    crCallback(crError);
 }
 
 SocketImplBoost& TcpInterfaceImplBoost::getSocket()

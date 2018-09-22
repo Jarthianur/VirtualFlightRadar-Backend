@@ -40,7 +40,7 @@ public:
     explicit TcpInterfaceImplBoost(std::uint16_t vPort);
     ~TcpInterfaceImplBoost() noexcept;
 
-    void run();
+    void run(std::unique_lock<std::mutex>& lock);
     void stop();
     void onAccept(const std::function<void(bool)>& crCallback);
     void close();
@@ -53,7 +53,6 @@ private:
     boost::asio::io_service mIoService;
     boost::asio::ip::tcp::acceptor mAcceptor;
     SocketImplBoost mSocket;
-    mutable std::mutex mMutex;
 };
 
 }  // namespace server

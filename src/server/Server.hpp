@@ -144,7 +144,8 @@ void Server<TcpInterfaceT, SocketT>::run()
     mRunning = true;
     mThread  = std::thread([this]() {
         accept();
-        mTcpIf.run();
+        std::unique_lock<std::mutex> lock(mMutex);
+        mTcpIf.run(lock);
         logger.debug("(Server) stopped");
     });
 }
@@ -198,6 +199,7 @@ void Server<TcpInterfaceT, SocketT>::send(const std::string& crStr)
 template<typename TcpInterfaceT, typename SocketT>
 void Server<TcpInterfaceT, SocketT>::accept()
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     mTcpIf.onAccept(
         std::bind(&Server<TcpInterfaceT, SocketT>::attemptConnection, this, std::placeholders::_1));
 }
