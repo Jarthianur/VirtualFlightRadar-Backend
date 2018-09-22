@@ -162,7 +162,7 @@ Client<ConnectorT>::Client(const Endpoint& endpoint, const std::string& componen
 template<typename ConnectorT>
 Client<ConnectorT>::~Client() noexcept
 {
-    stop();
+    Client<ConnectorT>::stop();
 }
 
 template<typename ConnectorT>
