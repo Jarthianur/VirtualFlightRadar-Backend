@@ -99,12 +99,12 @@ void VFRB::serve()
     {
         try
         {
-            mpAircraftData->processAircrafts(mpGpsData->getPosition(),
-                                             mpAtmosphereData->getAtmPressure());
-            mServer.send(mpAircraftData->getSerialized());
-            mServer.send(mpGpsData->getSerialized());
-            mServer.send(mpAtmosphereData->getSerialized());
-            mServer.send(mpWindData->getSerialized());
+            mpAircraftData->processAircrafts(mpGpsData->get_position(),
+                                             mpAtmosphereData->get_atmPressure());
+            mServer.send(mpAircraftData->get_serialized());
+            mServer.send(mpGpsData->get_serialized());
+            mServer.send(mpAtmosphereData->get_serialized());
+            mServer.send(mpWindData->get_serialized());
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
         catch(const std::exception& e)

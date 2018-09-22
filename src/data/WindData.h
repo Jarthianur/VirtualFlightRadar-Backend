@@ -44,7 +44,7 @@ public:
      * @brief Constructor
      * @param crWind The initial wind information
      */
-    explicit WindData(const object::Wind& crWind);
+    explicit WindData(const object::Wind& wind);
 
     ~WindData() noexcept;
 
@@ -55,7 +55,7 @@ public:
      * @return the MWV sentence, if valid, else empty string
      * @threadsafe
      */
-    std::string getSerialized() override;
+    std::string get_serialized() override;
 
     /**
      * @fn update
@@ -65,12 +65,12 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvWind) override;
+    bool update(object::Object&& wind) override;
 
 private:
     /// @var mWind
     /// The Wind information
-    object::Wind mWind;
+    object::Wind m_wind;
 };
 
 }  // namespace data

@@ -34,14 +34,24 @@ namespace config
 {
 using namespace util;
 
-Configuration::Configuration(std::istream& rStream)
+Configuration::Configuration(std::istream& stream)
 {
     try
     {
         ConfigReader reader;
-        PropertyMap properties;
-        reader.read(rStream, properties);
-        init(properties);
+        Properties properties;
+        reader.read(stream, properties);
+        m_atmPressure
+        = boost::get<double>(checkNumber(stringToNumber<double>(properties.get_property(
+                                                  SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
+                                              SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
+    m_position    = resolvePosition(properties);
+    m_maxDistance = resolveFilter(properties, KV_KEY_MAX_DIST);
+    m_maxHeight   = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
+    m_serverPort  = resolveServerPort(properties);
+    m_groundMode  = !properties.get_property(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
+    m_feedProperties = resolveFeeds(properties);
+    dumpInfo();
     }
     catch(const std::exception&)
     {
@@ -52,48 +62,32 @@ Configuration::Configuration(std::istream& rStream)
 Configuration::~Configuration() noexcept
 {}
 
-void Configuration::init(const PropertyMap& crProperties)
-{
-    m_atmPressure
-        = boost::get<double>(checkNumberValue(stringToNumber<double>(crProperties.getProperty(
-                                                  SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
-                                              SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
-    m_position    = resolvePosition(crProperties);
-    m_maxDistance = resolveFilter(crProperties, KV_KEY_MAX_DIST);
-    m_maxHeight   = resolveFilter(crProperties, KV_KEY_MAX_HEIGHT);
-    m_serverPort  = resolveServerPort(crProperties);
-    m_groundMode  = !crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
-    m_feedMapping = resolveFeeds(crProperties);
-
-    dumpInfo();
-}
-
-object::GpsPosition Configuration::resolvePosition(const PropertyMap& crProperties) const
+object::GpsPosition Configuration::resolvePosition(const Properties& properties) const
 {
     object::Position pos;
-    pos.latitude = boost::get<double>(checkNumberValue(
-        stringToNumber<double>(crProperties.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0")),
+    pos.latitude = boost::get<double>(checkNumber(
+        stringToNumber<double>(properties.get_property(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0")),
         SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
     pos.longitude
-        = boost::get<double>(checkNumberValue(stringToNumber<double>(crProperties.getProperty(
+        = boost::get<double>(checkNumber(stringToNumber<double>(properties.get_property(
                                                   SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0")),
                                               SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
     pos.altitude = boost::get<std::int32_t>(
-        checkNumberValue(stringToNumber<std::int32_t>(
-                             crProperties.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0")),
+        checkNumber(stringToNumber<std::int32_t>(
+                             properties.get_property(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0")),
                          SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
-    double geoid = boost::get<double>(checkNumberValue(
-        stringToNumber<double>(crProperties.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0")),
+    double geoid = boost::get<double>(checkNumber(
+        stringToNumber<double>(properties.get_property(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0")),
         SECT_KEY_FALLBACK, KV_KEY_GEOID));
     return object::GpsPosition(pos, geoid);
 }
 
-std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) const
+std::uint16_t Configuration::resolveServerPort(const Properties& properties) const
 {
     try
     {
         std::uint64_t port = boost::get<std::uint64_t>(
-            checkNumberValue(stringToNumber<std::uint64_t>(crProperties.getProperty(
+            checkNumber(stringToNumber<std::uint64_t>(properties.get_property(
                                  SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353")),
                              SECT_KEY_GENERAL, KV_KEY_SERVER_PORT));
         if(port > std::numeric_limits<std::uint16_t>::max())
@@ -108,14 +102,14 @@ std::uint16_t Configuration::resolveServerPort(const PropertyMap& crProperties) 
     }
 }
 
-std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
-                                          const std::string& crKey) const
+std::int32_t Configuration::resolveFilter(const Properties& properties,
+                                          const std::string& key) const
 {
     try
     {
-        std::int32_t filter = boost::get<std::int32_t>(checkNumberValue(
-            stringToNumber<std::int32_t>(crProperties.getProperty(SECT_KEY_FILTER, crKey, "-1")),
-            SECT_KEY_FILTER, crKey));
+        std::int32_t filter = boost::get<std::int32_t>(checkNumber(
+            stringToNumber<std::int32_t>(properties.get_property(SECT_KEY_FILTER, key, "-1")),
+            SECT_KEY_FILTER, key));
         return filter < 0 ? std::numeric_limits<std::int32_t>::max() : filter;
     }
     catch(const std::invalid_argument&)
@@ -124,16 +118,16 @@ std::int32_t Configuration::resolveFilter(const PropertyMap& crProperties,
     }
 }
 
-FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties)
+FeedProperties Configuration::resolveFeeds(const Properties& properties)
 {
     std::list<std::string> list
-        = splitCommaSeparated(crProperties.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
-    FeedMapping mapping;
+        = splitCommaSeparated(properties.get_property(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+    FeedProperties mapping;
     for(auto& it : list)
     {
         try
         {
-            mapping.push_back(std::make_pair(it, crProperties.getSectionKeyValue(it)));
+            mapping.push_back(std::make_pair(it, properties.get_propertySection(it)));
         }
         catch(const std::out_of_range& e)
         {
@@ -143,15 +137,15 @@ FeedMapping Configuration::resolveFeeds(const PropertyMap& crProperties)
     return mapping;
 }
 
-Number Configuration::checkNumberValue(const OptNumber& crOptNumber, const std::string& crSection,
-                                       const std::string& crKey) const
+Number Configuration::checkNumber(const OptNumber& number, const std::string& section,
+                                       const std::string& key) const
 {
-    if(!crOptNumber)
+    if(!number)
     {
-        logger.warn("(Config) ", crSection, ".", crKey, ": Could not resolve value.");
+        logger.warn("(Config) ", section, ".", key, ": Could not resolve value.");
         throw std::invalid_argument("");
     }
-    return *crOptNumber;
+    return *number;
 }
 
 void Configuration::dumpInfo() const
@@ -173,7 +167,7 @@ void Configuration::dumpInfo() const
     logger.info("(Config) " SECT_KEY_GENERAL "." KV_KEY_SERVER_PORT ": ",
                 std::to_string(m_serverPort));
     logger.info("(Config) " SECT_KEY_GENERAL "." KV_KEY_GND_MODE ": ", m_groundMode ? "Yes" : "No");
-    logger.info("(Config) number of feeds: ", std::to_string(m_feedMapping.size()));
+    logger.info("(Config) number of feeds: ", std::to_string(m_feedProperties.size()));
 }
 
 }  // namespace config

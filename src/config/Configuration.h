@@ -28,7 +28,7 @@
 
 #include "../Defines.h"
 #include "../object/GpsPosition.h"
-#include "PropertyMap.h"
+#include "Properties.h"
 #include "Util.hpp"
 
 /**
@@ -111,7 +111,7 @@ namespace config
 {
 /// @typedef FeedMapping
 /// List of pairs with feed name and key-values
-using FeedMapping = std::list<std::pair<std::string, KeyValueMap>>;
+using FeedProperties = std::list<std::pair<std::string, KeyValueMap>>;
 
 /**
  * @class Configuration
@@ -128,7 +128,7 @@ public:
      * @param rStream The input stream
      * @throw std::runtime_error if any error occures
      */
-    explicit Configuration(std::istream& rStream);
+    explicit Configuration(std::istream& stream);
 
     /**
      * @fn ~Configuration
@@ -137,13 +137,6 @@ public:
     ~Configuration() noexcept;
 
 private:
-    /**
-     * @fn init
-     * @brief Unpack the given properties.
-     * @param crProperties The properties
-     * @throw std::invalid_argument from invoked statements
-     */
-    void init(const PropertyMap& crProperties);
 
     /**
      * @fn resolvePosition
@@ -151,7 +144,7 @@ private:
      * @param crProperties The properties
      * @return the position
      */
-    object::GpsPosition resolvePosition(const PropertyMap& crProperties) const;
+    object::GpsPosition resolvePosition(const Properties& properties) const;
 
     /**
      * @fn resolveServerPort
@@ -159,7 +152,7 @@ private:
      * @param crProperties The properties
      * @return the port
      */
-    std::uint16_t resolveServerPort(const PropertyMap& crProperties) const;
+    std::uint16_t resolveServerPort(const Properties& properties) const;
 
     /**
      * @fn resolveFeeds
@@ -167,7 +160,7 @@ private:
      * @param crProperties The properties
      * @return a list of all feeds with their sections
      */
-    FeedMapping resolveFeeds(const PropertyMap& crProperties);
+    FeedProperties resolveFeeds(const Properties& properties);
 
     /**
      * @fn resolveFilter
@@ -177,7 +170,7 @@ private:
      * @param crKey        The filter key
      * @return the filter value
      */
-    std::int32_t resolveFilter(const PropertyMap& crProperties, const std::string& crKey) const;
+    std::int32_t resolveFilter(const Properties& properties, const std::string& key) const;
 
     /**
      * @fn checkNumberValue
@@ -188,8 +181,8 @@ private:
      * @return the number value
      * @throw std::invalid_argument if the Number is invalid
      */
-    util::Number checkNumberValue(const util::OptNumber& crOptNumber, const std::string& crSection,
-                                  const std::string& crKey) const;
+    util::Number checkNumber(const util::OptNumber& number, const std::string& section,
+                                  const std::string& key) const;
 
     /**
      * @fn dumpInfo
@@ -223,7 +216,7 @@ private:
 
     /// @var mFeedMapping
     /// List of feeds with their key-value map
-    FeedMapping m_feedMapping;
+    FeedProperties m_feedProperties;
 
 public:
     /**
@@ -235,7 +228,7 @@ public:
     GETTER_V(maxDistance)
     GETTER_V(serverPort)
     GETSET_V(groundMode)
-    GETTER_CR(feedMapping)
+    GETTER_CR(feedProperties)
 };
 
 }  // namespace config

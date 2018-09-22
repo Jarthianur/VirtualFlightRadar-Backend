@@ -61,7 +61,7 @@ public:
      * @param rPosition The target position
      * @return true on success, else false
      */
-    bool unpack(const std::string& crStr, object::GpsPosition& rPosition) noexcept override;
+    bool unpack(const std::string& sentence, object::GpsPosition& position) noexcept override;
 
 private:
     /**
@@ -71,11 +71,11 @@ private:
      * @param rPosition The target position
      * @return true on success, else false
      */
-    bool parsePosition(const boost::smatch& crMatch, object::GpsPosition& rPosition);
+    bool parsePosition(const boost::smatch& match, object::GpsPosition& position);
 
     /// @var msGpggaRe
     /// Regular expression to parse GGA
-    static const boost::regex msGpggaRe;
+    static const boost::regex s_GPGGA_RE;
 };
 }  // namespace parser
 }  // namespace feed

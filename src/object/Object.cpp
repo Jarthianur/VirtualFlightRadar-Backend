@@ -19,45 +19,45 @@
 
 namespace object
 {
-Object::Object() : mLastPriority(0)
+Object::Object() : m_lastPriority(0)
 {}
 
-Object::Object(std::uint32_t vPriority) : mLastPriority(vPriority)
+Object::Object(std::uint32_t priority) : m_lastPriority(priority)
 {}
 
 Object::~Object() noexcept
 {}
 
-void Object::assign(Object&& crOther)
+void Object::assign(Object&& other)
 {
-    this->mSerialized   = std::move(crOther.mSerialized);
-    this->mLastPriority = crOther.mLastPriority;
+    this->m_serialized   = std::move(other.m_serialized);
+    this->m_lastPriority = other.m_lastPriority;
     this->m_updateAge   = 0;
 }
 
-bool Object::tryUpdate(Object&& rvOther)
+bool Object::tryUpdate(Object&& other)
 {
-    if(rvOther.canUpdate(*this))
+    if(other.canUpdate(*this))
     {
-        this->assign(std::move(rvOther));
+        this->assign(std::move(other));
         return true;
     }
     return false;
 }
 
-bool Object::canUpdate(const Object& crOther) const
+bool Object::canUpdate(const Object& other) const
 {
-    return this->mLastPriority >= crOther.mLastPriority || crOther.m_updateAge >= OBJ_OUTDATED;
+    return this->m_lastPriority >= other.m_lastPriority || other.m_updateAge >= OBJ_OUTDATED;
 }
 
-void Object::set_serialized(std::string&& rvSerialized)
+void Object::set_serialized(std::string&& serialized)
 {
-    mSerialized = std::move(rvSerialized);
+    m_serialized = std::move(serialized);
 }
 
 const std::string& Object::get_serialized() const
 {
-    return mSerialized;
+    return m_serialized;
 }
 
 Object& Object::operator++()

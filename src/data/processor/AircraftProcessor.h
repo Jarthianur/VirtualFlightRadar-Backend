@@ -50,7 +50,7 @@ public:
      * @brief Constructor
      * @param vMaxDist The max distance filter
      */
-    explicit AircraftProcessor(std::int32_t vMaxDist);
+    explicit AircraftProcessor(std::int32_t maxDist);
 
     ~AircraftProcessor() noexcept;
 
@@ -60,7 +60,7 @@ public:
      * @note Resulting string has trailing <cr><lf>.
      * @param rAircraft The Aircraft to process
      */
-    void process(object::Aircraft& rAircraft) override;
+    void process(object::Aircraft& aircraft) override;
 
     /**
      * @fn setRefered
@@ -70,7 +70,7 @@ public:
      * @param crRefPosition The position
      * @param vAtmPress     The pressure
      */
-    void setRefered(const object::Position& crRefPosition, double vAtmPress);
+    void referTo(const object::Position& position, double atmPress);
 
 private:
     /**
@@ -78,7 +78,7 @@ private:
      * @brief Calcutale an Aircrafts position relative to the refered one.
      * @param crAircraft The Aircraft to calculate for
      */
-    void calcRelativePosition(const object::Aircraft& crAircraft);
+    void calculateRelPosition(const object::Aircraft& aircraft);
 
     /**
      * @fn genPflauStr
@@ -86,7 +86,7 @@ private:
      * @param crAircraft The Aircaft
      * @return the sentence
      */
-    std::string genPflauStr(const object::Aircraft& crAircraft);
+    std::string get_PFLAU(const object::Aircraft& aircraft);
 
     /**
      * @fn genPflaaStr
@@ -94,65 +94,65 @@ private:
      * @param crAircraft The Aircaft
      * @return the sentence
      */
-    std::string genPflaaStr(const object::Aircraft& crAircraft);
+    std::string get_PFLAA(const object::Aircraft& aircraft);
 
-    /// @var mMaxDistance
+    /// @var m_maxDistance
     /// Max distance to process an aircraft
-    const std::int32_t mMaxDistance;
+    const std::int32_t m_maxDistance;
 
-    /// @var mtReferedPosition
+    /// @var m_refPosition
     /// The refered position
-    object::Position mtReferedPosition{0.0, 0.0, 0};
+    mutable object::Position m_refPosition{0.0, 0.0, 0};
 
-    double mtAtmPressure = 1013.25;
+    mutable double m_refAtmPressure = 1013.25;
 
     /// @var mtReferedLatRad
     /// Refered latitude as radian
-    double mtReferedLatRad = 0.0;
+    mutable double m_refRadLatitude = 0.0;
 
     /// @var mtAircraftLatRad
     /// Aircraft latitude as radian
-    double mtAircraftLatRad = 0.0;
+    mutable double m_aircraftRadLatitude = 0.0;
 
-    /// @var mtLatDistance
+    /// @var m_latDistance
     /// Distance/Difference between Aircraft's and refered latitude
-    double mtLatDistance = 0.0;
+    mutable double m_latDistance = 0.0;
 
     /// @var mtReferedLonRad
     /// Refered longitude as radian
-    double mtReferedLonRad = 0.0;
+    mutable double m_refRadLongitude = 0.0;
 
     /// @var mtAircraftLonRad
     /// Aircraft's longitude as radian
-    double mtAircraftLonRad = 0.0;
+    mutable double m_aircraftRadLongitude = 0.0;
 
-    /// @var mtLonDistance
+    /// @var m_lonDistance
     /// Distance/Difference between Aircraft's and refered longitude
-    double mtLonDistance = 0.0;
+    mutable double m_lonDistance = 0.0;
 
     /// @var mtBearingRel
     /// Relative bearing
-    double mtBearingRel = 0.0;
+    mutable double m_relBearing = 0.0;
 
     /// @var mtBearingAbs
     /// Absolute bearing
-    double mtBearingAbs = 0.0;
+    mutable double m_absBearing = 0.0;
 
     /// @var mtRelNorth
     /// Relative distance in northern direction; m
-    std::int32_t mtRelNorth = 0;
+    mutable std::int32_t m_relNorth = 0;
 
     /// @var mtRelEast
     /// Relative distance in eastern direction; m
-    std::int32_t mtRelEast = 0;
+   mutable std::int32_t m_relEast = 0;
 
     /// @var mtRelVertical
     /// Relative vertical distance; m
-    std::int32_t mtRelVertical = 0;
+    mutable std::int32_t m_relVertical = 0;
 
-    /// @var mtDistance
+    /// @var m_distance
     /// Distance between Aircraft and refered position; m
-    std::int32_t mtDistance = 0;
+    mutable std::int32_t m_distance = 0;
 };
 
 }  // namespace processor

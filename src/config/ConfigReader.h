@@ -27,7 +27,7 @@
 #include <boost/optional.hpp>
 #include <boost/regex.hpp>
 
-#include "PropertyMap.h"
+#include "Properties.h"
 
 /// @namespace config
 namespace config
@@ -51,7 +51,7 @@ public:
      * @param rStream The stream to read
      * @param rMap    The map to store the properties in
      */
-    void read(std::istream& rStream, PropertyMap& rMap);
+    void read(std::istream& stream, Properties& properties);
 
 private:
     /**
@@ -63,7 +63,7 @@ private:
      * @param crLine The string to parse
      * @return an optional section name
      */
-    boost::optional<std::string> parseSection(const std::string& crLine);
+    boost::optional<std::string> parseSection(const std::string& line);
 
     /**
      * @fn parseKeyValue
@@ -72,31 +72,11 @@ private:
      * @param crLine The string to parse
      * @return an optional KeyValue
      */
-    boost::optional<KeyValue> parseKeyValue(const std::string& crLine);
-
-    /**
-     * @fn addKeyValue
-     * @brief Add a key-value pair to the properties.
-     * @param crSection  The section name
-     * @param crKeyValue The key-value pair
-     * @param vLineNr    The corresponding line number
-     * @param rMap       The properties
-     */
-    void addKeyValue(const std::string& crSection, const KeyValue& crKeyValue, std::size_t vLineNr,
-                     PropertyMap& rMap);
-
-    /**
-     * @fn addSection
-     * @brief Add a section to the properties.
-     * @param crSection The section name
-     * @param vLineNr   The corresponding line number
-     * @param rMap      The properties
-     */
-    void addSection(const std::string& crSection, std::size_t vLineNr, PropertyMap& rMap);
+    boost::optional<KeyValue> parseProperty(const std::string& line);
 
     /// @var mConfRe
     /// Regular expression for 'key = value'
-    const boost::regex mConfRe;
+    const static boost::regex s_keyValueRE;
 };
 
 }  // namespace config

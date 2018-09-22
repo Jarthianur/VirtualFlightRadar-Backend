@@ -55,9 +55,9 @@ using OptNumber = boost::optional<Number>;
  * @return an optional number, which may be invalid
  */
 template<typename T>
-inline OptNumber stringToNumber(const std::string& crStr)
+inline OptNumber stringToNumber(const std::string& str)
 {
-    std::stringstream ss(crStr);
+    std::stringstream ss(str);
     T result;
     if(ss >> result)
     {
@@ -72,19 +72,19 @@ inline OptNumber stringToNumber(const std::string& crStr)
  * @param rStr The string
  * @return the trimmed string
  */
-inline std::string& trimString(std::string& rStr)
+inline std::string& trimString(std::string& str)
 {
-    std::size_t f = rStr.find_first_not_of(' ');
+    std::size_t f = str.find_first_not_of(' ');
     if(f != std::string::npos)
     {
-        rStr = rStr.substr(f);
+        str = str.substr(f);
     }
-    std::size_t l = rStr.find_last_not_of(' ');
+    std::size_t l = str.find_last_not_of(' ');
     if(l != std::string::npos)
     {
-        rStr = rStr.substr(0, l + 1);
+        str = str.substr(0, l + 1);
     }
-    return rStr;
+    return str;
 }
 
 /**
@@ -93,11 +93,11 @@ inline std::string& trimString(std::string& rStr)
  * @param crStr The given string
  * @return a list of strings
  */
-inline std::list<std::string> splitCommaSeparated(const std::string& crStr)
+inline std::list<std::string> splitCommaSeparated(const std::string& str)
 {
     std::list<std::string> list;
     std::stringstream ss;
-    ss.str(crStr);
+    ss.str(str);
     std::string item;
 
     while(std::getline(ss, item, ','))

@@ -24,8 +24,8 @@
 #include <memory>
 #include <string>
 
+#include "../config/Properties.h"
 #include "../Defines.h"
-#include "../config/PropertyMap.h"
 #include "Feed.h"
 
 namespace feed
@@ -62,8 +62,8 @@ public:
      * @param pData    The GpsData pointer
      * @throw std::logic_error from parent constructor
      */
-    GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-            std::shared_ptr<data::GpsData> pData);
+    GpsFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+            std::shared_ptr<data::GpsData> data);
 
     /**
      * @fn ~GpsFeed
@@ -76,12 +76,12 @@ public:
     /**
      * @see Feed#process
      */
-    bool process(const std::string& crResponse) noexcept override;
+    bool process(const std::string& response) noexcept override;
 
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    static parser::GpsParser smParser;
+    static parser::GpsParser s_parser;
 };
 
 }  // namespace feed

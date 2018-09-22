@@ -26,8 +26,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "../config/Properties.h"
 #include "../Defines.h"
-#include "../config/PropertyMap.h"
 #include "Feed.h"
 
 namespace feed
@@ -66,8 +66,8 @@ public:
      * @param vMaxHeight The max height filter
      * @throw std::logic_error if login is not given or from parent constructor
      */
-    AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-              std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight);
+    AprscFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+              std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
 
     /**
      * @fn ~AprscFeed
@@ -80,16 +80,16 @@ public:
     /**
      * @see Feed#process
      */
-    bool process(const std::string& crResponse) noexcept override;
+    bool process(const std::string& response) noexcept override;
 
-    const std::string& getLoginStr() const;
+    const std::string& get_login() const;
 
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    static parser::AprsParser smParser;
+    static parser::AprsParser s_parser;
 
-    config::KeyValueMap::const_iterator mLoginStrIt;
+    config::KeyValueMap::const_iterator m_loginIt;
 };
 
 }  // namespace feed

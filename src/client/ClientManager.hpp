@@ -131,7 +131,7 @@ void ClientManager<ConnectorT>::subscribe(std::shared_ptr<feed::Feed> feed)
         case feed::Feed::Protocol::APRS:
             it = m_clients
                      .insert(std::make_shared<AprscClient<ConnectorT>>(
-                         endpoint, std::static_pointer_cast<feed::AprscFeed>(feed)->getLoginStr()))
+                         endpoint, std::static_pointer_cast<feed::AprscFeed>(feed)->get_login()))
                      .first;
             break;
         case feed::Feed::Protocol::SBS:

@@ -42,47 +42,47 @@ namespace data
 GpsData::GpsData() : Data()
 {}
 
-GpsData::GpsData(const GpsPosition& crPosition, bool vGround)
-    : Data(), mPosition(crPosition), mGroundMode(vGround)
+GpsData::GpsData(const GpsPosition& position, bool ground)
+    : Data(), m_position(position), m_groundMode(ground)
 {
-    mProcessor.process(mPosition);
+    m_processor.process(m_position);
 }
 
 GpsData::~GpsData() noexcept
 {}
 
-std::string GpsData::getSerialized()
+std::string GpsData::get_serialized()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    return (++mPosition).get_serialized();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return (++m_position).get_serialized();
 }
 
-bool GpsData::update(Object&& rvPosition)
+bool GpsData::update(Object&& position)
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    if(mPositionLocked)
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if(m_positionLocked)
     {
         throw std::runtime_error("Position was locked before.");
     }
-    bool updated = mPosition.tryUpdate(std::move(rvPosition));
+    bool updated = m_position.tryUpdate(std::move(position));
     if(updated)
     {
-        mProcessor.process(mPosition);
+        m_processor.process(m_position);
     }
-    return (mPositionLocked = updated && mGroundMode && isPositionGood());
+    return (m_positionLocked = updated && m_groundMode && isPositionGood());
 }
 
-Position GpsData::getPosition()
+Position GpsData::get_position()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    return mPosition.get_position();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_position.get_position();
 }
 
 bool GpsData::isPositionGood()
 {
-    return mPosition.get_nrOfSatellites() >= GPS_NR_SATS_GOOD
-           && mPosition.get_fixQuality() >= GPS_FIX_GOOD
-           && mPosition.get_dilution() <= GPS_HOR_DILUTION_GOOD;
+    return m_position.get_nrOfSatellites() >= GPS_NR_SATS_GOOD
+           && m_position.get_fixQuality() >= GPS_FIX_GOOD
+           && m_position.get_dilution() <= GPS_HOR_DILUTION_GOOD;
 }
 
 }  // namespace data

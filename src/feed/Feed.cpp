@@ -37,17 +37,17 @@
 
 namespace feed
 {
-Feed::Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
-           std::shared_ptr<data::Data> pData)
-    : m_name(crName), m_properties(crKvMap), m_data(pData)
+Feed::Feed(const std::string& name, const config::KeyValueMap& propertyMap,
+           std::shared_ptr<data::Data> data)
+    : m_name(name), m_propertyMap(propertyMap), m_data(data)
 {
     initPriority();
-    if(m_properties.find(KV_KEY_HOST) == m_properties.end())
+    if(m_propertyMap.find(KV_KEY_HOST) == m_propertyMap.end())
     {
         logger.warn(COMPONENT " could not find: ", m_name, "." KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
-    if(m_properties.find(KV_KEY_PORT) == m_properties.end())
+    if(m_propertyMap.find(KV_KEY_PORT) == m_propertyMap.end())
     {
         logger.warn(COMPONENT " could not find: ", m_name, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
@@ -62,7 +62,7 @@ void Feed::initPriority() noexcept
     try
     {
         m_priority = static_cast<std::uint32_t>(std::max<std::uint64_t>(
-            0, std::min<std::uint64_t>(std::stoul(m_properties.at(KV_KEY_PRIORITY)),
+            0, std::min<std::uint64_t>(std::stoul(m_propertyMap.at(KV_KEY_PRIORITY)),
                                        std::numeric_limits<std::uint32_t>::max())));
     }
     catch(const std::logic_error&)
@@ -78,7 +78,7 @@ void Feed::initPriority() noexcept
 
 client::Endpoint Feed::get_endpoint() const
 {
-    return {m_properties.find(KV_KEY_HOST)->second, m_properties.find(KV_KEY_PORT)->second};
+    return {m_propertyMap.find(KV_KEY_HOST)->second, m_propertyMap.find(KV_KEY_PORT)->second};
 }
 
 }  // namespace feed

@@ -49,7 +49,7 @@ public:
      * @brief Process a GPS position.
      * @param rPosition The position
      */
-    void process(object::GpsPosition& rPosition) override;
+    void process(object::GpsPosition& position) override;
 
 private:
     /**
@@ -59,7 +59,7 @@ private:
      * @param crPosition The position
      * @return the GPGGA sentence
      */
-    std::string genGpggaStr(const object::GpsPosition& crPosition);
+    std::string get_GPGGA(const object::GpsPosition& position);
 
     /**
      * @fn genGprmcStr
@@ -68,7 +68,7 @@ private:
      * @param crPosition The position
      * @return the GPRMC sentence
      */
-    std::string genGprmcStr(const object::GpsPosition& crPosition);
+    std::string get_GPRMC(const object::GpsPosition& position);
 
     /**
      * @fn evalPosition
@@ -76,31 +76,31 @@ private:
      * @param vLatitude  The latitude
      * @param vLongitude The longitude
      */
-    void evalPosition(double vLatitude, double vLongitude);
+    void evalPosition(double latitude, double longitude);
 
     /// @var mtLatStr
     /// Orientation of the latitude (S,N)
-    char mtLatStr = 'x';
+    mutable char m_directionSN = 'x';
 
     /// @var mtLonStr
     /// Orientation of the longitude (E,W)
-    char mtLonStr = 'x';
+    mutable char m_directionEW = 'x';
 
     /// @var mtLatDeg
     /// Degrees of latitude
-    double mtLatDeg = 0.0;
+    mutable double m_degLatitude = 0.0;
 
     /// @var mtLonDeg
     /// Degrees of longitude
-    double mtLonDeg = 0.0;
+    mutable double m_degLongitude = 0.0;
 
     /// @var mtLatMin
     /// Minutes of latitude
-    double mtLatMin = 0.0;
+    mutable double m_minLatitude = 0.0;
 
     /// @var mtLonMin
     /// Minutes of longitude
-    double mtLonMin = 0.0;
+    mutable double m_minLongitude = 0.0;
 };
 
 }  // namespace processor

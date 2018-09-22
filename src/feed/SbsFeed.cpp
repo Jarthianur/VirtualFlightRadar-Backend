@@ -30,13 +30,13 @@
 
 namespace feed
 {
-parser::SbsParser SbsFeed::smParser;
+parser::SbsParser SbsFeed::s_parser;
 
-SbsFeed::SbsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                 std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
-    : Feed(crName, crKvMap, pData)
+SbsFeed::SbsFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+                 std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
+    : Feed(name, propertyMap, data)
 {
-    parser::SbsParser::s_maxHeight = vMaxHeight;
+    parser::SbsParser::s_maxHeight = maxHeight;
 }
 
 SbsFeed::~SbsFeed() noexcept
@@ -47,10 +47,10 @@ Feed::Protocol SbsFeed::get_protocol() const
     return Protocol::SBS;
 }
 
-bool SbsFeed::process(const std::string& crResponse) noexcept
+bool SbsFeed::process(const std::string& response) noexcept
 {
     object::Aircraft ac(get_priority());
-    if(smParser.unpack(crResponse, ac))
+    if(s_parser.unpack(response, ac))
     {
         m_data->update(std::move(ac));
     }

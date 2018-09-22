@@ -30,11 +30,11 @@
 
 namespace feed
 {
-parser::AtmosphereParser AtmosphereFeed::smParser;
+parser::AtmosphereParser AtmosphereFeed::s_parser;
 
-AtmosphereFeed::AtmosphereFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                               std::shared_ptr<data::AtmosphereData> pData)
-    : Feed(crName, crKvMap, pData)
+AtmosphereFeed::AtmosphereFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+                               std::shared_ptr<data::AtmosphereData> data)
+    : Feed(name, propertyMap, data)
 {}
 
 AtmosphereFeed::~AtmosphereFeed() noexcept
@@ -45,10 +45,10 @@ Feed::Protocol AtmosphereFeed::get_protocol() const
     return Protocol::SENSOR;
 }
 
-bool AtmosphereFeed::process(const std::string& crResponse) noexcept
+bool AtmosphereFeed::process(const std::string& response) noexcept
 {
     object::Atmosphere atmos(get_priority());
-    if(smParser.unpack(crResponse, atmos))
+    if(s_parser.unpack(response, atmos))
     {
         m_data->update(std::move(atmos));
     }

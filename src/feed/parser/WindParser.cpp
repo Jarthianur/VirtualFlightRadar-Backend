@@ -24,38 +24,28 @@
 
 #include "WindParser.h"
 
-namespace feed
-{
-namespace parser
-{
-WindParser::WindParser() : Parser<object::Wind>()
-{}
-
-WindParser::~WindParser() noexcept
-{}
-
-bool WindParser::unpack(const std::string& crStr, object::Wind& rWind) noexcept
-{
-    try
-    {
-        return (std::stoi(crStr.substr(crStr.rfind('*') + 1, 2), nullptr, 16)
-                    == math::checksum(crStr.c_str(), crStr.length())
-                && parseWind(crStr, rWind));
-    }
-    catch(const std::logic_error&)
-    {
-        return false;
-    }
+namespace feed {
+namespace parser {
+WindParser::WindParser() :
+		Parser<object::Wind>() {
 }
 
-bool WindParser::parseWind(const std::string& crStr, object::Wind& rWind)
+WindParser::~WindParser() noexcept
 {
-    bool valid;
-    if((valid = (crStr.find("MWV") != std::string::npos)))
-    {
-        rWind.set_serialized(std::string(crStr));
-    }
-    return valid;
+}
+
+bool WindParser::unpack(const std::string& sentence, object::Wind& wind) noexcept
+{
+	try {
+		if ((std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16)
+				== math::checksum(sentence.c_str(), sentence.length()))
+				&& (sentence.find("MWV") != std::string::npos)) {
+			wind.set_serialized(std::string(sentence));
+			return true;
+		}
+	} catch (const std::logic_error&) {
+	}
+	return false;
 }
 
 }  // namespace parser

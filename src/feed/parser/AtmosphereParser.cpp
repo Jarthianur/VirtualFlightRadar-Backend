@@ -26,47 +26,41 @@
 
 #include "../../Math.hpp"
 
-namespace feed
-{
-namespace parser
-{
-AtmosphereParser::AtmosphereParser() : Parser<object::Atmosphere>()
-{}
+namespace feed {
+namespace parser {
+AtmosphereParser::AtmosphereParser() :
+		Parser<object::Atmosphere>() {
+}
 
 AtmosphereParser::~AtmosphereParser() noexcept
-{}
-
-bool AtmosphereParser::unpack(const std::string& crStr, object::Atmosphere& rAtmos) noexcept
 {
-    try
-    {
-        return (std::stoi(crStr.substr(crStr.rfind('*') + 1, 2), nullptr, 16)
-                    == math::checksum(crStr.c_str(), crStr.length())
-                && parseAtmosphere(crStr, rAtmos));
-    }
-    catch(const std::logic_error&)
-    {
-        return false;
-    }
 }
 
-bool AtmosphereParser::parseAtmosphere(const std::string& crStr, object::Atmosphere& rAtmos)
-{
-    bool valid = false;
-    if(crStr.find("MDA") != std::string::npos)
-    {
-        std::size_t tmpB   = crStr.find('B') - 1;
-        std::size_t tmpS   = crStr.substr(0, tmpB).find_last_of(',') + 1;
-        std::size_t subLen = tmpB - tmpS;
-        std::size_t numIdx;
-        double tmpPress = std::stod(crStr.substr(tmpS, subLen), &numIdx) * 1000.0;
-        if((valid = (numIdx == subLen)))
-        {
-            rAtmos.set_serialized(std::string(crStr));
-            rAtmos.set_pressure(tmpPress);
-        }
-    }
-    return valid;
+bool AtmosphereParser::unpack(const std::string& sentence,
+		object::Atmosphere& atmosphere) noexcept
+		{
+	try {
+		bool valid = false;
+		if ((std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16)
+				== math::checksum(sentence.c_str(), sentence.length()))
+				&& (sentence.find("MDA") != std::string::npos)) {
+			std::size_t tmpB = sentence.find('B') - 1;
+			std::size_t tmpS = sentence.substr(0, tmpB).find_last_of(',') + 1;
+			std::size_t subLen = tmpB - tmpS;
+			std::size_t numIdx;
+			double tmpPress = std::stod(sentence.substr(tmpS, subLen), &numIdx)
+					* 1000.0;
+			if ((valid = (numIdx == subLen))) {
+				atmosphere.set_serialized(std::string(sentence));
+				atmosphere.set_pressure(tmpPress);
+
+			}
+			return valid;
+		}
+	} catch (const std::logic_error&) {
+	}
+	return false;
 }
+
 }  // namespace parser
 }  // namespace feed

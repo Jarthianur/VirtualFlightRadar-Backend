@@ -57,7 +57,7 @@ public:
      * @brief Constructor
      * @param vMaxDist The max distance filter
      */
-    explicit AircraftData(std::int32_t vMaxDist);
+    explicit AircraftData(std::int32_t maxDist);
 
     ~AircraftData() noexcept;
 
@@ -67,7 +67,7 @@ public:
      * @return the report
      * @threadsafe
      */
-    std::string getSerialized() override;
+    std::string get_serialized() override;
 
     /**
      * @fn update
@@ -78,7 +78,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvAircraft) override;
+    bool update(object::Object&& aircraft) override;
 
     /**
      * @fn processAircrafts
@@ -87,7 +87,7 @@ public:
      * @param vAtmPress The atmospheric pressure
      * @threadsafe
      */
-    void processAircrafts(const object::Position& crRefPosition, double vAtmPress) noexcept;
+    void processAircrafts(const object::Position& position, double atmPress) noexcept;
 
 private:
     /**
@@ -95,19 +95,19 @@ private:
      * @brief Insert an Aircraft in the internal container.
      * @param crAircraft The aircraft
      */
-    void insert(const object::Aircraft& crAircraft);
+    void insert(const object::Aircraft& aircraft);
 
     /// @var mProcessor
     /// Providing functionality to process Aircrafts
-    processor::AircraftProcessor mProcessor;
+    processor::AircraftProcessor m_processor;
 
     /// @var mContainer
     /// Vector holding the Aircrafts
-    std::vector<object::Aircraft> mContainer;
+    std::vector<object::Aircraft> m_container;
 
     /// @var mIndexMap
     /// Map aircraft Id's to index and attempt counters.
-    std::unordered_map<std::string, std::size_t> mIndexMap;
+    std::unordered_map<std::string, std::size_t> m_index;
 };
 
 }  // namespace data

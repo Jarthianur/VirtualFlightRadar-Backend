@@ -64,16 +64,16 @@ protected:
      * @brief End a given string with checksum and CRLF.
      * @param rDestStr The target string
      */
-    void finishSentence(std::string& rDestStr)
+    void finishSentence(std::string& sentence)
     {
-        std::snprintf(mBuffer, sizeof(mBuffer), "%02x\r\n",
-                      math::checksum(mBuffer, sizeof(mBuffer)));
-        rDestStr.append(mBuffer);
+        std::snprintf(m_buffer, sizeof(m_buffer), "%02x\r\n",
+                      math::checksum(m_buffer, sizeof(m_buffer)));
+        sentence.append(m_buffer);
     }
 
     /// @var mBuffer
     /// The internal buffer for format strings
-    char mBuffer[PROC_BUFF_S] = "";
+    char m_buffer[PROC_BUFF_S] = "";
 };
 }  // namespace processor
 }  // namespace data

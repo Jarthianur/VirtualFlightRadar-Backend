@@ -26,7 +26,7 @@
 #include <type_traits>
 #include <boost/optional.hpp>
 
-#include "../config/PropertyMap.h"
+#include "../config/Properties.h"
 
 namespace config
 {
@@ -62,11 +62,11 @@ public:
      * @param pGpsData      The GpsData pointer
      * @param pWindData     The WindData pointer
      */
-    FeedFactory(const config::Configuration& crConfig,
-                std::shared_ptr<data::AircraftData>& pAircraftData,
-                std::shared_ptr<data::AtmosphereData>& pAtmosData,
-                std::shared_ptr<data::GpsData>& pGpsData,
-                std::shared_ptr<data::WindData>& pWindData);
+    FeedFactory(const config::Configuration& config,
+                std::shared_ptr<data::AircraftData>& aircraftData,
+                std::shared_ptr<data::AtmosphereData>& atmosData,
+                std::shared_ptr<data::GpsData>& gpsData,
+                std::shared_ptr<data::WindData>& windData);
 
     /**
      * @fn ~FeedFactory
@@ -82,8 +82,8 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    boost::optional<std::shared_ptr<Feed>> createFeed(const std::string& crName,
-                                                      const config::KeyValueMap& crKvMap);
+    boost::optional<std::shared_ptr<Feed>> createFeed(const std::string& name,
+                                                      const config::KeyValueMap& propertyMap);
 
 private:
     /**
@@ -97,26 +97,26 @@ private:
      * @throw std::logic_error from invoked constructors
      */
     template<typename T, typename std::enable_if<std::is_base_of<Feed, T>::value>::type* = nullptr>
-    std::shared_ptr<T> makeFeed(const std::string& crName, const config::KeyValueMap& crKvMap);
+    std::shared_ptr<T> makeFeed(const std::string& name, const config::KeyValueMap& propertyMap);
 
     /// @var mrConfig
     /// Reference to the Configuration
-    const config::Configuration& mrConfig;
+    const config::Configuration& m_config;
 
     /// @var mpAircraftData
     /// Pointer to the AircraftData
-    std::shared_ptr<data::AircraftData> mpAircraftData;
+    std::shared_ptr<data::AircraftData> m_aircraftData;
 
     /// @var mpAtmosphereData
     /// Pointer to the AtmosphereData
-    std::shared_ptr<data::AtmosphereData> mpAtmosData;
+    std::shared_ptr<data::AtmosphereData> m_atmosData;
 
     /// @var mpGpsData
     /// Pointer to the GpsData
-    std::shared_ptr<data::GpsData> mpGpsData;
+    std::shared_ptr<data::GpsData> m_gpsData;
 
     /// @var mpWindData
     /// Pointer to the WindData
-    std::shared_ptr<data::WindData> mpWindData;
+    std::shared_ptr<data::WindData> m_windData;
 };
 }  // namespace feed

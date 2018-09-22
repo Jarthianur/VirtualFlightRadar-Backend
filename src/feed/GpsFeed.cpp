@@ -37,11 +37,11 @@
 
 namespace feed
 {
-parser::GpsParser GpsFeed::smParser;
+parser::GpsParser GpsFeed::s_parser;
 
-GpsFeed::GpsFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                 std::shared_ptr<data::GpsData> pData)
-    : Feed(crName, crKvMap, pData)
+GpsFeed::GpsFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+                 std::shared_ptr<data::GpsData> data)
+    : Feed(name, propertyMap, data)
 {}
 
 GpsFeed::~GpsFeed() noexcept
@@ -52,10 +52,10 @@ Feed::Protocol GpsFeed::get_protocol() const
     return Protocol::GPS;
 }
 
-bool GpsFeed::process(const std::string& crResponse) noexcept
+bool GpsFeed::process(const std::string& response) noexcept
 {
     object::GpsPosition pos(get_priority());
-    if(smParser.unpack(crResponse, pos))
+    if(s_parser.unpack(response, pos))
     {
         try
         {

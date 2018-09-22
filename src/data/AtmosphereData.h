@@ -44,7 +44,7 @@ public:
      * @brief Constructor
      * @param vAtmosphere The initial info
      */
-    explicit AtmosphereData(const object::Atmosphere& crAtmosphere);
+    explicit AtmosphereData(const object::Atmosphere& atmosphere);
 
     ~AtmosphereData() noexcept;
 
@@ -54,7 +54,7 @@ public:
      * @return the MDA sentence
      * @threadsafe
      */
-    std::string getSerialized() override;
+    std::string get_serialized() override;
 
     /**
      * @fn update
@@ -64,7 +64,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvAtmosphere) override;
+    bool update(object::Object&& atmosphere) override;
 
     /**
      * @fn getAtmPressure
@@ -72,11 +72,11 @@ public:
      * @return the pressure
      * @threadsafe
      */
-    double getAtmPressure();
+    double get_atmPressure();
 
 private:
     /// @var mAtmosphere
     /// Holding atmospheric information
-    object::Atmosphere mAtmosphere;
+    object::Atmosphere m_atmosphere;
 };
 }  // namespace data

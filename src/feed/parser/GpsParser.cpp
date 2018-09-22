@@ -70,7 +70,7 @@ namespace feed
 {
 namespace parser
 {
-const boost::regex GpsParser::msGpggaRe(
+const boost::regex GpsParser::s_GPGGA_RE(
     "^\\$[A-Z]{2}GGA,(\\d{6}),(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
     boost::regex::optimize | boost::regex::icase);
 
@@ -80,14 +80,14 @@ GpsParser::GpsParser() : Parser()
 GpsParser::~GpsParser() noexcept
 {}
 
-bool GpsParser::unpack(const std::string& crStr, object::GpsPosition& rPosition) noexcept
+bool GpsParser::unpack(const std::string& sentence, object::GpsPosition& position) noexcept
 {
     try
     {
         boost::smatch match;
-        return std::stoi(crStr.substr(crStr.rfind('*') + 1, 2), nullptr, 16)
-                   == math::checksum(crStr.c_str(), crStr.length())
-               && boost::regex_match(crStr, match, msGpggaRe) && parsePosition(match, rPosition);
+        return std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16)
+                   == math::checksum(sentence.c_str(), sentence.length())
+               && boost::regex_match(sentence, match, s_GPGGA_RE) && parsePosition(match, position);
     }
     catch(const std::logic_error&)
     {
@@ -95,29 +95,29 @@ bool GpsParser::unpack(const std::string& crStr, object::GpsPosition& rPosition)
     }
 }
 
-bool GpsParser::parsePosition(const boost::smatch& crMatch, object::GpsPosition& rPosition)
+bool GpsParser::parsePosition(const boost::smatch& match, object::GpsPosition& position)
 {
     object::Position pos;
-    pos.latitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LAT)));
+    pos.latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
 
-    if(crMatch.str(RE_GGA_LAT_DIR).compare("S") == 0)
+    if(match.str(RE_GGA_LAT_DIR).compare("S") == 0)
     {
         pos.latitude = -pos.latitude;
     }
-    pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_GGA_LON)));
+    pos.longitude = math::dmToDeg(std::stod(match.str(RE_GGA_LON)));
 
-    if(crMatch.str(RE_GGA_LON_DIR).compare("W") == 0)
+    if(match.str(RE_GGA_LON_DIR).compare("W") == 0)
     {
         pos.longitude = -pos.longitude;
     }
-    pos.altitude = math::doubleToInt(std::stod(crMatch.str(RE_GGA_ALT)));
-    rPosition.set_position(pos);
-    rPosition.set_timeStamp(
-        object::TimeStamp(crMatch.str(RE_GGA_TIME), object::TimeStamp::Format::HHMMSS));
-    rPosition.set_fixQuality(std::stoi(crMatch.str(RE_GGA_FIX)));
-    rPosition.set_nrOfSatellites(std::stoi(crMatch.str(RE_GGA_SAT)));
-    rPosition.set_dilution(std::stod(crMatch.str(RE_GGA_DIL)));
-    rPosition.set_geoid(std::stod(crMatch.str(RE_GGA_GEOID)));
+    pos.altitude = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
+    position.set_position(pos);
+    position.set_timeStamp(
+        object::TimeStamp(match.str(RE_GGA_TIME), object::TimeStamp::Format::HHMMSS));
+    position.set_fixQuality(std::stoi(match.str(RE_GGA_FIX)));
+    position.set_nrOfSatellites(std::stoi(match.str(RE_GGA_SAT)));
+    position.set_dilution(std::stod(match.str(RE_GGA_DIL)));
+    position.set_geoid(std::stod(match.str(RE_GGA_GEOID)));
     return true;
 }
 

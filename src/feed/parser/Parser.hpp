@@ -51,7 +51,7 @@ public:
      * @param _1    The target object
      * @return true on success, else false
      */
-    virtual bool unpack(const std::string& crStr, T& _1) noexcept = 0;
+    virtual bool unpack(const std::string& sentence, T& _1) noexcept = 0;
 };
 
 }  // namespace parser

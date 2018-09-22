@@ -31,11 +31,11 @@
 namespace client
 {
 ConnectorImplBoost::ConnectorImplBoost()
-    : mIoService(),
-      mSocket(mIoService),
-      mResolver(mIoService),
-      mTimer(mIoService),
-      mIStream(&mBuffer)
+    : m_ioService(),
+      m_socket(m_ioService),
+      m_resolver(m_ioService),
+      m_timer(m_ioService),
+      m_istream(&m_buffer)
 {}
 
 ConnectorImplBoost::~ConnectorImplBoost() noexcept
@@ -43,141 +43,141 @@ ConnectorImplBoost::~ConnectorImplBoost() noexcept
 
 void ConnectorImplBoost::run()
 {
-    mIoService.run();
+    m_ioService.run();
 }
 
 void ConnectorImplBoost::stop()
 {
     close();
-    if(!mIoService.stopped())
+    if(!m_ioService.stopped())
     {
-        mIoService.stop();
+        m_ioService.stop();
     }
 }
 
 void ConnectorImplBoost::close()
 {
-    mTimer.expires_at(boost::posix_time::pos_infin);
-    mTimer.cancel();
-    if(mSocket.is_open())
+    m_timer.expires_at(boost::posix_time::pos_infin);
+    m_timer.cancel();
+    if(m_socket.is_open())
     {
         boost::system::error_code ec;
-        mSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-        mSocket.close();
+        m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        m_socket.close();
     }
 }
 
-void ConnectorImplBoost::onConnect(const Endpoint& crEndpoint, const Callback& crCallback)
+void ConnectorImplBoost::onConnect(const Endpoint& endpoint, const Callback& callback)
 {
     boost::asio::ip::tcp::resolver::query query(
-        crEndpoint.host, crEndpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
-    mResolver.async_resolve(query, boost::bind(&ConnectorImplBoost::handleResolve, this,
+        endpoint.host, endpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
+    m_resolver.async_resolve(query, boost::bind(&ConnectorImplBoost::handleResolve, this,
                                                boost::asio::placeholders::error,
-                                               boost::asio::placeholders::iterator, crCallback));
+                                               boost::asio::placeholders::iterator, callback));
 }
 
-void ConnectorImplBoost::onRead(const ReadCallback& crCallback)
+void ConnectorImplBoost::onRead(const ReadCallback& callback)
 {
     boost::asio::async_read_until(
-        mSocket, mBuffer, "\r\n",
+        m_socket, m_buffer, "\r\n",
         boost::bind(&ConnectorImplBoost::handleRead, this, boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred, crCallback));
+                    boost::asio::placeholders::bytes_transferred, callback));
 }
 
-void ConnectorImplBoost::onWrite(const std::string& crStr, const Callback& crCallback)
+void ConnectorImplBoost::onWrite(const std::string& msg, const Callback& callback)
 {
-    boost::asio::async_write(mSocket, boost::asio::buffer(crStr),
+    boost::asio::async_write(m_socket, boost::asio::buffer(msg),
                              boost::bind(&ConnectorImplBoost::handleWrite, this,
                                          boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred, crCallback));
+                                         boost::asio::placeholders::bytes_transferred, callback));
 }
 
-void ConnectorImplBoost::onTimeout(const Callback& crCallback, std::uint32_t vTimeout)
+void ConnectorImplBoost::onTimeout(const Callback& callback, std::uint32_t timeout)
 {
-    if(vTimeout > 0)
+    if(timeout > 0)
     {
-        resetTimer(vTimeout);
+        resetTimer(timeout);
     }
-    mTimer.async_wait(boost::bind(&ConnectorImplBoost::handleTimeout, this,
-                                  boost::asio::placeholders::error, crCallback));
+    m_timer.async_wait(boost::bind(&ConnectorImplBoost::handleTimeout, this,
+                                  boost::asio::placeholders::error, callback));
 }
 
 void ConnectorImplBoost::resetTimer(std::uint32_t vTimeout)
 {
-    mTimer.expires_from_now(boost::posix_time::seconds(vTimeout));
+    m_timer.expires_from_now(boost::posix_time::seconds(vTimeout));
 }
 
 bool ConnectorImplBoost::timerExpired()
 {
-    return mTimer.expires_at() <= boost::asio::deadline_timer::traits_type::now();
+    return m_timer.expires_at() <= boost::asio::deadline_timer::traits_type::now();
 }
 
-void ConnectorImplBoost::handleWrite(const boost::system::error_code& crError, std::size_t,
-                                     const Callback& crCallback) noexcept
+void ConnectorImplBoost::handleWrite(const boost::system::error_code& error, std::size_t,
+                                     const Callback& callback) noexcept
 {
-    if(crError)
+    if(error)
     {
-        logger.debug("(Client) failed to write: ", crError.message());
+        logger.debug("(Client) failed to write: ", error.message());
     }
-    crCallback(crError);
+    callback(error);
 }
 
-void ConnectorImplBoost::handleResolve(const boost::system::error_code& crError,
-                                       boost::asio::ip::tcp::resolver::iterator vResolverIt,
-                                       const Callback& crCallback) noexcept
+void ConnectorImplBoost::handleResolve(const boost::system::error_code& error,
+                                       boost::asio::ip::tcp::resolver::iterator resolverIt,
+                                       const Callback& callback) noexcept
 {
-    if(!crError)
+    if(!error)
     {
-        boost::asio::async_connect(mSocket, vResolverIt,
+        boost::asio::async_connect(m_socket, resolverIt,
                                    boost::bind(&ConnectorImplBoost::handleConnect, this,
                                                boost::asio::placeholders::error,
-                                               boost::asio::placeholders::iterator, crCallback));
+                                               boost::asio::placeholders::iterator, callback));
     }
     else
     {
-        logger.debug("(Client) failed to resolve host: ", crError.message());
-        crCallback(true);
+        logger.debug("(Client) failed to resolve host: ", error.message());
+        callback(true);
     }
 }
 
-void ConnectorImplBoost::handleConnect(const boost::system::error_code& crError,
+void ConnectorImplBoost::handleConnect(const boost::system::error_code& error,
                                        boost::asio::ip::tcp::resolver::iterator,
-                                       const Callback& crCallback) noexcept
+                                       const Callback& callback) noexcept
 {
-    if(crError)
+    if(error)
     {
-        logger.debug("(Client) failed to connect: ", crError.message());
+        logger.debug("(Client) failed to connect: ", error.message());
     }
     else
     {
-        mSocket.set_option(boost::asio::socket_base::keep_alive(true));
+        m_socket.set_option(boost::asio::socket_base::keep_alive(true));
     }
-    crCallback(crError);
+    callback(error);
 }
 
-void ConnectorImplBoost::handleTimeout(const boost::system::error_code& crError,
-                                       const Callback& crCallback) noexcept
+void ConnectorImplBoost::handleTimeout(const boost::system::error_code& error,
+                                       const Callback& callback) noexcept
 {
-    if(crError)
+    if(error)
     {
-        logger.debug("(Client) timeout: ", crError.message());
+        logger.debug("(Client) timeout: ", error.message());
     }
-    crCallback(crError);
+    callback(error);
 }
 
-void ConnectorImplBoost::handleRead(const boost::system::error_code& crError, std::size_t,
-                                    const ReadCallback& crCallback) noexcept
+void ConnectorImplBoost::handleRead(const boost::system::error_code& error, std::size_t,
+                                    const ReadCallback& callback) noexcept
 {
-    if(crError)
+    if(error)
     {
-        logger.debug("(Client) read: ", crError.message());
+        logger.debug("(Client) read: ", error.message());
     }
     else
     {
-        std::getline(mIStream, mResponse);
-        mResponse.append("\n");
+        std::getline(m_istream, m_response);
+        m_response.append("\n");
     }
-    crCallback(crError, mResponse);
+    callback(error, m_response);
 }
 
 }  // namespace client

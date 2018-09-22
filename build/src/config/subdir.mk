@@ -6,17 +6,17 @@
 CPP_SRCS += \
 ../src/config/ConfigReader.cpp \
 ../src/config/Configuration.cpp \
-../src/config/PropertyMap.cpp 
+../src/config/Properties.cpp 
 
 OBJS += \
 ./src/config/ConfigReader.o \
 ./src/config/Configuration.o \
-./src/config/PropertyMap.o 
+./src/config/Properties.o 
 
 CPP_DEPS += \
 ./src/config/ConfigReader.d \
 ./src/config/Configuration.d \
-./src/config/PropertyMap.d 
+./src/config/Properties.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

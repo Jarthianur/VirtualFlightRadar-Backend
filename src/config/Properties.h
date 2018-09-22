@@ -39,12 +39,12 @@ using KeyValue = std::pair<std::string, std::string>;
  * @class PropertyMap
  * @brief Store key-value pairs for sections.
  */
-class PropertyMap
+class Properties
 {
 public:
-    PropertyMap();
+    Properties();
 
-    ~PropertyMap() noexcept;
+    ~Properties() noexcept;
 
     /**
      * @fn getProperty
@@ -54,8 +54,8 @@ public:
      * @param crDefault The default value (default: empty)
      * @return the value for key in section if found, else the default value
      */
-    const std::string getProperty(const std::string& crSection, const std::string& crKey,
-                                  const std::string& crDefault = "") const;
+    const std::string get_property(const std::string& section, const std::string& key,
+                                  const std::string& alternative = "") const;
 
     /**
      * @fn getSectionKeyValue
@@ -64,7 +64,7 @@ public:
      * @return the kv-map if found, else an empty one
      * @throw std::out_of_range if the section is not found
      */
-    const KeyValueMap& getSectionKeyValue(const std::string& crSection) const;
+    const KeyValueMap& get_propertySection(const std::string& section) const;
 
     /**
      * @fn addProperty
@@ -74,7 +74,7 @@ public:
      * @param rKeyValue The key-value pair (default: empty)
      * @return true on success, else false
      */
-    bool addProperty(const std::string& crSection, const KeyValue& crKeyValue = {});
+    bool addProperty(const std::string& section, const KeyValue& property = {});
 
 private:
     /// @var mPropertiesMap

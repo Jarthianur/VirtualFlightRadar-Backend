@@ -39,49 +39,49 @@ namespace data
 AircraftData::AircraftData() : AircraftData(0)
 {}
 
-AircraftData::AircraftData(std::int32_t vMaxDist) : Data(), mProcessor(vMaxDist)
+AircraftData::AircraftData(std::int32_t maxDist) : Data(), m_processor(maxDist)
 {
-    mContainer.reserve(ESTIMATED_TRAFFIC);
-    mIndexMap.reserve(ESTIMATED_TRAFFIC * 2);
+    m_container.reserve(ESTIMATED_TRAFFIC);
+    m_index.reserve(ESTIMATED_TRAFFIC * 2);
 }
 
 AircraftData::~AircraftData() noexcept
 {}
 
-std::string AircraftData::getSerialized()
+std::string AircraftData::get_serialized()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     std::string tmp;
-    tmp.reserve(mContainer.size() * 128);
-    for(const auto& it : mContainer)
+    tmp.reserve(m_container.size() * 128);
+    for(const auto& it : m_container)
     {
         tmp += it.get_updateAge() < OBJ_OUTDATED ? it.get_serialized() : "";
     }
     return tmp;
 }
 
-bool AircraftData::update(Object&& rvAircraft)
+bool AircraftData::update(Object&& aircraft)
 {
-    std::lock_guard<std::mutex> lock(this->mMutex);
-    Aircraft&& rvUpdate = static_cast<Aircraft&&>(rvAircraft);
-    const auto index    = mIndexMap.find(rvUpdate.get_id());
+    std::lock_guard<std::mutex> lock(this->m_mutex);
+    Aircraft&& rvUpdate = static_cast<Aircraft&&>(aircraft);
+    const auto index    = m_index.find(rvUpdate.get_id());
 
-    if(index != mIndexMap.end())
+    if(index != m_index.end())
     {
-        return mContainer[index->second].tryUpdate(std::move(rvAircraft));
+        return m_container[index->second].tryUpdate(std::move(aircraft));
     }
     insert(rvUpdate);
     return true;
 }
 
-void AircraftData::processAircrafts(const Position& crRefPosition, double vAtmPress) noexcept
+void AircraftData::processAircrafts(const Position& position, double atmPress) noexcept
 {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     std::size_t index = 0;
     bool del          = false;
-    auto it           = mContainer.begin();
+    auto it           = m_container.begin();
 
-    while(it != mContainer.end())
+    while(it != m_container.end())
     {
         ++(*it);
         try
@@ -94,22 +94,22 @@ void AircraftData::processAircrafts(const Position& crRefPosition, double vAtmPr
             if(it->get_updateAge() >= AC_DELETE_THRESHOLD)
             {
                 del = true;
-                mIndexMap.erase(it->get_id());
-                it = mContainer.erase(it);
+                m_index.erase(it->get_id());
+                it = m_container.erase(it);
             }
             else
             {
                 if(it->get_updateAge() == 1)
                 {
-                    mProcessor.setRefered(crRefPosition, vAtmPress);
-                    mProcessor.process(*it);
+                    m_processor.referTo(position, atmPress);
+                    m_processor.process(*it);
                 }
                 ++it;
                 ++index;
             }
-            if(del && it != mContainer.end())
+            if(del && it != m_container.end())
             {
-                mIndexMap.at(it->get_id()) = index;
+                m_index.at(it->get_id()) = index;
             }
         }
         catch(const std::exception&)
@@ -118,9 +118,9 @@ void AircraftData::processAircrafts(const Position& crRefPosition, double vAtmPr
     }
 }
 
-void AircraftData::insert(const object::Aircraft& crAircraft)
+void AircraftData::insert(const object::Aircraft& aircraft)
 {
-    mIndexMap.insert({crAircraft.get_id(), mContainer.size()});
-    mContainer.push_back(crAircraft);
+    m_index.insert({aircraft.get_id(), m_container.size()});
+    m_container.push_back(aircraft);
 }
 }  // namespace data

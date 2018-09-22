@@ -62,52 +62,52 @@ SbsParser::SbsParser() : Parser<Aircraft>()
 SbsParser::~SbsParser() noexcept
 {}
 
-bool SbsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
+bool SbsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcept
 {
     std::size_t p   = 6, delim;
     std::uint32_t i = 2;
     Position pos;
 
-    if(crStr.find(',', p) == std::string::npos || !(crStr.size() > 4 && crStr[4] == '3'))
+    if(sentence.find(',', p) == std::string::npos || !(sentence.size() > 4 && sentence[4] == '3'))
     {
         return false;
     }
-    while((delim = crStr.find(',', p)) != std::string::npos && i < 16)
+    while((delim = sentence.find(',', p)) != std::string::npos && i < 16)
     {
-        if(!parseField(i++, crStr.substr(p, delim - p), pos, rAircraft))
+        if(!parseField(i++, sentence.substr(p, delim - p), pos, aircraft))
         {
             return false;
         }
         p = delim + 1;
     }
-    rAircraft.set_position(pos);
-    rAircraft.set_targetType(Aircraft::TargetType::TRANSPONDER);
-    rAircraft.set_aircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
-    rAircraft.set_idType(Aircraft::IdType::ICAO);
+    aircraft.set_position(pos);
+    aircraft.set_targetType(Aircraft::TargetType::TRANSPONDER);
+    aircraft.set_aircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
+    aircraft.set_idType(Aircraft::IdType::ICAO);
     return i == 16 && pos.altitude <= s_maxHeight;
 }
 
-bool SbsParser::parseField(std::uint32_t vField, const std::string& crStr, Position& rPosition,
-                           Aircraft& rAircraft) noexcept
+bool SbsParser::parseField(std::uint32_t fieldNr, const std::string& field, Position& position,
+                           Aircraft& aircraft) noexcept
 {
     try
     {
-        switch(vField)
+        switch(fieldNr)
         {
             case SBS_FIELD_ID:
-                rAircraft.set_id(crStr);
+                aircraft.set_id(field);
                 break;
             case SBS_FIELD_TIME:
-                rAircraft.set_timeStamp(TimeStamp(crStr, TimeStamp::Format::HH_MM_SS_FFF));
+                aircraft.set_timeStamp(TimeStamp(field, TimeStamp::Format::HH_MM_SS_FFF));
                 break;
             case SBS_FIELD_ALT:
-                rPosition.altitude = math::doubleToInt(std::stod(crStr) * math::FEET_2_M);
+                position.altitude = math::doubleToInt(std::stod(field) * math::FEET_2_M);
                 break;
             case SBS_FIELD_LAT:
-                rPosition.latitude = std::stod(crStr);
+                position.latitude = std::stod(field);
                 break;
             case SBS_FIELD_LON:
-                rPosition.longitude = std::stod(crStr);
+                position.longitude = std::stod(field);
                 break;
             default:
                 break;

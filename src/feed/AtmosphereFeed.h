@@ -24,8 +24,8 @@
 #include <memory>
 #include <string>
 
+#include "../config/Properties.h"
 #include "../Defines.h"
-#include "../config/PropertyMap.h"
 #include "Feed.h"
 
 namespace feed
@@ -64,8 +64,8 @@ public:
      * @param pAtmosData The AtmosphereData pointer
      * @throw std::logic_error from parent constructor
      */
-    AtmosphereFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                   std::shared_ptr<data::AtmosphereData> pData);
+    AtmosphereFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+                   std::shared_ptr<data::AtmosphereData> data);
 
     /**
      * @fn ~AtmosphereFeed
@@ -78,12 +78,12 @@ public:
     /**
      * @see Feed#process
      */
-    bool process(const std::string& crResponse) noexcept override;
+    bool process(const std::string& response) noexcept override;
 
 private:
     /// @var mParser
     /// Parser to unpack response from Client
-    static parser::AtmosphereParser smParser;
+    static parser::AtmosphereParser s_parser;
 };
 
 }  // namespace feed

@@ -86,11 +86,11 @@ using namespace object;
 
 namespace parser
 {
-const boost::regex AprsParser::msAprsRe(
+const boost::regex AprsParser::s_APRS_RE(
     "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
     boost::regex::optimize | boost::regex::icase);
 
-const boost::regex AprsParser::msAprsComRe(
+const boost::regex AprsParser::s_APRSExtRE(
     "^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
     boost::regex::optimize | boost::regex::icase);
 
@@ -102,46 +102,46 @@ AprsParser::AprsParser() : Parser<Aircraft>()
 AprsParser::~AprsParser() noexcept
 {}
 
-bool AprsParser::unpack(const std::string& crStr, Aircraft& rAircraft) noexcept
+bool AprsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcept
 {
     boost::smatch match, com_match;
 
-    if((!crStr.empty() && crStr.front() == '#')
-       || !(boost::regex_match(crStr, match, msAprsRe) && parsePosition(match, rAircraft)
-            && parseTimeStamp(match, rAircraft)))
+    if((!sentence.empty() && sentence.front() == '#')
+       || !(boost::regex_match(sentence, match, s_APRS_RE) && parsePosition(match, aircraft)
+            && parseTimeStamp(match, aircraft)))
     {
         return false;
     }
     std::string comm(match.str(RE_APRS_COM));
 
-    if(!(boost::regex_match(comm, com_match, msAprsComRe) && parseComment(com_match, rAircraft)))
+    if(!(boost::regex_match(comm, com_match, s_APRSExtRE) && parseComment(com_match, aircraft)))
     {
         return false;
     }
-    rAircraft.set_fullInfo(parseMovement(match, com_match, rAircraft));
-    rAircraft.set_targetType(Aircraft::TargetType::FLARM);
+    aircraft.set_fullInfo(parseMovement(match, com_match, aircraft));
+    aircraft.set_targetType(Aircraft::TargetType::FLARM);
     return true;
 }
 
-bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft) noexcept
+bool AprsParser::parsePosition(const boost::smatch& match, Aircraft& aircraft) noexcept
 {
     bool valid = false;
     try
     {
         Position pos;
-        pos.latitude = math::dmToDeg(std::stod(crMatch.str(RE_APRS_LAT)));
-        if(crMatch.str(RE_APRS_LAT_DIR).compare("S") == 0)
+        pos.latitude = math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
+        if(match.str(RE_APRS_LAT_DIR).compare("S") == 0)
         {
             pos.latitude = -pos.latitude;
         }
-        pos.longitude = math::dmToDeg(std::stod(crMatch.str(RE_APRS_LON)));
-        if(crMatch.str(RE_APRS_LON_DIR).compare("W") == 0)
+        pos.longitude = math::dmToDeg(std::stod(match.str(RE_APRS_LON)));
+        if(match.str(RE_APRS_LON_DIR).compare("W") == 0)
         {
             pos.longitude = -pos.longitude;
         }
-        pos.altitude = math::doubleToInt(std::stod(crMatch.str(RE_APRS_ALT)) * math::FEET_2_M);
+        pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT)) * math::FEET_2_M);
 
-        rAircraft.set_position(pos);
+        aircraft.set_position(pos);
         valid = pos.altitude <= s_maxHeight;
     }
     catch(const std::logic_error&)
@@ -150,16 +150,16 @@ bool AprsParser::parsePosition(const boost::smatch& crMatch, Aircraft& rAircraft
     return valid;
 }
 
-bool AprsParser::parseComment(const boost::smatch& crMatch, Aircraft& rAircraft) noexcept
+bool AprsParser::parseComment(const boost::smatch& match, Aircraft& aircraft) noexcept
 {
     bool valid = true;
-    rAircraft.set_id(crMatch.str(RE_APRS_COM_ID));
+    aircraft.set_id(match.str(RE_APRS_COM_ID));
     try
     {
-        rAircraft.set_idType(static_cast<Aircraft::IdType>(
-            std::stoi(crMatch.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03));
-        rAircraft.set_aircraftType(static_cast<Aircraft::AircraftType>(
-            (std::stoi(crMatch.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2));
+        aircraft.set_idType(static_cast<Aircraft::IdType>(
+            std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03));
+        aircraft.set_aircraftType(static_cast<Aircraft::AircraftType>(
+            (std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2));
     }
     catch(const std::logic_error&)
     {
@@ -168,31 +168,31 @@ bool AprsParser::parseComment(const boost::smatch& crMatch, Aircraft& rAircraft)
     return valid;
 }
 
-bool AprsParser::parseMovement(const boost::smatch& crMatch, const boost::smatch& crCommMatch,
-                               Aircraft& rAircraft) noexcept
+bool AprsParser::parseMovement(const boost::smatch& match, const boost::smatch& comMatch,
+                               Aircraft& aircraft) noexcept
 {
     Movement move;
     bool valid = true;
     // This needs to be split later to parse independently.
     try
     {
-        move.heading   = std::stod(crMatch.str(RE_APRS_HEAD));
-        move.gndSpeed  = std::stod(crMatch.str(RE_APRS_GND_SPD)) * math::KTS_2_MS;
-        move.climbRate = std::stod(crCommMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS;
+        move.heading   = std::stod(match.str(RE_APRS_HEAD));
+        move.gndSpeed  = std::stod(match.str(RE_APRS_GND_SPD)) * math::KTS_2_MS;
+        move.climbRate = std::stod(comMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS;
     }
     catch(const std::logic_error&)
     {
         valid = false;
     }
-    rAircraft.set_movement(move);
+    aircraft.set_movement(move);
     return valid;
 }
 
-bool AprsParser::parseTimeStamp(const boost::smatch& crMatch, Aircraft& rAircraft) noexcept
+bool AprsParser::parseTimeStamp(const boost::smatch& match, Aircraft& aircraft) noexcept
 {
     try
     {
-        rAircraft.set_timeStamp(TimeStamp(crMatch.str(RE_APRS_TIME), TimeStamp::Format::HHMMSS));
+        aircraft.set_timeStamp(TimeStamp(match.str(RE_APRS_TIME), TimeStamp::Format::HHMMSS));
     }
     catch(const std::invalid_argument&)
     {

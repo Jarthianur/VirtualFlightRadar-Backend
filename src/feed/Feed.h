@@ -27,7 +27,7 @@
 
 #include "../Defines.h"
 #include "../client/Endpoint.hpp"
-#include "../config/PropertyMap.h"
+#include "../config/Properties.h"
 
 namespace data
 {
@@ -46,7 +46,7 @@ class Feed
 public:
     NOT_COPYABLE(Feed)
 
-    enum class Protocol : std::uint32_t
+    enum class Protocol : std::int32_t
     {
         APRS,
         SBS,
@@ -69,7 +69,7 @@ public:
      * @brief Handle Client's response.
      * @param crResponse The response
      */
-    virtual bool process(const std::string& crResponse) noexcept = 0;
+    virtual bool process(const std::string& response) noexcept = 0;
 
 protected:
     /**
@@ -79,8 +79,8 @@ protected:
      * @param crKvMap The properties map
      * @throw std::logic_error if host or port are not given
      */
-    Feed(const std::string& crName, const config::KeyValueMap& crKvMap,
-         std::shared_ptr<data::Data> pData);
+    Feed(const std::string& name, const config::KeyValueMap& propertyMap,
+         std::shared_ptr<data::Data> data);
 
     /// @var mName
     /// Unique name
@@ -88,7 +88,7 @@ protected:
 
     /// @var mKvMap
     /// Key-value-map holding the properties.
-    const config::KeyValueMap m_properties;
+    const config::KeyValueMap m_propertyMap;
 
     std::shared_ptr<data::Data> m_data;
 

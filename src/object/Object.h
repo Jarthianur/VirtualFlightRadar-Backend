@@ -45,7 +45,7 @@ public:
      * @brief Constructor
      * @param vPriority The initial priority
      */
-    explicit Object(std::uint32_t vPriority);
+    explicit Object(std::uint32_t priority);
 
     virtual ~Object() noexcept;
 
@@ -58,14 +58,14 @@ public:
      * @param vAttempts The update attempt count
      * @return true on success, else false
      */
-    virtual bool tryUpdate(Object&& rvOther);
+    virtual bool tryUpdate(Object&& other);
 
     /**
      * @fn setSerialized
      * @brief Set the string representation of this Objects data.
      * @param rvSerialized The string representation
      */
-    virtual void set_serialized(std::string&& rvSerialized);
+    virtual void set_serialized(std::string&& serialized);
 
     /**
      * @fn getSerialized
@@ -82,7 +82,7 @@ protected:
      * @brief Assign other objects values to this.
      * @param rvOther The other Object
      */
-    virtual void assign(Object&& rvOther);
+    virtual void assign(Object&& other);
 
     /**
      * @fn canUpdate
@@ -91,15 +91,15 @@ protected:
      * @param vAttempts The update attempt count
      * @return true if yes, else false
      */
-    virtual bool canUpdate(const Object& crOther) const;
+    virtual bool canUpdate(const Object& other) const;
 
     /// @var mLastPriority
     /// Got last update with this priority.
-    std::uint32_t mLastPriority;
+    std::uint32_t m_lastPriority;
 
     /// @var mSerialized
     /// The string representation of this Objects data.
-    std::string mSerialized;
+    std::string m_serialized;
 
     /// @var mUpdateAge
     /// Times processed without update.

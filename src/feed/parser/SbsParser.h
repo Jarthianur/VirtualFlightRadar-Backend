@@ -52,7 +52,7 @@ public:
      * @brief Unpack into Aircraft.
      * @see Parser#unpack
      */
-    bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
+    bool unpack(const std::string& sentence, object::Aircraft& aircraft) noexcept override;
 
     /// @var mMaxHeight
     /// The max height filter
@@ -68,8 +68,8 @@ private:
      * @param rAircraft The target aircraft
      * @return true on success, else false
      */
-    bool parseField(std::uint32_t vField, const std::string& crStr, object::Position& rPosition,
-                    object::Aircraft& rAircraft) noexcept;
+    bool parseField(std::uint32_t fieldNr, const std::string& field, object::Position& position,
+                    object::Aircraft& aircraft) noexcept;
 };
 }  // namespace parser
 }  // namespace feed

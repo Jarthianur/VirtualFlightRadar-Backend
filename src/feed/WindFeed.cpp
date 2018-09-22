@@ -30,11 +30,11 @@
 
 namespace feed
 {
-parser::WindParser WindFeed::smParser;
+parser::WindParser WindFeed::s_parser;
 
-WindFeed::WindFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                   std::shared_ptr<data::WindData> pData)
-    : Feed(crName, crKvMap, pData)
+WindFeed::WindFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+                   std::shared_ptr<data::WindData> data)
+    : Feed(name, propertyMap, data)
 {}
 
 WindFeed::~WindFeed() noexcept
@@ -45,10 +45,10 @@ Feed::Protocol WindFeed::get_protocol() const
     return Protocol::SENSOR;
 }
 
-bool WindFeed::process(const std::string& crResponse) noexcept
+bool WindFeed::process(const std::string& response) noexcept
 {
     object::Wind wind(get_priority());
-    if(smParser.unpack(crResponse, wind))
+    if(s_parser.unpack(response, wind))
     {
         m_data->update(std::move(wind));
     }

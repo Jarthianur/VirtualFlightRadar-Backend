@@ -28,24 +28,24 @@ namespace data
 WindData::WindData() : Data()
 {}
 
-WindData::WindData(const object::Wind& crWind) : Data(), mWind(crWind)
+WindData::WindData(const object::Wind& wind) : Data(), m_wind(wind)
 {}
 
 WindData::~WindData() noexcept
 {}
 
-std::string WindData::getSerialized()
+std::string WindData::get_serialized()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    std::string tmp((++mWind).get_serialized());
-    mWind.set_serialized("");
+    std::lock_guard<std::mutex> lock(m_mutex);
+    std::string tmp((++m_wind).get_serialized());
+    m_wind.set_serialized("");
     return tmp;
 }
 
-bool WindData::update(Object&& rvWind)
+bool WindData::update(Object&& wind)
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    return mWind.tryUpdate(std::move(rvWind));
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_wind.tryUpdate(std::move(wind));
 }
 
 }  // namespace data

@@ -37,78 +37,78 @@ using namespace data;
 
 namespace feed
 {
-FeedFactory::FeedFactory(const Configuration& crConfig,
-                         std::shared_ptr<AircraftData>& pAircraftData,
-                         std::shared_ptr<AtmosphereData>& pAtmosData,
-                         std::shared_ptr<GpsData>& pGpsData, std::shared_ptr<WindData>& pWindData)
-    : mrConfig(crConfig),
-      mpAircraftData(pAircraftData),
-      mpAtmosData(pAtmosData),
-      mpGpsData(pGpsData),
-      mpWindData(pWindData)
+FeedFactory::FeedFactory(const Configuration& config,
+                         std::shared_ptr<AircraftData>& aircraftData,
+                         std::shared_ptr<AtmosphereData>& atmosData,
+                         std::shared_ptr<GpsData>& gpsData, std::shared_ptr<WindData>& windData)
+    : m_config(config),
+      m_aircraftData(aircraftData),
+      m_atmosData(atmosData),
+      m_gpsData(gpsData),
+      m_windData(windData)
 {}
 
 FeedFactory::~FeedFactory() noexcept
 {}
 
 template<>
-std::shared_ptr<AprscFeed> FeedFactory::makeFeed<AprscFeed>(const std::string& crName,
-                                                            const KeyValueMap& crKvMap)
+std::shared_ptr<AprscFeed> FeedFactory::makeFeed<AprscFeed>(const std::string& name,
+                                                            const KeyValueMap& propertyMap)
 {
-    return std::make_shared<AprscFeed>(crName, crKvMap, mpAircraftData, mrConfig.get_maxHeight());
+    return std::make_shared<AprscFeed>(name, propertyMap, m_aircraftData, m_config.get_maxHeight());
 }
 
 template<>
-std::shared_ptr<GpsFeed> FeedFactory::makeFeed<GpsFeed>(const std::string& crName,
-                                                        const KeyValueMap& crKvMap)
+std::shared_ptr<GpsFeed> FeedFactory::makeFeed<GpsFeed>(const std::string& name,
+                                                        const KeyValueMap& propertyMap)
 {
-    return std::make_shared<GpsFeed>(crName, crKvMap, mpGpsData);
+    return std::make_shared<GpsFeed>(name, propertyMap, m_gpsData);
 }
 
 template<>
-std::shared_ptr<SbsFeed> FeedFactory::makeFeed<SbsFeed>(const std::string& crName,
-                                                        const KeyValueMap& crKvMap)
+std::shared_ptr<SbsFeed> FeedFactory::makeFeed<SbsFeed>(const std::string& name,
+                                                        const KeyValueMap& propertyMap)
 {
-    return std::make_shared<SbsFeed>(crName, crKvMap, mpAircraftData, mrConfig.get_maxHeight());
+    return std::make_shared<SbsFeed>(name, propertyMap, m_aircraftData, m_config.get_maxHeight());
 }
 
 template<>
-std::shared_ptr<WindFeed> FeedFactory::makeFeed<WindFeed>(const std::string& crName,
-                                                          const KeyValueMap& crKvMap)
+std::shared_ptr<WindFeed> FeedFactory::makeFeed<WindFeed>(const std::string& name,
+                                                          const KeyValueMap& propertyMap)
 {
-    return std::make_shared<WindFeed>(crName, crKvMap, mpWindData);
+    return std::make_shared<WindFeed>(name, propertyMap, m_windData);
 }
 
 template<>
-std::shared_ptr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(const std::string& crName,
-                                                                      const KeyValueMap& crKvMap)
+std::shared_ptr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(const std::string& name,
+                                                                      const KeyValueMap& propertyMap)
 {
-    return std::make_shared<AtmosphereFeed>(crName, crKvMap, mpAtmosData);
+    return std::make_shared<AtmosphereFeed>(name, propertyMap, m_atmosData);
 }
 
-boost::optional<std::shared_ptr<Feed>> FeedFactory::createFeed(const std::string& crName,
-                                                               const KeyValueMap& crKvMap)
+boost::optional<std::shared_ptr<Feed>> FeedFactory::createFeed(const std::string& name,
+                                                               const KeyValueMap& propertyMap)
 {
-    if(crName.find(SECT_KEY_APRSC) != std::string::npos)
+    if(name.find(SECT_KEY_APRSC) != std::string::npos)
     {
-        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<AprscFeed>(crName, crKvMap));
+        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<AprscFeed>(name, propertyMap));
     }
-    else if(crName.find(SECT_KEY_SBS) != std::string::npos)
+    else if(name.find(SECT_KEY_SBS) != std::string::npos)
     {
-        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<SbsFeed>(crName, crKvMap));
+        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<SbsFeed>(name, propertyMap));
     }
-    else if(crName.find(SECT_KEY_GPS) != std::string::npos)
+    else if(name.find(SECT_KEY_GPS) != std::string::npos)
     {
-        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<GpsFeed>(crName, crKvMap));
+        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<GpsFeed>(name, propertyMap));
     }
-    else if(crName.find(SECT_KEY_WIND) != std::string::npos)
+    else if(name.find(SECT_KEY_WIND) != std::string::npos)
     {
-        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<WindFeed>(crName, crKvMap));
+        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<WindFeed>(name, propertyMap));
     }
-    else if(crName.find(SECT_KEY_ATMOS) != std::string::npos)
+    else if(name.find(SECT_KEY_ATMOS) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(
-            makeFeed<AtmosphereFeed>(crName, crKvMap));
+            makeFeed<AtmosphereFeed>(name, propertyMap));
     }
     return boost::none;
 }

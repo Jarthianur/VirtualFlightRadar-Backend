@@ -45,7 +45,7 @@ public:
      * @brief Get the serialized data.
      * @return the string
      */
-    virtual std::string getSerialized() = 0;
+    virtual std::string get_serialized() = 0;
 
     /**
      * @fn update
@@ -59,6 +59,6 @@ public:
 protected:
     /// @var mMutex
     /// Used for RW on this data
-    mutable std::mutex mMutex;
+    mutable std::mutex m_mutex;
 };
 }  // namespace data

@@ -47,38 +47,38 @@ public:
     void run();
     void stop();
     void close();
-    void onConnect(const Endpoint& crEndpoint, const Callback& crCallback);
+    void onConnect(const Endpoint& endpoint, const Callback& callback);
     void onRead(const ReadCallback& crCallback);
-    void onWrite(const std::string& crStr, const Callback& crCallback);
-    void onTimeout(const Callback& crCallback, std::uint32_t vTimeout = 0);
-    void resetTimer(std::uint32_t vTimeout);
+    void onWrite(const std::string& msg, const Callback& callback);
+    void onTimeout(const Callback& callback, std::uint32_t timeout = 0);
+    void resetTimer(std::uint32_t timeout);
     bool timerExpired();
 
 private:
-    void handleResolve(const boost::system::error_code& crError,
-                       boost::asio::ip::tcp::resolver::iterator vResolverIt,
-                       const Callback& crCallback) noexcept;
+    void handleResolve(const boost::system::error_code& error,
+                       boost::asio::ip::tcp::resolver::iterator resolverIt,
+                       const Callback& callback) noexcept;
 
-    void handleConnect(const boost::system::error_code& crError,
-                       boost::asio::ip::tcp::resolver::iterator vResolverIt,
-                       const Callback& crCallback) noexcept;
+    void handleConnect(const boost::system::error_code& error,
+                       boost::asio::ip::tcp::resolver::iterator resolverIt,
+                       const Callback& callback) noexcept;
 
-    void handleTimeout(const boost::system::error_code& crError,
-                       const Callback& crCallback) noexcept;
+    void handleTimeout(const boost::system::error_code& error,
+                       const Callback& callback) noexcept;
 
-    void handleRead(const boost::system::error_code& crError, std::size_t vBytes,
-                    const ReadCallback& crCallback) noexcept;
+    void handleRead(const boost::system::error_code& error, std::size_t bytes,
+                    const ReadCallback& callback) noexcept;
 
-    void handleWrite(const boost::system::error_code& crError, std::size_t vBytes,
-                     const Callback& crCallback) noexcept;
+    void handleWrite(const boost::system::error_code& error, std::size_t bytes,
+                     const Callback& callback) noexcept;
 
-    boost::asio::io_service mIoService;
-    boost::asio::ip::tcp::socket mSocket;
-    boost::asio::ip::tcp::resolver mResolver;
-    boost::asio::deadline_timer mTimer;
-    boost::asio::streambuf mBuffer;
-    std::string mResponse;
-    std::istream mIStream;
+    boost::asio::io_service m_ioService;
+    boost::asio::ip::tcp::socket m_socket;
+    boost::asio::ip::tcp::resolver m_resolver;
+    boost::asio::deadline_timer m_timer;
+    boost::asio::streambuf m_buffer;
+    std::string m_response;
+    std::istream m_istream;
 };
 
 }  // namespace client

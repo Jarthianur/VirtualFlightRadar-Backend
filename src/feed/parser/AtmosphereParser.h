@@ -49,18 +49,7 @@ public:
      * @brief Unpack into Climate.
      * @see Parser#unpack
      */
-    bool unpack(const std::string& crStr, object::Atmosphere& rAtmos) noexcept override;
-
-private:
-    /**
-     * @fn parseClimate
-     * @brief Parse a sentence and unpack into Climate.
-     * @param crStr    The string to parse
-     * @param rClimate The target object
-     * @return true on success, else false
-     * @throw std::out_of_range, std::invalid_argument from invoked functions
-     */
-    bool parseAtmosphere(const std::string& crStr, object::Atmosphere& rAtmos);
+    bool unpack(const std::string& sentence, object::Atmosphere& atmosphere) noexcept override;
 };
 }  // namespace parser
 }  // namespace feed

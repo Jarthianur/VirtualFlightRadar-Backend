@@ -54,7 +54,7 @@ public:
      * @see Parser#unpack
      * @return true on success, else false
      */
-    bool unpack(const std::string& crStr, object::Aircraft& rAircraft) noexcept override;
+    bool unpack(const std::string& sentence, object::Aircraft& aircraft) noexcept override;
 
     /// @var mMaxHeight
     /// The max height filter
@@ -68,7 +68,7 @@ private:
      * @param rAircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parsePosition(const boost::smatch& crMatch, object::Aircraft& rAircraft) noexcept;
+    bool parsePosition(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
 
     /**
      * @fn parseComment
@@ -77,7 +77,7 @@ private:
      * @param rAircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parseComment(const boost::smatch& crMatch, object::Aircraft& rAircraft) noexcept;
+    bool parseComment(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
 
     /**
      * @fn parseMovement
@@ -87,8 +87,8 @@ private:
      * @param rAircraft   The target Aircraft
      * @return true on success, else false
      */
-    bool parseMovement(const boost::smatch& crMatch, const boost::smatch& crCommMatch,
-                       object::Aircraft& rAircraft) noexcept;
+    bool parseMovement(const boost::smatch& match, const boost::smatch& comMatch,
+                       object::Aircraft& aircraft) noexcept;
 
     /**
      * @fn parseTimeStamp
@@ -97,15 +97,15 @@ private:
      * @param rAircraft   The target Aircraft
      * @return true on success, else false
      */
-    bool parseTimeStamp(const boost::smatch& crMatch, object::Aircraft& rAircraft) noexcept;
+    bool parseTimeStamp(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
 
     /// @var msAprsRe
     /// Regular expression for APRS protocol
-    static const boost::regex msAprsRe;
+    static const boost::regex s_APRS_RE;
 
     /// @var msAprsComRe
     /// Regular expression for OGN specific APRS extension
-    static const boost::regex msAprsComRe;
+    static const boost::regex s_APRSExtRE;
 };
 }  // namespace parser
 }  // namespace feed

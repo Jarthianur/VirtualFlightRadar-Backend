@@ -88,14 +88,13 @@ private:
 
     /// @var mLoginStr
     /// Login string
-    std::string m_login;
+    const std::string m_login;
 };
 
 template<typename ConnectorT>
 AprscClient<ConnectorT>::AprscClient(const Endpoint& endpoint, const std::string& login)
-    : Client<ConnectorT>(endpoint, "(AprscClient)"), m_login(login)
+    : Client<ConnectorT>(endpoint, "(AprscClient)"), m_login(login + "\r\n")
 {
-    m_login.append("\r\n");
 }
 
 template<typename ConnectorT>

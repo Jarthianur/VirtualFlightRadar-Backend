@@ -19,43 +19,43 @@
  }
  */
 
-#include "PropertyMap.h"
+#include "Properties.h"
 
 #include <stdexcept>
 
 namespace config
 {
-PropertyMap::PropertyMap()
+Properties::Properties()
 {}
 
-PropertyMap::~PropertyMap() noexcept
+Properties::~Properties() noexcept
 {}
 
-const std::string PropertyMap::getProperty(const std::string& crSection, const std::string& crKey,
-                                           const std::string& crDefault) const
+const std::string Properties::get_property(const std::string& section, const std::string& key,
+                                           const std::string& alternative) const
 {
-    auto sectionIt = m_propertiesMap.find(crSection);
+    auto sectionIt = m_propertiesMap.find(section);
     if(sectionIt != m_propertiesMap.end())
     {
-        auto kvIt = sectionIt->second.find(crKey);
+        auto kvIt = sectionIt->second.find(key);
         if(kvIt != sectionIt->second.end() && !kvIt->second.empty())
         {
             return kvIt->second;
         }
         else
         {
-            return crDefault;
+            return alternative;
         }
     }
     else
     {
-        return crDefault;
+        return alternative;
     }
 }
 
-const KeyValueMap& PropertyMap::getSectionKeyValue(const std::string& crSection) const
+const KeyValueMap& Properties::get_propertySection(const std::string& section) const
 {
-    auto it = m_propertiesMap.find(crSection);
+    auto it = m_propertiesMap.find(section);
     if(it != m_propertiesMap.end())
     {
         return it->second;
@@ -66,9 +66,9 @@ const KeyValueMap& PropertyMap::getSectionKeyValue(const std::string& crSection)
     }
 }
 
-bool config::PropertyMap::addProperty(const std::string& crSection, const KeyValue& crKeyValue)
+bool config::Properties::addProperty(const std::string& section, const KeyValue& property)
 {
-    return m_propertiesMap[crSection].emplace(crKeyValue).second;
+    return m_propertiesMap[section].emplace(property).second;
 }
 
 }  // namespace config

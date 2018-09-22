@@ -28,28 +28,28 @@ namespace data
 AtmosphereData::AtmosphereData() : Data()
 {}
 
-AtmosphereData::AtmosphereData(const Atmosphere& crAtmosphere) : Data(), mAtmosphere(crAtmosphere)
+AtmosphereData::AtmosphereData(const Atmosphere& atmosphere) : Data(), m_atmosphere(atmosphere)
 {}
 
 AtmosphereData::~AtmosphereData() noexcept
 {}
 
-std::string AtmosphereData::getSerialized()
+std::string AtmosphereData::get_serialized()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    return (++mAtmosphere).get_serialized();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return (++m_atmosphere).get_serialized();
 }
 
-bool AtmosphereData::update(Object&& rvAtmosphere)
+bool AtmosphereData::update(Object&& atmosphere)
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    return mAtmosphere.tryUpdate(std::move(rvAtmosphere));
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_atmosphere.tryUpdate(std::move(atmosphere));
 }
 
-double AtmosphereData::getAtmPressure()
+double AtmosphereData::get_atmPressure()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    return mAtmosphere.get_pressure();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_atmosphere.get_pressure();
 }
 
 }  // namespace data

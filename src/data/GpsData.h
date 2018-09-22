@@ -45,7 +45,7 @@ public:
      * @brief Constructor
      * @param crPosition The initial info
      */
-    GpsData(const object::GpsPosition& crPosition, bool vGround);
+    GpsData(const object::GpsPosition& position, bool ground);
 
     ~GpsData() noexcept;
 
@@ -55,7 +55,7 @@ public:
      * @return the NMEA string
      * @threadsafe
      */
-    std::string getSerialized() override;
+    std::string get_serialized() override;
 
     /**
      * @fn getPosition
@@ -63,7 +63,7 @@ public:
      * @return the position
      * @threadsafe
      */
-    object::Position getPosition();
+    object::Position get_position();
 
     /**
      * @fn update
@@ -73,7 +73,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& rvPosition) override;
+    bool update(object::Object&& position) override;
 
 private:
     /**
@@ -85,19 +85,19 @@ private:
 
     /// @var mPosition
     /// The position
-    object::GpsPosition mPosition;
+    object::GpsPosition m_position;
 
     /// @var mProcessor
     /// Processor for GPS information
-    processor::GpsProcessor mProcessor;
+    processor::GpsProcessor m_processor;
 
     /// @var mPositionLocked
     /// Locking state of the current position
-    bool mPositionLocked = false;
+    bool m_positionLocked = false;
 
     /// @var mGroundMode
     /// Ground mode state
-    bool mGroundMode = false;
+    bool m_groundMode = false;
 };
 
 }  // namespace data

@@ -36,15 +36,15 @@
 
 namespace feed
 {
-parser::AprsParser AprscFeed::smParser;
+parser::AprsParser AprscFeed::s_parser;
 
-AprscFeed::AprscFeed(const std::string& crName, const config::KeyValueMap& crKvMap,
-                     std::shared_ptr<data::AircraftData> pData, std::int32_t vMaxHeight)
-    : Feed(crName, crKvMap, pData)
+AprscFeed::AprscFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+                     std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
+    : Feed(name, propertyMap, data)
 {
-    parser::AprsParser::s_maxHeight = vMaxHeight;
-    mLoginStrIt                     = m_properties.find(KV_KEY_LOGIN);
-    if(mLoginStrIt == m_properties.end())
+    parser::AprsParser::s_maxHeight = maxHeight;
+    m_loginIt                     = m_propertyMap.find(KV_KEY_LOGIN);
+    if(m_loginIt == m_propertyMap.end())
     {
         logger.warn(COMPONENT " could not find: ", m_name, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
@@ -59,19 +59,19 @@ Feed::Protocol AprscFeed::get_protocol() const
     return Protocol::APRS;
 }
 
-bool AprscFeed::process(const std::string& crResponse) noexcept
+bool AprscFeed::process(const std::string& response) noexcept
 {
     object::Aircraft ac(get_priority());
-    if(smParser.unpack(crResponse, ac))
+    if(s_parser.unpack(response, ac))
     {
         m_data->update(std::move(ac));
     }
     return true;
 }
 
-const std::string& AprscFeed::getLoginStr() const
+const std::string& AprscFeed::get_login() const
 {
-    return mLoginStrIt->second;
+    return m_loginIt->second;
 }
 
 }  // namespace feed
