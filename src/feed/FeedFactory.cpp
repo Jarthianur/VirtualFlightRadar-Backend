@@ -37,8 +37,7 @@ using namespace data;
 
 namespace feed
 {
-FeedFactory::FeedFactory(const Configuration& config,
-                         std::shared_ptr<AircraftData>& aircraftData,
+FeedFactory::FeedFactory(const Configuration& config, std::shared_ptr<AircraftData>& aircraftData,
                          std::shared_ptr<AtmosphereData>& atmosData,
                          std::shared_ptr<GpsData>& gpsData, std::shared_ptr<WindData>& windData)
     : m_config(config),
@@ -80,8 +79,8 @@ std::shared_ptr<WindFeed> FeedFactory::makeFeed<WindFeed>(const std::string& nam
 }
 
 template<>
-std::shared_ptr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(const std::string& name,
-                                                                      const KeyValueMap& propertyMap)
+std::shared_ptr<AtmosphereFeed>
+FeedFactory::makeFeed<AtmosphereFeed>(const std::string& name, const KeyValueMap& propertyMap)
 {
     return std::make_shared<AtmosphereFeed>(name, propertyMap, m_atmosData);
 }

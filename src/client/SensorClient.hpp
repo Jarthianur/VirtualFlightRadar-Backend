@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include "Client.hpp"
 #include "../Parameters.h"
+#include "Client.hpp"
 
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT

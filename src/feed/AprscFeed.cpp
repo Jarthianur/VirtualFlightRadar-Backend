@@ -43,7 +43,7 @@ AprscFeed::AprscFeed(const std::string& name, const config::KeyValueMap& propert
     : Feed(name, propertyMap, data)
 {
     parser::AprsParser::s_maxHeight = maxHeight;
-    m_loginIt                     = m_propertyMap.find(KV_KEY_LOGIN);
+    m_loginIt                       = m_propertyMap.find(KV_KEY_LOGIN);
     if(m_loginIt == m_propertyMap.end())
     {
         logger.warn(COMPONENT " could not find: ", m_name, "." KV_KEY_LOGIN);

@@ -72,8 +72,8 @@ void ConnectorImplBoost::onConnect(const Endpoint& endpoint, const Callback& cal
     boost::asio::ip::tcp::resolver::query query(
         endpoint.host, endpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
     m_resolver.async_resolve(query, boost::bind(&ConnectorImplBoost::handleResolve, this,
-                                               boost::asio::placeholders::error,
-                                               boost::asio::placeholders::iterator, callback));
+                                                boost::asio::placeholders::error,
+                                                boost::asio::placeholders::iterator, callback));
 }
 
 void ConnectorImplBoost::onRead(const ReadCallback& callback)
@@ -99,7 +99,7 @@ void ConnectorImplBoost::onTimeout(const Callback& callback, std::uint32_t timeo
         resetTimer(timeout);
     }
     m_timer.async_wait(boost::bind(&ConnectorImplBoost::handleTimeout, this,
-                                  boost::asio::placeholders::error, callback));
+                                   boost::asio::placeholders::error, callback));
 }
 
 void ConnectorImplBoost::resetTimer(std::uint32_t vTimeout)

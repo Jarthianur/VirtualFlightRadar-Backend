@@ -29,7 +29,7 @@ namespace server
 class SocketException : public std::exception
 {
 public:
-    SocketException(const std::string& msg);
+    explicit SocketException(const std::string& msg);
     ~SocketException() noexcept;
 
     const char* what() const noexcept;

@@ -28,8 +28,9 @@
 
 namespace config
 {
-const boost::regex ConfigReader::s_keyValueRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
-              boost::regex_constants::optimize);
+const boost::regex
+    ConfigReader::s_keyValueRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
+                               boost::regex_constants::optimize);
 
 ConfigReader::ConfigReader()
 {}
@@ -55,20 +56,20 @@ void ConfigReader::read(std::istream& stream, Properties& properties)
         {
             currentSection = *section;
             if(!properties.addProperty(currentSection))
-                {
-                    logger.warn("(ConfigReader) could not add section [", std::to_string(lineNr),
-                                "]: ", *section);
-                }
+            {
+                logger.warn("(ConfigReader) could not add section [", std::to_string(lineNr),
+                            "]: ", *section);
+            }
             continue;
         }
         boost::optional<KeyValue> keyValue = parseProperty(currentLine);
         if(keyValue)
         {
-        	if(!properties.addProperty(currentSection, *keyValue))
-        	    {
-        	        logger.warn("(ConfigReader) could not add property [", std::to_string(lineNr),
-        	                    "]: ", (*keyValue).first);
-        	    }
+            if(!properties.addProperty(currentSection, *keyValue))
+            {
+                logger.warn("(ConfigReader) could not add property [", std::to_string(lineNr),
+                            "]: ", (*keyValue).first);
+            }
         }
         else
         {

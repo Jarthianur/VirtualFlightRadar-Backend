@@ -225,7 +225,8 @@ void Server<TcpInterfaceT, SocketT>::attemptConnection(bool error) noexcept
         std::lock_guard<std::mutex> lock(m_mutex);
         try
         {
-            if(m_activeConnections < S_MAX_CLIENTS && !isConnected(m_tcpIf.get_socket().get_address()))
+            if(m_activeConnections < S_MAX_CLIENTS
+               && !isConnected(m_tcpIf.get_socket().get_address()))
             {
                 for(auto& it : m_connections)
                 {

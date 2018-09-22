@@ -144,7 +144,7 @@ private:
 
     /// @var mtRelEast
     /// Relative distance in eastern direction; m
-   mutable std::int32_t m_relEast = 0;
+    mutable std::int32_t m_relEast = 0;
 
     /// @var mtRelVertical
     /// Relative vertical distance; m

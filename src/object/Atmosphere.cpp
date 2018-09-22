@@ -36,7 +36,7 @@ void Atmosphere::assign(Object&& other)
 {
     Object::assign(std::move(other));
     Atmosphere&& update = static_cast<Atmosphere&&>(other);
-    this->m_pressure       = update.m_pressure;
+    this->m_pressure    = update.m_pressure;
 }
 
 }  // namespace object

@@ -26,8 +26,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "../config/Properties.h"
 #include "../Defines.h"
+#include "../config/Properties.h"
 #include "Feed.h"
 
 namespace feed

@@ -137,7 +137,6 @@ public:
     ~Configuration() noexcept;
 
 private:
-
     /**
      * @fn resolvePosition
      * @brief Resolve the fallback position.
@@ -182,7 +181,7 @@ private:
      * @throw std::invalid_argument if the Number is invalid
      */
     util::Number checkNumber(const util::OptNumber& number, const std::string& section,
-                                  const std::string& key) const;
+                             const std::string& key) const;
 
     /**
      * @fn dumpInfo

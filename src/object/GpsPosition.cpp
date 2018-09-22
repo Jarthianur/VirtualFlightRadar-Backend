@@ -35,13 +35,13 @@ GpsPosition::~GpsPosition() noexcept
 void GpsPosition::assign(Object&& other)
 {
     Object::assign(std::move(other));
-    GpsPosition&& update = static_cast<GpsPosition&&>(other);
-    this->m_position        = update.m_position;
-    this->m_timeStamp       = update.m_timeStamp;
-    this->m_nrOfSatellites  = update.m_nrOfSatellites;
-    this->m_fixQuality      = update.m_fixQuality;
-    this->m_geoid           = update.m_geoid;
-    this->m_dilution        = update.m_dilution;
+    GpsPosition&& update   = static_cast<GpsPosition&&>(other);
+    this->m_position       = update.m_position;
+    this->m_timeStamp      = update.m_timeStamp;
+    this->m_nrOfSatellites = update.m_nrOfSatellites;
+    this->m_fixQuality     = update.m_fixQuality;
+    this->m_geoid          = update.m_geoid;
+    this->m_dilution       = update.m_dilution;
 }
 
 bool GpsPosition::canUpdate(const Object& other) const

@@ -23,8 +23,7 @@
 
 namespace server
 {
-SocketException::SocketException(const std::string& msg)
-    : std::exception(), m_message(msg)
+SocketException::SocketException(const std::string& msg) : std::exception(), m_message(msg)
 {}
 
 SocketException::~SocketException() noexcept

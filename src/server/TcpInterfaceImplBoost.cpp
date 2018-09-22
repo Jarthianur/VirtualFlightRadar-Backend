@@ -29,7 +29,7 @@ namespace server
 TcpInterfaceImplBoost::TcpInterfaceImplBoost(std::uint16_t port)
     : m_ioService(),
       m_acceptor(m_ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
-                boost::asio::ip::tcp::acceptor::reuse_address(true)),
+                 boost::asio::ip::tcp::acceptor::reuse_address(true)),
       m_socket(boost::move(boost::asio::ip::tcp::socket(m_ioService)))
 {}
 
@@ -76,8 +76,8 @@ void TcpInterfaceImplBoost::onAccept(const std::function<void(bool)>& callback)
     if(m_acceptor.is_open())
     {
         m_acceptor.async_accept(m_socket.get(),
-                               boost::bind(&TcpInterfaceImplBoost::handleAccept, this,
-                                           boost::asio::placeholders::error, callback));
+                                boost::bind(&TcpInterfaceImplBoost::handleAccept, this,
+                                            boost::asio::placeholders::error, callback));
     }
 }
 

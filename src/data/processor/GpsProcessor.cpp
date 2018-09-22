@@ -54,8 +54,8 @@ std::string GpsProcessor::get_GPGGA(const GpsPosition& position)
         m_buffer, sizeof(m_buffer),
         /*"$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"*/
         "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02d,1,%d,M,%.1lf,M,,*",
-        utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
-        m_directionEW, /*pos.fixQa,*/ position.get_nrOfSatellites(),
+        utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
+        m_degLongitude, m_minLongitude, m_directionEW, /*pos.fixQa,*/ position.get_nrOfSatellites(),
         position.get_position().altitude, position.get_geoid());
     std::string nmea_str(m_buffer);
     finishSentence(nmea_str);
@@ -72,8 +72,9 @@ std::string GpsProcessor::get_GPRMC(const GpsPosition& position)
     std::snprintf(
         m_buffer, sizeof(m_buffer),
         "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
-        utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
-        m_directionEW, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
+        utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
+        m_degLongitude, m_minLongitude, m_directionEW, utc->tm_mday, utc->tm_mon + 1,
+        utc->tm_year - 100);
     std::string nmea_str(m_buffer);
     finishSentence(nmea_str);
 
@@ -82,10 +83,10 @@ std::string GpsProcessor::get_GPRMC(const GpsPosition& position)
 
 void GpsProcessor::evalPosition(double latitude, double longitude)
 {
-    m_directionSN = (latitude < 0) ? 'S' : 'N';
-    m_directionEW = (longitude < 0) ? 'W' : 'E';
-    m_degLatitude = std::abs(std::floor(latitude));
-    m_minLatitude = std::abs(60.0 * (latitude - m_degLatitude));
+    m_directionSN  = (latitude < 0) ? 'S' : 'N';
+    m_directionEW  = (longitude < 0) ? 'W' : 'E';
+    m_degLatitude  = std::abs(std::floor(latitude));
+    m_minLatitude  = std::abs(60.0 * (latitude - m_degLatitude));
     m_degLongitude = std::abs(std::floor(longitude));
     m_minLongitude = std::abs(60.0 * (longitude - m_degLongitude));
 }

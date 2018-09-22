@@ -32,7 +32,7 @@ void Object::assign(Object&& other)
 {
     this->m_serialized   = std::move(other.m_serialized);
     this->m_lastPriority = other.m_lastPriority;
-    this->m_updateAge   = 0;
+    this->m_updateAge    = 0;
 }
 
 bool Object::tryUpdate(Object&& other)

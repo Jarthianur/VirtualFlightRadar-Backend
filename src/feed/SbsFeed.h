@@ -25,8 +25,8 @@
 #include <memory>
 #include <string>
 
-#include "../config/Properties.h"
 #include "../Defines.h"
+#include "../config/Properties.h"
 #include "Feed.h"
 
 namespace feed

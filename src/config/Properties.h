@@ -55,7 +55,7 @@ public:
      * @return the value for key in section if found, else the default value
      */
     const std::string get_property(const std::string& section, const std::string& key,
-                                  const std::string& alternative = "") const;
+                                   const std::string& alternative = "") const;
 
     /**
      * @fn getSectionKeyValue

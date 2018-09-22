@@ -63,8 +63,7 @@ private:
                        boost::asio::ip::tcp::resolver::iterator resolverIt,
                        const Callback& callback) noexcept;
 
-    void handleTimeout(const boost::system::error_code& error,
-                       const Callback& callback) noexcept;
+    void handleTimeout(const boost::system::error_code& error, const Callback& callback) noexcept;
 
     void handleRead(const boost::system::error_code& error, std::size_t bytes,
                     const ReadCallback& callback) noexcept;

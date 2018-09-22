@@ -39,7 +39,7 @@ Aircraft::~Aircraft() noexcept
 void Aircraft::assign(Object&& other)
 {
     Object::assign(std::move(other));
-    Aircraft&& update  = static_cast<Aircraft&&>(other);
+    Aircraft&& update    = static_cast<Aircraft&&>(other);
     this->m_idType       = update.m_idType;
     this->m_aircraftType = update.m_aircraftType;
     this->m_targetType   = update.m_targetType;
