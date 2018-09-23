@@ -43,5 +43,5 @@ int main(int, char**)
     test_object(runner);
     test_math(runner);
 
-    return rep->report(runner);
+    return rep->report(runner) > 0 ? 1 : 0;
 }

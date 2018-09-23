@@ -38,7 +38,7 @@ void test_data(test::TestSuitesRunner& runner)
     describe<AircraftData>("Container functions", runner)
         ->test(
             "invalidate aircraft",
-            []() {
+            []{
                 feed::parser::SbsParser sbsParser;
                 AircraftData data;
                 object::Aircraft ac;
@@ -52,11 +52,11 @@ void test_data(test::TestSuitesRunner& runner)
                 {
                     data.processAircrafts(pos, press);
                 }
-                assertTrue(data.getSerialized().empty());
+                assertTrue(data.get_serialized().empty());
             })
         ->test(
             "delete aircraft",
-            []() {
+            []{
                 feed::parser::SbsParser sbsParser;
                 AircraftData data;
                 object::Aircraft ac;
@@ -73,7 +73,7 @@ void test_data(test::TestSuitesRunner& runner)
             })
         ->test(
             "prefer FLARM, accept again if no input",
-            []() {
+            []{
                 feed::parser::SbsParser sbsParser;
                 feed::parser::AprsParser aprsParser;
                 AircraftData data;
@@ -97,10 +97,10 @@ void test_data(test::TestSuitesRunner& runner)
                     ac);
                 data.update(std::move(ac));
                 data.processAircrafts(pos, press);
-                std::string proc = data.getSerialized();
+                std::string proc = data.get_serialized();
                 bool matched     = boost::regex_search(proc, match, helper::pflauRe);
                 assertTrue(matched);
-                assertStr(match.str(2), "610", EQUALS);
+                assertEqStr(match.str(2), "610");
                 for(int i = 0; i < AC_NO_FLARM_THRESHOLD; ++i)
                 {
                     data.processAircrafts(pos, press);
@@ -110,12 +110,12 @@ void test_data(test::TestSuitesRunner& runner)
                     ac);
                 data.update(std::move(ac));
                 data.processAircrafts(pos, press);
-                proc    = data.getSerialized();
+                proc    = data.get_serialized();
                 matched = boost::regex_search(proc, match, helper::pflauRe);
                 assertTrue(matched);
-                assertStr(match.str(2), "1000", EQUALS);
+                assertEqStr(match.str(2), "1000");
             })
-        ->test("write after outdated", []() {
+        ->test("write after outdated", []{
             feed::parser::AprsParser aprsParser;
             object::Aircraft ac1(1);
             object::Aircraft ac2(2);
@@ -151,7 +151,7 @@ void test_data(test::TestSuitesRunner& runner)
 
     describeParallel<GpsData>("gps string", runner)
         ->test("correct gps position",
-               []() {
+               []{
                    GpsData data;
                    object::GpsPosition pos({10.0, 85.0, 100}, 40.0);
                    pos.setTimeStamp(object::TimeStamp("000001", object::TimeStamp::Format::HHMMSS));
@@ -166,7 +166,7 @@ void test_data(test::TestSuitesRunner& runner)
                })
         ->test(
             "write higher priority",
-            []() {
+            []{
                 GpsData data;
                 object::GpsPosition pos0(0);
                 object::GpsPosition pos1(1);
@@ -181,7 +181,7 @@ void test_data(test::TestSuitesRunner& runner)
                 data.update(std::move(pos0));
                 assertEquals(data.getPosition().altitude, 2000);
             })
-        ->test("write after outdated", []() {
+        ->test("write after outdated", []{
             GpsData data;
             object::GpsPosition pos1(1);
             object::GpsPosition pos2(2);
@@ -204,7 +204,7 @@ void test_data(test::TestSuitesRunner& runner)
 
     describeParallel<WindData>("wind data", runner)
         ->test("extract WIMWV",
-               []() {
+               []{
                    WindData data;
                    object::Wind wind;
                    wind.set_serialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
@@ -213,7 +213,7 @@ void test_data(test::TestSuitesRunner& runner)
                    assertStr(data.getSerialized(), "", EQUALS);
                })
         ->test("write higher priority",
-               []() {
+               []{
                    WindData data;
                    object::Wind wind0(0);
                    object::Wind wind1(1);
@@ -225,7 +225,7 @@ void test_data(test::TestSuitesRunner& runner)
                    wind0.set_serialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
                    assertFalse(data.update(std::move(wind0)));
                })
-        ->test("write after attempt", []() {
+        ->test("write after attempt", []{
             WindData data;
             object::Wind wind1(1);
             object::Wind wind2(2);
@@ -241,7 +241,7 @@ void test_data(test::TestSuitesRunner& runner)
 
     describeParallel<AtmosphereData>("atmosphere data", runner)
         ->test("get WIMDA, pressure",
-               []() {
+               []{
                    AtmosphereData data;
                    object::Atmosphere atm;
                    atm.setPressure(1009.1);
@@ -252,7 +252,7 @@ void test_data(test::TestSuitesRunner& runner)
                    assertEquals(data.getAtmPressure(), 1009.1);
                })
         ->test("write higher priority",
-               []() {
+               []{
                    AtmosphereData data;
                    object::Atmosphere atm0(0);
                    object::Atmosphere atm1(1);
@@ -263,7 +263,7 @@ void test_data(test::TestSuitesRunner& runner)
                    data.update(std::move(atm1));
                    assertEquals(data.getAtmPressure(), 900.0);
                })
-        ->test("write after attempt", []() {
+        ->test("write after attempt", []{
             AtmosphereData data;
             object::Atmosphere atm1(1);
             object::Atmosphere atm2(2);

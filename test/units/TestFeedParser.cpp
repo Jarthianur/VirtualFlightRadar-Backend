@@ -49,12 +49,12 @@ void test_feed_parser(test::TestSuitesRunner& runner)
                 sbsParser.unpack(
                     "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
                     ac);
-                assertEqStr(ac.getId(), "AAAAAA");
-                assertEquals(ac.getTargetType(), object::Aircraft::TargetType::TRANSPONDER);
-                assertEquals(ac.getPosition().altitude, math::doubleToInt(math::FEET_2_M * 1000));
-                assertEquals(ac.getPosition().latitude, 49.0);
-                assertEquals(ac.getPosition().longitude, 8.0);
-                assertFalse(ac.getFullInfoAvailable());
+                assertEqStr(ac.get_id(), "AAAAAA");
+                assertEquals(ac.get_targetType(), object::Aircraft::TargetType::TRANSPONDER);
+                assertEquals(ac.get_position().altitude, math::doubleToInt(math::FEET_2_M * 1000));
+                assertEquals(ac.get_position().latitude, 49.0);
+                assertEquals(ac.get_position().longitude, 8.0);
+                assertFalse(ac.get_fullInfo());
             })
         ->test(
             "invalid msg",
@@ -83,7 +83,7 @@ void test_feed_parser(test::TestSuitesRunner& runner)
         ->test("filter height", []() {
             object::Aircraft ac;
             SbsParser tmpSbs;
-            tmpSbs.setMaxHeight(0);
+            SbsParser::s_maxHeight = 0;
             assertFalse(tmpSbs.unpack(
                 "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
                 ac));
@@ -107,12 +107,12 @@ void test_feed_parser(test::TestSuitesRunner& runner)
                 assertTrue(aprsParser.unpack(
                     "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
                     ac));
-                assertEqStr(ac.getId(), "AAAAAA");
-                assertEquals(ac.getTargetType(), object::Aircraft::TargetType::FLARM);
-                assertEquals(ac.getPosition().altitude, 0);
-                assertEquals(ac.getPosition().latitude, 49.0);
-                assertEquals(ac.getPosition().longitude, -8.0);
-                assertTrue(ac.getFullInfoAvailable());
+                assertEqStr(ac.get_id(), "AAAAAA");
+                assertEquals(ac.get_targetType(), object::Aircraft::TargetType::FLARM);
+                assertEquals(ac.get_position().altitude, 0);
+                assertEquals(ac.get_position().latitude, 49.0);
+                assertEquals(ac.get_position().longitude, -8.0);
+                assertTrue(ac.get_fullInfo());
             })
         ->test(
             "invalid msg",
@@ -131,7 +131,7 @@ void test_feed_parser(test::TestSuitesRunner& runner)
             })
         ->test("filter height", []() {
             AprsParser tmpAprs;
-            tmpAprs.setMaxHeight(0);
+            SbsParser::s_maxHeight = 0;
             object::Aircraft ac;
             assertFalse(tmpAprs.unpack(
                 "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
@@ -162,7 +162,7 @@ void test_feed_parser(test::TestSuitesRunner& runner)
                    object::Atmosphere atm;
                    std::string mda("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
                    assertTrue(atmParser.unpack(mda, atm));
-                   assertEquals(atm.getPressure(), 1009.1);
+                   assertEquals(atm.get_pressure(), 1009.1);
                    assertEquals(atm.get_serialized(), mda);
                })
         ->test("invalid msg", []() {
@@ -188,13 +188,13 @@ void test_feed_parser(test::TestSuitesRunner& runner)
                        "$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49\r\n", pos));
                    assertTrue(gpsParser.unpack(
                        "$GPGGA,183552,5000.0466,S,00815.7555,W,1,05,1,105,M,48.0,M,,*46\n", pos));
-                   assertEquals(pos.getDilution(), 1.0);
-                   assertEquals(pos.getFixQuality(), 1);
-                   assertEquals(pos.getNrOfSatellites(), 5);
-                   assertEquals(pos.getGeoid(), 48.0);
-                   assertEquals(pos.getPosition().latitude, -math::dmToDeg(5000.0466));
-                   assertEquals(pos.getPosition().longitude, -math::dmToDeg(815.7555));
-                   assertEquals(pos.getPosition().altitude, 105);
+                   assertEquals(pos.get_dilution(), 1.0);
+                   assertEquals(pos.get_fixQuality(), 1);
+                   assertEquals(pos.get_nrOfSatellites(), 5);
+                   assertEquals(pos.get_geoid(), 48.0);
+                   assertEquals(pos.get_position().latitude, -math::dmToDeg(5000.0466));
+                   assertEquals(pos.get_position().longitude, -math::dmToDeg(815.7555));
+                   assertEquals(pos.get_position().altitude, 105);
                })
         ->test("invalid msg", []() {
             GpsParser gpsParser;

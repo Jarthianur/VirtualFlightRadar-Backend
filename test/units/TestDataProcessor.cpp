@@ -29,7 +29,7 @@ using namespace sctf;
 
 void test_data_processor(test::TestSuitesRunner& runner)
 {
-    describe<GpsProcessor>("Process GPS data", runner)->test("process", []() {
+    describe<GpsProcessor>("Process GPS data", runner)->test("process", [] {
         GpsProcessor gpsp;
         boost::smatch match;
         GpsPosition pos({0.0, 0.0, 0}, 48.0);
@@ -40,14 +40,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
 
     describe<AircraftProcessor>("Process Aircrafts", runner)
         ->test("Aircraft at,above base pos",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({49.0, 8.0, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({49.0, 8.0, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({49.0, 8.0, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({49.0, 8.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -64,28 +64,28 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(5), "BBBBBB");
                    assertEqStr(match.str(9), "8");
                })
-        ->test("filter distance", []() {
+        ->test("filter distance", [] {
             AircraftProcessor proc(0);
             Aircraft ac;
-            ac.setId("BBBBBB");
-            ac.setFullInfoAvailable(false);
-            ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-            ac.setPosition({49.0, 8.0, math::doubleToInt(math::FEET_2_M * 3281)});
-            proc.setRefered({49.1, 8.1, 0}, 1013.25);
+            ac.set_id("BBBBBB");
+            ac.set_fullInfo(false);
+            ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+            ac.set_position({49.0, 8.0, math::doubleToInt(math::FEET_2_M * 3281)});
+            proc.referTo({49.1, 8.1, 0}, 1013.25);
             proc.process(ac);
             assertEqStr(ac.get_serialized(), "");
         });
 
     describeParallel<AircraftProcessor>("process relative positions", runner)
         ->test("Cross Equator S to N",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({0.1, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({-0.1, 0.0, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({0.1, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({-0.1, 0.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -99,14 +99,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(3), "1000");
                })
         ->test("Cross Equator N to S",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({-0.1, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({0.1, 0.0, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({-0.1, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({0.1, 0.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -120,14 +120,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(3), "1000");
                })
         ->test("Cross Northpole",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({89.9, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({89.9, 180.0, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({89.9, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({89.9, 180.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -141,14 +141,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(3), "1000");
                })
         ->test("Cross Southpole",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({-89.9, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({-89.9, 180.0, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({-89.9, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({-89.9, 180.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -162,14 +162,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(3), "1000");
                })
         ->test("Cross 0-Meridian on Equator E to W",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({0.0, -0.1, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({0.0, 0.1, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({0.0, -0.1, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({0.0, 0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -183,14 +183,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(3), "1000");
                })
         ->test("Cross 0-Meridian on Equator W to E",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({0.0, 0.1, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({0.0, -0.1, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({0.0, 0.1, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({0.0, -0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -204,14 +204,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(3), "1000");
                })
         ->test("Cross 0-Meridian on LAT(60) E to W",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({60.0, -0.1, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({60.0, 0.1, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({60.0, -0.1, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({60.0, 0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -225,14 +225,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(3), "1000");
                })
         ->test("Cross 0-Meridian on LAT(-60) W to E",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({-60.0, 0.1, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({-60.0, -0.1, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({-60.0, 0.1, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({-60.0, -0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -246,14 +246,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(3), "1000");
                })
         ->test("Cross 180-Meridian on Equator E to W",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({0.0, -179.9, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({0.0, 179.9, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({0.0, -179.9, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({0.0, 179.9, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -267,14 +267,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(3), "1000");
                })
         ->test("Cross 180-Meridian on Equator W to E",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({0.0, 179.9, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({0.0, -179.9, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({0.0, 179.9, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({0.0, -179.9, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -289,14 +289,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                })
         ->test(
             "North America",
-            []() {
+            [] {
                 AircraftProcessor proc;
                 Aircraft ac;
-                ac.setId("BBBBBB");
-                ac.setFullInfoAvailable(false);
-                ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                ac.setPosition({33.825808, -112.219232, math::doubleToInt(math::FEET_2_M * 3281)});
-                proc.setRefered({33.653124, -112.692253, 0}, 1013.25);
+                ac.set_id("BBBBBB");
+                ac.set_fullInfo(false);
+                ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                ac.set_position({33.825808, -112.219232, math::doubleToInt(math::FEET_2_M * 3281)});
+                proc.referTo({33.653124, -112.692253, 0}, 1013.25);
                 proc.process(ac);
                 boost::smatch match;
                 bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -311,14 +311,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
             })
         ->test(
             "South America",
-            []() {
+            [] {
                 AircraftProcessor proc;
                 Aircraft ac;
-                ac.setId("BBBBBB");
-                ac.setFullInfoAvailable(false);
-                ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                ac.setPosition({-34.699833, -58.791788, math::doubleToInt(math::FEET_2_M * 3281)});
-                proc.setRefered({-34.680059, -58.818111, 0}, 1013.25);
+                ac.set_id("BBBBBB");
+                ac.set_fullInfo(false);
+                ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                ac.set_position({-34.699833, -58.791788, math::doubleToInt(math::FEET_2_M * 3281)});
+                proc.referTo({-34.680059, -58.818111, 0}, 1013.25);
                 proc.process(ac);
                 boost::smatch match;
                 bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -332,14 +332,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                 assertEqStr(match.str(3), "1000");
             })
         ->test("North Africa",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({5.386705, -5.750365, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({5.392435, -5.748392, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({5.386705, -5.750365, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({5.392435, -5.748392, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -354,14 +354,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                })
         ->test(
             "South Africa",
-            []() {
+            [] {
                 AircraftProcessor proc;
                 Aircraft ac;
-                ac.setId("BBBBBB");
-                ac.setFullInfoAvailable(false);
-                ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                ac.setPosition({-23.229517, 15.049683, math::doubleToInt(math::FEET_2_M * 3281)});
-                proc.setRefered({-26.069244, 15.484389, 0}, 1013.25);
+                ac.set_id("BBBBBB");
+                ac.set_fullInfo(false);
+                ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                ac.set_position({-23.229517, 15.049683, math::doubleToInt(math::FEET_2_M * 3281)});
+                proc.referTo({-26.069244, 15.484389, 0}, 1013.25);
                 proc.process(ac);
                 boost::smatch match;
                 bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -376,14 +376,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
             })
         ->test(
             "Australia",
-            []() {
+            [] {
                 AircraftProcessor proc;
                 Aircraft ac;
-                ac.setId("BBBBBB");
-                ac.setFullInfoAvailable(false);
-                ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                ac.setPosition({-26.152199, 133.376684, math::doubleToInt(math::FEET_2_M * 3281)});
-                proc.setRefered({-25.278208, 133.366885, 0}, 1013.25);
+                ac.set_id("BBBBBB");
+                ac.set_fullInfo(false);
+                ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                ac.set_position({-26.152199, 133.376684, math::doubleToInt(math::FEET_2_M * 3281)});
+                proc.referTo({-25.278208, 133.366885, 0}, 1013.25);
                 proc.process(ac);
                 boost::smatch match;
                 bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -397,14 +397,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                 assertEqStr(match.str(3), "1000");
             })
         ->test("Central Europe",
-               []() {
+               [] {
                    AircraftProcessor proc;
                    Aircraft ac;
-                   ac.setId("BBBBBB");
-                   ac.setFullInfoAvailable(false);
-                   ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.setPosition({49.719445, 9.087646, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.setRefered({49.719521, 9.083279, 0}, 1013.25);
+                   ac.set_id("BBBBBB");
+                   ac.set_fullInfo(false);
+                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                   ac.set_position({49.719445, 9.087646, math::doubleToInt(math::FEET_2_M * 3281)});
+                   proc.referTo({49.719521, 9.083279, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
                    bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
@@ -417,14 +417,14 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    assertEqStr(match.str(2), "314");
                    assertEqStr(match.str(3), "1000");
                })
-        ->test("Asia", []() {
+        ->test("Asia", [] {
             AircraftProcessor proc;
             Aircraft ac;
-            ac.setId("BBBBBB");
-            ac.setFullInfoAvailable(false);
-            ac.setTargetType(Aircraft::TargetType::TRANSPONDER);
-            ac.setPosition({32.896360, 103.855837, math::doubleToInt(math::FEET_2_M * 3281)});
-            proc.setRefered({65.900837, 101.570680, 0}, 1013.25);
+            ac.set_id("BBBBBB");
+            ac.set_fullInfo(false);
+            ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
+            ac.set_position({32.896360, 103.855837, math::doubleToInt(math::FEET_2_M * 3281)});
+            proc.referTo({65.900837, 101.570680, 0}, 1013.25);
             proc.process(ac);
             boost::smatch match;
             bool matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
