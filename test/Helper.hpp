@@ -31,7 +31,7 @@
 
 #define TEST_FUNCTION(NAME) extern void NAME(test::TestSuitesRunner&);
 
-#define syso(M) std::cout << M << std::endl;
+#define syso(M) std::cout << M << std::endl
 
 #define assertEqStr(V, E) assertT(V, EQUALS, E, std::string)
 

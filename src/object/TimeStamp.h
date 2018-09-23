@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <string>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 /// @namespace object
 namespace object
@@ -93,6 +94,6 @@ private:
     /// The time in milliseconds
     std::uint64_t m_value;
 
-    bool m_yesterday;
+    boost::gregorian::date::date_int_type m_day;
 };
 }  // namespace object

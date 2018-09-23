@@ -22,11 +22,10 @@
 #include "TimeStamp.h"
 
 #include <stdexcept>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace object
 {
-TimeStamp::TimeStamp() : m_value(0), m_yesterday(false)
+TimeStamp::TimeStamp() : m_value(0), m_day(0)
 {}
 
 TimeStamp::TimeStamp(const std::string& value, Format format)
@@ -62,12 +61,15 @@ TimeStamp::TimeStamp(const std::string& value, Format format)
     {
         throw std::invalid_argument("");
     }
-    m_value     = static_cast<std::uint64_t>(h * 3600000 + m * 60000 + s * 1000 + f);
-    m_yesterday = m_value >= now();
+    m_value = static_cast<std::uint64_t>(h * 3600000 + m * 60000 + s * 1000 + f);
+    m_day   = boost::posix_time::microsec_clock::universal_time().date().modjulian_day();
+    if(m_value >= now())
+    {
+        --m_day;
+    }
 }
 
-TimeStamp::TimeStamp(const TimeStamp& other)
-    : m_value(other.m_value), m_yesterday(other.m_yesterday)
+TimeStamp::TimeStamp(const TimeStamp& other) : m_value(other.m_value), m_day(other.m_day)
 {}
 
 TimeStamp::~TimeStamp() noexcept
@@ -75,15 +77,15 @@ TimeStamp::~TimeStamp() noexcept
 
 TimeStamp& TimeStamp::operator=(const TimeStamp& other)
 {
-    this->m_value     = other.m_value;
-    this->m_yesterday = other.m_yesterday;
+    this->m_value = other.m_value;
+    this->m_day   = other.m_day;
     return *this;
 }
 
 bool TimeStamp::operator>(const TimeStamp& other) const
 {
-    return (other.m_yesterday && !this->m_yesterday)
-           || ((!this->m_yesterday || other.m_yesterday) && this->m_value > other.m_value);
+    return (this->m_day > other.m_day)
+           || ((this->m_day == other.m_day) && this->m_value > other.m_value);
 }
 
 std::uint64_t TimeStamp::now() const
