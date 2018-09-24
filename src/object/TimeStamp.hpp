@@ -22,8 +22,8 @@
 #pragma once
 
 #include <cstdint>
+#include <stdexcept>
 #include <string>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 /// @namespace object
 namespace object
@@ -32,6 +32,7 @@ namespace object
  * @class TimeStamp
  * @brief Represent a timestamp as number of milliseconds.
  */
+template<typename DateTimeT>
 class TimeStamp
 {
 public:
@@ -88,12 +89,80 @@ public:
     bool operator>(const TimeStamp& other) const;
 
 private:
-    std::uint64_t now() const;
-
     /// @var mValue
     /// The time in milliseconds
-    std::uint64_t m_value;
+    std::int64_t m_value;
 
-    boost::gregorian::date::date_int_type m_day;
+    std::uint32_t m_day;
 };
+
+template<typename DateTimeT>
+TimeStamp<DateTimeT>::TimeStamp(const std::string& value, Format format) : m_day(DateTimeT::day())
+{
+    std::int32_t h = 99, m = 99, s = 99, f = 9999;
+    try
+    {
+        switch(format)
+        {
+            case Format::HHMMSS:
+            {
+                h = std::stoi(value.substr(0, 2));
+                m = std::stoi(value.substr(2, 2));
+                s = std::stoi(value.substr(4, 2));
+                f = 0;
+            }
+            break;
+            case Format::HH_MM_SS_FFF:
+            {
+                h = std::stoi(value.substr(0, 2));
+                m = std::stoi(value.substr(3, 2));
+                s = std::stoi(value.substr(6, 2));
+                f = std::stoi(value.substr(9, 3));
+            }
+            break;
+        }
+    }
+    catch(const std::out_of_range&)
+    {
+        throw std::invalid_argument("");
+    }
+    if(h > 23 || m > 59 || s > 59 || f > 999)
+    {
+        throw std::invalid_argument("");
+    }
+    m_value = static_cast<std::int64_t>(h * 3600000 + m * 60000 + s * 1000 + f);
+    if(m_value >= DateTimeT::now())
+    {
+        --m_day;
+    }
+}
+
+template<typename DateTimeT>
+TimeStamp<DateTimeT>::TimeStamp() : m_value(0), m_day(0)
+{}
+
+template<typename DateTimeT>
+TimeStamp<DateTimeT>::TimeStamp(const TimeStamp<DateTimeT>& other)
+    : m_value(other.m_value), m_day(other.m_day)
+{}
+
+template<typename DateTimeT>
+TimeStamp<DateTimeT>::~TimeStamp() noexcept
+{}
+
+template<typename DateTimeT>
+TimeStamp<DateTimeT>& TimeStamp<DateTimeT>::operator=(const TimeStamp<DateTimeT>& other)
+{
+    this->m_value = other.m_value;
+    this->m_day   = other.m_day;
+    return *this;
+}
+
+template<typename DateTimeT>
+bool TimeStamp<DateTimeT>::operator>(const TimeStamp<DateTimeT>& other) const
+{
+    return (this->m_day > other.m_day)
+           || ((this->m_day == other.m_day) && this->m_value > other.m_value);
+}
+
 }  // namespace object

@@ -27,7 +27,8 @@
 #include "../Defines.h"
 #include "GpsPosition.h"
 #include "Object.h"
-#include "TimeStamp.h"
+#include "TimeStamp.hpp"
+#include "DateTimeImplBoost.h"
 
 /// @def A_VALUE_NA
 /// Indicate a double value is not available.
@@ -186,7 +187,7 @@ private:
 
     /// @var mTimeStamp
     /// The timestamp of the last report.
-    TimeStamp m_timeStamp;
+    TimeStamp<DateTimeImplBoost> m_timeStamp;
 
     /// @var mFullInfo
     /// Is full set of information available?

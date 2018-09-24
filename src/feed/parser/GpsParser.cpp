@@ -24,7 +24,8 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../object/TimeStamp.h"
+#include "../../object/TimeStamp.hpp"
+#include "../../object/DateTimeImplBoost.h"
 
 /// @def RE_GGA_TIME
 /// GGA regex match capture group of time
@@ -113,7 +114,7 @@ bool GpsParser::parsePosition(const boost::smatch& match, object::GpsPosition& p
     pos.altitude = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
     position.set_position(pos);
     position.set_timeStamp(
-        object::TimeStamp(match.str(RE_GGA_TIME), object::TimeStamp::Format::HHMMSS));
+        object::TimeStamp<object::DateTimeImplBoost>(match.str(RE_GGA_TIME), object::TimeStamp<object::DateTimeImplBoost>::Format::HHMMSS));
     position.set_fixQuality(std::stoi(match.str(RE_GGA_FIX)));
     position.set_nrOfSatellites(std::stoi(match.str(RE_GGA_SAT)));
     position.set_dilution(std::stod(match.str(RE_GGA_DIL)));

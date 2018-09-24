@@ -22,7 +22,7 @@
 #include "../../src/object/Aircraft.h"
 #include "../../src/object/Atmosphere.h"
 #include "../../src/object/GpsPosition.h"
-#include "../../src/object/TimeStamp.h"
+#include "../../src/object/TimeStamp.hpp"
 #include "../../src/object/Wind.h"
 #include "../Helper.hpp"
 

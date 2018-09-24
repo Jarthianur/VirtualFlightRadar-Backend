@@ -24,8 +24,9 @@
 #include <cstdint>
 
 #include "../Defines.h"
+#include "DateTimeImplBoost.h"
 #include "Object.h"
-#include "TimeStamp.h"
+#include "TimeStamp.hpp"
 
 /// @namespace object
 namespace object
@@ -101,7 +102,7 @@ private:
 
     /// @var mTimeStamp
     /// The timestamp of this position
-    TimeStamp m_timeStamp;
+    TimeStamp<DateTimeImplBoost> m_timeStamp;
 
     /// @var mNrOfSatellites
     /// The number of satellites

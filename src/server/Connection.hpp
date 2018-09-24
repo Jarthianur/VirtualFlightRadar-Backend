@@ -83,7 +83,7 @@ public:
 };
 
 template<typename SocketT>
-Connection<SocketT>::~Connection<SocketT>() noexcept
+Connection<SocketT>::~Connection() noexcept
 {}
 
 template<typename SocketT>
