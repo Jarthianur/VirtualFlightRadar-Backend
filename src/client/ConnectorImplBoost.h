@@ -21,22 +21,16 @@
 
 #pragma once
 
-#include <functional>
 #include <istream>
-#include <string>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
 #include "../Defines.h"
+#include "Connector.hpp"
 
 namespace client
 {
-struct Endpoint;
-
-using Callback     = std::function<void(bool)>;
-using ReadCallback = std::function<void(bool, const std::string&)>;
-
-class ConnectorImplBoost
+class ConnectorImplBoost : public Connector
 {
 public:
     NOT_COPYABLE(ConnectorImplBoost)
@@ -44,15 +38,15 @@ public:
     ConnectorImplBoost();
     ~ConnectorImplBoost() noexcept;
 
-    void run();
-    void stop();
-    void close();
-    void onConnect(const Endpoint& endpoint, const Callback& callback);
-    void onRead(const ReadCallback& crCallback);
-    void onWrite(const std::string& msg, const Callback& callback);
-    void onTimeout(const Callback& callback, std::uint32_t timeout = 0);
-    void resetTimer(std::uint32_t timeout);
-    bool timerExpired();
+    void run() override;
+    void stop() override;
+    void close() override;
+    void onConnect(const Endpoint& endpoint, const Callback& callback) override;
+    void onRead(const ReadCallback& crCallback) override;
+    void onWrite(const std::string& msg, const Callback& callback) override;
+    void onTimeout(const Callback& callback, std::uint32_t timeout = 0) override;
+    void resetTimer(std::uint32_t timeout) override;
+    bool timerExpired() override;
 
 private:
     void handleResolve(const boost::system::error_code& error,

@@ -26,7 +26,7 @@
 #include <sstream>
 #include <thread>
 
-#include "client/ClientManager.hpp"
+#include "client/ClientManager.h"
 #include "client/ConnectorImplBoost.h"
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
@@ -66,7 +66,7 @@ void VFRB::run() noexcept
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
     Signals signals;
-    client::ClientManager<client::ConnectorImplBoost> clientManager;
+    client::ClientManager clientManager;
 
     signals.addHandler([this](const boost::system::error_code&, const int) {
         logger.info("(VFRB) caught signal to shutdown ...");
@@ -86,9 +86,9 @@ void VFRB::run() noexcept
 
     serve();
 
-    signals.stop();
-    clientManager.stop();
+        clientManager.stop();
     m_server.stop();
+        signals.stop();
 
     logger.info("Stopped after ", get_duration(start));
 }

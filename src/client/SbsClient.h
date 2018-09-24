@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "Client.hpp"
+#include "Client.h"
 
 /// @namespace client
 namespace client
@@ -31,8 +31,8 @@ namespace client
  * @brief Connect to a SBS server.
  * @extends Client
  */
-template<typename ConnectorT>
-class SbsClient : public Client<ConnectorT>
+
+class SbsClient : public Client
 {
 public:
     NOT_COPYABLE(SbsClient)
@@ -44,7 +44,7 @@ public:
      * @param crPort  The port
      * @param rFeed   The handler Feed reference
      */
-    explicit SbsClient(const Endpoint& endpoint);
+    SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector);
 
     /**
      * @fn ~SbsClient
@@ -56,32 +56,7 @@ private:
     /**
      * @see Client#handleConnect
      */
-    void handleConnect(bool error) noexcept override;
+    void handleConnect(bool error) override;
 };
-
-template<typename ConnectorT>
-SbsClient<ConnectorT>::SbsClient(const Endpoint& endpoint)
-    : Client<ConnectorT>(endpoint, "(SbsClient)")
-{}
-
-template<typename ConnectorT>
-SbsClient<ConnectorT>::~SbsClient() noexcept
-{}
-
-template<typename ConnectorT>
-void SbsClient<ConnectorT>::handleConnect(bool error) noexcept
-{
-    if(!error)
-    {
-        std::lock_guard<std::mutex> lock(this->m_mutex);
-        this->read();
-    }
-    else
-    {
-        logger.warn(this->m_component, " failed to connect to ", this->m_endpoint.host, ":",
-                    this->m_endpoint.port);
-        this->reconnect();
-    }
-}
 
 }  // namespace client

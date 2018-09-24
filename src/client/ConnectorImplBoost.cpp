@@ -31,7 +31,8 @@
 namespace client
 {
 ConnectorImplBoost::ConnectorImplBoost()
-    : m_ioService(),
+    : Connector(),
+      m_ioService(),
       m_socket(m_ioService),
       m_resolver(m_ioService),
       m_timer(m_ioService),
@@ -77,19 +78,19 @@ void ConnectorImplBoost::onConnect(const Endpoint& endpoint, const Callback& cal
 }
 
 void ConnectorImplBoost::onRead(const ReadCallback& callback)
-{
+{if(m_socket.is_open()) {
     boost::asio::async_read_until(
         m_socket, m_buffer, "\r\n",
         boost::bind(&ConnectorImplBoost::handleRead, this, boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred, callback));
+                    boost::asio::placeholders::bytes_transferred, callback));}
 }
 
 void ConnectorImplBoost::onWrite(const std::string& msg, const Callback& callback)
-{
+{if(m_socket.is_open()) {
     boost::asio::async_write(m_socket, boost::asio::buffer(msg),
                              boost::bind(&ConnectorImplBoost::handleWrite, this,
                                          boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred, callback));
+                                         boost::asio::placeholders::bytes_transferred, callback));}
 }
 
 void ConnectorImplBoost::onTimeout(const Callback& callback, std::uint32_t timeout)
