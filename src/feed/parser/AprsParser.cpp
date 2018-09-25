@@ -193,8 +193,8 @@ bool AprsParser::parseTimeStamp(const boost::smatch& match, Aircraft& aircraft) 
 {
     try
     {
-        aircraft.set_timeStamp(
-            TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_APRS_TIME), timestamp::Format::HHMMSS));
+        aircraft.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_APRS_TIME),
+                                                                       timestamp::Format::HHMMSS));
     }
     catch(const std::invalid_argument&)
     {

@@ -98,8 +98,8 @@ bool SbsParser::parseField(std::uint32_t fieldNr, const std::string& field, Posi
                 aircraft.set_id(field);
                 break;
             case SBS_FIELD_TIME:
-                aircraft.set_timeStamp(
-                    TimeStamp<timestamp::DateTimeImplBoost>(field, timestamp::Format::HH_MM_SS_FFF));
+                aircraft.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(
+                    field, timestamp::Format::HH_MM_SS_FFF));
                 break;
             case SBS_FIELD_ALT:
                 position.altitude = math::doubleToInt(std::stod(field) * math::FEET_2_M);
