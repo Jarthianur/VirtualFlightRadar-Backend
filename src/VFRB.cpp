@@ -64,7 +64,6 @@ void VFRB::run() noexcept
     m_running = true;
     logger.info("(VFRB) startup");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-
     Signals signals;
     client::ClientManager clientManager;
 
@@ -72,24 +71,28 @@ void VFRB::run() noexcept
         logger.info("(VFRB) caught signal to shutdown ...");
         m_running = false;
     });
-
-    for(const auto& it : m_feeds)
+    for(auto it : m_feeds)
     {
         logger.info("(VFRB) run feed: ", it->get_name());
-        clientManager.subscribe(it);
+        try
+        {
+            clientManager.subscribe(it);
+        }
+        catch(const std::logic_error& e)
+        {
+            logger.error("(VFRB) ", e.what());
+        }
     }
     m_feeds.clear();
 
     signals.run();
     m_server.run();
     clientManager.run();
-
+    std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
     serve();
-
-        clientManager.stop();
+    clientManager.stop();
     m_server.stop();
-        signals.stop();
-
+    signals.stop();
     logger.info("Stopped after ", get_duration(start));
 }
 
@@ -118,18 +121,18 @@ void VFRB::serve()
 void VFRB::createFeeds(const config::Configuration& config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
-    for(const auto& feed : config.get_feedProperties())
+    for(const auto& prop : config.get_feedProperties())
     {
         try
         {
-            auto optFeedPtr = factory.createFeed(feed.first, feed.second);
+            auto optFeedPtr = factory.createFeed(prop.first, prop.second);
             if(optFeedPtr)
             {
                 m_feeds.push_back(*optFeedPtr);
             }
             else
             {
-                logger.warn("(VFRB) create feed ", feed.first,
+                logger.warn("(VFRB) create feed ", prop.first,
                             ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
                             ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS
                             ", " SECT_KEY_GPS);
@@ -137,7 +140,7 @@ void VFRB::createFeeds(const config::Configuration& config)
         }
         catch(const std::exception& e)
         {
-            logger.warn("(VFRB) create feed ", feed.first, ": ", e.what());
+            logger.warn("(VFRB) create feed ", prop.first, ": ", e.what());
         }
     }
 }

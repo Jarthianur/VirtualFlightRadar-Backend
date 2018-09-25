@@ -21,40 +21,29 @@
 
 #pragma once
 
-#include <cstdint>
-#include <functional>
-#include <mutex>
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
-#include "SocketImplBoost.h"
+#include "Client.h"
 
-#include "../Defines.h"
+#include <memory>
 
-namespace server
+namespace feed
 {
-class TcpInterfaceImplBoost
+class Feed;
+}  // namespace feed
+
+namespace client
+{
+class ClientFactory
 {
 public:
-    NOT_COPYABLE(TcpInterfaceImplBoost)
+    ClientFactory();
+    ~ClientFactory() noexcept;
 
-    explicit TcpInterfaceImplBoost(std::uint16_t port);
-    ~TcpInterfaceImplBoost() noexcept;
-
-    void run(std::unique_lock<std::mutex>& lock);
-    void stop();
-    void onAccept(const std::function<void(bool)>& callback);
-    void close();
+    static std::shared_ptr<Client> createClientFor(std::shared_ptr<feed::Feed> feed);
 
 private:
-    void handleAccept(const boost::system::error_code& error,
-                      const std::function<void(bool)>& callback) noexcept;
-
-    boost::asio::io_service m_ioService;
-    boost::asio::ip::tcp::acceptor m_acceptor;
-    SocketImplBoost m_socket;
-
-public:
-    GETTER_R(socket)
+    template<typename T,
+             typename std::enable_if<std::is_base_of<Client, T>::value>::type* = nullptr>
+    static std::shared_ptr<T> makeClient(std::shared_ptr<feed::Feed> feed);
 };
 
-}  // namespace server
+}  // namespace client

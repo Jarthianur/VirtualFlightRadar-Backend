@@ -25,9 +25,9 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
+#include "../../object/DateTimeImplBoost.h"
 #include "../../object/GpsPosition.h"
 #include "../../object/TimeStamp.hpp"
-#include "../../object/DateTimeImplBoost.h"
 
 /// @def RE_APRS_TIME
 /// APRS regex match group of time
@@ -193,7 +193,8 @@ bool AprsParser::parseTimeStamp(const boost::smatch& match, Aircraft& aircraft) 
 {
     try
     {
-        aircraft.set_timeStamp(TimeStamp<DateTimeImplBoost>(match.str(RE_APRS_TIME), TimeStamp<DateTimeImplBoost>::Format::HHMMSS));
+        aircraft.set_timeStamp(
+            TimeStamp<DateTimeImplBoost>(match.str(RE_APRS_TIME), timestamp::Format::HHMMSS));
     }
     catch(const std::invalid_argument&)
     {

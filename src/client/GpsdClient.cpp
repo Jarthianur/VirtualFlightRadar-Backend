@@ -21,9 +21,9 @@
 
 #include "GpsdClient.h"
 
-#include <utility>
-#include <thread>
 #include <chrono>
+#include <thread>
+#include <utility>
 
 #include "../Logger.hpp"
 

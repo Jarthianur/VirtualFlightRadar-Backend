@@ -35,8 +35,10 @@ using ReadCallback = std::function<void(bool, const std::string&)>;
 class Connector
 {
 public:
-    Connector(){}
-    virtual ~Connector() noexcept{}
+    Connector()
+    {}
+    virtual ~Connector() noexcept
+    {}
 
     virtual void run()                                                          = 0;
     virtual void stop()                                                         = 0;

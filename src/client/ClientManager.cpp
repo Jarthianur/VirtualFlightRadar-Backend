@@ -21,13 +21,8 @@
 
 #include "ClientManager.h"
 
-#include "../feed/AprscFeed.h"
 #include "../feed/Feed.h"
-#include "AprscClient.h"
-#include "ConnectorImplBoost.h"
-#include "GpsdClient.h"
-#include "SbsClient.h"
-#include "SensorClient.h"
+#include "ClientFactory.h"
 
 namespace client
 {
@@ -42,36 +37,24 @@ ClientManager::~ClientManager() noexcept
 void ClientManager::subscribe(std::shared_ptr<feed::Feed> feed)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    ClientIter it     = m_clients.end();
-    Endpoint endpoint = feed->get_endpoint();
-    std::shared_ptr<Connector> connector    = std::make_shared<ConnectorImplBoost>();
-    switch(feed->get_protocol())
+    ClientIter it = m_clients.end();
+    it            = m_clients.insert(ClientFactory::createClientFor(feed)).first;
+    if(it != m_clients.end())
     {
-        case feed::Feed::Protocol::APRS:
-            it = m_clients
-                     .insert(std::make_shared<AprscClient>(
-                         endpoint, std::static_pointer_cast<feed::AprscFeed>(feed)->get_login(),
-                         connector))
-                     .first;
-            break;
-        case feed::Feed::Protocol::SBS:
-            it = m_clients.insert(std::make_shared<SbsClient>(endpoint, connector)).first;
-            break;
-        case feed::Feed::Protocol::GPS:
-            it = m_clients.insert(std::make_shared<GpsdClient>(endpoint, connector)).first;
-            break;
-        case feed::Feed::Protocol::SENSOR:
-            it = m_clients.insert(std::make_shared<SensorClient>(endpoint, connector)).first;
-            break;
+        (*it)->subscribe(feed);
     }
-    (*it)->subscribe(feed);
+    else
+    {
+        throw std::logic_error("could not subscribe feed " + feed->get_name());
+    }
 }
 
 void ClientManager::run()
-{std::lock_guard<std::mutex> lock(m_mutex);
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
     for(auto it : m_clients)
     {
-        m_thdGroup.create_thread([this,it] {
+        m_thdGroup.create_thread([this, it] {
             it->run();
             std::lock_guard<std::mutex> lock(m_mutex);
             m_clients.erase(it);

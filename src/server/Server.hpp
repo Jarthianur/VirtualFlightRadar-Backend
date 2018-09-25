@@ -139,8 +139,8 @@ Server<TcpInterfaceT, SocketT>::~Server() noexcept
 template<typename TcpInterfaceT, typename SocketT>
 void Server<TcpInterfaceT, SocketT>::run()
 {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        logger.info("(Server) start server");
+    std::lock_guard<std::mutex> lock(m_mutex);
+    logger.info("(Server) start server");
     m_running = true;
     m_thread  = std::thread([this]() {
         accept();

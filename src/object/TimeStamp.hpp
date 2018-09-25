@@ -28,6 +28,20 @@
 /// @namespace object
 namespace object
 {
+namespace timestamp
+{
+/**
+ * @enum Format
+ * @brief Format of a given time string.
+ */
+enum class Format : std::int32_t
+{
+    HHMMSS,
+    HH_MM_SS_FFF
+};
+
+}  // namespace timestamp
+
 /**
  * @class TimeStamp
  * @brief Represent a timestamp as number of milliseconds.
@@ -36,16 +50,6 @@ template<typename DateTimeT>
 class TimeStamp
 {
 public:
-    /**
-     * @enum Format
-     * @brief Format of a given time string.
-     */
-    enum class Format : std::int32_t
-    {
-        HHMMSS,
-        HH_MM_SS_FFF
-    };
-
     TimeStamp();
 
     /**
@@ -58,7 +62,7 @@ public:
      * @param vFormat The format
      * @throw std::invalid_argument if the time string is invalid
      */
-    TimeStamp(const std::string& value, Format format);
+    TimeStamp(const std::string& value, timestamp::Format format);
 
     /**
      * @fn TimeStamp
@@ -97,14 +101,15 @@ private:
 };
 
 template<typename DateTimeT>
-TimeStamp<DateTimeT>::TimeStamp(const std::string& value, Format format) : m_day(DateTimeT::day())
+TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format format)
+    : m_day(DateTimeT::day())
 {
     std::int32_t h = 99, m = 99, s = 99, f = 9999;
     try
     {
         switch(format)
         {
-            case Format::HHMMSS:
+            case timestamp::Format::HHMMSS:
             {
                 h = std::stoi(value.substr(0, 2));
                 m = std::stoi(value.substr(2, 2));
@@ -112,7 +117,7 @@ TimeStamp<DateTimeT>::TimeStamp(const std::string& value, Format format) : m_day
                 f = 0;
             }
             break;
-            case Format::HH_MM_SS_FFF:
+            case timestamp::Format::HH_MM_SS_FFF:
             {
                 h = std::stoi(value.substr(0, 2));
                 m = std::stoi(value.substr(3, 2));

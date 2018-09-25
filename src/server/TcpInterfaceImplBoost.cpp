@@ -96,9 +96,4 @@ void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
     callback(error);
 }
 
-SocketImplBoost& TcpInterfaceImplBoost::get_socket()
-{
-    return m_socket;
-}
-
 }  // namespace server

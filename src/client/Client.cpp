@@ -21,9 +21,9 @@
 
 #include "Client.h"
 
-#include <utility>
 #include <chrono>
 #include <condition_variable>
+#include <utility>
 #include <boost/functional/hash.hpp>
 
 #include "../Logger.hpp"
@@ -107,9 +107,9 @@ void Client::stop()
 
 void Client::scheduleStop()
 {
-	std::condition_variable cond_ready;
+    std::condition_variable cond_ready;
     std::unique_lock<std::mutex> lock(m_mutex);
-    cond_ready.wait_for(lock,std::chrono::milliseconds(100),[this]{return m_running;});
+    cond_ready.wait_for(lock, std::chrono::milliseconds(100), [this] { return m_running; });
     stop();
 }
 

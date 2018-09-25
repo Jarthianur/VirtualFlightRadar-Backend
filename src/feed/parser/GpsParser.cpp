@@ -24,8 +24,8 @@
 #include <stdexcept>
 
 #include "../../Math.hpp"
-#include "../../object/TimeStamp.hpp"
 #include "../../object/DateTimeImplBoost.h"
+#include "../../object/TimeStamp.hpp"
 
 /// @def RE_GGA_TIME
 /// GGA regex match capture group of time
@@ -67,6 +67,8 @@
 /// GGA regex match capture group of geoid separation
 #define RE_GGA_GEOID 10
 
+using namespace object;
+
 namespace feed
 {
 namespace parser
@@ -81,7 +83,7 @@ GpsParser::GpsParser() : Parser()
 GpsParser::~GpsParser() noexcept
 {}
 
-bool GpsParser::unpack(const std::string& sentence, object::GpsPosition& position) noexcept
+bool GpsParser::unpack(const std::string& sentence, GpsPosition& position) noexcept
 {
     try
     {
@@ -96,9 +98,9 @@ bool GpsParser::unpack(const std::string& sentence, object::GpsPosition& positio
     }
 }
 
-bool GpsParser::parsePosition(const boost::smatch& match, object::GpsPosition& position)
+bool GpsParser::parsePosition(const boost::smatch& match, GpsPosition& position)
 {
-    object::Position pos;
+    Position pos;
     pos.latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
 
     if(match.str(RE_GGA_LAT_DIR).compare("S") == 0)
@@ -114,7 +116,7 @@ bool GpsParser::parsePosition(const boost::smatch& match, object::GpsPosition& p
     pos.altitude = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
     position.set_position(pos);
     position.set_timeStamp(
-        object::TimeStamp<object::DateTimeImplBoost>(match.str(RE_GGA_TIME), object::TimeStamp<object::DateTimeImplBoost>::Format::HHMMSS));
+        TimeStamp<object::DateTimeImplBoost>(match.str(RE_GGA_TIME), timestamp::Format::HHMMSS));
     position.set_fixQuality(std::stoi(match.str(RE_GGA_FIX)));
     position.set_nrOfSatellites(std::stoi(match.str(RE_GGA_SAT)));
     position.set_dilution(std::stod(match.str(RE_GGA_DIL)));
