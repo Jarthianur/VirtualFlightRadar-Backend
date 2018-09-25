@@ -34,12 +34,12 @@ using namespace sctf;
 void test_config(test::TestSuitesRunner& runner)
 {
     describe<ConfigReader>("read config", runner)->test("read", [] {
-        std::stringstream conf;
-        conf << "[" SECT_KEY_FALLBACK "]\n" << KV_KEY_LATITUDE "   = 0.000000\n";
-        conf << KV_KEY_LONGITUDE " = \n" << KV_KEY_ALTITUDE "=1000; alt\n;ghsgd";
+        std::stringstream conf_in;
+        conf_in << "[" SECT_KEY_FALLBACK "]\n" << KV_KEY_LATITUDE "   = 0.000000\n";
+        conf_in << KV_KEY_LONGITUDE " = \n" << KV_KEY_ALTITUDE "=1000; alt\n;ghsgd";
         ConfigReader cr;
         Properties map;
-        cr.read(conf, map);
+        cr.read(conf_in, map);
         assertEqStr(map.get_property(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "invalid"), "0.000000");
         assertEqStr(map.get_property(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "invalid"), "invalid");
         assertEqStr(map.get_property(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "invalid"), "1000");

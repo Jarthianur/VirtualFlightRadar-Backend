@@ -98,13 +98,23 @@ void test_object(test::TestSuitesRunner& runner)
                    assertTrue(t2 > t1);
                    assertFalse(t1 > t2);
                })
-        ->test("comparison - new day msg", [] {
+        ->test("comparison - new day msg",
+               [] {
+                   DateTimeImplTest::set_day(1);
+                   DateTimeImplTest::set_now(23, 59, 0);
+                   TS t1("235800", Format::HHMMSS);
+                   DateTimeImplTest::set_day(2);
+                   DateTimeImplTest::set_now(0, 1, 0);
+                   TS t2("000000", Format::HHMMSS);
+                   assertTrue(t2 > t1);
+                   assertFalse(t1 > t2);
+               })
+        ->test("comparison - incremental day", [] {
             DateTimeImplTest::set_day(1);
-            DateTimeImplTest::set_now(23, 59, 0);
-            TS t1("235800", Format::HHMMSS);
+            DateTimeImplTest::set_now(13, 0, 0);
+            TS t1("120000", Format::HHMMSS);
             DateTimeImplTest::set_day(2);
-            DateTimeImplTest::set_now(0, 1, 0);
-            TS t2("000000", Format::HHMMSS);
+            TS t2("110000", Format::HHMMSS);
             assertTrue(t2 > t1);
             assertFalse(t1 > t2);
         });

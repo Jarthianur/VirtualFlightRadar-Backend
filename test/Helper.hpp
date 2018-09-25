@@ -24,9 +24,12 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <boost/regex.hpp>
 
 #include "../src/object/Aircraft.h"
+#include "../src/server/Connection.hpp"
+#include "../src/server/TcpInterface.hpp"
 #include "framework/src/sctf.hpp"
 
 #define TEST_FUNCTION(NAME) extern void NAME(test::TestSuitesRunner&);
@@ -86,4 +89,64 @@ private:
     static std::uint32_t _day;
 };
 }  // namespace timestamp
-}  // namespace timestamp
+}  // namespace object
+
+namespace server
+{
+class SocketImplTest
+{
+};
+
+class TcpInterfaceImplTests : public TcpInterface<SocketImplTest>
+{
+public:
+    TcpInterfaceImplTests()           = default;
+    ~TcpInterfaceImplTests() noexcept = default;
+
+    void run(std::unique_lock<std::mutex>& lock) override
+    {
+        while(!stopped)
+        {
+            std::this_thread::yield();
+        }
+    }
+
+    void stop() override
+    {
+        if(on_accept)
+            on_accept(true);
+    }
+
+    void onAccept(const std::function<void(bool)>& callback) override
+    {
+        on_accept = callback;
+    }
+
+    void close() override
+    {
+        if(on_accept)
+            on_accept(true);
+    }
+
+    std::unique_ptr<Connection<SocketImplTest>> startConnection() override
+    {
+        return Connection<SocketImplTest>::create(SocketImplTest());
+    }
+
+    std::string get_currentAddress() const override
+    {
+        return currentAddress;
+    }
+
+    void connect(bool err, const std::string& adr)
+    {
+        currentAddress = adr;
+        on_accept(err);
+    }
+
+private:
+    std::function<void(bool)> on_accept;
+    std::string currentAddress;
+    bool stopped = false;
+};
+}  // namespace server
