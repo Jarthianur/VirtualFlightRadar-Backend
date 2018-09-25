@@ -40,7 +40,8 @@ namespace sctf
 namespace util
 {
 template<>
-inline std::string serialize<object::Aircraft::TargetType>(const object::Aircraft::TargetType& crTargetType)
+inline std::string
+serialize<object::Aircraft::TargetType>(const object::Aircraft::TargetType& crTargetType)
 {
     return std::to_string(static_cast<std::uint32_t>(crTargetType));
 }
@@ -55,4 +56,34 @@ static boost::regex pflaaRe(
 static boost::regex gpsRe(
     "(\\$GPRMC,\\d{6},A,0000\\.00,N,00000\\.00,E,0,0,\\d{6},001\\.0,W\\*[0-9a-fA-F]{2}\\s*)?(\\$GPGGA,\\d{6},0000\\.0000,N,00000\\.0000,E,1,00,1,0,M,0\\.0,M,,\\*[0-9a-fA-F]{2}\\s*)?");
 
-}  // helper
+}  // namespace helper
+
+namespace object
+{
+namespace timestamp
+{
+struct DateTimeImplTest
+{
+    static std::int64_t now()
+    {
+        return 0;
+    }
+    static std::uint32_t day()
+    {
+        return 0;
+    }
+    static void set_day(std::uint32_t d)
+    {
+        _day = d;
+    }
+    static void set_now(std::uint32_t h, std::uint32_t m, std::uint32_t s)
+    {
+        _now = h * 3600000 + m * 60000 + s * 1000;
+    }
+
+private:
+    static std::int64_t _now;
+    static std::uint32_t _day;
+};
+}  // namespace timestamp
+}  // namespace timestamp

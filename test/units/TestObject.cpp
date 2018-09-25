@@ -27,7 +27,13 @@
 #include "../Helper.hpp"
 
 using namespace object;
+using namespace timestamp;
 using namespace sctf;
+
+using TS = TimeStamp<DateTimeImplTest>;
+
+std::int64_t DateTimeImplTest::_now  = 0;
+std::uint32_t DateTimeImplTest::_day = 0;
 
 void test_object(test::TestSuitesRunner& runner)
 {
@@ -54,32 +60,51 @@ void test_object(test::TestSuitesRunner& runner)
             assertTrue(o2.tryUpdate(std::move(o1)));
         });
 
-    describe<TimeStamp>("Basic TimeStamp tests", runner)
+    describe<TS>("Basic TimeStamp tests", runner)
+        ->setup([] {
+            DateTimeImplTest::set_day(1);
+            DateTimeImplTest::set_now(12, 0, 0);
+        })
         ->test("creation - valid format",
                [] {
-                   assertNoExcept(TimeStamp("120000", TimeStamp::Format::HHMMSS));
-                   assertNoExcept(TimeStamp("12:00:00.000", TimeStamp::Format::HH_MM_SS_FFF));
+                   assertNoExcept(TS("120000", Format::HHMMSS));
+                   assertNoExcept(TS("12:00:00.000", Format::HH_MM_SS_FFF));
                })
         ->test("creation - invalid format",
                [] {
-                   assertException(TimeStamp("", TimeStamp::Format::HHMMSS), std::invalid_argument);
-                   assertException(TimeStamp("adgjhag", TimeStamp::Format::HHMMSS),
+                   assertException(TS("", Format::HHMMSS), std::invalid_argument);
+                   assertException(TS("adgjhag", Format::HHMMSS), std::invalid_argument);
+                   assertException(TS("36:60:11.11111", Format::HH_MM_SS_FFF),
                                    std::invalid_argument);
-                   assertException(TimeStamp("36:60:11.11111", TimeStamp::Format::HH_MM_SS_FFF),
-                                   std::invalid_argument);
-                   assertException(TimeStamp("366022", TimeStamp::Format::HHMMSS),
-                                   std::invalid_argument);
+                   assertException(TS("366022", Format::HHMMSS), std::invalid_argument);
                })
         ->test("comparison - incremental time",
                [] {
-                   TimeStamp t1("120000", TimeStamp::Format::HHMMSS);
-                   TimeStamp t2("120001", TimeStamp::Format::HHMMSS);
+                   DateTimeImplTest::set_day(1);
+                   DateTimeImplTest::set_now(13, 0, 0);
+                   TS t1("120000", Format::HHMMSS);
+                   TS t2("120001", Format::HHMMSS);
                    assertTrue(t2 > t1);
                    assertFalse(t1 > t2);
                })
-        ->test("comparison - day change", [] {
-            TimeStamp t1("235959", TimeStamp::Format::HHMMSS);
-            TimeStamp t2("000000", TimeStamp::Format::HHMMSS);
+        ->test("comparison - old day msg",
+               [] {
+                   DateTimeImplTest::set_day(1);
+                   DateTimeImplTest::set_now(23, 59, 0);
+                   TS t1("235800", Format::HHMMSS);
+                   DateTimeImplTest::set_day(2);
+                   DateTimeImplTest::set_now(0, 0, 0);
+                   TS t2("235900", Format::HHMMSS);
+                   assertTrue(t2 > t1);
+                   assertFalse(t1 > t2);
+               })
+        ->test("comparison - new day msg", [] {
+            DateTimeImplTest::set_day(1);
+            DateTimeImplTest::set_now(23, 59, 0);
+            TS t1("235800", Format::HHMMSS);
+            DateTimeImplTest::set_day(2);
+            DateTimeImplTest::set_now(0, 1, 0);
+            TS t2("000000", Format::HHMMSS);
             assertTrue(t2 > t1);
             assertFalse(t1 > t2);
         });
