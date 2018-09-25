@@ -55,7 +55,7 @@ public:
      * @param rvSocket The socket
      * @return a shared ptr to the Connection object
      */
-    static std::unique_ptr<Connection<SocketT>> start(SocketT&& socket);
+    static std::unique_ptr<Connection<SocketT>> create(SocketT&& socket);
 
     bool write(const std::string& msg);
 
@@ -87,7 +87,7 @@ Connection<SocketT>::~Connection() noexcept
 {}
 
 template<typename SocketT>
-std::unique_ptr<Connection<SocketT>> Connection<SocketT>::start(SocketT&& socket)
+std::unique_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socket)
 {
     return std::unique_ptr<Connection<SocketT>>(new Connection<SocketT>(std::move(socket)));
 }

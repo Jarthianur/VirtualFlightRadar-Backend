@@ -21,28 +21,32 @@
 
 #pragma once
 
+#include <functional>
+#include <memory>
+#include <mutex>
 #include <string>
-#include <boost/asio.hpp>
-#include <boost/move/move.hpp>
 
 #include "../Defines.h"
 
 namespace server
 {
-class SocketImplBoost
+template<typename SocketT>
+class Connection;
+
+template<typename SocketT>
+class TcpInterface
 {
 public:
-    MOVABLE_BUT_NOT_COPYABLE(SocketImplBoost)
+    TcpInterface() = default;
 
-    explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket);
-    ~SocketImplBoost() noexcept;
-    std::string get_address() const;
-    bool write(const std::string& msg);
-    void close();
-    boost::asio::ip::tcp::socket& get();
+    virtual ~TcpInterface() noexcept = default;
 
-private:
-    boost::asio::ip::tcp::socket m_socket;
+    virtual void run(std::unique_lock<std::mutex>& lock)             = 0;
+    virtual void stop()                                              = 0;
+    virtual void onAccept(const std::function<void(bool)>& callback) = 0;
+    virtual void close()                                             = 0;
+    virtual std::unique_ptr<Connection<SocketT>> startConnection()   = 0;
+    virtual std::string get_currentAddress() const                   = 0;
 };
 
 }  // namespace server

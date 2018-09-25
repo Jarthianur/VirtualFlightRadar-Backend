@@ -33,6 +33,7 @@
 #include "../Logger.hpp"
 #include "../Parameters.h"
 #include "Connection.hpp"
+#include "TcpInterfaceImplBoost.h"
 
 #ifdef SERVER_MAX_CLIENTS
 /// @def S_MAX_CLIENTS
@@ -49,7 +50,7 @@ namespace server
  * @class Server
  * @brief A TCP server to serve the same reports to all clients.
  */
-template<typename TcpInterfaceT, typename SocketT>
+template<typename SocketT>
 class Server
 {
 public:
@@ -63,6 +64,8 @@ public:
      * @param vPort The port
      */
     explicit Server(std::uint16_t port);
+
+    explicit Server(std::shared_ptr<TcpInterface<SocketT>> interface);
 
     ~Server() noexcept;
 
@@ -105,7 +108,7 @@ private:
 
     void attemptConnection(bool error) noexcept;
 
-    TcpInterfaceT m_tcpIf;
+    std::shared_ptr<TcpInterface<SocketT>> m_tcpIf;
 
     /// @var mConnections
     /// Vector holding Connections
@@ -122,22 +125,26 @@ private:
     mutable std::mutex m_mutex;
 };
 
-template<typename TcpInterfaceT, typename SocketT>
-Server<TcpInterfaceT, SocketT>::Server(std::uint16_t port) : m_tcpIf(port)
+template<typename SocketT>
+Server<SocketT>::Server(std::uint16_t port) : m_tcpIf(std::make_shared<TcpInterfaceImplBoost>(port))
 {}
 
-template<typename TcpInterfaceT, typename SocketT>
-Server<TcpInterfaceT, SocketT>::Server() : Server<TcpInterfaceT, SocketT>(4353)
+template<typename SocketT>
+Server<SocketT>::Server(std::shared_ptr<TcpInterface<SocketT>> interface) : m_tcpIf(interface)
 {}
 
-template<typename TcpInterfaceT, typename SocketT>
-Server<TcpInterfaceT, SocketT>::~Server() noexcept
+template<typename SocketT>
+Server<SocketT>::Server() : Server<SocketT>(4353)
+{}
+
+template<typename SocketT>
+Server<SocketT>::~Server() noexcept
 {
     stop();
 }
 
-template<typename TcpInterfaceT, typename SocketT>
-void Server<TcpInterfaceT, SocketT>::run()
+template<typename SocketT>
+void Server<SocketT>::run()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     logger.info("(Server) start server");
@@ -145,13 +152,13 @@ void Server<TcpInterfaceT, SocketT>::run()
     m_thread  = std::thread([this]() {
         accept();
         std::unique_lock<std::mutex> lock(m_mutex);
-        m_tcpIf.run(lock);
+        m_tcpIf->run(lock);
         logger.debug("(Server) stopped");
     });
 }
 
-template<typename TcpInterfaceT, typename SocketT>
-void Server<TcpInterfaceT, SocketT>::stop()
+template<typename SocketT>
+void Server<SocketT>::stop()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if(m_running)
@@ -166,7 +173,7 @@ void Server<TcpInterfaceT, SocketT>::stop()
             }
         }
         m_activeConnections = 0;
-        m_tcpIf.stop();
+        m_tcpIf->stop();
         if(m_thread.joinable())
         {
             m_thread.join();
@@ -174,8 +181,8 @@ void Server<TcpInterfaceT, SocketT>::stop()
     }
 }
 
-template<typename TcpInterfaceT, typename SocketT>
-void Server<TcpInterfaceT, SocketT>::send(const std::string& msg)
+template<typename SocketT>
+void Server<SocketT>::send(const std::string& msg)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if(msg.empty() || m_activeConnections == 0)
@@ -196,16 +203,15 @@ void Server<TcpInterfaceT, SocketT>::send(const std::string& msg)
     }
 }
 
-template<typename TcpInterfaceT, typename SocketT>
-void Server<TcpInterfaceT, SocketT>::accept()
+template<typename SocketT>
+void Server<SocketT>::accept()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_tcpIf.onAccept(
-        std::bind(&Server<TcpInterfaceT, SocketT>::attemptConnection, this, std::placeholders::_1));
+    m_tcpIf->onAccept(std::bind(&Server<SocketT>::attemptConnection, this, std::placeholders::_1));
 }
 
-template<typename TcpInterfaceT, typename SocketT>
-bool Server<TcpInterfaceT, SocketT>::isConnected(const std::string& address)
+template<typename SocketT>
+bool Server<SocketT>::isConnected(const std::string& address)
 {
     for(const auto& it : m_connections)
     {
@@ -217,22 +223,21 @@ bool Server<TcpInterfaceT, SocketT>::isConnected(const std::string& address)
     return false;
 }
 
-template<typename TcpInterfaceT, typename SocketT>
-void Server<TcpInterfaceT, SocketT>::attemptConnection(bool error) noexcept
+template<typename SocketT>
+void Server<SocketT>::attemptConnection(bool error) noexcept
 {
     if(!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         try
         {
-            if(m_activeConnections < S_MAX_CLIENTS
-               && !isConnected(m_tcpIf.get_socket().get_address()))
+            if(m_activeConnections < S_MAX_CLIENTS && !isConnected(m_tcpIf->get_currentAddress()))
             {
                 for(auto& it : m_connections)
                 {
                     if(!it)
                     {
-                        it = Connection<SocketT>::start(std::move(m_tcpIf.get_socket()));
+                        it = m_tcpIf->startConnection();
                         ++m_activeConnections;
                         logger.info("(Server) connection from: ", it->get_address());
                         break;
@@ -241,14 +246,14 @@ void Server<TcpInterfaceT, SocketT>::attemptConnection(bool error) noexcept
             }
             else
             {
-                logger.info("(Server) refused connection to ", m_tcpIf.get_socket().get_address());
-                m_tcpIf.close();
+                logger.info("(Server) refused connection to ", m_tcpIf->get_currentAddress());
+                m_tcpIf->close();
             }
         }
         catch(const SocketException& e)
         {
             logger.warn("(Server) connection failed: ", e.what());
-            m_tcpIf.close();
+            m_tcpIf->close();
         }
     }
     else

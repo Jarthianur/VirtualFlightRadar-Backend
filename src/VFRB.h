@@ -116,7 +116,7 @@ private:
 
     /// @var mServer
     /// Manage clients and sending of data
-    server::Server<server::TcpInterfaceImplBoost, server::SocketImplBoost> m_server;
+    server::Server<server::SocketImplBoost> m_server;
 
     /// @var mFeeds
     /// List of all active feeds

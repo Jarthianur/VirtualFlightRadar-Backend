@@ -20,14 +20,18 @@
  */
 
 #include "TcpInterfaceImplBoost.h"
+
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
+
 #include "../Logger.hpp"
+#include "Connection.hpp"
 
 namespace server
 {
 TcpInterfaceImplBoost::TcpInterfaceImplBoost(std::uint16_t port)
-    : m_ioService(),
+    : TcpInterface<SocketImplBoost>(),
+      m_ioService(),
       m_acceptor(m_ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
                  boost::asio::ip::tcp::acceptor::reuse_address(true)),
       m_socket(boost::move(boost::asio::ip::tcp::socket(m_ioService)))
@@ -94,6 +98,20 @@ void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
         logger.debug("(Server) accept: ", error.message());
     }
     callback(error);
+}
+
+std::unique_ptr<Connection<SocketImplBoost>> TcpInterfaceImplBoost::startConnection()
+{
+    if(!m_socket.get().is_open())
+    {
+        throw SocketException("cannot start connection on closed socket");
+    }
+    return Connection<SocketImplBoost>::create(std::move(m_socket));
+}
+
+std::string TcpInterfaceImplBoost::get_currentAddress() const
+{
+    return m_socket.get_address();
 }
 
 }  // namespace server

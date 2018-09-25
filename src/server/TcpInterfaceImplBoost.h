@@ -26,13 +26,15 @@
 #include <mutex>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
+
 #include "SocketImplBoost.h"
+#include "TcpInterface.hpp"
 
 #include "../Defines.h"
 
 namespace server
 {
-class TcpInterfaceImplBoost
+class TcpInterfaceImplBoost : public TcpInterface<SocketImplBoost>
 {
 public:
     NOT_COPYABLE(TcpInterfaceImplBoost)
@@ -40,10 +42,12 @@ public:
     explicit TcpInterfaceImplBoost(std::uint16_t port);
     ~TcpInterfaceImplBoost() noexcept;
 
-    void run(std::unique_lock<std::mutex>& lock);
-    void stop();
-    void onAccept(const std::function<void(bool)>& callback);
-    void close();
+    void run(std::unique_lock<std::mutex>& lock) override;
+    void stop() override;
+    void onAccept(const std::function<void(bool)>& callback) override;
+    void close() override;
+    std::unique_ptr<Connection<SocketImplBoost>> startConnection() override;
+    std::string get_currentAddress() const override;
 
 private:
     void handleAccept(const boost::system::error_code& error,
@@ -52,9 +56,6 @@ private:
     boost::asio::io_service m_ioService;
     boost::asio::ip::tcp::acceptor m_acceptor;
     SocketImplBoost m_socket;
-
-public:
-    GETTER_R(socket)
 };
 
 }  // namespace server
