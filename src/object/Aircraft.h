@@ -187,7 +187,7 @@ private:
 
     /// @var mTimeStamp
     /// The timestamp of the last report.
-    TimeStamp<DateTimeImplBoost> m_timeStamp;
+    TimeStamp<timestamp::DateTimeImplBoost> m_timeStamp;
 
     /// @var mFullInfo
     /// Is full set of information available?

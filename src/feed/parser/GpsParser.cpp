@@ -116,7 +116,7 @@ bool GpsParser::parsePosition(const boost::smatch& match, GpsPosition& position)
     pos.altitude = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
     position.set_position(pos);
     position.set_timeStamp(
-        TimeStamp<object::DateTimeImplBoost>(match.str(RE_GGA_TIME), timestamp::Format::HHMMSS));
+        TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_GGA_TIME), timestamp::Format::HHMMSS));
     position.set_fixQuality(std::stoi(match.str(RE_GGA_FIX)));
     position.set_nrOfSatellites(std::stoi(match.str(RE_GGA_SAT)));
     position.set_dilution(std::stod(match.str(RE_GGA_DIL)));

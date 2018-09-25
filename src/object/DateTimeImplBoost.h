@@ -25,6 +25,8 @@
 
 namespace object
 {
+namespace timestamp
+{
 class DateTimeImplBoost
 {
 public:
@@ -36,4 +38,5 @@ public:
     static std::uint32_t day();
 };
 
+}  // namespace timestamp
 }  // namespace object

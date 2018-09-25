@@ -102,7 +102,7 @@ private:
 
     /// @var mTimeStamp
     /// The timestamp of this position
-    TimeStamp<DateTimeImplBoost> m_timeStamp;
+    TimeStamp<timestamp::DateTimeImplBoost> m_timeStamp;
 
     /// @var mNrOfSatellites
     /// The number of satellites

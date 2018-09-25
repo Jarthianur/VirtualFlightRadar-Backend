@@ -25,6 +25,8 @@
 
 namespace object
 {
+namespace timestamp
+{
 DateTimeImplBoost::DateTimeImplBoost()
 {}
 
@@ -45,4 +47,5 @@ std::uint32_t DateTimeImplBoost::day()
         boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
 }
 
+}  // namespace timestamp
 }  // namespace object
