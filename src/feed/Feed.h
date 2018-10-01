@@ -46,7 +46,7 @@ class Feed
 public:
     NOT_COPYABLE(Feed)
 
-    enum class Protocol : std::int32_t
+    enum class Protocol : std::int8_t
     {
         APRS,
         SBS,

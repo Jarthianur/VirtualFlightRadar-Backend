@@ -45,11 +45,9 @@ template<typename T>
 class Processor
 {
 public:
-    Processor()
-    {}
+    Processor() = default;
 
-    virtual ~Processor() noexcept
-    {}
+    virtual ~Processor() noexcept = default;
 
     /**
      * @fn process
@@ -64,7 +62,7 @@ protected:
      * @brief End a given string with checksum and CRLF.
      * @param rDestStr The target string
      */
-    void finishSentence(std::string& sentence)
+    inline void finishSentence(std::string& sentence)
     {
         std::snprintf(m_buffer, sizeof(m_buffer), "%02x\r\n",
                       math::checksum(m_buffer, sizeof(m_buffer)));

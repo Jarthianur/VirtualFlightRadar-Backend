@@ -32,9 +32,6 @@ using namespace sctf;
 
 using TS = TimeStamp<DateTimeImplTest>;
 
-std::int64_t DateTimeImplTest::_now  = 0;
-std::uint32_t DateTimeImplTest::_day = 0;
-
 void test_object(test::TestSuitesRunner& runner)
 {
     describe<Object>("Basic Object tests", runner)

@@ -28,9 +28,8 @@ src/config \
 src/data \
 src/data/processor \
 src/feed \
-src/feed/client \
+src/client \
 src/feed/parser \
 src/object \
 src/server \
-test \
-test/units
+test

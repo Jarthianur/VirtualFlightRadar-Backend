@@ -5,14 +5,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../../src/VFRB.cpp \
+../../src/Signals.cpp \
 ../../src/Logger.cpp
 
 OBJS += \
 ./src/VFRB.o \
+./src/Signals.o \
 ./src/Logger.o
 
 CPP_DEPS += \
 ./src/VFRB.d \
+./src/Signals.d \
 ./src/Logger.d
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -80,6 +80,7 @@ void AircraftData::processAircrafts(const Position& position, double atmPress) n
     std::size_t index = 0;
     bool del          = false;
     auto it           = m_container.begin();
+    m_processor.referTo(position, atmPress);
 
     while(it != m_container.end())
     {
@@ -101,7 +102,6 @@ void AircraftData::processAircrafts(const Position& position, double atmPress) n
             {
                 if(it->get_updateAge() == 1)
                 {
-                    m_processor.referTo(position, atmPress);
                     m_processor.process(*it);
                 }
                 ++it;

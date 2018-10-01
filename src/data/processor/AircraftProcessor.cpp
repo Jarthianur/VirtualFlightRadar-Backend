@@ -99,19 +99,18 @@ std::string AircraftProcessor::get_PFLAA(const Aircraft& aircraft)
 {
     if(aircraft.get_fullInfo())
     {
-        std::snprintf(m_buffer, sizeof(m_buffer), "$PFLAA,0,%d,%d,%d,%d,%s,%03d,,%d,%3.1lf,%1x*",
-                      m_relNorth, m_relEast, m_relVertical,
-                      static_cast<std::int32_t>(aircraft.get_idType()), aircraft.get_id().c_str(),
+        std::snprintf(m_buffer, sizeof(m_buffer),
+                      "$PFLAA,0,%d,%d,%d,%hhd,%s,%03d,,%d,%3.1lf,%1hhx*", m_relNorth, m_relEast,
+                      m_relVertical, aircraft.get_idType(), aircraft.get_id().c_str(),
                       math::doubleToInt(aircraft.get_movement().heading),
                       math::doubleToInt(aircraft.get_movement().gndSpeed * math::MS_2_KMH),
-                      aircraft.get_movement().climbRate,
-                      static_cast<std::uint32_t>(aircraft.get_aircraftType()));
+                      aircraft.get_movement().climbRate, aircraft.get_aircraftType());
     }
     else
     {
-        std::snprintf(m_buffer, sizeof(m_buffer), "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1x*", m_relNorth,
+        std::snprintf(m_buffer, sizeof(m_buffer), "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhx*", m_relNorth,
                       m_relEast, m_relVertical, aircraft.get_id().c_str(),
-                      static_cast<std::uint32_t>(aircraft.get_aircraftType()));
+                      aircraft.get_aircraftType());
     }
     std::string tmp(m_buffer);
     finishSentence(tmp);

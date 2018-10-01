@@ -34,7 +34,7 @@ namespace timestamp
  * @enum Format
  * @brief Format of a given time string.
  */
-enum class Format : std::int32_t
+enum class Format : std::int8_t
 {
     HHMMSS,
     HH_MM_SS_FFF

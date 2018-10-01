@@ -153,7 +153,6 @@ bool AprsParser::parsePosition(const boost::smatch& match, Aircraft& aircraft) n
 
 bool AprsParser::parseComment(const boost::smatch& match, Aircraft& aircraft) noexcept
 {
-    bool valid = true;
     aircraft.set_id(match.str(RE_APRS_COM_ID));
     try
     {
@@ -164,16 +163,15 @@ bool AprsParser::parseComment(const boost::smatch& match, Aircraft& aircraft) no
     }
     catch(const std::logic_error&)
     {
-        valid = false;
+        return false;
     }
-    return valid;
+    return true;
 }
 
 bool AprsParser::parseMovement(const boost::smatch& match, const boost::smatch& comMatch,
                                Aircraft& aircraft) noexcept
 {
     Movement move;
-    bool valid = true;
     // This needs to be split later to parse independently.
     try
     {
@@ -183,10 +181,10 @@ bool AprsParser::parseMovement(const boost::smatch& match, const boost::smatch& 
     }
     catch(const std::logic_error&)
     {
-        valid = false;
+        return false;
     }
     aircraft.set_movement(move);
-    return valid;
+    return true;
 }
 
 bool AprsParser::parseTimeStamp(const boost::smatch& match, Aircraft& aircraft) noexcept

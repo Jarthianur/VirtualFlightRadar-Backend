@@ -106,11 +106,11 @@ private:
 
     /// @var mNrOfSatellites
     /// The number of satellites
-    std::int32_t m_nrOfSatellites = 1;
+    std::int8_t m_nrOfSatellites = 1;
 
     /// @var mFixQuality
     /// The GPS fix quality
-    std::int32_t m_fixQuality = 5;
+    std::int8_t m_fixQuality = 5;
 
     /// @var mDilution
     /// The position dilution

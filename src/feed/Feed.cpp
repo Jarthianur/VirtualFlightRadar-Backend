@@ -28,7 +28,7 @@
 
 #include "../Logger.hpp"
 #include "../config/Configuration.h"
-#include "../data/Data.h"
+#include "../data/Data.hpp"
 
 #ifdef COMPONENT
 #undef COMPONENT

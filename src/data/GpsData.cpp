@@ -62,7 +62,7 @@ bool GpsData::update(Object&& position)
     std::lock_guard<std::mutex> lock(m_mutex);
     if(m_positionLocked)
     {
-        throw std::runtime_error("Position was locked before.");
+        throw std::runtime_error("position was locked before.");
     }
     bool updated = m_position.tryUpdate(std::move(position));
     if(updated)

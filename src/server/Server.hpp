@@ -114,7 +114,7 @@ private:
     /// Vector holding Connections
     std::array<std::unique_ptr<Connection<SocketT>>, S_MAX_CLIENTS> m_connections;
 
-    std::uint32_t m_activeConnections = 0;
+    std::uint8_t m_activeConnections = 0;
 
     bool m_running = false;
 

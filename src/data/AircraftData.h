@@ -29,7 +29,7 @@
 
 #include "../object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
-#include "Data.h"
+#include "Data.hpp"
 
 ///  @def AC_DELETE_THRESHOLD
 /// Times until aircraft gets deleted

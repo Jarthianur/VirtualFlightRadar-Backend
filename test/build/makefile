@@ -5,18 +5,17 @@
 -include ../makefile.init
 
 RM := rm -rf
-CXX := ${VFRB_COMPILER}
+CXX := $(or ${VFRB_COMPILER},${VFRB_COMPILER},g++)
 BOOST_L := ${BOOST_LIBS_L}
 BOOST_I := ${BOOST_ROOT_I}
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include test/units/subdir.mk
 -include test/subdir.mk
 -include src/server/subdir.mk
 -include src/object/subdir.mk
 -include src/feed/parser/subdir.mk
--include src/feed/client/subdir.mk
+-include src/client/subdir.mk
 -include src/feed/subdir.mk
 -include src/data/processor/subdir.mk
 -include src/data/subdir.mk

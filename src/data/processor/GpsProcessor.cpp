@@ -23,7 +23,6 @@
 
 #include <cmath>
 #include <cstdio>
-#include <ctime>
 
 using namespace object;
 
@@ -39,15 +38,14 @@ GpsProcessor::~GpsProcessor() noexcept
 
 void GpsProcessor::process(object::GpsPosition& position)
 {
-    position.set_serialized(get_GPGGA(position) + get_GPRMC(position));
-}
-
-std::string GpsProcessor::get_GPGGA(const GpsPosition& position)
-{
     std::time_t now = std::time(nullptr);
     std::tm* utc    = std::gmtime(&now);
     evalPosition(position.get_position().latitude, position.get_position().longitude);
+    position.set_serialized(get_GPGGA(position, utc) + get_GPRMC(position, utc));
+}
 
+std::string GpsProcessor::get_GPGGA(const GpsPosition& position, const std::tm* utc)
+{
     // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
     // support others.
     std::snprintf(
@@ -63,12 +61,8 @@ std::string GpsProcessor::get_GPGGA(const GpsPosition& position)
     return nmea_str;
 }
 
-std::string GpsProcessor::get_GPRMC(const GpsPosition& position)
+std::string GpsProcessor::get_GPRMC(const GpsPosition& position, const std::tm* utc)
 {
-    std::time_t now = std::time(nullptr);
-    std::tm* utc    = std::gmtime(&now);
-    evalPosition(position.get_position().latitude, position.get_position().longitude);
-
     std::snprintf(
         m_buffer, sizeof(m_buffer),
         "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
