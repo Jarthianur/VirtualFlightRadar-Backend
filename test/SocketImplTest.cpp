@@ -23,6 +23,15 @@
 
 namespace server
 {
+SocketImplTest::SocketImplTest(SocketImplTest&& other) : m_socket(other.m_socket)
+{}
+
+SocketImplTest& SocketImplTest::operator=(SocketImplTest&& other)
+{
+    m_socket = other.m_socket;
+    return *this;
+}
+
 SocketImplTest::SocketImplTest(int&& socket) : m_socket(socket)
 {}
 

@@ -20,40 +20,40 @@ CPP_SRCS += \
 
 OBJS += \
 ./test/UnitTests.o \
-./TestServer.o \
-./TestObject.o \
-./TestMath.o \
-./TestFeedParser.o \
-./TestFeed.o \
-./TestDataProcessor.o \
-./TestData.o \
-./TestConfig.o \
-./TestClient.o \
-./TcpInterfaceImplTest.o \
-./SocketImplTest.o \
-./DateTimeImplTest.o
+./test/TestServer.o \
+./test/TestObject.o \
+./test/TestMath.o \
+./test/TestFeedParser.o \
+./test/TestFeed.o \
+./test/TestDataProcessor.o \
+./test/TestData.o \
+./test/TestConfig.o \
+./test/TestClient.o \
+./test/TcpInterfaceImplTest.o \
+./test/SocketImplTest.o \
+./test/DateTimeImplTest.o
 
 CPP_DEPS += \
 ./test/UnitTests.d \
-./TestServer.d \
-./TestObject.d \
-./TestMath.d \
-./TestFeedParser.d \
-./TestFeed.d \
-./TestDataProcessor.d \
-./TestData.d \
-./TestConfig.d \
-./TestClient.d \
-./TcpInterfaceImplTest.d \
-./SocketImplTest.d \
-./DateTimeImplTest.d
+./test/TestServer.d \
+./test/TestObject.d \
+./test/TestMath.d \
+./test/TestFeedParser.d \
+./test/TestFeed.d \
+./test/TestDataProcessor.d \
+./test/TestData.d \
+./test/TestConfig.d \
+./test/TestClient.d \
+./test/TcpInterfaceImplTest.d \
+./test/SocketImplTest.d \
+./test/DateTimeImplTest.d
 
 
 # Each subdirectory must supply rules for building sources it contributes
 test/%.o: ../%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	$(CXX) -std=c++1y $(BOOST_I) -O0 -g3 -Wall -c -fmessage-length=0 -fprofile-arcs -ftest-coverage -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	$(CXX) -std=c++1y $(BOOST_I) -O0 -g3 -Wall -DSCTF_CUSTOM_EPSILON=0.000001 -c -fmessage-length=0 -fprofile-arcs -ftest-coverage -fopenmp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

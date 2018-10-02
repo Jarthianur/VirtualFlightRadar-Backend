@@ -19,9 +19,9 @@
  }
  */
 
-#include "../../src/data/processor/AircraftProcessor.h"
-#include "../../src/data/processor/GpsProcessor.h"
-#include "../Helper.hpp"
+#include "../src/data/processor/AircraftProcessor.h"
+#include "../src/data/processor/GpsProcessor.h"
+#include "helper.hpp"
 
 using namespace data::processor;
 using namespace object;

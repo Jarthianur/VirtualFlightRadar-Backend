@@ -23,10 +23,10 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "../../src/config/ConfigReader.h"
-#include "../../src/config/Configuration.h"
-#include "../../src/config/Properties.h"
-#include "../Helper.hpp"
+#include "../src/config/ConfigReader.h"
+#include "../src/config/Configuration.h"
+#include "../src/config/Properties.h"
+#include "helper.hpp"
 
 using namespace config;
 using namespace sctf;

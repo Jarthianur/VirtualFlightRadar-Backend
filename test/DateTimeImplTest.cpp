@@ -26,11 +26,11 @@ std::uint32_t DateTimeImplTest::_day = 0;
 
 std::int64_t DateTimeImplTest::now()
 {
-    return 0;
+    return _now;
 }
 std::uint32_t DateTimeImplTest::day()
 {
-    return 0;
+    return _day;
 }
 void DateTimeImplTest::set_day(std::uint32_t d)
 {

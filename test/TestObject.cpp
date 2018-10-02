@@ -19,12 +19,13 @@
  }
  */
 
-#include "../../src/object/Aircraft.h"
-#include "../../src/object/Atmosphere.h"
-#include "../../src/object/GpsPosition.h"
-#include "../../src/object/TimeStamp.hpp"
-#include "../../src/object/Wind.h"
-#include "../Helper.hpp"
+#include "../src/object/Aircraft.h"
+#include "../src/object/Atmosphere.h"
+#include "../src/object/GpsPosition.h"
+#include "../src/object/TimeStamp.hpp"
+#include "../src/object/Wind.h"
+#include "DateTimeImplTest.h"
+#include "helper.hpp"
 
 using namespace object;
 using namespace timestamp;
@@ -44,17 +45,19 @@ void test_object(test::TestSuitesRunner& runner)
         ->test("tryUpdate", [] {
             Object o1;
             Object o2(1);
+            Object o3(2);
             o1.set_serialized("");
             o2.set_serialized("a");
+            o3.set_serialized("b");
             assertEquals(o1.get_serialized().size(), 0);
             assertTrue(o1.tryUpdate(std::move(o2)));
             assertEqStr(o1.get_serialized(), "a");
             for(int i = 0; i < OBJ_OUTDATED; ++i)
             {
-                assertFalse(o2.tryUpdate(std::move(o1)));
-                ++o2;
+                assertFalse(o3.tryUpdate(std::move(o1)));
+                ++o3;
             }
-            assertTrue(o2.tryUpdate(std::move(o1)));
+            assertTrue(o3.tryUpdate(std::move(o1)));
         });
 
     describe<TS>("Basic TimeStamp tests", runner)
@@ -115,4 +118,12 @@ void test_object(test::TestSuitesRunner& runner)
             assertTrue(t2 > t1);
             assertFalse(t1 > t2);
         });
+
+    describe<GpsPosition>("Basic GpsPosition tests", runner)->test("assign", [] {
+        GpsPosition pos1({2.0, 2.0, 2}, 41.0);
+        GpsPosition pos2({1.0, 1.0, 1}, 48.0);
+        assertTrue(pos1.tryUpdate(std::move(pos2)));
+        assertEquals(pos1.get_geoid(), 48.0);
+        assertEquals(pos1.get_position().latitude, 1.0);
+    });
 }

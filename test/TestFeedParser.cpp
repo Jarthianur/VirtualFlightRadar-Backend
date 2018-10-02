@@ -22,18 +22,18 @@
 #include <stdexcept>
 #include <string>
 
-#include "../../src/Math.hpp"
-#include "../../src/feed/parser/AprsParser.h"
-#include "../../src/feed/parser/AtmosphereParser.h"
-#include "../../src/feed/parser/GpsParser.h"
-#include "../../src/feed/parser/SbsParser.h"
-#include "../../src/feed/parser/WindParser.h"
-#include "../../src/object/Aircraft.h"
-#include "../../src/object/Atmosphere.h"
-#include "../../src/object/GpsPosition.h"
-#include "../../src/object/TimeStamp.hpp"
-#include "../../src/object/Wind.h"
-#include "../Helper.hpp"
+#include "../src/Math.hpp"
+#include "../src/feed/parser/AprsParser.h"
+#include "../src/feed/parser/AtmosphereParser.h"
+#include "../src/feed/parser/GpsParser.h"
+#include "../src/feed/parser/SbsParser.h"
+#include "../src/feed/parser/WindParser.h"
+#include "../src/object/Aircraft.h"
+#include "../src/object/Atmosphere.h"
+#include "../src/object/GpsPosition.h"
+#include "../src/object/TimeStamp.hpp"
+#include "../src/object/Wind.h"
+#include "helper.hpp"
 
 using namespace feed::parser;
 using namespace sctf;

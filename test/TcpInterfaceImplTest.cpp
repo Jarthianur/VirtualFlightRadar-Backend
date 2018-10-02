@@ -29,14 +29,15 @@ namespace server
 {
 TcpInterfaceImplTests::TcpInterfaceImplTests() : TcpInterface<SocketImplTest>()
 {}
+
 TcpInterfaceImplTests::~TcpInterfaceImplTests() noexcept
 {}
 
 void TcpInterfaceImplTests::run(std::unique_lock<std::mutex>& lock)
 {
+    lock.unlock();
     while(!stopped)
     {
-        lock.unlock();
         std::this_thread::yield();
     }
 }
@@ -60,7 +61,7 @@ void TcpInterfaceImplTests::close()
 
 std::unique_ptr<Connection<SocketImplTest>> TcpInterfaceImplTests::startConnection()
 {
-    return Connection<SocketImplTest>::create(SocketImplTest(1));
+    return Connection<SocketImplTest>::create(SocketImplTest(0));
 }
 
 std::string TcpInterfaceImplTests::get_currentAddress() const
