@@ -103,4 +103,11 @@ inline std::list<std::string> splitCommaSeparated(const std::string& str)
     }
     return list;
 }
+
+template<typename T>
+auto raw_type(T value) -> typename std::underlying_type<T>::type
+{
+    return static_cast<typename std::underlying_type<T>::type>(value);
+}
+
 }  // namespace util

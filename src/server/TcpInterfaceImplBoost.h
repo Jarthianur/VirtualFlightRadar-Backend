@@ -51,7 +51,7 @@ public:
 
 private:
     void handleAccept(const boost::system::error_code& error,
-                      const std::function<void(bool)>& callback) noexcept;
+                      const std::function<void(bool)>& callback);
 
     boost::asio::io_service m_ioService;
     boost::asio::ip::tcp::acceptor m_acceptor;

@@ -91,7 +91,7 @@ void TcpInterfaceImplBoost::close()
 }
 
 void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
-                                         const std::function<void(bool)>& callback) noexcept
+                                         const std::function<void(bool)>& callback)
 {
     if(error)
     {

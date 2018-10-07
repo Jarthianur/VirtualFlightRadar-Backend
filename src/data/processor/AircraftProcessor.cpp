@@ -26,6 +26,7 @@
 #include <limits>
 
 #include "../../util/math.hpp"
+#include "../../util/utility.hpp"
 
 using namespace object;
 
@@ -99,18 +100,18 @@ std::string AircraftProcessor::get_PFLAA(const Aircraft& aircraft)
 {
     if(aircraft.get_fullInfo())
     {
-        std::snprintf(m_buffer, sizeof(m_buffer),
-                      "$PFLAA,0,%d,%d,%d,%hhd,%s,%03d,,%d,%3.1lf,%1hhx*", m_relNorth, m_relEast,
-                      m_relVertical, aircraft.get_idType(), aircraft.get_id().c_str(),
-                      math::doubleToInt(aircraft.get_movement().heading),
-                      math::doubleToInt(aircraft.get_movement().gndSpeed * math::MS_2_KMH),
-                      aircraft.get_movement().climbRate, aircraft.get_aircraftType());
+        std::snprintf(
+            m_buffer, sizeof(m_buffer), "$PFLAA,0,%d,%d,%d,%hhd,%s,%03d,,%d,%3.1lf,%1hhx*",
+            m_relNorth, m_relEast, m_relVertical, util::raw_type(aircraft.get_idType()),
+            aircraft.get_id().c_str(), math::doubleToInt(aircraft.get_movement().heading),
+            math::doubleToInt(aircraft.get_movement().gndSpeed * math::MS_2_KMH),
+            aircraft.get_movement().climbRate, util::raw_type(aircraft.get_aircraftType()));
     }
     else
     {
         std::snprintf(m_buffer, sizeof(m_buffer), "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhx*", m_relNorth,
                       m_relEast, m_relVertical, aircraft.get_id().c_str(),
-                      aircraft.get_aircraftType());
+                      util::raw_type(aircraft.get_aircraftType()));
     }
     std::string tmp(m_buffer);
     finishSentence(tmp);
