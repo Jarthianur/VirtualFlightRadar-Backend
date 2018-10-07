@@ -27,10 +27,15 @@
 
 #include "../util/Logger.hpp"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
+#define COMPONENT "(GpsdClient)"
+
 namespace client
 {
 GpsdClient::GpsdClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
-    : Client(endpoint, "(GpsdClient)", connector)
+    : Client(endpoint, COMPONENT, connector)
 {}
 
 GpsdClient::~GpsdClient() noexcept

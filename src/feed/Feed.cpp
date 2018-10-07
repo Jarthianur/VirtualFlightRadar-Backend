@@ -26,30 +26,25 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../util/Logger.hpp"
 #include "../config/Configuration.h"
 #include "../data/Data.hpp"
-
-#ifdef COMPONENT
-#undef COMPONENT
-#endif
-#define COMPONENT "(Feed)"
+#include "../util/Logger.hpp"
 
 namespace feed
 {
-Feed::Feed(const std::string& name, const config::KeyValueMap& propertyMap,
+Feed::Feed(const std::string& name, const char* component, const config::KeyValueMap& propertyMap,
            std::shared_ptr<data::Data> data)
-    : m_name(name), m_propertyMap(propertyMap), m_data(data)
+    : m_name(name), m_component(component), m_propertyMap(propertyMap), m_data(data)
 {
     initPriority();
     if(m_propertyMap.find(KV_KEY_HOST) == m_propertyMap.end())
     {
-        logger.warn(COMPONENT " could not find: ", m_name, "." KV_KEY_HOST);
+        logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
     if(m_propertyMap.find(KV_KEY_PORT) == m_propertyMap.end())
     {
-        logger.warn(COMPONENT " could not find: ", m_name, "." KV_KEY_PORT);
+        logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
 }
@@ -67,11 +62,11 @@ void Feed::initPriority() noexcept
     }
     catch(const std::logic_error&)
     {
-        logger.warn(COMPONENT " create ", m_name, ": Invalid priority given.");
+        logger.warn(m_component, " create ", m_name, ": Invalid priority given.");
     }
     if(m_priority == 0)
     {
-        logger.warn(COMPONENT " create ", m_name,
+        logger.warn(m_component, " create ", m_name,
                     ": Priority is 0; this feed cannot update higher ones.");
     }
 }

@@ -26,7 +26,13 @@
 #include "../config/Configuration.h"
 #include "../data/AtmosphereData.h"
 #include "../object/Atmosphere.h"
+#include "../util/Logger.hpp"
 #include "parser/AtmosphereParser.h"
+
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
+#define COMPONENT "(AtmosphereFeed)"
 
 namespace feed
 {
@@ -34,7 +40,7 @@ parser::AtmosphereParser AtmosphereFeed::s_parser;
 
 AtmosphereFeed::AtmosphereFeed(const std::string& name, const config::KeyValueMap& propertyMap,
                                std::shared_ptr<data::AtmosphereData> data)
-    : Feed(name, propertyMap, data)
+    : Feed(name, COMPONENT, propertyMap, data)
 {}
 
 AtmosphereFeed::~AtmosphereFeed() noexcept
@@ -50,6 +56,7 @@ bool AtmosphereFeed::process(const std::string& response)
     object::Atmosphere atmos(get_priority());
     if(s_parser.unpack(response, atmos))
     {
+        logger.debug(m_component, "[", m_name, "] update: ", response);
         m_data->update(std::move(atmos));
     }
     return true;

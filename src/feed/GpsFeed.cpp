@@ -24,10 +24,10 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../util/Logger.hpp"
 #include "../config/Configuration.h"
 #include "../data/GpsData.h"
 #include "../object/GpsPosition.h"
+#include "../util/Logger.hpp"
 #include "parser/GpsParser.h"
 
 #ifdef COMPONENT
@@ -41,7 +41,7 @@ parser::GpsParser GpsFeed::s_parser;
 
 GpsFeed::GpsFeed(const std::string& name, const config::KeyValueMap& propertyMap,
                  std::shared_ptr<data::GpsData> data)
-    : Feed(name, propertyMap, data)
+    : Feed(name, COMPONENT, propertyMap, data)
 {}
 
 GpsFeed::~GpsFeed() noexcept
@@ -57,6 +57,7 @@ bool GpsFeed::process(const std::string& response)
     object::GpsPosition pos(get_priority());
     if(s_parser.unpack(response, pos))
     {
+        logger.debug(m_component, "[", m_name, "] update: ", response);
         try
         {
             if(m_data->update(std::move(pos)))
@@ -66,7 +67,7 @@ bool GpsFeed::process(const std::string& response)
         }
         catch(const std::runtime_error& e)
         {
-            logger.info(COMPONENT " ", m_name, ": ", e.what());
+            logger.info(m_component, " ", m_name, ": ", e.what());
             return false;
         }
     }

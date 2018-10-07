@@ -27,11 +27,16 @@
 
 #include "../util/Logger.hpp"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
+#define COMPONENT "(AprscClient)"
+
 namespace client
 {
 AprscClient::AprscClient(const Endpoint& endpoint, const std::string& login,
                          std::shared_ptr<Connector> connector)
-    : Client(endpoint, "(AprscClient)", connector), m_login(login + "\r\n")
+    : Client(endpoint, COMPONENT, connector), m_login(login + "\r\n")
 {}
 
 AprscClient::~AprscClient() noexcept

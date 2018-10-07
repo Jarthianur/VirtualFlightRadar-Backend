@@ -23,10 +23,10 @@
 
 #include <stdexcept>
 
-#include "../util/Logger.hpp"
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
+#include "../util/Logger.hpp"
 #include "parser/AprsParser.h"
 
 #ifdef COMPONENT
@@ -40,13 +40,13 @@ parser::AprsParser AprscFeed::s_parser;
 
 AprscFeed::AprscFeed(const std::string& name, const config::KeyValueMap& propertyMap,
                      std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
-    : Feed(name, propertyMap, data)
+    : Feed(name, COMPONENT, propertyMap, data)
 {
     parser::AprsParser::s_maxHeight = maxHeight;
     m_loginIt                       = m_propertyMap.find(KV_KEY_LOGIN);
     if(m_loginIt == m_propertyMap.end())
     {
-        logger.warn(COMPONENT " could not find: ", m_name, "." KV_KEY_LOGIN);
+        logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
 }
@@ -64,6 +64,7 @@ bool AprscFeed::process(const std::string& response)
     object::Aircraft ac(get_priority());
     if(s_parser.unpack(response, ac))
     {
+        logger.debug(m_component, "[", m_name, "] update: ", response);
         m_data->update(std::move(ac));
     }
     return true;

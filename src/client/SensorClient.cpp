@@ -25,10 +25,15 @@
 
 #include "../util/Logger.hpp"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
+#define COMPONENT "(SensorClient)"
+
 namespace client
 {
 SensorClient::SensorClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
-    : Client(endpoint, "(SensorClient)", connector)
+    : Client(endpoint, COMPONENT, connector)
 {}
 
 SensorClient::~SensorClient() noexcept

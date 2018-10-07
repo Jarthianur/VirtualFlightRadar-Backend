@@ -23,10 +23,15 @@
 
 #include "../util/Logger.hpp"
 
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
+#define COMPONENT "(SbsClient)"
+
 namespace client
 {
 SbsClient::SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
-    : Client(endpoint, "(SbsClient)", connector)
+    : Client(endpoint, COMPONENT, connector)
 {}
 
 SbsClient::~SbsClient() noexcept

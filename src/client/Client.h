@@ -83,8 +83,7 @@ protected:
      * @param crComponent  The component name
      * @param rFeed        The handler Feed reference
      */
-    Client(const Endpoint& endpoint, const std::string& component,
-           std::shared_ptr<Connector> connector);
+    Client(const Endpoint& endpoint, const char* component, std::shared_ptr<Connector> connector);
 
     /**
      * @fn stop
@@ -141,7 +140,7 @@ protected:
 
     /// @var mComponent
     /// Component string used for logging
-    const std::string m_component;
+    const char* const m_component;
 
     /// @var mHost
     /// Hostname

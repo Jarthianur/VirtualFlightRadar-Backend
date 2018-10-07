@@ -26,7 +26,13 @@
 #include "../config/Configuration.h"
 #include "../data/AircraftData.h"
 #include "../object/Aircraft.h"
+#include "../util/Logger.hpp"
 #include "parser/SbsParser.h"
+
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
+#define COMPONENT "(SbsFeed)"
 
 namespace feed
 {
@@ -34,7 +40,7 @@ parser::SbsParser SbsFeed::s_parser;
 
 SbsFeed::SbsFeed(const std::string& name, const config::KeyValueMap& propertyMap,
                  std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
-    : Feed(name, propertyMap, data)
+    : Feed(name, COMPONENT, propertyMap, data)
 {
     parser::SbsParser::s_maxHeight = maxHeight;
 }
@@ -52,6 +58,7 @@ bool SbsFeed::process(const std::string& response)
     object::Aircraft ac(get_priority());
     if(s_parser.unpack(response, ac))
     {
+        logger.debug(m_component, "[", m_name, "] update: ", response);
         m_data->update(std::move(ac));
     }
     return true;

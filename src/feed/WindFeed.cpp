@@ -26,7 +26,13 @@
 #include "../config/Configuration.h"
 #include "../data/WindData.h"
 #include "../object/Wind.h"
+#include "../util/Logger.hpp"
 #include "parser/WindParser.h"
+
+#ifdef COMPONENT
+#undef COMPONENT
+#endif
+#define COMPONENT "(WindFeed)"
 
 namespace feed
 {
@@ -34,7 +40,7 @@ parser::WindParser WindFeed::s_parser;
 
 WindFeed::WindFeed(const std::string& name, const config::KeyValueMap& propertyMap,
                    std::shared_ptr<data::WindData> data)
-    : Feed(name, propertyMap, data)
+    : Feed(name, COMPONENT, propertyMap, data)
 {}
 
 WindFeed::~WindFeed() noexcept
@@ -50,6 +56,7 @@ bool WindFeed::process(const std::string& response)
     object::Wind wind(get_priority());
     if(s_parser.unpack(response, wind))
     {
+        logger.debug(m_component, "[", m_name, "] update: ", response);
         m_data->update(std::move(wind));
     }
     return true;

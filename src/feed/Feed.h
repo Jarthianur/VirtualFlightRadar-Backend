@@ -79,12 +79,14 @@ protected:
      * @param crKvMap The properties map
      * @throw std::logic_error if host or port are not given
      */
-    Feed(const std::string& name, const config::KeyValueMap& propertyMap,
+    Feed(const std::string& name, const char* component, const config::KeyValueMap& propertyMap,
          std::shared_ptr<data::Data> data);
 
     /// @var mName
     /// Unique name
     const std::string m_name;
+
+    const char* const m_component;
 
     /// @var mKvMap
     /// Key-value-map holding the properties.

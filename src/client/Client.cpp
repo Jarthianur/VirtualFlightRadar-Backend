@@ -26,12 +26,12 @@
 #include <utility>
 #include <boost/functional/hash.hpp>
 
-#include "../util/Logger.hpp"
 #include "../feed/Feed.h"
+#include "../util/Logger.hpp"
 
 namespace client
 {
-Client::Client(const Endpoint& endpoint, const std::string& component,
+Client::Client(const Endpoint& endpoint, const char* component,
                std::shared_ptr<Connector> connector)
     : m_connector(connector), m_component(component), m_endpoint(endpoint)
 {}
