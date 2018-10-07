@@ -24,8 +24,8 @@
 #include <cstdint>
 #include <string>
 
-#include "../../Defines.h"
 #include "../../object/Aircraft.h"
+#include "../../util/defines.h"
 
 #include "Parser.hpp"
 

@@ -22,6 +22,7 @@ BOOST_I := ${BOOST_ROOT_I}
 -include src/data/processor/subdir.mk
 -include src/data/subdir.mk
 -include src/config/subdir.mk
+-include src/util/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk

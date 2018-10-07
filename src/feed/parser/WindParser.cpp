@@ -20,9 +20,9 @@
  */
 
 #include <stdexcept>
-#include "../../Math.hpp"
 
 #include "WindParser.h"
+#include "../../util/math.hpp"
 
 namespace feed
 {

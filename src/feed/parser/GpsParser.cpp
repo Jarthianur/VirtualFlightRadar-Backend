@@ -23,9 +23,9 @@
 
 #include <stdexcept>
 
-#include "../../Math.hpp"
 #include "../../object/DateTimeImplBoost.h"
 #include "../../object/TimeStamp.hpp"
+#include "../../util/math.hpp"
 
 /// @def RE_GGA_TIME
 /// GGA regex match capture group of time

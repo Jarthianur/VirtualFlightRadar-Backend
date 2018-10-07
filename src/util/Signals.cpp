@@ -21,6 +21,8 @@
 
 #include "Signals.h"
 
+namespace util {
+
 Signals::Signals() : m_ioService(), m_sigSet(m_ioService)
 {
     m_sigSet.add(SIGINT);
@@ -61,3 +63,4 @@ void Signals::addHandler(const SignalHandler& handler)
     std::lock_guard<std::mutex> lock(m_mutex);
     m_sigSet.async_wait(handler);
 }
+} //namespace util

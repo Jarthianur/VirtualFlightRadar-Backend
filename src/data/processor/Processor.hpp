@@ -24,7 +24,7 @@
 #include <cstdio>
 #include <string>
 
-#include "../../Math.hpp"
+#include "../../util/math.hpp"
 
 /// @def PROC_BUFF_S
 /// The internal buffer size

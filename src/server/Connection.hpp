@@ -25,8 +25,8 @@
 #include <string>
 #include <utility>
 
-#include "../Defines.h"
-#include "../Logger.hpp"
+#include "../util/Logger.hpp"
+#include "../util/defines.h"
 #include "SocketException.h"
 
 /// @namespace server

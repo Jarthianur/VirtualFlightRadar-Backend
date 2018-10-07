@@ -25,7 +25,7 @@
 #include <boost/date_time.hpp>
 #include <boost/move/move.hpp>
 
-#include "../Logger.hpp"
+#include "../util/Logger.hpp"
 #include "Endpoint.hpp"
 
 namespace client

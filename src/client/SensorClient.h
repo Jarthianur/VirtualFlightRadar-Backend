@@ -23,7 +23,7 @@
 
 #include "Client.h"
 
-#include "../Parameters.h"
+#include "../parameters.h"
 
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT
 #define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT

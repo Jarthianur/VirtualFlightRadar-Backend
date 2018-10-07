@@ -25,7 +25,7 @@
 #include <utility>
 #include <boost/functional/hash.hpp>
 
-#include "../Logger.hpp"
+#include "../util/Logger.hpp"
 
 namespace client
 {

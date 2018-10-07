@@ -26,10 +26,10 @@
 #include <list>
 #include <string>
 
-#include "../Defines.h"
 #include "../object/GpsPosition.h"
+#include "../util/defines.h"
+#include "../util/utility.hpp"
 #include "Properties.h"
-#include "Util.hpp"
 
 /**
  * Configuration section keys

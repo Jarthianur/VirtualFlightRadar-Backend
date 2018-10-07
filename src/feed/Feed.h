@@ -25,9 +25,9 @@
 #include <memory>
 #include <string>
 
-#include "../Defines.h"
 #include "../client/Endpoint.hpp"
 #include "../config/Properties.h"
+#include "../util/defines.h"
 
 namespace data
 {

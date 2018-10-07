@@ -26,7 +26,7 @@
 #include <mutex>
 #include <string>
 
-#include "../Defines.h"
+#include "../util/defines.h"
 
 namespace server
 {

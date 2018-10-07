@@ -29,9 +29,6 @@
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
-/// @namespace config
-namespace config
-{
 /// @namespace util
 namespace util
 {
@@ -107,4 +104,3 @@ inline std::list<std::string> splitCommaSeparated(const std::string& str)
     return list;
 }
 }  // namespace util
-}  // namespace config

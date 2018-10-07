@@ -30,7 +30,7 @@
 #include "server/Server.hpp"
 #include "server/SocketImplBoost.h"
 #include "server/TcpInterfaceImplBoost.h"
-#include "Defines.h"
+#include "util/defines.h"
 
 namespace config
 {

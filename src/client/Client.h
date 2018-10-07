@@ -27,8 +27,8 @@
 #include <string>
 #include <vector>
 
-#include "../Defines.h"
-#include "../Parameters.h"
+#include "../parameters.h"
+#include "../util/defines.h"
 #include "Connector.hpp"
 #include "Endpoint.hpp"
 

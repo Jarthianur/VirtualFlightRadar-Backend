@@ -31,4 +31,5 @@ src/feed \
 src/client \
 src/feed/parser \
 src/object \
-src/server
+src/server \
+src/util

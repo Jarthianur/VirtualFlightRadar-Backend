@@ -24,7 +24,7 @@
 #include <stdexcept>
 
 #include "config/Configuration.h"
-#include "Logger.hpp"
+#include "util/Logger.hpp"
 #include "VFRB.h"
 
 #ifndef VERSION

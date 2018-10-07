@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <string>
 
-#include "../Defines.h"
+#include "../util/defines.h"
 
 /// @def AC_OUTDATED
 /// Times until aircraft is outdated

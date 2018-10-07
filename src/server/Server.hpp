@@ -29,9 +29,9 @@
 #include <thread>
 #include <utility>
 
-#include "../Defines.h"
-#include "../Logger.hpp"
-#include "../Parameters.h"
+#include "../util/Logger.hpp"
+#include "../parameters.h"
+#include "../util/defines.h"
 #include "Connection.hpp"
 #include "TcpInterfaceImplBoost.h"
 

@@ -27,7 +27,9 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "Defines.h"
+#include "defines.h"
+
+namespace util {
 
 using SignalHandler = std::function<void(const boost::system::error_code&, const int)>;
 
@@ -49,3 +51,4 @@ private:
     std::thread m_thread;
     mutable std::mutex m_mutex;
 };
+} // namespace util

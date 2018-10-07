@@ -4,20 +4,20 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/data/processor/GpsProcessor.cpp \
-../src/data/processor/AircraftProcessor.cpp
+../src/util/Logger.cpp \
+../src/util/Signals.cpp
 
 OBJS += \
-./src/data/processor/GpsProcessor.o \
-./src/data/processor/AircraftProcessor.o
+./src/util/Logger.o \
+./src/util/Signals.o 
 
 CPP_DEPS += \
-./src/data/processor/GpsProcessor.d \
-./src/data/processor/AircraftProcessor.d
+./src/util/Logger.d \
+./src/util/Signals.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/data/processor/%.o: ../src/data/processor/%.cpp
+src/util/%.o: ../src/util/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	$(CXX) -std=c++14 $(BOOST_I) -O$(OPT_LVL) $(DBG) -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"

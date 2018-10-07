@@ -23,7 +23,7 @@
 
 #include <cstdint>
 
-#include "../Defines.h"
+#include "../util/defines.h"
 #include "Object.h"
 
 /// @def ICAO_STD_A

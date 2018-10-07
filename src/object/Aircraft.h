@@ -24,7 +24,7 @@
 #include <cstdint>
 #include <string>
 
-#include "../Defines.h"
+#include "../util/defines.h"
 #include "DateTimeImplBoost.h"
 #include "GpsPosition.h"
 #include "Object.h"

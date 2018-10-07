@@ -24,7 +24,7 @@
 #include <cstddef>
 #include <stdexcept>
 
-#include "../../Math.hpp"
+#include "../../util/math.hpp"
 
 namespace feed
 {

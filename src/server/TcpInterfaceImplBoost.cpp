@@ -24,7 +24,7 @@
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
 
-#include "../Logger.hpp"
+#include "../util/Logger.hpp"
 #include "Connection.hpp"
 
 namespace server

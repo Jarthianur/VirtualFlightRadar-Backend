@@ -27,10 +27,10 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "../util/defines.h"
 #include "SocketImplBoost.h"
 #include "TcpInterface.hpp"
 
-#include "../Defines.h"
 
 namespace server
 {

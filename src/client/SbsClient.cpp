@@ -21,7 +21,7 @@
 
 #include "SbsClient.h"
 
-#include "../Logger.hpp"
+#include "../util/Logger.hpp"
 
 namespace client
 {

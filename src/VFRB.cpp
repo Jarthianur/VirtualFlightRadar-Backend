@@ -37,8 +37,8 @@
 #include "feed/FeedFactory.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
-#include "Logger.hpp"
-#include "Signals.h"
+#include "util/Logger.hpp"
+#include "util/Signals.h"
 
 using namespace data;
 
@@ -64,7 +64,7 @@ void VFRB::run() noexcept
     m_running = true;
     logger.info("(VFRB) startup");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    Signals signals;
+    util::Signals signals;
     client::ClientManager clientManager;
 
     signals.addHandler([this](const boost::system::error_code&, const int) {

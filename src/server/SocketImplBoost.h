@@ -25,7 +25,7 @@
 #include <boost/asio.hpp>
 #include <boost/move/move.hpp>
 
-#include "../Defines.h"
+#include "../util/defines.h"
 
 namespace server
 {

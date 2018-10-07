@@ -25,7 +25,7 @@
 #include <thread>
 #include <utility>
 
-#include "../Logger.hpp"
+#include "../util/Logger.hpp"
 
 namespace client
 {
