@@ -45,7 +45,7 @@ Feed::Protocol AtmosphereFeed::get_protocol() const
     return Protocol::SENSOR;
 }
 
-bool AtmosphereFeed::process(const std::string& response) noexcept
+bool AtmosphereFeed::process(const std::string& response)
 {
     object::Atmosphere atmos(get_priority());
     if(s_parser.unpack(response, atmos))

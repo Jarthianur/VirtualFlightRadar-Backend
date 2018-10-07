@@ -181,7 +181,7 @@ function build() {
     trap "fail -e popd Build has failed!" ERR
     pushd "$VFRB_ROOT/build/"
     make clean 
-    make all -j2
+    make all -j4
     popd
     trap - ERR
 }

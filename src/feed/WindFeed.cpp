@@ -45,7 +45,7 @@ Feed::Protocol WindFeed::get_protocol() const
     return Protocol::SENSOR;
 }
 
-bool WindFeed::process(const std::string& response) noexcept
+bool WindFeed::process(const std::string& response)
 {
     object::Wind wind(get_priority());
     if(s_parser.unpack(response, wind))

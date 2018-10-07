@@ -69,7 +69,7 @@ public:
      * @brief Handle Client's response.
      * @param crResponse The response
      */
-    virtual bool process(const std::string& response) noexcept = 0;
+    virtual bool process(const std::string& response) = 0;
 
 protected:
     /**

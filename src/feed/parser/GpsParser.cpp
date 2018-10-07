@@ -22,6 +22,7 @@
 #include "GpsParser.h"
 
 #include <stdexcept>
+#include <type_traits>
 
 #include "../../object/DateTimeImplBoost.h"
 #include "../../object/TimeStamp.hpp"
@@ -117,8 +118,12 @@ bool GpsParser::parsePosition(const boost::smatch& match, GpsPosition& position)
     position.set_position(pos);
     position.set_timeStamp(
         TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_GGA_TIME), timestamp::Format::HHMMSS));
-    position.set_fixQuality(std::stoi(match.str(RE_GGA_FIX)));
-    position.set_nrOfSatellites(std::stoi(match.str(RE_GGA_SAT)));
+    position.set_fixQuality(
+        static_cast<std::result_of<decltype (&GpsPosition::get_fixQuality)(GpsPosition)>::type>(
+            std::stoi(match.str(RE_GGA_FIX))));
+    position.set_nrOfSatellites(
+        static_cast<std::result_of<decltype (&GpsPosition::get_nrOfSatellites)(GpsPosition)>::type>(
+            std::stoi(match.str(RE_GGA_SAT))));
     position.set_dilution(std::stod(match.str(RE_GGA_DIL)));
     position.set_geoid(std::stod(match.str(RE_GGA_GEOID)));
     return true;

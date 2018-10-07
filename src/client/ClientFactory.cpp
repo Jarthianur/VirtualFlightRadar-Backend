@@ -74,16 +74,12 @@ std::shared_ptr<Client> ClientFactory::createClientFor(std::shared_ptr<feed::Fee
     {
         case feed::Feed::Protocol::APRS:
             return makeClient<AprscClient>(feed);
-            break;
         case feed::Feed::Protocol::SBS:
             return makeClient<SbsClient>(feed);
-            break;
         case feed::Feed::Protocol::GPS:
             return makeClient<GpsdClient>(feed);
-            break;
         case feed::Feed::Protocol::SENSOR:
             return makeClient<SensorClient>(feed);
-            break;
     }
     throw std::logic_error("unknown protocol");  // can never happen
 }

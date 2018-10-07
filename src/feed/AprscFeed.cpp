@@ -59,7 +59,7 @@ Feed::Protocol AprscFeed::get_protocol() const
     return Protocol::APRS;
 }
 
-bool AprscFeed::process(const std::string& response) noexcept
+bool AprscFeed::process(const std::string& response)
 {
     object::Aircraft ac(get_priority());
     if(s_parser.unpack(response, ac))

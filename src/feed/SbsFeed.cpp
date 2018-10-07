@@ -47,7 +47,7 @@ Feed::Protocol SbsFeed::get_protocol() const
     return Protocol::SBS;
 }
 
-bool SbsFeed::process(const std::string& response) noexcept
+bool SbsFeed::process(const std::string& response)
 {
     object::Aircraft ac(get_priority());
     if(s_parser.unpack(response, ac))

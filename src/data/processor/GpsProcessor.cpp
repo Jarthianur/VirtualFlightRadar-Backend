@@ -41,7 +41,7 @@ void GpsProcessor::process(object::GpsPosition& position)
     std::time_t now = std::time(nullptr);
     std::tm* utc    = std::gmtime(&now);
     evalPosition(position.get_position().latitude, position.get_position().longitude);
-    position.set_serialized(get_GPGGA(position, utc) + get_GPRMC(position, utc));
+    position.set_serialized(get_GPGGA(position, utc) + get_GPRMC(utc));
 }
 
 std::string GpsProcessor::get_GPGGA(const GpsPosition& position, const std::tm* utc)
@@ -61,7 +61,7 @@ std::string GpsProcessor::get_GPGGA(const GpsPosition& position, const std::tm* 
     return nmea_str;
 }
 
-std::string GpsProcessor::get_GPRMC(const GpsPosition& position, const std::tm* utc)
+std::string GpsProcessor::get_GPRMC(const std::tm* utc)
 {
     std::snprintf(
         m_buffer, sizeof(m_buffer),

@@ -69,7 +69,7 @@ private:
      * @param crPosition The position
      * @return the GPRMC sentence
      */
-    std::string get_GPRMC(const object::GpsPosition& position, const std::tm* utc);
+    std::string get_GPRMC(const std::tm* utc);
 
     /**
      * @fn evalPosition
