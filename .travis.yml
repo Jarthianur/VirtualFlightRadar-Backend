@@ -11,9 +11,6 @@ git:
 before_install:
     - docker pull debian:sid
 
-install:
-    - gem install coveralls-lcov
-
 before_script:
     - docker run -e "WORKSPACE=$TRAVIS_BUILD_DIR" -e "VFRB_COMPILER=g++-6" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:sid bash
     - docker ps -a
@@ -27,11 +24,11 @@ script:
     - docker stop vfrb
 
 after_success:
-    - coveralls-lcov --repo-token ${COVERALLS_TOKEN} reports/cov.info
+    - bash <(curl -s https://codecov.io/bash)
 
 notifications:
     email:
         recipients:
            - jarthianur.github@gmail.com
         on_success: change
-on_failure: change
+        on_failure: change

@@ -361,8 +361,8 @@ function gen_coverage() {
     lcov --directory build --capture --output-file reports/vfrb.info
     lcov -a reports/test_base.info -a reports/test.info -a reports/vfrb_base.info -a reports/vfrb.info \
         -o reports/all.info
-    lcov --remove reports/all.info 'test/*' '/usr/*' -o reports/cov.info
-    lcov --list reports/cov.info
+    lcov --remove reports/all.info 'test/*' '/usr/*' -o reports/lcov.info
+    lcov --list reports/lcov.info
     popd
     trap - ERR
 }
