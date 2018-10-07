@@ -160,7 +160,7 @@ void Server<SocketT>::run()
 template<typename SocketT>
 void Server<SocketT>::stop()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::unique_lock<std::mutex> lock(m_mutex);
     if(m_running)
     {
         m_running = false;
@@ -174,6 +174,7 @@ void Server<SocketT>::stop()
         }
         m_activeConnections = 0;
         m_tcpIf->stop();
+        lock.unlock();
         if(m_thread.joinable())
         {
             m_thread.join();
