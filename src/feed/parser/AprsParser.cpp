@@ -140,7 +140,7 @@ bool AprsParser::parsePosition(const boost::smatch& match, Aircraft& aircraft) n
         {
             pos.longitude = -pos.longitude;
         }
-        pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT)) /* * math::FEET_2_M*/);
+        pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT)) * math::FEET_2_M);
 
         aircraft.set_position(pos);
         valid = pos.altitude <= s_maxHeight;
