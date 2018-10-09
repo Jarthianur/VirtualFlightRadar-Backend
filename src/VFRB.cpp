@@ -88,7 +88,6 @@ void VFRB::run() noexcept
     signals.run();
     m_server.run();
     clientManager.run();
-    std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
     serve();
     clientManager.stop();
     m_server.stop();
@@ -98,6 +97,7 @@ void VFRB::run() noexcept
 
 void VFRB::serve()
 {
+    std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
     while(m_running)
     {
         try

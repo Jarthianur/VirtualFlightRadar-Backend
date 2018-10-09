@@ -60,7 +60,7 @@ private:
      * @param crPosition The position
      * @return the GPGGA sentence
      */
-    std::string get_GPGGA(const object::GpsPosition& position, const std::tm* utc);
+    void appendGPGGA(const object::GpsPosition& position, const std::tm* utc);
 
     /**
      * @fn genGprmcStr
@@ -69,7 +69,7 @@ private:
      * @param crPosition The position
      * @return the GPRMC sentence
      */
-    std::string get_GPRMC(const std::tm* utc);
+    void appendGPRMC(const std::tm* utc);
 
     /**
      * @fn evalPosition

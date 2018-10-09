@@ -47,8 +47,17 @@ AircraftProcessor::~AircraftProcessor() noexcept
 void AircraftProcessor::process(Aircraft& aircraft)
 {
     calculateRelPosition(aircraft);
-    aircraft.set_serialized(
-        (m_distance <= m_maxDistance ? get_PFLAU(aircraft) + get_PFLAA(aircraft) : ""));
+    m_processed.clear();
+    if(m_distance <= m_maxDistance)
+    {
+        appendPFLAU(aircraft);
+        appendPFLAA(aircraft);
+        aircraft.set_serialized(std::move(m_processed));
+    }
+    else
+    {
+        aircraft.set_serialized("");
+    }
 }
 
 void AircraftProcessor::referTo(const Position& position, double atmPress)
@@ -86,17 +95,16 @@ void AircraftProcessor::calculateRelPosition(const Aircraft& aircraft)
                         : aircraft.get_position().altitude - m_refPosition.altitude;
 }
 
-std::string AircraftProcessor::get_PFLAU(const Aircraft& aircraft)
+void AircraftProcessor::appendPFLAU(const Aircraft& aircraft)
 {
     std::snprintf(m_buffer, sizeof(m_buffer), "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
                   math::doubleToInt(m_relBearing), m_relVertical, m_distance,
                   aircraft.get_id().c_str());
-    std::string tmp(m_buffer);
-    finishSentence(tmp);
-    return tmp;
+    m_processed.append(m_buffer);
+    finishSentence();
 }
 
-std::string AircraftProcessor::get_PFLAA(const Aircraft& aircraft)
+void AircraftProcessor::appendPFLAA(const Aircraft& aircraft)
 {
     if(aircraft.get_fullInfo())
     {
@@ -113,9 +121,8 @@ std::string AircraftProcessor::get_PFLAA(const Aircraft& aircraft)
                       m_relEast, m_relVertical, aircraft.get_id().c_str(),
                       util::raw_type(aircraft.get_aircraftType()));
     }
-    std::string tmp(m_buffer);
-    finishSentence(tmp);
-    return tmp;
+    m_processed.append(m_buffer);
+    finishSentence();
 }
 
 }  // namespace processor

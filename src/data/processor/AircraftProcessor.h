@@ -86,7 +86,7 @@ private:
      * @param crAircraft The Aircaft
      * @return the sentence
      */
-    std::string get_PFLAU(const object::Aircraft& aircraft);
+    void appendPFLAU(const object::Aircraft& aircraft);
 
     /**
      * @fn genPflaaStr
@@ -94,7 +94,7 @@ private:
      * @param crAircraft The Aircaft
      * @return the sentence
      */
-    std::string get_PFLAA(const object::Aircraft& aircraft);
+    void appendPFLAA(const object::Aircraft& aircraft);
 
     /// @var m_maxDistance
     /// Max distance to process an aircraft

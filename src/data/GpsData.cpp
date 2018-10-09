@@ -54,6 +54,7 @@ GpsData::~GpsData() noexcept
 std::string GpsData::get_serialized()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
+    m_processor.process(m_position);
     return (++m_position).get_serialized();
 }
 
