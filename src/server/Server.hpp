@@ -29,8 +29,8 @@
 #include <thread>
 #include <utility>
 
-#include "../util/Logger.hpp"
 #include "../parameters.h"
+#include "../util/Logger.hpp"
 #include "../util/defines.h"
 #include "Connection.hpp"
 #include "TcpInterfaceImplBoost.h"
@@ -190,6 +190,7 @@ void Server<SocketT>::send(const std::string& msg)
     {
         return;
     }
+    logger.debug("(Server) send: ", msg);
     for(auto& it : m_connections)
     {
         if(it)
