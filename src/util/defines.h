@@ -30,28 +30,28 @@
 /// @def GETTER_V(MEMBER, NAME)
 /// Define and declare an inlined by-value-getter.
 /// NAME is the method suffix.
-#define GETTER_V(MEMBER)                             \
-    inline decltype(m_##MEMBER) get_##MEMBER() const \
-    {                                                \
-        return m_##MEMBER;                           \
+#define GETTER_V(MEMBER)                                   \
+    inline auto get_##MEMBER() const->decltype(m_##MEMBER) \
+    {                                                      \
+        return m_##MEMBER;                                 \
     }
 
 /// @def GETTER_R(MEMBER, NAME)
 /// Define and declare an inlined by-reference-getter.
 /// NAME is the method suffix.
-#define GETTER_R(MEMBER)                        \
-    inline decltype(m_##MEMBER)& get_##MEMBER() \
-    {                                           \
-        return m_##MEMBER;                      \
+#define GETTER_R(MEMBER)                              \
+    inline auto get_##MEMBER()->decltype(m_##MEMBER)& \
+    {                                                 \
+        return m_##MEMBER;                            \
     }
 
 /// @def GETTER_CR(MEMBER, NAME)
 /// Define and declare an inlined by-const_reference-getter.
 /// NAME is the method suffix.
-#define GETTER_CR(MEMBER)                                   \
-    inline const decltype(m_##MEMBER)& get_##MEMBER() const \
-    {                                                       \
-        return m_##MEMBER;                                  \
+#define GETTER_CR(MEMBER)                                         \
+    inline auto get_##MEMBER() const->const decltype(m_##MEMBER)& \
+    {                                                             \
+        return m_##MEMBER;                                        \
     }
 
 /// @def SETTER_V(MEMBER, NAME)
