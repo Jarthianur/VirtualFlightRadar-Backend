@@ -99,7 +99,7 @@ if [ ! -z "$DO_TEST" ]; then
     static_analysis
     build_test
     run_unit_test
-    run_regression
+    #run_regression
     gen_coverage
 fi
 

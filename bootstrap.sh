@@ -334,8 +334,8 @@ function run_regression() {
     sleep 20
     log -i Stop vfrb and run check
     $SUDO pkill -2 -f $VFRB_UUT || true
-    ./regression.sh check
     sleep 4
+    ./regression.sh check
     popd
     trap - ERR
 }
