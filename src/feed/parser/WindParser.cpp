@@ -21,8 +21,8 @@
 
 #include <stdexcept>
 
-#include "WindParser.h"
 #include "../../util/math.hpp"
+#include "WindParser.h"
 
 namespace feed
 {

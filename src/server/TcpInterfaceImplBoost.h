@@ -31,7 +31,6 @@
 #include "SocketImplBoost.h"
 #include "TcpInterface.hpp"
 
-
 namespace server
 {
 class TcpInterfaceImplBoost : public TcpInterface<SocketImplBoost>

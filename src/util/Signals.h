@@ -29,8 +29,8 @@
 
 #include "defines.h"
 
-namespace util {
-
+namespace util
+{
 using SignalHandler = std::function<void(const boost::system::error_code&, const int)>;
 
 class Signals
@@ -51,4 +51,4 @@ private:
     std::thread m_thread;
     mutable std::mutex m_mutex;
 };
-} // namespace util
+}  // namespace util
