@@ -14,16 +14,15 @@ before_install:
 before_script:
     - docker run -e "WORKSPACE=$TRAVIS_BUILD_DIR" -e "VFRB_COMPILER=g++" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:stretch-slim bash
     - docker ps -a
-    - docker exec -it vfrb echo 'deb http://ftp.debian.org/debian stretch-backports main' >> /etc/apt/sources.list
-    - docker exec -it vfrb cat /etc/apt/sources.list
-    - docker exec -it vfrb apt-get update
+    - docker exec -it vfrb sh -c "echo 'deb http://ftp.debian.org/debian stretch-backports main' >> /etc/apt/sources.list"
+    - docker exec -it vfrb sh -c "cat /etc/apt/sources.list"
 
 script:
-    - docker exec -it vfrb mkdir -p $TRAVIS_BUILD_DIR
-    - docker exec -it vfrb cp -r /travis/. $TRAVIS_BUILD_DIR
-    - docker exec -it vfrb $TRAVIS_BUILD_DIR/run.sh build test -y
-    - docker exec -it vfrb cp -r $TRAVIS_BUILD_DIR/reports /travis/
-    - docker exec -it vfrb chown $(id -u):$(id -g) -R /travis/reports
+    - docker exec -it vfrb sh -c "mkdir -p $TRAVIS_BUILD_DIR"
+    - docker exec -it vfrb sh -c "cp -r /travis/. $TRAVIS_BUILD_DIR"
+    - docker exec -it vfrb sh -c "$TRAVIS_BUILD_DIR/run.sh build test -y"
+    - docker exec -it vfrb sh -c "cp -r $TRAVIS_BUILD_DIR/reports /travis/"
+    - docker exec -it vfrb sh -c "chown $(id -u):$(id -g) -R /travis/reports"
     - docker stop vfrb
 
 after_success:
