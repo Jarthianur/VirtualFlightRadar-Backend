@@ -237,7 +237,7 @@ function install_test_deps() {
     require PKG_MANAGER
     case $PKG_MANAGER in
     *apt-get)
-        local TOOLS='cppcheck clang-format-6.0 wget netcat procps perl'
+        local TOOLS='cppcheck clang-format-6.0 wget netcat procps perl lcov'
     ;;
     *)
         log -w Tests currently only run under ubuntu/debian systems.
@@ -248,16 +248,6 @@ function install_test_deps() {
     ALL="$TOOLS"
     log -i "$SUDO" "$PKG_MANAGER" -y install "$ALL"
     $SUDO $PKG_MANAGER -y install $ALL
-    if [ "$(lcov --version | grep -o '1.11')" != '1.11' ]; then
-        require VFRB_ROOT
-        trap "fail -e 'rm lcov_1.11.orig.tar.gz' -e popd Failed to install test dependencies!" ERR
-        pushd $VFRB_ROOT
-        wget 'http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz'
-        tar xf lcov_1.11.orig.tar.gz
-        $SUDO make -C lcov-1.11/ install
-        rm lcov_1.11.orig.tar.gz
-        popd
-    fi
     trap - ERR
 }
 
