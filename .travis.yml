@@ -9,11 +9,12 @@ git:
     submodules: true
 
 before_install:
-    - docker pull debian:sid
+    - docker pull debian:stretch-slim
 
 before_script:
-    - docker run -e "WORKSPACE=$TRAVIS_BUILD_DIR" -e "VFRB_COMPILER=g++-6" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:sid bash
+    - docker run -e "WORKSPACE=$TRAVIS_BUILD_DIR" -e "VFRB_COMPILER=g++" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:stretch-slim bash
     - docker ps -a
+    - docker exec -it vfrb echo 'deb http://ftp.debian.org/debian stretch-backports main' >> /etc/apt/sources.list
 
 script:
     - docker exec -it vfrb mkdir -p $TRAVIS_BUILD_DIR

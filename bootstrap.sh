@@ -163,8 +163,6 @@ function install_deps() {
     log -i "$SUDO" "$PKG_MANAGER" -y install "$ALL"
     $SUDO $PKG_MANAGER -y install $ALL
     trap - ERR
-    #pip install --upgrade pip
-    #pip install spline
 }
 
 # test for custom boost
