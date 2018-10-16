@@ -19,12 +19,9 @@
 
 namespace object
 {
-Wind::Wind() : Object()
-{}
+Wind::Wind() : Object() {}
 
-Wind::Wind(std::uint32_t priority) : Object(priority)
-{}
+Wind::Wind(std::uint32_t priority) : Object(priority) {}
 
-Wind::~Wind() noexcept
-{}
+Wind::~Wind() noexcept {}
 }  // namespace object

@@ -29,6 +29,7 @@
 #include "../object/GpsPosition.h"
 #include "../util/defines.h"
 #include "../util/utility.hpp"
+
 #include "Properties.h"
 
 /**

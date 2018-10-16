@@ -27,6 +27,7 @@
 
 #include "../util/Logger.hpp"
 #include "../util/defines.h"
+
 #include "SocketException.h"
 
 /// @namespace server
@@ -99,7 +100,7 @@ bool Connection<SocketT>::write(const std::string& msg)
     {
         return m_socket.write(msg);
     }
-    catch(const SocketException& e)
+    catch (const SocketException& e)
     {
         logger.debug("(Connection) write: ", e.what());
     }

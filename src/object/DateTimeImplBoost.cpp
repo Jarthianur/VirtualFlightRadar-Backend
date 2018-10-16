@@ -27,11 +27,9 @@ namespace object
 {
 namespace timestamp
 {
-DateTimeImplBoost::DateTimeImplBoost()
-{}
+DateTimeImplBoost::DateTimeImplBoost() {}
 
-DateTimeImplBoost::~DateTimeImplBoost() noexcept
-{}
+DateTimeImplBoost::~DateTimeImplBoost() noexcept {}
 
 std::int64_t DateTimeImplBoost::now()
 {

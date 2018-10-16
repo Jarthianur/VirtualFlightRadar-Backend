@@ -22,6 +22,7 @@
 #pragma once
 
 #include <string>
+
 #include <boost/asio.hpp>
 #include <boost/move/move.hpp>
 
@@ -36,9 +37,9 @@ public:
 
     explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket);
     ~SocketImplBoost() noexcept;
-    std::string get_address() const;
-    bool write(const std::string& msg);
-    void close();
+    std::string                   get_address() const;
+    bool                          write(const std::string& msg);
+    void                          close();
     boost::asio::ip::tcp::socket& get();
 
 private:

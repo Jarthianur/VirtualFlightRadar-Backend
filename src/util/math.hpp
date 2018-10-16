@@ -101,8 +101,8 @@ inline double degree(double radian)
  */
 inline std::int32_t doubleToInt(double value)
 {
-    return (value >= 0.0) ? static_cast<std::int32_t>(value + 0.5)
-                          : static_cast<std::int32_t>(value - 0.5);
+    return (value >= 0.0) ? static_cast<std::int32_t>(value + 0.5) :
+                            static_cast<std::int32_t>(value - 0.5);
 }
 
 /**
@@ -141,8 +141,8 @@ inline std::int32_t icaoHeight(double pressure)
 inline std::int32_t checksum(const char* sentence, std::size_t length)
 {
     std::int32_t csum = 0;
-    std::size_t i     = 1;  // $ in nmea str not included
-    while(i < length && sentence[i] != '*' && sentence[i] != '\0')
+    std::size_t  i    = 1;  // $ in nmea str not included
+    while (i < length && sentence[i] != '*' && sentence[i] != '\0')
     {
         csum ^= static_cast<std::int32_t>(sentence[i++]);
     }

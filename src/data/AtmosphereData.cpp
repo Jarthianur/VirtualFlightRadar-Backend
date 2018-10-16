@@ -25,14 +25,11 @@ using namespace object;
 
 namespace data
 {
-AtmosphereData::AtmosphereData() : Data()
-{}
+AtmosphereData::AtmosphereData() : Data() {}
 
-AtmosphereData::AtmosphereData(const Atmosphere& atmosphere) : Data(), m_atmosphere(atmosphere)
-{}
+AtmosphereData::AtmosphereData(const Atmosphere& atmosphere) : Data(), m_atmosphere(atmosphere) {}
 
-AtmosphereData::~AtmosphereData() noexcept
-{}
+AtmosphereData::~AtmosphereData() noexcept {}
 
 std::string AtmosphereData::get_serialized()
 {

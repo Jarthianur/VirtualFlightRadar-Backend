@@ -26,7 +26,7 @@
 #include "../util/Logger.hpp"
 
 #ifdef COMPONENT
-#undef COMPONENT
+#    undef COMPONENT
 #endif
 #define COMPONENT "(SensorClient)"
 
@@ -36,8 +36,7 @@ SensorClient::SensorClient(const Endpoint& endpoint, std::shared_ptr<Connector> 
     : Client(endpoint, COMPONENT, connector)
 {}
 
-SensorClient::~SensorClient() noexcept
-{}
+SensorClient::~SensorClient() noexcept {}
 
 void SensorClient::read()
 {
@@ -47,10 +46,10 @@ void SensorClient::read()
 
 void SensorClient::checkDeadline(bool error)
 {
-    if(!error)
+    if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if(m_connector->timerExpired())
+        if (m_connector->timerExpired())
         {
             logger.debug(m_component, " timed out, reconnect ...");
             reconnect();
@@ -65,7 +64,7 @@ void SensorClient::checkDeadline(bool error)
 
 void SensorClient::handleConnect(bool error)
 {
-    if(!error)
+    if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);

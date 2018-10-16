@@ -23,8 +23,7 @@
 
 namespace object
 {
-Aircraft::Aircraft() : Aircraft(0)
-{}
+Aircraft::Aircraft() : Aircraft(0) {}
 
 Aircraft::Aircraft(std::uint32_t priority)
     : Object(priority),
@@ -33,8 +32,7 @@ Aircraft::Aircraft(std::uint32_t priority)
       m_targetType(TargetType::TRANSPONDER)
 {}
 
-Aircraft::~Aircraft() noexcept
-{}
+Aircraft::~Aircraft() noexcept {}
 
 void Aircraft::assign(Object&& other)
 {
@@ -52,17 +50,17 @@ void Aircraft::assign(Object&& other)
 bool Aircraft::canUpdate(const Object& other) const
 {
     const Aircraft& toUpdate = static_cast<const Aircraft&>(other);
-    return (this->m_timeStamp > toUpdate.m_timeStamp)
-           && (toUpdate.m_targetType == TargetType::TRANSPONDER
-               || this->m_targetType == TargetType::FLARM)
-           && Object::canUpdate(other);
+    return (this->m_timeStamp > toUpdate.m_timeStamp) &&
+           (toUpdate.m_targetType == TargetType::TRANSPONDER ||
+            this->m_targetType == TargetType::FLARM) &&
+           Object::canUpdate(other);
 }
 
 void Aircraft::set_aircraftType(Aircraft::AircraftType type)
 {
-    m_aircraftType = type < AircraftType::UNKNOWN || type > AircraftType::STATIC_OBJECT
-                         ? AircraftType::UNKNOWN
-                         : type;
+    m_aircraftType = type < AircraftType::UNKNOWN || type > AircraftType::STATIC_OBJECT ?
+                         AircraftType::UNKNOWN :
+                         type;
 }
 
 void Aircraft::set_idType(Aircraft::IdType type)

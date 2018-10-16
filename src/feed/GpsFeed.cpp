@@ -31,7 +31,7 @@
 #include "parser/GpsParser.h"
 
 #ifdef COMPONENT
-#undef COMPONENT
+#    undef COMPONENT
 #endif
 #define COMPONENT "(GpsFeed)"
 
@@ -44,8 +44,7 @@ GpsFeed::GpsFeed(const std::string& name, const config::KeyValueMap& propertyMap
     : Feed(name, COMPONENT, propertyMap, data)
 {}
 
-GpsFeed::~GpsFeed() noexcept
-{}
+GpsFeed::~GpsFeed() noexcept {}
 
 Feed::Protocol GpsFeed::get_protocol() const
 {
@@ -55,19 +54,19 @@ Feed::Protocol GpsFeed::get_protocol() const
 bool GpsFeed::process(const std::string& response)
 {
     object::GpsPosition pos(get_priority());
-    if(s_parser.unpack(response, pos))
+    if (s_parser.unpack(response, pos))
     {
         logger.debug(m_component, "[", m_name, "] update: ", response);
         logger.debug(m_component, "[", m_name, "] pos: ", pos.get_position().latitude, ";",
                      pos.get_position().longitude, ";", pos.get_position().altitude);
         try
         {
-            if(m_data->update(std::move(pos)))
+            if (m_data->update(std::move(pos)))
             {
                 throw std::runtime_error("received good position -> stop");
             }
         }
-        catch(const std::runtime_error& e)
+        catch (const std::runtime_error& e)
         {
             logger.info(m_component, " ", m_name, ": ", e.what());
             return false;

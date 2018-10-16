@@ -56,25 +56,23 @@ namespace parser
 {
 std::int32_t SbsParser::s_maxHeight = std::numeric_limits<std::int32_t>::max();
 
-SbsParser::SbsParser() : Parser<Aircraft>()
-{}
+SbsParser::SbsParser() : Parser<Aircraft>() {}
 
-SbsParser::~SbsParser() noexcept
-{}
+SbsParser::~SbsParser() noexcept {}
 
 bool SbsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcept
 {
-    std::size_t p   = 6, delim;
+    std::size_t   p = 6, delim;
     std::uint32_t i = 2;
-    Position pos;
+    Position      pos;
 
-    if(sentence.find(',', p) == std::string::npos || !(sentence.size() > 4 && sentence[4] == '3'))
+    if (sentence.find(',', p) == std::string::npos || !(sentence.size() > 4 && sentence[4] == '3'))
     {
         return false;
     }
-    while((delim = sentence.find(',', p)) != std::string::npos && i < 16)
+    while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
     {
-        if(!parseField(i++, sentence.substr(p, delim - p), pos, aircraft))
+        if (!parseField(i++, sentence.substr(p, delim - p), pos, aircraft))
         {
             return false;
         }
@@ -92,11 +90,9 @@ bool SbsParser::parseField(std::uint32_t fieldNr, const std::string& field, Posi
 {
     try
     {
-        switch(fieldNr)
+        switch (fieldNr)
         {
-            case SBS_FIELD_ID:
-                aircraft.set_id(field);
-                break;
+            case SBS_FIELD_ID: aircraft.set_id(field); break;
             case SBS_FIELD_TIME:
                 aircraft.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(
                     field, timestamp::Format::HH_MM_SS_FFF));
@@ -104,17 +100,12 @@ bool SbsParser::parseField(std::uint32_t fieldNr, const std::string& field, Posi
             case SBS_FIELD_ALT:
                 position.altitude = math::doubleToInt(std::stod(field) * math::FEET_2_M);
                 break;
-            case SBS_FIELD_LAT:
-                position.latitude = std::stod(field);
-                break;
-            case SBS_FIELD_LON:
-                position.longitude = std::stod(field);
-                break;
-            default:
-                break;
+            case SBS_FIELD_LAT: position.latitude = std::stod(field); break;
+            case SBS_FIELD_LON: position.longitude = std::stod(field); break;
+            default: break;
         }
     }
-    catch(const std::logic_error&)
+    catch (const std::logic_error&)
     {
         return false;
     }

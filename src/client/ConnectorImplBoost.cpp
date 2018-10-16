@@ -26,6 +26,7 @@
 #include <boost/move/move.hpp>
 
 #include "../util/Logger.hpp"
+
 #include "Endpoint.hpp"
 
 namespace client
@@ -39,8 +40,7 @@ ConnectorImplBoost::ConnectorImplBoost()
       m_istream(&m_buffer)
 {}
 
-ConnectorImplBoost::~ConnectorImplBoost() noexcept
-{}
+ConnectorImplBoost::~ConnectorImplBoost() noexcept {}
 
 void ConnectorImplBoost::run()
 {
@@ -50,7 +50,7 @@ void ConnectorImplBoost::run()
 void ConnectorImplBoost::stop()
 {
     close();
-    if(!m_ioService.stopped())
+    if (!m_ioService.stopped())
     {
         m_ioService.stop();
     }
@@ -60,7 +60,7 @@ void ConnectorImplBoost::close()
 {
     m_timer.expires_at(boost::posix_time::pos_infin);
     m_timer.cancel();
-    if(m_socket.is_open())
+    if (m_socket.is_open())
     {
         boost::system::error_code ec;
         m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
@@ -79,7 +79,7 @@ void ConnectorImplBoost::onConnect(const Endpoint& endpoint, const Callback& cal
 
 void ConnectorImplBoost::onRead(const ReadCallback& callback)
 {
-    if(m_socket.is_open())
+    if (m_socket.is_open())
     {
         boost::asio::async_read_until(
             m_socket, m_buffer, "\r\n",
@@ -90,7 +90,7 @@ void ConnectorImplBoost::onRead(const ReadCallback& callback)
 
 void ConnectorImplBoost::onWrite(const std::string& msg, const Callback& callback)
 {
-    if(m_socket.is_open())
+    if (m_socket.is_open())
     {
         boost::asio::async_write(
             m_socket, boost::asio::buffer(msg),
@@ -101,7 +101,7 @@ void ConnectorImplBoost::onWrite(const std::string& msg, const Callback& callbac
 
 void ConnectorImplBoost::onTimeout(const Callback& callback, std::uint32_t timeout)
 {
-    if(timeout > 0)
+    if (timeout > 0)
     {
         resetTimer(timeout);
     }
@@ -120,20 +120,20 @@ bool ConnectorImplBoost::timerExpired()
 }
 
 void ConnectorImplBoost::handleWrite(const boost::system::error_code& error, std::size_t,
-                                     const Callback& callback) noexcept
+                                     const Callback&                  callback) noexcept
 {
-    if(error)
+    if (error)
     {
         logger.debug("(Client) failed to write: ", error.message());
     }
     callback(error);
 }
 
-void ConnectorImplBoost::handleResolve(const boost::system::error_code& error,
+void ConnectorImplBoost::handleResolve(const boost::system::error_code&         error,
                                        boost::asio::ip::tcp::resolver::iterator resolverIt,
-                                       const Callback& callback) noexcept
+                                       const Callback&                          callback) noexcept
 {
-    if(!error)
+    if (!error)
     {
         boost::asio::async_connect(m_socket, resolverIt,
                                    boost::bind(&ConnectorImplBoost::handleConnect, this,
@@ -151,7 +151,7 @@ void ConnectorImplBoost::handleConnect(const boost::system::error_code& error,
                                        boost::asio::ip::tcp::resolver::iterator,
                                        const Callback& callback) noexcept
 {
-    if(error)
+    if (error)
     {
         logger.debug("(Client) failed to connect: ", error.message());
     }
@@ -163,9 +163,9 @@ void ConnectorImplBoost::handleConnect(const boost::system::error_code& error,
 }
 
 void ConnectorImplBoost::handleTimeout(const boost::system::error_code& error,
-                                       const Callback& callback) noexcept
+                                       const Callback&                  callback) noexcept
 {
-    if(error)
+    if (error)
     {
         logger.debug("(Client) timeout: ", error.message());
     }
@@ -173,9 +173,9 @@ void ConnectorImplBoost::handleTimeout(const boost::system::error_code& error,
 }
 
 void ConnectorImplBoost::handleRead(const boost::system::error_code& error, std::size_t,
-                                    const ReadCallback& callback) noexcept
+                                    const ReadCallback&              callback) noexcept
 {
-    if(error)
+    if (error)
     {
         logger.debug("(Client) read: ", error.message());
     }

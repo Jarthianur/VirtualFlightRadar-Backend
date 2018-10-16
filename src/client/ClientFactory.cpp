@@ -23,6 +23,7 @@
 
 #include "../feed/AprscFeed.h"
 #include "../feed/Feed.h"
+
 #include "AprscClient.h"
 #include "ConnectorImplBoost.h"
 #include "GpsdClient.h"
@@ -31,15 +32,13 @@
 
 namespace client
 {
-ClientFactory::ClientFactory()
-{}
+ClientFactory::ClientFactory() {}
 
-ClientFactory::~ClientFactory() noexcept
-{}
+ClientFactory::~ClientFactory() noexcept {}
 
 template<>
 std::shared_ptr<AprscClient>
-ClientFactory::makeClient<AprscClient>(std::shared_ptr<feed::Feed> feed)
+    ClientFactory::makeClient<AprscClient>(std::shared_ptr<feed::Feed> feed)
 {
     return std::make_shared<AprscClient>(
         feed->get_endpoint(), std::static_pointer_cast<feed::AprscFeed>(feed)->get_login(),
@@ -55,7 +54,7 @@ std::shared_ptr<SbsClient> ClientFactory::makeClient<SbsClient>(std::shared_ptr<
 
 template<>
 std::shared_ptr<SensorClient>
-ClientFactory::makeClient<SensorClient>(std::shared_ptr<feed::Feed> feed)
+    ClientFactory::makeClient<SensorClient>(std::shared_ptr<feed::Feed> feed)
 {
     return std::make_shared<SensorClient>(feed->get_endpoint(),
                                           std::make_shared<ConnectorImplBoost>());
@@ -70,16 +69,12 @@ std::shared_ptr<GpsdClient> ClientFactory::makeClient<GpsdClient>(std::shared_pt
 
 std::shared_ptr<Client> ClientFactory::createClientFor(std::shared_ptr<feed::Feed> feed)
 {
-    switch(feed->get_protocol())
+    switch (feed->get_protocol())
     {
-        case feed::Feed::Protocol::APRS:
-            return makeClient<AprscClient>(feed);
-        case feed::Feed::Protocol::SBS:
-            return makeClient<SbsClient>(feed);
-        case feed::Feed::Protocol::GPS:
-            return makeClient<GpsdClient>(feed);
-        case feed::Feed::Protocol::SENSOR:
-            return makeClient<SensorClient>(feed);
+        case feed::Feed::Protocol::APRS: return makeClient<AprscClient>(feed);
+        case feed::Feed::Protocol::SBS: return makeClient<SbsClient>(feed);
+        case feed::Feed::Protocol::GPS: return makeClient<GpsdClient>(feed);
+        case feed::Feed::Protocol::SENSOR: return makeClient<SensorClient>(feed);
     }
     throw std::logic_error("unknown protocol");  // can never happen
 }

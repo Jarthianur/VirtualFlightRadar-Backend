@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include "Client.h"
-
 #include <string>
+
+#include "Client.h"
 
 /// @namespace client
 namespace client

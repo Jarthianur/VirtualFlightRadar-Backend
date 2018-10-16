@@ -19,36 +19,34 @@
  }
  */
 
+#include "WindParser.h"
+
 #include <stdexcept>
 
 #include "../../util/math.hpp"
-#include "WindParser.h"
 
 namespace feed
 {
 namespace parser
 {
-WindParser::WindParser() : Parser<object::Wind>()
-{}
+WindParser::WindParser() : Parser<object::Wind>() {}
 
-WindParser::~WindParser() noexcept
-{}
+WindParser::~WindParser() noexcept {}
 
 bool WindParser::unpack(const std::string& sentence, object::Wind& wind) noexcept
 {
     try
     {
-        if((std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16)
-            == math::checksum(sentence.c_str(), sentence.length()))
-           && (sentence.find("MWV") != std::string::npos))
+        if ((std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
+             math::checksum(sentence.c_str(), sentence.length())) &&
+            (sentence.find("MWV") != std::string::npos))
         {
             wind.set_serialized(std::string(sentence));
             return true;
         }
     }
-    catch(const std::logic_error&)
-    {
-    }
+    catch (const std::logic_error&)
+    {}
     return false;
 }
 

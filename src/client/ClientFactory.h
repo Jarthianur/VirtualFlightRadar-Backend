@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include "Client.h"
-
 #include <memory>
+
+#include "Client.h"
 
 namespace feed
 {

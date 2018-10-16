@@ -46,7 +46,7 @@ struct thread_group
     void join_all()
     {
         std::for_each(_threads.begin(), _threads.end(), [](std::thread& thd) {
-            if(thd.joinable())
+            if (thd.joinable())
             {
                 thd.join();
             }

@@ -23,12 +23,13 @@
 
 #include <stdexcept>
 #include <utility>
+
 #include <boost/functional/hash.hpp>
 
 #include "../util/Logger.hpp"
 
 #ifdef COMPONENT
-#undef COMPONENT
+#    undef COMPONENT
 #endif
 #define COMPONENT "(AprscClient)"
 
@@ -39,8 +40,7 @@ AprscClient::AprscClient(const Endpoint& endpoint, const std::string& login,
     : Client(endpoint, COMPONENT, connector), m_login(login + "\r\n")
 {}
 
-AprscClient::~AprscClient() noexcept
-{}
+AprscClient::~AprscClient() noexcept {}
 
 bool AprscClient::equals(const Client& other) const
 {
@@ -49,7 +49,7 @@ bool AprscClient::equals(const Client& other) const
         const AprscClient& derived = dynamic_cast<const AprscClient&>(other);
         return Client::equals(other) && this->m_login == derived.m_login;
     }
-    catch(const std::bad_cast&)
+    catch (const std::bad_cast&)
     {
         return false;
     }
@@ -64,7 +64,7 @@ std::size_t AprscClient::hash() const
 
 void AprscClient::handleConnect(bool error)
 {
-    if(!error)
+    if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_connector->onWrite(m_login,
@@ -86,7 +86,7 @@ void AprscClient::sendKeepAlive()
 
 void AprscClient::handleLogin(bool error)
 {
-    if(!error)
+    if (!error)
     {
         logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -100,11 +100,11 @@ void AprscClient::handleLogin(bool error)
 
 void AprscClient::handleSendKeepAlive(bool error)
 {
-    if(!error)
+    if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_connector->onWrite("#keep-alive beacon\r\n", [this](bool error) {
-            if(!error)
+            if (!error)
             {
                 sendKeepAlive();
             }

@@ -41,12 +41,12 @@ public:
 
     virtual ~TcpInterface() noexcept = default;
 
-    virtual void run(std::unique_lock<std::mutex>& lock)             = 0;
-    virtual void stop()                                              = 0;
-    virtual void onAccept(const std::function<void(bool)>& callback) = 0;
-    virtual void close()                                             = 0;
-    virtual std::unique_ptr<Connection<SocketT>> startConnection()   = 0;
-    virtual std::string get_currentAddress() const                   = 0;
+    virtual void run(std::unique_lock<std::mutex>& lock)                    = 0;
+    virtual void stop()                                                     = 0;
+    virtual void onAccept(const std::function<void(bool)>& callback)        = 0;
+    virtual void close()                                                    = 0;
+    virtual std::unique_ptr<Connection<SocketT>> startConnection()          = 0;
+    virtual std::string                          get_currentAddress() const = 0;
 };
 
 }  // namespace server

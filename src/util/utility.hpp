@@ -26,6 +26,7 @@
 #include <list>
 #include <sstream>
 #include <string>
+
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
@@ -55,8 +56,8 @@ template<typename T>
 inline OptNumber stringToNumber(const std::string& str)
 {
     std::stringstream ss(str);
-    T result;
-    if(ss >> result)
+    T                 result;
+    if (ss >> result)
     {
         return Number(result);
     }
@@ -72,12 +73,12 @@ inline OptNumber stringToNumber(const std::string& str)
 inline std::string& trimString(std::string& str)
 {
     std::size_t f = str.find_first_not_of(' ');
-    if(f != std::string::npos)
+    if (f != std::string::npos)
     {
         str = str.substr(f);
     }
     std::size_t l = str.find_last_not_of(' ');
-    if(l != std::string::npos)
+    if (l != std::string::npos)
     {
         str = str.substr(0, l + 1);
     }
@@ -93,11 +94,11 @@ inline std::string& trimString(std::string& str)
 inline std::list<std::string> splitCommaSeparated(const std::string& str)
 {
     std::list<std::string> list;
-    std::stringstream ss;
+    std::stringstream      ss;
     ss.str(str);
     std::string item;
 
-    while(std::getline(ss, item, ','))
+    while (std::getline(ss, item, ','))
     {
         list.push_back(trimString(item));
     }

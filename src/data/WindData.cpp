@@ -25,19 +25,16 @@ using namespace object;
 
 namespace data
 {
-WindData::WindData() : Data()
-{}
+WindData::WindData() : Data() {}
 
-WindData::WindData(const object::Wind& wind) : Data(), m_wind(wind)
-{}
+WindData::WindData(const object::Wind& wind) : Data(), m_wind(wind) {}
 
-WindData::~WindData() noexcept
-{}
+WindData::~WindData() noexcept {}
 
 std::string WindData::get_serialized()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    std::string tmp((++m_wind).get_serialized());
+    std::string                 tmp((++m_wind).get_serialized());
     m_wind.set_serialized("");
     return tmp;
 }

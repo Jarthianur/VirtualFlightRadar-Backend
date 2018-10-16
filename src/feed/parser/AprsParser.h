@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <string>
+
 #include <boost/regex.hpp>
 
 #include "../../object/Aircraft.h"

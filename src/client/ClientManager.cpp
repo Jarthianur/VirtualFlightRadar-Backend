@@ -22,12 +22,12 @@
 #include "ClientManager.h"
 
 #include "../feed/Feed.h"
+
 #include "ClientFactory.h"
 
 namespace client
 {
-ClientManager::ClientManager()
-{}
+ClientManager::ClientManager() {}
 
 ClientManager::~ClientManager() noexcept
 {
@@ -37,9 +37,9 @@ ClientManager::~ClientManager() noexcept
 void ClientManager::subscribe(std::shared_ptr<feed::Feed> feed)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    ClientIter it = m_clients.end();
-    it            = m_clients.insert(ClientFactory::createClientFor(feed)).first;
-    if(it != m_clients.end())
+    ClientIter                  it = m_clients.end();
+    it                             = m_clients.insert(ClientFactory::createClientFor(feed)).first;
+    if (it != m_clients.end())
     {
         (*it)->subscribe(feed);
     }
@@ -52,7 +52,7 @@ void ClientManager::subscribe(std::shared_ptr<feed::Feed> feed)
 void ClientManager::run()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    for(auto it : m_clients)
+    for (auto it : m_clients)
     {
         m_thdGroup.create_thread([this, it] {
             it->run();
@@ -66,7 +66,7 @@ void ClientManager::stop()
 {
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        for(auto it : m_clients)
+        for (auto it : m_clients)
         {
             it->scheduleStop();
         }

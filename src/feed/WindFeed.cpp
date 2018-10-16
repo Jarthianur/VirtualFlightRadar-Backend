@@ -30,7 +30,7 @@
 #include "parser/WindParser.h"
 
 #ifdef COMPONENT
-#undef COMPONENT
+#    undef COMPONENT
 #endif
 #define COMPONENT "(WindFeed)"
 
@@ -43,8 +43,7 @@ WindFeed::WindFeed(const std::string& name, const config::KeyValueMap& propertyM
     : Feed(name, COMPONENT, propertyMap, data)
 {}
 
-WindFeed::~WindFeed() noexcept
-{}
+WindFeed::~WindFeed() noexcept {}
 
 Feed::Protocol WindFeed::get_protocol() const
 {
@@ -54,7 +53,7 @@ Feed::Protocol WindFeed::get_protocol() const
 bool WindFeed::process(const std::string& response)
 {
     object::Wind wind(get_priority());
-    if(s_parser.unpack(response, wind))
+    if (s_parser.unpack(response, wind))
     {
         logger.debug(m_component, "[", m_name, "] update: ", response);
         m_data->update(std::move(wind));

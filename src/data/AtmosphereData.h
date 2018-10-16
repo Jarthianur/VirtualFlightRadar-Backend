@@ -24,6 +24,7 @@
 #include <string>
 
 #include "../object/Atmosphere.h"
+
 #include "Data.hpp"
 
 /// @namespace data

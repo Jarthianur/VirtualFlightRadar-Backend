@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+
 #include <boost/optional.hpp>
 
 #include "../config/Properties.h"
@@ -62,8 +63,8 @@ public:
      * @param pGpsData      The GpsData pointer
      * @param pWindData     The WindData pointer
      */
-    FeedFactory(const config::Configuration& config,
-                std::shared_ptr<data::AircraftData>& aircraftData,
+    FeedFactory(const config::Configuration&           config,
+                std::shared_ptr<data::AircraftData>&   aircraftData,
                 std::shared_ptr<data::AtmosphereData>& atmosData,
                 std::shared_ptr<data::GpsData>& gpsData, std::shared_ptr<data::WindData>& windData);
 
@@ -81,7 +82,7 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    boost::optional<std::shared_ptr<Feed>> createFeed(const std::string& name,
+    boost::optional<std::shared_ptr<Feed>> createFeed(const std::string&         name,
                                                       const config::KeyValueMap& propertyMap);
 
 private:

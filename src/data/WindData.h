@@ -24,6 +24,7 @@
 #include <string>
 
 #include "../object/Wind.h"
+
 #include "Data.hpp"
 
 /// @namespace data

@@ -25,6 +25,7 @@
 #include <boost/move/move.hpp>
 
 #include "../util/Logger.hpp"
+
 #include "Connection.hpp"
 
 namespace server
@@ -46,17 +47,17 @@ void TcpInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
 {
     try
     {
-        if(m_acceptor.is_open())
+        if (m_acceptor.is_open())
         {
             lock.unlock();
             m_ioService.run();
         }
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
         logger.error("TcpInterfaceImplBoost::run() caught: ", e.what());
     }
-    catch(...)
+    catch (...)
     {
         logger.error("TcpInterfaceImplBoost::run() caught error");
     }
@@ -64,11 +65,11 @@ void TcpInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
 
 void TcpInterfaceImplBoost::stop()
 {
-    if(m_acceptor.is_open())
+    if (m_acceptor.is_open())
     {
         m_acceptor.close();
     }
-    if(!m_ioService.stopped())
+    if (!m_ioService.stopped())
     {
         m_ioService.stop();
     }
@@ -77,7 +78,7 @@ void TcpInterfaceImplBoost::stop()
 
 void TcpInterfaceImplBoost::onAccept(const std::function<void(bool)>& callback)
 {
-    if(m_acceptor.is_open())
+    if (m_acceptor.is_open())
     {
         m_acceptor.async_accept(m_socket.get(),
                                 boost::bind(&TcpInterfaceImplBoost::handleAccept, this,
@@ -93,7 +94,7 @@ void TcpInterfaceImplBoost::close()
 void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
                                          const std::function<void(bool)>& callback)
 {
-    if(error)
+    if (error)
     {
         logger.debug("(Server) accept: ", error.message());
     }
@@ -102,7 +103,7 @@ void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
 
 std::unique_ptr<Connection<SocketImplBoost>> TcpInterfaceImplBoost::startConnection()
 {
-    if(!m_socket.get().is_open())
+    if (!m_socket.get().is_open())
     {
         throw SocketException("cannot start connection on closed socket");
     }

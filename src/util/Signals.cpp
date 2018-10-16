@@ -47,12 +47,12 @@ void Signals::stop()
 {
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if(!m_ioService.stopped())
+        if (!m_ioService.stopped())
         {
             m_ioService.stop();
         }
     }
-    if(m_thread.joinable())
+    if (m_thread.joinable())
     {
         m_thread.join();
     }

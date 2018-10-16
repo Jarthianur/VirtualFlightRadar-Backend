@@ -26,6 +26,7 @@
 #include "../data/AtmosphereData.h"
 #include "../data/GpsData.h"
 #include "../data/WindData.h"
+
 #include "AprscFeed.h"
 #include "AtmosphereFeed.h"
 #include "GpsFeed.h"
@@ -47,8 +48,7 @@ FeedFactory::FeedFactory(const Configuration& config, std::shared_ptr<AircraftDa
       m_windData(windData)
 {}
 
-FeedFactory::~FeedFactory() noexcept
-{}
+FeedFactory::~FeedFactory() noexcept {}
 
 template<>
 std::shared_ptr<AprscFeed> FeedFactory::makeFeed<AprscFeed>(const std::string& name,
@@ -80,7 +80,7 @@ std::shared_ptr<WindFeed> FeedFactory::makeFeed<WindFeed>(const std::string& nam
 
 template<>
 std::shared_ptr<AtmosphereFeed>
-FeedFactory::makeFeed<AtmosphereFeed>(const std::string& name, const KeyValueMap& propertyMap)
+    FeedFactory::makeFeed<AtmosphereFeed>(const std::string& name, const KeyValueMap& propertyMap)
 {
     return std::make_shared<AtmosphereFeed>(name, propertyMap, m_atmosData);
 }
@@ -88,23 +88,23 @@ FeedFactory::makeFeed<AtmosphereFeed>(const std::string& name, const KeyValueMap
 boost::optional<std::shared_ptr<Feed>> FeedFactory::createFeed(const std::string& name,
                                                                const KeyValueMap& propertyMap)
 {
-    if(name.find(SECT_KEY_APRSC) != std::string::npos)
+    if (name.find(SECT_KEY_APRSC) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<AprscFeed>(name, propertyMap));
     }
-    else if(name.find(SECT_KEY_SBS) != std::string::npos)
+    else if (name.find(SECT_KEY_SBS) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<SbsFeed>(name, propertyMap));
     }
-    else if(name.find(SECT_KEY_GPS) != std::string::npos)
+    else if (name.find(SECT_KEY_GPS) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<GpsFeed>(name, propertyMap));
     }
-    else if(name.find(SECT_KEY_WIND) != std::string::npos)
+    else if (name.find(SECT_KEY_WIND) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<WindFeed>(name, propertyMap));
     }
-    else if(name.find(SECT_KEY_ATMOS) != std::string::npos)
+    else if (name.find(SECT_KEY_ATMOS) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(
             makeFeed<AtmosphereFeed>(name, propertyMap));

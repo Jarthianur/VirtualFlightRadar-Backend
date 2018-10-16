@@ -29,15 +29,14 @@
 #ifndef ESTIMATED_TRAFFIC
 /// @def ESTIMATED_TRAFFIC
 /// Amount of aircrafts estimated, for initial container size
-#define ESTIMATED_TRAFFIC 1
+#    define ESTIMATED_TRAFFIC 1
 #endif
 
 using namespace object;
 
 namespace data
 {
-AircraftData::AircraftData() : AircraftData(0)
-{}
+AircraftData::AircraftData() : AircraftData(0) {}
 
 AircraftData::AircraftData(std::int32_t maxDist) : Data(), m_processor(maxDist)
 {
@@ -45,15 +44,14 @@ AircraftData::AircraftData(std::int32_t maxDist) : Data(), m_processor(maxDist)
     m_index.reserve(ESTIMATED_TRAFFIC * 2);
 }
 
-AircraftData::~AircraftData() noexcept
-{}
+AircraftData::~AircraftData() noexcept {}
 
 std::string AircraftData::get_serialized()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    std::string tmp;
+    std::string                 tmp;
     tmp.reserve(m_container.size() * 128);
-    for(const auto& it : m_container)
+    for (const auto& it : m_container)
     {
         tmp += it.get_updateAge() < OBJ_OUTDATED ? it.get_serialized() : "";
     }
@@ -63,10 +61,10 @@ std::string AircraftData::get_serialized()
 bool AircraftData::update(Object&& aircraft)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    Aircraft&& rvUpdate = static_cast<Aircraft&&>(aircraft);
-    const auto index    = m_index.find(rvUpdate.get_id());
+    Aircraft&&                  rvUpdate = static_cast<Aircraft&&>(aircraft);
+    const auto                  index    = m_index.find(rvUpdate.get_id());
 
-    if(index != m_index.end())
+    if (index != m_index.end())
     {
         return m_container[index->second].tryUpdate(std::move(aircraft));
     }
@@ -77,22 +75,22 @@ bool AircraftData::update(Object&& aircraft)
 void AircraftData::processAircrafts(const Position& position, double atmPress) noexcept
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    std::size_t index = 0;
-    bool del          = false;
-    auto it           = m_container.begin();
+    std::size_t                 index = 0;
+    bool                        del   = false;
+    auto                        it    = m_container.begin();
     m_processor.referTo(position, atmPress);
 
-    while(it != m_container.end())
+    while (it != m_container.end())
     {
         ++(*it);
         try
         {
             // if no FLARM msg received after x, assume target has Transponder
-            if(it->get_updateAge() == AC_NO_FLARM_THRESHOLD)
+            if (it->get_updateAge() == AC_NO_FLARM_THRESHOLD)
             {
                 it->set_targetType(Aircraft::TargetType::TRANSPONDER);
             }
-            if(it->get_updateAge() >= AC_DELETE_THRESHOLD)
+            if (it->get_updateAge() >= AC_DELETE_THRESHOLD)
             {
                 del = true;
                 m_index.erase(it->get_id());
@@ -100,21 +98,20 @@ void AircraftData::processAircrafts(const Position& position, double atmPress) n
             }
             else
             {
-                if(it->get_updateAge() == 1)
+                if (it->get_updateAge() == 1)
                 {
                     m_processor.process(*it);
                 }
                 ++it;
                 ++index;
             }
-            if(del && it != m_container.end())
+            if (del && it != m_container.end())
             {
                 m_index.at(it->get_id()) = index;
             }
         }
-        catch(const std::exception&)
-        {
-        }
+        catch (const std::exception&)
+        {}
     }
 }
 

@@ -237,7 +237,7 @@ function install_test_deps() {
     require PKG_MANAGER
     case $PKG_MANAGER in
     *apt-get)
-        local TOOLS='cppcheck clang-format-5.0 wget netcat procps perl'
+        local TOOLS='cppcheck clang-format-6.0 wget netcat procps perl'
     ;;
     *)
         log -w Tests currently only run under ubuntu/debian systems.
@@ -292,7 +292,7 @@ function static_analysis() {
     pushd $VFRB_ROOT
     cppcheck --enable=warning,style,performance,unusedFunction,missingInclude --error-exitcode=1 --inline-suppr -I src/ -q src/
     for f in $(find src/ -type f); do
-        diff -u <(cat $f) <(clang-format-5.0 -style=file $f) || true
+        diff -u <(cat $f) <(clang-format-6.0 -style=file $f) || true
     done &> format.diff
     if [ "$(wc -l format.diff | cut -d' ' -f1)" -gt 0 ]; then
         log -e Code format does not comply to the specification.

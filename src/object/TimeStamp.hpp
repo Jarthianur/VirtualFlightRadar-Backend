@@ -107,7 +107,7 @@ TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format form
     std::int32_t h = 99, m = 99, s = 99, f = 9999;
     try
     {
-        switch(format)
+        switch (format)
         {
             case timestamp::Format::HHMMSS:
             {
@@ -127,16 +127,16 @@ TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format form
             break;
         }
     }
-    catch(const std::out_of_range&)
+    catch (const std::out_of_range&)
     {
         throw std::invalid_argument("");
     }
-    if(h > 23 || m > 59 || s > 59 || f > 999)
+    if (h > 23 || m > 59 || s > 59 || f > 999)
     {
         throw std::invalid_argument("");
     }
     m_value = static_cast<std::int64_t>(h * 3600000 + m * 60000 + s * 1000 + f);
-    if(m_value >= DateTimeT::now())
+    if (m_value >= DateTimeT::now())
     {
         --m_day;
     }
@@ -166,8 +166,8 @@ TimeStamp<DateTimeT>& TimeStamp<DateTimeT>::operator=(const TimeStamp<DateTimeT>
 template<typename DateTimeT>
 bool TimeStamp<DateTimeT>::operator>(const TimeStamp<DateTimeT>& other) const
 {
-    return (this->m_day > other.m_day)
-           || ((this->m_day == other.m_day) && this->m_value > other.m_value);
+    return (this->m_day > other.m_day) ||
+           ((this->m_day == other.m_day) && this->m_value > other.m_value);
 }
 
 }  // namespace object

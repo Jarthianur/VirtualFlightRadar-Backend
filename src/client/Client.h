@@ -29,6 +29,7 @@
 
 #include "../parameters.h"
 #include "../util/defines.h"
+
 #include "Connector.hpp"
 #include "Endpoint.hpp"
 
@@ -41,9 +42,9 @@ namespace client
 /// @def C_CON_WAIT_TIMEVAL
 /// Wait for (re-)connect timeout
 #ifdef CLIENT_CONNECT_WAIT_TIMEVAL
-#define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
+#    define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
 #else
-#define C_CON_WAIT_TIMEVAL 120
+#    define C_CON_WAIT_TIMEVAL 120
 #endif
 
 /**

@@ -37,20 +37,19 @@ Feed::Feed(const std::string& name, const char* component, const config::KeyValu
     : m_name(name), m_component(component), m_propertyMap(propertyMap), m_data(data)
 {
     initPriority();
-    if(m_propertyMap.find(KV_KEY_HOST) == m_propertyMap.end())
+    if (m_propertyMap.find(KV_KEY_HOST) == m_propertyMap.end())
     {
         logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
-    if(m_propertyMap.find(KV_KEY_PORT) == m_propertyMap.end())
+    if (m_propertyMap.find(KV_KEY_PORT) == m_propertyMap.end())
     {
         logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
 }
 
-Feed::~Feed() noexcept
-{}
+Feed::~Feed() noexcept {}
 
 void Feed::initPriority() noexcept
 {
@@ -60,11 +59,11 @@ void Feed::initPriority() noexcept
             0, std::min<std::uint64_t>(std::stoul(m_propertyMap.at(KV_KEY_PRIORITY)),
                                        std::numeric_limits<std::uint32_t>::max())));
     }
-    catch(const std::logic_error&)
+    catch (const std::logic_error&)
     {
         logger.warn(m_component, " create ", m_name, ": Invalid priority given.");
     }
-    if(m_priority == 0)
+    if (m_priority == 0)
     {
         logger.warn(m_component, " create ", m_name,
                     ": Priority is 0; this feed cannot update higher ones.");

@@ -26,6 +26,7 @@
 
 #include "../config/Properties.h"
 #include "../util/defines.h"
+
 #include "Feed.h"
 
 namespace feed

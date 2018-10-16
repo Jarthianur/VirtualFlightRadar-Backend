@@ -24,6 +24,7 @@
 #include <functional>
 #include <mutex>
 #include <thread>
+
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
@@ -48,7 +49,7 @@ public:
 private:
     boost::asio::io_service m_ioService;
     boost::asio::signal_set m_sigSet;
-    std::thread m_thread;
-    mutable std::mutex m_mutex;
+    std::thread             m_thread;
+    mutable std::mutex      m_mutex;
 };
 }  // namespace util

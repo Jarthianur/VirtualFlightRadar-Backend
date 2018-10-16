@@ -26,11 +26,9 @@
 
 Logger logger;
 
-Logger::Logger() : m_outStream(&std::cout), m_errStream(&std::cerr)
-{}
+Logger::Logger() : m_outStream(&std::cout), m_errStream(&std::cerr) {}
 
-Logger::~Logger() noexcept
-{}
+Logger::~Logger() noexcept {}
 
 void Logger::set_debug(bool enable)
 {
@@ -40,8 +38,8 @@ void Logger::set_debug(bool enable)
 
 std::string Logger::get_time()
 {
-    std::time_t tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    char time[32]  = "";
+    std::time_t tt       = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    char        time[32] = "";
     std::strftime(time, 32, "%c", gmtime(&tt));
     return std::string(time);
 }

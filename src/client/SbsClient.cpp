@@ -24,7 +24,7 @@
 #include "../util/Logger.hpp"
 
 #ifdef COMPONENT
-#undef COMPONENT
+#    undef COMPONENT
 #endif
 #define COMPONENT "(SbsClient)"
 
@@ -34,12 +34,11 @@ SbsClient::SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connec
     : Client(endpoint, COMPONENT, connector)
 {}
 
-SbsClient::~SbsClient() noexcept
-{}
+SbsClient::~SbsClient() noexcept {}
 
 void SbsClient::handleConnect(bool error)
 {
-    if(!error)
+    if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         read();

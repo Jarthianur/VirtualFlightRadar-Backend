@@ -24,6 +24,7 @@
 #include "../src/object/GpsPosition.h"
 #include "../src/object/TimeStamp.hpp"
 #include "../src/object/Wind.h"
+
 #include "DateTimeImplTest.h"
 #include "helper.hpp"
 
@@ -52,7 +53,7 @@ void test_object(test::TestSuitesRunner& runner)
             assertEquals(o1.get_serialized().size(), 0);
             assertTrue(o1.tryUpdate(std::move(o2)));
             assertEqStr(o1.get_serialized(), "a");
-            for(int i = 0; i < OBJ_OUTDATED; ++i)
+            for (int i = 0; i < OBJ_OUTDATED; ++i)
             {
                 assertFalse(o3.tryUpdate(std::move(o1)));
                 ++o3;

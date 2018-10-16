@@ -22,10 +22,12 @@
 #pragma once
 
 #include <istream>
+
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
 #include "../util/defines.h"
+
 #include "Connector.hpp"
 
 namespace client
@@ -49,13 +51,13 @@ public:
     bool timerExpired() override;
 
 private:
-    void handleResolve(const boost::system::error_code& error,
+    void handleResolve(const boost::system::error_code&         error,
                        boost::asio::ip::tcp::resolver::iterator resolverIt,
-                       const Callback& callback) noexcept;
+                       const Callback&                          callback) noexcept;
 
-    void handleConnect(const boost::system::error_code& error,
+    void handleConnect(const boost::system::error_code&         error,
                        boost::asio::ip::tcp::resolver::iterator resolverIt,
-                       const Callback& callback) noexcept;
+                       const Callback&                          callback) noexcept;
 
     void handleTimeout(const boost::system::error_code& error, const Callback& callback) noexcept;
 
@@ -65,13 +67,13 @@ private:
     void handleWrite(const boost::system::error_code& error, std::size_t bytes,
                      const Callback& callback) noexcept;
 
-    boost::asio::io_service m_ioService;
-    boost::asio::ip::tcp::socket m_socket;
+    boost::asio::io_service        m_ioService;
+    boost::asio::ip::tcp::socket   m_socket;
     boost::asio::ip::tcp::resolver m_resolver;
-    boost::asio::deadline_timer m_timer;
-    boost::asio::streambuf m_buffer;
-    std::string m_response;
-    std::istream m_istream;
+    boost::asio::deadline_timer    m_timer;
+    boost::asio::streambuf         m_buffer;
+    std::string                    m_response;
+    std::istream                   m_istream;
 };
 
 }  // namespace client

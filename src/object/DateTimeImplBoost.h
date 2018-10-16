@@ -34,7 +34,7 @@ public:
 
     ~DateTimeImplBoost() noexcept;
 
-    static std::int64_t now();
+    static std::int64_t  now();
     static std::uint32_t day();
 };
 

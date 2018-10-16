@@ -38,11 +38,9 @@ template<typename T>
 class Parser
 {
 public:
-    Parser()
-    {}
+    Parser() {}
 
-    virtual ~Parser() noexcept
-    {}
+    virtual ~Parser() noexcept {}
 
     /**
      * @fn unpack

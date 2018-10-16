@@ -30,7 +30,7 @@
 #include "parser/SbsParser.h"
 
 #ifdef COMPONENT
-#undef COMPONENT
+#    undef COMPONENT
 #endif
 #define COMPONENT "(SbsFeed)"
 
@@ -45,8 +45,7 @@ SbsFeed::SbsFeed(const std::string& name, const config::KeyValueMap& propertyMap
     parser::SbsParser::s_maxHeight = maxHeight;
 }
 
-SbsFeed::~SbsFeed() noexcept
-{}
+SbsFeed::~SbsFeed() noexcept {}
 
 Feed::Protocol SbsFeed::get_protocol() const
 {
@@ -56,7 +55,7 @@ Feed::Protocol SbsFeed::get_protocol() const
 bool SbsFeed::process(const std::string& response)
 {
     object::Aircraft ac(get_priority());
-    if(s_parser.unpack(response, ac))
+    if (s_parser.unpack(response, ac))
     {
         logger.debug(m_component, "[", m_name, "] update: ", response);
         m_data->update(std::move(ac));

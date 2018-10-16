@@ -32,15 +32,16 @@
 #include "../parameters.h"
 #include "../util/Logger.hpp"
 #include "../util/defines.h"
+
 #include "Connection.hpp"
 #include "TcpInterfaceImplBoost.h"
 
 #ifdef SERVER_MAX_CLIENTS
 /// @def S_MAX_CLIENTS
 /// The max amount of client to accept at once
-#define S_MAX_CLIENTS SERVER_MAX_CLIENTS
+#    define S_MAX_CLIENTS SERVER_MAX_CLIENTS
 #else
-#define S_MAX_CLIENTS 2
+#    define S_MAX_CLIENTS 2
 #endif
 
 /// @namespace server
@@ -161,13 +162,13 @@ template<typename SocketT>
 void Server<SocketT>::stop()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
-    if(m_running)
+    if (m_running)
     {
         m_running = false;
         logger.info("(Server) stopping all connections ...");
-        for(auto& it : m_connections)
+        for (auto& it : m_connections)
         {
-            if(it)
+            if (it)
             {
                 it.reset();
             }
@@ -175,7 +176,7 @@ void Server<SocketT>::stop()
         m_activeConnections = 0;
         m_tcpIf->stop();
         lock.unlock();
-        if(m_thread.joinable())
+        if (m_thread.joinable())
         {
             m_thread.join();
         }
@@ -186,16 +187,16 @@ template<typename SocketT>
 void Server<SocketT>::send(const std::string& msg)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if(msg.empty() || m_activeConnections == 0)
+    if (msg.empty() || m_activeConnections == 0)
     {
         return;
     }
     logger.debug("(Server) send: ", msg);
-    for(auto& it : m_connections)
+    for (auto& it : m_connections)
     {
-        if(it)
+        if (it)
         {
-            if(!it.get()->write(msg))
+            if (!it.get()->write(msg))
             {
                 logger.warn("(Server) lost connection to: ", it.get()->get_address());
                 it.reset();
@@ -215,9 +216,9 @@ void Server<SocketT>::accept()
 template<typename SocketT>
 bool Server<SocketT>::isConnected(const std::string& address)
 {
-    for(const auto& it : m_connections)
+    for (const auto& it : m_connections)
     {
-        if(it && it.get()->get_address() == address)
+        if (it && it.get()->get_address() == address)
         {
             return true;
         }
@@ -228,16 +229,16 @@ bool Server<SocketT>::isConnected(const std::string& address)
 template<typename SocketT>
 void Server<SocketT>::attemptConnection(bool error) noexcept
 {
-    if(!error)
+    if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         try
         {
-            if(m_activeConnections < S_MAX_CLIENTS && !isConnected(m_tcpIf->get_currentAddress()))
+            if (m_activeConnections < S_MAX_CLIENTS && !isConnected(m_tcpIf->get_currentAddress()))
             {
-                for(auto& it : m_connections)
+                for (auto& it : m_connections)
                 {
-                    if(!it)
+                    if (!it)
                     {
                         it = m_tcpIf->startConnection();
                         ++m_activeConnections;
@@ -252,7 +253,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
                 m_tcpIf->close();
             }
         }
-        catch(const SocketException& e)
+        catch (const SocketException& e)
         {
             logger.warn("(Server) connection failed: ", e.what());
             m_tcpIf->close();

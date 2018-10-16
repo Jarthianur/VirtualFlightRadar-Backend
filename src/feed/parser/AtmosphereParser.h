@@ -24,6 +24,7 @@
 #include <string>
 
 #include "../../object/Atmosphere.h"
+
 #include "Parser.hpp"
 
 /// @namespace feed

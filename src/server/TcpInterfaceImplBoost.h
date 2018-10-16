@@ -24,10 +24,12 @@
 #include <cstdint>
 #include <functional>
 #include <mutex>
+
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
 #include "../util/defines.h"
+
 #include "SocketImplBoost.h"
 #include "TcpInterface.hpp"
 
@@ -46,15 +48,15 @@ public:
     void onAccept(const std::function<void(bool)>& callback) override;
     void close() override;
     std::unique_ptr<Connection<SocketImplBoost>> startConnection() override;
-    std::string get_currentAddress() const override;
+    std::string                                  get_currentAddress() const override;
 
 private:
     void handleAccept(const boost::system::error_code& error,
                       const std::function<void(bool)>& callback);
 
-    boost::asio::io_service m_ioService;
+    boost::asio::io_service        m_ioService;
     boost::asio::ip::tcp::acceptor m_acceptor;
-    SocketImplBoost m_socket;
+    SocketImplBoost                m_socket;
 };
 
 }  // namespace server

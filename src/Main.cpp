@@ -25,10 +25,11 @@
 
 #include "config/Configuration.h"
 #include "util/Logger.hpp"
+
 #include "VFRB.h"
 
 #ifndef VERSION
-#define VERSION "DEMO"
+#    define VERSION "DEMO"
 #endif
 
 /**
@@ -51,7 +52,7 @@ int main(int argc, char** argv)
 {
     logger.info("VirtualFlightRadar-Backend -- " VERSION);
 
-    if(argc < 3)
+    if (argc < 3)
     {
         logger.info(
             "usage: ./VirtualFlightRadar-Backend [OPTIONS] [-c | --config] path_to_file.ini\n"
@@ -68,7 +69,7 @@ int main(int argc, char** argv)
         VFRB vfrb(evalArgs(argc, argv));
         vfrb.run();
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
         logger.error("(VFRB) fatal: ", e.what());
         return -1;
@@ -80,24 +81,24 @@ int main(int argc, char** argv)
 config::Configuration evalArgs(std::int32_t argc, char** argv)
 {
     std::string ini_file;
-    bool gnd       = false;
-    bool cfg_found = false;
+    bool        gnd       = false;
+    bool        cfg_found = false;
 
-    for(int i = 1; i < argc; i++)
+    for (int i = 1; i < argc; i++)
     {
-        if(std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
+        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
         {
             ini_file = std::string(argv[++i]);
-            if(!(cfg_found = (ini_file.rfind(".ini") != std::string::npos)))
+            if (!(cfg_found = (ini_file.rfind(".ini") != std::string::npos)))
             {
                 throw std::runtime_error(ini_file + " is not a .ini file.");
             }
         }
-        else if(std::string(argv[i]).find("-g") != std::string::npos)
+        else if (std::string(argv[i]).find("-g") != std::string::npos)
         {
             gnd = true;
         }
-        else if(std::string(argv[i]).find("-v") != std::string::npos)
+        else if (std::string(argv[i]).find("-v") != std::string::npos)
         {
             logger.set_debug(true);
         }
@@ -107,11 +108,11 @@ config::Configuration evalArgs(std::int32_t argc, char** argv)
         }
     }
 
-    if(cfg_found)
+    if (cfg_found)
     {
-        std::ifstream file(ini_file);
+        std::ifstream         file(ini_file);
         config::Configuration conf(file);
-        if(gnd)
+        if (gnd)
         {
             conf.set_groundMode(true);
             logger.info("(VFRB) Override ground mode: Yes");

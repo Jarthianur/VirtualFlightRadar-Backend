@@ -19,18 +19,15 @@
 
 namespace object
 {
-Atmosphere::Atmosphere() : Object()
-{}
+Atmosphere::Atmosphere() : Object() {}
 
-Atmosphere::Atmosphere(std::uint32_t priority) : Object(priority)
-{}
+Atmosphere::Atmosphere(std::uint32_t priority) : Object(priority) {}
 
 Atmosphere::Atmosphere(double pressure, std::uint32_t priority)
     : Object(priority), m_pressure(pressure)
 {}
 
-Atmosphere::~Atmosphere() noexcept
-{}
+Atmosphere::~Atmosphere() noexcept {}
 
 void Atmosphere::assign(Object&& other)
 {

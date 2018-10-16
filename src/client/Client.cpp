@@ -24,6 +24,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <utility>
+
 #include <boost/functional/hash.hpp>
 
 #include "../feed/Feed.h"
@@ -44,7 +45,7 @@ Client::~Client() noexcept
 void Client::run()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
-    if(!m_running)
+    if (!m_running)
     {
         m_running = true;
         connect();
@@ -81,7 +82,7 @@ void Client::connect()
 void Client::reconnect()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if(m_running)
+    if (m_running)
     {
         logger.info(m_component, " schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->close();
@@ -97,7 +98,7 @@ void Client::timedConnect()
 
 void Client::stop()
 {
-    if(m_running)
+    if (m_running)
     {
         m_running = false;
         logger.info(m_component, " disconnect from ", m_endpoint.host, ":", m_endpoint.port);
@@ -107,7 +108,7 @@ void Client::stop()
 
 void Client::scheduleStop()
 {
-    std::condition_variable cond_ready;
+    std::condition_variable      cond_ready;
     std::unique_lock<std::mutex> lock(m_mutex);
     cond_ready.wait_for(lock, std::chrono::milliseconds(100), [this] { return m_running; });
     stop();
@@ -121,7 +122,7 @@ void Client::read()
 
 void Client::handleTimedConnect(bool error)
 {
-    if(!error)
+    if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         logger.info(m_component, " try connect to ", m_endpoint.host, ":", m_endpoint.port);
@@ -136,12 +137,12 @@ void Client::handleTimedConnect(bool error)
 
 void Client::handleRead(bool error, const std::string& response)
 {
-    if(!error)
+    if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        for(auto& it : m_feeds)
+        for (auto& it : m_feeds)
         {
-            if(!it->process(response))
+            if (!it->process(response))
             {
                 stop();
             }

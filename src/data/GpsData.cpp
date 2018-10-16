@@ -39,8 +39,7 @@ using namespace object;
 
 namespace data
 {
-GpsData::GpsData() : Data()
-{}
+GpsData::GpsData() : Data() {}
 
 GpsData::GpsData(const GpsPosition& position, bool ground)
     : Data(), m_position(position), m_groundMode(ground)
@@ -48,8 +47,7 @@ GpsData::GpsData(const GpsPosition& position, bool ground)
     m_processor.process(m_position);
 }
 
-GpsData::~GpsData() noexcept
-{}
+GpsData::~GpsData() noexcept {}
 
 std::string GpsData::get_serialized()
 {
@@ -61,12 +59,12 @@ std::string GpsData::get_serialized()
 bool GpsData::update(Object&& position)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if(m_positionLocked)
+    if (m_positionLocked)
     {
         throw std::runtime_error("position was locked before.");
     }
     bool updated = m_position.tryUpdate(std::move(position));
-    if(updated)
+    if (updated)
     {
         m_processor.process(m_position);
     }
@@ -81,9 +79,9 @@ Position GpsData::get_position()
 
 bool GpsData::isPositionGood()
 {
-    return m_position.get_nrOfSatellites() >= GPS_NR_SATS_GOOD
-           && m_position.get_fixQuality() >= GPS_FIX_GOOD
-           && m_position.get_dilution() <= GPS_HOR_DILUTION_GOOD;
+    return m_position.get_nrOfSatellites() >= GPS_NR_SATS_GOOD &&
+           m_position.get_fixQuality() >= GPS_FIX_GOOD &&
+           m_position.get_dilution() <= GPS_HOR_DILUTION_GOOD;
 }
 
 }  // namespace data

@@ -25,20 +25,18 @@
 
 namespace config
 {
-Properties::Properties()
-{}
+Properties::Properties() {}
 
-Properties::~Properties() noexcept
-{}
+Properties::~Properties() noexcept {}
 
 const std::string Properties::get_property(const std::string& section, const std::string& key,
                                            const std::string& alternative) const
 {
     auto sectionIt = m_propertiesMap.find(section);
-    if(sectionIt != m_propertiesMap.end())
+    if (sectionIt != m_propertiesMap.end())
     {
         auto kvIt = sectionIt->second.find(key);
-        if(kvIt != sectionIt->second.end() && !kvIt->second.empty())
+        if (kvIt != sectionIt->second.end() && !kvIt->second.empty())
         {
             return kvIt->second;
         }
@@ -56,7 +54,7 @@ const std::string Properties::get_property(const std::string& section, const std
 const KeyValueMap& Properties::get_propertySection(const std::string& section) const
 {
     auto it = m_propertiesMap.find(section);
-    if(it != m_propertiesMap.end())
+    if (it != m_propertiesMap.end())
     {
         return it->second;
     }

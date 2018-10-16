@@ -69,7 +69,7 @@ public:
     template<typename T, typename... TRest>
     void debug(T&& msg, TRest&&... tail)
     {
-        if(m_debugEnabled)
+        if (m_debugEnabled)
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             *m_outStream << "\r[DEBUG] " << get_time() << ":: ";
@@ -79,7 +79,7 @@ public:
     template<typename T>
     void debug(T&& msg)
     {
-        if(m_debugEnabled)
+        if (m_debugEnabled)
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             *m_outStream << "\r[DEBUG] " << get_time() << ":: ";

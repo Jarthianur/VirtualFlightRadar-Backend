@@ -30,7 +30,7 @@
 #include "parser/AtmosphereParser.h"
 
 #ifdef COMPONENT
-#undef COMPONENT
+#    undef COMPONENT
 #endif
 #define COMPONENT "(AtmosphereFeed)"
 
@@ -43,8 +43,7 @@ AtmosphereFeed::AtmosphereFeed(const std::string& name, const config::KeyValueMa
     : Feed(name, COMPONENT, propertyMap, data)
 {}
 
-AtmosphereFeed::~AtmosphereFeed() noexcept
-{}
+AtmosphereFeed::~AtmosphereFeed() noexcept {}
 
 Feed::Protocol AtmosphereFeed::get_protocol() const
 {
@@ -54,7 +53,7 @@ Feed::Protocol AtmosphereFeed::get_protocol() const
 bool AtmosphereFeed::process(const std::string& response)
 {
     object::Atmosphere atmos(get_priority());
-    if(s_parser.unpack(response, atmos))
+    if (s_parser.unpack(response, atmos))
     {
         logger.debug(m_component, "[", m_name, "] update: ", response);
         logger.debug(m_component, "[", m_name, "] atmos: ", atmos.get_pressure());

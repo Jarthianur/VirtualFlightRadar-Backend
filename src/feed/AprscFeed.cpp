@@ -30,7 +30,7 @@
 #include "parser/AprsParser.h"
 
 #ifdef COMPONENT
-#undef COMPONENT
+#    undef COMPONENT
 #endif
 #define COMPONENT "(AprscFeed)"
 
@@ -44,15 +44,14 @@ AprscFeed::AprscFeed(const std::string& name, const config::KeyValueMap& propert
 {
     parser::AprsParser::s_maxHeight = maxHeight;
     m_loginIt                       = m_propertyMap.find(KV_KEY_LOGIN);
-    if(m_loginIt == m_propertyMap.end())
+    if (m_loginIt == m_propertyMap.end())
     {
         logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
 }
 
-AprscFeed::~AprscFeed() noexcept
-{}
+AprscFeed::~AprscFeed() noexcept {}
 
 Feed::Protocol AprscFeed::get_protocol() const
 {
@@ -62,7 +61,7 @@ Feed::Protocol AprscFeed::get_protocol() const
 bool AprscFeed::process(const std::string& response)
 {
     object::Aircraft ac(get_priority());
-    if(s_parser.unpack(response, ac))
+    if (s_parser.unpack(response, ac))
     {
         logger.debug(m_component, "[", m_name, "] update: ", response);
         m_data->update(std::move(ac));

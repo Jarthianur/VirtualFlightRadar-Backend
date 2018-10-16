@@ -19,15 +19,15 @@
  }
  */
 
+#include "SocketImplBoost.h"
+
 #include <boost/system/error_code.hpp>
 
 #include "SocketException.h"
-#include "SocketImplBoost.h"
 
 namespace server
 {
-SocketImplBoost::SocketImplBoost(SocketImplBoost&& other) : m_socket(boost::move(other.m_socket))
-{}
+SocketImplBoost::SocketImplBoost(SocketImplBoost&& other) : m_socket(boost::move(other.m_socket)) {}
 
 SocketImplBoost& SocketImplBoost::operator=(SocketImplBoost&& other)
 {
@@ -38,7 +38,7 @@ SocketImplBoost& SocketImplBoost::operator=(SocketImplBoost&& other)
 SocketImplBoost::SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket)
     : m_socket(boost::move(socket))
 {
-    if(m_socket.is_open())
+    if (m_socket.is_open())
     {
         m_socket.non_blocking(true);
     }
@@ -51,7 +51,7 @@ SocketImplBoost::~SocketImplBoost() noexcept
 
 std::string SocketImplBoost::get_address() const
 {
-    if(!m_socket.is_open())
+    if (!m_socket.is_open())
     {
         throw SocketException("cannot get address from closed socket");
     }
@@ -60,7 +60,7 @@ std::string SocketImplBoost::get_address() const
 
 bool SocketImplBoost::write(const std::string& msg)
 {
-    if(!m_socket.is_open())
+    if (!m_socket.is_open())
     {
         throw SocketException("cannot write on closed socket");
     }
@@ -71,7 +71,7 @@ bool SocketImplBoost::write(const std::string& msg)
 
 void SocketImplBoost::close()
 {
-    if(m_socket.is_open())
+    if (m_socket.is_open())
     {
         boost::system::error_code ignored_ec;
         m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ignored_ec);

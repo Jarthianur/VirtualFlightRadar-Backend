@@ -24,10 +24,12 @@
 #include <limits>
 #include <stdexcept>
 #include <utility>
+
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
 #include "../util/Logger.hpp"
+
 #include "ConfigReader.h"
 
 namespace config
@@ -39,12 +41,12 @@ Configuration::Configuration(std::istream& stream)
     try
     {
         ConfigReader reader;
-        Properties properties;
+        Properties   properties;
         reader.read(stream, properties);
-        m_atmPressure
-            = boost::get<double>(checkNumber(stringToNumber<double>(properties.get_property(
-                                                 SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
-                                             SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
+        m_atmPressure =
+            boost::get<double>(checkNumber(stringToNumber<double>(properties.get_property(
+                                               SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
+                                           SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
         m_position       = resolvePosition(properties);
         m_maxDistance    = resolveFilter(properties, KV_KEY_MAX_DIST);
         m_maxHeight      = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
@@ -53,14 +55,13 @@ Configuration::Configuration(std::istream& stream)
         m_feedProperties = resolveFeeds(properties);
         dumpInfo();
     }
-    catch(const std::exception&)
+    catch (const std::exception&)
     {
         throw std::runtime_error("Failed to read configuration file");
     }
 }
 
-Configuration::~Configuration() noexcept
-{}
+Configuration::~Configuration() noexcept {}
 
 object::GpsPosition Configuration::resolvePosition(const Properties& properties) const
 {
@@ -71,10 +72,10 @@ object::GpsPosition Configuration::resolvePosition(const Properties& properties)
     pos.longitude = boost::get<double>(checkNumber(
         stringToNumber<double>(properties.get_property(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0")),
         SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
-    pos.altitude
-        = boost::get<std::int32_t>(checkNumber(stringToNumber<std::int32_t>(properties.get_property(
-                                                   SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0")),
-                                               SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
+    pos.altitude =
+        boost::get<std::int32_t>(checkNumber(stringToNumber<std::int32_t>(properties.get_property(
+                                                 SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0")),
+                                             SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
     double geoid = boost::get<double>(checkNumber(
         stringToNumber<double>(properties.get_property(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0")),
         SECT_KEY_FALLBACK, KV_KEY_GEOID));
@@ -89,19 +90,19 @@ std::uint16_t Configuration::resolveServerPort(const Properties& properties) con
             checkNumber(stringToNumber<std::uint64_t>(
                             properties.get_property(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353")),
                         SECT_KEY_GENERAL, KV_KEY_SERVER_PORT));
-        if(port > std::numeric_limits<std::uint16_t>::max())
+        if (port > std::numeric_limits<std::uint16_t>::max())
         {
             throw std::invalid_argument("");
         }
         return port & 0xFFFF;
     }
-    catch(const std::logic_error&)
+    catch (const std::logic_error&)
     {
         return 4353;
     }
 }
 
-std::int32_t Configuration::resolveFilter(const Properties& properties,
+std::int32_t Configuration::resolveFilter(const Properties&  properties,
                                           const std::string& key) const
 {
     try
@@ -111,7 +112,7 @@ std::int32_t Configuration::resolveFilter(const Properties& properties,
             SECT_KEY_FILTER, key));
         return filter < 0 ? std::numeric_limits<std::int32_t>::max() : filter;
     }
-    catch(const std::invalid_argument&)
+    catch (const std::invalid_argument&)
     {
         return std::numeric_limits<std::int32_t>::max();
     }
@@ -119,16 +120,16 @@ std::int32_t Configuration::resolveFilter(const Properties& properties,
 
 FeedProperties Configuration::resolveFeeds(const Properties& properties)
 {
-    std::list<std::string> list
-        = splitCommaSeparated(properties.get_property(SECT_KEY_GENERAL, KV_KEY_FEEDS));
+    std::list<std::string> list =
+        splitCommaSeparated(properties.get_property(SECT_KEY_GENERAL, KV_KEY_FEEDS));
     FeedProperties mapping;
-    for(auto& it : list)
+    for (auto& it : list)
     {
         try
         {
             mapping.push_back(std::make_pair(it, properties.get_propertySection(it)));
         }
-        catch(const std::out_of_range& e)
+        catch (const std::out_of_range& e)
         {
             logger.warn("(Config) resolveFeeds: ", e.what(), " for ", it);
         }
@@ -139,7 +140,7 @@ FeedProperties Configuration::resolveFeeds(const Properties& properties)
 Number Configuration::checkNumber(const OptNumber& number, const std::string& section,
                                   const std::string& key) const
 {
-    if(!number)
+    if (!number)
     {
         logger.warn("(Config) ", section, ".", key, ": Could not resolve value.");
         throw std::invalid_argument("");

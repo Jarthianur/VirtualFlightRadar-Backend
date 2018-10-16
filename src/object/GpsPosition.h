@@ -24,6 +24,7 @@
 #include <cstdint>
 
 #include "../util/defines.h"
+
 #include "DateTimeImplBoost.h"
 #include "Object.h"
 #include "TimeStamp.hpp"

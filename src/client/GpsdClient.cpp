@@ -28,7 +28,7 @@
 #include "../util/Logger.hpp"
 
 #ifdef COMPONENT
-#undef COMPONENT
+#    undef COMPONENT
 #endif
 #define COMPONENT "(GpsdClient)"
 
@@ -38,12 +38,11 @@ GpsdClient::GpsdClient(const Endpoint& endpoint, std::shared_ptr<Connector> conn
     : Client(endpoint, COMPONENT, connector)
 {}
 
-GpsdClient::~GpsdClient() noexcept
-{}
+GpsdClient::~GpsdClient() noexcept {}
 
 void GpsdClient::handleConnect(bool error)
 {
-    if(!error)
+    if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_connector->onWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
@@ -58,7 +57,7 @@ void GpsdClient::handleConnect(bool error)
 
 void GpsdClient::stop()
 {
-    if(m_running)
+    if (m_running)
     {
         m_connector->onWrite("?WATCH={\"enable\":false}\r\n",
                              [this](bool) { logger.info(m_component, " stopped watch"); });
@@ -69,7 +68,7 @@ void GpsdClient::stop()
 
 void GpsdClient::handleWatch(bool error)
 {
-    if(!error)
+    if (!error)
     {
         logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
         std::lock_guard<std::mutex> lock(m_mutex);

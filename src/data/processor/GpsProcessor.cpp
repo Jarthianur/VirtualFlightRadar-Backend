@@ -31,16 +31,14 @@ namespace data
 {
 namespace processor
 {
-GpsProcessor::GpsProcessor() : Processor<object::GpsPosition>()
-{}
+GpsProcessor::GpsProcessor() : Processor<object::GpsPosition>() {}
 
-GpsProcessor::~GpsProcessor() noexcept
-{}
+GpsProcessor::~GpsProcessor() noexcept {}
 
 void GpsProcessor::process(object::GpsPosition& position)
 {
     std::time_t now = std::time(nullptr);
-    std::tm* utc    = std::gmtime(&now);
+    std::tm*    utc = std::gmtime(&now);
     evalPosition(position.get_position().latitude, position.get_position().longitude);
     m_processed.clear();
     appendGPGGA(position, utc);

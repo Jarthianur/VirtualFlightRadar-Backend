@@ -41,14 +41,13 @@ AircraftProcessor::AircraftProcessor(std::int32_t maxDist)
     : Processor<object::Aircraft>(), m_maxDistance(maxDist)
 {}
 
-AircraftProcessor::~AircraftProcessor() noexcept
-{}
+AircraftProcessor::~AircraftProcessor() noexcept {}
 
 void AircraftProcessor::process(Aircraft& aircraft)
 {
     calculateRelPosition(aircraft);
     m_processed.clear();
-    if(m_distance <= m_maxDistance)
+    if (m_distance <= m_maxDistance)
     {
         appendPFLAU(aircraft);
         appendPFLAA(aircraft);
@@ -75,24 +74,24 @@ void AircraftProcessor::calculateRelPosition(const Aircraft& aircraft)
     m_lonDistance          = m_aircraftRadLongitude - m_refRadLongitude;
     m_latDistance          = m_aircraftRadLatitude - m_refRadLatitude;
 
-    double a = std::pow(std::sin(m_latDistance / 2.0), 2.0)
-               + std::cos(m_refRadLatitude) * std::cos(m_aircraftRadLatitude)
-                     * std::pow(std::sin(m_lonDistance / 2.0), 2.0);
-    m_distance
-        = math::doubleToInt(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
+    double a = std::pow(std::sin(m_latDistance / 2.0), 2.0) +
+               std::cos(m_refRadLatitude) * std::cos(m_aircraftRadLatitude) *
+                   std::pow(std::sin(m_lonDistance / 2.0), 2.0);
+    m_distance =
+        math::doubleToInt(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
 
     m_relBearing = math::degree(std::atan2(
         std::sin(m_aircraftRadLongitude - m_refRadLongitude) * std::cos(m_aircraftRadLatitude),
-        std::cos(m_refRadLatitude) * std::sin(m_aircraftRadLatitude)
-            - std::sin(m_refRadLatitude) * std::cos(m_aircraftRadLatitude)
-                  * std::cos(m_aircraftRadLongitude - m_refRadLongitude)));
+        std::cos(m_refRadLatitude) * std::sin(m_aircraftRadLatitude) -
+            std::sin(m_refRadLatitude) * std::cos(m_aircraftRadLatitude) *
+                std::cos(m_aircraftRadLongitude - m_refRadLongitude)));
     m_absBearing = std::fmod((m_relBearing + 360.0), 360.0);
 
     m_relNorth    = math::doubleToInt(std::cos(math::radian(m_absBearing)) * m_distance);
     m_relEast     = math::doubleToInt(std::sin(math::radian(m_absBearing)) * m_distance);
-    m_relVertical = aircraft.get_targetType() == Aircraft::TargetType::TRANSPONDER
-                        ? aircraft.get_position().altitude - math::icaoHeight(m_refAtmPressure)
-                        : aircraft.get_position().altitude - m_refPosition.altitude;
+    m_relVertical = aircraft.get_targetType() == Aircraft::TargetType::TRANSPONDER ?
+                        aircraft.get_position().altitude - math::icaoHeight(m_refAtmPressure) :
+                        aircraft.get_position().altitude - m_refPosition.altitude;
 }
 
 void AircraftProcessor::appendPFLAU(const Aircraft& aircraft)
@@ -106,7 +105,7 @@ void AircraftProcessor::appendPFLAU(const Aircraft& aircraft)
 
 void AircraftProcessor::appendPFLAA(const Aircraft& aircraft)
 {
-    if(aircraft.get_fullInfo())
+    if (aircraft.get_fullInfo())
     {
         std::snprintf(
             m_buffer, sizeof(m_buffer), "$PFLAA,0,%d,%d,%d,%hhd,%s,%03d,,%d,%3.1lf,%1hhx*",

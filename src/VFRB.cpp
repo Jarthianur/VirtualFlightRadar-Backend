@@ -56,29 +56,28 @@ VFRB::VFRB(const config::Configuration& config)
     createFeeds(config);
 }
 
-VFRB::~VFRB() noexcept
-{}
+VFRB::~VFRB() noexcept {}
 
 void VFRB::run() noexcept
 {
     m_running = true;
     logger.info("(VFRB) startup");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    util::Signals signals;
-    client::ClientManager clientManager;
+    util::Signals                         signals;
+    client::ClientManager                 clientManager;
 
     signals.addHandler([this](const boost::system::error_code&, const int) {
         logger.info("(VFRB) caught signal to shutdown ...");
         m_running = false;
     });
-    for(auto it : m_feeds)
+    for (auto it : m_feeds)
     {
         logger.info("(VFRB) run feed: ", it->get_name());
         try
         {
             clientManager.subscribe(it);
         }
-        catch(const std::logic_error& e)
+        catch (const std::logic_error& e)
         {
             logger.error("(VFRB) ", e.what());
         }
@@ -98,7 +97,7 @@ void VFRB::run() noexcept
 void VFRB::serve()
 {
     std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
-    while(m_running)
+    while (m_running)
     {
         try
         {
@@ -110,7 +109,7 @@ void VFRB::serve()
             m_server.send(m_windData->get_serialized());
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
-        catch(const std::exception& e)
+        catch (const std::exception& e)
         {
             logger.error("(VFRB) error: ", e.what());
             m_running = false;
@@ -121,12 +120,12 @@ void VFRB::serve()
 void VFRB::createFeeds(const config::Configuration& config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
-    for(const auto& prop : config.get_feedProperties())
+    for (const auto& prop : config.get_feedProperties())
     {
         try
         {
             auto optFeedPtr = factory.createFeed(prop.first, prop.second);
-            if(optFeedPtr)
+            if (optFeedPtr)
             {
                 m_feeds.push_back(*optFeedPtr);
             }
@@ -138,7 +137,7 @@ void VFRB::createFeeds(const config::Configuration& config)
                             ", " SECT_KEY_GPS);
             }
         }
-        catch(const std::exception& e)
+        catch (const std::exception& e)
         {
             logger.warn("(VFRB) create feed ", prop.first, ": ", e.what());
         }
@@ -149,7 +148,7 @@ std::string VFRB::get_duration(std::chrono::steady_clock::time_point start) cons
 {
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     std::chrono::minutes runtime = std::chrono::duration_cast<std::chrono::minutes>(end - start);
-    std::stringstream ss;
+    std::stringstream    ss;
     ss << runtime.count() / 60 / 24 << " days, " << runtime.count() / 60 << " hours, "
        << runtime.count() % 60 << " minutes";
     return ss.str();

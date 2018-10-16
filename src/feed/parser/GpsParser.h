@@ -22,9 +22,11 @@
 #pragma once
 
 #include <string>
+
 #include <boost/regex.hpp>
 
 #include "../../object/GpsPosition.h"
+
 #include "Parser.hpp"
 
 /// @namespace feed

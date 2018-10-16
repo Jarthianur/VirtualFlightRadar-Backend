@@ -78,22 +78,20 @@ const boost::regex GpsParser::s_GPGGA_RE(
     "^\\$[A-Z]{2}GGA,(\\d{6}),(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
     boost::regex::optimize | boost::regex::icase);
 
-GpsParser::GpsParser() : Parser()
-{}
+GpsParser::GpsParser() : Parser() {}
 
-GpsParser::~GpsParser() noexcept
-{}
+GpsParser::~GpsParser() noexcept {}
 
 bool GpsParser::unpack(const std::string& sentence, GpsPosition& position) noexcept
 {
     try
     {
         boost::smatch match;
-        return std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16)
-                   == math::checksum(sentence.c_str(), sentence.length())
-               && boost::regex_match(sentence, match, s_GPGGA_RE) && parsePosition(match, position);
+        return std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
+                   math::checksum(sentence.c_str(), sentence.length()) &&
+               boost::regex_match(sentence, match, s_GPGGA_RE) && parsePosition(match, position);
     }
-    catch(const std::logic_error&)
+    catch (const std::logic_error&)
     {
         return false;
     }
@@ -104,13 +102,13 @@ bool GpsParser::parsePosition(const boost::smatch& match, GpsPosition& position)
     Position pos;
     pos.latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
 
-    if(match.str(RE_GGA_LAT_DIR).compare("S") == 0)
+    if (match.str(RE_GGA_LAT_DIR).compare("S") == 0)
     {
         pos.latitude = -pos.latitude;
     }
     pos.longitude = math::dmToDeg(std::stod(match.str(RE_GGA_LON)));
 
-    if(match.str(RE_GGA_LON_DIR).compare("W") == 0)
+    if (match.str(RE_GGA_LON_DIR).compare("W") == 0)
     {
         pos.longitude = -pos.longitude;
     }

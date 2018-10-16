@@ -19,14 +19,11 @@
 
 namespace object
 {
-Object::Object() : m_lastPriority(0)
-{}
+Object::Object() : m_lastPriority(0) {}
 
-Object::Object(std::uint32_t priority) : m_lastPriority(priority)
-{}
+Object::Object(std::uint32_t priority) : m_lastPriority(priority) {}
 
-Object::~Object() noexcept
-{}
+Object::~Object() noexcept {}
 
 void Object::assign(Object&& other)
 {
@@ -37,7 +34,7 @@ void Object::assign(Object&& other)
 
 bool Object::tryUpdate(Object&& other)
 {
-    if(other.canUpdate(*this))
+    if (other.canUpdate(*this))
     {
         this->assign(std::move(other));
         return true;
