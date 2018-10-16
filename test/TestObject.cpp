@@ -122,6 +122,8 @@ void test_object(test::TestSuitesRunner& runner)
     describe<GpsPosition>("Basic GpsPosition tests", runner)->test("assign", [] {
         GpsPosition pos1({2.0, 2.0, 2}, 41.0);
         GpsPosition pos2({1.0, 1.0, 1}, 48.0);
+        pos2.set_timeStamp(
+            TimeStamp<timestamp::DateTimeImplBoost>("120000", timestamp::Format::HHMMSS));
         assertTrue(pos1.tryUpdate(std::move(pos2)));
         assertEquals(pos1.get_geoid(), 48.0);
         assertEquals(pos1.get_position().latitude, 1.0);

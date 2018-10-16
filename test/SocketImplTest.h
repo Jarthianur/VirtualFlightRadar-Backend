@@ -24,7 +24,7 @@
 #include <cstdint>
 #include <string>
 
-#include "../src/Defines.h"
+#include "../src/util/defines.h"
 
 namespace server
 {

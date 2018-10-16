@@ -32,4 +32,5 @@ src/client \
 src/feed/parser \
 src/object \
 src/server \
+src/util \
 test

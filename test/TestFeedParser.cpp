@@ -22,7 +22,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "../src/Math.hpp"
 #include "../src/feed/parser/AprsParser.h"
 #include "../src/feed/parser/AtmosphereParser.h"
 #include "../src/feed/parser/GpsParser.h"
@@ -33,6 +32,7 @@
 #include "../src/object/GpsPosition.h"
 #include "../src/object/TimeStamp.hpp"
 #include "../src/object/Wind.h"
+#include "../src/util/math.hpp"
 #include "helper.hpp"
 
 using namespace feed::parser;
@@ -131,7 +131,7 @@ void test_feed_parser(test::TestSuitesRunner& runner)
             })
         ->test("filter height", []() {
             AprsParser tmpAprs;
-            SbsParser::s_maxHeight = 0;
+            AprsParser::s_maxHeight = 0;
             object::Aircraft ac;
             assertFalse(tmpAprs.unpack(
                 "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
