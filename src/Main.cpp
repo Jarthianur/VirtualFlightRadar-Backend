@@ -23,6 +23,8 @@
 #include <fstream>
 #include <stdexcept>
 
+#include <boost/program_options.hpp>
+
 #include "config/Configuration.h"
 #include "util/Logger.hpp"
 
@@ -50,6 +52,19 @@ config::Configuration evalArgs(std::int32_t argc, char** argv);
  */
 int main(int argc, char** argv)
 {
+    boost::program_options::options_description cmdline_options("VirtualFlightRadar-Backend" VERSION);
+    cmdline_options.add_options()("help,h", "show this message");
+    cmdline_options.add_options()("verbose,v", "enable debug logging");
+    cmdline_options.add_options()("ground-mode,g", "forcibly enable ground mode");
+    cmdline_options.add_options()("config,c", boost::program_options::value<std::string>(),
+                                  "config file");
+    boost::program_options::variables_map vm;
+    boost::program_options::store(
+        boost::program_options::parse_command_line(argc, argv, cmdline_options), vm);
+    boost::program_options::notify(vm);
+
+    logger.info(cmdline_options);
+
     logger.info("VirtualFlightRadar-Backend -- " VERSION);
 
     if (argc < 3)
