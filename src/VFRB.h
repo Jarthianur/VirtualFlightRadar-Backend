@@ -62,7 +62,7 @@ public:
      * @brief Constructor
      * @param crConfig The configuration
      */
-    explicit VFRB(const config::Configuration& config);
+    explicit VFRB(std::shared_ptr<config::Configuration> config);
 
     /**
      * @fn ~VFRB
@@ -82,7 +82,7 @@ private:
      * @brief Register all input Feeds.
      * @param crConfig The Configuration
      */
-    void createFeeds(const config::Configuration& config);
+    void createFeeds(std::shared_ptr<config::Configuration> config);
 
     /**
      * @fn serve

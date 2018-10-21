@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <fstream>
 #include <iostream>
 #include <mutex>
 #include <string>
@@ -131,12 +132,16 @@ public:
         log(m_errStream, std::forward<T>(msg));
     }
 
-    void set_debug(bool enable);
+    void set_debug(bool enable = true);
+
+    void set_logFile(const std::string& file);
 
 private:
     /// @var mMutex
     /// Mutex for threadsafe logging
     mutable std::mutex m_mutex;
+
+    std::ofstream m_logFile;
 
     /// @var m_outStream
     /// Stream to log INFO,DEBUG,WARN

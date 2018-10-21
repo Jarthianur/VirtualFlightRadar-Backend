@@ -38,9 +38,10 @@ using namespace data;
 
 namespace feed
 {
-FeedFactory::FeedFactory(const Configuration& config, std::shared_ptr<AircraftData>& aircraftData,
-                         std::shared_ptr<AtmosphereData>& atmosData,
-                         std::shared_ptr<GpsData>& gpsData, std::shared_ptr<WindData>& windData)
+FeedFactory::FeedFactory(std::shared_ptr<config::Configuration> config,
+                         std::shared_ptr<AircraftData>          aircraftData,
+                         std::shared_ptr<AtmosphereData>        atmosData,
+                         std::shared_ptr<GpsData> gpsData, std::shared_ptr<WindData> windData)
     : m_config(config),
       m_aircraftData(aircraftData),
       m_atmosData(atmosData),
@@ -54,7 +55,8 @@ template<>
 std::shared_ptr<AprscFeed> FeedFactory::makeFeed<AprscFeed>(const std::string& name,
                                                             const KeyValueMap& propertyMap)
 {
-    return std::make_shared<AprscFeed>(name, propertyMap, m_aircraftData, m_config.get_maxHeight());
+    return std::make_shared<AprscFeed>(name, propertyMap, m_aircraftData,
+                                       m_config->get_maxHeight());
 }
 
 template<>
@@ -68,7 +70,7 @@ template<>
 std::shared_ptr<SbsFeed> FeedFactory::makeFeed<SbsFeed>(const std::string& name,
                                                         const KeyValueMap& propertyMap)
 {
-    return std::make_shared<SbsFeed>(name, propertyMap, m_aircraftData, m_config.get_maxHeight());
+    return std::make_shared<SbsFeed>(name, propertyMap, m_aircraftData, m_config->get_maxHeight());
 }
 
 template<>
