@@ -316,7 +316,7 @@ function run_regression() {
     VFRB_UUT="vfrb-$(cat $VFRB_ROOT/version.txt)"
     if ! $VFRB_ROOT/build/$VFRB_UUT; then $(exit 0); fi
     if ! $VFRB_ROOT/build/$VFRB_UUT -v -g -c bla.txt; then $(exit 0); fi
-    trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
+    #trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
     #pushd $VFRB_ROOT/test
     #log -i Start mocking servers
     #./regression.sh serve
@@ -327,9 +327,9 @@ function run_regression() {
     #log -i Connect to vfrb
     #./regression.sh receive
     #./regression.sh receive
-    sleep 20
+    #sleep 20
     #log -i Stop vfrb and run check
-    $SUDO pkill -2 -f $VFRB_UUT || true
+    #$SUDO pkill -2 -f $VFRB_UUT || true
     #sleep 4
     #./regression.sh check
     #popd
