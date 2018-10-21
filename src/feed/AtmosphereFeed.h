@@ -65,7 +65,7 @@ public:
      * @param pAtmosData The AtmosphereData pointer
      * @throw std::logic_error from parent constructor
      */
-    AtmosphereFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+    AtmosphereFeed(const std::string& name, const config::Properties& properties,
                    std::shared_ptr<data::AtmosphereData> data);
 
     /**

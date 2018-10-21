@@ -40,23 +40,22 @@ Configuration::Configuration(std::istream& stream)
 {
     try
     {
-        ConfigReader reader;
-        Properties   properties;
-        reader.read(stream, properties);
+        Properties properties = ConfigReader(stream).read();
         m_atmPressure =
             boost::get<double>(checkNumber(stringToNumber<double>(properties.get_property(
-                                               SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25")),
+                                               SECT_KEY_FALLBACK "." KV_KEY_PRESSURE, "1013.25")),
                                            SECT_KEY_FALLBACK, KV_KEY_PRESSURE));
-        m_position       = resolvePosition(properties);
-        m_maxDistance    = resolveFilter(properties, KV_KEY_MAX_DIST);
-        m_maxHeight      = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
-        m_serverPort     = resolveServerPort(properties);
-        m_groundMode     = !properties.get_property(SECT_KEY_GENERAL, KV_KEY_GND_MODE).empty();
-        m_feedProperties = resolveFeeds(properties);
+        m_position    = resolvePosition(properties);
+        m_maxDistance = resolveFilter(properties, KV_KEY_MAX_DIST);
+        m_maxHeight   = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
+        m_serverPort  = resolveServerPort(properties);
+        m_groundMode  = !properties.get_property(SECT_KEY_GENERAL "." KV_KEY_GND_MODE).empty();
+        resolveFeeds(properties);
         dumpInfo();
     }
-    catch (const std::exception&)
+    catch (const std::exception& e)
     {
+        logger.error("(Config) init: ", e.what());
         throw std::runtime_error("Failed to read configuration file");
     }
 }
@@ -66,18 +65,20 @@ Configuration::~Configuration() noexcept {}
 object::GpsPosition Configuration::resolvePosition(const Properties& properties) const
 {
     object::Position pos;
-    pos.latitude  = boost::get<double>(checkNumber(
-        stringToNumber<double>(properties.get_property(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0")),
-        SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
-    pos.longitude = boost::get<double>(checkNumber(
-        stringToNumber<double>(properties.get_property(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0")),
-        SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
+    pos.latitude =
+        boost::get<double>(checkNumber(stringToNumber<double>(properties.get_property(
+                                           SECT_KEY_FALLBACK "." KV_KEY_LATITUDE, "0.0")),
+                                       SECT_KEY_FALLBACK, KV_KEY_LATITUDE));
+    pos.longitude =
+        boost::get<double>(checkNumber(stringToNumber<double>(properties.get_property(
+                                           SECT_KEY_FALLBACK "." KV_KEY_LONGITUDE, "0.0")),
+                                       SECT_KEY_FALLBACK, KV_KEY_LONGITUDE));
     pos.altitude =
         boost::get<std::int32_t>(checkNumber(stringToNumber<std::int32_t>(properties.get_property(
-                                                 SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0")),
+                                                 SECT_KEY_FALLBACK "." KV_KEY_ALTITUDE, "0")),
                                              SECT_KEY_FALLBACK, KV_KEY_ALTITUDE));
     double geoid = boost::get<double>(checkNumber(
-        stringToNumber<double>(properties.get_property(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0")),
+        stringToNumber<double>(properties.get_property(SECT_KEY_FALLBACK "." KV_KEY_GEOID, "0.0")),
         SECT_KEY_FALLBACK, KV_KEY_GEOID));
     return object::GpsPosition(pos, geoid);
 }
@@ -87,8 +88,8 @@ std::uint16_t Configuration::resolveServerPort(const Properties& properties) con
     try
     {
         std::uint64_t port = boost::get<std::uint64_t>(
-            checkNumber(stringToNumber<std::uint64_t>(
-                            properties.get_property(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353")),
+            checkNumber(stringToNumber<std::uint64_t>(properties.get_property(
+                            SECT_KEY_GENERAL "." KV_KEY_SERVER_PORT, "4353")),
                         SECT_KEY_GENERAL, KV_KEY_SERVER_PORT));
         if (port > std::numeric_limits<std::uint16_t>::max())
         {
@@ -108,7 +109,7 @@ std::int32_t Configuration::resolveFilter(const Properties&  properties,
     try
     {
         std::int32_t filter = boost::get<std::int32_t>(checkNumber(
-            stringToNumber<std::int32_t>(properties.get_property(SECT_KEY_FILTER, key, "-1")),
+            stringToNumber<std::int32_t>(properties.get_property(SECT_KEY_FILTER "." + key, "-1")),
             SECT_KEY_FILTER, key));
         return filter < 0 ? std::numeric_limits<std::int32_t>::max() : filter;
     }
@@ -118,23 +119,20 @@ std::int32_t Configuration::resolveFilter(const Properties&  properties,
     }
 }
 
-FeedProperties Configuration::resolveFeeds(const Properties& properties)
+void Configuration::resolveFeeds(const Properties& properties)
 {
-    std::list<std::string> list =
-        splitCommaSeparated(properties.get_property(SECT_KEY_GENERAL, KV_KEY_FEEDS));
-    FeedProperties mapping;
-    for (auto& it : list)
+    for (auto& it : splitCommaSeparated(properties.get_property(SECT_KEY_GENERAL "." KV_KEY_FEEDS)))
     {
         try
         {
-            mapping.push_back(std::make_pair(it, properties.get_propertySection(it)));
+            m_feedProperties.emplace(it, properties.get_propertySection(it));
+            m_feedNames.push_back(it);
         }
         catch (const std::out_of_range& e)
         {
             logger.warn("(Config) resolveFeeds: ", e.what(), " for ", it);
         }
     }
-    return mapping;
 }
 
 Number Configuration::checkNumber(const OptNumber& number, const std::string& section,

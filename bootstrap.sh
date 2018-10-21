@@ -137,8 +137,7 @@ function install_deps() {
     *apt-get)
         local UPDATE="apt-get update"
         local SETUP=''
-        local BOOST='libboost-dev libboost-system-dev libboost-regex-dev'
-        #local PYTHON='python python-pip'
+        local BOOST='libboost-dev libboost-system-dev libboost-regex-dev libboost-program-options-dev'
         ! $VFRB_COMPILER -v > /dev/null 2>&1
         if [ $? -eq 0 ]; then
             local GCC="$(basename "$VFRB_COMPILER")"
@@ -149,7 +148,6 @@ function install_deps() {
         local UPDATE='yum clean all'
         local SETUP='yum -y install epel-release'
         local BOOST='boost boost-devel'
-        #local PYTHON='python python-pip'
         local GCC='gcc-c++ make'
     ;;
     esac
@@ -317,8 +315,8 @@ function run_regression() {
     require VFRB_ROOT
     VFRB_UUT="vfrb-$(cat $VFRB_ROOT/version.txt)"
     if ! $VFRB_ROOT/build/$VFRB_UUT; then $(exit 0); fi
-    if ! $VFRB_ROOT/build/$VFRB_UUT -g -c bla.txt; then $(exit 0); fi
-    trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
+    if ! $VFRB_ROOT/build/$VFRB_UUT -v -g -c bla.txt; then $(exit 0); fi
+    #trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
     #pushd $VFRB_ROOT/test
     #log -i Start mocking servers
     #./regression.sh serve
@@ -331,7 +329,7 @@ function run_regression() {
     #./regression.sh receive
     #sleep 20
     #log -i Stop vfrb and run check
-    $SUDO pkill -2 -f $VFRB_UUT || true
+    #$SUDO pkill -2 -f $VFRB_UUT || true
     #sleep 4
     #./regression.sh check
     #popd

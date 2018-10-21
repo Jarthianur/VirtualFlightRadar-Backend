@@ -63,10 +63,10 @@ public:
      * @param pGpsData      The GpsData pointer
      * @param pWindData     The WindData pointer
      */
-    FeedFactory(const config::Configuration&           config,
-                std::shared_ptr<data::AircraftData>&   aircraftData,
-                std::shared_ptr<data::AtmosphereData>& atmosData,
-                std::shared_ptr<data::GpsData>& gpsData, std::shared_ptr<data::WindData>& windData);
+    FeedFactory(std::shared_ptr<config::Configuration> config,
+                std::shared_ptr<data::AircraftData>    aircraftData,
+                std::shared_ptr<data::AtmosphereData>  atmosData,
+                std::shared_ptr<data::GpsData> gpsData, std::shared_ptr<data::WindData> windData);
 
     /**
      * @fn ~FeedFactory
@@ -82,8 +82,7 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    boost::optional<std::shared_ptr<Feed>> createFeed(const std::string&         name,
-                                                      const config::KeyValueMap& propertyMap);
+    boost::optional<std::shared_ptr<Feed>> createFeed(const std::string& name);
 
 private:
     /**
@@ -97,11 +96,11 @@ private:
      * @throw std::logic_error from invoked constructors
      */
     template<typename T, typename std::enable_if<std::is_base_of<Feed, T>::value>::type* = nullptr>
-    std::shared_ptr<T> makeFeed(const std::string& name, const config::KeyValueMap& propertyMap);
+    std::shared_ptr<T> makeFeed(const std::string& name);
 
     /// @var mrConfig
     /// Reference to the Configuration
-    const config::Configuration& m_config;
+    std::shared_ptr<config::Configuration> m_config;
 
     /// @var mpAircraftData
     /// Pointer to the AircraftData

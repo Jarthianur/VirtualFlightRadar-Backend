@@ -67,7 +67,7 @@ public:
      * @param vMaxHeight The max height filter
      * @throw std::logic_error if login is not given or from parent constructor
      */
-    AprscFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+    AprscFeed(const std::string& name, const config::Properties& propertyMap,
               std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
 
     /**
@@ -83,14 +83,12 @@ public:
      */
     bool process(const std::string& response) override;
 
-    const std::string& get_login() const;
+    std::string get_login() const;
 
 private:
     /// @var mParser
     /// Parser to unpack response from Client
     static parser::AprsParser s_parser;
-
-    config::KeyValueMap::const_iterator m_loginIt;
 };
 
 }  // namespace feed

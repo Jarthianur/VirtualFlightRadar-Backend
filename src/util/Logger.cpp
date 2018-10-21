@@ -36,6 +36,18 @@ void Logger::set_debug(bool enable)
     m_debugEnabled = enable;
 }
 
+void Logger::set_logFile(const std::string& file)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_logFile = std::ofstream(file);
+    if (!m_logFile)
+    {
+        throw std::runtime_error("Could not open log file");
+    }
+    m_outStream = &m_logFile;
+    m_errStream = &m_logFile;
+}
+
 std::string Logger::get_time()
 {
     std::time_t tt       = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
