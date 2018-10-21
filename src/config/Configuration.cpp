@@ -53,8 +53,9 @@ Configuration::Configuration(std::istream& stream)
         resolveFeeds(properties);
         dumpInfo();
     }
-    catch (const std::exception&)
+    catch (const std::exception& e)
     {
+        logger.error("(Config) init: ", e.what());
         throw std::runtime_error("Failed to read configuration file");
     }
 }
@@ -120,12 +121,12 @@ std::int32_t Configuration::resolveFilter(const Properties&  properties,
 
 void Configuration::resolveFeeds(const Properties& properties)
 {
-    m_feedNames = splitCommaSeparated(properties.get_property(SECT_KEY_GENERAL "." KV_KEY_FEEDS));
-    for (auto& it : m_feedNames)
+    for (auto& it : splitCommaSeparated(properties.get_property(SECT_KEY_GENERAL "." KV_KEY_FEEDS)))
     {
         try
         {
             m_feedProperties.emplace(it, properties.get_propertySection(it));
+            m_feedNames.push_back(it);
         }
         catch (const std::out_of_range& e)
         {

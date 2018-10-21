@@ -29,8 +29,6 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "../util/Logger.hpp"
-
 namespace config
 {
 ConfigReader::ConfigReader(std::istream& stream) : m_stream(stream) {}
@@ -44,8 +42,7 @@ Properties ConfigReader::read()
     }
     catch (const boost::property_tree::ini_parser_error& e)
     {
-        logger.error(e.what());
-        throw std::runtime_error("");
+        throw std::runtime_error(e.filename() + " is not a valid INI file");
     }
     return Properties(std::move(tree));
 }
