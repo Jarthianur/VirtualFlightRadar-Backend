@@ -66,7 +66,7 @@ public:
      * @param vMaxHeight The max height filter
      * @throw std::logic_error from parent constructor
      */
-    SbsFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+    SbsFeed(const std::string& name, const config::Properties& properties,
             std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
 
     /**

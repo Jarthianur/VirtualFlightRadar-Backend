@@ -63,7 +63,7 @@ public:
      * @param pData    The GpsData pointer
      * @throw std::logic_error from parent constructor
      */
-    GpsFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+    GpsFeed(const std::string& name, const config::Properties& properties,
             std::shared_ptr<data::GpsData> data);
 
     /**

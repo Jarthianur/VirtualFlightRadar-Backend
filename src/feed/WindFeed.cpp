@@ -38,9 +38,9 @@ namespace feed
 {
 parser::WindParser WindFeed::s_parser;
 
-WindFeed::WindFeed(const std::string& name, const config::KeyValueMap& propertyMap,
+WindFeed::WindFeed(const std::string& name, const config::Properties& properties,
                    std::shared_ptr<data::WindData> data)
-    : Feed(name, COMPONENT, propertyMap, data)
+    : Feed(name, COMPONENT, properties, data)
 {}
 
 WindFeed::~WindFeed() noexcept {}

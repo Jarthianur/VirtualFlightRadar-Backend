@@ -22,91 +22,32 @@
 #include "ConfigReader.h"
 
 #include <stdexcept>
+#include <string>
 #include <utility>
+
+#include <boost/property_tree/exceptions.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "../util/Logger.hpp"
 
 namespace config
 {
-const boost::regex
-    ConfigReader::s_keyValueRE("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
-                               boost::regex_constants::optimize);
+ConfigReader::ConfigReader(std::istream& stream) : m_stream(stream) {}
 
-ConfigReader::ConfigReader() {}
-
-ConfigReader::~ConfigReader() noexcept {}
-
-void ConfigReader::read(std::istream& stream, Properties& properties)
+Properties ConfigReader::read()
 {
-    std::string currentLine;
-    std::string currentSection;
-    std::size_t lineNr = 0;
-
-    while (std::getline(stream, currentLine))
-    {
-        ++lineNr;
-        if (currentLine.empty() || (currentLine.length() > 0 && currentLine[0] == ';'))
-        {
-            continue;
-        }
-        boost::optional<std::string> section = parseSection(currentLine);
-        if (section)
-        {
-            currentSection = *section;
-            if (!properties.addProperty(currentSection))
-            {
-                logger.warn("(ConfigReader) could not add section [", std::to_string(lineNr),
-                            "]: ", *section);
-            }
-            continue;
-        }
-        boost::optional<KeyValue> keyValue = parseProperty(currentLine);
-        if (keyValue)
-        {
-            if (!properties.addProperty(currentSection, *keyValue))
-            {
-                logger.warn("(ConfigReader) could not add property [", std::to_string(lineNr),
-                            "]: ", (*keyValue).first);
-            }
-        }
-        else
-        {
-            logger.error("(ConfigReader) malformed param [", std::to_string(lineNr),
-                         "]: ", currentLine);
-        }
-    }
-}
-
-boost::optional<std::string> ConfigReader::parseSection(const std::string& line)
-{
+    boost::property_tree::ptree tree;
     try
     {
-        if (line.at(0) == '[')
-        {
-            return line.substr(1, line.rfind(']') - 1);
-        }
+        boost::property_tree::read_ini(m_stream, tree);
     }
-    catch (const std::out_of_range&)
-    {}
-    return boost::none;
-}
-
-boost::optional<KeyValue> ConfigReader::parseProperty(const std::string& line)
-{
-    boost::smatch match;
-
-    if (boost::regex_match(line, match, s_keyValueRE))
+    catch (const boost::property_tree::ini_parser_error& e)
     {
-        std::string value = match.str(2);
-        std::size_t l     = value.find_last_not_of(' ');
-
-        if (l != std::string::npos)
-        {
-            value = value.substr(0, l + 1);
-        }
-        return std::make_pair(match.str(1), value);
+        logger.error(e.what());
+        throw std::runtime_error("");
     }
-    return boost::none;
+    return Properties(std::move(tree));
 }
 
 }  // namespace config

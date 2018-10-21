@@ -120,18 +120,18 @@ void VFRB::serve()
 void VFRB::createFeeds(std::shared_ptr<config::Configuration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
-    for (const auto& prop : config->get_feedProperties())
+    for (const auto& name : config->get_feedNames())
     {
         try
         {
-            auto optFeedPtr = factory.createFeed(prop.first, prop.second);
+            auto optFeedPtr = factory.createFeed(name);
             if (optFeedPtr)
             {
                 m_feeds.push_back(*optFeedPtr);
             }
             else
             {
-                logger.warn("(VFRB) create feed ", prop.first,
+                logger.warn("(VFRB) create feed ", name,
                             ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
                             ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS
                             ", " SECT_KEY_GPS);
@@ -139,7 +139,7 @@ void VFRB::createFeeds(std::shared_ptr<config::Configuration> config)
         }
         catch (const std::exception& e)
         {
-            logger.warn("(VFRB) create feed ", prop.first, ": ", e.what());
+            logger.warn("(VFRB) create feed ", name, ": ", e.what());
         }
     }
 }

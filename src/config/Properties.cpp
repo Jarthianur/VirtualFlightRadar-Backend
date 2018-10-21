@@ -25,48 +25,25 @@
 
 namespace config
 {
-Properties::Properties() {}
+Properties::Properties(const boost::property_tree::ptree& ptree) : m_pTree(ptree) {}
 
-Properties::~Properties() noexcept {}
+Properties::Properties(boost::property_tree::ptree&& ptree) : m_pTree(std::move(ptree)) {}
 
-const std::string Properties::get_property(const std::string& section, const std::string& key,
-                                           const std::string& alternative) const
+std::string Properties::get_property(const std::string& path, const std::string& alternative) const
 {
-    auto sectionIt = m_propertiesMap.find(section);
-    if (sectionIt != m_propertiesMap.end())
-    {
-        auto kvIt = sectionIt->second.find(key);
-        if (kvIt != sectionIt->second.end() && !kvIt->second.empty())
-        {
-            return kvIt->second;
-        }
-        else
-        {
-            return alternative;
-        }
-    }
-    else
-    {
-        return alternative;
-    }
+    return m_pTree.get(path, alternative);
 }
 
-const KeyValueMap& Properties::get_propertySection(const std::string& section) const
+Properties Properties::get_propertySection(const std::string& section) const
 {
-    auto it = m_propertiesMap.find(section);
-    if (it != m_propertiesMap.end())
+    try
     {
-        return it->second;
+        return Properties(m_pTree.get_child(section));
     }
-    else
+    catch (...)
     {
         throw std::out_of_range("section not found");
     }
-}
-
-bool config::Properties::addProperty(const std::string& section, const KeyValue& property)
-{
-    return m_propertiesMap[section].emplace(property).second;
 }
 
 }  // namespace config

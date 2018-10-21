@@ -21,12 +21,7 @@
 
 #pragma once
 
-#include <cstddef>
 #include <istream>
-#include <string>
-
-#include <boost/optional.hpp>
-#include <boost/regex.hpp>
 
 #include "Properties.h"
 
@@ -42,9 +37,9 @@ namespace config
 class ConfigReader
 {
 public:
-    ConfigReader();
+    ConfigReader(std::istream& stream);
 
-    ~ConfigReader() noexcept;
+    ~ConfigReader() noexcept = default;
 
     /**
      * @fn read
@@ -52,32 +47,10 @@ public:
      * @param rStream The stream to read
      * @param rMap    The map to store the properties in
      */
-    void read(std::istream& stream, Properties& properties);
+    Properties read();
 
 private:
-    /**
-     * @fn parseSection
-     * @brief Parse a section header.
-     *
-     * A section begins with '[name]', which is the header.
-     *
-     * @param crLine The string to parse
-     * @return an optional section name
-     */
-    boost::optional<std::string> parseSection(const std::string& line);
-
-    /**
-     * @fn parseKeyValue
-     * @brief Parse a key-value pair.
-     * @see mConfRe
-     * @param crLine The string to parse
-     * @return an optional KeyValue
-     */
-    boost::optional<KeyValue> parseProperty(const std::string& line);
-
-    /// @var mConfRe
-    /// Regular expression for 'key = value'
-    const static boost::regex s_keyValueRE;
+    std::istream& m_stream;
 };
 
 }  // namespace config

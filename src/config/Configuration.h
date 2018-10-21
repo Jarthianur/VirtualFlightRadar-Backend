@@ -110,10 +110,6 @@
 /// @namespace config
 namespace config
 {
-/// @typedef FeedMapping
-/// List of pairs with feed name and key-values
-using FeedProperties = std::list<std::pair<std::string, KeyValueMap>>;
-
 /**
  * @class Configuration
  * @brief Represents a VFRB configuration.
@@ -160,7 +156,7 @@ private:
      * @param crProperties The properties
      * @return a list of all feeds with their sections
      */
-    FeedProperties resolveFeeds(const Properties& properties);
+    void resolveFeeds(const Properties& properties);
 
     /**
      * @fn resolveFilter
@@ -216,7 +212,9 @@ private:
 
     /// @var mFeedMapping
     /// List of feeds with their key-value map
-    FeedProperties m_feedProperties;
+    std::list<std::string> m_feedNames;
+
+    std::unordered_map<std::string, Properties> m_feedProperties;
 
 public:
     /**
@@ -228,6 +226,7 @@ public:
     GETTER_V(maxDistance)
     GETTER_V(serverPort)
     GETSET_V(groundMode)
+    GETTER_CR(feedNames)
     GETTER_CR(feedProperties)
 };
 

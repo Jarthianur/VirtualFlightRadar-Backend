@@ -30,19 +30,21 @@
 #include "../data/Data.hpp"
 #include "../util/Logger.hpp"
 
+using namespace config;
+
 namespace feed
 {
-Feed::Feed(const std::string& name, const char* component, const config::KeyValueMap& propertyMap,
+Feed::Feed(const std::string& name, const char* component, const Properties& properties,
            std::shared_ptr<data::Data> data)
-    : m_name(name), m_component(component), m_propertyMap(propertyMap), m_data(data)
+    : m_name(name), m_component(component), m_properties(properties), m_data(data)
 {
     initPriority();
-    if (m_propertyMap.find(KV_KEY_HOST) == m_propertyMap.end())
+    if (m_properties.get_property(KV_KEY_HOST).empty())
     {
         logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
-    if (m_propertyMap.find(KV_KEY_PORT) == m_propertyMap.end())
+    if (m_properties.get_property(KV_KEY_PORT).empty())
     {
         logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
@@ -56,23 +58,18 @@ void Feed::initPriority() noexcept
     try
     {
         m_priority = static_cast<std::uint32_t>(std::max<std::uint64_t>(
-            0, std::min<std::uint64_t>(std::stoul(m_propertyMap.at(KV_KEY_PRIORITY)),
+            0, std::min<std::uint64_t>(std::stoul(m_properties.get_property(KV_KEY_PRIORITY)),
                                        std::numeric_limits<std::uint32_t>::max())));
     }
     catch (const std::logic_error&)
     {
         logger.warn(m_component, " create ", m_name, ": Invalid priority given.");
     }
-    if (m_priority == 0)
-    {
-        logger.warn(m_component, " create ", m_name,
-                    ": Priority is 0; this feed cannot update higher ones.");
-    }
 }
 
 client::Endpoint Feed::get_endpoint() const
 {
-    return {m_propertyMap.find(KV_KEY_HOST)->second, m_propertyMap.find(KV_KEY_PORT)->second};
+    return {m_properties.get_property(KV_KEY_HOST), m_properties.get_property(KV_KEY_PORT)};
 }
 
 }  // namespace feed

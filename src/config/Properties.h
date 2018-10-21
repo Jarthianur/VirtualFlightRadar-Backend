@@ -24,17 +24,11 @@
 #include <string>
 #include <unordered_map>
 
+#include <boost/property_tree/ptree.hpp>
+
 /// @namespace config
 namespace config
 {
-/// @typedef KeyValueMap
-/// Map key to value
-using KeyValueMap = std::unordered_map<std::string, std::string>;
-
-/// @typedef KeyValue
-/// key-value pair
-using KeyValue = std::pair<std::string, std::string>;
-
 /**
  * @class PropertyMap
  * @brief Store key-value pairs for sections.
@@ -42,9 +36,11 @@ using KeyValue = std::pair<std::string, std::string>;
 class Properties
 {
 public:
-    Properties();
+    explicit Properties(const boost::property_tree::ptree& ptree);
 
-    ~Properties() noexcept;
+    explicit Properties(boost::property_tree::ptree&& ptree);
+
+    ~Properties() noexcept = default;
 
     /**
      * @fn getProperty
@@ -54,8 +50,7 @@ public:
      * @param crDefault The default value (default: empty)
      * @return the value for key in section if found, else the default value
      */
-    const std::string get_property(const std::string& section, const std::string& key,
-                                   const std::string& alternative = "") const;
+    std::string get_property(const std::string& path, const std::string& alternative = "") const;
 
     /**
      * @fn getSectionKeyValue
@@ -64,22 +59,10 @@ public:
      * @return the kv-map if found, else an empty one
      * @throw std::out_of_range if the section is not found
      */
-    const KeyValueMap& get_propertySection(const std::string& section) const;
-
-    /**
-     * @fn addProperty
-     * @brief Add a key-value pair for a section.
-     * @note If the section does not exist, it gets created.
-     * @param rSection  The section name
-     * @param rKeyValue The key-value pair (default: empty)
-     * @return true on success, else false
-     */
-    bool addProperty(const std::string& section, const KeyValue& property = {});
+    Properties get_propertySection(const std::string& section) const;
 
 private:
-    /// @var mPropertiesMap
-    /// The map of sections with kv-maps
-    std::unordered_map<std::string, KeyValueMap> m_propertiesMap;
+    boost::property_tree::ptree m_pTree;
 };
 
 }  // namespace config
