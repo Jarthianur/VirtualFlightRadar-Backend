@@ -8,32 +8,20 @@ This is done by the install.sh automatically through appending the export instru
 To apply this change reboot the system.
 
 ```bash
-{path to binary} -c {path to config file} > {path to log file}  2>&1 &
+{path to binary} -c {path to config file} -o {path to log file} &
 ```
 
 ### Example
 
 ```bash
-./vfrb -c vfrb.ini > vfrb.log 2>&1 &
+./vfrb -c vfrb.ini -o vfrb.log &
 ```
 
 The log will be in the specified file.
-If You want to force the *Ground-Mode*, just add `-g` to the commandline arguments.
 
 ## As Service
 
-By invoking `./install.sh service`, the systemd service for VFR-B was automatically configured to start after boot.  
-To disable it call, where *servicename* is like *VFRB_NAME_B* from `bootstrap.sh`.
-
-```bash
-sudo systemctl disable {servicename}.service
-```
-
-### Run the service once by
-
-```bash
-sudo service {servicename} start
-```
+By invoking `./run.sh install`, the systemd service for VFR-B was automatically configured to start after boot.
 
 ### Watch the log with
 
@@ -41,12 +29,14 @@ sudo service {servicename} start
 journalctl -u {servicename}.service
 ```
 
-### Examples
+## Commandline arguments
 
-```bash
-sudo service vfrb start
-# ------
-sudo systemctl disable vfrb.service
-# ------
-journalctl -u vfrb.service
-```
+VFRB supports a few commandline arguments to control its behavior.
+
+| Argument | Explanation |
+| -- | -- |
+|-h / --help| Show an overview of all arguments and their usage.|
+|-c / --config | Set the configuration file to use.|
+|-v / --verbose| Enable debug logging |
+|-g / --ground-mode| Forcibly enable ground mode. |
+|-o / --output| Set a file where to pu all the logs. |

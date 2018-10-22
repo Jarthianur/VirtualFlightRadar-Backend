@@ -32,7 +32,6 @@ priority = 0
 ...
 
 All the parameters and sections should be self explanatory.
-Some information can be found in the comments of [vfrb.ini](/vfrb.ini)
 
 ### [general]
 
@@ -42,7 +41,8 @@ Therefore the entries must contain one of the following keywords
 
 + aprs
 + sbs
-+ sens
++ wind
++ atm
 + gps
 
 To enable the [Ground-Mode](#ground-mode), just assign any value to `gndMode`, to disable leave it empty.
@@ -72,12 +72,8 @@ The parameters for a feed section are
 
 Where `login` is only required for APRS feeds. `host` and `port` define the hostname /-address and port to connect to.
 `priority` defines the priority relative to all other feeds of the same type, therefor is only required if multiple feeds of same type exist.
-The priority is an integer, where a higher value means a higher priority. The priority is taken into account together with the update attempts of a feed.
-To be exact, a feed can update the corresponding data if its priority, multiplied with the former count of update attempts, is greater than the previous priority of that data.
-That means two things. First, a feed given priority `0` will never update others with a higher one and is therefor only reasonable as a single feed.
-Second, the update behavior can be controlled by the quotient of priorities.
-As an example, consider two wind sensors, each one with an own feed, and one has a priority of 10, the other has 2.
-Then the second one needs to try to update the wind data 5 times, without the first one updating in between, and the 5th attempt is the writing one (obviously 5*2=10).
+If multiple feeds of the same type use the same host, port combination, only one connection is used and thus shared betweeen them.
+The priority is an integer, where a higher value means a higher priority.
 
 #### Ground-Mode
 

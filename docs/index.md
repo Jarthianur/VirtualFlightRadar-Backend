@@ -1,7 +1,7 @@
 # VirtualFlightRadar-Backend (VFR-B)
 
 [![Build Status](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend.svg?branch=master)](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend)
-[![Coverage Status](https://coveralls.io/repos/github/Jarthianur/VirtualFlightRadar-Backend/badge.svg?branch=master)](https://coveralls.io/github/Jarthianur/VirtualFlightRadar-Backend?branch=master)
+[![codecov](https://codecov.io/gh/Jarthianur/VirtualFlightRadar-Backend/branch/master/graph/badge.svg)](https://codecov.io/gh/Jarthianur/VirtualFlightRadar-Backend)
 [![BCH compliance](https://bettercodehub.com/edge/badge/Jarthianur/VirtualFlightRadar-Backend?branch=master)](https://bettercodehub.com/)
 
 This project is intended to be an interface between APRS-/ADS-B-receivers, weather-sensors and XCSoar and the airfield manager respectively.
@@ -10,8 +10,6 @@ The aim is to provide a powerful backend-service, which receives position report
 and finally sending NMEA reports to any client. These reports may be displayed by any aviation-purposed navigation application, supporting NMEA protocol.
 The well-known, free glider navigation tool [XCSoar](https://www.xcsoar.org/) is recommended as such, as it supports all features provided by the VFR-B
 and is also available for most common platforms.
-
-Have a look at the [code of conduct](CODE-OF-CONDUCT.html), or the official [webpage](https://jarthianur.github.io/VirtualFlightRadar-Backend).
 
 ## Content
 
@@ -71,5 +69,5 @@ Contributions are always welcome.
 ---
 Status quo:
 
-Version **2.2.0**  
+Version **3.0.0**  
 Read more in the [CHANGELOG](CHANGELOG.html).
