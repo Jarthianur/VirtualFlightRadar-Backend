@@ -108,7 +108,7 @@ std::shared_ptr<Configuration> get_config(const program_options::variables_map& 
         std::ifstream file(variables["config"].as<std::string>());
         if (!file)
         {
-            throw std::runtime_error(variables["config"].as<std::string>() + " is not accessible");
+            throw std::logic_error(variables["config"].as<std::string>() + " is not accessible");
         }
         auto conf = std::make_shared<Configuration>(file);
         if (variables.count("ground-mode"))
@@ -120,6 +120,6 @@ std::shared_ptr<Configuration> get_config(const program_options::variables_map& 
     }
     else
     {
-        throw std::runtime_error("No config file given.");
+        throw std::logic_error("No config file given.");
     }
 }

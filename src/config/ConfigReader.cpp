@@ -42,7 +42,7 @@ Properties ConfigReader::read()
     }
     catch (const boost::property_tree::ini_parser_error& e)
     {
-        throw std::runtime_error(e.filename() + " is not a valid INI file");
+        throw std::invalid_argument(e.filename() + " is not a valid INI file");
     }
     return Properties(std::move(tree));
 }

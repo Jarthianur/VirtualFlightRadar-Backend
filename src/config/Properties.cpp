@@ -21,7 +21,7 @@
 
 #include "Properties.h"
 
-#include <stdexcept>
+#include <boost/property_tree/exceptions.hpp>
 
 namespace config
 {
@@ -40,9 +40,9 @@ Properties Properties::get_propertySection(const std::string& section) const
     {
         return Properties(m_pTree.get_child(section));
     }
-    catch (...)
+    catch (const boost::property_tree::ptree_bad_path&)
     {
-        throw std::out_of_range("section not found");
+        throw std::out_of_range(section + " not found");
     }
 }
 

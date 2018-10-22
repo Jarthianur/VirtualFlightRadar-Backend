@@ -56,7 +56,7 @@ Configuration::Configuration(std::istream& stream)
     catch (const std::exception& e)
     {
         logger.error("(Config) init: ", e.what());
-        throw std::runtime_error("Failed to read configuration file");
+        throw std::logic_error("Failed to read configuration file");
     }
 }
 
