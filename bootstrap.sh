@@ -157,6 +157,7 @@ function install_deps() {
         ALL="$ALL $BOOST"
     fi
     $(ifelse "-z '$SETUP'" "$SUDO $SETUP" '')
+    echo "$SUDO $UPDATE"
     $SUDO $UPDATE
     log -i "$SUDO" "$PKG_MANAGER" -y install "$ALL"
     $SUDO $PKG_MANAGER -y install $ALL
