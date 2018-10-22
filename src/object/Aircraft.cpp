@@ -21,6 +21,8 @@
 
 #include "Aircraft.h"
 
+#include <typeinfo>
+
 namespace object
 {
 Aircraft::Aircraft() : Aircraft(0) {}
@@ -36,24 +38,36 @@ Aircraft::~Aircraft() noexcept {}
 
 void Aircraft::assign(Object&& other)
 {
-    Object::assign(std::move(other));
-    Aircraft&& update    = static_cast<Aircraft&&>(other);
-    this->m_idType       = update.m_idType;
-    this->m_aircraftType = update.m_aircraftType;
-    this->m_targetType   = update.m_targetType;
-    this->m_position     = update.m_position;
-    this->m_movement     = update.m_movement;
-    this->m_timeStamp    = update.m_timeStamp;
-    this->m_fullInfo     = update.m_fullInfo;
+    try
+    {
+        Aircraft&& update = dynamic_cast<Aircraft&&>(other);
+        Object::assign(std::move(other));
+        this->m_idType       = update.m_idType;
+        this->m_aircraftType = update.m_aircraftType;
+        this->m_targetType   = update.m_targetType;
+        this->m_position     = update.m_position;
+        this->m_movement     = update.m_movement;
+        this->m_timeStamp    = update.m_timeStamp;
+        this->m_fullInfo     = update.m_fullInfo;
+    }
+    catch (const std::bad_cast&)
+    {}
 }
 
 bool Aircraft::canUpdate(const Object& other) const
 {
-    const Aircraft& toUpdate = static_cast<const Aircraft&>(other);
-    return (this->m_timeStamp > toUpdate.m_timeStamp) &&
-           (toUpdate.m_targetType == TargetType::TRANSPONDER ||
-            this->m_targetType == TargetType::FLARM) &&
-           Object::canUpdate(other);
+    try
+    {
+        const Aircraft& toUpdate = dynamic_cast<const Aircraft&>(other);
+        return (this->m_timeStamp > toUpdate.m_timeStamp) &&
+               (toUpdate.m_targetType == TargetType::TRANSPONDER ||
+                this->m_targetType == TargetType::FLARM) &&
+               Object::canUpdate(other);
+    }
+    catch (const std::bad_cast&)
+    {
+        return false;
+    }
 }
 
 void Aircraft::set_aircraftType(Aircraft::AircraftType type)

@@ -17,6 +17,8 @@
 
 #include "GpsPosition.h"
 
+#include <typeinfo>
+
 namespace object
 {
 GpsPosition::GpsPosition() : Object() {}
@@ -31,20 +33,32 @@ GpsPosition::~GpsPosition() noexcept {}
 
 void GpsPosition::assign(Object&& other)
 {
-    Object::assign(std::move(other));
-    GpsPosition&& update   = static_cast<GpsPosition&&>(other);
-    this->m_position       = update.m_position;
-    this->m_timeStamp      = update.m_timeStamp;
-    this->m_nrOfSatellites = update.m_nrOfSatellites;
-    this->m_fixQuality     = update.m_fixQuality;
-    this->m_geoid          = update.m_geoid;
-    this->m_dilution       = update.m_dilution;
+    try
+    {
+        GpsPosition&& update = dynamic_cast<GpsPosition&&>(other);
+        Object::assign(std::move(other));
+        this->m_position       = update.m_position;
+        this->m_timeStamp      = update.m_timeStamp;
+        this->m_nrOfSatellites = update.m_nrOfSatellites;
+        this->m_fixQuality     = update.m_fixQuality;
+        this->m_geoid          = update.m_geoid;
+        this->m_dilution       = update.m_dilution;
+    }
+    catch (const std::bad_cast&)
+    {}
 }
 
 bool GpsPosition::canUpdate(const Object& other) const
 {
-    const GpsPosition& toUpdate = static_cast<const GpsPosition&>(other);
-    return (this->m_timeStamp > toUpdate.m_timeStamp) && Object::canUpdate(other);
+    try
+    {
+        const GpsPosition& toUpdate = dynamic_cast<const GpsPosition&>(other);
+        return (this->m_timeStamp > toUpdate.m_timeStamp) && Object::canUpdate(other);
+    }
+    catch (const std::bad_cast&)
+    {
+        return false;
+    }
 }
 
 }  // namespace object

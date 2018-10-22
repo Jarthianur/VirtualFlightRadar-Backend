@@ -17,6 +17,8 @@
 
 #include "Atmosphere.h"
 
+#include <typeinfo>
+
 namespace object
 {
 Atmosphere::Atmosphere() : Object() {}
@@ -31,9 +33,14 @@ Atmosphere::~Atmosphere() noexcept {}
 
 void Atmosphere::assign(Object&& other)
 {
-    Object::assign(std::move(other));
-    Atmosphere&& update = static_cast<Atmosphere&&>(other);
-    this->m_pressure    = update.m_pressure;
+    try
+    {
+        Atmosphere&& update = dynamic_cast<Atmosphere&&>(other);
+        Object::assign(std::move(other));
+        this->m_pressure = update.m_pressure;
+    }
+    catch (const std::bad_cast&)
+    {}
 }
 
 }  // namespace object
