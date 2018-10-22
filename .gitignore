@@ -1,15 +1,16 @@
 *
 !/**/
 /*/
+!.github/
 !/test/
 !/build/
 !/src/
 !/service/
 !/docs/
+!.github/**
 !/service/**
 !/docs/_includes/**
 !/docs/assets/**
-!/.ide/**
 !LICENSE
 !CODEOWNERS
 !.gitattributes
