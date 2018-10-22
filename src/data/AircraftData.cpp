@@ -61,14 +61,14 @@ std::string AircraftData::get_serialized()
 bool AircraftData::update(Object&& aircraft)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    Aircraft&&                  rvUpdate = static_cast<Aircraft&&>(aircraft);
-    const auto                  index    = m_index.find(rvUpdate.get_id());
+    Aircraft&&                  update = static_cast<Aircraft&&>(aircraft);
+    const auto                  index  = m_index.find(update.get_id());
 
     if (index != m_index.end())
     {
         return m_container[index->second].tryUpdate(std::move(aircraft));
     }
-    insert(rvUpdate);
+    insert(update);
     return true;
 }
 

@@ -63,10 +63,11 @@ bool GpsFeed::process(const std::string& response)
         {
             if (m_data->update(std::move(pos)))
             {
-                throw std::runtime_error("received good position -> stop");
+                logger.info(m_component, " ", m_name, ": received good position -> stop");
+                return false;
             }
         }
-        catch (const std::runtime_error& e)
+        catch (const data::PositionLocked& e)
         {
             logger.info(m_component, " ", m_name, ": ", e.what());
             return false;

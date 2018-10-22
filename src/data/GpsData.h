@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <exception>
 #include <string>
 
 #include "../object/GpsPosition.h"
@@ -99,6 +100,15 @@ private:
     /// @var mGroundMode
     /// Ground mode state
     bool m_groundMode = false;
+};
+
+class PositionLocked : public std::exception
+{
+public:
+    PositionLocked();
+    ~PositionLocked() noexcept = default;
+
+    const char* what() const noexcept override;
 };
 
 }  // namespace data

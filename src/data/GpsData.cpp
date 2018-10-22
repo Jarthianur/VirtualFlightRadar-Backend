@@ -61,7 +61,7 @@ bool GpsData::update(Object&& position)
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_positionLocked)
     {
-        throw std::runtime_error("position was locked before.");
+        throw PositionLocked();
     }
     bool updated = m_position.tryUpdate(std::move(position));
     if (updated)
@@ -82,6 +82,13 @@ bool GpsData::isPositionGood()
     return m_position.get_nrOfSatellites() >= GPS_NR_SATS_GOOD &&
            m_position.get_fixQuality() >= GPS_FIX_GOOD &&
            m_position.get_dilution() <= GPS_HOR_DILUTION_GOOD;
+}
+
+PositionLocked::PositionLocked() : std::exception() {}
+
+const char* PositionLocked::what() const noexcept
+{
+    return "position was locked before";
 }
 
 }  // namespace data
