@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # working
-if [ "$(whoami)" != 'root' ]; then
+if [ $(id -u) -ne 0 ]; then
     SUDO='sudo'
 fi
 export SUDO="${SUDO:-}"

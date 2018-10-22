@@ -4,10 +4,6 @@ All necessary dependencies and build steps are automated in the `run.sh` file.
 To build the VFRB execute `./run.sh build` in bash.
 If you want to specify build paths etc, just follow the description from `run.sh --help`.
 
-## Software Requirements
-
-+ GNU compiler g++ (>= 5.4)
-
 ## Install
 
 ### Manually
