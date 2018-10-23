@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lboost_regex -lboost_system -lboost_program_options -lpthread
+LIBS := -lboost_regex -lboost_system -lboost_program_options
 
