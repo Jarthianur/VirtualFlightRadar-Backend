@@ -1,4 +1,25 @@
-FROM debian:stretch-slim
+#FROM debian:stretch-slim
+FROM alpine:3.8 AS build
+
+ENV VFRB_VERSION="dock"
+
+#RUN apt-get update && \
+#    apt-get install -no-install-recommends -y curl && \
+#    apt-get autoremove && \
+#    apt-get clean && \
+#    rm -rf /var/lib/apt/lists/*
+
+RUN apk add --no-cache curl bash
+
+COPY . /tmp/vfrb/
+WORKDIR /tmp/vfrb
+RUN ./run.sh build -y
+RUN mkdir -p /opt && \
+    mv build/vfrb-dock vfrb.ini healthcheck.sh /opt/ && \
+    rm -rf /tmp/vfrb && \
+    apk del --no-cache g++ make bash
+
+FROM alpine:3.8
 
 LABEL maintainer="Jarthianur jarthianur.github@gmail.com" \
     app="VirtualFlightRadar-Backend" \
@@ -7,24 +28,13 @@ LABEL maintainer="Jarthianur jarthianur.github@gmail.com" \
 
 EXPOSE 4353
 
-ENV VFRB_VERSION="dock"
+RUN apk add --no-cache libstdc++ boost-dev boost-system boost-regex boost-program_options
 
-RUN apt-get update && \
-    apt-get install -no-install-recommends -y curl && \
-    apt-get autoremove && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+COPY --from=build /opt/* /opt/
 
-COPY . /tmp/vfrb/
-WORKDIR /tmp/vfrb
-RUN ./run.sh build -y
-RUN mkdir -p /opt && \
-    mv build/vfrb-dock vfrb.ini healthcheck.sh /opt/ && \
-    rm -rf /tmp/vfrb
-
+#--start-period=10s \
 HEALTHCHECK --interval=5m \
     --timeout=10s \
-    --start-period=10s \
     --retries=1 \
     CMD [ "/opt/healthcheck.sh" ]
 

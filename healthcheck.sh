@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 curl -m 2 -f -s -o /dev/null localhost:4353
 err=$?

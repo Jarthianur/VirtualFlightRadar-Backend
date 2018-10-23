@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # working
 if [ $(id -u) -ne 0 ]; then
     SUDO='sudo'
@@ -105,12 +103,15 @@ function resolve_pkg_manager() {
     if [ "$(which 2>&1)" == "" ]; then
         APT="$(which apt-get || true)"
         YUM="$(which yum || true)"
+        APK="$(which apk || true)"
     else
         RELEASE="$(cat /etc/*-release)"
-        if [ "$(echo $RELEASE | grep -oiP '(ubuntu|debian)')" != "" ]; then
+        if [ "$(echo $RELEASE | grep -oiE '(ubuntu|debian)')" != "" ]; then
             APT="apt-get"
-        elif [ "$(echo $RELEASE | grep -oiP '(centos|fedora)')" != "" ]; then
+        elif [ "$(echo $RELEASE | grep -oiE '(centos|fedora)')" != "" ]; then
             YUM="yum"
+        elif [ "$(echo $RELEASE | grep -oiE 'alpine')" != "" ]; then
+            APK="apk"
         fi
     fi
     if [ ! -z "$APT" ]; then
@@ -119,6 +120,9 @@ function resolve_pkg_manager() {
     elif [ ! -z "$YUM" ]; then
         export PKG_MANAGER="$YUM"
         log -i Using yum as package manager.
+    elif [ ! -z "$APK" ]; then
+        export PKG_MANAGER="$APK"
+        log -i Using apk as package manager.
     else
         log -e Could not determine package manager!
         error=1
@@ -137,30 +141,39 @@ function install_deps() {
     *apt-get)
         local UPDATE="apt-get update"
         local SETUP=''
+        local INSTALL='install -y --no-install-recommends'
         local BOOST='libboost-dev libboost-system-dev libboost-regex-dev libboost-program-options-dev'
         ! $VFRB_COMPILER -v > /dev/null 2>&1
+        local GCC=""
         if [ $? -eq 0 ]; then
-            local GCC="$(basename "$VFRB_COMPILER")"
+            GCC="$(basename "$VFRB_COMPILER")"
         fi
         GCC="$GCC make"
     ;;
     *yum)
         local UPDATE='yum clean all'
         local SETUP='yum -y install epel-release'
+        local INSTALL='install -y'
         local BOOST='boost boost-devel'
         local GCC='gcc-c++ make'
     ;;
+    *apk)
+        local UPDATE=''
+        local SETUP=''
+        local INSTALL='add --no-cache'
+        local BOOST='boost-dev boost-system boost-regex boost-program_options'
+        local GCC='g++ make'
+    ;;
     esac
-    require GCC BOOST UPDATE
+    require GCC BOOST INSTALL
     ALL="$GCC"
     if [ -z "$CUSTOM_BOOST" ]; then
         ALL="$ALL $BOOST"
     fi
     $(ifelse "-z '$SETUP'" "$SUDO $SETUP" '')
-    echo "$SUDO $UPDATE"
-    $SUDO $UPDATE
-    log -i "$SUDO" "$PKG_MANAGER" -y install "$ALL"
-    $SUDO $PKG_MANAGER -y install $ALL
+    $(ifelse "-z '$UPDATE'" "$SUDO $UPDATE" '')
+    log -i "$SUDO" "$PKG_MANAGER" "$INSTALL" "$ALL"
+    $SUDO $PKG_MANAGER $INSTALL $ALL
     trap - ERR
 }
 
@@ -237,7 +250,7 @@ function install_test_deps() {
         local TOOLS='cppcheck clang-format-6.0 wget netcat procps perl lcov'
     ;;
     *)
-        log -w Tests currently only run under ubuntu/debian systems.
+        log -e Tests currently only run under ubuntu/debian systems.
         return 1
     ;;
     esac
@@ -359,7 +372,7 @@ function docker_image() {
     log -i BUILD DOCKER IMAGE
     require VFRB_ROOT VFRB_VERSION
     if [ ! -x /usr/bin/docker ]; then
-        log -e docker must be installed to run this
+        log -e docker must be installed to create a docker image
         return 1
     fi
     trap "fail -e popd Docker image creation failed!" ERR
