@@ -1,0 +1,11 @@
+.github/
+docs/
+test/
+service/
+.travis.yml
+README.md
+LICENSE
+.gitattributes
+.gitignore
+.gitmodules
+.clang-format

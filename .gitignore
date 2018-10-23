@@ -18,6 +18,8 @@
 !.gitmodules
 !.clang-format
 !makefile
+!Dockerfile
+!.dockerignore
 !*.mk
 !*.sh
 !*.md
