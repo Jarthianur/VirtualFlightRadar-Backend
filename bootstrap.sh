@@ -353,3 +353,18 @@ function gen_coverage() {
     popd
     trap - ERR
 }
+
+function docker_image() {
+    set -eE
+    log -i BUILD DOCKER IMAGE
+    require VFRB_ROOT VFRB_VERSION
+    if [ ! -x /usr/bin/docker ]; then
+        log -e docker must be installed to run this
+        return 1
+    fi
+    trap "fail -e popd Docker image creation failed!" ERR
+    pushd $VFRB_ROOT
+    $SUDO docker build . -t user/vfrb:latest -t user/vfrb:${VFRB_VERSION}
+    popd
+    trap - ERR
+}

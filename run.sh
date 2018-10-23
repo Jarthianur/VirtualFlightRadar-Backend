@@ -27,6 +27,8 @@ function print_help() {
     echo '  install : Build and install the VFRB executable, config file and service.'
     echo '  test    : Build and run the unit, regression tests and code analysis.'
     echo '            Also generate test/coverage report.'
+    echo '  docker  : Build a minimal docker image. Cannot be combined with other tasks.'
+    echo '            The vfrb.ini will be copied, so edit it before running this command.'
     echo ''
     echo 'ENVIRONMENT:'
     echo 'Following adjustments can be made with environment variables.'
@@ -34,6 +36,7 @@ function print_help() {
     echo '  VFRB_COMPILER  : Use this compiler.'
     echo '  VFRB_EXEC_PATH : Same as "--path=".'
     echo '  VFRB_INI_PATH  : Same as "--ini-path=".'
+    echo '  VFRB_VERSION   : Set this version.'
     echo ''
 }
 
@@ -63,12 +66,21 @@ for arg in $@; do
     test)
         DO_TEST=1
     ;;
+    docker)
+        DO_DOCKER=1
+    ;;
     -h | --help | *)
         print_help
         exit 1
     ;;
     esac
 done
+
+if [ ! -z "$DO_DOCKER" ]; then
+    docker_image
+    log -i Run e.g. "'sudo docker run --name vfrb -p 4353:4353 -dit user/vfrb:latest -g'"
+    exit 0
+fi
 
 if [ "$(basename $VFRB_INI_PATH | grep -o '.ini')" == "" ]; then
     log -e "\"$VFRB_INI_PATH\"" is not a valid path to an ini file!
