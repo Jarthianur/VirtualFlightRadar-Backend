@@ -158,11 +158,11 @@ function install_deps() {
     require PKG_MANAGER VFRB_COMPILER
     case $PKG_MANAGER in
     *apt-get)
-        local UPDATE="apt-get update"
+        local UPDATE='apt-get update'
         local SETUP=''
         local INSTALL='install -y'
         local BOOST='libboost-dev libboost-system-dev libboost-regex-dev libboost-program-options-dev'
-        local GCC=""
+        local GCC=''
         ! $VFRB_COMPILER -v > /dev/null 2>&1
         if [ $? -eq 0 ]; then
             GCC="$(basename "$VFRB_COMPILER")"

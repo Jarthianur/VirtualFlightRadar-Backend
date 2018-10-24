@@ -14,7 +14,7 @@ RUN mkdir -p /opt && \
 
 FROM alpine:3.8
 
-LABEL maintainer="Jarthianur jarthianur.github@gmail.com" \
+LABEL maintainer="Jarthianur <jarthianur.github@gmail.com>" \
     app="VirtualFlightRadar-Backend" \
     description="VirtualFlightRadar-Backend running in a docker container." \
     url="https://github.com/Jarthianur/VirtualFlightRadar-Backend"
