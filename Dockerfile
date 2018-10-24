@@ -1,7 +1,7 @@
 FROM alpine:3.8 AS build
 
 ENV VFRB_VERSION="dock" \
-    VFRB_COMPILE_STATIC="yes"
+    VFRB_LINK_STATIC="yes"
 
 RUN apk add --no-cache bash
 

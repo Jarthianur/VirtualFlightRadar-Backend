@@ -160,10 +160,10 @@ function install_deps() {
     *apt-get)
         local UPDATE="apt-get update"
         local SETUP=''
-        local INSTALL='install -y --no-install-recommends'
+        local INSTALL='install -y'
         local BOOST='libboost-dev libboost-system-dev libboost-regex-dev libboost-program-options-dev'
-        ! $VFRB_COMPILER -v > /dev/null 2>&1
         local GCC=""
+        ! $VFRB_COMPILER -v > /dev/null 2>&1
         if [ $? -eq 0 ]; then
             GCC="$(basename "$VFRB_COMPILER")"
         fi
@@ -174,7 +174,13 @@ function install_deps() {
         local SETUP='yum -y install epel-release'
         local INSTALL='install -y'
         local BOOST='boost boost-devel'
-        local GCC='gcc-c++ make'
+        local GCC=""
+        ! $VFRB_COMPILER -v > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            log -w $VFRB_COMPILER is not installed, default to gcc-c++
+            GCC="gcc-c++"
+        fi
+        GCC="$GCC make"
     ;;
     *apk)
         local UPDATE=''
@@ -189,8 +195,8 @@ function install_deps() {
     if [ -z "$CUSTOM_BOOST" ]; then
         ALL="$ALL $BOOST"
     fi
-    $(ifelse "-z '$SETUP'" "$SUDO $SETUP" '')
     $(ifelse "-z '$UPDATE'" "$SUDO $UPDATE" '')
+    $(ifelse "-z '$SETUP'" "$SUDO $SETUP" '')
     log -i "$SUDO" "$PKG_MANAGER" "$INSTALL" "$ALL"
     $SUDO $PKG_MANAGER $INSTALL $ALL
     trap - ERR
@@ -288,7 +294,7 @@ function build_test() {
     if [ ! -z "$CUSTOM_BOOST" ]; then
         require BOOST_LIBS_L BOOST_ROOT_I
     fi
-    export VFRB_DEBUG="-g --coverage"
+    export VFRB_DEBUG="-g3 --coverage"
     export VFRB_OPT="0"
     trap "fail -e popd Build has failed!" ERR
     pushd "$VFRB_ROOT/test/build/"

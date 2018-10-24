@@ -52,11 +52,12 @@ function print_help() {
     echo ''
     echo 'ENVIRONMENT:'
     echo 'Following adjustments can be made with environment variables.'
-    echo '  BOOST_ROOT     : Assume boost manually installed at this path.'
-    echo '  VFRB_COMPILER  : Use this compiler.'
-    echo '  VFRB_EXEC_PATH : Same as "--path=".'
-    echo '  VFRB_INI_PATH  : Same as "--ini-path=".'
-    echo '  VFRB_VERSION   : Set this version.'
+    echo '  BOOST_ROOT       : Assume boost manually installed at this path.'
+    echo '  VFRB_COMPILER    : Use this compiler.'
+    echo '  VFRB_LINK_STATIC : Link libraries static where possible.'
+    echo '  VFRB_EXEC_PATH   : Same as "--path=".'
+    echo '  VFRB_INI_PATH    : Same as "--ini-path=".'
+    echo '  VFRB_VERSION     : Set this version.'
     echo ''
 }
 

@@ -10,7 +10,7 @@ DBG := ${VFRB_DEBUG}
 TARGET := $(or ${VFRB_TARGET},${VFRB_TARGET},vfrb)
 CXX := $(or ${VFRB_COMPILER},${VFRB_COMPILER},g++)
 STATIC_FLAG := -Wl,-Bstatic
-COMPILE_STATIC := $(if ${VFRB_COMPILE_STATIC},$(STATIC_FLAG),)
+LINK_STATIC := $(if ${VFRB_LINK_STATIC},$(STATIC_FLAG),)
 BOOST_L := ${BOOST_LIBS_L}
 BOOST_I := ${BOOST_ROOT_I}
 
@@ -59,7 +59,7 @@ all: VirtualFlightRadar-Backend
 VirtualFlightRadar-Backend: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: G++ Linker'
-	$(CXX) $(BOOST_L) $(DBG) -o $(TARGET) $(OBJS) $(USER_OBJS) $(COMPILE_STATIC) $(LIBS) -Wl,-Bdynamic -lpthread -Wl,--as-needed
+	$(CXX) $(BOOST_L) $(DBG) -o $(TARGET) $(OBJS) $(USER_OBJS) $(LINK_STATIC) $(LIBS) -Wl,-Bdynamic -lpthread -Wl,--as-needed
 	@echo 'Finished building target: $@'
 	@echo ' '
 
