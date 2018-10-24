@@ -29,9 +29,9 @@ export VFRB_TARGET="vfrb-$VFRB_VERSION"
 VFRB_EXEC_PATH=${VFRB_EXEC_PATH:-"$VFRB_ROOT/build/$VFRB_TARGET"}
 VFRB_INI_PATH=${VFRB_INI_PATH:-"$VFRB_ROOT/build/vfrb.ini"}
 
-. "$VFRB_ROOT/bootstrap.sh"
+source "$VFRB_ROOT/bootstrap.sh"
 
-print_help() {
+function print_help() {
     echo 'VirtualFlightRadar-Backend install script.'
     echo ''
     echo 'Usage: ./run.sh [OPTIONS] <TASKS>'
@@ -103,13 +103,17 @@ if [ ! -z "$DO_DOCKER" ]; then
     exit 0
 fi
 
-if [ "$(basename $VFRB_INI_PATH | grep -o '.ini')" = "" ]; then
+if [ "$(basename $VFRB_INI_PATH | grep -o '.ini')" == "" ]; then
     log -e "\"$VFRB_INI_PATH\"" is not a valid path to an ini file!
     exit 1
 fi
 prepare_path "$VFRB_EXEC_PATH"
+REPLACE_INI=1
 ! prepare_path "$VFRB_INI_PATH"
-export REPLACE_INI=$(ifelse "$? -eq 1" '0' '1')
+if [ $? -eq 1 ]; then
+    REPLACE_INI=0
+fi
+export REPLACE_INI
 log -i VFRB executable will be at "$VFRB_EXEC_PATH"
 log -i VFRB ini file will be at "$VFRB_INI_PATH"
 
@@ -128,7 +132,9 @@ fi
 if [ ! -z "$DO_TEST" ]; then
     install_deps
     install_test_deps
-    $(ifelse "-d $VFRB_ROOT/reports/" '' "mkdir $VFRB_ROOT/reports/")
+    if [ ! -d $VFRB_ROOT/reports/ ]; then
+        mkdir $VFRB_ROOT/reports/
+    fi
     static_analysis
     build_test
     run_unit_test

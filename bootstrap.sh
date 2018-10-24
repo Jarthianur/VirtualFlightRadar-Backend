@@ -25,15 +25,6 @@ export SUDO="${SUDO:-}"
 export PROMPT="$(basename $0)"
 
 # working
-function ifelse() {
-    if [ $1 ]; then
-        printf '%s' "$2"
-    else
-        printf '%s' "$3"
-    fi
-}
-
-# working
 function log() {
     local TIME=`date +"%T"`
     case $1 in
@@ -48,7 +39,11 @@ function log() {
     ;;
     esac
     shift
-    echo " $TIME $PROMPT$(ifelse "'${FUNCNAME[1]}' == ''" '' "->${FUNCNAME[1]}"):: $*"
+    local ROUTINE=''
+    if [ -n "${FUNCNAME[1]}" ]; then
+        ROUTINE="->${FUNCNAME[1]}"
+    fi
+    echo " ${TIME} ${PROMPT}${ROUTINE}:: $*"
 }
 
 # working
@@ -73,21 +68,21 @@ function fail() {
             shift
         ;;
         *)
-            MSG="$MSG $1"
+            MSG="${MSG} $1"
         ;;
         esac
         shift
     done
-    log -e $MSG
+    log -e ${MSG}
     exit 1
 }
 
 # working
 function confirm() {
     log -i $*
-    if [ -z "$AUTO_CONFIRM" ]; then
+    if [ -z "${AUTO_CONFIRM}" ]; then
         read -r -p "Confirm? [yes|no]: " READ
-        case $READ in
+        case ${READ} in
         [yY] | yes | YES)
             return 0
         ;;
@@ -103,17 +98,14 @@ function confirm() {
 # working
 function prepare_path() {
     set -e
-    local error=0
     if [ -e "$1" ]; then
         log -w "\"$1\"" already exists.
         confirm Replace the existing one\?
-        error=$?
-        $(ifelse "$error -eq 0" "rm -rf '$1'" '')
+        rm -rf "$1"
     else
         mkdir -p "$(dirname $1)"
-        error=$?
     fi
-    return $error
+    return 0
 }
 
 # working
@@ -133,13 +125,13 @@ function resolve_pkg_manager() {
             APK="apk"
         fi
     fi
-    if [ ! -z "$APT" ]; then
+    if [ -n "$APT" ]; then
         export PKG_MANAGER="$APT"
         log -i Using apt as package manager.
-    elif [ ! -z "$YUM" ]; then
+    elif [ -n "$YUM" ]; then
         export PKG_MANAGER="$YUM"
         log -i Using yum as package manager.
-    elif [ ! -z "$APK" ]; then
+    elif [ -n "$APK" ]; then
         export PKG_MANAGER="$APK"
         log -i Using apk as package manager.
     else
@@ -174,10 +166,10 @@ function install_deps() {
         local SETUP='yum -y install epel-release'
         local INSTALL='install -y'
         local BOOST='boost boost-devel'
-        local GCC=""
+        local GCC=''
         ! $VFRB_COMPILER -v > /dev/null 2>&1
         if [ $? -eq 0 ]; then
-            log -w $VFRB_COMPILER is not installed, default to gcc-c++
+            log -w "$VFRB_COMPILER" is not installed, default to gcc-c++
             GCC="gcc-c++"
         fi
         GCC="$GCC make"
@@ -195,8 +187,8 @@ function install_deps() {
     if [ -z "$CUSTOM_BOOST" ]; then
         ALL="$ALL $BOOST"
     fi
-    $(ifelse "-z '$UPDATE'" "$SUDO $UPDATE" '')
-    $(ifelse "-z '$SETUP'" "$SUDO $SETUP" '')
+    if [ -n "$UPDATE" ]; then $SUDO $UPDATE; fi
+    if [ -n "$SETUP" ]; then $SUDO $SETUP; fi
     log -i "$SUDO" "$PKG_MANAGER" "$INSTALL" "$ALL"
     $SUDO $PKG_MANAGER $INSTALL $ALL
     trap - ERR
@@ -208,7 +200,7 @@ function build() {
     set -eE
     log -i BUILD VFRB
     require VFRB_ROOT VFRB_TARGET VFRB_COMPILER
-    if [ ! -z "$CUSTOM_BOOST" ]; then
+    if [ -n "$CUSTOM_BOOST" ]; then
         require BOOST_LIBS_L BOOST_ROOT_I
     fi
     export VFRB_OPT=${VFRB_OPT:-"3"}
@@ -229,7 +221,7 @@ function install_service() {
     local SYSD_PATH="/etc/systemd/system"
     trap "fail -e popd Service installation has failed!" ERR
     pushd "$SYSD_PATH"
-    if [ ! -z "$CUSTOM_BOOST" ]; then
+    if [ -n "$CUSTOM_BOOST" ]; then
         require BOOST_ROOT
         $SUDO mkdir "vfrb.service.d"
         $SUDO sh -c "sed -e 's|%BOOST_LIBS_PATH%|${BOOST_ROOT}/stage/lib:|' \
@@ -291,7 +283,7 @@ function build_test() {
     set -eE
     log -i BUILD VFRB TESTS
     require VFRB_ROOT VFRB_COMPILER
-    if [ ! -z "$CUSTOM_BOOST" ]; then
+    if [ -n "$CUSTOM_BOOST" ]; then
         require BOOST_LIBS_L BOOST_ROOT_I
     fi
     export VFRB_DEBUG="-g3 --coverage"
@@ -335,12 +327,15 @@ function run_unit_test() {
     set -eE
     log -i RUN UNIT TESTS
     require VFRB_ROOT
+    local error=1
     trap "fail -e popd Unit tests failed!" ERR
     pushd $VFRB_ROOT
     lcov --initial --directory test/build --capture --output-file reports/test_base.info
     lcov --initial --directory build --capture --output-file reports/vfrb_base.info
     ! test/build/VFR-Test &> reports/unittests.xml
-    local error=$(ifelse "$? -eq 1" '0' '1')
+    if [ $? -eq 1 ]; then
+        error=0
+    fi
     cat reports/unittests.xml
     $(exit $error)
     popd
