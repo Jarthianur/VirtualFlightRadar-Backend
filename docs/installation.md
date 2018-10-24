@@ -34,3 +34,11 @@ If not already done, now the runtime configuration must be specified in the targ
 There are prebuilt binaries available per release, at least for the RaspberryPi.
 Download the right one and put it where ever you want it to stay.
 Of course you need to write an `.ini` file.
+
+### Docker
+
+If you want to run this application containerized, using docker, there is a task which creates a minimal docker image.
+Simply run `./run.sh docker` to build the image. Whilst the image creation process, the *vfrb.ini* file is copied into the image.
+This allows to create an image with complete configuration done and without the need to touch the file later.
+Please pay attention to your network setup, as "localhost" refers to the docker container and not the actual host.
+Hence use the actual IP address of your host for all services that run there. Also the internal port must stay at 4353.

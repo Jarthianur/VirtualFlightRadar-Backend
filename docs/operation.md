@@ -40,3 +40,11 @@ VFRB supports a few commandline arguments to control its behavior.
 |-v / --verbose| Enable debug logging |
 |-g / --ground-mode| Forcibly enable ground mode. |
 |-o / --output| Set a file where to pu all the logs. |
+
+## Run as docker container
+
+Assuming the docker image was built correctly as described [here](installation.md),
+you can run the VFRB inside a minimal container without messing up your host with dependencies or whatever.
+Also you can run the VFRB on any platform you like, wherever docker is available.
+To run a docker container execute like `docker run --name VFRB -p <PORT>:4353 -dit user/vfrb:latest [OPTIONS]`.
+Where *PORT* can be any port you like and *OPTIONS* can be any VFRB commandline argument, except for *-c*.
