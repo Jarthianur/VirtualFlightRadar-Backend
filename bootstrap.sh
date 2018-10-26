@@ -17,28 +17,31 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # }
 
-# working
+# set SUDO if not root
 if [ $(id -u) -ne 0 ]; then
     SUDO='sudo'
 fi
 export SUDO="${SUDO:-}"
+
+# set logging PROMPT
 export PROMPT="$(basename $0)"
 
-# working
+# logging function
+# param 1 may indicate log level
+# all other params are printed
 function log() {
     local TIME=`date +"%T"`
     case $1 in
     -i)
-        echo -en "\033[0;32m[INFO ]\033[0m"
+        echo -en "\033[0;32m[INFO ]\033[0m"; shift
     ;;
     -w)
-        echo -en "\033[0;33m[WARN ]\033[0m"
+        echo -en "\033[0;33m[WARN ]\033[0m"; shift
     ;;
     -e)
-        echo -en "\033[0;31m[ERROR]\033[0m"
+        echo -en "\033[0;31m[ERROR]\033[0m"; shift
     ;;
     esac
-    shift
     local ROUTINE=''
     if [ -n "${FUNCNAME[1]}" ]; then
         ROUTINE="->${FUNCNAME[1]}"
@@ -46,7 +49,8 @@ function log() {
     echo " ${TIME} ${PROMPT}${ROUTINE}:: $*"
 }
 
-# working
+# require an env var to be set and not empty
+# params are the var names
 function require() {
     local error=0
     for v in $*; do
@@ -58,7 +62,9 @@ function require() {
     return $error
 }
 
-# working
+# exit the script with 1 and execute/log given params
+# all params preceeded by -e are executed
+# all other params are logged
 function fail() {
     local MSG=''
     while [ $# -gt 0 ]; do
@@ -77,7 +83,9 @@ function fail() {
     exit 1
 }
 
-# working
+# wait for user input to confirm or deny
+# all params are logged
+# if AUTO_CONFIRM is set skip
 function confirm() {
     log -i $*
     if [ -z "${AUTO_CONFIRM}" ]; then
@@ -95,20 +103,21 @@ function confirm() {
     return 0
 }
 
-# working
+# create a directory path, remove before if already exists
+# waits for confirm
 function prepare_path() {
     set -e
     if [ -e "$1" ]; then
         log -w "\"$1\"" already exists.
         confirm Replace the existing one\?
-        rm -rf "$1"
+        rm "$1"
     else
         mkdir -p "$(dirname $1)"
     fi
     return 0
 }
 
-# working
+# set PKG_MANAGER to the distributions package manager
 function resolve_pkg_manager() {
     local error=0
     if [ "$(which 2>&1)" == "" ]; then
@@ -141,7 +150,7 @@ function resolve_pkg_manager() {
     return $error
 }
 
-# working
+# install all build dependencies
 function install_deps() {
     set -eE
     log -i INSTALL DEPENDENCIES
@@ -175,9 +184,9 @@ function install_deps() {
         GCC="$GCC make"
     ;;
     *apk)
-        local UPDATE=''
+        local UPDATE='apk update'
         local SETUP=''
-        local INSTALL='add --no-cache'
+        local INSTALL='add'
         local BOOST='boost-dev boost-system boost-regex boost-program_options'
         local GCC='g++ make'
     ;;
@@ -194,8 +203,7 @@ function install_deps() {
     trap - ERR
 }
 
-# test for custom boost
-# working
+# build for production
 function build() {
     set -eE
     log -i BUILD VFRB
@@ -213,7 +221,7 @@ function build() {
     trap - ERR
 }
 
-# working
+# install systemd service
 function install_service() {
     set -eE
     log -i INSTALL VFRB SERVICE
@@ -235,7 +243,7 @@ function install_service() {
     trap - ERR
 }
 
-# working
+# install binary and config
 function install() {
     set -eE
     log -i INSTALL VFRB
@@ -255,7 +263,7 @@ function install() {
     trap - ERR
 }
 
-# working
+# install test dependencies
 function install_test_deps() {
     set -eE
     log -i INSTALL TEST DEPENDENCIES
@@ -278,7 +286,7 @@ function install_test_deps() {
     trap - ERR
 }
 
-#working
+# build for testing
 function build_test() {
     set -eE
     log -i BUILD VFRB TESTS
@@ -300,7 +308,7 @@ function build_test() {
     trap - ERR
 }
 
-# working
+# perform static code analysis
 function static_analysis() {
     set -eE
     log -i RUN STATIC CODE ANALYSIS
@@ -322,7 +330,7 @@ function static_analysis() {
     trap - ERR
 }
 
-# working
+# execute testing binary
 function run_unit_test() {
     set -eE
     log -i RUN UNIT TESTS
@@ -342,7 +350,7 @@ function run_unit_test() {
     trap - ERR
 }
 
-# working
+# execute regression tests
 function run_regression() {
     set -eE
     log -i RUN REGRESSION TESTS
@@ -370,7 +378,7 @@ function run_regression() {
     trap - ERR
 }
 
-# working
+# generate coverage report for unit and regression tests
 function gen_coverage() {
     set -eE
     log -i GENERATE COVERAGE REPORT
@@ -387,6 +395,7 @@ function gen_coverage() {
     trap - ERR
 }
 
+# build docker image for production
 function docker_image() {
     set -eE
     log -i BUILD DOCKER IMAGE

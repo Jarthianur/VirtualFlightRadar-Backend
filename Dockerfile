@@ -8,9 +8,8 @@ RUN apk add --no-cache bash
 COPY . /tmp/vfrb/
 WORKDIR /tmp/vfrb
 RUN ./run.sh build -y
-RUN mkdir -p /opt && \
-    mv build/vfrb-dock vfrb.ini healthcheck.sh /opt/ && \
-    rm -rf /tmp/vfrb
+RUN mkdir /opt && \
+    mv build/vfrb-dock vfrb.ini healthcheck.sh /opt/
 
 FROM alpine:3.8
 

@@ -17,10 +17,14 @@ before_script:
     - docker exec -it vfrb sh -c "echo 'deb http://ftp.debian.org/debian stretch-backports main' >> /etc/apt/sources.list"
 
 script:
+    # build production docker image
     - ./run.sh docker
+    # prepare cicd docker image
     - docker exec -it vfrb sh -c "mkdir -p $TRAVIS_BUILD_DIR"
     - docker exec -it vfrb sh -c "cp -r /travis/. $TRAVIS_BUILD_DIR"
-    - docker exec -it vfrb sh -c "$TRAVIS_BUILD_DIR/run.sh test -y"
+    # run build and tests
+    - docker exec -it vfrb sh -c "$TRAVIS_BUILD_DIR/run.sh build test -y"
+    # copy reports back
     - docker exec -it vfrb sh -c "cp -r $TRAVIS_BUILD_DIR/reports /travis/"
     - docker exec -it vfrb sh -c "chown $(id -u):$(id -g) -R /travis/reports"
     - docker stop vfrb

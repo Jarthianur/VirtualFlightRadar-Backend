@@ -21,6 +21,7 @@
 
 set -e
 
+# set env vars
 VFRB_ROOT=${WORKSPACE:-$PWD}
 export BOOST_ROOT=${BOOST_ROOT:-}
 export VFRB_VERSION=${VFRB_VERSION:-$(cat "$VFRB_ROOT/version.txt" | tr -d '\n')}
@@ -31,6 +32,7 @@ VFRB_INI_PATH=${VFRB_INI_PATH:-"$VFRB_ROOT/build/vfrb.ini"}
 
 source "$VFRB_ROOT/bootstrap.sh"
 
+# print a description of usage and arguments
 function print_help() {
     echo 'VirtualFlightRadar-Backend install script.'
     echo ''
@@ -61,11 +63,13 @@ function print_help() {
     echo ''
 }
 
+# print help if no args given
 if [ $# -eq 0 ]; then
     print_help
     exit 1
 fi
 
+# resolve given args
 for arg in $@; do
     case $arg in
     --path=*)
@@ -97,39 +101,23 @@ for arg in $@; do
     esac
 done
 
-if [ ! -z "$DO_DOCKER" ]; then
-    docker_image
-    log -i Run e.g. "'sudo docker run --name vfrb -p 4353:4353 -dit user/vfrb:latest -g'"
-    exit 0
-fi
-
-if [ "$(basename $VFRB_INI_PATH | grep -o '.ini')" == "" ]; then
-    log -e "\"$VFRB_INI_PATH\"" is not a valid path to an ini file!
-    exit 1
-fi
-prepare_path "$VFRB_EXEC_PATH"
-REPLACE_INI=1
-! prepare_path "$VFRB_INI_PATH"
-if [ $? -eq 1 ]; then
-    REPLACE_INI=0
-fi
-export REPLACE_INI
-log -i VFRB executable will be at "$VFRB_EXEC_PATH"
-log -i VFRB ini file will be at "$VFRB_INI_PATH"
-
-if [ ! -z "$BOOST_ROOT" ]; then
+# set boost paths if manually installed (deprecated)
+if [ -n "$BOOST_ROOT" ]; then
     log -i Using custom boost: "$BOOST_ROOT"
     export BOOST_LIBS_L="-L${BOOST_ROOT}/stage/lib"
     export BOOST_ROOT_I="-I${BOOST_ROOT}"
     export CUSTOM_BOOST=1
 fi
 
-if [ ! -z "$DO_BUILD" ]; then
-    install_deps
-    build
+# task "docker"
+if [ -n "$DO_DOCKER" ]; then
+    docker_image
+    log -i Run e.g. "'sudo docker run --name vfrb -p 4353:4353 -dit user/vfrb:latest -g'"
+    exit 0
 fi
 
-if [ ! -z "$DO_TEST" ]; then
+# task "test"
+if [ -n "$DO_TEST" ]; then
     install_deps
     install_test_deps
     if [ ! -d $VFRB_ROOT/reports/ ]; then
@@ -142,7 +130,27 @@ if [ ! -z "$DO_TEST" ]; then
     gen_coverage
 fi
 
-if [ ! -z "$DO_INSTALL" ]; then
+# task "build"
+if [ -n "$DO_BUILD" ]; then
+    install_deps
+    build
+fi
+
+# task "install"
+if [ -n "$DO_INSTALL" ]; then
+    if [ "$(basename $VFRB_INI_PATH | grep -o '.ini')" == "" ]; then
+        log -e "\"$VFRB_INI_PATH\"" is not a valid path to an ini file!
+        exit 1
+    fi
+    prepare_path "$VFRB_EXEC_PATH"
+    REPLACE_INI=1
+    ! prepare_path "$VFRB_INI_PATH"
+    if [ $? -eq 1 ]; then
+        REPLACE_INI=0
+    fi
+    export REPLACE_INI
+    log -i VFRB executable will be at "$VFRB_EXEC_PATH"
+    log -i VFRB ini file will be at "$VFRB_INI_PATH"
     install
     install_service
 fi
