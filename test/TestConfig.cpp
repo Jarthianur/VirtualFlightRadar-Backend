@@ -41,7 +41,7 @@ void test_config(test::TestSuitesRunner& runner)
         Properties prop = ConfigReader(conf_in).read();
         assertEqStr(prop.get_property(SECT_KEY_FALLBACK "." KV_KEY_LATITUDE, "invalid"),
                     "0.000000");
-        assertEqStr(prop.get_property(SECT_KEY_FALLBACK "." KV_KEY_LONGITUDE, "invalid"), "");
+        assertEqStr(prop.get_property(SECT_KEY_FALLBACK "." KV_KEY_LONGITUDE, "invalid"), "invalid");
         assertEqStr(prop.get_property(SECT_KEY_FALLBACK "." KV_KEY_ALTITUDE, "invalid"), "1000");
         assertEqStr(prop.get_property(SECT_KEY_FALLBACK "." KV_KEY_GEOID, "invalid"), "invalid");
         assertTrue(prop.get_property("nothing", "").empty());
