@@ -29,25 +29,83 @@ namespace client
 {
 struct Endpoint;
 
-using Callback     = std::function<void(bool)>;
+/// @typedef Callback
+/// Common callback function
+using Callback = std::function<void(bool)>;
+
+/// @typedef ReadCallback
+/// Callback function for read
 using ReadCallback = std::function<void(bool, const std::string&)>;
 
+/**
+ * @brief The async TCP interface for clients
+ */
 class Connector
 {
 public:
+    /**
+     * @brief Constructor
+     */
     Connector() = default;
 
+    /**
+     * @brief Destructor
+     */
     virtual ~Connector() noexcept = default;
 
-    virtual void run()                                                          = 0;
-    virtual void stop()                                                         = 0;
-    virtual void close()                                                        = 0;
-    virtual void onConnect(const Endpoint& endpoint, const Callback& callback)  = 0;
-    virtual void onRead(const ReadCallback& crCallback)                         = 0;
-    virtual void onWrite(const std::string& msg, const Callback& callback)      = 0;
+    /**
+     * @brief Run this connector.
+     */
+    virtual void run() = 0;
+
+    /**
+     * @brief Stop this connector.
+     */
+    virtual void stop() = 0;
+
+    /**
+     * @brief Close the connection.
+     */
+    virtual void close() = 0;
+
+    /**
+     * @brief Attempt to connect to endpoint.
+     * @param endpoint The remote endpoint
+     * @param callback The callback to execute when done
+     */
+    virtual void onConnect(const Endpoint& endpoint, const Callback& callback) = 0;
+
+    /**
+     * @brief Attempt to read from current connection.
+     * @param callback The callback to execute when done
+     */
+    virtual void onRead(const ReadCallback& callback) = 0;
+
+    /**
+     * @brief Attempt to write to current connection.
+     * @param msg      The message to send
+     * @param callback The callback to execute when done
+     */
+    virtual void onWrite(const std::string& msg, const Callback& callback) = 0;
+
+    /**
+     * @brief Execute function after timeout.
+     * @param callback The callback to execute
+     * @param timeout  The timeout (default: 0)
+     */
     virtual void onTimeout(const Callback& callback, std::uint32_t timeout = 0) = 0;
-    virtual void resetTimer(std::uint32_t timeout)                              = 0;
-    virtual bool timerExpired()                                                 = 0;
+
+    /**
+     * @brief Reset the timeout.
+     * @param timeout The new timeout
+     */
+    virtual void resetTimer(std::uint32_t timeout) = 0;
+
+    /**
+     * @brief Check whether the timeout ran off.
+     * @return true if it ran off, else false
+     */
+    virtual bool timerExpired() = 0;
 };
 
 }  // namespace client

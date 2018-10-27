@@ -36,13 +36,23 @@ namespace feed
 class Feed;
 }  // namespace feed
 
+/**
+ * @brief A thread group
+ */
 struct thread_group
 {
+    /**
+     * @brief Create a thread in this group.
+     * @param func The thread function
+     */
     void create_thread(const std::function<void()>& func)
     {
         _threads.push_back(std::thread(func));
     }
 
+    /**
+     * @brief Join all threads in this group.
+     */
     void join_all()
     {
         std::for_each(_threads.begin(), _threads.end(), [](std::thread& thd) {
@@ -54,11 +64,15 @@ struct thread_group
     }
 
 private:
+    /// List of threads
     std::list<std::thread> _threads;
 };
 
 namespace client
 {
+/**
+ * @brief Functor for hashing clients.
+ */
 struct ClientHasher
 {
     std::size_t operator()(const std::shared_ptr<Client>& client) const
@@ -67,6 +81,9 @@ struct ClientHasher
     }
 };
 
+/**
+ * @brief Functor for comparing clients.
+ */
 struct ClientComparator
 {
     bool operator()(const std::shared_ptr<Client>& client1,
@@ -76,28 +93,58 @@ struct ClientComparator
     }
 };
 
+/// @typedef ClientSet
+/// Set of clients with custom hasher and comparator
 using ClientSet = std::unordered_set<std::shared_ptr<Client>, ClientHasher, ClientComparator>;
 
+/// @typedef ClientIter
+/// Iterator in ClientSet
 using ClientIter = ClientSet::iterator;
 
+/**
+ * @brief Managing multi-threaded clients.
+ */
 class ClientManager
 {
 public:
-    ClientManager();
+    /**
+     * @brief Constructor
+     */
+    ClientManager() = default;
 
+    /**
+     * @brief Destructor
+     */
     ~ClientManager() noexcept;
 
+    /**
+     * @brief Subscribe a Feed to the respective Client.
+     * @param feed The feed to subscribe
+     * @threadsafe
+     */
     void subscribe(std::shared_ptr<feed::Feed> feed);
 
+    /**
+     * @brief Run all clients in their own thread.
+     * @threadsafe
+     */
     void run();
 
+    /**
+     * @brief Stop all clients.
+     * @note Blocks until all clients have stopped.
+     * @threadsafe
+     */
     void stop();
 
 private:
+    /// Set of clients
     ClientSet m_clients;
 
+    /// Thread group for client threads
     thread_group m_thdGroup;
 
+    /// Mutex for threadsafety
     mutable std::mutex m_mutex;
 };
 

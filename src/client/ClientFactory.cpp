@@ -32,10 +32,6 @@
 
 namespace client
 {
-ClientFactory::ClientFactory() {}
-
-ClientFactory::~ClientFactory() noexcept {}
-
 template<>
 std::shared_ptr<AprscClient>
     ClientFactory::makeClient<AprscClient>(std::shared_ptr<feed::Feed> feed)

@@ -27,8 +27,6 @@
 
 namespace client
 {
-ClientManager::ClientManager() {}
-
 ClientManager::~ClientManager() noexcept
 {
     stop();

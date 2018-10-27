@@ -32,15 +32,36 @@ class Feed;
 
 namespace client
 {
+/**
+ * @brief A factory for clients.
+ */
 class ClientFactory
 {
 public:
-    ClientFactory();
-    ~ClientFactory() noexcept;
+    /**
+     * @brief Constructor
+     */
+    ClientFactory() = default;
 
+    /**
+     * @brief Destructor
+     */
+    ~ClientFactory() noexcept = default;
+
+    /**
+     * @brief Create a Client needed by a Feed.
+     * @param feed The feed to create for
+     * @return the client as pointer
+     */
     static std::shared_ptr<Client> createClientFor(std::shared_ptr<feed::Feed> feed);
 
 private:
+    /**
+     * @brief Factory method for Client creation.
+     * @tparam T The type of client
+     * @param feed The feed to create for
+     * @return the client as pointer
+     */
     template<typename T,
              typename std::enable_if<std::is_base_of<Client, T>::value>::type* = nullptr>
     static std::shared_ptr<T> makeClient(std::shared_ptr<feed::Feed> feed);

@@ -97,9 +97,9 @@ public:
 protected:
     /**
      * @brief Constructor
-     * @param endpoint The connection Endpoint
-     * @param component  The component name
-     * @param connector        The Connector interface
+     * @param endpoint  The connection Endpoint
+     * @param component The component name
+     * @param connector The Connector interface
      */
     Client(const Endpoint& endpoint, const char* component, std::shared_ptr<Connector> connector);
 
@@ -137,36 +137,34 @@ protected:
 
     /**
      * @brief Handler for read
-     * @param error The error indicator
-     * @param response  The received string
+     * @param error    The error indicator
+     * @param response The received string
      */
     void handleRead(bool error, const std::string& response);
 
     /**
      * @brief Handler for connect
-     * @param error     The error indicator
+     * @param error The error indicator
      */
     virtual void handleConnect(bool error) = 0;
 
-    /// @brief Connector interface
+    /// Connector interface
     std::shared_ptr<Connector> m_connector;
 
-    /// @brief Run state indicator
+    /// Run state indicator
     bool m_running = false;
 
-    /// @var mComponent
     /// Component string used for logging
     const char* const m_component;
 
-    /// @var mHost
-    /// Hostname
+    /// Remote endpoint
     const Endpoint m_endpoint;
 
+    /// Mutex for threadsafety
     mutable std::mutex m_mutex;
 
 private:
-    /// @var mrFeeds
-    /// Handler Feed references
+    /// Container for subscribed feeds
     std::vector<std::shared_ptr<feed::Feed>> m_feeds;
 };
 

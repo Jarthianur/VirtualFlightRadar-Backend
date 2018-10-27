@@ -25,70 +25,66 @@
 
 #include "Client.h"
 
-/// @namespace client
 namespace client
 {
 /**
- * @class AprscClient
- * @brief Connect to an APRSC server.
- * @extends Client
+ * @brief Client for APRSC server.
  */
-
 class AprscClient : public Client
 {
 public:
     NOT_COPYABLE(AprscClient)
 
     /**
-     * @fn AprscClient
      * @brief Constructor
-     * @param crHost  The hostname
-     * @param crPort  The port
-     * @param crLogin The login string to transmit
-     * @param rFeed   The handler Feed reference
+     * @param endpoint  The remote endpoint
+     * @param login     The login string
+     * @param connector The Connector interface
      */
     AprscClient(const Endpoint& endpoint, const std::string& login,
                 std::shared_ptr<Connector> connector);
 
     /**
-     * @fn ~AprscClient
      * @brief Destructor
      */
     ~AprscClient() noexcept;
 
+    /**
+     * @brief Override Client::equals
+     */
     bool equals(const Client& other) const override;
 
+    /**
+     * @brief Override Client::hash
+     */
     std::size_t hash() const override;
 
 private:
     /**
-     * @fn sendKeepAlive
-     * @brief Send a keep-alive beacon every 10 minutes.
+     * @brief Schedule sending of a keep-alive beacon.
      */
     void sendKeepAlive();
 
     /**
-     * @see Client#handleConnect
+     * @brief Implement Client::handleConnect
+     * @threadsafe
      */
     void handleConnect(bool error) override;
 
     /**
-     * @fn handleLogin
-     * @brief Handler login string sending.
-     * @param crError The error code
-     * @param vBytes  The sent bytes
+     * @brief Handler for sending of the login string.
+     * @param error The error indicator
+     * @threadsafe
      */
     void handleLogin(bool error);
 
     /**
-     * @fn handleSendKeepAlive
-     * @brief Handler for sendKeepAlive
-     * @param crError The error code
-     * @param vBytes  The sent bytes
+     * @brief Handler for sending a keep-alive beacon.
+     * @param error The error indicator
+     * @threadsafe
      */
     void handleSendKeepAlive(bool error);
 
-    /// @var mLoginStr
     /// Login string
     const std::string m_login;
 };
