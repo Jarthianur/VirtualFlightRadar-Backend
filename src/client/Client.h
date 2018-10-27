@@ -48,8 +48,7 @@ namespace client
 #endif
 
 /**
- * @brief Base class representing a TCP client.
- * @tparam ConnectorT The connector interface
+ * @brief Base class for an async TCP client.
  */
 class Client
 {
@@ -62,81 +61,97 @@ public:
     virtual ~Client() noexcept;
 
     /**
-     * @brief Run the Client.
+     * @brief Run the clients connection- and eventhandlers.
      * @note Returns after all queued handlers have returned.
+     * @threadsafe
      */
     void run();
 
+    /**
+     * @brief Stop after client has been started.
+     * @note Wait until run has been called.
+     * @threadsafe
+     */
     void scheduleStop();
 
+    /**
+     * @brief Compare to another client by value.
+     * @param other The other Client
+     * @return true if equals, else false
+     */
     virtual bool equals(const Client& other) const;
 
+    /**
+     * @brief Get a hash value of this client.
+     * @return the hash value
+     */
     virtual std::size_t hash() const;
 
+    /**
+     * @brief Subscribe a Feed to this client.
+     * @param feed The Feed to subscribe
+     * @threadsafe
+     */
     void subscribe(std::shared_ptr<feed::Feed> feed);
 
 protected:
     /**
-     * @fn Client
      * @brief Constructor
-     * @param crHost       The hostname
-     * @param crPort       The port
-     * @param crComponent  The component name
-     * @param rFeed        The handler Feed reference
+     * @param endpoint The connection Endpoint
+     * @param component  The component name
+     * @param connector        The Connector interface
      */
     Client(const Endpoint& endpoint, const char* component, std::shared_ptr<Connector> connector);
 
     /**
-     * @fn stop
-     * @brief Stop the Client and close the connection.
+     * @brief Stop and close the connection.
      */
     virtual void stop();
 
     /**
-     * @fn timedConnect
-     * @brief Connect after timeout.
+     * @brief Schedule to connect after some timeout.
      */
     void timedConnect();
 
     /**
-     * @fn read
-     * @brief Read from remote endpoint.
+     * @brief Schedule to read from endpoint.
      */
     virtual void read();
 
     /**
-     * @fn connect
-     * @brief Connect to host.
+     * @brief Schedule to connect to endpoint.
      */
     void connect();
 
+    /**
+     * @brief Close connection and schedule to connect after timeout.
+     * @threadsafe
+     */
     void reconnect();
 
     /**
-     * @fn handleTimedConnect
-     * @brief Handler for timedConnect.
-     * @param crError The error code
+     * @brief Handler for timedConnect
+     * @param error The error indicator
      */
     void handleTimedConnect(bool error);
 
     /**
-     * @fn handleRead
-     * @brief Handler for read.
-     * @param crError The error code
-     * @param vBytes  The sent bytes
+     * @brief Handler for read
+     * @param error The error indicator
+     * @param response  The received string
      */
     void handleRead(bool error, const std::string& response);
 
     /**
-     * @fn handleConnect
-     * @brief Handler for connect.
-     * @param crError     The error code
-     * @param vResolverIt The resolve iterator
+     * @brief Handler for connect
+     * @param error     The error indicator
      */
     virtual void handleConnect(bool error) = 0;
 
+    /// @brief Connector interface
     std::shared_ptr<Connector> m_connector;
 
+    /// @brief Run state indicator
     bool m_running = false;
 
     /// @var mComponent
