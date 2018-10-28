@@ -35,190 +35,157 @@
 /**
  * Configuration section keys
  */
-/// @def SECT_KEY_FALLBACK
 #define SECT_KEY_FALLBACK "fallback"
-
-/// @def SECT_KEY_GENERAL
 #define SECT_KEY_GENERAL "general"
-
-/// @def SECT_KEY_FILTER
 #define SECT_KEY_FILTER "filter"
 
-/// @def SECT_KEY_APRSC
+/**
+ * Keywords for feeds
+ */
 #define SECT_KEY_APRSC "aprs"
-
-/// @def SECT_KEY_SBS
 #define SECT_KEY_SBS "sbs"
-
-/// @def SECT_KEY_GPS
 #define SECT_KEY_GPS "gps"
-
-/// @def SECT_KEY_WIND
 #define SECT_KEY_WIND "wind"
-
-/// @def SECT_KEY_ATMOS
 #define SECT_KEY_ATMOS "atm"
 
 /**
- * Per section key-value keys
+ * Property keys for section "general"
  */
-/// @def KV_KEY_FEEDS
 #define KV_KEY_FEEDS "feeds"
-
-/// @def KV_KEY_GND_MODE
 #define KV_KEY_GND_MODE "gndMode"
-
-/// @def KV_KEY_LATITUDE
-#define KV_KEY_LATITUDE "latitude"
-
-/// @def KV_KEY_LONGITUDE
-#define KV_KEY_LONGITUDE "longitude"
-
-/// @def KV_KEY_ALTITUDE
-#define KV_KEY_ALTITUDE "altitude"
-
-/// @def KV_KEY_GEOID
-#define KV_KEY_GEOID "geoid"
-
-/// @def KV_KEY_PRESSURE
-#define KV_KEY_PRESSURE "pressure"
-
-/// @def KV_KEY_TEMPERATURE
-#define KV_KEY_TEMPERATURE "temperature"
-
-/// @def KV_KEY_MAX_DIST
-#define KV_KEY_MAX_DIST "maxDist"
-
-/// @def KV_KEY_MAX_HEIGHT
-#define KV_KEY_MAX_HEIGHT "maxHeight"
-
-/// @def KV_KEY_SERVER_PORT
 #define KV_KEY_SERVER_PORT "serverPort"
 
-/// @def KV_KEY_HOST
+/**
+ * Property keys for section "fallback"
+ */
+#define KV_KEY_LATITUDE "latitude"
+#define KV_KEY_LONGITUDE "longitude"
+#define KV_KEY_ALTITUDE "altitude"
+#define KV_KEY_GEOID "geoid"
+#define KV_KEY_PRESSURE "pressure"
+
+/**
+ * Property keys for section "filter"
+ */
+#define KV_KEY_MAX_DIST "maxDist"
+#define KV_KEY_MAX_HEIGHT "maxHeight"
+
+/**
+ * Property keys for feed sections
+ */
 #define KV_KEY_HOST "host"
-
-/// @def KV_KEY_PORT
 #define KV_KEY_PORT "port"
-
-/// @def KV_KEY_PRIORITY
 #define KV_KEY_PRIORITY "priority"
-
-/// @def KV_KEY_LOGIN
 #define KV_KEY_LOGIN "login"
 
-/// @namespace config
+/// Concat section and key
+#define PATH(S, K) (S "." K)
+
 namespace config
 {
 /**
- * @class Configuration
- * @brief Represents a VFRB configuration.
- *
- * Evaluate and store a configuration for the VFRB.
+ * Path definitions
+ */
+constexpr const char* PATH_FEEDS       = PATH(SECT_KEY_GENERAL, KV_KEY_FEEDS);
+constexpr const char* PATH_GND_MODE    = PATH(SECT_KEY_GENERAL, KV_KEY_GND_MODE);
+constexpr const char* PATH_SERVER_PORT = PATH(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT);
+constexpr const char* PATH_LATITUDE    = PATH(SECT_KEY_FALLBACK, KV_KEY_LATITUDE);
+constexpr const char* PATH_LONGITUDE   = PATH(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE);
+constexpr const char* PATH_ALTITUDE    = PATH(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE);
+constexpr const char* PATH_GEOID       = PATH(SECT_KEY_FALLBACK, KV_KEY_GEOID);
+constexpr const char* PATH_PRESSURE    = PATH(SECT_KEY_FALLBACK, KV_KEY_PRESSURE);
+constexpr const char* PATH_MAX_DIST    = PATH(SECT_KEY_FILTER, KV_KEY_MAX_DIST);
+constexpr const char* PATH_MAX_HEIGHT  = PATH(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT);
+
+/**
+ * @brief VFRB Configuration
  */
 class Configuration
 {
 public:
     /**
-     * @fn Configuration
      * @brief Constructor
-     * @param rStream The input stream
-     * @throw std::runtime_error if any error occures
+     * @param stream The input stream
+     * @throw std::logic_error if any error occurres
      */
     explicit Configuration(std::istream& stream);
 
     /**
-     * @fn ~Configuration
      * @brief Destructor
      */
-    ~Configuration() noexcept;
+    ~Configuration() noexcept = default;
 
 private:
     /**
-     * @fn resolvePosition
      * @brief Resolve the fallback position.
-     * @param crProperties The properties
+     * @param properties The properties
      * @return the position
      */
     object::GpsPosition resolvePosition(const Properties& properties) const;
 
     /**
-     * @fn resolveServerPort
      * @brief Resolve the server port.
-     * @param crProperties The properties
-     * @return the port
+     * @param properties The properties
+     * @return the port number
      */
     std::uint16_t resolveServerPort(const Properties& properties) const;
 
     /**
-     * @fn resolveFeeds
      * @brief Resolve the feeds and their config.
-     * @param crProperties The properties
-     * @return a list of all feeds with their sections
+     * @param properties The properties
      */
     void resolveFeeds(const Properties& properties);
 
     /**
-     * @fn resolveFilter
-     * @brief Resolve a filter.
+     * @brief Resolve a filter value.
      * @note An invalid/negative value results in the max value which means disabled.
-     * @param crProperties The properties
-     * @param crKey        The filter key
+     * @param properties The properties
+     * @param path       The filter key
      * @return the filter value
      */
     std::int32_t resolveFilter(const Properties& properties, const std::string& key) const;
 
     /**
-     * @fn checkNumberValue
-     * @brief Check a Number.
-     * @param crOptNumber The optinonal Number
-     * @param crSection   The section name
-     * @param crKey       The key
+     * @brief Check an optional Number to be valid.
+     * @param number The optinonal Number
+     * @param path   The key path
      * @return the number value
      * @throw std::invalid_argument if the Number is invalid
      */
-    util::Number checkNumber(const util::OptNumber& number, const std::string& section,
-                             const std::string& key) const;
+    util::Number checkNumber(const util::OptNumber& number, const std::string& path) const;
 
     /**
-     * @fn dumpInfo
-     * @brief Dump the current config state using info log.
+     * @brief Dump the current config state as info log.
      */
     void dumpInfo() const;
 
-    /// @var mPosition
     /// Fallback position
     object::GpsPosition m_position;
 
-    /// @var mAtmPressure
     /// Atmospheric fallback pressure
     double m_atmPressure;
 
-    /// @var mMaxHeight
     /// Maximum height for reported aircrafts
     std::int32_t m_maxHeight;
 
-    /// @var mMaxDistance
     /// Maximum distance for reported aircrafts
     std::int32_t m_maxDistance;
 
-    /// @var mServerPort
     /// Port where to serve reports
     std::uint16_t m_serverPort;
 
-    /// @var mGroundMode
     /// Ground mode state
     bool m_groundMode;
 
-    /// @var mFeedMapping
-    /// List of feeds with their key-value map
+    /// List of feed names
     std::list<std::string> m_feedNames;
 
+    ///  Map feed names to their properties
     std::unordered_map<std::string, Properties> m_feedProperties;
 
 public:
     /**
-     * Define and declare getters.
+     * Getters
      */
     GETTER_CR(position)
     GETTER_V(atmPressure)

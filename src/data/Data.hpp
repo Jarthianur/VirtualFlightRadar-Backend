@@ -20,45 +20,44 @@
 #include <mutex>
 #include <string>
 
-/// @namespace object
 namespace object
 {
 class Object;
 }  // namespace object
 
-/// @namespace data
 namespace data
 {
 /**
- * @class Data
- * @brief The Data interface.
+ * @brief The Data interface
  */
 class Data
 {
 public:
+    /**
+     * @brief Constructor
+     */
     Data() = default;
 
+    /**
+     * @brief Destructor
+     */
     virtual ~Data() noexcept = default;
 
     /**
-     * @fn getSerialized
      * @brief Get the serialized data.
-     * @return the string
+     * @param dest The string to append the data to
      */
-    virtual std::string get_serialized() = 0;
+    virtual void get_serialized(std::string& dest) = 0;
 
     /**
-     * @fn update
      * @brief Attempt to update this data.
-     * @param _1    The new Object
-     * @param vSlot The slot for registered attempts
+     * @param _1 The new Object
      * @return true on success, else false
      */
     virtual bool update(object::Object&& _1) = 0;
 
 protected:
-    /// @var mMutex
-    /// Used for RW on this data
+    /// Mutex for threadsafety
     mutable std::mutex m_mutex;
 };
 }  // namespace data

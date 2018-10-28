@@ -55,7 +55,7 @@ public:
      * @return the MDA sentence
      * @threadsafe
      */
-    std::string get_serialized() override;
+    void get_serialized(std::string& dest) override;
 
     /**
      * @fn update

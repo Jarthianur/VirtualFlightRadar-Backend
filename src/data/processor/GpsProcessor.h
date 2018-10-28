@@ -28,25 +28,27 @@
 
 #include "Processor.hpp"
 
-/// @namespace data
 namespace data
 {
-/// @namespace processor
 namespace processor
 {
 /**
- * @class GpsProcessor
  * @brief Process GPS positions to NMEA GGA and RMC sentences.
  */
 class GpsProcessor : public Processor<object::GpsPosition>
 {
 public:
+    /**
+     * @brief Constructor
+     */
     GpsProcessor();
 
-    ~GpsProcessor() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~GpsProcessor() noexcept = default;
 
     /**
-     * @fn process
      * @brief Process a GPS position.
      * @param rPosition The position
      */
@@ -54,52 +56,40 @@ public:
 
 private:
     /**
-     * @fn genGpggaStr
-     * @brief Generate a GPGGA sentence.
-     * @note Contains trailing <cr><lf>.
-     * @param crPosition The position
-     * @return the GPGGA sentence
+     * @brief Append GPGGA sentence to processing string.
+     * @param position The position
+     * @param utc      The current utc time
      */
     void appendGPGGA(const object::GpsPosition& position, const std::tm* utc);
 
     /**
-     * @fn genGprmcStr
-     * @brief Generate a GPRMC sentence.
-     * @note Contains trailing <cr><lf>.
-     * @param crPosition The position
-     * @return the GPRMC sentence
+     * @brief Append GPRMC sentence to processing string.
+     * @param utc The current utc time
      */
     void appendGPRMC(const std::tm* utc);
 
     /**
-     * @fn evalPosition
-     * @brief Evaluate given latitude and longitude.
-     * @param vLatitude  The latitude
-     * @param vLongitude The longitude
+     * @brief Evaluate position for given latitude and longitude.
+     * @param latitude  The latitude
+     * @param longitude The longitude
      */
     void evalPosition(double latitude, double longitude);
 
-    /// @var mtLatStr
     /// Orientation of the latitude (S,N)
     mutable char m_directionSN = 'x';
 
-    /// @var mtLonStr
     /// Orientation of the longitude (E,W)
     mutable char m_directionEW = 'x';
 
-    /// @var mtLatDeg
     /// Degrees of latitude
     mutable double m_degLatitude = 0.0;
 
-    /// @var mtLonDeg
     /// Degrees of longitude
     mutable double m_degLongitude = 0.0;
 
-    /// @var mtLatMin
     /// Minutes of latitude
     mutable double m_minLatitude = 0.0;
 
-    /// @var mtLonMin
     /// Minutes of longitude
     mutable double m_minLongitude = 0.0;
 };

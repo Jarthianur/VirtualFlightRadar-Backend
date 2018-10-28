@@ -27,27 +27,29 @@
 
 #include "Data.hpp"
 
-/// @namespace data
 namespace data
 {
 /**
- * @class WindData
  * @brief Store wind information.
- * @implements Data
  */
 class WindData : public Data
 {
 public:
+    /**
+     * @brief Constructor
+     */
     WindData();
 
     /**
-     * @fn WindData
      * @brief Constructor
-     * @param crWind The initial wind information
+     * @param wind The initial wind information
      */
     explicit WindData(const object::Wind& wind);
 
-    ~WindData() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~WindData() noexcept = default;
 
     /**
      * @fn getSerialized
@@ -56,7 +58,7 @@ public:
      * @return the MWV sentence, if valid, else empty string
      * @threadsafe
      */
-    std::string get_serialized() override;
+    void get_serialized(std::string& dest) override;
 
     /**
      * @fn update

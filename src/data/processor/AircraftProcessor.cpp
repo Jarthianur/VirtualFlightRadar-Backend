@@ -41,8 +41,6 @@ AircraftProcessor::AircraftProcessor(std::int32_t maxDist)
     : Processor<object::Aircraft>(), m_maxDistance(maxDist)
 {}
 
-AircraftProcessor::~AircraftProcessor() noexcept {}
-
 void AircraftProcessor::process(Aircraft& aircraft)
 {
     calculateRelPosition(aircraft);

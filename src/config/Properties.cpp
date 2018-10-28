@@ -31,8 +31,8 @@ Properties::Properties(boost::property_tree::ptree&& ptree) : m_pTree(std::move(
 
 std::string Properties::get_property(const std::string& path, const std::string& alternative) const
 {
-    std::string prop(m_pTree.get(path, alternative));
-    return prop.empty() ? alternative : prop;
+    std::string property(m_pTree.get(path, alternative));
+    return property.empty() ? alternative : property;
 }
 
 Properties Properties::get_propertySection(const std::string& section) const

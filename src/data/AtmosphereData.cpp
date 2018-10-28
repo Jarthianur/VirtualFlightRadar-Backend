@@ -31,10 +31,10 @@ AtmosphereData::AtmosphereData(const Atmosphere& atmosphere) : Data(), m_atmosph
 
 AtmosphereData::~AtmosphereData() noexcept {}
 
-std::string AtmosphereData::get_serialized()
+void AtmosphereData::get_serialized(std::string& dest)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return (++m_atmosphere).get_serialized();
+    dest += (++m_atmosphere).get_serialized();
 }
 
 bool AtmosphereData::update(Object&& atmosphere)

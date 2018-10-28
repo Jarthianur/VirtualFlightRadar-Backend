@@ -25,31 +25,33 @@
 
 #include "Properties.h"
 
-/// @namespace config
 namespace config
 {
 /**
- * @class ConfigReader
  * @brief Read a config in INI format.
- *
- * Provide methods to read any input, in INI format, and store those properties.
  */
 class ConfigReader
 {
 public:
+    /**
+     * @brief Constructor
+     * @param stream The input stream to read from
+     */
     ConfigReader(std::istream& stream);
 
+    /**
+     * @brief Destructor
+     */
     ~ConfigReader() noexcept = default;
 
     /**
-     * @fn read
-     * @brief Read the given stream and store valid properties in a map.
-     * @param rStream The stream to read
-     * @param rMap    The map to store the properties in
+     * @brief Read the given stream and return read properties.
+     * @return the Properties
      */
     Properties read();
 
 private:
+    /// The input stream
     std::istream& m_stream;
 };
 

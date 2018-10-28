@@ -96,17 +96,20 @@ void VFRB::run() noexcept
 
 void VFRB::serve()
 {
+    std::string message;
     std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
     while (m_running)
     {
+        message.clear();
         try
         {
             m_aircraftData->processAircrafts(m_gpsData->get_position(),
                                              m_atmosphereData->get_atmPressure());
-            m_server.send(m_aircraftData->get_serialized());
-            m_server.send(m_gpsData->get_serialized());
-            m_server.send(m_atmosphereData->get_serialized());
-            m_server.send(m_windData->get_serialized());
+            m_aircraftData->get_serialized(message);
+            m_gpsData->get_serialized(message);
+            m_atmosphereData->get_serialized(message);
+            m_windData->get_serialized(message);
+            m_server.send(message);
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
         catch (const std::exception& e)

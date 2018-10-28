@@ -26,18 +26,11 @@
 
 #include "../../util/math.hpp"
 
-/// @def PROC_BUFF_S
-/// The internal buffer size
-#define PROC_BUFF_S 4096
-
-/// @namespace data
 namespace data
 {
-/// @namespace processor
 namespace processor
 {
 /**
- * @class Processor
  * @brief Processor base class/interface.
  * @tparam T The type of object to process
  */
@@ -45,22 +38,25 @@ template<typename T>
 class Processor
 {
 public:
+    /**
+     * @brief Constructor
+     */
     Processor() = default;
 
+    /**
+     * @brief Destructor
+     */
     virtual ~Processor() noexcept = default;
 
     /**
-     * @fn process
-     * @brief Process a given object.
+     * @brief Process an object.
      * @param _1 The object of type T
      */
     virtual void process(T& _1) = 0;
 
 protected:
     /**
-     * @fn finishSentence
-     * @brief End a given string with checksum and CRLF.
-     * @param rDestStr The target string
+     * @brief End the processing string with checksum and CRLF.
      */
     inline void finishSentence()
     {
@@ -69,9 +65,8 @@ protected:
         m_processed.append(m_buffer);
     }
 
-    /// @var mBuffer
     /// The internal buffer for format strings
-    char m_buffer[PROC_BUFF_S] = "";
+    char m_buffer[4096] = "";
 
     mutable std::string m_processed;
 };

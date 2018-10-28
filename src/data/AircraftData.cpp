@@ -46,16 +46,13 @@ AircraftData::AircraftData(std::int32_t maxDist) : Data(), m_processor(maxDist)
 
 AircraftData::~AircraftData() noexcept {}
 
-std::string AircraftData::get_serialized()
+void AircraftData::get_serialized(std::string& dest)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    std::string                 tmp;
-    tmp.reserve(m_container.size() * 128);
     for (const auto& it : m_container)
     {
-        tmp += it.get_updateAge() < OBJ_OUTDATED ? it.get_serialized() : "";
+        dest += it.get_updateAge() < OBJ_OUTDATED ? it.get_serialized() : "";
     }
-    return tmp;
 }
 
 bool AircraftData::update(Object&& aircraft)

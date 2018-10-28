@@ -26,42 +26,49 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-/// @namespace config
 namespace config
 {
 /**
- * @class PropertyMap
- * @brief Store key-value pairs for sections.
+ * @brief Store key-value pairs sectionwise.
  */
 class Properties
 {
 public:
+    /**
+     * @brief Copy-constructor
+     * @param ptree The property tree to copy
+     */
     explicit Properties(const boost::property_tree::ptree& ptree);
 
+    /**
+     * @brief Move-constructor
+     * @param ptree The property tree to move
+     */
     explicit Properties(boost::property_tree::ptree&& ptree);
 
+    /**
+     * @brief Destructor
+     */
     ~Properties() noexcept = default;
 
     /**
-     * @fn getProperty
-     * @brief Get the value under a section for the given key.
-     * @param crSection The section of the property
-     * @param crKey     The key to get the value for
-     * @param crDefault The default value (default: empty)
-     * @return the value for key in section if found, else the default value
+     * @brief Get the value at a property path (section.key), or a default value.
+     * @param path        The property path
+     * @param alternative The default value (default: empty)
+     * @return the value at path if found and not empty, else the default value
      */
     std::string get_property(const std::string& path, const std::string& alternative = "") const;
 
     /**
-     * @fn getSectionKeyValue
-     * @brief Get the key-value-map for a section.
-     * @param crSection The section to get the kv-map for
-     * @return the kv-map if found, else an empty one
+     * @brief Get the Properties for a section.
+     * @param section The section
+     * @return the Properties for that section
      * @throw std::out_of_range if the section is not found
      */
     Properties get_propertySection(const std::string& section) const;
 
 private:
+    /// The underlying property tree
     boost::property_tree::ptree m_pTree;
 };
 

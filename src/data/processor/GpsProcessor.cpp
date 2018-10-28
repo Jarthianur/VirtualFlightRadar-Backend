@@ -33,8 +33,6 @@ namespace processor
 {
 GpsProcessor::GpsProcessor() : Processor<object::GpsPosition>() {}
 
-GpsProcessor::~GpsProcessor() noexcept {}
-
 void GpsProcessor::process(object::GpsPosition& position)
 {
     std::time_t now = std::time(nullptr);
