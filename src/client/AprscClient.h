@@ -28,7 +28,7 @@
 namespace client
 {
 /**
- * @brief Client for APRSC server.
+ * @brief Client for APRSC servers
  */
 class AprscClient : public Client
 {

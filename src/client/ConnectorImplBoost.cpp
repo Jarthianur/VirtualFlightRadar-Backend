@@ -40,8 +40,6 @@ ConnectorImplBoost::ConnectorImplBoost()
       m_istream(&m_buffer)
 {}
 
-ConnectorImplBoost::~ConnectorImplBoost() noexcept {}
-
 void ConnectorImplBoost::run()
 {
     m_ioService.run();

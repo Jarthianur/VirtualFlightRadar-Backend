@@ -39,6 +39,9 @@ using ReadCallback = std::function<void(bool, const std::string&)>;
 
 /**
  * @brief The async TCP interface for clients
+ *
+ * As this is just an interface, all specific actions and details will be defined by a concrete
+ * implementation. Hence all documentations placed here describe only an intention.
  */
 class Connector
 {

@@ -31,46 +31,43 @@
 #    define WC_RCV_TIMEOUT 5
 #endif
 
-/// @namespace client
 namespace client
 {
 /**
- * @class SensorClient
- * @brief Connect to a sender of sensoric information.
- * @extends Client
+ * @brief Client for sensor servers
  */
-
 class SensorClient : public Client
 {
 public:
     NOT_COPYABLE(SensorClient)
 
     /**
-     * @fn SensorClient
      * @brief Constructor
-     * @param crHost The hostname
-     * @param crPort The port
-     * @param rFeed  The handler Feed reference
+     * @param endpoint  The remote endpoint
+     * @param connector The Connector interface
      */
     SensorClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector);
 
     /**
-     * @fn ~SensorClient
      * @brief Destructor
      */
-    ~SensorClient() noexcept;
+    ~SensorClient() noexcept = default;
 
 private:
+    /**
+     * @brief Override Client::read, use timeout
+     */
     void read() override;
 
     /**
-     * @fn checkDeadline
      * @brief Check read timeout deadline reached.
+     * @threadsafe
      */
     void checkDeadline(bool error);
 
     /**
-     * @see Client#handleConnect
+     * @brief Implement Client::handleConnect
+     * @threadsafe
      */
     void handleConnect(bool error) override;
 };

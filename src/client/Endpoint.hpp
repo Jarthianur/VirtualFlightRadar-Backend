@@ -25,15 +25,26 @@
 
 namespace client
 {
+/**
+ * @brief A remote endpoint
+ */
 struct Endpoint
 {
-    const std::string host;
-    const std::string port;
-
-    bool operator==(const Endpoint& crOther) const
+    /**
+     * @brief Equality comparison by value
+     * @param other The other endpoint
+     * @return true if both are equal, else false
+     */
+    bool operator==(const Endpoint& other) const
     {
-        return host == crOther.host && port == crOther.port;
+        return host == other.host && port == other.port;
     }
+
+    /// Hostname
+    const std::string host;
+
+    /// Port number
+    const std::string port;
 };
 
 }  // namespace client

@@ -23,38 +23,32 @@
 
 #include "Client.h"
 
-/// @namespace client
 namespace client
 {
 /**
- * @class SbsClient
- * @brief Connect to a SBS server.
- * @extends Client
+ * @brief Client for SBS servers
  */
-
 class SbsClient : public Client
 {
 public:
     NOT_COPYABLE(SbsClient)
 
     /**
-     * @fn SbsClient
      * @brief Constructor
-     * @param crHost  The hostname
-     * @param crPort  The port
-     * @param rFeed   The handler Feed reference
+     * @param endpoint  The remote endpoint
+     * @param connector The Connector interface
      */
     SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector);
 
     /**
-     * @fn ~SbsClient
      * @brief Destructor
      */
-    ~SbsClient() noexcept;
+    ~SbsClient() noexcept = default;
 
 private:
     /**
-     * @see Client#handleConnect
+     * @brief Implement Client::handleConnect
+     * @threadsafe
      */
     void handleConnect(bool error) override;
 };

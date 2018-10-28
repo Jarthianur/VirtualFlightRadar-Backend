@@ -36,8 +36,6 @@ SensorClient::SensorClient(const Endpoint& endpoint, std::shared_ptr<Connector> 
     : Client(endpoint, COMPONENT, connector)
 {}
 
-SensorClient::~SensorClient() noexcept {}
-
 void SensorClient::read()
 {
     m_connector->resetTimer(WC_RCV_TIMEOUT);

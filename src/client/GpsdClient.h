@@ -23,53 +23,44 @@
 
 #include "Client.h"
 
-/// @namespace client
 namespace client
 {
 /**
- * @class GpsdClient
- * @brief Connect to a GPSD server.
- * @extends Client
+ * @brief Client for GPSD servers
  */
-
 class GpsdClient : public Client
 {
 public:
     NOT_COPYABLE(GpsdClient)
 
     /**
-     * @fn GpsdClient
      * @brief Constructor
-     * @param crHost The hostname
-     * @param crPort The port
-     * @param rFeed  The handler Feed reference
+     * @param endpoint  The remote endpoint
+     * @param connector The Connector interface
      */
     GpsdClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector);
 
     /**
-     * @fn ~GpsdClient
      * @brief Destructor
      */
-    ~GpsdClient() noexcept;
+    ~GpsdClient() noexcept = default;
 
 private:
     /**
-     * @fn stop
-     * @brief Send unwatch-request before stop.
-     * @see Client#stop
+     * @brief Send unwatch-request and stop this client.
      */
     void stop() override;
 
     /**
-     * @see Client#handleConnect
+     * @brief Implement Client::handleConnect
+     * @threadsafe
      */
     void handleConnect(bool error) override;
 
     /**
-     * @fn handleWatch
      * @brief Handler for watch-request sending
-     * @param crError The error code
-     * @param vBytes  The sent bytes
+     * @param error The error indicator
+     * @threadsafe
      */
     void handleWatch(bool error);
 };

@@ -38,8 +38,6 @@ GpsdClient::GpsdClient(const Endpoint& endpoint, std::shared_ptr<Connector> conn
     : Client(endpoint, COMPONENT, connector)
 {}
 
-GpsdClient::~GpsdClient() noexcept {}
-
 void GpsdClient::handleConnect(bool error)
 {
     if (!error)

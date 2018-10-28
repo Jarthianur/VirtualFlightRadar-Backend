@@ -48,7 +48,7 @@ namespace client
 #endif
 
 /**
- * @brief Base class for an async TCP client.
+ * @brief Base class for an async TCP client
  */
 class Client
 {
