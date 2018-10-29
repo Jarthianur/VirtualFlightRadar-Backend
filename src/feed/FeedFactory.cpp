@@ -21,11 +21,11 @@
 
 #include "FeedFactory.h"
 
-#include "../config/Configuration.h"
-#include "../data/AircraftData.h"
-#include "../data/AtmosphereData.h"
-#include "../data/GpsData.h"
-#include "../data/WindData.h"
+#include "config/Configuration.h"
+#include "data/AircraftData.h"
+#include "data/AtmosphereData.h"
+#include "data/GpsData.h"
+#include "data/WindData.h"
 
 #include "AprscFeed.h"
 #include "AtmosphereFeed.h"

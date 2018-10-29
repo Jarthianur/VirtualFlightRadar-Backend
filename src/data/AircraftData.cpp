@@ -24,7 +24,7 @@
 #include <iterator>
 #include <stdexcept>
 
-#include "../parameters.h"
+#include "parameters.h"
 
 #ifndef ESTIMATED_TRAFFIC
 /// @def ESTIMATED_TRAFFIC

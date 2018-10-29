@@ -23,10 +23,10 @@
 
 #include <unordered_map>
 
-#include "../config/Configuration.h"
-#include "../data/AtmosphereData.h"
-#include "../object/Atmosphere.h"
-#include "../util/Logger.hpp"
+#include "config/Configuration.h"
+#include "data/AtmosphereData.h"
+#include "object/Atmosphere.h"
+#include "util/Logger.hpp"
 #include "parser/AtmosphereParser.h"
 
 #ifdef COMPONENT

@@ -5,6 +5,7 @@
 !/test/
 !/build/
 !/src/
+!/include/
 !/service/
 !/docs/
 !.github/**

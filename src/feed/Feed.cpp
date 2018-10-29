@@ -26,9 +26,9 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../config/Configuration.h"
-#include "../data/Data.hpp"
-#include "../util/Logger.hpp"
+#include "config/Configuration.h"
+#include "data/Data.hpp"
+#include "util/Logger.hpp"
 
 using namespace config;
 

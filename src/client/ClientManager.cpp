@@ -21,7 +21,7 @@
 
 #include "ClientManager.h"
 
-#include "../feed/Feed.h"
+#include "feed/Feed.h"
 
 #include "ClientFactory.h"
 

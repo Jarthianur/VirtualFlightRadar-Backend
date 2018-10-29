@@ -27,8 +27,8 @@
 
 #include <boost/functional/hash.hpp>
 
-#include "../feed/Feed.h"
-#include "../util/Logger.hpp"
+#include "feed/Feed.h"
+#include "util/Logger.hpp"
 
 namespace client
 {

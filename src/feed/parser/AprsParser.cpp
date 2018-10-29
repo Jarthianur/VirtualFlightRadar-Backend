@@ -24,10 +24,10 @@
 #include <limits>
 #include <stdexcept>
 
-#include "../../object/DateTimeImplBoost.h"
-#include "../../object/GpsPosition.h"
-#include "../../object/TimeStamp.hpp"
-#include "../../util/math.hpp"
+#include "object/DateTimeImplBoost.h"
+#include "object/GpsPosition.h"
+#include "object/TimeStamp.hpp"
+#include "util/math.hpp"
 
 /// @def RE_APRS_TIME
 /// APRS regex match group of time

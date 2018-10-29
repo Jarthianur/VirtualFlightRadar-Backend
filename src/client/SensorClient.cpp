@@ -23,7 +23,7 @@
 
 #include <utility>
 
-#include "../util/Logger.hpp"
+#include "util/Logger.hpp"
 
 #ifdef COMPONENT
 #    undef COMPONENT

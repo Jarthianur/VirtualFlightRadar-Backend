@@ -21,8 +21,8 @@
 
 #include "ClientFactory.h"
 
-#include "../feed/AprscFeed.h"
-#include "../feed/Feed.h"
+#include "feed/AprscFeed.h"
+#include "feed/Feed.h"
 
 #include "AprscClient.h"
 #include "ConnectorImplBoost.h"

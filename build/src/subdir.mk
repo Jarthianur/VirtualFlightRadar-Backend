@@ -21,7 +21,7 @@ V_VERSION := ${VFRB_VERSION}
 src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	$(CXX) -std=c++14 $(BOOST_I) -DVERSION=\"$(V_VERSION)\" -O$(OPT_LVL) $(DBG) -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	$(CXX) -std=c++14 $(BOOST_I) -I"../include" -DVERSION=\"$(V_VERSION)\" -O$(OPT_LVL) $(DBG) -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

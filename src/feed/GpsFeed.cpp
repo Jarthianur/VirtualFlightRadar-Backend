@@ -24,10 +24,10 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../config/Configuration.h"
-#include "../data/GpsData.h"
-#include "../object/GpsPosition.h"
-#include "../util/Logger.hpp"
+#include "config/Configuration.h"
+#include "data/GpsData.h"
+#include "object/GpsPosition.h"
+#include "util/Logger.hpp"
 #include "parser/GpsParser.h"
 
 #ifdef COMPONENT

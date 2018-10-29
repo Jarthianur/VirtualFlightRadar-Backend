@@ -25,8 +25,8 @@
 #include <cstdio>
 #include <limits>
 
-#include "../../util/math.hpp"
-#include "../../util/utility.hpp"
+#include "util/math.hpp"
+#include "util/utility.hpp"
 
 using namespace object;
 

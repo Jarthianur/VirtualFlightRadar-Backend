@@ -23,7 +23,7 @@
 
 #include <stdexcept>
 
-#include "../../util/math.hpp"
+#include "util/math.hpp"
 
 namespace feed
 {

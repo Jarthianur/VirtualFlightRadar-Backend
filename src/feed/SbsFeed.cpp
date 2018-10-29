@@ -23,10 +23,10 @@
 
 #include <unordered_map>
 
-#include "../config/Configuration.h"
-#include "../data/AircraftData.h"
-#include "../object/Aircraft.h"
-#include "../util/Logger.hpp"
+#include "config/Configuration.h"
+#include "data/AircraftData.h"
+#include "object/Aircraft.h"
+#include "util/Logger.hpp"
 #include "parser/SbsParser.h"
 
 #ifdef COMPONENT
