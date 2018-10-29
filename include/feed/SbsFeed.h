@@ -35,22 +35,18 @@ namespace feed
 namespace parser
 {
 class SbsParser;
-} /* namespace parser */
-} /* namespace feed */
+}  // namespace parser
+}  // namespace feed
 
-/// @namespace data
 namespace data
 {
 class AircraftData;
 }  // namespace data
 
-/// @namespace feed
 namespace feed
 {
 /**
- * @class SbsFeed
- * @brief SBS input feed.
- * @extends Feed
+ * @brief Extend Feed for SBS protocol.
  */
 class SbsFeed : public Feed
 {
@@ -58,32 +54,33 @@ public:
     NOT_COPYABLE(SbsFeed)
 
     /**
-     * @fn SbsFeed
      * @brief Constructor
-     * @param crName     The unique name
-     * @param crKvMap    The properties map
-     * @param pData      The AircraftData pointer
-     * @param vMaxHeight The max height filter
+     * @param name       The unique name
+     * @param properties The Properties
+     * @param data       The AircraftData container
+     * @param maxHeight  The max height filter
      * @throw std::logic_error from parent constructor
      */
     SbsFeed(const std::string& name, const config::Properties& properties,
             std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
 
     /**
-     * @fn ~SbsFeed
      * @brief Destructor
      */
-    ~SbsFeed() noexcept;
+    ~SbsFeed() noexcept = default;
 
+    /**
+     * @brief Get this feeds Protocol.
+     * @return Protocol::SBS
+     */
     Protocol get_protocol() const override;
 
     /**
-     * @see Feed#process
+     * @brief Feed::process.
      */
     bool process(const std::string& response) override;
 
 private:
-    /// @var mParser
     /// Parser to unpack response from Client
     static parser::SbsParser s_parser;
 };

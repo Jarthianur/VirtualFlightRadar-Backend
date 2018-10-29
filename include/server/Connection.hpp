@@ -30,13 +30,11 @@
 
 #include "SocketException.h"
 
-/// @namespace server
 namespace server
 {
 /**
- * @class Connection
  * @brief TCP connection opened by the Server.
- * @see Server.h
+ * @tparam SocketT The type of socket implementation
  */
 template<typename SocketT>
 class Connection final
@@ -45,40 +43,40 @@ public:
     NOT_COPYABLE(Connection)
 
     /**
-     * @fn ~Connection
      * @brief Destructor
      */
     ~Connection() noexcept;
 
     /**
-     * @fn start
      * @brief Start a Connection.
-     * @param rvSocket The socket
+     * @param socket The socket
      * @return a shared ptr to the Connection object
      */
     static std::unique_ptr<Connection<SocketT>> create(SocketT&& socket);
 
+    /**
+     * @brief Write a message to the endpoint.
+     * @param msg The message
+     * @return true on success, else false
+     */
     bool write(const std::string& msg);
 
 private:
     /**
-     * @fn Connection
      * @brief Constructor
-     * @param rvSocket The socket
+     * @param socket The socket
      */
     explicit Connection(SocketT&& socket);
 
-    /// @var mSocket
     /// Socket
     SocketT m_socket;
 
-    /// @var mIpAddress
     /// IP address
     const std::string m_address;
 
 public:
     /**
-     * Define and declare getters.
+     * Getters
      */
     GETTER_CR(address)
 };

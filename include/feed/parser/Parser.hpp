@@ -23,14 +23,11 @@
 
 #include <string>
 
-/// @namespace feed
 namespace feed
 {
-/// @namespace parser
 namespace parser
 {
 /**
- * @class Parser
  * @brief Interface for parsers.
  * @tparam T The corresponding object type
  */
@@ -38,15 +35,20 @@ template<typename T>
 class Parser
 {
 public:
-    Parser() {}
-
-    virtual ~Parser() noexcept {}
+    /**
+     * @brief Constructor
+     */
+    Parser() = default;
 
     /**
-     * @fn unpack
+     * @brief Destructor
+     */
+    virtual ~Parser() noexcept = default;
+
+    /**
      * @brief Unpack a given string into the templated object.
-     * @param crStr The msg to unpack
-     * @param _1    The target object
+     * @param sentence The string to unpack
+     * @param _1       The target object
      * @return true on success, else false
      */
     virtual bool unpack(const std::string& sentence, T& _1) noexcept = 0;

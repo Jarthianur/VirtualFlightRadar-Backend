@@ -29,27 +29,26 @@
 #include <thread>
 #include <utility>
 
-#include "parameters.h"
 #include "util/Logger.hpp"
 #include "util/defines.h"
 
 #include "Connection.hpp"
 #include "TcpInterfaceImplBoost.h"
+#include "parameters.h"
 
-#ifdef SERVER_MAX_CLIENTS
 /// @def S_MAX_CLIENTS
 /// The max amount of client to accept at once
+#ifdef SERVER_MAX_CLIENTS
 #    define S_MAX_CLIENTS SERVER_MAX_CLIENTS
 #else
 #    define S_MAX_CLIENTS 2
 #endif
 
-/// @namespace server
 namespace server
 {
 /**
- * @class Server
  * @brief A TCP server to serve the same reports to all clients.
+ * @tparam SocketT The socket implementation
  */
 template<typename SocketT>
 class Server
@@ -57,72 +56,82 @@ class Server
 public:
     NOT_COPYABLE(Server)
 
+    /**
+     * @brief Constructor
+     */
     Server();
 
     /**
-     * @fn Server
      * @brief Constructor
-     * @param vPort The port
+     * @param port The port
      */
     explicit Server(std::uint16_t port);
 
+    /**
+     * @brief Server
+     * @param interface The TcpInterface to use
+     */
     explicit Server(std::shared_ptr<TcpInterface<SocketT>> interface);
 
+    /**
+     * @brief Destructor
+     */
     ~Server() noexcept;
 
     /**
-     * @fn run
      * @brief Run the Server.
-     * @note Returns after all operations in the queue have returned.
+     * @threadsafe
      */
     void run();
 
     /**
-     * @fn stop
      * @brief Stop all connections.
      * @threadsafe
      */
     void stop();
 
     /**
-     * @fn send
      * @brief Write a message to all clients.
-     * @param crStr The msg to write
+     * @param msg The msg to write
      * @threadsafe
      */
     void send(const std::string& msg);
 
 private:
     /**
-     * @fn accept
-     * @brief Accept connections.
+     * @brief Schedule to accept connections.
      */
     void accept();
 
     /**
-     * @fn isConnected
      * @brief Check whether an ip address already exists in the Connection container.
-     * @param crIpAddress The ip address to check
+     * @param address The ip address to check
      * @return true if the ip is already registered, else false
      */
     bool isConnected(const std::string& address);
 
+    /**
+     * @brief Handler for accepting connections.
+     * @param error The error indicator
+     */
     void attemptConnection(bool error) noexcept;
 
+    /// TcpInterface
     std::shared_ptr<TcpInterface<SocketT>> m_tcpIf;
 
-    /// @var mConnections
-    /// Vector holding Connections
+    /// Connections container
     std::array<std::unique_ptr<Connection<SocketT>>, S_MAX_CLIENTS> m_connections;
 
+    /// Number of active connections
     std::uint8_t m_activeConnections = 0;
 
+    /// Running state
     bool m_running = false;
 
+    /// Internal thread
     std::thread m_thread;
 
-    /// @var mMutex
-    /// Mutex
+    /// Mutex for threadsafety
     mutable std::mutex m_mutex;
 };
 

@@ -29,53 +29,43 @@
 
 #include "Parser.hpp"
 
-/// @namespace feed
 namespace feed
 {
-/// @namespace parser
 namespace parser
 {
 /**
- * @class GpsParser
- * @brief Unpacking NMEA sentences from GPSD.
- * @implements Parser
+ * @brief Implement Parser for GPS NMEA sentences.
  */
 class GpsParser : public Parser<object::GpsPosition>
 {
 public:
     /**
-     * @fn GpsParser
      * @brief Constructor
      */
     GpsParser();
 
     /**
-     * @fn ~GpsParser
      * @brief Destructor
      */
-    ~GpsParser() noexcept;
+    ~GpsParser() noexcept = default;
 
     /**
-     * @fn unpack
      * @brief Unpack into GpsPosition.
-     * @see Parser#unpack
-     * @param crStr     The string to unpack
-     * @param rPosition The target position
+     * @param sentence The string to unpack
+     * @param position The position to unpack into
      * @return true on success, else false
      */
     bool unpack(const std::string& sentence, object::GpsPosition& position) noexcept override;
 
 private:
     /**
-     * @fn parsePosition
      * @brief Parse a Position.
-     * @param crMatch   The regex match
-     * @param rPosition The target position
+     * @param match    The regex match
+     * @param position The target position
      * @return true on success, else false
      */
     bool parsePosition(const boost::smatch& match, object::GpsPosition& position);
 
-    /// @var msGpggaRe
     /// Regular expression to parse GGA
     static const boost::regex s_GPGGA_RE;
 };

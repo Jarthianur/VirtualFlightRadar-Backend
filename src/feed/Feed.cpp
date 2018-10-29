@@ -51,8 +51,6 @@ Feed::Feed(const std::string& name, const char* component, const Properties& pro
     }
 }
 
-Feed::~Feed() noexcept {}
-
 void Feed::initPriority() noexcept
 {
     try

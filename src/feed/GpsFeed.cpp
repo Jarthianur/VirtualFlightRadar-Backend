@@ -44,8 +44,6 @@ GpsFeed::GpsFeed(const std::string& name, const config::Properties& properties,
     : Feed(name, COMPONENT, properties, data)
 {}
 
-GpsFeed::~GpsFeed() noexcept {}
-
 Feed::Protocol GpsFeed::get_protocol() const
 {
     return Protocol::GPS;

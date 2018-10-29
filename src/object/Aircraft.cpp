@@ -25,7 +25,7 @@
 
 namespace object
 {
-Aircraft::Aircraft() : Aircraft(0) {}
+Aircraft::Aircraft() : Object() {}
 
 Aircraft::Aircraft(std::uint32_t priority)
     : Object(priority),
@@ -33,8 +33,6 @@ Aircraft::Aircraft(std::uint32_t priority)
       m_aircraftType(AircraftType::POWERED_AIRCRAFT),
       m_targetType(TargetType::TRANSPONDER)
 {}
-
-Aircraft::~Aircraft() noexcept {}
 
 void Aircraft::assign(Object&& other)
 {

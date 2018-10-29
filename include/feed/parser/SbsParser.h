@@ -29,43 +29,43 @@
 
 #include "Parser.hpp"
 
-/// @namespace feed
 namespace feed
 {
-/// @namespace parser
 namespace parser
 {
 /**
- * @class SbsParser
- * @brief Unpack SBS sentences.
- * @implements Parser
+ * @brief Implement Parser for SBS sentences.
  */
 class SbsParser : public Parser<object::Aircraft>
 {
 public:
+    /**
+     * @brief Constructor
+     */
     SbsParser();
 
-    ~SbsParser() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~SbsParser() noexcept = default;
 
     /**
-     * @fn unpack
      * @brief Unpack into Aircraft.
-     * @see Parser#unpack
+     * @param sentence The string to unpack
+     * @param aircraft The Aircraft to unpack into
      */
     bool unpack(const std::string& sentence, object::Aircraft& aircraft) noexcept override;
 
-    /// @var mMaxHeight
     /// The max height filter
     static std::int32_t s_maxHeight;
 
 private:
     /**
-     * @fn parseField
      * @brief Parse a field in SBS and set respective values.
-     * @param vField    The field number
-     * @param crStr     The field string
-     * @param rPosition The target position
-     * @param rAircraft The target aircraft
+     * @param fieldNr  The field number
+     * @param field    The string in that field
+     * @param position The target position
+     * @param aircraft The target Aircraft
      * @return true on success, else false
      */
     bool parseField(std::uint32_t fieldNr, const std::string& field, object::Position& position,

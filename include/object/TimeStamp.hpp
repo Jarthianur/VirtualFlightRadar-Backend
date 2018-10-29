@@ -25,13 +25,11 @@
 #include <stdexcept>
 #include <string>
 
-/// @namespace object
 namespace object
 {
 namespace timestamp
 {
 /**
- * @enum Format
  * @brief Format of a given time string.
  */
 enum class Format : std::int8_t
@@ -43,61 +41,57 @@ enum class Format : std::int8_t
 }  // namespace timestamp
 
 /**
- * @class TimeStamp
- * @brief Represent a timestamp as number of milliseconds.
+ * @brief A timestamp
+ * @tparam DateTimeT The provider of time functions
  */
 template<typename DateTimeT>
 class TimeStamp
 {
 public:
-    TimeStamp();
+    /**
+     * @brief Constructor
+     */
+    TimeStamp() = default;
 
     /**
-     * @fn TimeStamp
      * @brief Constructor
-     *
-     * Create a TimeStamp from string with specific format.
-     *
-     * @param crValue The time string
-     * @param vFormat The format
+     * @param value  The time string
+     * @param format The format
      * @throw std::invalid_argument if the time string is invalid
      */
     TimeStamp(const std::string& value, timestamp::Format format);
 
     /**
-     * @fn TimeStamp
-     * @brief Constructor
-     *
-     * Copy constructor
-     *
-     * @param crOther The other TimeStamp
+     * @brief Copy-Constructor
+     * @param other The other TimeStamp
      */
     TimeStamp(const TimeStamp& other);
 
-    ~TimeStamp() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~TimeStamp() noexcept = default;
 
     /**
-     * @fn operator =
      * @brief Assign other TimeStamps value.
-     * @param crOther The other TimeStamp
+     * @param other The other TimeStamp
      * @return this
      */
     TimeStamp& operator=(const TimeStamp& other);
 
     /**
-     * @fn operator <=
      * @brief Compare this value to be less than, or equals others.
-     * @param crOther The other TimeStamp
+     * @param other The other TimeStamp
      * @return true if less, or equals, else false
      */
     bool operator>(const TimeStamp& other) const;
 
 private:
-    /// @var mValue
-    /// The time in milliseconds
-    std::int64_t m_value;
+    /// Time in milliseconds
+    std::int64_t m_value = 0;
 
-    std::uint32_t m_day;
+    /// Incremental day number
+    std::uint32_t m_day = 0;
 };
 
 template<typename DateTimeT>
@@ -143,16 +137,8 @@ TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format form
 }
 
 template<typename DateTimeT>
-TimeStamp<DateTimeT>::TimeStamp() : m_value(0), m_day(0)
-{}
-
-template<typename DateTimeT>
 TimeStamp<DateTimeT>::TimeStamp(const TimeStamp<DateTimeT>& other)
     : m_value(other.m_value), m_day(other.m_day)
-{}
-
-template<typename DateTimeT>
-TimeStamp<DateTimeT>::~TimeStamp() noexcept
 {}
 
 template<typename DateTimeT>

@@ -19,11 +19,7 @@
 
 namespace object
 {
-Object::Object() : m_lastPriority(0) {}
-
 Object::Object(std::uint32_t priority) : m_lastPriority(priority) {}
-
-Object::~Object() noexcept {}
 
 void Object::assign(Object&& other)
 {

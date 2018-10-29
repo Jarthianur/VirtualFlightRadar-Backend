@@ -68,6 +68,7 @@ protected:
     /// The internal buffer for format strings
     char m_buffer[4096] = "";
 
+    /// Processing string
     mutable std::string m_processed;
 };
 }  // namespace processor

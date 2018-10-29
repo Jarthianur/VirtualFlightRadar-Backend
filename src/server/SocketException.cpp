@@ -25,8 +25,6 @@ namespace server
 {
 SocketException::SocketException(const std::string& msg) : std::exception(), m_message(msg) {}
 
-SocketException::~SocketException() noexcept {}
-
 const char* SocketException::what() const noexcept
 {
     return m_message.c_str();

@@ -31,42 +31,33 @@
 #include "Object.h"
 #include "TimeStamp.hpp"
 
-/// @def A_VALUE_NA
-/// Indicate a double value is not available.
+/// Indicate a value is not available.
 #define A_VALUE_NA -1024.0
 
-/// @namespace object
 namespace object
 {
 /**
- * @struct Movement
  * @brief Hold information about an Aircrafts movement.
  */
 struct Movement
 {
-    /// @var gndSpeed
     /// Speed over ground; m/s
     double gndSpeed = A_VALUE_NA;
 
-    /// @var heading
     /// Heading; deg [0-359]
     double heading = A_VALUE_NA;
 
-    /// @var climbRate
     /// Climb rate; m/s
     double climbRate = A_VALUE_NA;
 };
 
 /**
- * @class Aircraft
- * @brief Respresents an aircraft.
- * @extends Object
+ * @brief Extend Object to an aircraft.
  */
 class Aircraft : public Object
 {
 public:
     /**
-     * @enum TargetType
      * @brief Device type from which the information is received.
      * @note FLARM is preferred over TRANSPONDER,
      *       in case an aircraft has both available.
@@ -78,7 +69,6 @@ public:
     };
 
     /**
-     * @enum AircraftType
      * @brief Aircraft types with their protocol codes.
      */
     enum class AircraftType : std::int8_t
@@ -101,7 +91,6 @@ public:
     };
 
     /**
-     * @enum IdType
      * @brief Id (address) types with their protocol codes.
      */
     enum class IdType : std::int8_t
@@ -113,90 +102,80 @@ public:
         OGN          = 3
     };
 
+    /**
+     * @brief Constructor
+     */
     Aircraft();
 
     /**
-     * @fn Aircraft
      * @brief Constructor
-     * @param vPriority The initial priority
+     * @param priority The initial priority
      */
     explicit Aircraft(std::uint32_t priority);
 
-    ~Aircraft() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~Aircraft() noexcept = default;
 
     /**
-     * @fn setAircraftType
      * @brief Set the aircraft type.
      *
      * The type is set to UNKNOWN, if the new type value is not in range of AircraftType.
      *
-     * @param vType The type
+     * @param type The type
      */
     void set_aircraftType(AircraftType type);
 
     /**
-     * @fn setIdType
      * @brief Set the id type.
      *
      * The id type is set to UNRECOGNIZED, if the new type value is not in range of
      * IdType.
      *
-     * @param vType The type
+     * @param type The type
      */
     void set_idType(IdType type);
 
 private:
     /**
-     * @fn assign
-     * @brief Assign an other Aircrafts values to this.
-     * @param rvOther The other Aircraft
+     * @brief Assign an other aircrafts values to this.
+     * @param other The other Aircraft
      */
     void assign(Object&& other) override;
 
     /**
-     * @fn canUpdate
-     * @brief Check whether this Aircraft can update the other one.
-     * @param crOther   The other Aircraft
-     * @param vAttempts The update attempt count
-     * @return true if yes, else false
+     * @brief Override Object::canUpdate.
      */
     bool canUpdate(const Object& other) const override;
 
-    /// @var mId
     /// Aircraft identifier
     std::string m_id;
 
-    /// @var mIdType
-    /// @see IdType
+    /// Id type
     IdType m_idType;
 
-    /// @var mAircraftType
-    /// @see AircraftType
+    /// Aircraft type
     AircraftType m_aircraftType;
 
-    /// @var mTargetType
-    /// @see TargetType
+    /// Target type
     TargetType m_targetType;
 
-    /// @var mPosition
     /// Currently known position.
     Position m_position{0.0, 0.0, 0};
 
-    /// @var mMovement
     /// Currently known movement.
     Movement m_movement;
 
-    /// @var mTimeStamp
     /// The timestamp of the last report.
     TimeStamp<timestamp::DateTimeImplBoost> m_timeStamp;
 
-    /// @var mFullInfo
     /// Is full set of information available?
     bool m_fullInfo = false;
 
 public:
     /**
-     * Define and declare getters and setters.
+     * Getters and setters
      */
     GETSET_CR(id)
     GETTER_V(idType)

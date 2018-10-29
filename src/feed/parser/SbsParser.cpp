@@ -58,8 +58,6 @@ std::int32_t SbsParser::s_maxHeight = std::numeric_limits<std::int32_t>::max();
 
 SbsParser::SbsParser() : Parser<Aircraft>() {}
 
-SbsParser::~SbsParser() noexcept {}
-
 bool SbsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcept
 {
     std::size_t   p = 6, delim;

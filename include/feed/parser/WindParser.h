@@ -31,17 +31,27 @@ namespace feed
 {
 namespace parser
 {
+/**
+ * @brief Implement Parser for NMEA wind sentences.
+ */
 class WindParser : public Parser<object::Wind>
 {
 public:
+    /**
+     * @brief Constructor
+     */
     WindParser();
 
-    ~WindParser() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~WindParser() noexcept = default;
 
     /**
-     * @fn unpack
-     * @brief Unpack into Climate.
-     * @see Parser#unpack
+     * @brief Unpack into Wind.
+     * @param sentence The string to unpack
+     * @param wind     The Wind to unpack into
+     * @return true on success, else false
      */
     bool unpack(const std::string& sentence, object::Wind& wind) noexcept override;
 };

@@ -34,22 +34,18 @@ namespace feed
 namespace parser
 {
 class WindParser;
-} /* namespace parser */
-} /* namespace feed */
+}  // namespace parser
+}  // namespace feed
 
-/// @namespace data
 namespace data
 {
 class WindData;
 }  // namespace data
 
-/// @namespace feed
 namespace feed
 {
 /**
- * @class WindFeed
- * @brief Sensor input feed.
- * @extends Feed
+ * @brief Extend Feed for windsensor input.
  */
 class WindFeed : public Feed
 {
@@ -57,32 +53,32 @@ public:
     NOT_COPYABLE(WindFeed)
 
     /**
-     * @fn WindFeed
      * @brief Constructor
-     * @param crName     The SensorFeeds unique name
-     * @param crKvMap    The properties map
-     * @param pWindData  The WindData pointer
-     * @param pAtmosData The AtmosphereData pointer
+     * @param name       The SensorFeeds unique name
+     * @param properties The Properties
+     * @param data       The WindData contianer
      * @throw std::logic_error from parent constructor
      */
     WindFeed(const std::string& name, const config::Properties& properties,
              std::shared_ptr<data::WindData> data);
 
     /**
-     * @fn ~WindFeed
      * @brief Destructor
      */
-    ~WindFeed() noexcept;
+    ~WindFeed() noexcept = default;
 
+    /**
+     * @brief Get this feeds Protocol.
+     * @return Protocol::SENSOR
+     */
     Protocol get_protocol() const override;
 
     /**
-     * @see Feed#process
+     * @brief Feed::process.
      */
     bool process(const std::string& response) override;
 
 private:
-    /// @var mParser
     /// Parser to unpack response from Client
     static parser::WindParser s_parser;
 };

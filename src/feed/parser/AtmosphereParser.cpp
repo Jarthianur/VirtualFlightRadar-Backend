@@ -32,8 +32,6 @@ namespace parser
 {
 AtmosphereParser::AtmosphereParser() : Parser<object::Atmosphere>() {}
 
-AtmosphereParser::~AtmosphereParser() noexcept {}
-
 bool AtmosphereParser::unpack(const std::string& sentence, object::Atmosphere& atmosphere) noexcept
 {
     try

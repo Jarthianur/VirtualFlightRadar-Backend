@@ -45,8 +45,6 @@ SbsFeed::SbsFeed(const std::string& name, const config::Properties& properties,
     parser::SbsParser::s_maxHeight = maxHeight;
 }
 
-SbsFeed::~SbsFeed() noexcept {}
-
 Feed::Protocol SbsFeed::get_protocol() const
 {
     return Protocol::SBS;

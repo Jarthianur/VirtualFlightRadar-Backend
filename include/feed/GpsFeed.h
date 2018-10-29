@@ -34,21 +34,18 @@ namespace feed
 namespace parser
 {
 class GpsParser;
-} /* namespace parser */
-} /* namespace feed */
+}  // namespace parser
+}  // namespace feed
 
 namespace data
 {
 class GpsData;
 }  // namespace data
 
-/// @namespace feed
 namespace feed
 {
 /**
- * @class GpsFeed
- * @brief GPS input feed.
- * @extends Feed
+ * @brief Extend Feed for GPS input.
  */
 class GpsFeed : public Feed
 {
@@ -56,31 +53,32 @@ public:
     NOT_COPYABLE(GpsFeed)
 
     /**
-     * @fn GpsFeed
      * @brief Constructor
-     * @param crName   The unique name
-     * @param crKvMap  The properties map
-     * @param pData    The GpsData pointer
+     * @param name       The unique name
+     * @param properties The Properties
+     * @param data       The GpsData container
      * @throw std::logic_error from parent constructor
      */
     GpsFeed(const std::string& name, const config::Properties& properties,
             std::shared_ptr<data::GpsData> data);
 
     /**
-     * @fn ~GpsFeed
      * @brief Destructor
      */
-    ~GpsFeed() noexcept;
+    ~GpsFeed() noexcept = default;
 
+    /**
+     * @brief Get this feeds Protocol.
+     * @return Protocol::GPS
+     */
     Protocol get_protocol() const override;
 
     /**
-     * @see Feed#process
+     * @brief Implement Feed::process.
      */
     bool process(const std::string& response) override;
 
 private:
-    /// @var mParser
     /// Parser to unpack response from Client
     static parser::GpsParser s_parser;
 };

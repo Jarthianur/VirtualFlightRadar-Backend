@@ -36,22 +36,18 @@ namespace feed
 namespace parser
 {
 class AprsParser;
-} /* namespace parser */
-} /* namespace feed */
+}  // namespace parser
+}  // namespace feed
 
-/// @namespace data
 namespace data
 {
 class AircraftData;
 }  // namespace data
 
-/// @namespace feed
 namespace feed
 {
 /**
- * @class AprscFeed
- * @brief APRSC input feed.
- * @extends Feed
+ * @brief Extend Feed for APRSC protocol.
  */
 class AprscFeed : public Feed
 {
@@ -59,34 +55,39 @@ public:
     NOT_COPYABLE(AprscFeed)
 
     /**
-     * @fn AprscFeed
      * @brief Constructor
-     * @param crName     The unique name
-     * @param crKvMap    The properties map
-     * @param pData      The AircraftData pointer
-     * @param vMaxHeight The max height filter
-     * @throw std::logic_error if login is not given or from parent constructor
+     * @param name       The unique name
+     * @param properties The Properties
+     * @param data       The AircraftData container
+     * @param maxHeight  The max height filter
+     * @throw std::logic_error if login is not given, or from parent constructor
      */
     AprscFeed(const std::string& name, const config::Properties& propertyMap,
               std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
 
     /**
-     * @fn ~AprscFeed
      * @brief Destructor
      */
-    ~AprscFeed() noexcept;
+    ~AprscFeed() noexcept = default;
 
+    /**
+     * @brief Get this feeds Protocol.
+     * @return Protocol::APRS
+     */
     Protocol get_protocol() const override;
 
     /**
-     * @see Feed#process
+     * @brief Implement Feed::process.
      */
     bool process(const std::string& response) override;
 
+    /**
+     * @brief Get the login string.
+     * @return the login
+     */
     std::string get_login() const;
 
 private:
-    /// @var mParser
     /// Parser to unpack response from Client
     static parser::AprsParser s_parser;
 };

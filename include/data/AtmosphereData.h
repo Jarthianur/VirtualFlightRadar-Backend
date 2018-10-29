@@ -27,48 +27,46 @@
 
 #include "Data.hpp"
 
-/// @namespace data
 namespace data
 {
 /**
- * @class AtmosphereData
  * @brief Store atmospheric information.
- * @implements Data
  */
 class AtmosphereData : public Data
 {
 public:
+    /**
+     * @brief Constructor
+     */
     AtmosphereData();
 
     /**
-     * @fn AtmosphereData
      * @brief Constructor
-     * @param vAtmosphere The initial info
+     * @param atmosphere The initial atm info
      */
     explicit AtmosphereData(const object::Atmosphere& atmosphere);
 
-    ~AtmosphereData() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~AtmosphereData() noexcept = default;
 
     /**
-     * @fn getSerialized
      * @brief Get the MDA sentence.
-     * @return the MDA sentence
+     * @param dest The destination string to append data
      * @threadsafe
      */
     void get_serialized(std::string& dest) override;
 
     /**
-     * @fn update
-     * @brief Attempt to update.
-     * @param rvAtmosphere The new data.
-     * @param vSlot        The attempt slot
+     * @brief Update he athmosphere data.
+     * @param atmosphere The new atm info
      * @return true on success, else false
      * @threadsafe
      */
     bool update(object::Object&& atmosphere) override;
 
     /**
-     * @fn getAtmPressure
      * @brief Get the atmospheric pressure.
      * @return the pressure
      * @threadsafe
@@ -76,8 +74,7 @@ public:
     double get_atmPressure();
 
 private:
-    /// @var mAtmosphere
-    /// Holding atmospheric information
+    /// Atmospheric information
     object::Atmosphere m_atmosphere;
 };
 }  // namespace data

@@ -47,8 +47,6 @@ GpsData::GpsData(const GpsPosition& position, bool ground)
     m_processor.process(m_position);
 }
 
-GpsData::~GpsData() noexcept {}
-
 void GpsData::get_serialized(std::string& dest)
 {
     std::lock_guard<std::mutex> lock(m_mutex);

@@ -27,55 +27,54 @@
 
 #include "Object.h"
 
-/// @def ICAO_STD_A
 /// ICAO standard atmospheric pressure at MSL
 #define ICAO_STD_A 1013.25
 
-/// @namespace object
 namespace object
 {
 struct Climate;
 
 /**
- *@class Atmosphere
- * @brief Represent atmospheric information.
- * @extends Object
+ * @brief Extend Object to atmospheric information.
  */
 class Atmosphere : public Object
 {
 public:
+    /**
+     * @brief Constructor
+     */
     Atmosphere();
 
     /**
-     * @fn Atmosphere
      * @brief Constructor
-     * @param vPriority The initial priority
+     * @param priority The initial priority
      */
     explicit Atmosphere(std::uint32_t priority);
 
     /**
-     * @fn Atmosphere
      * @brief Constructor
-     * @param vPressure The initial pressure
-     * @param vPriority The initial priority
+     * @param pressure The initial pressure
+     * @param priority The initial priority
      */
     Atmosphere(double pressure, std::uint32_t priority);
 
-    ~Atmosphere() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~Atmosphere() noexcept = default;
 
 private:
     /**
-     * @see Object#assign
+     * @brief Extend Object::assign.
      */
     void assign(Object&& other) override;
 
-    /// @var mPressure
     /// The atmospheric pressure
     double m_pressure = ICAO_STD_A;
 
 public:
     /**
-     * Define and declare getters and setters.
+     * Getters and setters
      */
     GETSET_V(pressure)
 };

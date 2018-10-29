@@ -52,26 +52,22 @@ public:
     ~WindData() noexcept = default;
 
     /**
-     * @fn getSerialized
      * @brief Get the MWV sentence.
      * @note The wind info is invalid after this operation.
-     * @return the MWV sentence, if valid, else empty string
+     * @param dest The destination string to append data
      * @threadsafe
      */
     void get_serialized(std::string& dest) override;
 
     /**
-     * @fn update
-     * @brief Attempt to update the wind information.
-     * @param rvWind The new wind information.
-     * @param vSlot  The attempt slot
+     * @brief Update the wind information.
+     * @param wind The new wind information.
      * @return true on success, else false
      * @threadsafe
      */
     bool update(object::Object&& wind) override;
 
 private:
-    /// @var mWind
     /// The Wind information
     object::Wind m_wind;
 };

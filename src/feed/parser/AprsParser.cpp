@@ -99,8 +99,6 @@ std::int32_t AprsParser::s_maxHeight = std::numeric_limits<std::int32_t>::max();
 
 AprsParser::AprsParser() : Parser<Aircraft>() {}
 
-AprsParser::~AprsParser() noexcept {}
-
 bool AprsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcept
 {
     boost::smatch match, com_match;

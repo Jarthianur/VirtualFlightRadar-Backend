@@ -32,7 +32,7 @@
 namespace config
 {
 class Configuration;
-} /* namespace config */
+}  // namespace config
 
 namespace data
 {
@@ -42,26 +42,23 @@ class GpsData;
 class WindData;
 }  // namespace data
 
-/// @namespace feed
 namespace feed
 {
 class Feed;
 
 /**
- * @class FeedFactory
  * @brief Factory for Feed creation.
  */
 class FeedFactory
 {
 public:
     /**
-     * @fn FeedFactory
      * @brief Constructor
-     * @param crConfig      The Configuration
-     * @param pAircraftData The AircraftData pointer
-     * @param pAtmosData    The AtmosphereData pointer
-     * @param pGpsData      The GpsData pointer
-     * @param pWindData     The WindData pointer
+     * @param config       The Configuration
+     * @param aircraftData The AircraftData pointer
+     * @param atmosData    The AtmosphereData pointer
+     * @param gpsData      The GpsData pointer
+     * @param windData     The WindData pointer
      */
     FeedFactory(std::shared_ptr<config::Configuration> config,
                 std::shared_ptr<data::AircraftData>    aircraftData,
@@ -69,16 +66,13 @@ public:
                 std::shared_ptr<data::GpsData> gpsData, std::shared_ptr<data::WindData> windData);
 
     /**
-     * @fn ~FeedFactory
      * @brief Destructor
      */
-    ~FeedFactory() noexcept;
+    ~FeedFactory() noexcept = default;
 
     /**
-     * @fn createFeed
      * @brief Create a Feed.
-     * @param crName  The feed name
-     * @param crKvMap The properties
+     * @param name  The feed name
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
@@ -86,35 +80,28 @@ public:
 
 private:
     /**
-     * @fn makeFeed
      * @brief Make a new Feed.
      * @tparam T The Feed type
      * @note Must be fully specialized for every concrete Feed type T.
-     * @param crName  The feed name
-     * @param crKvMap The properties
+     * @param name  The feed name
      * @return a pointer to the concrete Feed
      * @throw std::logic_error from invoked constructors
      */
     template<typename T, typename std::enable_if<std::is_base_of<Feed, T>::value>::type* = nullptr>
     std::shared_ptr<T> makeFeed(const std::string& name);
 
-    /// @var mrConfig
-    /// Reference to the Configuration
+    /// Pointer to the Configuration
     std::shared_ptr<config::Configuration> m_config;
 
-    /// @var mpAircraftData
     /// Pointer to the AircraftData
     std::shared_ptr<data::AircraftData> m_aircraftData;
 
-    /// @var mpAtmosphereData
     /// Pointer to the AtmosphereData
     std::shared_ptr<data::AtmosphereData> m_atmosData;
 
-    /// @var mpGpsData
     /// Pointer to the GpsData
     std::shared_ptr<data::GpsData> m_gpsData;
 
-    /// @var mpWindData
     /// Pointer to the WindData
     std::shared_ptr<data::WindData> m_windData;
 };

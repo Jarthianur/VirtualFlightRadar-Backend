@@ -31,80 +31,75 @@
 
 #include "Parser.hpp"
 
-/// @namespace feed
 namespace feed
 {
-/// @namespace parser
 namespace parser
 {
 /**
- * @class AprsParser
- * @brief Unpacking APRS sentences.
- * @implements Parser
+ * @brief Implement Parser for APRS sentences.
  */
 class AprsParser : public Parser<object::Aircraft>
 {
 public:
+    /**
+     * @brief Constructor
+     */
     AprsParser();
 
-    ~AprsParser() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~AprsParser() noexcept = default;
 
     /**
-     * @fn unpack
      * @brief Unpack into Aircraft.
-     * @see Parser#unpack
+     * @param sentence The string to unpack
+     * @param aircraft The Aircraft to unpack into
      * @return true on success, else false
      */
     bool unpack(const std::string& sentence, object::Aircraft& aircraft) noexcept override;
 
-    /// @var mMaxHeight
     /// The max height filter
     static std::int32_t s_maxHeight;
 
 private:
     /**
-     * @fn parsePosition
      * @brief Parse a Position.
-     * @param crMatch   The regex match
-     * @param rAircraft The target Aircraft
+     * @param match    The regex match
+     * @param aircraft The target Aircraft
      * @return true on success, else false
      */
     bool parsePosition(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
 
     /**
-     * @fn parseComment
      * @brief Parse the APRS comment.
-     * @param crMatch   The regex match
-     * @param rAircraft The target Aircraft
+     * @param match    The regex match
+     * @param aircraft The target Aircraft
      * @return true on success, else false
      */
     bool parseComment(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
 
     /**
-     * @fn parseMovement
      * @brief Parse the Movement information.
-     * @param crMatch     The regex match
-     * @param crCommMatch The comment regex match
-     * @param rAircraft   The target Aircraft
+     * @param match    The regex match
+     * @param comMatch The comment regex match
+     * @param aircraft The target Aircraft
      * @return true on success, else false
      */
     bool parseMovement(const boost::smatch& match, const boost::smatch& comMatch,
                        object::Aircraft& aircraft) noexcept;
 
     /**
-     * @fn parseTimeStamp
      * @brief Parse the TimeStamp information.
-     * @param crMatch     The regex match
-     * @param rAircraft   The target Aircraft
+     * @param match    The regex match
+     * @param aircraft The target Aircraft
      * @return true on success, else false
      */
     bool parseTimeStamp(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
 
-    /// @var msAprsRe
     /// Regular expression for APRS protocol
     static const boost::regex s_APRS_RE;
 
-    /// @var msAprsComRe
     /// Regular expression for OGN specific APRS extension
     static const boost::regex s_APRSExtRE;
 };

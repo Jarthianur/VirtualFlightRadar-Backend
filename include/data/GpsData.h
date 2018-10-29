@@ -29,17 +29,17 @@
 
 #include "Data.hpp"
 
-/// @namespace data
 namespace data
 {
 /**
- * @class GpsData
  * @brief Store GPS information.
- * @implements Data
  */
 class GpsData : public Data
 {
 public:
+    /**
+     * @brief Constructor
+     */
     GpsData();
 
     /**
@@ -49,18 +49,19 @@ public:
      */
     GpsData(const object::GpsPosition& position, bool ground);
 
-    ~GpsData() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~GpsData() noexcept = default;
 
     /**
-     * @fn getSerialized
      * @brief Get NMEA GPS report.
-     * @return the NMEA string
+     * @param dest The destination string to append data
      * @threadsafe
      */
     void get_serialized(std::string& dest) override;
 
     /**
-     * @fn getPosition
      * @brief Get the position.
      * @return the position
      * @threadsafe
@@ -68,40 +69,37 @@ public:
     object::Position get_position();
 
     /**
-     * @fn update
-     * @brief Try to update the base position.
-     * @param rvPosition The new position
-     * @param vSlot      The attempt slot
-     * @return true on success, else false
+     * @brief Update the position.
+     * @param position The new position
+     * @return true on success and ground-mode enabled and position was good, else false
+     * @throw PositionLocked if the position was locked before
      * @threadsafe
      */
     bool update(object::Object&& position) override;
 
 private:
     /**
-     * @fn isPositionGood
      * @brief Check whether the position is good enough.
      * @return true if yes, else false
      */
     bool isPositionGood();
 
-    /// @var mPosition
     /// The position
     object::GpsPosition m_position;
 
-    /// @var mProcessor
     /// Processor for GPS information
     processor::GpsProcessor m_processor;
 
-    /// @var mPositionLocked
     /// Locking state of the current position
     bool m_positionLocked = false;
 
-    /// @var mGroundMode
     /// Ground mode state
     bool m_groundMode = false;
 };
 
+/**
+ * @brief Exception to signal that position was already locked.
+ */
 class PositionLocked : public std::exception
 {
 public:

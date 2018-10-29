@@ -43,8 +43,6 @@ AtmosphereFeed::AtmosphereFeed(const std::string& name, const config::Properties
     : Feed(name, COMPONENT, properties, data)
 {}
 
-AtmosphereFeed::~AtmosphereFeed() noexcept {}
-
 Feed::Protocol AtmosphereFeed::get_protocol() const
 {
     return Protocol::SENSOR;

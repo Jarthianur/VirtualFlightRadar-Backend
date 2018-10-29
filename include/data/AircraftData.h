@@ -32,82 +32,73 @@
 
 #include "Data.hpp"
 
-///  @def AC_DELETE_THRESHOLD
 /// Times until aircraft gets deleted
 #define AC_DELETE_THRESHOLD 120
 
-/// @def AC_NO_FLARM_THRESHOLD
 /// Times until FLARM status is removed
 #define AC_NO_FLARM_THRESHOLD OBJ_OUTDATED
 
-/// @namespace data
 namespace data
 {
 /**
- * @class AircraftData
- * @brief Store Aircrafts.
- * @implements Data
+ * @brief Store aircrafts.
  */
 class AircraftData : public Data
 {
 public:
+    /**
+     * @brief Constructor
+     */
     AircraftData();
 
     /**
-     * @fn AircraftData
      * @brief Constructor
-     * @param vMaxDist The max distance filter
+     * @param maxDist The max distance filter
      */
     explicit AircraftData(std::int32_t maxDist);
 
-    ~AircraftData() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~AircraftData() noexcept = default;
 
     /**
-     * @fn getSerialized
-     * @brief Get the reports for all processed Aircrafts
-     * @return the report
+     * @brief Get the reports for all processed aircrafts.
+     * @param dest The destination string to append reports
      * @threadsafe
      */
     void get_serialized(std::string& dest) override;
 
     /**
-     * @fn update
      * @brief Insert or update an Aircraft.
-     * @note The success depends on the registered attempts and the update priority.
-     * @param rvAircraft The update
-     * @param vSlot      The attempt slot
+     * @param aircraft The update
      * @return true on success, else false
      * @threadsafe
      */
     bool update(object::Object&& aircraft) override;
 
     /**
-     * @fn processAircrafts
-     * @brief Process all Aircrafts.
-     * @param crRefPosition The refered position
-     * @param vAtmPress The atmospheric pressure
+     * @brief Process all aircrafts.
+     * @param position The refered position
+     * @param atmPress The atmospheric pressure
      * @threadsafe
      */
     void processAircrafts(const object::Position& position, double atmPress) noexcept;
 
 private:
     /**
-     * @fn insert
-     * @brief Insert an Aircraft in the internal container.
-     * @param crAircraft The aircraft
+     * @brief Insert an aircraft into the internal container.
+     * @param aircraft The aircraft
      */
-    void insert(const object::Aircraft& aircraft);
+    void insert(object::Aircraft&& aircraft);
 
-    /// @var mProcessor
-    /// Providing functionality to process Aircrafts
+    /// Processor for aircrafts
     processor::AircraftProcessor m_processor;
 
-    /// @var mContainer
-    /// Vector holding the Aircrafts
+    /// Vector holding the aircrafts
     std::vector<object::Aircraft> m_container;
 
-    /// @var mIndexMap
-    /// Map aircraft Id's to index and attempt counters.
+    /// Map aircraft Id's to container index
     std::unordered_map<std::string, std::size_t> m_index;
 };
 

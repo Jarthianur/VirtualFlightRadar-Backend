@@ -29,8 +29,6 @@ AtmosphereData::AtmosphereData() : Data() {}
 
 AtmosphereData::AtmosphereData(const Atmosphere& atmosphere) : Data(), m_atmosphere(atmosphere) {}
 
-AtmosphereData::~AtmosphereData() noexcept {}
-
 void AtmosphereData::get_serialized(std::string& dest)
 {
     std::lock_guard<std::mutex> lock(m_mutex);

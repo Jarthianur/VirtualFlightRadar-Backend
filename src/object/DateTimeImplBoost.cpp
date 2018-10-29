@@ -27,10 +27,6 @@ namespace object
 {
 namespace timestamp
 {
-DateTimeImplBoost::DateTimeImplBoost() {}
-
-DateTimeImplBoost::~DateTimeImplBoost() noexcept {}
-
 std::int64_t DateTimeImplBoost::now()
 {
     return static_cast<std::int64_t>(

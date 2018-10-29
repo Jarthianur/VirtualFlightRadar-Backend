@@ -27,28 +27,30 @@
 
 #include "Parser.hpp"
 
-/// @namespace feed
 namespace feed
 {
-/// @namespace parser
 namespace parser
 {
 /**
- * @class AtmosphereParser
- * @brief Unpack NMEA sentences from sensors.
- * @implements Parser
+ * @brief Implement Parser for NMEA sentences from sensors.
  */
 class AtmosphereParser : public Parser<object::Atmosphere>
 {
 public:
+    /**
+     * @brief Constructor
+     */
     AtmosphereParser();
 
-    ~AtmosphereParser() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~AtmosphereParser() noexcept = default;
 
     /**
-     * @fn unpack
-     * @brief Unpack into Climate.
-     * @see Parser#unpack
+     * @brief Unpack into Atmosphere.
+     * @param sentence   The string to unpack
+     * @param atmosphere The Atmosphere to unpack into
      */
     bool unpack(const std::string& sentence, object::Atmosphere& atmosphere) noexcept override;
 };

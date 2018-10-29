@@ -26,15 +26,31 @@
 
 namespace server
 {
+/**
+ * @brief Exception to signal socket errors.
+ */
 class SocketException : public std::exception
 {
 public:
+    /**
+     * @brief Constructor
+     * @param msg The error message
+     */
     explicit SocketException(const std::string& msg);
-    ~SocketException() noexcept;
 
+    /**
+     * @brief Destructor
+     */
+    ~SocketException() noexcept = default;
+
+    /**
+     * @brief Get the error message.
+     * @return the message
+     */
     const char* what() const noexcept;
 
 private:
+    /// Error message
     const std::string m_message;
 };
 

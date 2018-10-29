@@ -27,14 +27,32 @@ namespace object
 {
 namespace timestamp
 {
+/**
+ * @brief Provide time functions using boost.
+ */
 class DateTimeImplBoost
 {
 public:
-    DateTimeImplBoost();
+    /**
+     * @brief Constructor
+     */
+    DateTimeImplBoost() = default;
 
-    ~DateTimeImplBoost() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~DateTimeImplBoost() noexcept = default;
 
-    static std::int64_t  now();
+    /**
+     * @brief Get the amount of milliseconds since 00:00 UTC.
+     * @return the milliseconds
+     */
+    static std::int64_t now();
+
+    /**
+     * @brief Get the current day as incremental number.
+     * @return the current day
+     */
     static std::uint32_t day();
 };
 

@@ -44,8 +44,6 @@ AircraftData::AircraftData(std::int32_t maxDist) : Data(), m_processor(maxDist)
     m_index.reserve(ESTIMATED_TRAFFIC * 2);
 }
 
-AircraftData::~AircraftData() noexcept {}
-
 void AircraftData::get_serialized(std::string& dest)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -65,7 +63,7 @@ bool AircraftData::update(Object&& aircraft)
     {
         return m_container[index->second].tryUpdate(std::move(aircraft));
     }
-    insert(update);
+    insert(std::move(update));
     return true;
 }
 
@@ -112,9 +110,9 @@ void AircraftData::processAircrafts(const Position& position, double atmPress) n
     }
 }
 
-void AircraftData::insert(const object::Aircraft& aircraft)
+void AircraftData::insert(object::Aircraft&& aircraft)
 {
     m_index.insert({aircraft.get_id(), m_container.size()});
-    m_container.push_back(aircraft);
+    m_container.push_back(std::move(aircraft));
 }
 }  // namespace data

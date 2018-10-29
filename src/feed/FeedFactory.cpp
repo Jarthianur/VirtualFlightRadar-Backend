@@ -49,8 +49,6 @@ FeedFactory::FeedFactory(std::shared_ptr<config::Configuration> config,
       m_windData(windData)
 {}
 
-FeedFactory::~FeedFactory() noexcept {}
-
 template<>
 std::shared_ptr<AprscFeed> FeedFactory::makeFeed<AprscFeed>(const std::string& name)
 {

@@ -43,8 +43,6 @@ WindFeed::WindFeed(const std::string& name, const config::Properties& properties
     : Feed(name, COMPONENT, properties, data)
 {}
 
-WindFeed::~WindFeed() noexcept {}
-
 Feed::Protocol WindFeed::get_protocol() const
 {
     return Protocol::SENSOR;

@@ -31,8 +31,6 @@ namespace parser
 {
 WindParser::WindParser() : Parser<object::Wind>() {}
 
-WindParser::~WindParser() noexcept {}
-
 bool WindParser::unpack(const std::string& sentence, object::Wind& wind) noexcept
 {
     try

@@ -50,8 +50,6 @@ AprscFeed::AprscFeed(const std::string& name, const config::Properties& properti
     }
 }
 
-AprscFeed::~AprscFeed() noexcept {}
-
 Feed::Protocol AprscFeed::get_protocol() const
 {
     return Protocol::APRS;

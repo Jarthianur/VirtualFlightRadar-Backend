@@ -29,8 +29,6 @@ GpsPosition::GpsPosition(const Position& position, double geoid)
     : Object(), m_position(position), m_geoid(geoid)
 {}
 
-GpsPosition::~GpsPosition() noexcept {}
-
 void GpsPosition::assign(Object&& other)
 {
     try

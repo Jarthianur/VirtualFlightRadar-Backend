@@ -29,97 +29,84 @@
 #include "Object.h"
 #include "TimeStamp.hpp"
 
-/// @namespace object
 namespace object
 {
 /**
- * @struct Position
- * @brief Represent a position on earth.
+ * @brief A position on earth.
  */
 struct Position
 {
-    /// @var latitude
     /// Latitude; deg
     double latitude;
 
-    /// @var longitude
     /// Longitude; deg
     double longitude;
 
-    /// @var altitude
     /// Altitude; m
     std::int32_t altitude;
 };
 
 /**
- * @class GpsPosition
- * @brief Represent a position and provide GPS information.
- * @extends Object
+ * @brief Extend Object to a GPS position.
  */
 class GpsPosition : public Object
 {
 public:
+    /**
+     * @brief Constructor
+     */
     GpsPosition();
 
     /**
-     * @fn GpsPosition
      * @brief Constructor
-     * @param vPriority The initial priority
+     * @param priority The initial priority
      */
     explicit GpsPosition(std::uint32_t priority);
 
     /**
-     * @fn GpsPosition
      * @brief Constructor
-     * @param crPosition The position
-     * @param vGeoid     The geoid
+     * @param position The position
+     * @param geoid    The geoid
      */
     GpsPosition(const Position& position, double geoid);
 
-    ~GpsPosition() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~GpsPosition() noexcept = default;
 
 private:
     /**
-     * @see Object#assign
+     * @brief Override Object::assign.
      */
     void assign(Object&& other) override;
 
     /**
-     * @fn canUpdate
-     * @brief Check whether this Aircraft can update the other one.
-     * @param crOther   The other Aircraft
-     * @param vAttempts The update attempt count
-     * @return true if yes, else false
+     * @brief Override Object::canUpdate.
      */
     bool canUpdate(const Object& other) const override;
 
-    /// @var mPosition
     /// The position
     Position m_position{0.0, 0.0, 0};
 
-    /// @var mGeoid
     /// The geoid separation
     double m_geoid = 0.0;
 
-    /// @var mTimeStamp
     /// The timestamp of this position
     TimeStamp<timestamp::DateTimeImplBoost> m_timeStamp;
 
-    /// @var mNrOfSatellites
-    /// The number of satellites
-    std::int8_t m_nrOfSatellites = 1;
-
-    /// @var mFixQuality
-    /// The GPS fix quality
-    std::int8_t m_fixQuality = 5;
-
-    /// @var mDilution
     /// The position dilution
     double m_dilution = 0.0;
 
+    /// The number of satellites
+    std::int8_t m_nrOfSatellites = 1;
+
+    /// The GPS fix quality
+    std::int8_t m_fixQuality = 5;
+
 public:
     /**
-     * Define and declare getters and setters.
+     *Getters and setters
      */
     GETSET_CR(position)
     GETSET_V(geoid)

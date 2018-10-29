@@ -34,18 +34,19 @@ namespace data
 class Data;
 } /* namespace data */
 
-/// @namespace feed
 namespace feed
 {
 /**
- * @class Feed
- * @brief Base class representing an input feed.
+ * @brief Base class for input feeds.
  */
 class Feed
 {
 public:
     NOT_COPYABLE(Feed)
 
+    /**
+     * @brief The protocol that the Feed supports.
+     */
     enum class Protocol : std::int8_t
     {
         APRS,
@@ -55,59 +56,63 @@ public:
     };
 
     /**
-     * @fn ~Feed
      * @brief Destructor
      */
-    virtual ~Feed() noexcept;
+    virtual ~Feed() noexcept = default;
 
+    /**
+     * @brief Get the supported Protocol.
+     * @return the protocol
+     */
     virtual Protocol get_protocol() const = 0;
 
+    /**
+     * @brief Get the feeds required Endpoint.
+     * @return the endpoint
+     */
     client::Endpoint get_endpoint() const;
 
     /**
-     * @fn process
-     * @brief Handle Client's response.
-     * @param crResponse The response
+     * @brief Handle client's response.
+     * @param response The response
      */
     virtual bool process(const std::string& response) = 0;
 
 protected:
     /**
-     * @fn Feed
      * @brief Constructor
-     * @param crName  The Feeds unique name
-     * @param crKvMap The properties map
-     * @throw std::logic_error if host or port are not given
+     * @param name       The Feeds unique name
+     * @param component  The component string
+     * @param properties The Properties
+     * @throw std::logic_error if host or port are not given in properties
      */
     Feed(const std::string& name, const char* component, const config::Properties& propertyMap,
          std::shared_ptr<data::Data> data);
 
-    /// @var mName
     /// Unique name
     const std::string m_name;
 
+    /// Component string
     const char* const m_component;
 
-    /// @var mKvMap
-    /// Key-value-map holding the properties.
+    /// Properties
     const config::Properties m_properties;
 
+    /// Respective Data container
     std::shared_ptr<data::Data> m_data;
 
 private:
     /**
-     * @fn initPriority
      * @brief Initialize the priority from the given properties.
      */
     void initPriority() noexcept;
 
-    /// @var mPriority
-    /// The priority
+    /// Priority
     std::uint32_t m_priority;
 
 public:
     /**
-     * Define and declare getters.
+     * Getters
      */
     GETTER_CR(name)
     GETTER_V(priority)
