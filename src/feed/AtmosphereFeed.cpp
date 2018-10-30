@@ -26,8 +26,8 @@
 #include "config/Configuration.h"
 #include "data/AtmosphereData.h"
 #include "object/Atmosphere.h"
-#include "util/Logger.hpp"
 #include "parser/AtmosphereParser.h"
+#include "util/Logger.hpp"
 
 #ifdef COMPONENT
 #    undef COMPONENT

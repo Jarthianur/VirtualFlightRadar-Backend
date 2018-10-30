@@ -92,7 +92,7 @@ void NetworkInterfaceImplBoost::close()
 }
 
 void NetworkInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
-                                         const std::function<void(bool)>& callback)
+                                             const std::function<void(bool)>& callback)
 {
     if (error)
     {

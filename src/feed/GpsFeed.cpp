@@ -27,8 +27,8 @@
 #include "config/Configuration.h"
 #include "data/GpsData.h"
 #include "object/GpsPosition.h"
-#include "util/Logger.hpp"
 #include "parser/GpsParser.h"
+#include "util/Logger.hpp"
 
 #ifdef COMPONENT
 #    undef COMPONENT

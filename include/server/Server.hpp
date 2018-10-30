@@ -136,7 +136,8 @@ private:
 };
 
 template<typename SocketT>
-Server<SocketT>::Server(std::uint16_t port) : m_tcpIf(std::make_shared<NetworkInterfaceImplBoost>(port))
+Server<SocketT>::Server(std::uint16_t port)
+    : m_tcpIf(std::make_shared<NetworkInterfaceImplBoost>(port))
 {}
 
 template<typename SocketT>

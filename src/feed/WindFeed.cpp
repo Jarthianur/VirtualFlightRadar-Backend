@@ -26,8 +26,8 @@
 #include "config/Configuration.h"
 #include "data/WindData.h"
 #include "object/Wind.h"
-#include "util/Logger.hpp"
 #include "parser/WindParser.h"
+#include "util/Logger.hpp"
 
 #ifdef COMPONENT
 #    undef COMPONENT
