@@ -27,7 +27,6 @@
 #include "data/WindData.h"
 #include "object/Wind.h"
 #include "parser/WindParser.h"
-#include "util/Logger.hpp"
 
 #ifdef COMPONENT
 #    undef COMPONENT
@@ -53,7 +52,6 @@ bool WindFeed::process(const std::string& response)
     object::Wind wind(get_priority());
     if (s_parser.unpack(response, wind))
     {
-        logger.debug(m_component, "[", m_name, "] update: ", response);
         m_data->update(std::move(wind));
     }
     return true;

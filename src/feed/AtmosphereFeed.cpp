@@ -27,7 +27,6 @@
 #include "data/AtmosphereData.h"
 #include "object/Atmosphere.h"
 #include "parser/AtmosphereParser.h"
-#include "util/Logger.hpp"
 
 #ifdef COMPONENT
 #    undef COMPONENT
@@ -53,8 +52,6 @@ bool AtmosphereFeed::process(const std::string& response)
     object::Atmosphere atmos(get_priority());
     if (s_parser.unpack(response, atmos))
     {
-        logger.debug(m_component, "[", m_name, "] update: ", response);
-        logger.debug(m_component, "[", m_name, "] atmos: ", atmos.get_pressure());
         m_data->update(std::move(atmos));
     }
     return true;

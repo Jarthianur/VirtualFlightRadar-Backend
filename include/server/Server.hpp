@@ -201,7 +201,6 @@ void Server<SocketT>::send(const std::string& msg)
     {
         return;
     }
-    logger.debug("(Server) send: ", msg);
     for (auto& it : m_connections)
     {
         if (it)

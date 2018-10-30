@@ -27,7 +27,6 @@
 #include "data/AircraftData.h"
 #include "object/Aircraft.h"
 #include "parser/SbsParser.h"
-#include "util/Logger.hpp"
 
 #ifdef COMPONENT
 #    undef COMPONENT
@@ -55,7 +54,6 @@ bool SbsFeed::process(const std::string& response)
     object::Aircraft ac(get_priority());
     if (s_parser.unpack(response, ac))
     {
-        logger.debug(m_component, "[", m_name, "] update: ", response);
         m_data->update(std::move(ac));
     }
     return true;

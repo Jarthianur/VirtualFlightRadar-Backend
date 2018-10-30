@@ -54,9 +54,6 @@ bool GpsFeed::process(const std::string& response)
     object::GpsPosition pos(get_priority());
     if (s_parser.unpack(response, pos))
     {
-        logger.debug(m_component, "[", m_name, "] update: ", response);
-        logger.debug(m_component, "[", m_name, "] pos: ", pos.get_position().latitude, ";",
-                     pos.get_position().longitude, ";", pos.get_position().altitude);
         try
         {
             if (m_data->update(std::move(pos)))
