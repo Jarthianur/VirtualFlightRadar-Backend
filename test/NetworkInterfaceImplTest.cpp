@@ -21,7 +21,7 @@
 
 #include <thread>
 
-#include "../src/server/Connection.hpp"
+#include "server/Connection.hpp"
 #include "SocketImplTest.h"
 #include "NetworkInterfaceImplTest.h"
 

@@ -21,7 +21,7 @@
 
 #include <boost/regex.hpp>
 
-#include "../src/util/math.hpp"
+#include "util/math.hpp"
 #include "helper.hpp"
 
 using namespace sctf;

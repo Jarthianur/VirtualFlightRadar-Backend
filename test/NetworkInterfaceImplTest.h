@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "../src/server/NetworkInterface.hpp"
+#include "server/NetworkInterface.hpp"
 
 namespace server
 {

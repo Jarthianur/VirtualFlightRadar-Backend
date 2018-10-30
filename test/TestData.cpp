@@ -22,12 +22,12 @@
 #include <string>
 #include <boost/regex.hpp>
 
-#include "../src/data/AircraftData.h"
-#include "../src/data/AtmosphereData.h"
-#include "../src/data/GpsData.h"
-#include "../src/data/WindData.h"
-#include "../src/feed/parser/AprsParser.h"
-#include "../src/feed/parser/SbsParser.h"
+#include "data/AircraftData.h"
+#include "data/AtmosphereData.h"
+#include "data/GpsData.h"
+#include "data/WindData.h"
+#include "feed/parser/AprsParser.h"
+#include "feed/parser/SbsParser.h"
 #include "helper.hpp"
 
 using namespace data;

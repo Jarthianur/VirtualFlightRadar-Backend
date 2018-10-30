@@ -26,7 +26,7 @@
 #include <string>
 #include <boost/regex.hpp>
 
-#include "../src/object/Aircraft.h"
+#include "object/Aircraft.h"
 #include "framework/sctf.hpp"
 
 #define TEST_FUNCTION(NAME) extern void NAME(test::TestSuitesRunner&);

@@ -22,17 +22,17 @@
 #include <stdexcept>
 #include <string>
 
-#include "../src/feed/parser/AprsParser.h"
-#include "../src/feed/parser/AtmosphereParser.h"
-#include "../src/feed/parser/GpsParser.h"
-#include "../src/feed/parser/SbsParser.h"
-#include "../src/feed/parser/WindParser.h"
-#include "../src/object/Aircraft.h"
-#include "../src/object/Atmosphere.h"
-#include "../src/object/GpsPosition.h"
-#include "../src/object/TimeStamp.hpp"
-#include "../src/object/Wind.h"
-#include "../src/util/math.hpp"
+#include "feed/parser/AprsParser.h"
+#include "feed/parser/AtmosphereParser.h"
+#include "feed/parser/GpsParser.h"
+#include "feed/parser/SbsParser.h"
+#include "feed/parser/WindParser.h"
+#include "object/Aircraft.h"
+#include "object/Atmosphere.h"
+#include "object/GpsPosition.h"
+#include "object/TimeStamp.hpp"
+#include "object/Wind.h"
+#include "util/math.hpp"
 #include "helper.hpp"
 
 using namespace feed::parser;

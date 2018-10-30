@@ -19,11 +19,11 @@
  }
  */
 
-#include "../src/object/Aircraft.h"
-#include "../src/object/Atmosphere.h"
-#include "../src/object/GpsPosition.h"
-#include "../src/object/TimeStamp.hpp"
-#include "../src/object/Wind.h"
+#include "object/Aircraft.h"
+#include "object/Atmosphere.h"
+#include "object/GpsPosition.h"
+#include "object/TimeStamp.hpp"
+#include "object/Wind.h"
 
 #include "DateTimeImplTest.h"
 #include "helper.hpp"
