@@ -19,11 +19,11 @@
  }
  */
 
-#include "util/Signals.h"
+#include "util/SignalListener.h"
 
 namespace util
 {
-Signals::Signals() : m_ioService(), m_sigSet(m_ioService)
+SignalListener::SignalListener() : m_ioService(), m_sigSet(m_ioService)
 {
     m_sigSet.add(SIGINT);
     m_sigSet.add(SIGTERM);
@@ -32,18 +32,18 @@ Signals::Signals() : m_ioService(), m_sigSet(m_ioService)
 #endif
 }
 
-Signals::~Signals() noexcept
+SignalListener::~SignalListener() noexcept
 {
     stop();
 }
 
-void Signals::run()
+void SignalListener::run()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_thread = std::thread([this]() { m_ioService.run(); });
 }
 
-void Signals::stop()
+void SignalListener::stop()
 {
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -58,7 +58,7 @@ void Signals::stop()
     }
 }
 
-void Signals::addHandler(const SignalHandler& handler)
+void SignalListener::addHandler(const SignalHandler& handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_sigSet.async_wait(handler);

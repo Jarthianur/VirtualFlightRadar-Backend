@@ -38,7 +38,7 @@
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
 #include "util/Logger.hpp"
-#include "util/Signals.h"
+#include "util/SignalListener.h"
 
 using namespace data;
 
@@ -56,14 +56,12 @@ VFRB::VFRB(std::shared_ptr<config::Configuration> config)
     createFeeds(config);
 }
 
-VFRB::~VFRB() noexcept {}
-
 void VFRB::run() noexcept
 {
     m_running = true;
     logger.info("(VFRB) startup");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    util::Signals                         signals;
+    util::SignalListener                         signals;
     client::ClientManager                 clientManager;
 
     signals.addHandler([this](const boost::system::error_code&, const int) {

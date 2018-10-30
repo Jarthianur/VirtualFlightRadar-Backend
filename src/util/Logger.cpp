@@ -28,8 +28,6 @@ Logger logger;
 
 Logger::Logger() : m_outStream(&std::cout), m_errStream(&std::cerr) {}
 
-Logger::~Logger() noexcept {}
-
 void Logger::set_debug(bool enable)
 {
     std::lock_guard<std::mutex> lock(m_mutex);

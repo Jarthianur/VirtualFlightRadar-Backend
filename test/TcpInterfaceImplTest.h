@@ -21,17 +21,17 @@
 
 #pragma once
 
-#include "../src/server/TcpInterface.hpp"
+#include "../src/server/NetworkInterface.hpp"
 
 namespace server
 {
 class SocketImplTest;
 
-class TcpInterfaceImplTests : public TcpInterface<SocketImplTest>
+class NetworkInterfaceImplTests : public NetworkInterface<SocketImplTest>
 {
 public:
-    TcpInterfaceImplTests();
-    ~TcpInterfaceImplTests() noexcept;
+    NetworkInterfaceImplTests();
+    ~NetworkInterfaceImplTests() noexcept;
 
     void run(std::unique_lock<std::mutex>& lock) override;
 

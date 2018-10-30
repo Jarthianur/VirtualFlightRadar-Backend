@@ -25,56 +25,44 @@
 #include <cstddef>
 #include <cstdint>
 
-/// @namespace math
 namespace math
 {
-/// @var KTS_2_KMH
 /// Convert knots to km/h
 const double KTS_2_KMH = 1.852;
 
-/// @var
 /// Convert km/h to knots
 const double KMH_2_KTS = 0.539957;
-/// @var
+
 /// Convert knots to m/s
 const double KTS_2_MS = 0.514444;
 
-/// @var
 /// Convert m/s to knots
 const double MS_2_KTS = 1.94384;
 
-/// @var
 /// Convert km/h to m/s
 const double KMH_2_MS = 0.277778;
 
-/// @var
 /// Convert m/s to km/h
 const double MS_2_KMH = 3.6;
 
-/// @var
 /// Convert m/s to fpm
 const double MS_2_FPM = 196.85;
 
-/// @var
 /// Convert fpm to m/s
 const double FPM_2_MS = 0.00508;
 
-/// @var
 /// Convert feet to m
 const double FEET_2_M = 0.3048;
 
-/// @var
 /// Convert m to feet
 const double M_2_FEET = 3.28084;
 
-/// @var PI
 /// The circular number
 const double PI = std::acos(-1.0);
 
 /**
- * @fn radian
  * @brief Convert degree to radian.
- * @param vDegree The degrees
+ * @param degree The degrees
  * @return the radian
  */
 inline double radian(double degree)
@@ -83,9 +71,8 @@ inline double radian(double degree)
 }
 
 /**
- * @fn degree
  * @brief Convert radian to degree.
- * @param vRadian The radian
+ * @param radian The radian
  * @return the degrees
  */
 inline double degree(double radian)
@@ -94,9 +81,8 @@ inline double degree(double radian)
 }
 
 /**
- * @fn doubleToInt
  * @brief Convert double to int, round to nearest number.
- * @param vDouble The floating point value
+ * @param value The floating point value
  * @return the rounded integer
  */
 inline std::int32_t doubleToInt(double value)
@@ -106,9 +92,8 @@ inline std::int32_t doubleToInt(double value)
 }
 
 /**
- * @fn dmToDeg
  * @brief Convert ( degree, minute-as-decimal ) to degree.
- * @param vDegMin The degree-minute value
+ * @param degMin The degree-minute value
  * @return the degree value
  */
 inline double dmToDeg(double degMin)
@@ -120,10 +105,9 @@ inline double dmToDeg(double degMin)
 }
 
 /**
- * @fn icaoHeight
  * @brief Calculate height difference from QNE to Pressure in meters with ICAO height
  * formula.
- * @param vPressure The air pressure
+ * @param pressure The air pressure
  * @return the height difference to QNE
  */
 inline std::int32_t icaoHeight(double pressure)
@@ -132,10 +116,9 @@ inline std::int32_t icaoHeight(double pressure)
 }
 
 /**
- * @fn checksum
  * @brief Compute checksum of nmea string.
- * @param cpSentence The sentence to eval
- * @param vSize      The sentences size
+ * @param sentence The sentence to eval
+ * @param length   The sentences size
  * @return the checksum
  */
 inline std::int32_t checksum(const char* sentence, std::size_t length)

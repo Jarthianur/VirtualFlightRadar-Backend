@@ -30,7 +30,6 @@
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
-/// @namespace util
 namespace util
 {
 /// @typedef Number
@@ -38,18 +37,13 @@ namespace util
 using Number = boost::variant<std::int32_t, std::uint64_t, double>;
 
 /// @typedef OptNumber
-/// @see Number
 /// An optional number, which may be invalid
 using OptNumber = boost::optional<Number>;
 
 /**
- * @fn stringToNumber
  * @brief Convert a string to number.
- *
- * The returned optional number is invalid, if the conversion fails.
- *
  * @tparam T    The number type
- * @param crStr The given string
+ * @param str The string to convert
  * @return an optional number, which may be invalid
  */
 template<typename T>
@@ -65,9 +59,8 @@ inline OptNumber stringToNumber(const std::string& str)
 }
 
 /**
- * @fn trimString
  * @brief Trim a string on both sides.
- * @param rStr The string
+ * @param str The string to trim
  * @return the trimmed string
  */
 inline std::string& trimString(std::string& str)
@@ -86,9 +79,8 @@ inline std::string& trimString(std::string& str)
 }
 
 /**
- * @fn splitCommaSeparated
  * @brief Split a string, separated at commata.
- * @param crStr The given string
+ * @param str The string to split
  * @return a list of strings
  */
 inline std::list<std::string> splitCommaSeparated(const std::string& str)
@@ -105,6 +97,11 @@ inline std::list<std::string> splitCommaSeparated(const std::string& str)
     return list;
 }
 
+/**
+ * @brief Get enum value as the underlying type.
+ * @param value The enum value
+ * @return the value as its underlyig type
+ */
 template<typename T>
 constexpr auto raw_type(T value) -> typename std::underlying_type<T>::type
 {

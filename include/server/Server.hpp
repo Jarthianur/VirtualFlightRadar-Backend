@@ -33,7 +33,7 @@
 #include "util/defines.h"
 
 #include "Connection.hpp"
-#include "TcpInterfaceImplBoost.h"
+#include "NetworkInterfaceImplBoost.h"
 #include "parameters.h"
 
 /// @def S_MAX_CLIENTS
@@ -69,9 +69,9 @@ public:
 
     /**
      * @brief Server
-     * @param interface The TcpInterface to use
+     * @param interface The NetworkInterface to use
      */
-    explicit Server(std::shared_ptr<TcpInterface<SocketT>> interface);
+    explicit Server(std::shared_ptr<NetworkInterface<SocketT>> interface);
 
     /**
      * @brief Destructor
@@ -116,8 +116,8 @@ private:
      */
     void attemptConnection(bool error) noexcept;
 
-    /// TcpInterface
-    std::shared_ptr<TcpInterface<SocketT>> m_tcpIf;
+    /// NetworkInterface
+    std::shared_ptr<NetworkInterface<SocketT>> m_tcpIf;
 
     /// Connections container
     std::array<std::unique_ptr<Connection<SocketT>>, S_MAX_CLIENTS> m_connections;
@@ -136,11 +136,11 @@ private:
 };
 
 template<typename SocketT>
-Server<SocketT>::Server(std::uint16_t port) : m_tcpIf(std::make_shared<TcpInterfaceImplBoost>(port))
+Server<SocketT>::Server(std::uint16_t port) : m_tcpIf(std::make_shared<NetworkInterfaceImplBoost>(port))
 {}
 
 template<typename SocketT>
-Server<SocketT>::Server(std::shared_ptr<TcpInterface<SocketT>> interface) : m_tcpIf(interface)
+Server<SocketT>::Server(std::shared_ptr<NetworkInterface<SocketT>> interface) : m_tcpIf(interface)
 {}
 
 template<typename SocketT>

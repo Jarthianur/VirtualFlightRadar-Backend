@@ -27,29 +27,28 @@
 #include <memory>
 #include <string>
 
+#include "server/NetworkInterfaceImplBoost.h"
 #include "server/Server.hpp"
 #include "server/SocketImplBoost.h"
-#include "server/TcpInterfaceImplBoost.h"
 #include "util/defines.h"
 
 namespace config
 {
 class Configuration;
-} /* namespace config */
+}  // namespace config
 namespace data
 {
 class AircraftData;
 class AtmosphereData;
 class GpsData;
 class WindData;
-} /* namespace data */
+}  // namespace data
 namespace feed
 {
 class Feed;
-} /* namespace feed */
+}  // namespace feed
 
 /**
- * @class VFRB
  * @brief Combine all features and is the main entry point for the actual VFR-B.
  */
 class VFRB
@@ -58,71 +57,58 @@ public:
     NOT_COPYABLE(VFRB)
 
     /**
-     * @fn VFRB
      * @brief Constructor
-     * @param crConfig The configuration
+     * @param config The Configuration
      */
     explicit VFRB(std::shared_ptr<config::Configuration> config);
 
     /**
-     * @fn ~VFRB
      * @brief Destructor
      */
-    ~VFRB() noexcept;
+    ~VFRB() noexcept = default;
 
     /**
-     * @fn run
      * @brief The VFRB's main method, runs the VFR-B.
      */
     void run() noexcept;
 
 private:
     /**
-     * @fn createFeeds
-     * @brief Register all input Feeds.
-     * @param crConfig The Configuration
+     * @brief Create all input feeds.
+     * @param config The Configuration
      */
     void createFeeds(std::shared_ptr<config::Configuration> config);
 
     /**
-     * @fn serve
-     * @brief Serve the data frequently every second using the Server.
+     * @brief Serve the data frequently every second.
      */
     void serve();
 
     /**
-     * @fn getDuration
      * @brief Get the duration from given start value as formatted string.
-     * @param vStart The start value
+     * @param start The start value
      * @return the duration string
      */
     std::string get_duration(std::chrono::steady_clock::time_point start) const;
 
-    /// @var mpAircraftData
-    /// Manage aircrafts
+    /// Aircraft container
     std::shared_ptr<data::AircraftData> m_aircraftData;
 
-    /// @var mpAtmosphereData
-    /// Manage atmospheric data
+    /// Atmospheric data container
     std::shared_ptr<data::AtmosphereData> m_atmosphereData;
 
-    /// @var mpGpsData
-    /// Manage GPS data
+    /// GPS data container
     std::shared_ptr<data::GpsData> m_gpsData;
 
-    /// @var mpWindData
-    /// Manage wind data
+    /// Wind data container
     std::shared_ptr<data::WindData> m_windData;
 
-    /// @var mServer
     /// Manage clients and sending of data
     server::Server<server::SocketImplBoost> m_server;
 
-    /// @var mFeeds
     /// List of all active feeds
     std::list<std::shared_ptr<feed::Feed>> m_feeds;
 
-    /// @var vRunStatus
     /// Atomic run-status.
     std::atomic<bool> m_running;
 };

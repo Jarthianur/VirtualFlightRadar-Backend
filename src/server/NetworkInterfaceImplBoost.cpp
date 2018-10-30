@@ -19,7 +19,7 @@
  }
  */
 
-#include "TcpInterfaceImplBoost.h"
+#include "NetworkInterfaceImplBoost.h"
 
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
@@ -30,20 +30,20 @@
 
 namespace server
 {
-TcpInterfaceImplBoost::TcpInterfaceImplBoost(std::uint16_t port)
-    : TcpInterface<SocketImplBoost>(),
+NetworkInterfaceImplBoost::NetworkInterfaceImplBoost(std::uint16_t port)
+    : NetworkInterface<SocketImplBoost>(),
       m_ioService(),
       m_acceptor(m_ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
                  boost::asio::ip::tcp::acceptor::reuse_address(true)),
       m_socket(boost::move(boost::asio::ip::tcp::socket(m_ioService)))
 {}
 
-TcpInterfaceImplBoost::~TcpInterfaceImplBoost() noexcept
+NetworkInterfaceImplBoost::~NetworkInterfaceImplBoost() noexcept
 {
     stop();
 }
 
-void TcpInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
+void NetworkInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
 {
     try
     {
@@ -55,15 +55,15 @@ void TcpInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
     }
     catch (const std::exception& e)
     {
-        logger.error("TcpInterfaceImplBoost::run() caught: ", e.what());
+        logger.error("NetworkInterfaceImplBoost::run() caught: ", e.what());
     }
     catch (...)
     {
-        logger.error("TcpInterfaceImplBoost::run() caught error");
+        logger.error("NetworkInterfaceImplBoost::run() caught error");
     }
 }
 
-void TcpInterfaceImplBoost::stop()
+void NetworkInterfaceImplBoost::stop()
 {
     if (m_acceptor.is_open())
     {
@@ -76,22 +76,22 @@ void TcpInterfaceImplBoost::stop()
     m_socket.close();
 }
 
-void TcpInterfaceImplBoost::onAccept(const std::function<void(bool)>& callback)
+void NetworkInterfaceImplBoost::onAccept(const std::function<void(bool)>& callback)
 {
     if (m_acceptor.is_open())
     {
         m_acceptor.async_accept(m_socket.get(),
-                                boost::bind(&TcpInterfaceImplBoost::handleAccept, this,
+                                boost::bind(&NetworkInterfaceImplBoost::handleAccept, this,
                                             boost::asio::placeholders::error, callback));
     }
 }
 
-void TcpInterfaceImplBoost::close()
+void NetworkInterfaceImplBoost::close()
 {
     m_socket.close();
 }
 
-void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
+void NetworkInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
                                          const std::function<void(bool)>& callback)
 {
     if (error)
@@ -101,7 +101,7 @@ void TcpInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
     callback(error);
 }
 
-std::unique_ptr<Connection<SocketImplBoost>> TcpInterfaceImplBoost::startConnection()
+std::unique_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startConnection()
 {
     if (!m_socket.get().is_open())
     {
@@ -110,7 +110,7 @@ std::unique_ptr<Connection<SocketImplBoost>> TcpInterfaceImplBoost::startConnect
     return Connection<SocketImplBoost>::create(std::move(m_socket));
 }
 
-std::string TcpInterfaceImplBoost::get_currentAddress() const
+std::string NetworkInterfaceImplBoost::get_currentAddress() const
 {
     return m_socket.get_address();
 }

@@ -5,15 +5,15 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../../src/util/Logger.cpp \
-../../src/util/Signals.cpp
+../../src/util/SignalListener.cpp
 
 OBJS += \
 ./src/util/Logger.o \
-./src/util/Signals.o 
+./src/util/SignalListener.o 
 
 CPP_DEPS += \
 ./src/util/Logger.d \
-./src/util/Signals.d 
+./src/util/SignalListener.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

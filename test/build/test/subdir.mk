@@ -14,7 +14,7 @@ CPP_SRCS += \
 ../TestData.cpp \
 ../TestConfig.cpp \
 ../TestClient.cpp \
-../TcpInterfaceImplTest.cpp \
+../NetworkInterfaceImplTest.cpp \
 ../SocketImplTest.cpp \
 ../DateTimeImplTest.cpp
 
@@ -29,7 +29,7 @@ OBJS += \
 ./test/TestData.o \
 ./test/TestConfig.o \
 ./test/TestClient.o \
-./test/TcpInterfaceImplTest.o \
+./test/NetworkInterfaceImplTest.o \
 ./test/SocketImplTest.o \
 ./test/DateTimeImplTest.o
 
@@ -44,7 +44,7 @@ CPP_DEPS += \
 ./test/TestData.d \
 ./test/TestConfig.d \
 ./test/TestClient.d \
-./test/TcpInterfaceImplTest.d \
+./test/NetworkInterfaceImplTest.d \
 ./test/SocketImplTest.d \
 ./test/DateTimeImplTest.d
 

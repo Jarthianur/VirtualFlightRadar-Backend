@@ -28,19 +28,23 @@
 #include <utility>
 
 /**
- * @class Logger
- * @brief Provides static functions for threadsafe logging.
+ * @brief Logger with different levels.
  */
 class Logger
 {
 public:
+    /**
+     * @brief Constructor
+     */
     Logger();
 
-    ~Logger() noexcept;
+    /**
+     * @brief Destructor
+     */
+    ~Logger() noexcept = default;
 
     /**
-     * @fn info
-     * @brief Log on INFO level to stdout.
+     * @brief Log on INFO level.
      * @tparam T     The first argument
      * @tparam TRest The rest of arguments
      * @threadsafe
@@ -61,8 +65,7 @@ public:
     }
 
     /**
-     * @fn debug
-     * @brief Log on DEBUG level to stdout.
+     * @brief Log on DEBUG level.
      * @tparam T     The first argument
      * @tparam TRest The rest of arguments
      * @threadsafe
@@ -89,8 +92,7 @@ public:
     }
 
     /**
-     * @fn warn
-     * @brief Log on WARN level to stdout.
+     * @brief Log on WARN level.
      * @tparam T     The first argument
      * @tparam TRest The rest of arguments
      * @threadsafe
@@ -111,8 +113,7 @@ public:
     }
 
     /**
-     * @fn error
-     * @brief Log on ERROR level to stderr.
+     * @brief Log on ERROR level.
      * @tparam T     The first argument
      * @tparam TRest The rest of arguments
      * @threadsafe
@@ -132,40 +133,45 @@ public:
         log(m_errStream, std::forward<T>(msg));
     }
 
+    /**
+     * @brief Enable/Disable debug level.
+     * @param enable true to enable, false to disable (default: true)
+     */
     void set_debug(bool enable = true);
 
+    /**
+     * @brief Set a logfile instead of stdout/stderr.
+     * @param file The filename
+     */
     void set_logFile(const std::string& file);
 
 private:
-    /// @var mMutex
     /// Mutex for threadsafe logging
     mutable std::mutex m_mutex;
 
+    /// The logfile stream
     std::ofstream m_logFile;
 
-    /// @var m_outStream
     /// Stream to log INFO,DEBUG,WARN
     std::ostream* m_outStream;
 
-    /// @var mpErrStream
     /// Stream to log ERROR
     std::ostream* m_errStream;
 
+    /// Enabling state of debug level
     bool m_debugEnabled = false;
 
     /**
-     * @fn getTime
      * @brief Get current date-time as string.
      * @return the date-time-string
      */
     static std::string get_time();
 
     /**
-     * @fn log
      * @brief Write to the given stream.
-     * @param pOut   The stream
      * @tparam T     The first argument
      * @tparam TRest The rest of arguments
+     * @param out The stream
      */
     template<typename T, typename... TRest>
     void log(std::ostream* out, T&& head, TRest&&... tail)
@@ -180,4 +186,5 @@ private:
     }
 };
 
+/// Extern Logger instance
 extern Logger logger;
