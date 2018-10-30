@@ -20,6 +20,7 @@
  */
 
 #include "helper.hpp"
+#include "util/Logger.hpp"
 
 using namespace sctf;
 
@@ -35,6 +36,7 @@ TEST_FUNCTION(test_feed)
 
 int main(int, char**)
 {
+    logger.set_logFile("/dev/null");
     // auto rep = createXmlReporter();
     auto rep = createPlainTextReporter(true);
     test::TestSuitesRunner runner;

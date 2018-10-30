@@ -99,7 +99,7 @@ private:
     double m_dilution = 0.0;
 
     /// The number of satellites
-    std::int8_t m_nrOfSatellites = 1;
+    std::uint8_t m_nrOfSatellites = 1;
 
     /// The GPS fix quality
     std::int8_t m_fixQuality = 5;

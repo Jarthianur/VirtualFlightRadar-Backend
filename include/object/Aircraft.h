@@ -62,7 +62,7 @@ public:
      * @note FLARM is preferred over TRANSPONDER,
      *       in case an aircraft has both available.
      */
-    enum class TargetType : std::int8_t
+    enum class TargetType : std::uint8_t
     {
         FLARM,
         TRANSPONDER
@@ -71,7 +71,7 @@ public:
     /**
      * @brief Aircraft types with their protocol codes.
      */
-    enum class AircraftType : std::int8_t
+    enum class AircraftType : std::uint8_t
     {
         UNKNOWN               = 0,
         GLIDER                = 1,
@@ -93,13 +93,12 @@ public:
     /**
      * @brief Id (address) types with their protocol codes.
      */
-    enum class IdType : std::int8_t
+    enum class IdType : std::uint8_t
     {
-        UNRECOGNIZED = -1,
-        RANDOM       = 0,
-        ICAO         = 1,
-        FLARM        = 2,
-        OGN          = 3
+        RANDOM = 0,
+        ICAO   = 1,
+        FLARM  = 2,
+        OGN    = 3
     };
 
     /**

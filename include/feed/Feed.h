@@ -47,7 +47,7 @@ public:
     /**
      * @brief The protocol that the Feed supports.
      */
-    enum class Protocol : std::int8_t
+    enum class Protocol : std::uint8_t
     {
         APRS,
         SBS,

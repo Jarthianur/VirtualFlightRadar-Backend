@@ -28,6 +28,7 @@
 
 #include "object/Aircraft.h"
 #include "framework/sctf.hpp"
+#include "util/utility.hpp"
 
 #define TEST_FUNCTION(NAME) extern void NAME(test::TestSuitesRunner&);
 
@@ -43,7 +44,7 @@ template<>
 inline std::string
 serialize<object::Aircraft::TargetType>(const object::Aircraft::TargetType& crTargetType)
 {
-    return std::to_string(static_cast<std::int8_t>(crTargetType));
+    return std::to_string(::util::raw_type(crTargetType));
 }
 }
 }
@@ -52,7 +53,7 @@ namespace helper
 {
 static boost::regex pflauRe("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
 static boost::regex pflaaRe(
-    "\\$PFLAA,0,([-]?\\d+?),([-]?\\d+?),([-]?\\d+?),(\\d+?),(\\S{6}),(\\d{3})?,,(\\d+?)?,([-]?\\d+?\\.\\d+?)?,([0-9A-F])\\*(?:\\S{2})");
+    "\\$PFLAA,0,([-]?\\d+?),([-]?\\d+?),([-]?\\d+?),(\\d+?),(\\S{6}),(\\d{3})?,,(\\d+?)?,([-]?\\d+?\\.\\d+?)?,([0-9A-F]{1,2})\\*(?:\\S{2})");
 static boost::regex gpsRe(
     "(\\$GPRMC,\\d{6},A,0000\\.00,N,00000\\.00,E,0,0,\\d{6},001\\.0,W\\*[0-9a-fA-F]{2}\\s*)?(\\$GPGGA,\\d{6},0000\\.0000,N,00000\\.0000,E,1,00,1,0,M,0\\.0,M,,\\*[0-9a-fA-F]{2}\\s*)?");
 

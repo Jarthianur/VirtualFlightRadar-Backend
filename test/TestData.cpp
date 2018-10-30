@@ -52,7 +52,9 @@ void test_data(test::TestSuitesRunner& runner)
                 {
                     data.processAircrafts(pos, press);
                 }
-                assertTrue(data.get_serialized().empty());
+                std::string serial;
+                data.get_serialized(serial);
+                assertTrue(serial.empty());
             })
         ->test(
             "delete aircraft",
@@ -79,6 +81,7 @@ void test_data(test::TestSuitesRunner& runner)
             object::Aircraft ac;
             object::Position pos{49.0, 8.0, 0};
             double press = 1013.25;
+            std::string serial;
 
             sbsParser.unpack(
                 "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0",
@@ -95,8 +98,8 @@ void test_data(test::TestSuitesRunner& runner)
                 ac);
             data.update(std::move(ac));
             data.processAircrafts(pos, press);
-            std::string proc = data.get_serialized();
-            bool matched     = boost::regex_search(proc, match, helper::pflauRe);
+            data.get_serialized(serial);
+            bool matched     = boost::regex_search(serial, match, helper::pflauRe);
             assertTrue(matched);
             assertEqStr(match.str(2), "610");
             for(int i = 0; i < AC_NO_FLARM_THRESHOLD; ++i)
@@ -108,8 +111,9 @@ void test_data(test::TestSuitesRunner& runner)
                 ac);
             data.update(std::move(ac));
             data.processAircrafts(pos, press);
-            proc    = data.get_serialized();
-            matched = boost::regex_search(proc, match, helper::pflauRe);
+            serial.clear();
+            data.get_serialized(serial);
+            matched = boost::regex_search(serial, match, helper::pflauRe);
             assertTrue(matched);
             assertEqStr(match.str(2), "1000");
         });

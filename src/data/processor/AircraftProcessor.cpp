@@ -106,7 +106,7 @@ void AircraftProcessor::appendPFLAA(const Aircraft& aircraft)
     if (aircraft.get_fullInfo())
     {
         std::snprintf(
-            m_buffer, sizeof(m_buffer), "$PFLAA,0,%d,%d,%d,%hhd,%s,%03d,,%d,%3.1lf,%1hhx*",
+            m_buffer, sizeof(m_buffer), "$PFLAA,0,%d,%d,%d,%hhu,%s,%03d,,%d,%3.1lf,%1hhX*",
             m_relNorth, m_relEast, m_relVertical, util::raw_type(aircraft.get_idType()),
             aircraft.get_id().c_str(), math::doubleToInt(aircraft.get_movement().heading),
             math::doubleToInt(aircraft.get_movement().gndSpeed * math::MS_2_KMH),
@@ -114,7 +114,7 @@ void AircraftProcessor::appendPFLAA(const Aircraft& aircraft)
     }
     else
     {
-        std::snprintf(m_buffer, sizeof(m_buffer), "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhx*", m_relNorth,
+        std::snprintf(m_buffer, sizeof(m_buffer), "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth,
                       m_relEast, m_relVertical, aircraft.get_id().c_str(),
                       util::raw_type(aircraft.get_aircraftType()));
     }

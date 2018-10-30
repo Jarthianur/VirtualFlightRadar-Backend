@@ -25,7 +25,7 @@
 
 namespace object
 {
-Aircraft::Aircraft() : Object() {}
+Aircraft::Aircraft() : Aircraft(0) {}
 
 Aircraft::Aircraft(std::uint32_t priority)
     : Object(priority),
@@ -70,14 +70,12 @@ bool Aircraft::canUpdate(const Object& other) const
 
 void Aircraft::set_aircraftType(Aircraft::AircraftType type)
 {
-    m_aircraftType = type < AircraftType::UNKNOWN || type > AircraftType::STATIC_OBJECT ?
-                         AircraftType::UNKNOWN :
-                         type;
+    m_aircraftType = type > AircraftType::STATIC_OBJECT ? AircraftType::UNKNOWN : type;
 }
 
 void Aircraft::set_idType(Aircraft::IdType type)
 {
-    m_idType = type < IdType::UNRECOGNIZED || type > IdType::OGN ? IdType::UNRECOGNIZED : type;
+    m_idType = type > IdType::OGN ? IdType::RANDOM : type;
 }
 
 }  // namespace object
