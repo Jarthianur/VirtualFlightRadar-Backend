@@ -129,7 +129,7 @@ public:
     /**
      * @brief Set the id type.
      *
-     * The id type is set to UNRECOGNIZED, if the new type value is not in range of
+     * The id type is set to RANDOM, if the new type value is not in range of
      * IdType.
      *
      * @param type The type
