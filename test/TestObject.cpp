@@ -155,7 +155,7 @@ void test_object(test::TestSuitesRunner& runner)
             Atmosphere a1(1.0, 0);
             Atmosphere a2(2.0, 1);
             assertFalse(a2.tryUpdate(std::move(a1)));
-            assertEquals(a2.get_pressure(), 1.0);
+            assertEquals(a2.get_pressure(), 2.0);
         });
 
     describe<Aircraft>("Basic Aircraft tests", runner)
@@ -165,6 +165,8 @@ void test_object(test::TestSuitesRunner& runner)
                    Aircraft a2(1);
                    a1.set_serialized("a1");
                    a2.set_serialized("a2");
+                   a2.set_timeStamp(
+                       TimeStamp<DateTimeImplBoost>("120000", timestamp::Format::HHMMSS));
                    assertTrue(a1.tryUpdate(std::move(a2)));
                    assertEqStr(a1.get_serialized(), "a2");
                    Aircraft a3;
@@ -175,6 +177,7 @@ void test_object(test::TestSuitesRunner& runner)
         ->test("update different target type", [] {
             Aircraft a1;
             Aircraft a2;
+            a2.set_timeStamp(TimeStamp<DateTimeImplBoost>("120000", timestamp::Format::HHMMSS));
             a2.set_targetType(Aircraft::TargetType::FLARM);
             assertTrue(a1.tryUpdate(std::move(a2)));
             assertFalse(a2.tryUpdate(std::move(a1)));
@@ -182,6 +185,7 @@ void test_object(test::TestSuitesRunner& runner)
             {
                 ++a2;
             } while (a2.get_updateAge() <= OBJ_OUTDATED);
+            a1.set_timeStamp(TimeStamp<DateTimeImplBoost>("120100", timestamp::Format::HHMMSS));
             assertTrue(a2.tryUpdate(std::move(a1)));
         });
 }
