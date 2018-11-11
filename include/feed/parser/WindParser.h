@@ -24,6 +24,7 @@
 #include <string>
 
 #include "object/Wind.h"
+#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -37,15 +38,9 @@ namespace parser
 class WindParser : public Parser<object::Wind>
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    WindParser();
+    DEFAULT_DTOR(WindParser)
 
-    /**
-     * @brief Destructor
-     */
-    ~WindParser() noexcept = default;
+    WindParser();
 
     /**
      * @brief Unpack into Wind.

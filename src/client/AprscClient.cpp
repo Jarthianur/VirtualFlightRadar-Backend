@@ -40,8 +40,6 @@ AprscClient::AprscClient(const Endpoint& endpoint, const std::string& login,
     : Client(endpoint, COMPONENT, connector), m_login(login + "\r\n")
 {}
 
-AprscClient::~AprscClient() noexcept {}
-
 bool AprscClient::equals(const Client& other) const
 {
     try

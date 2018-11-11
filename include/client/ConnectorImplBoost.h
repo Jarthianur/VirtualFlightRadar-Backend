@@ -39,16 +39,9 @@ class ConnectorImplBoost : public Connector
 {
 public:
     NOT_COPYABLE(ConnectorImplBoost)
+    DEFAULT_DTOR(ConnectorImplBoost)
 
-    /**
-     * @brief Constructor
-     */
     ConnectorImplBoost();
-
-    /**
-     * @brief Destructor
-     */
-    ~ConnectorImplBoost() noexcept = default;
 
     /**
      * @brief Run the internal event handler queue.

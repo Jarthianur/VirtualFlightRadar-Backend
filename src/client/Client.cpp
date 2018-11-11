@@ -37,11 +37,6 @@ Client::Client(const Endpoint& endpoint, const char* component,
     : m_connector(connector), m_component(component), m_endpoint(endpoint)
 {}
 
-Client::~Client() noexcept
-{
-    Client::stop();
-}
-
 void Client::run()
 {
     std::unique_lock<std::mutex> lock(m_mutex);

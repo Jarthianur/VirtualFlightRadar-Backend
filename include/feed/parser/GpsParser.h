@@ -26,6 +26,7 @@
 #include <boost/regex.hpp>
 
 #include "object/GpsPosition.h"
+#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -39,15 +40,9 @@ namespace parser
 class GpsParser : public Parser<object::GpsPosition>
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    GpsParser();
+    DEFAULT_DTOR(GpsParser)
 
-    /**
-     * @brief Destructor
-     */
-    ~GpsParser() noexcept = default;
+    GpsParser();
 
     /**
      * @brief Unpack into GpsPosition.

@@ -55,17 +55,13 @@ class VFRB
 {
 public:
     NOT_COPYABLE(VFRB)
+    DEFAULT_DTOR(VFRB)
 
     /**
      * @brief Constructor
      * @param config The Configuration
      */
     explicit VFRB(std::shared_ptr<config::Configuration> config);
-
-    /**
-     * @brief Destructor
-     */
-    ~VFRB() noexcept = default;
 
     /**
      * @brief The VFRB's main method, runs the VFR-B.

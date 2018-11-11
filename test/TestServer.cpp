@@ -19,9 +19,20 @@
  }
  */
 
+#include "server/Server.hpp"
+
+#include "NetworkInterfaceImplTest.h"
+#include "SocketImplTest.h"
 #include "helper.hpp"
 
 using namespace sctf;
+using namespace server;
 
 void test_server(test::TestSuitesRunner& runner)
-{}
+{
+    describe("Basic Server tests", runner)->test("accept connection", [] {
+        auto                   ifc = std::make_shared<NetworkInterfaceImplTests>();
+        Server<SocketImplTest> server(ifc);
+        server.run();
+    });
+}

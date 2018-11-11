@@ -33,21 +33,14 @@ namespace object
 class Object
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    Object() = default;
+    DEFAULT_CTOR(Object)
+    DEFAULT_VIRTUAL_DTOR(Object)
 
     /**
      * @brief Constructor
      * @param priority The initial priority
      */
     explicit Object(std::uint32_t priority);
-
-    /**
-     * @brief Destructor
-     */
-    virtual ~Object() noexcept = default;
 
     /**
      * @brief Try to update this Object.

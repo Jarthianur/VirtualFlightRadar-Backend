@@ -57,6 +57,8 @@ struct Movement
 class Aircraft : public Object
 {
 public:
+    DEFAULT_DTOR(Aircraft)
+
     /**
      * @brief Device type from which the information is received.
      * @note FLARM is preferred over TRANSPONDER,
@@ -101,9 +103,6 @@ public:
         OGN    = 3
     };
 
-    /**
-     * @brief Constructor
-     */
     Aircraft();
 
     /**
@@ -111,11 +110,6 @@ public:
      * @param priority The initial priority
      */
     explicit Aircraft(std::uint32_t priority);
-
-    /**
-     * @brief Destructor
-     */
-    ~Aircraft() noexcept = default;
 
     /**
      * @brief Set the aircraft type.

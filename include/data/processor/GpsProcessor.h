@@ -25,6 +25,7 @@
 #include <string>
 
 #include "object/GpsPosition.h"
+#include "util/defines.h"
 
 #include "Processor.hpp"
 
@@ -38,15 +39,9 @@ namespace processor
 class GpsProcessor : public Processor<object::GpsPosition>
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    GpsProcessor();
+    DEFAULT_DTOR(GpsProcessor)
 
-    /**
-     * @brief Destructor
-     */
-    ~GpsProcessor() noexcept = default;
+    GpsProcessor();
 
     /**
      * @brief Process a GPS position.

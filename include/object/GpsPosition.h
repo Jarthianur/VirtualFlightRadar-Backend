@@ -52,9 +52,8 @@ struct Position
 class GpsPosition : public Object
 {
 public:
-    /**
-     * @brief Constructor
-     */
+    DEFAULT_DTOR(GpsPosition)
+
     GpsPosition();
 
     /**
@@ -69,11 +68,6 @@ public:
      * @param geoid    The geoid
      */
     GpsPosition(const Position& position, double geoid);
-
-    /**
-     * @brief Destructor
-     */
-    ~GpsPosition() noexcept = default;
 
 private:
     /**

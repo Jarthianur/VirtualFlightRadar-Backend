@@ -27,21 +27,16 @@
 #include <string>
 #include <utility>
 
+#include "util/defines.h"
+
 /**
  * @brief Logger with different levels.
  */
 class Logger
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    Logger();
-
-    /**
-     * @brief Destructor
-     */
-    ~Logger() noexcept = default;
+    DEFAULT_CTOR(Logger)
+    DEFAULT_DTOR(Logger)
 
     /**
      * @brief Log on INFO level.
@@ -146,20 +141,19 @@ public:
     void set_logFile(const std::string& file);
 
 private:
-    /// Mutex for threadsafe logging
-    mutable std::mutex m_mutex;
-
     /// The logfile stream
     std::ofstream m_logFile;
 
     /// Stream to log INFO,DEBUG,WARN
-    std::ostream* m_outStream;
+    std::ostream* m_outStream = &std::cout;
 
     /// Stream to log ERROR
-    std::ostream* m_errStream;
+    std::ostream* m_errStream = &std::cerr;
 
     /// Enabling state of debug level
     bool m_debugEnabled = false;
+
+    mutable std::mutex m_mutex;
 
     /**
      * @brief Get current date-time as string.

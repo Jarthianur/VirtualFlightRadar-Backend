@@ -44,9 +44,6 @@ public:
      */
     explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket);
 
-    /**
-     * @brief Destructor
-     */
     ~SocketImplBoost() noexcept;
 
     /**

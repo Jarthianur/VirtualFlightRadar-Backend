@@ -28,6 +28,7 @@
 #include <boost/optional.hpp>
 
 #include "config/Properties.h"
+#include "util/defines.h"
 
 namespace config
 {
@@ -52,6 +53,8 @@ class Feed;
 class FeedFactory
 {
 public:
+    DEFAULT_DTOR(FeedFactory)
+
     /**
      * @brief Constructor
      * @param config       The Configuration
@@ -64,11 +67,6 @@ public:
                 std::shared_ptr<data::AircraftData>    aircraftData,
                 std::shared_ptr<data::AtmosphereData>  atmosData,
                 std::shared_ptr<data::GpsData> gpsData, std::shared_ptr<data::WindData> windData);
-
-    /**
-     * @brief Destructor
-     */
-    ~FeedFactory() noexcept = default;
 
     /**
      * @brief Create a Feed.

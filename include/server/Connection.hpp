@@ -41,11 +41,7 @@ class Connection final
 {
 public:
     NOT_COPYABLE(Connection)
-
-    /**
-     * @brief Destructor
-     */
-    ~Connection() noexcept;
+    DEFAULT_DTOR(Connection)
 
     /**
      * @brief Start a Connection.
@@ -80,10 +76,6 @@ public:
      */
     GETTER_CR(address)
 };
-
-template<typename SocketT>
-Connection<SocketT>::~Connection() noexcept
-{}
 
 template<typename SocketT>
 std::unique_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socket)

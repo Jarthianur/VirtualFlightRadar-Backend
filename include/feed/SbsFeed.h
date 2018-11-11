@@ -52,6 +52,7 @@ class SbsFeed : public Feed
 {
 public:
     NOT_COPYABLE(SbsFeed)
+    DEFAULT_DTOR(SbsFeed)
 
     /**
      * @brief Constructor
@@ -63,11 +64,6 @@ public:
      */
     SbsFeed(const std::string& name, const config::Properties& properties,
             std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
-
-    /**
-     * @brief Destructor
-     */
-    ~SbsFeed() noexcept = default;
 
     /**
      * @brief Get this feeds Protocol.

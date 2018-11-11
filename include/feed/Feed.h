@@ -32,7 +32,7 @@
 namespace data
 {
 class Data;
-} /* namespace data */
+}  // namespace data
 
 namespace feed
 {
@@ -43,6 +43,7 @@ class Feed
 {
 public:
     NOT_COPYABLE(Feed)
+    DEFAULT_VIRTUAL_DTOR(Feed)
 
     /**
      * @brief The protocol that the Feed supports.
@@ -54,11 +55,6 @@ public:
         GPS,
         SENSOR
     };
-
-    /**
-     * @brief Destructor
-     */
-    virtual ~Feed() noexcept = default;
 
     /**
      * @brief Get the supported Protocol.

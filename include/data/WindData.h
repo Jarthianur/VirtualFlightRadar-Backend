@@ -24,6 +24,7 @@
 #include <string>
 
 #include "object/Wind.h"
+#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -35,9 +36,8 @@ namespace data
 class WindData : public Data
 {
 public:
-    /**
-     * @brief Constructor
-     */
+    DEFAULT_DTOR(WindData)
+
     WindData();
 
     /**
@@ -45,11 +45,6 @@ public:
      * @param wind The initial wind information
      */
     explicit WindData(const object::Wind& wind);
-
-    /**
-     * @brief Destructor
-     */
-    ~WindData() noexcept = default;
 
     /**
      * @brief Get the MWV sentence.

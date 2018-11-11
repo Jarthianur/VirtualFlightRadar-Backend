@@ -32,6 +32,7 @@ class SbsClient : public Client
 {
 public:
     NOT_COPYABLE(SbsClient)
+    DEFAULT_DTOR(SbsClient)
 
     /**
      * @brief Constructor
@@ -39,11 +40,6 @@ public:
      * @param connector The Connector interface
      */
     SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector);
-
-    /**
-     * @brief Destructor
-     */
-    ~SbsClient() noexcept = default;
 
 private:
     /**

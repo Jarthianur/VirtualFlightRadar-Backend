@@ -25,6 +25,8 @@
 #include <functional>
 #include <string>
 
+#include "util/defines.h"
+
 namespace client
 {
 struct Endpoint;
@@ -46,15 +48,8 @@ using ReadCallback = std::function<void(bool, const std::string&)>;
 class Connector
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    Connector() = default;
-
-    /**
-     * @brief Destructor
-     */
-    virtual ~Connector() noexcept = default;
+    DEFAULT_CTOR(Connector)
+    DEFAULT_VIRTUAL_DTOR(Connector)
 
     /**
      * @brief Run this connector.

@@ -23,6 +23,8 @@
 
 #include <string>
 
+#include "util/defines.h"
+
 namespace feed
 {
 namespace parser
@@ -35,15 +37,8 @@ template<typename T>
 class Parser
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    Parser() = default;
-
-    /**
-     * @brief Destructor
-     */
-    virtual ~Parser() noexcept = default;
+    DEFAULT_CTOR(Parser)
+    DEFAULT_VIRTUAL_DTOR(Parser)
 
     /**
      * @brief Unpack a given string into the templated object.

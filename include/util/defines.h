@@ -86,6 +86,21 @@
     GETTER_CR(MEMBER)     \
     SETTER_CR(MEMBER)
 
+/// @def DEFAULT_CTOR
+/// @param TYPE The classname
+/// Define default constructor for class.
+#define DEFAULT_CTOR(TYPE) TYPE() = default;
+
+/// @def DEFAULT_DTOR
+/// @param TYPE The classname
+/// Define default destructor for class.
+#define DEFAULT_DTOR(TYPE) ~TYPE() noexcept = default;
+
+/// @def DEFAULT_VIRTUAL_DTOR
+/// @param TYPE The classname
+/// Define virtual default destructor for class.
+#define DEFAULT_VIRTUAL_DTOR(TYPE) virtual ~TYPE() noexcept = default;
+
 /// @def NON_COPYABLE
 /// @param TYPE The classname
 /// Make a class of TYPE non copyable.

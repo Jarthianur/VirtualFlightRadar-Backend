@@ -24,6 +24,7 @@
 #include <string>
 
 #include "object/Atmosphere.h"
+#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -35,9 +36,8 @@ namespace data
 class AtmosphereData : public Data
 {
 public:
-    /**
-     * @brief Constructor
-     */
+    DEFAULT_DTOR(AtmosphereData)
+
     AtmosphereData();
 
     /**
@@ -45,11 +45,6 @@ public:
      * @param atmosphere The initial atm info
      */
     explicit AtmosphereData(const object::Atmosphere& atmosphere);
-
-    /**
-     * @brief Destructor
-     */
-    ~AtmosphereData() noexcept = default;
 
     /**
      * @brief Get the MDA sentence.

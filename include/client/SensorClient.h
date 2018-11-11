@@ -39,6 +39,7 @@ class SensorClient : public Client
 {
 public:
     NOT_COPYABLE(SensorClient)
+    DEFAULT_DTOR(SensorClient)
 
     /**
      * @brief Constructor
@@ -46,11 +47,6 @@ public:
      * @param connector The Connector interface
      */
     SensorClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector);
-
-    /**
-     * @brief Destructor
-     */
-    ~SensorClient() noexcept = default;
 
 private:
     /**

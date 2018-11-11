@@ -26,6 +26,7 @@
 
 #include "object/Aircraft.h"
 #include "object/GpsPosition.h"
+#include "util/defines.h"
 
 #include "Processor.hpp"
 
@@ -39,9 +40,8 @@ namespace processor
 class AircraftProcessor : public Processor<object::Aircraft>
 {
 public:
-    /**
-     * @brief Constructor
-     */
+    DEFAULT_DTOR(AircraftProcessor)
+
     AircraftProcessor();
 
     /**
@@ -49,11 +49,6 @@ public:
      * @param maxDist The max distance filter
      */
     explicit AircraftProcessor(std::int32_t maxDist);
-
-    /**
-     *  @brief Destructor
-     */
-    ~AircraftProcessor() noexcept = default;
 
     /**
      * @brief Process an aircraft.

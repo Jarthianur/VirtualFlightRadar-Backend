@@ -20,6 +20,8 @@
 #include <mutex>
 #include <string>
 
+#include "util/defines.h"
+
 namespace object
 {
 class Object;
@@ -33,15 +35,8 @@ namespace data
 class Data
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    Data() = default;
-
-    /**
-     * @brief Destructor
-     */
-    virtual ~Data() noexcept = default;
+    DEFAULT_CTOR(Data)
+    DEFAULT_VIRTUAL_DTOR(Data)
 
     /**
      * @brief Get the serialized data.
@@ -57,7 +52,6 @@ public:
     virtual bool update(object::Object&& _1) = 0;
 
 protected:
-    /// Mutex for threadsafety
     mutable std::mutex m_mutex;
 };
 }  // namespace data

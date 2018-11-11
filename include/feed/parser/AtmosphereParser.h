@@ -24,6 +24,7 @@
 #include <string>
 
 #include "object/Atmosphere.h"
+#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -37,15 +38,9 @@ namespace parser
 class AtmosphereParser : public Parser<object::Atmosphere>
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    AtmosphereParser();
+    DEFAULT_DTOR(AtmosphereParser)
 
-    /**
-     * @brief Destructor
-     */
-    ~AtmosphereParser() noexcept = default;
+    AtmosphereParser();
 
     /**
      * @brief Unpack into Atmosphere.

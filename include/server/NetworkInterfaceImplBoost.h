@@ -49,9 +49,6 @@ public:
      */
     explicit NetworkInterfaceImplBoost(std::uint16_t port);
 
-    /**
-     * @brief Destructor
-     */
     ~NetworkInterfaceImplBoost() noexcept;
 
     /**

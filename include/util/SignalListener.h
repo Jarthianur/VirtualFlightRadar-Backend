@@ -44,14 +44,8 @@ class SignalListener
 public:
     NOT_COPYABLE(SignalListener)
 
-    /**
-     * @brief Constructor
-     */
     SignalListener();
 
-    /**
-     * @brief Destructor
-     */
     ~SignalListener() noexcept;
 
     /**
@@ -83,7 +77,6 @@ private:
     /// Thread to run this
     std::thread m_thread;
 
-    /// Mutex for threadsafety
     mutable std::mutex m_mutex;
 };
 }  // namespace util

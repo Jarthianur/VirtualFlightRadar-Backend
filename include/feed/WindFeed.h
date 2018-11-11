@@ -51,6 +51,7 @@ class WindFeed : public Feed
 {
 public:
     NOT_COPYABLE(WindFeed)
+    DEFAULT_DTOR(WindFeed)
 
     /**
      * @brief Constructor
@@ -61,11 +62,6 @@ public:
      */
     WindFeed(const std::string& name, const config::Properties& properties,
              std::shared_ptr<data::WindData> data);
-
-    /**
-     * @brief Destructor
-     */
-    ~WindFeed() noexcept = default;
 
     /**
      * @brief Get this feeds Protocol.

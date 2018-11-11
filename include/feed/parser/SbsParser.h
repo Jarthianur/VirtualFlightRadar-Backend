@@ -39,15 +39,9 @@ namespace parser
 class SbsParser : public Parser<object::Aircraft>
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    SbsParser();
+    DEFAULT_DTOR(SbsParser)
 
-    /**
-     * @brief Destructor
-     */
-    ~SbsParser() noexcept = default;
+    SbsParser();
 
     /**
      * @brief Unpack into Aircraft.

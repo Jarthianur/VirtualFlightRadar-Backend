@@ -53,6 +53,7 @@ class AprscFeed : public Feed
 {
 public:
     NOT_COPYABLE(AprscFeed)
+    DEFAULT_DTOR(AprscFeed)
 
     /**
      * @brief Constructor
@@ -64,11 +65,6 @@ public:
      */
     AprscFeed(const std::string& name, const config::Properties& propertyMap,
               std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
-
-    /**
-     * @brief Destructor
-     */
-    ~AprscFeed() noexcept = default;
 
     /**
      * @brief Get this feeds Protocol.

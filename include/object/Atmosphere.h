@@ -40,9 +40,8 @@ struct Climate;
 class Atmosphere : public Object
 {
 public:
-    /**
-     * @brief Constructor
-     */
+    DEFAULT_DTOR(Atmosphere)
+
     Atmosphere();
 
     /**
@@ -57,11 +56,6 @@ public:
      * @param priority The initial priority
      */
     Atmosphere(double pressure, std::uint32_t priority);
-
-    /**
-     * @brief Destructor
-     */
-    ~Atmosphere() noexcept = default;
 
 private:
     /**

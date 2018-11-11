@@ -24,6 +24,7 @@
 #include <cstdio>
 #include <string>
 
+#include "util/defines.h"
 #include "util/math.hpp"
 
 namespace data
@@ -38,15 +39,8 @@ template<typename T>
 class Processor
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    Processor() = default;
-
-    /**
-     * @brief Destructor
-     */
-    virtual ~Processor() noexcept = default;
+    DEFAULT_CTOR(Processor)
+    DEFAULT_VIRTUAL_DTOR(Processor)
 
     /**
      * @brief Process an object.

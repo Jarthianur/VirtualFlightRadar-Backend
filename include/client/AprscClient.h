@@ -34,6 +34,7 @@ class AprscClient : public Client
 {
 public:
     NOT_COPYABLE(AprscClient)
+    DEFAULT_DTOR(AprscClient)
 
     /**
      * @brief Constructor
@@ -44,19 +45,8 @@ public:
     AprscClient(const Endpoint& endpoint, const std::string& login,
                 std::shared_ptr<Connector> connector);
 
-    /**
-     * @brief Destructor
-     */
-    ~AprscClient() noexcept;
-
-    /**
-     * @brief Override Client::equals
-     */
     bool equals(const Client& other) const override;
 
-    /**
-     * @brief Override Client::hash
-     */
     std::size_t hash() const override;
 
 private:

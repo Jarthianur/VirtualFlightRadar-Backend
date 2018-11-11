@@ -54,11 +54,7 @@ class Client
 {
 public:
     NOT_COPYABLE(Client)
-
-    /**
-     * @brief Destructor
-     */
-    virtual ~Client() noexcept;
+    DEFAULT_VIRTUAL_DTOR(Client)
 
     /**
      * @brief Run the clients connection- and eventhandlers.
@@ -160,7 +156,6 @@ protected:
     /// Remote endpoint
     const Endpoint m_endpoint;
 
-    /// Mutex for threadsafety
     mutable std::mutex m_mutex;
 
 private:

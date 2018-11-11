@@ -56,9 +56,6 @@ class Server
 public:
     NOT_COPYABLE(Server)
 
-    /**
-     * @brief Constructor
-     */
     Server();
 
     /**
@@ -73,9 +70,6 @@ public:
      */
     explicit Server(std::shared_ptr<NetworkInterface<SocketT>> interface);
 
-    /**
-     * @brief Destructor
-     */
     ~Server() noexcept;
 
     /**
@@ -131,7 +125,6 @@ private:
     /// Internal thread
     std::thread m_thread;
 
-    /// Mutex for threadsafety
     mutable std::mutex m_mutex;
 };
 

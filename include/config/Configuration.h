@@ -103,17 +103,14 @@ constexpr const char* PATH_MAX_HEIGHT  = PATH(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT
 class Configuration
 {
 public:
+    DEFAULT_DTOR(Configuration)
+
     /**
      * @brief Constructor
      * @param stream The input stream
      * @throw std::logic_error if any error occurres
      */
     explicit Configuration(std::istream& stream);
-
-    /**
-     * @brief Destructor
-     */
-    ~Configuration() noexcept = default;
 
 private:
     /**

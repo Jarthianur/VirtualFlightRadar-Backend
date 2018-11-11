@@ -23,6 +23,8 @@
 
 #include <memory>
 
+#include "util/defines.h"
+
 #include "Client.h"
 
 namespace feed
@@ -38,15 +40,8 @@ namespace client
 class ClientFactory
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    ClientFactory() = default;
-
-    /**
-     * @brief Destructor
-     */
-    ~ClientFactory() noexcept = default;
+    DEFAULT_CTOR(ClientFactory)
+    DEFAULT_DTOR(ClientFactory)
 
     /**
      * @brief Create a Client needed by a Feed.

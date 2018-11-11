@@ -24,6 +24,8 @@
 #include <exception>
 #include <string>
 
+#include "util/defines.h"
+
 namespace server
 {
 /**
@@ -32,16 +34,13 @@ namespace server
 class SocketException : public std::exception
 {
 public:
+    DEFAULT_DTOR(SocketException)
+
     /**
      * @brief Constructor
      * @param msg The error message
      */
     explicit SocketException(const std::string& msg);
-
-    /**
-     * @brief Destructor
-     */
-    ~SocketException() noexcept = default;
 
     /**
      * @brief Get the error message.

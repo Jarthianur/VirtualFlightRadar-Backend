@@ -51,6 +51,7 @@ class GpsFeed : public Feed
 {
 public:
     NOT_COPYABLE(GpsFeed)
+    DEFAULT_DTOR(GpsFeed)
 
     /**
      * @brief Constructor
@@ -61,11 +62,6 @@ public:
      */
     GpsFeed(const std::string& name, const config::Properties& properties,
             std::shared_ptr<data::GpsData> data);
-
-    /**
-     * @brief Destructor
-     */
-    ~GpsFeed() noexcept = default;
 
     /**
      * @brief Get this feeds Protocol.

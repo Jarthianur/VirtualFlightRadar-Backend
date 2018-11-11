@@ -32,6 +32,7 @@ class GpsdClient : public Client
 {
 public:
     NOT_COPYABLE(GpsdClient)
+    DEFAULT_DTOR(GpsdClient)
 
     /**
      * @brief Constructor
@@ -39,11 +40,6 @@ public:
      * @param connector The Connector interface
      */
     GpsdClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector);
-
-    /**
-     * @brief Destructor
-     */
-    ~GpsdClient() noexcept = default;
 
 private:
     /**

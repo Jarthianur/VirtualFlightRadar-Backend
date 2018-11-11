@@ -23,6 +23,8 @@
 
 #include <cstdint>
 
+#include "util/defines.h"
+
 namespace object
 {
 namespace timestamp
@@ -33,15 +35,8 @@ namespace timestamp
 class DateTimeImplBoost
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    DateTimeImplBoost() = default;
-
-    /**
-     * @brief Destructor
-     */
-    ~DateTimeImplBoost() noexcept = default;
+    DEFAULT_CTOR(DateTimeImplBoost)
+    DEFAULT_DTOR(DateTimeImplBoost)
 
     /**
      * @brief Get the amount of milliseconds since 00:00 UTC.

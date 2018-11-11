@@ -51,6 +51,7 @@ class AtmosphereFeed : public Feed
 {
 public:
     NOT_COPYABLE(AtmosphereFeed)
+    DEFAULT_DTOR(AtmosphereFeed)
 
     /**
      * @brief Constructor
@@ -61,11 +62,6 @@ public:
      */
     AtmosphereFeed(const std::string& name, const config::Properties& properties,
                    std::shared_ptr<data::AtmosphereData> data);
-
-    /**
-     * @brief Destructor
-     */
-    ~AtmosphereFeed() noexcept = default;
 
     /**
      * @brief Get this feeds Protocol.

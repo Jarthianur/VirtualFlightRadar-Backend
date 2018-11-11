@@ -29,6 +29,7 @@
 
 #include "object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
+#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -46,9 +47,8 @@ namespace data
 class AircraftData : public Data
 {
 public:
-    /**
-     * @brief Constructor
-     */
+    DEFAULT_DTOR(AircraftData)
+
     AircraftData();
 
     /**
@@ -56,11 +56,6 @@ public:
      * @param maxDist The max distance filter
      */
     explicit AircraftData(std::int32_t maxDist);
-
-    /**
-     * @brief Destructor
-     */
-    ~AircraftData() noexcept = default;
 
     /**
      * @brief Get the reports for all processed aircrafts.

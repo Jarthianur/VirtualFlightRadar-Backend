@@ -29,6 +29,8 @@
 #include <thread>
 #include <unordered_set>
 
+#include "util/defines.h"
+
 #include "Client.h"
 
 namespace feed
@@ -36,26 +38,16 @@ namespace feed
 class Feed;
 }  // namespace feed
 
-/**
- * @brief A thread group
- */
 struct thread_group
 {
-    /**
-     * @brief Create a thread in this group.
-     * @param func The thread function
-     */
     void create_thread(const std::function<void()>& func)
     {
-        _threads.push_back(std::thread(func));
+        m_threads.push_back(std::thread(func));
     }
 
-    /**
-     * @brief Join all threads in this group.
-     */
     void join_all()
     {
-        std::for_each(_threads.begin(), _threads.end(), [](std::thread& thd) {
+        std::for_each(m_threads.begin(), m_threads.end(), [](std::thread& thd) {
             if (thd.joinable())
             {
                 thd.join();
@@ -64,8 +56,7 @@ struct thread_group
     }
 
 private:
-    /// List of threads
-    std::list<std::thread> _threads;
+    std::list<std::thread> m_threads;
 };
 
 namespace client
@@ -107,14 +98,8 @@ using ClientIter = ClientSet::iterator;
 class ClientManager
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    ClientManager() = default;
+    DEFAULT_CTOR(ClientManager)
 
-    /**
-     * @brief Destructor
-     */
     ~ClientManager() noexcept;
 
     /**
@@ -144,7 +129,6 @@ private:
     /// Thread group for client threads
     thread_group m_thdGroup;
 
-    /// Mutex for threadsafety
     mutable std::mutex m_mutex;
 };
 

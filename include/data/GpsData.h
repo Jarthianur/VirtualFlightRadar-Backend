@@ -26,6 +26,7 @@
 
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
+#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -37,9 +38,8 @@ namespace data
 class GpsData : public Data
 {
 public:
-    /**
-     * @brief Constructor
-     */
+    DEFAULT_DTOR(GpsData)
+
     GpsData();
 
     /**
@@ -48,11 +48,6 @@ public:
      * @param crPosition The initial info
      */
     GpsData(const object::GpsPosition& position, bool ground);
-
-    /**
-     * @brief Destructor
-     */
-    ~GpsData() noexcept = default;
 
     /**
      * @brief Get NMEA GPS report.
@@ -103,8 +98,9 @@ private:
 class PositionLocked : public std::exception
 {
 public:
+    DEFAULT_DTOR(PositionLocked)
+
     PositionLocked();
-    ~PositionLocked() noexcept = default;
 
     const char* what() const noexcept override;
 };

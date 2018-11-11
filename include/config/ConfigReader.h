@@ -23,6 +23,8 @@
 
 #include <istream>
 
+#include "util/defines.h"
+
 #include "Properties.h"
 
 namespace config
@@ -33,16 +35,13 @@ namespace config
 class ConfigReader
 {
 public:
+    DEFAULT_DTOR(ConfigReader)
+
     /**
      * @brief Constructor
      * @param stream The input stream to read from
      */
     ConfigReader(std::istream& stream);
-
-    /**
-     * @brief Destructor
-     */
-    ~ConfigReader() noexcept = default;
 
     /**
      * @brief Read the given stream and return read properties.

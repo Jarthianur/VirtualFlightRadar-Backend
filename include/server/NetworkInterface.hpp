@@ -41,15 +41,8 @@ template<typename SocketT>
 class NetworkInterface
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    NetworkInterface() = default;
-
-    /**
-     * @brief Destructor
-     */
-    virtual ~NetworkInterface() noexcept = default;
+    DEFAULT_CTOR(NetworkInterface)
+    DEFAULT_VIRTUAL_DTOR(NetworkInterface)
 
     /**
      * @brief Run this interface.

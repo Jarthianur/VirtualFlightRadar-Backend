@@ -25,6 +25,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "util/defines.h"
+
 namespace object
 {
 namespace timestamp
@@ -48,10 +50,8 @@ template<typename DateTimeT>
 class TimeStamp
 {
 public:
-    /**
-     * @brief Constructor
-     */
-    TimeStamp() = default;
+    DEFAULT_CTOR(TimeStamp)
+    DEFAULT_DTOR(TimeStamp)
 
     /**
      * @brief Constructor
@@ -66,11 +66,6 @@ public:
      * @param other The other TimeStamp
      */
     TimeStamp(const TimeStamp& other);
-
-    /**
-     * @brief Destructor
-     */
-    ~TimeStamp() noexcept = default;
 
     /**
      * @brief Assign other TimeStamps value.

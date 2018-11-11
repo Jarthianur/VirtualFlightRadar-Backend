@@ -26,6 +26,8 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "util/defines.h"
+
 namespace config
 {
 /**
@@ -34,6 +36,8 @@ namespace config
 class Properties
 {
 public:
+    DEFAULT_DTOR(Properties)
+
     /**
      * @brief Copy-constructor
      * @param ptree The property tree to copy
@@ -45,11 +49,6 @@ public:
      * @param ptree The property tree to move
      */
     explicit Properties(boost::property_tree::ptree&& ptree);
-
-    /**
-     * @brief Destructor
-     */
-    ~Properties() noexcept = default;
 
     /**
      * @brief Get the value at a property path (section.key), or a default value.
