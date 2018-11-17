@@ -140,22 +140,13 @@ void test_data(test::TestSuitesRunner& runner)
                 ac1);
             assertTrue(data.update(std::move(ac2)));
 
-            for (int i = 0; i < OBJ_OUTDATED - 1; ++i)
+            for (int i = 0; i < OBJ_OUTDATED; ++i)
             {
                 assertFalse(data.update(std::move(ac1)));
                 data.processAircrafts(pos, press);
-                dest.clear();
-                data.get_serialized(dest);
-                boost::smatch match;
-                assertTrue(boost::regex_search(dest, match, helper::pflauRe));
-                assertEqStr(match.str(2), "610");
             }
-            data.processAircrafts(pos, press);
-            data.get_serialized(dest);
-            assertZero(dest.size());
             assertTrue(data.update(std::move(ac1)));
             data.processAircrafts(pos, press);
-            dest.clear();
             data.get_serialized(dest);
             boost::smatch match;
             assertTrue(boost::regex_search(dest, match, helper::pflauRe));
@@ -169,7 +160,7 @@ void test_data(test::TestSuitesRunner& runner)
                    GpsPosition pos({10.0, 85.0, 100}, 40.0);
                    std::string fix;
                    pos.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(
-                       "000001", timestamp::Format::HHMMSS));
+                       helper::timePlus(-1), timestamp::Format::HHMMSS));
                    data.update(std::move(pos));
                    assertEquals(data.get_position().latitude, 10.0);
                    assertEquals(data.get_position().longitude, 85.0);
@@ -187,14 +178,12 @@ void test_data(test::TestSuitesRunner& runner)
                    pos0.set_position({0.0, 0.0, 1000});
                    pos1.set_position({0.0, 0.0, 2000});
                    pos1.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(
-                       "000001", timestamp::Format::HHMMSS));
-                   assertTrue(data.update(std::move(pos0)));
-                   assertEquals(data.get_position().altitude, 1000);
-                   data.update(std::move(pos1));
+                       helper::timePlus(0), timestamp::Format::HHMMSS));
+                   assertTrue(data.update(std::move(pos1)));
                    assertEquals(data.get_position().altitude, 2000);
                    pos0.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(
-                       "000002", timestamp::Format::HHMMSS));
-                   data.update(std::move(pos0));
+                       helper::timePlus(0), timestamp::Format::HHMMSS));
+                   assertFalse(data.update(std::move(pos0)));
                    assertEquals(data.get_position().altitude, 2000);
                })
         ->test("write after outdated", [] {
@@ -204,18 +193,19 @@ void test_data(test::TestSuitesRunner& runner)
             std::string dest;
             pos1.set_position({0.0, 0.0, 1000});
             pos2.set_position({0.0, 0.0, 2000});
-            pos1.set_timeStamp(
-                TimeStamp<timestamp::DateTimeImplBoost>("000001", timestamp::Format::HHMMSS));
+            pos2.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(helper::timePlus(10),
+                                                                       timestamp::Format::HHMMSS));
             assertTrue(data.update(std::move(pos2)));
             assertEquals(data.get_position().altitude, 2000);
-
-            for (int i = 0; i < OBJ_OUTDATED - 1; ++i)
+            pos1.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(helper::timePlus(20),
+                                                                       timestamp::Format::HHMMSS));
+            for (int i = 0; i < OBJ_OUTDATED; ++i)
             {
                 assertFalse(data.update(std::move(pos1)));
                 assertEquals(data.get_position().altitude, 2000);
+                dest.clear();
                 data.get_serialized(dest);
             }
-            data.get_serialized(dest);
             assertTrue(data.update(std::move(pos1)));
             assertEquals(data.get_position().altitude, 1000);
         });
@@ -249,21 +239,23 @@ void test_data(test::TestSuitesRunner& runner)
                    wind0.set_serialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
                    assertFalse(data.update(std::move(wind0)));
                })
-        ->test("write after attempt", [] {
+        ->test("write after outdated", [] {
             WindData    data;
             Wind        wind1(1);
             Wind        wind2(2);
             std::string dest;
             wind1.set_serialized("lower");
             wind2.set_serialized("higher");
-            data.update(std::move(wind2));
+            assertTrue(data.update(std::move(wind2)));
             data.get_serialized(dest);
             assertEqStr(dest, "higher");
-            data.update(std::move(wind1));
-            dest.clear();
-            data.get_serialized(dest);
-            assertEqStr(dest, "");
-            data.update(std::move(wind1));
+            for (int i = 0; i < OBJ_OUTDATED - 1; ++i)
+            {
+                assertFalse(data.update(std::move(wind1)));
+                dest.clear();
+                data.get_serialized(dest);
+            }
+            assertTrue(data.update(std::move(wind1)));
             dest.clear();
             data.get_serialized(dest);
             assertEqStr(dest, "lower");
@@ -294,17 +286,23 @@ void test_data(test::TestSuitesRunner& runner)
                    data.update(std::move(atm1));
                    assertEquals(data.get_atmPressure(), 900.0);
                })
-        ->test("write after attempt", [] {
+        ->test("write after outdated", [] {
             AtmosphereData data;
             Atmosphere     atm1(1);
             Atmosphere     atm2(2);
+            std::string    dest;
             atm1.set_pressure(1009.1);
             atm2.set_pressure(900.0);
-            data.update(std::move(atm2));
+            assertTrue(data.update(std::move(atm2)));
             assertEquals(data.get_atmPressure(), 900.0);
-            data.update(std::move(atm1));
-            assertEquals(data.get_atmPressure(), 900.0);
-            data.update(std::move(atm1));
+            for (int i = 0; i < OBJ_OUTDATED; ++i)
+            {
+                assertFalse(data.update(std::move(atm1)));
+                assertEquals(data.get_atmPressure(), 900.0);
+                dest.clear();
+                data.get_serialized(dest);
+            }
+            assertTrue(data.update(std::move(atm1)));
             assertEquals(data.get_atmPressure(), 1009.1);
         });
 }

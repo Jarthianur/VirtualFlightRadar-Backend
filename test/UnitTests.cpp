@@ -19,8 +19,9 @@
  }
  */
 
-#include "helper.hpp"
 #include "util/Logger.hpp"
+
+#include "helper.hpp"
 
 using namespace sctf;
 
@@ -38,7 +39,7 @@ int main(int, char**)
 {
     logger.set_logFile("/dev/null");
     // auto rep = createXmlReporter();
-    auto rep = createPlainTextReporter(true);
+    auto                   rep = createPlainTextReporter(true);
     test::TestSuitesRunner runner;
 
     test_config(runner);

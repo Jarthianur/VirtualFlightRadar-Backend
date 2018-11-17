@@ -24,10 +24,12 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
+
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/regex.hpp>
 
-#include "object/Aircraft.h"
 #include "framework/sctf.hpp"
+#include "object/Aircraft.h"
 #include "util/utility.hpp"
 
 #define TEST_FUNCTION(NAME) extern void NAME(test::TestSuitesRunner&);
@@ -42,12 +44,12 @@ namespace util
 {
 template<>
 inline std::string
-serialize<object::Aircraft::TargetType>(const object::Aircraft::TargetType& crTargetType)
+    serialize<object::Aircraft::TargetType>(const object::Aircraft::TargetType& crTargetType)
 {
     return std::to_string(::util::raw_type(crTargetType));
 }
-}
-}
+}  // namespace util
+}  // namespace sctf
 
 namespace helper
 {
@@ -57,4 +59,11 @@ static boost::regex pflaaRe(
 static boost::regex gpsRe(
     "(\\$GPRMC,\\d{6},A,0000\\.00,N,00000\\.00,E,0,0,\\d{6},001\\.0,W\\*[0-9a-fA-F]{2}\\s*)?(\\$GPGGA,\\d{6},0000\\.0000,N,00000\\.0000,E,1,00,1,0,M,0\\.0,M,,\\*[0-9a-fA-F]{2}\\s*)?");
 
+static std::string timePlus(std::int32_t val)
+{
+    return boost::posix_time::to_iso_string(
+        boost::posix_time::time_duration(
+            boost::posix_time::second_clock::local_time().time_of_day()) +
+        boost::posix_time::seconds(val));
+}
 }  // namespace helper

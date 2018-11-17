@@ -59,14 +59,18 @@ bool GpsData::update(Object&& position)
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_positionLocked)
     {
-        throw PositionLocked();
+        throw PositionAlreadyLocked();
     }
     bool updated = m_position.tryUpdate(std::move(position));
     if (updated)
     {
         m_processor.process(m_position);
+        if (m_groundMode && isPositionGood())
+        {
+            throw ReceivedGoodPosition();
+        }
     }
-    return (m_positionLocked = updated && m_groundMode && isPositionGood());
+    return updated;
 }
 
 Position GpsData::get_position()
@@ -82,11 +86,18 @@ bool GpsData::isPositionGood()
            m_position.get_dilution() <= GPS_HOR_DILUTION_GOOD;
 }
 
-PositionLocked::PositionLocked() : std::exception() {}
+PositionAlreadyLocked::PositionAlreadyLocked() : GpsDataException() {}
 
-const char* PositionLocked::what() const noexcept
+const char* PositionAlreadyLocked::what() const noexcept
 {
     return "position was locked before";
+}
+
+ReceivedGoodPosition::ReceivedGoodPosition() : GpsDataException() {}
+
+const char* ReceivedGoodPosition::what() const noexcept
+{
+    return "received good position";
 }
 
 }  // namespace data

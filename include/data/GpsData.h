@@ -66,8 +66,9 @@ public:
     /**
      * @brief Update the position.
      * @param position The new position
-     * @return true on success and ground-mode enabled and position was good, else false
-     * @throw PositionLocked if the position was locked before
+     * @return true on success, else false
+     * @throw PositionAlreadyLocked if the position was locked before
+     * @throw ReceivedGoodPosition if the position was good and ground mode is enabled, hence locked
      * @threadsafe
      */
     bool update(object::Object&& position) override;
@@ -92,15 +93,36 @@ private:
     bool m_groundMode = false;
 };
 
+class GpsDataException : public std::exception
+{
+protected:
+    DEFAULT_VIRTUAL_DTOR(GpsDataException)
+
+    GpsDataException() : std::exception() {}
+};
+
 /**
  * @brief Exception to signal that position was already locked.
  */
-class PositionLocked : public std::exception
+class PositionAlreadyLocked : public GpsDataException
 {
 public:
-    DEFAULT_DTOR(PositionLocked)
+    DEFAULT_DTOR(PositionAlreadyLocked)
 
-    PositionLocked();
+    PositionAlreadyLocked();
+
+    const char* what() const noexcept override;
+};
+
+/**
+ * @brief Exception to signal that the position was good.
+ */
+class ReceivedGoodPosition : public GpsDataException
+{
+public:
+    DEFAULT_DTOR(ReceivedGoodPosition)
+
+    ReceivedGoodPosition();
 
     const char* what() const noexcept override;
 };
