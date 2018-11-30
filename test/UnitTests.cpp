@@ -19,36 +19,38 @@
  }
  */
 
-#include <cstdint>
+#include "util/Logger.hpp"
 
-#include "../src/config/Configuration.h"
-#include "framework/src/framework.h"
+#include "helper.hpp"
 
-using namespace testsuite;
+using namespace sctf;
 
-#ifdef assert
-#undef assert
-#endif
+TEST_FUNCTION(test_config)
+TEST_FUNCTION(test_data)
+TEST_FUNCTION(test_data_processor)
+TEST_FUNCTION(test_feed_parser)
+TEST_FUNCTION(test_object)
+TEST_FUNCTION(test_math)
+TEST_FUNCTION(test_client)
+TEST_FUNCTION(test_server)
+TEST_FUNCTION(test_feed)
 
-extern void test_util(TestSuitesRunner&);
-extern void test_config(TestSuitesRunner&);
-extern void test_data(TestSuitesRunner&);
-extern void test_aircraft(TestSuitesRunner&);
-extern void test_parser(TestSuitesRunner&);
-
-int main(int argc, char *argv[])
+int main(int, char**)
 {
-    auto rep = reporter::createXmlReporter();
-    TestSuitesRunner runner;
+    logger.set_logFile("/dev/null");
+    // auto rep = createXmlReporter();
+    auto                   rep = createPlainTextReporter(true);
+    test::TestSuitesRunner runner;
 
-    config::Configuration::filter_maxHeight = INT32_MAX;
-    config::Configuration::filter_maxDist = INT32_MAX;
-
-    test_util(runner);
     test_config(runner);
-    test_aircraft(runner);
     test_data(runner);
-    test_parser(runner);
+    test_data_processor(runner);
+    test_feed_parser(runner);
+    test_object(runner);
+    test_math(runner);
+    test_feed(runner);
+    test_client(runner);
+    test_server(runner);
 
-    return rep->report(runner);
+    return rep->report(runner) > 0 ? 1 : 0;
 }

@@ -32,7 +32,6 @@ priority = 0
 ...
 
 All the parameters and sections should be self explanatory.
-Some information can be found in the comments of [vfrb.ini](/vfrb.ini)
 
 ### [general]
 
@@ -42,7 +41,8 @@ Therefore the entries must contain one of the following keywords
 
 + aprs
 + sbs
-+ sens
++ wind
++ atm
 + gps
 
 To enable the [Ground-Mode](#ground-mode), just assign any value to `gndMode`, to disable leave it empty.
@@ -72,6 +72,7 @@ The parameters for a feed section are
 
 Where `login` is only required for APRS feeds. `host` and `port` define the hostname /-address and port to connect to.
 `priority` defines the priority relative to all other feeds of the same type, therefor is only required if multiple feeds of same type exist.
+If multiple feeds of the same type use the same host, port combination, only one connection is used and thus shared betweeen them.
 The priority is an integer, where a higher value means a higher priority.
 
 #### Ground-Mode

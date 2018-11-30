@@ -19,58 +19,35 @@
  }
  */
 
-#include "Logger.h"
+#include "util/Logger.hpp"
 
 #include <chrono>
 #include <ctime>
-#include <iostream>
-#include <boost/thread/lock_guard.hpp>
-#include <boost/chrono.hpp>
 
-namespace util
-{
+Logger logger;
 
-Logger::Logger()
+void Logger::set_debug(bool enable)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_debugEnabled = enable;
 }
 
-Logger::~Logger() noexcept
+void Logger::set_logFile(const std::string& file)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_logFile = std::ofstream(file);
+    if (!m_logFile)
+    {
+        throw std::runtime_error("Could not open log file");
+    }
+    m_outStream = &m_logFile;
+    m_errStream = &m_logFile;
 }
 
-boost::mutex Logger::mMutex;
-
-const std::string Logger::getTime()
+std::string Logger::get_time()
 {
-    std::time_t tt = boost::chrono::system_clock::to_time_t(
-            boost::chrono::system_clock::now());
-    std::string time(asctime(gmtime(&tt)));
-    time.pop_back();
-    return time;
+    std::time_t tt       = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    char        time[32] = "";
+    std::strftime(time, 32, "%c", gmtime(&tt));
+    return std::string(time);
 }
-
-void Logger::info(const std::string& cr_subj, const std::string& cr_msg)
-{
-    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cout << "[INFO]  " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
-}
-
-void Logger::debug(const std::string& cr_subj, const std::string& cr_msg)
-{
-    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cout << "[DEBUG] " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
-}
-
-void Logger::warn(const std::string& cr_subj, const std::string& cr_msg)
-{
-    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cout << "[WARN]  " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
-}
-
-void Logger::error(const std::string& cr_subj, const std::string& cr_msg)
-{
-    boost::lock_guard<boost::mutex> lock(Logger::mMutex);
-    std::cerr << "[ERROR] " << getTime() << ":: " << cr_subj << cr_msg << std::endl;
-}
-
-}  // namespace util

@@ -21,50 +21,53 @@
 
 #include "AprscFeed.h"
 
-#include <memory>
 #include <stdexcept>
-#include <unordered_map>
 
-#include "../aircraft/Aircraft.hpp"
-#include "../aircraft/AircraftContainer.h"
-#include "../config/Configuration.h"
-#include "../tcp/client/AprscClient.h"
-#include "../util/Logger.h"
-#include "../VFRB.h"
+#include "config/Configuration.h"
+#include "data/AircraftData.h"
+#include "object/Aircraft.h"
+#include "parser/AprsParser.h"
+#include "util/Logger.hpp"
 
-using namespace util;
+#ifdef COMPONENT
+#    undef COMPONENT
+#endif
+#define COMPONENT "(AprscFeed)"
 
 namespace feed
 {
+parser::AprsParser AprscFeed::s_parser;
 
-AprscFeed::AprscFeed(const std::string& cr_name, std::int32_t prio,
-        const config::keyValueMap& cr_kvmap)
-        : Feed(cr_name, prio, cr_kvmap)
+AprscFeed::AprscFeed(const std::string& name, const config::Properties& properties,
+                     std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
+    : Feed(name, COMPONENT, properties, data)
 {
-    auto it = mKvMap.find(KV_KEY_LOGIN);
-    if (it == mKvMap.end())
+    parser::AprsParser::s_maxHeight = maxHeight;
+    if (m_properties.get_property(KV_KEY_LOGIN, "-") == "-")
     {
-        Logger::warn("(AprscFeed) could not find: ", mName + "." KV_KEY_LOGIN);
+        logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_LOGIN);
         throw std::logic_error("No login given");
-    } else
-    {
-        mpClient = std::unique_ptr<tcp::client::Client>(
-                new tcp::client::AprscClient(mKvMap.find(KV_KEY_HOST)->second,
-                        mKvMap.find(KV_KEY_PORT)->second, it->second, *this));
     }
 }
 
-AprscFeed::~AprscFeed() noexcept
+Feed::Protocol AprscFeed::get_protocol() const
 {
+    return Protocol::APRS;
 }
 
-void AprscFeed::process(const std::string& cr_res) noexcept
+bool AprscFeed::process(const std::string& response)
 {
-    aircraft::Aircraft ac;
-    if (mParser.unpack(cr_res, ac))
+    object::Aircraft ac(get_priority());
+    if (s_parser.unpack(response, ac))
     {
-        VFRB::msAcCont.insertAircraft(ac, mPriority);
+        m_data->update(std::move(ac));
     }
+    return true;
 }
 
-} // namespace feed
+std::string AprscFeed::get_login() const
+{
+    return m_properties.get_property(KV_KEY_LOGIN);
+}
+
+}  // namespace feed

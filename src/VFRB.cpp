@@ -1,4 +1,4 @@
-/*
+﻿/*
  Copyright_License {
 
  Copyright (C) 2016 VirtualFlightRadar-Backend
@@ -21,155 +21,136 @@
 
 #include "VFRB.h"
 
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/chrono.hpp>
-#include <boost/thread.hpp>
-#include <boost/move/move.hpp>
+#include <csignal>
 #include <exception>
-#include <functional>
-#include <string>
+#include <sstream>
+#include <thread>
 
+#include "client/ClientManager.h"
+#include "client/ConnectorImplBoost.h"
 #include "config/Configuration.h"
-#include "aircraft/AircraftContainer.h"
+#include "data/AircraftData.h"
+#include "data/AtmosphereData.h"
 #include "data/GpsData.h"
-#include "data/SensorData.h"
-#include "tcp/client/AprscClient.h"
-#include "tcp/client/SbsClient.h"
-#include "tcp/client/SensorClient.h"
-#include "tcp/server/Server.h"
-#include "util/Logger.h"
+#include "data/WindData.h"
 #include "feed/Feed.h"
-#include "util/Position.h"
-#include "util/SensorInfo.h"
+#include "feed/FeedFactory.h"
+#include "object/Atmosphere.h"
+#include "object/GpsPosition.h"
+#include "util/Logger.hpp"
+#include "util/SignalListener.h"
 
-using namespace util;
+using namespace data;
 
-#define SYNC_TIME (1)
+#define SYNC_TIME 1
 
-std::atomic<bool> VFRB::global_run_status(true);
-aircraft::AircraftContainer VFRB::msAcCont;
-data::SensorData VFRB::msSensorData;
-data::GpsData VFRB::msGpsData;
-
-VFRB::VFRB()
+VFRB::VFRB(std::shared_ptr<config::Configuration> config)
+    : m_aircraftData(std::make_shared<AircraftData>(config->get_maxDistance())),
+      m_atmosphereData(
+          std::make_shared<AtmosphereData>(object::Atmosphere(config->get_atmPressure(), 0))),
+      m_gpsData(std::make_shared<GpsData>(config->get_position(), config->get_groundMode())),
+      m_windData(std::make_shared<WindData>()),
+      m_server(config->get_serverPort()),
+      m_running(false)
 {
-}
-
-VFRB::~VFRB() noexcept
-{
+    createFeeds(config);
 }
 
 void VFRB::run() noexcept
 {
-    Logger::info("(VFRB) startup");
-    //store start time
-    boost::chrono::steady_clock::time_point start = boost::chrono::steady_clock::now();
+    m_running = true;
+    logger.info("(VFRB) startup");
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    util::SignalListener                  signals;
+    client::ClientManager                 clientManager;
 
-    // register signals and run handler
-    boost::asio::io_service io_service;
-    boost::asio::signal_set signal_set(io_service);
-
-    signal_set.add(SIGINT);
-    signal_set.add(SIGTERM);
-#if defined(SIGQUIT)
-    signal_set.add(SIGQUIT);
-#endif // defined(SIGQUIT)
-
-    signal_set.async_wait(
-            boost::bind(&VFRB::handleSignals, boost::asio::placeholders::error,
-                    boost::asio::placeholders::signal_number));
-
-    boost::thread signal_thread([&io_service]()
-    {
-        io_service.run();
+    signals.addHandler([this](const boost::system::error_code&, const int) {
+        logger.info("(VFRB) caught signal to shutdown ...");
+        m_running = false;
     });
-
-    // init server and run handler
-    tcp::server::Server server(signal_set, config::Configuration::global_server_port);
-    boost::thread server_thread(boost::bind(&VFRB::handleServer, std::ref(server)));
-
-    //init input threads
-    boost::thread_group feed_threads;
-    for (auto it = config::Configuration::global_feeds.begin();
-            it != config::Configuration::global_feeds.end(); ++it)
+    for (auto it : m_feeds)
     {
-        feed_threads.create_thread(
-                boost::bind(&VFRB::handleFeed, std::ref(signal_set), *it));
+        logger.info("(VFRB) run feed: ", it->get_name());
+        try
+        {
+            clientManager.subscribe(it);
+        }
+        catch (const std::logic_error& e)
+        {
+            logger.error("(VFRB) ", e.what());
+        }
     }
-    config::Configuration::global_feeds.clear();
+    m_feeds.clear();
 
-    while (global_run_status)
+    signals.run();
+    m_server.run();
+    clientManager.run();
+    serve();
+    clientManager.stop();
+    m_server.stop();
+    signals.stop();
+    logger.info("Stopped after ", get_duration(start));
+}
+
+void VFRB::serve()
+{
+    std::string message;
+    std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
+    while (m_running)
+    {
+        message.clear();
+        try
+        {
+            m_aircraftData->processAircrafts(m_gpsData->get_position(),
+                                             m_atmosphereData->get_atmPressure());
+            m_aircraftData->get_serialized(message);
+            m_gpsData->get_serialized(message);
+            m_atmosphereData->get_serialized(message);
+            m_windData->get_serialized(message);
+            m_server.send(message);
+            std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
+        }
+        catch (const std::exception& e)
+        {
+            logger.error("(VFRB) error: ", e.what());
+            m_running = false;
+        }
+    }
+}
+
+void VFRB::createFeeds(std::shared_ptr<config::Configuration> config)
+{
+    feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
+    for (const auto& name : config->get_feedNames())
     {
         try
         {
-            //write Aircrafts to clients
-            std::string str = msAcCont.processAircrafts();
-            if (str.length() > 0)
+            auto optFeedPtr = factory.createFeed(name);
+            if (optFeedPtr)
             {
-                server.writeToAll(str);
+                m_feeds.push_back(*optFeedPtr);
             }
-
-            //write GPS position to clients
-            server.writeToAll(msGpsData.getGpsStr());
-
-            // write weather info to clients
-            str = msSensorData.getMdaStr() + msSensorData.getMwvStr();
-            if (str.length() > 0)
+            else
             {
-                server.writeToAll(str);
+                logger.warn("(VFRB) create feed ", name,
+                            ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
+                            ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS
+                            ", " SECT_KEY_GPS);
             }
-
-            //synchronise cycles to ~SYNC_TIME sec
-            boost::this_thread::sleep_for(boost::chrono::seconds(SYNC_TIME));
-        } catch (const std::exception& e)
+        }
+        catch (const std::exception& e)
         {
-            Logger::error("(VFRB) error: ", e.what());
-            global_run_status = false;
-        } catch (...)
-        {
-            Logger::error("(VFRB) error");
-            global_run_status = false;
+            logger.warn("(VFRB) create feed ", name, ": ", e.what());
         }
     }
-
-    // exit sequence, join threads
-    server_thread.join();
-    feed_threads.join_all();
-    signal_thread.join();
-
-    //eval end time
-    boost::chrono::steady_clock::time_point end = boost::chrono::steady_clock::now();
-    boost::chrono::minutes runtime = boost::chrono::duration_cast<boost::chrono::minutes>(
-            end - start);
-    std::string time_str(std::to_string(runtime.count() / 60 / 24));
-    time_str += " days, ";
-    time_str += std::to_string(runtime.count() / 60);
-    time_str += " hours, ";
-    time_str += std::to_string(runtime.count() % 60);
-    time_str += " mins";
-
-    Logger::info("EXITING / runtime: ", time_str);
-
 }
 
-void VFRB::handleServer(tcp::server::Server& r_server)
+std::string VFRB::get_duration(std::chrono::steady_clock::time_point start) const
 {
-    Logger::info("(Server) startup: localhost ",
-            std::to_string(config::Configuration::global_server_port));
-    r_server.run();
-    global_run_status = false;
-}
-
-void VFRB::handleFeed(boost::asio::signal_set& r_sigset,
-        std::shared_ptr<feed::Feed> p_feed)
-{
-    Logger::info("(VFRB) run feed: ", p_feed->mName);
-    p_feed->run(r_sigset);
-}
-
-void VFRB::handleSignals(const boost::system::error_code& cr_ec, const int sig)
-{
-    Logger::info("(VFRB) caught signal: ", "shutdown");
-    global_run_status = false;
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::chrono::minutes runtime = std::chrono::duration_cast<std::chrono::minutes>(end - start);
+    std::stringstream    ss;
+    ss << runtime.count() / 60 / 24 << " days, " << runtime.count() / 60 << " hours, "
+       << runtime.count() % 60 << " minutes";
+    return ss.str();
 }

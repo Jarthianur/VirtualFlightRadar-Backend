@@ -1,5 +1,16 @@
 # changelog
 
+## 3.0.0
+
++ improved priority handling of feeds
++ take timestamps into account
++ a lot of internal code changes
++ several bugfixes
++ option to log into file
++ option for debug logging
++ split sensor feeds to wind and atmosphere
++ improved connection handling
+
 ## 2.2.0
 
 + new code documentation

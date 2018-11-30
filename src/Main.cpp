@@ -19,33 +19,28 @@
  }
  */
 
-#include <cstdint>
 #include <fstream>
+#include <iostream>
+#include <memory>
 #include <stdexcept>
-#include <string>
+
+#include <boost/program_options.hpp>
 
 #include "config/Configuration.h"
-#include "data/GpsData.h"
-#include "data/SensorData.h"
-#include "util/Logger.h"
-#include "util/Position.h"
-#include "util/SensorInfo.h"
+#include "util/Logger.hpp"
+
 #include "VFRB.h"
 
 #ifndef VERSION
-#define VERSION "DEMO"
+#    define VERSION "DEMO"
 #endif
 
-using namespace util;
+using namespace config;
+using namespace boost;
 
-/**
- * @fn evalArgs
- * @brief Evaluate comandline arguments.
- * @param argc The argument count
- * @param argv The arguments
- * @return 0 if succeeded, -1 in case of failure
- */
-std::int32_t evalArgs(std::int32_t argc, char** argv);
+program_options::variables_map evalArgs(int argc, char** argv);
+
+std::shared_ptr<Configuration> get_config(const program_options::variables_map& variables);
 
 /**
  * @fn main
@@ -56,87 +51,75 @@ std::int32_t evalArgs(std::int32_t argc, char** argv);
  */
 int main(int argc, char** argv)
 {
-    Logger::info("VirtualFlightRadar-Backend -- ", VERSION);
-
-    if (argc < 3)
+    try
     {
-        Logger::info(
-                "usage: ./VirtualFlightRadar-Backend [OPTIONS] [-c | --config] path_to_file.ini\n"
-                        "Run VFR-B with given config file.\n"
-                        "The config file must be in valid '.ini' format!\n"
-                        "OPTIONS:\n"
-                        "-g | --gnd-mode : Force ground-mode, GPS feed will stop if a 'good' position is received.");
-        return -1;
+        VFRB vfrb(get_config(evalArgs(argc, argv)));
+        vfrb.run();
     }
-
-    if (evalArgs(argc, argv) != 0)
+    catch (const std::exception& e)
     {
-        return -1;
+        logger.error("(VFRB) fatal: ", e.what());
+        return 1;
     }
-
-    VFRB::msSensorData.init( { "", "", config::Configuration::base_pressure });
-    VFRB::msGpsData.init( { { config::Configuration::base_latitude,
-            config::Configuration::base_longitude, config::Configuration::base_altitude },
-            1, 5, config::Configuration::base_geoid, 0.0 });
-    VFRB::run();
-
+    catch (...)
+    {
+        return 1;
+    }
     return 0;
 }
 
-std::int32_t evalArgs(std::int32_t argc, char** argv)
+program_options::variables_map evalArgs(int argc, char** argv)
 {
-    std::string ini_file;
-    bool gnd = false;
-    bool cfg_found = false;
+    program_options::options_description cmdline_options("VirtualFlightRadar-Backend -- " VERSION);
+    cmdline_options.add_options()("help,h", "show this message");
+    cmdline_options.add_options()("verbose,v", "enable debug logging");
+    cmdline_options.add_options()(
+        "ground-mode,g",
+        "forcibly enable ground mode; GPS feeds will stop when a good position is received");
+    cmdline_options.add_options()("config,c", program_options::value<std::string>(), "config file");
+    cmdline_options.add_options()("output,o", program_options::value<std::string>(),
+                                  "specify where to log");
+    program_options::variables_map variables;
+    program_options::store(program_options::parse_command_line(argc, argv, cmdline_options),
+                           variables);
+    program_options::notify(variables);
 
-    for (int i = 1; i < argc; i++)
+    if (argc < 3 || variables.count("help"))
     {
-        if (std::string(argv[i]).find("-c") != std::string::npos && i + 1 < argc)
-        {
-            ini_file = std::string(argv[++i]);
-            if (ini_file.rfind(".ini") == std::string::npos)
-            {
-                Logger::error("(VFRB) not a ini file: ", ini_file);
-                return -1;
-            } else
-            {
-                cfg_found = true;
-            }
-        } else if (std::string(argv[i]).find("-g") != std::string::npos)
-        {
-            gnd = true;
-        } else
-        {
-            Logger::warn("(VFRB) unrecognized option: ", std::string(argv[i]));
-        }
+        std::cout << cmdline_options << std::endl;
+        throw 1;
     }
-
-    if (cfg_found)
-    {
-        try
-        {
-            std::ifstream file(ini_file);
-            config::Configuration conf(file);
-        } catch (const std::logic_error& e)
-        {
-            Logger::error("(VFRB) eval config: ", e.what());
-            return -1;
-        }
-    } else
-    {
-        Logger::error("(VFRB) no config file given");
-        return -1;
-    }
-
-    if (gnd || config::Configuration::global_gnd_mode)
-    {
-        config::Configuration::global_gnd_mode = true;
-        Logger::info("(VFRB) GND mode: yes");
-    } else
-    {
-        Logger::info("(VFRB) GND mode: no");
-    }
-
-    return 0;
+    return variables;
 }
 
+std::shared_ptr<Configuration> get_config(const program_options::variables_map& variables)
+{
+    if (variables.count("verbose"))
+    {
+        logger.set_debug();
+    }
+    if (variables.count("output"))
+    {
+        logger.set_logFile(variables["output"].as<std::string>());
+    }
+    logger.info("VirtualFlightRadar-Backend -- " VERSION);
+    if (variables.count("config"))
+    {
+        std::ifstream file(variables["config"].as<std::string>());
+        if (!file)
+        {
+            throw std::logic_error(variables["config"].as<std::string>() + " is not accessible");
+        }
+        auto conf = std::make_shared<Configuration>(file);
+        if (variables.count("ground-mode"))
+        {
+            conf->set_groundMode(true);
+            logger.info("(VFRB) Override ground mode: Yes");
+        }
+        return conf;
+    }
+    else
+    {
+        throw std::logic_error("No config file given.");
+    }
+}

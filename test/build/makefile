@@ -5,19 +5,22 @@
 -include ../makefile.init
 
 RM := rm -rf
+CXX := $(or ${VFRB_COMPILER},${VFRB_COMPILER},g++)
+BOOST_L := ${BOOST_LIBS_L}
+BOOST_I := ${BOOST_ROOT_I}
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include test/units/subdir.mk
 -include test/subdir.mk
--include src/util/subdir.mk
--include src/tcp/server/subdir.mk
--include src/tcp/client/subdir.mk
--include src/parser/subdir.mk
+-include src/server/subdir.mk
+-include src/object/subdir.mk
+-include src/feed/parser/subdir.mk
+-include src/client/subdir.mk
 -include src/feed/subdir.mk
+-include src/data/processor/subdir.mk
 -include src/data/subdir.mk
 -include src/config/subdir.mk
--include src/aircraft/subdir.mk
+-include src/util/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -54,7 +57,7 @@ all: VFR-Test
 VFR-Test: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -coverage -fopenmp -o "VFR-Test" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(CXX) $(BOOST_L) -coverage -fopenmp -o "VFR-Test" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -21,42 +21,42 @@
 
 #include "SbsFeed.h"
 
-#include <boost/optional.hpp>
-#include <memory>
-#include <stdexcept>
 #include <unordered_map>
 
-#include "../aircraft/Aircraft.hpp"
-#include "../aircraft/AircraftContainer.h"
-#include "../config/Configuration.h"
-#include "../tcp/client/SbsClient.h"
-#include "../VFRB.h"
+#include "config/Configuration.h"
+#include "data/AircraftData.h"
+#include "object/Aircraft.h"
+#include "parser/SbsParser.h"
 
-using namespace util;
+#ifdef COMPONENT
+#    undef COMPONENT
+#endif
+#define COMPONENT "(SbsFeed)"
 
 namespace feed
 {
+parser::SbsParser SbsFeed::s_parser;
 
-SbsFeed::SbsFeed(const std::string& cr_name, std::int32_t prio,
-        const config::keyValueMap& cr_kvmap)
-        : Feed(cr_name, prio, cr_kvmap)
+SbsFeed::SbsFeed(const std::string& name, const config::Properties& properties,
+                 std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
+    : Feed(name, COMPONENT, properties, data)
 {
-    mpClient = std::unique_ptr<tcp::client::Client>(
-            new tcp::client::SbsClient(mKvMap.find(KV_KEY_HOST)->second,
-                    mKvMap.find(KV_KEY_PORT)->second, *this));
+    parser::SbsParser::s_maxHeight = maxHeight;
 }
 
-SbsFeed::~SbsFeed() noexcept
+Feed::Protocol SbsFeed::get_protocol() const
 {
+    return Protocol::SBS;
 }
 
-void SbsFeed::process(const std::string& cr_res) noexcept
+bool SbsFeed::process(const std::string& response)
 {
-    aircraft::Aircraft ac;
-    if (mParser.unpack(cr_res, ac))
+    object::Aircraft ac(get_priority());
+    if (s_parser.unpack(response, ac))
     {
-        VFRB::msAcCont.insertAircraft(ac, mPriority);
+        m_data->update(std::move(ac));
     }
+    return true;
 }
 
-} // namespace feed
+}  // namespace feed

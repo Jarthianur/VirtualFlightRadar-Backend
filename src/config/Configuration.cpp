@@ -21,217 +21,131 @@
 
 #include "Configuration.h"
 
-#include <iterator>
-#include <sstream>
+#include <limits>
 #include <stdexcept>
+#include <utility>
 
-#include "../feed/AprscFeed.h"
-#include "../feed/GpsFeed.h"
-#include "../feed/SbsFeed.h"
-#include "../feed/SensorFeed.h"
-#include "../util/Logger.h"
+#include <boost/optional.hpp>
+#include <boost/variant.hpp>
+
+#include "util/Logger.hpp"
+
 #include "ConfigReader.h"
-#include "PropertyMap.h"
-
-using namespace util;
 
 namespace config
 {
+using namespace util;
 
-Configuration::Configuration(std::istream& r_stream)
+Configuration::Configuration(std::istream& stream)
 {
-    if (!init(r_stream))
+    try
     {
+        Properties properties = ConfigReader(stream).read();
+        m_atmPressure         = boost::get<double>(
+            checkNumber(stringToNumber<double>(properties.get_property(PATH_PRESSURE, "1013.25")),
+                        PATH_PRESSURE));
+        m_position    = resolvePosition(properties);
+        m_maxDistance = resolveFilter(properties, KV_KEY_MAX_DIST);
+        m_maxHeight   = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
+        m_serverPort  = resolveServerPort(properties);
+        m_groundMode  = !properties.get_property(PATH_GND_MODE).empty();
+        resolveFeeds(properties);
+        dumpInfo();
+    }
+    catch (const std::exception& e)
+    {
+        logger.error("(Config) init: ", e.what());
         throw std::logic_error("Failed to read configuration file");
     }
 }
 
-Configuration::~Configuration() noexcept
+object::GpsPosition Configuration::resolvePosition(const Properties& properties) const
 {
+    object::Position pos;
+    pos.latitude  = boost::get<double>(checkNumber(
+        stringToNumber<double>(properties.get_property(PATH_LATITUDE, "0.0")), PATH_LATITUDE));
+    pos.longitude = boost::get<double>(checkNumber(
+        stringToNumber<double>(properties.get_property(PATH_LONGITUDE, "0.0")), PATH_LONGITUDE));
+    pos.altitude  = boost::get<std::int32_t>(checkNumber(
+        stringToNumber<std::int32_t>(properties.get_property(PATH_ALTITUDE, "0")), PATH_ALTITUDE));
+    double geoid  = boost::get<double>(checkNumber(
+        stringToNumber<double>(properties.get_property(PATH_GEOID, "0.0")), PATH_GEOID));
+    return object::GpsPosition(pos, geoid);
 }
 
-std::int32_t Configuration::base_altitude = 0;
-double Configuration::base_latitude = 0.0;
-double Configuration::base_longitude = 0.0;
-double Configuration::base_geoid = 0.0;
-double Configuration::base_pressure = 0.0;
-std::int32_t Configuration::filter_maxHeight = 0;
-std::int32_t Configuration::filter_maxDist = 0;
-std::uint16_t Configuration::global_server_port = 1;
-bool Configuration::global_gnd_mode = false;
-
-std::vector<std::shared_ptr<feed::Feed>> Configuration::global_feeds;
-
-bool Configuration::init(std::istream& r_stream)
+std::uint16_t Configuration::resolveServerPort(const Properties& properties) const
 {
-    ConfigReader reader;
-    PropertyMap properties;
     try
     {
-        reader.read(r_stream, properties);
-    } catch (const std::exception& e)
-    {
-        Logger::error("(Config) read file: ", e.what());
-        return false;
-    } catch (...)
-    {
-        Logger::error("(Config) read file");
-        return false;
+        std::uint64_t port = boost::get<std::uint64_t>(checkNumber(
+            stringToNumber<std::uint64_t>(properties.get_property(PATH_SERVER_PORT, "4353")),
+            PATH_SERVER_PORT));
+        if (port > std::numeric_limits<std::uint16_t>::max())
+        {
+            throw std::invalid_argument("");
+        }
+        return port & 0xFFFF;
     }
-
-    // get fallbacks
-    base_latitude = strToDouble(
-            properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_LATITUDE, "0.0"));
-    Logger::info("(Config) " KV_KEY_LATITUDE ": ", std::to_string(base_latitude));
-    base_longitude = strToDouble(
-            properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_LONGITUDE, "0.0"));
-    Logger::info("(Config) " KV_KEY_LONGITUDE ": ", std::to_string(base_longitude));
-    base_altitude = strToInt(
-            properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_ALTITUDE, "0"));
-    Logger::info("(Config) " KV_KEY_ALTITUDE ": ", std::to_string(base_altitude));
-    base_geoid = strToDouble(
-            properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_GEOID, "0.0"));
-    Logger::info("(Config) " KV_KEY_GEOID ": ", std::to_string(base_geoid));
-    base_pressure = strToDouble(
-            properties.getProperty(SECT_KEY_FALLBACK, KV_KEY_PRESSURE, "1013.25"));
-    Logger::info("(Config) " KV_KEY_PRESSURE ": ", std::to_string(base_pressure));
-
-    // get filters
-    std::string tmp = properties.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_HEIGHT, "-1");
-    if (tmp == "-1")
+    catch (const std::logic_error&)
     {
-        filter_maxHeight = INT32_MAX;
-    } else
-    {
-        filter_maxHeight = strToInt(tmp);
+        return 4353;
     }
-    Logger::info("(Config) " KV_KEY_MAX_HEIGHT ": ", std::to_string(filter_maxHeight));
-
-    tmp = properties.getProperty(SECT_KEY_FILTER, KV_KEY_MAX_DIST, "-1");
-    if (tmp == "-1")
-    {
-        filter_maxDist = INT32_MAX;
-    } else
-    {
-        filter_maxDist = strToInt(tmp);
-    }
-    Logger::info("(Config) " KV_KEY_MAX_DIST ": ", std::to_string(filter_maxDist));
-
-    // get general
-    global_gnd_mode = properties.getProperty(SECT_KEY_GENERAL, KV_KEY_GND_MODE) != "";
-
-    global_server_port = (uint16_t) strToInt(
-            properties.getProperty(SECT_KEY_GENERAL, KV_KEY_SERVER_PORT, "4353"));
-    Logger::info("(Config) " KV_KEY_SERVER_PORT ": ", std::to_string(global_server_port));
-
-    std::size_t nrf = registerFeeds(properties);
-    Logger::info("(Config) number of feeds: ", std::to_string(nrf));
-
-    return nrf > 0;
 }
 
-std::size_t Configuration::registerFeeds(const PropertyMap& cr_map)
+std::int32_t Configuration::resolveFilter(const Properties&  properties,
+                                          const std::string& key) const
 {
-    std::vector<std::string> feeds;
-    std::stringstream ss;
-    ss.str(cr_map.getProperty(SECT_KEY_GENERAL, KV_KEY_FEEDS));
-    std::string item;
-    while (std::getline(ss, item, ','))
-    {
-        std::size_t f = item.find_first_not_of(' ');
-        if (f != std::string::npos)
-        {
-            item = item.substr(f);
-        }
-        std::size_t l = item.find_last_not_of(' ');
-        if (l != std::string::npos)
-        {
-            item = item.substr(0, l + 1);
-        }
-        feeds.push_back(item);
-    }
-
-    for (auto it = feeds.cbegin(); it != feeds.cend(); ++it)
-    {
-        if (it->find(SECT_KEY_APRSC) != std::string::npos)
-        {
-            try
-            {
-                global_feeds.push_back(
-                        std::shared_ptr<feed::Feed>(
-                                new feed::AprscFeed(*it, strToInt(cr_map.getProperty(*it,
-                                KV_KEY_PRIORITY, "0")), cr_map.getSectionKv(*it))));
-            } catch (const std::exception& e)
-            {
-                Logger::warn("(Config) create feed " + *it + ": ", e.what());
-            }
-        } else if (it->find(SECT_KEY_SBS) != std::string::npos)
-        {
-            try
-            {
-                global_feeds.push_back(
-                        std::shared_ptr<feed::Feed>(
-                                new feed::SbsFeed(*it, strToInt(cr_map.getProperty(*it,
-                                KV_KEY_PRIORITY, "0")), cr_map.getSectionKv(*it))));
-            } catch (const std::exception& e)
-            {
-                Logger::warn("(Config) create feed " + *it + ": ", e.what());
-            }
-        } else if (it->find(SECT_KEY_SENS) != std::string::npos)
-        {
-            try
-            {
-                global_feeds.push_back(
-                        std::shared_ptr<feed::Feed>(
-                                new feed::SensorFeed(*it, strToInt(cr_map.getProperty(*it,
-                                KV_KEY_PRIORITY, "0")), cr_map.getSectionKv(*it))));
-            } catch (const std::exception& e)
-            {
-                Logger::warn("(Config) create feed " + *it + ": ", e.what());
-            }
-        } else if (it->find(SECT_KEY_GPS) != std::string::npos)
-        {
-            try
-            {
-                global_feeds.push_back(
-                        std::shared_ptr<feed::Feed>(
-                                new feed::GpsFeed(*it, strToInt(cr_map.getProperty(*it,
-                                KV_KEY_PRIORITY, "0")), cr_map.getSectionKv(*it))));
-            } catch (const std::exception& e)
-            {
-                Logger::warn("(Config) create feed " + *it + ": ", e.what());
-            }
-        }
-    }
-    return global_feeds.size();
-}
-
-std::int32_t Configuration::strToInt(const std::string& cr_str) noexcept
-{
-    std::int32_t val = 0;
     try
     {
-        val = std::stoi(cr_str);
-    } catch (const std::logic_error& iae)
-    {
-        Logger::warn("(Config) invalid configuration: ",
-                cr_str.length() == 0 ? "empty" : cr_str);
+        std::string  path   = std::string(SECT_KEY_FILTER ".") + key;
+        std::int32_t filter = boost::get<std::int32_t>(
+            checkNumber(stringToNumber<std::int32_t>(properties.get_property(path, "-1")), path));
+        return filter < 0 ? std::numeric_limits<std::int32_t>::max() : filter;
     }
-    return val;
+    catch (const std::invalid_argument&)
+    {
+        return std::numeric_limits<std::int32_t>::max();
+    }
 }
 
-double Configuration::strToDouble(const std::string& cr_str) noexcept
+void Configuration::resolveFeeds(const Properties& properties)
 {
-    double val = 0.0;
-    try
+    for (auto& it : splitCommaSeparated(properties.get_property(PATH_FEEDS)))
     {
-        val = std::stod(cr_str);
-    } catch (const std::logic_error& iae)
-    {
-        Logger::warn("(Config) invalid configuration: ",
-                cr_str.length() == 0 ? "empty" : cr_str);
+        try
+        {
+            m_feedProperties.emplace(it, properties.get_propertySection(it));
+            m_feedNames.push_back(it);
+        }
+        catch (const std::out_of_range& e)
+        {
+            logger.warn("(Config) resolveFeeds: ", e.what(), " for ", it);
+        }
     }
-    return val;
+}
+
+Number Configuration::checkNumber(const OptNumber& number, const std::string& path) const
+{
+    if (!number)
+    {
+        logger.warn("(Config) ", path, ": Could not resolve value.");
+        throw std::invalid_argument("");
+    }
+    return *number;
+}
+
+void Configuration::dumpInfo() const
+{
+    logger.info("(Config) ", PATH_LATITUDE, ": ", m_position.get_position().latitude);
+    logger.info("(Config) ", PATH_LONGITUDE, ": ", m_position.get_position().longitude);
+    logger.info("(Config) ", PATH_ALTITUDE, ": ", m_position.get_position().altitude);
+    logger.info("(Config) ", PATH_GEOID, ": ", m_position.get_geoid());
+    logger.info("(Config) ", PATH_PRESSURE, ": ", m_atmPressure);
+    logger.info("(Config) ", PATH_MAX_HEIGHT, ": ", m_maxHeight);
+    logger.info("(Config) ", PATH_MAX_DIST, ": ", m_maxDistance);
+    logger.info("(Config) ", PATH_SERVER_PORT, ": ", m_serverPort);
+    logger.info("(Config) ", PATH_GND_MODE, ": ", m_groundMode ? "Yes" : "No");
+    logger.info("(Config) number of feeds: ", m_feedProperties.size());
 }
 
 }  // namespace config

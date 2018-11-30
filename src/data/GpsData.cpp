@@ -21,60 +21,83 @@
 
 #include "GpsData.h"
 
-#include <boost/thread/lock_guard.hpp>
-#include <boost/thread/mutex.hpp>
+#include <stdexcept>
+
+/// @def GPS_NR_SATS_GOOD
+/// Good number of satellites
+#define GPS_NR_SATS_GOOD 7
+
+/// @def GPS_FIX_GOOD
+/// Good fix quality
+#define GPS_FIX_GOOD 1
+
+/// @def GPS_HOR_DILUTION_GOOD
+/// Good horizontal dilution
+#define GPS_HOR_DILUTION_GOOD 1.0
+
+using namespace object;
 
 namespace data
 {
+GpsData::GpsData() : Data() {}
 
-GpsData::GpsData()
+GpsData::GpsData(const GpsPosition& position, bool ground)
+    : Data(), m_position(position), m_groundMode(ground)
 {
+    m_processor.process(m_position);
 }
 
-GpsData::~GpsData() noexcept
+void GpsData::get_serialized(std::string& dest)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_processor.process(m_position);
+    dest += (++m_position).get_serialized();
 }
 
-void GpsData::init(struct util::ExtGpsPosition pos)
+bool GpsData::update(Object&& position)
 {
-    mBasePos.trySetValue(pos, 0);
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_positionLocked)
+    {
+        throw PositionAlreadyLocked();
+    }
+    bool updated = m_position.tryUpdate(std::move(position));
+    if (updated)
+    {
+        m_processor.process(m_position);
+        if (m_groundMode && isPositionGood())
+        {
+            throw ReceivedGoodPosition();
+        }
+    }
+    return updated;
 }
 
-std::string GpsData::getGpsStr()
+Position GpsData::get_position()
 {
-    std::string gps = mGpsMod.genGprmcStr(getBasePos());
-    gps.append(mGpsMod.genGpggaStr(getBasePos()));
-    return gps;
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_position.get_position();
 }
 
-std::int32_t GpsData::getBaseAlt()
+bool GpsData::isPositionGood()
 {
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value.position.altitude;
+    return m_position.get_nrOfSatellites() >= GPS_NR_SATS_GOOD &&
+           m_position.get_fixQuality() >= GPS_FIX_GOOD &&
+           m_position.get_dilution() <= GPS_HOR_DILUTION_GOOD;
 }
 
-double GpsData::getBaseLat()
+PositionAlreadyLocked::PositionAlreadyLocked() : GpsDataException() {}
+
+const char* PositionAlreadyLocked::what() const noexcept
 {
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value.position.latitude;
+    return "position was locked before";
 }
 
-void GpsData::update(const struct util::ExtGpsPosition& cr_pos, std::int32_t prio)
+ReceivedGoodPosition::ReceivedGoodPosition() : GpsDataException() {}
+
+const char* ReceivedGoodPosition::what() const noexcept
 {
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    mBasePos.trySetValue(cr_pos, prio);
+    return "received good position";
 }
 
-double GpsData::getBaseLong()
-{
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value.position.longitude;
-}
-
-struct util::ExtGpsPosition GpsData::getBasePos()
-{
-    boost::lock_guard<boost::mutex> lock(mBasePos.mutex);
-    return mBasePos.value;
-}
-
-} // namespace data
+}  // namespace data

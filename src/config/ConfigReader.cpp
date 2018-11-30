@@ -21,84 +21,30 @@
 
 #include "ConfigReader.h"
 
-#include <cstddef>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
-#include "../util/Logger.h"
-#include "PropertyMap.h"
-
-using namespace util;
+#include <boost/property_tree/exceptions.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 namespace config
 {
+ConfigReader::ConfigReader(std::istream& stream) : m_stream(stream) {}
 
-ConfigReader::ConfigReader()
-        : mConfRe("^(\\S+?)\\s*?=\\s*?(\\S+?[^;]*?)\\s*?(?:;[\\S\\s]*?)?$",
-                boost::regex_constants::optimize)
+Properties ConfigReader::read()
 {
-}
-
-ConfigReader::~ConfigReader() noexcept
-{
-}
-
-void ConfigReader::read(std::istream& r_stream, PropertyMap& r_map)
-{
-    std::string key;
-    std::string value;
-    std::string line;
-    std::string section;
-    std::size_t line_nr = 0;
-    while (std::getline(r_stream, line))
+    boost::property_tree::ptree tree;
+    try
     {
-        line_nr++;
-        try
-        {
-            if (line.length() == 0 || line.at(0) == ';')
-            {
-                continue;
-            }
-            if (line.at(0) == '[')
-            {
-                section = line.substr(1, line.rfind(']') - 1);
-                if (!r_map.addProperty(section))
-                {
-                    Logger::warn(
-                            "(ConfigReader) could not add section ["
-                                    + std::to_string(line_nr) + "]: ", section);
-                }
-                continue;
-            }
-            boost::smatch match;
-            if (boost::regex_match(line, match, mConfRe))
-            {
-                key = match.str(1);
-                value = match.str(2);
-                std::size_t l = value.find_last_not_of(' ');
-                if (l != std::string::npos)
-                {
-                    value = value.substr(0, l + 1);
-                }
-                keyValue kv_pair = std::make_pair(key, value);
-                if (!r_map.addProperty(section, kv_pair))
-                {
-                    Logger::warn(
-                            "(ConfigReader) could not add property ["
-                                    + std::to_string(line_nr) + "]: ", key);
-                }
-            } else
-            {
-                Logger::error(
-                        "(ConfigReader) malformed param [" + std::to_string(line_nr)
-                                + "]: ", line);
-            }
-        } catch (const std::out_of_range& e)
-        {
-            continue;
-        }
+        boost::property_tree::read_ini(m_stream, tree);
     }
+    catch (const boost::property_tree::ini_parser_error& e)
+    {
+        throw std::invalid_argument(e.filename() + " is not a valid INI file");
+    }
+    return Properties(std::move(tree));
 }
 
 }  // namespace config

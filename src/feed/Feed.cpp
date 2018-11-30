@@ -22,61 +22,52 @@
 #include "Feed.h"
 
 #include <algorithm>
-#include <atomic>
+#include <limits>
 #include <stdexcept>
 #include <unordered_map>
 
-#include "../config/Configuration.h"
-#include "../tcp/client/Client.h"
-#include "../util/Logger.h"
-#include "../VFRB.h"
+#include "config/Configuration.h"
+#include "data/Data.hpp"
+#include "util/Logger.hpp"
 
-using namespace util;
+using namespace config;
 
 namespace feed
 {
-
-Feed::Feed(const std::string& cr_name, std::int32_t prio,
-        const config::keyValueMap& cr_kvmap)
-        : mName(cr_name),
-          mPriority(prio),
-          mKvMap(cr_kvmap)
+Feed::Feed(const std::string& name, const char* component, const Properties& properties,
+           std::shared_ptr<data::Data> data)
+    : m_name(name), m_component(component), m_properties(properties), m_data(data)
 {
-    if (mKvMap.find(KV_KEY_HOST) == mKvMap.end())
+    initPriority();
+    if (m_properties.get_property(KV_KEY_HOST).empty())
     {
-        Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_HOST);
+        logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
-    if (mKvMap.find(KV_KEY_PORT) == mKvMap.end())
+    if (m_properties.get_property(KV_KEY_PORT).empty())
     {
-        Logger::warn("(Feed) could not find: ", mName + "." KV_KEY_PORT);
+        logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
 }
 
-Feed::~Feed() noexcept
+void Feed::initPriority() noexcept
 {
-}
-
-Feed::Feed(BOOST_RV_REF(Feed) other)
-: mName(std::move(other.mName)),
-mPriority(other.mPriority),
-mKvMap(std::move(other.mKvMap)),
-mpClient(std::move(other.mpClient))
-{
-}
-
-Feed& Feed::operator =(BOOST_RV_REF(Feed))
-{
-    return *this;
-}
-
-void Feed::run(boost::asio::signal_set& r_sigset) noexcept
-{
-    if (VFRB::global_run_status)
+    try
     {
-        mpClient->run(r_sigset);
+        m_priority = static_cast<std::uint32_t>(std::max<std::uint64_t>(
+            0, std::min<std::uint64_t>(std::stoul(m_properties.get_property(KV_KEY_PRIORITY)),
+                                       std::numeric_limits<std::uint32_t>::max())));
     }
+    catch (const std::logic_error&)
+    {
+        logger.warn(m_component, " create ", m_name, ": Invalid priority given.");
+    }
+}
+
+client::Endpoint Feed::get_endpoint() const
+{
+    return {m_properties.get_property(KV_KEY_HOST), m_properties.get_property(KV_KEY_PORT)};
 }
 
 }  // namespace feed

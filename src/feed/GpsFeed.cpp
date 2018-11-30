@@ -21,52 +21,50 @@
 
 #include "GpsFeed.h"
 
-#include <memory>
+#include <stdexcept>
 #include <unordered_map>
 
-#include "../config/Configuration.h"
-#include "../data/GpsData.h"
-#include "../tcp/client/GpsdClient.h"
-#include "../util/Logger.h"
-#include "../util/Position.h"
-#include "../VFRB.h"
+#include "config/Configuration.h"
+#include "data/GpsData.h"
+#include "object/GpsPosition.h"
+#include "parser/GpsParser.h"
+#include "util/Logger.hpp"
 
-/// Define GPS metrics
-#define GPS_NR_SATS_GOOD      7
-#define GPS_FIX_GOOD          1
-#define GPS_HOR_DILUTION_GOOD 1.0
-
-using namespace util;
+#ifdef COMPONENT
+#    undef COMPONENT
+#endif
+#define COMPONENT "(GpsFeed)"
 
 namespace feed
 {
+parser::GpsParser GpsFeed::s_parser;
 
-GpsFeed::GpsFeed(const std::string& cr_name, std::int32_t prio,
-        const config::keyValueMap& cr_kvmap)
-        : Feed(cr_name, prio, cr_kvmap)
+GpsFeed::GpsFeed(const std::string& name, const config::Properties& properties,
+                 std::shared_ptr<data::GpsData> data)
+    : Feed(name, COMPONENT, properties, data)
+{}
+
+Feed::Protocol GpsFeed::get_protocol() const
 {
-    mpClient = std::unique_ptr<tcp::client::Client>(
-            new tcp::client::GpsdClient(mKvMap.find(KV_KEY_HOST)->second,
-                    mKvMap.find(KV_KEY_PORT)->second, *this));
+    return Protocol::GPS;
 }
 
-GpsFeed::~GpsFeed() noexcept
+bool GpsFeed::process(const std::string& response)
 {
-}
-
-void GpsFeed::process(const std::string& cr_res) noexcept
-{
-    struct ExtGpsPosition pos;
-    if (mParser.unpack(cr_res, pos))
+    object::GpsPosition pos(get_priority());
+    if (s_parser.unpack(response, pos))
     {
-        VFRB::msGpsData.update(pos, mPriority);
-        if (config::Configuration::global_gnd_mode && pos.nrSats >= GPS_NR_SATS_GOOD
-                && pos.fixQa >= GPS_FIX_GOOD && pos.dilution <= GPS_HOR_DILUTION_GOOD)
+        try
         {
-            Logger::info("(GpsFeed) received good position -> stop");
-            mpClient->stop();
+            m_data->update(std::move(pos));
+        }
+        catch (const data::GpsDataException& e)
+        {
+            logger.info(m_component, " ", m_name, ": ", e.what());
+            return false;
         }
     }
+    return true;
 }
 
-} // namespace feed
+}  // namespace feed
