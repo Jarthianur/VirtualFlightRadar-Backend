@@ -42,6 +42,7 @@ function print_help() {
     echo '  --path=<PATH/NAME>     : Set a custom path, including filename, where to install the executable.'
     echo '  --ini-path=<PATH/NAME> : Set a custom path, including filename, where to install the config file.'
     echo '  -y | --confirm-yes     : Automatically confirm all decisions. (dangerous)'
+    echo '  -n | --no-update       : Disable package installation and updates'
     echo '  -h | --help            : Display this message'
     echo ''
     echo 'TASKS:'
@@ -94,6 +95,9 @@ for arg in $@; do
     docker)
         DO_DOCKER=1
     ;;
+    -n | --no-update)
+        NO_UPDATE=1
+    ;;
     -h | --help | *)
         print_help
         exit 1
@@ -118,8 +122,10 @@ fi
 
 # task "test"
 if [ -n "$DO_TEST" ]; then
-    install_deps
-    install_test_deps
+    if [ -z "$NO_UPDATE" ]; then
+        install_deps
+        install_test_deps
+    fi
     if [ ! -d $VFRB_ROOT/reports/ ]; then
         mkdir $VFRB_ROOT/reports/
     fi
@@ -132,7 +138,9 @@ fi
 
 # task "build"
 if [ -n "$DO_BUILD" ]; then
-    install_deps
+    if [ -z "$NO_UPDATE" ]; then
+        install_deps
+    fi
     build
 fi
 
