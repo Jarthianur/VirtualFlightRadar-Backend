@@ -123,13 +123,16 @@ function resolve_pkg_manager() {
     if [ "$(which 2>&1)" == "" ]; then
         APT="$(which apt-get || true)"
         YUM="$(which yum || true)"
+        DNF="$(which dnf || true)"
         APK="$(which apk || true)"
     else
         RELEASE="$(cat /etc/*-release)"
         if [ "$(echo $RELEASE | grep -oiE '(ubuntu|debian)')" != "" ]; then
             APT="apt-get"
-        elif [ "$(echo $RELEASE | grep -oiE '(centos|fedora)')" != "" ]; then
+        elif [ "$(echo $RELEASE | grep -oiE '(centos)')" != "" ]; then
             YUM="yum"
+        elif [ "$(echo $RELEASE | grep -oiE '(fedora)')" != "" ]; then
+            DNF="dnf"
         elif [ "$(echo $RELEASE | grep -oiE 'alpine')" != "" ]; then
             APK="apk"
         fi
@@ -140,6 +143,9 @@ function resolve_pkg_manager() {
     elif [ -n "$YUM" ]; then
         export PKG_MANAGER="$YUM"
         log -i Using yum as package manager.
+    elif [ -n "$DNF" ]; then
+        export PKG_MANAGER="$DNF"
+        log -i Using dnf as package manager.
     elif [ -n "$APK" ]; then
         export PKG_MANAGER="$APK"
         log -i Using apk as package manager.
@@ -171,8 +177,21 @@ function install_deps() {
         GCC="$GCC make"
     ;;
     *yum)
-        local UPDATE='yum clean all'
+        local UPDATE=''
         local SETUP='yum -y install epel-release'
+        local INSTALL='install -y'
+        local BOOST='boost boost-devel'
+        local GCC=''
+        ! $VFRB_COMPILER -v > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            log -w "$VFRB_COMPILER" is not installed, default to gcc-c++
+            GCC="gcc-c++"
+        fi
+        GCC="$GCC make"
+    ;;
+    *dnf)
+        local UPDATE=''
+        local SETUP=''
         local INSTALL='install -y'
         local BOOST='boost boost-devel'
         local GCC=''
@@ -274,6 +293,9 @@ function install_test_deps() {
     *apt-get)
         local TOOLS='cppcheck clang-format-6.0 wget netcat procps perl lcov'
     ;;
+    *dnf)
+        local TOOLS='cppcheck wget perl lcov nmap-ncat procps-ng clang'
+    ;;
     *)
         log -e Tests currently only run under ubuntu/debian systems.
         return 1
@@ -316,8 +338,13 @@ function static_analysis() {
     trap "fail -e popd Static code analysis failed!" ERR
     pushd $VFRB_ROOT
     cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ -q src/
+    local FORMAT="clang-format-6.0"
+    ! $FORMAT --version
+    if [ $? -eq 0 ]; then
+        FORMAT="clang-format"
+    fi
     for f in $(find src/ include/ -type f); do
-        diff -u <(cat $f) <(clang-format-6.0 -style=file $f) || true
+        diff -u <(cat $f) <($FORMAT -style=file $f) || true
     done &> format.diff
     if [ "$(wc -l format.diff | cut -d' ' -f1)" -gt 0 ]; then
         log -e Code format does not comply to the specification.
