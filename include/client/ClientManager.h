@@ -29,8 +29,9 @@
 #include <thread>
 #include <unordered_set>
 
-#include "client/Client.h"
 #include "util/defines.h"
+
+#include "Client.h"
 
 namespace feed
 {

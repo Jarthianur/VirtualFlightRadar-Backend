@@ -25,9 +25,10 @@
 
 #include <boost/regex.hpp>
 
-#include "feed/parser/Parser.hpp"
 #include "object/GpsPosition.h"
 #include "util/defines.h"
+
+#include "Parser.hpp"
 
 namespace feed
 {

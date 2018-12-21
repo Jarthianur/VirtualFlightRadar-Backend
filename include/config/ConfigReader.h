@@ -23,8 +23,9 @@
 
 #include <istream>
 
-#include "config/Properties.h"
 #include "util/defines.h"
+
+#include "Properties.h"
 
 namespace config
 {

@@ -24,10 +24,11 @@
 #include <exception>
 #include <string>
 
-#include "data/Data.hpp"
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
 #include "util/defines.h"
+
+#include "Data.hpp"
 
 namespace data
 {

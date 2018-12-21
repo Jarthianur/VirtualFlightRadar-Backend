@@ -19,17 +19,19 @@
  }
  */
 
-#include "client/ConnectorImplBoost.h"
+#include "client/net/impl/ConnectorImplBoost.h"
 
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/move/move.hpp>
 
-#include "client/Endpoint.hpp"
+#include "client/net/Endpoint.hpp"
 #include "util/Logger.hpp"
 
 namespace client
 {
+using namespace net;
+
 ConnectorImplBoost::ConnectorImplBoost()
     : Connector(),
       m_ioService(),
@@ -183,5 +185,4 @@ void ConnectorImplBoost::handleRead(const boost::system::error_code& error, std:
     }
     callback(error, m_response);
 }
-
 }  // namespace client

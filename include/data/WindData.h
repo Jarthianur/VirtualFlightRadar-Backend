@@ -23,9 +23,10 @@
 
 #include <string>
 
-#include "data/Data.hpp"
 #include "object/Wind.h"
 #include "util/defines.h"
+
+#include "Data.hpp"
 
 namespace data
 {

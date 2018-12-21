@@ -23,8 +23,9 @@
 
 #include <cstdint>
 
-#include "object/Object.h"
 #include "util/defines.h"
+
+#include "Object.h"
 
 /// ICAO standard atmospheric pressure at MSL
 #define ICAO_STD_A 1013.25

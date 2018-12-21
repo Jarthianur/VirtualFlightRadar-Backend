@@ -30,6 +30,8 @@
 
 namespace server
 {
+namespace net
+{
 /**
  * @brief Socket implementation using boost
  */
@@ -76,5 +78,5 @@ private:
     /// Underlying socket
     boost::asio::ip::tcp::socket m_socket;
 };
-
+}  // namespace net
 }  // namespace server

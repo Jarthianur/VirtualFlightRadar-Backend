@@ -29,6 +29,8 @@
 
 namespace client
 {
+namespace net
+{
 struct Endpoint;
 
 /// @typedef Callback
@@ -105,5 +107,5 @@ public:
      */
     virtual bool timerExpired() = 0;
 };
-
+}  // namespace net
 }  // namespace client

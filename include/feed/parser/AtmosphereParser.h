@@ -23,9 +23,10 @@
 
 #include <string>
 
-#include "feed/parser/Parser.hpp"
 #include "object/Atmosphere.h"
 #include "util/defines.h"
+
+#include "Parser.hpp"
 
 namespace feed
 {

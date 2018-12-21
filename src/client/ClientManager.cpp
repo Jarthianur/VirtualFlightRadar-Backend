@@ -70,5 +70,4 @@ void ClientManager::stop()
     }
     m_thdGroup.join_all();
 }
-
 }  // namespace client

@@ -25,6 +25,8 @@
 
 namespace client
 {
+namespace net
+{
 /**
  * @brief A remote endpoint
  */
@@ -46,5 +48,5 @@ struct Endpoint
     /// Port number
     const std::string port;
 };
-
+}  // namespace net
 }  // namespace client

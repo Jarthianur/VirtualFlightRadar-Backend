@@ -19,14 +19,16 @@
  }
  */
 
-#include "server/SocketImplBoost.h"
+#include "server/net/impl/SocketImplBoost.h"
 
 #include <boost/system/error_code.hpp>
 
-#include "server/SocketException.h"
+#include "server/net/SocketException.h"
 
 namespace server
 {
+using namespace net;
+
 SocketImplBoost::SocketImplBoost(SocketImplBoost&& other) : m_socket(boost::move(other.m_socket)) {}
 
 SocketImplBoost& SocketImplBoost::operator=(SocketImplBoost&& other)

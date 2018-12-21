@@ -27,9 +27,9 @@
 #include <memory>
 #include <string>
 
-#include "server/NetworkInterfaceImplBoost.h"
 #include "server/Server.hpp"
-#include "server/SocketImplBoost.h"
+#include "server/net/impl/NetworkInterfaceImplBoost.h"
+#include "server/net/impl/SocketImplBoost.h"
 #include "util/defines.h"
 
 namespace config
@@ -100,7 +100,7 @@ private:
     std::shared_ptr<data::WindData> m_windData;
 
     /// Manage clients and sending of data
-    server::Server<server::SocketImplBoost> m_server;
+    server::Server<server::net::SocketImplBoost> m_server;
 
     /// List of all active feeds
     std::list<std::shared_ptr<feed::Feed>> m_feeds;

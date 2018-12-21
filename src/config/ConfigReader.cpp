@@ -46,5 +46,4 @@ Properties ConfigReader::read()
     }
     return Properties(std::move(tree));
 }
-
 }  // namespace config

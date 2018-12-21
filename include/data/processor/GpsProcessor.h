@@ -24,9 +24,10 @@
 #include <ctime>
 #include <string>
 
-#include "data/processor/Processor.hpp"
 #include "object/GpsPosition.h"
 #include "util/defines.h"
+
+#include "Processor.hpp"
 
 namespace data
 {

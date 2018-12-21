@@ -26,10 +26,12 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "client/Connector.hpp"
+#include "client/net/Connector.hpp"
 #include "util/defines.h"
 
 namespace client
+{
+namespace net
 {
 /**
  * @brief Implement the Connector interface using boost::asio.
@@ -165,5 +167,5 @@ private:
     /// Message stream for conversion
     std::istream m_istream;
 };
-
+}  // namespace net
 }  // namespace client

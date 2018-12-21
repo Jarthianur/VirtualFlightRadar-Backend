@@ -50,6 +50,5 @@ public:
      */
     static std::uint32_t day();
 };
-
 }  // namespace timestamp
 }  // namespace object

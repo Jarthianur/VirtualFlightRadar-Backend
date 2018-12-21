@@ -34,6 +34,8 @@
 
 namespace client
 {
+using namespace net;
+
 GpsdClient::GpsdClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
     : Client(endpoint, COMPONENT, connector)
 {}
@@ -77,5 +79,4 @@ void GpsdClient::handleWatch(bool error)
         logger.error(m_component, " send watch request failed");
     }
 }
-
 }  // namespace client

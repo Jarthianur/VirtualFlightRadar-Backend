@@ -19,7 +19,7 @@
  }
  */
 
-#include "server/NetworkInterfaceImplBoost.h"
+#include "server/net/impl/NetworkInterfaceImplBoost.h"
 
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
@@ -29,6 +29,8 @@
 
 namespace server
 {
+using namespace net;
+
 NetworkInterfaceImplBoost::NetworkInterfaceImplBoost(std::uint16_t port)
     : NetworkInterface<SocketImplBoost>(),
       m_ioService(),

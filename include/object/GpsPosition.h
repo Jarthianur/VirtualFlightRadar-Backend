@@ -23,11 +23,11 @@
 
 #include <cstdint>
 
+#include "impl/DateTimeImplBoost.h"
 #include "util/defines.h"
 
-#include "object/DateTimeImplBoost.h"
-#include "object/Object.h"
-#include "object/TimeStamp.hpp"
+#include "Object.h"
+#include "TimeStamp.hpp"
 
 namespace object
 {

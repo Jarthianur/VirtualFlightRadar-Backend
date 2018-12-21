@@ -28,6 +28,8 @@
 
 namespace server
 {
+namespace net
+{
 /**
  * @brief Exception to signal socket errors.
  */
@@ -52,5 +54,5 @@ private:
     /// Error message
     const std::string m_message;
 };
-
+}  // namespace net
 }  // namespace server

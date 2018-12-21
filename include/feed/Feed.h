@@ -25,7 +25,7 @@
 #include <memory>
 #include <string>
 
-#include "client/Endpoint.hpp"
+#include "client/net/Endpoint.hpp"
 #include "config/Properties.h"
 #include "util/defines.h"
 
@@ -66,7 +66,7 @@ public:
      * @brief Get the feeds required Endpoint.
      * @return the endpoint
      */
-    client::Endpoint get_endpoint() const;
+    client::net::Endpoint get_endpoint() const;
 
     /**
      * @brief Handle client's response.

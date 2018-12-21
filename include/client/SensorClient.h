@@ -21,8 +21,7 @@
 
 #pragma once
 
-#include "client/Client.h"
-
+#include "Client.h"
 #include "parameters.h"
 
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT
@@ -47,7 +46,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    SensorClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector);
+    SensorClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
 
 private:
     /**

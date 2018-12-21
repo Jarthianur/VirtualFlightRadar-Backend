@@ -28,11 +28,13 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "server/NetworkInterface.hpp"
-#include "server/SocketImplBoost.h"
+#include "server/net/NetworkInterface.hpp"
+#include "server/net/impl/SocketImplBoost.h"
 #include "util/defines.h"
 
 namespace server
+{
+namespace net
 {
 /**
  * @brief Implement NetworkInterface using boost.
@@ -105,5 +107,5 @@ private:
     /// Current socket
     SocketImplBoost m_socket;
 };
-
+}  // namespace net
 }  // namespace server

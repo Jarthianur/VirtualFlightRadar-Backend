@@ -27,8 +27,8 @@
 #include <string>
 #include <vector>
 
-#include "client/Connector.hpp"
-#include "client/Endpoint.hpp"
+#include "net/Connector.hpp"
+#include "net/Endpoint.hpp"
 #include "util/defines.h"
 
 #include "parameters.h"
@@ -97,7 +97,8 @@ protected:
      * @param component The component name
      * @param connector The Connector interface
      */
-    Client(const Endpoint& endpoint, const char* component, std::shared_ptr<Connector> connector);
+    Client(const net::Endpoint& endpoint, const char* component,
+           std::shared_ptr<net::Connector> connector);
 
     /**
      * @brief Stop and close the connection.
@@ -145,7 +146,7 @@ protected:
     virtual void handleConnect(bool error) = 0;
 
     /// Connector interface
-    std::shared_ptr<Connector> m_connector;
+    std::shared_ptr<net::Connector> m_connector;
 
     /// Run state indicator
     bool m_running = false;
@@ -154,7 +155,7 @@ protected:
     const char* const m_component;
 
     /// Remote endpoint
-    const Endpoint m_endpoint;
+    const net::Endpoint m_endpoint;
 
     mutable std::mutex m_mutex;
 

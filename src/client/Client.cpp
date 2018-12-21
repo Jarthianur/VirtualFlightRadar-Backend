@@ -32,6 +32,8 @@
 
 namespace client
 {
+using namespace net;
+
 Client::Client(const Endpoint& endpoint, const char* component,
                std::shared_ptr<Connector> connector)
     : m_connector(connector), m_component(component), m_endpoint(endpoint)
@@ -150,5 +152,4 @@ void Client::handleRead(bool error, const std::string& response)
         reconnect();
     }
 }
-
 }  // namespace client

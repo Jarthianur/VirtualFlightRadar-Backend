@@ -19,9 +19,11 @@
  }
  */
 
-#include "server/SocketException.h"
+#include "server/net/SocketException.h"
 
 namespace server
+{
+namespace net
 {
 SocketException::SocketException(const std::string& msg) : std::exception(), m_message(msg) {}
 
@@ -29,5 +31,5 @@ const char* SocketException::what() const noexcept
 {
     return m_message.c_str();
 }
-
+}  // namespace net
 }  // namespace server

@@ -27,7 +27,7 @@
 #include <thread>
 
 #include "client/ClientManager.h"
-#include "client/ConnectorImplBoost.h"
+#include "client/net/impl/ConnectorImplBoost.h"
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"

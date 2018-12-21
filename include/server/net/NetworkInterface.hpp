@@ -32,7 +32,8 @@ namespace server
 {
 template<typename SocketT>
 class Connection;
-
+namespace net
+{
 /**
  * @brief Network interface for TCP a server.
  * @tparam SocketT The socket implementation
@@ -78,5 +79,5 @@ public:
      */
     virtual std::string get_currentAddress() const = 0;
 };
-
+}  // namespace net
 }  // namespace server
