@@ -19,7 +19,7 @@
  }
  */
 
-#include "SocketException.h"
+#include "server/SocketException.h"
 
 namespace server
 {

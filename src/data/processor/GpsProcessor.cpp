@@ -19,7 +19,7 @@
  }
  */
 
-#include "GpsProcessor.h"
+#include "data/processor/GpsProcessor.h"
 
 #include <cmath>
 #include <cstdio>

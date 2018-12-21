@@ -24,12 +24,11 @@
 #include <cstdint>
 #include <string>
 
+#include "object/DateTimeImplBoost.h"
+#include "object/GpsPosition.h"
+#include "object/Object.h"
+#include "object/TimeStamp.hpp"
 #include "util/defines.h"
-
-#include "DateTimeImplBoost.h"
-#include "GpsPosition.h"
-#include "Object.h"
-#include "TimeStamp.hpp"
 
 /// Indicate a value is not available.
 #define A_VALUE_NA -1024.0

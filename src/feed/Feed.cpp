@@ -19,7 +19,7 @@
  }
  */
 
-#include "Feed.h"
+#include "feed/Feed.h"
 
 #include <algorithm>
 #include <limits>

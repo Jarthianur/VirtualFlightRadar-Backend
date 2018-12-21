@@ -19,7 +19,7 @@
  }
  */
 
-#include "AprscClient.h"
+#include "client/AprscClient.h"
 
 #include <stdexcept>
 #include <utility>

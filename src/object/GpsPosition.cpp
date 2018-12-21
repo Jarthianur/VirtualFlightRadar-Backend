@@ -15,7 +15,7 @@
  }
  */
 
-#include "GpsPosition.h"
+#include "object/GpsPosition.h"
 
 #include <typeinfo>
 

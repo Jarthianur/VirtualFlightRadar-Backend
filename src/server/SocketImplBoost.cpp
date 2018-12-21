@@ -19,11 +19,11 @@
  }
  */
 
-#include "SocketImplBoost.h"
+#include "server/SocketImplBoost.h"
 
 #include <boost/system/error_code.hpp>
 
-#include "SocketException.h"
+#include "server/SocketException.h"
 
 namespace server
 {

@@ -19,7 +19,7 @@
  }
  */
 
-#include "Configuration.h"
+#include "config/Configuration.h"
 
 #include <limits>
 #include <stdexcept>
@@ -28,9 +28,8 @@
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
+#include "config/ConfigReader.h"
 #include "util/Logger.hpp"
-
-#include "ConfigReader.h"
 
 namespace config
 {

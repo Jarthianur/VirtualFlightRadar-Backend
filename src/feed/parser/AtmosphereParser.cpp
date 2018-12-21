@@ -19,7 +19,7 @@
  }
  */
 
-#include "AtmosphereParser.h"
+#include "feed/parser/AtmosphereParser.h"
 
 #include <cstddef>
 #include <stdexcept>

@@ -19,7 +19,7 @@
  }
  */
 
-#include "Properties.h"
+#include "config/Properties.h"
 
 #include <boost/property_tree/exceptions.hpp>
 

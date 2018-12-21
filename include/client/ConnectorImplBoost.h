@@ -26,9 +26,8 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "client/Connector.hpp"
 #include "util/defines.h"
-
-#include "Connector.hpp"
 
 namespace client
 {

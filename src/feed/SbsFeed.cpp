@@ -19,14 +19,14 @@
  }
  */
 
-#include "SbsFeed.h"
+#include "feed/SbsFeed.h"
 
 #include <unordered_map>
 
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
+#include "feed/parser/SbsParser.h"
 #include "object/Aircraft.h"
-#include "parser/SbsParser.h"
 
 #ifdef COMPONENT
 #    undef COMPONENT

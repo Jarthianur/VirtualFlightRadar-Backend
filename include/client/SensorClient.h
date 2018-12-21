@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include "Client.h"
+#include "client/Client.h"
+
 #include "parameters.h"
 
 #ifdef WINDCLIENT_RECEIVE_TIMEOUT

@@ -19,7 +19,7 @@
  }
  */
 
-#include "SbsClient.h"
+#include "client/SbsClient.h"
 
 #include "util/Logger.hpp"
 

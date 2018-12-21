@@ -24,11 +24,10 @@
 #include <cstdint>
 #include <string>
 
+#include "data/processor/Processor.hpp"
 #include "object/Aircraft.h"
 #include "object/GpsPosition.h"
 #include "util/defines.h"
-
-#include "Processor.hpp"
 
 namespace data
 {

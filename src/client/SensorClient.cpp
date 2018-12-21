@@ -19,7 +19,7 @@
  }
  */
 
-#include "SensorClient.h"
+#include "client/SensorClient.h"
 
 #include <utility>
 

@@ -19,7 +19,7 @@
  }
  */
 
-#include "ConfigReader.h"
+#include "config/ConfigReader.h"
 
 #include <stdexcept>
 #include <string>

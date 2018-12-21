@@ -19,14 +19,14 @@
  }
  */
 
-#include "AprscFeed.h"
+#include "feed/AprscFeed.h"
 
 #include <stdexcept>
 
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
+#include "feed/parser/AprsParser.h"
 #include "object/Aircraft.h"
-#include "parser/AprsParser.h"
 #include "util/Logger.hpp"
 
 #ifdef COMPONENT

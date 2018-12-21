@@ -19,7 +19,7 @@
  }
  */
 
-#include "GpsParser.h"
+#include "feed/parser/GpsParser.h"
 
 #include <stdexcept>
 #include <type_traits>

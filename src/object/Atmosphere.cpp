@@ -15,7 +15,7 @@
  }
  */
 
-#include "Atmosphere.h"
+#include "object/Atmosphere.h"
 
 #include <typeinfo>
 

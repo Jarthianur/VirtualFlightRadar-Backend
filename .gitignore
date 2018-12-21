@@ -35,3 +35,4 @@
 !*.yaml
 !*.css
 !*.xml
+CMakeCache.txt

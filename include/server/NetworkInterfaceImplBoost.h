@@ -28,10 +28,9 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "server/NetworkInterface.hpp"
+#include "server/SocketImplBoost.h"
 #include "util/defines.h"
-
-#include "NetworkInterface.hpp"
-#include "SocketImplBoost.h"
 
 namespace server
 {

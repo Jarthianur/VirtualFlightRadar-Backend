@@ -19,19 +19,18 @@
  }
  */
 
-#include "FeedFactory.h"
+#include "feed/FeedFactory.h"
 
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
 #include "data/GpsData.h"
 #include "data/WindData.h"
-
-#include "AprscFeed.h"
-#include "AtmosphereFeed.h"
-#include "GpsFeed.h"
-#include "SbsFeed.h"
-#include "WindFeed.h"
+#include "feed/AprscFeed.h"
+#include "feed/AtmosphereFeed.h"
+#include "feed/GpsFeed.h"
+#include "feed/SbsFeed.h"
+#include "feed/WindFeed.h"
 
 using namespace config;
 using namespace data;

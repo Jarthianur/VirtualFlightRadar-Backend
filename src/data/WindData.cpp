@@ -19,7 +19,7 @@
  }
  */
 
-#include "WindData.h"
+#include "data/WindData.h"
 
 using namespace object;
 

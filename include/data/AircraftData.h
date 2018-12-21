@@ -27,11 +27,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "data/Data.hpp"
 #include "object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
 #include "util/defines.h"
-
-#include "Data.hpp"
 
 /// Times until aircraft gets deleted
 #define AC_DELETE_THRESHOLD 120

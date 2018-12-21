@@ -24,10 +24,9 @@
 #include <cstdint>
 #include <string>
 
+#include "feed/parser/Parser.hpp"
 #include "object/Aircraft.h"
 #include "util/defines.h"
-
-#include "Parser.hpp"
 
 namespace feed
 {

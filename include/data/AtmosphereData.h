@@ -23,10 +23,9 @@
 
 #include <string>
 
+#include "data/Data.hpp"
 #include "object/Atmosphere.h"
 #include "util/defines.h"
-
-#include "Data.hpp"
 
 namespace data
 {

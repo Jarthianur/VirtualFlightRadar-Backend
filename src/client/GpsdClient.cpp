@@ -19,7 +19,7 @@
  }
  */
 
-#include "GpsdClient.h"
+#include "client/GpsdClient.h"
 
 #include <chrono>
 #include <thread>

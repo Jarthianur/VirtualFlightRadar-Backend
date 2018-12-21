@@ -19,7 +19,7 @@
  }
  */
 
-#include "AprsParser.h"
+#include "feed/parser/AprsParser.h"
 
 #include <limits>
 #include <stdexcept>

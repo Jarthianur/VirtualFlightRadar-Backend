@@ -19,14 +19,14 @@
  }
  */
 
-#include "AtmosphereFeed.h"
+#include "feed/AtmosphereFeed.h"
 
 #include <unordered_map>
 
 #include "config/Configuration.h"
 #include "data/AtmosphereData.h"
+#include "feed/parser/AtmosphereParser.h"
 #include "object/Atmosphere.h"
-#include "parser/AtmosphereParser.h"
 
 #ifdef COMPONENT
 #    undef COMPONENT

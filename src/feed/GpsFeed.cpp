@@ -19,15 +19,15 @@
  }
  */
 
-#include "GpsFeed.h"
+#include "feed/GpsFeed.h"
 
 #include <stdexcept>
 #include <unordered_map>
 
 #include "config/Configuration.h"
 #include "data/GpsData.h"
+#include "feed/parser/GpsParser.h"
 #include "object/GpsPosition.h"
-#include "parser/GpsParser.h"
 #include "util/Logger.hpp"
 
 #ifdef COMPONENT

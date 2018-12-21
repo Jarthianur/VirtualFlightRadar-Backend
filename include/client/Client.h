@@ -27,10 +27,10 @@
 #include <string>
 #include <vector>
 
+#include "client/Connector.hpp"
+#include "client/Endpoint.hpp"
 #include "util/defines.h"
 
-#include "Connector.hpp"
-#include "Endpoint.hpp"
 #include "parameters.h"
 
 namespace feed

@@ -25,9 +25,9 @@
 
 #include "util/defines.h"
 
-#include "DateTimeImplBoost.h"
-#include "Object.h"
-#include "TimeStamp.hpp"
+#include "object/DateTimeImplBoost.h"
+#include "object/Object.h"
+#include "object/TimeStamp.hpp"
 
 namespace object
 {

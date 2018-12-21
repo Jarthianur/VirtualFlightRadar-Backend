@@ -19,15 +19,14 @@
  }
  */
 
-#include "ConnectorImplBoost.h"
+#include "client/ConnectorImplBoost.h"
 
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/move/move.hpp>
 
+#include "client/Endpoint.hpp"
 #include "util/Logger.hpp"
-
-#include "Endpoint.hpp"
 
 namespace client
 {

@@ -19,16 +19,15 @@
  }
  */
 
-#include "ClientFactory.h"
+#include "client/ClientFactory.h"
 
+#include "client/AprscClient.h"
+#include "client/ConnectorImplBoost.h"
+#include "client/GpsdClient.h"
+#include "client/SbsClient.h"
+#include "client/SensorClient.h"
 #include "feed/AprscFeed.h"
 #include "feed/Feed.h"
-
-#include "AprscClient.h"
-#include "ConnectorImplBoost.h"
-#include "GpsdClient.h"
-#include "SbsClient.h"
-#include "SensorClient.h"
 
 namespace client
 {

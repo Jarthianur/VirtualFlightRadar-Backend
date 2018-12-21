@@ -19,14 +19,13 @@
  }
  */
 
-#include "NetworkInterfaceImplBoost.h"
+#include "server/NetworkInterfaceImplBoost.h"
 
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
 
+#include "server/Connection.hpp"
 #include "util/Logger.hpp"
-
-#include "Connection.hpp"
 
 namespace server
 {

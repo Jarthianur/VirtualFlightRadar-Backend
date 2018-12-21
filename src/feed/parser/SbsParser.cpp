@@ -19,7 +19,7 @@
  }
  */
 
-#include "SbsParser.h"
+#include "feed/parser/SbsParser.h"
 
 #include <cstddef>
 #include <limits>
