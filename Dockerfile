@@ -9,7 +9,8 @@ COPY . /tmp/vfrb/
 WORKDIR /tmp/vfrb
 RUN ./run.sh build -y
 RUN mkdir /opt && \
-    mv build/vfrb-dock vfrb.ini healthcheck.sh /opt/
+    mv build/vfrb-dock healthcheck.sh /opt/ && \
+    mv vfrb.ini.in /opt/vfrb.ini
 
 FROM alpine:3.8
 

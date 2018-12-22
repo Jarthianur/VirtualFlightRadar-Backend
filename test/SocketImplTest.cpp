@@ -23,8 +23,9 @@
 
 namespace server
 {
-SocketImplTest::SocketImplTest(SocketImplTest&& other) : m_socket(other.m_socket)
-{}
+namespace net
+{
+SocketImplTest::SocketImplTest(SocketImplTest&& other) : m_socket(other.m_socket) {}
 
 SocketImplTest& SocketImplTest::operator=(SocketImplTest&& other)
 {
@@ -32,11 +33,9 @@ SocketImplTest& SocketImplTest::operator=(SocketImplTest&& other)
     return *this;
 }
 
-SocketImplTest::SocketImplTest(int&& socket) : m_socket(socket)
-{}
+SocketImplTest::SocketImplTest(int&& socket) : m_socket(socket) {}
 
-SocketImplTest::~SocketImplTest() noexcept
-{}
+SocketImplTest::~SocketImplTest() noexcept {}
 
 std::string SocketImplTest::get_address() const
 {
@@ -58,5 +57,5 @@ int& SocketImplTest::get()
 {
     return m_socket;
 }
-
+}  // namespace net
 }  // namespace server

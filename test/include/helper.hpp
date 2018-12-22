@@ -28,9 +28,10 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/regex.hpp>
 
-#include "framework/sctf.hpp"
 #include "object/Aircraft.h"
 #include "util/utility.hpp"
+
+#include "sctf.hpp"
 
 #define TEST_FUNCTION(NAME) extern void NAME(test::TestSuitesRunner&);
 

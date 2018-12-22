@@ -103,20 +103,6 @@ function confirm() {
     return 0
 }
 
-# create a directory path, remove before if already exists
-# waits for confirm
-function prepare_path() {
-    set -e
-    if [ -e "$1" ]; then
-        log -w "\"$1\"" already exists.
-        confirm Replace the existing one\?
-        rm "$1"
-    else
-        mkdir -p "$(dirname $1)"
-    fi
-    return 0
-}
-
 # set PKG_MANAGER to the distributions package manager
 function resolve_pkg_manager() {
     local error=0
@@ -227,58 +213,25 @@ function build() {
     set -eE
     log -i BUILD VFRB
     require VFRB_ROOT VFRB_TARGET VFRB_COMPILER
-    if [ -n "$CUSTOM_BOOST" ]; then
-        require BOOST_LIBS_L BOOST_ROOT_I
-    fi
-    export VFRB_OPT=${VFRB_OPT:-"3"}
-    export VFRB_DEBUG=""
     trap "fail -e popd Build has failed!" ERR
     pushd "$VFRB_ROOT/build/"
-    make clean 
-    make all -j4
+    cmake ..
+    make release -j$(nproc)
     popd
     trap - ERR
 }
 
 # install systemd service
-function install_service() {
-    set -eE
-    log -i INSTALL VFRB SERVICE
-    require VFRB_ROOT VFRB_EXEC_PATH VFRB_INI_PATH
-    local SYSD_PATH="/etc/systemd/system"
-    trap "fail -e popd Service installation has failed!" ERR
-    pushd "$SYSD_PATH"
-    if [ -n "$CUSTOM_BOOST" ]; then
-        require BOOST_ROOT
-        $SUDO mkdir "vfrb.service.d"
-        $SUDO sh -c "sed -e 's|%BOOST_LIBS_PATH%|${BOOST_ROOT}/stage/lib:|' \
-        <'$VFRB_ROOT/service/vfrb.service.d/vfrb.conf' >vfrb.service.d/vfrb.conf"
-    fi
-    $SUDO sh -c "sed -e 's|%VFRB_EXEC_PATH%|${VFRB_EXEC_PATH}|' \
-        -e 's|%VFRB_INI_PATH%|${VFRB_INI_PATH}|' \
-        < ${VFRB_ROOT}/service/vfrb.service >vfrb.service"
-    $SUDO systemctl enable vfrb.service
-    log -i VFRB service created.
-    trap - ERR
-}
-
-# install binary and config
 function install() {
     set -eE
-    log -i INSTALL VFRB
-    trap "fail Failed to install VFRB!" ERR
-    require VFRB_TARGET VFRB_ROOT VFRB_EXEC_PATH VFRB_INI_PATH VFRB_VERSION REPLACE_INI
-    if [ -x "$VFRB_ROOT/build/$VFRB_TARGET" ]; then
-        mv "$VFRB_ROOT/build/$VFRB_TARGET" "$VFRB_EXEC_PATH"
-        log -i "$VFRB_EXEC_PATH" created.
-    else
-        log -e "$VFRB_TARGET" does not exist!
-        return 1
-    fi
-    if [ $REPLACE_INI -eq 0 ]; then
-        sed "s|%VERSION%|${VFRB_VERSION}|" <"$VFRB_ROOT/vfrb.ini" >"$VFRB_INI_PATH"
-        log -i "$VFRB_INI_PATH" created.
-    fi
+    log -i INSTALL VFRB SERVICE
+    require VFRB_ROOT VFRB_INI
+    trap "fail -e popd Service installation has failed!" ERR
+    pushd $VFRB_ROOT/build/
+    $SUDO make install
+    $SUDO systemctl enable vfrb.service
+    log -i VFRB service created.
+    popd
     trap - ERR
 }
 
@@ -313,19 +266,10 @@ function build_test() {
     set -eE
     log -i BUILD VFRB TESTS
     require VFRB_ROOT VFRB_COMPILER
-    if [ -n "$CUSTOM_BOOST" ]; then
-        require BOOST_LIBS_L BOOST_ROOT_I
-    fi
-    export VFRB_DEBUG="-g3 --coverage"
-    export VFRB_OPT="0"
     trap "fail -e popd Build has failed!" ERR
-    pushd "$VFRB_ROOT/test/build/"
-    make clean
-    make all -j2
-    popd
     pushd "$VFRB_ROOT/build/"
-    make clean
-    make all -j2
+    cmake ..
+    make test regression -j$(nproc)
     popd
     trap - ERR
 }
@@ -337,7 +281,7 @@ function static_analysis() {
     require VFRB_ROOT
     trap "fail -e popd Static code analysis failed!" ERR
     pushd $VFRB_ROOT
-    cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -I src/ -q src/
+    cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -q -I include/  src/
     local FORMAT="clang-format-6.0"
     ! $FORMAT --version
     if [ $? -eq 0 ]; then
@@ -345,14 +289,14 @@ function static_analysis() {
     fi
     for f in $(find src/ include/ -type f); do
         diff -u <(cat $f) <($FORMAT -style=file $f) || true
-    done &> format.diff
+    done &> /tmp/format.diff
     if [ "$(wc -l format.diff | cut -d' ' -f1)" -gt 0 ]; then
         log -e Code format does not comply to the specification.
-        cat format.diff
-        rm format.diff
+        cat /tmp/format.diff
+        rm /tmp/format.diff
         return 1
     fi
-    rm format.diff
+    rm /tmp/format.diff
     popd
     trap - ERR
 }
@@ -363,11 +307,11 @@ function run_unit_test() {
     log -i RUN UNIT TESTS
     require VFRB_ROOT
     local error=1
+    local VFRB_UUT="$(find $VFRB_ROOT/build/ -name '*test*' -executable | head -n1)"
     trap "fail -e popd Unit tests failed!" ERR
     pushd $VFRB_ROOT
-    lcov --initial --directory test/build --capture --output-file reports/test_base.info
-    lcov --initial --directory build --capture --output-file reports/vfrb_base.info
-    ! test/build/VFR-Test &> reports/unittests.xml
+    lcov --initial --directory CMakeFiles/test.dir --capture --output-file reports/test_base.info
+    ! test/build/$VFRB_UUT &> reports/unittests.xml
     if [ $? -eq 1 ]; then
         error=0
     fi
@@ -382,7 +326,8 @@ function run_regression() {
     set -eE
     log -i RUN REGRESSION TESTS
     require VFRB_ROOT
-    VFRB_UUT="vfrb-$(cat $VFRB_ROOT/version.txt)"
+    local VFRB_UUT="$(find $VFRB_ROOT/build/ -name '*regression*' -executable | head -n1)"
+    lcov --initial --directory CMakeFiles/regression.dir --capture --output-file reports/vfrb_base.info
     if ! $VFRB_ROOT/build/$VFRB_UUT; then $(exit 0); fi
     if ! $VFRB_ROOT/build/$VFRB_UUT -v -g -c bla.txt; then $(exit 0); fi
     trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
@@ -412,8 +357,8 @@ function gen_coverage() {
     require VFRB_ROOT
     trap "fail -e popd Coverage report generation failed!" ERR
     pushd $VFRB_ROOT
-    lcov --directory test/build --capture --output-file reports/test.info
-    lcov --directory build --capture --output-file reports/vfrb.info
+    lcov --directory CMakeFiles/test.dir --capture --output-file reports/test.info
+    lcov --directory CMakeFiles/regression.dir --capture --output-file reports/vfrb.info
     lcov -a reports/test_base.info -a reports/test.info -a reports/vfrb_base.info -a reports/vfrb.info \
         -o reports/all.info
     lcov --remove reports/all.info 'test/*' '/usr/*' -o reports/lcov.info

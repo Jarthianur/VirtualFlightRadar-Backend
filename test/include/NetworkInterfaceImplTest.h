@@ -21,34 +21,38 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-
-#include "util/defines.h"
+#include "server/net/NetworkInterface.hpp"
 
 namespace server
 {
-class SocketImplTest
+namespace net
+{
+class SocketImplTest;
+
+class NetworkInterfaceImplTests : public NetworkInterface<SocketImplTest>
 {
 public:
-    MOVABLE_BUT_NOT_COPYABLE(SocketImplTest)
+    NetworkInterfaceImplTests();
+    ~NetworkInterfaceImplTests() noexcept;
 
-    explicit SocketImplTest(int&& socket);
-    ~SocketImplTest() noexcept;
+    void run(std::unique_lock<std::mutex>& lock) override;
 
-    std::string get_address() const;
-    bool write(const std::string& msg);
-    void close();
-    int& get();
+    void stop() override;
+
+    void onAccept(const std::function<void(bool)>& callback) override;
+
+    void close() override;
+
+    std::unique_ptr<Connection<SocketImplTest>> startConnection() override;
+
+    std::string get_currentAddress() const override;
+
+    void connect(bool err, const std::string& adr);
 
 private:
-    std::string m_buffer;
-    std::int32_t m_socket;
-    std::string m_address;
-
-public:
-    GETTER_CR(buffer)
-    SETTER_CR(address)
+    std::function<void(bool)> on_accept;
+    std::string               currentAddress;
+    bool                      stopped = false;
 };
-
+}  // namespace net
 }  // namespace server
