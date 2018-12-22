@@ -10,9 +10,15 @@ message(STATUS "The host processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
 file(READ ${PROJECT_SOURCE_DIR}/version.txt TMP_VERSION)
 string(STRIP "${TMP_VERSION}" CMAKE_PROJECT_VERSION)
-set(vfrb_prod_bin vfrb-${CMAKE_PROJECT_VERSION}-${CMAKE_HOST_SYSTEM_PROCESSOR})
-set(vfrb_regression_bin vfrb_regression-${CMAKE_PROJECT_VERSION}-${CMAKE_HOST_SYSTEM_PROCESSOR})
-set(vfrb_test_bin vfrb_test-${CMAKE_PROJECT_VERSION}-${CMAKE_HOST_SYSTEM_PROCESSOR})
+
+if(NOT DEFINED VFRB_BIN_TAG)
+    set(VFRB_BIN_TAG "${CMAKE_PROJECT_VERSION}-${CMAKE_HOST_SYSTEM_PROCESSOR}")
+endif()
+
+set(vfrb_prod_bin vfrb-${VFRB_BIN_TAG})
+set(vfrb_regression_bin vfrb_regression-${VFRB_BIN_TAG})
+set(vfrb_test_bin vfrb_test-${VFRB_BIN_TAG})
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 file(GLOB_RECURSE vfrb_sources src/*.cpp)
@@ -70,7 +76,7 @@ target_link_libraries(test PUBLIC Boost::regex Boost::system Boost::program_opti
 # target: install
 #
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY true)
-install(CODE "file(READ vfrb.service.in service_file_data)\n
+install(CODE "file(READ ${PROJECT_SOURCE_DIR}/vfrb.service.in service_file_data)\n
   string(REPLACE \"%VFRB_EXEC_PATH%\" \"${PROJECT_BINARY_DIR}/${vfrb_prod_bin}\" service_file_data \"\${service_file_data}\")\n
   string(REPLACE \"%VFRB_INI_PATH%\" \"${PROJECT_BINARY_DIR}/$ENV{VFRB_INI}\" service_file_data \"\${service_file_data}\")\n
   file(WRITE /etc/systemd/system/vfrb.service \"\${service_file_data}\")")

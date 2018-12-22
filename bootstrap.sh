@@ -160,7 +160,7 @@ function install_deps() {
         if [ $? -eq 0 ]; then
             GCC="$(basename "$VFRB_COMPILER")"
         fi
-        GCC="$GCC make"
+        GCC="$GCC make cmake"
     ;;
     *yum)
         local UPDATE=''
@@ -173,7 +173,7 @@ function install_deps() {
             log -w "$VFRB_COMPILER" is not installed, default to gcc-c++
             GCC="gcc-c++"
         fi
-        GCC="$GCC make"
+        GCC="$GCC make cmake"
     ;;
     *dnf)
         local UPDATE=''
@@ -186,14 +186,14 @@ function install_deps() {
             log -w "$VFRB_COMPILER" is not installed, default to gcc-c++
             GCC="gcc-c++"
         fi
-        GCC="$GCC make"
+        GCC="$GCC make cmake"
     ;;
     *apk)
         local UPDATE='apk update'
         local SETUP=''
         local INSTALL='add'
         local BOOST='boost-dev boost-system boost-regex boost-program_options'
-        local GCC='g++ make'
+        local GCC='g++ make cmake'
     ;;
     esac
     require GCC BOOST INSTALL
@@ -213,9 +213,16 @@ function build() {
     set -eE
     log -i BUILD VFRB
     require VFRB_ROOT VFRB_COMPILER
+    local LS=""
+    if [ -n "${VFRB_LINK_STATIC}" ]; then
+        LS="-DBOOST_STATIC=1 --no-warn-unused-cli"
+    fi
+    if [ -n "${VFRB_BIN_TAG}" ]; then
+        LS="$LS -DVFRB_BIN_TAG=$VFRB_BIN_TAG"
+    fi
     trap "fail -e popd Build has failed!" ERR
     pushd $VFRB_ROOT/build/
-    cmake ..
+    cmake .. $LS
     make release -j$(nproc)
     popd
     trap - ERR

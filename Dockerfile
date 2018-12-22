@@ -1,11 +1,12 @@
 FROM alpine:3.8 AS build
 
-ENV VFRB_VERSION="dock" \
-    VFRB_LINK_STATIC="yes"
+ENV VFRB_LINK_STATIC="yes" \
+    VFRB_BIN_TAG="dock"
 
 RUN apk add --no-cache bash
 
 COPY . /tmp/vfrb/
+RUN echo -en "$VFRB_BIN_TAG" > /tmp/vfrb/version.txt
 WORKDIR /tmp/vfrb
 RUN ./run.sh build -y
 RUN mkdir /opt && \

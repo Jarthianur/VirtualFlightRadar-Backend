@@ -23,7 +23,7 @@ set -e
 
 # set env vars
 VFRB_ROOT=${WORKSPACE:-$PWD}
-export VFRB_VERSION=${VFRB_VERSION:-$(cat "$VFRB_ROOT/version.txt" | tr -d '\n')}
+export VFRB_VERSION=$(cat "$VFRB_ROOT/version.txt" | tr -d '\n')
 export VFRB_COMPILER=${VFRB_COMPILER:-g++}
 export VFRB_INI="vfrb.ini"
 
@@ -121,6 +121,9 @@ fi
 if [ -n "$DO_BUILD" ]; then
     if [ -z "$NO_UPDATE" ]; then
         install_deps
+    fi
+    if [ ! -d $VFRB_ROOT/build ]; then
+        mkdir -p $VFRB_ROOT/build
     fi
     build
 fi
