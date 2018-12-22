@@ -212,9 +212,9 @@ function install_deps() {
 function build() {
     set -eE
     log -i BUILD VFRB
-    require VFRB_ROOT VFRB_TARGET VFRB_COMPILER
+    require VFRB_ROOT VFRB_COMPILER
     trap "fail -e popd Build has failed!" ERR
-    pushd "$VFRB_ROOT/build/"
+    pushd $VFRB_ROOT/build/
     cmake ..
     make release -j$(nproc)
     popd
@@ -290,7 +290,7 @@ function static_analysis() {
     for f in $(find src/ include/ -type f); do
         diff -u <(cat $f) <($FORMAT -style=file $f) || true
     done &> /tmp/format.diff
-    if [ "$(wc -l format.diff | cut -d' ' -f1)" -gt 0 ]; then
+    if [ "$(wc -l /tmp/format.diff | cut -d' ' -f1)" -gt 0 ]; then
         log -e Code format does not comply to the specification.
         cat /tmp/format.diff
         rm /tmp/format.diff
@@ -307,11 +307,11 @@ function run_unit_test() {
     log -i RUN UNIT TESTS
     require VFRB_ROOT
     local error=1
-    local VFRB_UUT="$(find $VFRB_ROOT/build/ -name '*test*' -executable | head -n1)"
+    local VFRB_UUT="$(find $VFRB_ROOT/build/ -name '*vfrb_test-*' -executable | head -n1)"
     trap "fail -e popd Unit tests failed!" ERR
     pushd $VFRB_ROOT
-    lcov --initial --directory CMakeFiles/test.dir --capture --output-file reports/test_base.info
-    ! test/build/$VFRB_UUT &> reports/unittests.xml
+    lcov --initial --directory build/CMakeFiles/test.dir --capture --output-file reports/test_base.info
+    ! $VFRB_UUT &> reports/unittests.xml
     if [ $? -eq 1 ]; then
         error=0
     fi
@@ -326,22 +326,22 @@ function run_regression() {
     set -eE
     log -i RUN REGRESSION TESTS
     require VFRB_ROOT
-    local VFRB_UUT="$(find $VFRB_ROOT/build/ -name '*regression*' -executable | head -n1)"
-    lcov --initial --directory CMakeFiles/regression.dir --capture --output-file reports/vfrb_base.info
-    if ! $VFRB_ROOT/build/$VFRB_UUT; then $(exit 0); fi
-    if ! $VFRB_ROOT/build/$VFRB_UUT -v -g -c bla.txt; then $(exit 0); fi
+    local VFRB_UUT="$(find $VFRB_ROOT/build/ -name '*vfrb_regression-*' -executable | head -n1)"
+    lcov --initial --directory $VFRB_ROOT/build/CMakeFiles/regression.dir --capture --output-file $VFRB_ROOT/reports/vfrb_base.info
+    if ! $VFRB_UUT; then $(exit 0); fi
+    if ! $VFRB_UUT -v -g -c bla.txt; then $(exit 0); fi
     trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
     pushd $VFRB_ROOT/test
     log -i Start mocking servers
     ./regression.sh serve
     sleep 2
     log -i Start vfrb
-    ../build/$VFRB_UUT -c resources/test.ini &
+    $VFRB_UUT -c resources/test.ini &
     sleep 2
     log -i Connect to vfrb
     ./regression.sh receive
     ./regression.sh receive
-    sleep 20
+    sleep 5
     log -i Stop vfrb and run check
     $SUDO pkill -2 -f $VFRB_UUT || true
     sleep 4
@@ -357,8 +357,8 @@ function gen_coverage() {
     require VFRB_ROOT
     trap "fail -e popd Coverage report generation failed!" ERR
     pushd $VFRB_ROOT
-    lcov --directory CMakeFiles/test.dir --capture --output-file reports/test.info
-    lcov --directory CMakeFiles/regression.dir --capture --output-file reports/vfrb.info
+    lcov --directory build/CMakeFiles/test.dir --capture --output-file reports/test.info
+    lcov --directory build/CMakeFiles/regression.dir --capture --output-file reports/vfrb.info
     lcov -a reports/test_base.info -a reports/test.info -a reports/vfrb_base.info -a reports/vfrb.info \
         -o reports/all.info
     lcov --remove reports/all.info 'test/*' '/usr/*' -o reports/lcov.info

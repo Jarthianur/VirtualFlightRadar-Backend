@@ -3,7 +3,6 @@
 /*/
 !.github/
 !/test/
-!/build/
 !/src/
 !/include/
 !/docs/

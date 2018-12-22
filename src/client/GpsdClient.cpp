@@ -22,6 +22,7 @@
 #include "client/GpsdClient.h"
 
 #include <chrono>
+#include <condition_variable>
 #include <thread>
 #include <utility>
 
@@ -57,12 +58,19 @@ void GpsdClient::handleConnect(bool error)
 
 void GpsdClient::stop()
 {
+    std::mutex                   sync;
+    std::unique_lock<std::mutex> lock(sync);
+    std::condition_variable      cv;
+    bool                         sent = false;
     if (m_running)
     {
-        m_connector->onWrite("?WATCH={\"enable\":false}\r\n",
-                             [this](bool) { logger.info(m_component, " stopped watch"); });
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        m_connector->onWrite("?WATCH={\"enable\":false}\r\n", [this, &sent, &cv](bool) {
+            logger.info(m_component, " stopped watch");
+            sent = true;
+            cv.notify_one();
+        });
     }
+    cv.wait_for(lock, std::chrono::milliseconds(500), [&] { return sent; });
     Client::stop();
 }
 
