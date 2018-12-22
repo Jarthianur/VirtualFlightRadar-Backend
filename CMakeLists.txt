@@ -46,7 +46,7 @@ target_link_libraries(release PUBLIC Boost::regex Boost::system Boost::program_o
 #
 # target: regression
 #
-set(CMAKE_CXX_FLAGS_STAGED "-O0 -g -fprofile-arcs -ftest-coverage -coverage")
+set(CMAKE_CXX_FLAGS_STAGED "-O0 -g --coverage")
 add_executable(regression ${vfrb_sources})
 set_target_properties(regression PROPERTIES OUTPUT_NAME ${vfrb_regression_bin})
 set_target_properties(regression PROPERTIES COMPILE_FLAGS "-DVERSION=\\\"${CMAKE_PROJECT_VERSION}\\\"")
@@ -57,7 +57,7 @@ target_link_libraries(regression PUBLIC Boost::regex Boost::system Boost::progra
 #
 # target: test
 #
-set(CMAKE_CXX_FLAGS_STAGED "-O0 -g -fprofile-arcs -ftest-coverage -coverage -fopenmp -DSCTF_CUSTOM_EPSILON=0.000001")
+set(CMAKE_CXX_FLAGS_STAGED "-O0 -g --coverage -fopenmp -DSCTF_CUSTOM_EPSILON=0.000001")
 list(REMOVE_ITEM vfrb_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
 list(APPEND vfrb_test_sources ${vfrb_sources})
 add_executable(test ${vfrb_test_sources})

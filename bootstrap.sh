@@ -283,7 +283,7 @@ function static_analysis() {
     pushd $VFRB_ROOT
     cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -q -I include/  src/
     local FORMAT="clang-format-6.0"
-    ! $FORMAT --version
+    ! $FORMAT --version > /dev/null 2>&1
     if [ $? -eq 0 ]; then
         FORMAT="clang-format"
     fi
@@ -310,7 +310,7 @@ function run_unit_test() {
     local VFRB_UUT="$(find $VFRB_ROOT/build/ -name '*vfrb_test-*' -executable | head -n1)"
     trap "fail -e popd Unit tests failed!" ERR
     pushd $VFRB_ROOT
-    lcov --initial --directory build/CMakeFiles/test.dir --capture --output-file reports/test_base.info
+    lcov -i -d build/CMakeFiles/test.dir -c -o reports/test_base.info
     ! $VFRB_UUT &> reports/unittests.xml
     if [ $? -eq 1 ]; then
         error=0
@@ -327,7 +327,7 @@ function run_regression() {
     log -i RUN REGRESSION TESTS
     require VFRB_ROOT
     local VFRB_UUT="$(find $VFRB_ROOT/build/ -name '*vfrb_regression-*' -executable | head -n1)"
-    lcov --initial --directory $VFRB_ROOT/build/CMakeFiles/regression.dir --capture --output-file $VFRB_ROOT/reports/vfrb_base.info
+    lcov -i -d $VFRB_ROOT/build/CMakeFiles/regression.dir -c -o $VFRB_ROOT/reports/vfrb_base.info
     if ! $VFRB_UUT; then $(exit 0); fi
     if ! $VFRB_UUT -v -g -c bla.txt; then $(exit 0); fi
     trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
@@ -357,11 +357,11 @@ function gen_coverage() {
     require VFRB_ROOT
     trap "fail -e popd Coverage report generation failed!" ERR
     pushd $VFRB_ROOT
-    lcov --directory build/CMakeFiles/test.dir --capture --output-file reports/test.info
-    lcov --directory build/CMakeFiles/regression.dir --capture --output-file reports/vfrb.info
+    lcov -d build/CMakeFiles/test.dir -c -o reports/test.info
+    lcov -d build/CMakeFiles/regression.dir -c -o reports/vfrb.info
     lcov -a reports/test_base.info -a reports/test.info -a reports/vfrb_base.info -a reports/vfrb.info \
         -o reports/all.info
-    lcov --remove reports/all.info 'test/*' '/usr/*' -o reports/lcov.info
+    lcov --remove reports/all.info '*test/*' '/usr/*' -o reports/lcov.info
     lcov --list reports/lcov.info
     popd
     trap - ERR
