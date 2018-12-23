@@ -300,7 +300,7 @@ function run_unit_test() {
     local VFRB_UUT="$(find $VFRB_ROOT/build/ -name '*vfrb_test-*' -executable | head -n1)"
     trap "fail -e popd Unit tests failed!" ERR
     pushd $VFRB_ROOT
-    lcov -i -d build/CMakeFiles/test.dir -c -o reports/test_base.info
+    lcov -i -d build/CMakeFiles/unittest.dir -c -o reports/test_base.info
     ! $VFRB_UUT &> reports/unittests.xml
     if [ $? -eq 1 ]; then
         error=0
@@ -347,7 +347,7 @@ function gen_coverage() {
     require VFRB_ROOT
     trap "fail -e popd Coverage report generation failed!" ERR
     pushd $VFRB_ROOT
-    lcov -d build/CMakeFiles/test.dir -c -o reports/test.info
+    lcov -d build/CMakeFiles/unittest.dir -c -o reports/test.info
     lcov -d build/CMakeFiles/regression.dir -c -o reports/vfrb.info
     lcov -a reports/test_base.info -a reports/test.info -a reports/vfrb_base.info -a reports/vfrb.info \
         -o reports/all.info

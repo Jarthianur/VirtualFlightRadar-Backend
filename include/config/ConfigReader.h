@@ -41,7 +41,7 @@ public:
      * @brief Constructor
      * @param stream The input stream to read from
      */
-    ConfigReader(std::istream& stream);
+    explicit ConfigReader(std::istream& stream);
 
     /**
      * @brief Read the given stream and return read properties.
