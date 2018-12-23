@@ -19,14 +19,15 @@ Please read the comments carefully, as these values change the programs behavior
 Either adjust the [vfrb.ini.in](https://github.com/Jarthianur/VirtualFlightRadar-Backend/blob/master/vfrb.ini.in)
 file right now to deploy it ready-to-use, or edit the final *vfrb.ini* file later.
 Next run `./run.sh build install [options]` and look at its output if you want it as a systemd service.
-If all requirements are met, the VFR-B was successfully built, stored where specified and a systemd service was properly configured.
+If all requirements are met, the VFR-B was successfully built and a systemd service was properly configured.
+All built files and the config can be found in `build`.
 
 If not already done, now the runtime configuration must be specified in the target `.ini` file.
 
 #### Example
 
 ```bash
-./run.sh build install --path=/home/pi/vfrb --ini-path=/home/pi/vfrb.ini -y
+./run.sh build install --ini=custom.ini -y
 ```
 
 ### Prebuilt
