@@ -148,7 +148,7 @@ function install_deps() {
     log -i INSTALL DEPENDENCIES
     trap "fail Failed to install dependencies!" ERR
     resolve_pkg_manager
-    require PKG_MANAGER VFRB_COMPILER
+    require PKG_MANAGER
     case $PKG_MANAGER in
     *apt-get)
         local UPDATE='apt-get update'
