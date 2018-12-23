@@ -19,11 +19,10 @@
  }
  */
 
-#include "ClientManager.h"
+#include "client/ClientManager.h"
 
+#include "client/ClientFactory.h"
 #include "feed/Feed.h"
-
-#include "ClientFactory.h"
 
 namespace client
 {
@@ -71,5 +70,4 @@ void ClientManager::stop()
     }
     m_thdGroup.join_all();
 }
-
 }  // namespace client

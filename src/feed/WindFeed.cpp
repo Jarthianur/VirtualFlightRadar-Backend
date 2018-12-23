@@ -19,14 +19,14 @@
  }
  */
 
-#include "WindFeed.h"
+#include "feed/WindFeed.h"
 
 #include <unordered_map>
 
 #include "config/Configuration.h"
 #include "data/WindData.h"
+#include "feed/parser/WindParser.h"
 #include "object/Wind.h"
-#include "parser/WindParser.h"
 
 #ifdef COMPONENT
 #    undef COMPONENT

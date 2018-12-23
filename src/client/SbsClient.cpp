@@ -19,7 +19,7 @@
  }
  */
 
-#include "SbsClient.h"
+#include "client/SbsClient.h"
 
 #include "util/Logger.hpp"
 
@@ -30,6 +30,8 @@
 
 namespace client
 {
+using namespace net;
+
 SbsClient::SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
     : Client(endpoint, COMPONENT, connector)
 {}
@@ -47,5 +49,4 @@ void SbsClient::handleConnect(bool error)
         reconnect();
     }
 }
-
 }  // namespace client

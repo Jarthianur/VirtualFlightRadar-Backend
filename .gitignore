@@ -3,13 +3,10 @@
 /*/
 !.github/
 !/test/
-!/build/
 !/src/
 !/include/
-!/service/
 !/docs/
 !.github/**
-!/service/**
 !/docs/_includes/**
 !/docs/assets/**
 !LICENSE
@@ -18,14 +15,11 @@
 !.gitignore
 !.gitmodules
 !.clang-format
-!makefile
 !Dockerfile
 !.dockerignore
-!*.mk
 !*.sh
 !*.md
-!*.txt
-!*.ini
+!*.in
 !*.cpp
 !*.hpp
 !*.c
@@ -35,3 +29,6 @@
 !*.yaml
 !*.css
 !*.xml
+!.gitkeep
+!CMakeLists.txt
+!version.txt

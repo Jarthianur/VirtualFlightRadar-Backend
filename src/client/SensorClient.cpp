@@ -19,7 +19,7 @@
  }
  */
 
-#include "SensorClient.h"
+#include "client/SensorClient.h"
 
 #include <utility>
 
@@ -32,6 +32,8 @@
 
 namespace client
 {
+using namespace net;
+
 SensorClient::SensorClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
     : Client(endpoint, COMPONENT, connector)
 {}
@@ -76,5 +78,4 @@ void SensorClient::handleConnect(bool error)
         reconnect();
     }
 }
-
 }  // namespace client

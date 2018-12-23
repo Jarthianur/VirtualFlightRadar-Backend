@@ -19,7 +19,7 @@
  }
  */
 
-#include "AircraftData.h"
+#include "data/AircraftData.h"
 
 #include <iterator>
 #include <stdexcept>

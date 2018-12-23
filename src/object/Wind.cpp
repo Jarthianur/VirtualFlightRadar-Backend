@@ -15,7 +15,7 @@
  }
  */
 
-#include "Wind.h"
+#include "object/Wind.h"
 
 namespace object
 {

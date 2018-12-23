@@ -19,19 +19,20 @@
  }
  */
 
-#include "ClientFactory.h"
+#include "client/ClientFactory.h"
 
+#include "client/AprscClient.h"
+#include "client/GpsdClient.h"
+#include "client/SbsClient.h"
+#include "client/SensorClient.h"
+#include "client/net/impl/ConnectorImplBoost.h"
 #include "feed/AprscFeed.h"
 #include "feed/Feed.h"
 
-#include "AprscClient.h"
-#include "ConnectorImplBoost.h"
-#include "GpsdClient.h"
-#include "SbsClient.h"
-#include "SensorClient.h"
-
 namespace client
 {
+using namespace net;
+
 template<>
 std::shared_ptr<AprscClient>
     ClientFactory::makeClient<AprscClient>(std::shared_ptr<feed::Feed> feed)
@@ -74,5 +75,4 @@ std::shared_ptr<Client> ClientFactory::createClientFor(std::shared_ptr<feed::Fee
     }
     throw std::logic_error("unknown protocol");  // can never happen
 }
-
 }  // namespace client

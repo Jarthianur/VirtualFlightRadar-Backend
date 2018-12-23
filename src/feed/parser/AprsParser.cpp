@@ -19,14 +19,14 @@
  }
  */
 
-#include "AprsParser.h"
+#include "feed/parser/AprsParser.h"
 
 #include <limits>
 #include <stdexcept>
 
-#include "object/DateTimeImplBoost.h"
 #include "object/GpsPosition.h"
 #include "object/TimeStamp.hpp"
+#include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
 
 /// @def RE_APRS_TIME

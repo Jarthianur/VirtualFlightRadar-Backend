@@ -19,7 +19,7 @@
  }
  */
 
-#include "ConfigReader.h"
+#include "config/ConfigReader.h"
 
 #include <stdexcept>
 #include <string>
@@ -46,5 +46,4 @@ Properties ConfigReader::read()
     }
     return Properties(std::move(tree));
 }
-
 }  // namespace config

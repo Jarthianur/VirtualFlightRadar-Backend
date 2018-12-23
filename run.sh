@@ -23,12 +23,8 @@ set -e
 
 # set env vars
 VFRB_ROOT=${WORKSPACE:-$PWD}
-export BOOST_ROOT=${BOOST_ROOT:-}
-export VFRB_VERSION=${VFRB_VERSION:-$(cat "$VFRB_ROOT/version.txt" | tr -d '\n')}
-export VFRB_COMPILER=${VFRB_COMPILER:-g++}
-export VFRB_TARGET="vfrb-$VFRB_VERSION"
-VFRB_EXEC_PATH=${VFRB_EXEC_PATH:-"$VFRB_ROOT/build/$VFRB_TARGET"}
-VFRB_INI_PATH=${VFRB_INI_PATH:-"$VFRB_ROOT/build/vfrb.ini"}
+export VFRB_VERSION=$(cat "$VFRB_ROOT/version.txt" | tr -d '\n')
+export VFRB_INI="vfrb.ini"
 
 source "$VFRB_ROOT/bootstrap.sh"
 
@@ -39,8 +35,7 @@ function print_help() {
     echo 'Usage: ./run.sh [OPTIONS] <TASKS>'
     echo ''
     echo 'OPTIONS:'
-    echo '  --path=<PATH/NAME>     : Set a custom path, including filename, where to install the executable.'
-    echo '  --ini-path=<PATH/NAME> : Set a custom path, including filename, where to install the config file.'
+    echo '  --ini=<NAME>           : Set a custom name for the config file.'
     echo '  -y | --confirm-yes     : Automatically confirm all decisions. (dangerous)'
     echo '  -n | --no-update       : Disable package installation and updates'
     echo '  -h | --help            : Display this message'
@@ -51,16 +46,11 @@ function print_help() {
     echo '  test    : Build and run the unit, regression tests and code analysis.'
     echo '            Also generate test/coverage report.'
     echo '  docker  : Build a minimal docker image. Cannot be combined with other tasks.'
-    echo '            The vfrb.ini will be copied, so edit it before running this command.'
+    echo '            The vfrb.ini.in will be copied, so edit it before running this command.'
     echo ''
     echo 'ENVIRONMENT:'
     echo 'Following adjustments can be made with environment variables.'
-    echo '  BOOST_ROOT       : Assume boost manually installed at this path.'
-    echo '  VFRB_COMPILER    : Use this compiler.'
     echo '  VFRB_LINK_STATIC : Link libraries static where possible.'
-    echo '  VFRB_EXEC_PATH   : Same as "--path=".'
-    echo '  VFRB_INI_PATH    : Same as "--ini-path=".'
-    echo '  VFRB_VERSION     : Set this version.'
     echo ''
 }
 
@@ -73,11 +63,8 @@ fi
 # resolve given args
 for arg in $@; do
     case $arg in
-    --path=*)
-        VFRB_EXEC_PATH="${arg#*=}"
-    ;;
-    --ini-path=*)
-        VFRB_INI_PATH="${arg#*=}"
+    --ini=*)
+        VFRB_INI="${arg#*=}"
     ;;
     -y | --confirm-yes)
         export AUTO_CONFIRM=1
@@ -104,14 +91,6 @@ for arg in $@; do
     ;;
     esac
 done
-
-# set boost paths if manually installed (deprecated)
-if [ -n "$BOOST_ROOT" ]; then
-    log -i Using custom boost: "$BOOST_ROOT"
-    export BOOST_LIBS_L="-L${BOOST_ROOT}/stage/lib"
-    export BOOST_ROOT_I="-I${BOOST_ROOT}"
-    export CUSTOM_BOOST=1
-fi
 
 # task "docker"
 if [ -n "$DO_DOCKER" ]; then
@@ -141,26 +120,23 @@ if [ -n "$DO_BUILD" ]; then
     if [ -z "$NO_UPDATE" ]; then
         install_deps
     fi
+    if [ ! -d $VFRB_ROOT/build ]; then
+        mkdir -p $VFRB_ROOT/build
+    fi
     build
 fi
 
 # task "install"
 if [ -n "$DO_INSTALL" ]; then
-    if [ "$(basename $VFRB_INI_PATH | grep -o '.ini')" == "" ]; then
-        log -e "\"$VFRB_INI_PATH\"" is not a valid path to an ini file!
-        exit 1
+    if [ -f "$VFRB_ROOT/build/$VFRB_INI" ]; then
+        log -w "\"$VFRB_ROOT/build/$VFRB_INI\"" already exists.
+        ! confirm Replace the existing one\?
+        if [ $? -eq 0 ]; then
+            sed "s|%VERSION%|${VFRB_VERSION}|" <"$VFRB_ROOT/vfrb.ini.in" > "$VFRB_ROOT/build/$VFRB_INI"
+            log -i "$VFRB_INI" created.
+        fi
     fi
-    prepare_path "$VFRB_EXEC_PATH"
-    REPLACE_INI=1
-    ! prepare_path "$VFRB_INI_PATH"
-    if [ $? -eq 1 ]; then
-        REPLACE_INI=0
-    fi
-    export REPLACE_INI
-    log -i VFRB executable will be at "$VFRB_EXEC_PATH"
-    log -i VFRB ini file will be at "$VFRB_INI_PATH"
     install
-    install_service
 fi
 
 log -i FINISHED

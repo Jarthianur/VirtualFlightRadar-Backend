@@ -19,7 +19,7 @@
  }
  */
 
-#include "GpsData.h"
+#include "data/GpsData.h"
 
 #include <stdexcept>
 

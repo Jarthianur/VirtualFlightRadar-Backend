@@ -19,13 +19,13 @@
  }
  */
 
-#include "GpsParser.h"
+#include "feed/parser/GpsParser.h"
 
 #include <stdexcept>
 #include <type_traits>
 
-#include "object/DateTimeImplBoost.h"
 #include "object/TimeStamp.hpp"
+#include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
 
 /// @def RE_GGA_TIME

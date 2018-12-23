@@ -19,7 +19,7 @@
  }
  */
 
-#include "AtmosphereData.h"
+#include "data/AtmosphereData.h"
 
 using namespace object;
 

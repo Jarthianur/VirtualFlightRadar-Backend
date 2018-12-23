@@ -19,7 +19,7 @@
  }
  */
 
-#include "Configuration.h"
+#include "config/Configuration.h"
 
 #include <limits>
 #include <stdexcept>
@@ -28,14 +28,13 @@
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
+#include "config/ConfigReader.h"
 #include "util/Logger.hpp"
 
-#include "ConfigReader.h"
+using namespace util;
 
 namespace config
 {
-using namespace util;
-
 Configuration::Configuration(std::istream& stream)
 {
     try
@@ -147,5 +146,4 @@ void Configuration::dumpInfo() const
     logger.info("(Config) ", PATH_GND_MODE, ": ", m_groundMode ? "Yes" : "No");
     logger.info("(Config) number of feeds: ", m_feedProperties.size());
 }
-
 }  // namespace config

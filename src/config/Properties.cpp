@@ -19,7 +19,7 @@
  }
  */
 
-#include "Properties.h"
+#include "config/Properties.h"
 
 #include <boost/property_tree/exceptions.hpp>
 
@@ -46,5 +46,4 @@ Properties Properties::get_propertySection(const std::string& section) const
         throw std::out_of_range(section + " not found");
     }
 }
-
 }  // namespace config

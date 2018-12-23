@@ -29,11 +29,11 @@
 #include <thread>
 #include <utility>
 
+#include "net/impl/NetworkInterfaceImplBoost.h"
 #include "util/Logger.hpp"
 #include "util/defines.h"
 
 #include "Connection.hpp"
-#include "NetworkInterfaceImplBoost.h"
 #include "parameters.h"
 
 /// @def S_MAX_CLIENTS
@@ -68,7 +68,7 @@ public:
      * @brief Server
      * @param interface The NetworkInterface to use
      */
-    explicit Server(std::shared_ptr<NetworkInterface<SocketT>> interface);
+    explicit Server(std::shared_ptr<net::NetworkInterface<SocketT>> interface);
 
     ~Server() noexcept;
 
@@ -111,7 +111,7 @@ private:
     void attemptConnection(bool error) noexcept;
 
     /// NetworkInterface
-    std::shared_ptr<NetworkInterface<SocketT>> m_tcpIf;
+    std::shared_ptr<net::NetworkInterface<SocketT>> m_netInterface;
 
     /// Connections container
     std::array<std::unique_ptr<Connection<SocketT>>, S_MAX_CLIENTS> m_connections;
@@ -130,11 +130,12 @@ private:
 
 template<typename SocketT>
 Server<SocketT>::Server(std::uint16_t port)
-    : m_tcpIf(std::make_shared<NetworkInterfaceImplBoost>(port))
+    : m_netInterface(std::make_shared<net::NetworkInterfaceImplBoost>(port))
 {}
 
 template<typename SocketT>
-Server<SocketT>::Server(std::shared_ptr<NetworkInterface<SocketT>> interface) : m_tcpIf(interface)
+Server<SocketT>::Server(std::shared_ptr<net::NetworkInterface<SocketT>> interface)
+    : m_netInterface(interface)
 {}
 
 template<typename SocketT>
@@ -156,7 +157,7 @@ void Server<SocketT>::run()
     m_thread  = std::thread([this]() {
         accept();
         std::unique_lock<std::mutex> lock(m_mutex);
-        m_tcpIf->run(lock);
+        m_netInterface->run(lock);
         logger.debug("(Server) stopped");
     });
 }
@@ -177,7 +178,7 @@ void Server<SocketT>::stop()
             }
         }
         m_activeConnections = 0;
-        m_tcpIf->stop();
+        m_netInterface->stop();
         lock.unlock();
         if (m_thread.joinable())
         {
@@ -212,7 +213,8 @@ template<typename SocketT>
 void Server<SocketT>::accept()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_tcpIf->onAccept(std::bind(&Server<SocketT>::attemptConnection, this, std::placeholders::_1));
+    m_netInterface->onAccept(
+        std::bind(&Server<SocketT>::attemptConnection, this, std::placeholders::_1));
 }
 
 template<typename SocketT>
@@ -236,13 +238,14 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
         std::lock_guard<std::mutex> lock(m_mutex);
         try
         {
-            if (m_activeConnections < S_MAX_CLIENTS && !isConnected(m_tcpIf->get_currentAddress()))
+            if (m_activeConnections < S_MAX_CLIENTS &&
+                !isConnected(m_netInterface->get_currentAddress()))
             {
                 for (auto& it : m_connections)
                 {
                     if (!it)
                     {
-                        it = m_tcpIf->startConnection();
+                        it = m_netInterface->startConnection();
                         ++m_activeConnections;
                         logger.info("(Server) connection from: ", it->get_address());
                         break;
@@ -251,14 +254,15 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
             }
             else
             {
-                logger.info("(Server) refused connection to ", m_tcpIf->get_currentAddress());
-                m_tcpIf->close();
+                logger.info("(Server) refused connection to ",
+                            m_netInterface->get_currentAddress());
+                m_netInterface->close();
             }
         }
-        catch (const SocketException& e)
+        catch (const net::SocketException& e)
         {
             logger.warn("(Server) connection failed: ", e.what());
-            m_tcpIf->close();
+            m_netInterface->close();
         }
     }
     else
@@ -267,5 +271,4 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
     }
     accept();
 }
-
 }  // namespace server

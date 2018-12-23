@@ -19,24 +19,26 @@
  }
  */
 
+#include "NetworkInterfaceImplTest.h"
+
 #include <thread>
 
 #include "server/Connection.hpp"
+
 #include "SocketImplTest.h"
-#include "NetworkInterfaceImplTest.h"
 
 namespace server
 {
-NetworkInterfaceImplTests::NetworkInterfaceImplTests() : NetworkInterface<SocketImplTest>()
-{}
+namespace net
+{
+NetworkInterfaceImplTests::NetworkInterfaceImplTests() : NetworkInterface<SocketImplTest>() {}
 
-NetworkInterfaceImplTests::~NetworkInterfaceImplTests() noexcept
-{}
+NetworkInterfaceImplTests::~NetworkInterfaceImplTests() noexcept {}
 
 void NetworkInterfaceImplTests::run(std::unique_lock<std::mutex>& lock)
 {
     lock.unlock();
-    while(!stopped)
+    while (!stopped)
     {
         std::this_thread::yield();
     }
@@ -44,8 +46,7 @@ void NetworkInterfaceImplTests::run(std::unique_lock<std::mutex>& lock)
 
 void NetworkInterfaceImplTests::stop()
 {
-    if(on_accept)
-        on_accept(true);
+    if (on_accept) on_accept(true);
 }
 
 void NetworkInterfaceImplTests::onAccept(const std::function<void(bool)>& callback)
@@ -55,8 +56,7 @@ void NetworkInterfaceImplTests::onAccept(const std::function<void(bool)>& callba
 
 void NetworkInterfaceImplTests::close()
 {
-    if(on_accept)
-        on_accept(true);
+    if (on_accept) on_accept(true);
 }
 
 std::unique_ptr<Connection<SocketImplTest>> NetworkInterfaceImplTests::startConnection()
@@ -74,4 +74,5 @@ void NetworkInterfaceImplTests::connect(bool err, const std::string& adr)
     currentAddress = adr;
     on_accept(err);
 }
+}  // namespace net
 }  // namespace server

@@ -39,7 +39,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector);
+    SbsClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
 
 private:
     /**

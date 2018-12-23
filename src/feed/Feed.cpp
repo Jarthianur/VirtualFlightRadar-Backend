@@ -19,7 +19,7 @@
  }
  */
 
-#include "Feed.h"
+#include "feed/Feed.h"
 
 #include <algorithm>
 #include <limits>
@@ -65,7 +65,7 @@ void Feed::initPriority() noexcept
     }
 }
 
-client::Endpoint Feed::get_endpoint() const
+client::net::Endpoint Feed::get_endpoint() const
 {
     return {m_properties.get_property(KV_KEY_HOST), m_properties.get_property(KV_KEY_PORT)};
 }

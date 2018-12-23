@@ -19,7 +19,7 @@
  }
  */
 
-#include "WindParser.h"
+#include "feed/parser/WindParser.h"
 
 #include <stdexcept>
 

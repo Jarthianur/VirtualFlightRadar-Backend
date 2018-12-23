@@ -19,7 +19,7 @@
  }
  */
 
-#include "AprscClient.h"
+#include "client/AprscClient.h"
 
 #include <stdexcept>
 #include <utility>
@@ -35,6 +35,8 @@
 
 namespace client
 {
+using namespace net;
+
 AprscClient::AprscClient(const Endpoint& endpoint, const std::string& login,
                          std::shared_ptr<Connector> connector)
     : Client(endpoint, COMPONENT, connector), m_login(login + "\r\n")
@@ -114,5 +116,4 @@ void AprscClient::handleSendKeepAlive(bool error)
         });
     }
 }
-
 }  // namespace client

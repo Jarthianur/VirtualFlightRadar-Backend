@@ -23,6 +23,7 @@
 
 #include <chrono>
 #include <ctime>
+#include <stdexcept>
 
 Logger logger;
 
