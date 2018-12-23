@@ -67,10 +67,10 @@ target_link_libraries(regression PUBLIC Boost::regex Boost::system Boost::progra
 set(CMAKE_CXX_FLAGS_STAGED "-O0 -g --coverage -fopenmp -DSCTF_CUSTOM_EPSILON=0.000001")
 list(REMOVE_ITEM vfrb_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
 list(APPEND vfrb_test_sources ${vfrb_sources})
-add_executable(test ${vfrb_test_sources})
-set_target_properties(test PROPERTIES OUTPUT_NAME ${vfrb_test_bin})
-target_include_directories(test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include ${PROJECT_SOURCE_DIR}/test/framework)
-target_link_libraries(test PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
+add_executable(unittest ${vfrb_test_sources})
+set_target_properties(unittest PROPERTIES OUTPUT_NAME ${vfrb_test_bin})
+target_include_directories(unittest PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include ${PROJECT_SOURCE_DIR}/test/framework)
+target_link_libraries(unittest PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
 
 #
 # target: install
