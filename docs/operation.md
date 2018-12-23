@@ -2,11 +2,6 @@
 
 ## Manually
 
-Don't care about the following, if boost was installed via package manager.
-Boost is linked dynamically, which means the *LD_LIBRARY_PATH* variable has to be set to boost libs path.
-This is done by the install.sh automatically through appending the export instruction to *~/.bashrc* .
-To apply this change reboot the system.
-
 ```bash
 {path to binary} -c {path to config file} -o {path to log file} &
 ```

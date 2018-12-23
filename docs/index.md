@@ -65,9 +65,3 @@ is able to fetch it.
 It is also possible to make the machine, which runs the VFR-B, accessible to the public.
 
 Contributions are always welcome.
-
----
-Status quo:
-
-Version **3.0.0**  
-Read more in the [CHANGELOG](CHANGELOG.html).

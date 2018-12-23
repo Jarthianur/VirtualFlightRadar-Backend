@@ -1,5 +1,11 @@
 # changelog
 
+## 3.0.1
+
++ restructuring code
++ build with cmake
++ small changes in client
+
 ## 3.0.0
 
 + improved priority handling of feeds
