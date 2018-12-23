@@ -155,38 +155,21 @@ function install_deps() {
         local SETUP=''
         local INSTALL='install -y'
         local BOOST='libboost-dev libboost-system-dev libboost-regex-dev libboost-program-options-dev'
-        local GCC=''
-        ! $VFRB_COMPILER -v > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            GCC="$(basename "$VFRB_COMPILER")"
-        fi
-        GCC="$GCC make cmake"
+        local GCC="g++ make cmake"
     ;;
     *yum)
         local UPDATE=''
         local SETUP='yum -y install epel-release'
         local INSTALL='install -y'
         local BOOST='boost boost-devel'
-        local GCC=''
-        ! $VFRB_COMPILER -v > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            log -w "$VFRB_COMPILER" is not installed, default to gcc-c++
-            GCC="gcc-c++"
-        fi
-        GCC="$GCC make cmake"
+        local GCC="gcc-c++ make cmake"
     ;;
     *dnf)
         local UPDATE=''
         local SETUP=''
         local INSTALL='install -y'
         local BOOST='boost boost-devel'
-        local GCC=''
-        ! $VFRB_COMPILER -v > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            log -w "$VFRB_COMPILER" is not installed, default to gcc-c++
-            GCC="gcc-c++"
-        fi
-        GCC="$GCC make cmake"
+        local GCC="gcc-c++ make cmake"
     ;;
     *apk)
         local UPDATE='apk update'
@@ -212,7 +195,7 @@ function install_deps() {
 function build() {
     set -eE
     log -i BUILD VFRB
-    require VFRB_ROOT VFRB_COMPILER
+    require VFRB_ROOT
     local LS=""
     if [ -n "${VFRB_LINK_STATIC}" ]; then
         LS="-DBOOST_STATIC=1 --no-warn-unused-cli"
@@ -272,7 +255,7 @@ function install_test_deps() {
 function build_test() {
     set -eE
     log -i BUILD VFRB TESTS
-    require VFRB_ROOT VFRB_COMPILER
+    require VFRB_ROOT
     trap "fail -e popd Build has failed!" ERR
     pushd "$VFRB_ROOT/build/"
     cmake ..

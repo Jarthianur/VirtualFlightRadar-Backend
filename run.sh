@@ -24,7 +24,6 @@ set -e
 # set env vars
 VFRB_ROOT=${WORKSPACE:-$PWD}
 export VFRB_VERSION=$(cat "$VFRB_ROOT/version.txt" | tr -d '\n')
-export VFRB_COMPILER=${VFRB_COMPILER:-g++}
 export VFRB_INI="vfrb.ini"
 
 source "$VFRB_ROOT/bootstrap.sh"
@@ -51,7 +50,6 @@ function print_help() {
     echo ''
     echo 'ENVIRONMENT:'
     echo 'Following adjustments can be made with environment variables.'
-    echo '  VFRB_COMPILER    : Use this compiler.'
     echo '  VFRB_LINK_STATIC : Link libraries static where possible.'
     echo ''
 }
