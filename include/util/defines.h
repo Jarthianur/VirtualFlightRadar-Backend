@@ -101,6 +101,11 @@
 /// Define virtual default destructor for class.
 #define DEFAULT_VIRTUAL_DTOR(TYPE) virtual ~TYPE() noexcept = default;
 
+/// @def DEFAULT_CHILD_DTOR
+/// @param TYPE The classname
+/// Define default destructor for child class.
+#define DEFAULT_CHILD_DTOR(TYPE) ~TYPE() noexcept override = default;
+
 /// @def NON_COPYABLE
 /// @param TYPE The classname
 /// Make a class of TYPE non copyable.

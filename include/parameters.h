@@ -64,16 +64,3 @@
  * somewhere else, like pilots and flight instructors.
  */
 #define SERVER_MAX_CLIENTS 3
-
-/**
- * @def ESTIMATED_TRAFFIC
- * Initial amount of space reserved for aircrafts.
- * The higher this value, the more memory is preallocated for the internal container.
- * This can increase the performance, but also uses up more RAM.
- * [0 <= x]
- * If traffic of 50 aircrafts is common at your base, set it accordingly.
- * If 10 aircrafts are a high amount of traffic,
- * there is no need to set it higher than that.
- * In doubt, set it to a lower value.
- */
-#define ESTIMATED_TRAFFIC 10

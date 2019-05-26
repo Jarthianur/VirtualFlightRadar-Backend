@@ -21,11 +21,13 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
+#include <map>
+#include <mutex>
 #include <string>
-#include <unordered_map>
-#include <vector>
 
 #include "object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
@@ -47,7 +49,7 @@ namespace data
 class AircraftData : public Data
 {
 public:
-    DEFAULT_DTOR(AircraftData)
+    DEFAULT_CHILD_DTOR(AircraftData)
 
     AircraftData();
 
@@ -81,20 +83,136 @@ public:
     void processAircrafts(const object::Position& position, double atmPress) noexcept;
 
 private:
-    /**
-     * @brief Insert an aircraft into the internal container.
-     * @param aircraft The aircraft
-     */
-    void insert(object::Aircraft&& aircraft);
+    class Container
+    {
+    public:
+        DEFAULT_CTOR(Container)
+        DEFAULT_DTOR(Container)
+
+        struct Iterator;
+        struct ValueType
+        {
+            ValueType(object::Aircraft&& a) : aircraft(std::move(a)) {}
+
+            ValueType& operator=(ValueType&& other)
+            {
+                aircraft.tryUpdate(std::move(other.aircraft));
+                return *this;
+            }
+
+            object::Aircraft aircraft;
+
+        protected:
+            friend struct Container::Iterator;
+            mutable std::mutex dataMutex;
+        };
+
+        using KeyType       = std::size_t;
+        using ContainerType = std::map<KeyType, ValueType>;
+
+        struct Iterator
+        {
+            explicit Iterator(Container& c) : iterator(c.m_container.end()), container(c) {}
+
+            Iterator(ContainerType::iterator&& iter, const Container& c)
+                : iterator(std::move(iter)), container(c)
+            {
+                if (iterator != container.m_container.end())
+                {
+                    dataLock = std::unique_lock<std::mutex>(iterator->second.dataMutex);
+                }
+            }
+
+            Iterator& operator++()
+            {
+                if (iterator != container.m_container.end())
+                {
+                    dataLock.unlock();
+                    std::lock_guard<std::mutex> lk(container.m_modMutex);
+                    if (++iterator != container.m_container.end())
+                    {
+                        dataLock = std::unique_lock<std::mutex>(iterator->second.dataMutex);
+                    }
+                }
+                return *this;
+            }
+
+            ValueType& operator*()
+            {
+                return iterator->second;
+            }
+
+            ValueType* operator->()
+            {
+                return &iterator->second;
+            }
+
+            KeyType getKey() const
+            {
+                return iterator->first;
+            }
+
+            bool operator==(const Iterator& other) const
+            {
+                return iterator == other.iterator;
+            }
+
+            bool operator!=(const Iterator& other) const
+            {
+                return iterator != other.iterator;
+            }
+
+        protected:
+            ContainerType::iterator      iterator;
+            std::unique_lock<std::mutex> dataLock;
+            const Container&             container;
+        };
+
+        Iterator begin()
+        {
+            std::lock_guard<std::mutex> lock(m_modMutex);
+            return Iterator(m_container.begin(), *this);
+        }
+
+        Iterator end()
+        {
+            return Iterator(*this);
+        }
+
+        std::pair<Iterator, bool> insert(object::Aircraft&& aircraft)
+        {
+            KeyType                     key = std::hash<std::string>()(aircraft.get_id());
+            std::lock_guard<std::mutex> lock(m_modMutex);
+            Iterator                    iter(m_container.find(key), *this);
+            if (iter == end())
+            {
+                return std::make_pair(
+                    Iterator(m_container.emplace(key, ValueType{std::move(aircraft)}).first, *this),
+                    true);
+            }
+            return std::make_pair(iter, false);
+        }
+
+        void erase(KeyType key)
+        {
+            std::lock_guard<std::mutex> lock(m_modMutex);
+            auto                        entry = m_container.find(key);
+            if (entry != m_container.end())
+            {
+                Iterator iter(std::move(entry), *this);
+                m_container.erase(key);
+            }
+        }
+
+    protected:
+        ContainerType      m_container;
+        mutable std::mutex m_modMutex;
+    };
+
+    Container m_container;
 
     /// Processor for aircrafts
     processor::AircraftProcessor m_processor;
-
-    /// Vector holding the aircrafts
-    std::vector<object::Aircraft> m_container;
-
-    /// Map aircraft Id's to container index
-    std::unordered_map<std::string, std::size_t> m_index;
 };
 
 }  // namespace data
