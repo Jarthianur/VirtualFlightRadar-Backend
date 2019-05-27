@@ -51,7 +51,7 @@ class WindFeed : public Feed
 {
 public:
     NOT_COPYABLE(WindFeed)
-    DEFAULT_DTOR(WindFeed)
+    DEFAULT_CHILD_DTOR(WindFeed)
 
     /**
      * @brief Constructor

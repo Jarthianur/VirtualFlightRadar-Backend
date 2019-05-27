@@ -18,6 +18,7 @@
 #include "object/GpsPosition.h"
 
 #include <typeinfo>
+#include <utility>
 
 namespace object
 {
@@ -57,6 +58,11 @@ bool GpsPosition::canUpdate(const Object& other) const
     {
         return false;
     }
+}
+
+util::CStringPack GpsPosition::getNMEA() const
+{
+    return m_nmea;
 }
 
 }  // namespace object

@@ -51,7 +51,7 @@ class AtmosphereFeed : public Feed
 {
 public:
     NOT_COPYABLE(AtmosphereFeed)
-    DEFAULT_DTOR(AtmosphereFeed)
+    DEFAULT_CHILD_DTOR(AtmosphereFeed)
 
     /**
      * @brief Constructor

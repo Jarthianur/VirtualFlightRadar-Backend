@@ -29,17 +29,17 @@ WindData::WindData() : Data() {}
 
 WindData::WindData(const object::Wind& wind) : Data(), m_wind(wind) {}
 
-void WindData::get_serialized(std::string& dest)
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    dest += (++m_wind).get_serialized();
-    m_wind.set_serialized("");
-}
-
 bool WindData::update(Object&& wind)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_wind.tryUpdate(std::move(wind));
+}
+
+void WindData::access(const accessor_fn& func)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    func(++m_wind);
+    m_wind.get_nmea().clear();
 }
 
 }  // namespace data

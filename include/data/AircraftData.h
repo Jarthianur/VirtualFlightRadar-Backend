@@ -35,12 +35,6 @@
 
 #include "Data.hpp"
 
-/// Times until aircraft gets deleted
-#define AC_DELETE_THRESHOLD 120
-
-/// Times until FLARM status is removed
-#define AC_NO_FLARM_THRESHOLD OBJ_OUTDATED
-
 namespace data
 {
 /**
@@ -48,41 +42,11 @@ namespace data
  */
 class AircraftData : public Data
 {
-public:
-    DEFAULT_CHILD_DTOR(AircraftData)
+    /// Times until FLARM status is removed
+    static constexpr const std::uint32_t NO_FLARM_THRESHOLD = object::Object::OUTDATED;
+    /// Times until aircraft gets deleted
+    static constexpr const std::uint32_t DELETE_THRESHOLD = 120;
 
-    AircraftData();
-
-    /**
-     * @brief Constructor
-     * @param maxDist The max distance filter
-     */
-    explicit AircraftData(std::int32_t maxDist);
-
-    /**
-     * @brief Get the reports for all processed aircrafts.
-     * @param dest The destination string to append reports
-     * @threadsafe
-     */
-    void get_serialized(std::string& dest) override;
-
-    /**
-     * @brief Insert or update an Aircraft.
-     * @param aircraft The update
-     * @return true on success, else false
-     * @threadsafe
-     */
-    bool update(object::Object&& aircraft) override;
-
-    /**
-     * @brief Process all aircrafts.
-     * @param position The refered position
-     * @param atmPress The atmospheric pressure
-     * @threadsafe
-     */
-    void processAircrafts(const object::Position& position, double atmPress) noexcept;
-
-private:
     class Container
     {
     public:
@@ -181,7 +145,8 @@ private:
 
         std::pair<Iterator, bool> insert(object::Aircraft&& aircraft)
         {
-            KeyType                     key = std::hash<std::string>()(aircraft.get_id());
+            KeyType key =
+                std::hash<std::string>()(*aircraft.get_id());  // TODO: provide char* based hashing
             std::lock_guard<std::mutex> lock(m_modMutex);
             Iterator                    iter(m_container.find(key), *this);
             if (iter == end())
@@ -209,6 +174,35 @@ private:
         mutable std::mutex m_modMutex;
     };
 
+public:
+    AircraftData();
+    DEFAULT_CHILD_DTOR(AircraftData)
+
+    /**
+     * @brief Constructor
+     * @param maxDist The max distance filter
+     */
+    explicit AircraftData(std::int32_t maxDist);
+
+    /**
+     * @brief Insert or update an Aircraft.
+     * @param aircraft The update
+     * @return true on success, else false
+     * @threadsafe
+     */
+    bool update(object::Object&& aircraft) override;
+
+    void set_environment(const object::Position& position, double atmPress);
+
+    /**
+     * @brief Process all aircrafts.
+     * @param position The refered position
+     * @param atmPress The atmospheric pressure
+     * @threadsafe
+     */
+    void access(const accessor_fn& func) override;
+
+private:
     Container m_container;
 
     /// Processor for aircrafts

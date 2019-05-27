@@ -18,12 +18,9 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 
 #include "util/defines.h"
-
-/// Times until aircraft is outdated
-#define OBJ_OUTDATED 4
+#include "util/utility.hpp"
 
 namespace object
 {
@@ -33,6 +30,8 @@ namespace object
 class Object
 {
 public:
+    static constexpr const std::uint32_t OUTDATED = 4;
+
     DEFAULT_CTOR(Object)
     DEFAULT_VIRTUAL_DTOR(Object)
 
@@ -51,22 +50,12 @@ public:
     virtual bool tryUpdate(Object&& other);
 
     /**
-     * @brief Set the string representation of this Objects data.
-     * @param serialized The string representation
-     */
-    virtual void set_serialized(std::string&& serialized);
-
-    /**
-     * @brief Get the string representation of this Objects data.
-     * @return m_serialized
-     */
-    virtual const std::string& get_serialized() const;
-
-    /**
      * @brief Increment the update age.
      * @return this
      */
     Object& operator++();
+
+    virtual util::CStringPack getNMEA() const = 0;
 
 protected:
     /**
@@ -87,9 +76,6 @@ protected:
 
     /// Times processed without update.
     std::uint32_t m_updateAge = 0;
-
-    /// The string representation of this Objects data.
-    std::string m_serialized;
 
 public:
     /**

@@ -47,11 +47,11 @@ GpsData::GpsData(const GpsPosition& position, bool ground)
     m_processor.process(m_position);
 }
 
-void GpsData::get_serialized(std::string& dest)
+void GpsData::access(const accessor_fn& func)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_processor.process(m_position);
-    dest += (++m_position).get_serialized();
+    func(++m_position);
 }
 
 bool GpsData::update(Object&& position)

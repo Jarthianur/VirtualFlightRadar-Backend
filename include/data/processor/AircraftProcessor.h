@@ -22,7 +22,6 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 
 #include "object/Aircraft.h"
 #include "object/GpsPosition.h"
@@ -40,9 +39,8 @@ namespace processor
 class AircraftProcessor : public Processor<object::Aircraft>
 {
 public:
-    DEFAULT_DTOR(AircraftProcessor)
-
     AircraftProcessor();
+    DEFAULT_CHILD_DTOR(AircraftProcessor)
 
     /**
      * @brief Constructor
@@ -54,7 +52,7 @@ public:
      * @brief Process an aircraft.
      * @param aircraft The Aircraft to process
      */
-    void process(object::Aircraft& aircraft) override;
+    void process(object::Aircraft& aircraft) const override;
 
     /**
      * @brief Set the refered position and atmospheric pressure.
@@ -68,28 +66,28 @@ private:
      * @brief Calcutale an aircrafts position relative to the refered one.
      * @param aircraft The Aircraft
      */
-    void calculateRelPosition(const object::Aircraft& aircraft);
+    void calculateRelPosition(const object::Aircraft& aircraft) const;
 
     /**
      * @brief Append PFLAU sentence to processing string.
      * @param aircraft The Aircaft
      */
-    void appendPFLAU(const object::Aircraft& aircraft);
+    std::size_t appendPFLAU(object::Aircraft& aircraft, std::size_t pos) const;
 
     /**
      * @brief Append PFLAA sentence to processing string.
      * @param aircraft The Aircaft
      */
-    void appendPFLAA(const object::Aircraft& aircraft);
+    std::size_t appendPFLAA(object::Aircraft& aircraft, std::size_t pos) const;
 
     /// Max distance to process an aircraft
     const std::int32_t m_maxDistance;
 
     /// Refered position
-    mutable object::Position m_refPosition{0.0, 0.0, 0};
+    object::Position m_refPosition{0.0, 0.0, 0};
 
     /// Refered pressure; hPa
-    mutable double m_refAtmPressure = 1013.25;
+    double m_refAtmPressure = 1013.25;
 
     /// Refered latitude as radian
     mutable double m_refRadLatitude = 0.0;

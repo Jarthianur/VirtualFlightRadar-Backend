@@ -38,9 +38,8 @@ namespace parser
 class AtmosphereParser : public Parser<object::Atmosphere>
 {
 public:
-    DEFAULT_DTOR(AtmosphereParser)
-
     AtmosphereParser();
+    DEFAULT_CHILD_DTOR(AtmosphereParser)
 
     /**
      * @brief Unpack into Atmosphere.

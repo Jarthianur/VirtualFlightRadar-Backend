@@ -125,7 +125,7 @@ inline std::int32_t checksum(const char* sentence, std::size_t length)
 {
     std::int32_t csum = 0;
     std::size_t  i    = 1;  // $ in nmea str not included
-    while (i < length && sentence[i] != '*' && sentence[i] != '\0')
+    while (i < length && (sentence[i] != '*' || sentence[i] != '\0'))
     {
         csum ^= static_cast<std::int32_t>(sentence[i++]);
     }

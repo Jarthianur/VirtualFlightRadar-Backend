@@ -22,7 +22,7 @@
 #pragma once
 
 #include <exception>
-#include <string>
+#include <mutex>
 
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
@@ -38,7 +38,7 @@ namespace data
 class GpsData : public Data
 {
 public:
-    DEFAULT_DTOR(GpsData)
+    DEFAULT_CHILD_DTOR(GpsData)
 
     GpsData();
 
@@ -50,20 +50,6 @@ public:
     GpsData(const object::GpsPosition& position, bool ground);
 
     /**
-     * @brief Get NMEA GPS report.
-     * @param dest The destination string to append data
-     * @threadsafe
-     */
-    void get_serialized(std::string& dest) override;
-
-    /**
-     * @brief Get the position.
-     * @return the position
-     * @threadsafe
-     */
-    object::Position get_position();
-
-    /**
      * @brief Update the position.
      * @param position The new position
      * @return true on success, else false
@@ -72,6 +58,15 @@ public:
      * @threadsafe
      */
     bool update(object::Object&& position) override;
+
+    void access(const accessor_fn& func) override;
+
+    /**
+     * @brief Get the position.
+     * @return the position
+     * @threadsafe
+     */
+    object::Position get_position();
 
 private:
     /**
@@ -91,6 +86,8 @@ private:
 
     /// Ground mode state
     bool m_groundMode = false;
+
+    mutable std::mutex m_mutex;
 };
 
 class GpsDataException : public std::exception

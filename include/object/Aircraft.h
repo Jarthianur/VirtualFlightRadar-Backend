@@ -22,42 +22,27 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
+#include <cstring>
 
 #include "impl/DateTimeImplBoost.h"
 #include "util/defines.h"
+#include "util/utility.hpp"
 
 #include "GpsPosition.h"
 #include "Object.h"
 #include "TimeStamp.hpp"
 
-/// Indicate a value is not available.
-#define A_VALUE_NA -1024.0
-
 namespace object
 {
-/**
- * @brief Hold information about an Aircrafts movement.
- */
-struct Movement
-{
-    /// Speed over ground; m/s
-    double gndSpeed = A_VALUE_NA;
-
-    /// Heading; deg [0-359]
-    double heading = A_VALUE_NA;
-
-    /// Climb rate; m/s
-    double climbRate = A_VALUE_NA;
-};
-
 /**
  * @brief Extend Object to an aircraft.
  */
 class Aircraft : public Object
 {
 public:
-    DEFAULT_DTOR(Aircraft)
+    static constexpr const double      VALUE_NA  = -1024.0;
+    static constexpr const std::size_t ID_SIZE   = 8;
+    static constexpr const std::size_t NMEA_SIZE = 4096;
 
     /**
      * @brief Device type from which the information is received.
@@ -103,6 +88,21 @@ public:
         OGN    = 3
     };
 
+    /**
+     * @brief Hold information about an Aircrafts movement.
+     */
+    struct Movement
+    {
+        /// Speed over ground; m/s
+        double gndSpeed = VALUE_NA;
+
+        /// Heading; deg [0-359]
+        double heading = VALUE_NA;
+
+        /// Climb rate; m/s
+        double climbRate = VALUE_NA;
+    };
+
     Aircraft();
 
     /**
@@ -110,6 +110,8 @@ public:
      * @param priority The initial priority
      */
     explicit Aircraft(std::uint32_t priority);
+
+    DEFAULT_CHILD_DTOR(Aircraft)
 
     /**
      * @brief Set the aircraft type.
@@ -130,6 +132,8 @@ public:
      */
     void set_idType(IdType type);
 
+    util::CStringPack getNMEA() const override;
+
 private:
     /**
      * @brief Assign an other aircrafts values to this.
@@ -143,7 +147,7 @@ private:
     bool canUpdate(const Object& other) const override;
 
     /// Aircraft identifier
-    std::string m_id;
+    util::CString<ID_SIZE> m_id;
 
     /// Id type
     IdType m_idType;
@@ -166,6 +170,8 @@ private:
     /// Is full set of information available?
     bool m_fullInfo = false;
 
+    util::CString<NMEA_SIZE> m_nmea;
+
 public:
     /**
      * Getters and setters
@@ -178,6 +184,7 @@ public:
     GETSET_CR(position)
     GETSET_CR(movement)
     GETSET_V(timeStamp)
+    GETTER_R(nmea)
 };
 
 }  // namespace object

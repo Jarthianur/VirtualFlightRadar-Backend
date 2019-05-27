@@ -24,11 +24,9 @@
 #include <cstdint>
 
 #include "util/defines.h"
+#include "util/utility.hpp"
 
 #include "Object.h"
-
-/// ICAO standard atmospheric pressure at MSL
-#define ICAO_STD_A 1013.25
 
 namespace object
 {
@@ -40,9 +38,12 @@ struct Climate;
 class Atmosphere : public Object
 {
 public:
-    DEFAULT_DTOR(Atmosphere)
+    /// ICAO standard atmospheric pressure at MSL
+    static constexpr const double      ICAO_STD  = 1013.25;
+    static constexpr const std::size_t NMEA_SIZE = 4096;
 
     Atmosphere();
+    DEFAULT_CHILD_DTOR(Atmosphere)
 
     /**
      * @brief Constructor
@@ -57,6 +58,8 @@ public:
      */
     Atmosphere(double pressure, std::uint32_t priority);
 
+    util::CStringPack getNMEA() const override;
+
 private:
     /**
      * @brief Extend Object::assign.
@@ -64,13 +67,16 @@ private:
     void assign(Object&& other) override;
 
     /// The atmospheric pressure
-    double m_pressure = ICAO_STD_A;
+    double m_pressure = ICAO_STD;
+
+    util::CString<NMEA_SIZE> m_nmea;
 
 public:
     /**
      * Getters and setters
      */
     GETSET_V(pressure)
+    GETTER_R(nmea)
 };
 
 }  // namespace object

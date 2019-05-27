@@ -27,6 +27,7 @@
 #include <boost/move/move.hpp>
 
 #include "util/defines.h"
+#include "util/utility.hpp"
 
 namespace server
 {
@@ -61,7 +62,7 @@ public:
      * @return true on success, else false
      * @throw SocketException if the socket is closed
      */
-    bool write(const std::string& msg);
+    bool write(const util::CStringPack& msg);
 
     /**
      * @brief Close the socket.

@@ -21,14 +21,18 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <list>
 #include <sstream>
 #include <string>
 
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
+
+#include "defines.h"
 
 namespace util
 {
@@ -107,5 +111,89 @@ constexpr auto raw_type(T value) -> typename std::underlying_type<T>::type
 {
     return static_cast<typename std::underlying_type<T>::type>(value);
 }
+
+using CStringPack = std::pair<const char*, std::size_t>;
+
+template<std::size_t N, typename std::enable_if<(N > 0)>::type* = nullptr>
+class CString
+{
+public:
+    static constexpr const std::size_t last = N - 1;
+
+    DEFAULT_DTOR(CString)
+
+    CString()
+    {
+        m_value[0] = '\0';
+    }
+
+    CString(const char* init)
+    {
+        operator=(init);
+    }
+
+    CString(const std::string& init)
+    {
+        copy(init.c_str(), init.size());
+    }
+
+    CString(const CString& other)
+    {
+        operator=(other);
+    }
+
+    CString& operator=(const char* other)
+    {
+        copy(other, std::strlen(other));
+        return *this;
+    }
+
+    CString& operator=(const std::string& other)
+    {
+        copy(other.c_str(), other.size());
+        return *this;
+    }
+
+    CString& operator=(const CString& other)
+    {
+        copy(other.m_value, other.m_length);
+        return *this;
+    }
+
+    char* operator*()
+    {
+        return m_value;
+    }
+
+    const char* operator*() const
+    {
+        return m_value;
+    }
+
+    void clear()
+    {
+        m_value[0] = '\0';
+        m_length   = 0;
+    }
+
+    operator CStringPack() const
+    {
+        return std::make_pair<const char*, std::size_t>(m_value, m_length);
+    }
+
+protected:
+    void copy(const char* str, std::size_t n)
+    {
+        m_length = std::min(last, n);
+        std::memcpy(m_value, str, m_length);
+        m_value[m_length] = '\0';
+    }
+
+    char        m_value[N];
+    std::size_t m_length = 0;
+
+public:
+    GETTER_V(length)
+};
 
 }  // namespace util

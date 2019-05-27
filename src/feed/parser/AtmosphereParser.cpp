@@ -48,7 +48,7 @@ bool AtmosphereParser::unpack(const std::string& sentence, object::Atmosphere& a
             double      tmpPress = std::stod(sentence.substr(tmpS, subLen), &numIdx) * 1000.0;
             if ((valid = (numIdx == subLen)))
             {
-                atmosphere.set_serialized(std::string(sentence));
+                atmosphere.get_nmea() = sentence;
                 atmosphere.set_pressure(tmpPress);
             }
             return valid;

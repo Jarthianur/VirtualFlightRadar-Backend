@@ -25,6 +25,7 @@
 
 #include "impl/DateTimeImplBoost.h"
 #include "util/defines.h"
+#include "util/utility.hpp"
 
 #include "Object.h"
 #include "TimeStamp.hpp"
@@ -52,9 +53,10 @@ struct Position
 class GpsPosition : public Object
 {
 public:
-    DEFAULT_DTOR(GpsPosition)
+    static constexpr const std::size_t NMEA_SIZE = 4096;
 
     GpsPosition();
+    DEFAULT_CHILD_DTOR(GpsPosition)
 
     /**
      * @brief Constructor
@@ -68,6 +70,8 @@ public:
      * @param geoid    The geoid
      */
     GpsPosition(const Position& position, double geoid);
+
+    util::CStringPack getNMEA() const override;
 
 private:
     /**
@@ -98,6 +102,8 @@ private:
     /// The GPS fix quality
     std::int8_t m_fixQuality = 5;
 
+    util::CString<NMEA_SIZE> m_nmea;
+
 public:
     /**
      *Getters and setters
@@ -108,5 +114,6 @@ public:
     GETSET_V(nrOfSatellites)
     GETSET_V(fixQuality)
     GETSET_V(dilution)
+    GETTER_R(nmea)
 };
 }  // namespace object

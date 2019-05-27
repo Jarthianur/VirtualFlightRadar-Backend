@@ -90,7 +90,13 @@ bool SbsParser::parseField(std::uint32_t fieldNr, const std::string& field, Posi
     {
         switch (fieldNr)
         {
-            case SBS_FIELD_ID: aircraft.set_id(field); break;
+            case SBS_FIELD_ID:
+                if (field.size() >= Aircraft::ID_SIZE)
+                {
+                    throw std::out_of_range("");
+                }
+                aircraft.set_id(field);
+                break;
             case SBS_FIELD_TIME:
                 aircraft.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(
                     field, timestamp::Format::HH_MM_SS_FFF));

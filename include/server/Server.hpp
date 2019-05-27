@@ -22,16 +22,17 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <thread>
 #include <utility>
 
 #include "net/impl/NetworkInterfaceImplBoost.h"
 #include "util/Logger.hpp"
 #include "util/defines.h"
+#include "util/utility.hpp"
 
 #include "Connection.hpp"
 #include "parameters.h"
@@ -89,7 +90,7 @@ public:
      * @param msg The msg to write
      * @threadsafe
      */
-    void send(const std::string& msg);
+    void send(const util::CStringPack& msg);
 
 private:
     /**
@@ -188,10 +189,10 @@ void Server<SocketT>::stop()
 }
 
 template<typename SocketT>
-void Server<SocketT>::send(const std::string& msg)
+void Server<SocketT>::send(const util::CStringPack& msg)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (msg.empty() || m_activeConnections == 0)
+    if (msg.second == 0 || m_activeConnections == 0)
     {
         return;
     }

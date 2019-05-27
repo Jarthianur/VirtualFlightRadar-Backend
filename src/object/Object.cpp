@@ -17,13 +17,14 @@
 
 #include "object/Object.h"
 
+#include <utility>
+
 namespace object
 {
 Object::Object(std::uint32_t priority) : m_lastPriority(priority) {}
 
 void Object::assign(Object&& other)
 {
-    this->m_serialized   = std::move(other.m_serialized);
     this->m_lastPriority = other.m_lastPriority;
     this->m_updateAge    = 0;
 }
@@ -40,17 +41,7 @@ bool Object::tryUpdate(Object&& other)
 
 bool Object::canUpdate(const Object& other) const
 {
-    return this->m_lastPriority >= other.m_lastPriority || other.m_updateAge >= OBJ_OUTDATED;
-}
-
-void Object::set_serialized(std::string&& serialized)
-{
-    m_serialized = std::move(serialized);
-}
-
-const std::string& Object::get_serialized() const
-{
-    return m_serialized;
+    return this->m_lastPriority >= other.m_lastPriority || other.m_updateAge >= OUTDATED;
 }
 
 Object& Object::operator++()

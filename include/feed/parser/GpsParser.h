@@ -40,9 +40,8 @@ namespace parser
 class GpsParser : public Parser<object::GpsPosition>
 {
 public:
-    DEFAULT_DTOR(GpsParser)
-
     GpsParser();
+    DEFAULT_CHILD_DTOR(GpsParser)
 
     /**
      * @brief Unpack into GpsPosition.

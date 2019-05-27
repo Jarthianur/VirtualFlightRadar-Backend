@@ -39,7 +39,7 @@ bool WindParser::unpack(const std::string& sentence, object::Wind& wind) noexcep
              math::checksum(sentence.c_str(), sentence.length())) &&
             (sentence.find("MWV") != std::string::npos))
         {
-            wind.set_serialized(std::string(sentence));
+            wind.get_nmea() = sentence;
             return true;
         }
     }

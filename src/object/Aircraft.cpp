@@ -78,4 +78,9 @@ void Aircraft::set_idType(Aircraft::IdType type)
     m_idType = type > IdType::OGN ? IdType::RANDOM : type;
 }
 
+util::CStringPack Aircraft::getNMEA() const
+{
+    return m_nmea;
+}
+
 }  // namespace object

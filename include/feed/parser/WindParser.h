@@ -38,9 +38,8 @@ namespace parser
 class WindParser : public Parser<object::Wind>
 {
 public:
-    DEFAULT_DTOR(WindParser)
-
     WindParser();
+    DEFAULT_CHILD_DTOR(WindParser)
 
     /**
      * @brief Unpack into Wind.

@@ -166,7 +166,7 @@ bool AprsParser::parseComment(const boost::smatch& match, Aircraft& aircraft) no
 bool AprsParser::parseMovement(const boost::smatch& match, const boost::smatch& comMatch,
                                Aircraft& aircraft) noexcept
 {
-    Movement move;
+    Aircraft::Movement move;
     // This needs to be split later to parse independently.
     try
     {

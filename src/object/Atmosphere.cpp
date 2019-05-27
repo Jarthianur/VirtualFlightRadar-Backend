@@ -18,6 +18,7 @@
 #include "object/Atmosphere.h"
 
 #include <typeinfo>
+#include <utility>
 
 namespace object
 {
@@ -39,6 +40,11 @@ void Atmosphere::assign(Object&& other)
     }
     catch (const std::bad_cast&)
     {}
+}
+
+util::CStringPack Atmosphere::getNMEA() const
+{
+    return m_nmea;
 }
 
 }  // namespace object

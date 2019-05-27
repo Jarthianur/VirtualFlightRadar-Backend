@@ -41,6 +41,7 @@
 #include "util/SignalListener.h"
 
 using namespace data;
+using namespace object;
 
 #define SYNC_TIME 1
 
@@ -94,20 +95,24 @@ void VFRB::run() noexcept
 
 void VFRB::serve()
 {
-    std::string message;
     std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
     while (m_running)
     {
-        message.clear();
         try
         {
-            m_aircraftData->processAircrafts(m_gpsData->get_position(),
-                                             m_atmosphereData->get_atmPressure());
-            m_aircraftData->get_serialized(message);
-            m_gpsData->get_serialized(message);
-            m_atmosphereData->get_serialized(message);
-            m_windData->get_serialized(message);
-            m_server.send(message);
+            m_aircraftData->set_environment(m_gpsData->get_position(),
+                                            m_atmosphereData->get_atmPressure());
+            m_aircraftData->access([this](const Object& it) {
+                if (it.get_updateAge() < Object::OUTDATED)
+                {
+                    m_server.send(it.getNMEA());
+                }
+            });
+
+            auto fn = [this](const Object& it) { m_server.send(it.getNMEA()); };
+            m_gpsData->access(fn);
+            m_atmosphereData->access(fn);
+            m_windData->access(fn);
             std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
         }
         catch (const std::exception& e)

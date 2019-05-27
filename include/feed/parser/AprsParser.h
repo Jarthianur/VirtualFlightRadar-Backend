@@ -41,9 +41,8 @@ namespace parser
 class AprsParser : public Parser<object::Aircraft>
 {
 public:
-    DEFAULT_DTOR(AprsParser)
-
     AprsParser();
+    DEFAULT_CHILD_DTOR(AprsParser)
 
     /**
      * @brief Unpack into Aircraft.

@@ -23,4 +23,9 @@ Wind::Wind() : Object() {}
 
 Wind::Wind(std::uint32_t priority) : Object(priority) {}
 
+util::CStringPack Wind::getNMEA() const
+{
+    return m_nmea;
+}
+
 }  // namespace object

@@ -28,6 +28,7 @@
 #include "net/SocketException.h"
 #include "util/Logger.hpp"
 #include "util/defines.h"
+#include "util/utility.hpp"
 
 namespace server
 {
@@ -54,7 +55,7 @@ public:
      * @param msg The message
      * @return true on success, else false
      */
-    bool write(const std::string& msg);
+    bool write(const util::CStringPack& msg);
 
 private:
     /**
@@ -83,7 +84,7 @@ std::unique_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socke
 }
 
 template<typename SocketT>
-bool Connection<SocketT>::write(const std::string& msg)
+bool Connection<SocketT>::write(const util::CStringPack& msg)
 {
     try
     {

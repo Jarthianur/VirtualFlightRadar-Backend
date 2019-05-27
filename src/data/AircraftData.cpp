@@ -32,15 +32,6 @@ AircraftData::AircraftData() : AircraftData(0) {}
 
 AircraftData::AircraftData(std::int32_t maxDist) : Data(), m_processor(maxDist) {}
 
-void AircraftData::get_serialized(std::string& dest)
-{
-    for (Container::Iterator iter = m_container.begin(); iter != m_container.end(); ++iter)
-    {
-        dest +=
-            iter->aircraft.get_updateAge() < OBJ_OUTDATED ? iter->aircraft.get_serialized() : "";
-    }
-}
-
 bool AircraftData::update(Object&& aircraft)
 {
     Aircraft&& update = static_cast<Aircraft&&>(aircraft);
@@ -52,21 +43,24 @@ bool AircraftData::update(Object&& aircraft)
     return true;
 }
 
-void AircraftData::processAircrafts(const Position& position, double atmPress) noexcept
+void AircraftData::set_environment(const Position& position, double atmPress)
 {
     m_processor.referTo(position, atmPress);
-    Container::Iterator iter = m_container.begin();
+}
 
+void AircraftData::access(const accessor_fn& func)
+{
+    Container::Iterator iter = m_container.begin();
     while (iter != m_container.end())
     {
         ++(iter->aircraft);
         try
         {
-            if (iter->aircraft.get_updateAge() == AC_NO_FLARM_THRESHOLD)
+            if (iter->aircraft.get_updateAge() == NO_FLARM_THRESHOLD)
             {
                 iter->aircraft.set_targetType(Aircraft::TargetType::TRANSPONDER);
             }
-            if (iter->aircraft.get_updateAge() >= AC_DELETE_THRESHOLD)
+            if (iter->aircraft.get_updateAge() >= DELETE_THRESHOLD)
             {
                 Container::KeyType key = iter.getKey();
                 ++iter;
@@ -75,6 +69,7 @@ void AircraftData::processAircrafts(const Position& position, double atmPress) n
             else
             {
                 m_processor.process(iter->aircraft);
+                func(iter->aircraft);
                 ++iter;
             }
         }

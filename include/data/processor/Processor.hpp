@@ -21,8 +21,8 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdio>
-#include <string>
 
 #include "util/defines.h"
 #include "util/math.hpp"
@@ -46,24 +46,16 @@ public:
      * @brief Process an object.
      * @param _1 The object of type T
      */
-    virtual void process(T& _1) = 0;
+    virtual void process(T& _1) const = 0;
 
 protected:
     /**
      * @brief End the processing string with checksum and CRLF.
      */
-    inline void finishSentence()
+    inline int finishSentence(char* buffer, std::size_t size, std::size_t n) const
     {
-        std::snprintf(m_buffer, sizeof(m_buffer), "%02x\r\n",
-                      math::checksum(m_buffer, sizeof(m_buffer)));
-        m_processed.append(m_buffer);
+        return std::snprintf(buffer, n, "%02x\r\n", math::checksum(buffer, size));
     }
-
-    /// The internal buffer for format strings
-    char m_buffer[4096] = "";
-
-    /// Processing string
-    mutable std::string m_processed;
 };
 }  // namespace processor
 }  // namespace data

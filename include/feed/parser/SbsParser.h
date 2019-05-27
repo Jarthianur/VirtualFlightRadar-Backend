@@ -39,9 +39,8 @@ namespace parser
 class SbsParser : public Parser<object::Aircraft>
 {
 public:
-    DEFAULT_DTOR(SbsParser)
-
     SbsParser();
+    DEFAULT_CHILD_DTOR(SbsParser)
 
     /**
      * @brief Unpack into Aircraft.
