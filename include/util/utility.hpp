@@ -23,84 +23,14 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <cstdint>
 #include <cstring>
-#include <list>
-#include <sstream>
 #include <string>
-
-#include <boost/optional.hpp>
-#include <boost/variant.hpp>
+#include <type_traits>
 
 #include "defines.h"
 
 namespace util
 {
-/// @typedef Number
-/// A variant number, which can have one of multiple representations
-using Number = boost::variant<std::int32_t, std::uint64_t, double>;
-
-/// @typedef OptNumber
-/// An optional number, which may be invalid
-using OptNumber = boost::optional<Number>;
-
-/**
- * @brief Convert a string to number.
- * @tparam T    The number type
- * @param str The string to convert
- * @return an optional number, which may be invalid
- */
-template<typename T>
-inline OptNumber stringToNumber(const std::string& str)
-{
-    std::stringstream ss(str);
-    T                 result;
-    if (ss >> result)
-    {
-        return Number(result);
-    }
-    return boost::none;
-}
-
-/**
- * @brief Trim a string on both sides.
- * @param str The string to trim
- * @return the trimmed string
- */
-inline std::string& trimString(std::string& str)
-{
-    std::size_t f = str.find_first_not_of(' ');
-    if (f != std::string::npos)
-    {
-        str = str.substr(f);
-    }
-    std::size_t l = str.find_last_not_of(' ');
-    if (l != std::string::npos)
-    {
-        str = str.substr(0, l + 1);
-    }
-    return str;
-}
-
-/**
- * @brief Split a string, separated at commata.
- * @param str The string to split
- * @return a list of strings
- */
-inline std::list<std::string> splitCommaSeparated(const std::string& str)
-{
-    std::list<std::string> list;
-    std::stringstream      ss;
-    ss.str(str);
-    std::string item;
-
-    while (std::getline(ss, item, ','))
-    {
-        list.push_back(trimString(item));
-    }
-    return list;
-}
-
 /**
  * @brief Get enum value as the underlying type.
  * @param value The enum value

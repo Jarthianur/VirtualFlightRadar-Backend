@@ -83,23 +83,23 @@ std::shared_ptr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(const std:
 
 boost::optional<std::shared_ptr<Feed>> FeedFactory::createFeed(const std::string& name)
 {
-    if (name.find(SECT_KEY_APRSC) != std::string::npos)
+    if (name.find(Configuration::SECT_KEY_APRSC) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<AprscFeed>(name));
     }
-    else if (name.find(SECT_KEY_SBS) != std::string::npos)
+    else if (name.find(Configuration::SECT_KEY_SBS) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<SbsFeed>(name));
     }
-    else if (name.find(SECT_KEY_GPS) != std::string::npos)
+    else if (name.find(Configuration::SECT_KEY_GPS) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<GpsFeed>(name));
     }
-    else if (name.find(SECT_KEY_WIND) != std::string::npos)
+    else if (name.find(Configuration::SECT_KEY_WIND) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<WindFeed>(name));
     }
-    else if (name.find(SECT_KEY_ATMOS) != std::string::npos)
+    else if (name.find(Configuration::SECT_KEY_ATMOS) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<AtmosphereFeed>(name));
     }

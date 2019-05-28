@@ -35,11 +35,13 @@
 #endif
 #define COMPONENT "(GpsFeed)"
 
+using namespace config;
+
 namespace feed
 {
 parser::GpsParser GpsFeed::s_parser;
 
-GpsFeed::GpsFeed(const std::string& name, const config::Properties& properties,
+GpsFeed::GpsFeed(const std::string& name, const Properties& properties,
                  std::shared_ptr<data::GpsData> data)
     : Feed(name, COMPONENT, properties, data)
 {}

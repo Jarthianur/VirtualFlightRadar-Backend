@@ -21,8 +21,12 @@
 
 #include "config/Configuration.h"
 
+#include <cstdint>
 #include <limits>
+#include <list>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 #include <boost/optional.hpp>
@@ -35,6 +39,82 @@ using namespace util;
 
 namespace config
 {
+using Number    = boost::variant<std::int32_t, std::uint64_t, double>;
+using OptNumber = boost::optional<Number>;
+
+/**
+ * @brief Convert a string to number.
+ * @tparam T    The number type
+ * @param str The string to convert
+ * @return an optional number, which may be invalid
+ */
+template<typename T>
+inline OptNumber stringToNumber(const std::string& str)
+{
+    std::stringstream ss(str);
+    T                 result;
+    if (ss >> result)
+    {
+        return Number(result);
+    }
+    return boost::none;
+}
+
+/**
+ * @brief Check an optional Number to be valid.
+ * @param number The optinonal Number
+ * @param path   The key path
+ * @return the number value
+ * @throw std::invalid_argument if the Number is invalid
+ */
+inline Number checkNumber(const OptNumber& number, const char* path)
+{
+    if (!number)
+    {
+        throw std::invalid_argument(std::string("invalid value at ") + path);
+    }
+    return *number;
+}
+
+/**
+ * @brief Trim a string on both sides.
+ * @param str The string to trim
+ * @return the trimmed string
+ */
+inline std::string& trimString(std::string& str)
+{
+    std::size_t f = str.find_first_not_of(' ');
+    if (f != std::string::npos)
+    {
+        str = str.substr(f);
+    }
+    std::size_t l = str.find_last_not_of(' ');
+    if (l != std::string::npos)
+    {
+        str = str.substr(0, l + 1);
+    }
+    return str;
+}
+
+/**
+ * @brief Split a string, separated at commata.
+ * @param str The string to split
+ * @return a list of strings
+ */
+inline std::list<std::string> split(const std::string& str, char delim = ',')
+{
+    std::list<std::string> list;
+    std::stringstream      ss;
+    ss.str(str);
+    std::string item;
+
+    while (std::getline(ss, item, delim))
+    {
+        list.push_back(trimString(item));
+    }
+    return list;
+}
+
 Configuration::Configuration(std::istream& stream)
 {
     try
@@ -44,8 +124,8 @@ Configuration::Configuration(std::istream& stream)
             checkNumber(stringToNumber<double>(properties.get_property(PATH_PRESSURE, "1013.25")),
                         PATH_PRESSURE));
         m_position    = resolvePosition(properties);
-        m_maxDistance = resolveFilter(properties, KV_KEY_MAX_DIST);
-        m_maxHeight   = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
+        m_maxDistance = resolveFilter(properties, PATH_MAX_DIST);
+        m_maxHeight   = resolveFilter(properties, PATH_MAX_HEIGHT);
         m_serverPort  = resolveServerPort(properties);
         m_groundMode  = !properties.get_property(PATH_GND_MODE).empty();
         resolveFeeds(properties);
@@ -53,7 +133,7 @@ Configuration::Configuration(std::istream& stream)
     }
     catch (const std::exception& e)
     {
-        logger.error("(Config) init: ", e.what());
+        logger.error(LOG_PREFIX, "init: ", e.what());
         throw std::logic_error("Failed to read configuration file");
     }
 }
@@ -81,22 +161,21 @@ std::uint16_t Configuration::resolveServerPort(const Properties& properties) con
             PATH_SERVER_PORT));
         if (port > std::numeric_limits<std::uint16_t>::max())
         {
-            throw std::invalid_argument("");
+            throw std::invalid_argument("invalid port number");
         }
         return port & 0xFFFF;
     }
-    catch (const std::logic_error&)
+    catch (const std::logic_error& e)
     {
+        logger.warn(LOG_PREFIX, "resolving server port: ", e.what());
         return 4353;
     }
 }
 
-std::int32_t Configuration::resolveFilter(const Properties&  properties,
-                                          const std::string& key) const
+std::int32_t Configuration::resolveFilter(const Properties& properties, const char* path) const
 {
     try
     {
-        std::string  path   = std::string(SECT_KEY_FILTER ".") + key;
         std::int32_t filter = boost::get<std::int32_t>(
             checkNumber(stringToNumber<std::int32_t>(properties.get_property(path, "-1")), path));
         return filter < 0 ? std::numeric_limits<std::int32_t>::max() : filter;
@@ -109,7 +188,7 @@ std::int32_t Configuration::resolveFilter(const Properties&  properties,
 
 void Configuration::resolveFeeds(const Properties& properties)
 {
-    for (auto& it : splitCommaSeparated(properties.get_property(PATH_FEEDS)))
+    for (auto& it : split(properties.get_property(PATH_FEEDS)))
     {
         try
         {
@@ -118,32 +197,22 @@ void Configuration::resolveFeeds(const Properties& properties)
         }
         catch (const std::out_of_range& e)
         {
-            logger.warn("(Config) resolveFeeds: ", e.what(), " for ", it);
+            logger.warn(LOG_PREFIX, "resolving feeds: ", e.what(), " for ", it);
         }
     }
 }
 
-Number Configuration::checkNumber(const OptNumber& number, const std::string& path) const
-{
-    if (!number)
-    {
-        logger.warn("(Config) ", path, ": Could not resolve value.");
-        throw std::invalid_argument("");
-    }
-    return *number;
-}
-
 void Configuration::dumpInfo() const
 {
-    logger.info("(Config) ", PATH_LATITUDE, ": ", m_position.get_position().latitude);
-    logger.info("(Config) ", PATH_LONGITUDE, ": ", m_position.get_position().longitude);
-    logger.info("(Config) ", PATH_ALTITUDE, ": ", m_position.get_position().altitude);
-    logger.info("(Config) ", PATH_GEOID, ": ", m_position.get_geoid());
-    logger.info("(Config) ", PATH_PRESSURE, ": ", m_atmPressure);
-    logger.info("(Config) ", PATH_MAX_HEIGHT, ": ", m_maxHeight);
-    logger.info("(Config) ", PATH_MAX_DIST, ": ", m_maxDistance);
-    logger.info("(Config) ", PATH_SERVER_PORT, ": ", m_serverPort);
-    logger.info("(Config) ", PATH_GND_MODE, ": ", m_groundMode ? "Yes" : "No");
-    logger.info("(Config) number of feeds: ", m_feedProperties.size());
+    logger.info(LOG_PREFIX, PATH_LATITUDE, ": ", m_position.get_position().latitude);
+    logger.info(LOG_PREFIX, PATH_LONGITUDE, ": ", m_position.get_position().longitude);
+    logger.info(LOG_PREFIX, PATH_ALTITUDE, ": ", m_position.get_position().altitude);
+    logger.info(LOG_PREFIX, PATH_GEOID, ": ", m_position.get_geoid());
+    logger.info(LOG_PREFIX, PATH_PRESSURE, ": ", m_atmPressure);
+    logger.info(LOG_PREFIX, PATH_MAX_HEIGHT, ": ", m_maxHeight);
+    logger.info(LOG_PREFIX, PATH_MAX_DIST, ": ", m_maxDistance);
+    logger.info(LOG_PREFIX, PATH_SERVER_PORT, ": ", m_serverPort);
+    logger.info(LOG_PREFIX, PATH_GND_MODE, ": ", m_groundMode ? "Yes" : "No");
+    logger.info(LOG_PREFIX, "number of feeds: ", m_feedProperties.size());
 }
 }  // namespace config

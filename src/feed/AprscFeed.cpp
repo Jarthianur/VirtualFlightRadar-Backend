@@ -34,18 +34,20 @@
 #endif
 #define COMPONENT "(AprscFeed)"
 
+using namespace config;
+
 namespace feed
 {
 parser::AprsParser AprscFeed::s_parser;
 
-AprscFeed::AprscFeed(const std::string& name, const config::Properties& properties,
+AprscFeed::AprscFeed(const std::string& name, const Properties& properties,
                      std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
     : Feed(name, COMPONENT, properties, data)
 {
     parser::AprsParser::s_maxHeight = maxHeight;
-    if (m_properties.get_property(KV_KEY_LOGIN, "-") == "-")
+    if (m_properties.get_property(Configuration::KV_KEY_LOGIN, "-") == "-")
     {
-        logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_LOGIN);
+        logger.warn(m_component, " could not find: ", m_name, ".", Configuration::KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
 }
@@ -67,7 +69,7 @@ bool AprscFeed::process(const std::string& response)
 
 std::string AprscFeed::get_login() const
 {
-    return m_properties.get_property(KV_KEY_LOGIN);
+    return m_properties.get_property(Configuration::KV_KEY_LOGIN);
 }
 
 }  // namespace feed

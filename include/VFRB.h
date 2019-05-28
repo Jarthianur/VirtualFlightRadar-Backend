@@ -54,6 +54,8 @@ class Feed;
 class VFRB
 {
 public:
+    CONST_LITERAL PROCESS_INTERVAL = 1;
+
     NOT_COPYABLE(VFRB)
     DEFAULT_DTOR(VFRB)
 

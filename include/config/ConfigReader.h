@@ -34,24 +34,29 @@ namespace config
  */
 class ConfigReader
 {
-public:
-    DEFAULT_DTOR(ConfigReader)
+    //< begin members >//
+    /// The input stream
+    std::istream& m_stream;
+    //< end members >//
 
+public:
+    //< begin ctors/dtors >//
     /**
      * @brief Constructor
      * @param stream The input stream to read from
      */
     explicit ConfigReader(std::istream& stream);
 
+    DEFAULT_DTOR(ConfigReader)
+    //< end ctors/dtors >//
+
+    //< begin methods >//
     /**
      * @brief Read the given stream and return read properties.
      * @return the Properties
      */
     Properties read();
-
-private:
-    /// The input stream
-    std::istream& m_stream;
+    //< end methods >//
 };
 
 }  // namespace config

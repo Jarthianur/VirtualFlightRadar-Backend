@@ -35,9 +35,13 @@ namespace config
  */
 class Properties
 {
-public:
-    DEFAULT_DTOR(Properties)
+    //< begin members >//
+    /// The underlying property tree
+    boost::property_tree::ptree m_pTree;
+    //< end members >//
 
+public:
+    //< begin ctors/dtors >//
     /**
      * @brief Copy-constructor
      * @param ptree The property tree to copy
@@ -50,6 +54,10 @@ public:
      */
     explicit Properties(boost::property_tree::ptree&& ptree);
 
+    DEFAULT_DTOR(Properties)
+    //< end ctors/dtors >//
+
+    //< begin methods >//
     /**
      * @brief Get the value at a property path (section.key), or a default value.
      * @param path        The property path
@@ -65,10 +73,7 @@ public:
      * @throw std::out_of_range if the section is not found
      */
     Properties get_propertySection(const std::string& section) const;
-
-private:
-    /// The underlying property tree
-    boost::property_tree::ptree m_pTree;
+    //< end methods >//
 };
 
 }  // namespace config

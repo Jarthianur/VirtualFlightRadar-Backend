@@ -33,11 +33,13 @@
 #endif
 #define COMPONENT "(SbsFeed)"
 
+using namespace config;
+
 namespace feed
 {
 parser::SbsParser SbsFeed::s_parser;
 
-SbsFeed::SbsFeed(const std::string& name, const config::Properties& properties,
+SbsFeed::SbsFeed(const std::string& name, const Properties& properties,
                  std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
     : Feed(name, COMPONENT, properties, data)
 {

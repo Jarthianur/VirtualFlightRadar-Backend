@@ -42,10 +42,9 @@
 
 using namespace data;
 using namespace object;
+using namespace config;
 
-#define SYNC_TIME 1
-
-VFRB::VFRB(std::shared_ptr<config::Configuration> config)
+VFRB::VFRB(std::shared_ptr<Configuration> config)
     : m_aircraftData(std::make_shared<AircraftData>(config->get_maxDistance())),
       m_atmosphereData(
           std::make_shared<AtmosphereData>(object::Atmosphere(config->get_atmPressure(), 0))),
@@ -95,7 +94,7 @@ void VFRB::run() noexcept
 
 void VFRB::serve()
 {
-    std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
+    std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
     while (m_running)
     {
         try
@@ -113,7 +112,7 @@ void VFRB::serve()
             m_gpsData->access(fn);
             m_atmosphereData->access(fn);
             m_windData->access(fn);
-            std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
+            std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
         }
         catch (const std::exception& e)
         {
@@ -123,7 +122,7 @@ void VFRB::serve()
     }
 }
 
-void VFRB::createFeeds(std::shared_ptr<config::Configuration> config)
+void VFRB::createFeeds(std::shared_ptr<Configuration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
     for (const auto& name : config->get_feedNames())
@@ -138,9 +137,10 @@ void VFRB::createFeeds(std::shared_ptr<config::Configuration> config)
             else
             {
                 logger.warn("(VFRB) create feed ", name,
-                            ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                            ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS
-                            ", " SECT_KEY_GPS);
+                            ": No keywords found; be sure feed names contain one of ",
+                            Configuration::SECT_KEY_APRSC, ", ", Configuration::SECT_KEY_SBS, ", ",
+                            Configuration::SECT_KEY_WIND, ", ", Configuration::SECT_KEY_ATMOS, ", ",
+                            Configuration::SECT_KEY_GPS);
             }
         }
         catch (const std::exception& e)

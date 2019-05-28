@@ -121,3 +121,5 @@
     TYPE& operator=(const TYPE&) = delete; \
     TYPE(TYPE&&);                          \
     TYPE& operator=(TYPE&&);
+
+#define CONST_LITERAL static constexpr auto

@@ -33,11 +33,13 @@
 #endif
 #define COMPONENT "(WindFeed)"
 
+using namespace config;
+
 namespace feed
 {
 parser::WindParser WindFeed::s_parser;
 
-WindFeed::WindFeed(const std::string& name, const config::Properties& properties,
+WindFeed::WindFeed(const std::string& name, const Properties& properties,
                    std::shared_ptr<data::WindData> data)
     : Feed(name, COMPONENT, properties, data)
 {}
