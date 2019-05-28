@@ -29,9 +29,9 @@ Aircraft::Aircraft() : Aircraft(0) {}
 
 Aircraft::Aircraft(std::uint32_t priority)
     : Object(priority),
+      m_targetType(TargetType::TRANSPONDER),
       m_idType(IdType::ICAO),
-      m_aircraftType(AircraftType::POWERED_AIRCRAFT),
-      m_targetType(TargetType::TRANSPONDER)
+      m_aircraftType(AircraftType::POWERED_AIRCRAFT)
 {}
 
 void Aircraft::assign(Object&& other)
@@ -81,6 +81,16 @@ void Aircraft::set_idType(Aircraft::IdType type)
 util::CStringPack Aircraft::getNMEA() const
 {
     return m_nmea;
+}
+
+auto Aircraft::getIdType() const -> decltype(m_idType)
+{
+    return m_idType;
+}
+
+auto Aircraft::getAircraftType() const -> decltype(m_aircraftType)
+{
+    return m_aircraftType;
 }
 
 }  // namespace object

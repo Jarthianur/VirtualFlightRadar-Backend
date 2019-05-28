@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "util/defines.h"
 #include "util/utility.hpp"
 
 #include "Object.h"
@@ -39,7 +38,7 @@ public:
     static constexpr const std::size_t NMEA_SIZE = 4096;
 
     Wind();
-    DEFAULT_CHILD_DTOR(Wind)
+    ~Wind() noexcept override = default;
 
     /**
      * @brief Constructor
@@ -47,13 +46,8 @@ public:
      */
     explicit Wind(std::uint32_t priority);
 
-    util::CStringPack getNMEA() const override;
-
-protected:
+    util::CStringPack        getNMEA() const override;
     util::CString<NMEA_SIZE> m_nmea;
-
-public:
-    GETTER_R(nmea)
 };
 
 }  // namespace object

@@ -25,7 +25,6 @@
 #include <string>
 
 #include "object/Aircraft.h"
-#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -40,7 +39,7 @@ class SbsParser : public Parser<object::Aircraft>
 {
 public:
     SbsParser();
-    DEFAULT_CHILD_DTOR(SbsParser)
+    ~SbsParser() noexcept override = default;
 
     /**
      * @brief Unpack into Aircraft.

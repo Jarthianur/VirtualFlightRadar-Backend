@@ -53,7 +53,7 @@ Feed::Protocol SbsFeed::get_protocol() const
 
 bool SbsFeed::process(const std::string& response)
 {
-    object::Aircraft ac(get_priority());
+    object::Aircraft ac(m_priority);
     if (s_parser.unpack(response, ac))
     {
         m_data->update(std::move(ac));

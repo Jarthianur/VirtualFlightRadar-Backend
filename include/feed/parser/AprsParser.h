@@ -27,7 +27,6 @@
 #include <boost/regex.hpp>
 
 #include "object/Aircraft.h"
-#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -42,7 +41,7 @@ class AprsParser : public Parser<object::Aircraft>
 {
 public:
     AprsParser();
-    DEFAULT_CHILD_DTOR(AprsParser)
+    ~AprsParser() noexcept override = default;
 
     /**
      * @brief Unpack into Aircraft.

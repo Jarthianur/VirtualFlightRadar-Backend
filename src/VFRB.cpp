@@ -45,12 +45,12 @@ using namespace object;
 using namespace config;
 
 VFRB::VFRB(std::shared_ptr<Configuration> config)
-    : m_aircraftData(std::make_shared<AircraftData>(config->get_maxDistance())),
+    : m_aircraftData(std::make_shared<AircraftData>(config->m_maxDistance)),
       m_atmosphereData(
-          std::make_shared<AtmosphereData>(object::Atmosphere(config->get_atmPressure(), 0))),
-      m_gpsData(std::make_shared<GpsData>(config->get_position(), config->get_groundMode())),
+          std::make_shared<AtmosphereData>(object::Atmosphere(config->m_atmPressure, 0))),
+      m_gpsData(std::make_shared<GpsData>(config->m_position, config->m_groundMode)),
       m_windData(std::make_shared<WindData>()),
-      m_server(config->get_serverPort()),
+      m_server(config->m_serverPort),
       m_running(false)
 {
     createFeeds(config);
@@ -70,7 +70,7 @@ void VFRB::run() noexcept
     });
     for (auto it : m_feeds)
     {
-        logger.info("(VFRB) run feed: ", it->get_name());
+        logger.info("(VFRB) run feed: ", it->m_name);
         try
         {
             clientManager.subscribe(it);
@@ -102,7 +102,7 @@ void VFRB::serve()
             m_aircraftData->set_environment(m_gpsData->get_position(),
                                             m_atmosphereData->get_atmPressure());
             m_aircraftData->access([this](const Object& it) {
-                if (it.get_updateAge() < Object::OUTDATED)
+                if (it.getUpdateAge() < Object::OUTDATED)
                 {
                     m_server.send(it.getNMEA());
                 }
@@ -125,7 +125,7 @@ void VFRB::serve()
 void VFRB::createFeeds(std::shared_ptr<Configuration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
-    for (const auto& name : config->get_feedNames())
+    for (const auto& name : config->m_feedNames)
     {
         try
         {

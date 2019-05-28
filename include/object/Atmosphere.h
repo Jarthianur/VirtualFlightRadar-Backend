@@ -23,7 +23,6 @@
 
 #include <cstdint>
 
-#include "util/defines.h"
 #include "util/utility.hpp"
 
 #include "Object.h"
@@ -43,7 +42,7 @@ public:
     static constexpr const std::size_t NMEA_SIZE = 4096;
 
     Atmosphere();
-    DEFAULT_CHILD_DTOR(Atmosphere)
+    ~Atmosphere() noexcept override = default;
 
     /**
      * @brief Constructor
@@ -59,24 +58,16 @@ public:
     Atmosphere(double pressure, std::uint32_t priority);
 
     util::CStringPack getNMEA() const override;
+    /// The atmospheric pressure
+    double m_pressure = ICAO_STD;
+
+    util::CString<NMEA_SIZE> m_nmea;
 
 private:
     /**
      * @brief Extend Object::assign.
      */
     void assign(Object&& other) override;
-
-    /// The atmospheric pressure
-    double m_pressure = ICAO_STD;
-
-    util::CString<NMEA_SIZE> m_nmea;
-
-public:
-    /**
-     * Getters and setters
-     */
-    GETSET_V(pressure)
-    GETTER_R(nmea)
 };
 
 }  // namespace object

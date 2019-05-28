@@ -24,7 +24,6 @@
 #include <ctime>
 
 #include "object/GpsPosition.h"
-#include "util/defines.h"
 
 #include "Processor.hpp"
 
@@ -39,7 +38,7 @@ class GpsProcessor : public Processor<object::GpsPosition>
 {
 public:
     GpsProcessor();
-    DEFAULT_CHILD_DTOR(GpsProcessor)
+    ~GpsProcessor() noexcept override = default;
 
     /**
      * @brief Process a GPS position.

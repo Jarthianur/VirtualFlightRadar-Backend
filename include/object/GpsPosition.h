@@ -24,7 +24,6 @@
 #include <cstdint>
 
 #include "impl/DateTimeImplBoost.h"
-#include "util/defines.h"
 #include "util/utility.hpp"
 
 #include "Object.h"
@@ -56,7 +55,7 @@ public:
     static constexpr const std::size_t NMEA_SIZE = 4096;
 
     GpsPosition();
-    DEFAULT_CHILD_DTOR(GpsPosition)
+    ~GpsPosition() noexcept override = default;
 
     /**
      * @brief Constructor
@@ -72,17 +71,6 @@ public:
     GpsPosition(const Position& position, double geoid);
 
     util::CStringPack getNMEA() const override;
-
-private:
-    /**
-     * @brief Override Object::assign.
-     */
-    void assign(Object&& other) override;
-
-    /**
-     * @brief Override Object::canUpdate.
-     */
-    bool canUpdate(const Object& other) const override;
 
     /// The position
     Position m_position{0.0, 0.0, 0};
@@ -104,16 +92,15 @@ private:
 
     util::CString<NMEA_SIZE> m_nmea;
 
-public:
+private:
     /**
-     *Getters and setters
+     * @brief Override Object::assign.
      */
-    GETSET_CR(position)
-    GETSET_V(geoid)
-    GETSET_V(timeStamp)
-    GETSET_V(nrOfSatellites)
-    GETSET_V(fixQuality)
-    GETSET_V(dilution)
-    GETTER_R(nmea)
+    void assign(Object&& other) override;
+
+    /**
+     * @brief Override Object::canUpdate.
+     */
+    bool canUpdate(const Object& other) const override;
 };
 }  // namespace object

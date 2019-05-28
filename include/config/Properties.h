@@ -26,8 +26,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "util/defines.h"
-
 namespace config
 {
 /**
@@ -54,7 +52,7 @@ public:
      */
     explicit Properties(boost::property_tree::ptree&& ptree);
 
-    DEFAULT_DTOR(Properties)
+    ~Properties() noexcept = default;
     //< end ctors/dtors >//
 
     //< begin methods >//

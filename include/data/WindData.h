@@ -24,7 +24,6 @@
 #include <mutex>
 
 #include "object/Wind.h"
-#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -37,7 +36,7 @@ class WindData : public Data
 {
 public:
     WindData();
-    DEFAULT_CHILD_DTOR(WindData)
+    ~WindData() noexcept override = default;
 
     /**
      * @brief Constructor

@@ -24,7 +24,6 @@
 #include <cstddef>
 #include <cstdio>
 
-#include "util/defines.h"
 #include "util/math.hpp"
 
 namespace data
@@ -39,8 +38,8 @@ template<typename T>
 class Processor
 {
 public:
-    DEFAULT_CTOR(Processor)
-    DEFAULT_VIRTUAL_DTOR(Processor)
+    Processor()                   = default;
+    virtual ~Processor() noexcept = default;
 
     /**
      * @brief Process an object.

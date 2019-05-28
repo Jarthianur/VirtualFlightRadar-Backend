@@ -52,7 +52,7 @@ class SbsFeed : public Feed
 {
 public:
     NOT_COPYABLE(SbsFeed)
-    DEFAULT_CHILD_DTOR(SbsFeed)
+    ~SbsFeed() noexcept override = default;
 
     /**
      * @brief Constructor

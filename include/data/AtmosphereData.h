@@ -24,7 +24,6 @@
 #include <mutex>
 
 #include "object/Atmosphere.h"
-#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -37,7 +36,7 @@ class AtmosphereData : public Data
 {
 public:
     AtmosphereData();
-    DEFAULT_CHILD_DTOR(AtmosphereData)
+    ~AtmosphereData() noexcept override = default;
 
     /**
      * @brief Constructor

@@ -28,7 +28,6 @@
 #include <boost/optional.hpp>
 
 #include "config/Properties.h"
-#include "util/defines.h"
 
 namespace config
 {
@@ -53,7 +52,7 @@ class Feed;
 class FeedFactory
 {
 public:
-    DEFAULT_DTOR(FeedFactory)
+    ~FeedFactory() noexcept = default;
 
     /**
      * @brief Constructor

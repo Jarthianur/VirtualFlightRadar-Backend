@@ -27,7 +27,6 @@
 #include <string>
 
 #include "object/GpsPosition.h"
-#include "util/defines.h"
 
 #include "Properties.h"
 
@@ -36,32 +35,10 @@ namespace config
 /**
  * @brief VFRB Configuration
  */
-class Configuration
+class Configuration final
 {
     //< begin members >//
-    /// Fallback position
-    object::GpsPosition m_position;
-
-    /// Atmospheric fallback pressure
-    double m_atmPressure;
-
-    /// Maximum height for reported aircrafts
-    std::int32_t m_maxHeight;
-
-    /// Maximum distance for reported aircrafts
-    std::int32_t m_maxDistance;
-
-    /// Port where to serve reports
-    std::uint16_t m_serverPort;
-
-    /// Ground mode state
-    bool m_groundMode;
-
-    /// List of feed names
-    std::list<std::string> m_feedNames;
-
-    ///  Map feed names to their properties
-    std::unordered_map<std::string, Properties> m_feedProperties;
+    const Properties m_properties;
     //< end members >//
 
     //< begin methods >//
@@ -83,7 +60,7 @@ class Configuration
      * @brief Resolve the feeds and their config.
      * @param properties The properties
      */
-    void resolveFeeds(const Properties& properties);
+    std::unordered_map<std::string, Properties> resolveFeeds(const Properties& properties);
 
     /**
      * @brief Resolve a filter value.
@@ -101,22 +78,48 @@ class Configuration
     //< end methods >//
 
     //< begin constants >//
-    CONST_LITERAL LOG_PREFIX = "(Config) ";
+    static constexpr auto LOG_PREFIX = "(Config) ";
 
     // Path definitions
-    CONST_LITERAL PATH_FEEDS       = "general.feeds";
-    CONST_LITERAL PATH_GND_MODE    = "general.gndMode";
-    CONST_LITERAL PATH_SERVER_PORT = "general.serverPort";
-    CONST_LITERAL PATH_LATITUDE    = "fallback.latitude";
-    CONST_LITERAL PATH_LONGITUDE   = "fallback.longitude";
-    CONST_LITERAL PATH_ALTITUDE    = "fallback.altitude";
-    CONST_LITERAL PATH_GEOID       = "fallback.geoid";
-    CONST_LITERAL PATH_PRESSURE    = "fallback.pressure";
-    CONST_LITERAL PATH_MAX_DIST    = "filter.maxDistance";
-    CONST_LITERAL PATH_MAX_HEIGHT  = "filter.maxHeight";
+    static constexpr auto PATH_FEEDS       = "general.feeds";
+    static constexpr auto PATH_GND_MODE    = "general.gndMode";
+    static constexpr auto PATH_SERVER_PORT = "general.serverPort";
+    static constexpr auto PATH_LATITUDE    = "fallback.latitude";
+    static constexpr auto PATH_LONGITUDE   = "fallback.longitude";
+    static constexpr auto PATH_ALTITUDE    = "fallback.altitude";
+    static constexpr auto PATH_GEOID       = "fallback.geoid";
+    static constexpr auto PATH_PRESSURE    = "fallback.pressure";
+    static constexpr auto PATH_MAX_DIST    = "filter.maxDistance";
+    static constexpr auto PATH_MAX_HEIGHT  = "filter.maxHeight";
     //< end constants >//
 
 public:
+    //< begin members >//
+    /// Ground mode state
+    bool m_groundMode;
+
+    /// Fallback position
+    const object::GpsPosition m_position;
+
+    /// Atmospheric fallback pressure
+    const double m_atmPressure;
+
+    /// Maximum height for reported aircrafts
+    const std::int32_t m_maxHeight;
+
+    /// Maximum distance for reported aircrafts
+    const std::int32_t m_maxDistance;
+
+    /// Port where to serve reports
+    const std::uint16_t m_serverPort;
+
+    /// List of feed names
+    const std::list<std::string> m_feedNames;
+
+    ///  Map feed names to their properties
+    const std::unordered_map<std::string, Properties> m_feedProperties;
+    //< end members >//
+
     //< begin ctors/dtors >//
     /**
      * @brief Constructor
@@ -125,54 +128,43 @@ public:
      */
     explicit Configuration(std::istream& stream);
 
-    DEFAULT_DTOR(Configuration)
+    ~Configuration() noexcept = default;
     //< end ctors/dtors >//
-
-    //< begin getters/setters >//
-    GETTER_CR(position)
-    GETTER_V(atmPressure)
-    GETTER_V(maxHeight)
-    GETTER_V(maxDistance)
-    GETTER_V(serverPort)
-    GETSET_V(groundMode)
-    GETTER_CR(feedNames)
-    GETTER_CR(feedProperties)
-    //< end getters/setters >//
 
     //< begin constants >//
     // Configuration section keys
-    CONST_LITERAL SECT_KEY_FALLBACK = "fallback";
-    CONST_LITERAL SECT_KEY_GENERAL  = "general";
-    CONST_LITERAL SECT_KEY_FILTER   = "filter";
+    static constexpr auto SECT_KEY_FALLBACK = "fallback";
+    static constexpr auto SECT_KEY_GENERAL  = "general";
+    static constexpr auto SECT_KEY_FILTER   = "filter";
 
     // Keywords for feeds
-    CONST_LITERAL SECT_KEY_APRSC = "aprs";
-    CONST_LITERAL SECT_KEY_SBS   = "sbs";
-    CONST_LITERAL SECT_KEY_GPS   = "gps";
-    CONST_LITERAL SECT_KEY_WIND  = "wind";
-    CONST_LITERAL SECT_KEY_ATMOS = "atm";
+    static constexpr auto SECT_KEY_APRSC = "aprs";
+    static constexpr auto SECT_KEY_SBS   = "sbs";
+    static constexpr auto SECT_KEY_GPS   = "gps";
+    static constexpr auto SECT_KEY_WIND  = "wind";
+    static constexpr auto SECT_KEY_ATMOS = "atm";
 
     // Property keys for section "general"
-    CONST_LITERAL KV_KEY_FEEDS       = "feeds";
-    CONST_LITERAL KV_KEY_GND_MODE    = "gndMode";
-    CONST_LITERAL KV_KEY_SERVER_PORT = "serverPort";
+    static constexpr auto KV_KEY_FEEDS       = "feeds";
+    static constexpr auto KV_KEY_GND_MODE    = "gndMode";
+    static constexpr auto KV_KEY_SERVER_PORT = "serverPort";
 
     // Property keys for section "fallback"
-    CONST_LITERAL KV_KEY_LATITUDE  = "latitude";
-    CONST_LITERAL KV_KEY_LONGITUDE = "longitude";
-    CONST_LITERAL KV_KEY_ALTITUDE  = "altitude";
-    CONST_LITERAL KV_KEY_GEOID     = "geoid";
-    CONST_LITERAL KV_KEY_PRESSURE  = "pressure";
+    static constexpr auto KV_KEY_LATITUDE  = "latitude";
+    static constexpr auto KV_KEY_LONGITUDE = "longitude";
+    static constexpr auto KV_KEY_ALTITUDE  = "altitude";
+    static constexpr auto KV_KEY_GEOID     = "geoid";
+    static constexpr auto KV_KEY_PRESSURE  = "pressure";
 
     // Property keys for section "filter"
-    CONST_LITERAL KV_KEY_MAX_DIST   = "maxDistance";
-    CONST_LITERAL KV_KEY_MAX_HEIGHT = "maxHeight";
+    static constexpr auto KV_KEY_MAX_DIST   = "maxDistance";
+    static constexpr auto KV_KEY_MAX_HEIGHT = "maxHeight";
 
     // Property keys for feed sections
-    CONST_LITERAL KV_KEY_HOST     = "host";
-    CONST_LITERAL KV_KEY_PORT     = "port";
-    CONST_LITERAL KV_KEY_PRIORITY = "priority";
-    CONST_LITERAL KV_KEY_LOGIN    = "login";
+    static constexpr auto KV_KEY_HOST     = "host";
+    static constexpr auto KV_KEY_PORT     = "port";
+    static constexpr auto KV_KEY_PRIORITY = "priority";
+    static constexpr auto KV_KEY_LOGIN    = "login";
     //< end constants >//
 };
 

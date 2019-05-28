@@ -115,8 +115,8 @@ bool AprsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcep
     {
         return false;
     }
-    aircraft.set_fullInfo(parseMovement(match, com_match, aircraft));
-    aircraft.set_targetType(Aircraft::TargetType::FLARM);
+    aircraft.m_fullInfo   = parseMovement(match, com_match, aircraft);
+    aircraft.m_targetType = Aircraft::TargetType::FLARM;
     return true;
 }
 
@@ -138,8 +138,8 @@ bool AprsParser::parsePosition(const boost::smatch& match, Aircraft& aircraft) n
         }
         pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT)) * math::FEET_2_M);
 
-        aircraft.set_position(pos);
-        valid = pos.altitude <= s_maxHeight;
+        aircraft.m_position = pos;
+        valid               = pos.altitude <= s_maxHeight;
     }
     catch (const std::logic_error&)
     {}
@@ -148,7 +148,7 @@ bool AprsParser::parsePosition(const boost::smatch& match, Aircraft& aircraft) n
 
 bool AprsParser::parseComment(const boost::smatch& match, Aircraft& aircraft) noexcept
 {
-    aircraft.set_id(match.str(RE_APRS_COM_ID));
+    aircraft.m_id = match.str(RE_APRS_COM_ID);
     try
     {
         aircraft.set_idType(static_cast<Aircraft::IdType>(
@@ -178,7 +178,7 @@ bool AprsParser::parseMovement(const boost::smatch& match, const boost::smatch& 
     {
         return false;
     }
-    aircraft.set_movement(move);
+    aircraft.m_movement = move;
     return true;
 }
 
@@ -186,8 +186,8 @@ bool AprsParser::parseTimeStamp(const boost::smatch& match, Aircraft& aircraft) 
 {
     try
     {
-        aircraft.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_APRS_TIME),
-                                                                       timestamp::Format::HHMMSS));
+        aircraft.m_timeStamp = TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_APRS_TIME),
+                                                                       timestamp::Format::HHMMSS);
     }
     catch (const std::invalid_argument&)
     {

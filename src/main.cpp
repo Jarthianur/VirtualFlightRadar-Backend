@@ -113,7 +113,7 @@ std::shared_ptr<Configuration> get_config(const program_options::variables_map& 
         auto conf = std::make_shared<Configuration>(file);
         if (variables.count("ground-mode"))
         {
-            conf->set_groundMode(true);
+            conf->m_groundMode = true;
             logger.info("(VFRB) Override ground mode: Yes");
         }
         return conf;

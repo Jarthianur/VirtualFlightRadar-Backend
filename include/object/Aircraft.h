@@ -25,7 +25,6 @@
 #include <cstring>
 
 #include "impl/DateTimeImplBoost.h"
-#include "util/defines.h"
 #include "util/utility.hpp"
 
 #include "GpsPosition.h"
@@ -111,7 +110,7 @@ public:
      */
     explicit Aircraft(std::uint32_t priority);
 
-    DEFAULT_CHILD_DTOR(Aircraft)
+    ~Aircraft() noexcept override = default;
 
     /**
      * @brief Set the aircraft type.
@@ -134,27 +133,8 @@ public:
 
     util::CStringPack getNMEA() const override;
 
-private:
-    /**
-     * @brief Assign an other aircrafts values to this.
-     * @param other The other Aircraft
-     */
-    void assign(Object&& other) override;
-
-    /**
-     * @brief Override Object::canUpdate.
-     */
-    bool canUpdate(const Object& other) const override;
-
     /// Aircraft identifier
     util::CString<ID_SIZE> m_id;
-
-    /// Id type
-    IdType m_idType;
-
-    /// Aircraft type
-    AircraftType m_aircraftType;
-
     /// Target type
     TargetType m_targetType;
 
@@ -172,19 +152,27 @@ private:
 
     util::CString<NMEA_SIZE> m_nmea;
 
-public:
+private:
     /**
-     * Getters and setters
+     * @brief Assign an other aircrafts values to this.
+     * @param other The other Aircraft
      */
-    GETSET_CR(id)
-    GETTER_V(idType)
-    GETSET_V(targetType)
-    GETTER_V(aircraftType)
-    GETSET_V(fullInfo)
-    GETSET_CR(position)
-    GETSET_CR(movement)
-    GETSET_V(timeStamp)
-    GETTER_R(nmea)
+    void assign(Object&& other) override;
+
+    /**
+     * @brief Override Object::canUpdate.
+     */
+    bool canUpdate(const Object& other) const override;
+
+    /// Id type
+    IdType m_idType;
+
+    /// Aircraft type
+    AircraftType m_aircraftType;
+
+public:
+    auto getIdType() const -> decltype(m_idType);
+    auto getAircraftType() const -> decltype(m_aircraftType);
 };
 
 }  // namespace object

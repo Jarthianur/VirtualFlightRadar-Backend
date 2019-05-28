@@ -51,7 +51,7 @@ Feed::Protocol WindFeed::get_protocol() const
 
 bool WindFeed::process(const std::string& response)
 {
-    object::Wind wind(get_priority());
+    object::Wind wind(m_priority);
     if (s_parser.unpack(response, wind))
     {
         m_data->update(std::move(wind));

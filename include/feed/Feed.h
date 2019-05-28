@@ -43,7 +43,7 @@ class Feed
 {
 public:
     NOT_COPYABLE(Feed)
-    DEFAULT_VIRTUAL_DTOR(Feed)
+    virtual ~Feed() noexcept = default;
 
     /**
      * @brief The protocol that the Feed supports.
@@ -74,6 +74,15 @@ public:
      */
     virtual bool process(const std::string& response) = 0;
 
+    /// Unique name
+    const std::string m_name;
+
+    /// Component string
+    const char* const m_component;
+
+    /// Properties
+    const config::Properties m_properties;
+
 protected:
     /**
      * @brief Constructor
@@ -85,33 +94,16 @@ protected:
     Feed(const std::string& name, const char* component, const config::Properties& propertyMap,
          std::shared_ptr<data::Data> data);
 
-    /// Unique name
-    const std::string m_name;
-
-    /// Component string
-    const char* const m_component;
-
-    /// Properties
-    const config::Properties m_properties;
-
     /// Respective Data container
     std::shared_ptr<data::Data> m_data;
+    /// Priority
+    const std::uint32_t m_priority;
 
 private:
     /**
      * @brief Initialize the priority from the given properties.
      */
-    void initPriority() noexcept;
-
-    /// Priority
-    std::uint32_t m_priority;
-
-public:
-    /**
-     * Getters
-     */
-    GETTER_CR(name)
-    GETTER_V(priority)
+    std::uint32_t initPriority() const noexcept;
 };
 
 }  // namespace feed

@@ -31,7 +31,6 @@
 
 #include "object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
-#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -50,8 +49,8 @@ class AircraftData : public Data
     class Container
     {
     public:
-        DEFAULT_CTOR(Container)
-        DEFAULT_DTOR(Container)
+        Container()           = default;
+        ~Container() noexcept = default;
 
         struct Iterator;
         struct ValueType
@@ -146,7 +145,7 @@ class AircraftData : public Data
         std::pair<Iterator, bool> insert(object::Aircraft&& aircraft)
         {
             KeyType key =
-                std::hash<std::string>()(*aircraft.get_id());  // TODO: provide char* based hashing
+                std::hash<std::string>()(*aircraft.m_id);  // TODO: provide char* based hashing
             std::lock_guard<std::mutex> lock(m_modMutex);
             Iterator                    iter(m_container.find(key), *this);
             if (iter == end())
@@ -176,7 +175,7 @@ class AircraftData : public Data
 
 public:
     AircraftData();
-    DEFAULT_CHILD_DTOR(AircraftData)
+    ~AircraftData() noexcept override = default;
 
     /**
      * @brief Constructor

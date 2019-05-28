@@ -27,8 +27,6 @@
 #include <string>
 #include <type_traits>
 
-#include "defines.h"
-
 namespace util
 {
 /**
@@ -45,12 +43,22 @@ constexpr auto raw_type(T value) -> typename std::underlying_type<T>::type
 using CStringPack = std::pair<const char*, std::size_t>;
 
 template<std::size_t N, typename std::enable_if<(N > 0)>::type* = nullptr>
-class CString
+class CString final
 {
+    void copy(const char* str, std::size_t n)
+    {
+        m_length = std::min(last, n);
+        std::memcpy(m_value, str, m_length);
+        m_value[m_length] = '\0';
+    }
+
+    char        m_value[N];
+    std::size_t m_length = 0;
+
 public:
     static constexpr const std::size_t last = N - 1;
 
-    DEFAULT_DTOR(CString)
+    ~CString() noexcept = default;
 
     CString()
     {
@@ -111,19 +119,10 @@ public:
         return std::make_pair<const char*, std::size_t>(m_value, m_length);
     }
 
-protected:
-    void copy(const char* str, std::size_t n)
+    inline auto getLength() const -> decltype(m_length)
     {
-        m_length = std::min(last, n);
-        std::memcpy(m_value, str, m_length);
-        m_value[m_length] = '\0';
+        return m_length;
     }
-
-    char        m_value[N];
-    std::size_t m_length = 0;
-
-public:
-    GETTER_V(length)
 };
 
 }  // namespace util

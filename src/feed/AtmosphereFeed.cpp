@@ -51,7 +51,7 @@ Feed::Protocol AtmosphereFeed::get_protocol() const
 
 bool AtmosphereFeed::process(const std::string& response)
 {
-    object::Atmosphere atmos(get_priority());
+    object::Atmosphere atmos(m_priority);
     if (s_parser.unpack(response, atmos))
     {
         m_data->update(std::move(atmos));

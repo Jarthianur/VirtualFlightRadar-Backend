@@ -56,11 +56,11 @@ void AircraftData::access(const accessor_fn& func)
         ++(iter->aircraft);
         try
         {
-            if (iter->aircraft.get_updateAge() == NO_FLARM_THRESHOLD)
+            if (iter->aircraft.getUpdateAge() == NO_FLARM_THRESHOLD)
             {
-                iter->aircraft.set_targetType(Aircraft::TargetType::TRANSPONDER);
+                iter->aircraft.m_targetType = Aircraft::TargetType::TRANSPONDER;
             }
-            if (iter->aircraft.get_updateAge() >= DELETE_THRESHOLD)
+            if (iter->aircraft.getUpdateAge() >= DELETE_THRESHOLD)
             {
                 Container::KeyType key = iter.getKey();
                 ++iter;

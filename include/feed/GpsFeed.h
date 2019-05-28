@@ -51,7 +51,7 @@ class GpsFeed : public Feed
 {
 public:
     NOT_COPYABLE(GpsFeed)
-    DEFAULT_CHILD_DTOR(GpsFeed)
+    ~GpsFeed() noexcept override = default;
 
     /**
      * @brief Constructor

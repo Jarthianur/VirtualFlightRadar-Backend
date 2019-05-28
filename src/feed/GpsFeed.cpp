@@ -53,7 +53,7 @@ Feed::Protocol GpsFeed::get_protocol() const
 
 bool GpsFeed::process(const std::string& response)
 {
-    object::GpsPosition pos(get_priority());
+    object::GpsPosition pos(m_priority);
     if (s_parser.unpack(response, pos))
     {
         try

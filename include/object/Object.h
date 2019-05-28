@@ -19,7 +19,6 @@
 
 #include <cstdint>
 
-#include "util/defines.h"
 #include "util/utility.hpp"
 
 namespace object
@@ -32,8 +31,8 @@ class Object
 public:
     static constexpr const std::uint32_t OUTDATED = 4;
 
-    DEFAULT_CTOR(Object)
-    DEFAULT_VIRTUAL_DTOR(Object)
+    Object()                   = default;
+    virtual ~Object() noexcept = default;
 
     /**
      * @brief Constructor
@@ -81,6 +80,6 @@ public:
     /**
      * Getters
      */
-    GETTER_V(updateAge)
+    auto getUpdateAge() const -> decltype(m_updateAge);
 };
 }  // namespace object

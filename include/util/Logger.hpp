@@ -27,16 +27,14 @@
 #include <string>
 #include <utility>
 
-#include "util/defines.h"
-
 /**
  * @brief Logger with different levels.
  */
 class Logger
 {
 public:
-    DEFAULT_CTOR(Logger)
-    DEFAULT_DTOR(Logger)
+    Logger()           = default;
+    ~Logger() noexcept = default;
 
     /**
      * @brief Log on INFO level.

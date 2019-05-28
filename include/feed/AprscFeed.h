@@ -53,7 +53,7 @@ class AprscFeed : public Feed
 {
 public:
     NOT_COPYABLE(AprscFeed)
-    DEFAULT_CHILD_DTOR(AprscFeed)
+    ~AprscFeed() noexcept override = default;
 
     /**
      * @brief Constructor

@@ -116,26 +116,23 @@ inline std::list<std::string> split(const std::string& str, char delim = ',')
 }
 
 Configuration::Configuration(std::istream& stream)
+try : m_properties(ConfigReader(stream).read()),
+      m_groundMode(!m_properties.get_property(PATH_GND_MODE).empty()),
+      m_position(resolvePosition(m_properties)),
+      m_atmPressure(boost::get<double>(
+          checkNumber(stringToNumber<double>(m_properties.get_property(PATH_PRESSURE, "1013.25")),
+                      PATH_PRESSURE))),
+      m_maxHeight(resolveFilter(m_properties, PATH_MAX_HEIGHT)),
+      m_maxDistance(resolveFilter(m_properties, PATH_MAX_DIST)),
+      m_serverPort(resolveServerPort(m_properties)),
+      m_feedNames(split(m_properties.get_property(PATH_FEEDS))),
+      m_feedProperties(resolveFeeds(m_properties))
 {
-    try
-    {
-        Properties properties = ConfigReader(stream).read();
-        m_atmPressure         = boost::get<double>(
-            checkNumber(stringToNumber<double>(properties.get_property(PATH_PRESSURE, "1013.25")),
-                        PATH_PRESSURE));
-        m_position    = resolvePosition(properties);
-        m_maxDistance = resolveFilter(properties, PATH_MAX_DIST);
-        m_maxHeight   = resolveFilter(properties, PATH_MAX_HEIGHT);
-        m_serverPort  = resolveServerPort(properties);
-        m_groundMode  = !properties.get_property(PATH_GND_MODE).empty();
-        resolveFeeds(properties);
-        dumpInfo();
-    }
-    catch (const std::exception& e)
-    {
-        logger.error(LOG_PREFIX, "init: ", e.what());
-        throw std::logic_error("Failed to read configuration file");
-    }
+    dumpInfo();
+}
+catch (const std::exception& e)
+{
+    logger.error(LOG_PREFIX, "init: ", e.what());
 }
 
 object::GpsPosition Configuration::resolvePosition(const Properties& properties) const
@@ -186,28 +183,30 @@ std::int32_t Configuration::resolveFilter(const Properties& properties, const ch
     }
 }
 
-void Configuration::resolveFeeds(const Properties& properties)
+std::unordered_map<std::string, Properties>
+    Configuration::resolveFeeds(const Properties& properties)
 {
-    for (auto& it : split(properties.get_property(PATH_FEEDS)))
+    std::unordered_map<std::string, Properties> map;
+    for (const auto& it : m_feedNames)
     {
         try
         {
-            m_feedProperties.emplace(it, properties.get_propertySection(it));
-            m_feedNames.push_back(it);
+            map.emplace(it, properties.get_propertySection(it));
         }
         catch (const std::out_of_range& e)
         {
             logger.warn(LOG_PREFIX, "resolving feeds: ", e.what(), " for ", it);
         }
     }
+    return map;
 }
 
 void Configuration::dumpInfo() const
 {
-    logger.info(LOG_PREFIX, PATH_LATITUDE, ": ", m_position.get_position().latitude);
-    logger.info(LOG_PREFIX, PATH_LONGITUDE, ": ", m_position.get_position().longitude);
-    logger.info(LOG_PREFIX, PATH_ALTITUDE, ": ", m_position.get_position().altitude);
-    logger.info(LOG_PREFIX, PATH_GEOID, ": ", m_position.get_geoid());
+    logger.info(LOG_PREFIX, PATH_LATITUDE, ": ", m_position.m_position.latitude);
+    logger.info(LOG_PREFIX, PATH_LONGITUDE, ": ", m_position.m_position.longitude);
+    logger.info(LOG_PREFIX, PATH_ALTITUDE, ": ", m_position.m_position.altitude);
+    logger.info(LOG_PREFIX, PATH_GEOID, ": ", m_position.m_geoid);
     logger.info(LOG_PREFIX, PATH_PRESSURE, ": ", m_atmPressure);
     logger.info(LOG_PREFIX, PATH_MAX_HEIGHT, ": ", m_maxHeight);
     logger.info(LOG_PREFIX, PATH_MAX_DIST, ": ", m_maxDistance);
@@ -215,4 +214,5 @@ void Configuration::dumpInfo() const
     logger.info(LOG_PREFIX, PATH_GND_MODE, ": ", m_groundMode ? "Yes" : "No");
     logger.info(LOG_PREFIX, "number of feeds: ", m_feedProperties.size());
 }
+
 }  // namespace config

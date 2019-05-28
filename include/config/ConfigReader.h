@@ -23,8 +23,6 @@
 
 #include <istream>
 
-#include "util/defines.h"
-
 #include "Properties.h"
 
 namespace config
@@ -47,7 +45,7 @@ public:
      */
     explicit ConfigReader(std::istream& stream);
 
-    DEFAULT_DTOR(ConfigReader)
+    ~ConfigReader() noexcept = default;
     //< end ctors/dtors >//
 
     //< begin methods >//

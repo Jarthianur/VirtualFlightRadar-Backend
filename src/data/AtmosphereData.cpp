@@ -44,7 +44,7 @@ bool AtmosphereData::update(Object&& atmosphere)
 double AtmosphereData::get_atmPressure()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_atmosphere.get_pressure();
+    return m_atmosphere.m_pressure;
 }
 
 }  // namespace data

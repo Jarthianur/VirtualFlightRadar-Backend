@@ -25,8 +25,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "util/defines.h"
-
 namespace object
 {
 namespace timestamp
@@ -50,8 +48,8 @@ template<typename DateTimeT>
 class TimeStamp
 {
 public:
-    DEFAULT_CTOR(TimeStamp)
-    DEFAULT_DTOR(TimeStamp)
+    TimeStamp()           = default;
+    ~TimeStamp() noexcept = default;
 
     /**
      * @brief Constructor

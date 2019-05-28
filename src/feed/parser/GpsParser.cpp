@@ -110,18 +110,16 @@ bool GpsParser::parsePosition(const boost::smatch& match, GpsPosition& position)
     {
         pos.longitude = -pos.longitude;
     }
-    pos.altitude = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
-    position.set_position(pos);
-    position.set_timeStamp(
-        TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_GGA_TIME), timestamp::Format::HHMMSS));
-    position.set_fixQuality(
-        static_cast<std::result_of<decltype (&GpsPosition::get_fixQuality)(GpsPosition)>::type>(
-            std::stoi(match.str(RE_GGA_FIX))));
-    position.set_nrOfSatellites(
-        static_cast<std::result_of<decltype (&GpsPosition::get_nrOfSatellites)(GpsPosition)>::type>(
-            std::stoi(match.str(RE_GGA_SAT))));
-    position.set_dilution(std::stod(match.str(RE_GGA_DIL)));
-    position.set_geoid(std::stod(match.str(RE_GGA_GEOID)));
+    pos.altitude        = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
+    position.m_position = pos;
+    position.m_timeStamp =
+        TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_GGA_TIME), timestamp::Format::HHMMSS);
+    position.m_fixQuality =
+        static_cast<decltype(position.m_fixQuality)>(std::stoi(match.str(RE_GGA_FIX)));
+    position.m_nrOfSatellites =
+        static_cast<decltype(position.m_nrOfSatellites)>(std::stoi(match.str(RE_GGA_SAT)));
+    position.m_dilution = (std::stod(match.str(RE_GGA_DIL)));
+    position.m_geoid    = (std::stod(match.str(RE_GGA_GEOID)));
     return true;
 }
 

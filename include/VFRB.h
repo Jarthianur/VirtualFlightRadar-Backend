@@ -54,10 +54,12 @@ class Feed;
 class VFRB
 {
 public:
-    CONST_LITERAL PROCESS_INTERVAL = 1;
+    static constexpr auto PROCESS_INTERVAL = 1;
+    static constexpr auto LOG_PREFIX       = "(VFRB) ";
 
     NOT_COPYABLE(VFRB)
-    DEFAULT_DTOR(VFRB)
+
+    ~VFRB() noexcept = default;
 
     /**
      * @brief Constructor

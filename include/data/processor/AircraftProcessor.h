@@ -25,7 +25,6 @@
 
 #include "object/Aircraft.h"
 #include "object/GpsPosition.h"
-#include "util/defines.h"
 
 #include "Processor.hpp"
 
@@ -40,7 +39,7 @@ class AircraftProcessor : public Processor<object::Aircraft>
 {
 public:
     AircraftProcessor();
-    DEFAULT_CHILD_DTOR(AircraftProcessor)
+    ~AircraftProcessor() noexcept override = default;
 
     /**
      * @brief Constructor

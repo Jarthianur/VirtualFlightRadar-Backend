@@ -36,9 +36,12 @@ namespace feed
 {
 Feed::Feed(const std::string& name, const char* component, const Properties& properties,
            std::shared_ptr<data::Data> data)
-    : m_name(name), m_component(component), m_properties(properties), m_data(data)
+    : m_name(name),
+      m_component(component),
+      m_properties(properties),
+      m_data(data),
+      m_priority(initPriority())
 {
-    initPriority();
     if (m_properties.get_property(Configuration::KV_KEY_HOST).empty())
     {
         logger.warn(m_component, " could not find: ", m_name, ".", Configuration::KV_KEY_HOST);
@@ -51,11 +54,11 @@ Feed::Feed(const std::string& name, const char* component, const Properties& pro
     }
 }
 
-void Feed::initPriority() noexcept
+std::uint32_t Feed::initPriority() const noexcept
 {
     try
     {
-        m_priority = static_cast<std::uint32_t>(std::max<std::uint64_t>(
+        return static_cast<std::uint32_t>(std::max<std::uint64_t>(
             0, std::min<std::uint64_t>(
                    std::stoul(m_properties.get_property(Configuration::KV_KEY_PRIORITY)),
                    std::numeric_limits<std::uint32_t>::max())));
@@ -64,6 +67,7 @@ void Feed::initPriority() noexcept
     {
         logger.warn(m_component, " create ", m_name, ": Invalid priority given.");
     }
+    return 0;
 }
 
 client::net::Endpoint Feed::get_endpoint() const

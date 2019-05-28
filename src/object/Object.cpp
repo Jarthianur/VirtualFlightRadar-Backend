@@ -50,4 +50,9 @@ Object& Object::operator++()
     return *this;
 }
 
+auto Object::getUpdateAge() const -> decltype(m_updateAge)
+{
+    return m_updateAge;
+}
+
 }  // namespace object

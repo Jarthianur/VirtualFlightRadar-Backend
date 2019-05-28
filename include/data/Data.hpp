@@ -19,8 +19,6 @@
 
 #include <functional>
 
-#include "util/defines.h"
-
 namespace object
 {
 class Object;
@@ -36,8 +34,8 @@ using accessor_fn = std::function<void(const object::Object&)>;
 class Data
 {
 public:
-    DEFAULT_CTOR(Data)
-    DEFAULT_VIRTUAL_DTOR(Data)
+    Data()                   = default;
+    virtual ~Data() noexcept = default;
 
     /**
      * @brief Attempt to update this data.

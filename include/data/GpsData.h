@@ -26,7 +26,6 @@
 
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
-#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -38,9 +37,8 @@ namespace data
 class GpsData : public Data
 {
 public:
-    DEFAULT_CHILD_DTOR(GpsData)
-
     GpsData();
+    ~GpsData() noexcept override = default;
 
     /**
      * @fn GpsData
@@ -93,9 +91,8 @@ private:
 class GpsDataException : public std::exception
 {
 protected:
-    DEFAULT_VIRTUAL_DTOR(GpsDataException)
-
     GpsDataException() : std::exception() {}
+    virtual ~GpsDataException() noexcept = default;
 };
 
 /**
@@ -104,9 +101,8 @@ protected:
 class PositionAlreadyLocked : public GpsDataException
 {
 public:
-    DEFAULT_DTOR(PositionAlreadyLocked)
-
     PositionAlreadyLocked();
+    ~PositionAlreadyLocked() noexcept override = default;
 
     const char* what() const noexcept override;
 };
@@ -117,9 +113,8 @@ public:
 class ReceivedGoodPosition : public GpsDataException
 {
 public:
-    DEFAULT_DTOR(ReceivedGoodPosition)
-
     ReceivedGoodPosition();
+    ~ReceivedGoodPosition() noexcept override = default;
 
     const char* what() const noexcept override;
 };

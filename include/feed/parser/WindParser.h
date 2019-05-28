@@ -24,7 +24,6 @@
 #include <string>
 
 #include "object/Wind.h"
-#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -39,7 +38,7 @@ class WindParser : public Parser<object::Wind>
 {
 public:
     WindParser();
-    DEFAULT_CHILD_DTOR(WindParser)
+    ~WindParser() noexcept override = default;
 
     /**
      * @brief Unpack into Wind.

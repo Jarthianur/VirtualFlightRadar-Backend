@@ -24,7 +24,6 @@
 #include <string>
 
 #include "object/Atmosphere.h"
-#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -39,7 +38,7 @@ class AtmosphereParser : public Parser<object::Atmosphere>
 {
 public:
     AtmosphereParser();
-    DEFAULT_CHILD_DTOR(AtmosphereParser)
+    ~AtmosphereParser() noexcept override = default;
 
     /**
      * @brief Unpack into Atmosphere.
