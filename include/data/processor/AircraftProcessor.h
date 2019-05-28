@@ -37,30 +37,25 @@ namespace processor
  */
 class AircraftProcessor : public Processor<object::Aircraft>
 {
-public:
-    AircraftProcessor();
-    ~AircraftProcessor() noexcept override = default;
+    //< begin members >//
+    const std::int32_t m_maxDistance;                    ///< Max distance to process an aircraft
+    object::Position   m_refPosition{0.0, 0.0, 0};       ///< Refered position
+    double             m_refAtmPressure      = 1013.25;  ///< Refered pressure; hPa
+    mutable double     m_refRadLatitude      = 0.0;      ///< Refered latitude as radian
+    mutable double     m_aircraftRadLatitude = 0.0;      ///< Aircraft latitude as radian
+    mutable double     m_latDistance = 0.0;  ///< Distance/Difference between Aircraft's and refered latitude
+    mutable double     m_refRadLongitude      = 0.0;  ///< Refered longitude as radian
+    mutable double     m_aircraftRadLongitude = 0.0;  ///< Aircraft's longitude as radian
+    mutable double     m_lonDistance = 0.0;  ///< Distance/Difference between Aircraft's and refered longitude
+    mutable double     m_relBearing  = 0.0;  ///< Relative bearing
+    mutable double     m_absBearing  = 0.0;  ///< Absolute bearing
+    mutable std::int32_t m_relNorth  = 0;    ///< Relative distance in northern direction; m
+    mutable std::int32_t m_relEast   = 0;    ///< Relative distance in eastern direction; m
+    mutable std::int32_t m_relVertical = 0;  ///< Relative vertical distance; m
+    mutable std::int32_t m_distance    = 0;  ///< Distance between Aircraft and refered position; m
+    //< end members >//
 
-    /**
-     * @brief Constructor
-     * @param maxDist The max distance filter
-     */
-    explicit AircraftProcessor(std::int32_t maxDist);
-
-    /**
-     * @brief Process an aircraft.
-     * @param aircraft The Aircraft to process
-     */
-    void process(object::Aircraft& aircraft) const override;
-
-    /**
-     * @brief Set the refered position and atmospheric pressure.
-     * @param position The position
-     * @param atmPress The pressure
-     */
-    void referTo(const object::Position& position, double atmPress);
-
-private:
+    //< begin methods >//
     /**
      * @brief Calcutale an aircrafts position relative to the refered one.
      * @param aircraft The Aircraft
@@ -78,51 +73,27 @@ private:
      * @param aircraft The Aircaft
      */
     std::size_t appendPFLAA(object::Aircraft& aircraft, std::size_t pos) const;
+    //< end methods >//
 
-    /// Max distance to process an aircraft
-    const std::int32_t m_maxDistance;
+public:
+    AircraftProcessor();
+    explicit AircraftProcessor(std::int32_t maxDist);  ///< @param maxDist The max distance filter
+    ~AircraftProcessor() noexcept override = default;
 
-    /// Refered position
-    object::Position m_refPosition{0.0, 0.0, 0};
+    //< begin interfaces >//
+    /**
+     * @brief Process an aircraft.
+     * @param aircraft The Aircraft to process
+     */
+    void process(object::Aircraft& aircraft) const override;
 
-    /// Refered pressure; hPa
-    double m_refAtmPressure = 1013.25;
-
-    /// Refered latitude as radian
-    mutable double m_refRadLatitude = 0.0;
-
-    /// Aircraft latitude as radian
-    mutable double m_aircraftRadLatitude = 0.0;
-
-    /// Distance/Difference between Aircraft's and refered latitude
-    mutable double m_latDistance = 0.0;
-
-    /// Refered longitude as radian
-    mutable double m_refRadLongitude = 0.0;
-
-    /// Aircraft's longitude as radian
-    mutable double m_aircraftRadLongitude = 0.0;
-
-    /// Distance/Difference between Aircraft's and refered longitude
-    mutable double m_lonDistance = 0.0;
-
-    /// Relative bearing
-    mutable double m_relBearing = 0.0;
-
-    /// Absolute bearing
-    mutable double m_absBearing = 0.0;
-
-    /// Relative distance in northern direction; m
-    mutable std::int32_t m_relNorth = 0;
-
-    /// Relative distance in eastern direction; m
-    mutable std::int32_t m_relEast = 0;
-
-    /// Relative vertical distance; m
-    mutable std::int32_t m_relVertical = 0;
-
-    /// Distance between Aircraft and refered position; m
-    mutable std::int32_t m_distance = 0;
+    /**
+     * @brief Set the refered position and atmospheric pressure.
+     * @param position The position
+     * @param atmPress The pressure
+     */
+    void referTo(const object::Position& position, double atmPress);
+    //< end interfaces >//
 };
 
 }  // namespace processor

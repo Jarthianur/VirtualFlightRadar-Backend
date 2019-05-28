@@ -22,13 +22,6 @@
 #pragma once
 
 #include "Client.h"
-#include "parameters.h"
-
-#ifdef WINDCLIENT_RECEIVE_TIMEOUT
-#    define WC_RCV_TIMEOUT WINDCLIENT_RECEIVE_TIMEOUT
-#else
-#    define WC_RCV_TIMEOUT 5
-#endif
 
 namespace client
 {
@@ -37,18 +30,7 @@ namespace client
  */
 class SensorClient : public Client
 {
-public:
-    NOT_COPYABLE(SensorClient)
-    DEFAULT_DTOR(SensorClient)
-
-    /**
-     * @brief Constructor
-     * @param endpoint  The remote endpoint
-     * @param connector The Connector interface
-     */
-    SensorClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
-
-private:
+    //< begin methods >//
     /**
      * @brief Override Client::read, use timeout
      */
@@ -65,6 +47,21 @@ private:
      * @threadsafe
      */
     void handleConnect(bool error) override;
+    //< end methods >//
+
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(SensorClient) ";
+    //< end constants >//
+
+public:
+    NOT_COPYABLE(SensorClient)
+
+    /**
+     * @param endpoint  The remote endpoint
+     * @param connector The Connector interface
+     */
+    SensorClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
+    ~SensorClient() noexcept override = default;
 };
 
 }  // namespace client

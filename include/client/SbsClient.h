@@ -30,23 +30,27 @@ namespace client
  */
 class SbsClient : public Client
 {
-public:
-    NOT_COPYABLE(SbsClient)
-    DEFAULT_DTOR(SbsClient)
-
-    /**
-     * @brief Constructor
-     * @param endpoint  The remote endpoint
-     * @param connector The Connector interface
-     */
-    SbsClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
-
-private:
+    //< begin methods >//
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
     void handleConnect(bool error) override;
+    //< end methods >//
+
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(SbsClient) ";
+    //< end constants >//
+
+public:
+    NOT_COPYABLE(SbsClient)
+
+    /**
+     * @param endpoint  The remote endpoint
+     * @param connector The Connector interface
+     */
+    SbsClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
+    ~SbsClient() noexcept override = default;
 };
 
 }  // namespace client

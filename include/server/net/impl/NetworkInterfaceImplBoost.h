@@ -95,8 +95,7 @@ private:
      * @param error    The error code
      * @param callback The callback to invoke
      */
-    void handleAccept(const boost::system::error_code& error,
-                      const std::function<void(bool)>& callback);
+    void handleAccept(const boost::system::error_code& error, const std::function<void(bool)>& callback);
 
     /// Internal IO-service
     boost::asio::io_service m_ioService;

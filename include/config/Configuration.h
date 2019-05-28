@@ -38,7 +38,7 @@ namespace config
 class Configuration final
 {
     //< begin members >//
-    const Properties m_properties;
+    const Properties m_properties;  ///< Properties from file
     //< end members >//
 
     //< begin methods >//
@@ -80,7 +80,6 @@ class Configuration final
     //< begin constants >//
     static constexpr auto LOG_PREFIX = "(Config) ";
 
-    // Path definitions
     static constexpr auto PATH_FEEDS       = "general.feeds";
     static constexpr auto PATH_GND_MODE    = "general.gndMode";
     static constexpr auto PATH_SERVER_PORT = "general.serverPort";
@@ -95,41 +94,22 @@ class Configuration final
 
 public:
     //< begin members >//
-    /// Ground mode state
-    bool m_groundMode;
-
-    /// Fallback position
-    const object::GpsPosition m_position;
-
-    /// Atmospheric fallback pressure
-    const double m_atmPressure;
-
-    /// Maximum height for reported aircrafts
-    const std::int32_t m_maxHeight;
-
-    /// Maximum distance for reported aircrafts
-    const std::int32_t m_maxDistance;
-
-    /// Port where to serve reports
-    const std::uint16_t m_serverPort;
-
-    /// List of feed names
-    const std::list<std::string> m_feedNames;
-
-    ///  Map feed names to their properties
-    const std::unordered_map<std::string, Properties> m_feedProperties;
+    bool                         groundMode;   ///< Ground mode state
+    const object::GpsPosition    gpsPosition;  ///< Fallback position
+    const double                 atmPressure;  ///< Atmospheric fallback pressure
+    const std::int32_t           maxHeight;    ///< Maximum height for reported aircrafts
+    const std::int32_t           maxDistance;  ///< Maximum distance for reported aircrafts
+    const std::uint16_t          serverPort;   ///< Port where to serve reports
+    const std::list<std::string> feedNames;    ///< List of feed names
+    const std::unordered_map<std::string, Properties> feedProperties;  ///< Map feed names to their properties
     //< end members >//
 
-    //< begin ctors/dtors >//
     /**
-     * @brief Constructor
      * @param stream The input stream
      * @throw std::logic_error if any error occurres
      */
     explicit Configuration(std::istream& stream);
-
     ~Configuration() noexcept = default;
-    //< end ctors/dtors >//
 
     //< begin constants >//
     // Configuration section keys

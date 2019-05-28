@@ -45,12 +45,11 @@ using namespace object;
 using namespace config;
 
 VFRB::VFRB(std::shared_ptr<Configuration> config)
-    : m_aircraftData(std::make_shared<AircraftData>(config->m_maxDistance)),
-      m_atmosphereData(
-          std::make_shared<AtmosphereData>(object::Atmosphere(config->m_atmPressure, 0))),
-      m_gpsData(std::make_shared<GpsData>(config->m_position, config->m_groundMode)),
+    : m_aircraftData(std::make_shared<AircraftData>(config->maxDistance)),
+      m_atmosphereData(std::make_shared<AtmosphereData>(object::Atmosphere(config->atmPressure, 0))),
+      m_gpsData(std::make_shared<GpsData>(config->gpsPosition, config->groundMode)),
       m_windData(std::make_shared<WindData>()),
-      m_server(config->m_serverPort),
+      m_server(config->serverPort),
       m_running(false)
 {
     createFeeds(config);
@@ -99,8 +98,7 @@ void VFRB::serve()
     {
         try
         {
-            m_aircraftData->set_environment(m_gpsData->get_position(),
-                                            m_atmosphereData->get_atmPressure());
+            m_aircraftData->setEnvironment(m_gpsData->getPosition(), m_atmosphereData->getAtmPressure());
             m_aircraftData->access([this](const Object& it) {
                 if (it.getUpdateAge() < Object::OUTDATED)
                 {
@@ -125,7 +123,7 @@ void VFRB::serve()
 void VFRB::createFeeds(std::shared_ptr<Configuration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
-    for (const auto& name : config->m_feedNames)
+    for (const auto& name : config->feedNames)
     {
         try
         {
@@ -153,9 +151,9 @@ void VFRB::createFeeds(std::shared_ptr<Configuration> config)
 std::string VFRB::get_duration(std::chrono::steady_clock::time_point start) const
 {
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::chrono::minutes runtime = std::chrono::duration_cast<std::chrono::minutes>(end - start);
+    std::chrono::minutes runtime              = std::chrono::duration_cast<std::chrono::minutes>(end - start);
     std::stringstream    ss;
-    ss << runtime.count() / 60 / 24 << " days, " << runtime.count() / 60 << " hours, "
-       << runtime.count() % 60 << " minutes";
+    ss << runtime.count() / 60 / 24 << " days, " << runtime.count() / 60 << " hours, " << runtime.count() % 60
+       << " minutes";
     return ss.str();
 }

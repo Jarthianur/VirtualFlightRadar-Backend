@@ -69,8 +69,8 @@ void ConnectorImplBoost::close()
 
 void ConnectorImplBoost::onConnect(const Endpoint& endpoint, const Callback& callback)
 {
-    boost::asio::ip::tcp::resolver::query query(
-        endpoint.host, endpoint.port, boost::asio::ip::tcp::resolver::query::canonical_name);
+    boost::asio::ip::tcp::resolver::query query(endpoint.host, endpoint.port,
+                                                boost::asio::ip::tcp::resolver::query::canonical_name);
     m_resolver.async_resolve(query, boost::bind(&ConnectorImplBoost::handleResolve, this,
                                                 boost::asio::placeholders::error,
                                                 boost::asio::placeholders::iterator, callback));
@@ -80,10 +80,10 @@ void ConnectorImplBoost::onRead(const ReadCallback& callback)
 {
     if (m_socket.is_open())
     {
-        boost::asio::async_read_until(
-            m_socket, m_buffer, "\r\n",
-            boost::bind(&ConnectorImplBoost::handleRead, this, boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred, callback));
+        boost::asio::async_read_until(m_socket, m_buffer, "\r\n",
+                                      boost::bind(&ConnectorImplBoost::handleRead, this,
+                                                  boost::asio::placeholders::error,
+                                                  boost::asio::placeholders::bytes_transferred, callback));
     }
 }
 
@@ -91,10 +91,10 @@ void ConnectorImplBoost::onWrite(const std::string& msg, const Callback& callbac
 {
     if (m_socket.is_open())
     {
-        boost::asio::async_write(
-            m_socket, boost::asio::buffer(msg),
-            boost::bind(&ConnectorImplBoost::handleWrite, this, boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred, callback));
+        boost::asio::async_write(m_socket, boost::asio::buffer(msg),
+                                 boost::bind(&ConnectorImplBoost::handleWrite, this,
+                                             boost::asio::placeholders::error,
+                                             boost::asio::placeholders::bytes_transferred, callback));
     }
 }
 
@@ -104,8 +104,8 @@ void ConnectorImplBoost::onTimeout(const Callback& callback, std::uint32_t timeo
     {
         resetTimer(timeout);
     }
-    m_timer.async_wait(boost::bind(&ConnectorImplBoost::handleTimeout, this,
-                                   boost::asio::placeholders::error, callback));
+    m_timer.async_wait(
+        boost::bind(&ConnectorImplBoost::handleTimeout, this, boost::asio::placeholders::error, callback));
 }
 
 void ConnectorImplBoost::resetTimer(std::uint32_t vTimeout)
@@ -125,7 +125,7 @@ void ConnectorImplBoost::handleWrite(const boost::system::error_code& error, std
     {
         logger.debug("(Client) failed to write: ", error.message());
     }
-    callback(error);
+    callback(bool(error));
 }
 
 void ConnectorImplBoost::handleResolve(const boost::system::error_code&         error,
@@ -158,7 +158,7 @@ void ConnectorImplBoost::handleConnect(const boost::system::error_code& error,
     {
         m_socket.set_option(boost::asio::socket_base::keep_alive(true));
     }
-    callback(error);
+    callback(bool(error));
 }
 
 void ConnectorImplBoost::handleTimeout(const boost::system::error_code& error,
@@ -168,7 +168,7 @@ void ConnectorImplBoost::handleTimeout(const boost::system::error_code& error,
     {
         logger.debug("(Client) timeout: ", error.message());
     }
-    callback(error);
+    callback(bool(error));
 }
 
 void ConnectorImplBoost::handleRead(const boost::system::error_code& error, std::size_t,
@@ -183,6 +183,6 @@ void ConnectorImplBoost::handleRead(const boost::system::error_code& error, std:
         std::getline(m_istream, m_response);
         m_response.append("\n");
     }
-    callback(error, m_response);
+    callback(bool(error), m_response);
 }
 }  // namespace client

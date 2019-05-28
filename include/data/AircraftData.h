@@ -41,11 +41,11 @@ namespace data
  */
 class AircraftData : public Data
 {
-    /// Times until FLARM status is removed
-    static constexpr const std::uint32_t NO_FLARM_THRESHOLD = object::Object::OUTDATED;
-    /// Times until aircraft gets deleted
-    static constexpr const std::uint32_t DELETE_THRESHOLD = 120;
-
+    //< begin members >//
+    /**
+     * @brief Internal container for aircrafts.
+     * Allows concurrent access to elements.
+     */
     class Container
     {
     public:
@@ -53,6 +53,10 @@ class AircraftData : public Data
         ~Container() noexcept = default;
 
         struct Iterator;
+
+        /**
+         * @brief Wrapper for Aircraft stored in the container.
+         */
         struct ValueType
         {
             ValueType(object::Aircraft&& a) : aircraft(std::move(a)) {}
@@ -73,6 +77,10 @@ class AircraftData : public Data
         using KeyType       = std::size_t;
         using ContainerType = std::map<KeyType, ValueType>;
 
+        /**
+         * @brief Iterator to access elements.
+         * Takes care about data locking and concurrent access.
+         */
         struct Iterator
         {
             explicit Iterator(Container& c) : iterator(c.m_container.end()), container(c) {}
@@ -144,15 +152,13 @@ class AircraftData : public Data
 
         std::pair<Iterator, bool> insert(object::Aircraft&& aircraft)
         {
-            KeyType key =
-                std::hash<std::string>()(*aircraft.m_id);  // TODO: provide char* based hashing
+            KeyType key = std::hash<std::string>()(*aircraft.m_id);  // TODO: provide char* based hashing
             std::lock_guard<std::mutex> lock(m_modMutex);
             Iterator                    iter(m_container.find(key), *this);
             if (iter == end())
             {
                 return std::make_pair(
-                    Iterator(m_container.emplace(key, ValueType{std::move(aircraft)}).first, *this),
-                    true);
+                    Iterator(m_container.emplace(key, ValueType{std::move(aircraft)}).first, *this), true);
             }
             return std::make_pair(iter, false);
         }
@@ -168,21 +174,25 @@ class AircraftData : public Data
             }
         }
 
-    protected:
-        ContainerType      m_container;
+    private:
+        ContainerType      m_container;  ///< Underlying container
         mutable std::mutex m_modMutex;
-    };
+    } m_container;                             ///< Internal container for aircrafts
+    processor::AircraftProcessor m_processor;  ///< Processor for aircrafts
+    //< end members >//
+
+    //< begin constants >//
+    static constexpr const auto NO_FLARM_THRESHOLD =
+        object::Object::OUTDATED;                        ///< Times until FLARM status is removed
+    static constexpr const auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
+    //< end constants >//
 
 public:
     AircraftData();
+    explicit AircraftData(std::int32_t maxDist);  ///< @param maxDist The max distance filter
     ~AircraftData() noexcept override = default;
 
-    /**
-     * @brief Constructor
-     * @param maxDist The max distance filter
-     */
-    explicit AircraftData(std::int32_t maxDist);
-
+    //< begin interfaces >//
     /**
      * @brief Insert or update an Aircraft.
      * @param aircraft The update
@@ -191,7 +201,7 @@ public:
      */
     bool update(object::Object&& aircraft) override;
 
-    void set_environment(const object::Position& position, double atmPress);
+    void setEnvironment(const object::Position& position, double atmPress);
 
     /**
      * @brief Process all aircrafts.
@@ -200,12 +210,7 @@ public:
      * @threadsafe
      */
     void access(const accessor_fn& func) override;
-
-private:
-    Container m_container;
-
-    /// Processor for aircrafts
-    processor::AircraftProcessor m_processor;
+    //< end interfaces >//
 };
 
 }  // namespace data

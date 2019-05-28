@@ -41,7 +41,7 @@ bool AtmosphereData::update(Object&& atmosphere)
     return m_atmosphere.tryUpdate(std::move(atmosphere));
 }
 
-double AtmosphereData::get_atmPressure()
+auto AtmosphereData::getAtmPressure() const -> decltype(m_atmosphere.m_pressure)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_atmosphere.m_pressure;

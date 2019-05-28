@@ -30,8 +30,7 @@ namespace timestamp
 std::int64_t DateTimeImplBoost::now()
 {
     return static_cast<std::int64_t>(
-        boost::posix_time::time_duration(
-            boost::posix_time::microsec_clock::universal_time().time_of_day())
+        boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
             .total_milliseconds());
 }
 

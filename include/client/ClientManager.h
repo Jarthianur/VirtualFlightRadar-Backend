@@ -77,18 +77,15 @@ struct ClientHasher
  */
 struct ClientComparator
 {
-    bool operator()(const std::shared_ptr<Client>& client1,
-                    const std::shared_ptr<Client>& client2) const
+    bool operator()(const std::shared_ptr<Client>& client1, const std::shared_ptr<Client>& client2) const
     {
         return client1->equals(*client2);
     }
 };
 
-/// @typedef ClientSet
 /// Set of clients with custom hasher and comparator
 using ClientSet = std::unordered_set<std::shared_ptr<Client>, ClientHasher, ClientComparator>;
 
-/// @typedef ClientIter
 /// Iterator in ClientSet
 using ClientIter = ClientSet::iterator;
 
@@ -97,11 +94,19 @@ using ClientIter = ClientSet::iterator;
  */
 class ClientManager
 {
-public:
-    DEFAULT_CTOR(ClientManager)
+    //< begin members >//
+    ClientSet          m_clients;   ///< Set of clients
+    thread_group       m_thdGroup;  ///< Thread group for client threads
+    mutable std::mutex m_mutex;
+    //< end members >//
 
+public:
+    NOT_COPYABLE(ClientManager)
+
+    ClientManager() = default;
     ~ClientManager() noexcept;
 
+    //< begin interfaces >//
     /**
      * @brief Subscribe a Feed to the respective Client.
      * @param feed The feed to subscribe
@@ -121,15 +126,7 @@ public:
      * @threadsafe
      */
     void stop();
-
-private:
-    /// Set of clients
-    ClientSet m_clients;
-
-    /// Thread group for client threads
-    thread_group m_thdGroup;
-
-    mutable std::mutex m_mutex;
+    //< end interfaces >//
 };
 
 }  // namespace client

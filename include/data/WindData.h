@@ -34,16 +34,17 @@ namespace data
  */
 class WindData : public Data
 {
+    //< begin members >//
+    object::Wind       m_wind;  ///< The Wind information
+    mutable std::mutex m_mutex;
+    //< end members >//
+
 public:
     WindData();
+    explicit WindData(const object::Wind& wind);  ///< @param wind The initial wind information
     ~WindData() noexcept override = default;
 
-    /**
-     * @brief Constructor
-     * @param wind The initial wind information
-     */
-    explicit WindData(const object::Wind& wind);
-
+    //< begin interfaces >//
     /**
      * @brief Update the wind information.
      * @param wind The new wind information.
@@ -53,12 +54,7 @@ public:
     bool update(object::Object&& wind) override;
 
     void access(const accessor_fn& func) override;
-
-private:
-    /// The Wind information
-    object::Wind m_wind;
-
-    mutable std::mutex m_mutex;
+    //< end interfaces >//
 };
 
 }  // namespace data

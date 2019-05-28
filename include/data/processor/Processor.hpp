@@ -37,17 +37,8 @@ namespace processor
 template<typename T>
 class Processor
 {
-public:
-    Processor()                   = default;
-    virtual ~Processor() noexcept = default;
-
-    /**
-     * @brief Process an object.
-     * @param _1 The object of type T
-     */
-    virtual void process(T& _1) const = 0;
-
 protected:
+    //< begin methods >//
     /**
      * @brief End the processing string with checksum and CRLF.
      */
@@ -55,6 +46,19 @@ protected:
     {
         return std::snprintf(buffer, n, "%02x\r\n", math::checksum(buffer, size));
     }
+    //< end methods >//
+
+public:
+    Processor()                   = default;
+    virtual ~Processor() noexcept = default;
+
+    //< begin interfaces >//
+    /**
+     * @brief Process an object.
+     * @param _1 The object of type T
+     */
+    virtual void process(T& _1) const = 0;
+    //< end interfaces >//
 };
 }  // namespace processor
 }  // namespace data

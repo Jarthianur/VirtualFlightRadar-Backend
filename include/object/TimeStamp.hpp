@@ -88,8 +88,7 @@ private:
 };
 
 template<typename DateTimeT>
-TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format format)
-    : m_day(DateTimeT::day())
+TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format format) : m_day(DateTimeT::day())
 {
     std::int32_t h = 99, m = 99, s = 99, f = 9999;
     try
@@ -145,8 +144,7 @@ TimeStamp<DateTimeT>& TimeStamp<DateTimeT>::operator=(const TimeStamp<DateTimeT>
 template<typename DateTimeT>
 bool TimeStamp<DateTimeT>::operator>(const TimeStamp<DateTimeT>& other) const
 {
-    return (this->m_day > other.m_day) ||
-           ((this->m_day == other.m_day) && this->m_value > other.m_value);
+    return (this->m_day > other.m_day) || ((this->m_day == other.m_day) && this->m_value > other.m_value);
 }
 
 }  // namespace object

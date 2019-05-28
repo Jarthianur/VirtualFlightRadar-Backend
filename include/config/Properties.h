@@ -34,28 +34,16 @@ namespace config
 class Properties
 {
     //< begin members >//
-    /// The underlying property tree
-    boost::property_tree::ptree m_pTree;
+    boost::property_tree::ptree m_pTree;  ///< The underlying property tree
     //< end members >//
 
 public:
-    //< begin ctors/dtors >//
-    /**
-     * @brief Copy-constructor
-     * @param ptree The property tree to copy
-     */
-    explicit Properties(const boost::property_tree::ptree& ptree);
-
-    /**
-     * @brief Move-constructor
-     * @param ptree The property tree to move
-     */
-    explicit Properties(boost::property_tree::ptree&& ptree);
-
+    explicit Properties(
+        const boost::property_tree::ptree& ptree);             ///< @param ptree The property tree to copy
+    explicit Properties(boost::property_tree::ptree&& ptree);  ///< @param ptree The property tree to move
     ~Properties() noexcept = default;
-    //< end ctors/dtors >//
 
-    //< begin methods >//
+    //< begin interfaces >//
     /**
      * @brief Get the value at a property path (section.key), or a default value.
      * @param path        The property path
@@ -71,7 +59,7 @@ public:
      * @throw std::out_of_range if the section is not found
      */
     Properties get_propertySection(const std::string& section) const;
-    //< end methods >//
+    //< end interfaces >//
 };
 
 }  // namespace config

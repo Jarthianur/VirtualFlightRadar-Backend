@@ -34,8 +34,7 @@ namespace data
 {
 namespace processor
 {
-AircraftProcessor::AircraftProcessor() : AircraftProcessor(std::numeric_limits<std::int32_t>::max())
-{}
+AircraftProcessor::AircraftProcessor() : AircraftProcessor(std::numeric_limits<std::int32_t>::max()) {}
 
 AircraftProcessor::AircraftProcessor(std::int32_t maxDist)
     : Processor<object::Aircraft>(), m_maxDistance(maxDist)
@@ -72,14 +71,13 @@ void AircraftProcessor::calculateRelPosition(const Aircraft& aircraft) const
     double a = std::pow(std::sin(m_latDistance / 2.0), 2.0) +
                std::cos(m_refRadLatitude) * std::cos(m_aircraftRadLatitude) *
                    std::pow(std::sin(m_lonDistance / 2.0), 2.0);
-    m_distance =
-        math::doubleToInt(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
+    m_distance = math::doubleToInt(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
 
-    m_relBearing = math::degree(std::atan2(
-        std::sin(m_aircraftRadLongitude - m_refRadLongitude) * std::cos(m_aircraftRadLatitude),
-        std::cos(m_refRadLatitude) * std::sin(m_aircraftRadLatitude) -
-            std::sin(m_refRadLatitude) * std::cos(m_aircraftRadLatitude) *
-                std::cos(m_aircraftRadLongitude - m_refRadLongitude)));
+    m_relBearing = math::degree(
+        std::atan2(std::sin(m_aircraftRadLongitude - m_refRadLongitude) * std::cos(m_aircraftRadLatitude),
+                   std::cos(m_refRadLatitude) * std::sin(m_aircraftRadLatitude) -
+                       std::sin(m_refRadLatitude) * std::cos(m_aircraftRadLatitude) *
+                           std::cos(m_aircraftRadLongitude - m_refRadLongitude)));
     m_absBearing = std::fmod((m_relBearing + 360.0), 360.0);
 
     m_relNorth    = math::doubleToInt(std::cos(math::radian(m_absBearing)) * m_distance);
@@ -91,9 +89,9 @@ void AircraftProcessor::calculateRelPosition(const Aircraft& aircraft) const
 
 std::size_t AircraftProcessor::appendPFLAU(Aircraft& aircraft, std::size_t pos) const
 {
-    int bytes = std::snprintf(*aircraft.m_nmea + pos, Aircraft::NMEA_SIZE - pos,
-                              "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::doubleToInt(m_relBearing),
-                              m_relVertical, m_distance, *aircraft.m_id);
+    int bytes =
+        std::snprintf(*aircraft.m_nmea + pos, Aircraft::NMEA_SIZE - pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
+                      math::doubleToInt(m_relBearing), m_relVertical, m_distance, *aircraft.m_id);
     bytes += finishSentence(*aircraft.m_nmea + pos, Aircraft::NMEA_SIZE - pos,
                             Aircraft::NMEA_SIZE - pos - static_cast<std::size_t>(bytes));
     return pos + static_cast<std::size_t>(bytes);
@@ -105,19 +103,17 @@ std::size_t AircraftProcessor::appendPFLAA(Aircraft& aircraft, std::size_t pos) 
     if (aircraft.m_fullInfo)
     {
         bytes = std::snprintf(*aircraft.m_nmea + pos, Aircraft::NMEA_SIZE - pos,
-                              "$PFLAA,0,%d,%d,%d,%hhu,%s,%03d,,%d,%3.1lf,%1hhX*", m_relNorth,
-                              m_relEast, m_relVertical, util::raw_type(aircraft.getIdType()),
-                              *aircraft.m_id, math::doubleToInt(aircraft.m_movement.heading),
+                              "$PFLAA,0,%d,%d,%d,%hhu,%s,%03d,,%d,%3.1lf,%1hhX*", m_relNorth, m_relEast,
+                              m_relVertical, util::raw_type(aircraft.getIdType()), *aircraft.m_id,
+                              math::doubleToInt(aircraft.m_movement.heading),
                               math::doubleToInt(aircraft.m_movement.gndSpeed * math::MS_2_KMH),
-                              aircraft.m_movement.climbRate,
-                              util::raw_type(aircraft.getAircraftType()));
+                              aircraft.m_movement.climbRate, util::raw_type(aircraft.getAircraftType()));
     }
     else
     {
-        bytes =
-            std::snprintf(*aircraft.m_nmea + pos, Aircraft::NMEA_SIZE - pos,
-                          "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
-                          *aircraft.m_id, util::raw_type(aircraft.getAircraftType()));
+        bytes = std::snprintf(*aircraft.m_nmea + pos, Aircraft::NMEA_SIZE - pos,
+                              "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
+                              *aircraft.m_id, util::raw_type(aircraft.getAircraftType()));
     }
     bytes += finishSentence(*aircraft.m_nmea + pos, Aircraft::NMEA_SIZE - pos,
                             Aircraft::NMEA_SIZE - pos - static_cast<std::size_t>(bytes));

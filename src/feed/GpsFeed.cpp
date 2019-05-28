@@ -41,8 +41,7 @@ namespace feed
 {
 parser::GpsParser GpsFeed::s_parser;
 
-GpsFeed::GpsFeed(const std::string& name, const Properties& properties,
-                 std::shared_ptr<data::GpsData> data)
+GpsFeed::GpsFeed(const std::string& name, const Properties& properties, std::shared_ptr<data::GpsData> data)
     : Feed(name, COMPONENT, properties, data)
 {}
 

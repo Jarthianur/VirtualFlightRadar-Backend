@@ -43,7 +43,7 @@ bool AircraftData::update(Object&& aircraft)
     return true;
 }
 
-void AircraftData::set_environment(const Position& position, double atmPress)
+void AircraftData::setEnvironment(const Position& position, double atmPress)
 {
     m_processor.referTo(position, atmPress);
 }

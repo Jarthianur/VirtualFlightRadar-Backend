@@ -151,8 +151,8 @@ bool AprsParser::parseComment(const boost::smatch& match, Aircraft& aircraft) no
     aircraft.m_id = match.str(RE_APRS_COM_ID);
     try
     {
-        aircraft.set_idType(static_cast<Aircraft::IdType>(
-            std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03));
+        aircraft.set_idType(
+            static_cast<Aircraft::IdType>(std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03));
         aircraft.set_aircraftType(static_cast<Aircraft::AircraftType>(
             (std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2));
     }
@@ -186,8 +186,8 @@ bool AprsParser::parseTimeStamp(const boost::smatch& match, Aircraft& aircraft) 
 {
     try
     {
-        aircraft.m_timeStamp = TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_APRS_TIME),
-                                                                       timestamp::Format::HHMMSS);
+        aircraft.m_timeStamp =
+            TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_APRS_TIME), timestamp::Format::HHMMSS);
     }
     catch (const std::invalid_argument&)
     {

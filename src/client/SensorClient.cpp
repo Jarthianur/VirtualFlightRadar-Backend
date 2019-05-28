@@ -25,22 +25,19 @@
 
 #include "util/Logger.hpp"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(SensorClient)"
+#include "parameters.h"
 
 namespace client
 {
 using namespace net;
 
 SensorClient::SensorClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
-    : Client(endpoint, COMPONENT, connector)
+    : Client(endpoint, LOG_PREFIX, connector)
 {}
 
 void SensorClient::read()
 {
-    m_connector->resetTimer(WC_RCV_TIMEOUT);
+    m_connector->resetTimer(param::WINDCLIENT_RECEIVE_TIMEOUT);
     Client::read();
 }
 
@@ -51,13 +48,12 @@ void SensorClient::checkDeadline(bool error)
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_connector->timerExpired())
         {
-            logger.debug(m_component, " timed out, reconnect ...");
+            logger.debug(LOG_PREFIX, "timed out, reconnect ...");
             reconnect();
         }
         else
         {
-            m_connector->onTimeout(
-                std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1));
+            m_connector->onTimeout(std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1));
         }
     }
 }
@@ -67,14 +63,14 @@ void SensorClient::handleConnect(bool error)
     if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->onTimeout(std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1),
-                               WC_RCV_TIMEOUT);
+                               param::WINDCLIENT_RECEIVE_TIMEOUT);
         read();
     }
     else
     {
-        logger.warn(m_component, " failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
         reconnect();
     }
 }

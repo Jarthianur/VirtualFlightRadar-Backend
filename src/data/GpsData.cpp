@@ -23,18 +23,6 @@
 
 #include <stdexcept>
 
-/// @def GPS_NR_SATS_GOOD
-/// Good number of satellites
-#define GPS_NR_SATS_GOOD 7
-
-/// @def GPS_FIX_GOOD
-/// Good fix quality
-#define GPS_FIX_GOOD 1
-
-/// @def GPS_HOR_DILUTION_GOOD
-/// Good horizontal dilution
-#define GPS_HOR_DILUTION_GOOD 1.0
-
 using namespace object;
 
 namespace data
@@ -73,16 +61,15 @@ bool GpsData::update(Object&& position)
     return updated;
 }
 
-Position GpsData::get_position()
+auto GpsData::getPosition() const -> decltype(m_position.m_position)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_position.m_position;
 }
 
-bool GpsData::isPositionGood()
+bool GpsData::isPositionGood() const
 {
-    return m_position.m_nrOfSatellites >= GPS_NR_SATS_GOOD &&
-           m_position.m_fixQuality >= GPS_FIX_GOOD &&
+    return m_position.m_nrOfSatellites >= GPS_NR_SATS_GOOD && m_position.m_fixQuality >= GPS_FIX_GOOD &&
            m_position.m_dilution <= GPS_HOR_DILUTION_GOOD;
 }
 

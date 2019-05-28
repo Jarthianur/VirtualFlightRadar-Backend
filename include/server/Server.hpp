@@ -135,8 +135,7 @@ Server<SocketT>::Server(std::uint16_t port)
 {}
 
 template<typename SocketT>
-Server<SocketT>::Server(std::shared_ptr<net::NetworkInterface<SocketT>> interface)
-    : m_netInterface(interface)
+Server<SocketT>::Server(std::shared_ptr<net::NetworkInterface<SocketT>> interface) : m_netInterface(interface)
 {}
 
 template<typename SocketT>
@@ -214,8 +213,7 @@ template<typename SocketT>
 void Server<SocketT>::accept()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_netInterface->onAccept(
-        std::bind(&Server<SocketT>::attemptConnection, this, std::placeholders::_1));
+    m_netInterface->onAccept(std::bind(&Server<SocketT>::attemptConnection, this, std::placeholders::_1));
 }
 
 template<typename SocketT>
@@ -239,8 +237,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
         std::lock_guard<std::mutex> lock(m_mutex);
         try
         {
-            if (m_activeConnections < S_MAX_CLIENTS &&
-                !isConnected(m_netInterface->get_currentAddress()))
+            if (m_activeConnections < S_MAX_CLIENTS && !isConnected(m_netInterface->get_currentAddress()))
             {
                 for (auto& it : m_connections)
                 {
@@ -255,8 +252,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
             }
             else
             {
-                logger.info("(Server) refused connection to ",
-                            m_netInterface->get_currentAddress());
+                logger.info("(Server) refused connection to ", m_netInterface->get_currentAddress());
                 m_netInterface->close();
             }
         }

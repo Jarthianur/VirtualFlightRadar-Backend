@@ -34,16 +34,18 @@ namespace data
  */
 class AtmosphereData : public Data
 {
+    //< begin members >//
+    object::Atmosphere m_atmosphere;  ///< Atmospheric information
+    mutable std::mutex m_mutex;
+    //< end members >//
+
 public:
     AtmosphereData();
+    explicit AtmosphereData(
+        const object::Atmosphere& atmosphere);  ///< @param atmosphere The initial atm info
     ~AtmosphereData() noexcept override = default;
 
-    /**
-     * @brief Constructor
-     * @param atmosphere The initial atm info
-     */
-    explicit AtmosphereData(const object::Atmosphere& atmosphere);
-
+    //< begin interfaces >//
     /**
      * @brief Update he athmosphere data.
      * @param atmosphere The new atm info
@@ -59,12 +61,7 @@ public:
      * @return the pressure
      * @threadsafe
      */
-    double get_atmPressure();
-
-private:
-    /// Atmospheric information
-    object::Atmosphere m_atmosphere;
-
-    mutable std::mutex m_mutex;
+    auto getAtmPressure() const -> decltype(m_atmosphere.m_pressure);
+    //< end interfaces >//
 };
 }  // namespace data

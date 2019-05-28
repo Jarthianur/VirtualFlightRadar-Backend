@@ -81,9 +81,8 @@ void NetworkInterfaceImplBoost::onAccept(const std::function<void(bool)>& callba
 {
     if (m_acceptor.is_open())
     {
-        m_acceptor.async_accept(m_socket.get(),
-                                boost::bind(&NetworkInterfaceImplBoost::handleAccept, this,
-                                            boost::asio::placeholders::error, callback));
+        m_acceptor.async_accept(m_socket.get(), boost::bind(&NetworkInterfaceImplBoost::handleAccept, this,
+                                                            boost::asio::placeholders::error, callback));
     }
 }
 

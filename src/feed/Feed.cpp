@@ -36,11 +36,7 @@ namespace feed
 {
 Feed::Feed(const std::string& name, const char* component, const Properties& properties,
            std::shared_ptr<data::Data> data)
-    : m_name(name),
-      m_component(component),
-      m_properties(properties),
-      m_data(data),
-      m_priority(initPriority())
+    : m_name(name), m_component(component), m_properties(properties), m_data(data), m_priority(initPriority())
 {
     if (m_properties.get_property(Configuration::KV_KEY_HOST).empty())
     {
@@ -59,9 +55,8 @@ std::uint32_t Feed::initPriority() const noexcept
     try
     {
         return static_cast<std::uint32_t>(std::max<std::uint64_t>(
-            0, std::min<std::uint64_t>(
-                   std::stoul(m_properties.get_property(Configuration::KV_KEY_PRIORITY)),
-                   std::numeric_limits<std::uint32_t>::max())));
+            0, std::min<std::uint64_t>(std::stoul(m_properties.get_property(Configuration::KV_KEY_PRIORITY)),
+                                       std::numeric_limits<std::uint32_t>::max())));
     }
     catch (const std::logic_error&)
     {

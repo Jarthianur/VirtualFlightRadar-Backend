@@ -36,17 +36,38 @@ namespace data
  */
 class GpsData : public Data
 {
+    //< begin members >//
+    object::GpsPosition     m_position;                ///< The position
+    processor::GpsProcessor m_processor;               ///< Processor for GPS information
+    bool                    m_positionLocked = false;  ///< Locking state of the current position
+    bool                    m_groundMode     = false;  ///< Ground mode state
+    mutable std::mutex      m_mutex;
+    //< end members >//
+
+    //< begin methods >//
+    /**
+     * @brief Check whether the position is good enough.
+     * @return true if yes, else false
+     */
+    bool isPositionGood() const;
+    //< end methods >//
+
+    //< begin constants >//
+    static constexpr auto GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
+    static constexpr auto GPS_FIX_GOOD          = 1;    ///< Good fix quality
+    static constexpr auto GPS_HOR_DILUTION_GOOD = 1.0;  ///< Good horizontal dilution
+    //< end constants >//
+
 public:
     GpsData();
-    ~GpsData() noexcept override = default;
 
     /**
-     * @fn GpsData
-     * @brief Constructor
      * @param crPosition The initial info
      */
     GpsData(const object::GpsPosition& position, bool ground);
+    ~GpsData() noexcept override = default;
 
+    //< begin interfaces >//
     /**
      * @brief Update the position.
      * @param position The new position
@@ -64,28 +85,8 @@ public:
      * @return the position
      * @threadsafe
      */
-    object::Position get_position();
-
-private:
-    /**
-     * @brief Check whether the position is good enough.
-     * @return true if yes, else false
-     */
-    bool isPositionGood();
-
-    /// The position
-    object::GpsPosition m_position;
-
-    /// Processor for GPS information
-    processor::GpsProcessor m_processor;
-
-    /// Locking state of the current position
-    bool m_positionLocked = false;
-
-    /// Ground mode state
-    bool m_groundMode = false;
-
-    mutable std::mutex m_mutex;
+    auto getPosition() const -> decltype(m_position.m_position);
+    //< end interfaces >//
 };
 
 class GpsDataException : public std::exception
@@ -103,7 +104,6 @@ class PositionAlreadyLocked : public GpsDataException
 public:
     PositionAlreadyLocked();
     ~PositionAlreadyLocked() noexcept override = default;
-
     const char* what() const noexcept override;
 };
 
@@ -115,7 +115,6 @@ class ReceivedGoodPosition : public GpsDataException
 public:
     ReceivedGoodPosition();
     ~ReceivedGoodPosition() noexcept override = default;
-
     const char* what() const noexcept override;
 };
 

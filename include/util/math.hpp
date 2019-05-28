@@ -87,8 +87,7 @@ inline double degree(double radian)
  */
 inline std::int32_t doubleToInt(double value)
 {
-    return (value >= 0.0) ? static_cast<std::int32_t>(value + 0.5) :
-                            static_cast<std::int32_t>(value - 0.5);
+    return (value >= 0.0) ? static_cast<std::int32_t>(value + 0.5) : static_cast<std::int32_t>(value - 0.5);
 }
 
 /**

@@ -25,19 +25,15 @@
 #include <functional>
 #include <string>
 
-#include "util/defines.h"
-
 namespace client
 {
 namespace net
 {
 struct Endpoint;
 
-/// @typedef Callback
 /// Common callback function
 using Callback = std::function<void(bool)>;
 
-/// @typedef ReadCallback
 /// Callback function for read
 using ReadCallback = std::function<void(bool, const std::string&)>;
 
@@ -50,9 +46,10 @@ using ReadCallback = std::function<void(bool, const std::string&)>;
 class Connector
 {
 public:
-    DEFAULT_CTOR(Connector)
-    DEFAULT_VIRTUAL_DTOR(Connector)
+    Connector()                   = default;
+    virtual ~Connector() noexcept = default;
 
+    //< begin interfaces >//
     /**
      * @brief Run this connector.
      */
@@ -106,6 +103,7 @@ public:
      * @return true if it ran off, else false
      */
     virtual bool timerExpired() = 0;
+    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace client

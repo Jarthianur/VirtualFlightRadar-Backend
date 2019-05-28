@@ -26,9 +26,7 @@ Atmosphere::Atmosphere() : Object() {}
 
 Atmosphere::Atmosphere(std::uint32_t priority) : Object(priority) {}
 
-Atmosphere::Atmosphere(double pressure, std::uint32_t priority)
-    : Object(priority), m_pressure(pressure)
-{}
+Atmosphere::Atmosphere(double pressure, std::uint32_t priority) : Object(priority), m_pressure(pressure) {}
 
 void Atmosphere::assign(Object&& other)
 {

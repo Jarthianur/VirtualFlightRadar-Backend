@@ -37,6 +37,7 @@ public:
     Data()                   = default;
     virtual ~Data() noexcept = default;
 
+    //< begin interfaces >//
     /**
      * @brief Attempt to update this data.
      * @param _1 The new Object
@@ -45,5 +46,6 @@ public:
     virtual bool update(object::Object&& _1) = 0;
 
     virtual void access(const accessor_fn& func) = 0;
+    //< end interfaces >//
 };
 }  // namespace data

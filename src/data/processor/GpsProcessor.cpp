@@ -41,32 +41,29 @@ void GpsProcessor::process(object::GpsPosition& position) const
     appendGPGGA(position, utc, appendGPRMC(position, utc, 0));
 }
 
-std::size_t GpsProcessor::appendGPGGA(GpsPosition& position, const std::tm* utc,
-                                      std::size_t pos) const
+std::size_t GpsProcessor::appendGPGGA(GpsPosition& position, const std::tm* utc, std::size_t pos) const
 {
     // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
     // support others.
     // "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"
-    int bytes = std::snprintf(
-        *position.m_nmea + pos, GpsPosition::NMEA_SIZE - pos,
-        "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02hhu,1,%d,M,%.1lf,M,,*",
-        utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
-        m_degLongitude, m_minLongitude, m_directionEW, /*pos.fixQa,*/ position.m_nrOfSatellites,
-        position.m_position.altitude, position.m_geoid);
+    int bytes =
+        std::snprintf(*position.m_nmea + pos, GpsPosition::NMEA_SIZE - pos,
+                      "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02hhu,1,%d,M,%.1lf,M,,*",
+                      utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
+                      m_degLongitude, m_minLongitude, m_directionEW, /*pos.fixQa,*/ position.m_nrOfSatellites,
+                      position.m_position.altitude, position.m_geoid);
     bytes += finishSentence(*position.m_nmea, GpsPosition::NMEA_SIZE - pos,
                             GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes));
     return pos + static_cast<std::size_t>(bytes);
 }
 
-std::size_t GpsProcessor::appendGPRMC(GpsPosition& position, const std::tm* utc,
-                                      std::size_t pos) const
+std::size_t GpsProcessor::appendGPRMC(GpsPosition& position, const std::tm* utc, std::size_t pos) const
 {
     int bytes = std::snprintf(
         *position.m_nmea + pos, GpsPosition::NMEA_SIZE - pos,
-        "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
-        utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
-        m_degLongitude, m_minLongitude, m_directionEW, utc->tm_mday, utc->tm_mon + 1,
-        utc->tm_year - 100);
+        "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*", utc->tm_hour,
+        utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
+        m_directionEW, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
     bytes += finishSentence(*position.m_nmea, GpsPosition::NMEA_SIZE - pos,
                             GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes));
     return pos + static_cast<std::size_t>(bytes);

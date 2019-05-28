@@ -39,8 +39,8 @@ namespace feed
 {
 FeedFactory::FeedFactory(std::shared_ptr<config::Configuration> config,
                          std::shared_ptr<AircraftData>          aircraftData,
-                         std::shared_ptr<AtmosphereData>        atmosData,
-                         std::shared_ptr<GpsData> gpsData, std::shared_ptr<WindData> windData)
+                         std::shared_ptr<AtmosphereData> atmosData, std::shared_ptr<GpsData> gpsData,
+                         std::shared_ptr<WindData> windData)
     : m_config(config),
       m_aircraftData(aircraftData),
       m_atmosData(atmosData),
@@ -51,33 +51,33 @@ FeedFactory::FeedFactory(std::shared_ptr<config::Configuration> config,
 template<>
 std::shared_ptr<AprscFeed> FeedFactory::makeFeed<AprscFeed>(const std::string& name)
 {
-    return std::make_shared<AprscFeed>(name, m_config->m_feedProperties.at(name), m_aircraftData,
-                                       m_config->m_maxHeight);
+    return std::make_shared<AprscFeed>(name, m_config->feedProperties.at(name), m_aircraftData,
+                                       m_config->maxHeight);
 }
 
 template<>
 std::shared_ptr<GpsFeed> FeedFactory::makeFeed<GpsFeed>(const std::string& name)
 {
-    return std::make_shared<GpsFeed>(name, m_config->m_feedProperties.at(name), m_gpsData);
+    return std::make_shared<GpsFeed>(name, m_config->feedProperties.at(name), m_gpsData);
 }
 
 template<>
 std::shared_ptr<SbsFeed> FeedFactory::makeFeed<SbsFeed>(const std::string& name)
 {
-    return std::make_shared<SbsFeed>(name, m_config->m_feedProperties.at(name), m_aircraftData,
-                                     m_config->m_maxHeight);
+    return std::make_shared<SbsFeed>(name, m_config->feedProperties.at(name), m_aircraftData,
+                                     m_config->maxHeight);
 }
 
 template<>
 std::shared_ptr<WindFeed> FeedFactory::makeFeed<WindFeed>(const std::string& name)
 {
-    return std::make_shared<WindFeed>(name, m_config->m_feedProperties.at(name), m_windData);
+    return std::make_shared<WindFeed>(name, m_config->feedProperties.at(name), m_windData);
 }
 
 template<>
 std::shared_ptr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(const std::string& name)
 {
-    return std::make_shared<AtmosphereFeed>(name, m_config->m_feedProperties.at(name), m_atmosData);
+    return std::make_shared<AtmosphereFeed>(name, m_config->feedProperties.at(name), m_atmosData);
 }
 
 boost::optional<std::shared_ptr<Feed>> FeedFactory::createFeed(const std::string& name)

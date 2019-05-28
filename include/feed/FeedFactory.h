@@ -64,8 +64,8 @@ public:
      */
     FeedFactory(std::shared_ptr<config::Configuration> config,
                 std::shared_ptr<data::AircraftData>    aircraftData,
-                std::shared_ptr<data::AtmosphereData>  atmosData,
-                std::shared_ptr<data::GpsData> gpsData, std::shared_ptr<data::WindData> windData);
+                std::shared_ptr<data::AtmosphereData> atmosData, std::shared_ptr<data::GpsData> gpsData,
+                std::shared_ptr<data::WindData> windData);
 
     /**
      * @brief Create a Feed.

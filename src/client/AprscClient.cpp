@@ -28,18 +28,13 @@
 
 #include "util/Logger.hpp"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(AprscClient)"
-
 namespace client
 {
 using namespace net;
 
 AprscClient::AprscClient(const Endpoint& endpoint, const std::string& login,
                          std::shared_ptr<Connector> connector)
-    : Client(endpoint, COMPONENT, connector), m_login(login + "\r\n")
+    : Client(endpoint, LOG_PREFIX, connector), m_login(login + "\r\n")
 {}
 
 bool AprscClient::equals(const Client& other) const
@@ -67,34 +62,32 @@ void AprscClient::handleConnect(bool error)
     if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_connector->onWrite(m_login,
-                             std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
+        m_connector->onWrite(m_login, std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
         sendKeepAlive();
     }
     else
     {
-        logger.warn(m_component, " failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
         reconnect();
     }
 }
 
 void AprscClient::sendKeepAlive()
 {
-    m_connector->onTimeout(
-        std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1), 600);
+    m_connector->onTimeout(std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1), 600);
 }
 
 void AprscClient::handleLogin(bool error)
 {
     if (!error)
     {
-        logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
         std::lock_guard<std::mutex> lock(m_mutex);
         read();
     }
     else
     {
-        logger.error(m_component, " send login failed");
+        logger.error(LOG_PREFIX, "send login failed");
     }
 }
 
@@ -110,7 +103,7 @@ void AprscClient::handleSendKeepAlive(bool error)
             }
             else
             {
-                logger.error(m_component, " send keep-alive beacon failed");
+                logger.error(LOG_PREFIX, "send keep-alive beacon failed");
                 reconnect();
             }
         });

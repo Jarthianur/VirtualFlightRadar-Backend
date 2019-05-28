@@ -28,17 +28,12 @@
 
 #include "util/Logger.hpp"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(GpsdClient)"
-
 namespace client
 {
 using namespace net;
 
 GpsdClient::GpsdClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
-    : Client(endpoint, COMPONENT, connector)
+    : Client(endpoint, LOG_PREFIX, connector)
 {}
 
 void GpsdClient::handleConnect(bool error)
@@ -51,7 +46,7 @@ void GpsdClient::handleConnect(bool error)
     }
     else
     {
-        logger.warn(m_component, " failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
         reconnect();
     }
 }
@@ -64,8 +59,8 @@ void GpsdClient::stop()
     bool                         sent = false;
     if (m_running)
     {
-        m_connector->onWrite("?WATCH={\"enable\":false}\r\n", [this, &sent, &cv](bool) {
-            logger.info(m_component, " stopped watch");
+        m_connector->onWrite("?WATCH={\"enable\":false}\r\n", [&sent, &cv](bool) {
+            logger.info(LOG_PREFIX, "stopped watch");
             sent = true;
             cv.notify_one();
         });
@@ -78,13 +73,13 @@ void GpsdClient::handleWatch(bool error)
 {
     if (!error)
     {
-        logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
         std::lock_guard<std::mutex> lock(m_mutex);
         read();
     }
     else
     {
-        logger.error(m_component, " send watch request failed");
+        logger.error(LOG_PREFIX, "send watch request failed");
     }
 }
 }  // namespace client

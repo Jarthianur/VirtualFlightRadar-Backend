@@ -38,12 +38,70 @@ namespace net
  */
 class ConnectorImplBoost : public Connector
 {
+    //< begin members >//
+    boost::asio::io_service        m_ioService;  ///< Internal IO-service
+    boost::asio::ip::tcp::socket   m_socket;     ///< Connection socket
+    boost::asio::ip::tcp::resolver m_resolver;   ///< Host resolver
+    boost::asio::deadline_timer    m_timer;      ///< Timer
+    boost::asio::streambuf         m_buffer;     ///< Read buffer
+    std::string                    m_response;   ///< Read message
+    std::istream                   m_istream;    ///< Message stream for conversion
+    //< end members >//
+
+    //< begin methods >//
+    /**
+     * @brief Handler for resolving endpoint
+     * @param error      The error code
+     * @param resolverIt The resolved host
+     * @param callback   The callback to invoke
+     */
+    void handleResolve(const boost::system::error_code&         error,
+                       boost::asio::ip::tcp::resolver::iterator resolverIt,
+                       const Callback&                          callback) noexcept;
+
+    /**
+     * @brief Handler for connecting to endpoint
+     * @param error      The error code
+     * @param resolverIt The resolved host
+     * @param callback   The callback to invoke
+     */
+    void handleConnect(const boost::system::error_code&         error,
+                       boost::asio::ip::tcp::resolver::iterator resolverIt,
+                       const Callback&                          callback) noexcept;
+
+    /**
+     * @brief Handler for timed out timer
+     * @param error    The error code
+     * @param callback The callback to invoke
+     */
+    void handleTimeout(const boost::system::error_code& error, const Callback& callback) noexcept;
+
+    /**
+     * @brief Handler for reading from endpoint
+     * @param error    The error code
+     * @param bytes    The amount of read bytes
+     * @param callback The callback to invoke
+     */
+    void handleRead(const boost::system::error_code& error, std::size_t bytes,
+                    const ReadCallback& callback) noexcept;
+
+    /**
+     * @brief Handler for writing to endpoint
+     * @param error    The error code
+     * @param bytes    The amount of sent bytes
+     * @param callback The callback to invoke
+     */
+    void handleWrite(const boost::system::error_code& error, std::size_t bytes,
+                     const Callback& callback) noexcept;
+    //< end methods >//
+
 public:
     NOT_COPYABLE(ConnectorImplBoost)
-    DEFAULT_DTOR(ConnectorImplBoost)
 
     ConnectorImplBoost();
+    ~ConnectorImplBoost() noexcept override = default;
 
+    //< begin interfaces >//
     /**
      * @brief Run the internal event handler queue.
      * @note Blocks until all handlers have returned.
@@ -99,73 +157,7 @@ public:
      * @return true if expired, else false
      */
     bool timerExpired() override;
-
-private:
-    /**
-     * @brief Handler for resolving endpoint
-     * @param error      The error code
-     * @param resolverIt The resolved host
-     * @param callback   The callback to invoke
-     */
-    void handleResolve(const boost::system::error_code&         error,
-                       boost::asio::ip::tcp::resolver::iterator resolverIt,
-                       const Callback&                          callback) noexcept;
-
-    /**
-     * @brief Handler for connecting to endpoint
-     * @param error      The error code
-     * @param resolverIt The resolved host
-     * @param callback   The callback to invoke
-     */
-    void handleConnect(const boost::system::error_code&         error,
-                       boost::asio::ip::tcp::resolver::iterator resolverIt,
-                       const Callback&                          callback) noexcept;
-
-    /**
-     * @brief Handler for timed out timer
-     * @param error    The error code
-     * @param callback The callback to invoke
-     */
-    void handleTimeout(const boost::system::error_code& error, const Callback& callback) noexcept;
-
-    /**
-     * @brief Handler for reading from endpoint
-     * @param error    The error code
-     * @param bytes    The amount of read bytes
-     * @param callback The callback to invoke
-     */
-    void handleRead(const boost::system::error_code& error, std::size_t bytes,
-                    const ReadCallback& callback) noexcept;
-
-    /**
-     * @brief Handler for writing to endpoint
-     * @param error    The error code
-     * @param bytes    The amount of sent bytes
-     * @param callback The callback to invoke
-     */
-    void handleWrite(const boost::system::error_code& error, std::size_t bytes,
-                     const Callback& callback) noexcept;
-
-    /// Internal IO-service
-    boost::asio::io_service m_ioService;
-
-    /// Connection socket
-    boost::asio::ip::tcp::socket m_socket;
-
-    /// Host resolver
-    boost::asio::ip::tcp::resolver m_resolver;
-
-    /// Timer
-    boost::asio::deadline_timer m_timer;
-
-    /// Read buffer
-    boost::asio::streambuf m_buffer;
-
-    /// Read message
-    std::string m_response;
-
-    /// Message stream for conversion
-    std::istream m_istream;
+    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace client
