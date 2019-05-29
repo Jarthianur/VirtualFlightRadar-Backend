@@ -28,35 +28,13 @@ namespace object
  */
 class Object
 {
-public:
-    static constexpr const std::uint32_t OUTDATED = 4;
-
-    Object()                   = default;
-    virtual ~Object() noexcept = default;
-
-    /**
-     * @brief Constructor
-     * @param priority The initial priority
-     */
-    explicit Object(std::uint32_t priority);
-
-    /**
-     * @brief Try to update this Object.
-     * @note If the other Object cannot update this, nothing happens.
-     * @param other   The other Object
-     * @return true on success, else false
-     */
-    virtual bool tryUpdate(Object&& other);
-
-    /**
-     * @brief Increment the update age.
-     * @return this
-     */
-    Object& operator++();
-
-    virtual util::CStringPack getNMEA() const = 0;
-
 protected:
+    //< begin members >//
+    std::uint32_t m_lastPriority = 0;  ///< Got last update with this priority.
+    std::uint32_t m_updateAge    = 0;  ///< Times processed without update.
+    //< end members >//
+
+    //< begin methods >//
     /**
      * @brief Assign other objects values to this.
      * @param other The other Object
@@ -69,17 +47,36 @@ protected:
      * @return true if yes, else false
      */
     virtual bool canUpdate(const Object& other) const;
-
-    /// Got last update with this priority.
-    std::uint32_t m_lastPriority = 0;
-
-    /// Times processed without update.
-    std::uint32_t m_updateAge = 0;
+    //< end methods >//
 
 public:
+    Object() = default;
+    explicit Object(std::uint32_t priority);  ///< @param priority The initial priority
+    virtual ~Object() noexcept = default;
+
+    //< begin operators >//
     /**
-     * Getters
+     * @brief Increment the update age.
+     * @return this
      */
-    auto getUpdateAge() const -> decltype(m_updateAge);
+    Object& operator++();
+    //< end operators >//
+
+    //< begin interfaces >//
+    /**
+     * @brief Try to update this Object.
+     * @note If the other Object cannot update this, nothing happens.
+     * @param other   The other Object
+     * @return true on success, else false
+     */
+    virtual bool tryUpdate(Object&& other);
+
+    virtual util::CStringPack getNMEA() const = 0;
+    auto                      getUpdateAge() const -> decltype(m_updateAge);
+    //< end interfaces >//
+
+    //< begin constants >//
+    static constexpr const std::uint32_t OUTDATED = 4;
+    //< end constants >//
 };
 }  // namespace object

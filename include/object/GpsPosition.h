@@ -29,21 +29,34 @@
 #include "Object.h"
 #include "TimeStamp.hpp"
 
+namespace data
+{
+class GpsData;
+namespace processor
+{
+class GpsProcessor;
+}  // namespace processor
+}  // namespace data
+namespace feed
+{
+namespace parser
+{
+class GpsParser;
+}  // namespace parser
+}  // namespace feed
+
 namespace object
 {
 /**
  * @brief A position on earth.
  */
-struct Position
+struct Location
 {
-    /// Latitude; deg
-    double latitude;
-
-    /// Longitude; deg
-    double longitude;
-
-    /// Altitude; m
-    std::int32_t altitude;
+    //< begin members >//
+    double       latitude;   ///< Latitude; deg
+    double       longitude;  ///< Longitude; deg
+    std::int32_t altitude;   ///< Altitude; m
+    //< end members >//
 };
 
 /**
@@ -51,48 +64,25 @@ struct Position
  */
 class GpsPosition : public Object
 {
-public:
+    friend class data::GpsData;
+    friend class data::processor::GpsProcessor;
+    friend class feed::parser::GpsParser;
+
+    //< begin constants >//
     static constexpr const std::size_t NMEA_SIZE = 4096;
+    //< end constants >//
 
-    GpsPosition();
-    ~GpsPosition() noexcept override = default;
+    //< begin members >//
+    Location                           m_location{0.0, 0.0, 0};  ///< The location
+    double                             m_geoid = 0.0;            ///< The geoid separation
+    TimeStamp<time::DateTimeImplBoost> m_timeStamp;              ///< The timestamp of this position
+    double                             m_dilution       = 0.0;   ///< The position dilution
+    std::uint8_t                       m_nrOfSatellites = 1;     ///< The number of satellites
+    std::int8_t                        m_fixQuality     = 5;     ///< The GPS fix quality
+    util::CString<NMEA_SIZE>           m_nmea;
+    //< end members >//
 
-    /**
-     * @brief Constructor
-     * @param priority The initial priority
-     */
-    explicit GpsPosition(std::uint32_t priority);
-
-    /**
-     * @brief Constructor
-     * @param position The position
-     * @param geoid    The geoid
-     */
-    GpsPosition(const Position& position, double geoid);
-
-    util::CStringPack getNMEA() const override;
-
-    /// The position
-    Position m_position{0.0, 0.0, 0};
-
-    /// The geoid separation
-    double m_geoid = 0.0;
-
-    /// The timestamp of this position
-    TimeStamp<timestamp::DateTimeImplBoost> m_timeStamp;
-
-    /// The position dilution
-    double m_dilution = 0.0;
-
-    /// The number of satellites
-    std::uint8_t m_nrOfSatellites = 1;
-
-    /// The GPS fix quality
-    std::int8_t m_fixQuality = 5;
-
-    util::CString<NMEA_SIZE> m_nmea;
-
-private:
+    //< begin methods >//
     /**
      * @brief Override Object::assign.
      */
@@ -102,5 +92,21 @@ private:
      * @brief Override Object::canUpdate.
      */
     bool canUpdate(const Object& other) const override;
+    //< end methods >//
+
+public:
+    GpsPosition();
+    explicit GpsPosition(std::uint32_t priority);  ///< @param priority The initial priority
+
+    /**
+     * @param position The position
+     * @param geoid    The geoid
+     */
+    GpsPosition(const Location& position, double geoid);
+    ~GpsPosition() noexcept override = default;
+
+    //< begin interfaces >//
+    util::CStringPack getNMEA() const override;
+    //< end interfaces >//
 };
 }  // namespace object

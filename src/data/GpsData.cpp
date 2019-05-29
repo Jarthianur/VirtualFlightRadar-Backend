@@ -61,10 +61,10 @@ bool GpsData::update(Object&& position)
     return updated;
 }
 
-auto GpsData::getPosition() const -> decltype(m_position.m_position)
+auto GpsData::getPosition() const -> decltype(m_position.m_location)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_position.m_position;
+    return m_position.m_location;
 }
 
 bool GpsData::isPositionGood() const

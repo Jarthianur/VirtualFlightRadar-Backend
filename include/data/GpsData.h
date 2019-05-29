@@ -85,7 +85,7 @@ public:
      * @return the position
      * @threadsafe
      */
-    auto getPosition() const -> decltype(m_position.m_position);
+    auto getPosition() const -> decltype(m_position.m_location);
     //< end interfaces >//
 };
 

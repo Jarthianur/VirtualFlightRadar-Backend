@@ -136,7 +136,7 @@ catch (const std::exception& e)
 
 object::GpsPosition Configuration::resolvePosition(const Properties& properties) const
 {
-    object::Position pos;
+    object::Location pos;
     pos.latitude = boost::get<double>(
         checkNumber(stringToNumber<double>(properties.get_property(PATH_LATITUDE, "0.0")), PATH_LATITUDE));
     pos.longitude = boost::get<double>(
@@ -201,9 +201,9 @@ std::unordered_map<std::string, Properties> Configuration::resolveFeeds(const Pr
 
 void Configuration::dumpInfo() const
 {
-    logger.info(LOG_PREFIX, PATH_LATITUDE, ": ", gpsPosition.m_position.latitude);
-    logger.info(LOG_PREFIX, PATH_LONGITUDE, ": ", gpsPosition.m_position.longitude);
-    logger.info(LOG_PREFIX, PATH_ALTITUDE, ": ", gpsPosition.m_position.altitude);
+    logger.info(LOG_PREFIX, PATH_LATITUDE, ": ", gpsPosition.m_location.latitude);
+    logger.info(LOG_PREFIX, PATH_LONGITUDE, ": ", gpsPosition.m_location.longitude);
+    logger.info(LOG_PREFIX, PATH_ALTITUDE, ": ", gpsPosition.m_location.altitude);
     logger.info(LOG_PREFIX, PATH_GEOID, ": ", gpsPosition.m_geoid);
     logger.info(LOG_PREFIX, PATH_PRESSURE, ": ", atmPressure);
     logger.info(LOG_PREFIX, PATH_MAX_HEIGHT, ": ", maxHeight);

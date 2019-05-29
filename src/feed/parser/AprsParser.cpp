@@ -125,7 +125,7 @@ bool AprsParser::parsePosition(const boost::smatch& match, Aircraft& aircraft) n
     bool valid = false;
     try
     {
-        Position pos;
+        Location pos;
         pos.latitude = math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
         if (match.str(RE_APRS_LAT_DIR).compare("S") == 0)
         {
@@ -151,9 +151,9 @@ bool AprsParser::parseComment(const boost::smatch& match, Aircraft& aircraft) no
     aircraft.m_id = match.str(RE_APRS_COM_ID);
     try
     {
-        aircraft.set_idType(
+        aircraft.setIdType(
             static_cast<Aircraft::IdType>(std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03));
-        aircraft.set_aircraftType(static_cast<Aircraft::AircraftType>(
+        aircraft.setAircraftType(static_cast<Aircraft::AircraftType>(
             (std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2));
     }
     catch (const std::logic_error&)
@@ -187,7 +187,7 @@ bool AprsParser::parseTimeStamp(const boost::smatch& match, Aircraft& aircraft) 
     try
     {
         aircraft.m_timeStamp =
-            TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_APRS_TIME), timestamp::Format::HHMMSS);
+            TimeStamp<time::DateTimeImplBoost>(match.str(RE_APRS_TIME), time::Format::HHMMSS);
     }
     catch (const std::invalid_argument&)
     {

@@ -62,7 +62,7 @@ bool SbsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcept
 {
     std::size_t   p = 6, delim;
     std::uint32_t i = 2;
-    Position      pos;
+    Location      pos;
 
     if (sentence.find(',', p) == std::string::npos || !(sentence.size() > 4 && sentence[4] == '3'))
     {
@@ -78,12 +78,12 @@ bool SbsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcept
     }
     aircraft.m_position   = pos;
     aircraft.m_targetType = Aircraft::TargetType::TRANSPONDER;
-    aircraft.set_aircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
-    aircraft.set_idType(Aircraft::IdType::ICAO);
+    aircraft.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
+    aircraft.setIdType(Aircraft::IdType::ICAO);
     return i == 16 && pos.altitude <= s_maxHeight;
 }
 
-bool SbsParser::parseField(std::uint32_t fieldNr, const std::string& field, Position& position,
+bool SbsParser::parseField(std::uint32_t fieldNr, const std::string& field, Location& position,
                            Aircraft& aircraft) noexcept
 {
     try
@@ -98,8 +98,7 @@ bool SbsParser::parseField(std::uint32_t fieldNr, const std::string& field, Posi
                 aircraft.m_id = field;
                 break;
             case SBS_FIELD_TIME:
-                aircraft.m_timeStamp =
-                    TimeStamp<timestamp::DateTimeImplBoost>(field, timestamp::Format::HH_MM_SS_FFF);
+                aircraft.m_timeStamp = TimeStamp<time::DateTimeImplBoost>(field, time::Format::HH_MM_SS_FFF);
                 break;
             case SBS_FIELD_ALT:
                 position.altitude = math::doubleToInt(std::stod(field) * math::FEET_2_M);

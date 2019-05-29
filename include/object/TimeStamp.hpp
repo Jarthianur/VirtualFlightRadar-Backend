@@ -27,7 +27,7 @@
 
 namespace object
 {
-namespace timestamp
+namespace time
 {
 /**
  * @brief Format of a given time string.
@@ -38,7 +38,7 @@ enum class Format : std::uint8_t
     HH_MM_SS_FFF
 };
 
-}  // namespace timestamp
+}  // namespace time
 
 /**
  * @brief A timestamp
@@ -47,24 +47,23 @@ enum class Format : std::uint8_t
 template<typename DateTimeT>
 class TimeStamp
 {
-public:
-    TimeStamp()           = default;
-    ~TimeStamp() noexcept = default;
+    //< begin members >//
+    std::int64_t  m_value = 0;  ///< Time in milliseconds
+    std::uint32_t m_day   = 0;  ///< Incremental day number
+    //< end members >//
 
+public:
+    TimeStamp() = default;
     /**
-     * @brief Constructor
      * @param value  The time string
      * @param format The format
      * @throw std::invalid_argument if the time string is invalid
      */
-    TimeStamp(const std::string& value, timestamp::Format format);
+    TimeStamp(const std::string& value, time::Format format);
+    TimeStamp(const TimeStamp& other);  ///< @param other The other TimeStamp
+    ~TimeStamp() noexcept = default;
 
-    /**
-     * @brief Copy-Constructor
-     * @param other The other TimeStamp
-     */
-    TimeStamp(const TimeStamp& other);
-
+    //< begin operators >//
     /**
      * @brief Assign other TimeStamps value.
      * @param other The other TimeStamp
@@ -78,24 +77,18 @@ public:
      * @return true if less, or equals, else false
      */
     bool operator>(const TimeStamp& other) const;
-
-private:
-    /// Time in milliseconds
-    std::int64_t m_value = 0;
-
-    /// Incremental day number
-    std::uint32_t m_day = 0;
+    //< end operators >//
 };
 
 template<typename DateTimeT>
-TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format format) : m_day(DateTimeT::day())
+TimeStamp<DateTimeT>::TimeStamp(const std::string& value, time::Format format) : m_day(DateTimeT::day())
 {
     std::int32_t h = 99, m = 99, s = 99, f = 9999;
     try
     {
         switch (format)
         {
-            case timestamp::Format::HHMMSS:
+            case time::Format::HHMMSS:
             {
                 h = std::stoi(value.substr(0, 2));
                 m = std::stoi(value.substr(2, 2));
@@ -103,7 +96,7 @@ TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format form
                 f = 0;
             }
             break;
-            case timestamp::Format::HH_MM_SS_FFF:
+            case time::Format::HH_MM_SS_FFF:
             {
                 h = std::stoi(value.substr(0, 2));
                 m = std::stoi(value.substr(3, 2));

@@ -37,7 +37,7 @@ void GpsProcessor::process(object::GpsPosition& position) const
 {
     std::time_t now = std::time(nullptr);
     std::tm*    utc = std::gmtime(&now);
-    evalPosition(position.m_position.latitude, position.m_position.longitude);
+    evalPosition(position.m_location.latitude, position.m_location.longitude);
     appendGPGGA(position, utc, appendGPRMC(position, utc, 0));
 }
 
@@ -51,7 +51,7 @@ std::size_t GpsProcessor::appendGPGGA(GpsPosition& position, const std::tm* utc,
                       "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02hhu,1,%d,M,%.1lf,M,,*",
                       utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
                       m_degLongitude, m_minLongitude, m_directionEW, /*pos.fixQa,*/ position.m_nrOfSatellites,
-                      position.m_position.altitude, position.m_geoid);
+                      position.m_location.altitude, position.m_geoid);
     bytes += finishSentence(*position.m_nmea, GpsPosition::NMEA_SIZE - pos,
                             GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes));
     return pos + static_cast<std::size_t>(bytes);

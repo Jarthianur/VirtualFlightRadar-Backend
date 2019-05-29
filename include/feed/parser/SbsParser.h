@@ -60,7 +60,7 @@ private:
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parseField(std::uint32_t fieldNr, const std::string& field, object::Position& position,
+    bool parseField(std::uint32_t fieldNr, const std::string& field, object::Location& position,
                     object::Aircraft& aircraft) noexcept;
 };
 }  // namespace parser

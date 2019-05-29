@@ -26,8 +26,8 @@ GpsPosition::GpsPosition() : Object() {}
 
 GpsPosition::GpsPosition(std::uint32_t priority) : Object(priority) {}
 
-GpsPosition::GpsPosition(const Position& position, double geoid)
-    : Object(), m_position(position), m_geoid(geoid)
+GpsPosition::GpsPosition(const Location& position, double geoid)
+    : Object(), m_location(position), m_geoid(geoid)
 {}
 
 void GpsPosition::assign(Object&& other)
@@ -36,7 +36,7 @@ void GpsPosition::assign(Object&& other)
     {
         GpsPosition&& update = dynamic_cast<GpsPosition&&>(other);
         Object::assign(std::move(other));
-        this->m_position       = update.m_position;
+        this->m_location       = update.m_location;
         this->m_timeStamp      = update.m_timeStamp;
         this->m_nrOfSatellites = update.m_nrOfSatellites;
         this->m_fixQuality     = update.m_fixQuality;

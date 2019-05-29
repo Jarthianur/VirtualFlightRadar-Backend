@@ -27,6 +27,18 @@
 
 #include "Object.h"
 
+namespace data
+{
+class AtmosphereData;
+}
+namespace feed
+{
+namespace parser
+{
+class AtmosphereParser;
+}
+}  // namespace feed
+
 namespace object
 {
 struct Climate;
@@ -36,19 +48,29 @@ struct Climate;
  */
 class Atmosphere : public Object
 {
-public:
-    /// ICAO standard atmospheric pressure at MSL
-    static constexpr const double      ICAO_STD  = 1013.25;
+    friend class data::AtmosphereData;
+    friend class feed::parser::AtmosphereParser;
+
+    //< begin constants >//
+    static constexpr const double      ICAO_STD  = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
     static constexpr const std::size_t NMEA_SIZE = 4096;
+    //< end constants >//
 
-    Atmosphere();
-    ~Atmosphere() noexcept override = default;
+    //< begin members >//
+    double                   m_pressure = ICAO_STD;  ///< The atmospheric pressure
+    util::CString<NMEA_SIZE> m_nmea;
+    //< end members >//
 
+    //< begin methods >//
     /**
-     * @brief Constructor
-     * @param priority The initial priority
+     * @brief Extend Object::assign.
      */
-    explicit Atmosphere(std::uint32_t priority);
+    void assign(Object&& other) override;
+    //< end methods >//
+
+public:
+    Atmosphere();
+    explicit Atmosphere(std::uint32_t priority);  ///< @param priority The initial priority
 
     /**
      * @brief Constructor
@@ -56,18 +78,11 @@ public:
      * @param priority The initial priority
      */
     Atmosphere(double pressure, std::uint32_t priority);
+    ~Atmosphere() noexcept override = default;
 
+    //< begin interfaces >//
     util::CStringPack getNMEA() const override;
-    /// The atmospheric pressure
-    double m_pressure = ICAO_STD;
-
-    util::CString<NMEA_SIZE> m_nmea;
-
-private:
-    /**
-     * @brief Extend Object::assign.
-     */
-    void assign(Object&& other) override;
+    //< end interfaces >//
 };
 
 }  // namespace object

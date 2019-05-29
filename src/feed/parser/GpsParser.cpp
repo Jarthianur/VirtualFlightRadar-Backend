@@ -97,7 +97,7 @@ bool GpsParser::unpack(const std::string& sentence, GpsPosition& position) noexc
 
 bool GpsParser::parsePosition(const boost::smatch& match, GpsPosition& position)
 {
-    Position pos;
+    Location pos;
     pos.latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
 
     if (match.str(RE_GGA_LAT_DIR).compare("S") == 0)
@@ -110,10 +110,9 @@ bool GpsParser::parsePosition(const boost::smatch& match, GpsPosition& position)
     {
         pos.longitude = -pos.longitude;
     }
-    pos.altitude        = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
-    position.m_position = pos;
-    position.m_timeStamp =
-        TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_GGA_TIME), timestamp::Format::HHMMSS);
+    pos.altitude          = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
+    position.m_location   = pos;
+    position.m_timeStamp  = TimeStamp<time::DateTimeImplBoost>(match.str(RE_GGA_TIME), time::Format::HHMMSS);
     position.m_fixQuality = static_cast<decltype(position.m_fixQuality)>(std::stoi(match.str(RE_GGA_FIX)));
     position.m_nrOfSatellites =
         static_cast<decltype(position.m_nrOfSatellites)>(std::stoi(match.str(RE_GGA_SAT)));

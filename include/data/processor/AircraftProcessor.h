@@ -39,7 +39,7 @@ class AircraftProcessor : public Processor<object::Aircraft>
 {
     //< begin members >//
     const std::int32_t m_maxDistance;                    ///< Max distance to process an aircraft
-    object::Position   m_refPosition{0.0, 0.0, 0};       ///< Refered position
+    object::Location   m_refPosition{0.0, 0.0, 0};       ///< Refered position
     double             m_refAtmPressure      = 1013.25;  ///< Refered pressure; hPa
     mutable double     m_refRadLatitude      = 0.0;      ///< Refered latitude as radian
     mutable double     m_aircraftRadLatitude = 0.0;      ///< Aircraft latitude as radian
@@ -92,7 +92,7 @@ public:
      * @param position The position
      * @param atmPress The pressure
      */
-    void referTo(const object::Position& position, double atmPress);
+    void referTo(const object::Location& position, double atmPress);
     //< end interfaces >//
 };
 

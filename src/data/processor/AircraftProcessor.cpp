@@ -53,7 +53,7 @@ void AircraftProcessor::process(Aircraft& aircraft) const
     }
 }
 
-void AircraftProcessor::referTo(const Position& position, double atmPress)
+void AircraftProcessor::referTo(const Location& position, double atmPress)
 {
     m_refPosition    = position;
     m_refAtmPressure = atmPress;
@@ -104,16 +104,16 @@ std::size_t AircraftProcessor::appendPFLAA(Aircraft& aircraft, std::size_t pos) 
     {
         bytes = std::snprintf(*aircraft.m_nmea + pos, Aircraft::NMEA_SIZE - pos,
                               "$PFLAA,0,%d,%d,%d,%hhu,%s,%03d,,%d,%3.1lf,%1hhX*", m_relNorth, m_relEast,
-                              m_relVertical, util::raw_type(aircraft.getIdType()), *aircraft.m_id,
+                              m_relVertical, util::raw_type(aircraft.m_idType), *aircraft.m_id,
                               math::doubleToInt(aircraft.m_movement.heading),
                               math::doubleToInt(aircraft.m_movement.gndSpeed * math::MS_2_KMH),
-                              aircraft.m_movement.climbRate, util::raw_type(aircraft.getAircraftType()));
+                              aircraft.m_movement.climbRate, util::raw_type(aircraft.m_aircraftType));
     }
     else
     {
         bytes = std::snprintf(*aircraft.m_nmea + pos, Aircraft::NMEA_SIZE - pos,
                               "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
-                              *aircraft.m_id, util::raw_type(aircraft.getAircraftType()));
+                              *aircraft.m_id, util::raw_type(aircraft.m_aircraftType));
     }
     bytes += finishSentence(*aircraft.m_nmea + pos, Aircraft::NMEA_SIZE - pos,
                             Aircraft::NMEA_SIZE - pos - static_cast<std::size_t>(bytes));
