@@ -51,12 +51,18 @@ namespace feed
  */
 class AprscFeed : public Feed
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(AprscFeed) ";
+    //< end constants >//
+
+    //< begin members >//
+    static parser::AprsParser s_parser;  ///< Parser to unpack response from Client
+    //< end members >//
+
 public:
     NOT_COPYABLE(AprscFeed)
-    ~AprscFeed() noexcept override = default;
 
     /**
-     * @brief Constructor
      * @param name       The unique name
      * @param properties The Properties
      * @param data       The AircraftData container
@@ -65,12 +71,14 @@ public:
      */
     AprscFeed(const std::string& name, const config::Properties& propertyMap,
               std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
+    ~AprscFeed() noexcept override = default;
 
+    //< begin interfaces >//
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::APRS
      */
-    Protocol get_protocol() const override;
+    Protocol getProtocol() const override;
 
     /**
      * @brief Implement Feed::process.
@@ -82,10 +90,7 @@ public:
      * @return the login
      */
     std::string get_login() const;
-
-private:
-    /// Parser to unpack response from Client
-    static parser::AprsParser s_parser;
+    //< end interfaces >//
 };
 
 }  // namespace feed

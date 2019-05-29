@@ -64,7 +64,7 @@ std::unique_ptr<Connection<SocketImplTest>> NetworkInterfaceImplTests::startConn
     return Connection<SocketImplTest>::create(SocketImplTest(0));
 }
 
-std::string NetworkInterfaceImplTests::get_currentAddress() const
+std::string NetworkInterfaceImplTests::getCurrentAddress() const
 {
     return currentAddress;
 }

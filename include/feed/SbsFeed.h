@@ -50,12 +50,18 @@ namespace feed
  */
 class SbsFeed : public Feed
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(SbsFeed) ";
+    //< end constants >//
+
+    //< begin members >//
+    static parser::SbsParser s_parser;  ///< Parser to unpack response from Client
+    //< end members >//
+
 public:
     NOT_COPYABLE(SbsFeed)
-    ~SbsFeed() noexcept override = default;
 
     /**
-     * @brief Constructor
      * @param name       The unique name
      * @param properties The Properties
      * @param data       The AircraftData container
@@ -64,21 +70,20 @@ public:
      */
     SbsFeed(const std::string& name, const config::Properties& properties,
             std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
+    ~SbsFeed() noexcept override = default;
 
+    //< begin interfaces >//
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::SBS
      */
-    Protocol get_protocol() const override;
+    Protocol getProtocol() const override;
 
     /**
      * @brief Feed::process.
      */
     bool process(const std::string& response) override;
-
-private:
-    /// Parser to unpack response from Client
-    static parser::SbsParser s_parser;
+    //< end interfaces >//
 };
 
 }  // namespace feed

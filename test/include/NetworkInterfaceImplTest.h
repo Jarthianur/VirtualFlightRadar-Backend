@@ -45,7 +45,7 @@ public:
 
     std::unique_ptr<Connection<SocketImplTest>> startConnection() override;
 
-    std::string get_currentAddress() const override;
+    std::string getCurrentAddress() const override;
 
     void connect(bool err, const std::string& adr);
 

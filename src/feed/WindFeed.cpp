@@ -28,11 +28,6 @@
 #include "feed/parser/WindParser.h"
 #include "object/Wind.h"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(WindFeed)"
-
 using namespace config;
 
 namespace feed
@@ -41,10 +36,10 @@ parser::WindParser WindFeed::s_parser;
 
 WindFeed::WindFeed(const std::string& name, const Properties& properties,
                    std::shared_ptr<data::WindData> data)
-    : Feed(name, COMPONENT, properties, data)
+    : Feed(name, LOG_PREFIX, properties, data)
 {}
 
-Feed::Protocol WindFeed::get_protocol() const
+Feed::Protocol WindFeed::getProtocol() const
 {
     return Protocol::SENSOR;
 }

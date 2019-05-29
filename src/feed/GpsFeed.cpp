@@ -30,11 +30,6 @@
 #include "object/GpsPosition.h"
 #include "util/Logger.hpp"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(GpsFeed)"
-
 using namespace config;
 
 namespace feed
@@ -42,10 +37,10 @@ namespace feed
 parser::GpsParser GpsFeed::s_parser;
 
 GpsFeed::GpsFeed(const std::string& name, const Properties& properties, std::shared_ptr<data::GpsData> data)
-    : Feed(name, COMPONENT, properties, data)
+    : Feed(name, LOG_PREFIX, properties, data)
 {}
 
-Feed::Protocol GpsFeed::get_protocol() const
+Feed::Protocol GpsFeed::getProtocol() const
 {
     return Protocol::GPS;
 }
@@ -61,7 +56,7 @@ bool GpsFeed::process(const std::string& response)
         }
         catch (const data::GpsDataException& e)
         {
-            logger.info(m_component, " ", m_name, ": ", e.what());
+            logger.info(m_logPrefix, name, ": ", e.what());
             return false;
         }
     }

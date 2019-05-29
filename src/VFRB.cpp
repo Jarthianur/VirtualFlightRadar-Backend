@@ -58,25 +58,25 @@ VFRB::VFRB(std::shared_ptr<Configuration> config)
 void VFRB::run() noexcept
 {
     m_running = true;
-    logger.info("(VFRB) startup");
+    logger.info(LOG_PREFIX, "starting...");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     util::SignalListener                  signals;
     client::ClientManager                 clientManager;
 
     signals.addHandler([this](const boost::system::error_code&, const int) {
-        logger.info("(VFRB) caught signal to shutdown ...");
+        logger.info(LOG_PREFIX, "caught signal to shutdown...");
         m_running = false;
     });
     for (auto it : m_feeds)
     {
-        logger.info("(VFRB) run feed: ", it->m_name);
+        logger.info(LOG_PREFIX, "run feed: ", it->name);
         try
         {
             clientManager.subscribe(it);
         }
         catch (const std::logic_error& e)
         {
-            logger.error("(VFRB) ", e.what());
+            logger.error(LOG_PREFIX, ": ", e.what());
         }
     }
     m_feeds.clear();
@@ -88,7 +88,7 @@ void VFRB::run() noexcept
     clientManager.stop();
     m_server.stop();
     signals.stop();
-    logger.info("Stopped after ", get_duration(start));
+    logger.info(LOG_PREFIX, "stopped after ", get_duration(start));
 }
 
 void VFRB::serve()
@@ -114,7 +114,7 @@ void VFRB::serve()
         }
         catch (const std::exception& e)
         {
-            logger.error("(VFRB) error: ", e.what());
+            logger.error(LOG_PREFIX, "fatal: ", e.what());
             m_running = false;
         }
     }
@@ -134,7 +134,7 @@ void VFRB::createFeeds(std::shared_ptr<Configuration> config)
             }
             else
             {
-                logger.warn("(VFRB) create feed ", name,
+                logger.warn(LOG_PREFIX, " can not create feed ", name,
                             ": No keywords found; be sure feed names contain one of ",
                             Configuration::SECT_KEY_APRSC, ", ", Configuration::SECT_KEY_SBS, ", ",
                             Configuration::SECT_KEY_WIND, ", ", Configuration::SECT_KEY_ATMOS, ", ",
@@ -143,7 +143,7 @@ void VFRB::createFeeds(std::shared_ptr<Configuration> config)
         }
         catch (const std::exception& e)
         {
-            logger.warn("(VFRB) create feed ", name, ": ", e.what());
+            logger.warn(LOG_PREFIX, "can not create feed ", name, ": ", e.what());
         }
     }
 }

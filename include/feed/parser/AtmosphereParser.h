@@ -23,9 +23,12 @@
 
 #include <string>
 
-#include "object/Atmosphere.h"
-
 #include "Parser.hpp"
+
+namespace object
+{
+class Atmosphere;
+}  // namespace object
 
 namespace feed
 {
@@ -40,12 +43,14 @@ public:
     AtmosphereParser();
     ~AtmosphereParser() noexcept override = default;
 
+    //< begin interfaces >//
     /**
      * @brief Unpack into Atmosphere.
      * @param sentence   The string to unpack
      * @param atmosphere The Atmosphere to unpack into
      */
     bool unpack(const std::string& sentence, object::Atmosphere& atmosphere) noexcept override;
+    //< end interfaces >//
 };
 }  // namespace parser
 }  // namespace feed

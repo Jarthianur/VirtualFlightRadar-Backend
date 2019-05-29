@@ -32,10 +32,45 @@
  */
 class Logger
 {
+    //< begin members >//
+    std::ofstream      m_logFile;                    ///< The logfile stream
+    std::ostream*      m_outStream    = &std::cout;  ///< Stream to log INFO,DEBUG,WARN
+    std::ostream*      m_errStream    = &std::cerr;  ///< Stream to log ERROR
+    bool               m_debugEnabled = false;       ///< Enabling state of debug level
+    mutable std::mutex m_mutex;
+    //< end members >//
+
+    //< begin methods >//
+    /**
+     * @brief Get current date-time as string.
+     * @return the date-time-string
+     */
+    static std::string get_time();
+
+    /**
+     * @brief Write to the given stream.
+     * @tparam T     The first argument
+     * @tparam TRest The rest of arguments
+     * @param out The stream
+     */
+    template<typename T, typename... TRest>
+    void log(std::ostream* out, T&& head, TRest&&... tail)
+    {
+        *out << std::forward<T>(head);
+        log(out, std::forward<TRest>(tail)...);
+    }
+    template<typename T>
+    void log(std::ostream* out, T&& last)
+    {
+        *out << std::forward<T>(last) << std::endl;
+    }
+    //< end methods >//
+
 public:
     Logger()           = default;
     ~Logger() noexcept = default;
 
+    //< begin interfaces >//
     /**
      * @brief Log on INFO level.
      * @tparam T     The first argument
@@ -130,52 +165,14 @@ public:
      * @brief Enable/Disable debug level.
      * @param enable true to enable, false to disable (default: true)
      */
-    void set_debug(bool enable = true);
+    void setDebug(bool enable = true);
 
     /**
      * @brief Set a logfile instead of stdout/stderr.
      * @param file The filename
      */
-    void set_logFile(const std::string& file);
-
-private:
-    /// The logfile stream
-    std::ofstream m_logFile;
-
-    /// Stream to log INFO,DEBUG,WARN
-    std::ostream* m_outStream = &std::cout;
-
-    /// Stream to log ERROR
-    std::ostream* m_errStream = &std::cerr;
-
-    /// Enabling state of debug level
-    bool m_debugEnabled = false;
-
-    mutable std::mutex m_mutex;
-
-    /**
-     * @brief Get current date-time as string.
-     * @return the date-time-string
-     */
-    static std::string get_time();
-
-    /**
-     * @brief Write to the given stream.
-     * @tparam T     The first argument
-     * @tparam TRest The rest of arguments
-     * @param out The stream
-     */
-    template<typename T, typename... TRest>
-    void log(std::ostream* out, T&& head, TRest&&... tail)
-    {
-        *out << std::forward<T>(head);
-        log(out, std::forward<TRest>(tail)...);
-    }
-    template<typename T>
-    void log(std::ostream* out, T&& last)
-    {
-        *out << std::forward<T>(last) << std::endl;
-    }
+    void setLogFile(const std::string& file);
+    //< end interfaces >//
 };
 
 /// Extern Logger instance

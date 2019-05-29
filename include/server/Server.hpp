@@ -37,14 +37,6 @@
 #include "Connection.hpp"
 #include "parameters.h"
 
-/// @def S_MAX_CLIENTS
-/// The max amount of client to accept at once
-#ifdef SERVER_MAX_CLIENTS
-#    define S_MAX_CLIENTS SERVER_MAX_CLIENTS
-#else
-#    define S_MAX_CLIENTS 2
-#endif
-
 namespace server
 {
 /**
@@ -54,25 +46,49 @@ namespace server
 template<typename SocketT>
 class Server
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(Server) ";
+    //< end constants >//
+
+    //< begin members >//
+    std::shared_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
+    std::array<std::unique_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
+                       m_connections;                ///< Connections container
+    std::uint8_t       m_activeConnections = 0;      ///< Number of active connections
+    bool               m_running           = false;  ///< Running state
+    std::thread        m_thread;                     ///< Internal thread
+    mutable std::mutex m_mutex;
+    //< end members >//
+
+    //< begin methods >//
+    /**
+     * @brief Schedule to accept connections.
+     */
+    void accept();
+
+    /**
+     * @brief Check whether an ip address already exists in the Connection container.
+     * @param address The ip address to check
+     * @return true if the ip is already registered, else false
+     */
+    bool isConnected(const std::string& address);
+
+    /**
+     * @brief Handler for accepting connections.
+     * @param error The error indicator
+     */
+    void attemptConnection(bool error) noexcept;
+    //< end methods >//
+
 public:
     NOT_COPYABLE(Server)
-
     Server();
-
-    /**
-     * @brief Constructor
-     * @param port The port
-     */
-    explicit Server(std::uint16_t port);
-
-    /**
-     * @brief Server
-     * @param interface The NetworkInterface to use
-     */
-    explicit Server(std::shared_ptr<net::NetworkInterface<SocketT>> interface);
-
+    explicit Server(std::uint16_t port);  ///< @param port The port
+    explicit Server(std::shared_ptr<net::NetworkInterface<SocketT>>
+                        interface);  ///< @param interface The NetworkInterface to use
     ~Server() noexcept;
 
+    //< begin interfaces >//
     /**
      * @brief Run the Server.
      * @threadsafe
@@ -91,42 +107,7 @@ public:
      * @threadsafe
      */
     void send(const util::CStringPack& msg);
-
-private:
-    /**
-     * @brief Schedule to accept connections.
-     */
-    void accept();
-
-    /**
-     * @brief Check whether an ip address already exists in the Connection container.
-     * @param address The ip address to check
-     * @return true if the ip is already registered, else false
-     */
-    bool isConnected(const std::string& address);
-
-    /**
-     * @brief Handler for accepting connections.
-     * @param error The error indicator
-     */
-    void attemptConnection(bool error) noexcept;
-
-    /// NetworkInterface
-    std::shared_ptr<net::NetworkInterface<SocketT>> m_netInterface;
-
-    /// Connections container
-    std::array<std::unique_ptr<Connection<SocketT>>, S_MAX_CLIENTS> m_connections;
-
-    /// Number of active connections
-    std::uint8_t m_activeConnections = 0;
-
-    /// Running state
-    bool m_running = false;
-
-    /// Internal thread
-    std::thread m_thread;
-
-    mutable std::mutex m_mutex;
+    //< end interfaces >//
 };
 
 template<typename SocketT>
@@ -152,13 +133,13 @@ template<typename SocketT>
 void Server<SocketT>::run()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    logger.info("(Server) start server");
+    logger.info(LOG_PREFIX, "starting...");
     m_running = true;
     m_thread  = std::thread([this]() {
         accept();
         std::unique_lock<std::mutex> lock(m_mutex);
         m_netInterface->run(lock);
-        logger.debug("(Server) stopped");
+        logger.debug(LOG_PREFIX, "stopped");
     });
 }
 
@@ -169,7 +150,7 @@ void Server<SocketT>::stop()
     if (m_running)
     {
         m_running = false;
-        logger.info("(Server) stopping all connections ...");
+        logger.info(LOG_PREFIX, "stopping all connections...");
         for (auto& it : m_connections)
         {
             if (it)
@@ -201,7 +182,7 @@ void Server<SocketT>::send(const util::CStringPack& msg)
         {
             if (!it.get()->write(msg))
             {
-                logger.warn("(Server) lost connection to: ", it.get()->get_address());
+                logger.warn(LOG_PREFIX, "lost connection to: ", it.get()->getAddress());
                 it.reset();
                 --m_activeConnections;
             }
@@ -221,7 +202,7 @@ bool Server<SocketT>::isConnected(const std::string& address)
 {
     for (const auto& it : m_connections)
     {
-        if (it && it.get()->get_address() == address)
+        if (it && it.get()->getAddress() == address)
         {
             return true;
         }
@@ -237,7 +218,8 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
         std::lock_guard<std::mutex> lock(m_mutex);
         try
         {
-            if (m_activeConnections < S_MAX_CLIENTS && !isConnected(m_netInterface->get_currentAddress()))
+            if (m_activeConnections < param::SERVER_MAX_CLIENTS &&
+                !isConnected(m_netInterface->getCurrentAddress()))
             {
                 for (auto& it : m_connections)
                 {
@@ -245,26 +227,26 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
                     {
                         it = m_netInterface->startConnection();
                         ++m_activeConnections;
-                        logger.info("(Server) connection from: ", it->get_address());
+                        logger.info(LOG_PREFIX, "connection from: ", it->address);
                         break;
                     }
                 }
             }
             else
             {
-                logger.info("(Server) refused connection to ", m_netInterface->get_currentAddress());
+                logger.info(LOG_PREFIX, "refused connection to ", m_netInterface->getCurrentAddress());
                 m_netInterface->close();
             }
         }
         catch (const net::SocketException& e)
         {
-            logger.warn("(Server) connection failed: ", e.what());
+            logger.warn(LOG_PREFIX, "connection failed: ", e.what());
             m_netInterface->close();
         }
     }
     else
     {
-        logger.warn("(Server) Could not accept connection");
+        logger.warn(LOG_PREFIX, "could not accept connection");
     }
     accept();
 }

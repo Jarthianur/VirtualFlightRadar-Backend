@@ -51,7 +51,7 @@ SocketImplBoost::~SocketImplBoost() noexcept
     close();
 }
 
-std::string SocketImplBoost::get_address() const
+std::string SocketImplBoost::getAddress() const
 {
     if (!m_socket.is_open())
     {

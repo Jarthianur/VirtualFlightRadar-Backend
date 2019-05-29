@@ -52,6 +52,13 @@ protected:
     mutable std::mutex                       m_mutex;
     //< end members >//
 
+    /**
+     * @param endpoint  The connection Endpoint
+     * @param component The component name
+     * @param connector The Connector interface
+     */
+    Client(const net::Endpoint& endpoint, const char* logPrefix, std::shared_ptr<net::Connector> connector);
+
     //< begin methods >//
     /**
      * @brief Handler for connect
@@ -101,13 +108,6 @@ protected:
 
 public:
     NOT_COPYABLE(Client)
-
-    /**
-     * @param endpoint  The connection Endpoint
-     * @param component The component name
-     * @param connector The Connector interface
-     */
-    Client(const net::Endpoint& endpoint, const char* logPrefix, std::shared_ptr<net::Connector> connector);
     virtual ~Client() noexcept = default;
 
     //< begin interfaces >//

@@ -41,14 +41,34 @@ namespace feed
  */
 class Feed
 {
-public:
-    NOT_COPYABLE(Feed)
-    virtual ~Feed() noexcept = default;
+    //< begin methods >//
+    /**
+     * @brief Initialize the priority from the given properties.
+     */
+    std::uint32_t initPriority() const noexcept;
+    //< end methods >//
 
+protected:
+    //< begin members >//
+    std::shared_ptr<data::Data> m_data;       ///< Respective Data container
+    const std::uint32_t         m_priority;   ///< Priority
+    const char* const           m_logPrefix;  ///< Component string
+    //< end members >//
+
+    /**
+     * @param name       The Feeds unique name
+     * @param component  The component string
+     * @param properties The Properties
+     * @throw std::logic_error if host or port are not given in properties
+     */
+    Feed(const std::string& name, const char* logPrefix, const config::Properties& propertyMap,
+         std::shared_ptr<data::Data> data);
+
+public:
     /**
      * @brief The protocol that the Feed supports.
      */
-    enum class Protocol : std::uint8_t
+    enum class Protocol : std::uint_fast8_t
     {
         APRS,
         SBS,
@@ -56,54 +76,33 @@ public:
         SENSOR
     };
 
+    //< begin members >//
+    const std::string        name;        ///< Unique name
+    const config::Properties properties;  ///< Properties
+    //< end members >//
+
+    NOT_COPYABLE(Feed)
+    virtual ~Feed() noexcept = default;
+
+    //< begin interfaces >//
     /**
      * @brief Get the supported Protocol.
      * @return the protocol
      */
-    virtual Protocol get_protocol() const = 0;
+    virtual Protocol getProtocol() const = 0;
 
     /**
      * @brief Get the feeds required Endpoint.
      * @return the endpoint
      */
-    client::net::Endpoint get_endpoint() const;
+    client::net::Endpoint getEndpoint() const;
 
     /**
      * @brief Handle client's response.
      * @param response The response
      */
     virtual bool process(const std::string& response) = 0;
-
-    /// Unique name
-    const std::string m_name;
-
-    /// Component string
-    const char* const m_component;
-
-    /// Properties
-    const config::Properties m_properties;
-
-protected:
-    /**
-     * @brief Constructor
-     * @param name       The Feeds unique name
-     * @param component  The component string
-     * @param properties The Properties
-     * @throw std::logic_error if host or port are not given in properties
-     */
-    Feed(const std::string& name, const char* component, const config::Properties& propertyMap,
-         std::shared_ptr<data::Data> data);
-
-    /// Respective Data container
-    std::shared_ptr<data::Data> m_data;
-    /// Priority
-    const std::uint32_t m_priority;
-
-private:
-    /**
-     * @brief Initialize the priority from the given properties.
-     */
-    std::uint32_t initPriority() const noexcept;
+    //< end interfaces >//
 };
 
 }  // namespace feed

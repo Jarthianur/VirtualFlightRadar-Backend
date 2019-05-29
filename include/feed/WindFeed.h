@@ -49,12 +49,18 @@ namespace feed
  */
 class WindFeed : public Feed
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(WindFeed) ";
+    //< end constants >//
+
+    //< begin members >//
+    static parser::WindParser s_parser;  ///< Parser to unpack response from Client
+    //< end members >//
+
 public:
     NOT_COPYABLE(WindFeed)
-    ~WindFeed() noexcept override = default;
 
     /**
-     * @brief Constructor
      * @param name       The SensorFeeds unique name
      * @param properties The Properties
      * @param data       The WindData contianer
@@ -62,21 +68,20 @@ public:
      */
     WindFeed(const std::string& name, const config::Properties& properties,
              std::shared_ptr<data::WindData> data);
+    ~WindFeed() noexcept override = default;
 
+    //< begin interfaces >//
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::SENSOR
      */
-    Protocol get_protocol() const override;
+    Protocol getProtocol() const override;
 
     /**
      * @brief Feed::process.
      */
     bool process(const std::string& response) override;
-
-private:
-    /// Parser to unpack response from Client
-    static parser::WindParser s_parser;
+    //< end interfaces >//
 };
 
 }  // namespace feed

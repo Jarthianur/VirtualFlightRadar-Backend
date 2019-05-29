@@ -49,12 +49,17 @@ namespace feed
  */
 class AtmosphereFeed : public Feed
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(AtmosphereFeed) ";
+    //< end constants >//
+
+    //< begin members >//
+    static parser::AtmosphereParser s_parser;  ///< Parser to unpack response from Client
+    //< end members >//
 public:
     NOT_COPYABLE(AtmosphereFeed)
-    ~AtmosphereFeed() noexcept override = default;
 
     /**
-     * @brief Constructor
      * @param name       The unique name
      * @param properties The Properties
      * @param data       The WindData container
@@ -62,21 +67,20 @@ public:
      */
     AtmosphereFeed(const std::string& name, const config::Properties& properties,
                    std::shared_ptr<data::AtmosphereData> data);
+    ~AtmosphereFeed() noexcept override = default;
 
+    //< begin interfaces >//
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::SENSOR
      */
-    Protocol get_protocol() const override;
+    Protocol getProtocol() const override;
 
     /**
      * @brief Implement Feed::process.
      */
     bool process(const std::string& response) override;
-
-private:
-    /// Parser to unpack response from Client
-    static parser::AtmosphereParser s_parser;
+    //< end interfaces >//
 };
 
 }  // namespace feed

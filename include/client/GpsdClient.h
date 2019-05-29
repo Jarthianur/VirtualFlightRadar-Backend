@@ -30,6 +30,10 @@ namespace client
  */
 class GpsdClient : public Client
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(GpsdClient) ";
+    //< end constants >//
+
     //< begin methods >//
     /**
      * @brief Send unwatch-request and stop this client.
@@ -49,10 +53,6 @@ class GpsdClient : public Client
      */
     void handleWatch(bool error);
     //< end methods >//
-
-    //< begin constants >//
-    static constexpr auto LOG_PREFIX = "(GpsdClient) ";
-    //< end constants >//
 
 public:
     NOT_COPYABLE(GpsdClient)

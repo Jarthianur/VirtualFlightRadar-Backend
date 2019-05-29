@@ -45,41 +45,48 @@ using CStringPack = std::pair<const char*, std::size_t>;
 template<std::size_t N, typename std::enable_if<(N > 0)>::type* = nullptr>
 class CString final
 {
+    //< begin constants >//
+    static constexpr auto last = N - 1;
+    //< end constants >//
+
+    //< begin members >//
+    char        m_value[N];
+    std::size_t m_length = 0;
+    //< end members >//
+
+    //< begin methods >//
     void copy(const char* str, std::size_t n)
     {
         m_length = std::min(last, n);
         std::memcpy(m_value, str, m_length);
         m_value[m_length] = '\0';
     }
-
-    char        m_value[N];
-    std::size_t m_length = 0;
+    //< end methods >//
 
 public:
-    static constexpr const std::size_t last = N - 1;
-
-    ~CString() noexcept = default;
-
     CString()
     {
         m_value[0] = '\0';
     }
 
-    CString(const char* init)
+    CString(const char* init)  ///< @param init The initial cstring to copy
     {
         operator=(init);
     }
 
-    CString(const std::string& init)
+    CString(const std::string& init)  ///< @param init The initial string to copy
     {
         copy(init.c_str(), init.size());
     }
 
-    CString(const CString& other)
+    CString(const CString& other)  ///< @param other The other CString to copy
     {
         operator=(other);
     }
 
+    ~CString() noexcept = default;
+
+    //< begin operators >//
     CString& operator=(const char* other)
     {
         copy(other, std::strlen(other));
@@ -108,21 +115,24 @@ public:
         return m_value;
     }
 
+    operator CStringPack() const
+    {
+        return std::make_pair<const char*, std::size_t>(m_value, m_length);
+    }
+    //< end operators >//
+
+    //< begin interfaces >//
     void clear()
     {
         m_value[0] = '\0';
         m_length   = 0;
     }
 
-    operator CStringPack() const
-    {
-        return std::make_pair<const char*, std::size_t>(m_value, m_length);
-    }
-
     inline auto getLength() const -> decltype(m_length)
     {
         return m_length;
     }
+    //< end interfaces >//
 };
 
 }  // namespace util

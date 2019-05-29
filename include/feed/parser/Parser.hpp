@@ -38,6 +38,7 @@ public:
     Parser()                   = default;
     virtual ~Parser() noexcept = default;
 
+    //< begin interfaces >//
     /**
      * @brief Unpack a given string into the templated object.
      * @param sentence The string to unpack
@@ -45,6 +46,7 @@ public:
      * @return true on success, else false
      */
     virtual bool unpack(const std::string& sentence, T& _1) noexcept = 0;
+    //< end interfaces >//
 };
 
 }  // namespace parser

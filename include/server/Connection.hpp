@@ -39,10 +39,25 @@ namespace server
 template<typename SocketT>
 class Connection final
 {
-public:
-    NOT_COPYABLE(Connection)
-    DEFAULT_DTOR(Connection)
+    //< begin members >//
+    SocketT m_socket;  ///< Socket
+    //< end members >//
 
+    /**
+     * @brief Constructor
+     * @param socket The socket
+     */
+    explicit Connection(SocketT&& socket);
+
+public:
+    //< begin members >//
+    const std::string address;  ///< IP address
+    //< end members >//
+
+    NOT_COPYABLE(Connection)
+    ~Connection() noexcept = default;
+
+    //< begin interfaces >//
     /**
      * @brief Start a Connection.
      * @param socket The socket
@@ -56,25 +71,7 @@ public:
      * @return true on success, else false
      */
     bool write(const util::CStringPack& msg);
-
-private:
-    /**
-     * @brief Constructor
-     * @param socket The socket
-     */
-    explicit Connection(SocketT&& socket);
-
-    /// Socket
-    SocketT m_socket;
-
-    /// IP address
-    const std::string m_address;
-
-public:
-    /**
-     * Getters
-     */
-    GETTER_CR(address)
+    //< end interfaces >//
 };
 
 template<typename SocketT>
@@ -99,7 +96,7 @@ bool Connection<SocketT>::write(const util::CStringPack& msg)
 
 template<typename SocketT>
 Connection<SocketT>::Connection(SocketT&& socket)
-    : m_socket(std::move(socket)), m_address(m_socket.get_address())
+    : m_socket(std::move(socket)), address(m_socket.getAddress())
 {}
 
 }  // namespace server

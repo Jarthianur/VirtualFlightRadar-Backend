@@ -32,6 +32,10 @@ namespace client
  */
 class AprscClient : public Client
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(AprscClient) ";
+    //< end constants >//
+
     //< begin members >//
     const std::string m_login;  ///< Login string
     //< end members >//
@@ -62,10 +66,6 @@ class AprscClient : public Client
      */
     void handleSendKeepAlive(bool error);
     //< end methods >//
-
-    //< begin constants >//
-    static constexpr auto LOG_PREFIX = "(AprscClient) ";
-    //< end constants >//
 
 public:
     NOT_COPYABLE(AprscClient)

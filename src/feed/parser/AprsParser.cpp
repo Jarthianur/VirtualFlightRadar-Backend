@@ -24,62 +24,11 @@
 #include <limits>
 #include <stdexcept>
 
+#include "object/Aircraft.h"
 #include "object/GpsPosition.h"
 #include "object/TimeStamp.hpp"
 #include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
-
-/// @def RE_APRS_TIME
-/// APRS regex match group of time
-#define RE_APRS_TIME 1
-
-/// @def RE_APRS_LAT
-/// APRS regex match group of latitude
-#define RE_APRS_LAT 2
-
-/// @def RE_APRS_LAT_DIR
-/// APRS regex match group of latitude orientation
-#define RE_APRS_LAT_DIR 3
-
-/// @def RE_APRS_LON
-/// APRS regex match group of longitude
-#define RE_APRS_LON 4
-
-/// @def RE_APRS_LON_DIR
-/// APRS regex match group of longitude orientation
-#define RE_APRS_LON_DIR 5
-
-/// @def RE_APRS_HEAD
-/// APRS regex match group of heading
-#define RE_APRS_HEAD 6
-
-/// @def RE_APRS_GND_SPD
-/// APRS regex match group of ground speed
-#define RE_APRS_GND_SPD 7
-
-/// @def RE_APRS_ALT
-/// APRS regex match group of altitude
-#define RE_APRS_ALT 8
-
-/// @def RE_APRS_COM
-/// APRS regex match group of comment
-#define RE_APRS_COM 9
-
-/// @def RE_APRS_COM_TYPE
-/// APRS regex match group of id and aircraft type
-#define RE_APRS_COM_TYPE 1
-
-/// @def RE_APRS_COM_ID
-/// APRS regex match group of aircraft id
-#define RE_APRS_COM_ID 2
-
-/// @def RE_APRS_COM_CR
-/// APRS regex match group of climb rate
-#define RE_APRS_COM_CR 3
-
-/// @def RE_APRS_COM_TR
-/// APRS regex match group of turn rate
-#define RE_APRS_COM_TR 4
 
 namespace feed
 {

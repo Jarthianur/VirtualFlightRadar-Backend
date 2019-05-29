@@ -49,12 +49,18 @@ namespace feed
  */
 class GpsFeed : public Feed
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(GpsFeed) ";
+    //< end constants >//
+
+    //< begin members >//
+    static parser::GpsParser s_parser;  ///< Parser to unpack response from Client
+    //< end members >//
+
 public:
     NOT_COPYABLE(GpsFeed)
-    ~GpsFeed() noexcept override = default;
 
     /**
-     * @brief Constructor
      * @param name       The unique name
      * @param properties The Properties
      * @param data       The GpsData container
@@ -62,21 +68,20 @@ public:
      */
     GpsFeed(const std::string& name, const config::Properties& properties,
             std::shared_ptr<data::GpsData> data);
+    ~GpsFeed() noexcept override = default;
 
+    //< begin interfaces >//
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::GPS
      */
-    Protocol get_protocol() const override;
+    Protocol getProtocol() const override;
 
     /**
      * @brief Implement Feed::process.
      */
     bool process(const std::string& response) override;
-
-private:
-    /// Parser to unpack response from Client
-    static parser::GpsParser s_parser;
+    //< end interfaces >//
 };
 
 }  // namespace feed

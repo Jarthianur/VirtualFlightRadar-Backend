@@ -37,6 +37,20 @@ namespace config
  */
 class Configuration final
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX       = "(Config) ";
+    static constexpr auto PATH_FEEDS       = "general.feeds";
+    static constexpr auto PATH_GND_MODE    = "general.gndMode";
+    static constexpr auto PATH_SERVER_PORT = "general.serverPort";
+    static constexpr auto PATH_LATITUDE    = "fallback.latitude";
+    static constexpr auto PATH_LONGITUDE   = "fallback.longitude";
+    static constexpr auto PATH_ALTITUDE    = "fallback.altitude";
+    static constexpr auto PATH_GEOID       = "fallback.geoid";
+    static constexpr auto PATH_PRESSURE    = "fallback.pressure";
+    static constexpr auto PATH_MAX_DIST    = "filter.maxDistance";
+    static constexpr auto PATH_MAX_HEIGHT  = "filter.maxHeight";
+    //< end constants >//
+
     //< begin members >//
     const Properties m_properties;  ///< Properties from file
     //< end members >//
@@ -77,40 +91,7 @@ class Configuration final
     void dumpInfo() const;
     //< end methods >//
 
-    //< begin constants >//
-    static constexpr auto LOG_PREFIX = "(Config) ";
-
-    static constexpr auto PATH_FEEDS       = "general.feeds";
-    static constexpr auto PATH_GND_MODE    = "general.gndMode";
-    static constexpr auto PATH_SERVER_PORT = "general.serverPort";
-    static constexpr auto PATH_LATITUDE    = "fallback.latitude";
-    static constexpr auto PATH_LONGITUDE   = "fallback.longitude";
-    static constexpr auto PATH_ALTITUDE    = "fallback.altitude";
-    static constexpr auto PATH_GEOID       = "fallback.geoid";
-    static constexpr auto PATH_PRESSURE    = "fallback.pressure";
-    static constexpr auto PATH_MAX_DIST    = "filter.maxDistance";
-    static constexpr auto PATH_MAX_HEIGHT  = "filter.maxHeight";
-    //< end constants >//
-
 public:
-    //< begin members >//
-    bool                         groundMode;   ///< Ground mode state
-    const object::GpsPosition    gpsPosition;  ///< Fallback position
-    const double                 atmPressure;  ///< Atmospheric fallback pressure
-    const std::int32_t           maxHeight;    ///< Maximum height for reported aircrafts
-    const std::int32_t           maxDistance;  ///< Maximum distance for reported aircrafts
-    const std::uint16_t          serverPort;   ///< Port where to serve reports
-    const std::list<std::string> feedNames;    ///< List of feed names
-    const std::unordered_map<std::string, Properties> feedProperties;  ///< Map feed names to their properties
-    //< end members >//
-
-    /**
-     * @param stream The input stream
-     * @throw std::logic_error if any error occurres
-     */
-    explicit Configuration(std::istream& stream);
-    ~Configuration() noexcept = default;
-
     //< begin constants >//
     // Configuration section keys
     static constexpr auto SECT_KEY_FALLBACK = "fallback";
@@ -146,6 +127,24 @@ public:
     static constexpr auto KV_KEY_PRIORITY = "priority";
     static constexpr auto KV_KEY_LOGIN    = "login";
     //< end constants >//
+
+    //< begin members >//
+    bool                         groundMode;   ///< Ground mode state
+    const object::GpsPosition    gpsPosition;  ///< Fallback position
+    const double                 atmPressure;  ///< Atmospheric fallback pressure
+    const std::int32_t           maxHeight;    ///< Maximum height for reported aircrafts
+    const std::int32_t           maxDistance;  ///< Maximum distance for reported aircrafts
+    const std::uint16_t          serverPort;   ///< Port where to serve reports
+    const std::list<std::string> feedNames;    ///< List of feed names
+    const std::unordered_map<std::string, Properties> feedProperties;  ///< Map feed names to their properties
+    //< end members >//
+
+    /**
+     * @param stream The input stream
+     * @throw std::logic_error if any error occurres
+     */
+    explicit Configuration(std::istream& stream);
+    ~Configuration() noexcept = default;
 };
 
 }  // namespace config

@@ -56,11 +56,11 @@ void NetworkInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
     }
     catch (const std::exception& e)
     {
-        logger.error("NetworkInterfaceImplBoost::run() caught: ", e.what());
+        logger.error(LOG_PREFIX, ": ", e.what());
     }
     catch (...)
     {
-        logger.error("NetworkInterfaceImplBoost::run() caught error");
+        logger.error(LOG_PREFIX, ": unknown error");
     }
 }
 
@@ -96,9 +96,9 @@ void NetworkInterfaceImplBoost::handleAccept(const boost::system::error_code& er
 {
     if (error)
     {
-        logger.debug("(Server) accept: ", error.message());
+        logger.debug(LOG_PREFIX, "accept: ", error.message());
     }
-    callback(error);
+    callback(bool(error));
 }
 
 std::unique_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startConnection()
@@ -110,9 +110,9 @@ std::unique_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startCon
     return Connection<SocketImplBoost>::create(std::move(m_socket));
 }
 
-std::string NetworkInterfaceImplBoost::get_currentAddress() const
+std::string NetworkInterfaceImplBoost::getCurrentAddress() const
 {
-    return m_socket.get_address();
+    return m_socket.getAddress();
 }
 
 }  // namespace server

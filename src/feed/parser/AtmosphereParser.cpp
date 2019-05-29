@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <stdexcept>
 
+#include "object/Atmosphere.h"
 #include "util/math.hpp"
 
 namespace feed

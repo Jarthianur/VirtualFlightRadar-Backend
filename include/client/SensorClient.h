@@ -30,6 +30,10 @@ namespace client
  */
 class SensorClient : public Client
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(SensorClient) ";
+    //< end constants >//
+
     //< begin methods >//
     /**
      * @brief Override Client::read, use timeout
@@ -48,10 +52,6 @@ class SensorClient : public Client
      */
     void handleConnect(bool error) override;
     //< end methods >//
-
-    //< begin constants >//
-    static constexpr auto LOG_PREFIX = "(SensorClient) ";
-    //< end constants >//
 
 public:
     NOT_COPYABLE(SensorClient)

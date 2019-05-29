@@ -50,6 +50,10 @@ protected:
     //< end methods >//
 
 public:
+    //< begin constants >//
+    static constexpr const std::uint32_t OUTDATED = 4;
+    //< end constants >//
+
     Object() = default;
     explicit Object(std::uint32_t priority);  ///< @param priority The initial priority
     virtual ~Object() noexcept = default;
@@ -74,9 +78,5 @@ public:
     virtual util::CStringPack getNMEA() const = 0;
     auto                      getUpdateAge() const -> decltype(m_updateAge);
     //< end interfaces >//
-
-    //< begin constants >//
-    static constexpr const std::uint32_t OUTDATED = 4;
-    //< end constants >//
 };
 }  // namespace object

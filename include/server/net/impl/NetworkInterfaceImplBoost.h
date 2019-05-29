@@ -41,17 +41,31 @@ namespace net
  */
 class NetworkInterfaceImplBoost : public NetworkInterface<SocketImplBoost>
 {
+    //< begin constants >//
+    static constexpr auto LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
+    //< end constants >//
+
+    //< begin members >//
+    boost::asio::io_service        m_ioService;  ///< Internal IO-service
+    boost::asio::ip::tcp::acceptor m_acceptor;   ///< Acceptor
+    SocketImplBoost                m_socket;     ///< Current socket
+    //< end members >//
+
+    //< begin methods >//
+    /**
+     * @brief Handler for accept calls
+     * @param error    The error code
+     * @param callback The callback to invoke
+     */
+    void handleAccept(const boost::system::error_code& error, const std::function<void(bool)>& callback);
+    //< end methods >//
+
 public:
     NOT_COPYABLE(NetworkInterfaceImplBoost)
+    explicit NetworkInterfaceImplBoost(std::uint16_t port);  ///< @param port The port number
+    ~NetworkInterfaceImplBoost() noexcept override;
 
-    /**
-     * @brief Constructor
-     * @param port The port number
-     */
-    explicit NetworkInterfaceImplBoost(std::uint16_t port);
-
-    ~NetworkInterfaceImplBoost() noexcept;
-
+    //< begin interfaces >//
     /**
      * @brief Run the event handler queue.
      * @note Blocks until all handlers have returned.
@@ -87,24 +101,8 @@ public:
      * @return the address
      * @throw SocketException if the current socket is not open
      */
-    std::string get_currentAddress() const override;
-
-private:
-    /**
-     * @brief Handler for accept calls
-     * @param error    The error code
-     * @param callback The callback to invoke
-     */
-    void handleAccept(const boost::system::error_code& error, const std::function<void(bool)>& callback);
-
-    /// Internal IO-service
-    boost::asio::io_service m_ioService;
-
-    /// Acceptor
-    boost::asio::ip::tcp::acceptor m_acceptor;
-
-    /// Current socket
-    SocketImplBoost m_socket;
+    std::string getCurrentAddress() const override;
+    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace server

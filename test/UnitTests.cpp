@@ -37,7 +37,7 @@ TEST_FUNCTION(test_feed)
 
 int main(int, char**)
 {
-    logger.set_logFile("/dev/null");
+    logger.setLogFile("/dev/null");
     // auto rep = createXmlReporter();
     auto                   rep = createPlainTextReporter(true);
     test::TestSuitesRunner runner;

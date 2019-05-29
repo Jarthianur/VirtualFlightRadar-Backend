@@ -28,11 +28,6 @@
 #include "feed/parser/AtmosphereParser.h"
 #include "object/Atmosphere.h"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(AtmosphereFeed)"
-
 using namespace config;
 
 namespace feed
@@ -41,10 +36,10 @@ parser::AtmosphereParser AtmosphereFeed::s_parser;
 
 AtmosphereFeed::AtmosphereFeed(const std::string& name, const Properties& properties,
                                std::shared_ptr<data::AtmosphereData> data)
-    : Feed(name, COMPONENT, properties, data)
+    : Feed(name, LOG_PREFIX, properties, data)
 {}
 
-Feed::Protocol AtmosphereFeed::get_protocol() const
+Feed::Protocol AtmosphereFeed::getProtocol() const
 {
     return Protocol::SENSOR;
 }

@@ -71,7 +71,7 @@ class Aircraft : public Object
      * @note FLARM is preferred over TRANSPONDER,
      *       in case an aircraft has both available.
      */
-    enum class TargetType : std::uint8_t
+    enum class TargetType : std::uint_fast8_t
     {
         FLARM,
         TRANSPONDER
@@ -80,7 +80,7 @@ class Aircraft : public Object
     /**
      * @brief Aircraft types with their protocol codes.
      */
-    enum class AircraftType : std::uint8_t
+    enum class AircraftType : std::uint_fast8_t
     {
         UNKNOWN               = 0,
         GLIDER                = 1,
@@ -102,7 +102,7 @@ class Aircraft : public Object
     /**
      * @brief Id (address) types with their protocol codes.
      */
-    enum class IdType : std::uint8_t
+    enum class IdType : std::uint_fast8_t
     {
         RANDOM = 0,
         ICAO   = 1,

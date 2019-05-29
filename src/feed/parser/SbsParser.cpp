@@ -25,28 +25,9 @@
 #include <limits>
 #include <stdexcept>
 
+#include "object/Aircraft.h"
 #include "object/GpsPosition.h"
 #include "util/math.hpp"
-
-/// @def SBS_FIELD_ID
-/// Field number of aircraft id
-#define SBS_FIELD_ID 4
-
-/// @def SBS_FIELD_TIME
-/// Field number of time
-#define SBS_FIELD_TIME 7
-
-/// @var SBS_FIELD_ALT
-/// Field number of altitude
-#define SBS_FIELD_ALT 11
-
-/// @def BS_FIELD_LAT
-/// Field number of latitude
-#define SBS_FIELD_LAT 14
-
-/// @def SBS_FIELD_LON
-/// Field number of longitude
-#define SBS_FIELD_LON 15
 
 using namespace object;
 

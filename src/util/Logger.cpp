@@ -27,13 +27,13 @@
 
 Logger logger;
 
-void Logger::set_debug(bool enable)
+void Logger::setDebug(bool enable)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_debugEnabled = enable;
 }
 
-void Logger::set_logFile(const std::string& file)
+void Logger::setLogFile(const std::string& file)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_logFile = std::ofstream(file);

@@ -41,6 +41,12 @@ namespace data
  */
 class AircraftData : public Data
 {
+    //< begin constants >//
+    static constexpr const auto NO_FLARM_THRESHOLD =
+        object::Object::OUTDATED;                        ///< Times until FLARM status is removed
+    static constexpr const auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
+    //< end constants >//
+
     //< begin members >//
     /**
      * @brief Internal container for aircrafts.
@@ -180,12 +186,6 @@ class AircraftData : public Data
     } m_container;                             ///< Internal container for aircrafts
     processor::AircraftProcessor m_processor;  ///< Processor for aircrafts
     //< end members >//
-
-    //< begin constants >//
-    static constexpr const auto NO_FLARM_THRESHOLD =
-        object::Object::OUTDATED;                        ///< Times until FLARM status is removed
-    static constexpr const auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
-    //< end constants >//
 
 public:
     AircraftData();

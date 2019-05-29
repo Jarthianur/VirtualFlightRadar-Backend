@@ -24,8 +24,6 @@
 #include <exception>
 #include <string>
 
-#include "util/defines.h"
-
 namespace server
 {
 namespace net
@@ -35,24 +33,21 @@ namespace net
  */
 class SocketException : public std::exception
 {
+    //< begin members >//
+    const std::string m_message;  ///< Error message
+    //< end members >//
+
 public:
-    DEFAULT_DTOR(SocketException)
+    SocketException() = default;
+    explicit SocketException(const std::string& msg);  ///< @param msg The error message
 
-    /**
-     * @brief Constructor
-     * @param msg The error message
-     */
-    explicit SocketException(const std::string& msg);
-
+    //< begin interfaces >//
     /**
      * @brief Get the error message.
      * @return the message
      */
     const char* what() const noexcept;
-
-private:
-    /// Error message
-    const std::string m_message;
+    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace server

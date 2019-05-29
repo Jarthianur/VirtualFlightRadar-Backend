@@ -38,23 +38,23 @@ namespace net
  */
 class SocketImplBoost
 {
+    //< begin members >//
+    boost::asio::ip::tcp::socket m_socket;  ///< Underlying socket
+    //< end members >//
+
 public:
     MOVABLE_BUT_NOT_COPYABLE(SocketImplBoost)
-
-    /**
-     * @brief Constructor
-     * @param socket The underlying socket
-     */
-    explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket);
-
+    explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket)
+                                 socket);  ///< @param socket The underlying socket
     ~SocketImplBoost() noexcept;
 
+    //< begin interfaces >//
     /**
      * @brief Get the remote IP address.
      * @return the address
      * @throw SocketException if the socket is closed
      */
-    std::string get_address() const;
+    std::string getAddress() const;
 
     /**
      * @brief Write a message on the socket to the endpoint.
@@ -74,10 +74,7 @@ public:
      * @return the socket
      */
     boost::asio::ip::tcp::socket& get();
-
-private:
-    /// Underlying socket
-    boost::asio::ip::tcp::socket m_socket;
+    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace server

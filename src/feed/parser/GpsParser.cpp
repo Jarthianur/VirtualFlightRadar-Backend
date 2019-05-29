@@ -24,49 +24,10 @@
 #include <stdexcept>
 #include <type_traits>
 
+#include "object/GpsPosition.h"
 #include "object/TimeStamp.hpp"
 #include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
-
-/// @def RE_GGA_TIME
-/// GGA regex match capture group of time
-#define RE_GGA_TIME 1
-
-/// @def RE_GGA_LAT
-/// GGA regex match capture group of latitude
-#define RE_GGA_LAT 2
-
-/// @def RE_GGA_LAT_DIR
-/// GGA regex match capture group of latitude orientation
-#define RE_GGA_LAT_DIR 3
-
-/// @def RE_GGA_LON
-/// GGA regex match capture group of longitude
-#define RE_GGA_LON 4
-
-/// @def RE_GGA_LON_DIR
-/// GGA regex match capture group of longitude orientation
-#define RE_GGA_LON_DIR 5
-
-/// @def RE_GGA_FIX
-/// GGA regex match capture group of fix quality
-#define RE_GGA_FIX 6
-
-/// @def RE_GGA_SAT
-/// GGA regex match capture group of sitallite count
-#define RE_GGA_SAT 7
-
-/// @def RE_GGA_DIL
-/// GGA regex match capture group of dilution
-#define RE_GGA_DIL 8
-
-/// @def RE_GGA_ALT
-/// GGA regex match capture group of altitude
-#define RE_GGA_ALT 9
-
-/// @def RE_GGA_GEOID
-/// GGA regex match capture group of geoid separation
-#define RE_GGA_GEOID 10
 
 using namespace object;
 

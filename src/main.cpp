@@ -93,11 +93,11 @@ std::shared_ptr<Configuration> get_config(const program_options::variables_map& 
 {
     if (variables.count("verbose"))
     {
-        logger.set_debug();
+        logger.setDebug();
     }
     if (variables.count("output"))
     {
-        logger.set_logFile(variables["output"].as<std::string>());
+        logger.setLogFile(variables["output"].as<std::string>());
     }
     logger.info("VirtualFlightRadar-Backend -- " VERSION);
     if (variables.count("config"))
