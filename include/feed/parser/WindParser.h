@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "object/Wind.h"
 
 #include "Parser.hpp"
@@ -47,7 +45,7 @@ public:
      * @param wind     The Wind to unpack into
      * @return true on success, else false
      */
-    bool unpack(const std::string& sentence, object::Wind& wind) noexcept override;
+    object::Wind unpack(const std::string& sentence, std::uint32_t priority) const override;
     //< end interfaces >//
 };
 }  // namespace parser

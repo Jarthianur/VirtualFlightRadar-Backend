@@ -21,17 +21,13 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
+#include <tuple>
 
 #include <boost/regex.hpp>
 
-#include "Parser.hpp"
+#include "object/Aircraft.h"
 
-namespace object
-{
-class Aircraft;
-}  // namespace object
+#include "Parser.hpp"
 
 namespace feed
 {
@@ -63,6 +59,8 @@ class AprsParser : public Parser<object::Aircraft>
     static const boost::regex s_APRSExtRE;  ///< Regular expression for OGN specific APRS extension
     //< end members >//
 
+    using MetaInfo = std::tuple<std::string, object::Aircraft::IdType, object::Aircraft::AircraftType>;
+
     //< begin methods >//
     /**
      * @brief Parse a Position.
@@ -70,7 +68,7 @@ class AprsParser : public Parser<object::Aircraft>
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parsePosition(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
+    object::Location parseLocation(const boost::smatch& match) const;
 
     /**
      * @brief Parse the APRS comment.
@@ -78,7 +76,7 @@ class AprsParser : public Parser<object::Aircraft>
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parseComment(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
+    MetaInfo parseComment(const boost::smatch& match) const;
 
     /**
      * @brief Parse the Movement information.
@@ -87,16 +85,15 @@ class AprsParser : public Parser<object::Aircraft>
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parseMovement(const boost::smatch& match, const boost::smatch& comMatch,
-                       object::Aircraft& aircraft) noexcept;
+    object::Aircraft::Movement parseMovement(const boost::smatch& match, const boost::smatch& comMatch) const;
 
     /**
-     * @brief Parse the TimeStamp information.
+     * @brief Parse the Timestamp information.
      * @param match    The regex match
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parseTimeStamp(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
+    object::Timestamp<object::time::DateTimeImplBoost> parseTimeStamp(const boost::smatch& match) const;
     //< end methods >//
 
 public:
@@ -114,7 +111,7 @@ public:
      * @param aircraft The Aircraft to unpack into
      * @return true on success, else false
      */
-    bool unpack(const std::string& sentence, object::Aircraft& aircraft) noexcept override;
+    object::Aircraft unpack(const std::string& sentence, std::uint32_t priority) const override;
     //< end interfaces >//
 };
 }  // namespace parser

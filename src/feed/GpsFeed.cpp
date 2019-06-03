@@ -21,9 +21,6 @@
 
 #include "feed/GpsFeed.h"
 
-#include <stdexcept>
-#include <unordered_map>
-
 #include "config/Configuration.h"
 #include "data/GpsData.h"
 #include "feed/parser/GpsParser.h"
@@ -47,18 +44,16 @@ Feed::Protocol GpsFeed::getProtocol() const
 
 bool GpsFeed::process(const std::string& response)
 {
-    object::GpsPosition pos(m_priority);
-    if (s_parser.unpack(response, pos))
+    try
     {
-        try
-        {
-            m_data->update(std::move(pos));
-        }
-        catch (const data::GpsDataException& e)
-        {
-            logger.info(m_logPrefix, name, ": ", e.what());
-            return false;
-        }
+        m_data->update(s_parser.unpack(response, m_priority));
+    }
+    catch (const parser::UnpackError&)
+    {}
+    catch (const data::GpsDataException& e)
+    {
+        logger.info(m_logPrefix, name, ": ", e.what());
+        return false;
     }
     return true;
 }

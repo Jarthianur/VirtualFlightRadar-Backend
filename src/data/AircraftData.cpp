@@ -21,8 +21,10 @@
 
 #include "data/AircraftData.h"
 
+#include <functional>
 #include <iterator>
 #include <stdexcept>
+#include <string>
 
 using namespace object;
 
@@ -35,10 +37,11 @@ AircraftData::AircraftData(std::int32_t maxDist) : Data(), m_processor(maxDist) 
 bool AircraftData::update(Object&& aircraft)
 {
     Aircraft&& update = static_cast<Aircraft&&>(aircraft);
-    auto       result = m_container.insert(std::move(update));
+    auto       result = m_container.insert(std::hash<std::string>()(*update.getId()),
+                                     std::move(update));  // TODO: provide char* based hashing
     if (!result.second)
     {
-        result.first->aircraft.tryUpdate(std::move(update));
+        result.first->value.tryUpdate(std::move(update));
     }
     return true;
 }
@@ -50,26 +53,26 @@ void AircraftData::setEnvironment(const Location& position, double atmPress)
 
 void AircraftData::access(const accessor_fn& func)
 {
-    Container::Iterator iter = m_container.begin();
+    util::ConcurrentContainer<Aircraft>::Iterator iter = m_container.begin();
     while (iter != m_container.end())
     {
-        ++(iter->aircraft);
+        ++(iter->value);
         try
         {
-            if (iter->aircraft.getUpdateAge() == NO_FLARM_THRESHOLD)
+            if (iter->value.getUpdateAge() == NO_FLARM_THRESHOLD)
             {
-                iter->aircraft.m_targetType = Aircraft::TargetType::TRANSPONDER;
+                iter->value.setTargetType(Aircraft::TargetType::TRANSPONDER);
             }
-            if (iter->aircraft.getUpdateAge() >= DELETE_THRESHOLD)
+            if (iter->value.getUpdateAge() >= DELETE_THRESHOLD)
             {
-                Container::KeyType key = iter.getKey();
+                util::ConcurrentContainer<Aircraft>::KeyType key = iter.getKey();
                 ++iter;
                 m_container.erase(key);
             }
             else
             {
-                m_processor.process(iter->aircraft);
-                func(iter->aircraft);
+                m_processor.process(iter->value);
+                func(iter->value);
                 ++iter;
             }
         }

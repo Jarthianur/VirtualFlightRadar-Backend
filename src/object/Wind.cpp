@@ -28,4 +28,9 @@ util::CStringPack Wind::getNMEA() const
     return m_nmea;
 }
 
+util::CString<Wind::NMEA_SIZE>& Wind::operator*()
+{
+    return m_nmea;
+}
+
 }  // namespace object

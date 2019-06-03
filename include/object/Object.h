@@ -34,6 +34,9 @@ protected:
     std::uint32_t m_updateAge    = 0;  ///< Times processed without update.
     //< end members >//
 
+    Object() = default;
+    explicit Object(std::uint32_t priority);  ///< @param priority The initial priority
+
     //< begin methods >//
     /**
      * @brief Assign other objects values to this.
@@ -54,8 +57,6 @@ public:
     static constexpr const std::uint32_t OUTDATED = 4;
     //< end constants >//
 
-    Object() = default;
-    explicit Object(std::uint32_t priority);  ///< @param priority The initial priority
     virtual ~Object() noexcept = default;
 
     //< begin operators >//

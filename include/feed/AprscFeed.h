@@ -23,8 +23,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <string>
-#include <unordered_map>
 
 #include "config/Properties.h"
 #include "util/defines.h"

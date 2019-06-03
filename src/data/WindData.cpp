@@ -39,7 +39,7 @@ void WindData::access(const accessor_fn& func)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     func(++m_wind);
-    m_wind.m_nmea.clear();
+    (*m_wind).clear();
 }
 
 }  // namespace data

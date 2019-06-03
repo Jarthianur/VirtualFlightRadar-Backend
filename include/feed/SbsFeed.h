@@ -23,7 +23,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <string>
 
 #include "config/Properties.h"
 #include "util/defines.h"

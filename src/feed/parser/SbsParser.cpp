@@ -25,7 +25,6 @@
 #include <limits>
 #include <stdexcept>
 
-#include "object/Aircraft.h"
 #include "object/GpsPosition.h"
 #include "util/math.hpp"
 
@@ -39,61 +38,57 @@ std::int32_t SbsParser::s_maxHeight = std::numeric_limits<std::int32_t>::max();
 
 SbsParser::SbsParser() : Parser<Aircraft>() {}
 
-bool SbsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcept
+Aircraft SbsParser::unpack(const std::string& sentence, std::uint32_t priority) const
 {
-    std::size_t   p = 6, delim;
-    std::uint32_t i = 2;
-    Location      pos;
+    std::size_t                        p = 6, delim;
+    std::uint32_t                      i = 2;
+    Location                           loc;
+    std::string                        id;
+    Timestamp<time::DateTimeImplBoost> ts;
 
-    if (sentence.find(',', p) == std::string::npos || !(sentence.size() > 4 && sentence[4] == '3'))
+    if (sentence.size() > 4 && sentence[4] == '3' && sentence.find(',', p) != std::string::npos)
     {
-        return false;
-    }
-    while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
-    {
-        if (!parseField(i++, sentence.substr(p, delim - p), pos, aircraft))
+        while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
         {
-            return false;
-        }
-        p = delim + 1;
-    }
-    aircraft.m_position   = pos;
-    aircraft.m_targetType = Aircraft::TargetType::TRANSPONDER;
-    aircraft.setAircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
-    aircraft.setIdType(Aircraft::IdType::ICAO);
-    return i == 16 && pos.altitude <= s_maxHeight;
-}
-
-bool SbsParser::parseField(std::uint32_t fieldNr, const std::string& field, Location& position,
-                           Aircraft& aircraft) noexcept
-{
-    try
-    {
-        switch (fieldNr)
-        {
-            case SBS_FIELD_ID:
-                if (field.size() >= Aircraft::ID_SIZE)
+            try
+            {
+                switch (i)
                 {
-                    throw std::out_of_range("");
+                    case SBS_FIELD_ID:
+                        id = sentence.substr(p, delim - p);
+                        if (id.size() >= Aircraft::ID_SIZE)
+                        {
+                            throw std::out_of_range("");
+                        }
+                        break;
+                    case SBS_FIELD_TIME:
+                        ts = Timestamp<time::DateTimeImplBoost>(sentence.substr(p, delim - p),
+                                                                time::Format::HH_MM_SS_FFF);
+                        break;
+                    case SBS_FIELD_ALT:
+                        loc.altitude =
+                            math::doubleToInt(std::stod(sentence.substr(p, delim - p)) * math::FEET_2_M);
+                        break;
+                    case SBS_FIELD_LAT: loc.latitude = std::stod(sentence.substr(p, delim - p)); break;
+                    case SBS_FIELD_LON: loc.longitude = std::stod(sentence.substr(p, delim - p)); break;
+                    default: break;
                 }
-                aircraft.m_id = field;
+            }
+            catch (const std::logic_error&)
+            {
                 break;
-            case SBS_FIELD_TIME:
-                aircraft.m_timeStamp = TimeStamp<time::DateTimeImplBoost>(field, time::Format::HH_MM_SS_FFF);
-                break;
-            case SBS_FIELD_ALT:
-                position.altitude = math::doubleToInt(std::stod(field) * math::FEET_2_M);
-                break;
-            case SBS_FIELD_LAT: position.latitude = std::stod(field); break;
-            case SBS_FIELD_LON: position.longitude = std::stod(field); break;
-            default: break;
+            }
+            p = delim + 1;
+            i += 1;
         }
     }
-    catch (const std::logic_error&)
+    if (i == 16 && loc.altitude <= s_maxHeight)
     {
-        return false;
+        // relies on TargetType::TRANSPONDER in ctor
+        return {priority, id, Aircraft::IdType::ICAO, Aircraft::AircraftType::POWERED_AIRCRAFT, loc, ts};
     }
-    return true;
+    throw UnpackError();
 }
+
 }  // namespace parser
 }  // namespace feed

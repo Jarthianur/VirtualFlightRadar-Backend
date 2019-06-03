@@ -21,23 +21,9 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "util/utility.hpp"
 
 #include "Object.h"
-
-namespace data
-{
-class AtmosphereData;
-}
-namespace feed
-{
-namespace parser
-{
-class AtmosphereParser;
-}
-}  // namespace feed
 
 namespace object
 {
@@ -48,9 +34,6 @@ struct Climate;
  */
 class Atmosphere : public Object
 {
-    friend class data::AtmosphereData;
-    friend class feed::parser::AtmosphereParser;
-
     //< begin constants >//
     static constexpr const double      ICAO_STD  = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
     static constexpr const std::size_t NMEA_SIZE = 4096;
@@ -77,11 +60,16 @@ public:
      * @param pressure The initial pressure
      * @param priority The initial priority
      */
-    Atmosphere(double pressure, std::uint32_t priority);
+    Atmosphere(std::uint32_t priority, double pressure);
     ~Atmosphere() noexcept override = default;
+
+    //< begin operators >//
+    util::CString<NMEA_SIZE>& operator*();
+    //< end operators >//
 
     //< begin interfaces >//
     util::CStringPack getNMEA() const override;
+    auto              getPressure() const -> decltype(m_pressure);
     //< end interfaces >//
 };
 

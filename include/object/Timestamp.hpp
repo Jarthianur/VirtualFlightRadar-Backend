@@ -45,7 +45,7 @@ enum class Format : std::uint_fast8_t
  * @tparam DateTimeT The provider of time functions
  */
 template<typename DateTimeT>
-class TimeStamp
+class Timestamp
 {
     //< begin members >//
     std::int64_t  m_value = 0;  ///< Time in milliseconds
@@ -53,35 +53,35 @@ class TimeStamp
     //< end members >//
 
 public:
-    TimeStamp() = default;
+    Timestamp() = default;
     /**
      * @param value  The time string
      * @param format The format
      * @throw std::invalid_argument if the time string is invalid
      */
-    TimeStamp(const std::string& value, time::Format format);
-    TimeStamp(const TimeStamp& other);  ///< @param other The other TimeStamp
-    ~TimeStamp() noexcept = default;
+    Timestamp(const std::string& value, time::Format format);
+    Timestamp(const Timestamp& other);  ///< @param other The other Timestamp
+    ~Timestamp() noexcept = default;
 
     //< begin operators >//
     /**
      * @brief Assign other TimeStamps value.
-     * @param other The other TimeStamp
+     * @param other The other Timestamp
      * @return this
      */
-    TimeStamp& operator=(const TimeStamp& other);
+    Timestamp& operator=(const Timestamp& other);
 
     /**
      * @brief Compare this value to be less than, or equals others.
-     * @param other The other TimeStamp
+     * @param other The other Timestamp
      * @return true if less, or equals, else false
      */
-    bool operator>(const TimeStamp& other) const;
+    bool operator>(const Timestamp& other) const;
     //< end operators >//
 };
 
 template<typename DateTimeT>
-TimeStamp<DateTimeT>::TimeStamp(const std::string& value, time::Format format) : m_day(DateTimeT::day())
+Timestamp<DateTimeT>::Timestamp(const std::string& value, time::Format format) : m_day(DateTimeT::day())
 {
     std::int32_t h = 99, m = 99, s = 99, f = 9999;
     try
@@ -122,12 +122,12 @@ TimeStamp<DateTimeT>::TimeStamp(const std::string& value, time::Format format) :
 }
 
 template<typename DateTimeT>
-TimeStamp<DateTimeT>::TimeStamp(const TimeStamp<DateTimeT>& other)
+Timestamp<DateTimeT>::Timestamp(const Timestamp<DateTimeT>& other)
     : m_value(other.m_value), m_day(other.m_day)
 {}
 
 template<typename DateTimeT>
-TimeStamp<DateTimeT>& TimeStamp<DateTimeT>::operator=(const TimeStamp<DateTimeT>& other)
+Timestamp<DateTimeT>& Timestamp<DateTimeT>::operator=(const Timestamp<DateTimeT>& other)
 {
     this->m_value = other.m_value;
     this->m_day   = other.m_day;
@@ -135,7 +135,7 @@ TimeStamp<DateTimeT>& TimeStamp<DateTimeT>::operator=(const TimeStamp<DateTimeT>
 }
 
 template<typename DateTimeT>
-bool TimeStamp<DateTimeT>::operator>(const TimeStamp<DateTimeT>& other) const
+bool Timestamp<DateTimeT>::operator>(const Timestamp<DateTimeT>& other) const
 {
     return (this->m_day > other.m_day) || ((this->m_day == other.m_day) && this->m_value > other.m_value);
 }

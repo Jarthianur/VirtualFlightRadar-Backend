@@ -31,7 +31,7 @@ namespace parser
 {
 WindParser::WindParser() : Parser<object::Wind>() {}
 
-bool WindParser::unpack(const std::string& sentence, object::Wind& wind) noexcept
+object::Wind WindParser::unpack(const std::string& sentence, std::uint32_t priority) const
 {
     try
     {
@@ -39,13 +39,14 @@ bool WindParser::unpack(const std::string& sentence, object::Wind& wind) noexcep
              math::checksum(sentence.c_str(), sentence.length())) &&
             (sentence.find("MWV") != std::string::npos))
         {
-            wind.m_nmea = sentence;
-            return true;
+            object::Wind wind{priority};
+            *wind = sentence;
+            return wind;
         }
     }
     catch (const std::logic_error&)
     {}
-    return false;
+    throw UnpackError();
 }
 
 }  // namespace parser

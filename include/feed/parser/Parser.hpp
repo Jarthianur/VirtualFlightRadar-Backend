@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <cstdint>
+#include <exception>
 #include <string>
 
 namespace feed
@@ -45,8 +47,19 @@ public:
      * @param _1       The target object
      * @return true on success, else false
      */
-    virtual bool unpack(const std::string& sentence, T& _1) noexcept = 0;
+    virtual T unpack(const std::string& sentence, std::uint32_t priority) const = 0;
     //< end interfaces >//
+};
+
+class UnpackError : public std::exception
+{
+public:
+    UnpackError() : std::exception() {}
+    virtual ~UnpackError() noexcept = default;
+    const char* what() const noexcept
+    {
+        return "unpack failed";
+    }
 };
 
 }  // namespace parser

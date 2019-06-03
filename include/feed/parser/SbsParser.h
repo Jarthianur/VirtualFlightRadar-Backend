@@ -21,16 +21,9 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
+#include "object/Aircraft.h"
 
 #include "Parser.hpp"
-
-namespace object
-{
-class Aircraft;
-struct Location;
-}  // namespace object
 
 namespace feed
 {
@@ -49,19 +42,6 @@ class SbsParser : public Parser<object::Aircraft>
     static constexpr auto SBS_FIELD_LON  = 15;  ///< Field number of longitude
     //< end constants >//
 
-    //< begin methods >//
-    /**
-     * @brief Parse a field in SBS and set respective values.
-     * @param fieldNr  The field number
-     * @param field    The string in that field
-     * @param position The target position
-     * @param aircraft The target Aircraft
-     * @return true on success, else false
-     */
-    bool parseField(std::uint32_t fieldNr, const std::string& field, object::Location& position,
-                    object::Aircraft& aircraft) noexcept;
-    //< end methods >//
-
 public:
     //< begin members >//
     static std::int32_t s_maxHeight;  ///< The max height filter
@@ -76,7 +56,7 @@ public:
      * @param sentence The string to unpack
      * @param aircraft The Aircraft to unpack into
      */
-    bool unpack(const std::string& sentence, object::Aircraft& aircraft) noexcept override;
+    object::Aircraft unpack(const std::string& sentence, std::uint32_t priority) const override;
     //< end interfaces >//
 };
 }  // namespace parser

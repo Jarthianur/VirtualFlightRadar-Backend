@@ -48,11 +48,12 @@ Feed::Protocol SbsFeed::getProtocol() const
 
 bool SbsFeed::process(const std::string& response)
 {
-    object::Aircraft ac(m_priority);
-    if (s_parser.unpack(response, ac))
+    try
     {
-        m_data->update(std::move(ac));
+        m_data->update(s_parser.unpack(response, m_priority));
     }
+    catch (const parser::UnpackError&)
+    {}
     return true;
 }
 

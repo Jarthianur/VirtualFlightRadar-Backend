@@ -21,16 +21,11 @@
 
 #pragma once
 
-#include <string>
-
 #include <boost/regex.hpp>
 
-#include "Parser.hpp"
+#include "object/GpsPosition.h"
 
-namespace object
-{
-class GpsPosition;
-}  // namespace object
+#include "Parser.hpp"
 
 namespace feed
 {
@@ -65,7 +60,7 @@ class GpsParser : public Parser<object::GpsPosition>
      * @param position The target position
      * @return true on success, else false
      */
-    bool parsePosition(const boost::smatch& match, object::GpsPosition& position);
+    object::GpsPosition parsePosition(const boost::smatch& match, std::uint32_t priority) const;
     //< end methods >//
 
 public:
@@ -79,7 +74,7 @@ public:
      * @param position The position to unpack into
      * @return true on success, else false
      */
-    bool unpack(const std::string& sentence, object::GpsPosition& position) noexcept override;
+    object::GpsPosition unpack(const std::string& sentence, std::uint32_t priority) const override;
     //< end interfaces >//
 };
 }  // namespace parser

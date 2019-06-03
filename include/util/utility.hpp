@@ -119,6 +119,11 @@ public:
     {
         return std::make_pair<const char*, std::size_t>(m_value, m_length);
     }
+
+    bool operator==(const CString& other) const
+    {
+        return std::strncmp(m_value, other.m_value, N) == 0;
+    }
     //< end operators >//
 
     //< begin interfaces >//

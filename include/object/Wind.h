@@ -25,18 +25,6 @@
 
 #include "Object.h"
 
-namespace data
-{
-class WindData;
-}
-namespace feed
-{
-namespace parser
-{
-class WindParser;
-}
-}  // namespace feed
-
 namespace object
 {
 struct Climate;
@@ -46,9 +34,6 @@ struct Climate;
  */
 class Wind : public Object
 {
-    friend class data::WindData;
-    friend class feed::parser::WindParser;
-
     //< begin constants >//
     static constexpr const std::size_t NMEA_SIZE = 4096;
     //< end constants >//
@@ -61,6 +46,10 @@ public:
     Wind();
     explicit Wind(std::uint32_t priority);  ///< @param priority The initial priority
     ~Wind() noexcept override = default;
+
+    //< begin operators >//
+    util::CString<NMEA_SIZE>& operator*();
+    //< end operators >//
 
     //< begin interfaces >//
     util::CStringPack getNMEA() const override;

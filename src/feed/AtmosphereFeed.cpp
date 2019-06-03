@@ -21,8 +21,6 @@
 
 #include "feed/AtmosphereFeed.h"
 
-#include <unordered_map>
-
 #include "config/Configuration.h"
 #include "data/AtmosphereData.h"
 #include "feed/parser/AtmosphereParser.h"
@@ -46,11 +44,12 @@ Feed::Protocol AtmosphereFeed::getProtocol() const
 
 bool AtmosphereFeed::process(const std::string& response)
 {
-    object::Atmosphere atmos(m_priority);
-    if (s_parser.unpack(response, atmos))
+    try
     {
-        m_data->update(std::move(atmos));
+        m_data->update(s_parser.unpack(response, m_priority));
     }
+    catch (const parser::UnpackError&)
+    {}
     return true;
 }
 

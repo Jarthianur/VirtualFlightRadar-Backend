@@ -21,8 +21,6 @@
 
 #include "feed/WindFeed.h"
 
-#include <unordered_map>
-
 #include "config/Configuration.h"
 #include "data/WindData.h"
 #include "feed/parser/WindParser.h"
@@ -46,11 +44,12 @@ Feed::Protocol WindFeed::getProtocol() const
 
 bool WindFeed::process(const std::string& response)
 {
-    object::Wind wind(m_priority);
-    if (s_parser.unpack(response, wind))
+    try
     {
-        m_data->update(std::move(wind));
+        m_data->update(s_parser.unpack(response, m_priority));
     }
+    catch (const parser::UnpackError&)
+    {}
     return true;
 }
 

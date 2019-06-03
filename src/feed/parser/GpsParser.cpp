@@ -25,7 +25,7 @@
 #include <type_traits>
 
 #include "object/GpsPosition.h"
-#include "object/TimeStamp.hpp"
+#include "object/Timestamp.hpp"
 #include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
 
@@ -41,45 +41,43 @@ const boost::regex GpsParser::s_GPGGA_RE(
 
 GpsParser::GpsParser() : Parser<GpsPosition>() {}
 
-bool GpsParser::unpack(const std::string& sentence, GpsPosition& position) noexcept
+GpsPosition GpsParser::unpack(const std::string& sentence, std::uint32_t priority) const
 {
     try
     {
         boost::smatch match;
-        return std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
-                   math::checksum(sentence.c_str(), sentence.length()) &&
-               boost::regex_match(sentence, match, s_GPGGA_RE) && parsePosition(match, position);
+        if (std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
+                math::checksum(sentence.c_str(), sentence.length()) &&
+            boost::regex_match(sentence, match, s_GPGGA_RE))
+        {
+            return parsePosition(match, priority);
+        }
     }
     catch (const std::logic_error&)
-    {
-        return false;
-    }
+    {}
+    throw UnpackError();
 }
 
-bool GpsParser::parsePosition(const boost::smatch& match, GpsPosition& position)
+GpsPosition GpsParser::parsePosition(const boost::smatch& match, std::uint32_t priority) const
 {
-    Location pos;
-    pos.latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
-
+    auto latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
     if (match.str(RE_GGA_LAT_DIR).compare("S") == 0)
     {
-        pos.latitude = -pos.latitude;
+        latitude = -latitude;
     }
-    pos.longitude = math::dmToDeg(std::stod(match.str(RE_GGA_LON)));
-
+    auto longitude = math::dmToDeg(std::stod(match.str(RE_GGA_LON)));
     if (match.str(RE_GGA_LON_DIR).compare("W") == 0)
     {
-        pos.longitude = -pos.longitude;
+        longitude = -longitude;
     }
-    pos.altitude          = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
-    position.m_location   = pos;
-    position.m_timeStamp  = TimeStamp<time::DateTimeImplBoost>(match.str(RE_GGA_TIME), time::Format::HHMMSS);
-    position.m_fixQuality = static_cast<decltype(position.m_fixQuality)>(std::stoi(match.str(RE_GGA_FIX)));
-    position.m_nrOfSatellites =
-        static_cast<decltype(position.m_nrOfSatellites)>(std::stoi(match.str(RE_GGA_SAT)));
-    position.m_dilution = (std::stod(match.str(RE_GGA_DIL)));
-    position.m_geoid    = (std::stod(match.str(RE_GGA_GEOID)));
-    return true;
+    auto altitude = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
+    return GpsPosition{priority,
+                       {latitude, longitude, altitude},
+                       std::stod(match.str(RE_GGA_GEOID)),
+                       std::stod(match.str(RE_GGA_DIL)),
+                       static_cast<std::uint8_t>(std::stoi(match.str(RE_GGA_SAT))),
+                       static_cast<std::int8_t>(std::stoi(match.str(RE_GGA_FIX))),
+                       Timestamp<time::DateTimeImplBoost>(match.str(RE_GGA_TIME), time::Format::HHMMSS)};
 }
 
 }  // namespace parser
