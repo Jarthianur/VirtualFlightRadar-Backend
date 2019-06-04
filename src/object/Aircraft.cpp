@@ -23,6 +23,8 @@
 
 #include <typeinfo>
 
+#include "util/math.hpp"
+
 namespace object
 {
 Aircraft::Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT,
@@ -37,19 +39,18 @@ Aircraft::Aircraft(std::uint32_t priority, const std::string& id, IdType idT, Ai
       m_movement(move),
       m_timestamp(timestamp),
       m_fullInfo(true)
-{}
+{
+    math::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
+    math::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
+}
 
 Aircraft::Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT,
                    const Location& loc, const Timestamp<time::DateTimeImplBoost>& timestamp)
-    : Object(priority),
-      m_id(id),
-      m_idType(idT > IdType::OGN ? IdType::RANDOM : idT),
-      m_aircraftType(aT > AircraftType::STATIC_OBJECT ? AircraftType::UNKNOWN : aT),
-      m_targetType(TargetType::TRANSPONDER),
-      m_location(loc),
-      m_timestamp(timestamp),
-      m_fullInfo(false)
-{}
+    : Aircraft(priority, id, idT, aT, loc, {.0, .0, .0}, timestamp)
+{
+    m_targetType = TargetType::TRANSPONDER;
+    m_fullInfo   = false;
+}
 
 void Aircraft::assign(Object&& other)
 {

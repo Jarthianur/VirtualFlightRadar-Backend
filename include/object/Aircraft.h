@@ -41,7 +41,7 @@ class Aircraft : public Object
 public:
     //< begin constants >//
     static constexpr const auto ID_SIZE   = 8;
-    static constexpr const auto NMEA_SIZE = 4096;
+    static constexpr const auto NMEA_SIZE = 192;
     //< end constants >//
 
     /**
@@ -93,6 +93,15 @@ public:
      */
     struct Movement
     {
+        //< begin constants >//
+        static constexpr auto MAX_GND_SPEED  = 10000.0;
+        static constexpr auto MIN_GND_SPEED  = -10000.0;
+        static constexpr auto MAX_HEADING    = 359.9;
+        static constexpr auto MIN_HEADING    = 0.0;
+        static constexpr auto MAX_CLIMB_RATE = 10000.0;
+        static constexpr auto MIN_CLIMB_RATE = -10000.0;
+        //< end constants >//
+
         //< begin members >//
         double gndSpeed;   ///< Speed over ground; m/s
         double heading;    ///< Heading; deg [0-359]
@@ -102,14 +111,14 @@ public:
 
 private:
     //< begin members >//
-    util::CString<ID_SIZE>             m_id;                     ///< Aircraft identifier
-    IdType                             m_idType;                 ///< Id type
-    AircraftType                       m_aircraftType;           ///< Aircraft type
-    TargetType                         m_targetType;             ///< Target type
-    Location                           m_location{0.0, 0.0, 0};  ///< Currently known position.
-    Movement                           m_movement;               ///< Currently known movement.
-    Timestamp<time::DateTimeImplBoost> m_timestamp;              ///< The timestamp of the last report.
-    bool                               m_fullInfo = false;       ///< Is full set of information available?
+    util::CString<ID_SIZE>             m_id;                ///< Aircraft identifier
+    IdType                             m_idType;            ///< Id type
+    AircraftType                       m_aircraftType;      ///< Aircraft type
+    TargetType                         m_targetType;        ///< Target type
+    Location                           m_location;          ///< Currently known position.
+    Movement                           m_movement;          ///< Currently known movement.
+    Timestamp<time::DateTimeImplBoost> m_timestamp;         ///< The timestamp of the last report.
+    bool                               m_fullInfo = false;  ///< Is full set of information available?
     util::CString<NMEA_SIZE>           m_nmea;
     //< end members >//
 

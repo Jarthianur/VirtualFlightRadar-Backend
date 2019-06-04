@@ -21,6 +21,7 @@
 
 #include "feed/parser/AprsParser.h"
 
+#include <algorithm>
 #include <limits>
 #include <stdexcept>
 
@@ -54,38 +55,41 @@ Aircraft AprsParser::unpack(const std::string& sentence, std::uint32_t priority)
     {
         throw UnpackError();
     }
-    auto meta = parseComment(com_match);
-    // relies on TargetType::FLARM in ctor
-    return {priority,
-            std::get<0>(meta),
-            std::get<1>(meta),
-            std::get<2>(meta),
-            parseLocation(match),
-            parseMovement(match, com_match),
-            parseTimeStamp(match)};
+    try
+    {
+        auto meta = parseComment(com_match);
+        // relies on TargetType::FLARM in ctor
+        return {priority,
+                std::get<0>(meta),
+                std::get<1>(meta),
+                std::get<2>(meta),
+                parseLocation(match),
+                parseMovement(match, com_match),
+                parseTimeStamp(match)};
+    }
+    catch (const UnpackError&)
+    {
+        throw;
+    }
+    catch (const std::exception&)
+    {}
+    throw UnpackError();
 }
 
 Location AprsParser::parseLocation(const boost::smatch& match) const
 {
     Location pos;
-    try
+    pos.latitude = math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
+    if (match.str(RE_APRS_LAT_DIR).compare("S") == 0)
     {
-        pos.latitude = math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
-        if (match.str(RE_APRS_LAT_DIR).compare("S") == 0)
-        {
-            pos.latitude = -pos.latitude;
-        }
-        pos.longitude = math::dmToDeg(std::stod(match.str(RE_APRS_LON)));
-        if (match.str(RE_APRS_LON_DIR).compare("W") == 0)
-        {
-            pos.longitude = -pos.longitude;
-        }
-        pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT)) * math::FEET_2_M);
+        pos.latitude = -pos.latitude;
     }
-    catch (const std::logic_error&)
+    pos.longitude = math::dmToDeg(std::stod(match.str(RE_APRS_LON)));
+    if (match.str(RE_APRS_LON_DIR).compare("W") == 0)
     {
-        throw UnpackError();
+        pos.longitude = -pos.longitude;
     }
+    pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT)) * math::FEET_2_M);
     if (pos.altitude <= s_maxHeight)
     {
         return pos;
@@ -95,40 +99,22 @@ Location AprsParser::parseLocation(const boost::smatch& match) const
 
 AprsParser::MetaInfo AprsParser::parseComment(const boost::smatch& match) const
 {
-    try
-    {
-        return {match.str(RE_APRS_COM_ID),
-                static_cast<Aircraft::IdType>(std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03),
-                static_cast<Aircraft::AircraftType>(
-                    (std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2)};
-    }
-    catch (const std::logic_error&)
-    {}
-    throw UnpackError();
+    return {match.str(RE_APRS_COM_ID),
+            static_cast<Aircraft::IdType>(std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03),
+            static_cast<Aircraft::AircraftType>(
+                (std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2)};
 }
 
 Aircraft::Movement AprsParser::parseMovement(const boost::smatch& match, const boost::smatch& comMatch) const
 {
     // This needs to be split later to parse independently.
-    try
-    {
-        return {std::stod(match.str(RE_APRS_HEAD)), std::stod(match.str(RE_APRS_GND_SPD)) * math::KTS_2_MS,
-                std::stod(comMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS};
-    }
-    catch (const std::logic_error&)
-    {}
-    throw UnpackError();
+    return {std::stod(match.str(RE_APRS_HEAD)), std::stod(match.str(RE_APRS_GND_SPD)) * math::KTS_2_MS,
+            std::max(-10000.0, std::min(10000.0, std::stod(comMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS))};
 }
 
 Timestamp<time::DateTimeImplBoost> AprsParser::parseTimeStamp(const boost::smatch& match) const
 {
-    try
-    {
-        return Timestamp<time::DateTimeImplBoost>(match.str(RE_APRS_TIME), time::Format::HHMMSS);
-    }
-    catch (const std::invalid_argument&)
-    {}
-    throw UnpackError();
+    return Timestamp<time::DateTimeImplBoost>(match.str(RE_APRS_TIME), time::Format::HHMMSS);
 }
 
 }  // namespace parser

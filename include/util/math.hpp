@@ -21,23 +21,25 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <stdexcept>
 
 namespace math
 {
-const double KTS_2_KMH = 1.852;            ///< Convert knots to km/h
-const double KMH_2_KTS = 0.539957;         ///< Convert km/h to knots
-const double KTS_2_MS  = 0.514444;         ///< Convert knots to m/s
-const double MS_2_KTS  = 1.94384;          ///< Convert m/s to knots
-const double KMH_2_MS  = 0.277778;         ///< Convert km/h to m/s
-const double MS_2_KMH  = 3.6;              ///< Convert m/s to km/h
-const double MS_2_FPM  = 196.85;           ///< Convert m/s to fpm
-const double FPM_2_MS  = 0.00508;          ///< Convert fpm to m/s
-const double FEET_2_M  = 0.3048;           ///< Convert feet to m
-const double M_2_FEET  = 3.28084;          ///< Convert m to feet
-const double PI        = std::acos(-1.0);  ///< The circular number
+constexpr auto KTS_2_KMH = 1.852;            ///< Convert knots to km/h
+constexpr auto KMH_2_KTS = 0.539957;         ///< Convert km/h to knots
+constexpr auto KTS_2_MS  = 0.514444;         ///< Convert knots to m/s
+constexpr auto MS_2_KTS  = 1.94384;          ///< Convert m/s to knots
+constexpr auto KMH_2_MS  = 0.277778;         ///< Convert km/h to m/s
+constexpr auto MS_2_KMH  = 3.6;              ///< Convert m/s to km/h
+constexpr auto MS_2_FPM  = 196.85;           ///< Convert m/s to fpm
+constexpr auto FPM_2_MS  = 0.00508;          ///< Convert fpm to m/s
+constexpr auto FEET_2_M  = 0.3048;           ///< Convert feet to m
+constexpr auto M_2_FEET  = 3.28084;          ///< Convert m to feet
+const auto     PI        = std::acos(-1.0);  ///< The circular number
 
 /**
  * @brief Convert degree to radian.
@@ -80,6 +82,22 @@ inline double dmToDeg(double degMin)
     double d     = std::floor(absDm);
     double m     = (absDm - d) * 100.0 / 60.0;
     return d + m;
+}
+
+template<typename T>
+T saturate(T val, T min, T max)
+{
+    return std::max(min, std::min(val, max));
+}
+
+template<typename T>
+void checkLimits(T val, T min, T max)
+{
+    if (val < min || val > max)
+    {
+        throw std::range_error("limits exceeded");
+    }
+    return val;
 }
 
 /**

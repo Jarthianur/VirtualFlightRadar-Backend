@@ -48,7 +48,7 @@ std::size_t GpsProcessor::appendGPGGA(GpsPosition& position, const std::tm* utc,
     // "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"
     int bytes = std::snprintf(
         **position + pos, GpsPosition::NMEA_SIZE - pos,
-        "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02hhu,1,%d,M,%.1lf,M,,*", utc->tm_hour,
+        "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*", utc->tm_hour,
         utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
         m_directionEW, /*pos.fixQa,*/ position.getNrOfSatellites(), position.getLocation().altitude,
         position.getGeoid());

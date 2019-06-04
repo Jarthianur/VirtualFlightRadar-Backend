@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "util/utility.hpp"
+#include <string>
 
 #include "Object.h"
 
@@ -34,12 +34,8 @@ struct Climate;
  */
 class Wind : public Object
 {
-    //< begin constants >//
-    static constexpr const std::size_t NMEA_SIZE = 4096;
-    //< end constants >//
-
     //< begin members >//
-    util::CString<NMEA_SIZE> m_nmea;
+    std::string m_nmea;
     //< end members >//
 
 public:
@@ -48,7 +44,7 @@ public:
     ~Wind() noexcept override = default;
 
     //< begin operators >//
-    util::CString<NMEA_SIZE>& operator*();
+    std::string& operator*();
     //< end operators >//
 
     //< begin interfaces >//

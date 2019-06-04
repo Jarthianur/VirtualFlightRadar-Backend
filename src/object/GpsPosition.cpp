@@ -20,11 +20,13 @@
 #include <typeinfo>
 #include <utility>
 
+#include "util/math.hpp"
+
 namespace object
 {
-GpsPosition::GpsPosition() : Object() {}
-
-GpsPosition::GpsPosition(std::uint32_t priority) : Object(priority) {}
+GpsPosition::GpsPosition(std::uint32_t priority, const Location& location, double geoid)
+    : GpsPosition(priority, location, geoid, 1.0, 3, 5, Timestamp<time::DateTimeImplBoost>())
+{}
 
 GpsPosition::GpsPosition(std::uint32_t priority, const Location& location, double geoid, double dilution,
                          std::uint8_t satellites, std::int8_t quality,
@@ -36,7 +38,11 @@ GpsPosition::GpsPosition(std::uint32_t priority, const Location& location, doubl
       m_nrOfSatellites(satellites),
       m_fixQuality(quality),
       m_timestamp(timestamp)
-{}
+{
+    math::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MIN_LATITUDE);
+    math::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MIN_LONGITUDE);
+    math::checkLimits(m_location.altitude, Location::MIN_ALTITUDE, Location::MIN_ALTITUDE);
+}
 
 void GpsPosition::assign(Object&& other)
 {

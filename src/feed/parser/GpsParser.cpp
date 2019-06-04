@@ -53,7 +53,7 @@ GpsPosition GpsParser::unpack(const std::string& sentence, std::uint32_t priorit
             return parsePosition(match, priority);
         }
     }
-    catch (const std::logic_error&)
+    catch (const std::exception&)
     {}
     throw UnpackError();
 }
@@ -71,13 +71,13 @@ GpsPosition GpsParser::parsePosition(const boost::smatch& match, std::uint32_t p
         longitude = -longitude;
     }
     auto altitude = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
-    return GpsPosition{priority,
-                       {latitude, longitude, altitude},
-                       std::stod(match.str(RE_GGA_GEOID)),
-                       std::stod(match.str(RE_GGA_DIL)),
-                       static_cast<std::uint8_t>(std::stoi(match.str(RE_GGA_SAT))),
-                       static_cast<std::int8_t>(std::stoi(match.str(RE_GGA_FIX))),
-                       Timestamp<time::DateTimeImplBoost>(match.str(RE_GGA_TIME), time::Format::HHMMSS)};
+    return {priority,
+            {latitude, longitude, altitude},
+            std::stod(match.str(RE_GGA_GEOID)),
+            std::stod(match.str(RE_GGA_DIL)),
+            static_cast<std::uint8_t>(std::stoi(match.str(RE_GGA_SAT))),
+            static_cast<std::int8_t>(std::stoi(match.str(RE_GGA_FIX))),
+            Timestamp<time::DateTimeImplBoost>(match.str(RE_GGA_TIME), time::Format::HHMMSS)};
 }
 
 }  // namespace parser

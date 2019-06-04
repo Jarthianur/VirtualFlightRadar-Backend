@@ -25,10 +25,10 @@ Wind::Wind(std::uint32_t priority) : Object(priority) {}
 
 util::CStringPack Wind::getNMEA() const
 {
-    return m_nmea;
+    return {m_nmea.c_str(), m_nmea.size()};
 }
 
-util::CString<Wind::NMEA_SIZE>& Wind::operator*()
+std::string& Wind::operator*()
 {
     return m_nmea;
 }

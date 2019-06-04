@@ -39,7 +39,7 @@ class GpsData : public Data
     //< begin constants >//
     static constexpr auto GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
     static constexpr auto GPS_FIX_GOOD          = 1;    ///< Good fix quality
-    static constexpr auto GPS_HOR_DILUTION_GOOD = 1.0;  ///< Good horizontal dilution
+    static constexpr auto GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
     //< end constants >//
 
     //< begin members >//

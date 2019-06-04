@@ -36,6 +36,15 @@ namespace object
  */
 struct Location
 {
+    //< begim constants >//
+    static constexpr auto MAX_LATITUDE  = 90.0;
+    static constexpr auto MIN_LATITUDE  = -90.0;
+    static constexpr auto MAX_LONGITUDE = 180.0;
+    static constexpr auto MIN_LONGITUDE = 0.0;
+    static constexpr auto MAX_ALTITUDE  = 100000;
+    static constexpr auto MIN_ALTITUDE  = -11000;
+    //< end constants >//
+
     //< begin members >//
     double       latitude;   ///< Latitude; deg
     double       longitude;  ///< Longitude; deg
@@ -50,17 +59,19 @@ class GpsPosition : public Object
 {
 public:
     //< begin constants >//
-    static constexpr const std::size_t NMEA_SIZE = 4096;
+    static constexpr auto NMEA_SIZE = 4096;
+    static constexpr auto MAX_GEOID = 86.0;
+    static constexpr auto MIN_GEOID = -108.0;
     //< end constants >//
 
 private:
     //< begin members >//
-    Location                           m_location{0.0, 0.0, 0};  ///< The location
-    double                             m_geoid          = 0.0;   ///< The geoid separation
-    double                             m_dilution       = 0.0;   ///< The position dilution
-    std::uint8_t                       m_nrOfSatellites = 1;     ///< The number of satellites
-    std::int8_t                        m_fixQuality     = 5;     ///< The GPS fix quality
-    Timestamp<time::DateTimeImplBoost> m_timestamp;              ///< The timestamp of this position
+    Location                           m_location;        ///< The location
+    double                             m_geoid;           ///< The geoid separation
+    double                             m_dilution;        ///< The position dilution
+    std::uint8_t                       m_nrOfSatellites;  ///< The number of satellites
+    std::int8_t                        m_fixQuality;      ///< The GPS fix quality
+    Timestamp<time::DateTimeImplBoost> m_timestamp;       ///< The timestamp of this position
     util::CString<NMEA_SIZE>           m_nmea;
     //< end members >//
 
@@ -77,8 +88,7 @@ private:
     //< end methods >//
 
 public:
-    GpsPosition();
-    explicit GpsPosition(std::uint32_t priority);  ///< @param priority The initial priority
+    GpsPosition(std::uint32_t priority, const Location& location, double geoid);
 
     /**
      * @param position The position

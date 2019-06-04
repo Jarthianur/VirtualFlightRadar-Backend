@@ -53,7 +53,7 @@ object::Atmosphere AtmosphereParser::unpack(const std::string& sentence, std::ui
             }
         }
     }
-    catch (const std::logic_error&)
+    catch (const std::exception&)
     {}
     throw UnpackError();
 }

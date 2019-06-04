@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "util/utility.hpp"
+#include <string>
 
 #include "Object.h"
 
@@ -35,13 +35,14 @@ struct Climate;
 class Atmosphere : public Object
 {
     //< begin constants >//
-    static constexpr const double      ICAO_STD  = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
-    static constexpr const std::size_t NMEA_SIZE = 4096;
+    static constexpr auto ICAO_STD     = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
+    static constexpr auto MAX_PRESSURE = 2000.0;
+    static constexpr auto MIN_PRESSURE = 0.0;
     //< end constants >//
 
     //< begin members >//
-    double                   m_pressure = ICAO_STD;  ///< The atmospheric pressure
-    util::CString<NMEA_SIZE> m_nmea;
+    double      m_pressure = ICAO_STD;  ///< The atmospheric pressure
+    std::string m_nmea;
     //< end members >//
 
     //< begin methods >//
@@ -64,7 +65,7 @@ public:
     ~Atmosphere() noexcept override = default;
 
     //< begin operators >//
-    util::CString<NMEA_SIZE>& operator*();
+    std::string& operator*();
     //< end operators >//
 
     //< begin interfaces >//

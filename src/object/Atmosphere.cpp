@@ -20,13 +20,18 @@
 #include <typeinfo>
 #include <utility>
 
+#include "util/math.hpp"
+
 namespace object
 {
 Atmosphere::Atmosphere() : Object() {}
 
 Atmosphere::Atmosphere(std::uint32_t priority) : Object(priority) {}
 
-Atmosphere::Atmosphere(std::uint32_t priority, double pressure) : Object(priority), m_pressure(pressure) {}
+Atmosphere::Atmosphere(std::uint32_t priority, double pressure) : Object(priority), m_pressure(pressure)
+{
+    math::checkLimits(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
+}
 
 void Atmosphere::assign(Object&& other)
 {
@@ -42,7 +47,7 @@ void Atmosphere::assign(Object&& other)
 
 util::CStringPack Atmosphere::getNMEA() const
 {
-    return m_nmea;
+    return {m_nmea.c_str(), m_nmea.size()};
 }
 
 auto Atmosphere::getPressure() const -> decltype(m_pressure)
@@ -50,7 +55,7 @@ auto Atmosphere::getPressure() const -> decltype(m_pressure)
     return m_pressure;
 }
 
-util::CString<Atmosphere::NMEA_SIZE>& Atmosphere::operator*()
+std::string& Atmosphere::operator*()
 {
     return m_nmea;
 }

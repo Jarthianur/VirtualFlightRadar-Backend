@@ -102,7 +102,7 @@ std::size_t AircraftProcessor::appendPFLAA(Aircraft& aircraft, std::size_t pos) 
     if (aircraft.hasFullInfo())
     {
         bytes = std::snprintf(**aircraft + pos, Aircraft::NMEA_SIZE - pos,
-                              "$PFLAA,0,%d,%d,%d,%hhu,%s,%03d,,%d,%3.1lf,%1hhX*", m_relNorth, m_relEast,
+                              "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast,
                               m_relVertical, util::raw_type(aircraft.getIdType()), *aircraft.getId(),
                               math::doubleToInt(aircraft.getMovement().heading),
                               math::doubleToInt(aircraft.getMovement().gndSpeed * math::MS_2_KMH),

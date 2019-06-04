@@ -46,11 +46,11 @@ Aircraft SbsParser::unpack(const std::string& sentence, std::uint32_t priority) 
     std::string                        id;
     Timestamp<time::DateTimeImplBoost> ts;
 
-    if (sentence.size() > 4 && sentence[4] == '3' && sentence.find(',', p) != std::string::npos)
+    try
     {
-        while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
+        if (sentence.size() > 4 && sentence[4] == '3' && sentence.find(',', p) != std::string::npos)
         {
-            try
+            while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
             {
                 switch (i)
                 {
@@ -58,7 +58,7 @@ Aircraft SbsParser::unpack(const std::string& sentence, std::uint32_t priority) 
                         id = sentence.substr(p, delim - p);
                         if (id.size() >= Aircraft::ID_SIZE)
                         {
-                            throw std::out_of_range("");
+                            throw std::range_error("");
                         }
                         break;
                     case SBS_FIELD_TIME:
@@ -73,20 +73,18 @@ Aircraft SbsParser::unpack(const std::string& sentence, std::uint32_t priority) 
                     case SBS_FIELD_LON: loc.longitude = std::stod(sentence.substr(p, delim - p)); break;
                     default: break;
                 }
+                p = delim + 1;
+                i += 1;
             }
-            catch (const std::logic_error&)
-            {
-                break;
-            }
-            p = delim + 1;
-            i += 1;
+        }
+        if (i == 16 && loc.altitude <= s_maxHeight)
+        {
+            // relies on TargetType::TRANSPONDER in ctor
+            return {priority, id, Aircraft::IdType::ICAO, Aircraft::AircraftType::POWERED_AIRCRAFT, loc, ts};
         }
     }
-    if (i == 16 && loc.altitude <= s_maxHeight)
-    {
-        // relies on TargetType::TRANSPONDER in ctor
-        return {priority, id, Aircraft::IdType::ICAO, Aircraft::AircraftType::POWERED_AIRCRAFT, loc, ts};
-    }
+    catch (const std::exception&)
+    {}
     throw UnpackError();
 }
 
