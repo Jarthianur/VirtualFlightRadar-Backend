@@ -38,17 +38,7 @@ namespace config
 class Configuration final
 {
     //< begin constants >//
-    static constexpr auto LOG_PREFIX       = "(Config) ";
-    static constexpr auto PATH_FEEDS       = "general.feeds";
-    static constexpr auto PATH_GND_MODE    = "general.gndMode";
-    static constexpr auto PATH_SERVER_PORT = "general.serverPort";
-    static constexpr auto PATH_LATITUDE    = "fallback.latitude";
-    static constexpr auto PATH_LONGITUDE   = "fallback.longitude";
-    static constexpr auto PATH_ALTITUDE    = "fallback.altitude";
-    static constexpr auto PATH_GEOID       = "fallback.geoid";
-    static constexpr auto PATH_PRESSURE    = "fallback.pressure";
-    static constexpr auto PATH_MAX_DIST    = "filter.maxDistance";
-    static constexpr auto PATH_MAX_HEIGHT  = "filter.maxHeight";
+    static constexpr auto LOG_PREFIX = "(Config) ";
     //< end constants >//
 
     //< begin members >//
@@ -126,6 +116,17 @@ public:
     static constexpr auto KV_KEY_PORT     = "port";
     static constexpr auto KV_KEY_PRIORITY = "priority";
     static constexpr auto KV_KEY_LOGIN    = "login";
+
+    static constexpr auto PATH_FEEDS       = "general.feeds";
+    static constexpr auto PATH_GND_MODE    = "general.gndMode";
+    static constexpr auto PATH_SERVER_PORT = "general.serverPort";
+    static constexpr auto PATH_LATITUDE    = "fallback.latitude";
+    static constexpr auto PATH_LONGITUDE   = "fallback.longitude";
+    static constexpr auto PATH_ALTITUDE    = "fallback.altitude";
+    static constexpr auto PATH_GEOID       = "fallback.geoid";
+    static constexpr auto PATH_PRESSURE    = "fallback.pressure";
+    static constexpr auto PATH_MAX_DIST    = "filter.maxDistance";
+    static constexpr auto PATH_MAX_HEIGHT  = "filter.maxHeight";
     //< end constants >//
 
     //< begin members >//

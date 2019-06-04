@@ -22,7 +22,7 @@
 #include "object/Aircraft.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
-#include "object/TimeStamp.hpp"
+#include "object/Timestamp.hpp"
 #include "object/Wind.h"
 
 #include "DateTimeImplTest.h"
@@ -32,36 +32,100 @@ using namespace object;
 using namespace time;
 using namespace sctf;
 
-using TS = TimeStamp<DateTimeImplTest>;
+using TS = Timestamp<DateTimeImplTest>;
 
-void test_object(test::TestSuitesRunner& runner)
+TEST_MODULE(test_object, {
+    test("aging", [] {
+        Object o;
+        assertEquals(o.get_updateAge(), 0);
+        assertEquals((++o).get_updateAge(), 1);
+    });
+    test("tryUpdate", [] {
+        Object o1;
+        Object o2(1);
+        Object o3(2);
+        o1.set_serialized("");
+        o2.set_serialized("a");
+        o3.set_serialized("b");
+        assertEquals(o1.get_serialized().size(), 0);
+        assertTrue(o1.tryUpdate(std::move(o2)));
+        assertEqStr(o1.get_serialized(), "a");
+        for (int i = 0; i < OBJ_OUTDATED; ++i)
+        {
+            assertFalse(o3.tryUpdate(std::move(o1)));
+            ++o3;
+        }
+        assertTrue(o3.tryUpdate(std::move(o1)));
+    });
+})
+
+TEST_MODULE(test_gps_position, {
+    test("update - successful", [] {
+        GpsPosition pos1({2.0, 2.0, 2}, 41.0, 0);
+        GpsPosition pos2({1.0, 1.0, 1}, 48.0, 0, Timestamp<time::DateTimeImplBoost>("120000", time::Format::HHMMSS));
+        assertTrue(pos1.tryUpdate(std::move(pos2)));
+        assertEquals(pos1.get_geoid(), 48.0);
+        assertEquals(pos1.get_position().latitude, 1.0);
+    });
+    test("update - failing", [] {
+        GpsPosition pos1({2.0, 2.0, 2}, 41.0);
+        GpsPosition pos2({1.0, 1.0, 1}, 48.0);
+        pos1.set_timeStamp(Timestamp<time::DateTimeImplBoost>("120100", time::Format::HHMMSS));
+        pos2.set_timeStamp(Timestamp<time::DateTimeImplBoost>("120000", time::Format::HHMMSS));
+        assertFalse(pos1.tryUpdate(std::move(pos2)));
+        assertEquals(pos1.get_geoid(), 41.0);
+        assertEquals(pos1.get_position().latitude, 2.0);
+    });
+})
+
+TEST_MODULE(test_atmosphere, {
+    test("update - successful", [] {
+        Atmosphere a1(1.0, 0);
+        Atmosphere a2(2.0, 1);
+        assertTrue(a1.tryUpdate(std::move(a2)));
+        assertEquals(a1.get_pressure(), 2.0);
+    });
+    test("update - failing", [] {
+        Atmosphere a1(1.0, 0);
+        Atmosphere a2(2.0, 1);
+        assertFalse(a2.tryUpdate(std::move(a1)));
+        assertEquals(a2.get_pressure(), 2.0);
+    });
+})
+
+TEST_MODULE(test_aircraft, {
+    test("update same target type", [] {
+        Aircraft a1;
+        Aircraft a2(1);
+        a1.set_serialized("a1");
+        a2.set_serialized("a2");
+        a2.set_timeStamp(Timestamp<DateTimeImplBoost>("120000", time::Format::HHMMSS));
+        assertTrue(a1.tryUpdate(std::move(a2)));
+        assertEqStr(a1.get_serialized(), "a2");
+        Aircraft a3;
+        a1.set_targetType(Aircraft::TargetType::FLARM);
+        a3.set_targetType(Aircraft::TargetType::FLARM);
+        assertTrue(a3.tryUpdate(std::move(a1)));
+    });
+    test("update different target type", [] {
+        Aircraft a1;
+        Aircraft a2;
+        a2.set_timeStamp(Timestamp<DateTimeImplBoost>("120000", time::Format::HHMMSS));
+        a2.set_targetType(Aircraft::TargetType::FLARM);
+        assertTrue(a1.tryUpdate(std::move(a2)));
+        assertFalse(a2.tryUpdate(std::move(a1)));
+        do
+        {
+            ++a2;
+        } while (a2.get_updateAge() <= OBJ_OUTDATED);
+        a1.set_timeStamp(Timestamp<DateTimeImplBoost>("120100", time::Format::HHMMSS));
+        assertTrue(a2.tryUpdate(std::move(a1)));
+    });
+})
+
+void test_timestamp()
 {
-    describe<Object>("Basic Object tests", runner)
-        ->test("aging",
-               [] {
-                   Object o;
-                   assertEquals(o.get_updateAge(), 0);
-                   assertEquals((++o).get_updateAge(), 1);
-               })
-        ->test("tryUpdate", [] {
-            Object o1;
-            Object o2(1);
-            Object o3(2);
-            o1.set_serialized("");
-            o2.set_serialized("a");
-            o3.set_serialized("b");
-            assertEquals(o1.get_serialized().size(), 0);
-            assertTrue(o1.tryUpdate(std::move(o2)));
-            assertEqStr(o1.get_serialized(), "a");
-            for (int i = 0; i < OBJ_OUTDATED; ++i)
-            {
-                assertFalse(o3.tryUpdate(std::move(o1)));
-                ++o3;
-            }
-            assertTrue(o3.tryUpdate(std::move(o1)));
-        });
-
-    describe<TS>("Basic TimeStamp tests", runner)
+    describe<TS>("Basic Timestamp tests")
         ->setup([] {
             DateTimeImplTest::set_day(1);
             DateTimeImplTest::set_now(12, 0, 0);
@@ -75,8 +139,7 @@ void test_object(test::TestSuitesRunner& runner)
                [] {
                    assertException(TS("", Format::HHMMSS), std::invalid_argument);
                    assertException(TS("adgjhag", Format::HHMMSS), std::invalid_argument);
-                   assertException(TS("36:60:11.11111", Format::HH_MM_SS_FFF),
-                                   std::invalid_argument);
+                   assertException(TS("36:60:11.11111", Format::HH_MM_SS_FFF), std::invalid_argument);
                    assertException(TS("366022", Format::HHMMSS), std::invalid_argument);
                })
         ->test("comparison - incremental time",
@@ -118,74 +181,5 @@ void test_object(test::TestSuitesRunner& runner)
             TS t2("110000", Format::HHMMSS);
             assertTrue(t2 > t1);
             assertFalse(t1 > t2);
-        });
-
-    describe<GpsPosition>("Basic GpsPosition tests", runner)
-        ->test("update - successful",
-               [] {
-                   GpsPosition pos1({2.0, 2.0, 2}, 41.0);
-                   GpsPosition pos2({1.0, 1.0, 1}, 48.0);
-                   pos2.set_timeStamp(TimeStamp<time::DateTimeImplBoost>(
-                       "120000", time::Format::HHMMSS));
-                   assertTrue(pos1.tryUpdate(std::move(pos2)));
-                   assertEquals(pos1.get_geoid(), 48.0);
-                   assertEquals(pos1.get_position().latitude, 1.0);
-               })
-        ->test("update - failing", [] {
-            GpsPosition pos1({2.0, 2.0, 2}, 41.0);
-            GpsPosition pos2({1.0, 1.0, 1}, 48.0);
-            pos1.set_timeStamp(
-                TimeStamp<time::DateTimeImplBoost>("120100", time::Format::HHMMSS));
-            pos2.set_timeStamp(
-                TimeStamp<time::DateTimeImplBoost>("120000", time::Format::HHMMSS));
-            assertFalse(pos1.tryUpdate(std::move(pos2)));
-            assertEquals(pos1.get_geoid(), 41.0);
-            assertEquals(pos1.get_position().latitude, 2.0);
-        });
-
-    describe<Atmosphere>("Basic Atmosphere tests", runner)
-        ->test("update - successful",
-               [] {
-                   Atmosphere a1(1.0, 0);
-                   Atmosphere a2(2.0, 1);
-                   assertTrue(a1.tryUpdate(std::move(a2)));
-                   assertEquals(a1.get_pressure(), 2.0);
-               })
-        ->test("update - failing", [] {
-            Atmosphere a1(1.0, 0);
-            Atmosphere a2(2.0, 1);
-            assertFalse(a2.tryUpdate(std::move(a1)));
-            assertEquals(a2.get_pressure(), 2.0);
-        });
-
-    describe<Aircraft>("Basic Aircraft tests", runner)
-        ->test("update same target type",
-               [] {
-                   Aircraft a1;
-                   Aircraft a2(1);
-                   a1.set_serialized("a1");
-                   a2.set_serialized("a2");
-                   a2.set_timeStamp(
-                       TimeStamp<DateTimeImplBoost>("120000", time::Format::HHMMSS));
-                   assertTrue(a1.tryUpdate(std::move(a2)));
-                   assertEqStr(a1.get_serialized(), "a2");
-                   Aircraft a3;
-                   a1.set_targetType(Aircraft::TargetType::FLARM);
-                   a3.set_targetType(Aircraft::TargetType::FLARM);
-                   assertTrue(a3.tryUpdate(std::move(a1)));
-               })
-        ->test("update different target type", [] {
-            Aircraft a1;
-            Aircraft a2;
-            a2.set_timeStamp(TimeStamp<DateTimeImplBoost>("120000", time::Format::HHMMSS));
-            a2.set_targetType(Aircraft::TargetType::FLARM);
-            assertTrue(a1.tryUpdate(std::move(a2)));
-            assertFalse(a2.tryUpdate(std::move(a1)));
-            do
-            {
-                ++a2;
-            } while (a2.get_updateAge() <= OBJ_OUTDATED);
-            a1.set_timeStamp(TimeStamp<DateTimeImplBoost>("120100", time::Format::HHMMSS));
-            assertTrue(a2.tryUpdate(std::move(a1)));
         });
 }

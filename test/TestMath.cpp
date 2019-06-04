@@ -22,49 +22,43 @@
 #include <boost/regex.hpp>
 
 #include "util/math.hpp"
+
 #include "helper.hpp"
 
 using namespace sctf;
 
-void test_math(test::TestSuitesRunner& runner)
-{
-    describe("math utils", runner, "math")
-        ->test("radian",
-               []() {
-                   assertEquals(math::radian(45.0), 0.785398);
-                   assertEquals(math::radian(0.0), 0.0);
-                   assertEquals(math::radian(360.0), 6.28319);
-               })
-        ->test("degree",
-               []() {
-                   assertEquals(math::degree(0.785398), 45.0);
-                   assertEquals(math::degree(0.0), 0.0);
-                   assertEquals(math::degree(6.28319), 360.0);
-               })
-        ->test("doubleToInt",
-               []() {
-                   assertEquals(math::doubleToInt(0.0), 0);
-                   assertEquals(math::doubleToInt(1.4), 1);
-                   assertEquals(math::doubleToInt(1.5), 2);
-                   assertEquals(math::doubleToInt(-1.4), -1);
-                   assertEquals(math::doubleToInt(-1.5), -2);
-               })
-        ->test("dmToDeg",
-               []() {
-                   assertEquals(math::dmToDeg(0.0), 0.0);
-                   assertEquals(math::dmToDeg(9030.50), 90.508333);
-                   assertEquals(math::dmToDeg(18000.0), 180.0);
-                   assertEquals(math::dmToDeg(-4512.3456), 45.205760);
-               })
-        ->test("calcIcaoHeight",
-               []() {
-                   assertEquals(math::icaoHeight(0.0), 44331);
-                   assertEquals(math::icaoHeight(1013.25), 0);
-                   assertEquals(math::icaoHeight(980.0), 281);
-               })
-        ->test("checksum", []() {
-            assertEquals(math::checksum("", sizeof("")), 0);
-            assertEquals(math::checksum("\0", sizeof("\0")), 0);
-            assertEquals(math::checksum("$abc*", sizeof("$abc*")), 96);
-        });
-}
+TEST_MODULE(test_math, {
+    test("radian", [] {
+        assertEquals(math::radian(45.0), 0.785398);
+        assertEquals(math::radian(0.0), 0.0);
+        assertEquals(math::radian(360.0), 6.28319);
+    });
+    test("degree", [] {
+        assertEquals(math::degree(0.785398), 45.0);
+        assertEquals(math::degree(0.0), 0.0);
+        assertEquals(math::degree(6.28319), 360.0);
+    });
+    test("doubleToInt", [] {
+        assertEquals(math::doubleToInt(0.0), 0);
+        assertEquals(math::doubleToInt(1.4), 1);
+        assertEquals(math::doubleToInt(1.5), 2);
+        assertEquals(math::doubleToInt(-1.4), -1);
+        assertEquals(math::doubleToInt(-1.5), -2);
+    });
+    test("dmToDeg", [] {
+        assertEquals(math::dmToDeg(0.0), 0.0);
+        assertEquals(math::dmToDeg(9030.50), 90.508333);
+        assertEquals(math::dmToDeg(18000.0), 180.0);
+        assertEquals(math::dmToDeg(-4512.3456), 45.205760);
+    });
+    test("calcIcaoHeight", [] {
+        assertEquals(math::icaoHeight(0.0), 44331);
+        assertEquals(math::icaoHeight(1013.25), 0);
+        assertEquals(math::icaoHeight(980.0), 281);
+    });
+    test("checksum", [] {
+        assertEquals(math::checksum("", sizeof("")), 0);
+        assertEquals(math::checksum("\0", sizeof("\0")), 0);
+        assertEquals(math::checksum("$abc*", sizeof("$abc*")), 96);
+    });
+})

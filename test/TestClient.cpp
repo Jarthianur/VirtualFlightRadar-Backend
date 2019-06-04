@@ -22,6 +22,3 @@
 #include "helper.hpp"
 
 using namespace sctf;
-
-void test_client(test::TestSuitesRunner& runner)
-{}

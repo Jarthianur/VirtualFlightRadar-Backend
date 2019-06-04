@@ -25,32 +25,11 @@
 
 using namespace sctf;
 
-TEST_FUNCTION(test_config)
-TEST_FUNCTION(test_data)
-TEST_FUNCTION(test_data_processor)
-TEST_FUNCTION(test_feed_parser)
-TEST_FUNCTION(test_object)
-TEST_FUNCTION(test_math)
-TEST_FUNCTION(test_client)
-TEST_FUNCTION(test_server)
-TEST_FUNCTION(test_feed)
+extern void test_timestamp();
 
-int main(int, char**)
+void dispatch()
 {
-    logger.setLogFile("/dev/null");
-    // auto rep = createXmlReporter();
-    auto                   rep = createPlainTextReporter(true);
-    test::TestSuitesRunner runner;
-
-    test_config(runner);
-    test_data(runner);
-    test_data_processor(runner);
-    test_feed_parser(runner);
-    test_object(runner);
-    test_math(runner);
-    test_feed(runner);
-    test_client(runner);
-    test_server(runner);
-
-    return rep->report(runner) > 0 ? 1 : 0;
+    test_timestamp();
 }
+
+SCTF_DEFAULT_MAIN(createPlainTextReporter(true), dispatch())

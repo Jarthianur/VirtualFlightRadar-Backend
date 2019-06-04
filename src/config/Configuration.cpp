@@ -49,7 +49,7 @@ using OptNumber = boost::optional<Number>;
  * @return an optional number, which may be invalid
  */
 template<typename T>
-inline OptNumber stringToNumber(const std::string& str)
+OptNumber stringToNumber(const std::string& str)
 {
     std::stringstream ss(str);
     T                 result;
@@ -67,7 +67,7 @@ inline OptNumber stringToNumber(const std::string& str)
  * @return the number value
  * @throw std::invalid_argument if the Number is invalid
  */
-inline Number checkNumber(const OptNumber& number, const char* path)
+Number checkNumber(const OptNumber& number, const char* path)
 {
     if (!number)
     {
@@ -81,7 +81,7 @@ inline Number checkNumber(const OptNumber& number, const char* path)
  * @param str The string to trim
  * @return the trimmed string
  */
-inline std::string& trimString(std::string& str)
+std::string& trimString(std::string& str)
 {
     std::size_t f = str.find_first_not_of(' ');
     if (f != std::string::npos)
@@ -145,7 +145,7 @@ object::GpsPosition Configuration::resolvePosition(const Properties& properties)
         stringToNumber<std::int32_t>(properties.get_property(PATH_ALTITUDE, "0")), PATH_ALTITUDE));
     double geoid = boost::get<double>(
         checkNumber(stringToNumber<double>(properties.get_property(PATH_GEOID, "0.0")), PATH_GEOID));
-    return object::GpsPosition(pos, geoid);
+    return object::GpsPosition(0, pos, geoid);
 }
 
 std::uint16_t Configuration::resolveServerPort(const Properties& properties) const
@@ -201,10 +201,10 @@ std::unordered_map<std::string, Properties> Configuration::resolveFeeds(const Pr
 
 void Configuration::dumpInfo() const
 {
-    logger.info(LOG_PREFIX, PATH_LATITUDE, ": ", gpsPosition.m_location.latitude);
-    logger.info(LOG_PREFIX, PATH_LONGITUDE, ": ", gpsPosition.m_location.longitude);
-    logger.info(LOG_PREFIX, PATH_ALTITUDE, ": ", gpsPosition.m_location.altitude);
-    logger.info(LOG_PREFIX, PATH_GEOID, ": ", gpsPosition.m_geoid);
+    logger.info(LOG_PREFIX, PATH_LATITUDE, ": ", gpsPosition.getLocation().latitude);
+    logger.info(LOG_PREFIX, PATH_LONGITUDE, ": ", gpsPosition.getLocation().longitude);
+    logger.info(LOG_PREFIX, PATH_ALTITUDE, ": ", gpsPosition.getLocation().altitude);
+    logger.info(LOG_PREFIX, PATH_GEOID, ": ", gpsPosition.getGeoid());
     logger.info(LOG_PREFIX, PATH_PRESSURE, ": ", atmPressure);
     logger.info(LOG_PREFIX, PATH_MAX_HEIGHT, ": ", maxHeight);
     logger.info(LOG_PREFIX, PATH_MAX_DIST, ": ", maxDistance);
