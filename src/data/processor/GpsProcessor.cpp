@@ -25,6 +25,8 @@
 #include <cstdio>
 #include <ctime>
 
+#include "util/math.hpp"
+
 using namespace object;
 
 namespace data
@@ -51,7 +53,7 @@ std::size_t GpsProcessor::appendGPGGA(GpsPosition& position, const std::tm* utc,
         "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*", utc->tm_hour,
         utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
         m_directionEW, /*pos.fixQa,*/ position.getNrOfSatellites(), position.getLocation().altitude,
-        position.getGeoid());
+        math::saturate(position.getGeoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
     bytes += finishSentence(**position, GpsPosition::NMEA_SIZE - pos,
                             GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes));
     return pos + static_cast<std::size_t>(bytes);
@@ -61,7 +63,7 @@ std::size_t GpsProcessor::appendGPRMC(GpsPosition& position, const std::tm* utc,
 {
     int bytes = std::snprintf(
         **position + pos, GpsPosition::NMEA_SIZE - pos,
-        "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*", utc->tm_hour,
+        "$GPRMC,%.2d%.2d%.2d,A,%02.0lf%06.3lf,%c,%03.0lf%06.3lf,%c,0,0,%.2d%.2d%.2d,001.0,W*", utc->tm_hour,
         utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
         m_directionEW, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
     bytes += finishSentence(**position, GpsPosition::NMEA_SIZE - pos,

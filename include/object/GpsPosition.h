@@ -59,7 +59,7 @@ class GpsPosition : public Object
 {
 public:
     //< begin constants >//
-    static constexpr auto NMEA_SIZE = 4096;
+    static constexpr auto NMEA_SIZE = 192;
     static constexpr auto MAX_GEOID = 86.0;
     static constexpr auto MIN_GEOID = -108.0;
     //< end constants >//

@@ -101,12 +101,17 @@ std::size_t AircraftProcessor::appendPFLAA(Aircraft& aircraft, std::size_t pos) 
     int bytes = 0;
     if (aircraft.hasFullInfo())
     {
-        bytes = std::snprintf(**aircraft + pos, Aircraft::NMEA_SIZE - pos,
-                              "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast,
-                              m_relVertical, util::raw_type(aircraft.getIdType()), *aircraft.getId(),
-                              math::doubleToInt(aircraft.getMovement().heading),
-                              math::doubleToInt(aircraft.getMovement().gndSpeed * math::MS_2_KMH),
-                              aircraft.getMovement().climbRate, util::raw_type(aircraft.getAircraftType()));
+        bytes = std::snprintf(
+            **aircraft + pos, Aircraft::NMEA_SIZE - pos, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*",
+            m_relNorth, m_relEast, m_relVertical, util::raw_type(aircraft.getIdType()), *aircraft.getId(),
+            math::doubleToInt(math::saturate(aircraft.getMovement().heading, Aircraft::Movement::MIN_HEADING,
+                                             Aircraft::Movement::MAX_HEADING)),
+            math::doubleToInt(math::saturate(aircraft.getMovement().gndSpeed * math::MS_2_KMH,
+                                             Aircraft::Movement::MIN_GND_SPEED,
+                                             Aircraft::Movement::MAX_GND_SPEED)),
+            math::saturate(aircraft.getMovement().climbRate, Aircraft::Movement::MIN_CLIMB_RATE,
+                           Aircraft::Movement::MAX_CLIMB_RATE),
+            util::raw_type(aircraft.getAircraftType()));
     }
     else
     {
