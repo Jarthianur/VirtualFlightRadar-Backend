@@ -24,8 +24,6 @@
 #include <cstddef>
 #include <cstdio>
 
-#include "util/math.hpp"
-
 namespace data
 {
 namespace processor
@@ -37,17 +35,6 @@ namespace processor
 template<typename T>
 class Processor
 {
-protected:
-    //< begin methods >//
-    /**
-     * @brief End the processing string with checksum and CRLF.
-     */
-    inline int finishSentence(char* buffer, std::size_t size, std::size_t n) const
-    {
-        return std::snprintf(buffer, n, "%02x\r\n", math::checksum(buffer, size));
-    }
-    //< end methods >//
-
 public:
     Processor()                   = default;
     virtual ~Processor() noexcept = default;

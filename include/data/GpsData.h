@@ -59,8 +59,6 @@ class GpsData : public Data
     //< end methods >//
 
 public:
-    GpsData();
-
     /**
      * @param crPosition The initial info
      */

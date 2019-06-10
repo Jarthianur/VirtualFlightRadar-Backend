@@ -27,8 +27,6 @@ using namespace object;
 
 namespace data
 {
-GpsData::GpsData() : Data() {}
-
 GpsData::GpsData(const GpsPosition& position, bool ground)
     : Data(), m_position(position), m_groundMode(ground)
 {
@@ -38,8 +36,13 @@ GpsData::GpsData(const GpsPosition& position, bool ground)
 void GpsData::access(const accessor_fn& func)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_processor.process(m_position);
-    func(++m_position);
+    try
+    {
+        m_processor.process(m_position);
+        func(++m_position);
+    }
+    catch (const std::exception&)
+    {}
 }
 
 bool GpsData::update(Object&& position)

@@ -22,8 +22,12 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdarg>
 #include <cstddef>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 
@@ -105,11 +109,6 @@ public:
         return *this;
     }
 
-    char* operator*()
-    {
-        return m_value;
-    }
-
     const char* operator*() const
     {
         return m_value;
@@ -131,6 +130,28 @@ public:
     {
         m_value[0] = '\0';
         m_length   = 0;
+    }
+
+    int snprintf(std::size_t pos, std::size_t n, const char* fmt, ...)
+    {
+        if (pos + n >= N)
+        {
+            throw std::out_of_range("");
+        }
+        va_list args;
+        va_start(args, fmt);
+        int b = 0;
+        if ((b = std::vsnprintf(m_value + pos, std::min(n, N), fmt, args)) >= 0)
+        {
+            m_length = b;
+        }
+        va_end(args);
+        if (b < 0)
+        {
+            clear();
+            throw std::out_of_range("");
+        }
+        return b;
     }
 
     inline auto getLength() const -> decltype(m_length)

@@ -62,7 +62,8 @@ TEST_MODULE(test_object, {
 TEST_MODULE(test_gps_position, {
     test("update - successful", [] {
         GpsPosition pos1({2.0, 2.0, 2}, 41.0, 0);
-        GpsPosition pos2({1.0, 1.0, 1}, 48.0, 0, Timestamp<time::DateTimeImplBoost>("120000", time::Format::HHMMSS));
+        GpsPosition pos2({1.0, 1.0, 1}, 48.0, 0,
+                         Timestamp<time::DateTimeImplBoost>("120000", time::Format::HHMMSS));
         assertTrue(pos1.tryUpdate(std::move(pos2)));
         assertEquals(pos1.get_geoid(), 48.0);
         assertEquals(pos1.get_position().latitude, 1.0);
@@ -95,13 +96,12 @@ TEST_MODULE(test_atmosphere, {
 
 TEST_MODULE(test_aircraft, {
     test("update same target type", [] {
-        Aircraft a1;
-        Aircraft a2(1);
-        a1.set_serialized("a1");
-        a2.set_serialized("a2");
-        a2.set_timeStamp(Timestamp<DateTimeImplBoost>("120000", time::Format::HHMMSS));
+        Aircraft a1(0, "123456", Aircraft::IdType::RANDOM, Aircraft::AircraftType::UNKNOWN, {.0, .0, 0},
+                    {.0, .0, .0}, Timestamp<DateTimeImplBoost>("120000", time::Format::HHMMSS));
+        Aircraft a2(0, "123456", Aircraft::IdType::ICAO, Aircraft::AircraftType::UNKNOWN, {.0, .0, 0},
+                    {.0, .0, .0}, Timestamp<DateTimeImplBoost>("130000", time::Format::HHMMSS));
         assertTrue(a1.tryUpdate(std::move(a2)));
-        assertEqStr(a1.get_serialized(), "a2");
+        assertEquals(a1.getIdType(), Aircraft::IdType::ICAO);
         Aircraft a3;
         a1.set_targetType(Aircraft::TargetType::FLARM);
         a3.set_targetType(Aircraft::TargetType::FLARM);

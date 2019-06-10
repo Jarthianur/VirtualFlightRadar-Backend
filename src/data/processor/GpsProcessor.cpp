@@ -22,7 +22,6 @@
 #include "data/processor/GpsProcessor.h"
 
 #include <cmath>
-#include <cstdio>
 #include <ctime>
 
 #include "util/math.hpp"
@@ -48,26 +47,26 @@ std::size_t GpsProcessor::appendGPGGA(GpsPosition& position, const std::tm* utc,
     // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
     // support others.
     // "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"
-    int bytes = std::snprintf(
-        **position + pos, GpsPosition::NMEA_SIZE - pos,
+    int bytes = (*position).snprintf(
+        pos, GpsPosition::NMEA_SIZE - pos,
         "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*", utc->tm_hour,
         utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
         m_directionEW, /*pos.fixQa,*/ position.getNrOfSatellites(), position.getLocation().altitude,
         math::saturate(position.getGeoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
-    bytes += finishSentence(**position, GpsPosition::NMEA_SIZE - pos,
-                            GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes));
+    bytes += (*position).snprintf(pos, GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
+                                  "%02x\r\n", math::checksum(**position, GpsPosition::NMEA_SIZE - pos));
     return pos + static_cast<std::size_t>(bytes);
 }
 
 std::size_t GpsProcessor::appendGPRMC(GpsPosition& position, const std::tm* utc, std::size_t pos) const
 {
-    int bytes = std::snprintf(
-        **position + pos, GpsPosition::NMEA_SIZE - pos,
+    int bytes = (*position).snprintf(
+        pos, GpsPosition::NMEA_SIZE - pos,
         "$GPRMC,%.2d%.2d%.2d,A,%02.0lf%06.3lf,%c,%03.0lf%06.3lf,%c,0,0,%.2d%.2d%.2d,001.0,W*", utc->tm_hour,
         utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
         m_directionEW, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
-    bytes += finishSentence(**position, GpsPosition::NMEA_SIZE - pos,
-                            GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes));
+    bytes += (*position).snprintf(pos, GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
+                                  "%02x\r\n", math::checksum(**position, GpsPosition::NMEA_SIZE - pos));
     return pos + static_cast<std::size_t>(bytes);
 }
 
