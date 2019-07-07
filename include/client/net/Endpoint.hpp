@@ -32,12 +32,9 @@ namespace net
  */
 struct Endpoint
 {
-    //< begin members >//
     const std::string host;  ///< Hostname
     const std::string port;  ///< Port number
-    //< end members >//
 
-    //< begin operators >//
     /**
      * @brief Equality comparison by value
      * @param other The other endpoint
@@ -47,7 +44,6 @@ struct Endpoint
     {
         return host == other.host && port == other.port;
     }
-    //< end operators >//
 };
 }  // namespace net
 }  // namespace client

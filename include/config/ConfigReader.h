@@ -32,21 +32,17 @@ namespace config
  */
 class ConfigReader
 {
-    //< begin members >//
     std::istream& m_stream;  ///< The input stream
-    //< end members >//
 
 public:
     explicit ConfigReader(std::istream& stream);  ///< @param stream The input stream to read from
     ~ConfigReader() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Read the given stream and return read properties.
      * @return the Properties
      */
     Properties read();
-    //< end interfaces >//
 };
 
 }  // namespace config

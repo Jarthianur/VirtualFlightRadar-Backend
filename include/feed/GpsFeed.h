@@ -49,13 +49,9 @@ namespace feed
  */
 class GpsFeed : public Feed
 {
-    //< begin constants >//
     static constexpr auto LOG_PREFIX = "(GpsFeed) ";
-    //< end constants >//
 
-    //< begin members >//
     static parser::GpsParser s_parser;  ///< Parser to unpack response from Client
-    //< end members >//
 
 public:
     NOT_COPYABLE(GpsFeed)
@@ -70,7 +66,6 @@ public:
             std::shared_ptr<data::GpsData> data);
     ~GpsFeed() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::GPS
@@ -81,7 +76,6 @@ public:
      * @brief Implement Feed::process.
      */
     bool process(const std::string& response) override;
-    //< end interfaces >//
 };
 
 }  // namespace feed

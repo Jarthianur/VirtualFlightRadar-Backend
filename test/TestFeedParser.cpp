@@ -41,67 +41,81 @@ using namespace sctf;
 
 TEST_MODULE(test_sbs_parser, {
     test("valid msg", [] {
-        SbsParser        sbsParser;
-        object::Aircraft ac;
-        sbsParser.unpack(
+        SbsParser sbsParser;
+        assertNoExcept(sbsParser.unpack(
             "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
-            ac);
-        assertEqStr(ac.get_id(), "AAAAAA");
-        assertEquals(ac.get_targetType(), object::Aircraft::TargetType::TRANSPONDER);
-        assertEquals(ac.get_position().altitude, math::doubleToInt(math::FEET_2_M * 1000));
-        assertEquals(ac.get_position().latitude, 49.0);
-        assertEquals(ac.get_position().longitude, 8.0);
-        assertFalse(ac.get_fullInfo());
+            0));
+        auto ac = sbsParser.unpack(
+            "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
+            0);
+        assertEquals(ac.getId(), "AAAAAA");
+        assertEquals(ac.getTargetType(), object::Aircraft::TargetType::TRANSPONDER);
+        assertEquals(ac.getLocation().altitude, math::doubleToInt(math::FEET_2_M * 1000));
+        assertEquals(ac.getLocation().latitude, 49.0);
+        assertEquals(ac.getLocation().longitude, 8.0);
+        assertFalse(ac.hasFullInfo());
     });
     test("invalid msg", [] {
-        SbsParser        sbsParser;
-        object::Aircraft ac;
-        assertFalse(sbsParser.unpack(
-            "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0", ac));
-        assertFalse(sbsParser.unpack(
-            "MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", ac));
-        assertFalse(sbsParser.unpack(
-            "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0",
-            ac));
-        assertFalse(sbsParser.unpack("MSG,someCrap in, here", ac));
-        assertFalse(sbsParser.unpack("MSG,4,0,,,,,,", ac));
-        assertFalse(sbsParser.unpack(
-            "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", ac));
-        assertFalse(sbsParser.unpack(
-            "MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", ac));
-        assertFalse(sbsParser.unpack("", ac));
+        SbsParser sbsParser;
+        assertException(
+            sbsParser.unpack(
+                "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0", 0),
+            UnpackError);
+        assertException(
+            sbsParser.unpack("MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0",
+                             0),
+            UnpackError);
+        assertException(
+            sbsParser.unpack(
+                "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0",
+                0),
+            UnpackError);
+        assertException(sbsParser.unpack("MSG,someCrap in, here", 0), UnpackError);
+        assertException(sbsParser.unpack("MSG,4,0,,,,,,", 0), UnpackError);
+        assertException(
+            sbsParser.unpack(
+                "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", 0),
+            UnpackError);
+        assertException(
+            sbsParser.unpack("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0",
+                             0),
+            UnpackError);
+        assertException(sbsParser.unpack("", 0), UnpackError);
     });
     test("filter height", [] {
-        object::Aircraft ac;
-        SbsParser        tmpSbs;
+        SbsParser tmpSbs;
         SbsParser::s_maxHeight = 0;
-        assertFalse(tmpSbs.unpack(
-            "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
-            ac));
+        assertException(
+            tmpSbs.unpack(
+                "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
+                0),
+            UnpackError);
     });
 })
 
 TEST_MODULE(test_aprs_parser, {
     test("valid msg", [] {
-        AprsParser       aprsParser;
-        object::Aircraft ac;
-        assertTrue(aprsParser.unpack(
-            "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA", ac));
-        assertTrue(aprsParser.unpack(
+        AprsParser aprsParser;
+        assertNoExcept(aprsParser.unpack(
+            "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA", 0));
+        assertNoExcept(aprsParser.unpack(
             "ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4",
-            ac));
-        assertTrue(aprsParser.unpack(
+            0));
+        assertNoExcept(aprsParser.unpack(
             "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4",
-            ac));
-        assertTrue(aprsParser.unpack(
+            0));
+        assertNoExcept(aprsParser.unpack(
             "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
-            ac));
-        assertEqStr(ac.get_id(), "AAAAAA");
-        assertEquals(ac.get_targetType(), object::Aircraft::TargetType::FLARM);
-        assertEquals(ac.get_position().altitude, 0);
-        assertEquals(ac.get_position().latitude, 49.0);
-        assertEquals(ac.get_position().longitude, -8.0);
-        assertTrue(ac.get_fullInfo());
+            0));
+        auto ac = aprsParser.unpack(
+            "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
+            0);
+        assertEquals(ac.getId(), "AAAAAA");
+        assertEquals(ac.getTargetType(), object::Aircraft::TargetType::FLARM);
+        assertEquals(ac.getLocation().altitude, 0);
+        assertEquals(ac.getLocation().latitude, 49.0);
+        assertEquals(ac.getLocation().longitude, -8.0);
+        assertTrue(ac.hasFullInfo());
     });
     test("invalid msg", [] {
         AprsParser       aprsParser;

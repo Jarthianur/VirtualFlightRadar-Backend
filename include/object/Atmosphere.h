@@ -34,23 +34,17 @@ struct Climate;
  */
 class Atmosphere : public Object
 {
-    //< begin constants >//
     static constexpr auto ICAO_STD     = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
     static constexpr auto MAX_PRESSURE = 2000.0;
     static constexpr auto MIN_PRESSURE = 0.0;
-    //< end constants >//
 
-    //< begin members >//
     double      m_pressure = ICAO_STD;  ///< The atmospheric pressure
     std::string m_nmea;
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Extend Object::assign.
      */
     void assign(Object&& other) override;
-    //< end methods >//
 
 public:
     Atmosphere();
@@ -64,14 +58,10 @@ public:
     Atmosphere(std::uint32_t priority, double pressure);
     ~Atmosphere() noexcept override = default;
 
-    //< begin operators >//
     std::string& operator*();
-    //< end operators >//
 
-    //< begin interfaces >//
     util::CStringPack getNMEA() const override;
     auto              getPressure() const -> decltype(m_pressure);
-    //< end interfaces >//
 };
 
 }  // namespace object

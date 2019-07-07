@@ -39,13 +39,11 @@ public:
     Processor()                   = default;
     virtual ~Processor() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Process an object.
      * @param _1 The object of type T
      */
     virtual void process(T& _1) const = 0;
-    //< end interfaces >//
 };
 }  // namespace processor
 }  // namespace data

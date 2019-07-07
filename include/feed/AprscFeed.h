@@ -49,13 +49,9 @@ namespace feed
  */
 class AprscFeed : public Feed
 {
-    //< begin constants >//
     static constexpr auto LOG_PREFIX = "(AprscFeed) ";
-    //< end constants >//
 
-    //< begin members >//
     static parser::AprsParser s_parser;  ///< Parser to unpack response from Client
-    //< end members >//
 
 public:
     NOT_COPYABLE(AprscFeed)
@@ -71,7 +67,6 @@ public:
               std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
     ~AprscFeed() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::APRS
@@ -88,7 +83,6 @@ public:
      * @return the login
      */
     std::string get_login() const;
-    //< end interfaces >//
 };
 
 }  // namespace feed

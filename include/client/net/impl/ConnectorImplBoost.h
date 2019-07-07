@@ -38,7 +38,6 @@ namespace net
  */
 class ConnectorImplBoost : public Connector
 {
-    //< begin members >//
     boost::asio::io_service        m_ioService;  ///< Internal IO-service
     boost::asio::ip::tcp::socket   m_socket;     ///< Connection socket
     boost::asio::ip::tcp::resolver m_resolver;   ///< Host resolver
@@ -46,9 +45,7 @@ class ConnectorImplBoost : public Connector
     boost::asio::streambuf         m_buffer;     ///< Read buffer
     std::string                    m_response;   ///< Read message
     std::istream                   m_istream;    ///< Message stream for conversion
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Handler for resolving endpoint
      * @param error      The error code
@@ -93,7 +90,6 @@ class ConnectorImplBoost : public Connector
      */
     void handleWrite(const boost::system::error_code& error, std::size_t bytes,
                      const Callback& callback) noexcept;
-    //< end methods >//
 
 public:
     NOT_COPYABLE(ConnectorImplBoost)
@@ -101,7 +97,6 @@ public:
     ConnectorImplBoost();
     ~ConnectorImplBoost() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Run the internal event handler queue.
      * @note Blocks until all handlers have returned.
@@ -157,7 +152,6 @@ public:
      * @return true if expired, else false
      */
     bool timerExpired() override;
-    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace client

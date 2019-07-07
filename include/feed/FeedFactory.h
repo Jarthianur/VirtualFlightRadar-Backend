@@ -51,15 +51,12 @@ class Feed;
  */
 class FeedFactory
 {
-    //< begin members >//
     std::shared_ptr<config::Configuration> m_config;        ///< Pointer to the Configuration
     std::shared_ptr<data::AircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
     std::shared_ptr<data::AtmosphereData>  m_atmosData;     ///< Pointer to the AtmosphereData
     std::shared_ptr<data::GpsData>         m_gpsData;       ///< Pointer to the GpsData
     std::shared_ptr<data::WindData>        m_windData;      ///< Pointer to the WindData
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Make a new Feed.
      * @tparam T The Feed type
@@ -70,7 +67,6 @@ class FeedFactory
      */
     template<typename T, typename std::enable_if<std::is_base_of<Feed, T>::value>::type* = nullptr>
     std::shared_ptr<T> makeFeed(const std::string& name);
-    //< end methods >//
 
 public:
     /**
@@ -86,7 +82,6 @@ public:
                 std::shared_ptr<data::WindData> windData);
     ~FeedFactory() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Create a Feed.
      * @param name  The feed name
@@ -94,6 +89,5 @@ public:
      * @throw std::logic_error from invoked methods
      */
     boost::optional<std::shared_ptr<Feed>> createFeed(const std::string& name);
-    //< end interfaces >//
 };
 }  // namespace feed

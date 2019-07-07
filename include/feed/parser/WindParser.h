@@ -38,7 +38,6 @@ public:
     WindParser();
     ~WindParser() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Unpack into Wind.
      * @param sentence The string to unpack
@@ -46,7 +45,6 @@ public:
      * @return true on success, else false
      */
     object::Wind unpack(const std::string& sentence, std::uint32_t priority) const override;
-    //< end interfaces >//
 };
 }  // namespace parser
 }  // namespace feed

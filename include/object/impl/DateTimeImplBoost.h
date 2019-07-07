@@ -36,7 +36,6 @@ public:
     DateTimeImplBoost()           = default;
     ~DateTimeImplBoost() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Get the amount of milliseconds since 00:00 UTC.
      * @return the milliseconds
@@ -48,7 +47,6 @@ public:
      * @return the current day
      */
     static std::uint32_t day();
-    //< end interfaces >//
 };
 }  // namespace time
 }  // namespace object

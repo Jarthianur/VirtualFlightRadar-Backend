@@ -38,9 +38,7 @@ namespace net
  */
 class SocketImplBoost
 {
-    //< begin members >//
     boost::asio::ip::tcp::socket m_socket;  ///< Underlying socket
-    //< end members >//
 
 public:
     MOVABLE_BUT_NOT_COPYABLE(SocketImplBoost)
@@ -48,7 +46,6 @@ public:
                                  socket);  ///< @param socket The underlying socket
     ~SocketImplBoost() noexcept;
 
-    //< begin interfaces >//
     /**
      * @brief Get the remote IP address.
      * @return the address
@@ -74,7 +71,6 @@ public:
      * @return the socket
      */
     boost::asio::ip::tcp::socket& get();
-    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace server

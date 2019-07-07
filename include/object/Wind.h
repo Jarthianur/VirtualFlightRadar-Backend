@@ -34,22 +34,16 @@ struct Climate;
  */
 class Wind : public Object
 {
-    //< begin members >//
     std::string m_nmea;
-    //< end members >//
 
 public:
     Wind();
     explicit Wind(std::uint32_t priority);  ///< @param priority The initial priority
     ~Wind() noexcept override = default;
 
-    //< begin operators >//
     std::string& operator*();
-    //< end operators >//
 
-    //< begin interfaces >//
     util::CStringPack getNMEA() const override;
-    //< end interfaces >//
 };
 
 }  // namespace object

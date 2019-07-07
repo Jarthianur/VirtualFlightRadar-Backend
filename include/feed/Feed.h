@@ -41,19 +41,15 @@ namespace feed
  */
 class Feed
 {
-    //< begin methods >//
     /**
      * @brief Initialize the priority from the given properties.
      */
     std::uint32_t initPriority() const noexcept;
-    //< end methods >//
 
 protected:
-    //< begin members >//
     std::shared_ptr<data::Data> m_data;       ///< Respective Data container
     const std::uint32_t         m_priority;   ///< Priority
     const char* const           m_logPrefix;  ///< Component string
-    //< end members >//
 
     /**
      * @param name       The Feeds unique name
@@ -76,15 +72,12 @@ public:
         SENSOR
     };
 
-    //< begin members >//
     const std::string        name;        ///< Unique name
     const config::Properties properties;  ///< Properties
-    //< end members >//
 
     NOT_COPYABLE(Feed)
     virtual ~Feed() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Get the supported Protocol.
      * @return the protocol
@@ -102,7 +95,6 @@ public:
      * @param response The response
      */
     virtual bool process(const std::string& response) = 0;
-    //< end interfaces >//
 };
 
 }  // namespace feed

@@ -49,23 +49,28 @@ using CStringPack = std::pair<const char*, std::size_t>;
 template<std::size_t N, typename std::enable_if<(N > 0)>::type* = nullptr>
 class CString final
 {
-    //< begin constants >//
     static constexpr auto last = N - 1;
-    //< end constants >//
 
-    //< begin members >//
     char        m_value[N];
     std::size_t m_length = 0;
-    //< end members >//
 
-    //< begin methods >//
     void copy(const char* str, std::size_t n)
     {
-        m_length = std::min(last, n);
+        if (n > last)
+        {
+            throw std::out_of_range("");
+        }
+        m_length = n;
         std::memcpy(m_value, str, m_length);
         m_value[m_length] = '\0';
     }
-    //< end methods >//
+
+    void copy(const CString& other)
+    {
+        m_length = other.m_length;
+        std::memcpy(m_value, other.m_value, m_length);
+        m_value[m_length] = '\0';
+    }
 
 public:
     CString()
@@ -80,7 +85,7 @@ public:
 
     CString(const std::string& init)  ///< @param init The initial string to copy
     {
-        copy(init.c_str(), init.size());
+        operator=(init);
     }
 
     CString(const CString& other)  ///< @param other The other CString to copy
@@ -90,7 +95,6 @@ public:
 
     ~CString() noexcept = default;
 
-    //< begin operators >//
     CString& operator=(const char* other)
     {
         copy(other, std::strlen(other));
@@ -105,7 +109,7 @@ public:
 
     CString& operator=(const CString& other)
     {
-        copy(other.m_value, other.m_length);
+        copy(other);
         return *this;
     }
 
@@ -123,9 +127,7 @@ public:
     {
         return std::strncmp(m_value, other.m_value, N) == 0;
     }
-    //< end operators >//
 
-    //< begin interfaces >//
     void clear()
     {
         m_value[0] = '\0';
@@ -158,7 +160,6 @@ public:
     {
         return m_length;
     }
-    //< end interfaces >//
 };
 
 }  // namespace util

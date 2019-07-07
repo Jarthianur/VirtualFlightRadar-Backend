@@ -29,15 +29,12 @@ namespace object
 class Object
 {
 protected:
-    //< begin members >//
     std::uint32_t m_lastPriority = 0;  ///< Got last update with this priority.
     std::uint32_t m_updateAge    = 0;  ///< Times processed without update.
-    //< end members >//
 
     Object() = default;
     explicit Object(std::uint32_t priority);  ///< @param priority The initial priority
 
-    //< begin methods >//
     /**
      * @brief Assign other objects values to this.
      * @param other The other Object
@@ -50,24 +47,18 @@ protected:
      * @return true if yes, else false
      */
     virtual bool canUpdate(const Object& other) const;
-    //< end methods >//
 
 public:
-    //< begin constants >//
     static constexpr const std::uint32_t OUTDATED = 4;
-    //< end constants >//
 
     virtual ~Object() noexcept = default;
 
-    //< begin operators >//
     /**
      * @brief Increment the update age.
      * @return this
      */
     Object& operator++();
-    //< end operators >//
 
-    //< begin interfaces >//
     /**
      * @brief Try to update this Object.
      * @note If the other Object cannot update this, nothing happens.
@@ -78,6 +69,5 @@ public:
 
     virtual util::CStringPack getNMEA() const = 0;
     auto                      getUpdateAge() const -> decltype(m_updateAge);
-    //< end interfaces >//
 };
 }  // namespace object

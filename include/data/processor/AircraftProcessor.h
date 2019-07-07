@@ -37,7 +37,6 @@ namespace processor
  */
 class AircraftProcessor : public Processor<object::Aircraft>
 {
-    //< begin members >//
     const std::int32_t m_maxDistance;                    ///< Max distance to process an aircraft
     object::Location   m_refLocation{0.0, 0.0, 0};       ///< Refered position
     double             m_refAtmPressure      = 1013.25;  ///< Refered pressure; hPa
@@ -53,9 +52,7 @@ class AircraftProcessor : public Processor<object::Aircraft>
     mutable std::int32_t m_relEast   = 0;    ///< Relative distance in eastern direction; m
     mutable std::int32_t m_relVertical = 0;  ///< Relative vertical distance; m
     mutable std::int32_t m_distance    = 0;  ///< Distance between Aircraft and refered position; m
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Calcutale an aircrafts position relative to the refered one.
      * @param aircraft The Aircraft
@@ -73,14 +70,12 @@ class AircraftProcessor : public Processor<object::Aircraft>
      * @param aircraft The Aircaft
      */
     std::size_t appendPFLAA(object::Aircraft& aircraft, std::size_t pos) const;
-    //< end methods >//
 
 public:
     AircraftProcessor();
     explicit AircraftProcessor(std::int32_t maxDist);  ///< @param maxDist The max distance filter
     ~AircraftProcessor() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Process an aircraft.
      * @param aircraft The Aircraft to process
@@ -93,7 +88,6 @@ public:
      * @param atmPress The pressure
      */
     void referTo(const object::Location& location, double atmPress);
-    //< end interfaces >//
 };
 
 }  // namespace processor

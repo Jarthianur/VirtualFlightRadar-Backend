@@ -43,14 +43,12 @@ namespace client
 class Client
 {
 protected:
-    //< begin members >//
     std::shared_ptr<net::Connector>          m_connector;        /// Connector interface
     bool                                     m_running = false;  /// Run state indicator
     const char* const                        m_logPrefix;        /// Component string used for logging
     const net::Endpoint                      m_endpoint;         /// Remote endpoint
     std::vector<std::shared_ptr<feed::Feed>> m_feeds;            /// Container for subscribed feeds
     mutable std::mutex                       m_mutex;
-    //< end members >//
 
     /**
      * @param endpoint  The connection Endpoint
@@ -59,7 +57,6 @@ protected:
      */
     Client(const net::Endpoint& endpoint, const char* logPrefix, std::shared_ptr<net::Connector> connector);
 
-    //< begin methods >//
     /**
      * @brief Handler for connect
      * @param error The error indicator
@@ -104,13 +101,11 @@ protected:
      * @param response The received string
      */
     void handleRead(bool error, const std::string& response);
-    //< end methods >//
 
 public:
     NOT_COPYABLE(Client)
     virtual ~Client() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Run the clients connection- and eventhandlers.
      * @note Returns after all queued handlers have returned.
@@ -144,7 +139,6 @@ public:
      * @return the hash value
      */
     virtual std::size_t hash() const;
-    //< end interfaces >//
 };
 
 }  // namespace client

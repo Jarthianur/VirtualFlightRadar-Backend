@@ -36,16 +36,13 @@ namespace processor
  */
 class GpsProcessor : public Processor<object::GpsPosition>
 {
-    //< begin members >//
     mutable char   m_directionSN  = 'x';  ///< Orientation of the latitude (S,N)
     mutable char   m_directionEW  = 'x';  ///< Orientation of the longitude (E,W)
     mutable double m_degLatitude  = 0.0;  ///< Degrees of latitude
     mutable double m_degLongitude = 0.0;  ///< Degrees of longitude
     mutable double m_minLatitude  = 0.0;  ///< Minutes of latitude
     mutable double m_minLongitude = 0.0;  ///< Minutes of longitude
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Append GPGGA sentence to processing string.
      * @param position The position
@@ -65,19 +62,16 @@ class GpsProcessor : public Processor<object::GpsPosition>
      * @param longitude The longitude
      */
     void evalPosition(double latitude, double longitude) const;
-    //< end methods >//
 
 public:
     GpsProcessor();
     ~GpsProcessor() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Process a GPS position.
      * @param rPosition The position
      */
     void process(object::GpsPosition& position) const override;
-    //< end interfaces >//
 };
 
 }  // namespace processor

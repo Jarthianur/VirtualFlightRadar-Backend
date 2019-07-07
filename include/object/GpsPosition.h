@@ -36,20 +36,16 @@ namespace object
  */
 struct Location
 {
-    //< begim constants >//
     static constexpr auto MAX_LATITUDE  = 90.0;
     static constexpr auto MIN_LATITUDE  = -90.0;
     static constexpr auto MAX_LONGITUDE = 180.0;
     static constexpr auto MIN_LONGITUDE = 0.0;
     static constexpr auto MAX_ALTITUDE  = 100000;
     static constexpr auto MIN_ALTITUDE  = -11000;
-    //< end constants >//
 
-    //< begin members >//
     double       latitude;   ///< Latitude; deg
     double       longitude;  ///< Longitude; deg
     std::int32_t altitude;   ///< Altitude; m
-    //< end members >//
 };
 
 /**
@@ -58,14 +54,11 @@ struct Location
 class GpsPosition : public Object
 {
 public:
-    //< begin constants >//
     static constexpr auto NMEA_SIZE = 192;
     static constexpr auto MAX_GEOID = 86.0;
     static constexpr auto MIN_GEOID = -108.0;
-    //< end constants >//
 
 private:
-    //< begin members >//
     Location                           m_location;        ///< The location
     double                             m_geoid;           ///< The geoid separation
     double                             m_dilution;        ///< The position dilution
@@ -73,9 +66,7 @@ private:
     std::int8_t                        m_fixQuality;      ///< The GPS fix quality
     Timestamp<time::DateTimeImplBoost> m_timestamp;       ///< The timestamp of this position
     util::CString<NMEA_SIZE>           m_nmea;
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Override Object::assign.
      */
@@ -85,7 +76,6 @@ private:
      * @brief Override Object::canUpdate.
      */
     bool canUpdate(const Object& other) const override;
-    //< end methods >//
 
 public:
     GpsPosition(std::uint32_t priority, const Location& location, double geoid);
@@ -99,11 +89,8 @@ public:
                 const Timestamp<time::DateTimeImplBoost>& timestamp);
     ~GpsPosition() noexcept override = default;
 
-    //< begin operators >//
     util::CString<NMEA_SIZE>& operator*();
-    //< end operators >//
 
-    //< begin interfaces >//
     util::CStringPack getNMEA() const override;
     auto              getLocation() const -> const decltype(m_location)&;
     auto              getGeoid() const -> decltype(m_geoid);
@@ -111,6 +98,5 @@ public:
     auto              getDilution() const -> decltype(m_dilution);
     auto              getNrOfSatellites() const -> decltype(m_nrOfSatellites);
     auto              getFixQuality() const -> decltype(m_fixQuality);
-    //< end interfaces >//
 };
 }  // namespace object

@@ -37,15 +37,10 @@ namespace config
  */
 class Configuration final
 {
-    //< begin constants >//
     static constexpr auto LOG_PREFIX = "(Config) ";
-    //< end constants >//
 
-    //< begin members >//
     const Properties m_properties;  ///< Properties from file
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Resolve the fallback position.
      * @param properties The properties
@@ -79,10 +74,8 @@ class Configuration final
      * @brief Dump the current config state as info log.
      */
     void dumpInfo() const;
-    //< end methods >//
 
 public:
-    //< begin constants >//
     // Configuration section keys
     static constexpr auto SECT_KEY_FALLBACK = "fallback";
     static constexpr auto SECT_KEY_GENERAL  = "general";
@@ -127,9 +120,7 @@ public:
     static constexpr auto PATH_PRESSURE    = "fallback.pressure";
     static constexpr auto PATH_MAX_DIST    = "filter.maxDistance";
     static constexpr auto PATH_MAX_HEIGHT  = "filter.maxHeight";
-    //< end constants >//
 
-    //< begin members >//
     bool                         groundMode;   ///< Ground mode state
     const object::GpsPosition    gpsPosition;  ///< Fallback position
     const double                 atmPressure;  ///< Atmospheric fallback pressure
@@ -138,7 +129,6 @@ public:
     const std::uint16_t          serverPort;   ///< Port where to serve reports
     const std::list<std::string> feedNames;    ///< List of feed names
     const std::unordered_map<std::string, Properties> feedProperties;  ///< Map feed names to their properties
-    //< end members >//
 
     /**
      * @param stream The input stream

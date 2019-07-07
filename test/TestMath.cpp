@@ -19,8 +19,6 @@
  }
  */
 
-#include <boost/regex.hpp>
-
 #include "util/math.hpp"
 
 #include "helper.hpp"

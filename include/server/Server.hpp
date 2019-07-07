@@ -46,11 +46,8 @@ namespace server
 template<typename SocketT>
 class Server
 {
-    //< begin constants >//
     static constexpr auto LOG_PREFIX = "(Server) ";
-    //< end constants >//
 
-    //< begin members >//
     std::shared_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
     std::array<std::unique_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
                        m_connections;                ///< Connections container
@@ -58,9 +55,7 @@ class Server
     bool               m_running           = false;  ///< Running state
     std::thread        m_thread;                     ///< Internal thread
     mutable std::mutex m_mutex;
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Schedule to accept connections.
      */
@@ -78,7 +73,6 @@ class Server
      * @param error The error indicator
      */
     void attemptConnection(bool error) noexcept;
-    //< end methods >//
 
 public:
     NOT_COPYABLE(Server)
@@ -88,7 +82,6 @@ public:
                         interface);  ///< @param interface The NetworkInterface to use
     ~Server() noexcept;
 
-    //< begin interfaces >//
     /**
      * @brief Run the Server.
      * @threadsafe
@@ -107,7 +100,6 @@ public:
      * @threadsafe
      */
     void send(const util::CStringPack& msg);
-    //< end interfaces >//
 };
 
 template<typename SocketT>

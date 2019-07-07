@@ -32,15 +32,12 @@
  */
 class Logger
 {
-    //< begin members >//
     std::ofstream      m_logFile;                    ///< The logfile stream
     std::ostream*      m_outStream    = &std::cout;  ///< Stream to log INFO,DEBUG,WARN
     std::ostream*      m_errStream    = &std::cerr;  ///< Stream to log ERROR
     bool               m_debugEnabled = false;       ///< Enabling state of debug level
     mutable std::mutex m_mutex;
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Get current date-time as string.
      * @return the date-time-string
@@ -64,13 +61,11 @@ class Logger
     {
         *out << std::forward<T>(last) << std::endl;
     }
-    //< end methods >//
 
 public:
     Logger()           = default;
     ~Logger() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Log on INFO level.
      * @tparam T     The first argument
@@ -172,7 +167,6 @@ public:
      * @param file The filename
      */
     void setLogFile(const std::string& file);
-    //< end interfaces >//
 };
 
 /// Extern Logger instance

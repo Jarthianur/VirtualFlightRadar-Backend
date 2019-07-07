@@ -33,9 +33,7 @@ namespace config
  */
 class Properties
 {
-    //< begin members >//
     boost::property_tree::ptree m_pTree;  ///< The underlying property tree
-    //< end members >//
 
 public:
     explicit Properties(
@@ -43,7 +41,6 @@ public:
     explicit Properties(boost::property_tree::ptree&& ptree);  ///< @param ptree The property tree to move
     ~Properties() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Get the value at a property path (section.key), or a default value.
      * @param path        The property path
@@ -59,7 +56,6 @@ public:
      * @throw std::out_of_range if the section is not found
      */
     Properties get_propertySection(const std::string& section) const;
-    //< end interfaces >//
 };
 
 }  // namespace config

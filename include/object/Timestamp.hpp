@@ -47,10 +47,8 @@ enum class Format : std::uint_fast8_t
 template<typename DateTimeT>
 class Timestamp
 {
-    //< begin members >//
     std::int64_t  m_value = 0;  ///< Time in milliseconds
     std::uint32_t m_day   = 0;  ///< Incremental day number
-    //< end members >//
 
 public:
     Timestamp() = default;
@@ -63,7 +61,6 @@ public:
     Timestamp(const Timestamp& other);  ///< @param other The other Timestamp
     ~Timestamp() noexcept = default;
 
-    //< begin operators >//
     /**
      * @brief Assign other TimeStamps value.
      * @param other The other Timestamp
@@ -77,7 +74,6 @@ public:
      * @return true if less, or equals, else false
      */
     bool operator>(const Timestamp& other) const;
-    //< end operators >//
 };
 
 template<typename DateTimeT>

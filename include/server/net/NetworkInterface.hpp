@@ -44,7 +44,6 @@ public:
     NetworkInterface()                   = default;
     virtual ~NetworkInterface() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Run this interface.
      * @param lock The lock that may be hold and released inside
@@ -78,7 +77,6 @@ public:
      * @return the address
      */
     virtual std::string getCurrentAddress() const = 0;
-    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace server

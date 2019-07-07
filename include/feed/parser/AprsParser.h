@@ -38,7 +38,6 @@ namespace parser
  */
 class AprsParser : public Parser<object::Aircraft>
 {
-    //< begin constants >//
     static constexpr auto RE_APRS_TIME     = 1;  ///< APRS regex match group of time
     static constexpr auto RE_APRS_LAT      = 2;  ///< APRS regex match group of latitude
     static constexpr auto RE_APRS_LAT_DIR  = 3;  ///< APRS regex match group of latitude orientation
@@ -52,16 +51,12 @@ class AprsParser : public Parser<object::Aircraft>
     static constexpr auto RE_APRS_COM_ID   = 2;  ///< APRS regex match group of aircraft id
     static constexpr auto RE_APRS_COM_CR   = 3;  ///< APRS regex match group of climb rate
     static constexpr auto RE_APRS_COM_TR   = 4;  ///< APRS regex match group of turn rate
-    //< end constants >//
 
-    //< begin members >//
     static const boost::regex s_APRS_RE;    ///< Regular expression for APRS protocol
     static const boost::regex s_APRSExtRE;  ///< Regular expression for OGN specific APRS extension
-    //< end members >//
 
     using MetaInfo = std::tuple<std::string, object::Aircraft::IdType, object::Aircraft::AircraftType>;
 
-    //< begin methods >//
     /**
      * @brief Parse a Position.
      * @param match    The regex match
@@ -94,17 +89,13 @@ class AprsParser : public Parser<object::Aircraft>
      * @return true on success, else false
      */
     object::Timestamp<object::time::DateTimeImplBoost> parseTimeStamp(const boost::smatch& match) const;
-    //< end methods >//
 
 public:
-    //< begin members >//
     static std::int32_t s_maxHeight;  ///< The max height filter
-    //< end members >//
 
     AprsParser();
     ~AprsParser() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Unpack into Aircraft.
      * @param sentence The string to unpack
@@ -112,7 +103,6 @@ public:
      * @return true on success, else false
      */
     object::Aircraft unpack(const std::string& sentence, std::uint32_t priority) const override;
-    //< end interfaces >//
 };
 }  // namespace parser
 }  // namespace feed

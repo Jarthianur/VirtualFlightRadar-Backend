@@ -41,31 +41,24 @@ namespace net
  */
 class NetworkInterfaceImplBoost : public NetworkInterface<SocketImplBoost>
 {
-    //< begin constants >//
     static constexpr auto LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
-    //< end constants >//
 
-    //< begin members >//
     boost::asio::io_service        m_ioService;  ///< Internal IO-service
     boost::asio::ip::tcp::acceptor m_acceptor;   ///< Acceptor
     SocketImplBoost                m_socket;     ///< Current socket
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Handler for accept calls
      * @param error    The error code
      * @param callback The callback to invoke
      */
     void handleAccept(const boost::system::error_code& error, const std::function<void(bool)>& callback);
-    //< end methods >//
 
 public:
     NOT_COPYABLE(NetworkInterfaceImplBoost)
     explicit NetworkInterfaceImplBoost(std::uint16_t port);  ///< @param port The port number
     ~NetworkInterfaceImplBoost() noexcept override;
 
-    //< begin interfaces >//
     /**
      * @brief Run the event handler queue.
      * @note Blocks until all handlers have returned.
@@ -102,7 +95,6 @@ public:
      * @throw SocketException if the current socket is not open
      */
     std::string getCurrentAddress() const override;
-    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace server

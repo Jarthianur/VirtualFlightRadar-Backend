@@ -37,7 +37,6 @@ namespace client
  */
 class ClientFactory
 {
-    //< begin methods >//
     /**
      * @brief Factory method for Client creation.
      * @tparam T The type of client
@@ -46,20 +45,17 @@ class ClientFactory
      */
     template<typename T, typename std::enable_if<std::is_base_of<Client, T>::value>::type* = nullptr>
     static std::shared_ptr<T> makeClient(std::shared_ptr<feed::Feed> feed);
-    //< end methods >//
 
 public:
     ClientFactory()           = default;
     ~ClientFactory() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Create a Client needed by a Feed.
      * @param feed The feed to create for
      * @return the client as pointer
      */
     static std::shared_ptr<Client> createClientFor(std::shared_ptr<feed::Feed> feed);
-    //< end interfaces >//
 };
 
 }  // namespace client

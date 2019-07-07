@@ -36,23 +36,18 @@ namespace data
  */
 class AircraftData : public Data
 {
-    //< begin constants >//
     static constexpr const auto NO_FLARM_THRESHOLD =
         object::Object::OUTDATED;                        ///< Times until FLARM status is removed
     static constexpr const auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
-    //< end constants >//
 
-    //< begin members >//
     util::ConcurrentContainer<object::Aircraft> m_container;  ///< Internal container for aircrafts
     processor::AircraftProcessor                m_processor;  ///< Processor for aircrafts
-    //< end members >//
 
 public:
     AircraftData();
     explicit AircraftData(std::int32_t maxDist);  ///< @param maxDist The max distance filter
     ~AircraftData() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Insert or update an Aircraft.
      * @param aircraft The update
@@ -70,7 +65,6 @@ public:
      * @threadsafe
      */
     void access(const accessor_fn& func) override;
-    //< end interfaces >//
 };
 
 }  // namespace data

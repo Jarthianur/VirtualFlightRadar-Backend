@@ -52,6 +52,11 @@ Aircraft::Aircraft(std::uint32_t priority, const std::string& id, IdType idT, Ai
     m_fullInfo   = false;
 }
 
+Aircraft::Aircraft(Aircraft&& other) : m_id(other.m_id)
+{
+    assign(std::move(other));
+}
+
 void Aircraft::assign(Object&& other)
 {
     try

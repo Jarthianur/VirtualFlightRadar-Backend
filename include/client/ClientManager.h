@@ -94,11 +94,9 @@ using ClientIter = ClientSet::iterator;
  */
 class ClientManager
 {
-    //< begin members >//
     ClientSet          m_clients;   ///< Set of clients
     thread_group       m_thdGroup;  ///< Thread group for client threads
     mutable std::mutex m_mutex;
-    //< end members >//
 
 public:
     NOT_COPYABLE(ClientManager)
@@ -106,7 +104,6 @@ public:
     ClientManager() = default;
     ~ClientManager() noexcept;
 
-    //< begin interfaces >//
     /**
      * @brief Subscribe a Feed to the respective Client.
      * @param feed The feed to subscribe
@@ -126,7 +123,6 @@ public:
      * @threadsafe
      */
     void stop();
-    //< end interfaces >//
 };
 
 }  // namespace client

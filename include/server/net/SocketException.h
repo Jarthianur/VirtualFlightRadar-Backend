@@ -33,21 +33,17 @@ namespace net
  */
 class SocketException : public std::exception
 {
-    //< begin members >//
     const std::string m_message;  ///< Error message
-    //< end members >//
 
 public:
     SocketException() = default;
     explicit SocketException(const std::string& msg);  ///< @param msg The error message
 
-    //< begin interfaces >//
     /**
      * @brief Get the error message.
      * @return the message
      */
     const char* what() const noexcept;
-    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace server

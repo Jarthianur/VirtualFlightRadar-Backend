@@ -36,27 +36,21 @@ namespace data
  */
 class GpsData : public Data
 {
-    //< begin constants >//
     static constexpr auto GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
     static constexpr auto GPS_FIX_GOOD          = 1;    ///< Good fix quality
     static constexpr auto GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
-    //< end constants >//
 
-    //< begin members >//
     object::GpsPosition     m_position;                ///< The position
     processor::GpsProcessor m_processor;               ///< Processor for GPS information
     bool                    m_positionLocked = false;  ///< Locking state of the current position
     bool                    m_groundMode     = false;  ///< Ground mode state
     mutable std::mutex      m_mutex;
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Check whether the position is good enough.
      * @return true if yes, else false
      */
     bool isPositionGood() const;
-    //< end methods >//
 
 public:
     /**
@@ -65,7 +59,6 @@ public:
     GpsData(const object::GpsPosition& position, bool ground);
     ~GpsData() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Update the position.
      * @param position The new position
@@ -84,7 +77,6 @@ public:
      * @threadsafe
      */
     auto getLocation() const -> decltype(m_position.getLocation());
-    //< end interfaces >//
 };
 
 class GpsDataException : public std::exception

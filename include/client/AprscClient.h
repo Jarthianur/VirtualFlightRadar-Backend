@@ -32,15 +32,10 @@ namespace client
  */
 class AprscClient : public Client
 {
-    //< begin constants >//
     static constexpr auto LOG_PREFIX = "(AprscClient) ";
-    //< end constants >//
 
-    //< begin members >//
     const std::string m_login;  ///< Login string
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Schedule sending of a keep-alive beacon.
      */
@@ -65,7 +60,6 @@ class AprscClient : public Client
      * @threadsafe
      */
     void handleSendKeepAlive(bool error);
-    //< end methods >//
 
 public:
     NOT_COPYABLE(AprscClient)
@@ -79,10 +73,8 @@ public:
                 std::shared_ptr<net::Connector> connector);
     ~AprscClient() noexcept override = default;
 
-    //< begin interfaces >//
     bool        equals(const Client& other) const override;
     std::size_t hash() const override;
-    //< end interfaces >//
 };
 
 }  // namespace client

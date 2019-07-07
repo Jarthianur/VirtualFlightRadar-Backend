@@ -40,19 +40,16 @@ using SignalHandler = std::function<void(const boost::system::error_code&, const
  */
 class SignalListener
 {
-    //< begin members >//
     boost::asio::io_service m_ioService;  ///< Internal IO-service
     boost::asio::signal_set m_sigSet;     ///< Internal signal set
     std::thread             m_thread;     ///< Thread to run this
     mutable std::mutex      m_mutex;
-    //< end members >//
 
 public:
     NOT_COPYABLE(SignalListener)
     SignalListener();
     ~SignalListener() noexcept;
 
-    //< begin interfaces >//
     /**
      * @brief Run this signal listener.
      * @threadsafe
@@ -71,6 +68,5 @@ public:
      * @threadsafe
      */
     void addHandler(const SignalHandler& handler);
-    //< end interfaces >//
 };
 }  // namespace util

@@ -39,9 +39,7 @@ namespace server
 template<typename SocketT>
 class Connection final
 {
-    //< begin members >//
     SocketT m_socket;  ///< Socket
-    //< end members >//
 
     /**
      * @brief Constructor
@@ -50,14 +48,11 @@ class Connection final
     explicit Connection(SocketT&& socket);
 
 public:
-    //< begin members >//
     const std::string address;  ///< IP address
-    //< end members >//
 
     NOT_COPYABLE(Connection)
     ~Connection() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Start a Connection.
      * @param socket The socket
@@ -71,7 +66,6 @@ public:
      * @return true on success, else false
      */
     bool write(const util::CStringPack& msg);
-    //< end interfaces >//
 };
 
 template<typename SocketT>

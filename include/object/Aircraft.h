@@ -39,10 +39,8 @@ namespace object
 class Aircraft : public Object
 {
 public:
-    //< begin constants >//
     static constexpr const auto ID_SIZE   = 8;
     static constexpr const auto NMEA_SIZE = 192;
-    //< end constants >//
 
     /**
      * @brief Device type from which the information is received.
@@ -93,24 +91,19 @@ public:
      */
     struct Movement
     {
-        //< begin constants >//
         static constexpr auto MAX_GND_SPEED  = 10000.0;
         static constexpr auto MIN_GND_SPEED  = -10000.0;
         static constexpr auto MAX_HEADING    = 359.9;
         static constexpr auto MIN_HEADING    = 0.0;
         static constexpr auto MAX_CLIMB_RATE = 10000.0;
         static constexpr auto MIN_CLIMB_RATE = -10000.0;
-        //< end constants >//
 
-        //< begin members >//
         double gndSpeed;   ///< Speed over ground; m/s
         double heading;    ///< Heading; deg [0-359]
         double climbRate;  ///< Climb rate; m/s
-        //< end members >//
     };
 
 private:
-    //< begin members >//
     util::CString<ID_SIZE>             m_id;                ///< Aircraft identifier
     IdType                             m_idType;            ///< Id type
     AircraftType                       m_aircraftType;      ///< Aircraft type
@@ -120,9 +113,7 @@ private:
     Timestamp<time::DateTimeImplBoost> m_timestamp;         ///< The timestamp of the last report.
     bool                               m_fullInfo = false;  ///< Is full set of information available?
     util::CString<NMEA_SIZE>           m_nmea;
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Assign an other aircrafts values to this.
      * @param other The other Aircraft
@@ -133,21 +124,18 @@ private:
      * @brief Override Object::canUpdate.
      */
     bool canUpdate(const Object& other) const override;
-    //< end methods >//
 
 public:
     Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT, const Location& loc,
              const Movement& move, const Timestamp<time::DateTimeImplBoost>& timestamp);
     Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT, const Location& loc,
              const Timestamp<time::DateTimeImplBoost>& timestamp);
+    Aircraft(Aircraft&& other);
     ~Aircraft() noexcept override = default;
 
-    //< begin operators >//
     util::CString<NMEA_SIZE>& operator*();
     Aircraft&                 operator=(Aircraft&& other);
-    //< end operators >//
 
-    //< begin interfaces >//
     util::CStringPack getNMEA() const override;
     auto              getIdType() const -> decltype(m_idType);
     auto              getAircraftType() const -> decltype(m_aircraftType);
@@ -158,7 +146,6 @@ public:
     auto              getTimestamp() const -> const decltype(m_timestamp)&;
     auto              hasFullInfo() const -> decltype(m_fullInfo);
     void              setTargetType(TargetType tt);
-    //< end interfaces >//
 };
 
 }  // namespace object

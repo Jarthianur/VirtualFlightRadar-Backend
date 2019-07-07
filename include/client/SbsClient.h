@@ -30,17 +30,13 @@ namespace client
  */
 class SbsClient : public Client
 {
-    //< begin constants >//
     static constexpr auto LOG_PREFIX = "(SbsClient) ";
-    //< end constants >//
 
-    //< begin methods >//
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
     void handleConnect(bool error) override;
-    //< end methods >//
 
 public:
     NOT_COPYABLE(SbsClient)

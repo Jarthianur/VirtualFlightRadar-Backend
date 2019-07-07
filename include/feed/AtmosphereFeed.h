@@ -49,13 +49,10 @@ namespace feed
  */
 class AtmosphereFeed : public Feed
 {
-    //< begin constants >//
     static constexpr auto LOG_PREFIX = "(AtmosphereFeed) ";
-    //< end constants >//
 
-    //< begin members >//
     static parser::AtmosphereParser s_parser;  ///< Parser to unpack response from Client
-    //< end members >//
+
 public:
     NOT_COPYABLE(AtmosphereFeed)
 
@@ -69,7 +66,6 @@ public:
                    std::shared_ptr<data::AtmosphereData> data);
     ~AtmosphereFeed() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::SENSOR
@@ -80,7 +76,6 @@ public:
      * @brief Implement Feed::process.
      */
     bool process(const std::string& response) override;
-    //< end interfaces >//
 };
 
 }  // namespace feed

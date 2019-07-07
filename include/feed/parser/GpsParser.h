@@ -36,7 +36,6 @@ namespace parser
  */
 class GpsParser : public Parser<object::GpsPosition>
 {
-    //< begin constants >//
     static constexpr auto RE_GGA_TIME    = 1;   ///< GGA regex match capture group of time
     static constexpr auto RE_GGA_LAT     = 2;   ///< GGA regex match capture group of latitude
     static constexpr auto RE_GGA_LAT_DIR = 3;   ///< GGA regex match capture group of latitude orientation
@@ -47,13 +46,9 @@ class GpsParser : public Parser<object::GpsPosition>
     static constexpr auto RE_GGA_DIL     = 8;   ///< GGA regex match capture group of dilution
     static constexpr auto RE_GGA_ALT     = 9;   ///< GGA regex match capture group of altitude
     static constexpr auto RE_GGA_GEOID   = 10;  ///< GGA regex match capture group of geoid separation
-    //< end constants >//
 
-    //< begin members >//
     static const boost::regex s_GPGGA_RE;  ///< Regular expression to parse GGA
-    //< end members >//
 
-    //< begin methods >//
     /**
      * @brief Parse a Position.
      * @param match    The regex match
@@ -61,13 +56,11 @@ class GpsParser : public Parser<object::GpsPosition>
      * @return true on success, else false
      */
     object::GpsPosition parsePosition(const boost::smatch& match, std::uint32_t priority) const;
-    //< end methods >//
 
 public:
     GpsParser();
     ~GpsParser() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Unpack into GpsPosition.
      * @param sentence The string to unpack
@@ -75,7 +68,6 @@ public:
      * @return true on success, else false
      */
     object::GpsPosition unpack(const std::string& sentence, std::uint32_t priority) const override;
-    //< end interfaces >//
 };
 }  // namespace parser
 }  // namespace feed

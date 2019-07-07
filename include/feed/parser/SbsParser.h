@@ -34,30 +34,24 @@ namespace parser
  */
 class SbsParser : public Parser<object::Aircraft>
 {
-    //< begin constants >//
     static constexpr auto SBS_FIELD_ID   = 4;   ///< Field number of aircraft id
     static constexpr auto SBS_FIELD_TIME = 7;   ///< Field number of time
     static constexpr auto SBS_FIELD_ALT  = 11;  ///< Field number of altitude
     static constexpr auto SBS_FIELD_LAT  = 14;  ///< Field number of latitude
     static constexpr auto SBS_FIELD_LON  = 15;  ///< Field number of longitude
-    //< end constants >//
 
 public:
-    //< begin members >//
     static std::int32_t s_maxHeight;  ///< The max height filter
-    //< end members >//
 
     SbsParser();
     ~SbsParser() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Unpack into Aircraft.
      * @param sentence The string to unpack
      * @param aircraft The Aircraft to unpack into
      */
     object::Aircraft unpack(const std::string& sentence, std::uint32_t priority) const override;
-    //< end interfaces >//
 };
 }  // namespace parser
 }  // namespace feed

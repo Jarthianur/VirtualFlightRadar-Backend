@@ -38,14 +38,12 @@ public:
     AtmosphereParser();
     ~AtmosphereParser() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Unpack into Atmosphere.
      * @param sentence   The string to unpack
      * @param atmosphere The Atmosphere to unpack into
      */
     object::Atmosphere unpack(const std::string& sentence, std::uint32_t priority) const override;
-    //< end interfaces >//
 };
 }  // namespace parser
 }  // namespace feed

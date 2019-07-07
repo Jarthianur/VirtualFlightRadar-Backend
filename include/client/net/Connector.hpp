@@ -49,7 +49,6 @@ public:
     Connector()                   = default;
     virtual ~Connector() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Run this connector.
      */
@@ -103,7 +102,6 @@ public:
      * @return true if it ran off, else false
      */
     virtual bool timerExpired() = 0;
-    //< end interfaces >//
 };
 }  // namespace net
 }  // namespace client

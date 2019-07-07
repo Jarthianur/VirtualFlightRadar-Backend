@@ -49,13 +49,9 @@ namespace feed
  */
 class SbsFeed : public Feed
 {
-    //< begin constants >//
     static constexpr auto LOG_PREFIX = "(SbsFeed) ";
-    //< end constants >//
 
-    //< begin members >//
     static parser::SbsParser s_parser;  ///< Parser to unpack response from Client
-    //< end members >//
 
 public:
     NOT_COPYABLE(SbsFeed)
@@ -71,7 +67,6 @@ public:
             std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
     ~SbsFeed() noexcept override = default;
 
-    //< begin interfaces >//
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::SBS
@@ -82,7 +77,6 @@ public:
      * @brief Feed::process.
      */
     bool process(const std::string& response) override;
-    //< end interfaces >//
 };
 
 }  // namespace feed

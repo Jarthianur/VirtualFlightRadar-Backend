@@ -40,7 +40,6 @@ public:
     Parser()                   = default;
     virtual ~Parser() noexcept = default;
 
-    //< begin interfaces >//
     /**
      * @brief Unpack a given string into the templated object.
      * @param sentence The string to unpack
@@ -48,7 +47,6 @@ public:
      * @return true on success, else false
      */
     virtual T unpack(const std::string& sentence, std::uint32_t priority) const = 0;
-    //< end interfaces >//
 };
 
 class UnpackError : public std::exception
