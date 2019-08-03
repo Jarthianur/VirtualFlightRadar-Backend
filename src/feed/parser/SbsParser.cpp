@@ -79,7 +79,6 @@ Aircraft SbsParser::unpack(const std::string& sentence, std::uint32_t priority) 
         }
         if (i == 16 && loc.altitude <= s_maxHeight)
         {
-            // relies on TargetType::TRANSPONDER in ctor
             return {priority, id, Aircraft::IdType::ICAO, Aircraft::AircraftType::POWERED_AIRCRAFT, loc, ts};
         }
     }

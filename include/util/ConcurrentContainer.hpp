@@ -72,9 +72,14 @@ public:
      */
     struct Iterator
     {
+        Iterator(const Iterator&) = delete;
+        Iterator& operator=(const Iterator&) = delete;
+
         explicit Iterator(ConcurrentContainer& c) : iterator(c.m_container.end()), container(c) {}
 
-        Iterator(const Iterator& other) : iterator(other.iterator), container(other.container) {}
+        Iterator(Iterator&& other)
+            : iterator(other.iterator), dataLock(std::move(other.dataLock)), container(other.container)
+        {}
 
         Iterator(typename ContainerType::iterator iter, const ConcurrentContainer& c)
             : iterator(iter), container(c)
@@ -83,6 +88,13 @@ public:
             {
                 dataLock = std::unique_lock<std::mutex>(iterator->second.dataMutex);
             }
+        }
+
+        Iterator& operator=(Iterator&& other)
+        {
+            iterator  = other.iterator;
+            dataLock  = std::move(other.dataLock);
+            container = other.container;
         }
 
         Iterator& operator++()
@@ -150,7 +162,7 @@ public:
             return std::make_pair(
                 Iterator(m_container.emplace(key, ValueType(std::move(value))).first, *this), true);
         }
-        return std::make_pair(iter, false);
+        return std::make_pair(std::move(iter), false);
     }
 
     void erase(KeyType key)

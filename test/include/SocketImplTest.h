@@ -32,25 +32,23 @@ namespace net
 {
 class SocketImplTest
 {
+    std::string  m_buffer;
+    std::int32_t m_socket;
+    std::string  m_address;
+
 public:
     MOVABLE_BUT_NOT_COPYABLE(SocketImplTest)
 
     explicit SocketImplTest(int&& socket);
     ~SocketImplTest() noexcept;
 
-    std::string get_address() const;
+    std::string getAddress() const;
     bool        write(const std::string& msg);
     void        close();
     int&        get();
 
-private:
-    std::string  m_buffer;
-    std::int32_t m_socket;
-    std::string  m_address;
-
-public:
-    GETTER_CR(buffer)
-    SETTER_CR(address)
+    auto getBuffer() -> const decltype(m_buffer)&;
+    void setAddress(const decltype(m_address)&);
 };
 }  // namespace net
 }  // namespace server

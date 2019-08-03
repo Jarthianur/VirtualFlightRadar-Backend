@@ -37,7 +37,7 @@ SocketImplTest::SocketImplTest(int&& socket) : m_socket(socket) {}
 
 SocketImplTest::~SocketImplTest() noexcept {}
 
-std::string SocketImplTest::get_address() const
+std::string SocketImplTest::getAddress() const
 {
     return m_address;
 }
@@ -57,5 +57,16 @@ int& SocketImplTest::get()
 {
     return m_socket;
 }
+
+auto SocketImplTest::getBuffer() -> const decltype(m_buffer)&
+{
+    return m_buffer;
+}
+
+void SocketImplTest::setAddress(const decltype(m_address)& addr)
+{
+    m_address = addr;
+}
+
 }  // namespace net
 }  // namespace server
