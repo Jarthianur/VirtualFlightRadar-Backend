@@ -30,8 +30,6 @@ namespace client
  */
 class SbsClient : public Client
 {
-    static constexpr auto LOG_PREFIX = "(SbsClient) ";
-
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe

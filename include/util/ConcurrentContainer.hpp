@@ -48,6 +48,8 @@ public:
     {
         ValueType(T&& val) : value(std::move(val)) {}
 
+        ValueType(ValueType&& other) : value(std::move(other.value)) {}
+
         ValueType& operator=(ValueType&& other)
         {
             value = std::move(other.value);
@@ -72,8 +74,10 @@ public:
     {
         explicit Iterator(ConcurrentContainer& c) : iterator(c.m_container.end()), container(c) {}
 
-        Iterator(typename ContainerType::iterator&& iter, const ConcurrentContainer& c)
-            : iterator(std::move(iter)), container(c)
+        Iterator(const Iterator& other) : iterator(other.iterator), container(other.container) {}
+
+        Iterator(typename ContainerType::iterator iter, const ConcurrentContainer& c)
+            : iterator(iter), container(c)
         {
             if (iterator != container.m_container.end())
             {
@@ -144,7 +148,7 @@ public:
         if (iter == end())
         {
             return std::make_pair(
-                Iterator(m_container.emplace(key, ValueType{std::move(value)}).first, *this), true);
+                Iterator(m_container.emplace(key, ValueType(std::move(value))).first, *this), true);
         }
         return std::make_pair(iter, false);
     }

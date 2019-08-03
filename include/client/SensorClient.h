@@ -30,8 +30,6 @@ namespace client
  */
 class SensorClient : public Client
 {
-    static constexpr auto LOG_PREFIX = "(SensorClient) ";
-
     /**
      * @brief Override Client::read, use timeout
      */

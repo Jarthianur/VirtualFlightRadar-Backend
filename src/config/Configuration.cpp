@@ -42,6 +42,53 @@ namespace config
 using Number    = boost::variant<std::int32_t, std::uint64_t, double>;
 using OptNumber = boost::optional<Number>;
 
+constexpr auto LOG_PREFIX = "(Config) ";
+
+// Configuration section keys
+const char* Configuration::SECT_KEY_FALLBACK = "fallback";
+const char* Configuration::SECT_KEY_GENERAL  = "general";
+const char* Configuration::SECT_KEY_FILTER   = "filter";
+
+// Keywords for feeds
+const char* Configuration::SECT_KEY_APRSC = "aprs";
+const char* Configuration::SECT_KEY_SBS   = "sbs";
+const char* Configuration::SECT_KEY_GPS   = "gps";
+const char* Configuration::SECT_KEY_WIND  = "wind";
+const char* Configuration::SECT_KEY_ATMOS = "atm";
+
+// Property keys for section "general"
+const char* Configuration::KV_KEY_FEEDS       = "feeds";
+const char* Configuration::KV_KEY_GND_MODE    = "gndMode";
+const char* Configuration::KV_KEY_SERVER_PORT = "serverPort";
+
+// Property keys for section "fallback"
+const char* Configuration::KV_KEY_LATITUDE  = "latitude";
+const char* Configuration::KV_KEY_LONGITUDE = "longitude";
+const char* Configuration::KV_KEY_ALTITUDE  = "altitude";
+const char* Configuration::KV_KEY_GEOID     = "geoid";
+const char* Configuration::KV_KEY_PRESSURE  = "pressure";
+
+// Property keys for section "filter"
+const char* Configuration::KV_KEY_MAX_DIST   = "maxDistance";
+const char* Configuration::KV_KEY_MAX_HEIGHT = "maxHeight";
+
+// Property keys for feed sections
+const char* Configuration::KV_KEY_HOST     = "host";
+const char* Configuration::KV_KEY_PORT     = "port";
+const char* Configuration::KV_KEY_PRIORITY = "priority";
+const char* Configuration::KV_KEY_LOGIN    = "login";
+
+const char* Configuration::PATH_FEEDS       = "general.feeds";
+const char* Configuration::PATH_GND_MODE    = "general.gndMode";
+const char* Configuration::PATH_SERVER_PORT = "general.serverPort";
+const char* Configuration::PATH_LATITUDE    = "fallback.latitude";
+const char* Configuration::PATH_LONGITUDE   = "fallback.longitude";
+const char* Configuration::PATH_ALTITUDE    = "fallback.altitude";
+const char* Configuration::PATH_GEOID       = "fallback.geoid";
+const char* Configuration::PATH_PRESSURE    = "fallback.pressure";
+const char* Configuration::PATH_MAX_DIST    = "filter.maxDistance";
+const char* Configuration::PATH_MAX_HEIGHT  = "filter.maxHeight";
+
 /**
  * @brief Convert a string to number.
  * @tparam T    The number type

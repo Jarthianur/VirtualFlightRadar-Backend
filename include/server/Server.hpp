@@ -46,7 +46,7 @@ namespace server
 template<typename SocketT>
 class Server
 {
-    static constexpr auto LOG_PREFIX = "(Server) ";
+    static const char* LOG_PREFIX;
 
     std::shared_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
     std::array<std::unique_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
@@ -101,6 +101,9 @@ public:
      */
     void send(const util::CStringPack& msg);
 };
+
+template<typename SocketT>
+const char* Server<SocketT>::LOG_PREFIX = "(Server) ";
 
 template<typename SocketT>
 Server<SocketT>::Server(std::uint16_t port)
@@ -174,7 +177,7 @@ void Server<SocketT>::send(const util::CStringPack& msg)
         {
             if (!it.get()->write(msg))
             {
-                logger.warn(LOG_PREFIX, "lost connection to: ", it.get()->getAddress());
+                logger.warn(LOG_PREFIX, "lost connection to: ", it.get()->address);
                 it.reset();
                 --m_activeConnections;
             }
@@ -194,7 +197,7 @@ bool Server<SocketT>::isConnected(const std::string& address)
 {
     for (const auto& it : m_connections)
     {
-        if (it && it.get()->getAddress() == address)
+        if (it && it.get()->address == address)
         {
             return true;
         }

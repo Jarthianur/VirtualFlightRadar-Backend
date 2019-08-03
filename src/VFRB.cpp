@@ -44,6 +44,9 @@ using namespace data;
 using namespace object;
 using namespace config;
 
+constexpr auto PROCESS_INTERVAL = 1;
+constexpr auto LOG_PREFIX       = "(VFRB) ";
+
 VFRB::VFRB(std::shared_ptr<Configuration> config)
     : m_aircraftData(std::make_shared<AircraftData>(config->maxDistance)),
       m_atmosphereData(std::make_shared<AtmosphereData>(object::Atmosphere{0, config->atmPressure})),

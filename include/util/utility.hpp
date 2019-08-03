@@ -30,6 +30,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 namespace util
 {
@@ -44,7 +45,7 @@ constexpr auto raw_type(T value) -> typename std::underlying_type<T>::type
     return static_cast<typename std::underlying_type<T>::type>(value);
 }
 
-using CStringPack = std::pair<const char*, std::size_t>;
+using CStringPack = std::pair<const char*, const std::size_t>;
 
 template<std::size_t N, typename std::enable_if<(N > 0)>::type* = nullptr>
 class CString final
@@ -120,7 +121,7 @@ public:
 
     operator CStringPack() const
     {
-        return std::make_pair<const char*, std::size_t>(m_value, m_length);
+        return std::pair<const char*, const std::size_t>(m_value, m_length);
     }
 
     bool operator==(const CString& other) const

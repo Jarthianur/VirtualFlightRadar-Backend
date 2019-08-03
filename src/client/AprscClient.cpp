@@ -32,6 +32,8 @@ namespace client
 {
 using namespace net;
 
+constexpr auto LOG_PREFIX = "(AprscClient) ";
+
 AprscClient::AprscClient(const Endpoint& endpoint, const std::string& login,
                          std::shared_ptr<Connector> connector)
     : Client(endpoint, LOG_PREFIX, connector), m_login(login + "\r\n")

@@ -53,9 +53,6 @@ class Feed;
  */
 class VFRB
 {
-    static constexpr auto PROCESS_INTERVAL = 1;
-    static constexpr auto LOG_PREFIX       = "(VFRB) ";
-
     std::shared_ptr<data::AircraftData>          m_aircraftData;    ///< Aircraft container
     std::shared_ptr<data::AtmosphereData>        m_atmosphereData;  ///< Atmospheric data container
     std::shared_ptr<data::GpsData>               m_gpsData;         ///< GPS data container

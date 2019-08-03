@@ -32,6 +32,8 @@ namespace client
 {
 using namespace net;
 
+constexpr auto LOG_PREFIX = "(GpsdClient) ";
+
 GpsdClient::GpsdClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
     : Client(endpoint, LOG_PREFIX, connector)
 {}

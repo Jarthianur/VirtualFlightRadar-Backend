@@ -97,7 +97,6 @@ void checkLimits(T val, T min, T max)
     {
         throw std::range_error("limits exceeded");
     }
-    return val;
 }
 
 /**

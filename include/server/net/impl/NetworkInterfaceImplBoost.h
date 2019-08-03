@@ -41,8 +41,6 @@ namespace net
  */
 class NetworkInterfaceImplBoost : public NetworkInterface<SocketImplBoost>
 {
-    static constexpr auto LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
-
     boost::asio::io_service        m_ioService;  ///< Internal IO-service
     boost::asio::ip::tcp::acceptor m_acceptor;   ///< Acceptor
     SocketImplBoost                m_socket;     ///< Current socket

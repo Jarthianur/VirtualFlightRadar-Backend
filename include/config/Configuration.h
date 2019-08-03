@@ -37,8 +37,6 @@ namespace config
  */
 class Configuration final
 {
-    static constexpr auto LOG_PREFIX = "(Config) ";
-
     const Properties m_properties;  ///< Properties from file
 
     /**
@@ -77,49 +75,49 @@ class Configuration final
 
 public:
     // Configuration section keys
-    static constexpr auto SECT_KEY_FALLBACK = "fallback";
-    static constexpr auto SECT_KEY_GENERAL  = "general";
-    static constexpr auto SECT_KEY_FILTER   = "filter";
+    static const char* SECT_KEY_FALLBACK;
+    static const char* SECT_KEY_GENERAL;
+    static const char* SECT_KEY_FILTER;
 
     // Keywords for feeds
-    static constexpr auto SECT_KEY_APRSC = "aprs";
-    static constexpr auto SECT_KEY_SBS   = "sbs";
-    static constexpr auto SECT_KEY_GPS   = "gps";
-    static constexpr auto SECT_KEY_WIND  = "wind";
-    static constexpr auto SECT_KEY_ATMOS = "atm";
+    static const char* SECT_KEY_APRSC;
+    static const char* SECT_KEY_SBS;
+    static const char* SECT_KEY_GPS;
+    static const char* SECT_KEY_WIND;
+    static const char* SECT_KEY_ATMOS;
 
     // Property keys for section "general"
-    static constexpr auto KV_KEY_FEEDS       = "feeds";
-    static constexpr auto KV_KEY_GND_MODE    = "gndMode";
-    static constexpr auto KV_KEY_SERVER_PORT = "serverPort";
+    static const char* KV_KEY_FEEDS;
+    static const char* KV_KEY_GND_MODE;
+    static const char* KV_KEY_SERVER_PORT;
 
     // Property keys for section "fallback"
-    static constexpr auto KV_KEY_LATITUDE  = "latitude";
-    static constexpr auto KV_KEY_LONGITUDE = "longitude";
-    static constexpr auto KV_KEY_ALTITUDE  = "altitude";
-    static constexpr auto KV_KEY_GEOID     = "geoid";
-    static constexpr auto KV_KEY_PRESSURE  = "pressure";
+    static const char* KV_KEY_LATITUDE;
+    static const char* KV_KEY_LONGITUDE;
+    static const char* KV_KEY_ALTITUDE;
+    static const char* KV_KEY_GEOID;
+    static const char* KV_KEY_PRESSURE;
 
     // Property keys for section "filter"
-    static constexpr auto KV_KEY_MAX_DIST   = "maxDistance";
-    static constexpr auto KV_KEY_MAX_HEIGHT = "maxHeight";
+    static const char* KV_KEY_MAX_DIST;
+    static const char* KV_KEY_MAX_HEIGHT;
 
     // Property keys for feed sections
-    static constexpr auto KV_KEY_HOST     = "host";
-    static constexpr auto KV_KEY_PORT     = "port";
-    static constexpr auto KV_KEY_PRIORITY = "priority";
-    static constexpr auto KV_KEY_LOGIN    = "login";
+    static const char* KV_KEY_HOST;
+    static const char* KV_KEY_PORT;
+    static const char* KV_KEY_PRIORITY;
+    static const char* KV_KEY_LOGIN;
 
-    static constexpr auto PATH_FEEDS       = "general.feeds";
-    static constexpr auto PATH_GND_MODE    = "general.gndMode";
-    static constexpr auto PATH_SERVER_PORT = "general.serverPort";
-    static constexpr auto PATH_LATITUDE    = "fallback.latitude";
-    static constexpr auto PATH_LONGITUDE   = "fallback.longitude";
-    static constexpr auto PATH_ALTITUDE    = "fallback.altitude";
-    static constexpr auto PATH_GEOID       = "fallback.geoid";
-    static constexpr auto PATH_PRESSURE    = "fallback.pressure";
-    static constexpr auto PATH_MAX_DIST    = "filter.maxDistance";
-    static constexpr auto PATH_MAX_HEIGHT  = "filter.maxHeight";
+    static const char* PATH_FEEDS;
+    static const char* PATH_GND_MODE;
+    static const char* PATH_SERVER_PORT;
+    static const char* PATH_LATITUDE;
+    static const char* PATH_LONGITUDE;
+    static const char* PATH_ALTITUDE;
+    static const char* PATH_GEOID;
+    static const char* PATH_PRESSURE;
+    static const char* PATH_MAX_DIST;
+    static const char* PATH_MAX_HEIGHT;
 
     bool                         groundMode;   ///< Ground mode state
     const object::GpsPosition    gpsPosition;  ///< Fallback position

@@ -31,6 +31,8 @@ namespace client
 {
 using namespace net;
 
+constexpr auto LOG_PREFIX = "(SensorClient) ";
+
 SensorClient::SensorClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
     : Client(endpoint, LOG_PREFIX, connector)
 {}

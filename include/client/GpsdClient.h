@@ -30,8 +30,6 @@ namespace client
  */
 class GpsdClient : public Client
 {
-    static constexpr auto LOG_PREFIX = "(GpsdClient) ";
-
     /**
      * @brief Send unwatch-request and stop this client.
      */

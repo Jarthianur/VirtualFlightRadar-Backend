@@ -31,6 +31,8 @@ namespace server
 {
 using namespace net;
 
+constexpr auto LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
+
 NetworkInterfaceImplBoost::NetworkInterfaceImplBoost(std::uint16_t port)
     : NetworkInterface<SocketImplBoost>(),
       m_ioService(),

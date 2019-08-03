@@ -32,8 +32,6 @@ namespace client
  */
 class AprscClient : public Client
 {
-    static constexpr auto LOG_PREFIX = "(AprscClient) ";
-
     const std::string m_login;  ///< Login string
 
     /**
