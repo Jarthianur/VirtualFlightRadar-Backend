@@ -50,7 +50,7 @@ Object& Object::operator++()
     return *this;
 }
 
-auto Object::getUpdateAge() const -> decltype(m_updateAge)
+auto Object::updateAge() const -> decltype(m_updateAge)
 {
     return m_updateAge;
 }

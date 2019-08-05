@@ -41,10 +41,10 @@ bool AtmosphereData::update(Object&& atmosphere)
     return m_atmosphere.tryUpdate(std::move(atmosphere));
 }
 
-auto AtmosphereData::getAtmPressure() const -> decltype(m_atmosphere.getPressure())
+auto AtmosphereData::atmPressure() const -> decltype(m_atmosphere.pressure())
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_atmosphere.getPressure();
+    return m_atmosphere.pressure();
 }
 
 }  // namespace data

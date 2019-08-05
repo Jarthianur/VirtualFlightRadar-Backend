@@ -47,7 +47,7 @@ public:
      * @param alternative The default value (default: empty)
      * @return the value at path if found and not empty, else the default value
      */
-    std::string get_property(const std::string& path, const std::string& alternative = "") const;
+    std::string property(const std::string& path, const std::string& alternative = "") const;
 
     /**
      * @brief Get the Properties for a section.
@@ -55,7 +55,7 @@ public:
      * @return the Properties for that section
      * @throw std::out_of_range if the section is not found
      */
-    Properties get_propertySection(const std::string& section) const;
+    Properties section(const std::string& section) const;
 };
 
 }  // namespace config

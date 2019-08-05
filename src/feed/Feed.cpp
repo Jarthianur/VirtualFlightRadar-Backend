@@ -38,12 +38,12 @@ Feed::Feed(const std::string& name, const char* logPrefix, const Properties& pro
            std::shared_ptr<data::Data> data)
     : m_data(data), m_priority(initPriority()), m_logPrefix(logPrefix), name(name), properties(properties)
 {
-    if (properties.get_property(Configuration::KV_KEY_HOST).empty())
+    if (properties.property(Configuration::KV_KEY_HOST).empty())
     {
         logger.warn(m_logPrefix, "could not find: ", name, ".", Configuration::KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
-    if (properties.get_property(Configuration::KV_KEY_PORT).empty())
+    if (properties.property(Configuration::KV_KEY_PORT).empty())
     {
         logger.warn(m_logPrefix, "could not find: ", name, ".", Configuration::KV_KEY_PORT);
         throw std::logic_error("No port given");
@@ -55,7 +55,7 @@ std::uint32_t Feed::initPriority() const noexcept
     try
     {
         return static_cast<std::uint32_t>(std::max<std::uint64_t>(
-            0, std::min<std::uint64_t>(std::stoul(properties.get_property(Configuration::KV_KEY_PRIORITY)),
+            0, std::min<std::uint64_t>(std::stoul(properties.property(Configuration::KV_KEY_PRIORITY)),
                                        std::numeric_limits<std::uint32_t>::max())));
     }
     catch (const std::logic_error&)
@@ -65,10 +65,10 @@ std::uint32_t Feed::initPriority() const noexcept
     return 0;
 }
 
-client::net::Endpoint Feed::getEndpoint() const
+client::net::Endpoint Feed::endpoint() const
 {
-    return {properties.get_property(Configuration::KV_KEY_HOST),
-            properties.get_property(Configuration::KV_KEY_PORT)};
+    return {properties.property(Configuration::KV_KEY_HOST),
+            properties.property(Configuration::KV_KEY_PORT)};
 }
 
 }  // namespace feed

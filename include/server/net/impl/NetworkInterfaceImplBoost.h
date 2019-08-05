@@ -92,7 +92,7 @@ public:
      * @return the address
      * @throw SocketException if the current socket is not open
      */
-    std::string getCurrentAddress() const override;
+    std::string stagedAddress() const override;
 };
 }  // namespace net
 }  // namespace server

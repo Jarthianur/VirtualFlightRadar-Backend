@@ -37,7 +37,7 @@ WindFeed::WindFeed(const std::string& name, const Properties& properties,
     : Feed(name, LOG_PREFIX, properties, data)
 {}
 
-Feed::Protocol WindFeed::getProtocol() const
+Feed::Protocol WindFeed::protocol() const
 {
     return Protocol::SENSOR;
 }

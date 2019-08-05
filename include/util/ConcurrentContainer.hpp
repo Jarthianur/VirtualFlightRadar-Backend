@@ -126,7 +126,7 @@ public:
             return &iterator->second;
         }
 
-        KeyType getKey() const
+        KeyType key() const
         {
             return iterator->first;
         }

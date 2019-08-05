@@ -70,7 +70,7 @@ public:
      * @brief Get this feeds Protocol.
      * @return Protocol::SENSOR
      */
-    Protocol getProtocol() const override;
+    Protocol protocol() const override;
 
     /**
      * @brief Implement Feed::process.

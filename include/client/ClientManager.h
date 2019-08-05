@@ -85,7 +85,6 @@ struct ClientComparator
 
 /// Set of clients with custom hasher and comparator
 using ClientSet = std::unordered_set<std::shared_ptr<Client>, ClientHasher, ClientComparator>;
-
 /// Iterator in ClientSet
 using ClientIter = ClientSet::iterator;
 

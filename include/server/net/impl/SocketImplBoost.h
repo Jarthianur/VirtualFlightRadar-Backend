@@ -51,7 +51,7 @@ public:
      * @return the address
      * @throw SocketException if the socket is closed
      */
-    std::string getAddress() const;
+    std::string address() const;
 
     /**
      * @brief Write a message on the socket to the endpoint.

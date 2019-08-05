@@ -49,18 +49,18 @@ TEST_MODULE(test_cstring, {
         {
             CString<8> cstr = "hello";
             assertEquals(cstr, "hello");
-            assertEquals(cstr.getLength(), 5);
+            assertEquals(cstr.length(), 5);
         }
         {
             CString<8> cstr = std::string("hello");
             assertEquals(cstr, "hello");
-            assertEquals(cstr.getLength(), 5);
+            assertEquals(cstr.length(), 5);
         }
         {
             CString<8> t("hello");
             CString<8> cstr = t;
             assertEquals(cstr, "hello");
-            assertEquals(cstr.getLength(), 5);
+            assertEquals(cstr.length(), 5);
         }
     });
     test("init/assign error", [] {

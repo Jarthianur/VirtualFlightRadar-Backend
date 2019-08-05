@@ -136,16 +136,16 @@ public:
     util::CString<NMEA_SIZE>& operator*();
     Aircraft&                 operator=(Aircraft&& other);
 
-    util::CStringPack getNMEA() const override;
-    auto              getIdType() const -> decltype(m_idType);
-    auto              getAircraftType() const -> decltype(m_aircraftType);
-    auto              getId() const -> const decltype(m_id)&;
-    auto              getTargetType() const -> decltype(m_targetType);
-    auto              getLocation() const -> const decltype(m_location)&;
-    auto              getMovement() const -> const decltype(m_movement)&;
-    auto              getTimestamp() const -> const decltype(m_timestamp)&;
+    util::CStringPack nmea() const override;
+    auto              idType() const -> decltype(m_idType);
+    auto              aircraftType() const -> decltype(m_aircraftType);
+    auto              id() const -> const decltype(m_id)&;
+    auto              targetType() const -> decltype(m_targetType);
+    auto              location() const -> const decltype(m_location)&;
+    auto              movement() const -> const decltype(m_movement)&;
+    auto              timestamp() const -> const decltype(m_timestamp)&;
     auto              hasFullInfo() const -> decltype(m_fullInfo);
-    void              setTargetType(TargetType tt);
+    void              targetType(TargetType tt);
 };
 
 }  // namespace object

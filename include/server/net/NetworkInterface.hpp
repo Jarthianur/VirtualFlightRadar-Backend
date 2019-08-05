@@ -76,7 +76,7 @@ public:
      * @brief Get the current connection address.
      * @return the address
      */
-    virtual std::string getCurrentAddress() const = 0;
+    virtual std::string stagedAddress() const = 0;
 };
 }  // namespace net
 }  // namespace server

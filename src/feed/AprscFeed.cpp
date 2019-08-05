@@ -40,14 +40,14 @@ AprscFeed::AprscFeed(const std::string& name, const Properties& properties,
     : Feed(name, LOG_PREFIX, properties, data)
 {
     parser::AprsParser::s_maxHeight = maxHeight;
-    if (properties.get_property(Configuration::KV_KEY_LOGIN, "-") == "-")
+    if (properties.property(Configuration::KV_KEY_LOGIN, "-") == "-")
     {
         logger.warn(m_logPrefix, "could not find: ", name, ".", Configuration::KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
 }
 
-Feed::Protocol AprscFeed::getProtocol() const
+Feed::Protocol AprscFeed::protocol() const
 {
     return Protocol::APRS;
 }
@@ -63,9 +63,9 @@ bool AprscFeed::process(const std::string& response)
     return true;
 }
 
-std::string AprscFeed::get_login() const
+std::string AprscFeed::login() const
 {
-    return properties.get_property(Configuration::KV_KEY_LOGIN);
+    return properties.property(Configuration::KV_KEY_LOGIN);
 }
 
 }  // namespace feed

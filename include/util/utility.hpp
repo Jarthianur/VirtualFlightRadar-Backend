@@ -157,7 +157,7 @@ public:
         return b;
     }
 
-    inline auto getLength() const -> decltype(m_length)
+    inline auto length() const -> decltype(m_length)
     {
         return m_length;
     }

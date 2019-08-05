@@ -37,7 +37,7 @@ AtmosphereFeed::AtmosphereFeed(const std::string& name, const Properties& proper
     : Feed(name, LOG_PREFIX, properties, data)
 {}
 
-Feed::Protocol AtmosphereFeed::getProtocol() const
+Feed::Protocol AtmosphereFeed::protocol() const
 {
     return Protocol::SENSOR;
 }

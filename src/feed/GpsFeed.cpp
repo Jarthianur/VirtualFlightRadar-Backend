@@ -37,7 +37,7 @@ GpsFeed::GpsFeed(const std::string& name, const Properties& properties, std::sha
     : Feed(name, LOG_PREFIX, properties, data)
 {}
 
-Feed::Protocol GpsFeed::getProtocol() const
+Feed::Protocol GpsFeed::protocol() const
 {
     return Protocol::GPS;
 }

@@ -91,7 +91,7 @@ void VFRB::run() noexcept
     clientManager.stop();
     m_server.stop();
     signals.stop();
-    logger.info(LOG_PREFIX, "stopped after ", get_duration(start));
+    logger.info(LOG_PREFIX, "stopped after ", duration(start));
 }
 
 void VFRB::serve()
@@ -101,15 +101,15 @@ void VFRB::serve()
     {
         try
         {
-            m_aircraftData->setEnvironment(m_gpsData->getLocation(), m_atmosphereData->getAtmPressure());
+            m_aircraftData->environment(m_gpsData->location(), m_atmosphereData->atmPressure());
             m_aircraftData->access([this](const Object& it) {
-                if (it.getUpdateAge() < Object::OUTDATED)
+                if (it.updateAge() < Object::OUTDATED)
                 {
-                    m_server.send(it.getNMEA());
+                    m_server.send(it.nmea());
                 }
             });
 
-            auto fn = [this](const Object& it) { m_server.send(it.getNMEA()); };
+            auto fn = [this](const Object& it) { m_server.send(it.nmea()); };
             m_gpsData->access(fn);
             m_atmosphereData->access(fn);
             m_windData->access(fn);
@@ -139,7 +139,7 @@ void VFRB::createFeeds(std::shared_ptr<Configuration> config)
     }
 }
 
-std::string VFRB::get_duration(std::chrono::steady_clock::time_point start) const
+std::string VFRB::duration(std::chrono::steady_clock::time_point start) const
 {
     std::chrono::minutes runtime =
         std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start);

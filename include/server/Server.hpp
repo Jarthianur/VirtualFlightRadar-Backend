@@ -214,7 +214,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
         try
         {
             if (m_activeConnections < param::SERVER_MAX_CLIENTS &&
-                !isConnected(m_netInterface->getCurrentAddress()))
+                !isConnected(m_netInterface->stagedAddress()))
             {
                 for (auto& it : m_connections)
                 {
@@ -229,7 +229,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
             }
             else
             {
-                logger.info(LOG_PREFIX, "refused connection to ", m_netInterface->getCurrentAddress());
+                logger.info(LOG_PREFIX, "refused connection to ", m_netInterface->stagedAddress());
                 m_netInterface->close();
             }
         }

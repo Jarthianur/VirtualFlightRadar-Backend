@@ -164,14 +164,14 @@ inline std::list<std::string> split(const std::string& str, char delim = ',')
 
 Configuration::Configuration(std::istream& stream)
 try : m_properties(ConfigReader(stream).read()),
-      groundMode(!m_properties.get_property(PATH_GND_MODE).empty()),
+      groundMode(!m_properties.property(PATH_GND_MODE).empty()),
       gpsPosition(resolvePosition(m_properties)),
       atmPressure(boost::get<double>(checkNumber(
-          stringToNumber<double>(m_properties.get_property(PATH_PRESSURE, "1013.25")), PATH_PRESSURE))),
+          stringToNumber<double>(m_properties.property(PATH_PRESSURE, "1013.25")), PATH_PRESSURE))),
       maxHeight(resolveFilter(m_properties, PATH_MAX_HEIGHT)),
       maxDistance(resolveFilter(m_properties, PATH_MAX_DIST)),
       serverPort(resolveServerPort(m_properties)),
-      feedNames(split(m_properties.get_property(PATH_FEEDS))),
+      feedNames(split(m_properties.property(PATH_FEEDS))),
       feedProperties(resolveFeeds(m_properties))
 {
     dumpInfo();
@@ -185,13 +185,13 @@ object::GpsPosition Configuration::resolvePosition(const Properties& properties)
 {
     object::Location pos;
     pos.latitude = boost::get<double>(
-        checkNumber(stringToNumber<double>(properties.get_property(PATH_LATITUDE, "0.0")), PATH_LATITUDE));
+        checkNumber(stringToNumber<double>(properties.property(PATH_LATITUDE, "0.0")), PATH_LATITUDE));
     pos.longitude = boost::get<double>(
-        checkNumber(stringToNumber<double>(properties.get_property(PATH_LONGITUDE, "0.0")), PATH_LONGITUDE));
+        checkNumber(stringToNumber<double>(properties.property(PATH_LONGITUDE, "0.0")), PATH_LONGITUDE));
     pos.altitude = boost::get<std::int32_t>(checkNumber(
-        stringToNumber<std::int32_t>(properties.get_property(PATH_ALTITUDE, "0")), PATH_ALTITUDE));
+        stringToNumber<std::int32_t>(properties.property(PATH_ALTITUDE, "0")), PATH_ALTITUDE));
     double geoid = boost::get<double>(
-        checkNumber(stringToNumber<double>(properties.get_property(PATH_GEOID, "0.0")), PATH_GEOID));
+        checkNumber(stringToNumber<double>(properties.property(PATH_GEOID, "0.0")), PATH_GEOID));
     return object::GpsPosition(0, pos, geoid);
 }
 
@@ -200,7 +200,7 @@ std::uint16_t Configuration::resolveServerPort(const Properties& properties) con
     try
     {
         std::uint64_t port = boost::get<std::uint64_t>(
-            checkNumber(stringToNumber<std::uint64_t>(properties.get_property(PATH_SERVER_PORT, "4353")),
+            checkNumber(stringToNumber<std::uint64_t>(properties.property(PATH_SERVER_PORT, "4353")),
                         PATH_SERVER_PORT));
         if (port > std::numeric_limits<std::uint16_t>::max())
         {
@@ -220,7 +220,7 @@ std::int32_t Configuration::resolveFilter(const Properties& properties, const ch
     try
     {
         std::int32_t filter = boost::get<std::int32_t>(
-            checkNumber(stringToNumber<std::int32_t>(properties.get_property(path, "-1")), path));
+            checkNumber(stringToNumber<std::int32_t>(properties.property(path, "-1")), path));
         return filter < 0 ? std::numeric_limits<std::int32_t>::max() : filter;
     }
     catch (const std::invalid_argument&)
@@ -236,7 +236,7 @@ std::unordered_map<std::string, Properties> Configuration::resolveFeeds(const Pr
     {
         try
         {
-            map.emplace(it, properties.get_propertySection(it));
+            map.emplace(it, properties.section(it));
         }
         catch (const std::out_of_range& e)
         {
@@ -248,10 +248,10 @@ std::unordered_map<std::string, Properties> Configuration::resolveFeeds(const Pr
 
 void Configuration::dumpInfo() const
 {
-    logger.info(LOG_PREFIX, PATH_LATITUDE, ": ", gpsPosition.getLocation().latitude);
-    logger.info(LOG_PREFIX, PATH_LONGITUDE, ": ", gpsPosition.getLocation().longitude);
-    logger.info(LOG_PREFIX, PATH_ALTITUDE, ": ", gpsPosition.getLocation().altitude);
-    logger.info(LOG_PREFIX, PATH_GEOID, ": ", gpsPosition.getGeoid());
+    logger.info(LOG_PREFIX, PATH_LATITUDE, ": ", gpsPosition.location().latitude);
+    logger.info(LOG_PREFIX, PATH_LONGITUDE, ": ", gpsPosition.location().longitude);
+    logger.info(LOG_PREFIX, PATH_ALTITUDE, ": ", gpsPosition.location().altitude);
+    logger.info(LOG_PREFIX, PATH_GEOID, ": ", gpsPosition.geoid());
     logger.info(LOG_PREFIX, PATH_PRESSURE, ": ", atmPressure);
     logger.info(LOG_PREFIX, PATH_MAX_HEIGHT, ": ", maxHeight);
     logger.info(LOG_PREFIX, PATH_MAX_DIST, ": ", maxDistance);

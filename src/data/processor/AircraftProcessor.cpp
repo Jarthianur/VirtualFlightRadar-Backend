@@ -62,8 +62,8 @@ void AircraftProcessor::calculateRelPosition(const Aircraft& aircraft) const
 {
     m_refRadLatitude       = math::radian(m_refLocation.latitude);
     m_refRadLongitude      = math::radian(m_refLocation.longitude);
-    m_aircraftRadLongitude = math::radian(aircraft.getLocation().longitude);
-    m_aircraftRadLatitude  = math::radian(aircraft.getLocation().latitude);
+    m_aircraftRadLongitude = math::radian(aircraft.location().longitude);
+    m_aircraftRadLatitude  = math::radian(aircraft.location().latitude);
     m_lonDistance          = m_aircraftRadLongitude - m_refRadLongitude;
     m_latDistance          = m_aircraftRadLatitude - m_refRadLatitude;
 
@@ -81,16 +81,16 @@ void AircraftProcessor::calculateRelPosition(const Aircraft& aircraft) const
 
     m_relNorth    = math::doubleToInt(std::cos(math::radian(m_absBearing)) * m_distance);
     m_relEast     = math::doubleToInt(std::sin(math::radian(m_absBearing)) * m_distance);
-    m_relVertical = aircraft.getTargetType() == Aircraft::TargetType::TRANSPONDER ?
-                        aircraft.getLocation().altitude - math::icaoHeight(m_refAtmPressure) :
-                        aircraft.getLocation().altitude - m_refLocation.altitude;
+    m_relVertical = aircraft.targetType() == Aircraft::TargetType::TRANSPONDER ?
+                        aircraft.location().altitude - math::icaoHeight(m_refAtmPressure) :
+                        aircraft.location().altitude - m_refLocation.altitude;
 }
 
 std::size_t AircraftProcessor::appendPFLAU(Aircraft& aircraft, std::size_t pos) const
 {
     int bytes =
         (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
-                             math::doubleToInt(m_relBearing), m_relVertical, m_distance, *aircraft.getId());
+                             math::doubleToInt(m_relBearing), m_relVertical, m_distance, *aircraft.id());
     bytes += (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
                                   "%02x\r\n", math::checksum(**aircraft, Aircraft::NMEA_SIZE - pos));
     return pos + static_cast<std::size_t>(bytes);
@@ -103,21 +103,21 @@ std::size_t AircraftProcessor::appendPFLAA(Aircraft& aircraft, std::size_t pos) 
     {
         bytes = (*aircraft).snprintf(
             pos, Aircraft::NMEA_SIZE - pos, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth,
-            m_relEast, m_relVertical, util::raw_type(aircraft.getIdType()), *aircraft.getId(),
-            math::doubleToInt(math::saturate(aircraft.getMovement().heading, Aircraft::Movement::MIN_HEADING,
+            m_relEast, m_relVertical, util::raw_type(aircraft.idType()), *aircraft.id(),
+            math::doubleToInt(math::saturate(aircraft.movement().heading, Aircraft::Movement::MIN_HEADING,
                                              Aircraft::Movement::MAX_HEADING)),
-            math::doubleToInt(math::saturate(aircraft.getMovement().gndSpeed * math::MS_2_KMH,
+            math::doubleToInt(math::saturate(aircraft.movement().gndSpeed * math::MS_2_KMH,
                                              Aircraft::Movement::MIN_GND_SPEED,
                                              Aircraft::Movement::MAX_GND_SPEED)),
-            math::saturate(aircraft.getMovement().climbRate, Aircraft::Movement::MIN_CLIMB_RATE,
+            math::saturate(aircraft.movement().climbRate, Aircraft::Movement::MIN_CLIMB_RATE,
                            Aircraft::Movement::MAX_CLIMB_RATE),
-            util::raw_type(aircraft.getAircraftType()));
+            util::raw_type(aircraft.aircraftType()));
     }
     else
     {
         bytes = (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*",
-                                     m_relNorth, m_relEast, m_relVertical, *aircraft.getId(),
-                                     util::raw_type(aircraft.getAircraftType()));
+                                     m_relNorth, m_relEast, m_relVertical, *aircraft.id(),
+                                     util::raw_type(aircraft.aircraftType()));
     }
     bytes += (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
                                   "%02x\r\n", math::checksum(**aircraft, Aircraft::NMEA_SIZE - pos));

@@ -71,7 +71,7 @@ public:
      * @brief Get this feeds Protocol.
      * @return Protocol::SBS
      */
-    Protocol getProtocol() const override;
+    Protocol protocol() const override;
 
     /**
      * @brief Feed::process.

@@ -71,7 +71,7 @@ public:
      * @brief Get this feeds Protocol.
      * @return Protocol::APRS
      */
-    Protocol getProtocol() const override;
+    Protocol protocol() const override;
 
     /**
      * @brief Implement Feed::process.
@@ -82,7 +82,7 @@ public:
      * @brief Get the login string.
      * @return the login
      */
-    std::string get_login() const;
+    std::string login() const;
 };
 
 }  // namespace feed

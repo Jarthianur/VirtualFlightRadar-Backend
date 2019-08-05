@@ -29,13 +29,13 @@ Properties::Properties(const boost::property_tree::ptree& ptree) : m_pTree(ptree
 
 Properties::Properties(boost::property_tree::ptree&& ptree) : m_pTree(std::move(ptree)) {}
 
-std::string Properties::get_property(const std::string& path, const std::string& alternative) const
+std::string Properties::property(const std::string& path, const std::string& alternative) const
 {
     std::string property(m_pTree.get(path, alternative));
     return property.empty() ? alternative : property;
 }
 
-Properties Properties::get_propertySection(const std::string& section) const
+Properties Properties::section(const std::string& section) const
 {
     try
     {

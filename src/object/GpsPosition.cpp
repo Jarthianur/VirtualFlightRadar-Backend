@@ -74,7 +74,7 @@ bool GpsPosition::canUpdate(const Object& other) const
     }
 }
 
-util::CStringPack GpsPosition::getNMEA() const
+util::CStringPack GpsPosition::nmea() const
 {
     return m_nmea;
 }
@@ -84,32 +84,32 @@ util::CString<GpsPosition::NMEA_SIZE>& GpsPosition::operator*()
     return m_nmea;
 }
 
-auto GpsPosition::getLocation() const -> const decltype(m_location)&
+auto GpsPosition::location() const -> const decltype(m_location)&
 {
     return m_location;
 }
 
-auto GpsPosition::getGeoid() const -> decltype(m_geoid)
+auto GpsPosition::geoid() const -> decltype(m_geoid)
 {
     return m_geoid;
 }
 
-auto GpsPosition::getTimestamp() const -> const decltype(m_timestamp)&
+auto GpsPosition::timestamp() const -> const decltype(m_timestamp)&
 {
     return m_timestamp;
 }
 
-auto GpsPosition::getDilution() const -> decltype(m_dilution)
+auto GpsPosition::dilution() const -> decltype(m_dilution)
 {
     return m_dilution;
 }
 
-auto GpsPosition::getNrOfSatellites() const -> decltype(m_nrOfSatellites)
+auto GpsPosition::nrOfSatellites() const -> decltype(m_nrOfSatellites)
 {
     return m_nrOfSatellites;
 }
 
-auto GpsPosition::getFixQuality() const -> decltype(m_fixQuality)
+auto GpsPosition::fixQuality() const -> decltype(m_fixQuality)
 {
     return m_fixQuality;
 }

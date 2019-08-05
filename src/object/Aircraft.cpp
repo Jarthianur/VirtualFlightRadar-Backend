@@ -91,7 +91,7 @@ bool Aircraft::canUpdate(const Object& other) const
     }
 }
 
-util::CStringPack Aircraft::getNMEA() const
+util::CStringPack Aircraft::nmea() const
 {
     return m_nmea;
 }
@@ -107,37 +107,37 @@ Aircraft& Aircraft::operator=(Aircraft&& other)
     return *this;
 }
 
-auto Aircraft::getIdType() const -> decltype(m_idType)
+auto Aircraft::idType() const -> decltype(m_idType)
 {
     return m_idType;
 }
 
-auto Aircraft::getAircraftType() const -> decltype(m_aircraftType)
+auto Aircraft::aircraftType() const -> decltype(m_aircraftType)
 {
     return m_aircraftType;
 }
 
-auto Aircraft::getId() const -> const decltype(m_id)&
+auto Aircraft::id() const -> const decltype(m_id)&
 {
     return m_id;
 }
 
-auto Aircraft::getTargetType() const -> decltype(m_targetType)
+auto Aircraft::targetType() const -> decltype(m_targetType)
 {
     return m_targetType;
 }
 
-auto Aircraft::getLocation() const -> const decltype(m_location)&
+auto Aircraft::location() const -> const decltype(m_location)&
 {
     return m_location;
 }
 
-auto Aircraft::getMovement() const -> const decltype(m_movement)&
+auto Aircraft::movement() const -> const decltype(m_movement)&
 {
     return m_movement;
 }
 
-auto Aircraft::getTimestamp() const -> const decltype(m_timestamp)&
+auto Aircraft::timestamp() const -> const decltype(m_timestamp)&
 {
     return m_timestamp;
 }
@@ -147,7 +147,7 @@ auto Aircraft::hasFullInfo() const -> decltype(m_fullInfo)
     return m_fullInfo;
 }
 
-void Aircraft::setTargetType(TargetType tt)
+void Aircraft::targetType(TargetType tt)
 {
     m_targetType = tt;
 }

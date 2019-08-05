@@ -89,8 +89,7 @@ bool Connection<SocketT>::write(const util::CStringPack& msg)
 }
 
 template<typename SocketT>
-Connection<SocketT>::Connection(SocketT&& socket)
-    : m_socket(std::move(socket)), address(m_socket.getAddress())
+Connection<SocketT>::Connection(SocketT&& socket) : m_socket(std::move(socket)), address(m_socket.address())
 {}
 
 }  // namespace server

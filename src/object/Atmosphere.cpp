@@ -45,12 +45,12 @@ void Atmosphere::assign(Object&& other)
     {}
 }
 
-util::CStringPack Atmosphere::getNMEA() const
+util::CStringPack Atmosphere::nmea() const
 {
     return {m_nmea.c_str(), m_nmea.size()};
 }
 
-auto Atmosphere::getPressure() const -> decltype(m_pressure)
+auto Atmosphere::pressure() const -> decltype(m_pressure)
 {
     return m_pressure;
 }

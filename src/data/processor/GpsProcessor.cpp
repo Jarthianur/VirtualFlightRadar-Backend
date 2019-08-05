@@ -38,7 +38,7 @@ void GpsProcessor::process(object::GpsPosition& position) const
 {
     std::time_t now = std::time(nullptr);
     std::tm*    utc = std::gmtime(&now);
-    evalPosition(position.getLocation().latitude, position.getLocation().longitude);
+    evalPosition(position.location().latitude, position.location().longitude);
     appendGPGGA(position, utc, appendGPRMC(position, utc, 0));
 }
 
@@ -51,8 +51,8 @@ std::size_t GpsProcessor::appendGPGGA(GpsPosition& position, const std::tm* utc,
         pos, GpsPosition::NMEA_SIZE - pos,
         "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*", utc->tm_hour,
         utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
-        m_directionEW, /*pos.fixQa,*/ position.getNrOfSatellites(), position.getLocation().altitude,
-        math::saturate(position.getGeoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
+        m_directionEW, /*pos.fixQa,*/ position.nrOfSatellites(), position.location().altitude,
+        math::saturate(position.geoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
     bytes += (*position).snprintf(pos, GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
                                   "%02x\r\n", math::checksum(**position, GpsPosition::NMEA_SIZE - pos));
     return pos + static_cast<std::size_t>(bytes);

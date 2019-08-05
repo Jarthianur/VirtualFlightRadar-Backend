@@ -36,32 +36,32 @@ using namespace net;
 template<>
 std::shared_ptr<AprscClient> ClientFactory::makeClient<AprscClient>(std::shared_ptr<feed::Feed> feed)
 {
-    return std::make_shared<AprscClient>(feed->getEndpoint(),
-                                         std::static_pointer_cast<feed::AprscFeed>(feed)->get_login(),
+    return std::make_shared<AprscClient>(feed->endpoint(),
+                                         std::static_pointer_cast<feed::AprscFeed>(feed)->login(),
                                          std::make_shared<ConnectorImplBoost>());
 }
 
 template<>
 std::shared_ptr<SbsClient> ClientFactory::makeClient<SbsClient>(std::shared_ptr<feed::Feed> feed)
 {
-    return std::make_shared<SbsClient>(feed->getEndpoint(), std::make_shared<ConnectorImplBoost>());
+    return std::make_shared<SbsClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
 }
 
 template<>
 std::shared_ptr<SensorClient> ClientFactory::makeClient<SensorClient>(std::shared_ptr<feed::Feed> feed)
 {
-    return std::make_shared<SensorClient>(feed->getEndpoint(), std::make_shared<ConnectorImplBoost>());
+    return std::make_shared<SensorClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
 }
 
 template<>
 std::shared_ptr<GpsdClient> ClientFactory::makeClient<GpsdClient>(std::shared_ptr<feed::Feed> feed)
 {
-    return std::make_shared<GpsdClient>(feed->getEndpoint(), std::make_shared<ConnectorImplBoost>());
+    return std::make_shared<GpsdClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
 }
 
 std::shared_ptr<Client> ClientFactory::createClientFor(std::shared_ptr<feed::Feed> feed)
 {
-    switch (feed->getProtocol())
+    switch (feed->protocol())
     {
         case feed::Feed::Protocol::APRS: return makeClient<AprscClient>(feed);
         case feed::Feed::Protocol::SBS: return makeClient<SbsClient>(feed);

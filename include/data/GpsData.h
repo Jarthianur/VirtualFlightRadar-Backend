@@ -76,13 +76,13 @@ public:
      * @return the position
      * @threadsafe
      */
-    auto getLocation() const -> decltype(m_position.getLocation());
+    auto location() const -> decltype(m_position.location());
 };
 
 class GpsDataException : public std::exception
 {
 protected:
-    GpsDataException() : std::exception() {}
+    GpsDataException();
     virtual ~GpsDataException() noexcept = default;
 };
 

@@ -58,6 +58,6 @@ public:
      * @return the pressure
      * @threadsafe
      */
-    auto getAtmPressure() const -> decltype(m_atmosphere.getPressure());
+    auto atmPressure() const -> decltype(m_atmosphere.pressure());
 };
 }  // namespace data

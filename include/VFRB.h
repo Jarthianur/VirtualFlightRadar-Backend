@@ -77,7 +77,7 @@ class VFRB
      * @param start The start value
      * @return the duration string
      */
-    std::string get_duration(std::chrono::steady_clock::time_point start) const;
+    std::string duration(std::chrono::steady_clock::time_point start) const;
 
 public:
     NOT_COPYABLE(VFRB)

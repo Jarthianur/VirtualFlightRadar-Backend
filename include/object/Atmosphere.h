@@ -60,8 +60,8 @@ public:
 
     std::string& operator*();
 
-    util::CStringPack getNMEA() const override;
-    auto              getPressure() const -> decltype(m_pressure);
+    util::CStringPack nmea() const override;
+    auto              pressure() const -> decltype(m_pressure);
 };
 
 }  // namespace object

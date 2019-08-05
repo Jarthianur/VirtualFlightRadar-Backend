@@ -42,7 +42,7 @@ class Logger
      * @brief Get current date-time as string.
      * @return the date-time-string
      */
-    static std::string get_time();
+    static std::string time();
 
     /**
      * @brief Write to the given stream.
@@ -76,14 +76,14 @@ public:
     void info(T&& msg, TRest&&... tail)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        *m_outStream << "\r[INFO]  " << get_time() << ":: ";
+        *m_outStream << "\r[INFO]  " << time() << ":: ";
         log(m_outStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
     }
     template<typename T>
     void info(T&& msg)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        *m_outStream << "\r[INFO]  " << get_time() << ":: ";
+        *m_outStream << "\r[INFO]  " << time() << ":: ";
         log(m_outStream, std::forward<T>(msg));
     }
 
@@ -99,7 +99,7 @@ public:
         if (m_debugEnabled)
         {
             std::lock_guard<std::mutex> lock(m_mutex);
-            *m_outStream << "\r[DEBUG] " << get_time() << ":: ";
+            *m_outStream << "\r[DEBUG] " << time() << ":: ";
             log(m_outStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
         }
     }
@@ -109,7 +109,7 @@ public:
         if (m_debugEnabled)
         {
             std::lock_guard<std::mutex> lock(m_mutex);
-            *m_outStream << "\r[DEBUG] " << get_time() << ":: ";
+            *m_outStream << "\r[DEBUG] " << time() << ":: ";
             log(m_outStream, std::forward<T>(msg));
         }
     }
@@ -124,14 +124,14 @@ public:
     void warn(T&& msg, TRest&&... tail)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        *m_outStream << "\r[WARN]  " << get_time() << ":: ";
+        *m_outStream << "\r[WARN]  " << time() << ":: ";
         log(m_outStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
     }
     template<typename T>
     void warn(T&& msg)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        *m_outStream << "\r[WARN]  " << get_time() << ":: ";
+        *m_outStream << "\r[WARN]  " << time() << ":: ";
         log(m_outStream, std::forward<T>(msg));
     }
 
@@ -145,14 +145,14 @@ public:
     void error(T&& msg, TRest&&... tail)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        *m_errStream << "\r[ERROR] " << get_time() << ":: ";
+        *m_errStream << "\r[ERROR] " << time() << ":: ";
         log(m_errStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
     }
     template<typename T>
     void error(T&& msg)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        *m_errStream << "\r[ERROR] " << get_time() << ":: ";
+        *m_errStream << "\r[ERROR] " << time() << ":: ";
         log(m_errStream, std::forward<T>(msg));
     }
 
@@ -160,13 +160,13 @@ public:
      * @brief Enable/Disable debug level.
      * @param enable true to enable, false to disable (default: true)
      */
-    void setDebug(bool enable = true);
+    void debug(bool enable = true);
 
     /**
      * @brief Set a logfile instead of stdout/stderr.
      * @param file The filename
      */
-    void setLogFile(const std::string& file);
+    void logFile(const std::string& file);
 };
 
 /// Extern Logger instance

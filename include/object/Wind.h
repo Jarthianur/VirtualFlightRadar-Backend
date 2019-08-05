@@ -43,7 +43,7 @@ public:
 
     std::string& operator*();
 
-    util::CStringPack getNMEA() const override;
+    util::CStringPack nmea() const override;
 };
 
 }  // namespace object

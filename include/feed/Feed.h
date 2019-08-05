@@ -82,13 +82,13 @@ public:
      * @brief Get the supported Protocol.
      * @return the protocol
      */
-    virtual Protocol getProtocol() const = 0;
+    virtual Protocol protocol() const = 0;
 
     /**
      * @brief Get the feeds required Endpoint.
      * @return the endpoint
      */
-    client::net::Endpoint getEndpoint() const;
+    client::net::Endpoint endpoint() const;
 
     /**
      * @brief Handle client's response.

@@ -64,17 +64,19 @@ bool GpsData::update(Object&& position)
     return updated;
 }
 
-auto GpsData::getLocation() const -> decltype(m_position.getLocation())
+auto GpsData::location() const -> decltype(m_position.location())
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_position.getLocation();
+    return m_position.location();
 }
 
 bool GpsData::isPositionGood() const
 {
-    return m_position.getNrOfSatellites() >= GPS_NR_SATS_GOOD && m_position.getFixQuality() >= GPS_FIX_GOOD &&
-           m_position.getDilution() <= GPS_HOR_DILUTION_GOOD;
+    return m_position.nrOfSatellites() >= GPS_NR_SATS_GOOD && m_position.fixQuality() >= GPS_FIX_GOOD &&
+           m_position.dilution() <= GPS_HOR_DILUTION_GOOD;
 }
+
+GpsDataException::GpsDataException() : std::exception() {}
 
 PositionAlreadyLocked::PositionAlreadyLocked() : GpsDataException() {}
 

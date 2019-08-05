@@ -37,7 +37,7 @@ AircraftData::AircraftData(std::int32_t maxDist) : Data(), m_processor(maxDist) 
 bool AircraftData::update(Object&& aircraft)
 {
     Aircraft&& update = static_cast<Aircraft&&>(aircraft);
-    auto       result = m_container.insert(std::hash<std::string>()(*update.getId()),
+    auto       result = m_container.insert(std::hash<std::string>()(*update.id()),
                                      std::move(update));  // TODO: provide char* based hashing
     if (!result.second)
     {
@@ -46,7 +46,7 @@ bool AircraftData::update(Object&& aircraft)
     return true;
 }
 
-void AircraftData::setEnvironment(const Location& position, double atmPress)
+void AircraftData::environment(const Location& position, double atmPress)
 {
     m_processor.referTo(position, atmPress);
 }
@@ -59,13 +59,13 @@ void AircraftData::access(const accessor_fn& func)
         ++(iter->value);
         try
         {
-            if (iter->value.getUpdateAge() == NO_FLARM_THRESHOLD)
+            if (iter->value.updateAge() == NO_FLARM_THRESHOLD)
             {
-                iter->value.setTargetType(Aircraft::TargetType::TRANSPONDER);
+                iter->value.targetType(Aircraft::TargetType::TRANSPONDER);
             }
-            if (iter->value.getUpdateAge() >= DELETE_THRESHOLD)
+            if (iter->value.updateAge() >= DELETE_THRESHOLD)
             {
-                auto key = iter.getKey();
+                auto key = iter.key();
                 ++iter;
                 m_container.erase(key);
             }

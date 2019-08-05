@@ -31,11 +31,8 @@ namespace net
 {
 struct Endpoint;
 
-/// Common callback function
-using Callback = std::function<void(bool)>;
-
-/// Callback function for read
-using ReadCallback = std::function<void(bool, const std::string&)>;
+using Callback     = std::function<void(bool)>;                      ///< Common callback function
+using ReadCallback = std::function<void(bool, const std::string&)>;  ///< Callback function for read
 
 /**
  * @brief The async TCP interface for clients

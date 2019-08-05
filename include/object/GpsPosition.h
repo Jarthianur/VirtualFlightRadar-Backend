@@ -91,12 +91,12 @@ public:
 
     util::CString<NMEA_SIZE>& operator*();
 
-    util::CStringPack getNMEA() const override;
-    auto              getLocation() const -> const decltype(m_location)&;
-    auto              getGeoid() const -> decltype(m_geoid);
-    auto              getTimestamp() const -> const decltype(m_timestamp)&;
-    auto              getDilution() const -> decltype(m_dilution);
-    auto              getNrOfSatellites() const -> decltype(m_nrOfSatellites);
-    auto              getFixQuality() const -> decltype(m_fixQuality);
+    util::CStringPack nmea() const override;
+    auto              location() const -> const decltype(m_location)&;
+    auto              geoid() const -> decltype(m_geoid);
+    auto              timestamp() const -> const decltype(m_timestamp)&;
+    auto              dilution() const -> decltype(m_dilution);
+    auto              nrOfSatellites() const -> decltype(m_nrOfSatellites);
+    auto              fixQuality() const -> decltype(m_fixQuality);
 };
 }  // namespace object

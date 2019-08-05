@@ -56,7 +56,7 @@ public:
      */
     bool update(object::Object&& aircraft) override;
 
-    void setEnvironment(const object::Location& position, double atmPress);
+    void environment(const object::Location& position, double atmPress);
 
     /**
      * @brief Process all aircrafts.

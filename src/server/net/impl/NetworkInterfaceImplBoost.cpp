@@ -112,9 +112,9 @@ std::unique_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startCon
     return Connection<SocketImplBoost>::create(std::move(m_socket));
 }
 
-std::string NetworkInterfaceImplBoost::getCurrentAddress() const
+std::string NetworkInterfaceImplBoost::stagedAddress() const
 {
-    return m_socket.getAddress();
+    return m_socket.address();
 }
 
 }  // namespace server
