@@ -53,7 +53,7 @@ void AircraftData::setEnvironment(const Location& position, double atmPress)
 
 void AircraftData::access(const accessor_fn& func)
 {
-    util::ConcurrentContainer<Aircraft>::Iterator iter = m_container.begin();
+    auto iter = m_container.begin();
     while (iter != m_container.end())
     {
         ++(iter->value);
@@ -65,7 +65,7 @@ void AircraftData::access(const accessor_fn& func)
             }
             if (iter->value.getUpdateAge() >= DELETE_THRESHOLD)
             {
-                util::ConcurrentContainer<Aircraft>::KeyType key = iter.getKey();
+                auto key = iter.getKey();
                 ++iter;
                 m_container.erase(key);
             }

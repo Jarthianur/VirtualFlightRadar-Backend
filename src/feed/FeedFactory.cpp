@@ -21,6 +21,9 @@
 
 #include "feed/FeedFactory.h"
 
+#include <stdexcept>
+#include <string>
+
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
@@ -80,29 +83,32 @@ std::shared_ptr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(const std:
     return std::make_shared<AtmosphereFeed>(name, m_config->feedProperties.at(name), m_atmosData);
 }
 
-boost::optional<std::shared_ptr<Feed>> FeedFactory::createFeed(const std::string& name)
+std::shared_ptr<Feed> FeedFactory::createFeed(const std::string& name)
 {
     if (name.find(Configuration::SECT_KEY_APRSC) != std::string::npos)
     {
-        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<AprscFeed>(name));
+        return makeFeed<AprscFeed>(name);
     }
-    else if (name.find(Configuration::SECT_KEY_SBS) != std::string::npos)
+    if (name.find(Configuration::SECT_KEY_SBS) != std::string::npos)
     {
-        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<SbsFeed>(name));
+        return makeFeed<SbsFeed>(name);
     }
-    else if (name.find(Configuration::SECT_KEY_GPS) != std::string::npos)
+    if (name.find(Configuration::SECT_KEY_GPS) != std::string::npos)
     {
-        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<GpsFeed>(name));
+        return makeFeed<GpsFeed>(name);
     }
-    else if (name.find(Configuration::SECT_KEY_WIND) != std::string::npos)
+    if (name.find(Configuration::SECT_KEY_WIND) != std::string::npos)
     {
-        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<WindFeed>(name));
+        return makeFeed<WindFeed>(name);
     }
-    else if (name.find(Configuration::SECT_KEY_ATMOS) != std::string::npos)
+    if (name.find(Configuration::SECT_KEY_ATMOS) != std::string::npos)
     {
-        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<AtmosphereFeed>(name));
+        return makeFeed<AtmosphereFeed>(name);
     }
-    return boost::none;
+    throw std::invalid_argument(std::string("no keywords found; be sure feed names contain one of ") +
+                                Configuration::SECT_KEY_APRSC + ", " + Configuration::SECT_KEY_SBS + ", " +
+                                Configuration::SECT_KEY_WIND + ", " + Configuration::SECT_KEY_ATMOS + ", " +
+                                Configuration::SECT_KEY_GPS);
 }
 
 }  // namespace feed

@@ -25,8 +25,6 @@
 #include <string>
 #include <type_traits>
 
-#include <boost/optional.hpp>
-
 #include "config/Properties.h"
 
 namespace config
@@ -88,6 +86,6 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    boost::optional<std::shared_ptr<Feed>> createFeed(const std::string& name);
+    std::shared_ptr<Feed> createFeed(const std::string& name);
 };
 }  // namespace feed

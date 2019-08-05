@@ -26,6 +26,8 @@
 #include <mutex>
 #include <utility>
 
+#include "util/defines.h"
+
 namespace util
 {
 /**
@@ -46,6 +48,8 @@ public:
      */
     struct ValueType
     {
+        NOT_COPYABLE(ValueType)
+
         ValueType(T&& val) : value(std::move(val)) {}
 
         ValueType(ValueType&& other) : value(std::move(other.value)) {}
@@ -60,7 +64,7 @@ public:
 
     protected:
         friend struct ConcurrentContainer::Iterator;
-        mutable std::mutex dataMutex;
+        mutable std::mutex mutex;
     };
 
     using KeyType       = std::size_t;
@@ -72,13 +76,14 @@ public:
      */
     struct Iterator
     {
-        Iterator(const Iterator&) = delete;
-        Iterator& operator=(const Iterator&) = delete;
+        NOT_COPYABLE(Iterator)
 
         explicit Iterator(ConcurrentContainer& c) : iterator(c.m_container.end()), container(c) {}
 
         Iterator(Iterator&& other)
-            : iterator(other.iterator), dataLock(std::move(other.dataLock)), container(other.container)
+            : iterator(std::move(other.iterator)),
+              valueLock(std::move(other.valueLock)),
+              container(other.container)
         {}
 
         Iterator(typename ContainerType::iterator iter, const ConcurrentContainer& c)
@@ -86,14 +91,14 @@ public:
         {
             if (iterator != container.m_container.end())
             {
-                dataLock = std::unique_lock<std::mutex>(iterator->second.dataMutex);
+                valueLock = std::unique_lock<std::mutex>(iterator->second.mutex);
             }
         }
 
         Iterator& operator=(Iterator&& other)
         {
-            iterator  = other.iterator;
-            dataLock  = std::move(other.dataLock);
+            iterator  = std::move(other.iterator);
+            valueLock = std::move(other.valueLock);
             container = other.container;
         }
 
@@ -101,11 +106,11 @@ public:
         {
             if (iterator != container.m_container.end())
             {
-                dataLock.unlock();
+                valueLock.unlock();
                 std::lock_guard<std::mutex> lk(container.m_modMutex);
                 if (++iterator != container.m_container.end())
                 {
-                    dataLock = std::unique_lock<std::mutex>(iterator->second.dataMutex);
+                    valueLock = std::unique_lock<std::mutex>(iterator->second.mutex);
                 }
             }
             return *this;
@@ -138,7 +143,7 @@ public:
 
     protected:
         typename ContainerType::iterator iterator;
-        std::unique_lock<std::mutex>     dataLock;
+        std::unique_lock<std::mutex>     valueLock;
         const ConcurrentContainer&       container;
     };
 

@@ -130,19 +130,7 @@ void VFRB::createFeeds(std::shared_ptr<Configuration> config)
     {
         try
         {
-            auto optFeedPtr = factory.createFeed(name);
-            if (optFeedPtr)
-            {
-                m_feeds.push_back(*optFeedPtr);
-            }
-            else
-            {
-                logger.warn(LOG_PREFIX, " can not create feed ", name,
-                            ": No keywords found; be sure feed names contain one of ",
-                            Configuration::SECT_KEY_APRSC, ", ", Configuration::SECT_KEY_SBS, ", ",
-                            Configuration::SECT_KEY_WIND, ", ", Configuration::SECT_KEY_ATMOS, ", ",
-                            Configuration::SECT_KEY_GPS);
-            }
+            m_feeds.push_back(factory.createFeed(name));
         }
         catch (const std::exception& e)
         {
@@ -153,10 +141,12 @@ void VFRB::createFeeds(std::shared_ptr<Configuration> config)
 
 std::string VFRB::get_duration(std::chrono::steady_clock::time_point start) const
 {
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::chrono::minutes runtime              = std::chrono::duration_cast<std::chrono::minutes>(end - start);
-    std::stringstream    ss;
-    ss << runtime.count() / 60 / 24 << " days, " << runtime.count() / 60 << " hours, " << runtime.count() % 60
-       << " minutes";
+    std::chrono::minutes runtime =
+        std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start);
+    std::int64_t      d = runtime.count() / 60 / 24;
+    std::int64_t      h = runtime.count() / 60 - d * 24;
+    std::int64_t      m = runtime.count() % 60;
+    std::stringstream ss;
+    ss << d << "d " << h << ":" << m;
     return ss.str();
 }
