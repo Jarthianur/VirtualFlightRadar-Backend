@@ -19,14 +19,42 @@
  }
  */
 
-#include "util/WorkerThread.h"
+#pragma once
 
 #include <chrono>
+#include <condition_variable>
+#include <functional>
+#include <mutex>
+#include <queue>
+#include <thread>
 #include <utility>
+
+#include "util/defines.h"
 
 namespace util
 {
-WorkerThread::WorkerThread(WorkerFn&& fn)
+template<typename T>
+class WorkerThread
+{
+    using WorkerFn = std::function<void(T&&)>;
+
+    bool                    m_running;
+    std::queue<T>           m_workQ;
+    mutable std::mutex      m_mutex;
+    std::condition_variable m_cv;
+    std::thread             m_worker;
+
+public:
+    NOT_COPYABLE(WorkerThread)
+
+    WorkerThread(WorkerFn&& fn);
+    ~WorkerThread() noexcept;
+
+    void push(const T& data);
+};
+
+template<typename T>
+WorkerThread<T>::WorkerThread(WorkerFn&& fn)
     : m_running(false), m_worker([this, &fn] {
           std::unique_lock<std::mutex> lock(m_mutex);
           m_running = true;
@@ -49,7 +77,8 @@ WorkerThread::WorkerThread(WorkerFn&& fn)
       })
 {}
 
-WorkerThread::~WorkerThread() noexcept
+template<typename T>
+WorkerThread<T>::~WorkerThread() noexcept
 {
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -66,7 +95,8 @@ WorkerThread::~WorkerThread() noexcept
     }
 }
 
-void WorkerThread::push(const std::string& data)
+template<typename T>
+void WorkerThread<T>::push(const T& data)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_workQ.push(data);

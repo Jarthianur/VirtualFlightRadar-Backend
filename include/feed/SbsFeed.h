@@ -23,9 +23,10 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
 
 #include "config/Properties.h"
-#include "util/WorkerThread.h"
+#include "util/WorkerThread.hpp"
 #include "util/defines.h"
 
 #include "Feed.h"
@@ -50,8 +51,8 @@ namespace feed
  */
 class SbsFeed : public Feed
 {
-    static parser::SbsParser s_parser;  ///< Parser to unpack response from Client
-    util::WorkerThread       m_worker;
+    static parser::SbsParser        s_parser;  ///< Parser to unpack response from Client
+    util::WorkerThread<std::string> m_worker;
 
 public:
     NOT_COPYABLE(SbsFeed)
