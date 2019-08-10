@@ -37,7 +37,14 @@ parser::AprsParser AprscFeed::s_parser;
 
 AprscFeed::AprscFeed(const std::string& name, const Properties& properties,
                      std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
-    : Feed(name, LOG_PREFIX, properties, data)
+    : Feed(name, LOG_PREFIX, properties, data), m_worker([this](std::string&& work) {
+          try
+          {
+              m_data->update(s_parser.unpack(work, m_priority));
+          }
+          catch (const parser::UnpackError&)
+          {}
+      })
 {
     parser::AprsParser::s_maxHeight = maxHeight;
     if (properties.property(Configuration::KV_KEY_LOGIN, "-") == "-")
@@ -54,12 +61,7 @@ Feed::Protocol AprscFeed::protocol() const
 
 bool AprscFeed::process(const std::string& response)
 {
-    try
-    {
-        m_data->update(s_parser.unpack(response, m_priority));
-    }
-    catch (const parser::UnpackError&)
-    {}
+    m_worker.push(response);
     return true;
 }
 

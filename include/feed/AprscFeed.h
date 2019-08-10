@@ -25,6 +25,7 @@
 #include <memory>
 
 #include "config/Properties.h"
+#include "util/WorkerThread.h"
 #include "util/defines.h"
 
 #include "Feed.h"
@@ -52,6 +53,7 @@ class AprscFeed : public Feed
     static constexpr auto LOG_PREFIX = "(AprscFeed) ";
 
     static parser::AprsParser s_parser;  ///< Parser to unpack response from Client
+    util::WorkerThread        m_worker;
 
 public:
     NOT_COPYABLE(AprscFeed)

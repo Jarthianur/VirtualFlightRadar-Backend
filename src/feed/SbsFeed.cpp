@@ -21,8 +21,6 @@
 
 #include "feed/SbsFeed.h"
 
-#include <unordered_map>
-
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "feed/parser/SbsParser.h"
@@ -34,9 +32,18 @@ namespace feed
 {
 parser::SbsParser SbsFeed::s_parser;
 
+constexpr auto LOG_PREFIX = "(SbsFeed) ";
+
 SbsFeed::SbsFeed(const std::string& name, const Properties& properties,
                  std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
-    : Feed(name, LOG_PREFIX, properties, data)
+    : Feed(name, LOG_PREFIX, properties, data), m_worker([this](std::string&& work) {
+          try
+          {
+              m_data->update(s_parser.unpack(work, m_priority));
+          }
+          catch (const parser::UnpackError&)
+          {}
+      })
 {
     parser::SbsParser::s_maxHeight = maxHeight;
 }
@@ -48,12 +55,7 @@ Feed::Protocol SbsFeed::protocol() const
 
 bool SbsFeed::process(const std::string& response)
 {
-    try
-    {
-        m_data->update(s_parser.unpack(response, m_priority));
-    }
-    catch (const parser::UnpackError&)
-    {}
+    m_worker.push(response);
     return true;
 }
 

@@ -59,4 +59,14 @@ TEST_MODULE(test_math, {
         assertEquals(math::checksum("\0", sizeof("\0")), 0);
         assertEquals(math::checksum("$abc*", sizeof("$abc*")), 96);
     });
+    test("saturate", [] {
+        assertEquals(math::saturate(15, 0, 10), 10);
+        assertEquals(math::saturate(9, 0, 10), 9);
+        assertEquals(math::saturate(1, 3, 10), 3);
+        assertEquals(math::saturate(-5, -10, 10), -5);
+        assertEquals(math::saturate(-5, 0, 10), 0);
+    });
+    test("checkLimits", [] {
+
+    });
 })
