@@ -163,16 +163,17 @@ inline std::list<std::string> split(const std::string& str, char delim = ',')
 }
 
 Configuration::Configuration(std::istream& stream)
-try : m_properties(ConfigReader(stream).read()),
-      groundMode(!m_properties.property(PATH_GND_MODE).empty()),
-      gpsPosition(resolvePosition(m_properties)),
-      atmPressure(boost::get<double>(checkNumber(
-          stringToNumber<double>(m_properties.property(PATH_PRESSURE, "1013.25")), PATH_PRESSURE))),
-      maxHeight(resolveFilter(m_properties, PATH_MAX_HEIGHT)),
-      maxDistance(resolveFilter(m_properties, PATH_MAX_DIST)),
-      serverPort(resolveServerPort(m_properties)),
-      feedNames(split(m_properties.property(PATH_FEEDS))),
-      feedProperties(resolveFeeds(m_properties))
+try :
+    m_properties(ConfigReader(stream).read()),
+    groundMode(!m_properties.property(PATH_GND_MODE).empty()),
+    gpsPosition(resolvePosition(m_properties)),
+    atmPressure(boost::get<double>(
+        checkNumber(stringToNumber<double>(m_properties.property(PATH_PRESSURE, "1013.25")), PATH_PRESSURE))),
+    maxHeight(resolveFilter(m_properties, PATH_MAX_HEIGHT)),
+    maxDistance(resolveFilter(m_properties, PATH_MAX_DIST)),
+    serverPort(resolveServerPort(m_properties)),
+    feedNames(split(m_properties.property(PATH_FEEDS))),
+    feedProperties(resolveFeeds(m_properties))
 {
     dumpInfo();
 }
@@ -188,8 +189,8 @@ object::GpsPosition Configuration::resolvePosition(const Properties& properties)
         checkNumber(stringToNumber<double>(properties.property(PATH_LATITUDE, "0.0")), PATH_LATITUDE));
     pos.longitude = boost::get<double>(
         checkNumber(stringToNumber<double>(properties.property(PATH_LONGITUDE, "0.0")), PATH_LONGITUDE));
-    pos.altitude = boost::get<std::int32_t>(checkNumber(
-        stringToNumber<std::int32_t>(properties.property(PATH_ALTITUDE, "0")), PATH_ALTITUDE));
+    pos.altitude = boost::get<std::int32_t>(
+        checkNumber(stringToNumber<std::int32_t>(properties.property(PATH_ALTITUDE, "0")), PATH_ALTITUDE));
     double geoid = boost::get<double>(
         checkNumber(stringToNumber<double>(properties.property(PATH_GEOID, "0.0")), PATH_GEOID));
     return object::GpsPosition(0, pos, geoid);
@@ -199,9 +200,8 @@ std::uint16_t Configuration::resolveServerPort(const Properties& properties) con
 {
     try
     {
-        std::uint64_t port = boost::get<std::uint64_t>(
-            checkNumber(stringToNumber<std::uint64_t>(properties.property(PATH_SERVER_PORT, "4353")),
-                        PATH_SERVER_PORT));
+        std::uint64_t port = boost::get<std::uint64_t>(checkNumber(
+            stringToNumber<std::uint64_t>(properties.property(PATH_SERVER_PORT, "4353")), PATH_SERVER_PORT));
         if (port > std::numeric_limits<std::uint16_t>::max())
         {
             throw std::invalid_argument("invalid port number");

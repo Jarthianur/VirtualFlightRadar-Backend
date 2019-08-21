@@ -21,15 +21,14 @@
 
 #pragma once
 
+#include <cstddef>
 #include <ctime>
 
 #include "object/GpsPosition.h"
 
 #include "Processor.hpp"
 
-namespace data
-{
-namespace processor
+namespace data::processor
 {
 /**
  * @brief Process GPS positions to NMEA GGA and RMC sentences.
@@ -74,5 +73,4 @@ public:
     void process(object::GpsPosition& position) const override;
 };
 
-}  // namespace processor
-}  // namespace data
+}  // namespace data::processor

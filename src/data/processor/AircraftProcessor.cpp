@@ -22,6 +22,7 @@
 #include "data/processor/AircraftProcessor.h"
 
 #include <cmath>
+#include <cstdio>
 #include <limits>
 
 #include "util/math.hpp"
@@ -29,9 +30,7 @@
 
 using namespace object;
 
-namespace data
-{
-namespace processor
+namespace data::processor
 {
 AircraftProcessor::AircraftProcessor() : AircraftProcessor(std::numeric_limits<std::int32_t>::max()) {}
 
@@ -124,5 +123,4 @@ std::size_t AircraftProcessor::appendPFLAA(Aircraft& aircraft, std::size_t pos) 
     return pos + static_cast<std::size_t>(bytes);
 }
 
-}  // namespace processor
-}  // namespace data
+}  // namespace data::processor

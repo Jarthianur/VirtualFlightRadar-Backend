@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 #include "object/Aircraft.h"
@@ -28,9 +29,7 @@
 
 #include "Processor.hpp"
 
-namespace data
-{
-namespace processor
+namespace data::processor
 {
 /**
  * @brief Process aircrafts to NMEA relative to the refered position.
@@ -90,5 +89,4 @@ public:
     void referTo(const object::Location& location, double atmPress);
 };
 
-}  // namespace processor
-}  // namespace data
+}  // namespace data::processor

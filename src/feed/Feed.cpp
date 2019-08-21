@@ -67,8 +67,7 @@ std::uint32_t Feed::initPriority() const noexcept
 
 client::net::Endpoint Feed::endpoint() const
 {
-    return {properties.property(Configuration::KV_KEY_HOST),
-            properties.property(Configuration::KV_KEY_PORT)};
+    return {properties.property(Configuration::KV_KEY_HOST), properties.property(Configuration::KV_KEY_PORT)};
 }
 
 }  // namespace feed

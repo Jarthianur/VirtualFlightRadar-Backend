@@ -23,9 +23,7 @@
 
 #include <string>
 
-namespace client
-{
-namespace net
+namespace client::net
 {
 /**
  * @brief A remote endpoint
@@ -45,5 +43,4 @@ struct Endpoint
         return host == other.host && port == other.port;
     }
 };
-}  // namespace net
-}  // namespace client
+}  // namespace client::net

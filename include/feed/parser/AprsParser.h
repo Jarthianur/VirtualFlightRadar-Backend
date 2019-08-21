@@ -29,28 +29,26 @@
 
 #include "Parser.hpp"
 
-namespace feed
-{
-namespace parser
+namespace feed::parser
 {
 /**
  * @brief Implement Parser for APRS sentences.
  */
 class AprsParser : public Parser<object::Aircraft>
 {
-    static constexpr auto RE_APRS_TIME     = 1;  ///< APRS regex match group of time
-    static constexpr auto RE_APRS_LAT      = 2;  ///< APRS regex match group of latitude
-    static constexpr auto RE_APRS_LAT_DIR  = 3;  ///< APRS regex match group of latitude orientation
-    static constexpr auto RE_APRS_LON      = 4;  ///< APRS regex match group of longitude
-    static constexpr auto RE_APRS_LON_DIR  = 5;  ///< APRS regex match group of longitude orientation
-    static constexpr auto RE_APRS_HEAD     = 6;  ///< APRS regex match group of heading
-    static constexpr auto RE_APRS_GND_SPD  = 7;  ///< APRS regex match group of ground speed
-    static constexpr auto RE_APRS_ALT      = 8;  ///< APRS regex match group of altitude
-    static constexpr auto RE_APRS_COM      = 9;  ///< APRS regex match group of comment
-    static constexpr auto RE_APRS_COM_TYPE = 1;  ///< APRS regex match group of id and aircraft type
-    static constexpr auto RE_APRS_COM_ID   = 2;  ///< APRS regex match group of aircraft id
-    static constexpr auto RE_APRS_COM_CR   = 3;  ///< APRS regex match group of climb rate
-    static constexpr auto RE_APRS_COM_TR   = 4;  ///< APRS regex match group of turn rate
+    inline static constexpr auto RE_APRS_TIME     = 1;  ///< APRS regex match group of time
+    inline static constexpr auto RE_APRS_LAT      = 2;  ///< APRS regex match group of latitude
+    inline static constexpr auto RE_APRS_LAT_DIR  = 3;  ///< APRS regex match group of latitude orientation
+    inline static constexpr auto RE_APRS_LON      = 4;  ///< APRS regex match group of longitude
+    inline static constexpr auto RE_APRS_LON_DIR  = 5;  ///< APRS regex match group of longitude orientation
+    inline static constexpr auto RE_APRS_HEAD     = 6;  ///< APRS regex match group of heading
+    inline static constexpr auto RE_APRS_GND_SPD  = 7;  ///< APRS regex match group of ground speed
+    inline static constexpr auto RE_APRS_ALT      = 8;  ///< APRS regex match group of altitude
+    inline static constexpr auto RE_APRS_COM      = 9;  ///< APRS regex match group of comment
+    inline static constexpr auto RE_APRS_COM_TYPE = 1;  ///< APRS regex match group of id and aircraft type
+    inline static constexpr auto RE_APRS_COM_ID   = 2;  ///< APRS regex match group of aircraft id
+    inline static constexpr auto RE_APRS_COM_CR   = 3;  ///< APRS regex match group of climb rate
+    inline static constexpr auto RE_APRS_COM_TR   = 4;  ///< APRS regex match group of turn rate
 
     static const boost::regex s_APRS_RE;    ///< Regular expression for APRS protocol
     static const boost::regex s_APRSExtRE;  ///< Regular expression for OGN specific APRS extension
@@ -104,5 +102,4 @@ public:
      */
     object::Aircraft unpack(const std::string& sentence, std::uint32_t priority) const override;
 };
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser

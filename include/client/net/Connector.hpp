@@ -25,9 +25,7 @@
 #include <functional>
 #include <string>
 
-namespace client
-{
-namespace net
+namespace client::net
 {
 struct Endpoint;
 
@@ -100,5 +98,4 @@ public:
      */
     virtual bool timerExpired() = 0;
 };
-}  // namespace net
-}  // namespace client
+}  // namespace client::net

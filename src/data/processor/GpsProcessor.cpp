@@ -22,15 +22,13 @@
 #include "data/processor/GpsProcessor.h"
 
 #include <cmath>
-#include <ctime>
+#include <cstdio>
 
 #include "util/math.hpp"
 
 using namespace object;
 
-namespace data
-{
-namespace processor
+namespace data::processor
 {
 GpsProcessor::GpsProcessor() : Processor<object::GpsPosition>() {}
 
@@ -80,5 +78,4 @@ void GpsProcessor::evalPosition(double latitude, double longitude) const
     m_minLongitude = std::abs(60.0 * (longitude - m_degLongitude));
 }
 
-}  // namespace processor
-}  // namespace data
+}  // namespace data::processor

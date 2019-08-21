@@ -28,10 +28,8 @@
 #include "client/net/Endpoint.hpp"
 #include "util/Logger.hpp"
 
-namespace client
+namespace client::net
 {
-using namespace net;
-
 ConnectorImplBoost::ConnectorImplBoost()
     : Connector(),
       m_ioService(),
@@ -185,4 +183,4 @@ void ConnectorImplBoost::handleRead(const boost::system::error_code& error, std:
     }
     callback(bool(error), m_response);
 }
-}  // namespace client
+}  // namespace client::net

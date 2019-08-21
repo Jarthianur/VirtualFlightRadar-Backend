@@ -29,9 +29,7 @@
 #include "client/net/Connector.hpp"
 #include "util/defines.h"
 
-namespace client
-{
-namespace net
+namespace client::net
 {
 /**
  * @brief Implement the Connector interface using boost::asio.
@@ -153,5 +151,4 @@ public:
      */
     bool timerExpired() override;
 };
-}  // namespace net
-}  // namespace client
+}  // namespace client::net
