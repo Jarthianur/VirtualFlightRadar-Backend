@@ -24,9 +24,9 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <unordered_map>
 
 #include "config/Properties.h"
+#include "util/WorkerThread.hpp"
 #include "util/defines.h"
 
 #include "Feed.h"
@@ -51,12 +51,15 @@ namespace feed
  */
 class AprscFeed : public Feed
 {
+    static constexpr auto LOG_PREFIX = "(AprscFeed) ";
+
+    static parser::AprsParser       s_parser;  ///< Parser to unpack response from Client
+    util::WorkerThread<std::string> m_worker;
+
 public:
     NOT_COPYABLE(AprscFeed)
-    DEFAULT_DTOR(AprscFeed)
 
     /**
-     * @brief Constructor
      * @param name       The unique name
      * @param properties The Properties
      * @param data       The AircraftData container
@@ -65,12 +68,13 @@ public:
      */
     AprscFeed(const std::string& name, const config::Properties& propertyMap,
               std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
+    ~AprscFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::APRS
      */
-    Protocol get_protocol() const override;
+    Protocol protocol() const override;
 
     /**
      * @brief Implement Feed::process.
@@ -81,11 +85,7 @@ public:
      * @brief Get the login string.
      * @return the login
      */
-    std::string get_login() const;
-
-private:
-    /// Parser to unpack response from Client
-    static parser::AprsParser s_parser;
+    std::string login() const;
 };
 
 }  // namespace feed

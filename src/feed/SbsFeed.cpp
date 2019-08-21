@@ -21,41 +21,41 @@
 
 #include "feed/SbsFeed.h"
 
-#include <unordered_map>
-
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "feed/parser/SbsParser.h"
 #include "object/Aircraft.h"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(SbsFeed)"
+using namespace config;
 
 namespace feed
 {
 parser::SbsParser SbsFeed::s_parser;
 
-SbsFeed::SbsFeed(const std::string& name, const config::Properties& properties,
+constexpr auto LOG_PREFIX = "(SbsFeed) ";
+
+SbsFeed::SbsFeed(const std::string& name, const Properties& properties,
                  std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
-    : Feed(name, COMPONENT, properties, data)
+    : Feed(name, LOG_PREFIX, properties, data), m_worker([this](std::string&& work) {
+          try
+          {
+              m_data->update(s_parser.unpack(work, m_priority));
+          }
+          catch (const parser::UnpackError&)
+          {}
+      })
 {
     parser::SbsParser::s_maxHeight = maxHeight;
 }
 
-Feed::Protocol SbsFeed::get_protocol() const
+Feed::Protocol SbsFeed::protocol() const
 {
     return Protocol::SBS;
 }
 
 bool SbsFeed::process(const std::string& response)
 {
-    object::Aircraft ac(get_priority());
-    if (s_parser.unpack(response, ac))
-    {
-        m_data->update(std::move(ac));
-    }
+    m_worker.push(response);
     return true;
 }
 

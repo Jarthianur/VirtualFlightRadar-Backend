@@ -21,48 +21,39 @@
 
 #include "feed/GpsFeed.h"
 
-#include <stdexcept>
-#include <unordered_map>
-
 #include "config/Configuration.h"
 #include "data/GpsData.h"
 #include "feed/parser/GpsParser.h"
 #include "object/GpsPosition.h"
 #include "util/Logger.hpp"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(GpsFeed)"
+using namespace config;
 
 namespace feed
 {
 parser::GpsParser GpsFeed::s_parser;
 
-GpsFeed::GpsFeed(const std::string& name, const config::Properties& properties,
-                 std::shared_ptr<data::GpsData> data)
-    : Feed(name, COMPONENT, properties, data)
+GpsFeed::GpsFeed(const std::string& name, const Properties& properties, std::shared_ptr<data::GpsData> data)
+    : Feed(name, LOG_PREFIX, properties, data)
 {}
 
-Feed::Protocol GpsFeed::get_protocol() const
+Feed::Protocol GpsFeed::protocol() const
 {
     return Protocol::GPS;
 }
 
 bool GpsFeed::process(const std::string& response)
 {
-    object::GpsPosition pos(get_priority());
-    if (s_parser.unpack(response, pos))
+    try
     {
-        try
-        {
-            m_data->update(std::move(pos));
-        }
-        catch (const data::GpsDataException& e)
-        {
-            logger.info(m_component, " ", m_name, ": ", e.what());
-            return false;
-        }
+        m_data->update(s_parser.unpack(response, m_priority));
+    }
+    catch (const parser::UnpackError&)
+    {}
+    catch (const data::GpsDataException& e)
+    {
+        logger.info(m_logPrefix, name, ": ", e.what());
+        return false;
     }
     return true;
 }

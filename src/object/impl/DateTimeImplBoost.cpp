@@ -25,13 +25,12 @@
 
 namespace object
 {
-namespace timestamp
+namespace time
 {
 std::int64_t DateTimeImplBoost::now()
 {
     return static_cast<std::int64_t>(
-        boost::posix_time::time_duration(
-            boost::posix_time::microsec_clock::universal_time().time_of_day())
+        boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
             .total_milliseconds());
 }
 
@@ -41,5 +40,5 @@ std::uint32_t DateTimeImplBoost::day()
         boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
 }
 
-}  // namespace timestamp
+}  // namespace time
 }  // namespace object

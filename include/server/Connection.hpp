@@ -28,6 +28,7 @@
 #include "net/SocketException.h"
 #include "util/Logger.hpp"
 #include "util/defines.h"
+#include "util/utility.hpp"
 
 namespace server
 {
@@ -38,9 +39,19 @@ namespace server
 template<typename SocketT>
 class Connection final
 {
+    SocketT m_socket;  ///< Socket
+
+    /**
+     * @brief Constructor
+     * @param socket The socket
+     */
+    explicit Connection(SocketT&& socket);
+
 public:
+    const std::string address;  ///< IP address
+
     NOT_COPYABLE(Connection)
-    DEFAULT_DTOR(Connection)
+    ~Connection() noexcept = default;
 
     /**
      * @brief Start a Connection.
@@ -54,26 +65,7 @@ public:
      * @param msg The message
      * @return true on success, else false
      */
-    bool write(const std::string& msg);
-
-private:
-    /**
-     * @brief Constructor
-     * @param socket The socket
-     */
-    explicit Connection(SocketT&& socket);
-
-    /// Socket
-    SocketT m_socket;
-
-    /// IP address
-    const std::string m_address;
-
-public:
-    /**
-     * Getters
-     */
-    GETTER_CR(address)
+    bool write(const util::CStringPack& msg);
 };
 
 template<typename SocketT>
@@ -83,7 +75,7 @@ std::unique_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socke
 }
 
 template<typename SocketT>
-bool Connection<SocketT>::write(const std::string& msg)
+bool Connection<SocketT>::write(const util::CStringPack& msg)
 {
     try
     {
@@ -97,8 +89,7 @@ bool Connection<SocketT>::write(const std::string& msg)
 }
 
 template<typename SocketT>
-Connection<SocketT>::Connection(SocketT&& socket)
-    : m_socket(std::move(socket)), m_address(m_socket.get_address())
+Connection<SocketT>::Connection(SocketT&& socket) : m_socket(std::move(socket)), address(m_socket.address())
 {}
 
 }  // namespace server

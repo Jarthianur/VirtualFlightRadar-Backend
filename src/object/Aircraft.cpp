@@ -23,16 +23,39 @@
 
 #include <typeinfo>
 
+#include "util/math.hpp"
+
 namespace object
 {
-Aircraft::Aircraft() : Aircraft(0) {}
-
-Aircraft::Aircraft(std::uint32_t priority)
+Aircraft::Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT,
+                   const Location& loc, const Movement& move,
+                   const Timestamp<time::DateTimeImplBoost>& timestamp)
     : Object(priority),
-      m_idType(IdType::ICAO),
-      m_aircraftType(AircraftType::POWERED_AIRCRAFT),
-      m_targetType(TargetType::TRANSPONDER)
-{}
+      m_id(id),
+      m_idType(idT > IdType::OGN ? IdType::RANDOM : idT),
+      m_aircraftType(aT > AircraftType::STATIC_OBJECT ? AircraftType::UNKNOWN : aT),
+      m_targetType(TargetType::FLARM),
+      m_location(loc),
+      m_movement(move),
+      m_timestamp(timestamp),
+      m_fullInfo(true)
+{
+    math::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
+    math::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
+}
+
+Aircraft::Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT,
+                   const Location& loc, const Timestamp<time::DateTimeImplBoost>& timestamp)
+    : Aircraft(priority, id, idT, aT, loc, {.0, .0, .0}, timestamp)
+{
+    m_targetType = TargetType::TRANSPONDER;
+    m_fullInfo   = false;
+}
+
+Aircraft::Aircraft(Aircraft&& other) : m_id(other.m_id)
+{
+    assign(std::move(other));
+}
 
 void Aircraft::assign(Object&& other)
 {
@@ -43,9 +66,9 @@ void Aircraft::assign(Object&& other)
         this->m_idType       = update.m_idType;
         this->m_aircraftType = update.m_aircraftType;
         this->m_targetType   = update.m_targetType;
-        this->m_position     = update.m_position;
+        this->m_location     = update.m_location;
         this->m_movement     = update.m_movement;
-        this->m_timeStamp    = update.m_timeStamp;
+        this->m_timestamp    = update.m_timestamp;
         this->m_fullInfo     = update.m_fullInfo;
     }
     catch (const std::bad_cast&)
@@ -57,7 +80,7 @@ bool Aircraft::canUpdate(const Object& other) const
     try
     {
         const Aircraft& toUpdate = dynamic_cast<const Aircraft&>(other);
-        return (this->m_timeStamp > toUpdate.m_timeStamp) &&
+        return (this->m_timestamp > toUpdate.m_timestamp) &&
                (toUpdate.m_targetType == TargetType::TRANSPONDER ||
                 this->m_targetType == TargetType::FLARM) &&
                Object::canUpdate(other);
@@ -68,14 +91,65 @@ bool Aircraft::canUpdate(const Object& other) const
     }
 }
 
-void Aircraft::set_aircraftType(Aircraft::AircraftType type)
+util::CStringPack Aircraft::nmea() const
 {
-    m_aircraftType = type > AircraftType::STATIC_OBJECT ? AircraftType::UNKNOWN : type;
+    return m_nmea;
 }
 
-void Aircraft::set_idType(Aircraft::IdType type)
+util::CString<Aircraft::NMEA_SIZE>& Aircraft::operator*()
 {
-    m_idType = type > IdType::OGN ? IdType::RANDOM : type;
+    return m_nmea;
+}
+
+Aircraft& Aircraft::operator=(Aircraft&& other)
+{
+    tryUpdate(std::move(other));
+    return *this;
+}
+
+auto Aircraft::idType() const -> decltype(m_idType)
+{
+    return m_idType;
+}
+
+auto Aircraft::aircraftType() const -> decltype(m_aircraftType)
+{
+    return m_aircraftType;
+}
+
+auto Aircraft::id() const -> const decltype(m_id)&
+{
+    return m_id;
+}
+
+auto Aircraft::targetType() const -> decltype(m_targetType)
+{
+    return m_targetType;
+}
+
+auto Aircraft::location() const -> const decltype(m_location)&
+{
+    return m_location;
+}
+
+auto Aircraft::movement() const -> const decltype(m_movement)&
+{
+    return m_movement;
+}
+
+auto Aircraft::timestamp() const -> const decltype(m_timestamp)&
+{
+    return m_timestamp;
+}
+
+auto Aircraft::hasFullInfo() const -> decltype(m_fullInfo)
+{
+    return m_fullInfo;
+}
+
+void Aircraft::targetType(TargetType tt)
+{
+    m_targetType = tt;
 }
 
 }  // namespace object

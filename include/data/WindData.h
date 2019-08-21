@@ -21,10 +21,9 @@
 
 #pragma once
 
-#include <string>
+#include <mutex>
 
 #include "object/Wind.h"
-#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -35,24 +34,13 @@ namespace data
  */
 class WindData : public Data
 {
+    object::Wind       m_wind;  ///< The Wind information
+    mutable std::mutex m_mutex;
+
 public:
-    DEFAULT_DTOR(WindData)
-
     WindData();
-
-    /**
-     * @brief Constructor
-     * @param wind The initial wind information
-     */
-    explicit WindData(const object::Wind& wind);
-
-    /**
-     * @brief Get the MWV sentence.
-     * @note The wind info is invalid after this operation.
-     * @param dest The destination string to append data
-     * @threadsafe
-     */
-    void get_serialized(std::string& dest) override;
+    explicit WindData(const object::Wind& wind);  ///< @param wind The initial wind information
+    ~WindData() noexcept override = default;
 
     /**
      * @brief Update the wind information.
@@ -62,9 +50,7 @@ public:
      */
     bool update(object::Object&& wind) override;
 
-private:
-    /// The Wind information
-    object::Wind m_wind;
+    void access(const accessor_fn& func) override;
 };
 
 }  // namespace data

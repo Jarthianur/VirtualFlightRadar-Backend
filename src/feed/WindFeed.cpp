@@ -21,39 +21,35 @@
 
 #include "feed/WindFeed.h"
 
-#include <unordered_map>
-
 #include "config/Configuration.h"
 #include "data/WindData.h"
 #include "feed/parser/WindParser.h"
 #include "object/Wind.h"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(WindFeed)"
+using namespace config;
 
 namespace feed
 {
 parser::WindParser WindFeed::s_parser;
 
-WindFeed::WindFeed(const std::string& name, const config::Properties& properties,
+WindFeed::WindFeed(const std::string& name, const Properties& properties,
                    std::shared_ptr<data::WindData> data)
-    : Feed(name, COMPONENT, properties, data)
+    : Feed(name, LOG_PREFIX, properties, data)
 {}
 
-Feed::Protocol WindFeed::get_protocol() const
+Feed::Protocol WindFeed::protocol() const
 {
     return Protocol::SENSOR;
 }
 
 bool WindFeed::process(const std::string& response)
 {
-    object::Wind wind(get_priority());
-    if (s_parser.unpack(response, wind))
+    try
     {
-        m_data->update(std::move(wind));
+        m_data->update(s_parser.unpack(response, m_priority));
     }
+    catch (const parser::UnpackError&)
+    {}
     return true;
 }
 

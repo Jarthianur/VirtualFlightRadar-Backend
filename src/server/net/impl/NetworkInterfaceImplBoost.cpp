@@ -31,6 +31,8 @@ namespace server
 {
 using namespace net;
 
+constexpr auto LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
+
 NetworkInterfaceImplBoost::NetworkInterfaceImplBoost(std::uint16_t port)
     : NetworkInterface<SocketImplBoost>(),
       m_ioService(),
@@ -56,11 +58,11 @@ void NetworkInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
     }
     catch (const std::exception& e)
     {
-        logger.error("NetworkInterfaceImplBoost::run() caught: ", e.what());
+        logger.error(LOG_PREFIX, ": ", e.what());
     }
     catch (...)
     {
-        logger.error("NetworkInterfaceImplBoost::run() caught error");
+        logger.error(LOG_PREFIX, ": unknown error");
     }
 }
 
@@ -81,9 +83,8 @@ void NetworkInterfaceImplBoost::onAccept(const std::function<void(bool)>& callba
 {
     if (m_acceptor.is_open())
     {
-        m_acceptor.async_accept(m_socket.get(),
-                                boost::bind(&NetworkInterfaceImplBoost::handleAccept, this,
-                                            boost::asio::placeholders::error, callback));
+        m_acceptor.async_accept(m_socket.get(), boost::bind(&NetworkInterfaceImplBoost::handleAccept, this,
+                                                            boost::asio::placeholders::error, callback));
     }
 }
 
@@ -97,9 +98,9 @@ void NetworkInterfaceImplBoost::handleAccept(const boost::system::error_code& er
 {
     if (error)
     {
-        logger.debug("(Server) accept: ", error.message());
+        logger.debug(LOG_PREFIX, "accept: ", error.message());
     }
-    callback(error);
+    callback(bool(error));
 }
 
 std::unique_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startConnection()
@@ -111,9 +112,9 @@ std::unique_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startCon
     return Connection<SocketImplBoost>::create(std::move(m_socket));
 }
 
-std::string NetworkInterfaceImplBoost::get_currentAddress() const
+std::string NetworkInterfaceImplBoost::stagedAddress() const
 {
-    return m_socket.get_address();
+    return m_socket.address();
 }
 
 }  // namespace server

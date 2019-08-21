@@ -21,10 +21,7 @@
 
 #pragma once
 
-#include <string>
-
 #include "object/Wind.h"
-#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -38,9 +35,8 @@ namespace parser
 class WindParser : public Parser<object::Wind>
 {
 public:
-    DEFAULT_DTOR(WindParser)
-
     WindParser();
+    ~WindParser() noexcept override = default;
 
     /**
      * @brief Unpack into Wind.
@@ -48,7 +44,7 @@ public:
      * @param wind     The Wind to unpack into
      * @return true on success, else false
      */
-    bool unpack(const std::string& sentence, object::Wind& wind) noexcept override;
+    object::Wind unpack(const std::string& sentence, std::uint32_t priority) const override;
 };
 }  // namespace parser
 }  // namespace feed

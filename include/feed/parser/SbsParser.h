@@ -21,11 +21,7 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-
 #include "object/Aircraft.h"
-#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -38,32 +34,24 @@ namespace parser
  */
 class SbsParser : public Parser<object::Aircraft>
 {
+    static constexpr auto SBS_FIELD_ID   = 4;   ///< Field number of aircraft id
+    static constexpr auto SBS_FIELD_TIME = 7;   ///< Field number of time
+    static constexpr auto SBS_FIELD_ALT  = 11;  ///< Field number of altitude
+    static constexpr auto SBS_FIELD_LAT  = 14;  ///< Field number of latitude
+    static constexpr auto SBS_FIELD_LON  = 15;  ///< Field number of longitude
+
 public:
-    DEFAULT_DTOR(SbsParser)
+    static std::int32_t s_maxHeight;  ///< The max height filter
 
     SbsParser();
+    ~SbsParser() noexcept override = default;
 
     /**
      * @brief Unpack into Aircraft.
      * @param sentence The string to unpack
      * @param aircraft The Aircraft to unpack into
      */
-    bool unpack(const std::string& sentence, object::Aircraft& aircraft) noexcept override;
-
-    /// The max height filter
-    static std::int32_t s_maxHeight;
-
-private:
-    /**
-     * @brief Parse a field in SBS and set respective values.
-     * @param fieldNr  The field number
-     * @param field    The string in that field
-     * @param position The target position
-     * @param aircraft The target Aircraft
-     * @return true on success, else false
-     */
-    bool parseField(std::uint32_t fieldNr, const std::string& field, object::Position& position,
-                    object::Aircraft& aircraft) noexcept;
+    object::Aircraft unpack(const std::string& sentence, std::uint32_t priority) const override;
 };
 }  // namespace parser
 }  // namespace feed

@@ -31,25 +31,22 @@
 #include "object/Aircraft.h"
 #include "util/utility.hpp"
 
+#pragma clang diagnostic ignored "-Wweak-vtables"
 #include "sctf.hpp"
 
-#define TEST_FUNCTION(NAME) extern void NAME(test::TestSuitesRunner&);
-
 #define syso(M) std::cout << M << std::endl
-
 #define assertEqStr(V, E) assertT(V, EQUALS, E, std::string)
 
 namespace sctf
 {
-namespace util
+namespace _
 {
 template<>
-inline std::string
-    serialize<object::Aircraft::TargetType>(const object::Aircraft::TargetType& crTargetType)
+inline std::string to_string<object::Aircraft::TargetType>(const object::Aircraft::TargetType& crTargetType)
 {
-    return std::to_string(::util::raw_type(crTargetType));
+    return std::to_string(util::raw_type(crTargetType));
 }
-}  // namespace util
+}  // namespace _
 }  // namespace sctf
 
 namespace helper
@@ -63,8 +60,7 @@ static boost::regex gpsRe(
 static std::string timePlus(std::int32_t val)
 {
     return boost::posix_time::to_iso_string(
-        boost::posix_time::time_duration(
-            boost::posix_time::second_clock::local_time().time_of_day()) +
+        boost::posix_time::time_duration(boost::posix_time::second_clock::local_time().time_of_day()) +
         boost::posix_time::seconds(val));
 }
 }  // namespace helper

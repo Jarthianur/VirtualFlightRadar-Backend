@@ -22,10 +22,8 @@
 #pragma once
 
 #include <ctime>
-#include <string>
 
 #include "object/GpsPosition.h"
-#include "util/defines.h"
 
 #include "Processor.hpp"
 
@@ -38,55 +36,42 @@ namespace processor
  */
 class GpsProcessor : public Processor<object::GpsPosition>
 {
-public:
-    DEFAULT_DTOR(GpsProcessor)
+    mutable char   m_directionSN  = 'x';  ///< Orientation of the latitude (S,N)
+    mutable char   m_directionEW  = 'x';  ///< Orientation of the longitude (E,W)
+    mutable double m_degLatitude  = 0.0;  ///< Degrees of latitude
+    mutable double m_degLongitude = 0.0;  ///< Degrees of longitude
+    mutable double m_minLatitude  = 0.0;  ///< Minutes of latitude
+    mutable double m_minLongitude = 0.0;  ///< Minutes of longitude
 
-    GpsProcessor();
-
-    /**
-     * @brief Process a GPS position.
-     * @param rPosition The position
-     */
-    void process(object::GpsPosition& position) override;
-
-private:
     /**
      * @brief Append GPGGA sentence to processing string.
      * @param position The position
      * @param utc      The current utc time
      */
-    void appendGPGGA(const object::GpsPosition& position, const std::tm* utc);
+    std::size_t appendGPGGA(object::GpsPosition& position, const std::tm* utc, std::size_t pos) const;
 
     /**
      * @brief Append GPRMC sentence to processing string.
      * @param utc The current utc time
      */
-    void appendGPRMC(const std::tm* utc);
+    std::size_t appendGPRMC(object::GpsPosition& position, const std::tm* utc, std::size_t pos) const;
 
     /**
      * @brief Evaluate position for given latitude and longitude.
      * @param latitude  The latitude
      * @param longitude The longitude
      */
-    void evalPosition(double latitude, double longitude);
+    void evalPosition(double latitude, double longitude) const;
 
-    /// Orientation of the latitude (S,N)
-    mutable char m_directionSN = 'x';
+public:
+    GpsProcessor();
+    ~GpsProcessor() noexcept override = default;
 
-    /// Orientation of the longitude (E,W)
-    mutable char m_directionEW = 'x';
-
-    /// Degrees of latitude
-    mutable double m_degLatitude = 0.0;
-
-    /// Degrees of longitude
-    mutable double m_degLongitude = 0.0;
-
-    /// Minutes of latitude
-    mutable double m_minLatitude = 0.0;
-
-    /// Minutes of longitude
-    mutable double m_minLongitude = 0.0;
+    /**
+     * @brief Process a GPS position.
+     * @param rPosition The position
+     */
+    void process(object::GpsPosition& position) const override;
 };
 
 }  // namespace processor

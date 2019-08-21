@@ -32,24 +32,8 @@ namespace client
  */
 class AprscClient : public Client
 {
-public:
-    NOT_COPYABLE(AprscClient)
-    DEFAULT_DTOR(AprscClient)
+    const std::string m_login;  ///< Login string
 
-    /**
-     * @brief Constructor
-     * @param endpoint  The remote endpoint
-     * @param login     The login string
-     * @param connector The Connector interface
-     */
-    AprscClient(const net::Endpoint& endpoint, const std::string& login,
-                std::shared_ptr<net::Connector> connector);
-
-    bool equals(const Client& other) const override;
-
-    std::size_t hash() const override;
-
-private:
     /**
      * @brief Schedule sending of a keep-alive beacon.
      */
@@ -75,8 +59,20 @@ private:
      */
     void handleSendKeepAlive(bool error);
 
-    /// Login string
-    const std::string m_login;
+public:
+    NOT_COPYABLE(AprscClient)
+
+    /**
+     * @param endpoint  The remote endpoint
+     * @param login     The login string
+     * @param connector The Connector interface
+     */
+    AprscClient(const net::Endpoint& endpoint, const std::string& login,
+                std::shared_ptr<net::Connector> connector);
+    ~AprscClient() noexcept override = default;
+
+    bool        equals(const Client& other) const override;
+    std::size_t hash() const override;
 };
 
 }  // namespace client

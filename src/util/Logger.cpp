@@ -27,13 +27,13 @@
 
 Logger logger;
 
-void Logger::set_debug(bool enable)
+void Logger::debug(bool enable)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_debugEnabled = enable;
 }
 
-void Logger::set_logFile(const std::string& file)
+void Logger::logFile(const std::string& file)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_logFile = std::ofstream(file);
@@ -45,7 +45,7 @@ void Logger::set_logFile(const std::string& file)
     m_errStream = &m_logFile;
 }
 
-std::string Logger::get_time()
+std::string Logger::time()
 {
     std::time_t tt       = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     char        time[32] = "";

@@ -22,11 +22,10 @@
 #pragma once
 
 #include <exception>
-#include <string>
+#include <mutex>
 
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
-#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -37,31 +36,28 @@ namespace data
  */
 class GpsData : public Data
 {
-public:
-    DEFAULT_DTOR(GpsData)
+    static constexpr auto GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
+    static constexpr auto GPS_FIX_GOOD          = 1;    ///< Good fix quality
+    static constexpr auto GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
 
-    GpsData();
+    object::GpsPosition     m_position;                ///< The position
+    processor::GpsProcessor m_processor;               ///< Processor for GPS information
+    bool                    m_positionLocked = false;  ///< Locking state of the current position
+    bool                    m_groundMode     = false;  ///< Ground mode state
+    mutable std::mutex      m_mutex;
 
     /**
-     * @fn GpsData
-     * @brief Constructor
+     * @brief Check whether the position is good enough.
+     * @return true if yes, else false
+     */
+    bool isPositionGood() const;
+
+public:
+    /**
      * @param crPosition The initial info
      */
     GpsData(const object::GpsPosition& position, bool ground);
-
-    /**
-     * @brief Get NMEA GPS report.
-     * @param dest The destination string to append data
-     * @threadsafe
-     */
-    void get_serialized(std::string& dest) override;
-
-    /**
-     * @brief Get the position.
-     * @return the position
-     * @threadsafe
-     */
-    object::Position get_position();
+    ~GpsData() noexcept override = default;
 
     /**
      * @brief Update the position.
@@ -73,32 +69,21 @@ public:
      */
     bool update(object::Object&& position) override;
 
-private:
+    void access(const accessor_fn& func) override;
+
     /**
-     * @brief Check whether the position is good enough.
-     * @return true if yes, else false
+     * @brief Get the position.
+     * @return the position
+     * @threadsafe
      */
-    bool isPositionGood();
-
-    /// The position
-    object::GpsPosition m_position;
-
-    /// Processor for GPS information
-    processor::GpsProcessor m_processor;
-
-    /// Locking state of the current position
-    bool m_positionLocked = false;
-
-    /// Ground mode state
-    bool m_groundMode = false;
+    auto location() const -> decltype(m_position.location());
 };
 
 class GpsDataException : public std::exception
 {
 protected:
-    DEFAULT_VIRTUAL_DTOR(GpsDataException)
-
-    GpsDataException() : std::exception() {}
+    GpsDataException();
+    virtual ~GpsDataException() noexcept = default;
 };
 
 /**
@@ -107,10 +92,8 @@ protected:
 class PositionAlreadyLocked : public GpsDataException
 {
 public:
-    DEFAULT_DTOR(PositionAlreadyLocked)
-
     PositionAlreadyLocked();
-
+    ~PositionAlreadyLocked() noexcept override = default;
     const char* what() const noexcept override;
 };
 
@@ -120,10 +103,8 @@ public:
 class ReceivedGoodPosition : public GpsDataException
 {
 public:
-    DEFAULT_DTOR(ReceivedGoodPosition)
-
     ReceivedGoodPosition();
-
+    ~ReceivedGoodPosition() noexcept override = default;
     const char* what() const noexcept override;
 };
 

@@ -21,12 +21,9 @@
 
 #pragma once
 
-#include <string>
-
 #include <boost/regex.hpp>
 
 #include "object/GpsPosition.h"
-#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -39,10 +36,30 @@ namespace parser
  */
 class GpsParser : public Parser<object::GpsPosition>
 {
-public:
-    DEFAULT_DTOR(GpsParser)
+    static constexpr auto RE_GGA_TIME    = 1;   ///< GGA regex match capture group of time
+    static constexpr auto RE_GGA_LAT     = 2;   ///< GGA regex match capture group of latitude
+    static constexpr auto RE_GGA_LAT_DIR = 3;   ///< GGA regex match capture group of latitude orientation
+    static constexpr auto RE_GGA_LON     = 4;   ///< GGA regex match capture group of longitude
+    static constexpr auto RE_GGA_LON_DIR = 5;   ///< GGA regex match capture group of longitude orientation
+    static constexpr auto RE_GGA_FIX     = 6;   ///< GGA regex match capture group of fix quality
+    static constexpr auto RE_GGA_SAT     = 7;   ///< GGA regex match capture group of sitallite count
+    static constexpr auto RE_GGA_DIL     = 8;   ///< GGA regex match capture group of dilution
+    static constexpr auto RE_GGA_ALT     = 9;   ///< GGA regex match capture group of altitude
+    static constexpr auto RE_GGA_GEOID   = 10;  ///< GGA regex match capture group of geoid separation
 
+    static const boost::regex s_GPGGA_RE;  ///< Regular expression to parse GGA
+
+    /**
+     * @brief Parse a Position.
+     * @param match    The regex match
+     * @param position The target position
+     * @return true on success, else false
+     */
+    object::GpsPosition parsePosition(const boost::smatch& match, std::uint32_t priority) const;
+
+public:
     GpsParser();
+    ~GpsParser() noexcept override = default;
 
     /**
      * @brief Unpack into GpsPosition.
@@ -50,19 +67,7 @@ public:
      * @param position The position to unpack into
      * @return true on success, else false
      */
-    bool unpack(const std::string& sentence, object::GpsPosition& position) noexcept override;
-
-private:
-    /**
-     * @brief Parse a Position.
-     * @param match    The regex match
-     * @param position The target position
-     * @return true on success, else false
-     */
-    bool parsePosition(const boost::smatch& match, object::GpsPosition& position);
-
-    /// Regular expression to parse GGA
-    static const boost::regex s_GPGGA_RE;
+    object::GpsPosition unpack(const std::string& sentence, std::uint32_t priority) const override;
 };
 }  // namespace parser
 }  // namespace feed

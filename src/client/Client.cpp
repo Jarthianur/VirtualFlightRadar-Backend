@@ -30,13 +30,14 @@
 #include "feed/Feed.h"
 #include "util/Logger.hpp"
 
+#include "parameters.h"
+
 namespace client
 {
 using namespace net;
 
-Client::Client(const Endpoint& endpoint, const char* component,
-               std::shared_ptr<Connector> connector)
-    : m_connector(connector), m_component(component), m_endpoint(endpoint)
+Client::Client(const Endpoint& endpoint, const char* logPrefix, std::shared_ptr<Connector> connector)
+    : m_connector(connector), m_logPrefix(logPrefix), m_endpoint(endpoint)
 {}
 
 void Client::run()
@@ -72,8 +73,7 @@ void Client::subscribe(std::shared_ptr<feed::Feed> feed)
 
 void Client::connect()
 {
-    m_connector->onConnect(m_endpoint,
-                           std::bind(&Client::handleConnect, this, std::placeholders::_1));
+    m_connector->onConnect(m_endpoint, std::bind(&Client::handleConnect, this, std::placeholders::_1));
 }
 
 void Client::reconnect()
@@ -81,7 +81,7 @@ void Client::reconnect()
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_running)
     {
-        logger.info(m_component, " schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(m_logPrefix, "schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->close();
         timedConnect();
     }
@@ -90,7 +90,7 @@ void Client::reconnect()
 void Client::timedConnect()
 {
     m_connector->onTimeout(std::bind(&Client::handleTimedConnect, this, std::placeholders::_1),
-                           C_CON_WAIT_TIMEVAL);
+                           param::CLIENT_CONNECT_WAIT_TIMEVAL);
 }
 
 void Client::stop()
@@ -98,7 +98,7 @@ void Client::stop()
     if (m_running)
     {
         m_running = false;
-        logger.info(m_component, " disconnect from ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(m_logPrefix, "disconnect from ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->stop();
     }
 }
@@ -113,8 +113,7 @@ void Client::scheduleStop()
 
 void Client::read()
 {
-    m_connector->onRead(
-        std::bind(&Client::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+    m_connector->onRead(std::bind(&Client::handleRead, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void Client::handleTimedConnect(bool error)
@@ -122,12 +121,12 @@ void Client::handleTimedConnect(bool error)
     if (!error)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        logger.info(m_component, " try connect to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(m_logPrefix, "try connect to ", m_endpoint.host, ":", m_endpoint.port);
         connect();
     }
     else
     {
-        logger.error(m_component, " failed to connect after timeout");
+        logger.error(m_logPrefix, "failed to connect after timeout");
         scheduleStop();
     }
 }
@@ -148,7 +147,7 @@ void Client::handleRead(bool error, const std::string& response)
     }
     else
     {
-        logger.error(m_component, " failed to read message");
+        logger.error(m_logPrefix, "failed to read message");
         reconnect();
     }
 }

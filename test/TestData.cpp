@@ -46,7 +46,7 @@ void test_data(test::TestSuitesRunner& runner)
                 feed::parser::SbsParser sbsParser;
                 AircraftData            data;
                 Aircraft                ac;
-                Position                pos{49.0, 8.0, 0};
+                Location                pos{49.0, 8.0, 0};
                 double                  press = 1013.25;
                 sbsParser.unpack(
                     "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0",
@@ -66,7 +66,7 @@ void test_data(test::TestSuitesRunner& runner)
                 feed::parser::SbsParser sbsParser;
                 AircraftData            data;
                 Aircraft                ac;
-                Position                pos{49.0, 8.0, 0};
+                Location                pos{49.0, 8.0, 0};
                 double                  press = 1013.25;
                 sbsParser.unpack(
                     "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0",
@@ -85,7 +85,7 @@ void test_data(test::TestSuitesRunner& runner)
                 AircraftData             data;
                 boost::smatch            match;
                 Aircraft                 ac;
-                Position                 pos{49.0, 8.0, 0};
+                Location                 pos{49.0, 8.0, 0};
                 double                   press = 1013.25;
                 std::string              serial;
 
@@ -128,7 +128,7 @@ void test_data(test::TestSuitesRunner& runner)
             Aircraft                 ac1(1);
             Aircraft                 ac2(2);
             AircraftData             data;
-            Position                 pos{49.0, 8.0, 0};
+            Location                 pos{49.0, 8.0, 0};
             double                   press = 1013.25;
             std::string              dest;
 
@@ -159,12 +159,12 @@ void test_data(test::TestSuitesRunner& runner)
                    GpsData     data;
                    GpsPosition pos({10.0, 85.0, 100}, 40.0);
                    std::string fix;
-                   pos.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(
-                       helper::timePlus(-1), timestamp::Format::HHMMSS));
+                   pos.set_timeStamp(Timestamp<time::DateTimeImplBoost>(
+                       helper::timePlus(-1), time::Format::HHMMSS));
                    data.update(std::move(pos));
-                   assertEquals(data.get_position().latitude, 10.0);
-                   assertEquals(data.get_position().longitude, 85.0);
-                   assertEquals(data.get_position().altitude, 100);
+                   assertEquals(data.location().latitude, 10.0);
+                   assertEquals(data.location().longitude, 85.0);
+                   assertEquals(data.location().altitude, 100);
                    data.get_serialized(fix);
                    boost::smatch match;
                    bool          matched = boost::regex_search(fix, match, helper::gpsRe);
@@ -177,14 +177,14 @@ void test_data(test::TestSuitesRunner& runner)
                    GpsPosition pos1(1);
                    pos0.set_position({0.0, 0.0, 1000});
                    pos1.set_position({0.0, 0.0, 2000});
-                   pos1.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(
-                       helper::timePlus(0), timestamp::Format::HHMMSS));
+                   pos1.set_timeStamp(Timestamp<time::DateTimeImplBoost>(
+                       helper::timePlus(0), time::Format::HHMMSS));
                    assertTrue(data.update(std::move(pos1)));
-                   assertEquals(data.get_position().altitude, 2000);
-                   pos0.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(
-                       helper::timePlus(0), timestamp::Format::HHMMSS));
+                   assertEquals(data.location().altitude, 2000);
+                   pos0.set_timeStamp(Timestamp<time::DateTimeImplBoost>(
+                       helper::timePlus(0), time::Format::HHMMSS));
                    assertFalse(data.update(std::move(pos0)));
-                   assertEquals(data.get_position().altitude, 2000);
+                   assertEquals(data.location().altitude, 2000);
                })
         ->test("write after outdated", [] {
             GpsData     data;
@@ -193,21 +193,21 @@ void test_data(test::TestSuitesRunner& runner)
             std::string dest;
             pos1.set_position({0.0, 0.0, 1000});
             pos2.set_position({0.0, 0.0, 2000});
-            pos2.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(helper::timePlus(10),
-                                                                       timestamp::Format::HHMMSS));
+            pos2.set_timeStamp(Timestamp<time::DateTimeImplBoost>(helper::timePlus(10),
+                                                                       time::Format::HHMMSS));
             assertTrue(data.update(std::move(pos2)));
-            assertEquals(data.get_position().altitude, 2000);
-            pos1.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(helper::timePlus(20),
-                                                                       timestamp::Format::HHMMSS));
+            assertEquals(data.location().altitude, 2000);
+            pos1.set_timeStamp(Timestamp<time::DateTimeImplBoost>(helper::timePlus(20),
+                                                                       time::Format::HHMMSS));
             for (int i = 0; i < OBJ_OUTDATED; ++i)
             {
                 assertFalse(data.update(std::move(pos1)));
-                assertEquals(data.get_position().altitude, 2000);
+                assertEquals(data.location().altitude, 2000);
                 dest.clear();
                 data.get_serialized(dest);
             }
             assertTrue(data.update(std::move(pos1)));
-            assertEquals(data.get_position().altitude, 1000);
+            assertEquals(data.location().altitude, 1000);
         });
 
     describeParallel<WindData>("wind data", runner)
@@ -272,7 +272,7 @@ void test_data(test::TestSuitesRunner& runner)
                    data.update(std::move(atm));
                    data.get_serialized(dest);
                    assertEqStr(dest, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
-                   assertEquals(data.get_atmPressure(), 1009.1);
+                   assertEquals(data.atmPressure(), 1009.1);
                })
         ->test("write higher priority",
                [] {
@@ -282,9 +282,9 @@ void test_data(test::TestSuitesRunner& runner)
                    atm0.set_pressure(1009.1);
                    atm1.set_pressure(900.0);
                    data.update(std::move(atm0));
-                   assertEquals(data.get_atmPressure(), 1009.1);
+                   assertEquals(data.atmPressure(), 1009.1);
                    data.update(std::move(atm1));
-                   assertEquals(data.get_atmPressure(), 900.0);
+                   assertEquals(data.atmPressure(), 900.0);
                })
         ->test("write after outdated", [] {
             AtmosphereData data;
@@ -294,15 +294,15 @@ void test_data(test::TestSuitesRunner& runner)
             atm1.set_pressure(1009.1);
             atm2.set_pressure(900.0);
             assertTrue(data.update(std::move(atm2)));
-            assertEquals(data.get_atmPressure(), 900.0);
+            assertEquals(data.atmPressure(), 900.0);
             for (int i = 0; i < OBJ_OUTDATED; ++i)
             {
                 assertFalse(data.update(std::move(atm1)));
-                assertEquals(data.get_atmPressure(), 900.0);
+                assertEquals(data.atmPressure(), 900.0);
                 dest.clear();
                 data.get_serialized(dest);
             }
             assertTrue(data.update(std::move(atm1)));
-            assertEquals(data.get_atmPressure(), 1009.1);
+            assertEquals(data.atmPressure(), 1009.1);
         });
 }

@@ -23,11 +23,9 @@
 
 #include <cstdint>
 
-#include "util/defines.h"
-
 namespace object
 {
-namespace timestamp
+namespace time
 {
 /**
  * @brief Provide time functions using boost.
@@ -35,8 +33,8 @@ namespace timestamp
 class DateTimeImplBoost
 {
 public:
-    DEFAULT_CTOR(DateTimeImplBoost)
-    DEFAULT_DTOR(DateTimeImplBoost)
+    DateTimeImplBoost()           = default;
+    ~DateTimeImplBoost() noexcept = default;
 
     /**
      * @brief Get the amount of milliseconds since 00:00 UTC.
@@ -50,5 +48,5 @@ public:
      */
     static std::uint32_t day();
 };
-}  // namespace timestamp
+}  // namespace time
 }  // namespace object

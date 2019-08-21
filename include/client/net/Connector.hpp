@@ -25,21 +25,14 @@
 #include <functional>
 #include <string>
 
-#include "util/defines.h"
-
 namespace client
 {
 namespace net
 {
 struct Endpoint;
 
-/// @typedef Callback
-/// Common callback function
-using Callback = std::function<void(bool)>;
-
-/// @typedef ReadCallback
-/// Callback function for read
-using ReadCallback = std::function<void(bool, const std::string&)>;
+using Callback     = std::function<void(bool)>;                      ///< Common callback function
+using ReadCallback = std::function<void(bool, const std::string&)>;  ///< Callback function for read
 
 /**
  * @brief The async TCP interface for clients
@@ -50,8 +43,8 @@ using ReadCallback = std::function<void(bool, const std::string&)>;
 class Connector
 {
 public:
-    DEFAULT_CTOR(Connector)
-    DEFAULT_VIRTUAL_DTOR(Connector)
+    Connector()                   = default;
+    virtual ~Connector() noexcept = default;
 
     /**
      * @brief Run this connector.

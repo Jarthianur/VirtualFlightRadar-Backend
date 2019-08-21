@@ -25,80 +25,66 @@
 #include <stdexcept>
 #include <string>
 
-#include "util/defines.h"
-
 namespace object
 {
-namespace timestamp
+namespace time
 {
 /**
  * @brief Format of a given time string.
  */
-enum class Format : std::uint8_t
+enum class Format : std::uint_fast8_t
 {
     HHMMSS,
     HH_MM_SS_FFF
 };
 
-}  // namespace timestamp
+}  // namespace time
 
 /**
  * @brief A timestamp
  * @tparam DateTimeT The provider of time functions
  */
 template<typename DateTimeT>
-class TimeStamp
+class Timestamp
 {
-public:
-    DEFAULT_CTOR(TimeStamp)
-    DEFAULT_DTOR(TimeStamp)
+    std::int64_t  m_value = 0;  ///< Time in milliseconds
+    std::uint32_t m_day   = 0;  ///< Incremental day number
 
+public:
+    Timestamp() = default;
     /**
-     * @brief Constructor
      * @param value  The time string
      * @param format The format
      * @throw std::invalid_argument if the time string is invalid
      */
-    TimeStamp(const std::string& value, timestamp::Format format);
-
-    /**
-     * @brief Copy-Constructor
-     * @param other The other TimeStamp
-     */
-    TimeStamp(const TimeStamp& other);
+    Timestamp(const std::string& value, time::Format format);
+    Timestamp(const Timestamp& other);  ///< @param other The other Timestamp
+    ~Timestamp() noexcept = default;
 
     /**
      * @brief Assign other TimeStamps value.
-     * @param other The other TimeStamp
+     * @param other The other Timestamp
      * @return this
      */
-    TimeStamp& operator=(const TimeStamp& other);
+    Timestamp& operator=(const Timestamp& other);
 
     /**
      * @brief Compare this value to be less than, or equals others.
-     * @param other The other TimeStamp
+     * @param other The other Timestamp
      * @return true if less, or equals, else false
      */
-    bool operator>(const TimeStamp& other) const;
-
-private:
-    /// Time in milliseconds
-    std::int64_t m_value = 0;
-
-    /// Incremental day number
-    std::uint32_t m_day = 0;
+    bool operator>(const Timestamp& other) const;
 };
 
 template<typename DateTimeT>
-TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format format)
-    : m_day(DateTimeT::day())
+Timestamp<DateTimeT>::Timestamp(const std::string& value, time::Format format) : m_day(DateTimeT::day())
 {
     std::int32_t h = 99, m = 99, s = 99, f = 9999;
     try
     {
         switch (format)
         {
-            case timestamp::Format::HHMMSS:
+            case time::Format::HHMMSS:
             {
                 h = std::stoi(value.substr(0, 2));
                 m = std::stoi(value.substr(2, 2));
@@ -106,7 +92,7 @@ TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format form
                 f = 0;
             }
             break;
-            case timestamp::Format::HH_MM_SS_FFF:
+            case time::Format::HH_MM_SS_FFF:
             {
                 h = std::stoi(value.substr(0, 2));
                 m = std::stoi(value.substr(3, 2));
@@ -132,12 +118,12 @@ TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format form
 }
 
 template<typename DateTimeT>
-TimeStamp<DateTimeT>::TimeStamp(const TimeStamp<DateTimeT>& other)
+Timestamp<DateTimeT>::Timestamp(const Timestamp<DateTimeT>& other)
     : m_value(other.m_value), m_day(other.m_day)
 {}
 
 template<typename DateTimeT>
-TimeStamp<DateTimeT>& TimeStamp<DateTimeT>::operator=(const TimeStamp<DateTimeT>& other)
+Timestamp<DateTimeT>& Timestamp<DateTimeT>::operator=(const Timestamp<DateTimeT>& other)
 {
     this->m_value = other.m_value;
     this->m_day   = other.m_day;
@@ -145,10 +131,9 @@ TimeStamp<DateTimeT>& TimeStamp<DateTimeT>::operator=(const TimeStamp<DateTimeT>
 }
 
 template<typename DateTimeT>
-bool TimeStamp<DateTimeT>::operator>(const TimeStamp<DateTimeT>& other) const
+bool Timestamp<DateTimeT>::operator>(const Timestamp<DateTimeT>& other) const
 {
-    return (this->m_day > other.m_day) ||
-           ((this->m_day == other.m_day) && this->m_value > other.m_value);
+    return (this->m_day > other.m_day) || ((this->m_day == other.m_day) && this->m_value > other.m_value);
 }
 
 }  // namespace object

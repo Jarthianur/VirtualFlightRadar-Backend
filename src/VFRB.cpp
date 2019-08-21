@@ -41,16 +41,18 @@
 #include "util/SignalListener.h"
 
 using namespace data;
+using namespace object;
+using namespace config;
 
-#define SYNC_TIME 1
+constexpr auto PROCESS_INTERVAL = 1;
+constexpr auto LOG_PREFIX       = "(VFRB) ";
 
-VFRB::VFRB(std::shared_ptr<config::Configuration> config)
-    : m_aircraftData(std::make_shared<AircraftData>(config->get_maxDistance())),
-      m_atmosphereData(
-          std::make_shared<AtmosphereData>(object::Atmosphere(config->get_atmPressure(), 0))),
-      m_gpsData(std::make_shared<GpsData>(config->get_position(), config->get_groundMode())),
+VFRB::VFRB(std::shared_ptr<Configuration> config)
+    : m_aircraftData(std::make_shared<AircraftData>(config->maxDistance)),
+      m_atmosphereData(std::make_shared<AtmosphereData>(object::Atmosphere{0, config->atmPressure})),
+      m_gpsData(std::make_shared<GpsData>(config->gpsPosition, config->groundMode)),
       m_windData(std::make_shared<WindData>()),
-      m_server(config->get_serverPort()),
+      m_server(config->serverPort),
       m_running(false)
 {
     createFeeds(config);
@@ -59,25 +61,25 @@ VFRB::VFRB(std::shared_ptr<config::Configuration> config)
 void VFRB::run() noexcept
 {
     m_running = true;
-    logger.info("(VFRB) startup");
+    logger.info(LOG_PREFIX, "starting...");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     util::SignalListener                  signals;
     client::ClientManager                 clientManager;
 
     signals.addHandler([this](const boost::system::error_code&, const int) {
-        logger.info("(VFRB) caught signal to shutdown ...");
+        logger.info(LOG_PREFIX, "caught signal to shutdown...");
         m_running = false;
     });
     for (auto it : m_feeds)
     {
-        logger.info("(VFRB) run feed: ", it->get_name());
+        logger.info(LOG_PREFIX, "run feed: ", it->name);
         try
         {
             clientManager.subscribe(it);
         }
         catch (const std::logic_error& e)
         {
-            logger.error("(VFRB) ", e.what());
+            logger.error(LOG_PREFIX, ": ", e.what());
         }
     }
     m_feeds.clear();
@@ -89,68 +91,62 @@ void VFRB::run() noexcept
     clientManager.stop();
     m_server.stop();
     signals.stop();
-    logger.info("Stopped after ", get_duration(start));
+    logger.info(LOG_PREFIX, "stopped after ", duration(start));
 }
 
 void VFRB::serve()
 {
-    std::string message;
-    std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
+    std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
     while (m_running)
     {
-        message.clear();
         try
         {
-            m_aircraftData->processAircrafts(m_gpsData->get_position(),
-                                             m_atmosphereData->get_atmPressure());
-            m_aircraftData->get_serialized(message);
-            m_gpsData->get_serialized(message);
-            m_atmosphereData->get_serialized(message);
-            m_windData->get_serialized(message);
-            m_server.send(message);
-            std::this_thread::sleep_for(std::chrono::seconds(SYNC_TIME));
+            m_aircraftData->environment(m_gpsData->location(), m_atmosphereData->atmPressure());
+            m_aircraftData->access([this](const Object& it) {
+                if (it.updateAge() < Object::OUTDATED)
+                {
+                    m_server.send(it.nmea());
+                }
+            });
+
+            auto fn = [this](const Object& it) { m_server.send(it.nmea()); };
+            m_gpsData->access(fn);
+            m_atmosphereData->access(fn);
+            m_windData->access(fn);
+            std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
         }
         catch (const std::exception& e)
         {
-            logger.error("(VFRB) error: ", e.what());
+            logger.error(LOG_PREFIX, "fatal: ", e.what());
             m_running = false;
         }
     }
 }
 
-void VFRB::createFeeds(std::shared_ptr<config::Configuration> config)
+void VFRB::createFeeds(std::shared_ptr<Configuration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
-    for (const auto& name : config->get_feedNames())
+    for (const auto& name : config->feedNames)
     {
         try
         {
-            auto optFeedPtr = factory.createFeed(name);
-            if (optFeedPtr)
-            {
-                m_feeds.push_back(*optFeedPtr);
-            }
-            else
-            {
-                logger.warn("(VFRB) create feed ", name,
-                            ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
-                            ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS
-                            ", " SECT_KEY_GPS);
-            }
+            m_feeds.push_back(factory.createFeed(name));
         }
         catch (const std::exception& e)
         {
-            logger.warn("(VFRB) create feed ", name, ": ", e.what());
+            logger.warn(LOG_PREFIX, "can not create feed ", name, ": ", e.what());
         }
     }
 }
 
-std::string VFRB::get_duration(std::chrono::steady_clock::time_point start) const
+std::string VFRB::duration(std::chrono::steady_clock::time_point start) const
 {
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::chrono::minutes runtime = std::chrono::duration_cast<std::chrono::minutes>(end - start);
-    std::stringstream    ss;
-    ss << runtime.count() / 60 / 24 << " days, " << runtime.count() / 60 << " hours, "
-       << runtime.count() % 60 << " minutes";
+    std::chrono::minutes runtime =
+        std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start);
+    std::int64_t      d = runtime.count() / 60 / 24;
+    std::int64_t      h = runtime.count() / 60 - d * 24;
+    std::int64_t      m = runtime.count() % 60;
+    std::stringstream ss;
+    ss << d << "d " << h << ":" << m;
     return ss.str();
 }

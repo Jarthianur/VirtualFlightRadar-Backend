@@ -21,11 +21,8 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdio>
-#include <string>
-
-#include "util/defines.h"
-#include "util/math.hpp"
 
 namespace data
 {
@@ -39,31 +36,14 @@ template<typename T>
 class Processor
 {
 public:
-    DEFAULT_CTOR(Processor)
-    DEFAULT_VIRTUAL_DTOR(Processor)
+    Processor()                   = default;
+    virtual ~Processor() noexcept = default;
 
     /**
      * @brief Process an object.
      * @param _1 The object of type T
      */
-    virtual void process(T& _1) = 0;
-
-protected:
-    /**
-     * @brief End the processing string with checksum and CRLF.
-     */
-    inline void finishSentence()
-    {
-        std::snprintf(m_buffer, sizeof(m_buffer), "%02x\r\n",
-                      math::checksum(m_buffer, sizeof(m_buffer)));
-        m_processed.append(m_buffer);
-    }
-
-    /// The internal buffer for format strings
-    char m_buffer[4096] = "";
-
-    /// Processing string
-    mutable std::string m_processed;
+    virtual void process(T& _1) const = 0;
 };
 }  // namespace processor
 }  // namespace data

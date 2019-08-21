@@ -31,74 +31,37 @@
 #include "net/Endpoint.hpp"
 #include "util/defines.h"
 
-#include "parameters.h"
-
 namespace feed
 {
 class Feed;
 }  // namespace feed
 namespace client
 {
-/// @def C_CON_WAIT_TIMEVAL
-/// Wait for (re-)connect timeout
-#ifdef CLIENT_CONNECT_WAIT_TIMEVAL
-#    define C_CON_WAIT_TIMEVAL CLIENT_CONNECT_WAIT_TIMEVAL
-#else
-#    define C_CON_WAIT_TIMEVAL 120
-#endif
-
 /**
  * @brief Base class for an async TCP client
  */
 class Client
 {
-public:
-    NOT_COPYABLE(Client)
-    DEFAULT_VIRTUAL_DTOR(Client)
-
-    /**
-     * @brief Run the clients connection- and eventhandlers.
-     * @note Returns after all queued handlers have returned.
-     * @threadsafe
-     */
-    void run();
-
-    /**
-     * @brief Stop after client has been started.
-     * @note Wait until run has been called.
-     * @threadsafe
-     */
-    void scheduleStop();
-
-    /**
-     * @brief Compare to another client by value.
-     * @param other The other Client
-     * @return true if equals, else false
-     */
-    virtual bool equals(const Client& other) const;
-
-    /**
-     * @brief Get a hash value of this client.
-     * @return the hash value
-     */
-    virtual std::size_t hash() const;
-
-    /**
-     * @brief Subscribe a Feed to this client.
-     * @param feed The Feed to subscribe
-     * @threadsafe
-     */
-    void subscribe(std::shared_ptr<feed::Feed> feed);
-
 protected:
+    std::shared_ptr<net::Connector>          m_connector;        /// Connector interface
+    bool                                     m_running = false;  /// Run state indicator
+    const char* const                        m_logPrefix;        /// Component string used for logging
+    const net::Endpoint                      m_endpoint;         /// Remote endpoint
+    std::vector<std::shared_ptr<feed::Feed>> m_feeds;            /// Container for subscribed feeds
+    mutable std::mutex                       m_mutex;
+
     /**
-     * @brief Constructor
      * @param endpoint  The connection Endpoint
      * @param component The component name
      * @param connector The Connector interface
      */
-    Client(const net::Endpoint& endpoint, const char* component,
-           std::shared_ptr<net::Connector> connector);
+    Client(const net::Endpoint& endpoint, const char* logPrefix, std::shared_ptr<net::Connector> connector);
+
+    /**
+     * @brief Handler for connect
+     * @param error The error indicator
+     */
+    virtual void handleConnect(bool error) = 0;
 
     /**
      * @brief Stop and close the connection.
@@ -106,14 +69,14 @@ protected:
     virtual void stop();
 
     /**
-     * @brief Schedule to connect after some timeout.
-     */
-    void timedConnect();
-
-    /**
      * @brief Schedule to read from endpoint.
      */
     virtual void read();
+
+    /**
+     * @brief Schedule to connect after some timeout.
+     */
+    void timedConnect();
 
     /**
      * @brief Schedule to connect to endpoint.
@@ -139,29 +102,43 @@ protected:
      */
     void handleRead(bool error, const std::string& response);
 
+public:
+    NOT_COPYABLE(Client)
+    virtual ~Client() noexcept = default;
+
     /**
-     * @brief Handler for connect
-     * @param error The error indicator
+     * @brief Run the clients connection- and eventhandlers.
+     * @note Returns after all queued handlers have returned.
+     * @threadsafe
      */
-    virtual void handleConnect(bool error) = 0;
+    void run();
 
-    /// Connector interface
-    std::shared_ptr<net::Connector> m_connector;
+    /**
+     * @brief Stop after client has been started.
+     * @note Wait until run has been called.
+     * @threadsafe
+     */
+    void scheduleStop();
 
-    /// Run state indicator
-    bool m_running = false;
+    /**
+     * @brief Subscribe a Feed to this client.
+     * @param feed The Feed to subscribe
+     * @threadsafe
+     */
+    void subscribe(std::shared_ptr<feed::Feed> feed);
 
-    /// Component string used for logging
-    const char* const m_component;
+    /**
+     * @brief Compare to another client by value.
+     * @param other The other Client
+     * @return true if equals, else false
+     */
+    virtual bool equals(const Client& other) const;
 
-    /// Remote endpoint
-    const net::Endpoint m_endpoint;
-
-    mutable std::mutex m_mutex;
-
-private:
-    /// Container for subscribed feeds
-    std::vector<std::shared_ptr<feed::Feed>> m_feeds;
+    /**
+     * @brief Get a hash value of this client.
+     * @return the hash value
+     */
+    virtual std::size_t hash() const;
 };
 
 }  // namespace client

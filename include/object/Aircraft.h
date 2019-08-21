@@ -22,49 +22,32 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
+#include <cstring>
 
 #include "impl/DateTimeImplBoost.h"
-#include "util/defines.h"
+#include "util/utility.hpp"
 
 #include "GpsPosition.h"
 #include "Object.h"
-#include "TimeStamp.hpp"
-
-/// Indicate a value is not available.
-#define A_VALUE_NA -1024.0
+#include "Timestamp.hpp"
 
 namespace object
 {
-/**
- * @brief Hold information about an Aircrafts movement.
- */
-struct Movement
-{
-    /// Speed over ground; m/s
-    double gndSpeed = A_VALUE_NA;
-
-    /// Heading; deg [0-359]
-    double heading = A_VALUE_NA;
-
-    /// Climb rate; m/s
-    double climbRate = A_VALUE_NA;
-};
-
 /**
  * @brief Extend Object to an aircraft.
  */
 class Aircraft : public Object
 {
 public:
-    DEFAULT_DTOR(Aircraft)
+    static constexpr const auto ID_SIZE   = 8;
+    static constexpr const auto NMEA_SIZE = 192;
 
     /**
      * @brief Device type from which the information is received.
      * @note FLARM is preferred over TRANSPONDER,
      *       in case an aircraft has both available.
      */
-    enum class TargetType : std::uint8_t
+    enum class TargetType : std::uint_fast8_t
     {
         FLARM,
         TRANSPONDER
@@ -73,7 +56,7 @@ public:
     /**
      * @brief Aircraft types with their protocol codes.
      */
-    enum class AircraftType : std::uint8_t
+    enum class AircraftType : std::uint_fast8_t
     {
         UNKNOWN               = 0,
         GLIDER                = 1,
@@ -95,7 +78,7 @@ public:
     /**
      * @brief Id (address) types with their protocol codes.
      */
-    enum class IdType : std::uint8_t
+    enum class IdType : std::uint_fast8_t
     {
         RANDOM = 0,
         ICAO   = 1,
@@ -103,34 +86,34 @@ public:
         OGN    = 3
     };
 
-    Aircraft();
-
     /**
-     * @brief Constructor
-     * @param priority The initial priority
+     * @brief Hold information about an Aircrafts movement.
      */
-    explicit Aircraft(std::uint32_t priority);
+    struct Movement
+    {
+        static constexpr auto MAX_GND_SPEED  = 10000.0;
+        static constexpr auto MIN_GND_SPEED  = -10000.0;
+        static constexpr auto MAX_HEADING    = 359.9;
+        static constexpr auto MIN_HEADING    = 0.0;
+        static constexpr auto MAX_CLIMB_RATE = 10000.0;
+        static constexpr auto MIN_CLIMB_RATE = -10000.0;
 
-    /**
-     * @brief Set the aircraft type.
-     *
-     * The type is set to UNKNOWN, if the new type value is not in range of AircraftType.
-     *
-     * @param type The type
-     */
-    void set_aircraftType(AircraftType type);
-
-    /**
-     * @brief Set the id type.
-     *
-     * The id type is set to RANDOM, if the new type value is not in range of
-     * IdType.
-     *
-     * @param type The type
-     */
-    void set_idType(IdType type);
+        double gndSpeed;   ///< Speed over ground; m/s
+        double heading;    ///< Heading; deg [0-359]
+        double climbRate;  ///< Climb rate; m/s
+    };
 
 private:
+    util::CString<ID_SIZE>             m_id;                ///< Aircraft identifier
+    IdType                             m_idType;            ///< Id type
+    AircraftType                       m_aircraftType;      ///< Aircraft type
+    TargetType                         m_targetType;        ///< Target type
+    Location                           m_location;          ///< Currently known position.
+    Movement                           m_movement;          ///< Currently known movement.
+    Timestamp<time::DateTimeImplBoost> m_timestamp;         ///< The timestamp of the last report.
+    bool                               m_fullInfo = false;  ///< Is full set of information available?
+    util::CString<NMEA_SIZE>           m_nmea;
+
     /**
      * @brief Assign an other aircrafts values to this.
      * @param other The other Aircraft
@@ -142,42 +125,27 @@ private:
      */
     bool canUpdate(const Object& other) const override;
 
-    /// Aircraft identifier
-    std::string m_id;
-
-    /// Id type
-    IdType m_idType;
-
-    /// Aircraft type
-    AircraftType m_aircraftType;
-
-    /// Target type
-    TargetType m_targetType;
-
-    /// Currently known position.
-    Position m_position{0.0, 0.0, 0};
-
-    /// Currently known movement.
-    Movement m_movement;
-
-    /// The timestamp of the last report.
-    TimeStamp<timestamp::DateTimeImplBoost> m_timeStamp;
-
-    /// Is full set of information available?
-    bool m_fullInfo = false;
-
 public:
-    /**
-     * Getters and setters
-     */
-    GETSET_CR(id)
-    GETTER_V(idType)
-    GETSET_V(targetType)
-    GETTER_V(aircraftType)
-    GETSET_V(fullInfo)
-    GETSET_CR(position)
-    GETSET_CR(movement)
-    GETSET_V(timeStamp)
+    Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT, const Location& loc,
+             const Movement& move, const Timestamp<time::DateTimeImplBoost>& timestamp);
+    Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT, const Location& loc,
+             const Timestamp<time::DateTimeImplBoost>& timestamp);
+    Aircraft(Aircraft&& other);
+    ~Aircraft() noexcept override = default;
+
+    util::CString<NMEA_SIZE>& operator*();
+    Aircraft&                 operator=(Aircraft&& other);
+
+    util::CStringPack nmea() const override;
+    auto              idType() const -> decltype(m_idType);
+    auto              aircraftType() const -> decltype(m_aircraftType);
+    auto              id() const -> const decltype(m_id)&;
+    auto              targetType() const -> decltype(m_targetType);
+    auto              location() const -> const decltype(m_location)&;
+    auto              movement() const -> const decltype(m_movement)&;
+    auto              timestamp() const -> const decltype(m_timestamp)&;
+    auto              hasFullInfo() const -> decltype(m_fullInfo);
+    void              targetType(TargetType tt);
 };
 
 }  // namespace object

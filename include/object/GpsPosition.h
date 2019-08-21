@@ -24,26 +24,28 @@
 #include <cstdint>
 
 #include "impl/DateTimeImplBoost.h"
-#include "util/defines.h"
+#include "util/utility.hpp"
 
 #include "Object.h"
-#include "TimeStamp.hpp"
+#include "Timestamp.hpp"
 
 namespace object
 {
 /**
  * @brief A position on earth.
  */
-struct Position
+struct Location
 {
-    /// Latitude; deg
-    double latitude;
+    static constexpr auto MAX_LATITUDE  = 90.0;
+    static constexpr auto MIN_LATITUDE  = -90.0;
+    static constexpr auto MAX_LONGITUDE = 180.0;
+    static constexpr auto MIN_LONGITUDE = 0.0;
+    static constexpr auto MAX_ALTITUDE  = 100000;
+    static constexpr auto MIN_ALTITUDE  = -11000;
 
-    /// Longitude; deg
-    double longitude;
-
-    /// Altitude; m
-    std::int32_t altitude;
+    double       latitude;   ///< Latitude; deg
+    double       longitude;  ///< Longitude; deg
+    std::int32_t altitude;   ///< Altitude; m
 };
 
 /**
@@ -52,24 +54,19 @@ struct Position
 class GpsPosition : public Object
 {
 public:
-    DEFAULT_DTOR(GpsPosition)
-
-    GpsPosition();
-
-    /**
-     * @brief Constructor
-     * @param priority The initial priority
-     */
-    explicit GpsPosition(std::uint32_t priority);
-
-    /**
-     * @brief Constructor
-     * @param position The position
-     * @param geoid    The geoid
-     */
-    GpsPosition(const Position& position, double geoid);
+    static constexpr auto NMEA_SIZE = 192;
+    static constexpr auto MAX_GEOID = 86.0;
+    static constexpr auto MIN_GEOID = -108.0;
 
 private:
+    Location                           m_location;        ///< The location
+    double                             m_geoid;           ///< The geoid separation
+    double                             m_dilution;        ///< The position dilution
+    std::uint8_t                       m_nrOfSatellites;  ///< The number of satellites
+    std::int8_t                        m_fixQuality;      ///< The GPS fix quality
+    Timestamp<time::DateTimeImplBoost> m_timestamp;       ///< The timestamp of this position
+    util::CString<NMEA_SIZE>           m_nmea;
+
     /**
      * @brief Override Object::assign.
      */
@@ -80,33 +77,26 @@ private:
      */
     bool canUpdate(const Object& other) const override;
 
-    /// The position
-    Position m_position{0.0, 0.0, 0};
-
-    /// The geoid separation
-    double m_geoid = 0.0;
-
-    /// The timestamp of this position
-    TimeStamp<timestamp::DateTimeImplBoost> m_timeStamp;
-
-    /// The position dilution
-    double m_dilution = 0.0;
-
-    /// The number of satellites
-    std::uint8_t m_nrOfSatellites = 1;
-
-    /// The GPS fix quality
-    std::int8_t m_fixQuality = 5;
-
 public:
+    GpsPosition(std::uint32_t priority, const Location& location, double geoid);
+
     /**
-     *Getters and setters
+     * @param position The position
+     * @param geoid    The geoid
      */
-    GETSET_CR(position)
-    GETSET_V(geoid)
-    GETSET_V(timeStamp)
-    GETSET_V(nrOfSatellites)
-    GETSET_V(fixQuality)
-    GETSET_V(dilution)
+    GpsPosition(std::uint32_t priority, const Location& location, double geoid, double dilution,
+                std::uint8_t satellites, std::int8_t quality,
+                const Timestamp<time::DateTimeImplBoost>& timestamp);
+    ~GpsPosition() noexcept override = default;
+
+    util::CString<NMEA_SIZE>& operator*();
+
+    util::CStringPack nmea() const override;
+    auto              location() const -> const decltype(m_location)&;
+    auto              geoid() const -> decltype(m_geoid);
+    auto              timestamp() const -> const decltype(m_timestamp)&;
+    auto              dilution() const -> decltype(m_dilution);
+    auto              nrOfSatellites() const -> decltype(m_nrOfSatellites);
+    auto              fixQuality() const -> decltype(m_fixQuality);
 };
 }  // namespace object

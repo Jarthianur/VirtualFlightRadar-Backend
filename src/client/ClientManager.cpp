@@ -42,7 +42,7 @@ void ClientManager::subscribe(std::shared_ptr<feed::Feed> feed)
     }
     else
     {
-        throw std::logic_error("could not subscribe feed " + feed->get_name());
+        throw std::logic_error("could not subscribe feed " + feed->name);
     }
 }
 

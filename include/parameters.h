@@ -31,8 +31,9 @@
  * even may cause the program not to work properly !!!
  */
 
+namespace param
+{
 /**
- * @def CLIENT_CONNECT_WAIT_TIMEVAL
  * Input-clients wait for this duration, in seconds, until
  * attempting a connect (reconnect).
  * [1 <= x]
@@ -42,20 +43,18 @@
  * every second. As well as waiting 1 hour if all receivers are up
  * after 2 minutes.
  */
-#define CLIENT_CONNECT_WAIT_TIMEVAL 120
+constexpr auto CLIENT_CONNECT_WAIT_TIMEVAL = 120;
 
 /**
- * @def WINDCLIENT_RECEIVE_TIMEOUT
  * Due to unstable hardware/drivers, it became apparent that
  * it is necessary to timeout the wind-sensors input.
  * [1 <= x]
  * A good way is to set this value to 1.5 * Y, where
  * Y is the time interval the wind-sensor sends its data.
  */
-#define WINDCLIENT_RECEIVE_TIMEOUT 5
+constexpr auto WINDCLIENT_RECEIVE_TIMEOUT = 5;
 
 /**
- * @def SERVER_MAX_CLIENTS
  * Max amount of clients, which can connect to the VFR-B's
  * internal NMEA-server.
  * [1 <= x]
@@ -63,17 +62,5 @@
  * Consider someone else wants surrounding traffic displayed from
  * somewhere else, like pilots and flight instructors.
  */
-#define SERVER_MAX_CLIENTS 3
-
-/**
- * @def ESTIMATED_TRAFFIC
- * Initial amount of space reserved for aircrafts.
- * The higher this value, the more memory is preallocated for the internal container.
- * This can increase the performance, but also uses up more RAM.
- * [0 <= x]
- * If traffic of 50 aircrafts is common at your base, set it accordingly.
- * If 10 aircrafts are a high amount of traffic,
- * there is no need to set it higher than that.
- * In doubt, set it to a lower value.
- */
-#define ESTIMATED_TRAFFIC 10
+constexpr auto SERVER_MAX_CLIENTS = 3;
+}  // namespace param

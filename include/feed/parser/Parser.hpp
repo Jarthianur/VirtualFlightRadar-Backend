@@ -21,9 +21,9 @@
 
 #pragma once
 
+#include <cstdint>
+#include <exception>
 #include <string>
-
-#include "util/defines.h"
 
 namespace feed
 {
@@ -37,8 +37,8 @@ template<typename T>
 class Parser
 {
 public:
-    DEFAULT_CTOR(Parser)
-    DEFAULT_VIRTUAL_DTOR(Parser)
+    Parser()                   = default;
+    virtual ~Parser() noexcept = default;
 
     /**
      * @brief Unpack a given string into the templated object.
@@ -46,7 +46,18 @@ public:
      * @param _1       The target object
      * @return true on success, else false
      */
-    virtual bool unpack(const std::string& sentence, T& _1) noexcept = 0;
+    virtual T unpack(const std::string& sentence, std::uint32_t priority) const = 0;
+};
+
+class UnpackError : public std::exception
+{
+public:
+    UnpackError() : std::exception() {}
+    virtual ~UnpackError() noexcept = default;
+    const char* what() const noexcept
+    {
+        return "unpack failed";
+    }
 };
 
 }  // namespace parser

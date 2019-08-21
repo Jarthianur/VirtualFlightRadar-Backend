@@ -51,7 +51,7 @@ SocketImplBoost::~SocketImplBoost() noexcept
     close();
 }
 
-std::string SocketImplBoost::get_address() const
+std::string SocketImplBoost::address() const
 {
     if (!m_socket.is_open())
     {
@@ -60,14 +60,14 @@ std::string SocketImplBoost::get_address() const
     return m_socket.remote_endpoint().address().to_string();
 }
 
-bool SocketImplBoost::write(const std::string& msg)
+bool SocketImplBoost::write(const util::CStringPack& msg)
 {
     if (!m_socket.is_open())
     {
         throw SocketException("cannot write on closed socket");
     }
     boost::system::error_code ec;
-    boost::asio::write(m_socket, boost::asio::buffer(msg), ec);
+    boost::asio::write(m_socket, boost::asio::buffer(msg.first, msg.second), ec);
     return !ec;
 }
 

@@ -32,7 +32,6 @@
 
 namespace util
 {
-/// @typedef SignalHandler
 /// Handler function
 using SignalHandler = std::function<void(const boost::system::error_code&, const int)>;
 
@@ -41,11 +40,14 @@ using SignalHandler = std::function<void(const boost::system::error_code&, const
  */
 class SignalListener
 {
+    boost::asio::io_service m_ioService;  ///< Internal IO-service
+    boost::asio::signal_set m_sigSet;     ///< Internal signal set
+    std::thread             m_thread;     ///< Thread to run this
+    mutable std::mutex      m_mutex;
+
 public:
     NOT_COPYABLE(SignalListener)
-
     SignalListener();
-
     ~SignalListener() noexcept;
 
     /**
@@ -66,17 +68,5 @@ public:
      * @threadsafe
      */
     void addHandler(const SignalHandler& handler);
-
-private:
-    /// Internal IO-service
-    boost::asio::io_service m_ioService;
-
-    /// Internal signal set
-    boost::asio::signal_set m_sigSet;
-
-    /// Thread to run this
-    std::thread m_thread;
-
-    mutable std::mutex m_mutex;
 };
 }  // namespace util

@@ -32,7 +32,7 @@ namespace parser
 {
 AtmosphereParser::AtmosphereParser() : Parser<object::Atmosphere>() {}
 
-bool AtmosphereParser::unpack(const std::string& sentence, object::Atmosphere& atmosphere) noexcept
+object::Atmosphere AtmosphereParser::unpack(const std::string& sentence, std::uint32_t priority) const
 {
     try
     {
@@ -40,23 +40,22 @@ bool AtmosphereParser::unpack(const std::string& sentence, object::Atmosphere& a
              math::checksum(sentence.c_str(), sentence.length())) &&
             (sentence.find("MDA") != std::string::npos))
         {
-            bool        valid  = false;
             std::size_t tmpB   = sentence.find('B') - 1;
             std::size_t tmpS   = sentence.substr(0, tmpB).find_last_of(',') + 1;
             std::size_t subLen = tmpB - tmpS;
             std::size_t numIdx;
             double      tmpPress = std::stod(sentence.substr(tmpS, subLen), &numIdx) * 1000.0;
-            if ((valid = (numIdx == subLen)))
+            if (numIdx == subLen)
             {
-                atmosphere.set_serialized(std::string(sentence));
-                atmosphere.set_pressure(tmpPress);
+                object::Atmosphere atmos{priority, tmpPress};
+                *atmos = sentence;
+                return atmos;
             }
-            return valid;
         }
     }
-    catch (const std::logic_error&)
+    catch (const std::exception&)
     {}
-    return false;
+    throw UnpackError();
 }
 
 }  // namespace parser

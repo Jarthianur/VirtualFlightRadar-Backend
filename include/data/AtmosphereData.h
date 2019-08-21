@@ -21,10 +21,9 @@
 
 #pragma once
 
-#include <string>
+#include <mutex>
 
 #include "object/Atmosphere.h"
-#include "util/defines.h"
 
 #include "Data.hpp"
 
@@ -35,23 +34,14 @@ namespace data
  */
 class AtmosphereData : public Data
 {
+    object::Atmosphere m_atmosphere;  ///< Atmospheric information
+    mutable std::mutex m_mutex;
+
 public:
-    DEFAULT_DTOR(AtmosphereData)
-
     AtmosphereData();
-
-    /**
-     * @brief Constructor
-     * @param atmosphere The initial atm info
-     */
-    explicit AtmosphereData(const object::Atmosphere& atmosphere);
-
-    /**
-     * @brief Get the MDA sentence.
-     * @param dest The destination string to append data
-     * @threadsafe
-     */
-    void get_serialized(std::string& dest) override;
+    explicit AtmosphereData(
+        const object::Atmosphere& atmosphere);  ///< @param atmosphere The initial atm info
+    ~AtmosphereData() noexcept override = default;
 
     /**
      * @brief Update he athmosphere data.
@@ -61,15 +51,13 @@ public:
      */
     bool update(object::Object&& atmosphere) override;
 
+    void access(const accessor_fn& func) override;
+
     /**
      * @brief Get the atmospheric pressure.
      * @return the pressure
      * @threadsafe
      */
-    double get_atmPressure();
-
-private:
-    /// Atmospheric information
-    object::Atmosphere m_atmosphere;
+    auto atmPressure() const -> decltype(m_atmosphere.pressure());
 };
 }  // namespace data

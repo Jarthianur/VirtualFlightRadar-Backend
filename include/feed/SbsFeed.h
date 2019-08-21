@@ -26,6 +26,7 @@
 #include <string>
 
 #include "config/Properties.h"
+#include "util/WorkerThread.hpp"
 #include "util/defines.h"
 
 #include "Feed.h"
@@ -50,12 +51,13 @@ namespace feed
  */
 class SbsFeed : public Feed
 {
+    static parser::SbsParser        s_parser;  ///< Parser to unpack response from Client
+    util::WorkerThread<std::string> m_worker;
+
 public:
     NOT_COPYABLE(SbsFeed)
-    DEFAULT_DTOR(SbsFeed)
 
     /**
-     * @brief Constructor
      * @param name       The unique name
      * @param properties The Properties
      * @param data       The AircraftData container
@@ -64,21 +66,18 @@ public:
      */
     SbsFeed(const std::string& name, const config::Properties& properties,
             std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
+    ~SbsFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::SBS
      */
-    Protocol get_protocol() const override;
+    Protocol protocol() const override;
 
     /**
      * @brief Feed::process.
      */
     bool process(const std::string& response) override;
-
-private:
-    /// Parser to unpack response from Client
-    static parser::SbsParser s_parser;
 };
 
 }  // namespace feed

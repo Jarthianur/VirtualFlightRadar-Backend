@@ -28,26 +28,6 @@
 #include "object/GpsPosition.h"
 #include "util/math.hpp"
 
-/// @def SBS_FIELD_ID
-/// Field number of aircraft id
-#define SBS_FIELD_ID 4
-
-/// @def SBS_FIELD_TIME
-/// Field number of time
-#define SBS_FIELD_TIME 7
-
-/// @var SBS_FIELD_ALT
-/// Field number of altitude
-#define SBS_FIELD_ALT 11
-
-/// @def BS_FIELD_LAT
-/// Field number of latitude
-#define SBS_FIELD_LAT 14
-
-/// @def SBS_FIELD_LON
-/// Field number of longitude
-#define SBS_FIELD_LON 15
-
 using namespace object;
 
 namespace feed
@@ -58,56 +38,54 @@ std::int32_t SbsParser::s_maxHeight = std::numeric_limits<std::int32_t>::max();
 
 SbsParser::SbsParser() : Parser<Aircraft>() {}
 
-bool SbsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcept
+Aircraft SbsParser::unpack(const std::string& sentence, std::uint32_t priority) const
 {
-    std::size_t   p = 6, delim;
-    std::uint32_t i = 2;
-    Position      pos;
+    std::size_t                        p = 6, delim;
+    std::uint32_t                      i = 2;
+    Location                           loc;
+    std::string                        id;
+    Timestamp<time::DateTimeImplBoost> ts;
 
-    if (sentence.find(',', p) == std::string::npos || !(sentence.size() > 4 && sentence[4] == '3'))
-    {
-        return false;
-    }
-    while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
-    {
-        if (!parseField(i++, sentence.substr(p, delim - p), pos, aircraft))
-        {
-            return false;
-        }
-        p = delim + 1;
-    }
-    aircraft.set_position(pos);
-    aircraft.set_targetType(Aircraft::TargetType::TRANSPONDER);
-    aircraft.set_aircraftType(Aircraft::AircraftType::POWERED_AIRCRAFT);
-    aircraft.set_idType(Aircraft::IdType::ICAO);
-    return i == 16 && pos.altitude <= s_maxHeight;
-}
-
-bool SbsParser::parseField(std::uint32_t fieldNr, const std::string& field, Position& position,
-                           Aircraft& aircraft) noexcept
-{
     try
     {
-        switch (fieldNr)
+        if (sentence.size() > 4 && sentence[4] == '3' && sentence.find(',', p) != std::string::npos)
         {
-            case SBS_FIELD_ID: aircraft.set_id(field); break;
-            case SBS_FIELD_TIME:
-                aircraft.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(
-                    field, timestamp::Format::HH_MM_SS_FFF));
-                break;
-            case SBS_FIELD_ALT:
-                position.altitude = math::doubleToInt(std::stod(field) * math::FEET_2_M);
-                break;
-            case SBS_FIELD_LAT: position.latitude = std::stod(field); break;
-            case SBS_FIELD_LON: position.longitude = std::stod(field); break;
-            default: break;
+            while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
+            {
+                switch (i)
+                {
+                    case SBS_FIELD_ID:
+                        id = sentence.substr(p, delim - p);
+                        if (id.size() >= Aircraft::ID_SIZE)
+                        {
+                            throw std::range_error("");
+                        }
+                        break;
+                    case SBS_FIELD_TIME:
+                        ts = Timestamp<time::DateTimeImplBoost>(sentence.substr(p, delim - p),
+                                                                time::Format::HH_MM_SS_FFF);
+                        break;
+                    case SBS_FIELD_ALT:
+                        loc.altitude =
+                            math::doubleToInt(std::stod(sentence.substr(p, delim - p)) * math::FEET_2_M);
+                        break;
+                    case SBS_FIELD_LAT: loc.latitude = std::stod(sentence.substr(p, delim - p)); break;
+                    case SBS_FIELD_LON: loc.longitude = std::stod(sentence.substr(p, delim - p)); break;
+                    default: break;
+                }
+                p = delim + 1;
+                i += 1;
+            }
+        }
+        if (i == 16 && loc.altitude <= s_maxHeight)
+        {
+            return {priority, id, Aircraft::IdType::ICAO, Aircraft::AircraftType::POWERED_AIRCRAFT, loc, ts};
         }
     }
-    catch (const std::logic_error&)
-    {
-        return false;
-    }
-    return true;
+    catch (const std::exception&)
+    {}
+    throw UnpackError();
 }
+
 }  // namespace parser
 }  // namespace feed

@@ -29,45 +29,45 @@
 #include "object/Aircraft.h"
 #include "util/Logger.hpp"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(AprscFeed)"
+using namespace config;
 
 namespace feed
 {
 parser::AprsParser AprscFeed::s_parser;
 
-AprscFeed::AprscFeed(const std::string& name, const config::Properties& properties,
+AprscFeed::AprscFeed(const std::string& name, const Properties& properties,
                      std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
-    : Feed(name, COMPONENT, properties, data)
+    : Feed(name, LOG_PREFIX, properties, data), m_worker([this](std::string&& work) {
+          try
+          {
+              m_data->update(s_parser.unpack(work, m_priority));
+          }
+          catch (const parser::UnpackError&)
+          {}
+      })
 {
     parser::AprsParser::s_maxHeight = maxHeight;
-    if (m_properties.get_property(KV_KEY_LOGIN, "-") == "-")
+    if (properties.property(Configuration::KV_KEY_LOGIN, "-") == "-")
     {
-        logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_LOGIN);
+        logger.warn(m_logPrefix, "could not find: ", name, ".", Configuration::KV_KEY_LOGIN);
         throw std::logic_error("No login given");
     }
 }
 
-Feed::Protocol AprscFeed::get_protocol() const
+Feed::Protocol AprscFeed::protocol() const
 {
     return Protocol::APRS;
 }
 
 bool AprscFeed::process(const std::string& response)
 {
-    object::Aircraft ac(get_priority());
-    if (s_parser.unpack(response, ac))
-    {
-        m_data->update(std::move(ac));
-    }
+    m_worker.push(response);
     return true;
 }
 
-std::string AprscFeed::get_login() const
+std::string AprscFeed::login() const
 {
-    return m_properties.get_property(KV_KEY_LOGIN);
+    return properties.property(Configuration::KV_KEY_LOGIN);
 }
 
 }  // namespace feed

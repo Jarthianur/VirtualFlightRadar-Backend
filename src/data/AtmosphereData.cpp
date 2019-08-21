@@ -29,10 +29,10 @@ AtmosphereData::AtmosphereData() : Data() {}
 
 AtmosphereData::AtmosphereData(const Atmosphere& atmosphere) : Data(), m_atmosphere(atmosphere) {}
 
-void AtmosphereData::get_serialized(std::string& dest)
+void AtmosphereData::access(const accessor_fn& func)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    dest += (++m_atmosphere).get_serialized();
+    func(++m_atmosphere);
 }
 
 bool AtmosphereData::update(Object&& atmosphere)
@@ -41,10 +41,10 @@ bool AtmosphereData::update(Object&& atmosphere)
     return m_atmosphere.tryUpdate(std::move(atmosphere));
 }
 
-double AtmosphereData::get_atmPressure()
+auto AtmosphereData::atmPressure() const -> decltype(m_atmosphere.pressure())
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_atmosphere.get_pressure();
+    return m_atmosphere.pressure();
 }
 
 }  // namespace data

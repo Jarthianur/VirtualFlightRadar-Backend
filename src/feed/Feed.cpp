@@ -34,40 +34,41 @@ using namespace config;
 
 namespace feed
 {
-Feed::Feed(const std::string& name, const char* component, const Properties& properties,
+Feed::Feed(const std::string& name, const char* logPrefix, const Properties& properties,
            std::shared_ptr<data::Data> data)
-    : m_name(name), m_component(component), m_properties(properties), m_data(data)
+    : m_data(data), m_priority(initPriority()), m_logPrefix(logPrefix), name(name), properties(properties)
 {
-    initPriority();
-    if (m_properties.get_property(KV_KEY_HOST).empty())
+    if (properties.property(Configuration::KV_KEY_HOST).empty())
     {
-        logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_HOST);
+        logger.warn(m_logPrefix, "could not find: ", name, ".", Configuration::KV_KEY_HOST);
         throw std::logic_error("No host given");
     }
-    if (m_properties.get_property(KV_KEY_PORT).empty())
+    if (properties.property(Configuration::KV_KEY_PORT).empty())
     {
-        logger.warn(m_component, " could not find: ", m_name, "." KV_KEY_PORT);
+        logger.warn(m_logPrefix, "could not find: ", name, ".", Configuration::KV_KEY_PORT);
         throw std::logic_error("No port given");
     }
 }
 
-void Feed::initPriority() noexcept
+std::uint32_t Feed::initPriority() const noexcept
 {
     try
     {
-        m_priority = static_cast<std::uint32_t>(std::max<std::uint64_t>(
-            0, std::min<std::uint64_t>(std::stoul(m_properties.get_property(KV_KEY_PRIORITY)),
+        return static_cast<std::uint32_t>(std::max<std::uint64_t>(
+            0, std::min<std::uint64_t>(std::stoul(properties.property(Configuration::KV_KEY_PRIORITY)),
                                        std::numeric_limits<std::uint32_t>::max())));
     }
     catch (const std::logic_error&)
     {
-        logger.warn(m_component, " create ", m_name, ": Invalid priority given.");
+        logger.warn(m_logPrefix, "create ", name, ": Invalid priority given.");
     }
+    return 0;
 }
 
-client::net::Endpoint Feed::get_endpoint() const
+client::net::Endpoint Feed::endpoint() const
 {
-    return {m_properties.get_property(KV_KEY_HOST), m_properties.get_property(KV_KEY_PORT)};
+    return {properties.property(Configuration::KV_KEY_HOST),
+            properties.property(Configuration::KV_KEY_PORT)};
 }
 
 }  // namespace feed

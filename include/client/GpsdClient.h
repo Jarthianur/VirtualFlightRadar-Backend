@@ -30,18 +30,6 @@ namespace client
  */
 class GpsdClient : public Client
 {
-public:
-    NOT_COPYABLE(GpsdClient)
-    DEFAULT_DTOR(GpsdClient)
-
-    /**
-     * @brief Constructor
-     * @param endpoint  The remote endpoint
-     * @param connector The Connector interface
-     */
-    GpsdClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
-
-private:
     /**
      * @brief Send unwatch-request and stop this client.
      */
@@ -59,6 +47,16 @@ private:
      * @threadsafe
      */
     void handleWatch(bool error);
+
+public:
+    NOT_COPYABLE(GpsdClient)
+
+    /**
+     * @param endpoint  The remote endpoint
+     * @param connector The Connector interface
+     */
+    GpsdClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
+    ~GpsdClient() noexcept override = default;
 };
 
 }  // namespace client

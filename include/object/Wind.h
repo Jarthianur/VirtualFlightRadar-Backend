@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include "util/defines.h"
+#include <string>
 
 #include "Object.h"
 
@@ -36,16 +34,16 @@ struct Climate;
  */
 class Wind : public Object
 {
+    std::string m_nmea;
+
 public:
-    DEFAULT_DTOR(Wind)
-
     Wind();
+    explicit Wind(std::uint32_t priority);  ///< @param priority The initial priority
+    ~Wind() noexcept override = default;
 
-    /**
-     * @brief Constructor
-     * @param priority The initial priority
-     */
-    explicit Wind(std::uint32_t priority);
+    std::string& operator*();
+
+    util::CStringPack nmea() const override;
 };
 
 }  // namespace object

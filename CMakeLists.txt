@@ -69,7 +69,7 @@ list(REMOVE_ITEM vfrb_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
 list(APPEND vfrb_test_sources ${vfrb_sources})
 add_executable(unittest ${vfrb_test_sources})
 set_target_properties(unittest PROPERTIES OUTPUT_NAME ${vfrb_test_bin})
-target_include_directories(unittest PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include ${PROJECT_SOURCE_DIR}/test/framework)
+target_include_directories(unittest PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
 target_link_libraries(unittest PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
 
 #

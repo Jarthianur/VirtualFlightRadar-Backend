@@ -21,39 +21,35 @@
 
 #include "feed/AtmosphereFeed.h"
 
-#include <unordered_map>
-
 #include "config/Configuration.h"
 #include "data/AtmosphereData.h"
 #include "feed/parser/AtmosphereParser.h"
 #include "object/Atmosphere.h"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(AtmosphereFeed)"
+using namespace config;
 
 namespace feed
 {
 parser::AtmosphereParser AtmosphereFeed::s_parser;
 
-AtmosphereFeed::AtmosphereFeed(const std::string& name, const config::Properties& properties,
+AtmosphereFeed::AtmosphereFeed(const std::string& name, const Properties& properties,
                                std::shared_ptr<data::AtmosphereData> data)
-    : Feed(name, COMPONENT, properties, data)
+    : Feed(name, LOG_PREFIX, properties, data)
 {}
 
-Feed::Protocol AtmosphereFeed::get_protocol() const
+Feed::Protocol AtmosphereFeed::protocol() const
 {
     return Protocol::SENSOR;
 }
 
 bool AtmosphereFeed::process(const std::string& response)
 {
-    object::Atmosphere atmos(get_priority());
-    if (s_parser.unpack(response, atmos))
+    try
     {
-        m_data->update(std::move(atmos));
+        m_data->update(s_parser.unpack(response, m_priority));
     }
+    catch (const parser::UnpackError&)
+    {}
     return true;
 }
 

@@ -22,8 +22,9 @@
 #include "data/processor/GpsProcessor.h"
 
 #include <cmath>
-#include <cstdio>
 #include <ctime>
+
+#include "util/math.hpp"
 
 using namespace object;
 
@@ -33,45 +34,43 @@ namespace processor
 {
 GpsProcessor::GpsProcessor() : Processor<object::GpsPosition>() {}
 
-void GpsProcessor::process(object::GpsPosition& position)
+void GpsProcessor::process(object::GpsPosition& position) const
 {
     std::time_t now = std::time(nullptr);
     std::tm*    utc = std::gmtime(&now);
-    evalPosition(position.get_position().latitude, position.get_position().longitude);
-    m_processed.clear();
-    appendGPGGA(position, utc);
-    appendGPRMC(utc);
-    position.set_serialized(std::move(m_processed));
+    evalPosition(position.location().latitude, position.location().longitude);
+    appendGPGGA(position, utc, appendGPRMC(position, utc, 0));
 }
 
-void GpsProcessor::appendGPGGA(const GpsPosition& position, const std::tm* utc)
+std::size_t GpsProcessor::appendGPGGA(GpsPosition& position, const std::tm* utc, std::size_t pos) const
 {
     // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
     // support others.
-    std::snprintf(
-        m_buffer, sizeof(m_buffer),
-        /*"$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"*/
-        "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%02hhu,1,%d,M,%.1lf,M,,*",
-        utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
-        m_degLongitude, m_minLongitude, m_directionEW, /*pos.fixQa,*/ position.get_nrOfSatellites(),
-        position.get_position().altitude, position.get_geoid());
-    m_processed.append(m_buffer);
-    finishSentence();
+    // "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"
+    int bytes = (*position).snprintf(
+        pos, GpsPosition::NMEA_SIZE - pos,
+        "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*", utc->tm_hour,
+        utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
+        m_directionEW, /*pos.fixQa,*/ position.nrOfSatellites(), position.location().altitude,
+        math::saturate(position.geoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
+    bytes += (*position).snprintf(pos, GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
+                                  "%02x\r\n", math::checksum(**position, GpsPosition::NMEA_SIZE - pos));
+    return pos + static_cast<std::size_t>(bytes);
 }
 
-void GpsProcessor::appendGPRMC(const std::tm* utc)
+std::size_t GpsProcessor::appendGPRMC(GpsPosition& position, const std::tm* utc, std::size_t pos) const
 {
-    std::snprintf(
-        m_buffer, sizeof(m_buffer),
-        "$GPRMC,%02d%02d%02d,A,%02.0lf%05.2lf,%c,%03.0lf%05.2lf,%c,0,0,%02d%02d%02d,001.0,W*",
-        utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
-        m_degLongitude, m_minLongitude, m_directionEW, utc->tm_mday, utc->tm_mon + 1,
-        utc->tm_year - 100);
-    m_processed.append(m_buffer);
-    finishSentence();
+    int bytes = (*position).snprintf(
+        pos, GpsPosition::NMEA_SIZE - pos,
+        "$GPRMC,%.2d%.2d%.2d,A,%02.0lf%06.3lf,%c,%03.0lf%06.3lf,%c,0,0,%.2d%.2d%.2d,001.0,W*", utc->tm_hour,
+        utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
+        m_directionEW, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
+    bytes += (*position).snprintf(pos, GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
+                                  "%02x\r\n", math::checksum(**position, GpsPosition::NMEA_SIZE - pos));
+    return pos + static_cast<std::size_t>(bytes);
 }
 
-void GpsProcessor::evalPosition(double latitude, double longitude)
+void GpsProcessor::evalPosition(double latitude, double longitude) const
 {
     m_directionSN  = (latitude < 0) ? 'S' : 'N';
     m_directionEW  = (longitude < 0) ? 'W' : 'E';

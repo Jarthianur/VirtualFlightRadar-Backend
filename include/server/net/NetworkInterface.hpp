@@ -26,12 +26,11 @@
 #include <mutex>
 #include <string>
 
-#include "util/defines.h"
-
 namespace server
 {
 template<typename SocketT>
 class Connection;
+
 namespace net
 {
 /**
@@ -42,8 +41,8 @@ template<typename SocketT>
 class NetworkInterface
 {
 public:
-    DEFAULT_CTOR(NetworkInterface)
-    DEFAULT_VIRTUAL_DTOR(NetworkInterface)
+    NetworkInterface()                   = default;
+    virtual ~NetworkInterface() noexcept = default;
 
     /**
      * @brief Run this interface.
@@ -77,7 +76,7 @@ public:
      * @brief Get the current connection address.
      * @return the address
      */
-    virtual std::string get_currentAddress() const = 0;
+    virtual std::string stagedAddress() const = 0;
 };
 }  // namespace net
 }  // namespace server

@@ -25,10 +25,7 @@
 #include <string>
 #include <type_traits>
 
-#include <boost/optional.hpp>
-
 #include "config/Properties.h"
-#include "util/defines.h"
 
 namespace config
 {
@@ -52,31 +49,12 @@ class Feed;
  */
 class FeedFactory
 {
-public:
-    DEFAULT_DTOR(FeedFactory)
+    std::shared_ptr<config::Configuration> m_config;        ///< Pointer to the Configuration
+    std::shared_ptr<data::AircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
+    std::shared_ptr<data::AtmosphereData>  m_atmosData;     ///< Pointer to the AtmosphereData
+    std::shared_ptr<data::GpsData>         m_gpsData;       ///< Pointer to the GpsData
+    std::shared_ptr<data::WindData>        m_windData;      ///< Pointer to the WindData
 
-    /**
-     * @brief Constructor
-     * @param config       The Configuration
-     * @param aircraftData The AircraftData pointer
-     * @param atmosData    The AtmosphereData pointer
-     * @param gpsData      The GpsData pointer
-     * @param windData     The WindData pointer
-     */
-    FeedFactory(std::shared_ptr<config::Configuration> config,
-                std::shared_ptr<data::AircraftData>    aircraftData,
-                std::shared_ptr<data::AtmosphereData>  atmosData,
-                std::shared_ptr<data::GpsData> gpsData, std::shared_ptr<data::WindData> windData);
-
-    /**
-     * @brief Create a Feed.
-     * @param name  The feed name
-     * @return an optional unique pointer to the feed
-     * @throw std::logic_error from invoked methods
-     */
-    boost::optional<std::shared_ptr<Feed>> createFeed(const std::string& name);
-
-private:
     /**
      * @brief Make a new Feed.
      * @tparam T The Feed type
@@ -88,19 +66,26 @@ private:
     template<typename T, typename std::enable_if<std::is_base_of<Feed, T>::value>::type* = nullptr>
     std::shared_ptr<T> makeFeed(const std::string& name);
 
-    /// Pointer to the Configuration
-    std::shared_ptr<config::Configuration> m_config;
+public:
+    /**
+     * @param config       The Configuration
+     * @param aircraftData The AircraftData pointer
+     * @param atmosData    The AtmosphereData pointer
+     * @param gpsData      The GpsData pointer
+     * @param windData     The WindData pointer
+     */
+    FeedFactory(std::shared_ptr<config::Configuration> config,
+                std::shared_ptr<data::AircraftData>    aircraftData,
+                std::shared_ptr<data::AtmosphereData> atmosData, std::shared_ptr<data::GpsData> gpsData,
+                std::shared_ptr<data::WindData> windData);
+    ~FeedFactory() noexcept = default;
 
-    /// Pointer to the AircraftData
-    std::shared_ptr<data::AircraftData> m_aircraftData;
-
-    /// Pointer to the AtmosphereData
-    std::shared_ptr<data::AtmosphereData> m_atmosData;
-
-    /// Pointer to the GpsData
-    std::shared_ptr<data::GpsData> m_gpsData;
-
-    /// Pointer to the WindData
-    std::shared_ptr<data::WindData> m_windData;
+    /**
+     * @brief Create a Feed.
+     * @param name  The feed name
+     * @return an optional unique pointer to the feed
+     * @throw std::logic_error from invoked methods
+     */
+    std::shared_ptr<Feed> createFeed(const std::string& name);
 };
 }  // namespace feed

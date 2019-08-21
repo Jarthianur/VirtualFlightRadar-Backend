@@ -23,4 +23,14 @@ Wind::Wind() : Object() {}
 
 Wind::Wind(std::uint32_t priority) : Object(priority) {}
 
+util::CStringPack Wind::nmea() const
+{
+    return {m_nmea.c_str(), m_nmea.size()};
+}
+
+std::string& Wind::operator*()
+{
+    return m_nmea;
+}
+
 }  // namespace object

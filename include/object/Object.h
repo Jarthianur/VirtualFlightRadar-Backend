@@ -18,12 +18,8 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 
-#include "util/defines.h"
-
-/// Times until aircraft is outdated
-#define OBJ_OUTDATED 4
+#include "util/utility.hpp"
 
 namespace object
 {
@@ -32,43 +28,13 @@ namespace object
  */
 class Object
 {
-public:
-    DEFAULT_CTOR(Object)
-    DEFAULT_VIRTUAL_DTOR(Object)
-
-    /**
-     * @brief Constructor
-     * @param priority The initial priority
-     */
-    explicit Object(std::uint32_t priority);
-
-    /**
-     * @brief Try to update this Object.
-     * @note If the other Object cannot update this, nothing happens.
-     * @param other   The other Object
-     * @return true on success, else false
-     */
-    virtual bool tryUpdate(Object&& other);
-
-    /**
-     * @brief Set the string representation of this Objects data.
-     * @param serialized The string representation
-     */
-    virtual void set_serialized(std::string&& serialized);
-
-    /**
-     * @brief Get the string representation of this Objects data.
-     * @return m_serialized
-     */
-    virtual const std::string& get_serialized() const;
-
-    /**
-     * @brief Increment the update age.
-     * @return this
-     */
-    Object& operator++();
-
 protected:
+    std::uint32_t m_lastPriority = 0;  ///< Got last update with this priority.
+    std::uint32_t m_updateAge    = 0;  ///< Times processed without update.
+
+    Object() = default;
+    explicit Object(std::uint32_t priority);  ///< @param priority The initial priority
+
     /**
      * @brief Assign other objects values to this.
      * @param other The other Object
@@ -82,19 +48,26 @@ protected:
      */
     virtual bool canUpdate(const Object& other) const;
 
-    /// Got last update with this priority.
-    std::uint32_t m_lastPriority = 0;
-
-    /// Times processed without update.
-    std::uint32_t m_updateAge = 0;
-
-    /// The string representation of this Objects data.
-    std::string m_serialized;
-
 public:
+    static constexpr const std::uint32_t OUTDATED = 4;
+
+    virtual ~Object() noexcept = default;
+
     /**
-     * Getters
+     * @brief Increment the update age.
+     * @return this
      */
-    GETTER_V(updateAge)
+    Object& operator++();
+
+    /**
+     * @brief Try to update this Object.
+     * @note If the other Object cannot update this, nothing happens.
+     * @param other   The other Object
+     * @return true on success, else false
+     */
+    virtual bool tryUpdate(Object&& other);
+
+    virtual util::CStringPack nmea() const = 0;
+    auto                      updateAge() const -> decltype(m_updateAge);
 };
 }  // namespace object

@@ -21,10 +21,7 @@
 
 #pragma once
 
-#include <string>
-
 #include "object/Atmosphere.h"
-#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -38,16 +35,15 @@ namespace parser
 class AtmosphereParser : public Parser<object::Atmosphere>
 {
 public:
-    DEFAULT_DTOR(AtmosphereParser)
-
     AtmosphereParser();
+    ~AtmosphereParser() noexcept override = default;
 
     /**
      * @brief Unpack into Atmosphere.
      * @param sentence   The string to unpack
      * @param atmosphere The Atmosphere to unpack into
      */
-    bool unpack(const std::string& sentence, object::Atmosphere& atmosphere) noexcept override;
+    object::Atmosphere unpack(const std::string& sentence, std::uint32_t priority) const override;
 };
 }  // namespace parser
 }  // namespace feed

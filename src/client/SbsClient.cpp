@@ -23,17 +23,14 @@
 
 #include "util/Logger.hpp"
 
-#ifdef COMPONENT
-#    undef COMPONENT
-#endif
-#define COMPONENT "(SbsClient)"
-
 namespace client
 {
 using namespace net;
 
+constexpr auto LOG_PREFIX = "(SbsClient) ";
+
 SbsClient::SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
-    : Client(endpoint, COMPONENT, connector)
+    : Client(endpoint, LOG_PREFIX, connector)
 {}
 
 void SbsClient::handleConnect(bool error)
@@ -45,7 +42,7 @@ void SbsClient::handleConnect(bool error)
     }
     else
     {
-        logger.warn(m_component, " failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
         reconnect();
     }
 }

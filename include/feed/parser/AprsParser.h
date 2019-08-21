@@ -21,13 +21,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
+#include <tuple>
 
 #include <boost/regex.hpp>
 
 #include "object/Aircraft.h"
-#include "util/defines.h"
 
 #include "Parser.hpp"
 
@@ -40,30 +38,32 @@ namespace parser
  */
 class AprsParser : public Parser<object::Aircraft>
 {
-public:
-    DEFAULT_DTOR(AprsParser)
+    static constexpr auto RE_APRS_TIME     = 1;  ///< APRS regex match group of time
+    static constexpr auto RE_APRS_LAT      = 2;  ///< APRS regex match group of latitude
+    static constexpr auto RE_APRS_LAT_DIR  = 3;  ///< APRS regex match group of latitude orientation
+    static constexpr auto RE_APRS_LON      = 4;  ///< APRS regex match group of longitude
+    static constexpr auto RE_APRS_LON_DIR  = 5;  ///< APRS regex match group of longitude orientation
+    static constexpr auto RE_APRS_HEAD     = 6;  ///< APRS regex match group of heading
+    static constexpr auto RE_APRS_GND_SPD  = 7;  ///< APRS regex match group of ground speed
+    static constexpr auto RE_APRS_ALT      = 8;  ///< APRS regex match group of altitude
+    static constexpr auto RE_APRS_COM      = 9;  ///< APRS regex match group of comment
+    static constexpr auto RE_APRS_COM_TYPE = 1;  ///< APRS regex match group of id and aircraft type
+    static constexpr auto RE_APRS_COM_ID   = 2;  ///< APRS regex match group of aircraft id
+    static constexpr auto RE_APRS_COM_CR   = 3;  ///< APRS regex match group of climb rate
+    static constexpr auto RE_APRS_COM_TR   = 4;  ///< APRS regex match group of turn rate
 
-    AprsParser();
+    static const boost::regex s_APRS_RE;    ///< Regular expression for APRS protocol
+    static const boost::regex s_APRSExtRE;  ///< Regular expression for OGN specific APRS extension
 
-    /**
-     * @brief Unpack into Aircraft.
-     * @param sentence The string to unpack
-     * @param aircraft The Aircraft to unpack into
-     * @return true on success, else false
-     */
-    bool unpack(const std::string& sentence, object::Aircraft& aircraft) noexcept override;
+    using MetaInfo = std::tuple<std::string, object::Aircraft::IdType, object::Aircraft::AircraftType>;
 
-    /// The max height filter
-    static std::int32_t s_maxHeight;
-
-private:
     /**
      * @brief Parse a Position.
      * @param match    The regex match
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parsePosition(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
+    object::Location parseLocation(const boost::smatch& match) const;
 
     /**
      * @brief Parse the APRS comment.
@@ -71,7 +71,7 @@ private:
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parseComment(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
+    MetaInfo parseComment(const boost::smatch& match) const;
 
     /**
      * @brief Parse the Movement information.
@@ -80,22 +80,29 @@ private:
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parseMovement(const boost::smatch& match, const boost::smatch& comMatch,
-                       object::Aircraft& aircraft) noexcept;
+    object::Aircraft::Movement parseMovement(const boost::smatch& match, const boost::smatch& comMatch) const;
 
     /**
-     * @brief Parse the TimeStamp information.
+     * @brief Parse the Timestamp information.
      * @param match    The regex match
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    bool parseTimeStamp(const boost::smatch& match, object::Aircraft& aircraft) noexcept;
+    object::Timestamp<object::time::DateTimeImplBoost> parseTimeStamp(const boost::smatch& match) const;
 
-    /// Regular expression for APRS protocol
-    static const boost::regex s_APRS_RE;
+public:
+    static std::int32_t s_maxHeight;  ///< The max height filter
 
-    /// Regular expression for OGN specific APRS extension
-    static const boost::regex s_APRSExtRE;
+    AprsParser();
+    ~AprsParser() noexcept override = default;
+
+    /**
+     * @brief Unpack into Aircraft.
+     * @param sentence The string to unpack
+     * @param aircraft The Aircraft to unpack into
+     * @return true on success, else false
+     */
+    object::Aircraft unpack(const std::string& sentence, std::uint32_t priority) const override;
 };
 }  // namespace parser
 }  // namespace feed

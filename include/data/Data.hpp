@@ -17,10 +17,7 @@
 
 #pragma once
 
-#include <mutex>
-#include <string>
-
-#include "util/defines.h"
+#include <functional>
 
 namespace object
 {
@@ -29,20 +26,16 @@ class Object;
 
 namespace data
 {
+using accessor_fn = std::function<void(const object::Object&)>;
+
 /**
  * @brief The Data interface
  */
 class Data
 {
 public:
-    DEFAULT_CTOR(Data)
-    DEFAULT_VIRTUAL_DTOR(Data)
-
-    /**
-     * @brief Get the serialized data.
-     * @param dest The string to append the data to
-     */
-    virtual void get_serialized(std::string& dest) = 0;
+    Data()                   = default;
+    virtual ~Data() noexcept = default;
 
     /**
      * @brief Attempt to update this data.
@@ -51,7 +44,6 @@ public:
      */
     virtual bool update(object::Object&& _1) = 0;
 
-protected:
-    mutable std::mutex m_mutex;
+    virtual void access(const accessor_fn& func) = 0;
 };
 }  // namespace data

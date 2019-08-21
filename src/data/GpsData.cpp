@@ -23,35 +23,26 @@
 
 #include <stdexcept>
 
-/// @def GPS_NR_SATS_GOOD
-/// Good number of satellites
-#define GPS_NR_SATS_GOOD 7
-
-/// @def GPS_FIX_GOOD
-/// Good fix quality
-#define GPS_FIX_GOOD 1
-
-/// @def GPS_HOR_DILUTION_GOOD
-/// Good horizontal dilution
-#define GPS_HOR_DILUTION_GOOD 1.0
-
 using namespace object;
 
 namespace data
 {
-GpsData::GpsData() : Data() {}
-
 GpsData::GpsData(const GpsPosition& position, bool ground)
     : Data(), m_position(position), m_groundMode(ground)
 {
     m_processor.process(m_position);
 }
 
-void GpsData::get_serialized(std::string& dest)
+void GpsData::access(const accessor_fn& func)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_processor.process(m_position);
-    dest += (++m_position).get_serialized();
+    try
+    {
+        m_processor.process(m_position);
+        func(++m_position);
+    }
+    catch (const std::exception&)
+    {}
 }
 
 bool GpsData::update(Object&& position)
@@ -73,18 +64,19 @@ bool GpsData::update(Object&& position)
     return updated;
 }
 
-Position GpsData::get_position()
+auto GpsData::location() const -> decltype(m_position.location())
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_position.get_position();
+    return m_position.location();
 }
 
-bool GpsData::isPositionGood()
+bool GpsData::isPositionGood() const
 {
-    return m_position.get_nrOfSatellites() >= GPS_NR_SATS_GOOD &&
-           m_position.get_fixQuality() >= GPS_FIX_GOOD &&
-           m_position.get_dilution() <= GPS_HOR_DILUTION_GOOD;
+    return m_position.nrOfSatellites() >= GPS_NR_SATS_GOOD && m_position.fixQuality() >= GPS_FIX_GOOD &&
+           m_position.dilution() <= GPS_HOR_DILUTION_GOOD;
 }
+
+GpsDataException::GpsDataException() : std::exception() {}
 
 PositionAlreadyLocked::PositionAlreadyLocked() : GpsDataException() {}
 

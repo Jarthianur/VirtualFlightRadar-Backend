@@ -21,65 +21,13 @@
 
 #include "feed/parser/AprsParser.h"
 
+#include <algorithm>
 #include <limits>
 #include <stdexcept>
 
-#include "object/GpsPosition.h"
-#include "object/TimeStamp.hpp"
+#include "object/Timestamp.hpp"
 #include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
-
-/// @def RE_APRS_TIME
-/// APRS regex match group of time
-#define RE_APRS_TIME 1
-
-/// @def RE_APRS_LAT
-/// APRS regex match group of latitude
-#define RE_APRS_LAT 2
-
-/// @def RE_APRS_LAT_DIR
-/// APRS regex match group of latitude orientation
-#define RE_APRS_LAT_DIR 3
-
-/// @def RE_APRS_LON
-/// APRS regex match group of longitude
-#define RE_APRS_LON 4
-
-/// @def RE_APRS_LON_DIR
-/// APRS regex match group of longitude orientation
-#define RE_APRS_LON_DIR 5
-
-/// @def RE_APRS_HEAD
-/// APRS regex match group of heading
-#define RE_APRS_HEAD 6
-
-/// @def RE_APRS_GND_SPD
-/// APRS regex match group of ground speed
-#define RE_APRS_GND_SPD 7
-
-/// @def RE_APRS_ALT
-/// APRS regex match group of altitude
-#define RE_APRS_ALT 8
-
-/// @def RE_APRS_COM
-/// APRS regex match group of comment
-#define RE_APRS_COM 9
-
-/// @def RE_APRS_COM_TYPE
-/// APRS regex match group of id and aircraft type
-#define RE_APRS_COM_TYPE 1
-
-/// @def RE_APRS_COM_ID
-/// APRS regex match group of aircraft id
-#define RE_APRS_COM_ID 2
-
-/// @def RE_APRS_COM_CR
-/// APRS regex match group of climb rate
-#define RE_APRS_COM_CR 3
-
-/// @def RE_APRS_COM_TR
-/// APRS regex match group of turn rate
-#define RE_APRS_COM_TR 4
 
 namespace feed
 {
@@ -99,101 +47,74 @@ std::int32_t AprsParser::s_maxHeight = std::numeric_limits<std::int32_t>::max();
 
 AprsParser::AprsParser() : Parser<Aircraft>() {}
 
-bool AprsParser::unpack(const std::string& sentence, Aircraft& aircraft) noexcept
+Aircraft AprsParser::unpack(const std::string& sentence, std::uint32_t priority) const
 {
     boost::smatch match, com_match;
-
-    if ((!sentence.empty() && sentence.front() == '#') ||
-        !(boost::regex_match(sentence, match, s_APRS_RE) && parsePosition(match, aircraft) &&
-          parseTimeStamp(match, aircraft)))
+    if ((!sentence.empty() && sentence[0] == '#') || !boost::regex_match(sentence, match, s_APRS_RE) ||
+        !boost::regex_match(match.str(RE_APRS_COM), com_match, s_APRSExtRE))
     {
-        return false;
+        throw UnpackError();
     }
-    std::string comm(match.str(RE_APRS_COM));
-
-    if (!(boost::regex_match(comm, com_match, s_APRSExtRE) && parseComment(com_match, aircraft)))
-    {
-        return false;
-    }
-    aircraft.set_fullInfo(parseMovement(match, com_match, aircraft));
-    aircraft.set_targetType(Aircraft::TargetType::FLARM);
-    return true;
-}
-
-bool AprsParser::parsePosition(const boost::smatch& match, Aircraft& aircraft) noexcept
-{
-    bool valid = false;
     try
     {
-        Position pos;
-        pos.latitude = math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
-        if (match.str(RE_APRS_LAT_DIR).compare("S") == 0)
-        {
-            pos.latitude = -pos.latitude;
-        }
-        pos.longitude = math::dmToDeg(std::stod(match.str(RE_APRS_LON)));
-        if (match.str(RE_APRS_LON_DIR).compare("W") == 0)
-        {
-            pos.longitude = -pos.longitude;
-        }
-        pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT)) * math::FEET_2_M);
-
-        aircraft.set_position(pos);
-        valid = pos.altitude <= s_maxHeight;
+        auto meta = parseComment(com_match);
+        // relies on TargetType::FLARM in ctor
+        return {priority,
+                std::get<0>(meta),
+                std::get<1>(meta),
+                std::get<2>(meta),
+                parseLocation(match),
+                parseMovement(match, com_match),
+                parseTimeStamp(match)};
     }
-    catch (const std::logic_error&)
+    catch (const UnpackError&)
+    {
+        throw;
+    }
+    catch (const std::exception&)
     {}
-    return valid;
+    throw UnpackError();
 }
 
-bool AprsParser::parseComment(const boost::smatch& match, Aircraft& aircraft) noexcept
+Location AprsParser::parseLocation(const boost::smatch& match) const
 {
-    aircraft.set_id(match.str(RE_APRS_COM_ID));
-    try
+    Location pos;
+    pos.latitude = math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
+    if (match.str(RE_APRS_LAT_DIR).compare("S") == 0)
     {
-        aircraft.set_idType(static_cast<Aircraft::IdType>(
-            std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03));
-        aircraft.set_aircraftType(static_cast<Aircraft::AircraftType>(
-            (std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2));
+        pos.latitude = -pos.latitude;
     }
-    catch (const std::logic_error&)
+    pos.longitude = math::dmToDeg(std::stod(match.str(RE_APRS_LON)));
+    if (match.str(RE_APRS_LON_DIR).compare("W") == 0)
     {
-        return false;
+        pos.longitude = -pos.longitude;
     }
-    return true;
+    pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT)) * math::FEET_2_M);
+    if (pos.altitude <= s_maxHeight)
+    {
+        return pos;
+    }
+    throw UnpackError();
 }
 
-bool AprsParser::parseMovement(const boost::smatch& match, const boost::smatch& comMatch,
-                               Aircraft& aircraft) noexcept
+AprsParser::MetaInfo AprsParser::parseComment(const boost::smatch& match) const
 {
-    Movement move;
+    return {match.str(RE_APRS_COM_ID),
+            static_cast<Aircraft::IdType>(std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03),
+            static_cast<Aircraft::AircraftType>(
+                (std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2)};
+}
+
+Aircraft::Movement AprsParser::parseMovement(const boost::smatch& match, const boost::smatch& comMatch) const
+{
     // This needs to be split later to parse independently.
-    try
-    {
-        move.heading   = std::stod(match.str(RE_APRS_HEAD));
-        move.gndSpeed  = std::stod(match.str(RE_APRS_GND_SPD)) * math::KTS_2_MS;
-        move.climbRate = std::stod(comMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS;
-    }
-    catch (const std::logic_error&)
-    {
-        return false;
-    }
-    aircraft.set_movement(move);
-    return true;
+    return {std::stod(match.str(RE_APRS_HEAD)), std::stod(match.str(RE_APRS_GND_SPD)) * math::KTS_2_MS,
+            std::max(-10000.0, std::min(10000.0, std::stod(comMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS))};
 }
 
-bool AprsParser::parseTimeStamp(const boost::smatch& match, Aircraft& aircraft) noexcept
+Timestamp<time::DateTimeImplBoost> AprsParser::parseTimeStamp(const boost::smatch& match) const
 {
-    try
-    {
-        aircraft.set_timeStamp(TimeStamp<timestamp::DateTimeImplBoost>(match.str(RE_APRS_TIME),
-                                                                       timestamp::Format::HHMMSS));
-    }
-    catch (const std::invalid_argument&)
-    {
-        return false;
-    }
-    return true;
+    return Timestamp<time::DateTimeImplBoost>(match.str(RE_APRS_TIME), time::Format::HHMMSS);
 }
 
 }  // namespace parser

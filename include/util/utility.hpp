@@ -21,82 +21,19 @@
 
 #pragma once
 
+#include <algorithm>
+#include <cstdarg>
 #include <cstddef>
-#include <cstdint>
-#include <list>
-#include <sstream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <stdexcept>
 #include <string>
-
-#include <boost/optional.hpp>
-#include <boost/variant.hpp>
+#include <type_traits>
+#include <utility>
 
 namespace util
 {
-/// @typedef Number
-/// A variant number, which can have one of multiple representations
-using Number = boost::variant<std::int32_t, std::uint64_t, double>;
-
-/// @typedef OptNumber
-/// An optional number, which may be invalid
-using OptNumber = boost::optional<Number>;
-
-/**
- * @brief Convert a string to number.
- * @tparam T    The number type
- * @param str The string to convert
- * @return an optional number, which may be invalid
- */
-template<typename T>
-inline OptNumber stringToNumber(const std::string& str)
-{
-    std::stringstream ss(str);
-    T                 result;
-    if (ss >> result)
-    {
-        return Number(result);
-    }
-    return boost::none;
-}
-
-/**
- * @brief Trim a string on both sides.
- * @param str The string to trim
- * @return the trimmed string
- */
-inline std::string& trimString(std::string& str)
-{
-    std::size_t f = str.find_first_not_of(' ');
-    if (f != std::string::npos)
-    {
-        str = str.substr(f);
-    }
-    std::size_t l = str.find_last_not_of(' ');
-    if (l != std::string::npos)
-    {
-        str = str.substr(0, l + 1);
-    }
-    return str;
-}
-
-/**
- * @brief Split a string, separated at commata.
- * @param str The string to split
- * @return a list of strings
- */
-inline std::list<std::string> splitCommaSeparated(const std::string& str)
-{
-    std::list<std::string> list;
-    std::stringstream      ss;
-    ss.str(str);
-    std::string item;
-
-    while (std::getline(ss, item, ','))
-    {
-        list.push_back(trimString(item));
-    }
-    return list;
-}
-
 /**
  * @brief Get enum value as the underlying type.
  * @param value The enum value
@@ -107,5 +44,123 @@ constexpr auto raw_type(T value) -> typename std::underlying_type<T>::type
 {
     return static_cast<typename std::underlying_type<T>::type>(value);
 }
+
+using CStringPack = std::pair<const char*, const std::size_t>;
+
+template<std::size_t N, typename std::enable_if<(N > 0)>::type* = nullptr>
+class CString final
+{
+    static constexpr auto last = N - 1;
+
+    char        m_value[N];
+    std::size_t m_length = 0;
+
+    void copy(const char* str, std::size_t n)
+    {
+        if (n > last)
+        {
+            throw std::out_of_range("");
+        }
+        m_length = n;
+        std::memcpy(m_value, str, m_length);
+        m_value[m_length] = '\0';
+    }
+
+    void copy(const CString& other)
+    {
+        m_length = other.m_length;
+        std::memcpy(m_value, other.m_value, m_length);
+        m_value[m_length] = '\0';
+    }
+
+public:
+    CString()
+    {
+        m_value[0] = '\0';
+    }
+
+    CString(const char* init)  ///< @param init The initial cstring to copy
+    {
+        operator=(init);
+    }
+
+    CString(const std::string& init)  ///< @param init The initial string to copy
+    {
+        operator=(init);
+    }
+
+    CString(const CString& other)  ///< @param other The other CString to copy
+    {
+        operator=(other);
+    }
+
+    ~CString() noexcept = default;
+
+    CString& operator=(const char* other)
+    {
+        copy(other, std::strlen(other));
+        return *this;
+    }
+
+    CString& operator=(const std::string& other)
+    {
+        copy(other.c_str(), other.size());
+        return *this;
+    }
+
+    CString& operator=(const CString& other)
+    {
+        copy(other);
+        return *this;
+    }
+
+    const char* operator*() const
+    {
+        return m_value;
+    }
+
+    operator CStringPack() const
+    {
+        return std::pair<const char*, const std::size_t>(m_value, m_length);
+    }
+
+    bool operator==(const CString& other) const
+    {
+        return std::strncmp(m_value, other.m_value, N) == 0;
+    }
+
+    void clear()
+    {
+        m_value[0] = '\0';
+        m_length   = 0;
+    }
+
+    int snprintf(std::size_t pos, std::size_t n, const char* fmt, ...)
+    {
+        if (pos + n >= N)
+        {
+            throw std::out_of_range("");
+        }
+        va_list args;
+        va_start(args, fmt);
+        int b = 0;
+        if ((b = std::vsnprintf(m_value + pos, std::min(n, N), fmt, args)) >= 0)
+        {
+            m_length = b;
+        }
+        va_end(args);
+        if (b < 0)
+        {
+            clear();
+            throw std::out_of_range("");
+        }
+        return b;
+    }
+
+    inline auto length() const -> decltype(m_length)
+    {
+        return m_length;
+    }
+};
 
 }  // namespace util

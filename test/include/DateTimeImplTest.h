@@ -25,12 +25,12 @@
 
 struct DateTimeImplTest
 {
-    static std::int64_t now();
+    static std::int64_t  now();
     static std::uint32_t day();
-    static void set_day(std::uint32_t d);
-    static void set_now(std::uint32_t h, std::uint32_t m, std::uint32_t s);
+    static void          set_day(std::uint32_t d);
+    static void          set_now(std::uint32_t h, std::uint32_t m, std::uint32_t s);
 
 private:
-    static std::int64_t _now;
+    static std::int64_t  _now;
     static std::uint32_t _day;
 };

@@ -21,14 +21,9 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include "util/defines.h"
+#include <string>
 
 #include "Object.h"
-
-/// ICAO standard atmospheric pressure at MSL
-#define ICAO_STD_A 1013.25
 
 namespace object
 {
@@ -39,38 +34,34 @@ struct Climate;
  */
 class Atmosphere : public Object
 {
-public:
-    DEFAULT_DTOR(Atmosphere)
+    static constexpr auto ICAO_STD     = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
+    static constexpr auto MAX_PRESSURE = 2000.0;
+    static constexpr auto MIN_PRESSURE = 0.0;
 
-    Atmosphere();
+    double      m_pressure = ICAO_STD;  ///< The atmospheric pressure
+    std::string m_nmea;
 
     /**
-     * @brief Constructor
-     * @param priority The initial priority
+     * @brief Extend Object::assign.
      */
-    explicit Atmosphere(std::uint32_t priority);
+    void assign(Object&& other) override;
+
+public:
+    Atmosphere();
+    explicit Atmosphere(std::uint32_t priority);  ///< @param priority The initial priority
 
     /**
      * @brief Constructor
      * @param pressure The initial pressure
      * @param priority The initial priority
      */
-    Atmosphere(double pressure, std::uint32_t priority);
+    Atmosphere(std::uint32_t priority, double pressure);
+    ~Atmosphere() noexcept override = default;
 
-private:
-    /**
-     * @brief Extend Object::assign.
-     */
-    void assign(Object&& other) override;
+    std::string& operator*();
 
-    /// The atmospheric pressure
-    double m_pressure = ICAO_STD_A;
-
-public:
-    /**
-     * Getters and setters
-     */
-    GETSET_V(pressure)
+    util::CStringPack nmea() const override;
+    auto              pressure() const -> decltype(m_pressure);
 };
 
 }  // namespace object

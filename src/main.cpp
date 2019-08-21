@@ -74,14 +74,11 @@ program_options::variables_map evalArgs(int argc, char** argv)
     cmdline_options.add_options()("help,h", "show this message");
     cmdline_options.add_options()("verbose,v", "enable debug logging");
     cmdline_options.add_options()(
-        "ground-mode,g",
-        "forcibly enable ground mode; GPS feeds will stop when a good position is received");
+        "ground-mode,g", "forcibly enable ground mode; GPS feeds will stop when a good position is received");
     cmdline_options.add_options()("config,c", program_options::value<std::string>(), "config file");
-    cmdline_options.add_options()("output,o", program_options::value<std::string>(),
-                                  "specify where to log");
+    cmdline_options.add_options()("output,o", program_options::value<std::string>(), "specify where to log");
     program_options::variables_map variables;
-    program_options::store(program_options::parse_command_line(argc, argv, cmdline_options),
-                           variables);
+    program_options::store(program_options::parse_command_line(argc, argv, cmdline_options), variables);
     program_options::notify(variables);
 
     if (argc < 3 || variables.count("help"))
@@ -96,11 +93,11 @@ std::shared_ptr<Configuration> get_config(const program_options::variables_map& 
 {
     if (variables.count("verbose"))
     {
-        logger.set_debug();
+        logger.debug();
     }
     if (variables.count("output"))
     {
-        logger.set_logFile(variables["output"].as<std::string>());
+        logger.logFile(variables["output"].as<std::string>());
     }
     logger.info("VirtualFlightRadar-Backend -- " VERSION);
     if (variables.count("config"))
@@ -113,7 +110,7 @@ std::shared_ptr<Configuration> get_config(const program_options::variables_map& 
         auto conf = std::make_shared<Configuration>(file);
         if (variables.count("ground-mode"))
         {
-            conf->set_groundMode(true);
+            conf->groundMode = true;
             logger.info("(VFRB) Override ground mode: Yes");
         }
         return conf;

@@ -27,6 +27,7 @@
 #include <boost/move/move.hpp>
 
 #include "util/defines.h"
+#include "util/utility.hpp"
 
 namespace server
 {
@@ -37,15 +38,12 @@ namespace net
  */
 class SocketImplBoost
 {
+    boost::asio::ip::tcp::socket m_socket;  ///< Underlying socket
+
 public:
     MOVABLE_BUT_NOT_COPYABLE(SocketImplBoost)
-
-    /**
-     * @brief Constructor
-     * @param socket The underlying socket
-     */
-    explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket);
-
+    explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket)
+                                 socket);  ///< @param socket The underlying socket
     ~SocketImplBoost() noexcept;
 
     /**
@@ -53,7 +51,7 @@ public:
      * @return the address
      * @throw SocketException if the socket is closed
      */
-    std::string get_address() const;
+    std::string address() const;
 
     /**
      * @brief Write a message on the socket to the endpoint.
@@ -61,7 +59,7 @@ public:
      * @return true on success, else false
      * @throw SocketException if the socket is closed
      */
-    bool write(const std::string& msg);
+    bool write(const util::CStringPack& msg);
 
     /**
      * @brief Close the socket.
@@ -73,10 +71,6 @@ public:
      * @return the socket
      */
     boost::asio::ip::tcp::socket& get();
-
-private:
-    /// Underlying socket
-    boost::asio::ip::tcp::socket m_socket;
 };
 }  // namespace net
 }  // namespace server

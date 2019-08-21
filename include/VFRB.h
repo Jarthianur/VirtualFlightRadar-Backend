@@ -53,22 +53,14 @@ class Feed;
  */
 class VFRB
 {
-public:
-    NOT_COPYABLE(VFRB)
-    DEFAULT_DTOR(VFRB)
+    std::shared_ptr<data::AircraftData>          m_aircraftData;    ///< Aircraft container
+    std::shared_ptr<data::AtmosphereData>        m_atmosphereData;  ///< Atmospheric data container
+    std::shared_ptr<data::GpsData>               m_gpsData;         ///< GPS data container
+    std::shared_ptr<data::WindData>              m_windData;        ///< Wind data container
+    server::Server<server::net::SocketImplBoost> m_server;          ///< Manage clients and sending of data
+    std::list<std::shared_ptr<feed::Feed>>       m_feeds;           ///< List of all active feeds
+    std::atomic<bool>                            m_running;         ///< Atomic run-status
 
-    /**
-     * @brief Constructor
-     * @param config The Configuration
-     */
-    explicit VFRB(std::shared_ptr<config::Configuration> config);
-
-    /**
-     * @brief The VFRB's main method, runs the VFR-B.
-     */
-    void run() noexcept;
-
-private:
     /**
      * @brief Create all input feeds.
      * @param config The Configuration
@@ -85,26 +77,15 @@ private:
      * @param start The start value
      * @return the duration string
      */
-    std::string get_duration(std::chrono::steady_clock::time_point start) const;
+    std::string duration(std::chrono::steady_clock::time_point start) const;
 
-    /// Aircraft container
-    std::shared_ptr<data::AircraftData> m_aircraftData;
+public:
+    NOT_COPYABLE(VFRB)
+    explicit VFRB(std::shared_ptr<config::Configuration> config);  ///< @param config The Configuration
+    ~VFRB() noexcept = default;
 
-    /// Atmospheric data container
-    std::shared_ptr<data::AtmosphereData> m_atmosphereData;
-
-    /// GPS data container
-    std::shared_ptr<data::GpsData> m_gpsData;
-
-    /// Wind data container
-    std::shared_ptr<data::WindData> m_windData;
-
-    /// Manage clients and sending of data
-    server::Server<server::net::SocketImplBoost> m_server;
-
-    /// List of all active feeds
-    std::list<std::shared_ptr<feed::Feed>> m_feeds;
-
-    /// Atomic run-status.
-    std::atomic<bool> m_running;
+    /**
+     * @brief The VFRB's main method, runs the VFR-B.
+     */
+    void run() noexcept;
 };
