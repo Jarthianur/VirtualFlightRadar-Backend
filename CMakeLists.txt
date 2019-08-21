@@ -20,7 +20,7 @@ set(vfrb_regression_bin vfrb_regression-${VFRB_BIN_TAG})
 set(vfrb_test_bin vfrb_test-${VFRB_BIN_TAG})
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
