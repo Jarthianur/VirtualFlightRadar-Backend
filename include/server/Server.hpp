@@ -51,7 +51,7 @@ class Server
     std::shared_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
     std::array<std::unique_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
                        m_connections;                ///< Connections container
-    std::uint8_t       m_activeConnections = 0;      ///< Number of active connections
+    u8                 m_activeConnections = 0;      ///< Number of active connections
     bool               m_running           = false;  ///< Running state
     std::thread        m_thread;                     ///< Internal thread
     mutable std::mutex m_mutex;
@@ -66,7 +66,7 @@ class Server
      * @param address The ip address to check
      * @return true if the ip is already registered, else false
      */
-    bool isConnected(const std::string& address);
+    bool isConnected(str const& address);
 
     /**
      * @brief Handler for accepting connections.
@@ -77,7 +77,7 @@ class Server
 public:
     NOT_COPYABLE(Server)
     Server();
-    explicit Server(std::uint16_t port);  ///< @param port The port
+    explicit Server(u16 port);  ///< @param port The port
     explicit Server(std::shared_ptr<net::NetworkInterface<SocketT>>
                         interface);  ///< @param interface The NetworkInterface to use
     ~Server() noexcept;
@@ -99,15 +99,14 @@ public:
      * @param msg The msg to write
      * @threadsafe
      */
-    void send(const util::CStringPack& msg);
+    void send(util::CStringPack const& msg);
 };
 
 template<typename SocketT>
 const char* Server<SocketT>::LOG_PREFIX = "(Server) ";
 
 template<typename SocketT>
-Server<SocketT>::Server(std::uint16_t port)
-    : m_netInterface(std::make_shared<net::NetworkInterfaceImplBoost>(port))
+Server<SocketT>::Server(u16 port) : m_netInterface(std::make_shared<net::NetworkInterfaceImplBoost>(port))
 {}
 
 template<typename SocketT>
@@ -164,7 +163,7 @@ void Server<SocketT>::stop()
 }
 
 template<typename SocketT>
-void Server<SocketT>::send(const util::CStringPack& msg)
+void Server<SocketT>::send(util::CStringPack const& msg)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (msg.second == 0 || m_activeConnections == 0)
@@ -193,9 +192,9 @@ void Server<SocketT>::accept()
 }
 
 template<typename SocketT>
-bool Server<SocketT>::isConnected(const std::string& address)
+bool Server<SocketT>::isConnected(str const& address)
 {
-    for (const auto& it : m_connections)
+    for (auto const& it : m_connections)
     {
         if (it && it.get()->address == address)
         {
@@ -233,7 +232,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
                 m_netInterface->close();
             }
         }
-        catch (const net::SocketException& e)
+        catch (net::SocketException const& e)
         {
             logger.warn(LOG_PREFIX, "connection failed: ", e.what());
             m_netInterface->close();

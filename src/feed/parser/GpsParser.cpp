@@ -22,7 +22,6 @@
 #include "feed/parser/GpsParser.h"
 
 #include <stdexcept>
-#include <type_traits>
 
 #include "object/GpsPosition.h"
 #include "object/Timestamp.hpp"
@@ -31,34 +30,31 @@
 
 using namespace object;
 
-namespace feed
+namespace feed::parser
 {
-namespace parser
-{
-const boost::regex GpsParser::s_GPGGA_RE(
+boost::regex const GpsParser::s_GPGGA_RE(
     "^\\$[A-Z]{2}GGA,(\\d{6}),(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
     boost::regex::optimize | boost::regex::icase);
 
 GpsParser::GpsParser() : Parser<GpsPosition>() {}
 
-GpsPosition GpsParser::unpack(const std::string& sentence, std::uint32_t priority) const
+GpsPosition GpsParser::unpack(str const& sentence, u32 priority) const
 {
     try
     {
-        boost::smatch match;
-        if (std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
-                math::checksum(sentence.c_str(), sentence.length()) &&
-            boost::regex_match(sentence, match, s_GPGGA_RE))
+        if (boost::smatch match; std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
+                                     math::checksum(sentence.c_str(), sentence.length()) &&
+                                 boost::regex_match(sentence, match, s_GPGGA_RE))
         {
             return parsePosition(match, priority);
         }
     }
-    catch (const std::exception&)
+    catch (std::exception const&)
     {}
     throw UnpackError();
 }
 
-GpsPosition GpsParser::parsePosition(const boost::smatch& match, std::uint32_t priority) const
+GpsPosition GpsParser::parsePosition(boost::smatch const& match, u32 priority) const
 {
     auto latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
     if (match.str(RE_GGA_LAT_DIR).compare("S") == 0)
@@ -75,10 +71,8 @@ GpsPosition GpsParser::parsePosition(const boost::smatch& match, std::uint32_t p
             {latitude, longitude, altitude},
             std::stod(match.str(RE_GGA_GEOID)),
             std::stod(match.str(RE_GGA_DIL)),
-            static_cast<std::uint8_t>(std::stoi(match.str(RE_GGA_SAT))),
-            static_cast<std::int8_t>(std::stoi(match.str(RE_GGA_FIX))),
+            static_cast<u8>(std::stoi(match.str(RE_GGA_SAT))),
+            static_cast<s8>(std::stoi(match.str(RE_GGA_FIX))),
             Timestamp<time::DateTimeImplBoost>(match.str(RE_GGA_TIME), time::Format::HHMMSS)};
 }
-
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser

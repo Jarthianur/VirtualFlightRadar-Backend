@@ -27,27 +27,27 @@
 
 #include "Parser.hpp"
 
-namespace feed
-{
-namespace parser
+namespace feed::parser
 {
 /**
  * @brief Implement Parser for GPS NMEA sentences.
  */
 class GpsParser : public Parser<object::GpsPosition>
 {
-    static constexpr auto RE_GGA_TIME    = 1;   ///< GGA regex match capture group of time
-    static constexpr auto RE_GGA_LAT     = 2;   ///< GGA regex match capture group of latitude
-    static constexpr auto RE_GGA_LAT_DIR = 3;   ///< GGA regex match capture group of latitude orientation
-    static constexpr auto RE_GGA_LON     = 4;   ///< GGA regex match capture group of longitude
-    static constexpr auto RE_GGA_LON_DIR = 5;   ///< GGA regex match capture group of longitude orientation
-    static constexpr auto RE_GGA_FIX     = 6;   ///< GGA regex match capture group of fix quality
-    static constexpr auto RE_GGA_SAT     = 7;   ///< GGA regex match capture group of sitallite count
-    static constexpr auto RE_GGA_DIL     = 8;   ///< GGA regex match capture group of dilution
-    static constexpr auto RE_GGA_ALT     = 9;   ///< GGA regex match capture group of altitude
-    static constexpr auto RE_GGA_GEOID   = 10;  ///< GGA regex match capture group of geoid separation
+    inline static constexpr auto RE_GGA_TIME = 1;  ///< GGA regex match capture group of time
+    inline static constexpr auto RE_GGA_LAT  = 2;  ///< GGA regex match capture group of latitude
+    inline static constexpr auto RE_GGA_LAT_DIR =
+        3;                                        ///< GGA regex match capture group of latitude orientation
+    inline static constexpr auto RE_GGA_LON = 4;  ///< GGA regex match capture group of longitude
+    inline static constexpr auto RE_GGA_LON_DIR =
+        5;  ///< GGA regex match capture group of longitude orientation
+    inline static constexpr auto RE_GGA_FIX   = 6;   ///< GGA regex match capture group of fix quality
+    inline static constexpr auto RE_GGA_SAT   = 7;   ///< GGA regex match capture group of sitallite count
+    inline static constexpr auto RE_GGA_DIL   = 8;   ///< GGA regex match capture group of dilution
+    inline static constexpr auto RE_GGA_ALT   = 9;   ///< GGA regex match capture group of altitude
+    inline static constexpr auto RE_GGA_GEOID = 10;  ///< GGA regex match capture group of geoid separation
 
-    static const boost::regex s_GPGGA_RE;  ///< Regular expression to parse GGA
+    static boost::regex const s_GPGGA_RE;  ///< Regular expression to parse GGA
 
     /**
      * @brief Parse a Position.
@@ -55,7 +55,7 @@ class GpsParser : public Parser<object::GpsPosition>
      * @param position The target position
      * @return true on success, else false
      */
-    object::GpsPosition parsePosition(const boost::smatch& match, std::uint32_t priority) const;
+    object::GpsPosition parsePosition(boost::smatch const& match, u32 priority) const;
 
 public:
     GpsParser();
@@ -67,7 +67,6 @@ public:
      * @param position The position to unpack into
      * @return true on success, else false
      */
-    object::GpsPosition unpack(const std::string& sentence, std::uint32_t priority) const override;
+    object::GpsPosition unpack(str const& sentence, u32 priority) const override;
 };
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser

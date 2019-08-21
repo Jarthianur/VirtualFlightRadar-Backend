@@ -21,7 +21,6 @@
 
 #include "feed/parser/SbsParser.h"
 
-#include <cstddef>
 #include <limits>
 #include <stdexcept>
 
@@ -30,27 +29,25 @@
 
 using namespace object;
 
-namespace feed
+namespace feed::parser
 {
-namespace parser
-{
-std::int32_t SbsParser::s_maxHeight = std::numeric_limits<std::int32_t>::max();
+s32 SbsParser::s_maxHeight = std::numeric_limits<s32>::max();
 
 SbsParser::SbsParser() : Parser<Aircraft>() {}
 
-Aircraft SbsParser::unpack(const std::string& sentence, std::uint32_t priority) const
+Aircraft SbsParser::unpack(str const& sentence, u32 priority) const
 {
-    std::size_t                        p = 6, delim;
-    std::uint32_t                      i = 2;
+    u32                                i = 2;
     Location                           loc;
-    std::string                        id;
+    str                                id;
     Timestamp<time::DateTimeImplBoost> ts;
 
     try
     {
-        if (sentence.size() > 4 && sentence[4] == '3' && sentence.find(',', p) != std::string::npos)
+        if (usize p = 6, delim = 0;
+            sentence.size() > 4 && sentence[4] == '3' && sentence.find(',', p) != str::npos)
         {
-            while ((delim = sentence.find(',', p)) != std::string::npos && i < 16)
+            while ((delim = sentence.find(',', p)) != str::npos && i < 16)
             {
                 switch (i)
                 {
@@ -82,10 +79,8 @@ Aircraft SbsParser::unpack(const std::string& sentence, std::uint32_t priority) 
             return {priority, id, Aircraft::IdType::ICAO, Aircraft::AircraftType::POWERED_AIRCRAFT, loc, ts};
         }
     }
-    catch (const std::exception&)
+    catch (std::exception const&)
     {}
     throw UnpackError();
 }
-
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser

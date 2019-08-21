@@ -26,9 +26,9 @@ namespace object
 {
 Atmosphere::Atmosphere() : Object() {}
 
-Atmosphere::Atmosphere(std::uint32_t priority) : Object(priority) {}
+Atmosphere::Atmosphere(u32 priority) : Object(priority) {}
 
-Atmosphere::Atmosphere(std::uint32_t priority, double pressure) : Object(priority), m_pressure(pressure)
+Atmosphere::Atmosphere(u32 priority, f64 pressure) : Object(priority), m_pressure(pressure)
 {
     math::checkLimits(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
 }
@@ -37,11 +37,11 @@ void Atmosphere::assign(Object&& other)
 {
     try
     {
-        Atmosphere&& update = dynamic_cast<Atmosphere&&>(other);
+        auto&& update = dynamic_cast<Atmosphere&&>(other);
         Object::assign(std::move(other));
         this->m_pressure = update.m_pressure;
     }
-    catch (const std::bad_cast&)
+    catch (std::bad_cast const&)
     {}
 }
 
@@ -55,9 +55,8 @@ auto Atmosphere::pressure() const -> decltype(m_pressure)
     return m_pressure;
 }
 
-std::string& Atmosphere::operator*()
+str& Atmosphere::operator*()
 {
     return m_nmea;
 }
-
 }  // namespace object

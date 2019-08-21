@@ -21,11 +21,9 @@
 
 #pragma once
 
-#include <cstdint>
+#include "util/types.h"
 
-namespace object
-{
-namespace time
+namespace object::time
 {
 /**
  * @brief Provide time functions using boost.
@@ -40,13 +38,12 @@ public:
      * @brief Get the amount of milliseconds since 00:00 UTC.
      * @return the milliseconds
      */
-    static std::int64_t now();
+    static s64 now();
 
     /**
      * @brief Get the current day as incremental number.
      * @return the current day
      */
-    static std::uint32_t day();
+    static u32 day();
 };
-}  // namespace time
-}  // namespace object
+}  // namespace object::time

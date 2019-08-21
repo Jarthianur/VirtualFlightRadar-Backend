@@ -21,42 +21,39 @@
 
 #include "feed/parser/AtmosphereParser.h"
 
-#include <cstddef>
 #include <stdexcept>
 
 #include "util/math.hpp"
 
-namespace feed
-{
-namespace parser
-{
-AtmosphereParser::AtmosphereParser() : Parser<object::Atmosphere>() {}
+using namespace object;
 
-object::Atmosphere AtmosphereParser::unpack(const std::string& sentence, std::uint32_t priority) const
+namespace feed::parser
+{
+AtmosphereParser::AtmosphereParser() : Parser<Atmosphere>() {}
+
+Atmosphere AtmosphereParser::unpack(str const& sentence, u32 priority) const
 {
     try
     {
         if ((std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
              math::checksum(sentence.c_str(), sentence.length())) &&
-            (sentence.find("MDA") != std::string::npos))
+            (sentence.find("MDA") != str::npos))
         {
-            std::size_t tmpB   = sentence.find('B') - 1;
-            std::size_t tmpS   = sentence.substr(0, tmpB).find_last_of(',') + 1;
-            std::size_t subLen = tmpB - tmpS;
-            std::size_t numIdx;
-            double      tmpPress = std::stod(sentence.substr(tmpS, subLen), &numIdx) * 1000.0;
+            usize tmpB   = sentence.find('B') - 1;
+            usize tmpS   = sentence.substr(0, tmpB).find_last_of(',') + 1;
+            usize subLen = tmpB - tmpS;
+            usize numIdx;
+            f64   tmpPress = std::stod(sentence.substr(tmpS, subLen), &numIdx) * 1000.0;
             if (numIdx == subLen)
             {
-                object::Atmosphere atmos{priority, tmpPress};
+                Atmosphere atmos{priority, tmpPress};
                 *atmos = sentence;
                 return atmos;
             }
         }
     }
-    catch (const std::exception&)
+    catch (std::exception const&)
     {}
     throw UnpackError();
 }
-
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser

@@ -19,22 +19,28 @@
  }
  */
 
-#include "object/impl/DateTimeImplBoost.h"
+#pragma once
 
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <cstddef>
+#include <cstdint>
+#include <mutex>
+#include <string>
 
-namespace object::time
-{
-s64 DateTimeImplBoost::now()
-{
-    return static_cast<s64>(
-        boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
-            .total_milliseconds());
-}
+using u8    = std::uint8_t;
+using s8    = std::int8_t;
+using u16   = std::uint16_t;
+using s16   = std::int16_t;
+using u32   = std::uint32_t;
+using s32   = std::int32_t;
+using u64   = std::uint64_t;
+using s64   = std::int64_t;
+using usize = std::size_t;
+using f32   = float;
+using f64   = double;
 
-u32 DateTimeImplBoost::day()
-{
-    return static_cast<u32>(boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
-}
+using enum_t = std::uint_fast8_t;
 
-}  // namespace object::time
+using str = std::string;
+
+using lock_guard  = std::lock_guard<std::mutex>;
+using unique_lock = std::unique_lock<std::mutex>;

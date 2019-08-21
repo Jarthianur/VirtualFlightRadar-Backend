@@ -25,23 +25,21 @@
 
 #include "Parser.hpp"
 
-namespace feed
-{
-namespace parser
+namespace feed::parser
 {
 /**
  * @brief Implement Parser for SBS sentences.
  */
 class SbsParser : public Parser<object::Aircraft>
 {
-    static constexpr auto SBS_FIELD_ID   = 4;   ///< Field number of aircraft id
-    static constexpr auto SBS_FIELD_TIME = 7;   ///< Field number of time
-    static constexpr auto SBS_FIELD_ALT  = 11;  ///< Field number of altitude
-    static constexpr auto SBS_FIELD_LAT  = 14;  ///< Field number of latitude
-    static constexpr auto SBS_FIELD_LON  = 15;  ///< Field number of longitude
+    inline static constexpr auto SBS_FIELD_ID   = 4;   ///< Field number of aircraft id
+    inline static constexpr auto SBS_FIELD_TIME = 7;   ///< Field number of time
+    inline static constexpr auto SBS_FIELD_ALT  = 11;  ///< Field number of altitude
+    inline static constexpr auto SBS_FIELD_LAT  = 14;  ///< Field number of latitude
+    inline static constexpr auto SBS_FIELD_LON  = 15;  ///< Field number of longitude
 
 public:
-    static std::int32_t s_maxHeight;  ///< The max height filter
+    static s32 s_maxHeight;  ///< The max height filter
 
     SbsParser();
     ~SbsParser() noexcept override = default;
@@ -51,7 +49,6 @@ public:
      * @param sentence The string to unpack
      * @param aircraft The Aircraft to unpack into
      */
-    object::Aircraft unpack(const std::string& sentence, std::uint32_t priority) const override;
+    object::Aircraft unpack(str const& sentence, u32 priority) const override;
 };
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser

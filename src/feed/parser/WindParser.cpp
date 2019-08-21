@@ -25,29 +25,27 @@
 
 #include "util/math.hpp"
 
-namespace feed
-{
-namespace parser
-{
-WindParser::WindParser() : Parser<object::Wind>() {}
+using namespace object;
 
-object::Wind WindParser::unpack(const std::string& sentence, std::uint32_t priority) const
+namespace feed::parser
+{
+WindParser::WindParser() : Parser<Wind>() {}
+
+Wind WindParser::unpack(str const& sentence, u32 priority) const
 {
     try
     {
         if ((std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
              math::checksum(sentence.c_str(), sentence.length())) &&
-            (sentence.find("MWV") != std::string::npos))
+            (sentence.find("MWV") != str::npos))
         {
-            object::Wind wind{priority};
+            Wind wind{priority};
             *wind = sentence;
             return wind;
         }
     }
-    catch (const std::logic_error&)
+    catch (std::logic_error const&)
     {}
     throw UnpackError();
 }
-
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser
