@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include <cstdint>
 #include <functional>
-#include <mutex>
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
@@ -31,10 +29,9 @@
 #include "server/net/NetworkInterface.hpp"
 #include "server/net/impl/SocketImplBoost.h"
 #include "util/defines.h"
+#include "util/types.h"
 
-namespace server
-{
-namespace net
+namespace server::net
 {
 /**
  * @brief Implement NetworkInterface using boost.
@@ -50,11 +47,11 @@ class NetworkInterfaceImplBoost : public NetworkInterface<SocketImplBoost>
      * @param error    The error code
      * @param callback The callback to invoke
      */
-    void handleAccept(const boost::system::error_code& error, const std::function<void(bool)>& callback);
+    void handleAccept(boost::system::error_code const& error, Callback const& callback);
 
 public:
     NOT_COPYABLE(NetworkInterfaceImplBoost)
-    explicit NetworkInterfaceImplBoost(std::uint16_t port);  ///< @param port The port number
+    explicit NetworkInterfaceImplBoost(u16 port);  ///< @param port The port number
     ~NetworkInterfaceImplBoost() noexcept override;
 
     /**
@@ -62,7 +59,7 @@ public:
      * @note Blocks until all handlers have returned.
      * @param lock The lock to release before entering blocking section
      */
-    void run(std::unique_lock<std::mutex>& lock) override;
+    void run(unique_lock& lock) override;
 
     /**
      * @brief Stop the event handler queue.
@@ -73,7 +70,7 @@ public:
      * @brief Schedule an accept call.
      * @param callback The callback to invoke when done
      */
-    void onAccept(const std::function<void(bool)>& callback) override;
+    void onAccept(Callback const& callback) override;
 
     /**
      * @brief Close current connection.
@@ -92,7 +89,6 @@ public:
      * @return the address
      * @throw SocketException if the current socket is not open
      */
-    std::string stagedAddress() const override;
+    str stagedAddress() const override;
 };
-}  // namespace net
-}  // namespace server
+}  // namespace server::net

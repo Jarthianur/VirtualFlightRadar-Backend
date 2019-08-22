@@ -34,6 +34,8 @@ using namespace config;
 
 namespace feed
 {
+static auto const& logger = Logger::instance();
+
 Feed::Feed(const std::string& name, const char* logPrefix, const Properties& properties,
            std::shared_ptr<data::Data> data)
     : m_data(data), m_priority(initPriority()), m_logPrefix(logPrefix), name(name), properties(properties)

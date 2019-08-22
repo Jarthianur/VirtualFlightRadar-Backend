@@ -22,16 +22,14 @@
 #pragma once
 
 #include <array>
-#include <cstddef>
-#include <cstdint>
 #include <memory>
-#include <mutex>
 #include <thread>
 #include <utility>
 
 #include "net/impl/NetworkInterfaceImplBoost.h"
 #include "util/Logger.hpp"
 #include "util/defines.h"
+#include "util/types.h"
 #include "util/utility.hpp"
 
 #include "Connection.hpp"
@@ -46,7 +44,8 @@ namespace server
 template<typename SocketT>
 class Server
 {
-    static const char* LOG_PREFIX;
+    static const char*   LOG_PREFIX;
+    static Logger const& logger;
 
     std::shared_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
     std::array<std::unique_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
@@ -106,6 +105,9 @@ template<typename SocketT>
 const char* Server<SocketT>::LOG_PREFIX = "(Server) ";
 
 template<typename SocketT>
+Logger const& Server<SocketT>::logger = Logger::instance();
+
+template<typename SocketT>
 Server<SocketT>::Server(u16 port) : m_netInterface(std::make_shared<net::NetworkInterfaceImplBoost>(port))
 {}
 
@@ -126,12 +128,12 @@ Server<SocketT>::~Server() noexcept
 template<typename SocketT>
 void Server<SocketT>::run()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    lock_guard lock(m_mutex);
     logger.info(LOG_PREFIX, "starting...");
     m_running = true;
     m_thread  = std::thread([this]() {
         accept();
-        std::unique_lock<std::mutex> lock(m_mutex);
+        unique_lock lock(m_mutex);
         m_netInterface->run(lock);
         logger.debug(LOG_PREFIX, "stopped");
     });
@@ -140,8 +142,7 @@ void Server<SocketT>::run()
 template<typename SocketT>
 void Server<SocketT>::stop()
 {
-    std::unique_lock<std::mutex> lock(m_mutex);
-    if (m_running)
+    if (unique_lock lock(m_mutex); m_running)
     {
         m_running = false;
         logger.info(LOG_PREFIX, "stopping all connections...");
@@ -165,7 +166,7 @@ void Server<SocketT>::stop()
 template<typename SocketT>
 void Server<SocketT>::send(util::CStringPack const& msg)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    lock_guard lock(m_mutex);
     if (msg.second == 0 || m_activeConnections == 0)
     {
         return;
@@ -187,7 +188,7 @@ void Server<SocketT>::send(util::CStringPack const& msg)
 template<typename SocketT>
 void Server<SocketT>::accept()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    lock_guard lock(m_mutex);
     m_netInterface->onAccept(std::bind(&Server<SocketT>::attemptConnection, this, std::placeholders::_1));
 }
 
@@ -209,7 +210,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        lock_guard lock(m_mutex);
         try
         {
             if (m_activeConnections < param::SERVER_MAX_CLIENTS &&

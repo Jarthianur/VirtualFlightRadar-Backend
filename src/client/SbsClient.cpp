@@ -27,7 +27,8 @@ namespace client
 {
 using namespace net;
 
-constexpr auto LOG_PREFIX = "(SbsClient) ";
+constexpr auto     LOG_PREFIX = "(SbsClient) ";
+static auto const& logger     = Logger::instance();
 
 SbsClient::SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
     : Client(endpoint, LOG_PREFIX, connector)

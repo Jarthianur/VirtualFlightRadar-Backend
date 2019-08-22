@@ -42,7 +42,8 @@ namespace config
 using Number    = boost::variant<std::int32_t, std::uint64_t, double>;
 using OptNumber = boost::optional<Number>;
 
-constexpr auto LOG_PREFIX = "(Config) ";
+constexpr auto     LOG_PREFIX = "(Config) ";
+static auto const& logger     = Logger::instance();
 
 // Configuration section keys
 const char* Configuration::SECT_KEY_FALLBACK = "fallback";

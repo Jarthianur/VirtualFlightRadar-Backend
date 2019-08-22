@@ -33,6 +33,8 @@ using namespace config;
 
 namespace feed
 {
+static auto const& logger = Logger::instance();
+
 parser::AprsParser AprscFeed::s_parser;
 
 AprscFeed::AprscFeed(const std::string& name, const Properties& properties,

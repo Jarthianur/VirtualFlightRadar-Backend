@@ -32,6 +32,8 @@
 
 #include "parameters.h"
 
+static auto const& logger = Logger::instance();
+
 namespace client
 {
 using namespace net;

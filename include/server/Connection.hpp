@@ -22,12 +22,12 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <utility>
 
 #include "net/SocketException.h"
 #include "util/Logger.hpp"
 #include "util/defines.h"
+#include "util/types.h"
 #include "util/utility.hpp"
 
 namespace server
@@ -48,7 +48,7 @@ class Connection final
     explicit Connection(SocketT&& socket);
 
 public:
-    const std::string address;  ///< IP address
+    str const address;  ///< IP address
 
     NOT_COPYABLE(Connection)
     ~Connection() noexcept = default;
@@ -65,7 +65,7 @@ public:
      * @param msg The message
      * @return true on success, else false
      */
-    bool write(const util::CStringPack& msg);
+    bool write(util::CStringPack const& msg);
 };
 
 template<typename SocketT>
@@ -75,15 +75,15 @@ std::unique_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socke
 }
 
 template<typename SocketT>
-bool Connection<SocketT>::write(const util::CStringPack& msg)
+bool Connection<SocketT>::write(util::CStringPack const& msg)
 {
     try
     {
         return m_socket.write(msg);
     }
-    catch (const net::SocketException& e)
+    catch (net::SocketException const& e)
     {
-        logger.debug("(Connection) write: ", e.what());
+        Logger::instance().debug("(Connection) write: ", e.what());
     }
     return false;
 }
@@ -91,5 +91,4 @@ bool Connection<SocketT>::write(const util::CStringPack& msg)
 template<typename SocketT>
 Connection<SocketT>::Connection(SocketT&& socket) : m_socket(std::move(socket)), address(m_socket.address())
 {}
-
 }  // namespace server

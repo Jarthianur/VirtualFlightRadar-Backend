@@ -24,47 +24,34 @@
 #include <fstream>
 #include <iostream>
 #include <mutex>
-#include <string>
 #include <utility>
+
+#include "util/types.h"
+
+#define PREFIX(S, P) *S << "\r" P "  " << time() << ":: "
 
 /**
  * @brief Logger with different levels.
  */
 class Logger
 {
-    std::ofstream      m_logFile;                    ///< The logfile stream
-    std::ostream*      m_outStream    = &std::cout;  ///< Stream to log INFO,DEBUG,WARN
-    std::ostream*      m_errStream    = &std::cerr;  ///< Stream to log ERROR
-    bool               m_debugEnabled = false;       ///< Enabling state of debug level
+    std::ofstream      m_logFile;                 ///< The logfile stream
+    std::ostream*      m_outStream = &std::cout;  ///< Stream to log INFO,DEBUG,WARN
+    std::ostream*      m_errStream = &std::cerr;  ///< Stream to log ERROR
     mutable std::mutex m_mutex;
 
     /**
      * @brief Get current date-time as string.
      * @return the date-time-string
      */
-    static std::string time();
+    static str time();
 
-    /**
-     * @brief Write to the given stream.
-     * @tparam T     The first argument
-     * @tparam TRest The rest of arguments
-     * @param out The stream
-     */
-    template<typename T, typename... TRest>
-    void log(std::ostream* out, T&& head, TRest&&... tail)
-    {
-        *out << std::forward<T>(head);
-        log(out, std::forward<TRest>(tail)...);
-    }
-    template<typename T>
-    void log(std::ostream* out, T&& last)
-    {
-        *out << std::forward<T>(last) << std::endl;
-    }
+    Logger() = default;
 
 public:
-    Logger()           = default;
     ~Logger() noexcept = default;
+
+    static Logger& instance();
 
     /**
      * @brief Log on INFO level.
@@ -72,19 +59,12 @@ public:
      * @tparam TRest The rest of arguments
      * @threadsafe
      */
-    template<typename T, typename... TRest>
-    void info(T&& msg, TRest&&... tail)
+    template<typename... Args>
+    void info(Args&&... args) const
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        *m_outStream << "\r[INFO]  " << time() << ":: ";
-        log(m_outStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
-    }
-    template<typename T>
-    void info(T&& msg)
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        *m_outStream << "\r[INFO]  " << time() << ":: ";
-        log(m_outStream, std::forward<T>(msg));
+        lock_guard lock(m_mutex);
+        PREFIX(m_outStream, "[INFO]");
+        (*m_outStream << ... << args) << std::endl;
     }
 
     /**
@@ -93,25 +73,14 @@ public:
      * @tparam TRest The rest of arguments
      * @threadsafe
      */
-    template<typename T, typename... TRest>
-    void debug(T&& msg, TRest&&... tail)
+    template<typename... Args>
+    void debug([[maybe_unused]] Args&&... args) const
     {
-        if (m_debugEnabled)
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            *m_outStream << "\r[DEBUG] " << time() << ":: ";
-            log(m_outStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
-        }
-    }
-    template<typename T>
-    void debug(T&& msg)
-    {
-        if (m_debugEnabled)
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            *m_outStream << "\r[DEBUG] " << time() << ":: ";
-            log(m_outStream, std::forward<T>(msg));
-        }
+#ifdef LOG_ENABLE_DEBUG
+        lock_guard lock(m_mutex);
+        PREFIX(m_outStream, "[DEBUG]");
+        (*m_outStream << ... << args) << std::endl;
+#endif
     }
 
     /**
@@ -120,19 +89,12 @@ public:
      * @tparam TRest The rest of arguments
      * @threadsafe
      */
-    template<typename T, typename... TRest>
-    void warn(T&& msg, TRest&&... tail)
+    template<typename... Args>
+    void warn(Args&&... args) const
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        *m_outStream << "\r[WARN]  " << time() << ":: ";
-        log(m_outStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
-    }
-    template<typename T>
-    void warn(T&& msg)
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        *m_outStream << "\r[WARN]  " << time() << ":: ";
-        log(m_outStream, std::forward<T>(msg));
+        lock_guard lock(m_mutex);
+        PREFIX(m_outStream, "[WARN ]");
+        (*m_outStream << ... << args) << std::endl;
     }
 
     /**
@@ -141,33 +103,19 @@ public:
      * @tparam TRest The rest of arguments
      * @threadsafe
      */
-    template<typename T, typename... TRest>
-    void error(T&& msg, TRest&&... tail)
+    template<typename... Args>
+    void error(Args&&... args) const
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        *m_errStream << "\r[ERROR] " << time() << ":: ";
-        log(m_errStream, std::forward<T>(msg), std::forward<TRest>(tail)...);
+        lock_guard lock(m_mutex);
+        PREFIX(m_errStream, "[ERROR]");
+        (*m_errStream << ... << args) << std::endl;
     }
-    template<typename T>
-    void error(T&& msg)
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        *m_errStream << "\r[ERROR] " << time() << ":: ";
-        log(m_errStream, std::forward<T>(msg));
-    }
-
-    /**
-     * @brief Enable/Disable debug level.
-     * @param enable true to enable, false to disable (default: true)
-     */
-    void debug(bool enable = true);
 
     /**
      * @brief Set a logfile instead of stdout/stderr.
      * @param file The filename
      */
-    void logFile(const std::string& file);
+    void logFile(str const& file);
 };
 
-/// Extern Logger instance
-extern Logger logger;
+#undef PREFIX

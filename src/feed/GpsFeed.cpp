@@ -31,6 +31,8 @@ using namespace config;
 
 namespace feed
 {
+static auto const& logger = Logger::instance();
+
 parser::GpsParser GpsFeed::s_parser;
 
 GpsFeed::GpsFeed(const std::string& name, const Properties& properties, std::shared_ptr<data::GpsData> data)

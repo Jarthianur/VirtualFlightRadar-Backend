@@ -32,7 +32,8 @@ namespace client
 {
 using namespace net;
 
-constexpr auto LOG_PREFIX = "(AprscClient) ";
+constexpr auto     LOG_PREFIX = "(AprscClient) ";
+static auto const& logger     = Logger::instance();
 
 AprscClient::AprscClient(const Endpoint& endpoint, const std::string& login,
                          std::shared_ptr<Connector> connector)

@@ -23,8 +23,8 @@
 
 #include <functional>
 #include <memory>
-#include <mutex>
-#include <string>
+
+#include "util/types.h"
 
 namespace server
 {
@@ -41,6 +41,8 @@ template<typename SocketT>
 class NetworkInterface
 {
 public:
+    using Callback = std::function<void(bool)>;
+
     NetworkInterface()                   = default;
     virtual ~NetworkInterface() noexcept = default;
 
@@ -48,7 +50,7 @@ public:
      * @brief Run this interface.
      * @param lock The lock that may be hold and released inside
      */
-    virtual void run(std::unique_lock<std::mutex>& lock) = 0;
+    virtual void run(unique_lock& lock) = 0;
 
     /**
      * @brief Stop this interface.
@@ -59,7 +61,7 @@ public:
      * @brief Schedule an accept call.
      * @param callback The callback to invoke when done
      */
-    virtual void onAccept(const std::function<void(bool)>& callback) = 0;
+    virtual void onAccept(Callback const& callback) = 0;
 
     /**
      * @brief Close the connection.
@@ -76,7 +78,7 @@ public:
      * @brief Get the current connection address.
      * @return the address
      */
-    virtual std::string stagedAddress() const = 0;
+    virtual str stagedAddress() const = 0;
 };
 }  // namespace net
 }  // namespace server

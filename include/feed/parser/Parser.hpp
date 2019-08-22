@@ -52,7 +52,7 @@ class UnpackError : public std::exception
 public:
     UnpackError() : std::exception() {}
     virtual ~UnpackError() noexcept = default;
-    const char* what() const noexcept
+    char const* what() const noexcept
     {
         return "unpack failed";
     }

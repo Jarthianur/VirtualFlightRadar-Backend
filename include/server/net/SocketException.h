@@ -22,28 +22,26 @@
 #pragma once
 
 #include <exception>
-#include <string>
 
-namespace server
-{
-namespace net
+#include "util/types.h"
+
+namespace server::net
 {
 /**
  * @brief Exception to signal socket errors.
  */
 class SocketException : public std::exception
 {
-    const std::string m_message;  ///< Error message
+    str const m_message;  ///< Error message
 
 public:
     SocketException() = default;
-    explicit SocketException(const std::string& msg);  ///< @param msg The error message
+    explicit SocketException(str const& msg);  ///< @param msg The error message
 
     /**
      * @brief Get the error message.
      * @return the message
      */
-    const char* what() const noexcept;
+    char const* what() const noexcept;
 };
-}  // namespace net
-}  // namespace server
+}  // namespace server::net

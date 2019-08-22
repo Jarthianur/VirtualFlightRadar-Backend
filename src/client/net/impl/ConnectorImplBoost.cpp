@@ -30,6 +30,8 @@
 
 namespace client::net
 {
+static auto const& logger = Logger::instance();
+
 ConnectorImplBoost::ConnectorImplBoost()
     : Connector(),
       m_ioService(),

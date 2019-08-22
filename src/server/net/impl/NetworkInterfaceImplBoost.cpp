@@ -27,13 +27,12 @@
 #include "server/Connection.hpp"
 #include "util/Logger.hpp"
 
-namespace server
+namespace server::net
 {
-using namespace net;
+constexpr auto     LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
+static auto const& logger     = Logger::instance();
 
-constexpr auto LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
-
-NetworkInterfaceImplBoost::NetworkInterfaceImplBoost(std::uint16_t port)
+NetworkInterfaceImplBoost::NetworkInterfaceImplBoost(u16 port)
     : NetworkInterface<SocketImplBoost>(),
       m_ioService(),
       m_acceptor(m_ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
@@ -46,7 +45,7 @@ NetworkInterfaceImplBoost::~NetworkInterfaceImplBoost() noexcept
     stop();
 }
 
-void NetworkInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
+void NetworkInterfaceImplBoost::run(unique_lock& lock)
 {
     try
     {
@@ -56,7 +55,7 @@ void NetworkInterfaceImplBoost::run(std::unique_lock<std::mutex>& lock)
             m_ioService.run();
         }
     }
-    catch (const std::exception& e)
+    catch (std::exception const& e)
     {
         logger.error(LOG_PREFIX, ": ", e.what());
     }
@@ -79,7 +78,7 @@ void NetworkInterfaceImplBoost::stop()
     m_socket.close();
 }
 
-void NetworkInterfaceImplBoost::onAccept(const std::function<void(bool)>& callback)
+void NetworkInterfaceImplBoost::onAccept(Callback const& callback)
 {
     if (m_acceptor.is_open())
     {
@@ -93,8 +92,7 @@ void NetworkInterfaceImplBoost::close()
     m_socket.close();
 }
 
-void NetworkInterfaceImplBoost::handleAccept(const boost::system::error_code& error,
-                                             const std::function<void(bool)>& callback)
+void NetworkInterfaceImplBoost::handleAccept(boost::system::error_code const& error, Callback const& callback)
 {
     if (error)
     {
@@ -112,9 +110,8 @@ std::unique_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startCon
     return Connection<SocketImplBoost>::create(std::move(m_socket));
 }
 
-std::string NetworkInterfaceImplBoost::stagedAddress() const
+str NetworkInterfaceImplBoost::stagedAddress() const
 {
     return m_socket.address();
 }
-
-}  // namespace server
+}  // namespace server::net
