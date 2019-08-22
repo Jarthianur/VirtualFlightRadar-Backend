@@ -30,6 +30,8 @@ namespace client
  */
 class SbsClient : public Client
 {
+    NOT_COPYABLE(SbsClient)
+
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
@@ -37,14 +39,11 @@ class SbsClient : public Client
     void handleConnect(bool error) override;
 
 public:
-    NOT_COPYABLE(SbsClient)
-
     /**
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    SbsClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
+    SbsClient(net::Endpoint const& endpoint, std::shared_ptr<net::Connector> connector);
     ~SbsClient() noexcept override = default;
 };
-
 }  // namespace client

@@ -36,9 +36,9 @@ namespace data
  */
 class GpsData : public Data
 {
-    static constexpr auto GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
-    static constexpr auto GPS_FIX_GOOD          = 1;    ///< Good fix quality
-    static constexpr auto GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
+    inline static constexpr auto GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
+    inline static constexpr auto GPS_FIX_GOOD          = 1;    ///< Good fix quality
+    inline static constexpr auto GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
 
     object::GpsPosition     m_position;                ///< The position
     processor::GpsProcessor m_processor;               ///< Processor for GPS information
@@ -56,7 +56,7 @@ public:
     /**
      * @param crPosition The initial info
      */
-    GpsData(const object::GpsPosition& position, bool ground);
+    GpsData(object::GpsPosition const& position, bool ground);
     ~GpsData() noexcept override = default;
 
     /**
@@ -69,7 +69,7 @@ public:
      */
     bool update(object::Object&& position) override;
 
-    void access(const accessor_fn& func) override;
+    void access(accessor_fn const& func) override;
 
     /**
      * @brief Get the position.
@@ -94,7 +94,7 @@ class PositionAlreadyLocked : public GpsDataException
 public:
     PositionAlreadyLocked();
     ~PositionAlreadyLocked() noexcept override = default;
-    const char* what() const noexcept override;
+    char const* what() const noexcept override;
 };
 
 /**
@@ -105,7 +105,6 @@ class ReceivedGoodPosition : public GpsDataException
 public:
     ReceivedGoodPosition();
     ~ReceivedGoodPosition() noexcept override = default;
-    const char* what() const noexcept override;
+    char const* what() const noexcept override;
 };
-
 }  // namespace data

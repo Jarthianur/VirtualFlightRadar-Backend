@@ -21,15 +21,14 @@
 
 #pragma once
 
-#include <cstddef>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <vector>
 
 #include "net/Connector.hpp"
 #include "net/Endpoint.hpp"
 #include "util/defines.h"
+#include "util/types.h"
 
 namespace feed
 {
@@ -42,11 +41,13 @@ namespace client
  */
 class Client
 {
+    NOT_COPYABLE(Client)
+
 protected:
     std::shared_ptr<net::Connector>          m_connector;        /// Connector interface
     bool                                     m_running = false;  /// Run state indicator
-    const char* const                        m_logPrefix;        /// Component string used for logging
-    const net::Endpoint                      m_endpoint;         /// Remote endpoint
+    char const* const                        m_logPrefix;        /// Component string used for logging
+    net::Endpoint const                      m_endpoint;         /// Remote endpoint
     std::vector<std::shared_ptr<feed::Feed>> m_feeds;            /// Container for subscribed feeds
     mutable std::mutex                       m_mutex;
 
@@ -55,7 +56,7 @@ protected:
      * @param component The component name
      * @param connector The Connector interface
      */
-    Client(const net::Endpoint& endpoint, const char* logPrefix, std::shared_ptr<net::Connector> connector);
+    Client(net::Endpoint const& endpoint, char const* logPrefix, std::shared_ptr<net::Connector> connector);
 
     /**
      * @brief Handler for connect
@@ -100,10 +101,9 @@ protected:
      * @param error    The error indicator
      * @param response The received string
      */
-    void handleRead(bool error, const std::string& response);
+    void handleRead(bool error, str const& response);
 
 public:
-    NOT_COPYABLE(Client)
     virtual ~Client() noexcept = default;
 
     /**
@@ -132,13 +132,12 @@ public:
      * @param other The other Client
      * @return true if equals, else false
      */
-    virtual bool equals(const Client& other) const;
+    virtual bool equals(Client const& other) const;
 
     /**
      * @brief Get a hash value of this client.
      * @return the hash value
      */
-    virtual std::size_t hash() const;
+    virtual usize hash() const;
 };
-
 }  // namespace client

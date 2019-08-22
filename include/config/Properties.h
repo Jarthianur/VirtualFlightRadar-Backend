@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include <string>
 #include <unordered_map>
 
 #include <boost/property_tree/ptree.hpp>
+
+#include "util/types.h"
 
 namespace config
 {
@@ -37,7 +38,7 @@ class Properties
 
 public:
     explicit Properties(
-        const boost::property_tree::ptree& ptree);             ///< @param ptree The property tree to copy
+        boost::property_tree::ptree const& ptree);             ///< @param ptree The property tree to copy
     explicit Properties(boost::property_tree::ptree&& ptree);  ///< @param ptree The property tree to move
     ~Properties() noexcept = default;
 
@@ -47,7 +48,7 @@ public:
      * @param alternative The default value (default: empty)
      * @return the value at path if found and not empty, else the default value
      */
-    std::string property(const std::string& path, const std::string& alternative = "") const;
+    str property(str const& path, str const& alternative = "") const;
 
     /**
      * @brief Get the Properties for a section.
@@ -55,7 +56,6 @@ public:
      * @return the Properties for that section
      * @throw std::out_of_range if the section is not found
      */
-    Properties section(const std::string& section) const;
+    Properties section(str const& section) const;
 };
-
 }  // namespace config

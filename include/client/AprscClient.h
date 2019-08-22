@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <string>
+#include "util/types.h"
 
 #include "Client.h"
 
@@ -32,7 +32,9 @@ namespace client
  */
 class AprscClient : public Client
 {
-    const std::string m_login;  ///< Login string
+    NOT_COPYABLE(AprscClient)
+
+    str const m_login;  ///< Login string
 
     /**
      * @brief Schedule sending of a keep-alive beacon.
@@ -60,19 +62,15 @@ class AprscClient : public Client
     void handleSendKeepAlive(bool error);
 
 public:
-    NOT_COPYABLE(AprscClient)
-
     /**
      * @param endpoint  The remote endpoint
      * @param login     The login string
      * @param connector The Connector interface
      */
-    AprscClient(const net::Endpoint& endpoint, const std::string& login,
-                std::shared_ptr<net::Connector> connector);
+    AprscClient(net::Endpoint const& endpoint, str const& login, std::shared_ptr<net::Connector> connector);
     ~AprscClient() noexcept override = default;
 
-    bool        equals(const Client& other) const override;
-    std::size_t hash() const override;
+    bool  equals(Client const& other) const override;
+    usize hash() const override;
 };
-
 }  // namespace client

@@ -21,16 +21,16 @@
 
 #pragma once
 
-#include <cstdint>
 #include <functional>
-#include <string>
+
+#include "util/types.h"
 
 namespace client::net
 {
 struct Endpoint;
 
-using Callback     = std::function<void(bool)>;                      ///< Common callback function
-using ReadCallback = std::function<void(bool, const std::string&)>;  ///< Callback function for read
+using Callback     = std::function<void(bool)>;              ///< Common callback function
+using ReadCallback = std::function<void(bool, str const&)>;  ///< Callback function for read
 
 /**
  * @brief The async TCP interface for clients
@@ -64,33 +64,33 @@ public:
      * @param endpoint The remote endpoint
      * @param callback The callback to execute when done
      */
-    virtual void onConnect(const Endpoint& endpoint, const Callback& callback) = 0;
+    virtual void onConnect(Endpoint const& endpoint, Callback const& callback) = 0;
 
     /**
      * @brief Attempt to read from current connection.
      * @param callback The callback to execute when done
      */
-    virtual void onRead(const ReadCallback& callback) = 0;
+    virtual void onRead(ReadCallback const& callback) = 0;
 
     /**
      * @brief Attempt to write to current connection.
      * @param msg      The message to send
      * @param callback The callback to execute when done
      */
-    virtual void onWrite(const std::string& msg, const Callback& callback) = 0;
+    virtual void onWrite(str const& msg, Callback const& callback) = 0;
 
     /**
      * @brief Execute function after timeout.
      * @param callback The callback to execute
      * @param timeout  The timeout (default: 0)
      */
-    virtual void onTimeout(const Callback& callback, std::uint32_t timeout = 0) = 0;
+    virtual void onTimeout(Callback const& callback, u32 timeout = 0) = 0;
 
     /**
      * @brief Reset the timeout.
      * @param timeout The new timeout
      */
-    virtual void resetTimer(std::uint32_t timeout) = 0;
+    virtual void resetTimer(u32 timeout) = 0;
 
     /**
      * @brief Check whether the timeout ran off.

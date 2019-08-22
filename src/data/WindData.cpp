@@ -21,25 +21,26 @@
 
 #include "data/WindData.h"
 
+#include "util/types.h"
+
 using namespace object;
 
 namespace data
 {
 WindData::WindData() : Data() {}
 
-WindData::WindData(const object::Wind& wind) : Data(), m_wind(wind) {}
+WindData::WindData(object::Wind const& wind) : Data(), m_wind(wind) {}
 
 bool WindData::update(Object&& wind)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    lock_guard lock(m_mutex);
     return m_wind.tryUpdate(std::move(wind));
 }
 
-void WindData::access(const accessor_fn& func)
+void WindData::access(accessor_fn const& func)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    lock_guard lock(m_mutex);
     func(++m_wind);
     (*m_wind).clear();
 }
-
 }  // namespace data

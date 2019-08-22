@@ -21,30 +21,31 @@
 
 #include "data/AtmosphereData.h"
 
+#include "util/types.h"
+
 using namespace object;
 
 namespace data
 {
 AtmosphereData::AtmosphereData() : Data() {}
 
-AtmosphereData::AtmosphereData(const Atmosphere& atmosphere) : Data(), m_atmosphere(atmosphere) {}
+AtmosphereData::AtmosphereData(Atmosphere const& atmosphere) : Data(), m_atmosphere(atmosphere) {}
 
-void AtmosphereData::access(const accessor_fn& func)
+void AtmosphereData::access(accessor_fn const& func)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    lock_guard lock(m_mutex);
     func(++m_atmosphere);
 }
 
 bool AtmosphereData::update(Object&& atmosphere)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    lock_guard lock(m_mutex);
     return m_atmosphere.tryUpdate(std::move(atmosphere));
 }
 
 auto AtmosphereData::atmPressure() const -> decltype(m_atmosphere.pressure())
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    lock_guard lock(m_mutex);
     return m_atmosphere.pressure();
 }
-
 }  // namespace data

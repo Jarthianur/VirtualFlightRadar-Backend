@@ -23,14 +23,14 @@
 
 #include "util/Logger.hpp"
 
+using namespace client::net;
+
 namespace client
 {
-using namespace net;
-
 constexpr auto     LOG_PREFIX = "(SbsClient) ";
 static auto const& logger     = Logger::instance();
 
-SbsClient::SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
+SbsClient::SbsClient(Endpoint const& endpoint, std::shared_ptr<Connector> connector)
     : Client(endpoint, LOG_PREFIX, connector)
 {}
 
@@ -38,7 +38,7 @@ void SbsClient::handleConnect(bool error)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        lock_guard lock(m_mutex);
         read();
     }
     else

@@ -57,5 +57,4 @@ public:
      */
     static std::shared_ptr<Client> createClientFor(std::shared_ptr<feed::Feed> feed);
 };
-
 }  // namespace client

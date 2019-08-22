@@ -26,7 +26,7 @@ class Object;
 
 namespace data
 {
-using accessor_fn = std::function<void(const object::Object&)>;
+using accessor_fn = std::function<void(object::Object const&)>;
 
 /**
  * @brief The Data interface
@@ -44,6 +44,6 @@ public:
      */
     virtual bool update(object::Object&& _1) = 0;
 
-    virtual void access(const accessor_fn& func) = 0;
+    virtual void access(accessor_fn const& func) = 0;
 };
 }  // namespace data

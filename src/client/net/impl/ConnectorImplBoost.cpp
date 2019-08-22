@@ -28,6 +28,9 @@
 #include "client/net/Endpoint.hpp"
 #include "util/Logger.hpp"
 
+using namespace boost::asio;
+using namespace boost::system;
+
 namespace client::net
 {
 static auto const& logger = Logger::instance();
@@ -61,65 +64,60 @@ void ConnectorImplBoost::close()
     m_timer.cancel();
     if (m_socket.is_open())
     {
-        boost::system::error_code ec;
-        m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        error_code ec;
+        m_socket.shutdown(ip::tcp::socket::shutdown_both, ec);
         m_socket.close();
     }
 }
 
-void ConnectorImplBoost::onConnect(const Endpoint& endpoint, const Callback& callback)
+void ConnectorImplBoost::onConnect(Endpoint const& endpoint, Callback const& callback)
 {
-    boost::asio::ip::tcp::resolver::query query(endpoint.host, endpoint.port,
-                                                boost::asio::ip::tcp::resolver::query::canonical_name);
-    m_resolver.async_resolve(query, boost::bind(&ConnectorImplBoost::handleResolve, this,
-                                                boost::asio::placeholders::error,
-                                                boost::asio::placeholders::iterator, callback));
+    ip::tcp::resolver::query query(endpoint.host, endpoint.port, ip::tcp::resolver::query::canonical_name);
+    m_resolver.async_resolve(query, boost::bind(&ConnectorImplBoost::handleResolve, this, placeholders::error,
+                                                placeholders::iterator, callback));
 }
 
-void ConnectorImplBoost::onRead(const ReadCallback& callback)
+void ConnectorImplBoost::onRead(ReadCallback const& callback)
 {
     if (m_socket.is_open())
     {
-        boost::asio::async_read_until(m_socket, m_buffer, "\r\n",
-                                      boost::bind(&ConnectorImplBoost::handleRead, this,
-                                                  boost::asio::placeholders::error,
-                                                  boost::asio::placeholders::bytes_transferred, callback));
+        async_read_until(m_socket, m_buffer, "\r\n",
+                         boost::bind(&ConnectorImplBoost::handleRead, this, placeholders::error,
+                                     placeholders::bytes_transferred, callback));
     }
 }
 
-void ConnectorImplBoost::onWrite(const std::string& msg, const Callback& callback)
+void ConnectorImplBoost::onWrite(str const& msg, Callback const& callback)
 {
     if (m_socket.is_open())
     {
-        boost::asio::async_write(m_socket, boost::asio::buffer(msg),
-                                 boost::bind(&ConnectorImplBoost::handleWrite, this,
-                                             boost::asio::placeholders::error,
-                                             boost::asio::placeholders::bytes_transferred, callback));
+        async_write(m_socket, buffer(msg),
+                    boost::bind(&ConnectorImplBoost::handleWrite, this, placeholders::error,
+                                placeholders::bytes_transferred, callback));
     }
 }
 
-void ConnectorImplBoost::onTimeout(const Callback& callback, std::uint32_t timeout)
+void ConnectorImplBoost::onTimeout(Callback const& callback, u32 timeout)
 {
     if (timeout > 0)
     {
         resetTimer(timeout);
     }
-    m_timer.async_wait(
-        boost::bind(&ConnectorImplBoost::handleTimeout, this, boost::asio::placeholders::error, callback));
+    m_timer.async_wait(boost::bind(&ConnectorImplBoost::handleTimeout, this, placeholders::error, callback));
 }
 
-void ConnectorImplBoost::resetTimer(std::uint32_t vTimeout)
+void ConnectorImplBoost::resetTimer(u32 vTimeout)
 {
     m_timer.expires_from_now(boost::posix_time::seconds(vTimeout));
 }
 
 bool ConnectorImplBoost::timerExpired()
 {
-    return m_timer.expires_at() <= boost::asio::deadline_timer::traits_type::now();
+    return m_timer.expires_at() <= deadline_timer::traits_type::now();
 }
 
-void ConnectorImplBoost::handleWrite(const boost::system::error_code& error, std::size_t,
-                                     const Callback&                  callback) noexcept
+void ConnectorImplBoost::handleWrite(error_code const& error, [[maybe_unused]] usize,
+                                     Callback const&   callback) noexcept
 {
     if (error)
     {
@@ -128,16 +126,14 @@ void ConnectorImplBoost::handleWrite(const boost::system::error_code& error, std
     callback(bool(error));
 }
 
-void ConnectorImplBoost::handleResolve(const boost::system::error_code&         error,
-                                       boost::asio::ip::tcp::resolver::iterator resolverIt,
-                                       const Callback&                          callback) noexcept
+void ConnectorImplBoost::handleResolve(error_code const& error, ip::tcp::resolver::iterator resolverIt,
+                                       Callback const& callback) noexcept
 {
     if (!error)
     {
-        boost::asio::async_connect(m_socket, resolverIt,
-                                   boost::bind(&ConnectorImplBoost::handleConnect, this,
-                                               boost::asio::placeholders::error,
-                                               boost::asio::placeholders::iterator, callback));
+        async_connect(m_socket, resolverIt,
+                      boost::bind(&ConnectorImplBoost::handleConnect, this, placeholders::error,
+                                  placeholders::iterator, callback));
     }
     else
     {
@@ -146,9 +142,8 @@ void ConnectorImplBoost::handleResolve(const boost::system::error_code&         
     }
 }
 
-void ConnectorImplBoost::handleConnect(const boost::system::error_code& error,
-                                       boost::asio::ip::tcp::resolver::iterator,
-                                       const Callback& callback) noexcept
+void ConnectorImplBoost::handleConnect(error_code const& error, [[maybe_unused]] ip::tcp::resolver::iterator,
+                                       Callback const&   callback) noexcept
 {
     if (error)
     {
@@ -156,13 +151,12 @@ void ConnectorImplBoost::handleConnect(const boost::system::error_code& error,
     }
     else
     {
-        m_socket.set_option(boost::asio::socket_base::keep_alive(true));
+        m_socket.set_option(socket_base::keep_alive(true));
     }
     callback(bool(error));
 }
 
-void ConnectorImplBoost::handleTimeout(const boost::system::error_code& error,
-                                       const Callback&                  callback) noexcept
+void ConnectorImplBoost::handleTimeout(error_code const& error, Callback const& callback) noexcept
 {
     if (error)
     {
@@ -171,8 +165,8 @@ void ConnectorImplBoost::handleTimeout(const boost::system::error_code& error,
     callback(bool(error));
 }
 
-void ConnectorImplBoost::handleRead(const boost::system::error_code& error, std::size_t,
-                                    const ReadCallback&              callback) noexcept
+void ConnectorImplBoost::handleRead(error_code const&   error, [[maybe_unused]] usize,
+                                    ReadCallback const& callback) noexcept
 {
     if (error)
     {

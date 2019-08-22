@@ -23,25 +23,27 @@
 
 #include <boost/property_tree/exceptions.hpp>
 
+using namespace boost::property_tree;
+
 namespace config
 {
-Properties::Properties(const boost::property_tree::ptree& ptree) : m_pTree(ptree) {}
+Properties::Properties(ptree const& ptree) : m_pTree(ptree) {}
 
-Properties::Properties(boost::property_tree::ptree&& ptree) : m_pTree(std::move(ptree)) {}
+Properties::Properties(ptree&& ptree) : m_pTree(std::move(ptree)) {}
 
-std::string Properties::property(const std::string& path, const std::string& alternative) const
+std::string Properties::property(str const& path, str const& alternative) const
 {
-    std::string property(m_pTree.get(path, alternative));
+    str property(m_pTree.get(path, alternative));
     return property.empty() ? alternative : property;
 }
 
-Properties Properties::section(const std::string& section) const
+Properties Properties::section(str const& section) const
 {
     try
     {
         return Properties(m_pTree.get_child(section));
     }
-    catch (const boost::property_tree::ptree_bad_path&)
+    catch (ptree_bad_path const&)
     {
         throw std::out_of_range(section + " not found");
     }

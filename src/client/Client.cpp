@@ -34,18 +34,17 @@
 
 static auto const& logger = Logger::instance();
 
+using namespace client::net;
+
 namespace client
 {
-using namespace net;
-
-Client::Client(const Endpoint& endpoint, const char* logPrefix, std::shared_ptr<Connector> connector)
+Client::Client(Endpoint const& endpoint, char const* logPrefix, std::shared_ptr<Connector> connector)
     : m_connector(connector), m_logPrefix(logPrefix), m_endpoint(endpoint)
 {}
 
 void Client::run()
 {
-    std::unique_lock<std::mutex> lock(m_mutex);
-    if (!m_running)
+    if (unique_lock lock(m_mutex); !m_running)
     {
         m_running = true;
         connect();
@@ -54,14 +53,14 @@ void Client::run()
     }
 }
 
-bool Client::equals(const Client& other) const
+bool Client::equals(Client const& other) const
 {
     return this->m_endpoint == other.m_endpoint;
 }
 
-std::size_t Client::hash() const
+usize Client::hash() const
 {
-    std::size_t seed = 0;
+    usize seed = 0;
     boost::hash_combine(seed, boost::hash_value(m_endpoint.host));
     boost::hash_combine(seed, boost::hash_value(m_endpoint.port));
     return seed;
@@ -69,7 +68,7 @@ std::size_t Client::hash() const
 
 void Client::subscribe(std::shared_ptr<feed::Feed> feed)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    lock_guard lock(m_mutex);
     m_feeds.push_back(feed);
 }
 
@@ -80,8 +79,7 @@ void Client::connect()
 
 void Client::reconnect()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_running)
+    if (lock_guard lock(m_mutex); m_running)
     {
         logger.info(m_logPrefix, "schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->close();
@@ -107,8 +105,8 @@ void Client::stop()
 
 void Client::scheduleStop()
 {
-    std::condition_variable      cond_ready;
-    std::unique_lock<std::mutex> lock(m_mutex);
+    std::condition_variable cond_ready;
+    unique_lock             lock(m_mutex);
     cond_ready.wait_for(lock, std::chrono::milliseconds(100), [this] { return m_running; });
     stop();
 }
@@ -122,7 +120,7 @@ void Client::handleTimedConnect(bool error)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        lock_guard lock(m_mutex);
         logger.info(m_logPrefix, "try connect to ", m_endpoint.host, ":", m_endpoint.port);
         connect();
     }
@@ -133,11 +131,11 @@ void Client::handleTimedConnect(bool error)
     }
 }
 
-void Client::handleRead(bool error, const std::string& response)
+void Client::handleRead(bool error, str const& response)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        lock_guard lock(m_mutex);
         for (auto& it : m_feeds)
         {
             if (!it->process(response))

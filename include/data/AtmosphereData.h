@@ -40,7 +40,7 @@ class AtmosphereData : public Data
 public:
     AtmosphereData();
     explicit AtmosphereData(
-        const object::Atmosphere& atmosphere);  ///< @param atmosphere The initial atm info
+        object::Atmosphere const& atmosphere);  ///< @param atmosphere The initial atm info
     ~AtmosphereData() noexcept override = default;
 
     /**
@@ -51,7 +51,7 @@ public:
      */
     bool update(object::Object&& atmosphere) override;
 
-    void access(const accessor_fn& func) override;
+    void access(accessor_fn const& func) override;
 
     /**
      * @brief Get the atmospheric pressure.

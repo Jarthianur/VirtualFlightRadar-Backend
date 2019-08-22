@@ -28,14 +28,14 @@
 
 #include "util/Logger.hpp"
 
+using namespace client::net;
+
 namespace client
 {
-using namespace net;
-
 constexpr auto     LOG_PREFIX = "(GpsdClient) ";
 static auto const& logger     = Logger::instance();
 
-GpsdClient::GpsdClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
+GpsdClient::GpsdClient(Endpoint const& endpoint, std::shared_ptr<Connector> connector)
     : Client(endpoint, LOG_PREFIX, connector)
 {}
 
@@ -43,7 +43,7 @@ void GpsdClient::handleConnect(bool error)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        lock_guard lock(m_mutex);
         m_connector->onWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
                              std::bind(&GpsdClient::handleWatch, this, std::placeholders::_1));
     }
@@ -56,10 +56,10 @@ void GpsdClient::handleConnect(bool error)
 
 void GpsdClient::stop()
 {
-    std::mutex                   sync;
-    std::unique_lock<std::mutex> lock(sync);
-    std::condition_variable      cv;
-    bool                         sent = false;
+    std::mutex              sync;
+    unique_lock             lock(sync);
+    std::condition_variable cv;
+    bool                    sent = false;
     if (m_running)
     {
         m_connector->onWrite("?WATCH={\"enable\":false}\r\n", [&sent, &cv](bool) {
@@ -77,7 +77,7 @@ void GpsdClient::handleWatch(bool error)
     if (!error)
     {
         logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
-        std::lock_guard<std::mutex> lock(m_mutex);
+        lock_guard lock(m_mutex);
         read();
     }
     else

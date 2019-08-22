@@ -21,11 +21,10 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
 #include "util/ConcurrentContainer.hpp"
+#include "util/types.h"
 
 #include "Data.hpp"
 
@@ -36,16 +35,16 @@ namespace data
  */
 class AircraftData : public Data
 {
-    static constexpr const auto NO_FLARM_THRESHOLD =
-        object::Object::OUTDATED;                        ///< Times until FLARM status is removed
-    static constexpr const auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
+    inline static constexpr auto NO_FLARM_THRESHOLD =
+        object::Object::OUTDATED;                         ///< Times until FLARM status is removed
+    inline static constexpr auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
 
     util::ConcurrentContainer<object::Aircraft> m_container;  ///< Internal container for aircrafts
     processor::AircraftProcessor                m_processor;  ///< Processor for aircrafts
 
 public:
     AircraftData();
-    explicit AircraftData(std::int32_t maxDist);  ///< @param maxDist The max distance filter
+    explicit AircraftData(s32 maxDist);  ///< @param maxDist The max distance filter
     ~AircraftData() noexcept override = default;
 
     /**
@@ -56,7 +55,7 @@ public:
      */
     bool update(object::Object&& aircraft) override;
 
-    void environment(const object::Location& position, double atmPress);
+    void environment(object::Location const& position, f64 atmPress);
 
     /**
      * @brief Process all aircrafts.
@@ -64,7 +63,6 @@ public:
      * @param atmPress The atmospheric pressure
      * @threadsafe
      */
-    void access(const accessor_fn& func) override;
+    void access(accessor_fn const& func) override;
 };
-
 }  // namespace data

@@ -29,10 +29,10 @@
 #include "feed/AprscFeed.h"
 #include "feed/Feed.h"
 
+using namespace client::net;
+
 namespace client
 {
-using namespace net;
-
 template<>
 std::shared_ptr<AprscClient> ClientFactory::makeClient<AprscClient>(std::shared_ptr<feed::Feed> feed)
 {

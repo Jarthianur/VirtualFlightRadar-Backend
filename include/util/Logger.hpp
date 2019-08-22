@@ -26,6 +26,7 @@
 #include <mutex>
 #include <utility>
 
+#include "util/defines.h"
 #include "util/types.h"
 
 #define PREFIX(S, P) *S << "\r" P "  " << time() << ":: "
@@ -35,6 +36,8 @@
  */
 class Logger
 {
+    NOT_COPYABLE(Logger)
+
     std::ofstream      m_logFile;                 ///< The logfile stream
     std::ostream*      m_outStream = &std::cout;  ///< Stream to log INFO,DEBUG,WARN
     std::ostream*      m_errStream = &std::cerr;  ///< Stream to log ERROR
@@ -63,7 +66,7 @@ public:
     void info(Args&&... args) const
     {
         lock_guard lock(m_mutex);
-        PREFIX(m_outStream, "[INFO]");
+        PREFIX(m_outStream, "[INFO ]");
         (*m_outStream << ... << args) << std::endl;
     }
 

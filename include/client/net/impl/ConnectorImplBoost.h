@@ -36,12 +36,14 @@ namespace client::net
  */
 class ConnectorImplBoost : public Connector
 {
+    NOT_COPYABLE(ConnectorImplBoost)
+
     boost::asio::io_service        m_ioService;  ///< Internal IO-service
     boost::asio::ip::tcp::socket   m_socket;     ///< Connection socket
     boost::asio::ip::tcp::resolver m_resolver;   ///< Host resolver
     boost::asio::deadline_timer    m_timer;      ///< Timer
     boost::asio::streambuf         m_buffer;     ///< Read buffer
-    std::string                    m_response;   ///< Read message
+    str                            m_response;   ///< Read message
     std::istream                   m_istream;    ///< Message stream for conversion
 
     /**
@@ -50,9 +52,9 @@ class ConnectorImplBoost : public Connector
      * @param resolverIt The resolved host
      * @param callback   The callback to invoke
      */
-    void handleResolve(const boost::system::error_code&         error,
+    void handleResolve(boost::system::error_code const&         error,
                        boost::asio::ip::tcp::resolver::iterator resolverIt,
-                       const Callback&                          callback) noexcept;
+                       Callback const&                          callback) noexcept;
 
     /**
      * @brief Handler for connecting to endpoint
@@ -60,16 +62,16 @@ class ConnectorImplBoost : public Connector
      * @param resolverIt The resolved host
      * @param callback   The callback to invoke
      */
-    void handleConnect(const boost::system::error_code&         error,
+    void handleConnect(boost::system::error_code const&         error,
                        boost::asio::ip::tcp::resolver::iterator resolverIt,
-                       const Callback&                          callback) noexcept;
+                       Callback const&                          callback) noexcept;
 
     /**
      * @brief Handler for timed out timer
      * @param error    The error code
      * @param callback The callback to invoke
      */
-    void handleTimeout(const boost::system::error_code& error, const Callback& callback) noexcept;
+    void handleTimeout(boost::system::error_code const& error, Callback const& callback) noexcept;
 
     /**
      * @brief Handler for reading from endpoint
@@ -77,8 +79,8 @@ class ConnectorImplBoost : public Connector
      * @param bytes    The amount of read bytes
      * @param callback The callback to invoke
      */
-    void handleRead(const boost::system::error_code& error, std::size_t bytes,
-                    const ReadCallback& callback) noexcept;
+    void handleRead(boost::system::error_code const& error, usize bytes,
+                    ReadCallback const& callback) noexcept;
 
     /**
      * @brief Handler for writing to endpoint
@@ -86,12 +88,9 @@ class ConnectorImplBoost : public Connector
      * @param bytes    The amount of sent bytes
      * @param callback The callback to invoke
      */
-    void handleWrite(const boost::system::error_code& error, std::size_t bytes,
-                     const Callback& callback) noexcept;
+    void handleWrite(boost::system::error_code const& error, usize bytes, Callback const& callback) noexcept;
 
 public:
-    NOT_COPYABLE(ConnectorImplBoost)
-
     ConnectorImplBoost();
     ~ConnectorImplBoost() noexcept override = default;
 
@@ -116,20 +115,20 @@ public:
      * @param endpoint The endpoint to connect to
      * @param callback The callback to invoke when done
      */
-    void onConnect(const Endpoint& endpoint, const Callback& callback) override;
+    void onConnect(Endpoint const& endpoint, Callback const& callback) override;
 
     /**
      * @brief Schedule to read from endpoint.
      * @param callback The callback to invoke when done
      */
-    void onRead(const ReadCallback& callback) override;
+    void onRead(ReadCallback const& callback) override;
 
     /**
      * @brief Schedule to write to endpoint.
      * @param msg      The message to send
      * @param callback The callback to invoke when done
      */
-    void onWrite(const std::string& msg, const Callback& callback) override;
+    void onWrite(str const& msg, Callback const& callback) override;
 
     /**
      * @brief Schedule an action after a timeout.
@@ -137,13 +136,13 @@ public:
      * @param callback The callback to invoke when timeout is reached
      * @param timeout  The timeout in seconds (default: 0)
      */
-    void onTimeout(const Callback& callback, std::uint32_t timeout = 0) override;
+    void onTimeout(Callback const& callback, u32 timeout = 0) override;
 
     /**
      * @brief Reset the timer to this value.
      * @param timeout The new timeout
      */
-    void resetTimer(std::uint32_t timeout) override;
+    void resetTimer(u32 timeout) override;
 
     /**
      * @brief Check whether the timer is expired.

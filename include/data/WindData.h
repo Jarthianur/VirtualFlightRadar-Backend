@@ -39,7 +39,7 @@ class WindData : public Data
 
 public:
     WindData();
-    explicit WindData(const object::Wind& wind);  ///< @param wind The initial wind information
+    explicit WindData(object::Wind const& wind);  ///< @param wind The initial wind information
     ~WindData() noexcept override = default;
 
     /**
@@ -50,7 +50,6 @@ public:
      */
     bool update(object::Object&& wind) override;
 
-    void access(const accessor_fn& func) override;
+    void access(accessor_fn const& func) override;
 };
-
 }  // namespace data

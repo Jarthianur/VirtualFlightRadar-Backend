@@ -30,6 +30,8 @@ namespace client
  */
 class SensorClient : public Client
 {
+    NOT_COPYABLE(SensorClient)
+
     /**
      * @brief Override Client::read, use timeout
      */
@@ -48,14 +50,11 @@ class SensorClient : public Client
     void handleConnect(bool error) override;
 
 public:
-    NOT_COPYABLE(SensorClient)
-
     /**
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    SensorClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
+    SensorClient(net::Endpoint const& endpoint, std::shared_ptr<net::Connector> connector);
     ~SensorClient() noexcept override = default;
 };
-
 }  // namespace client
