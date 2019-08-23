@@ -38,6 +38,8 @@ namespace server::net
  */
 class NetworkInterfaceImplBoost : public NetworkInterface<SocketImplBoost>
 {
+    NOT_COPYABLE(NetworkInterfaceImplBoost)
+
     boost::asio::io_service        m_ioService;  ///< Internal IO-service
     boost::asio::ip::tcp::acceptor m_acceptor;   ///< Acceptor
     SocketImplBoost                m_socket;     ///< Current socket
@@ -50,7 +52,6 @@ class NetworkInterfaceImplBoost : public NetworkInterface<SocketImplBoost>
     void handleAccept(boost::system::error_code const& error, Callback const& callback);
 
 public:
-    NOT_COPYABLE(NetworkInterfaceImplBoost)
     explicit NetworkInterfaceImplBoost(u16 port);  ///< @param port The port number
     ~NetworkInterfaceImplBoost() noexcept override;
 

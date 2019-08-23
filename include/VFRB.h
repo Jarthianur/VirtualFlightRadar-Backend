@@ -25,12 +25,12 @@
 #include <chrono>
 #include <list>
 #include <memory>
-#include <string>
 
 #include "server/Server.hpp"
 #include "server/net/impl/NetworkInterfaceImplBoost.h"
 #include "server/net/impl/SocketImplBoost.h"
 #include "util/defines.h"
+#include "util/types.h"
 
 namespace config
 {
@@ -53,6 +53,8 @@ class Feed;
  */
 class VFRB
 {
+    NOT_COPYABLE(VFRB)
+
     std::shared_ptr<data::AircraftData>          m_aircraftData;    ///< Aircraft container
     std::shared_ptr<data::AtmosphereData>        m_atmosphereData;  ///< Atmospheric data container
     std::shared_ptr<data::GpsData>               m_gpsData;         ///< GPS data container
@@ -77,10 +79,9 @@ class VFRB
      * @param start The start value
      * @return the duration string
      */
-    std::string duration(std::chrono::steady_clock::time_point start) const;
+    str duration(std::chrono::steady_clock::time_point start) const;
 
 public:
-    NOT_COPYABLE(VFRB)
     explicit VFRB(std::shared_ptr<config::Configuration> config);  ///< @param config The Configuration
     ~VFRB() noexcept = default;
 

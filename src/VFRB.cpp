@@ -51,7 +51,7 @@ static auto const& logger = Logger::instance();
 
 VFRB::VFRB(std::shared_ptr<Configuration> config)
     : m_aircraftData(std::make_shared<AircraftData>(
-          [this](const Object& it) {
+          [this](Object const& it) {
               if (it.updateAge() < Object::OUTDATED)
               {
                   m_server.send(it.nmea());
@@ -59,11 +59,11 @@ VFRB::VFRB(std::shared_ptr<Configuration> config)
           },
           config->maxDistance)),
       m_atmosphereData(
-          std::make_shared<AtmosphereData>([this](const Object& it) { m_server.send(it.nmea()); },
+          std::make_shared<AtmosphereData>([this](Object const& it) { m_server.send(it.nmea()); },
                                            object::Atmosphere{0, config->atmPressure})),
-      m_gpsData(std::make_shared<GpsData>([this](const Object& it) { m_server.send(it.nmea()); },
+      m_gpsData(std::make_shared<GpsData>([this](Object const& it) { m_server.send(it.nmea()); },
                                           config->gpsPosition, config->groundMode)),
-      m_windData(std::make_shared<WindData>([this](const Object& it) { m_server.send(it.nmea()); })),
+      m_windData(std::make_shared<WindData>([this](Object const& it) { m_server.send(it.nmea()); })),
       m_server(config->serverPort),
       m_running(false)
 {
@@ -78,7 +78,7 @@ void VFRB::run() noexcept
     util::SignalListener                  signals;
     client::ClientManager                 clientManager;
 
-    signals.addHandler([this](const boost::system::error_code&, const int) {
+    signals.addHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {
         logger.info(LOG_PREFIX, "caught signal to shutdown...");
         m_running = false;
     });
@@ -89,7 +89,7 @@ void VFRB::run() noexcept
         {
             clientManager.subscribe(it);
         }
-        catch (const std::logic_error& e)
+        catch (std::logic_error const& e)
         {
             logger.error(LOG_PREFIX, ": ", e.what());
         }
@@ -120,7 +120,7 @@ void VFRB::serve()
             m_windData->access();
             std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
         }
-        catch (const std::exception& e)
+        catch (std::exception const& e)
         {
             logger.error(LOG_PREFIX, "fatal: ", e.what());
             m_running = false;
@@ -131,26 +131,26 @@ void VFRB::serve()
 void VFRB::createFeeds(std::shared_ptr<Configuration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
-    for (const auto& name : config->feedNames)
+    for (auto const& name : config->feedNames)
     {
         try
         {
             m_feeds.push_back(factory.createFeed(name));
         }
-        catch (const std::exception& e)
+        catch (std::exception const& e)
         {
             logger.warn(LOG_PREFIX, "can not create feed ", name, ": ", e.what());
         }
     }
 }
 
-std::string VFRB::duration(std::chrono::steady_clock::time_point start) const
+str VFRB::duration(std::chrono::steady_clock::time_point start) const
 {
     std::chrono::minutes runtime =
         std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start);
-    std::int64_t      d = runtime.count() / 60 / 24;
-    std::int64_t      h = runtime.count() / 60 - d * 24;
-    std::int64_t      m = runtime.count() % 60;
+    s64               d = runtime.count() / 60 / 24;
+    s64               h = runtime.count() / 60 - d * 24;
+    s64               m = runtime.count() % 60;
     std::stringstream ss;
     ss << d << "d " << h << ":" << m;
     return ss.str();

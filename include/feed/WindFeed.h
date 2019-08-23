@@ -21,21 +21,12 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include "config/Properties.h"
-#include "util/defines.h"
-
 #include "Feed.h"
 
-namespace feed
-{
-namespace parser
+namespace feed::parser
 {
 class WindParser;
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser
 
 namespace data
 {
@@ -49,21 +40,20 @@ namespace feed
  */
 class WindFeed : public Feed
 {
+    NOT_COPYABLE(WindFeed)
+
     static constexpr auto LOG_PREFIX = "(WindFeed) ";
 
     static parser::WindParser s_parser;  ///< Parser to unpack response from Client
 
 public:
-    NOT_COPYABLE(WindFeed)
-
     /**
      * @param name       The SensorFeeds unique name
      * @param properties The Properties
      * @param data       The WindData contianer
      * @throw std::logic_error from parent constructor
      */
-    WindFeed(const std::string& name, const config::Properties& properties,
-             std::shared_ptr<data::WindData> data);
+    WindFeed(str const& name, config::Properties const& properties, std::shared_ptr<data::WindData> data);
     ~WindFeed() noexcept override = default;
 
     /**
@@ -75,7 +65,6 @@ public:
     /**
      * @brief Feed::process.
      */
-    bool process(const std::string& response) override;
+    bool process(str const& response) override;
 };
-
 }  // namespace feed

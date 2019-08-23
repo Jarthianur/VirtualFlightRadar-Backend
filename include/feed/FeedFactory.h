@@ -22,10 +22,10 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <type_traits>
 
 #include "config/Properties.h"
+#include "util/types.h"
 
 namespace config
 {
@@ -64,7 +64,7 @@ class FeedFactory
      * @throw std::logic_error from invoked constructors
      */
     template<typename T, typename std::enable_if<std::is_base_of<Feed, T>::value>::type* = nullptr>
-    std::shared_ptr<T> makeFeed(const std::string& name);
+    std::shared_ptr<T> makeFeed(str const& name);
 
 public:
     /**
@@ -86,6 +86,6 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    std::shared_ptr<Feed> createFeed(const std::string& name);
+    std::shared_ptr<Feed> createFeed(str const& name);
 };
 }  // namespace feed

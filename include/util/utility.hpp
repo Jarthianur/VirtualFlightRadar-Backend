@@ -23,12 +23,10 @@
 
 #include <algorithm>
 #include <cstdarg>
-#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
-#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -47,17 +45,17 @@ constexpr auto raw_type(T value) -> typename std::underlying_type<T>::type
     return static_cast<typename std::underlying_type<T>::type>(value);
 }
 
-using CStringPack = std::pair<const char*, const std::size_t>;
+using CStringPack = std::pair<char const*, usize const>;
 
-template<std::size_t N, typename std::enable_if<(N > 0)>::type* = nullptr>
+template<usize N, typename std::enable_if<(N > 0)>::type* = nullptr>
 class CString final
 {
-    static constexpr auto last = N - 1;
+    inline static constexpr auto last = N - 1;
 
-    char        m_value[N];
-    std::size_t m_length = 0;
+    char  m_value[N];
+    usize m_length = 0;
 
-    void copy(const char* str, std::size_t n)
+    void copy(char const* str, usize n)
     {
         if (n > last)
         {
@@ -68,7 +66,7 @@ class CString final
         m_value[m_length] = '\0';
     }
 
-    void copy(const CString& other)
+    void copy(CString const& other)
     {
         m_length = other.m_length;
         std::memcpy(m_value, other.m_value, m_length);
@@ -81,52 +79,52 @@ public:
         m_value[0] = '\0';
     }
 
-    CString(const char* init)  ///< @param init The initial cstring to copy
+    CString(char const* init)  ///< @param init The initial cstring to copy
     {
         operator=(init);
     }
 
-    CString(const std::string& init)  ///< @param init The initial string to copy
+    CString(str const& init)  ///< @param init The initial string to copy
     {
         operator=(init);
     }
 
-    CString(const CString& other)  ///< @param other The other CString to copy
+    CString(CString const& other)  ///< @param other The other CString to copy
     {
         operator=(other);
     }
 
     ~CString() noexcept = default;
 
-    CString& operator=(const char* other)
+    CString& operator=(char const* other)
     {
         copy(other, std::strlen(other));
         return *this;
     }
 
-    CString& operator=(const std::string& other)
+    CString& operator=(str const& other)
     {
         copy(other.c_str(), other.size());
         return *this;
     }
 
-    CString& operator=(const CString& other)
+    CString& operator=(CString const& other)
     {
         copy(other);
         return *this;
     }
 
-    const char* operator*() const
+    char const* operator*() const
     {
         return m_value;
     }
 
     operator CStringPack() const
     {
-        return std::pair<const char*, const std::size_t>(m_value, m_length);
+        return std::pair<char const*, usize const>(m_value, m_length);
     }
 
-    bool operator==(const CString& other) const
+    bool operator==(CString const& other) const
     {
         return std::strncmp(m_value, other.m_value, N) == 0;
     }
@@ -137,7 +135,7 @@ public:
         m_length   = 0;
     }
 
-    int snprintf(std::size_t pos, std::size_t n, const char* fmt, ...)
+    int snprintf(usize pos, usize n, char const* fmt, ...)
     {
         if (pos + n >= N)
         {
@@ -164,5 +162,4 @@ public:
         return m_length;
     }
 };
-
 }  // namespace util

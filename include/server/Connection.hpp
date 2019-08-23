@@ -39,6 +39,8 @@ namespace server
 template<typename SocketT>
 class Connection final
 {
+    NOT_COPYABLE(Connection)
+
     SocketT m_socket;  ///< Socket
 
     /**
@@ -50,7 +52,6 @@ class Connection final
 public:
     str const address;  ///< IP address
 
-    NOT_COPYABLE(Connection)
     ~Connection() noexcept = default;
 
     /**

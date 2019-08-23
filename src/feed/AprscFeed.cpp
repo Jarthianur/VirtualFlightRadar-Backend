@@ -37,14 +37,14 @@ static auto const& logger = Logger::instance();
 
 parser::AprsParser AprscFeed::s_parser;
 
-AprscFeed::AprscFeed(const std::string& name, const Properties& properties,
-                     std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
-    : Feed(name, LOG_PREFIX, properties, data), m_worker([this](std::string&& work) {
+AprscFeed::AprscFeed(str const& name, Properties const& properties, std::shared_ptr<data::AircraftData> data,
+                     s32 maxHeight)
+    : Feed(name, LOG_PREFIX, properties, data), m_worker([this](str&& work) {
           try
           {
               m_data->update(s_parser.unpack(work, m_priority));
           }
-          catch (const parser::UnpackError&)
+          catch (parser::UnpackError const&)
           {}
       })
 {
@@ -61,15 +61,14 @@ Feed::Protocol AprscFeed::protocol() const
     return Protocol::APRS;
 }
 
-bool AprscFeed::process(const std::string& response)
+bool AprscFeed::process(str const& response)
 {
     m_worker.push(response);
     return true;
 }
 
-std::string AprscFeed::login() const
+str AprscFeed::login() const
 {
     return properties.property(Configuration::KV_KEY_LOGIN);
 }
-
 }  // namespace feed

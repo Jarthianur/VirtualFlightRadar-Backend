@@ -21,12 +21,11 @@
 
 #pragma once
 
-#include <cstddef>
 #include <map>
-#include <mutex>
 #include <utility>
 
 #include "util/defines.h"
+#include "util/types.h"
 
 namespace util
 {
@@ -64,10 +63,10 @@ public:
 
     protected:
         friend struct ConcurrentContainer::Iterator;
-        mutable std::mutex mutex;
+        std::mutex mutable mutex;
     };
 
-    using KeyType       = std::size_t;
+    using KeyType       = usize;
     using ContainerType = std::map<KeyType, ValueType>;
 
     /**
@@ -86,12 +85,12 @@ public:
               container(other.container)
         {}
 
-        Iterator(typename ContainerType::iterator iter, const ConcurrentContainer& c)
+        Iterator(typename ContainerType::iterator iter, ConcurrentContainer const& c)
             : iterator(iter), container(c)
         {
             if (iterator != container.m_container.end())
             {
-                valueLock = std::unique_lock<std::mutex>(iterator->second.mutex);
+                valueLock = unique_lock(iterator->second.mutex);
             }
         }
 
@@ -107,10 +106,10 @@ public:
             if (iterator != container.m_container.end())
             {
                 valueLock.unlock();
-                std::lock_guard<std::mutex> lk(container.m_modMutex);
+                lock_guard lk(container.m_modMutex);
                 if (++iterator != container.m_container.end())
                 {
-                    valueLock = std::unique_lock<std::mutex>(iterator->second.mutex);
+                    valueLock = unique_lock(iterator->second.mutex);
                 }
             }
             return *this;
@@ -131,25 +130,25 @@ public:
             return iterator->first;
         }
 
-        bool operator==(const Iterator& other) const
+        bool operator==(Iterator const& other) const
         {
             return iterator == other.iterator;
         }
 
-        bool operator!=(const Iterator& other) const
+        bool operator!=(Iterator const& other) const
         {
             return iterator != other.iterator;
         }
 
     protected:
         typename ContainerType::iterator iterator;
-        std::unique_lock<std::mutex>     valueLock;
-        const ConcurrentContainer&       container;
+        unique_lock                      valueLock;
+        ConcurrentContainer const&       container;
     };
 
     Iterator begin()
     {
-        std::lock_guard<std::mutex> lock(m_modMutex);
+        lock_guard lock(m_modMutex);
         return Iterator(m_container.begin(), *this);
     }
 
@@ -160,8 +159,8 @@ public:
 
     std::pair<Iterator, bool> insert(KeyType key, T&& value)
     {
-        std::lock_guard<std::mutex> lock(m_modMutex);
-        Iterator                    iter(m_container.find(key), *this);
+        lock_guard lock(m_modMutex);
+        Iterator   iter(m_container.find(key), *this);
         if (iter == end())
         {
             return std::make_pair(
@@ -172,8 +171,8 @@ public:
 
     void erase(KeyType key)
     {
-        std::lock_guard<std::mutex> lock(m_modMutex);
-        auto                        entry = m_container.find(key);
+        lock_guard lock(m_modMutex);
+        auto       entry = m_container.find(key);
         if (entry != m_container.end())
         {
             Iterator iter(std::move(entry), *this);
@@ -182,8 +181,7 @@ public:
     }
 
 private:
-    ContainerType      m_container;  ///< Underlying container
-    mutable std::mutex m_modMutex;
+    ContainerType m_container;  ///< Underlying container
+    std::mutex mutable m_modMutex;
 };
-
 }  // namespace util

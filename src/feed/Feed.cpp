@@ -36,7 +36,7 @@ namespace feed
 {
 static auto const& logger = Logger::instance();
 
-Feed::Feed(const std::string& name, const char* logPrefix, const Properties& properties,
+Feed::Feed(str const& name, char const* logPrefix, Properties const& properties,
            std::shared_ptr<data::Data> data)
     : m_data(data), m_priority(initPriority()), m_logPrefix(logPrefix), name(name), properties(properties)
 {
@@ -52,15 +52,15 @@ Feed::Feed(const std::string& name, const char* logPrefix, const Properties& pro
     }
 }
 
-std::uint32_t Feed::initPriority() const noexcept
+u32 Feed::initPriority() const noexcept
 {
     try
     {
-        return static_cast<std::uint32_t>(std::max<std::uint64_t>(
-            0, std::min<std::uint64_t>(std::stoul(properties.property(Configuration::KV_KEY_PRIORITY)),
-                                       std::numeric_limits<std::uint32_t>::max())));
+        return static_cast<u32>(
+            std::max<u64>(0, std::min<u64>(std::stoul(properties.property(Configuration::KV_KEY_PRIORITY)),
+                                           std::numeric_limits<u32>::max())));
     }
-    catch (const std::logic_error&)
+    catch (std::logic_error const&)
     {
         logger.warn(m_logPrefix, "create ", name, ": Invalid priority given.");
     }
@@ -71,5 +71,4 @@ client::net::Endpoint Feed::endpoint() const
 {
     return {properties.property(Configuration::KV_KEY_HOST), properties.property(Configuration::KV_KEY_PORT)};
 }
-
 }  // namespace feed

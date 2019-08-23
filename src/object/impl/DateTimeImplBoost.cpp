@@ -36,5 +36,4 @@ u32 DateTimeImplBoost::day()
 {
     return static_cast<u32>(boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
 }
-
 }  // namespace object::time

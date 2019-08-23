@@ -21,21 +21,12 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include "config/Properties.h"
-#include "util/defines.h"
-
 #include "Feed.h"
 
-namespace feed
-{
-namespace parser
+namespace feed::parser
 {
 class GpsParser;
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser
 
 namespace data
 {
@@ -49,21 +40,20 @@ namespace feed
  */
 class GpsFeed : public Feed
 {
+    NOT_COPYABLE(GpsFeed)
+
     static constexpr auto LOG_PREFIX = "(GpsFeed) ";
 
     static parser::GpsParser s_parser;  ///< Parser to unpack response from Client
 
 public:
-    NOT_COPYABLE(GpsFeed)
-
     /**
      * @param name       The unique name
      * @param properties The Properties
      * @param data       The GpsData container
      * @throw std::logic_error from parent constructor
      */
-    GpsFeed(const std::string& name, const config::Properties& properties,
-            std::shared_ptr<data::GpsData> data);
+    GpsFeed(str const& name, config::Properties const& properties, std::shared_ptr<data::GpsData> data);
     ~GpsFeed() noexcept override = default;
 
     /**
@@ -75,7 +65,6 @@ public:
     /**
      * @brief Implement Feed::process.
      */
-    bool process(const std::string& response) override;
+    bool process(str const& response) override;
 };
-
 }  // namespace feed

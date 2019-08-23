@@ -21,23 +21,14 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <string>
-
-#include "config/Properties.h"
 #include "util/WorkerThread.hpp"
-#include "util/defines.h"
 
 #include "Feed.h"
 
-namespace feed
-{
-namespace parser
+namespace feed::parser
 {
 class AprsParser;
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser
 
 namespace data
 {
@@ -51,14 +42,14 @@ namespace feed
  */
 class AprscFeed : public Feed
 {
-    static constexpr auto LOG_PREFIX = "(AprscFeed) ";
-
-    static parser::AprsParser       s_parser;  ///< Parser to unpack response from Client
-    util::WorkerThread<std::string> m_worker;
-
-public:
     NOT_COPYABLE(AprscFeed)
 
+    static constexpr auto LOG_PREFIX = "(AprscFeed) ";
+
+    static parser::AprsParser s_parser;  ///< Parser to unpack response from Client
+    util::WorkerThread<str>   m_worker;
+
+public:
     /**
      * @param name       The unique name
      * @param properties The Properties
@@ -66,8 +57,8 @@ public:
      * @param maxHeight  The max height filter
      * @throw std::logic_error if login is not given, or from parent constructor
      */
-    AprscFeed(const std::string& name, const config::Properties& propertyMap,
-              std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
+    AprscFeed(str const& name, config::Properties const& propertyMap,
+              std::shared_ptr<data::AircraftData> data, s32 maxHeight);
     ~AprscFeed() noexcept override = default;
 
     /**
@@ -79,13 +70,12 @@ public:
     /**
      * @brief Implement Feed::process.
      */
-    bool process(const std::string& response) override;
+    bool process(str const& response) override;
 
     /**
      * @brief Get the login string.
      * @return the login
      */
-    std::string login() const;
+    str login() const;
 };
-
 }  // namespace feed

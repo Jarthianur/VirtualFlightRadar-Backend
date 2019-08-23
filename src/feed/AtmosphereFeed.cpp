@@ -32,7 +32,7 @@ namespace feed
 {
 parser::AtmosphereParser AtmosphereFeed::s_parser;
 
-AtmosphereFeed::AtmosphereFeed(const std::string& name, const Properties& properties,
+AtmosphereFeed::AtmosphereFeed(str const& name, Properties const& properties,
                                std::shared_ptr<data::AtmosphereData> data)
     : Feed(name, LOG_PREFIX, properties, data)
 {}
@@ -42,15 +42,14 @@ Feed::Protocol AtmosphereFeed::protocol() const
     return Protocol::SENSOR;
 }
 
-bool AtmosphereFeed::process(const std::string& response)
+bool AtmosphereFeed::process(str const& response)
 {
     try
     {
         m_data->update(s_parser.unpack(response, m_priority));
     }
-    catch (const parser::UnpackError&)
+    catch (parser::UnpackError const&)
     {}
     return true;
 }
-
 }  // namespace feed

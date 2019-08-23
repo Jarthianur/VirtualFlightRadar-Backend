@@ -39,6 +39,7 @@ class SocketImplBoost
 
 public:
     MOVABLE_BUT_NOT_COPYABLE(SocketImplBoost)
+
     explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket)
                                  socket);  ///< @param socket The underlying socket
     ~SocketImplBoost() noexcept;

@@ -32,8 +32,7 @@ namespace feed
 {
 parser::WindParser WindFeed::s_parser;
 
-WindFeed::WindFeed(const std::string& name, const Properties& properties,
-                   std::shared_ptr<data::WindData> data)
+WindFeed::WindFeed(str const& name, Properties const& properties, std::shared_ptr<data::WindData> data)
     : Feed(name, LOG_PREFIX, properties, data)
 {}
 
@@ -42,15 +41,14 @@ Feed::Protocol WindFeed::protocol() const
     return Protocol::SENSOR;
 }
 
-bool WindFeed::process(const std::string& response)
+bool WindFeed::process(str const& response)
 {
     try
     {
         m_data->update(s_parser.unpack(response, m_priority));
     }
-    catch (const parser::UnpackError&)
+    catch (parser::UnpackError const&)
     {}
     return true;
 }
-
 }  // namespace feed

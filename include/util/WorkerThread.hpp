@@ -24,39 +24,37 @@
 #include <chrono>
 #include <condition_variable>
 #include <functional>
-#include <mutex>
 #include <queue>
 #include <thread>
 #include <utility>
 
 #include "util/defines.h"
+#include "util/types.h"
 
 namespace util
 {
-template<typename T>
-class WorkerThread
+template<typename DataT, typename FnT>
+class WorkerThreadT
 {
-    using WorkerFn = std::function<void(T&&)>;
+    NOT_COPYABLE(WorkerThreadT)
 
-    bool                    m_running;
-    std::queue<T>           m_workQ;
-    mutable std::mutex      m_mutex;
+    bool              m_running;
+    std::queue<DataT> m_workQ;
+    std::mutex mutable m_mutex;
     std::condition_variable m_cv;
     std::thread             m_worker;
 
 public:
-    NOT_COPYABLE(WorkerThread)
+    WorkerThreadT(FnT&& fn);
+    ~WorkerThreadT() noexcept;
 
-    WorkerThread(WorkerFn&& fn);
-    ~WorkerThread() noexcept;
-
-    void push(const T& data);
+    void push(DataT const& data);
 };
 
-template<typename T>
-WorkerThread<T>::WorkerThread(WorkerFn&& fn)
-    : m_running(false), m_worker([this, &fn] {
-          std::unique_lock<std::mutex> lock(m_mutex);
+template<typename DataT, typename FnT>
+WorkerThreadT<DataT, FnT>::WorkerThreadT(FnT&& fn)
+    : m_running(false), m_worker([this, fn = std::move(fn)] {
+          unique_lock lock(m_mutex);
           m_running = true;
           while (m_running)
           {
@@ -70,18 +68,18 @@ WorkerThread<T>::WorkerThread(WorkerFn&& fn)
                   auto work = std::move(m_workQ.front());
                   m_workQ.pop();
                   lock.unlock();
-                  fn(std::move(work));
+                  std::invoke(fn, std::move(work));
                   lock.lock();
               }
           }
       })
 {}
 
-template<typename T>
-WorkerThread<T>::~WorkerThread() noexcept
+template<typename DataT, typename FnT>
+WorkerThreadT<DataT, FnT>::~WorkerThreadT() noexcept
 {
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        lock_guard lock(m_mutex);
         while (!m_workQ.empty())
         {
             m_workQ.pop();
@@ -95,12 +93,14 @@ WorkerThread<T>::~WorkerThread() noexcept
     }
 }
 
-template<typename T>
-void WorkerThread<T>::push(const T& data)
+template<typename DataT, typename FnT>
+void WorkerThreadT<DataT, FnT>::push(DataT const& data)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    lock_guard lock(m_mutex);
     m_workQ.push(data);
     m_cv.notify_one();
 }
 
+template<typename DataT>
+using WorkerThread = WorkerThreadT<DataT, std::function<void(DataT&&)>>;
 }  // namespace util
