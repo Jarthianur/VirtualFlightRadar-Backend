@@ -21,15 +21,13 @@
 
 #include "data/WindData.h"
 
-#include "util/types.h"
-
 using namespace object;
 
 namespace data
 {
-WindData::WindData() : Data() {}
+WindData::WindData(AccessFn&& fn) : Data(std::move(fn)) {}
 
-WindData::WindData(object::Wind const& wind) : Data(), m_wind(wind) {}
+WindData::WindData(AccessFn&& fn, object::Wind const& wind) : Data(std::move(fn)), m_wind(wind) {}
 
 bool WindData::update(Object&& wind)
 {
@@ -37,10 +35,10 @@ bool WindData::update(Object&& wind)
     return m_wind.tryUpdate(std::move(wind));
 }
 
-void WindData::access(accessor_fn const& func)
+void WindData::access()
 {
     lock_guard lock(m_mutex);
-    func(++m_wind);
+    m_accessFn(++m_wind);
     (*m_wind).clear();
 }
 }  // namespace data

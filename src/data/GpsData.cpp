@@ -23,25 +23,23 @@
 
 #include <stdexcept>
 
-#include "util/types.h"
-
 using namespace object;
 
 namespace data
 {
-GpsData::GpsData(GpsPosition const& position, bool ground)
-    : Data(), m_position(position), m_groundMode(ground)
+GpsData::GpsData(AccessFn&& fn, GpsPosition const& position, bool ground)
+    : Data(std::move(fn)), m_position(position), m_groundMode(ground)
 {
     m_processor.process(m_position);
 }
 
-void GpsData::access(accessor_fn const& func)
+void GpsData::access()
 {
     lock_guard lock(m_mutex);
     try
     {
         m_processor.process(m_position);
-        func(++m_position);
+        m_accessFn(++m_position);
     }
     catch (std::exception const&)
     {}

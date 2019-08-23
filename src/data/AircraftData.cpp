@@ -21,23 +21,20 @@
 
 #include "data/AircraftData.h"
 
-#include <functional>
-#include <iterator>
 #include <stdexcept>
-#include <string>
 
 using namespace object;
 
 namespace data
 {
-AircraftData::AircraftData() : AircraftData(0) {}
+AircraftData::AircraftData(AccessFn&& fn) : AircraftData(std::move(fn), 0) {}
 
-AircraftData::AircraftData(std::int32_t maxDist) : Data(), m_processor(maxDist) {}
+AircraftData::AircraftData(AccessFn&& fn, s32 maxDist) : Data(std::move(fn)), m_processor(maxDist) {}
 
 bool AircraftData::update(Object&& aircraft)
 {
-    Aircraft&& update = static_cast<Aircraft&&>(aircraft);
-    auto       result = m_container.insert(std::hash<std::string>()(*update.id()),
+    auto&& update = static_cast<Aircraft&&>(aircraft);
+    auto   result = m_container.insert(std::hash<str>()(*update.id()),
                                      std::move(update));  // TODO: provide char* based hashing
     if (!result.second)
     {
@@ -46,12 +43,12 @@ bool AircraftData::update(Object&& aircraft)
     return true;
 }
 
-void AircraftData::environment(const Location& position, double atmPress)
+void AircraftData::environment(Location const& position, f64 atmPress)
 {
     m_processor.referTo(position, atmPress);
 }
 
-void AircraftData::access(const accessor_fn& func)
+void AircraftData::access()
 {
     auto iter = m_container.begin();
     while (iter != m_container.end())
@@ -72,13 +69,12 @@ void AircraftData::access(const accessor_fn& func)
             else
             {
                 m_processor.process(iter->value);
-                func(iter->value);
+                m_accessFn(iter->value);
                 ++iter;
             }
         }
-        catch (const std::exception&)
+        catch (std::exception const&)
         {}
     }
 }
-
 }  // namespace data

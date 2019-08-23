@@ -40,7 +40,7 @@ void GpsProcessor::process(object::GpsPosition& position) const
     appendGPGGA(position, utc, appendGPRMC(position, utc, 0));
 }
 
-std::size_t GpsProcessor::appendGPGGA(GpsPosition& position, const std::tm* utc, std::size_t pos) const
+usize GpsProcessor::appendGPGGA(GpsPosition& position, std::tm const* utc, usize pos) const
 {
     // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
     // support others.
@@ -51,24 +51,24 @@ std::size_t GpsProcessor::appendGPGGA(GpsPosition& position, const std::tm* utc,
         utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
         m_directionEW, /*pos.fixQa,*/ position.nrOfSatellites(), position.location().altitude,
         math::saturate(position.geoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
-    bytes += (*position).snprintf(pos, GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
-                                  "%02x\r\n", math::checksum(**position, GpsPosition::NMEA_SIZE - pos));
-    return pos + static_cast<std::size_t>(bytes);
+    bytes += (*position).snprintf(pos, GpsPosition::NMEA_SIZE - pos - static_cast<usize>(bytes), "%02x\r\n",
+                                  math::checksum(**position, GpsPosition::NMEA_SIZE - pos));
+    return pos + static_cast<usize>(bytes);
 }
 
-std::size_t GpsProcessor::appendGPRMC(GpsPosition& position, const std::tm* utc, std::size_t pos) const
+usize GpsProcessor::appendGPRMC(GpsPosition& position, std::tm const* utc, usize pos) const
 {
     int bytes = (*position).snprintf(
         pos, GpsPosition::NMEA_SIZE - pos,
         "$GPRMC,%.2d%.2d%.2d,A,%02.0lf%06.3lf,%c,%03.0lf%06.3lf,%c,0,0,%.2d%.2d%.2d,001.0,W*", utc->tm_hour,
         utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude,
         m_directionEW, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
-    bytes += (*position).snprintf(pos, GpsPosition::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
-                                  "%02x\r\n", math::checksum(**position, GpsPosition::NMEA_SIZE - pos));
-    return pos + static_cast<std::size_t>(bytes);
+    bytes += (*position).snprintf(pos, GpsPosition::NMEA_SIZE - pos - static_cast<usize>(bytes), "%02x\r\n",
+                                  math::checksum(**position, GpsPosition::NMEA_SIZE - pos));
+    return pos + static_cast<usize>(bytes);
 }
 
-void GpsProcessor::evalPosition(double latitude, double longitude) const
+void GpsProcessor::evalPosition(f64 latitude, f64 longitude) const
 {
     m_directionSN  = (latitude < 0) ? 'S' : 'N';
     m_directionEW  = (longitude < 0) ? 'W' : 'E';
@@ -77,5 +77,4 @@ void GpsProcessor::evalPosition(double latitude, double longitude) const
     m_degLongitude = std::abs(std::floor(longitude));
     m_minLongitude = std::abs(60.0 * (longitude - m_degLongitude));
 }
-
 }  // namespace data::processor

@@ -43,8 +43,8 @@ class AircraftData : public Data
     processor::AircraftProcessor                m_processor;  ///< Processor for aircrafts
 
 public:
-    AircraftData();
-    explicit AircraftData(s32 maxDist);  ///< @param maxDist The max distance filter
+    explicit AircraftData(AccessFn&& fn);
+    AircraftData(AccessFn&& fn, s32 maxDist);  ///< @param maxDist The max distance filter
     ~AircraftData() noexcept override = default;
 
     /**
@@ -63,6 +63,6 @@ public:
      * @param atmPress The atmospheric pressure
      * @threadsafe
      */
-    void access(accessor_fn const& func) override;
+    void access() override;
 };
 }  // namespace data

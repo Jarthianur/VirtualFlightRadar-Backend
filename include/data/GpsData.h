@@ -22,10 +22,10 @@
 #pragma once
 
 #include <exception>
-#include <mutex>
 
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
+#include "util/types.h"
 
 #include "Data.hpp"
 
@@ -44,7 +44,7 @@ class GpsData : public Data
     processor::GpsProcessor m_processor;               ///< Processor for GPS information
     bool                    m_positionLocked = false;  ///< Locking state of the current position
     bool                    m_groundMode     = false;  ///< Ground mode state
-    mutable std::mutex      m_mutex;
+    std::mutex mutable m_mutex;
 
     /**
      * @brief Check whether the position is good enough.
@@ -56,7 +56,7 @@ public:
     /**
      * @param crPosition The initial info
      */
-    GpsData(object::GpsPosition const& position, bool ground);
+    GpsData(AccessFn&& fn, object::GpsPosition const& position, bool ground);
     ~GpsData() noexcept override = default;
 
     /**
@@ -69,7 +69,7 @@ public:
      */
     bool update(object::Object&& position) override;
 
-    void access(accessor_fn const& func) override;
+    void access() override;
 
     /**
      * @brief Get the position.

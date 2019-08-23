@@ -32,11 +32,9 @@ using namespace object;
 
 namespace data::processor
 {
-AircraftProcessor::AircraftProcessor() : AircraftProcessor(std::numeric_limits<std::int32_t>::max()) {}
+AircraftProcessor::AircraftProcessor() : AircraftProcessor(std::numeric_limits<s32>::max()) {}
 
-AircraftProcessor::AircraftProcessor(std::int32_t maxDist)
-    : Processor<object::Aircraft>(), m_maxDistance(maxDist)
-{}
+AircraftProcessor::AircraftProcessor(s32 maxDist) : Processor<object::Aircraft>(), m_maxDistance(maxDist) {}
 
 void AircraftProcessor::process(Aircraft& aircraft) const
 {
@@ -51,13 +49,13 @@ void AircraftProcessor::process(Aircraft& aircraft) const
     }
 }
 
-void AircraftProcessor::referTo(const Location& location, double atmPress)
+void AircraftProcessor::referTo(Location const& location, f64 atmPress)
 {
     m_refLocation    = location;
     m_refAtmPressure = atmPress;
 }
 
-void AircraftProcessor::calculateRelPosition(const Aircraft& aircraft) const
+void AircraftProcessor::calculateRelPosition(Aircraft const& aircraft) const
 {
     m_refRadLatitude       = math::radian(m_refLocation.latitude);
     m_refRadLongitude      = math::radian(m_refLocation.longitude);
@@ -66,9 +64,9 @@ void AircraftProcessor::calculateRelPosition(const Aircraft& aircraft) const
     m_lonDistance          = m_aircraftRadLongitude - m_refRadLongitude;
     m_latDistance          = m_aircraftRadLatitude - m_refRadLatitude;
 
-    double a = std::pow(std::sin(m_latDistance / 2.0), 2.0) +
-               std::cos(m_refRadLatitude) * std::cos(m_aircraftRadLatitude) *
-                   std::pow(std::sin(m_lonDistance / 2.0), 2.0);
+    f64 a = std::pow(std::sin(m_latDistance / 2.0), 2.0) + std::cos(m_refRadLatitude) *
+                                                               std::cos(m_aircraftRadLatitude) *
+                                                               std::pow(std::sin(m_lonDistance / 2.0), 2.0);
     m_distance = math::doubleToInt(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
 
     m_relBearing = math::degree(
@@ -85,17 +83,17 @@ void AircraftProcessor::calculateRelPosition(const Aircraft& aircraft) const
                         aircraft.location().altitude - m_refLocation.altitude;
 }
 
-std::size_t AircraftProcessor::appendPFLAU(Aircraft& aircraft, std::size_t pos) const
+usize AircraftProcessor::appendPFLAU(Aircraft& aircraft, usize pos) const
 {
     int bytes =
         (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
                              math::doubleToInt(m_relBearing), m_relVertical, m_distance, *aircraft.id());
-    bytes += (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
-                                  "%02x\r\n", math::checksum(**aircraft, Aircraft::NMEA_SIZE - pos));
-    return pos + static_cast<std::size_t>(bytes);
+    bytes += (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos - static_cast<usize>(bytes), "%02x\r\n",
+                                  math::checksum(**aircraft, Aircraft::NMEA_SIZE - pos));
+    return pos + static_cast<usize>(bytes);
 }
 
-std::size_t AircraftProcessor::appendPFLAA(Aircraft& aircraft, std::size_t pos) const
+usize AircraftProcessor::appendPFLAA(Aircraft& aircraft, usize pos) const
 {
     int bytes = 0;
     if (aircraft.hasFullInfo())
@@ -118,9 +116,8 @@ std::size_t AircraftProcessor::appendPFLAA(Aircraft& aircraft, std::size_t pos) 
                                      m_relNorth, m_relEast, m_relVertical, *aircraft.id(),
                                      util::raw_type(aircraft.aircraftType()));
     }
-    bytes += (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos - static_cast<std::size_t>(bytes),
-                                  "%02x\r\n", math::checksum(**aircraft, Aircraft::NMEA_SIZE - pos));
-    return pos + static_cast<std::size_t>(bytes);
+    bytes += (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos - static_cast<usize>(bytes), "%02x\r\n",
+                                  math::checksum(**aircraft, Aircraft::NMEA_SIZE - pos));
+    return pos + static_cast<usize>(bytes);
 }
-
 }  // namespace data::processor

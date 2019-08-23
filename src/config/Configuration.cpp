@@ -22,9 +22,11 @@
 #include "config/Configuration.h"
 
 #include <limits>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <utility>
+#include <variant>
 
 #include "config/ConfigReader.h"
 #include "util/Logger.hpp"
@@ -65,7 +67,7 @@ OptNumber stringToNumber(str const& str)
  * @return the number value
  * @throw std::invalid_argument if the Number is invalid
  */
-Number checkNumber(OptNumber const& number, char const* path)
+inline Number checkNumber(OptNumber const& number, char const* path)
 {
     if (!number)
     {
@@ -79,7 +81,7 @@ Number checkNumber(OptNumber const& number, char const* path)
  * @param str The string to trim
  * @return the trimmed string
  */
-str& trimString(str& str)
+inline str& trimString(str& str)
 {
     usize f = str.find_first_not_of(' ');
     if (f != str::npos)

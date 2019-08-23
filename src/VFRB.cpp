@@ -50,10 +50,20 @@ constexpr auto LOG_PREFIX       = "(VFRB) ";
 static auto const& logger = Logger::instance();
 
 VFRB::VFRB(std::shared_ptr<Configuration> config)
-    : m_aircraftData(std::make_shared<AircraftData>(config->maxDistance)),
-      m_atmosphereData(std::make_shared<AtmosphereData>(object::Atmosphere{0, config->atmPressure})),
-      m_gpsData(std::make_shared<GpsData>(config->gpsPosition, config->groundMode)),
-      m_windData(std::make_shared<WindData>()),
+    : m_aircraftData(std::make_shared<AircraftData>(
+          [this](const Object& it) {
+              if (it.updateAge() < Object::OUTDATED)
+              {
+                  m_server.send(it.nmea());
+              }
+          },
+          config->maxDistance)),
+      m_atmosphereData(
+          std::make_shared<AtmosphereData>([this](const Object& it) { m_server.send(it.nmea()); },
+                                           object::Atmosphere{0, config->atmPressure})),
+      m_gpsData(std::make_shared<GpsData>([this](const Object& it) { m_server.send(it.nmea()); },
+                                          config->gpsPosition, config->groundMode)),
+      m_windData(std::make_shared<WindData>([this](const Object& it) { m_server.send(it.nmea()); })),
       m_server(config->serverPort),
       m_running(false)
 {
@@ -104,17 +114,10 @@ void VFRB::serve()
         try
         {
             m_aircraftData->environment(m_gpsData->location(), m_atmosphereData->atmPressure());
-            m_aircraftData->access([this](const Object& it) {
-                if (it.updateAge() < Object::OUTDATED)
-                {
-                    m_server.send(it.nmea());
-                }
-            });
-
-            auto fn = [this](const Object& it) { m_server.send(it.nmea()); };
-            m_gpsData->access(fn);
-            m_atmosphereData->access(fn);
-            m_windData->access(fn);
+            m_aircraftData->access();
+            m_gpsData->access();
+            m_atmosphereData->access();
+            m_windData->access();
             std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
         }
         catch (const std::exception& e)

@@ -21,20 +21,20 @@
 
 #include "data/AtmosphereData.h"
 
-#include "util/types.h"
-
 using namespace object;
 
 namespace data
 {
-AtmosphereData::AtmosphereData() : Data() {}
+AtmosphereData::AtmosphereData(AccessFn&& fn) : Data(std::move(fn)) {}
 
-AtmosphereData::AtmosphereData(Atmosphere const& atmosphere) : Data(), m_atmosphere(atmosphere) {}
+AtmosphereData::AtmosphereData(AccessFn&& fn, Atmosphere const& atmosphere)
+    : Data(std::move(fn)), m_atmosphere(atmosphere)
+{}
 
-void AtmosphereData::access(accessor_fn const& func)
+void AtmosphereData::access()
 {
     lock_guard lock(m_mutex);
-    func(++m_atmosphere);
+    m_accessFn(++m_atmosphere);
 }
 
 bool AtmosphereData::update(Object&& atmosphere)

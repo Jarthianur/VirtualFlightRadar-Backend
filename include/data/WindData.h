@@ -21,9 +21,8 @@
 
 #pragma once
 
-#include <mutex>
-
 #include "object/Wind.h"
+#include "util/types.h"
 
 #include "Data.hpp"
 
@@ -34,12 +33,12 @@ namespace data
  */
 class WindData : public Data
 {
-    object::Wind       m_wind;  ///< The Wind information
-    mutable std::mutex m_mutex;
+    object::Wind m_wind;  ///< The Wind information
+    std::mutex mutable m_mutex;
 
 public:
-    WindData();
-    explicit WindData(object::Wind const& wind);  ///< @param wind The initial wind information
+    explicit WindData(AccessFn&& fn);
+    WindData(AccessFn&& fn, object::Wind const& wind);  ///< @param wind The initial wind information
     ~WindData() noexcept override = default;
 
     /**
@@ -50,6 +49,6 @@ public:
      */
     bool update(object::Object&& wind) override;
 
-    void access(accessor_fn const& func) override;
+    void access() override;
 };
 }  // namespace data
