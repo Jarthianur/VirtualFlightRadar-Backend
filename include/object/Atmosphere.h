@@ -60,7 +60,7 @@ public:
 
     str& operator*();
 
-    util::CStringPack nmea() const override;
-    auto              pressure() const -> decltype(m_pressure);
+    str_view nmea() const override;
+    auto     pressure() const -> decltype(m_pressure);
 };
 }  // namespace object

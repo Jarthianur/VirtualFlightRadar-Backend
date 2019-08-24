@@ -38,9 +38,9 @@ GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid, f64 
       m_fixQuality(quality),
       m_timestamp(timestamp)
 {
-    math::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MIN_LATITUDE);
-    math::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MIN_LONGITUDE);
-    math::checkLimits(m_location.altitude, Location::MIN_ALTITUDE, Location::MIN_ALTITUDE);
+    math::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
+    math::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
+    math::checkLimits(m_location.altitude, Location::MIN_ALTITUDE, Location::MAX_ALTITUDE);
 }
 
 void GpsPosition::assign(Object&& other)
@@ -73,7 +73,7 @@ bool GpsPosition::canUpdate(Object const& other) const
     }
 }
 
-util::CStringPack GpsPosition::nmea() const
+str_view GpsPosition::nmea() const
 {
     return m_nmea;
 }

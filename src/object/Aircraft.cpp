@@ -90,7 +90,7 @@ bool Aircraft::canUpdate(Object const& other) const
     }
 }
 
-util::CStringPack Aircraft::nmea() const
+str_view Aircraft::nmea() const
 {
     return m_nmea;
 }

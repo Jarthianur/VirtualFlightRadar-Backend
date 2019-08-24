@@ -99,7 +99,7 @@ public:
      * @param msg The msg to write
      * @threadsafe
      */
-    void send(util::CStringPack const& msg);
+    void send(str_view const& msg);
 };
 
 template<typename SocketT>
@@ -165,10 +165,10 @@ void Server<SocketT>::stop()
 }
 
 template<typename SocketT>
-void Server<SocketT>::send(util::CStringPack const& msg)
+void Server<SocketT>::send(str_view const& msg)
 {
     lock_guard lock(m_mutex);
-    if (msg.second == 0 || m_activeConnections == 0)
+    if (msg.length() == 0 || m_activeConnections == 0)
     {
         return;
     }

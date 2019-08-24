@@ -27,6 +27,8 @@
 
 #include "util/types.h"
 
+using namespace std::literals;
+
 namespace math
 {
 inline constexpr auto KTS_2_KMH = 1.852;            ///< Convert knots to km/h
@@ -95,7 +97,8 @@ void checkLimits(T val, T min, T max)
 {
     if (val < min || val > max)
     {
-        throw std::range_error("limits exceeded");
+        throw std::range_error("limits exceeded "s + std::to_string(val) + " not in [" + std::to_string(min) +
+                               " , " + std::to_string(max) + "]");
     }
 }
 
@@ -116,13 +119,13 @@ inline s32 icaoHeight(f64 pressure)
  * @param length   The sentences size
  * @return the checksum
  */
-inline s32 checksum(char const* sentence, usize length)
+inline s32 checksum(str_view const& sv, usize pos)
 {
     s32   csum = 0;
-    usize i    = 1;  // $ in nmea str not included
-    while (i < length && (sentence[i] != '*' || sentence[i] != '\0'))
+    usize i    = 1 + pos;  // $ in nmea str not included
+    while (i < sv.length() && sv[i] != '*')
     {
-        csum ^= static_cast<s32>(sentence[i++]);
+        csum ^= static_cast<s32>(sv[i++]);
     }
     return csum;
 }

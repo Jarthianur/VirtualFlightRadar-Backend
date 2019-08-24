@@ -66,7 +66,7 @@ public:
      * @param msg The message
      * @return true on success, else false
      */
-    bool write(util::CStringPack const& msg);
+    bool write(str_view const& msg);
 };
 
 template<typename SocketT>
@@ -76,7 +76,7 @@ std::unique_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socke
 }
 
 template<typename SocketT>
-bool Connection<SocketT>::write(util::CStringPack const& msg)
+bool Connection<SocketT>::write(str_view const& msg)
 {
     try
     {

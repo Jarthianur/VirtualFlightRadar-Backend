@@ -57,7 +57,7 @@ public:
      * @return true on success, else false
      * @throw SocketException if the socket is closed
      */
-    bool write(util::CStringPack const& msg);
+    bool write(str_view const& msg);
 
     /**
      * @brief Close the socket.

@@ -43,6 +43,6 @@ public:
 
     str& operator*();
 
-    util::CStringPack nmea() const override;
+    str_view nmea() const override;
 };
 }  // namespace object

@@ -28,6 +28,7 @@ file(GLOB_RECURSE vfrb_sources src/*.cpp)
 file(GLOB_RECURSE vfrb_test_sources test/*.cpp)
 
 set(CMAKE_BUILD_TYPE staged)
+set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Werror")
 
 if(DEFINED BOOST_STATIC)
     message(STATUS "Linking boost statically")
@@ -44,30 +45,28 @@ find_package(Threads REQUIRED)
 #
 # target: release
 #
-set(CMAKE_CXX_FLAGS_STAGED "-O3 -DNDEBUG -Wall -Wextra -Werror")
 add_executable(release ${vfrb_sources})
+target_compile_options(release PUBLIC -O3 -DNDEBUG -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
 set_target_properties(release PROPERTIES OUTPUT_NAME ${vfrb_prod_bin})
-set_target_properties(release PROPERTIES COMPILE_FLAGS "-DVERSION=\\\"${CMAKE_PROJECT_VERSION}\\\"")
 target_include_directories(release PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(release PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
 
 #
 # target: regression
 #
-set(CMAKE_CXX_FLAGS_STAGED "-O0 -g --coverage")
 add_executable(regression ${vfrb_sources})
+target_compile_options(regression PUBLIC -O0 -g --coverage -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
 set_target_properties(regression PROPERTIES OUTPUT_NAME ${vfrb_regression_bin})
-set_target_properties(regression PROPERTIES COMPILE_FLAGS "-DVERSION=\\\"${CMAKE_PROJECT_VERSION}\\\"")
 target_include_directories(regression PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(regression PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
 
 #
 # target: test
 #
-set(CMAKE_CXX_FLAGS_STAGED "-O0 -g --coverage -fopenmp -DSCTF_CUSTOM_EPSILON=0.000001")
 list(REMOVE_ITEM vfrb_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
 list(APPEND vfrb_test_sources ${vfrb_sources})
 add_executable(unittest ${vfrb_test_sources})
+target_compile_options(unittest PUBLIC -O0 -g --coverage -fopenmp -DSCTF_CUSTOM_EPSILON=0.000001)
 set_target_properties(unittest PROPERTIES OUTPUT_NAME ${vfrb_test_bin})
 target_include_directories(unittest PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
 target_link_libraries(unittest PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)

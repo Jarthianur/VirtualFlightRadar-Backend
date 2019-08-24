@@ -23,7 +23,7 @@ Wind::Wind() : Object() {}
 
 Wind::Wind(u32 priority) : Object(priority) {}
 
-util::CStringPack Wind::nmea() const
+str_view Wind::nmea() const
 {
     return {m_nmea.c_str(), m_nmea.size()};
 }

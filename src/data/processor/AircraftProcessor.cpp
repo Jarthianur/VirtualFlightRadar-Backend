@@ -85,22 +85,20 @@ void AircraftProcessor::calculateRelPosition(Aircraft const& aircraft) const
 
 usize AircraftProcessor::appendPFLAU(Aircraft& aircraft, usize pos) const
 {
-    int bytes =
-        (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*",
-                             math::doubleToInt(m_relBearing), m_relVertical, m_distance, *aircraft.id());
-    bytes += (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos - static_cast<usize>(bytes), "%02x\r\n",
-                                  math::checksum(**aircraft, Aircraft::NMEA_SIZE - pos));
-    return pos + static_cast<usize>(bytes);
+    int next = (*aircraft).format(pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::doubleToInt(m_relBearing),
+                                  m_relVertical, m_distance, (*aircraft.id()).data());
+    next += (*aircraft).format(pos, "%02x\r\n", math::checksum(**aircraft, pos));
+    return pos + static_cast<usize>(next);
 }
 
 usize AircraftProcessor::appendPFLAA(Aircraft& aircraft, usize pos) const
 {
-    int bytes = 0;
+    int next = 0;
     if (aircraft.hasFullInfo())
     {
-        bytes = (*aircraft).snprintf(
-            pos, Aircraft::NMEA_SIZE - pos, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth,
-            m_relEast, m_relVertical, util::raw_type(aircraft.idType()), *aircraft.id(),
+        next = (*aircraft).format(
+            pos, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast, m_relVertical,
+            util::raw_type(aircraft.idType()), (*aircraft.id()).data(),
             math::doubleToInt(math::saturate(aircraft.movement().heading, Aircraft::Movement::MIN_HEADING,
                                              Aircraft::Movement::MAX_HEADING)),
             math::doubleToInt(math::saturate(aircraft.movement().gndSpeed * math::MS_2_KMH,
@@ -112,12 +110,11 @@ usize AircraftProcessor::appendPFLAA(Aircraft& aircraft, usize pos) const
     }
     else
     {
-        bytes = (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*",
-                                     m_relNorth, m_relEast, m_relVertical, *aircraft.id(),
-                                     util::raw_type(aircraft.aircraftType()));
+        next =
+            (*aircraft).format(pos, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
+                               (*aircraft.id()).data(), util::raw_type(aircraft.aircraftType()));
     }
-    bytes += (*aircraft).snprintf(pos, Aircraft::NMEA_SIZE - pos - static_cast<usize>(bytes), "%02x\r\n",
-                                  math::checksum(**aircraft, Aircraft::NMEA_SIZE - pos));
-    return pos + static_cast<usize>(bytes);
+    next += (*aircraft).format(pos, "%02x\r\n", math::checksum(**aircraft, pos));
+    return pos + static_cast<usize>(next);
 }
 }  // namespace data::processor

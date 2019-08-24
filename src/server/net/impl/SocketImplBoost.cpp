@@ -58,14 +58,14 @@ str SocketImplBoost::address() const
     return m_socket.remote_endpoint().address().to_string();
 }
 
-bool SocketImplBoost::write(util::CStringPack const& msg)
+bool SocketImplBoost::write(str_view const& msg)
 {
     if (!m_socket.is_open())
     {
         throw SocketException("cannot write on closed socket");
     }
     boost::system::error_code ec;
-    boost::asio::write(m_socket, boost::asio::buffer(msg.first, msg.second), ec);
+    boost::asio::write(m_socket, boost::asio::buffer(msg.data(), msg.length()), ec);
     return !ec;
 }
 

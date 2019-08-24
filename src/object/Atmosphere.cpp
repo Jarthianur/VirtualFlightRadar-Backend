@@ -45,7 +45,7 @@ void Atmosphere::assign(Object&& other)
     {}
 }
 
-util::CStringPack Atmosphere::nmea() const
+str_view Atmosphere::nmea() const
 {
     return {m_nmea.c_str(), m_nmea.size()};
 }

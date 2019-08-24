@@ -66,7 +66,7 @@ public:
      */
     virtual bool tryUpdate(Object&& other);
 
-    virtual util::CStringPack nmea() const = 0;
+    virtual str_view nmea() const = 0;
     auto                      updateAge() const -> decltype(m_updateAge);
 };
 }  // namespace object

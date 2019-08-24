@@ -89,7 +89,7 @@ public:
 
     util::CString<NMEA_SIZE>& operator*();
 
-    util::CStringPack nmea() const override;
+    str_view nmea() const override;
     auto              location() const -> decltype(m_location) const&;
     auto              geoid() const -> decltype(m_geoid);
     auto              timestamp() const -> decltype(m_timestamp) const&;
