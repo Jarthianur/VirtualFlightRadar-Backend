@@ -67,7 +67,7 @@ public:
      * @param login     The login string
      * @param connector The Connector interface
      */
-    AprscClient(net::Endpoint const& endpoint, str const& login, std::shared_ptr<net::Connector> connector);
+    AprscClient(net::Endpoint const& endpoint, str const& login, s_ptr<net::Connector> connector);
     ~AprscClient() noexcept override = default;
 
     bool  equals(Client const& other) const override;

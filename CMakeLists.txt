@@ -55,7 +55,7 @@ target_link_libraries(release PUBLIC Boost::regex Boost::system Boost::program_o
 # target: regression
 #
 add_executable(regression ${vfrb_sources})
-target_compile_options(regression PUBLIC -O0 -g --coverage -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
+target_compile_options(regression PUBLIC -O0 -g -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
 set_target_properties(regression PROPERTIES OUTPUT_NAME ${vfrb_regression_bin})
 target_include_directories(regression PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(regression PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)

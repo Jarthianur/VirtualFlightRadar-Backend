@@ -54,7 +54,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    SensorClient(net::Endpoint const& endpoint, std::shared_ptr<net::Connector> connector);
+    SensorClient(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
     ~SensorClient() noexcept override = default;
 };
 }  // namespace client

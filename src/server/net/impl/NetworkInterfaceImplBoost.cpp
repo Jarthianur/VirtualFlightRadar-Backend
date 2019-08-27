@@ -45,13 +45,13 @@ NetworkInterfaceImplBoost::~NetworkInterfaceImplBoost() noexcept
     stop();
 }
 
-void NetworkInterfaceImplBoost::run(unique_lock& lock)
+void NetworkInterfaceImplBoost::run(std::unique_lock<std::mutex>& lk)
 {
     try
     {
         if (m_acceptor.is_open())
         {
-            lock.unlock();
+            lk.unlock();
             m_ioService.run();
         }
     }
@@ -101,7 +101,7 @@ void NetworkInterfaceImplBoost::handleAccept(boost::system::error_code const& er
     callback(bool(error));
 }
 
-std::unique_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startConnection()
+u_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startConnection()
 {
     if (!m_socket.get().is_open())
     {

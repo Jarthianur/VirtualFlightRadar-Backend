@@ -51,22 +51,22 @@ template<usize N, typename std::enable_if<(N > 0)>::type* = nullptr>
 class CString final
 {
     std::array<char, N> m_data;
-    str_view            m_view;
+    std::string_view    m_view;
 
-    void copy(str_view const& sv)
+    void copy(std::string_view const& sv)
     {
         if (sv.length() > N)
         {
             throw std::overflow_error("");
         }
         std::copy_n(sv.cbegin(), sv.length(), m_data.begin());
-        m_view = str_view(m_data.data(), sv.length());
+        m_view = std::string_view(m_data.data(), sv.length());
     }
 
     void copy(CString const& other)
     {
         std::copy(other.m_data.cbegin(), other.m_data.cend(), m_data.begin());
-        m_view = str_view(m_data.data(), other.m_view.length());
+        m_view = std::string_view(m_data.data(), other.m_view.length());
     }
 
 public:
@@ -90,7 +90,7 @@ public:
         operator=(other);
     }
 
-    CString(str_view const& other)  ///< @param other The other CString to copy
+    CString(std::string_view const& other)  ///< @param other The other CString to copy
     {
         operator=(other);
     }
@@ -99,13 +99,13 @@ public:
 
     CString& operator=(char const* other)
     {
-        copy(str_view(other));
+        copy(std::string_view(other));
         return *this;
     }
 
     CString& operator=(str const& other)
     {
-        copy(str_view(other));
+        copy(std::string_view(other));
         return *this;
     }
 
@@ -115,18 +115,18 @@ public:
         return *this;
     }
 
-    CString& operator=(str_view const& other)
+    CString& operator=(std::string_view const& other)
     {
         copy(other);
         return *this;
     }
 
-    str_view const& operator*() const
+    std::string_view const& operator*() const
     {
         return m_view;
     }
 
-    operator str_view() const
+    operator std::string_view() const
     {
         return m_view;
     }
@@ -139,7 +139,7 @@ public:
     void clear()
     {
         m_data[0] = '\0';
-        m_view    = str_view(m_data.data(), 0);
+        m_view    = std::string_view(m_data.data(), 0);
     }
 
     int format(usize pos, char const* fmt, ...)
@@ -152,9 +152,9 @@ public:
         va_list args;
         va_start(args, fmt);
         int b = 0;
-        if ((b = std::vsnprintf(m_data + pos, max, fmt, args)) >= 0)
+        if ((b = std::vsnprintf(m_data.data() + pos, max, fmt, args)) >= 0)
         {
-            m_view = str_view(m_data.data(), pos + b + 1);
+            m_view = std::string_view(m_data.data(), pos + b + 1);
         }
         va_end(args);
         if (b < 0)

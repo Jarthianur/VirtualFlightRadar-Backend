@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <mutex>
+
 #include "object/Wind.h"
 #include "util/types.h"
 

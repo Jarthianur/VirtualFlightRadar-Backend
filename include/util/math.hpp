@@ -119,7 +119,7 @@ inline s32 icaoHeight(f64 pressure)
  * @param length   The sentences size
  * @return the checksum
  */
-inline s32 checksum(str_view const& sv, usize pos)
+inline s32 checksum(std::string_view const& sv, usize pos)
 {
     s32   csum = 0;
     usize i    = 1 + pos;  // $ in nmea str not included

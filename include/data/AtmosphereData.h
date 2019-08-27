@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <mutex>
+
 #include "object/Atmosphere.h"
 #include "util/types.h"
 

@@ -59,7 +59,7 @@ void NetworkInterfaceImplTests::close()
     if (on_accept) on_accept(true);
 }
 
-std::unique_ptr<Connection<SocketImplTest>> NetworkInterfaceImplTests::startConnection()
+u_ptr<Connection<SocketImplTest>> NetworkInterfaceImplTests::startConnection()
 {
     return Connection<SocketImplTest>::create(SocketImplTest(0));
 }

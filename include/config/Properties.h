@@ -48,8 +48,8 @@ public:
      * @param alternative The default value (default: empty)
      * @return the value at path if found and not empty, else the default value
      */
-    str property(str const& path, str const& alternative = "") const;
-
+    str property(str const& path, str const& defVal) const noexcept;
+    str property(str const& path) const;
     /**
      * @brief Get the Properties for a section.
      * @param section The section

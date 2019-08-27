@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <memory>
 #include <mutex>
 #include <vector>
 
@@ -44,19 +43,19 @@ class Client
     NOT_COPYABLE(Client)
 
 protected:
-    std::shared_ptr<net::Connector>          m_connector;        /// Connector interface
-    bool                                     m_running = false;  /// Run state indicator
-    char const* const                        m_logPrefix;        /// Component string used for logging
-    net::Endpoint const                      m_endpoint;         /// Remote endpoint
-    std::vector<std::shared_ptr<feed::Feed>> m_feeds;            /// Container for subscribed feeds
-    mutable std::mutex                       m_mutex;
+    s_ptr<net::Connector>          m_connector;        /// Connector interface
+    bool                           m_running = false;  /// Run state indicator
+    char const* const              m_logPrefix;        /// Component string used for logging
+    net::Endpoint const            m_endpoint;         /// Remote endpoint
+    std::vector<s_ptr<feed::Feed>> m_feeds;            /// Container for subscribed feeds
+    mutable std::mutex             m_mutex;
 
     /**
      * @param endpoint  The connection Endpoint
      * @param component The component name
      * @param connector The Connector interface
      */
-    Client(net::Endpoint const& endpoint, char const* logPrefix, std::shared_ptr<net::Connector> connector);
+    Client(net::Endpoint const& endpoint, char const* logPrefix, s_ptr<net::Connector> connector);
 
     /**
      * @brief Handler for connect
@@ -125,7 +124,7 @@ public:
      * @param feed The Feed to subscribe
      * @threadsafe
      */
-    void subscribe(std::shared_ptr<feed::Feed> feed);
+    void subscribe(s_ptr<feed::Feed> feed);
 
     /**
      * @brief Compare to another client by value.

@@ -22,7 +22,6 @@
 #include "config/Configuration.h"
 
 #include <limits>
-#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <utility>
@@ -36,8 +35,7 @@ using namespace std::literals;
 
 namespace config
 {
-using Number    = std::variant<s32, u64, f64>;
-using OptNumber = std::optional<Number>;
+using Number = std::variant<s32, u64, f64>;
 
 constexpr auto     LOG_PREFIX = "(Config) ";
 static auto const& logger     = Logger::instance();
@@ -49,7 +47,7 @@ static auto const& logger     = Logger::instance();
  * @return an optional number, which may be invalid
  */
 template<typename T>
-OptNumber stringToNumber(str const& str)
+Number strToNumber(str const& str, char const* path)
 {
     std::stringstream ss(str);
     T                 result;
@@ -57,23 +55,7 @@ OptNumber stringToNumber(str const& str)
     {
         return Number(result);
     }
-    return {};
-}
-
-/**
- * @brief Check an optional Number to be valid.
- * @param number The optinonal Number
- * @param path   The key path
- * @return the number value
- * @throw std::invalid_argument if the Number is invalid
- */
-inline Number checkNumber(OptNumber const& number, char const* path)
-{
-    if (!number)
-    {
-        throw std::invalid_argument("invalid value at "s + path);
-    }
-    return *number;
+    throw std::invalid_argument("invalid value at "s + path);
 }
 
 /**
@@ -118,14 +100,14 @@ inline std::list<str> split(str const& s, char delim = ',')
 Configuration::Configuration(std::istream& stream)
 try :
     m_properties(ConfigReader(stream).read()),
-    groundMode(!m_properties.property(PATH_GND_MODE).empty()),
+    groundMode(m_properties.property(PATH_GND_MODE, "no") == "no"),
     gpsPosition(resolvePosition(m_properties)),
-    atmPressure(std::get<f64>(
-        checkNumber(stringToNumber<f64>(m_properties.property(PATH_PRESSURE, "1013.25")), PATH_PRESSURE))),
+    atmPressure(std::get<f64>(strToNumber<f64>(m_properties.property(PATH_PRESSURE, "1013.25"),
+                                               PATH_PRESSURE))),
     maxHeight(resolveFilter(m_properties, PATH_MAX_HEIGHT)),
     maxDistance(resolveFilter(m_properties, PATH_MAX_DIST)),
     serverPort(resolveServerPort(m_properties)),
-    feedNames(split(m_properties.property(PATH_FEEDS))),
+    feedNames(split(m_properties.property(PATH_FEEDS, ""))),
     feedProperties(resolveFeeds(m_properties))
 {
     dumpInfo();
@@ -138,23 +120,20 @@ catch (std::exception const& e)
 object::GpsPosition Configuration::resolvePosition(Properties const& properties) const
 {
     object::Location pos;
-    pos.latitude = std::get<f64>(
-        checkNumber(stringToNumber<f64>(properties.property(PATH_LATITUDE, "0.0")), PATH_LATITUDE));
-    pos.longitude = std::get<f64>(
-        checkNumber(stringToNumber<f64>(properties.property(PATH_LONGITUDE, "0.0")), PATH_LONGITUDE));
-    pos.altitude = std::get<s32>(
-        checkNumber(stringToNumber<s32>(properties.property(PATH_ALTITUDE, "0")), PATH_ALTITUDE));
-    f64 geoid =
-        std::get<f64>(checkNumber(stringToNumber<f64>(properties.property(PATH_GEOID, "0.0")), PATH_GEOID));
+    pos.latitude = std::get<f64>(strToNumber<f64>(properties.property(PATH_LATITUDE, "0.0"), PATH_LATITUDE));
+    pos.longitude =
+        std::get<f64>(strToNumber<f64>(properties.property(PATH_LONGITUDE, "0.0"), PATH_LONGITUDE));
+    pos.altitude = std::get<s32>(strToNumber<s32>(properties.property(PATH_ALTITUDE, "0"), PATH_ALTITUDE));
+    f64 geoid    = std::get<f64>(strToNumber<f64>(properties.property(PATH_GEOID, "0.0"), PATH_GEOID));
     return object::GpsPosition(0, pos, geoid);
 }
 
-std::uint16_t Configuration::resolveServerPort(const Properties& properties) const
+u16 Configuration::resolveServerPort(const Properties& properties) const
 {
     try
     {
-        u64 port = std::get<u64>(checkNumber(
-            stringToNumber<u64>(properties.property(PATH_SERVER_PORT, "4353")), PATH_SERVER_PORT));
+        u64 port =
+            std::get<u64>(strToNumber<u64>(properties.property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT));
         if (port > std::numeric_limits<u16>::max())
         {
             throw std::invalid_argument("invalid port number");
@@ -172,7 +151,7 @@ s32 Configuration::resolveFilter(Properties const& properties, char const* path)
 {
     try
     {
-        s32 filter = std::get<s32>(checkNumber(stringToNumber<s32>(properties.property(path, "-1")), path));
+        s32 filter = std::get<s32>(strToNumber<s32>(properties.property(path, "-1"), path));
         return filter < 0 ? std::numeric_limits<s32>::max() : filter;
     }
     catch (std::invalid_argument const&)

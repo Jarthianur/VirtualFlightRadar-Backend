@@ -134,15 +134,15 @@ public:
     util::CString<NMEA_SIZE>& operator*();
     Aircraft&                 operator=(Aircraft&& other);
 
-    str_view nmea() const override;
-    auto     idType() const -> decltype(m_idType);
-    auto     aircraftType() const -> decltype(m_aircraftType);
-    auto     id() const -> decltype(m_id) const&;
-    auto     targetType() const -> decltype(m_targetType);
-    auto     location() const -> decltype(m_location) const&;
-    auto     movement() const -> decltype(m_movement) const&;
-    auto     timestamp() const -> decltype(m_timestamp) const&;
-    auto     hasFullInfo() const -> decltype(m_fullInfo);
-    void     targetType(TargetType tt);
+    std::string_view nmea() const override;
+    auto             idType() const -> decltype(m_idType);
+    auto             aircraftType() const -> decltype(m_aircraftType);
+    auto             id() const -> decltype(m_id) const&;
+    auto             targetType() const -> decltype(m_targetType);
+    auto             location() const -> decltype(m_location) const&;
+    auto             movement() const -> decltype(m_movement) const&;
+    auto             timestamp() const -> decltype(m_timestamp) const&;
+    auto             hasFullInfo() const -> decltype(m_fullInfo);
+    void             targetType(TargetType tt);
 };
 }  // namespace object

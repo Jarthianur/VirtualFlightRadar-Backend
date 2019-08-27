@@ -33,8 +33,8 @@ namespace feed
 parser::AtmosphereParser AtmosphereFeed::s_parser;
 
 AtmosphereFeed::AtmosphereFeed(str const& name, Properties const& properties,
-                               std::shared_ptr<data::AtmosphereData> data)
-    : Feed(name, LOG_PREFIX, properties, data)
+                               s_ptr<data::AtmosphereData> data)
+    : Feed(name, properties, data)
 {}
 
 Feed::Protocol AtmosphereFeed::protocol() const

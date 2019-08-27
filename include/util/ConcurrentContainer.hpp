@@ -22,6 +22,7 @@
 #pragma once
 
 #include <map>
+#include <mutex>
 #include <utility>
 
 #include "util/defines.h"
@@ -90,7 +91,7 @@ public:
         {
             if (iterator != container.m_container.end())
             {
-                valueLock = unique_lock(iterator->second.mutex);
+                valueLock = std::unique_lock(iterator->second.mutex);
             }
         }
 
@@ -106,10 +107,10 @@ public:
             if (iterator != container.m_container.end())
             {
                 valueLock.unlock();
-                lock_guard lk(container.m_modMutex);
+                std::lock_guard lk(container.m_modMutex);
                 if (++iterator != container.m_container.end())
                 {
-                    valueLock = unique_lock(iterator->second.mutex);
+                    valueLock = std::unique_lock(iterator->second.mutex);
                 }
             }
             return *this;
@@ -142,13 +143,13 @@ public:
 
     protected:
         typename ContainerType::iterator iterator;
-        unique_lock                      valueLock;
+        std::unique_lock<std::mutex>     valueLock;
         ConcurrentContainer const&       container;
     };
 
     Iterator begin()
     {
-        lock_guard lock(m_modMutex);
+        std::lock_guard lk(m_modMutex);
         return Iterator(m_container.begin(), *this);
     }
 
@@ -159,8 +160,8 @@ public:
 
     std::pair<Iterator, bool> insert(KeyType key, T&& value)
     {
-        lock_guard lock(m_modMutex);
-        Iterator   iter(m_container.find(key), *this);
+        std::lock_guard lk(m_modMutex);
+        Iterator        iter(m_container.find(key), *this);
         if (iter == end())
         {
             return std::make_pair(
@@ -171,8 +172,8 @@ public:
 
     void erase(KeyType key)
     {
-        lock_guard lock(m_modMutex);
-        auto       entry = m_container.find(key);
+        std::lock_guard lk(m_modMutex);
+        auto            entry = m_container.find(key);
         if (entry != m_container.end())
         {
             Iterator iter(std::move(entry), *this);

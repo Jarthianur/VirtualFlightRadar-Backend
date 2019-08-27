@@ -57,8 +57,8 @@ public:
      * @param maxHeight  The max height filter
      * @throw std::logic_error if login is not given, or from parent constructor
      */
-    AprscFeed(str const& name, config::Properties const& propertyMap,
-              std::shared_ptr<data::AircraftData> data, s32 maxHeight);
+    AprscFeed(str const& m_name, config::Properties const& propertyMap, s_ptr<data::AircraftData> data,
+              s32 maxHeight);
     ~AprscFeed() noexcept override = default;
 
     /**

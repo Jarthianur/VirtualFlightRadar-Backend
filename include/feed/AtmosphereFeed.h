@@ -42,8 +42,6 @@ class AtmosphereFeed : public Feed
 {
     NOT_COPYABLE(AtmosphereFeed)
 
-    static constexpr auto LOG_PREFIX = "(AtmosphereFeed) ";
-
     static parser::AtmosphereParser s_parser;  ///< Parser to unpack response from Client
 
 public:
@@ -53,8 +51,8 @@ public:
      * @param data       The WindData container
      * @throw std::logic_error from parent constructor
      */
-    AtmosphereFeed(str const& name, config::Properties const& properties,
-                   std::shared_ptr<data::AtmosphereData> data);
+    AtmosphereFeed(str const& m_name, config::Properties const& m_properties,
+                   s_ptr<data::AtmosphereData> data);
     ~AtmosphereFeed() noexcept override = default;
 
     /**

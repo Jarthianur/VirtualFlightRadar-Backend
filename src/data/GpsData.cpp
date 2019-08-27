@@ -35,7 +35,7 @@ GpsData::GpsData(AccessFn&& fn, GpsPosition const& position, bool ground)
 
 void GpsData::access()
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     try
     {
         m_processor.process(m_position);
@@ -47,7 +47,7 @@ void GpsData::access()
 
 bool GpsData::update(Object&& position)
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     if (m_positionLocked)
     {
         throw PositionAlreadyLocked();
@@ -66,7 +66,7 @@ bool GpsData::update(Object&& position)
 
 auto GpsData::location() const -> decltype(m_position.location())
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     return m_position.location();
 }
 

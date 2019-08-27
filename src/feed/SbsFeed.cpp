@@ -32,11 +32,8 @@ namespace feed
 {
 parser::SbsParser SbsFeed::s_parser;
 
-constexpr auto LOG_PREFIX = "(SbsFeed) ";
-
-SbsFeed::SbsFeed(str const& name, Properties const& properties, std::shared_ptr<data::AircraftData> data,
-                 s32 maxHeight)
-    : Feed(name, LOG_PREFIX, properties, data), m_worker([this](str&& work) {
+SbsFeed::SbsFeed(str const& name, Properties const& properties, s_ptr<data::AircraftData> data, s32 maxHeight)
+    : Feed(name, properties, data), m_worker([this](str&& work) {
           try
           {
               m_data->update(s_parser.unpack(work, m_priority));

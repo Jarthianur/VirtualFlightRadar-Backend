@@ -54,11 +54,11 @@ public:
 template<typename DataT, typename FnT>
 WorkerThreadT<DataT, FnT>::WorkerThreadT(FnT&& fn)
     : m_running(false), m_worker([this, fn = std::move(fn)] {
-          unique_lock lock(m_mutex);
+          std::unique_lock lk(m_mutex);
           m_running = true;
           while (m_running)
           {
-              m_cv.wait_for(lock, std::chrono::milliseconds(500));
+              m_cv.wait_for(lk, std::chrono::milliseconds(500));
               if (!m_running)
               {
                   break;
@@ -67,9 +67,9 @@ WorkerThreadT<DataT, FnT>::WorkerThreadT(FnT&& fn)
               {
                   auto work = std::move(m_workQ.front());
                   m_workQ.pop();
-                  lock.unlock();
+                  lk.unlock();
                   std::invoke(fn, std::move(work));
-                  lock.lock();
+                  lk.lock();
               }
           }
       })
@@ -79,7 +79,7 @@ template<typename DataT, typename FnT>
 WorkerThreadT<DataT, FnT>::~WorkerThreadT() noexcept
 {
     {
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         while (!m_workQ.empty())
         {
             m_workQ.pop();
@@ -96,7 +96,7 @@ WorkerThreadT<DataT, FnT>::~WorkerThreadT() noexcept
 template<typename DataT, typename FnT>
 void WorkerThreadT<DataT, FnT>::push(DataT const& data)
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_workQ.push(data);
     m_cv.notify_one();
 }

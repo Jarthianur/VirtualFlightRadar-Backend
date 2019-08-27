@@ -23,7 +23,7 @@
 
 #include <algorithm>
 #include <list>
-#include <memory>
+#include <mutex>
 #include <thread>
 #include <unordered_set>
 
@@ -65,7 +65,7 @@ namespace client
  */
 struct ClientHasher
 {
-    usize operator()(std::shared_ptr<Client> const& client) const
+    usize operator()(s_ptr<Client> const& client) const
     {
         return client->hash();
     }
@@ -76,14 +76,14 @@ struct ClientHasher
  */
 struct ClientComparator
 {
-    bool operator()(std::shared_ptr<Client> const& client1, std::shared_ptr<Client> const& client2) const
+    bool operator()(s_ptr<Client> const& client1, s_ptr<Client> const& client2) const
     {
         return client1->equals(*client2);
     }
 };
 
 /// Set of clients with custom hasher and comparator
-using ClientSet = std::unordered_set<std::shared_ptr<Client>, ClientHasher, ClientComparator>;
+using ClientSet = std::unordered_set<s_ptr<Client>, ClientHasher, ClientComparator>;
 /// Iterator in ClientSet
 using ClientIter = ClientSet::iterator;
 
@@ -107,7 +107,7 @@ public:
      * @param feed The feed to subscribe
      * @threadsafe
      */
-    void subscribe(std::shared_ptr<feed::Feed> feed);
+    void subscribe(s_ptr<feed::Feed> feed);
 
     /**
      * @brief Run all clients in their own thread.

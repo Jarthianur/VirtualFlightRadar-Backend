@@ -43,6 +43,6 @@ public:
 
     str& operator*();
 
-    str_view nmea() const override;
+    std::string_view nmea() const override;
 };
 }  // namespace object

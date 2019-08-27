@@ -89,12 +89,12 @@ public:
 
     util::CString<NMEA_SIZE>& operator*();
 
-    str_view nmea() const override;
-    auto              location() const -> decltype(m_location) const&;
-    auto              geoid() const -> decltype(m_geoid);
-    auto              timestamp() const -> decltype(m_timestamp) const&;
-    auto              dilution() const -> decltype(m_dilution);
-    auto              nrOfSatellites() const -> decltype(m_nrOfSatellites);
-    auto              fixQuality() const -> decltype(m_fixQuality);
+    std::string_view nmea() const override;
+    auto             location() const -> decltype(m_location) const&;
+    auto             geoid() const -> decltype(m_geoid);
+    auto             timestamp() const -> decltype(m_timestamp) const&;
+    auto             dilution() const -> decltype(m_dilution);
+    auto             nrOfSatellites() const -> decltype(m_nrOfSatellites);
+    auto             fixQuality() const -> decltype(m_fixQuality);
 };
 }  // namespace object

@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <memory>
 #include <utility>
 
 #include "net/SocketException.h"
@@ -59,24 +58,24 @@ public:
      * @param socket The socket
      * @return a shared ptr to the Connection object
      */
-    static std::unique_ptr<Connection<SocketT>> create(SocketT&& socket);
+    static u_ptr<Connection<SocketT>> create(SocketT&& socket);
 
     /**
      * @brief Write a message to the endpoint.
      * @param msg The message
      * @return true on success, else false
      */
-    bool write(str_view const& msg);
+    bool write(std::string_view const& msg);
 };
 
 template<typename SocketT>
-std::unique_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socket)
+u_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socket)
 {
-    return std::unique_ptr<Connection<SocketT>>(new Connection<SocketT>(std::move(socket)));
+    return u_ptr<Connection<SocketT>>(new Connection<SocketT>(std::move(socket)));
 }
 
 template<typename SocketT>
-bool Connection<SocketT>::write(str_view const& msg)
+bool Connection<SocketT>::write(std::string_view const& msg)
 {
     try
     {

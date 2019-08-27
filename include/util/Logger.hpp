@@ -65,7 +65,7 @@ public:
     template<typename... Args>
     void info(Args&&... args) const
     {
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         PREFIX(m_outStream, "[INFO ]");
         (*m_outStream << ... << args) << std::endl;
     }
@@ -80,7 +80,7 @@ public:
     void debug([[maybe_unused]] Args&&... args) const
     {
 #ifdef LOG_ENABLE_DEBUG
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         PREFIX(m_outStream, "[DEBUG]");
         (*m_outStream << ... << args) << std::endl;
 #endif
@@ -95,7 +95,7 @@ public:
     template<typename... Args>
     void warn(Args&&... args) const
     {
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         PREFIX(m_outStream, "[WARN ]");
         (*m_outStream << ... << args) << std::endl;
     }
@@ -109,7 +109,7 @@ public:
     template<typename... Args>
     void error(Args&&... args) const
     {
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         PREFIX(m_errStream, "[ERROR]");
         (*m_errStream << ... << args) << std::endl;
     }

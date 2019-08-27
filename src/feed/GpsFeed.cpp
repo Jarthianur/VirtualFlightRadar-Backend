@@ -31,12 +31,13 @@ using namespace config;
 
 namespace feed
 {
-static auto const& logger = Logger::instance();
+constexpr auto     LOG_PREFIX = "(GpsFeed) ";
+static auto const& logger     = Logger::instance();
 
 parser::GpsParser GpsFeed::s_parser;
 
-GpsFeed::GpsFeed(str const& name, Properties const& properties, std::shared_ptr<data::GpsData> data)
-    : Feed(name, LOG_PREFIX, properties, data)
+GpsFeed::GpsFeed(str const& name, Properties const& properties, s_ptr<data::GpsData> data)
+    : Feed(name, properties, data)
 {}
 
 Feed::Protocol GpsFeed::protocol() const
@@ -54,7 +55,7 @@ bool GpsFeed::process(str const& response)
     {}
     catch (data::GpsDataException const& e)
     {
-        logger.info(m_logPrefix, name, ": ", e.what());
+        logger.info(LOG_PREFIX, m_name, ": ", e.what());
         return false;
     }
     return true;

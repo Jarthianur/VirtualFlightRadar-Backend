@@ -22,6 +22,7 @@
 #pragma once
 
 #include <exception>
+#include <mutex>
 
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"

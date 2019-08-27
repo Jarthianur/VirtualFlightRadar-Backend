@@ -27,19 +27,17 @@
 #include "data/AircraftData.h"
 #include "feed/parser/AprsParser.h"
 #include "object/Aircraft.h"
-#include "util/Logger.hpp"
 
 using namespace config;
+using namespace std::literals;
 
 namespace feed
 {
-static auto const& logger = Logger::instance();
-
 parser::AprsParser AprscFeed::s_parser;
 
-AprscFeed::AprscFeed(str const& name, Properties const& properties, std::shared_ptr<data::AircraftData> data,
+AprscFeed::AprscFeed(str const& name, Properties const& properties, s_ptr<data::AircraftData> data,
                      s32 maxHeight)
-    : Feed(name, LOG_PREFIX, properties, data), m_worker([this](str&& work) {
+    : Feed(name, properties, data), m_worker([this](str&& work) {
           try
           {
               m_data->update(s_parser.unpack(work, m_priority));
@@ -49,10 +47,13 @@ AprscFeed::AprscFeed(str const& name, Properties const& properties, std::shared_
       })
 {
     parser::AprsParser::s_maxHeight = maxHeight;
-    if (properties.property(Configuration::KV_KEY_LOGIN, "-") == "-")
+    try
     {
-        logger.warn(m_logPrefix, "could not find: ", name, ".", Configuration::KV_KEY_LOGIN);
-        throw std::logic_error("No login given");
+        properties.property(Configuration::KV_KEY_LOGIN);
+    }
+    catch (std::out_of_range const&)
+    {
+        throw std::logic_error("could not find: "s + name + "." + Configuration::KV_KEY_LOGIN);
     }
 }
 
@@ -69,6 +70,6 @@ bool AprscFeed::process(str const& response)
 
 str AprscFeed::login() const
 {
-    return properties.property(Configuration::KV_KEY_LOGIN);
+    return m_properties.property(Configuration::KV_KEY_LOGIN);
 }
 }  // namespace feed

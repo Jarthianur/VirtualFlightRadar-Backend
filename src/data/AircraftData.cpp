@@ -34,7 +34,7 @@ AircraftData::AircraftData(AccessFn&& fn, s32 maxDist) : Data(std::move(fn)), m_
 bool AircraftData::update(Object&& aircraft)
 {
     auto&& update = static_cast<Aircraft&&>(aircraft);
-    auto   result = m_container.insert(std::hash<str_view>()(*update.id()),
+    auto   result = m_container.insert(std::hash<std::string_view>()(*update.id()),
                                      std::move(update));  // TODO: provide char* based hashing
     if (!result.second)
     {

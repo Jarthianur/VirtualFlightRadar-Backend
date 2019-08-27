@@ -58,7 +58,7 @@ str SocketImplBoost::address() const
     return m_socket.remote_endpoint().address().to_string();
 }
 
-bool SocketImplBoost::write(str_view const& msg)
+bool SocketImplBoost::write(std::string_view const& msg)
 {
     if (!m_socket.is_open())
     {

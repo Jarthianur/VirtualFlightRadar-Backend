@@ -42,8 +42,6 @@ class WindFeed : public Feed
 {
     NOT_COPYABLE(WindFeed)
 
-    static constexpr auto LOG_PREFIX = "(WindFeed) ";
-
     static parser::WindParser s_parser;  ///< Parser to unpack response from Client
 
 public:
@@ -53,7 +51,7 @@ public:
      * @param data       The WindData contianer
      * @throw std::logic_error from parent constructor
      */
-    WindFeed(str const& name, config::Properties const& properties, std::shared_ptr<data::WindData> data);
+    WindFeed(str const& m_name, config::Properties const& m_properties, s_ptr<data::WindData> data);
     ~WindFeed() noexcept override = default;
 
     /**

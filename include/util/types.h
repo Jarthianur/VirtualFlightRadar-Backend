@@ -23,9 +23,8 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <mutex>
+#include <memory>
 #include <string>
-#include <string_view>
 
 using u8    = std::uint8_t;
 using s8    = std::int8_t;
@@ -41,8 +40,10 @@ using f64   = double;
 
 using enum_t = std::uint_fast8_t;
 
-using str      = std::string;
-using str_view = std::string_view;
+using str = std::string;
 
-using lock_guard  = std::lock_guard<std::mutex>;
-using unique_lock = std::unique_lock<std::mutex>;
+template<typename T>
+using s_ptr = std::shared_ptr<T>;
+
+template<typename T>
+using u_ptr = std::unique_ptr<T>;

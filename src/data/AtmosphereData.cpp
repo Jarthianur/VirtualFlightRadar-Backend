@@ -33,19 +33,19 @@ AtmosphereData::AtmosphereData(AccessFn&& fn, Atmosphere const& atmosphere)
 
 void AtmosphereData::access()
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_accessFn(++m_atmosphere);
 }
 
 bool AtmosphereData::update(Object&& atmosphere)
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     return m_atmosphere.tryUpdate(std::move(atmosphere));
 }
 
 auto AtmosphereData::atmPressure() const -> decltype(m_atmosphere.pressure())
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     return m_atmosphere.pressure();
 }
 }  // namespace data

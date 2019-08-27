@@ -60,7 +60,7 @@ public:
      * @note Blocks until all handlers have returned.
      * @param lock The lock to release before entering blocking section
      */
-    void run(unique_lock& lock) override;
+    void run(std::unique_lock<std::mutex>& lk) override;
 
     /**
      * @brief Stop the event handler queue.
@@ -83,7 +83,7 @@ public:
      * @return the Connection
      * @throw SocketException if the current socket is not open
      */
-    std::unique_ptr<Connection<SocketImplBoost>> startConnection() override;
+    u_ptr<Connection<SocketImplBoost>> startConnection() override;
 
     /**
      * @brief Get the current connected address.

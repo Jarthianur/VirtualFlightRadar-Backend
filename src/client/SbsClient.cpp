@@ -30,7 +30,7 @@ namespace client
 constexpr auto     LOG_PREFIX = "(SbsClient) ";
 static auto const& logger     = Logger::instance();
 
-SbsClient::SbsClient(Endpoint const& endpoint, std::shared_ptr<Connector> connector)
+SbsClient::SbsClient(Endpoint const& endpoint, s_ptr<Connector> connector)
     : Client(endpoint, LOG_PREFIX, connector)
 {}
 
@@ -38,7 +38,7 @@ void SbsClient::handleConnect(bool error)
 {
     if (!error)
     {
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         read();
     }
     else

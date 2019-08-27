@@ -66,7 +66,7 @@ public:
      */
     virtual bool tryUpdate(Object&& other);
 
-    virtual str_view nmea() const = 0;
-    auto                      updateAge() const -> decltype(m_updateAge);
+    virtual std::string_view nmea() const = 0;
+    auto                     updateAge() const -> decltype(m_updateAge);
 };
 }  // namespace object

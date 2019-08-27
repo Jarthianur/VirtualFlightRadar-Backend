@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "client/net/Endpoint.hpp"
 #include "config/Properties.h"
 #include "util/defines.h"
@@ -45,12 +43,13 @@ class Feed
     /**
      * @brief Initialize the priority from the given properties.
      */
-    u32 initPriority() const noexcept;
+    u32 initPriority() const;
 
 protected:
-    std::shared_ptr<data::Data> m_data;       ///< Respective Data container
-    u32 const                   m_priority;   ///< Priority
-    char const* const           m_logPrefix;  ///< Component string
+    config::Properties const m_properties;  ///< Properties
+    str const                m_name;        ///< Unique name
+    u32 const                m_priority;    ///< Priority
+    s_ptr<data::Data>        m_data;        ///< Respective Data container
 
     /**
      * @param name       The Feeds unique name
@@ -58,8 +57,7 @@ protected:
      * @param properties The Properties
      * @throw std::logic_error if host or port are not given in properties
      */
-    Feed(str const& name, char const* logPrefix, config::Properties const& propertyMap,
-         std::shared_ptr<data::Data> data);
+    Feed(str const& m_name, config::Properties const& propertyMap, s_ptr<data::Data> data);
 
 public:
     /**
@@ -72,9 +70,6 @@ public:
         GPS,
         SENSOR
     };
-
-    str const                name;        ///< Unique name
-    config::Properties const properties;  ///< Properties
 
     virtual ~Feed() noexcept = default;
 
@@ -95,5 +90,7 @@ public:
      * @param response The response
      */
     virtual bool process(str const& response) = 0;
+
+    auto name() const -> decltype(m_name) const&;
 };
 }  // namespace feed

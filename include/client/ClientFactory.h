@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <memory>
+#include "util/types.h"
 
 #include "Client.h"
 
@@ -44,7 +44,7 @@ class ClientFactory
      * @return the client as pointer
      */
     template<typename T, typename std::enable_if<std::is_base_of<Client, T>::value>::type* = nullptr>
-    static std::shared_ptr<T> makeClient(std::shared_ptr<feed::Feed> feed);
+    static s_ptr<T> makeClient(s_ptr<feed::Feed> feed);
 
 public:
     ClientFactory()           = default;
@@ -55,6 +55,6 @@ public:
      * @param feed The feed to create for
      * @return the client as pointer
      */
-    static std::shared_ptr<Client> createClientFor(std::shared_ptr<feed::Feed> feed);
+    static s_ptr<Client> createClientFor(s_ptr<feed::Feed> feed);
 };
 }  // namespace client

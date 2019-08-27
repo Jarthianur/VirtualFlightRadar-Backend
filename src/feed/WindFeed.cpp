@@ -32,8 +32,8 @@ namespace feed
 {
 parser::WindParser WindFeed::s_parser;
 
-WindFeed::WindFeed(str const& name, Properties const& properties, std::shared_ptr<data::WindData> data)
-    : Feed(name, LOG_PREFIX, properties, data)
+WindFeed::WindFeed(str const& name, Properties const& properties, s_ptr<data::WindData> data)
+    : Feed(name, properties, data)
 {}
 
 Feed::Protocol WindFeed::protocol() const

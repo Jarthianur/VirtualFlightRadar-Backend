@@ -42,8 +42,6 @@ class GpsFeed : public Feed
 {
     NOT_COPYABLE(GpsFeed)
 
-    static constexpr auto LOG_PREFIX = "(GpsFeed) ";
-
     static parser::GpsParser s_parser;  ///< Parser to unpack response from Client
 
 public:
@@ -53,7 +51,7 @@ public:
      * @param data       The GpsData container
      * @throw std::logic_error from parent constructor
      */
-    GpsFeed(str const& name, config::Properties const& properties, std::shared_ptr<data::GpsData> data);
+    GpsFeed(str const& m_name, config::Properties const& m_properties, s_ptr<data::GpsData> data);
     ~GpsFeed() noexcept override = default;
 
     /**

@@ -27,7 +27,7 @@
 
 void Logger::logFile(str const& file)
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_logFile = std::ofstream(file);
     if (!m_logFile)
     {

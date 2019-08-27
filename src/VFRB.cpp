@@ -49,7 +49,7 @@ constexpr auto LOG_PREFIX       = "(VFRB) ";
 
 static auto const& logger = Logger::instance();
 
-VFRB::VFRB(std::shared_ptr<Configuration> config)
+VFRB::VFRB(s_ptr<Configuration> config)
     : m_aircraftData(std::make_shared<AircraftData>(
           [this](Object const& it) {
               if (it.updateAge() < Object::OUTDATED)
@@ -84,7 +84,7 @@ void VFRB::run() noexcept
     });
     for (auto it : m_feeds)
     {
-        logger.info(LOG_PREFIX, "run feed: ", it->name);
+        logger.info(LOG_PREFIX, "run feed: ", it->name());
         try
         {
             clientManager.subscribe(it);
@@ -128,7 +128,7 @@ void VFRB::serve()
     }
 }
 
-void VFRB::createFeeds(std::shared_ptr<Configuration> config)
+void VFRB::createFeeds(s_ptr<Configuration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
     for (auto const& name : config->feedNames)

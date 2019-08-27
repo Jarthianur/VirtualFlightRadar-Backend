@@ -57,7 +57,7 @@ public:
      * @return true on success, else false
      * @throw SocketException if the socket is closed
      */
-    bool write(str_view const& msg);
+    bool write(std::string_view const& msg);
 
     /**
      * @brief Close the socket.

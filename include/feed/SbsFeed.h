@@ -55,7 +55,7 @@ public:
      * @param maxHeight  The max height filter
      * @throw std::logic_error from parent constructor
      */
-    SbsFeed(str const& name, config::Properties const& properties, std::shared_ptr<data::AircraftData> data,
+    SbsFeed(str const& m_name, config::Properties const& m_properties, s_ptr<data::AircraftData> data,
             s32 maxHeight);
     ~SbsFeed() noexcept override = default;
 

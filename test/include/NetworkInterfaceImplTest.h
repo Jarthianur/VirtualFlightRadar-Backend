@@ -43,7 +43,7 @@ public:
 
     void close() override;
 
-    std::unique_ptr<Connection<SocketImplTest>> startConnection() override;
+    u_ptr<Connection<SocketImplTest>> startConnection() override;
 
     std::string stagedAddress() const override;
 

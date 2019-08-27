@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <memory>
 #include <type_traits>
 
 #include "config/Properties.h"
@@ -49,11 +48,11 @@ class Feed;
  */
 class FeedFactory
 {
-    std::shared_ptr<config::Configuration> m_config;        ///< Pointer to the Configuration
-    std::shared_ptr<data::AircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
-    std::shared_ptr<data::AtmosphereData>  m_atmosData;     ///< Pointer to the AtmosphereData
-    std::shared_ptr<data::GpsData>         m_gpsData;       ///< Pointer to the GpsData
-    std::shared_ptr<data::WindData>        m_windData;      ///< Pointer to the WindData
+    s_ptr<config::Configuration> m_config;        ///< Pointer to the Configuration
+    s_ptr<data::AircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
+    s_ptr<data::AtmosphereData>  m_atmosData;     ///< Pointer to the AtmosphereData
+    s_ptr<data::GpsData>         m_gpsData;       ///< Pointer to the GpsData
+    s_ptr<data::WindData>        m_windData;      ///< Pointer to the WindData
 
     /**
      * @brief Make a new Feed.
@@ -64,7 +63,7 @@ class FeedFactory
      * @throw std::logic_error from invoked constructors
      */
     template<typename T, typename std::enable_if<std::is_base_of<Feed, T>::value>::type* = nullptr>
-    std::shared_ptr<T> makeFeed(str const& name);
+    s_ptr<T> makeFeed(str const& name);
 
 public:
     /**
@@ -74,10 +73,9 @@ public:
      * @param gpsData      The GpsData pointer
      * @param windData     The WindData pointer
      */
-    FeedFactory(std::shared_ptr<config::Configuration> config,
-                std::shared_ptr<data::AircraftData>    aircraftData,
-                std::shared_ptr<data::AtmosphereData> atmosData, std::shared_ptr<data::GpsData> gpsData,
-                std::shared_ptr<data::WindData> windData);
+    FeedFactory(s_ptr<config::Configuration> config, s_ptr<data::AircraftData> aircraftData,
+                s_ptr<data::AtmosphereData> atmosData, s_ptr<data::GpsData> gpsData,
+                s_ptr<data::WindData> windData);
     ~FeedFactory() noexcept = default;
 
     /**
@@ -86,6 +84,6 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    std::shared_ptr<Feed> createFeed(str const& name);
+    s_ptr<Feed> createFeed(str const& name);
 };
 }  // namespace feed

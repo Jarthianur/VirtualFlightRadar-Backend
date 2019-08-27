@@ -45,7 +45,7 @@ void Atmosphere::assign(Object&& other)
     {}
 }
 
-str_view Atmosphere::nmea() const
+std::string_view Atmosphere::nmea() const
 {
     return {m_nmea.c_str(), m_nmea.size()};
 }

@@ -49,8 +49,8 @@ class Server
     static char const*   LOG_PREFIX;
     static Logger const& logger;
 
-    std::shared_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
-    std::array<std::unique_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
+    s_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
+    std::array<u_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
                 m_connections;                ///< Connections container
     u8          m_activeConnections = 0;      ///< Number of active connections
     bool        m_running           = false;  ///< Running state
@@ -78,8 +78,8 @@ class Server
 public:
     Server();
     explicit Server(u16 port);  ///< @param port The port
-    explicit Server(std::shared_ptr<net::NetworkInterface<SocketT>>
-                        interface);  ///< @param interface The NetworkInterface to use
+    explicit Server(
+        s_ptr<net::NetworkInterface<SocketT>> interface);  ///< @param interface The NetworkInterface to use
     ~Server() noexcept;
 
     /**
@@ -99,7 +99,7 @@ public:
      * @param msg The msg to write
      * @threadsafe
      */
-    void send(str_view const& msg);
+    void send(std::string_view const& msg);
 };
 
 template<typename SocketT>
@@ -113,7 +113,7 @@ Server<SocketT>::Server(u16 port) : m_netInterface(std::make_shared<net::Network
 {}
 
 template<typename SocketT>
-Server<SocketT>::Server(std::shared_ptr<net::NetworkInterface<SocketT>> interface) : m_netInterface(interface)
+Server<SocketT>::Server(s_ptr<net::NetworkInterface<SocketT>> interface) : m_netInterface(interface)
 {}
 
 template<typename SocketT>
@@ -129,13 +129,13 @@ Server<SocketT>::~Server() noexcept
 template<typename SocketT>
 void Server<SocketT>::run()
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     logger.info(LOG_PREFIX, "starting...");
     m_running = true;
     m_thread  = std::thread([this]() {
         accept();
-        unique_lock lock(m_mutex);
-        m_netInterface->run(lock);
+        std::unique_lock lk(m_mutex);
+        m_netInterface->run(lk);
         logger.debug(LOG_PREFIX, "stopped");
     });
 }
@@ -143,7 +143,7 @@ void Server<SocketT>::run()
 template<typename SocketT>
 void Server<SocketT>::stop()
 {
-    if (unique_lock lock(m_mutex); m_running)
+    if (std::unique_lock lk(m_mutex); m_running)
     {
         m_running = false;
         logger.info(LOG_PREFIX, "stopping all connections...");
@@ -156,7 +156,7 @@ void Server<SocketT>::stop()
         }
         m_activeConnections = 0;
         m_netInterface->stop();
-        lock.unlock();
+        lk.unlock();
         if (m_thread.joinable())
         {
             m_thread.join();
@@ -165,9 +165,9 @@ void Server<SocketT>::stop()
 }
 
 template<typename SocketT>
-void Server<SocketT>::send(str_view const& msg)
+void Server<SocketT>::send(std::string_view const& msg)
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     if (msg.length() == 0 || m_activeConnections == 0)
     {
         return;
@@ -189,7 +189,7 @@ void Server<SocketT>::send(str_view const& msg)
 template<typename SocketT>
 void Server<SocketT>::accept()
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_netInterface->onAccept(std::bind(&Server<SocketT>::attemptConnection, this, std::placeholders::_1));
 }
 
@@ -211,7 +211,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
 {
     if (!error)
     {
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         try
         {
             if (m_activeConnections < param::SERVER_MAX_CLIENTS &&

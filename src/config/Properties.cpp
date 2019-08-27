@@ -31,10 +31,34 @@ Properties::Properties(ptree const& ptree) : m_pTree(ptree) {}
 
 Properties::Properties(ptree&& ptree) : m_pTree(std::move(ptree)) {}
 
-std::string Properties::property(str const& path, str const& alternative) const
+str Properties::property(str const& path, str const& defVal) const noexcept
 {
-    str property(m_pTree.get(path, alternative));
-    return property.empty() ? alternative : property;
+    try
+    {
+        auto p = m_pTree.get_child(path).get_value<str>();
+        return p.empty() ? defVal : p;
+    }
+    catch (ptree_bad_path const&)
+    {
+        return defVal;
+    }
+}
+
+str Properties::property(str const& path) const
+{
+    try
+    {
+        auto p = m_pTree.get_child(path).get_value<str>();
+        if (p.empty())
+        {
+            throw std::out_of_range(path + " is empty");
+        }
+        return p;
+    }
+    catch (ptree_bad_path const&)
+    {
+        throw std::out_of_range(path + " not found");
+    }
 }
 
 Properties Properties::section(str const& section) const

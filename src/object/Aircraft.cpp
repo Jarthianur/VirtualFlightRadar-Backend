@@ -90,7 +90,7 @@ bool Aircraft::canUpdate(Object const& other) const
     }
 }
 
-str_view Aircraft::nmea() const
+std::string_view Aircraft::nmea() const
 {
     return m_nmea;
 }

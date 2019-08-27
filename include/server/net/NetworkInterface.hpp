@@ -22,7 +22,7 @@
 #pragma once
 
 #include <functional>
-#include <memory>
+#include <mutex>
 
 #include "util/types.h"
 
@@ -50,7 +50,7 @@ public:
      * @brief Run this interface.
      * @param lock The lock that may be hold and released inside
      */
-    virtual void run(unique_lock& lock) = 0;
+    virtual void run(std::unique_lock<std::mutex>& lk) = 0;
 
     /**
      * @brief Stop this interface.
@@ -72,7 +72,7 @@ public:
      * @brief Start and get the current Connection.
      * @return the Connection
      */
-    virtual std::unique_ptr<Connection<SocketT>> startConnection() = 0;
+    virtual u_ptr<Connection<SocketT>> startConnection() = 0;
 
     /**
      * @brief Get the current connection address.

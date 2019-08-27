@@ -73,7 +73,7 @@ bool GpsPosition::canUpdate(Object const& other) const
     }
 }
 
-str_view GpsPosition::nmea() const
+std::string_view GpsPosition::nmea() const
 {
     return m_nmea;
 }

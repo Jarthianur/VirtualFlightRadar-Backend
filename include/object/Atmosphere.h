@@ -60,7 +60,7 @@ public:
 
     str& operator*();
 
-    str_view nmea() const override;
-    auto     pressure() const -> decltype(m_pressure);
+    std::string_view nmea() const override;
+    auto             pressure() const -> decltype(m_pressure);
 };
 }  // namespace object

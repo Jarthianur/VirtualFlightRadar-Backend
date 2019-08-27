@@ -38,17 +38,17 @@ using namespace client::net;
 
 namespace client
 {
-Client::Client(Endpoint const& endpoint, char const* logPrefix, std::shared_ptr<Connector> connector)
+Client::Client(Endpoint const& endpoint, char const* logPrefix, s_ptr<Connector> connector)
     : m_connector(connector), m_logPrefix(logPrefix), m_endpoint(endpoint)
 {}
 
 void Client::run()
 {
-    if (unique_lock lock(m_mutex); !m_running)
+    if (std::unique_lock lk(m_mutex); !m_running)
     {
         m_running = true;
         connect();
-        lock.unlock();
+        lk.unlock();
         m_connector->run();
     }
 }
@@ -66,9 +66,9 @@ usize Client::hash() const
     return seed;
 }
 
-void Client::subscribe(std::shared_ptr<feed::Feed> feed)
+void Client::subscribe(s_ptr<feed::Feed> feed)
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_feeds.push_back(feed);
 }
 
@@ -79,7 +79,7 @@ void Client::connect()
 
 void Client::reconnect()
 {
-    if (lock_guard lock(m_mutex); m_running)
+    if (std::lock_guard lk(m_mutex); m_running)
     {
         logger.info(m_logPrefix, "schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->close();
@@ -106,8 +106,8 @@ void Client::stop()
 void Client::scheduleStop()
 {
     std::condition_variable cond_ready;
-    unique_lock             lock(m_mutex);
-    cond_ready.wait_for(lock, std::chrono::milliseconds(100), [this] { return m_running; });
+    std::unique_lock        lk(m_mutex);
+    cond_ready.wait_for(lk, std::chrono::milliseconds(100), [this] { return m_running; });
     stop();
 }
 
@@ -120,7 +120,7 @@ void Client::handleTimedConnect(bool error)
 {
     if (!error)
     {
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         logger.info(m_logPrefix, "try connect to ", m_endpoint.host, ":", m_endpoint.port);
         connect();
     }
@@ -135,7 +135,7 @@ void Client::handleRead(bool error, str const& response)
 {
     if (!error)
     {
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         for (auto& it : m_feeds)
         {
             if (!it->process(response))

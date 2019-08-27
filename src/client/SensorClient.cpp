@@ -34,7 +34,7 @@ namespace client
 constexpr auto     LOG_PREFIX = "(SensorClient) ";
 static auto const& logger     = Logger::instance();
 
-SensorClient::SensorClient(Endpoint const& endpoint, std::shared_ptr<Connector> connector)
+SensorClient::SensorClient(Endpoint const& endpoint, s_ptr<Connector> connector)
     : Client(endpoint, LOG_PREFIX, connector)
 {}
 
@@ -48,7 +48,7 @@ void SensorClient::checkDeadline(bool error)
 {
     if (!error)
     {
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         if (m_connector->timerExpired())
         {
             logger.debug(LOG_PREFIX, "timed out, reconnect ...");
@@ -65,7 +65,7 @@ void SensorClient::handleConnect(bool error)
 {
     if (!error)
     {
-        lock_guard lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->onTimeout(std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1),
                                param::WINDCLIENT_RECEIVE_TIMEOUT);

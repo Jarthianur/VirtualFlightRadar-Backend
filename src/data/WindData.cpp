@@ -31,13 +31,13 @@ WindData::WindData(AccessFn&& fn, object::Wind const& wind) : Data(std::move(fn)
 
 bool WindData::update(Object&& wind)
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     return m_wind.tryUpdate(std::move(wind));
 }
 
 void WindData::access()
 {
-    lock_guard lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_accessFn(++m_wind);
     (*m_wind).clear();
 }
