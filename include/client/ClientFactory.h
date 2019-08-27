@@ -25,12 +25,12 @@
 
 #include "Client.h"
 
-namespace feed
+namespace vfrb::feed
 {
 class Feed;
-}  // namespace feed
+}  // namespace vfrb::feed
 
-namespace client
+namespace vfrb::client
 {
 /**
  * @brief A factory for clients.
@@ -57,4 +57,4 @@ public:
      */
     static s_ptr<Client> createClientFor(s_ptr<feed::Feed> feed);
 };
-}  // namespace client
+}  // namespace vfrb::client

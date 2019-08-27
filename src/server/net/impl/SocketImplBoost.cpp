@@ -25,7 +25,7 @@
 
 #include "server/net/SocketException.h"
 
-namespace server::net
+namespace vfrb::server::net
 {
 SocketImplBoost::SocketImplBoost(SocketImplBoost&& other) : m_socket(boost::move(other.m_socket)) {}
 
@@ -83,4 +83,4 @@ boost::asio::ip::tcp::socket& SocketImplBoost::get()
 {
     return m_socket;
 }
-}  // namespace server::net
+}  // namespace vfrb::server::net

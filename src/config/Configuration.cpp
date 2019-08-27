@@ -28,12 +28,13 @@
 #include <variant>
 
 #include "config/ConfigReader.h"
+#include "exception/Exception.hpp"
 #include "util/Logger.hpp"
 
-using namespace util;
+using namespace vfrb::util;
 using namespace std::literals;
 
-namespace config
+namespace vfrb::config
 {
 using Number = std::variant<s32, u64, f64>;
 
@@ -190,4 +191,4 @@ void Configuration::dumpInfo() const
     logger.info(LOG_PREFIX, PATH_GND_MODE, ": ", groundMode ? "Yes" : "No");
     logger.info(LOG_PREFIX, "number of feeds: ", feedProperties.size());
 }
-}  // namespace config
+}  // namespace vfrb::config

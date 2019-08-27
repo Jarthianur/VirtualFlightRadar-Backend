@@ -27,7 +27,7 @@
 
 #include "Parser.hpp"
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 /**
  * @brief Implement Parser for GPS NMEA sentences.
@@ -69,4 +69,4 @@ public:
      */
     object::GpsPosition unpack(str const& sentence, u32 priority) const override;
 };
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

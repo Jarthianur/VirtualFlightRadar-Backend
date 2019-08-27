@@ -30,7 +30,7 @@
 
 #include "Data.hpp"
 
-namespace data
+namespace vfrb::data
 {
 /**
  * @brief Store GPS information.
@@ -108,4 +108,4 @@ public:
     ~ReceivedGoodPosition() noexcept override = default;
     char const* what() const noexcept override;
 };
-}  // namespace data
+}  // namespace vfrb::data

@@ -28,9 +28,9 @@
 #include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 boost::regex const GpsParser::s_GPGGA_RE(
     "^\\$[A-Z]{2}GGA,(\\d{6}),(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
@@ -75,4 +75,4 @@ GpsPosition GpsParser::parsePosition(boost::smatch const& match, u32 priority) c
             static_cast<s8>(std::stoi(match.str(RE_GGA_FIX))),
             Timestamp<time::DateTimeImplBoost>(match.str(RE_GGA_TIME), time::Format::HHMMSS)};
 }
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

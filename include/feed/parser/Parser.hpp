@@ -25,7 +25,7 @@
 
 #include "util/types.h"
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 /**
  * @brief Interface for parsers.
@@ -57,4 +57,4 @@ public:
         return "unpack failed";
     }
 };
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

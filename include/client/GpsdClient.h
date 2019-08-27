@@ -23,7 +23,7 @@
 
 #include "Client.h"
 
-namespace client
+namespace vfrb::client
 {
 /**
  * @brief Client for GPSD servers
@@ -60,4 +60,4 @@ public:
     GpsdClient(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
     ~GpsdClient() noexcept override = default;
 };
-}  // namespace client
+}  // namespace vfrb::client

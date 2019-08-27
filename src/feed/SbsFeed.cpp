@@ -26,9 +26,9 @@
 #include "feed/parser/SbsParser.h"
 #include "object/Aircraft.h"
 
-using namespace config;
+using namespace vfrb::config;
 
-namespace feed
+namespace vfrb::feed
 {
 parser::SbsParser SbsFeed::s_parser;
 
@@ -55,4 +55,4 @@ bool SbsFeed::process(str const& response)
     m_worker.push(response);
     return true;
 }
-}  // namespace feed
+}  // namespace vfrb::feed

@@ -29,11 +29,11 @@
 #include "util/defines.h"
 #include "util/types.h"
 
-namespace feed
+namespace vfrb::feed
 {
 class Feed;
-}  // namespace feed
-namespace client
+}  // namespace vfrb::feed
+namespace vfrb::client
 {
 /**
  * @brief Base class for an async TCP client
@@ -140,4 +140,4 @@ public:
      */
     virtual usize hash() const;
 };
-}  // namespace client
+}  // namespace vfrb::client

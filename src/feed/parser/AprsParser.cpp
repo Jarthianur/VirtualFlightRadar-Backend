@@ -29,9 +29,9 @@
 #include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 boost::regex const AprsParser::s_APRS_RE(
     "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
@@ -114,4 +114,4 @@ Timestamp<time::DateTimeImplBoost> AprsParser::parseTimeStamp(boost::smatch cons
 {
     return Timestamp<time::DateTimeImplBoost>(match.str(RE_APRS_TIME), time::Format::HHMMSS);
 }
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

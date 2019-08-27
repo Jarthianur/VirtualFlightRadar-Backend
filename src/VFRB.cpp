@@ -24,10 +24,10 @@
 #include <csignal>
 #include <exception>
 #include <sstream>
-#include <thread>
 
 #include "client/ClientManager.h"
 #include "client/net/impl/ConnectorImplBoost.h"
+#include "concurrency/SignalListener.h"
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
@@ -38,12 +38,13 @@
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
 #include "util/Logger.hpp"
-#include "util/SignalListener.h"
 
-using namespace data;
-using namespace object;
-using namespace config;
+using namespace vfrb::data;
+using namespace vfrb::object;
+using namespace vfrb::config;
 
+namespace vfrb
+{
 constexpr auto PROCESS_INTERVAL = 1;
 constexpr auto LOG_PREFIX       = "(VFRB) ";
 
@@ -75,7 +76,7 @@ void VFRB::run() noexcept
     m_running = true;
     logger.info(LOG_PREFIX, "starting...");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    util::SignalListener                  signals;
+    concurrency::SignalListener           signals;
     client::ClientManager                 clientManager;
 
     signals.addHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {
@@ -155,3 +156,4 @@ str VFRB::duration(std::chrono::steady_clock::time_point start) const
     ss << d << "d " << h << ":" << m;
     return ss.str();
 }
+}  // namespace vfrb

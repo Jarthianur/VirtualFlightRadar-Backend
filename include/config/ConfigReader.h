@@ -25,7 +25,7 @@
 
 #include "Properties.h"
 
-namespace config
+namespace vfrb::config
 {
 /**
  * @brief Read a config in INI format.
@@ -44,4 +44,4 @@ public:
      */
     Properties read();
 };
-}  // namespace config
+}  // namespace vfrb::config

@@ -23,7 +23,7 @@
 
 #include "Client.h"
 
-namespace client
+namespace vfrb::client
 {
 /**
  * @brief Client for SBS servers
@@ -48,4 +48,4 @@ public:
     SbsClient(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
     ~SbsClient() noexcept override = default;
 };
-}  // namespace client
+}  // namespace vfrb::client

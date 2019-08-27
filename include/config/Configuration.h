@@ -29,7 +29,7 @@
 
 #include "Properties.h"
 
-namespace config
+namespace vfrb::config
 {
 /**
  * @brief VFRB Configuration
@@ -134,4 +134,4 @@ public:
     explicit Configuration(std::istream& stream);
     ~Configuration() noexcept = default;
 };
-}  // namespace config
+}  // namespace vfrb::config

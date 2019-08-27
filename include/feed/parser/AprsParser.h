@@ -29,7 +29,7 @@
 
 #include "Parser.hpp"
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 /**
  * @brief Implement Parser for APRS sentences.
@@ -102,4 +102,4 @@ public:
      */
     object::Aircraft unpack(str const& sentence, u32 priority) const override;
 };
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

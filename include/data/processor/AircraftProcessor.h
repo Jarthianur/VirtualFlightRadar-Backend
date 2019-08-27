@@ -27,7 +27,7 @@
 
 #include "Processor.hpp"
 
-namespace data::processor
+namespace vfrb::data::processor
 {
 /**
  * @brief Process aircrafts to NMEA relative to the refered position.
@@ -86,4 +86,4 @@ public:
      */
     void referTo(object::Location const& location, f64 atmPress);
 };
-}  // namespace data::processor
+}  // namespace vfrb::data::processor

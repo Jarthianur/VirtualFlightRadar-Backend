@@ -27,9 +27,9 @@
 #include "object/GpsPosition.h"
 #include "util/Logger.hpp"
 
-using namespace config;
+using namespace vfrb::config;
 
-namespace feed
+namespace vfrb::feed
 {
 constexpr auto     LOG_PREFIX = "(GpsFeed) ";
 static auto const& logger     = Logger::instance();
@@ -60,4 +60,4 @@ bool GpsFeed::process(str const& response)
     }
     return true;
 }
-}  // namespace feed
+}  // namespace vfrb::feed

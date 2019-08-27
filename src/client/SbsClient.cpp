@@ -23,9 +23,9 @@
 
 #include "util/Logger.hpp"
 
-using namespace client::net;
+using namespace vfrb::client::net;
 
-namespace client
+namespace vfrb::client
 {
 constexpr auto     LOG_PREFIX = "(SbsClient) ";
 static auto const& logger     = Logger::instance();
@@ -50,4 +50,4 @@ char const* SbsClient::logPrefix() const
 {
     return LOG_PREFIX;
 }
-}  // namespace client
+}  // namespace vfrb::client

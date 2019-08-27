@@ -27,9 +27,9 @@
 #include "object/GpsPosition.h"
 #include "util/math.hpp"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 s32 SbsParser::s_maxHeight = std::numeric_limits<s32>::max();
 
@@ -83,4 +83,4 @@ Aircraft SbsParser::unpack(str const& sentence, u32 priority) const
     {}
     throw UnpackError();
 }
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

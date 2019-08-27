@@ -25,7 +25,7 @@
 
 #include "util/types.h"
 
-namespace object::time
+namespace vfrb::object::time
 {
 /**
  * @brief Format of a given time string.
@@ -36,9 +36,9 @@ enum class Format : enum_t
     HH_MM_SS_FFF
 };
 
-}  // namespace object::time
+}  // namespace vfrb::object::time
 
-namespace object
+namespace vfrb::object
 {
 /**
  * @brief A timestamp
@@ -135,4 +135,4 @@ bool Timestamp<DateTimeT>::operator>(Timestamp<DateTimeT> const& other) const
 {
     return (this->m_day > other.m_day) || ((this->m_day == other.m_day) && this->m_value > other.m_value);
 }
-}  // namespace object
+}  // namespace vfrb::object

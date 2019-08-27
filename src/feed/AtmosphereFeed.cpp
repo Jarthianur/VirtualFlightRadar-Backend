@@ -26,9 +26,9 @@
 #include "feed/parser/AtmosphereParser.h"
 #include "object/Atmosphere.h"
 
-using namespace config;
+using namespace vfrb::config;
 
-namespace feed
+namespace vfrb::feed
 {
 parser::AtmosphereParser AtmosphereFeed::s_parser;
 
@@ -52,4 +52,4 @@ bool AtmosphereFeed::process(str const& response)
     {}
     return true;
 }
-}  // namespace feed
+}  // namespace vfrb::feed

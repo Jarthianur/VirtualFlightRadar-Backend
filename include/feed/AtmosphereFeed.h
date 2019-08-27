@@ -23,17 +23,17 @@
 
 #include "Feed.h"
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 class AtmosphereParser;
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser
 
-namespace data
+namespace vfrb::data
 {
 class AtmosphereData;
-}  // namespace data
+}  // namespace vfrb::data
 
-namespace feed
+namespace vfrb::feed
 {
 /**
  * @brief Extend Feed for sensor input.
@@ -66,4 +66,4 @@ public:
      */
     bool process(str const& response) override;
 };
-}  // namespace feed
+}  // namespace vfrb::feed

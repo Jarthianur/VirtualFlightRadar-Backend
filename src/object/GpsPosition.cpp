@@ -22,7 +22,7 @@
 
 #include "util/math.hpp"
 
-namespace object
+namespace vfrb::object
 {
 GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid)
     : GpsPosition(priority, location, geoid, 1.0, 3, 5, Timestamp<time::DateTimeImplBoost>())
@@ -112,4 +112,4 @@ auto GpsPosition::fixQuality() const -> decltype(m_fixQuality)
 {
     return m_fixQuality;
 }
-}  // namespace object
+}  // namespace vfrb::object

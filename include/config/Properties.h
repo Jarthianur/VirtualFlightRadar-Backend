@@ -27,7 +27,7 @@
 
 #include "util/types.h"
 
-namespace config
+namespace vfrb::config
 {
 /**
  * @brief Store key-value pairs sectionwise.
@@ -58,4 +58,4 @@ public:
      */
     Properties section(str const& section) const;
 };
-}  // namespace config
+}  // namespace vfrb::config

@@ -31,6 +31,8 @@
 
 #define PREFIX(S, P) *S << "\r" P "  " << time() << ":: "
 
+namespace vfrb
+{
 /**
  * @brief Logger with different levels.
  */
@@ -120,5 +122,5 @@ public:
      */
     void logFile(str const& file);
 };
-
+}  // namespace vfrb
 #undef PREFIX

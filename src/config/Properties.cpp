@@ -25,7 +25,7 @@
 
 using namespace boost::property_tree;
 
-namespace config
+namespace vfrb::config
 {
 Properties::Properties(ptree const& ptree) : m_pTree(ptree) {}
 
@@ -72,4 +72,4 @@ Properties Properties::section(str const& section) const
         throw std::out_of_range(section + " not found");
     }
 }
-}  // namespace config
+}  // namespace vfrb::config

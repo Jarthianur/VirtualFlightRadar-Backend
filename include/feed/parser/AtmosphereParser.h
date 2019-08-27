@@ -25,7 +25,7 @@
 
 #include "Parser.hpp"
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 /**
  * @brief Implement Parser for NMEA sentences from sensors.
@@ -43,4 +43,4 @@ public:
      */
     object::Atmosphere unpack(str const& sentence, u32 priority) const override;
 };
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

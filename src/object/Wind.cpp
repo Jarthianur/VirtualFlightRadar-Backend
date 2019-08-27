@@ -17,7 +17,7 @@
 
 #include "object/Wind.h"
 
-namespace object
+namespace vfrb::object
 {
 Wind::Wind() : Object() {}
 
@@ -32,4 +32,4 @@ str& Wind::operator*()
 {
     return m_nmea;
 }
-}  // namespace object
+}  // namespace vfrb::object

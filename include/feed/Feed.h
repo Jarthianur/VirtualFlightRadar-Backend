@@ -26,12 +26,12 @@
 #include "util/defines.h"
 #include "util/types.h"
 
-namespace data
+namespace vfrb::data
 {
 class Data;
-}  // namespace data
+}  // namespace vfrb::data
 
-namespace feed
+namespace vfrb::feed
 {
 /**
  * @brief Base class for input feeds.
@@ -93,4 +93,4 @@ public:
 
     auto name() const -> decltype(m_name) const&;
 };
-}  // namespace feed
+}  // namespace vfrb::feed

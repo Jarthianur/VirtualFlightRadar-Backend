@@ -23,7 +23,7 @@
 
 #include "util/types.h"
 
-namespace object::time
+namespace vfrb::object::time
 {
 /**
  * @brief Provide time functions using boost.
@@ -46,4 +46,4 @@ public:
      */
     static u32 day();
 };
-}  // namespace object::time
+}  // namespace vfrb::object::time

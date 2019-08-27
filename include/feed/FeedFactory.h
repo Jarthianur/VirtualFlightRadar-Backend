@@ -26,20 +26,20 @@
 #include "config/Properties.h"
 #include "util/types.h"
 
-namespace config
+namespace vfrb::config
 {
 class Configuration;
-}  // namespace config
+}  // namespace vfrb::config
 
-namespace data
+namespace vfrb::data
 {
 class AircraftData;
 class AtmosphereData;
 class GpsData;
 class WindData;
-}  // namespace data
+}  // namespace vfrb::data
 
-namespace feed
+namespace vfrb::feed
 {
 class Feed;
 
@@ -86,4 +86,4 @@ public:
      */
     s_ptr<Feed> createFeed(str const& name);
 };
-}  // namespace feed
+}  // namespace vfrb::feed

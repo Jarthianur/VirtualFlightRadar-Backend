@@ -21,23 +21,36 @@
 
 #pragma once
 
-namespace vfrb::data::processor
-{
-/**
- * @brief Processor base class/interface.
- * @tparam T The type of object to process
- */
-template<typename T>
-class Processor
-{
-public:
-    Processor()                   = default;
-    virtual ~Processor() noexcept = default;
+#include <functional>
+#include <list>
 
-    /**
-     * @brief Process an object.
-     * @param _1 The object of type T
-     */
-    virtual void process(T& _1) const = 0;
+#include "concurrency/GuardedThread.hpp"
+#include "util/defines.h"
+
+namespace vfrb::concurrency
+{
+class ThreadGroup
+{
+    NOT_COPYABLE(ThreadGroup)
+
+    std::list<GuardedThread> m_threads;
+
+public:
+    ThreadGroup() = default;
+    ~ThreadGroup() noexcept
+    {
+        joinAll();
+    }
+
+    template<typename FnT>
+    void createThread(FnT&& fn)
+    {
+        m_threads.push_back(GuardedThread(std::forward<FnT>(fn)));
+    }
+
+    void joinAll()
+    {
+        m_threads.clear();
+    }
 };
-}  // namespace vfrb::data::processor
+}  // namespace vfrb::concurrency

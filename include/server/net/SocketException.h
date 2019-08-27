@@ -25,7 +25,7 @@
 
 #include "util/types.h"
 
-namespace server::net
+namespace vfrb::server::net
 {
 /**
  * @brief Exception to signal socket errors.
@@ -44,4 +44,4 @@ public:
      */
     char const* what() const noexcept;
 };
-}  // namespace server::net
+}  // namespace vfrb::server::net

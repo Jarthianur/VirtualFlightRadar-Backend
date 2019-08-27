@@ -28,7 +28,7 @@
 
 #include "Data.hpp"
 
-namespace data
+namespace vfrb::data
 {
 /**
  * @brief Store atmospheric information.
@@ -61,4 +61,4 @@ public:
      */
     auto atmPressure() const -> decltype(m_atmosphere.pressure());
 };
-}  // namespace data
+}  // namespace vfrb::data

@@ -21,7 +21,7 @@
 
 #include "server/net/SocketException.h"
 
-namespace server::net
+namespace vfrb::server::net
 {
 SocketException::SocketException(str const& msg) : std::exception(), m_message(msg) {}
 
@@ -29,4 +29,4 @@ char const* SocketException::what() const noexcept
 {
     return m_message.c_str();
 }
-}  // namespace server::net
+}  // namespace vfrb::server::net

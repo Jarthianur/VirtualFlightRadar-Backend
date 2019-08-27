@@ -34,11 +34,11 @@
 #include "feed/SbsFeed.h"
 #include "feed/WindFeed.h"
 
-using namespace config;
-using namespace data;
+using namespace vfrb::config;
+using namespace vfrb::data;
 using namespace std::literals;
 
-namespace feed
+namespace vfrb::feed
 {
 FeedFactory::FeedFactory(s_ptr<config::Configuration> config, s_ptr<AircraftData> aircraftData,
                          s_ptr<AtmosphereData> atmosData, s_ptr<GpsData> gpsData, s_ptr<WindData> windData)
@@ -108,4 +108,4 @@ s_ptr<Feed> FeedFactory::createFeed(str const& name)
                                 Configuration::SECT_KEY_WIND + ", " + Configuration::SECT_KEY_ATMOS + ", " +
                                 Configuration::SECT_KEY_GPS);
 }
-}  // namespace feed
+}  // namespace vfrb::feed

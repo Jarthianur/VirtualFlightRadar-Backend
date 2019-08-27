@@ -29,7 +29,7 @@
 
 using namespace std::literals;
 
-namespace math
+namespace vfrb::math
 {
 inline constexpr auto KTS_2_KMH = 1.852;            ///< Convert knots to km/h
 inline constexpr auto KMH_2_KTS = 0.539957;         ///< Convert km/h to knots
@@ -129,4 +129,4 @@ inline s32 checksum(std::string_view const& sv, usize pos)
     }
     return csum;
 }
-}  // namespace math
+}  // namespace vfrb::math

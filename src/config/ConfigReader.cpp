@@ -30,7 +30,7 @@
 
 using namespace boost::property_tree;
 
-namespace config
+namespace vfrb::config
 {
 ConfigReader::ConfigReader(std::istream& stream) : m_stream(stream) {}
 
@@ -47,4 +47,4 @@ Properties ConfigReader::read()
     }
     return Properties(std::move(tree));
 }
-}  // namespace config
+}  // namespace vfrb::config

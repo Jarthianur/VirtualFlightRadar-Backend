@@ -29,7 +29,7 @@
 #include "util/types.h"
 #include "util/utility.hpp"
 
-namespace server
+namespace vfrb::server
 {
 /**
  * @brief TCP connection opened by the Server.
@@ -91,4 +91,4 @@ bool Connection<SocketT>::write(std::string_view const& msg)
 template<typename SocketT>
 Connection<SocketT>::Connection(SocketT&& socket) : m_socket(std::move(socket)), address(m_socket.address())
 {}
-}  // namespace server
+}  // namespace vfrb::server

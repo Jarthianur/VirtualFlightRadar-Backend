@@ -23,9 +23,8 @@
 
 #include <array>
 #include <memory>
-#include <thread>
-#include <utility>
 
+#include "concurrency/GuardedThread.hpp"
 #include "net/impl/NetworkInterfaceImplBoost.h"
 #include "util/Logger.hpp"
 #include "util/defines.h"
@@ -35,7 +34,7 @@
 #include "Connection.hpp"
 #include "parameters.h"
 
-namespace server
+namespace vfrb::server
 {
 /**
  * @brief A TCP server to serve the same reports to all clients.
@@ -51,11 +50,11 @@ class Server
 
     s_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
     std::array<u_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
-                m_connections;                ///< Connections container
-    u8          m_activeConnections = 0;      ///< Number of active connections
-    bool        m_running           = false;  ///< Running state
-    std::thread m_thread;                     ///< Internal thread
+         m_connections;                ///< Connections container
+    u8   m_activeConnections = 0;      ///< Number of active connections
+    bool m_running           = false;  ///< Running state
     std::mutex mutable m_mutex;
+    concurrency::GuardedThread m_thread;  ///< Internal thread
 
     /**
      * @brief Schedule to accept connections.
@@ -132,7 +131,7 @@ void Server<SocketT>::run()
     std::lock_guard lk(m_mutex);
     logger.info(LOG_PREFIX, "starting...");
     m_running = true;
-    m_thread  = std::thread([this]() {
+    m_thread.spawn([this]() {
         accept();
         std::unique_lock lk(m_mutex);
         m_netInterface->run(lk);
@@ -143,7 +142,7 @@ void Server<SocketT>::run()
 template<typename SocketT>
 void Server<SocketT>::stop()
 {
-    if (std::unique_lock lk(m_mutex); m_running)
+    if (std::lock_guard lk(m_mutex); m_running)
     {
         m_running = false;
         logger.info(LOG_PREFIX, "stopping all connections...");
@@ -156,11 +155,6 @@ void Server<SocketT>::stop()
         }
         m_activeConnections = 0;
         m_netInterface->stop();
-        lk.unlock();
-        if (m_thread.joinable())
-        {
-            m_thread.join();
-        }
     }
 }
 
@@ -246,4 +240,4 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
     }
     accept();
 }
-}  // namespace server
+}  // namespace vfrb::server

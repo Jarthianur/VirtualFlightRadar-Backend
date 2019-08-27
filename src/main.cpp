@@ -32,11 +32,13 @@
 #include "VFRB.h"
 
 #ifndef VERSION
-#    define VERSION "DEMO"
+constexpr auto VERSION = "DEMO";
 #endif
 
-using namespace config;
+using namespace vfrb;
+using namespace vfrb::config;
 using namespace boost;
+using namespace std::literals;
 
 static auto& logger = Logger::instance();
 
@@ -72,7 +74,7 @@ int main(int argc, char** argv)
 
 program_options::variables_map evalArgs(int argc, char** argv)
 {
-    program_options::options_description cmdline_options("VirtualFlightRadar-Backend -- " VERSION);
+    program_options::options_description cmdline_options("VirtualFlightRadar-Backend -- "s + VERSION);
     cmdline_options.add_options()("help,h", "show this message");
     cmdline_options.add_options()("verbose,v", "enable debug logging");
     cmdline_options.add_options()(

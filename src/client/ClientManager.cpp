@@ -24,7 +24,7 @@
 #include "client/ClientFactory.h"
 #include "feed/Feed.h"
 
-namespace client
+namespace vfrb::client
 {
 ClientManager::~ClientManager() noexcept
 {
@@ -51,7 +51,7 @@ void ClientManager::run()
     std::lock_guard lk(m_mutex);
     for (auto it : m_clients)
     {
-        m_thdGroup.create_thread([this, it] {
+        m_thdGroup.createThread([this, it] {
             it->run();
             std::lock_guard lk(m_mutex);
             m_clients.erase(it);
@@ -68,6 +68,5 @@ void ClientManager::stop()
             it->scheduleStop();
         }
     }
-    m_thdGroup.join_all();
 }
-}  // namespace client
+}  // namespace vfrb::client

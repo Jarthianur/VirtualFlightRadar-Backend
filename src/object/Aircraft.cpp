@@ -25,7 +25,7 @@
 
 #include "util/math.hpp"
 
-namespace object
+namespace vfrb::object
 {
 Aircraft::Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
                    Movement const& move, Timestamp<time::DateTimeImplBoost> const& timestamp)
@@ -150,4 +150,4 @@ void Aircraft::targetType(TargetType tt)
 {
     m_targetType = tt;
 }
-}  // namespace object
+}  // namespace vfrb::object

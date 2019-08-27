@@ -28,7 +28,7 @@
 
 #include "Data.hpp"
 
-namespace data
+namespace vfrb::data
 {
 /**
  * @brief Store wind information.
@@ -53,4 +53,4 @@ public:
 
     void access() override;
 };
-}  // namespace data
+}  // namespace vfrb::data

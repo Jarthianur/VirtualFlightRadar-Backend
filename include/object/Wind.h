@@ -25,7 +25,7 @@
 
 #include "Object.h"
 
-namespace object
+namespace vfrb::object
 {
 struct Climate;
 
@@ -45,4 +45,4 @@ public:
 
     std::string_view nmea() const override;
 };
-}  // namespace object
+}  // namespace vfrb::object

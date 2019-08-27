@@ -25,9 +25,9 @@
 
 #include "util/math.hpp"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 WindParser::WindParser() : Parser<Wind>() {}
 
@@ -48,4 +48,4 @@ Wind WindParser::unpack(str const& sentence, u32 priority) const
     {}
     throw UnpackError();
 }
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

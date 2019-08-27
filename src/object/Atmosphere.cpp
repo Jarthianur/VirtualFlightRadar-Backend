@@ -22,7 +22,7 @@
 
 #include "util/math.hpp"
 
-namespace object
+namespace vfrb::object
 {
 Atmosphere::Atmosphere() : Object() {}
 
@@ -59,4 +59,4 @@ str& Atmosphere::operator*()
 {
     return m_nmea;
 }
-}  // namespace object
+}  // namespace vfrb::object

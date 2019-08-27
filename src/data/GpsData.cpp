@@ -23,9 +23,9 @@
 
 #include <stdexcept>
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace data
+namespace vfrb::data
 {
 GpsData::GpsData(AccessFn&& fn, GpsPosition const& position, bool ground)
     : Data(std::move(fn)), m_position(position), m_groundMode(ground)
@@ -91,4 +91,4 @@ char const* ReceivedGoodPosition::what() const noexcept
 {
     return "received good position";
 }
-}  // namespace data
+}  // namespace vfrb::data

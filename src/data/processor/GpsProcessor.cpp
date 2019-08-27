@@ -26,9 +26,9 @@
 
 #include "util/math.hpp"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace data::processor
+namespace vfrb::data::processor
 {
 GpsProcessor::GpsProcessor() : Processor<object::GpsPosition>() {}
 
@@ -73,4 +73,4 @@ void GpsProcessor::evalPosition(f64 latitude, f64 longitude) const
     m_degLongitude = std::abs(std::floor(longitude));
     m_minLongitude = std::abs(60.0 * (longitude - m_degLongitude));
 }
-}  // namespace data::processor
+}  // namespace vfrb::data::processor

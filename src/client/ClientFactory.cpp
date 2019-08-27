@@ -29,9 +29,9 @@
 #include "feed/AprscFeed.h"
 #include "feed/Feed.h"
 
-using namespace client::net;
+using namespace vfrb::client::net;
 
-namespace client
+namespace vfrb::client
 {
 template<>
 s_ptr<AprscClient> ClientFactory::makeClient<AprscClient>(s_ptr<feed::Feed> feed)
@@ -70,4 +70,4 @@ s_ptr<Client> ClientFactory::createClientFor(s_ptr<feed::Feed> feed)
     }
     throw std::logic_error("unknown protocol");
 }
-}  // namespace client
+}  // namespace vfrb::client

@@ -20,7 +20,7 @@
 #include "util/types.h"
 #include "util/utility.hpp"
 
-namespace object
+namespace vfrb::object
 {
 /**
  * @brief Base object class
@@ -69,4 +69,4 @@ public:
     virtual std::string_view nmea() const = 0;
     auto                     updateAge() const -> decltype(m_updateAge);
 };
-}  // namespace object
+}  // namespace vfrb::object

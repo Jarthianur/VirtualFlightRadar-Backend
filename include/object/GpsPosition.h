@@ -28,7 +28,7 @@
 #include "Object.h"
 #include "Timestamp.hpp"
 
-namespace object
+namespace vfrb::object
 {
 /**
  * @brief A position on earth.
@@ -97,4 +97,4 @@ public:
     auto             nrOfSatellites() const -> decltype(m_nrOfSatellites);
     auto             fixQuality() const -> decltype(m_fixQuality);
 };
-}  // namespace object
+}  // namespace vfrb::object

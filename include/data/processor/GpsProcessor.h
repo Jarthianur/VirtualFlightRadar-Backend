@@ -28,7 +28,7 @@
 
 #include "Processor.hpp"
 
-namespace data::processor
+namespace vfrb::data::processor
 {
 /**
  * @brief Process GPS positions to NMEA GGA and RMC sentences.
@@ -72,4 +72,4 @@ public:
      */
     void process(object::GpsPosition& position) const override;
 };
-}  // namespace data::processor
+}  // namespace vfrb::data::processor

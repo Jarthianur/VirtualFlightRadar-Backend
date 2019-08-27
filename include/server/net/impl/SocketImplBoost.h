@@ -28,7 +28,7 @@
 #include "util/types.h"
 #include "util/utility.hpp"
 
-namespace server::net
+namespace vfrb::server::net
 {
 /**
  * @brief Socket implementation using boost
@@ -70,4 +70,4 @@ public:
      */
     boost::asio::ip::tcp::socket& get();
 };
-}  // namespace server::net
+}  // namespace vfrb::server::net

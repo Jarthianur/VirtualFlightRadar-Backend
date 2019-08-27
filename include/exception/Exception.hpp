@@ -21,23 +21,11 @@
 
 #pragma once
 
-namespace vfrb::data::processor
-{
-/**
- * @brief Processor base class/interface.
- * @tparam T The type of object to process
- */
-template<typename T>
-class Processor
-{
-public:
-    Processor()                   = default;
-    virtual ~Processor() noexcept = default;
+#include <exception>
 
-    /**
-     * @brief Process an object.
-     * @param _1 The object of type T
-     */
-    virtual void process(T& _1) const = 0;
-};
-}  // namespace vfrb::data::processor
+#include "util/types.h"
+
+namespace vfrb::exception
+{
+using Exception = std::exception;
+}

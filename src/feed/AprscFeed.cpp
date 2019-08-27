@@ -28,10 +28,10 @@
 #include "feed/parser/AprsParser.h"
 #include "object/Aircraft.h"
 
-using namespace config;
+using namespace vfrb::config;
 using namespace std::literals;
 
-namespace feed
+namespace vfrb::feed
 {
 parser::AprsParser AprscFeed::s_parser;
 
@@ -72,4 +72,4 @@ str AprscFeed::login() const
 {
     return m_properties.property(Configuration::KV_KEY_LOGIN);
 }
-}  // namespace feed
+}  // namespace vfrb::feed

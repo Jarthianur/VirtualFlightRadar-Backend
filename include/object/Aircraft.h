@@ -29,7 +29,7 @@
 #include "Object.h"
 #include "Timestamp.hpp"
 
-namespace object
+namespace vfrb::object
 {
 /**
  * @brief Extend Object to an aircraft.
@@ -145,4 +145,4 @@ public:
     auto             hasFullInfo() const -> decltype(m_fullInfo);
     void             targetType(TargetType tt);
 };
-}  // namespace object
+}  // namespace vfrb::object

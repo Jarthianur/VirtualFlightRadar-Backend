@@ -29,10 +29,10 @@
 #include "config/Configuration.h"
 #include "data/Data.hpp"
 
-using namespace config;
+using namespace vfrb::config;
 using namespace std::literals;
 
-namespace feed
+namespace vfrb::feed
 {
 Feed::Feed(str const& name, Properties const& properties, s_ptr<data::Data> data)
     : m_properties(properties), m_name(name), m_priority(initPriority()), m_data(data)
@@ -71,4 +71,4 @@ auto Feed::name() const -> decltype(m_name) const&
 {
     return m_name;
 }
-}  // namespace feed
+}  // namespace vfrb::feed

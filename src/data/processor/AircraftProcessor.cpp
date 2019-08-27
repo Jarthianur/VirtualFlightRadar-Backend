@@ -28,9 +28,9 @@
 #include "util/math.hpp"
 #include "util/utility.hpp"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace data::processor
+namespace vfrb::data::processor
 {
 AircraftProcessor::AircraftProcessor() : AircraftProcessor(std::numeric_limits<s32>::max()) {}
 
@@ -117,4 +117,4 @@ usize AircraftProcessor::appendPFLAA(Aircraft& aircraft, usize pos) const
     next += (*aircraft).format(pos, "%02x\r\n", math::checksum(**aircraft, pos));
     return pos + static_cast<usize>(next);
 }
-}  // namespace data::processor
+}  // namespace vfrb::data::processor

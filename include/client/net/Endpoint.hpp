@@ -23,7 +23,7 @@
 
 #include "util/types.h"
 
-namespace client::net
+namespace vfrb::client::net
 {
 /**
  * @brief A remote endpoint
@@ -43,4 +43,4 @@ struct Endpoint
         return host == other.host && port == other.port;
     }
 };
-}  // namespace client::net
+}  // namespace vfrb::client::net

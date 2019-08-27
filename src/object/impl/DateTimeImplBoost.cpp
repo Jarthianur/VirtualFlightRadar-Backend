@@ -23,7 +23,7 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-namespace object::time
+namespace vfrb::object::time
 {
 s64 DateTimeImplBoost::now()
 {
@@ -36,4 +36,4 @@ u32 DateTimeImplBoost::day()
 {
     return static_cast<u32>(boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
 }
-}  // namespace object::time
+}  // namespace vfrb::object::time

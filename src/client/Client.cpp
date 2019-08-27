@@ -32,11 +32,11 @@
 
 #include "parameters.h"
 
-static auto const& logger = Logger::instance();
+static auto const& logger = vfrb::Logger::instance();
 
-using namespace client::net;
+using namespace vfrb::client::net;
 
-namespace client
+namespace vfrb::client
 {
 Client::Client(Endpoint const& endpoint, s_ptr<Connector> connector)
     : m_connector(connector), m_endpoint(endpoint)
@@ -151,4 +151,4 @@ void Client::handleRead(bool error, str const& response)
         reconnect();
     }
 }
-}  // namespace client
+}  // namespace vfrb::client

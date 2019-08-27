@@ -34,7 +34,7 @@
 
 #include "types.h"
 
-namespace util
+namespace vfrb::util
 {
 /**
  * @brief Get enum value as the underlying type.
@@ -170,4 +170,4 @@ public:
         return m_view.length();
     }
 };
-}  // namespace util
+}  // namespace vfrb::util
