@@ -30,9 +30,7 @@ namespace client
 constexpr auto     LOG_PREFIX = "(SbsClient) ";
 static auto const& logger     = Logger::instance();
 
-SbsClient::SbsClient(Endpoint const& endpoint, s_ptr<Connector> connector)
-    : Client(endpoint, LOG_PREFIX, connector)
-{}
+SbsClient::SbsClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Client(endpoint, connector) {}
 
 void SbsClient::handleConnect(bool error)
 {
@@ -46,5 +44,10 @@ void SbsClient::handleConnect(bool error)
         logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
         reconnect();
     }
+}
+
+char const* SbsClient::logPrefix() const
+{
+    return LOG_PREFIX;
 }
 }  // namespace client

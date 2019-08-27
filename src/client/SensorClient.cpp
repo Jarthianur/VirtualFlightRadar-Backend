@@ -34,8 +34,7 @@ namespace client
 constexpr auto     LOG_PREFIX = "(SensorClient) ";
 static auto const& logger     = Logger::instance();
 
-SensorClient::SensorClient(Endpoint const& endpoint, s_ptr<Connector> connector)
-    : Client(endpoint, LOG_PREFIX, connector)
+SensorClient::SensorClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Client(endpoint, connector)
 {}
 
 void SensorClient::read()
@@ -76,5 +75,10 @@ void SensorClient::handleConnect(bool error)
         logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
         reconnect();
     }
+}
+
+char const* SensorClient::logPrefix() const
+{
+    return LOG_PREFIX;
 }
 }  // namespace client

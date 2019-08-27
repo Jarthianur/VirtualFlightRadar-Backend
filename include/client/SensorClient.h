@@ -49,6 +49,8 @@ class SensorClient : public Client
      */
     void handleConnect(bool error) override;
 
+    char const* logPrefix() const override;
+
 public:
     /**
      * @param endpoint  The remote endpoint

@@ -68,6 +68,6 @@ s_ptr<Client> ClientFactory::createClientFor(s_ptr<feed::Feed> feed)
         case feed::Feed::Protocol::GPS: return makeClient<GpsdClient>(feed);
         case feed::Feed::Protocol::SENSOR: return makeClient<SensorClient>(feed);
     }
-    throw std::logic_error("unknown protocol");  // can never happen
+    throw std::logic_error("unknown protocol");
 }
 }  // namespace client

@@ -45,7 +45,6 @@ class Client
 protected:
     s_ptr<net::Connector>          m_connector;        /// Connector interface
     bool                           m_running = false;  /// Run state indicator
-    char const* const              m_logPrefix;        /// Component string used for logging
     net::Endpoint const            m_endpoint;         /// Remote endpoint
     std::vector<s_ptr<feed::Feed>> m_feeds;            /// Container for subscribed feeds
     mutable std::mutex             m_mutex;
@@ -55,13 +54,15 @@ protected:
      * @param component The component name
      * @param connector The Connector interface
      */
-    Client(net::Endpoint const& endpoint, char const* logPrefix, s_ptr<net::Connector> connector);
+    Client(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
 
     /**
      * @brief Handler for connect
      * @param error The error indicator
      */
     virtual void handleConnect(bool error) = 0;
+
+    virtual char const* logPrefix() const = 0;
 
     /**
      * @brief Stop and close the connection.

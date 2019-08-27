@@ -36,7 +36,7 @@ constexpr auto     LOG_PREFIX = "(AprscClient) ";
 static auto const& logger     = Logger::instance();
 
 AprscClient::AprscClient(Endpoint const& endpoint, str const& login, s_ptr<Connector> connector)
-    : Client(endpoint, LOG_PREFIX, connector), m_login(login + "\r\n")
+    : Client(endpoint, connector), m_login(login + "\r\n")
 {}
 
 bool AprscClient::equals(Client const& other) const
@@ -110,5 +110,10 @@ void AprscClient::handleSendKeepAlive(bool error)
             }
         });
     }
+}
+
+char const* AprscClient::logPrefix() const
+{
+    return LOG_PREFIX;
 }
 }  // namespace client

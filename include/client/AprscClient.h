@@ -61,6 +61,8 @@ class AprscClient : public Client
      */
     void handleSendKeepAlive(bool error);
 
+    char const* logPrefix() const override;
+
 public:
     /**
      * @param endpoint  The remote endpoint

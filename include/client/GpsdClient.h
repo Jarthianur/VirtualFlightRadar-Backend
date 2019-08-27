@@ -50,6 +50,8 @@ class GpsdClient : public Client
      */
     void handleWatch(bool error);
 
+    char const* logPrefix() const override;
+
 public:
     /**
      * @param endpoint  The remote endpoint

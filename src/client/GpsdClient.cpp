@@ -35,9 +35,7 @@ namespace client
 constexpr auto     LOG_PREFIX = "(GpsdClient) ";
 static auto const& logger     = Logger::instance();
 
-GpsdClient::GpsdClient(Endpoint const& endpoint, s_ptr<Connector> connector)
-    : Client(endpoint, LOG_PREFIX, connector)
-{}
+GpsdClient::GpsdClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Client(endpoint, connector) {}
 
 void GpsdClient::handleConnect(bool error)
 {
@@ -84,5 +82,10 @@ void GpsdClient::handleWatch(bool error)
     {
         logger.error(LOG_PREFIX, "send watch request failed");
     }
+}
+
+char const* GpsdClient::logPrefix() const
+{
+    return LOG_PREFIX;
 }
 }  // namespace client

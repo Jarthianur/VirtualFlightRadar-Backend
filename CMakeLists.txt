@@ -5,7 +5,7 @@ message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
 message(STATUS "The host processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
 #
-# definitions
+#definitions
 #
 
 file(READ ${PROJECT_SOURCE_DIR}/version.txt TMP_VERSION)
@@ -28,7 +28,7 @@ file(GLOB_RECURSE vfrb_sources src/*.cpp)
 file(GLOB_RECURSE vfrb_test_sources test/*.cpp)
 
 set(CMAKE_BUILD_TYPE staged)
-set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Werror")
 
 if(DEFINED BOOST_STATIC)
     message(STATUS "Linking boost statically")

@@ -38,8 +38,8 @@ using namespace client::net;
 
 namespace client
 {
-Client::Client(Endpoint const& endpoint, char const* logPrefix, s_ptr<Connector> connector)
-    : m_connector(connector), m_logPrefix(logPrefix), m_endpoint(endpoint)
+Client::Client(Endpoint const& endpoint, s_ptr<Connector> connector)
+    : m_connector(connector), m_endpoint(endpoint)
 {}
 
 void Client::run()
@@ -81,7 +81,7 @@ void Client::reconnect()
 {
     if (std::lock_guard lk(m_mutex); m_running)
     {
-        logger.info(m_logPrefix, "schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(logPrefix(), "schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->close();
         timedConnect();
     }
@@ -98,7 +98,7 @@ void Client::stop()
     if (m_running)
     {
         m_running = false;
-        logger.info(m_logPrefix, "disconnect from ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(logPrefix(), "disconnect from ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->stop();
     }
 }
@@ -121,12 +121,12 @@ void Client::handleTimedConnect(bool error)
     if (!error)
     {
         std::lock_guard lk(m_mutex);
-        logger.info(m_logPrefix, "try connect to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(logPrefix(), "try connect to ", m_endpoint.host, ":", m_endpoint.port);
         connect();
     }
     else
     {
-        logger.error(m_logPrefix, "failed to connect after timeout");
+        logger.error(logPrefix(), "failed to connect after timeout");
         scheduleStop();
     }
 }
@@ -147,7 +147,7 @@ void Client::handleRead(bool error, str const& response)
     }
     else
     {
-        logger.error(m_logPrefix, "failed to read message");
+        logger.error(logPrefix(), "failed to read message");
         reconnect();
     }
 }
