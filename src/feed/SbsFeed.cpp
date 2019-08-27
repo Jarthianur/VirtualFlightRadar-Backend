@@ -32,16 +32,13 @@ namespace feed
 {
 parser::SbsParser SbsFeed::s_parser;
 
-constexpr auto LOG_PREFIX = "(SbsFeed) ";
-
-SbsFeed::SbsFeed(const std::string& name, const Properties& properties,
-                 std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight)
-    : Feed(name, LOG_PREFIX, properties, data), m_worker([this](std::string&& work) {
+SbsFeed::SbsFeed(str const& name, Properties const& properties, s_ptr<data::AircraftData> data, s32 maxHeight)
+    : Feed(name, properties, data), m_worker([this](str&& work) {
           try
           {
               m_data->update(s_parser.unpack(work, m_priority));
           }
-          catch (const parser::UnpackError&)
+          catch (parser::UnpackError const&)
           {}
       })
 {
@@ -53,10 +50,9 @@ Feed::Protocol SbsFeed::protocol() const
     return Protocol::SBS;
 }
 
-bool SbsFeed::process(const std::string& response)
+bool SbsFeed::process(str const& response)
 {
     m_worker.push(response);
     return true;
 }
-
 }  // namespace feed

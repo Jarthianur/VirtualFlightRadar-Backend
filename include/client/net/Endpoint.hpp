@@ -21,29 +21,26 @@
 
 #pragma once
 
-#include <string>
+#include "util/types.h"
 
-namespace client
-{
-namespace net
+namespace client::net
 {
 /**
  * @brief A remote endpoint
  */
 struct Endpoint
 {
-    const std::string host;  ///< Hostname
-    const std::string port;  ///< Port number
+    str const host;  ///< Hostname
+    str const port;  ///< Port number
 
     /**
      * @brief Equality comparison by value
      * @param other The other endpoint
      * @return true if both are equal, else false
      */
-    bool operator==(const Endpoint& other) const
+    bool operator==(Endpoint const& other) const
     {
         return host == other.host && port == other.port;
     }
 };
-}  // namespace net
-}  // namespace client
+}  // namespace client::net

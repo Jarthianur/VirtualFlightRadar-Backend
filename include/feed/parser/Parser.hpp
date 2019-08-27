@@ -21,19 +21,17 @@
 
 #pragma once
 
-#include <cstdint>
 #include <exception>
-#include <string>
 
-namespace feed
-{
-namespace parser
+#include "util/types.h"
+
+namespace feed::parser
 {
 /**
  * @brief Interface for parsers.
  * @tparam T The corresponding object type
  */
-template<typename T>
+template<typename ObjectT>
 class Parser
 {
 public:
@@ -46,7 +44,7 @@ public:
      * @param _1       The target object
      * @return true on success, else false
      */
-    virtual T unpack(const std::string& sentence, std::uint32_t priority) const = 0;
+    virtual ObjectT unpack(str const& sentence, u32 priority) const = 0;
 };
 
 class UnpackError : public std::exception
@@ -54,11 +52,9 @@ class UnpackError : public std::exception
 public:
     UnpackError() : std::exception() {}
     virtual ~UnpackError() noexcept = default;
-    const char* what() const noexcept
+    char const* what() const noexcept
     {
         return "unpack failed";
     }
 };
-
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser

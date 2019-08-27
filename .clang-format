@@ -38,6 +38,7 @@ BreakBeforeBinaryOperators: None
 BreakBeforeInheritanceComma: false
 BreakBeforeTernaryOperators: false
 BreakConstructorInitializers: BeforeColon
+BreakInheritanceList: AfterColon
 BreakStringLiterals: false
 ColumnLimit: 110
 CompactNamespaces: false
@@ -68,11 +69,15 @@ NamespaceIndentation: None
 PointerAlignment: Left
 ReflowComments: true
 SortIncludes: true
-SortUsingDeclarations: true
+SortUsingDeclarations: false
 SpaceAfterCStyleCast: true
 SpaceAfterTemplateKeyword: false
 SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
 SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 2
 SpacesInAngles: false

@@ -24,13 +24,12 @@
 
 namespace object
 {
-GpsPosition::GpsPosition(std::uint32_t priority, const Location& location, double geoid)
+GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid)
     : GpsPosition(priority, location, geoid, 1.0, 3, 5, Timestamp<time::DateTimeImplBoost>())
 {}
 
-GpsPosition::GpsPosition(std::uint32_t priority, const Location& location, double geoid, double dilution,
-                         std::uint8_t satellites, std::int8_t quality,
-                         const Timestamp<time::DateTimeImplBoost>& timestamp)
+GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid, f64 dilution, u8 satellites,
+                         s8 quality, Timestamp<time::DateTimeImplBoost> const& timestamp)
     : Object(priority),
       m_location(location),
       m_geoid(geoid),
@@ -39,16 +38,16 @@ GpsPosition::GpsPosition(std::uint32_t priority, const Location& location, doubl
       m_fixQuality(quality),
       m_timestamp(timestamp)
 {
-    math::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MIN_LATITUDE);
-    math::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MIN_LONGITUDE);
-    math::checkLimits(m_location.altitude, Location::MIN_ALTITUDE, Location::MIN_ALTITUDE);
+    math::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
+    math::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
+    math::checkLimits(m_location.altitude, Location::MIN_ALTITUDE, Location::MAX_ALTITUDE);
 }
 
 void GpsPosition::assign(Object&& other)
 {
     try
     {
-        GpsPosition&& update = dynamic_cast<GpsPosition&&>(other);
+        auto&& update = dynamic_cast<GpsPosition&&>(other);
         Object::assign(std::move(other));
         this->m_location       = update.m_location;
         this->m_timestamp      = update.m_timestamp;
@@ -57,24 +56,24 @@ void GpsPosition::assign(Object&& other)
         this->m_geoid          = update.m_geoid;
         this->m_dilution       = update.m_dilution;
     }
-    catch (const std::bad_cast&)
+    catch (std::bad_cast const&)
     {}
 }
 
-bool GpsPosition::canUpdate(const Object& other) const
+bool GpsPosition::canUpdate(Object const& other) const
 {
     try
     {
-        const GpsPosition& toUpdate = dynamic_cast<const GpsPosition&>(other);
+        auto const& toUpdate = dynamic_cast<const GpsPosition&>(other);
         return (this->m_timestamp > toUpdate.m_timestamp) && Object::canUpdate(other);
     }
-    catch (const std::bad_cast&)
+    catch (std::bad_cast const&)
     {
         return false;
     }
 }
 
-util::CStringPack GpsPosition::nmea() const
+std::string_view GpsPosition::nmea() const
 {
     return m_nmea;
 }
@@ -84,7 +83,7 @@ util::CString<GpsPosition::NMEA_SIZE>& GpsPosition::operator*()
     return m_nmea;
 }
 
-auto GpsPosition::location() const -> const decltype(m_location)&
+auto GpsPosition::location() const -> decltype(m_location) const&
 {
     return m_location;
 }
@@ -94,7 +93,7 @@ auto GpsPosition::geoid() const -> decltype(m_geoid)
     return m_geoid;
 }
 
-auto GpsPosition::timestamp() const -> const decltype(m_timestamp)&
+auto GpsPosition::timestamp() const -> decltype(m_timestamp) const&
 {
     return m_timestamp;
 }
@@ -113,5 +112,4 @@ auto GpsPosition::fixQuality() const -> decltype(m_fixQuality)
 {
     return m_fixQuality;
 }
-
 }  // namespace object

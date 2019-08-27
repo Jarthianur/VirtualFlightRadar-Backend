@@ -21,17 +21,14 @@
 
 #pragma once
 
-#include <string>
-
 #include <boost/asio.hpp>
 #include <boost/move/move.hpp>
 
 #include "util/defines.h"
+#include "util/types.h"
 #include "util/utility.hpp"
 
-namespace server
-{
-namespace net
+namespace server::net
 {
 /**
  * @brief Socket implementation using boost
@@ -42,6 +39,7 @@ class SocketImplBoost
 
 public:
     MOVABLE_BUT_NOT_COPYABLE(SocketImplBoost)
+
     explicit SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket)
                                  socket);  ///< @param socket The underlying socket
     ~SocketImplBoost() noexcept;
@@ -51,7 +49,7 @@ public:
      * @return the address
      * @throw SocketException if the socket is closed
      */
-    std::string address() const;
+    str address() const;
 
     /**
      * @brief Write a message on the socket to the endpoint.
@@ -59,7 +57,7 @@ public:
      * @return true on success, else false
      * @throw SocketException if the socket is closed
      */
-    bool write(const util::CStringPack& msg);
+    bool write(std::string_view const& msg);
 
     /**
      * @brief Close the socket.
@@ -72,5 +70,4 @@ public:
      */
     boost::asio::ip::tcp::socket& get();
 };
-}  // namespace net
-}  // namespace server
+}  // namespace server::net

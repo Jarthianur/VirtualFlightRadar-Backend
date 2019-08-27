@@ -39,14 +39,14 @@ SignalListener::~SignalListener() noexcept
 
 void SignalListener::run()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_thread = std::thread([this]() { m_ioService.run(); });
 }
 
 void SignalListener::stop()
 {
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         if (!m_ioService.stopped())
         {
             m_ioService.stop();
@@ -58,9 +58,9 @@ void SignalListener::stop()
     }
 }
 
-void SignalListener::addHandler(const SignalHandler& handler)
+void SignalListener::addHandler(SignalHandler const& handler)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_sigSet.async_wait(handler);
 }
 }  // namespace util

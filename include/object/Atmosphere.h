@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <string>
+#include "util/types.h"
 
 #include "Object.h"
 
@@ -34,12 +34,12 @@ struct Climate;
  */
 class Atmosphere : public Object
 {
-    static constexpr auto ICAO_STD     = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
-    static constexpr auto MAX_PRESSURE = 2000.0;
-    static constexpr auto MIN_PRESSURE = 0.0;
+    inline static constexpr auto ICAO_STD     = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
+    inline static constexpr auto MAX_PRESSURE = 2000.0;
+    inline static constexpr auto MIN_PRESSURE = 0.0;
 
-    double      m_pressure = ICAO_STD;  ///< The atmospheric pressure
-    std::string m_nmea;
+    f64 m_pressure = ICAO_STD;  ///< The atmospheric pressure
+    str m_nmea;
 
     /**
      * @brief Extend Object::assign.
@@ -48,20 +48,19 @@ class Atmosphere : public Object
 
 public:
     Atmosphere();
-    explicit Atmosphere(std::uint32_t priority);  ///< @param priority The initial priority
+    explicit Atmosphere(u32 priority);  ///< @param priority The initial priority
 
     /**
      * @brief Constructor
      * @param pressure The initial pressure
      * @param priority The initial priority
      */
-    Atmosphere(std::uint32_t priority, double pressure);
+    Atmosphere(u32 priority, f64 pressure);
     ~Atmosphere() noexcept override = default;
 
-    std::string& operator*();
+    str& operator*();
 
-    util::CStringPack nmea() const override;
-    auto              pressure() const -> decltype(m_pressure);
+    std::string_view nmea() const override;
+    auto             pressure() const -> decltype(m_pressure);
 };
-
 }  // namespace object

@@ -23,22 +23,17 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-namespace object
+namespace object::time
 {
-namespace time
+s64 DateTimeImplBoost::now()
 {
-std::int64_t DateTimeImplBoost::now()
-{
-    return static_cast<std::int64_t>(
+    return static_cast<s64>(
         boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
             .total_milliseconds());
 }
 
-std::uint32_t DateTimeImplBoost::day()
+u32 DateTimeImplBoost::day()
 {
-    return static_cast<std::uint32_t>(
-        boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
+    return static_cast<u32>(boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
 }
-
-}  // namespace time
-}  // namespace object
+}  // namespace object::time

@@ -22,16 +22,14 @@
 #pragma once
 
 #include <array>
-#include <cstddef>
-#include <cstdint>
 #include <memory>
-#include <mutex>
 #include <thread>
 #include <utility>
 
 #include "net/impl/NetworkInterfaceImplBoost.h"
 #include "util/Logger.hpp"
 #include "util/defines.h"
+#include "util/types.h"
 #include "util/utility.hpp"
 
 #include "Connection.hpp"
@@ -46,15 +44,18 @@ namespace server
 template<typename SocketT>
 class Server
 {
-    static const char* LOG_PREFIX;
+    NOT_COPYABLE(Server)
 
-    std::shared_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
-    std::array<std::unique_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
-                       m_connections;                ///< Connections container
-    std::uint8_t       m_activeConnections = 0;      ///< Number of active connections
-    bool               m_running           = false;  ///< Running state
-    std::thread        m_thread;                     ///< Internal thread
-    mutable std::mutex m_mutex;
+    static char const*   LOG_PREFIX;
+    static Logger const& logger;
+
+    s_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
+    std::array<u_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
+                m_connections;                ///< Connections container
+    u8          m_activeConnections = 0;      ///< Number of active connections
+    bool        m_running           = false;  ///< Running state
+    std::thread m_thread;                     ///< Internal thread
+    std::mutex mutable m_mutex;
 
     /**
      * @brief Schedule to accept connections.
@@ -66,7 +67,7 @@ class Server
      * @param address The ip address to check
      * @return true if the ip is already registered, else false
      */
-    bool isConnected(const std::string& address);
+    bool isConnected(str const& address);
 
     /**
      * @brief Handler for accepting connections.
@@ -75,11 +76,10 @@ class Server
     void attemptConnection(bool error) noexcept;
 
 public:
-    NOT_COPYABLE(Server)
     Server();
-    explicit Server(std::uint16_t port);  ///< @param port The port
-    explicit Server(std::shared_ptr<net::NetworkInterface<SocketT>>
-                        interface);  ///< @param interface The NetworkInterface to use
+    explicit Server(u16 port);  ///< @param port The port
+    explicit Server(
+        s_ptr<net::NetworkInterface<SocketT>> interface);  ///< @param interface The NetworkInterface to use
     ~Server() noexcept;
 
     /**
@@ -99,19 +99,21 @@ public:
      * @param msg The msg to write
      * @threadsafe
      */
-    void send(const util::CStringPack& msg);
+    void send(std::string_view const& msg);
 };
 
 template<typename SocketT>
-const char* Server<SocketT>::LOG_PREFIX = "(Server) ";
+char const* Server<SocketT>::LOG_PREFIX = "(Server) ";
 
 template<typename SocketT>
-Server<SocketT>::Server(std::uint16_t port)
-    : m_netInterface(std::make_shared<net::NetworkInterfaceImplBoost>(port))
+Logger const& Server<SocketT>::logger = Logger::instance();
+
+template<typename SocketT>
+Server<SocketT>::Server(u16 port) : m_netInterface(std::make_shared<net::NetworkInterfaceImplBoost>(port))
 {}
 
 template<typename SocketT>
-Server<SocketT>::Server(std::shared_ptr<net::NetworkInterface<SocketT>> interface) : m_netInterface(interface)
+Server<SocketT>::Server(s_ptr<net::NetworkInterface<SocketT>> interface) : m_netInterface(interface)
 {}
 
 template<typename SocketT>
@@ -127,13 +129,13 @@ Server<SocketT>::~Server() noexcept
 template<typename SocketT>
 void Server<SocketT>::run()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     logger.info(LOG_PREFIX, "starting...");
     m_running = true;
     m_thread  = std::thread([this]() {
         accept();
-        std::unique_lock<std::mutex> lock(m_mutex);
-        m_netInterface->run(lock);
+        std::unique_lock lk(m_mutex);
+        m_netInterface->run(lk);
         logger.debug(LOG_PREFIX, "stopped");
     });
 }
@@ -141,8 +143,7 @@ void Server<SocketT>::run()
 template<typename SocketT>
 void Server<SocketT>::stop()
 {
-    std::unique_lock<std::mutex> lock(m_mutex);
-    if (m_running)
+    if (std::unique_lock lk(m_mutex); m_running)
     {
         m_running = false;
         logger.info(LOG_PREFIX, "stopping all connections...");
@@ -155,7 +156,7 @@ void Server<SocketT>::stop()
         }
         m_activeConnections = 0;
         m_netInterface->stop();
-        lock.unlock();
+        lk.unlock();
         if (m_thread.joinable())
         {
             m_thread.join();
@@ -164,10 +165,10 @@ void Server<SocketT>::stop()
 }
 
 template<typename SocketT>
-void Server<SocketT>::send(const util::CStringPack& msg)
+void Server<SocketT>::send(std::string_view const& msg)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (msg.second == 0 || m_activeConnections == 0)
+    std::lock_guard lk(m_mutex);
+    if (msg.length() == 0 || m_activeConnections == 0)
     {
         return;
     }
@@ -188,14 +189,14 @@ void Server<SocketT>::send(const util::CStringPack& msg)
 template<typename SocketT>
 void Server<SocketT>::accept()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_netInterface->onAccept(std::bind(&Server<SocketT>::attemptConnection, this, std::placeholders::_1));
 }
 
 template<typename SocketT>
-bool Server<SocketT>::isConnected(const std::string& address)
+bool Server<SocketT>::isConnected(str const& address)
 {
-    for (const auto& it : m_connections)
+    for (auto const& it : m_connections)
     {
         if (it && it.get()->address == address)
         {
@@ -210,7 +211,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         try
         {
             if (m_activeConnections < param::SERVER_MAX_CLIENTS &&
@@ -233,7 +234,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
                 m_netInterface->close();
             }
         }
-        catch (const net::SocketException& e)
+        catch (net::SocketException const& e)
         {
             logger.warn(LOG_PREFIX, "connection failed: ", e.what());
             m_netInterface->close();

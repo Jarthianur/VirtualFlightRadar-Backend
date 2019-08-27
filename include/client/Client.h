@@ -21,15 +21,13 @@
 
 #pragma once
 
-#include <cstddef>
-#include <memory>
 #include <mutex>
-#include <string>
 #include <vector>
 
 #include "net/Connector.hpp"
 #include "net/Endpoint.hpp"
 #include "util/defines.h"
+#include "util/types.h"
 
 namespace feed
 {
@@ -42,26 +40,29 @@ namespace client
  */
 class Client
 {
+    NOT_COPYABLE(Client)
+
 protected:
-    std::shared_ptr<net::Connector>          m_connector;        /// Connector interface
-    bool                                     m_running = false;  /// Run state indicator
-    const char* const                        m_logPrefix;        /// Component string used for logging
-    const net::Endpoint                      m_endpoint;         /// Remote endpoint
-    std::vector<std::shared_ptr<feed::Feed>> m_feeds;            /// Container for subscribed feeds
-    mutable std::mutex                       m_mutex;
+    s_ptr<net::Connector>          m_connector;        /// Connector interface
+    bool                           m_running = false;  /// Run state indicator
+    net::Endpoint const            m_endpoint;         /// Remote endpoint
+    std::vector<s_ptr<feed::Feed>> m_feeds;            /// Container for subscribed feeds
+    mutable std::mutex             m_mutex;
 
     /**
      * @param endpoint  The connection Endpoint
      * @param component The component name
      * @param connector The Connector interface
      */
-    Client(const net::Endpoint& endpoint, const char* logPrefix, std::shared_ptr<net::Connector> connector);
+    Client(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
 
     /**
      * @brief Handler for connect
      * @param error The error indicator
      */
     virtual void handleConnect(bool error) = 0;
+
+    virtual char const* logPrefix() const = 0;
 
     /**
      * @brief Stop and close the connection.
@@ -100,10 +101,9 @@ protected:
      * @param error    The error indicator
      * @param response The received string
      */
-    void handleRead(bool error, const std::string& response);
+    void handleRead(bool error, str const& response);
 
 public:
-    NOT_COPYABLE(Client)
     virtual ~Client() noexcept = default;
 
     /**
@@ -125,20 +125,19 @@ public:
      * @param feed The Feed to subscribe
      * @threadsafe
      */
-    void subscribe(std::shared_ptr<feed::Feed> feed);
+    void subscribe(s_ptr<feed::Feed> feed);
 
     /**
      * @brief Compare to another client by value.
      * @param other The other Client
      * @return true if equals, else false
      */
-    virtual bool equals(const Client& other) const;
+    virtual bool equals(Client const& other) const;
 
     /**
      * @brief Get a hash value of this client.
      * @return the hash value
      */
-    virtual std::size_t hash() const;
+    virtual usize hash() const;
 };
-
 }  // namespace client

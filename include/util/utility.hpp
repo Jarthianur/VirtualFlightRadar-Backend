@@ -22,15 +22,17 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <cstdarg>
-#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
-#include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
+
+#include "types.h"
 
 namespace util
 {
@@ -45,122 +47,127 @@ constexpr auto raw_type(T value) -> typename std::underlying_type<T>::type
     return static_cast<typename std::underlying_type<T>::type>(value);
 }
 
-using CStringPack = std::pair<const char*, const std::size_t>;
-
-template<std::size_t N, typename std::enable_if<(N > 0)>::type* = nullptr>
+template<usize N, typename std::enable_if<(N > 0)>::type* = nullptr>
 class CString final
 {
-    static constexpr auto last = N - 1;
+    std::array<char, N> m_data;
+    std::string_view    m_view;
 
-    char        m_value[N];
-    std::size_t m_length = 0;
-
-    void copy(const char* str, std::size_t n)
+    void copy(std::string_view const& sv)
     {
-        if (n > last)
+        if (sv.length() > N)
         {
-            throw std::out_of_range("");
+            throw std::overflow_error("");
         }
-        m_length = n;
-        std::memcpy(m_value, str, m_length);
-        m_value[m_length] = '\0';
+        std::copy_n(sv.cbegin(), sv.length(), m_data.begin());
+        m_view = std::string_view(m_data.data(), sv.length());
     }
 
-    void copy(const CString& other)
+    void copy(CString const& other)
     {
-        m_length = other.m_length;
-        std::memcpy(m_value, other.m_value, m_length);
-        m_value[m_length] = '\0';
+        std::copy(other.m_data.cbegin(), other.m_data.cend(), m_data.begin());
+        m_view = std::string_view(m_data.data(), other.m_view.length());
     }
 
 public:
     CString()
     {
-        m_value[0] = '\0';
+        clear();
     }
 
-    CString(const char* init)  ///< @param init The initial cstring to copy
+    CString(char const* init)  ///< @param init The initial cstring to copy
     {
         operator=(init);
     }
 
-    CString(const std::string& init)  ///< @param init The initial string to copy
+    CString(str const& init)  ///< @param init The initial string to copy
     {
         operator=(init);
     }
 
-    CString(const CString& other)  ///< @param other The other CString to copy
+    CString(CString const& other)  ///< @param other The other CString to copy
+    {
+        operator=(other);
+    }
+
+    CString(std::string_view const& other)  ///< @param other The other CString to copy
     {
         operator=(other);
     }
 
     ~CString() noexcept = default;
 
-    CString& operator=(const char* other)
+    CString& operator=(char const* other)
     {
-        copy(other, std::strlen(other));
+        copy(std::string_view(other));
         return *this;
     }
 
-    CString& operator=(const std::string& other)
+    CString& operator=(str const& other)
     {
-        copy(other.c_str(), other.size());
+        copy(std::string_view(other));
         return *this;
     }
 
-    CString& operator=(const CString& other)
+    CString& operator=(CString const& other)
     {
         copy(other);
         return *this;
     }
 
-    const char* operator*() const
+    CString& operator=(std::string_view const& other)
     {
-        return m_value;
+        copy(other);
+        return *this;
     }
 
-    operator CStringPack() const
+    std::string_view const& operator*() const
     {
-        return std::pair<const char*, const std::size_t>(m_value, m_length);
+        return m_view;
     }
 
-    bool operator==(const CString& other) const
+    operator std::string_view() const
     {
-        return std::strncmp(m_value, other.m_value, N) == 0;
+        return m_view;
+    }
+
+    bool operator==(CString const& other) const
+    {
+        return m_view == other.m_view;
     }
 
     void clear()
     {
-        m_value[0] = '\0';
-        m_length   = 0;
+        m_data[0] = '\0';
+        m_view    = std::string_view(m_data.data(), 0);
     }
 
-    int snprintf(std::size_t pos, std::size_t n, const char* fmt, ...)
+    int format(usize pos, char const* fmt, ...)
     {
-        if (pos + n >= N)
+        if (pos >= N)
         {
-            throw std::out_of_range("");
+            throw std::overflow_error("");
         }
+        usize   max = N - pos;
         va_list args;
         va_start(args, fmt);
         int b = 0;
-        if ((b = std::vsnprintf(m_value + pos, std::min(n, N), fmt, args)) >= 0)
+        if ((b = std::vsnprintf(m_data.data() + pos, max, fmt, args)) >= 0)
         {
-            m_length = b;
+            m_view = std::string_view(m_data.data(), pos + b + 1);
         }
         va_end(args);
         if (b < 0)
         {
             clear();
-            throw std::out_of_range("");
+            throw std::logic_error("");
         }
         return b;
     }
 
-    inline auto length() const -> decltype(m_length)
+    inline usize length() const
     {
-        return m_length;
+        return m_view.length();
     }
 };
-
 }  // namespace util

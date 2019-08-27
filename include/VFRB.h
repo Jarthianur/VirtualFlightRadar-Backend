@@ -25,12 +25,12 @@
 #include <chrono>
 #include <list>
 #include <memory>
-#include <string>
 
 #include "server/Server.hpp"
 #include "server/net/impl/NetworkInterfaceImplBoost.h"
 #include "server/net/impl/SocketImplBoost.h"
 #include "util/defines.h"
+#include "util/types.h"
 
 namespace config
 {
@@ -53,19 +53,21 @@ class Feed;
  */
 class VFRB
 {
-    std::shared_ptr<data::AircraftData>          m_aircraftData;    ///< Aircraft container
-    std::shared_ptr<data::AtmosphereData>        m_atmosphereData;  ///< Atmospheric data container
-    std::shared_ptr<data::GpsData>               m_gpsData;         ///< GPS data container
-    std::shared_ptr<data::WindData>              m_windData;        ///< Wind data container
+    NOT_COPYABLE(VFRB)
+
+    s_ptr<data::AircraftData>                    m_aircraftData;    ///< Aircraft container
+    s_ptr<data::AtmosphereData>                  m_atmosphereData;  ///< Atmospheric data container
+    s_ptr<data::GpsData>                         m_gpsData;         ///< GPS data container
+    s_ptr<data::WindData>                        m_windData;        ///< Wind data container
     server::Server<server::net::SocketImplBoost> m_server;          ///< Manage clients and sending of data
-    std::list<std::shared_ptr<feed::Feed>>       m_feeds;           ///< List of all active feeds
+    std::list<s_ptr<feed::Feed>>                 m_feeds;           ///< List of all active feeds
     std::atomic<bool>                            m_running;         ///< Atomic run-status
 
     /**
      * @brief Create all input feeds.
      * @param config The Configuration
      */
-    void createFeeds(std::shared_ptr<config::Configuration> config);
+    void createFeeds(s_ptr<config::Configuration> config);
 
     /**
      * @brief Serve the data frequently every second.
@@ -77,11 +79,10 @@ class VFRB
      * @param start The start value
      * @return the duration string
      */
-    std::string duration(std::chrono::steady_clock::time_point start) const;
+    str duration(std::chrono::steady_clock::time_point start) const;
 
 public:
-    NOT_COPYABLE(VFRB)
-    explicit VFRB(std::shared_ptr<config::Configuration> config);  ///< @param config The Configuration
+    explicit VFRB(s_ptr<config::Configuration> config);  ///< @param config The Configuration
     ~VFRB() noexcept = default;
 
     /**

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <functional>
+#include <utility>
 
 namespace object
 {
@@ -26,15 +27,18 @@ class Object;
 
 namespace data
 {
-using accessor_fn = std::function<void(const object::Object&)>;
+using AccessFn = std::function<void(object::Object const&)>;
 
 /**
  * @brief The Data interface
  */
 class Data
 {
+protected:
+    AccessFn m_accessFn;
+
 public:
-    Data()                   = default;
+    explicit Data(AccessFn&& fn) : m_accessFn(std::move(fn)) {}
     virtual ~Data() noexcept = default;
 
     /**
@@ -44,6 +48,6 @@ public:
      */
     virtual bool update(object::Object&& _1) = 0;
 
-    virtual void access(const accessor_fn& func) = 0;
+    virtual void access() = 0;
 };
 }  // namespace data

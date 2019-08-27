@@ -21,23 +21,14 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <string>
-
-#include "config/Properties.h"
 #include "util/WorkerThread.hpp"
-#include "util/defines.h"
 
 #include "Feed.h"
 
-namespace feed
-{
-namespace parser
+namespace feed::parser
 {
 class SbsParser;
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser
 
 namespace data
 {
@@ -51,12 +42,12 @@ namespace feed
  */
 class SbsFeed : public Feed
 {
-    static parser::SbsParser        s_parser;  ///< Parser to unpack response from Client
-    util::WorkerThread<std::string> m_worker;
-
-public:
     NOT_COPYABLE(SbsFeed)
 
+    static parser::SbsParser s_parser;  ///< Parser to unpack response from Client
+    util::WorkerThread<str>  m_worker;
+
+public:
     /**
      * @param name       The unique name
      * @param properties The Properties
@@ -64,8 +55,8 @@ public:
      * @param maxHeight  The max height filter
      * @throw std::logic_error from parent constructor
      */
-    SbsFeed(const std::string& name, const config::Properties& properties,
-            std::shared_ptr<data::AircraftData> data, std::int32_t maxHeight);
+    SbsFeed(str const& m_name, config::Properties const& m_properties, s_ptr<data::AircraftData> data,
+            s32 maxHeight);
     ~SbsFeed() noexcept override = default;
 
     /**
@@ -77,7 +68,6 @@ public:
     /**
      * @brief Feed::process.
      */
-    bool process(const std::string& response) override;
+    bool process(str const& response) override;
 };
-
 }  // namespace feed

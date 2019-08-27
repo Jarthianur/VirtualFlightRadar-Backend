@@ -23,21 +23,20 @@
 
 #include "util/Logger.hpp"
 
+using namespace client::net;
+
 namespace client
 {
-using namespace net;
+constexpr auto     LOG_PREFIX = "(SbsClient) ";
+static auto const& logger     = Logger::instance();
 
-constexpr auto LOG_PREFIX = "(SbsClient) ";
-
-SbsClient::SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
-    : Client(endpoint, LOG_PREFIX, connector)
-{}
+SbsClient::SbsClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Client(endpoint, connector) {}
 
 void SbsClient::handleConnect(bool error)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         read();
     }
     else
@@ -45,5 +44,10 @@ void SbsClient::handleConnect(bool error)
         logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
         reconnect();
     }
+}
+
+char const* SbsClient::logPrefix() const
+{
+    return LOG_PREFIX;
 }
 }  // namespace client

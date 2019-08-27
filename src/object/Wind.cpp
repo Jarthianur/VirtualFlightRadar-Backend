@@ -21,16 +21,15 @@ namespace object
 {
 Wind::Wind() : Object() {}
 
-Wind::Wind(std::uint32_t priority) : Object(priority) {}
+Wind::Wind(u32 priority) : Object(priority) {}
 
-util::CStringPack Wind::nmea() const
+std::string_view Wind::nmea() const
 {
     return {m_nmea.c_str(), m_nmea.size()};
 }
 
-std::string& Wind::operator*()
+str& Wind::operator*()
 {
     return m_nmea;
 }
-
 }  // namespace object

@@ -21,13 +21,12 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
 #include <utility>
 
 #include "net/SocketException.h"
 #include "util/Logger.hpp"
 #include "util/defines.h"
+#include "util/types.h"
 #include "util/utility.hpp"
 
 namespace server
@@ -39,6 +38,8 @@ namespace server
 template<typename SocketT>
 class Connection final
 {
+    NOT_COPYABLE(Connection)
+
     SocketT m_socket;  ///< Socket
 
     /**
@@ -48,9 +49,8 @@ class Connection final
     explicit Connection(SocketT&& socket);
 
 public:
-    const std::string address;  ///< IP address
+    str const address;  ///< IP address
 
-    NOT_COPYABLE(Connection)
     ~Connection() noexcept = default;
 
     /**
@@ -58,32 +58,32 @@ public:
      * @param socket The socket
      * @return a shared ptr to the Connection object
      */
-    static std::unique_ptr<Connection<SocketT>> create(SocketT&& socket);
+    static u_ptr<Connection<SocketT>> create(SocketT&& socket);
 
     /**
      * @brief Write a message to the endpoint.
      * @param msg The message
      * @return true on success, else false
      */
-    bool write(const util::CStringPack& msg);
+    bool write(std::string_view const& msg);
 };
 
 template<typename SocketT>
-std::unique_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socket)
+u_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socket)
 {
-    return std::unique_ptr<Connection<SocketT>>(new Connection<SocketT>(std::move(socket)));
+    return u_ptr<Connection<SocketT>>(new Connection<SocketT>(std::move(socket)));
 }
 
 template<typename SocketT>
-bool Connection<SocketT>::write(const util::CStringPack& msg)
+bool Connection<SocketT>::write(std::string_view const& msg)
 {
     try
     {
         return m_socket.write(msg);
     }
-    catch (const net::SocketException& e)
+    catch (net::SocketException const& e)
     {
-        logger.debug("(Connection) write: ", e.what());
+        Logger::instance().debug("(Connection) write: ", e.what());
     }
     return false;
 }
@@ -91,5 +91,4 @@ bool Connection<SocketT>::write(const util::CStringPack& msg)
 template<typename SocketT>
 Connection<SocketT>::Connection(SocketT&& socket) : m_socket(std::move(socket)), address(m_socket.address())
 {}
-
 }  // namespace server

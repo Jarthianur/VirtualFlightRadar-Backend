@@ -38,9 +38,11 @@
 using namespace config;
 using namespace boost;
 
+static auto& logger = Logger::instance();
+
 program_options::variables_map evalArgs(int argc, char** argv);
 
-std::shared_ptr<Configuration> get_config(const program_options::variables_map& variables);
+s_ptr<Configuration> get_config(const program_options::variables_map& variables);
 
 /**
  * @fn main
@@ -89,7 +91,7 @@ program_options::variables_map evalArgs(int argc, char** argv)
     return variables;
 }
 
-std::shared_ptr<Configuration> get_config(const program_options::variables_map& variables)
+s_ptr<Configuration> get_config(const program_options::variables_map& variables)
 {
     if (variables.count("verbose"))
     {

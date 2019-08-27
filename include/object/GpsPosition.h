@@ -21,9 +21,8 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "impl/DateTimeImplBoost.h"
+#include "util/types.h"
 #include "util/utility.hpp"
 
 #include "Object.h"
@@ -36,16 +35,16 @@ namespace object
  */
 struct Location
 {
-    static constexpr auto MAX_LATITUDE  = 90.0;
-    static constexpr auto MIN_LATITUDE  = -90.0;
-    static constexpr auto MAX_LONGITUDE = 180.0;
-    static constexpr auto MIN_LONGITUDE = 0.0;
-    static constexpr auto MAX_ALTITUDE  = 100000;
-    static constexpr auto MIN_ALTITUDE  = -11000;
+    inline static constexpr auto MAX_LATITUDE  = 90.0;
+    inline static constexpr auto MIN_LATITUDE  = -90.0;
+    inline static constexpr auto MAX_LONGITUDE = 180.0;
+    inline static constexpr auto MIN_LONGITUDE = 0.0;
+    inline static constexpr auto MAX_ALTITUDE  = 100000;
+    inline static constexpr auto MIN_ALTITUDE  = -11000;
 
-    double       latitude;   ///< Latitude; deg
-    double       longitude;  ///< Longitude; deg
-    std::int32_t altitude;   ///< Altitude; m
+    f64 latitude;   ///< Latitude; deg
+    f64 longitude;  ///< Longitude; deg
+    s32 altitude;   ///< Altitude; m
 };
 
 /**
@@ -54,16 +53,16 @@ struct Location
 class GpsPosition : public Object
 {
 public:
-    static constexpr auto NMEA_SIZE = 192;
-    static constexpr auto MAX_GEOID = 86.0;
-    static constexpr auto MIN_GEOID = -108.0;
+    inline static constexpr auto NMEA_SIZE = 192;
+    inline static constexpr auto MAX_GEOID = 86.0;
+    inline static constexpr auto MIN_GEOID = -108.0;
 
 private:
     Location                           m_location;        ///< The location
-    double                             m_geoid;           ///< The geoid separation
-    double                             m_dilution;        ///< The position dilution
-    std::uint8_t                       m_nrOfSatellites;  ///< The number of satellites
-    std::int8_t                        m_fixQuality;      ///< The GPS fix quality
+    f64                                m_geoid;           ///< The geoid separation
+    f64                                m_dilution;        ///< The position dilution
+    u8                                 m_nrOfSatellites;  ///< The number of satellites
+    s8                                 m_fixQuality;      ///< The GPS fix quality
     Timestamp<time::DateTimeImplBoost> m_timestamp;       ///< The timestamp of this position
     util::CString<NMEA_SIZE>           m_nmea;
 
@@ -75,28 +74,27 @@ private:
     /**
      * @brief Override Object::canUpdate.
      */
-    bool canUpdate(const Object& other) const override;
+    bool canUpdate(Object const& other) const override;
 
 public:
-    GpsPosition(std::uint32_t priority, const Location& location, double geoid);
+    GpsPosition(u32 priority, Location const& location, f64 geoid);
 
     /**
      * @param position The position
      * @param geoid    The geoid
      */
-    GpsPosition(std::uint32_t priority, const Location& location, double geoid, double dilution,
-                std::uint8_t satellites, std::int8_t quality,
-                const Timestamp<time::DateTimeImplBoost>& timestamp);
+    GpsPosition(u32 priority, Location const& location, f64 geoid, f64 dilution, u8 satellites, s8 quality,
+                Timestamp<time::DateTimeImplBoost> const& timestamp);
     ~GpsPosition() noexcept override = default;
 
     util::CString<NMEA_SIZE>& operator*();
 
-    util::CStringPack nmea() const override;
-    auto              location() const -> const decltype(m_location)&;
-    auto              geoid() const -> decltype(m_geoid);
-    auto              timestamp() const -> const decltype(m_timestamp)&;
-    auto              dilution() const -> decltype(m_dilution);
-    auto              nrOfSatellites() const -> decltype(m_nrOfSatellites);
-    auto              fixQuality() const -> decltype(m_fixQuality);
+    std::string_view nmea() const override;
+    auto             location() const -> decltype(m_location) const&;
+    auto             geoid() const -> decltype(m_geoid);
+    auto             timestamp() const -> decltype(m_timestamp) const&;
+    auto             dilution() const -> decltype(m_dilution);
+    auto             nrOfSatellites() const -> decltype(m_nrOfSatellites);
+    auto             fixQuality() const -> decltype(m_fixQuality);
 };
 }  // namespace object

@@ -21,73 +21,24 @@
 
 #include "config/Configuration.h"
 
-#include <cstdint>
 #include <limits>
-#include <list>
 #include <sstream>
 #include <stdexcept>
-#include <string>
 #include <utility>
-
-#include <boost/optional.hpp>
-#include <boost/variant.hpp>
+#include <variant>
 
 #include "config/ConfigReader.h"
 #include "util/Logger.hpp"
 
 using namespace util;
+using namespace std::literals;
 
 namespace config
 {
-using Number    = boost::variant<std::int32_t, std::uint64_t, double>;
-using OptNumber = boost::optional<Number>;
+using Number = std::variant<s32, u64, f64>;
 
-constexpr auto LOG_PREFIX = "(Config) ";
-
-// Configuration section keys
-const char* Configuration::SECT_KEY_FALLBACK = "fallback";
-const char* Configuration::SECT_KEY_GENERAL  = "general";
-const char* Configuration::SECT_KEY_FILTER   = "filter";
-
-// Keywords for feeds
-const char* Configuration::SECT_KEY_APRSC = "aprs";
-const char* Configuration::SECT_KEY_SBS   = "sbs";
-const char* Configuration::SECT_KEY_GPS   = "gps";
-const char* Configuration::SECT_KEY_WIND  = "wind";
-const char* Configuration::SECT_KEY_ATMOS = "atm";
-
-// Property keys for section "general"
-const char* Configuration::KV_KEY_FEEDS       = "feeds";
-const char* Configuration::KV_KEY_GND_MODE    = "gndMode";
-const char* Configuration::KV_KEY_SERVER_PORT = "serverPort";
-
-// Property keys for section "fallback"
-const char* Configuration::KV_KEY_LATITUDE  = "latitude";
-const char* Configuration::KV_KEY_LONGITUDE = "longitude";
-const char* Configuration::KV_KEY_ALTITUDE  = "altitude";
-const char* Configuration::KV_KEY_GEOID     = "geoid";
-const char* Configuration::KV_KEY_PRESSURE  = "pressure";
-
-// Property keys for section "filter"
-const char* Configuration::KV_KEY_MAX_DIST   = "maxDistance";
-const char* Configuration::KV_KEY_MAX_HEIGHT = "maxHeight";
-
-// Property keys for feed sections
-const char* Configuration::KV_KEY_HOST     = "host";
-const char* Configuration::KV_KEY_PORT     = "port";
-const char* Configuration::KV_KEY_PRIORITY = "priority";
-const char* Configuration::KV_KEY_LOGIN    = "login";
-
-const char* Configuration::PATH_FEEDS       = "general.feeds";
-const char* Configuration::PATH_GND_MODE    = "general.gndMode";
-const char* Configuration::PATH_SERVER_PORT = "general.serverPort";
-const char* Configuration::PATH_LATITUDE    = "fallback.latitude";
-const char* Configuration::PATH_LONGITUDE   = "fallback.longitude";
-const char* Configuration::PATH_ALTITUDE    = "fallback.altitude";
-const char* Configuration::PATH_GEOID       = "fallback.geoid";
-const char* Configuration::PATH_PRESSURE    = "fallback.pressure";
-const char* Configuration::PATH_MAX_DIST    = "filter.maxDistance";
-const char* Configuration::PATH_MAX_HEIGHT  = "filter.maxHeight";
+constexpr auto     LOG_PREFIX = "(Config) ";
+static auto const& logger     = Logger::instance();
 
 /**
  * @brief Convert a string to number.
@@ -96,7 +47,7 @@ const char* Configuration::PATH_MAX_HEIGHT  = "filter.maxHeight";
  * @return an optional number, which may be invalid
  */
 template<typename T>
-OptNumber stringToNumber(const std::string& str)
+Number strToNumber(str const& str, char const* path)
 {
     std::stringstream ss(str);
     T                 result;
@@ -104,23 +55,7 @@ OptNumber stringToNumber(const std::string& str)
     {
         return Number(result);
     }
-    return boost::none;
-}
-
-/**
- * @brief Check an optional Number to be valid.
- * @param number The optinonal Number
- * @param path   The key path
- * @return the number value
- * @throw std::invalid_argument if the Number is invalid
- */
-Number checkNumber(const OptNumber& number, const char* path)
-{
-    if (!number)
-    {
-        throw std::invalid_argument(std::string("invalid value at ") + path);
-    }
-    return *number;
+    throw std::invalid_argument("invalid value at "s + path);
 }
 
 /**
@@ -128,17 +63,17 @@ Number checkNumber(const OptNumber& number, const char* path)
  * @param str The string to trim
  * @return the trimmed string
  */
-std::string& trimString(std::string& str)
+inline str& trimString(str& str)
 {
-    std::size_t f = str.find_first_not_of(' ');
-    if (f != std::string::npos)
+    usize f = str.find_first_not_of(' ');
+    if (f != str::npos)
     {
         str = str.substr(f);
     }
-    std::size_t l = str.find_last_not_of(' ');
-    if (l != std::string::npos)
+    f = str.find_last_not_of(' ');
+    if (f != str::npos)
     {
-        str = str.substr(0, l + 1);
+        str = str.substr(0, f + 1);
     }
     return str;
 }
@@ -148,12 +83,12 @@ std::string& trimString(std::string& str)
  * @param str The string to split
  * @return a list of strings
  */
-inline std::list<std::string> split(const std::string& str, char delim = ',')
+inline std::list<str> split(str const& s, char delim = ',')
 {
-    std::list<std::string> list;
-    std::stringstream      ss;
-    ss.str(str);
-    std::string item;
+    std::list<str>    list;
+    std::stringstream ss;
+    ss.str(s);
+    str item;
 
     while (std::getline(ss, item, delim))
     {
@@ -163,82 +98,78 @@ inline std::list<std::string> split(const std::string& str, char delim = ',')
 }
 
 Configuration::Configuration(std::istream& stream)
-try : m_properties(ConfigReader(stream).read()),
-      groundMode(!m_properties.property(PATH_GND_MODE).empty()),
-      gpsPosition(resolvePosition(m_properties)),
-      atmPressure(boost::get<double>(checkNumber(
-          stringToNumber<double>(m_properties.property(PATH_PRESSURE, "1013.25")), PATH_PRESSURE))),
-      maxHeight(resolveFilter(m_properties, PATH_MAX_HEIGHT)),
-      maxDistance(resolveFilter(m_properties, PATH_MAX_DIST)),
-      serverPort(resolveServerPort(m_properties)),
-      feedNames(split(m_properties.property(PATH_FEEDS))),
-      feedProperties(resolveFeeds(m_properties))
+try :
+    m_properties(ConfigReader(stream).read()),
+    groundMode(m_properties.property(PATH_GND_MODE, "no") == "no"),
+    gpsPosition(resolvePosition(m_properties)),
+    atmPressure(std::get<f64>(strToNumber<f64>(m_properties.property(PATH_PRESSURE, "1013.25"),
+                                               PATH_PRESSURE))),
+    maxHeight(resolveFilter(m_properties, PATH_MAX_HEIGHT)),
+    maxDistance(resolveFilter(m_properties, PATH_MAX_DIST)),
+    serverPort(resolveServerPort(m_properties)),
+    feedNames(split(m_properties.property(PATH_FEEDS, ""))),
+    feedProperties(resolveFeeds(m_properties))
 {
     dumpInfo();
 }
-catch (const std::exception& e)
+catch (std::exception const& e)
 {
     logger.error(LOG_PREFIX, "init: ", e.what());
 }
 
-object::GpsPosition Configuration::resolvePosition(const Properties& properties) const
+object::GpsPosition Configuration::resolvePosition(Properties const& properties) const
 {
     object::Location pos;
-    pos.latitude = boost::get<double>(
-        checkNumber(stringToNumber<double>(properties.property(PATH_LATITUDE, "0.0")), PATH_LATITUDE));
-    pos.longitude = boost::get<double>(
-        checkNumber(stringToNumber<double>(properties.property(PATH_LONGITUDE, "0.0")), PATH_LONGITUDE));
-    pos.altitude = boost::get<std::int32_t>(checkNumber(
-        stringToNumber<std::int32_t>(properties.property(PATH_ALTITUDE, "0")), PATH_ALTITUDE));
-    double geoid = boost::get<double>(
-        checkNumber(stringToNumber<double>(properties.property(PATH_GEOID, "0.0")), PATH_GEOID));
+    pos.latitude = std::get<f64>(strToNumber<f64>(properties.property(PATH_LATITUDE, "0.0"), PATH_LATITUDE));
+    pos.longitude =
+        std::get<f64>(strToNumber<f64>(properties.property(PATH_LONGITUDE, "0.0"), PATH_LONGITUDE));
+    pos.altitude = std::get<s32>(strToNumber<s32>(properties.property(PATH_ALTITUDE, "0"), PATH_ALTITUDE));
+    f64 geoid    = std::get<f64>(strToNumber<f64>(properties.property(PATH_GEOID, "0.0"), PATH_GEOID));
     return object::GpsPosition(0, pos, geoid);
 }
 
-std::uint16_t Configuration::resolveServerPort(const Properties& properties) const
+u16 Configuration::resolveServerPort(const Properties& properties) const
 {
     try
     {
-        std::uint64_t port = boost::get<std::uint64_t>(
-            checkNumber(stringToNumber<std::uint64_t>(properties.property(PATH_SERVER_PORT, "4353")),
-                        PATH_SERVER_PORT));
-        if (port > std::numeric_limits<std::uint16_t>::max())
+        u64 port =
+            std::get<u64>(strToNumber<u64>(properties.property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT));
+        if (port > std::numeric_limits<u16>::max())
         {
             throw std::invalid_argument("invalid port number");
         }
         return port & 0xFFFF;
     }
-    catch (const std::logic_error& e)
+    catch (std::logic_error const& e)
     {
         logger.warn(LOG_PREFIX, "resolving server port: ", e.what());
         return 4353;
     }
 }
 
-std::int32_t Configuration::resolveFilter(const Properties& properties, const char* path) const
+s32 Configuration::resolveFilter(Properties const& properties, char const* path) const
 {
     try
     {
-        std::int32_t filter = boost::get<std::int32_t>(
-            checkNumber(stringToNumber<std::int32_t>(properties.property(path, "-1")), path));
-        return filter < 0 ? std::numeric_limits<std::int32_t>::max() : filter;
+        s32 filter = std::get<s32>(strToNumber<s32>(properties.property(path, "-1"), path));
+        return filter < 0 ? std::numeric_limits<s32>::max() : filter;
     }
-    catch (const std::invalid_argument&)
+    catch (std::invalid_argument const&)
     {
-        return std::numeric_limits<std::int32_t>::max();
+        return std::numeric_limits<s32>::max();
     }
 }
 
-std::unordered_map<std::string, Properties> Configuration::resolveFeeds(const Properties& properties)
+std::unordered_map<str, Properties> Configuration::resolveFeeds(Properties const& properties)
 {
-    std::unordered_map<std::string, Properties> map;
-    for (const auto& it : feedNames)
+    std::unordered_map<str, Properties> map;
+    for (auto const& it : feedNames)
     {
         try
         {
             map.emplace(it, properties.section(it));
         }
-        catch (const std::out_of_range& e)
+        catch (std::out_of_range const& e)
         {
             logger.warn(LOG_PREFIX, "resolving feeds: ", e.what(), " for ", it);
         }
@@ -259,5 +190,4 @@ void Configuration::dumpInfo() const
     logger.info(LOG_PREFIX, PATH_GND_MODE, ": ", groundMode ? "Yes" : "No");
     logger.info(LOG_PREFIX, "number of feeds: ", feedProperties.size());
 }
-
 }  // namespace config

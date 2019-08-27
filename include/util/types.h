@@ -21,27 +21,29 @@
 
 #pragma once
 
-#include <exception>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
 
-#include "util/types.h"
+using u8    = std::uint8_t;
+using s8    = std::int8_t;
+using u16   = std::uint16_t;
+using s16   = std::int16_t;
+using u32   = std::uint32_t;
+using s32   = std::int32_t;
+using u64   = std::uint64_t;
+using s64   = std::int64_t;
+using usize = std::size_t;
+using f32   = float;
+using f64   = double;
 
-namespace server::net
-{
-/**
- * @brief Exception to signal socket errors.
- */
-class SocketException : public std::exception
-{
-    str const m_message;  ///< Error message
+using enum_t = std::uint_fast8_t;
 
-public:
-    SocketException() = default;
-    explicit SocketException(str const& msg);  ///< @param msg The error message
+using str = std::string;
 
-    /**
-     * @brief Get the error message.
-     * @return the message
-     */
-    char const* what() const noexcept;
-};
-}  // namespace server::net
+template<typename T>
+using s_ptr = std::shared_ptr<T>;
+
+template<typename T>
+using u_ptr = std::unique_ptr<T>;

@@ -21,21 +21,12 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include "config/Properties.h"
-#include "util/defines.h"
-
 #include "Feed.h"
 
-namespace feed
-{
-namespace parser
+namespace feed::parser
 {
 class AtmosphereParser;
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser
 
 namespace data
 {
@@ -49,21 +40,19 @@ namespace feed
  */
 class AtmosphereFeed : public Feed
 {
-    static constexpr auto LOG_PREFIX = "(AtmosphereFeed) ";
+    NOT_COPYABLE(AtmosphereFeed)
 
     static parser::AtmosphereParser s_parser;  ///< Parser to unpack response from Client
 
 public:
-    NOT_COPYABLE(AtmosphereFeed)
-
     /**
      * @param name       The unique name
      * @param properties The Properties
      * @param data       The WindData container
      * @throw std::logic_error from parent constructor
      */
-    AtmosphereFeed(const std::string& name, const config::Properties& properties,
-                   std::shared_ptr<data::AtmosphereData> data);
+    AtmosphereFeed(str const& m_name, config::Properties const& m_properties,
+                   s_ptr<data::AtmosphereData> data);
     ~AtmosphereFeed() noexcept override = default;
 
     /**
@@ -75,7 +64,6 @@ public:
     /**
      * @brief Implement Feed::process.
      */
-    bool process(const std::string& response) override;
+    bool process(str const& response) override;
 };
-
 }  // namespace feed

@@ -27,14 +27,14 @@
 
 #include "parameters.h"
 
+using namespace client::net;
+
 namespace client
 {
-using namespace net;
+constexpr auto     LOG_PREFIX = "(SensorClient) ";
+static auto const& logger     = Logger::instance();
 
-constexpr auto LOG_PREFIX = "(SensorClient) ";
-
-SensorClient::SensorClient(const Endpoint& endpoint, std::shared_ptr<Connector> connector)
-    : Client(endpoint, LOG_PREFIX, connector)
+SensorClient::SensorClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Client(endpoint, connector)
 {}
 
 void SensorClient::read()
@@ -47,7 +47,7 @@ void SensorClient::checkDeadline(bool error)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         if (m_connector->timerExpired())
         {
             logger.debug(LOG_PREFIX, "timed out, reconnect ...");
@@ -64,7 +64,7 @@ void SensorClient::handleConnect(bool error)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->onTimeout(std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1),
                                param::WINDCLIENT_RECEIVE_TIMEOUT);
@@ -75,5 +75,10 @@ void SensorClient::handleConnect(bool error)
         logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
         reconnect();
     }
+}
+
+char const* SensorClient::logPrefix() const
+{
+    return LOG_PREFIX;
 }
 }  // namespace client

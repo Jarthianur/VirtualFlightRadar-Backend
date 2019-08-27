@@ -25,9 +25,7 @@
 
 #include "Parser.hpp"
 
-namespace feed
-{
-namespace parser
+namespace feed::parser
 {
 /**
  * @brief Implement Parser for NMEA sentences from sensors.
@@ -43,7 +41,6 @@ public:
      * @param sentence   The string to unpack
      * @param atmosphere The Atmosphere to unpack into
      */
-    object::Atmosphere unpack(const std::string& sentence, std::uint32_t priority) const override;
+    object::Atmosphere unpack(str const& sentence, u32 priority) const override;
 };
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser

@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include <cstdint>
-
+#include "util/types.h"
 #include "util/utility.hpp"
 
 namespace object
@@ -29,11 +28,11 @@ namespace object
 class Object
 {
 protected:
-    std::uint32_t m_lastPriority = 0;  ///< Got last update with this priority.
-    std::uint32_t m_updateAge    = 0;  ///< Times processed without update.
+    u32 m_lastPriority = 0;  ///< Got last update with this priority.
+    u32 m_updateAge    = 0;  ///< Times processed without update.
 
     Object() = default;
-    explicit Object(std::uint32_t priority);  ///< @param priority The initial priority
+    explicit Object(u32 priority);  ///< @param priority The initial priority
 
     /**
      * @brief Assign other objects values to this.
@@ -46,10 +45,10 @@ protected:
      * @param other   The other Object
      * @return true if yes, else false
      */
-    virtual bool canUpdate(const Object& other) const;
+    virtual bool canUpdate(Object const& other) const;
 
 public:
-    static constexpr const std::uint32_t OUTDATED = 4;
+    inline static constexpr auto OUTDATED = 4;
 
     virtual ~Object() noexcept = default;
 
@@ -67,7 +66,7 @@ public:
      */
     virtual bool tryUpdate(Object&& other);
 
-    virtual util::CStringPack nmea() const = 0;
-    auto                      updateAge() const -> decltype(m_updateAge);
+    virtual std::string_view nmea() const = 0;
+    auto                     updateAge() const -> decltype(m_updateAge);
 };
 }  // namespace object

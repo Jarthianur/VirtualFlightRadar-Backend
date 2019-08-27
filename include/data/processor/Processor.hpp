@@ -21,12 +21,7 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdio>
-
-namespace data
-{
-namespace processor
+namespace data::processor
 {
 /**
  * @brief Processor base class/interface.
@@ -45,5 +40,4 @@ public:
      */
     virtual void process(T& _1) const = 0;
 };
-}  // namespace processor
-}  // namespace data
+}  // namespace data::processor

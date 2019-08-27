@@ -25,9 +25,7 @@
 
 #include "Parser.hpp"
 
-namespace feed
-{
-namespace parser
+namespace feed::parser
 {
 /**
  * @brief Implement Parser for NMEA wind sentences.
@@ -44,7 +42,6 @@ public:
      * @param wind     The Wind to unpack into
      * @return true on success, else false
      */
-    object::Wind unpack(const std::string& sentence, std::uint32_t priority) const override;
+    object::Wind unpack(str const& sentence, u32 priority) const override;
 };
-}  // namespace parser
-}  // namespace feed
+}  // namespace feed::parser

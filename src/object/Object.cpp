@@ -21,7 +21,7 @@
 
 namespace object
 {
-Object::Object(std::uint32_t priority) : m_lastPriority(priority) {}
+Object::Object(u32 priority) : m_lastPriority(priority) {}
 
 void Object::assign(Object&& other)
 {
@@ -39,7 +39,7 @@ bool Object::tryUpdate(Object&& other)
     return false;
 }
 
-bool Object::canUpdate(const Object& other) const
+bool Object::canUpdate(Object const& other) const
 {
     return this->m_lastPriority >= other.m_lastPriority || other.m_updateAge >= OUTDATED;
 }
@@ -54,5 +54,4 @@ auto Object::updateAge() const -> decltype(m_updateAge)
 {
     return m_updateAge;
 }
-
 }  // namespace object

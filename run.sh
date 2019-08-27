@@ -83,7 +83,10 @@ for arg in $@; do
         DO_DOCKER=1
     ;;
     format)
-	for f in $(find "$VFRB_ROOT/src" "$VFRB_ROOT/include" -type f); do echo $f; clang-format -i -style=file $f; done
+        for f in $(find "$VFRB_ROOT/src" "$VFRB_ROOT/include" -type f); do
+            echo $f
+            clang-format -i -style=file $f
+        done
     ;;
     -n | --no-update)
         NO_UPDATE=1

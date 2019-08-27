@@ -24,44 +24,43 @@
 #include <ctime>
 
 #include "object/GpsPosition.h"
+#include "util/types.h"
 
 #include "Processor.hpp"
 
-namespace data
-{
-namespace processor
+namespace data::processor
 {
 /**
  * @brief Process GPS positions to NMEA GGA and RMC sentences.
  */
 class GpsProcessor : public Processor<object::GpsPosition>
 {
-    mutable char   m_directionSN  = 'x';  ///< Orientation of the latitude (S,N)
-    mutable char   m_directionEW  = 'x';  ///< Orientation of the longitude (E,W)
-    mutable double m_degLatitude  = 0.0;  ///< Degrees of latitude
-    mutable double m_degLongitude = 0.0;  ///< Degrees of longitude
-    mutable double m_minLatitude  = 0.0;  ///< Minutes of latitude
-    mutable double m_minLongitude = 0.0;  ///< Minutes of longitude
+    char mutable m_directionSN = 'x';  ///< Orientation of the latitude (S,N)
+    char mutable m_directionEW = 'x';  ///< Orientation of the longitude (E,W)
+    f64 mutable m_degLatitude  = 0.0;  ///< Degrees of latitude
+    f64 mutable m_degLongitude = 0.0;  ///< Degrees of longitude
+    f64 mutable m_minLatitude  = 0.0;  ///< Minutes of latitude
+    f64 mutable m_minLongitude = 0.0;  ///< Minutes of longitude
 
     /**
      * @brief Append GPGGA sentence to processing string.
      * @param position The position
      * @param utc      The current utc time
      */
-    std::size_t appendGPGGA(object::GpsPosition& position, const std::tm* utc, std::size_t pos) const;
+    usize appendGPGGA(object::GpsPosition& position, std::tm const* utc, usize pos) const;
 
     /**
      * @brief Append GPRMC sentence to processing string.
      * @param utc The current utc time
      */
-    std::size_t appendGPRMC(object::GpsPosition& position, const std::tm* utc, std::size_t pos) const;
+    usize appendGPRMC(object::GpsPosition& position, std::tm const* utc, usize pos) const;
 
     /**
      * @brief Evaluate position for given latitude and longitude.
      * @param latitude  The latitude
      * @param longitude The longitude
      */
-    void evalPosition(double latitude, double longitude) const;
+    void evalPosition(f64 latitude, f64 longitude) const;
 
 public:
     GpsProcessor();
@@ -73,6 +72,4 @@ public:
      */
     void process(object::GpsPosition& position) const override;
 };
-
-}  // namespace processor
-}  // namespace data
+}  // namespace data::processor

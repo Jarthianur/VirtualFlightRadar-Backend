@@ -23,25 +23,51 @@
 
 #include <boost/property_tree/exceptions.hpp>
 
+using namespace boost::property_tree;
+
 namespace config
 {
-Properties::Properties(const boost::property_tree::ptree& ptree) : m_pTree(ptree) {}
+Properties::Properties(ptree const& ptree) : m_pTree(ptree) {}
 
-Properties::Properties(boost::property_tree::ptree&& ptree) : m_pTree(std::move(ptree)) {}
+Properties::Properties(ptree&& ptree) : m_pTree(std::move(ptree)) {}
 
-std::string Properties::property(const std::string& path, const std::string& alternative) const
+str Properties::property(str const& path, str const& defVal) const noexcept
 {
-    std::string property(m_pTree.get(path, alternative));
-    return property.empty() ? alternative : property;
+    try
+    {
+        auto p = m_pTree.get_child(path).get_value<str>();
+        return p.empty() ? defVal : p;
+    }
+    catch (ptree_bad_path const&)
+    {
+        return defVal;
+    }
 }
 
-Properties Properties::section(const std::string& section) const
+str Properties::property(str const& path) const
+{
+    try
+    {
+        auto p = m_pTree.get_child(path).get_value<str>();
+        if (p.empty())
+        {
+            throw std::out_of_range(path + " is empty");
+        }
+        return p;
+    }
+    catch (ptree_bad_path const&)
+    {
+        throw std::out_of_range(path + " not found");
+    }
+}
+
+Properties Properties::section(str const& section) const
 {
     try
     {
         return Properties(m_pTree.get_child(section));
     }
-    catch (const boost::property_tree::ptree_bad_path&)
+    catch (ptree_bad_path const&)
     {
         throw std::out_of_range(section + " not found");
     }

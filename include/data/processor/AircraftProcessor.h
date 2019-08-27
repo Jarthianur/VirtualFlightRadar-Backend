@@ -21,59 +21,56 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "object/Aircraft.h"
 #include "object/GpsPosition.h"
+#include "util/types.h"
 
 #include "Processor.hpp"
 
-namespace data
-{
-namespace processor
+namespace data::processor
 {
 /**
  * @brief Process aircrafts to NMEA relative to the refered position.
  */
 class AircraftProcessor : public Processor<object::Aircraft>
 {
-    const std::int32_t m_maxDistance;                    ///< Max distance to process an aircraft
-    object::Location   m_refLocation{0.0, 0.0, 0};       ///< Refered position
-    double             m_refAtmPressure      = 1013.25;  ///< Refered pressure; hPa
-    mutable double     m_refRadLatitude      = 0.0;      ///< Refered latitude as radian
-    mutable double     m_aircraftRadLatitude = 0.0;      ///< Aircraft latitude as radian
-    mutable double     m_latDistance = 0.0;  ///< Distance/Difference between Aircraft's and refered latitude
-    mutable double     m_refRadLongitude      = 0.0;  ///< Refered longitude as radian
-    mutable double     m_aircraftRadLongitude = 0.0;  ///< Aircraft's longitude as radian
-    mutable double     m_lonDistance = 0.0;  ///< Distance/Difference between Aircraft's and refered longitude
-    mutable double     m_relBearing  = 0.0;  ///< Relative bearing
-    mutable double     m_absBearing  = 0.0;  ///< Absolute bearing
-    mutable std::int32_t m_relNorth  = 0;    ///< Relative distance in northern direction; m
-    mutable std::int32_t m_relEast   = 0;    ///< Relative distance in eastern direction; m
-    mutable std::int32_t m_relVertical = 0;  ///< Relative vertical distance; m
-    mutable std::int32_t m_distance    = 0;  ///< Distance between Aircraft and refered position; m
+    s32 const        m_maxDistance;               ///< Max distance to process an aircraft
+    object::Location m_refLocation{0.0, 0.0, 0};  ///< Refered position
+    f64              m_refAtmPressure = 1013.25;  ///< Refered pressure; hPa
+    f64 mutable m_refRadLatitude      = 0.0;      ///< Refered latitude as radian
+    f64 mutable m_aircraftRadLatitude = 0.0;      ///< Aircraft latitude as radian
+    f64 mutable m_latDistance         = 0.0;  ///< Distance/Difference between Aircraft's and refered latitude
+    f64 mutable m_refRadLongitude     = 0.0;  ///< Refered longitude as radian
+    f64 mutable m_aircraftRadLongitude = 0.0;  ///< Aircraft's longitude as radian
+    f64 mutable m_lonDistance = 0.0;  ///< Distance/Difference between Aircraft's and refered longitude
+    f64 mutable m_relBearing  = 0.0;  ///< Relative bearing
+    f64 mutable m_absBearing  = 0.0;  ///< Absolute bearing
+    s32 mutable m_relNorth    = 0;    ///< Relative distance in northern direction; m
+    s32 mutable m_relEast     = 0;    ///< Relative distance in eastern direction; m
+    s32 mutable m_relVertical = 0;    ///< Relative vertical distance; m
+    s32 mutable m_distance    = 0;    ///< Distance between Aircraft and refered position; m
 
     /**
      * @brief Calcutale an aircrafts position relative to the refered one.
      * @param aircraft The Aircraft
      */
-    void calculateRelPosition(const object::Aircraft& aircraft) const;
+    void calculateRelPosition(object::Aircraft const& aircraft) const;
 
     /**
      * @brief Append PFLAU sentence to processing string.
      * @param aircraft The Aircaft
      */
-    std::size_t appendPFLAU(object::Aircraft& aircraft, std::size_t pos) const;
+    usize appendPFLAU(object::Aircraft& aircraft, usize pos) const;
 
     /**
      * @brief Append PFLAA sentence to processing string.
      * @param aircraft The Aircaft
      */
-    std::size_t appendPFLAA(object::Aircraft& aircraft, std::size_t pos) const;
+    usize appendPFLAA(object::Aircraft& aircraft, usize pos) const;
 
 public:
     AircraftProcessor();
-    explicit AircraftProcessor(std::int32_t maxDist);  ///< @param maxDist The max distance filter
+    explicit AircraftProcessor(s32 maxDist);  ///< @param maxDist The max distance filter
     ~AircraftProcessor() noexcept override = default;
 
     /**
@@ -87,8 +84,6 @@ public:
      * @param position The position
      * @param atmPress The pressure
      */
-    void referTo(const object::Location& location, double atmPress);
+    void referTo(object::Location const& location, f64 atmPress);
 };
-
-}  // namespace processor
-}  // namespace data
+}  // namespace data::processor

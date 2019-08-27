@@ -21,15 +21,12 @@
 
 #include "server/net/SocketException.h"
 
-namespace server
+namespace server::net
 {
-namespace net
-{
-SocketException::SocketException(const std::string& msg) : std::exception(), m_message(msg) {}
+SocketException::SocketException(str const& msg) : std::exception(), m_message(msg) {}
 
-const char* SocketException::what() const noexcept
+char const* SocketException::what() const noexcept
 {
     return m_message.c_str();
 }
-}  // namespace net
-}  // namespace server
+}  // namespace server::net

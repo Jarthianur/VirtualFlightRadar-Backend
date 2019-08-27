@@ -24,6 +24,7 @@
 #include <mutex>
 
 #include "object/Atmosphere.h"
+#include "util/types.h"
 
 #include "Data.hpp"
 
@@ -35,12 +36,12 @@ namespace data
 class AtmosphereData : public Data
 {
     object::Atmosphere m_atmosphere;  ///< Atmospheric information
-    mutable std::mutex m_mutex;
+    std::mutex mutable m_mutex;
 
 public:
-    AtmosphereData();
-    explicit AtmosphereData(
-        const object::Atmosphere& atmosphere);  ///< @param atmosphere The initial atm info
+    explicit AtmosphereData(AccessFn&& fn);
+    AtmosphereData(AccessFn&&                fn,
+                   object::Atmosphere const& atmosphere);  ///< @param atmosphere The initial atm info
     ~AtmosphereData() noexcept override = default;
 
     /**
@@ -51,7 +52,7 @@ public:
      */
     bool update(object::Object&& atmosphere) override;
 
-    void access(const accessor_fn& func) override;
+    void access() override;
 
     /**
      * @brief Get the atmospheric pressure.

@@ -27,27 +27,27 @@ using namespace object;
 
 namespace data
 {
-GpsData::GpsData(const GpsPosition& position, bool ground)
-    : Data(), m_position(position), m_groundMode(ground)
+GpsData::GpsData(AccessFn&& fn, GpsPosition const& position, bool ground)
+    : Data(std::move(fn)), m_position(position), m_groundMode(ground)
 {
     m_processor.process(m_position);
 }
 
-void GpsData::access(const accessor_fn& func)
+void GpsData::access()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     try
     {
         m_processor.process(m_position);
-        func(++m_position);
+        m_accessFn(++m_position);
     }
-    catch (const std::exception&)
+    catch (std::exception const&)
     {}
 }
 
 bool GpsData::update(Object&& position)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     if (m_positionLocked)
     {
         throw PositionAlreadyLocked();
@@ -66,7 +66,7 @@ bool GpsData::update(Object&& position)
 
 auto GpsData::location() const -> decltype(m_position.location())
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     return m_position.location();
 }
 
@@ -80,16 +80,15 @@ GpsDataException::GpsDataException() : std::exception() {}
 
 PositionAlreadyLocked::PositionAlreadyLocked() : GpsDataException() {}
 
-const char* PositionAlreadyLocked::what() const noexcept
+char const* PositionAlreadyLocked::what() const noexcept
 {
     return "position was locked before";
 }
 
 ReceivedGoodPosition::ReceivedGoodPosition() : GpsDataException() {}
 
-const char* ReceivedGoodPosition::what() const noexcept
+char const* ReceivedGoodPosition::what() const noexcept
 {
     return "received good position";
 }
-
 }  // namespace data

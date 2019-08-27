@@ -43,7 +43,7 @@ namespace param
  * every second. As well as waiting 1 hour if all receivers are up
  * after 2 minutes.
  */
-constexpr auto CLIENT_CONNECT_WAIT_TIMEVAL = 120;
+inline constexpr auto CLIENT_CONNECT_WAIT_TIMEVAL = 120;
 
 /**
  * Due to unstable hardware/drivers, it became apparent that
@@ -52,7 +52,7 @@ constexpr auto CLIENT_CONNECT_WAIT_TIMEVAL = 120;
  * A good way is to set this value to 1.5 * Y, where
  * Y is the time interval the wind-sensor sends its data.
  */
-constexpr auto WINDCLIENT_RECEIVE_TIMEOUT = 5;
+inline constexpr auto WINDCLIENT_RECEIVE_TIMEOUT = 5;
 
 /**
  * Max amount of clients, which can connect to the VFR-B's
@@ -62,5 +62,5 @@ constexpr auto WINDCLIENT_RECEIVE_TIMEOUT = 5;
  * Consider someone else wants surrounding traffic displayed from
  * somewhere else, like pilots and flight instructors.
  */
-constexpr auto SERVER_MAX_CLIENTS = 3;
+inline constexpr auto SERVER_MAX_CLIENTS = 3;
 }  // namespace param

@@ -22,14 +22,13 @@
 #pragma once
 
 #include <algorithm>
-#include <cstddef>
 #include <list>
-#include <memory>
 #include <mutex>
 #include <thread>
 #include <unordered_set>
 
 #include "util/defines.h"
+#include "util/types.h"
 
 #include "Client.h"
 
@@ -40,7 +39,7 @@ class Feed;
 
 struct thread_group
 {
-    void create_thread(const std::function<void()>& func)
+    void create_thread(std::function<void()> const& func)
     {
         m_threads.push_back(std::thread(func));
     }
@@ -66,7 +65,7 @@ namespace client
  */
 struct ClientHasher
 {
-    std::size_t operator()(const std::shared_ptr<Client>& client) const
+    usize operator()(s_ptr<Client> const& client) const
     {
         return client->hash();
     }
@@ -77,14 +76,14 @@ struct ClientHasher
  */
 struct ClientComparator
 {
-    bool operator()(const std::shared_ptr<Client>& client1, const std::shared_ptr<Client>& client2) const
+    bool operator()(s_ptr<Client> const& client1, s_ptr<Client> const& client2) const
     {
         return client1->equals(*client2);
     }
 };
 
 /// Set of clients with custom hasher and comparator
-using ClientSet = std::unordered_set<std::shared_ptr<Client>, ClientHasher, ClientComparator>;
+using ClientSet = std::unordered_set<s_ptr<Client>, ClientHasher, ClientComparator>;
 /// Iterator in ClientSet
 using ClientIter = ClientSet::iterator;
 
@@ -93,13 +92,13 @@ using ClientIter = ClientSet::iterator;
  */
 class ClientManager
 {
+    NOT_COPYABLE(ClientManager)
+
     ClientSet          m_clients;   ///< Set of clients
     thread_group       m_thdGroup;  ///< Thread group for client threads
     mutable std::mutex m_mutex;
 
 public:
-    NOT_COPYABLE(ClientManager)
-
     ClientManager() = default;
     ~ClientManager() noexcept;
 
@@ -108,7 +107,7 @@ public:
      * @param feed The feed to subscribe
      * @threadsafe
      */
-    void subscribe(std::shared_ptr<feed::Feed> feed);
+    void subscribe(s_ptr<feed::Feed> feed);
 
     /**
      * @brief Run all clients in their own thread.
@@ -123,5 +122,4 @@ public:
      */
     void stop();
 };
-
 }  // namespace client

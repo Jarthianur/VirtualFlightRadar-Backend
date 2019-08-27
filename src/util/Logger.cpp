@@ -25,17 +25,9 @@
 #include <ctime>
 #include <stdexcept>
 
-Logger logger;
-
-void Logger::debug(bool enable)
+void Logger::logFile(str const& file)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_debugEnabled = enable;
-}
-
-void Logger::logFile(const std::string& file)
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_logFile = std::ofstream(file);
     if (!m_logFile)
     {
@@ -45,10 +37,16 @@ void Logger::logFile(const std::string& file)
     m_errStream = &m_logFile;
 }
 
-std::string Logger::time()
+str Logger::time()
 {
     std::time_t tt       = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     char        time[32] = "";
     std::strftime(time, 32, "%c", gmtime(&tt));
-    return std::string(time);
+    return time;
+}
+
+Logger& Logger::instance()
+{
+    static Logger log;
+    return log;
 }

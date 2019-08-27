@@ -25,21 +25,20 @@ using namespace object;
 
 namespace data
 {
-WindData::WindData() : Data() {}
+WindData::WindData(AccessFn&& fn) : Data(std::move(fn)) {}
 
-WindData::WindData(const object::Wind& wind) : Data(), m_wind(wind) {}
+WindData::WindData(AccessFn&& fn, object::Wind const& wind) : Data(std::move(fn)), m_wind(wind) {}
 
 bool WindData::update(Object&& wind)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     return m_wind.tryUpdate(std::move(wind));
 }
 
-void WindData::access(const accessor_fn& func)
+void WindData::access()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    func(++m_wind);
+    std::lock_guard lk(m_mutex);
+    m_accessFn(++m_wind);
     (*m_wind).clear();
 }
-
 }  // namespace data

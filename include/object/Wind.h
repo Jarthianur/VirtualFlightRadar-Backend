@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <string>
+#include "util/types.h"
 
 #include "Object.h"
 
@@ -34,16 +34,15 @@ struct Climate;
  */
 class Wind : public Object
 {
-    std::string m_nmea;
+    str m_nmea;
 
 public:
     Wind();
-    explicit Wind(std::uint32_t priority);  ///< @param priority The initial priority
+    explicit Wind(u32 priority);  ///< @param priority The initial priority
     ~Wind() noexcept override = default;
 
-    std::string& operator*();
+    str& operator*();
 
-    util::CStringPack nmea() const override;
+    std::string_view nmea() const override;
 };
-
 }  // namespace object

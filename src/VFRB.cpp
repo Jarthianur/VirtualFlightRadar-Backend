@@ -47,11 +47,23 @@ using namespace config;
 constexpr auto PROCESS_INTERVAL = 1;
 constexpr auto LOG_PREFIX       = "(VFRB) ";
 
-VFRB::VFRB(std::shared_ptr<Configuration> config)
-    : m_aircraftData(std::make_shared<AircraftData>(config->maxDistance)),
-      m_atmosphereData(std::make_shared<AtmosphereData>(object::Atmosphere{0, config->atmPressure})),
-      m_gpsData(std::make_shared<GpsData>(config->gpsPosition, config->groundMode)),
-      m_windData(std::make_shared<WindData>()),
+static auto const& logger = Logger::instance();
+
+VFRB::VFRB(s_ptr<Configuration> config)
+    : m_aircraftData(std::make_shared<AircraftData>(
+          [this](Object const& it) {
+              if (it.updateAge() < Object::OUTDATED)
+              {
+                  m_server.send(it.nmea());
+              }
+          },
+          config->maxDistance)),
+      m_atmosphereData(
+          std::make_shared<AtmosphereData>([this](Object const& it) { m_server.send(it.nmea()); },
+                                           object::Atmosphere{0, config->atmPressure})),
+      m_gpsData(std::make_shared<GpsData>([this](Object const& it) { m_server.send(it.nmea()); },
+                                          config->gpsPosition, config->groundMode)),
+      m_windData(std::make_shared<WindData>([this](Object const& it) { m_server.send(it.nmea()); })),
       m_server(config->serverPort),
       m_running(false)
 {
@@ -66,18 +78,18 @@ void VFRB::run() noexcept
     util::SignalListener                  signals;
     client::ClientManager                 clientManager;
 
-    signals.addHandler([this](const boost::system::error_code&, const int) {
+    signals.addHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {
         logger.info(LOG_PREFIX, "caught signal to shutdown...");
         m_running = false;
     });
     for (auto it : m_feeds)
     {
-        logger.info(LOG_PREFIX, "run feed: ", it->name);
+        logger.info(LOG_PREFIX, "run feed: ", it->name());
         try
         {
             clientManager.subscribe(it);
         }
-        catch (const std::logic_error& e)
+        catch (std::logic_error const& e)
         {
             logger.error(LOG_PREFIX, ": ", e.what());
         }
@@ -102,20 +114,13 @@ void VFRB::serve()
         try
         {
             m_aircraftData->environment(m_gpsData->location(), m_atmosphereData->atmPressure());
-            m_aircraftData->access([this](const Object& it) {
-                if (it.updateAge() < Object::OUTDATED)
-                {
-                    m_server.send(it.nmea());
-                }
-            });
-
-            auto fn = [this](const Object& it) { m_server.send(it.nmea()); };
-            m_gpsData->access(fn);
-            m_atmosphereData->access(fn);
-            m_windData->access(fn);
+            m_aircraftData->access();
+            m_gpsData->access();
+            m_atmosphereData->access();
+            m_windData->access();
             std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
         }
-        catch (const std::exception& e)
+        catch (std::exception const& e)
         {
             logger.error(LOG_PREFIX, "fatal: ", e.what());
             m_running = false;
@@ -123,29 +128,29 @@ void VFRB::serve()
     }
 }
 
-void VFRB::createFeeds(std::shared_ptr<Configuration> config)
+void VFRB::createFeeds(s_ptr<Configuration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
-    for (const auto& name : config->feedNames)
+    for (auto const& name : config->feedNames)
     {
         try
         {
             m_feeds.push_back(factory.createFeed(name));
         }
-        catch (const std::exception& e)
+        catch (std::exception const& e)
         {
             logger.warn(LOG_PREFIX, "can not create feed ", name, ": ", e.what());
         }
     }
 }
 
-std::string VFRB::duration(std::chrono::steady_clock::time_point start) const
+str VFRB::duration(std::chrono::steady_clock::time_point start) const
 {
     std::chrono::minutes runtime =
         std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start);
-    std::int64_t      d = runtime.count() / 60 / 24;
-    std::int64_t      h = runtime.count() / 60 - d * 24;
-    std::int64_t      m = runtime.count() % 60;
+    s64               d = runtime.count() / 60 / 24;
+    s64               h = runtime.count() / 60 - d * 24;
+    s64               m = runtime.count() % 60;
     std::stringstream ss;
     ss << d << "d " << h << ":" << m;
     return ss.str();

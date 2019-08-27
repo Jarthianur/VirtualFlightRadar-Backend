@@ -44,5 +44,4 @@ public:
      */
     Properties read();
 };
-
 }  // namespace config

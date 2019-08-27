@@ -21,10 +21,8 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstring>
-
 #include "impl/DateTimeImplBoost.h"
+#include "util/types.h"
 #include "util/utility.hpp"
 
 #include "GpsPosition.h"
@@ -39,15 +37,15 @@ namespace object
 class Aircraft : public Object
 {
 public:
-    static constexpr const auto ID_SIZE   = 8;
-    static constexpr const auto NMEA_SIZE = 192;
+    inline static constexpr auto ID_SIZE   = 8;
+    inline static constexpr auto NMEA_SIZE = 192;
 
     /**
      * @brief Device type from which the information is received.
      * @note FLARM is preferred over TRANSPONDER,
      *       in case an aircraft has both available.
      */
-    enum class TargetType : std::uint_fast8_t
+    enum class TargetType : enum_t
     {
         FLARM,
         TRANSPONDER
@@ -56,7 +54,7 @@ public:
     /**
      * @brief Aircraft types with their protocol codes.
      */
-    enum class AircraftType : std::uint_fast8_t
+    enum class AircraftType : enum_t
     {
         UNKNOWN               = 0,
         GLIDER                = 1,
@@ -78,7 +76,7 @@ public:
     /**
      * @brief Id (address) types with their protocol codes.
      */
-    enum class IdType : std::uint_fast8_t
+    enum class IdType : enum_t
     {
         RANDOM = 0,
         ICAO   = 1,
@@ -91,16 +89,16 @@ public:
      */
     struct Movement
     {
-        static constexpr auto MAX_GND_SPEED  = 10000.0;
-        static constexpr auto MIN_GND_SPEED  = -10000.0;
-        static constexpr auto MAX_HEADING    = 359.9;
-        static constexpr auto MIN_HEADING    = 0.0;
-        static constexpr auto MAX_CLIMB_RATE = 10000.0;
-        static constexpr auto MIN_CLIMB_RATE = -10000.0;
+        inline static constexpr auto MAX_GND_SPEED  = 10000.0;
+        inline static constexpr auto MIN_GND_SPEED  = -10000.0;
+        inline static constexpr auto MAX_HEADING    = 359.9;
+        inline static constexpr auto MIN_HEADING    = 0.0;
+        inline static constexpr auto MAX_CLIMB_RATE = 10000.0;
+        inline static constexpr auto MIN_CLIMB_RATE = -10000.0;
 
-        double gndSpeed;   ///< Speed over ground; m/s
-        double heading;    ///< Heading; deg [0-359]
-        double climbRate;  ///< Climb rate; m/s
+        f64 gndSpeed;   ///< Speed over ground; m/s
+        f64 heading;    ///< Heading; deg [0-359]
+        f64 climbRate;  ///< Climb rate; m/s
     };
 
 private:
@@ -123,29 +121,28 @@ private:
     /**
      * @brief Override Object::canUpdate.
      */
-    bool canUpdate(const Object& other) const override;
+    bool canUpdate(Object const& other) const override;
 
 public:
-    Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT, const Location& loc,
-             const Movement& move, const Timestamp<time::DateTimeImplBoost>& timestamp);
-    Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT, const Location& loc,
-             const Timestamp<time::DateTimeImplBoost>& timestamp);
+    Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
+             Movement const& move, Timestamp<time::DateTimeImplBoost> const& timestamp);
+    Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
+             Timestamp<time::DateTimeImplBoost> const& timestamp);
     Aircraft(Aircraft&& other);
     ~Aircraft() noexcept override = default;
 
     util::CString<NMEA_SIZE>& operator*();
     Aircraft&                 operator=(Aircraft&& other);
 
-    util::CStringPack nmea() const override;
-    auto              idType() const -> decltype(m_idType);
-    auto              aircraftType() const -> decltype(m_aircraftType);
-    auto              id() const -> const decltype(m_id)&;
-    auto              targetType() const -> decltype(m_targetType);
-    auto              location() const -> const decltype(m_location)&;
-    auto              movement() const -> const decltype(m_movement)&;
-    auto              timestamp() const -> const decltype(m_timestamp)&;
-    auto              hasFullInfo() const -> decltype(m_fullInfo);
-    void              targetType(TargetType tt);
+    std::string_view nmea() const override;
+    auto             idType() const -> decltype(m_idType);
+    auto             aircraftType() const -> decltype(m_aircraftType);
+    auto             id() const -> decltype(m_id) const&;
+    auto             targetType() const -> decltype(m_targetType);
+    auto             location() const -> decltype(m_location) const&;
+    auto             movement() const -> decltype(m_movement) const&;
+    auto             timestamp() const -> decltype(m_timestamp) const&;
+    auto             hasFullInfo() const -> decltype(m_fullInfo);
+    void             targetType(TargetType tt);
 };
-
 }  // namespace object

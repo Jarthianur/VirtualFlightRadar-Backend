@@ -31,29 +31,29 @@ ClientManager::~ClientManager() noexcept
     stop();
 }
 
-void ClientManager::subscribe(std::shared_ptr<feed::Feed> feed)
+void ClientManager::subscribe(s_ptr<feed::Feed> feed)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    ClientIter                  it = m_clients.end();
-    it                             = m_clients.insert(ClientFactory::createClientFor(feed)).first;
+    std::lock_guard lk(m_mutex);
+    ClientIter      it = m_clients.end();
+    it                 = m_clients.insert(ClientFactory::createClientFor(feed)).first;
     if (it != m_clients.end())
     {
         (*it)->subscribe(feed);
     }
     else
     {
-        throw std::logic_error("could not subscribe feed " + feed->name);
+        throw std::logic_error("could not subscribe feed " + feed->name());
     }
 }
 
 void ClientManager::run()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     for (auto it : m_clients)
     {
         m_thdGroup.create_thread([this, it] {
             it->run();
-            std::lock_guard<std::mutex> lock(m_mutex);
+            std::lock_guard lk(m_mutex);
             m_clients.erase(it);
         });
     }
@@ -62,7 +62,7 @@ void ClientManager::run()
 void ClientManager::stop()
 {
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         for (auto it : m_clients)
         {
             it->scheduleStop();

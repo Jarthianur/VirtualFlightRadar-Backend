@@ -22,31 +22,32 @@
 #pragma once
 
 #include <functional>
-#include <mutex>
 #include <thread>
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
 #include "util/defines.h"
+#include "util/types.h"
 
 namespace util
 {
 /// Handler function
-using SignalHandler = std::function<void(const boost::system::error_code&, const int)>;
+using SignalHandler = std::function<void(boost::system::error_code const&, int const)>;
 
 /**
  * @brief Catch and handle system signals.
  */
 class SignalListener
 {
+    NOT_COPYABLE(SignalListener)
+
     boost::asio::io_service m_ioService;  ///< Internal IO-service
     boost::asio::signal_set m_sigSet;     ///< Internal signal set
     std::thread             m_thread;     ///< Thread to run this
-    mutable std::mutex      m_mutex;
+    std::mutex mutable m_mutex;
 
 public:
-    NOT_COPYABLE(SignalListener)
     SignalListener();
     ~SignalListener() noexcept;
 
@@ -67,6 +68,6 @@ public:
      * @param handler The handler to invoke when signal caught
      * @threadsafe
      */
-    void addHandler(const SignalHandler& handler);
+    void addHandler(SignalHandler const& handler);
 };
 }  // namespace util

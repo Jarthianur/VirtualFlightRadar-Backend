@@ -25,10 +25,8 @@
 
 #include "server/net/SocketException.h"
 
-namespace server
+namespace server::net
 {
-using namespace net;
-
 SocketImplBoost::SocketImplBoost(SocketImplBoost&& other) : m_socket(boost::move(other.m_socket)) {}
 
 SocketImplBoost& SocketImplBoost::operator=(SocketImplBoost&& other)
@@ -51,7 +49,7 @@ SocketImplBoost::~SocketImplBoost() noexcept
     close();
 }
 
-std::string SocketImplBoost::address() const
+str SocketImplBoost::address() const
 {
     if (!m_socket.is_open())
     {
@@ -60,14 +58,14 @@ std::string SocketImplBoost::address() const
     return m_socket.remote_endpoint().address().to_string();
 }
 
-bool SocketImplBoost::write(const util::CStringPack& msg)
+bool SocketImplBoost::write(std::string_view const& msg)
 {
     if (!m_socket.is_open())
     {
         throw SocketException("cannot write on closed socket");
     }
     boost::system::error_code ec;
-    boost::asio::write(m_socket, boost::asio::buffer(msg.first, msg.second), ec);
+    boost::asio::write(m_socket, boost::asio::buffer(msg.data(), msg.length()), ec);
     return !ec;
 }
 
@@ -85,5 +83,4 @@ boost::asio::ip::tcp::socket& SocketImplBoost::get()
 {
     return m_socket;
 }
-
-}  // namespace server
+}  // namespace server::net

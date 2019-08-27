@@ -30,6 +30,8 @@ namespace client
  */
 class GpsdClient : public Client
 {
+    NOT_COPYABLE(GpsdClient)
+
     /**
      * @brief Send unwatch-request and stop this client.
      */
@@ -48,15 +50,14 @@ class GpsdClient : public Client
      */
     void handleWatch(bool error);
 
-public:
-    NOT_COPYABLE(GpsdClient)
+    char const* logPrefix() const override;
 
+public:
     /**
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    GpsdClient(const net::Endpoint& endpoint, std::shared_ptr<net::Connector> connector);
+    GpsdClient(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
     ~GpsdClient() noexcept override = default;
 };
-
 }  // namespace client

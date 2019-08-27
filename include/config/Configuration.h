@@ -21,12 +21,11 @@
 
 #pragma once
 
-#include <cstdint>
 #include <istream>
 #include <list>
-#include <string>
 
 #include "object/GpsPosition.h"
+#include "util/types.h"
 
 #include "Properties.h"
 
@@ -37,27 +36,27 @@ namespace config
  */
 class Configuration final
 {
-    const Properties m_properties;  ///< Properties from file
+    Properties const m_properties;  ///< Properties from file
 
     /**
      * @brief Resolve the fallback position.
      * @param properties The properties
      * @return the position
      */
-    object::GpsPosition resolvePosition(const Properties& properties) const;
+    object::GpsPosition resolvePosition(Properties const& properties) const;
 
     /**
      * @brief Resolve the server port.
      * @param properties The properties
      * @return the port number
      */
-    std::uint16_t resolveServerPort(const Properties& properties) const;
+    u16 resolveServerPort(Properties const& properties) const;
 
     /**
      * @brief Resolve the feeds and their config.
      * @param properties The properties
      */
-    std::unordered_map<std::string, Properties> resolveFeeds(const Properties& properties);
+    std::unordered_map<str, Properties> resolveFeeds(Properties const& properties);
 
     /**
      * @brief Resolve a filter value.
@@ -66,7 +65,7 @@ class Configuration final
      * @param path       The filter key
      * @return the filter value
      */
-    std::int32_t resolveFilter(const Properties& properties, const char* key) const;
+    s32 resolveFilter(Properties const& properties, char const* key) const;
 
     /**
      * @brief Dump the current config state as info log.
@@ -75,58 +74,58 @@ class Configuration final
 
 public:
     // Configuration section keys
-    static const char* SECT_KEY_FALLBACK;
-    static const char* SECT_KEY_GENERAL;
-    static const char* SECT_KEY_FILTER;
+    inline static constexpr auto SECT_KEY_FALLBACK = "fallback";
+    inline static constexpr auto SECT_KEY_GENERAL  = "general";
+    inline static constexpr auto SECT_KEY_FILTER   = "filter";
 
     // Keywords for feeds
-    static const char* SECT_KEY_APRSC;
-    static const char* SECT_KEY_SBS;
-    static const char* SECT_KEY_GPS;
-    static const char* SECT_KEY_WIND;
-    static const char* SECT_KEY_ATMOS;
+    inline static constexpr auto SECT_KEY_APRSC = "aprs";
+    inline static constexpr auto SECT_KEY_SBS   = "sbs";
+    inline static constexpr auto SECT_KEY_GPS   = "gps";
+    inline static constexpr auto SECT_KEY_WIND  = "wind";
+    inline static constexpr auto SECT_KEY_ATMOS = "atm";
 
     // Property keys for section "general"
-    static const char* KV_KEY_FEEDS;
-    static const char* KV_KEY_GND_MODE;
-    static const char* KV_KEY_SERVER_PORT;
+    inline static constexpr auto KV_KEY_FEEDS       = "feeds";
+    inline static constexpr auto KV_KEY_GND_MODE    = "gndMode";
+    inline static constexpr auto KV_KEY_SERVER_PORT = "serverPort";
 
     // Property keys for section "fallback"
-    static const char* KV_KEY_LATITUDE;
-    static const char* KV_KEY_LONGITUDE;
-    static const char* KV_KEY_ALTITUDE;
-    static const char* KV_KEY_GEOID;
-    static const char* KV_KEY_PRESSURE;
+    inline static constexpr auto KV_KEY_LATITUDE  = "latitude";
+    inline static constexpr auto KV_KEY_LONGITUDE = "longitude";
+    inline static constexpr auto KV_KEY_ALTITUDE  = "altitude";
+    inline static constexpr auto KV_KEY_GEOID     = "geoid";
+    inline static constexpr auto KV_KEY_PRESSURE  = "pressure";
 
     // Property keys for section "filter"
-    static const char* KV_KEY_MAX_DIST;
-    static const char* KV_KEY_MAX_HEIGHT;
+    inline static constexpr auto KV_KEY_MAX_DIST   = "maxDistance";
+    inline static constexpr auto KV_KEY_MAX_HEIGHT = "maxHeight";
 
     // Property keys for feed sections
-    static const char* KV_KEY_HOST;
-    static const char* KV_KEY_PORT;
-    static const char* KV_KEY_PRIORITY;
-    static const char* KV_KEY_LOGIN;
+    inline static constexpr auto KV_KEY_HOST     = "host";
+    inline static constexpr auto KV_KEY_PORT     = "port";
+    inline static constexpr auto KV_KEY_PRIORITY = "priority";
+    inline static constexpr auto KV_KEY_LOGIN    = "login";
 
-    static const char* PATH_FEEDS;
-    static const char* PATH_GND_MODE;
-    static const char* PATH_SERVER_PORT;
-    static const char* PATH_LATITUDE;
-    static const char* PATH_LONGITUDE;
-    static const char* PATH_ALTITUDE;
-    static const char* PATH_GEOID;
-    static const char* PATH_PRESSURE;
-    static const char* PATH_MAX_DIST;
-    static const char* PATH_MAX_HEIGHT;
+    inline static constexpr auto PATH_FEEDS       = "general.feeds";
+    inline static constexpr auto PATH_GND_MODE    = "general.gndMode";
+    inline static constexpr auto PATH_SERVER_PORT = "general.serverPort";
+    inline static constexpr auto PATH_LATITUDE    = "fallback.latitude";
+    inline static constexpr auto PATH_LONGITUDE   = "fallback.longitude";
+    inline static constexpr auto PATH_ALTITUDE    = "fallback.altitude";
+    inline static constexpr auto PATH_GEOID       = "fallback.geoid";
+    inline static constexpr auto PATH_PRESSURE    = "fallback.pressure";
+    inline static constexpr auto PATH_MAX_DIST    = "filter.maxDistance";
+    inline static constexpr auto PATH_MAX_HEIGHT  = "filter.maxHeight";
 
-    bool                         groundMode;   ///< Ground mode state
-    const object::GpsPosition    gpsPosition;  ///< Fallback position
-    const double                 atmPressure;  ///< Atmospheric fallback pressure
-    const std::int32_t           maxHeight;    ///< Maximum height for reported aircrafts
-    const std::int32_t           maxDistance;  ///< Maximum distance for reported aircrafts
-    const std::uint16_t          serverPort;   ///< Port where to serve reports
-    const std::list<std::string> feedNames;    ///< List of feed names
-    const std::unordered_map<std::string, Properties> feedProperties;  ///< Map feed names to their properties
+    bool                                      groundMode;      ///< Ground mode state
+    object::GpsPosition const                 gpsPosition;     ///< Fallback position
+    f64 const                                 atmPressure;     ///< Atmospheric fallback pressure
+    s32 const                                 maxHeight;       ///< Maximum height for reported aircrafts
+    s32 const                                 maxDistance;     ///< Maximum distance for reported aircrafts
+    u16 const                                 serverPort;      ///< Port where to serve reports
+    std::list<str> const                      feedNames;       ///< List of feed names
+    std::unordered_map<str, Properties> const feedProperties;  ///< Map feed names to their properties
 
     /**
      * @param stream The input stream
@@ -135,5 +134,4 @@ public:
     explicit Configuration(std::istream& stream);
     ~Configuration() noexcept = default;
 };
-
 }  // namespace config

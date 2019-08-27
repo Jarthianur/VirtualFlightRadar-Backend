@@ -22,12 +22,13 @@
 #include "config/ConfigReader.h"
 
 #include <stdexcept>
-#include <string>
 #include <utility>
 
 #include <boost/property_tree/exceptions.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+
+using namespace boost::property_tree;
 
 namespace config
 {
@@ -35,12 +36,12 @@ ConfigReader::ConfigReader(std::istream& stream) : m_stream(stream) {}
 
 Properties ConfigReader::read()
 {
-    boost::property_tree::ptree tree;
+    ptree tree;
     try
     {
-        boost::property_tree::read_ini(m_stream, tree);
+        read_ini(m_stream, tree);
     }
-    catch (const boost::property_tree::ini_parser_error& e)
+    catch (ini_parser_error const& e)
     {
         throw std::invalid_argument(e.filename() + " is not a valid INI file");
     }

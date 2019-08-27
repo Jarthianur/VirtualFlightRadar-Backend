@@ -21,25 +21,25 @@
 
 #pragma once
 
-#include <cstdint>
 #include <stdexcept>
-#include <string>
 
-namespace object
-{
-namespace time
+#include "util/types.h"
+
+namespace object::time
 {
 /**
  * @brief Format of a given time string.
  */
-enum class Format : std::uint_fast8_t
+enum class Format : enum_t
 {
     HHMMSS,
     HH_MM_SS_FFF
 };
 
-}  // namespace time
+}  // namespace object::time
 
+namespace object
+{
 /**
  * @brief A timestamp
  * @tparam DateTimeT The provider of time functions
@@ -47,8 +47,8 @@ enum class Format : std::uint_fast8_t
 template<typename DateTimeT>
 class Timestamp
 {
-    std::int64_t  m_value = 0;  ///< Time in milliseconds
-    std::uint32_t m_day   = 0;  ///< Incremental day number
+    s64 m_value = 0;  ///< Time in milliseconds
+    u32 m_day   = 0;  ///< Incremental day number
 
 public:
     Timestamp() = default;
@@ -57,8 +57,8 @@ public:
      * @param format The format
      * @throw std::invalid_argument if the time string is invalid
      */
-    Timestamp(const std::string& value, time::Format format);
-    Timestamp(const Timestamp& other);  ///< @param other The other Timestamp
+    Timestamp(str const& value, time::Format format);
+    Timestamp(Timestamp const& other);  ///< @param other The other Timestamp
     ~Timestamp() noexcept = default;
 
     /**
@@ -66,20 +66,20 @@ public:
      * @param other The other Timestamp
      * @return this
      */
-    Timestamp& operator=(const Timestamp& other);
+    Timestamp& operator=(Timestamp const& other);
 
     /**
      * @brief Compare this value to be less than, or equals others.
      * @param other The other Timestamp
      * @return true if less, or equals, else false
      */
-    bool operator>(const Timestamp& other) const;
+    bool operator>(Timestamp const& other) const;
 };
 
 template<typename DateTimeT>
-Timestamp<DateTimeT>::Timestamp(const std::string& value, time::Format format) : m_day(DateTimeT::day())
+Timestamp<DateTimeT>::Timestamp(str const& value, time::Format format) : m_day(DateTimeT::day())
 {
-    std::int32_t h = 99, m = 99, s = 99, f = 9999;
+    s32 h = 99, m = 99, s = 99, f = 9999;
     try
     {
         switch (format)
@@ -102,7 +102,7 @@ Timestamp<DateTimeT>::Timestamp(const std::string& value, time::Format format) :
             break;
         }
     }
-    catch (const std::out_of_range&)
+    catch (std::out_of_range const&)
     {
         throw std::invalid_argument("");
     }
@@ -110,7 +110,7 @@ Timestamp<DateTimeT>::Timestamp(const std::string& value, time::Format format) :
     {
         throw std::invalid_argument("");
     }
-    m_value = static_cast<std::int64_t>(h * 3600000 + m * 60000 + s * 1000 + f);
+    m_value = static_cast<s64>(h * 3600000 + m * 60000 + s * 1000 + f);
     if (m_value >= DateTimeT::now())
     {
         --m_day;
@@ -118,12 +118,12 @@ Timestamp<DateTimeT>::Timestamp(const std::string& value, time::Format format) :
 }
 
 template<typename DateTimeT>
-Timestamp<DateTimeT>::Timestamp(const Timestamp<DateTimeT>& other)
+Timestamp<DateTimeT>::Timestamp(Timestamp<DateTimeT> const& other)
     : m_value(other.m_value), m_day(other.m_day)
 {}
 
 template<typename DateTimeT>
-Timestamp<DateTimeT>& Timestamp<DateTimeT>::operator=(const Timestamp<DateTimeT>& other)
+Timestamp<DateTimeT>& Timestamp<DateTimeT>::operator=(Timestamp<DateTimeT> const& other)
 {
     this->m_value = other.m_value;
     this->m_day   = other.m_day;
@@ -131,9 +131,8 @@ Timestamp<DateTimeT>& Timestamp<DateTimeT>::operator=(const Timestamp<DateTimeT>
 }
 
 template<typename DateTimeT>
-bool Timestamp<DateTimeT>::operator>(const Timestamp<DateTimeT>& other) const
+bool Timestamp<DateTimeT>::operator>(Timestamp<DateTimeT> const& other) const
 {
     return (this->m_day > other.m_day) || ((this->m_day == other.m_day) && this->m_value > other.m_value);
 }
-
 }  // namespace object

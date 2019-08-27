@@ -27,9 +27,8 @@
 
 namespace object
 {
-Aircraft::Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT,
-                   const Location& loc, const Movement& move,
-                   const Timestamp<time::DateTimeImplBoost>& timestamp)
+Aircraft::Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
+                   Movement const& move, Timestamp<time::DateTimeImplBoost> const& timestamp)
     : Object(priority),
       m_id(id),
       m_idType(idT > IdType::OGN ? IdType::RANDOM : idT),
@@ -44,8 +43,8 @@ Aircraft::Aircraft(std::uint32_t priority, const std::string& id, IdType idT, Ai
     math::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
 }
 
-Aircraft::Aircraft(std::uint32_t priority, const std::string& id, IdType idT, AircraftType aT,
-                   const Location& loc, const Timestamp<time::DateTimeImplBoost>& timestamp)
+Aircraft::Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
+                   Timestamp<time::DateTimeImplBoost> const& timestamp)
     : Aircraft(priority, id, idT, aT, loc, {.0, .0, .0}, timestamp)
 {
     m_targetType = TargetType::TRANSPONDER;
@@ -61,7 +60,7 @@ void Aircraft::assign(Object&& other)
 {
     try
     {
-        Aircraft&& update = dynamic_cast<Aircraft&&>(other);
+        auto&& update = dynamic_cast<Aircraft&&>(other);
         Object::assign(std::move(other));
         this->m_idType       = update.m_idType;
         this->m_aircraftType = update.m_aircraftType;
@@ -71,27 +70,27 @@ void Aircraft::assign(Object&& other)
         this->m_timestamp    = update.m_timestamp;
         this->m_fullInfo     = update.m_fullInfo;
     }
-    catch (const std::bad_cast&)
+    catch (std::bad_cast const&)
     {}
 }
 
-bool Aircraft::canUpdate(const Object& other) const
+bool Aircraft::canUpdate(Object const& other) const
 {
     try
     {
-        const Aircraft& toUpdate = dynamic_cast<const Aircraft&>(other);
+        auto const& toUpdate = dynamic_cast<Aircraft const&>(other);
         return (this->m_timestamp > toUpdate.m_timestamp) &&
                (toUpdate.m_targetType == TargetType::TRANSPONDER ||
                 this->m_targetType == TargetType::FLARM) &&
                Object::canUpdate(other);
     }
-    catch (const std::bad_cast&)
+    catch (std::bad_cast const&)
     {
         return false;
     }
 }
 
-util::CStringPack Aircraft::nmea() const
+std::string_view Aircraft::nmea() const
 {
     return m_nmea;
 }
@@ -117,7 +116,7 @@ auto Aircraft::aircraftType() const -> decltype(m_aircraftType)
     return m_aircraftType;
 }
 
-auto Aircraft::id() const -> const decltype(m_id)&
+auto Aircraft::id() const -> decltype(m_id) const&
 {
     return m_id;
 }
@@ -127,17 +126,17 @@ auto Aircraft::targetType() const -> decltype(m_targetType)
     return m_targetType;
 }
 
-auto Aircraft::location() const -> const decltype(m_location)&
+auto Aircraft::location() const -> decltype(m_location) const&
 {
     return m_location;
 }
 
-auto Aircraft::movement() const -> const decltype(m_movement)&
+auto Aircraft::movement() const -> decltype(m_movement) const&
 {
     return m_movement;
 }
 
-auto Aircraft::timestamp() const -> const decltype(m_timestamp)&
+auto Aircraft::timestamp() const -> decltype(m_timestamp) const&
 {
     return m_timestamp;
 }
@@ -151,5 +150,4 @@ void Aircraft::targetType(TargetType tt)
 {
     m_targetType = tt;
 }
-
 }  // namespace object

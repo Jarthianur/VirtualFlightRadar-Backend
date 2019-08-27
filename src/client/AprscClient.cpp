@@ -28,33 +28,33 @@
 
 #include "util/Logger.hpp"
 
+using namespace client::net;
+
 namespace client
 {
-using namespace net;
+constexpr auto     LOG_PREFIX = "(AprscClient) ";
+static auto const& logger     = Logger::instance();
 
-constexpr auto LOG_PREFIX = "(AprscClient) ";
-
-AprscClient::AprscClient(const Endpoint& endpoint, const std::string& login,
-                         std::shared_ptr<Connector> connector)
-    : Client(endpoint, LOG_PREFIX, connector), m_login(login + "\r\n")
+AprscClient::AprscClient(Endpoint const& endpoint, str const& login, s_ptr<Connector> connector)
+    : Client(endpoint, connector), m_login(login + "\r\n")
 {}
 
-bool AprscClient::equals(const Client& other) const
+bool AprscClient::equals(Client const& other) const
 {
     try
     {
-        const AprscClient& derived = dynamic_cast<const AprscClient&>(other);
+        auto const& derived = dynamic_cast<AprscClient const&>(other);
         return Client::equals(other) && this->m_login == derived.m_login;
     }
-    catch (const std::bad_cast&)
+    catch (std::bad_cast const&)
     {
         return false;
     }
 }
 
-std::size_t AprscClient::hash() const
+usize AprscClient::hash() const
 {
-    std::size_t seed = Client::hash();
+    usize seed = Client::hash();
     boost::hash_combine(seed, boost::hash_value(m_login));
     return seed;
 }
@@ -63,7 +63,7 @@ void AprscClient::handleConnect(bool error)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         m_connector->onWrite(m_login, std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
         sendKeepAlive();
     }
@@ -84,7 +84,7 @@ void AprscClient::handleLogin(bool error)
     if (!error)
     {
         logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         read();
     }
     else
@@ -97,7 +97,7 @@ void AprscClient::handleSendKeepAlive(bool error)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         m_connector->onWrite("#keep-alive beacon\r\n", [this](bool error) {
             if (!error)
             {
@@ -110,5 +110,10 @@ void AprscClient::handleSendKeepAlive(bool error)
             }
         });
     }
+}
+
+char const* AprscClient::logPrefix() const
+{
+    return LOG_PREFIX;
 }
 }  // namespace client

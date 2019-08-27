@@ -32,42 +32,43 @@
 
 #include "parameters.h"
 
+static auto const& logger = Logger::instance();
+
+using namespace client::net;
+
 namespace client
 {
-using namespace net;
-
-Client::Client(const Endpoint& endpoint, const char* logPrefix, std::shared_ptr<Connector> connector)
-    : m_connector(connector), m_logPrefix(logPrefix), m_endpoint(endpoint)
+Client::Client(Endpoint const& endpoint, s_ptr<Connector> connector)
+    : m_connector(connector), m_endpoint(endpoint)
 {}
 
 void Client::run()
 {
-    std::unique_lock<std::mutex> lock(m_mutex);
-    if (!m_running)
+    if (std::unique_lock lk(m_mutex); !m_running)
     {
         m_running = true;
         connect();
-        lock.unlock();
+        lk.unlock();
         m_connector->run();
     }
 }
 
-bool Client::equals(const Client& other) const
+bool Client::equals(Client const& other) const
 {
     return this->m_endpoint == other.m_endpoint;
 }
 
-std::size_t Client::hash() const
+usize Client::hash() const
 {
-    std::size_t seed = 0;
+    usize seed = 0;
     boost::hash_combine(seed, boost::hash_value(m_endpoint.host));
     boost::hash_combine(seed, boost::hash_value(m_endpoint.port));
     return seed;
 }
 
-void Client::subscribe(std::shared_ptr<feed::Feed> feed)
+void Client::subscribe(s_ptr<feed::Feed> feed)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     m_feeds.push_back(feed);
 }
 
@@ -78,10 +79,9 @@ void Client::connect()
 
 void Client::reconnect()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_running)
+    if (std::lock_guard lk(m_mutex); m_running)
     {
-        logger.info(m_logPrefix, "schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(logPrefix(), "schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->close();
         timedConnect();
     }
@@ -98,16 +98,16 @@ void Client::stop()
     if (m_running)
     {
         m_running = false;
-        logger.info(m_logPrefix, "disconnect from ", m_endpoint.host, ":", m_endpoint.port);
+        logger.info(logPrefix(), "disconnect from ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->stop();
     }
 }
 
 void Client::scheduleStop()
 {
-    std::condition_variable      cond_ready;
-    std::unique_lock<std::mutex> lock(m_mutex);
-    cond_ready.wait_for(lock, std::chrono::milliseconds(100), [this] { return m_running; });
+    std::condition_variable cond_ready;
+    std::unique_lock        lk(m_mutex);
+    cond_ready.wait_for(lk, std::chrono::milliseconds(100), [this] { return m_running; });
     stop();
 }
 
@@ -120,22 +120,22 @@ void Client::handleTimedConnect(bool error)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        logger.info(m_logPrefix, "try connect to ", m_endpoint.host, ":", m_endpoint.port);
+        std::lock_guard lk(m_mutex);
+        logger.info(logPrefix(), "try connect to ", m_endpoint.host, ":", m_endpoint.port);
         connect();
     }
     else
     {
-        logger.error(m_logPrefix, "failed to connect after timeout");
+        logger.error(logPrefix(), "failed to connect after timeout");
         scheduleStop();
     }
 }
 
-void Client::handleRead(bool error, const std::string& response)
+void Client::handleRead(bool error, str const& response)
 {
     if (!error)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard lk(m_mutex);
         for (auto& it : m_feeds)
         {
             if (!it->process(response))
@@ -147,7 +147,7 @@ void Client::handleRead(bool error, const std::string& response)
     }
     else
     {
-        logger.error(m_logPrefix, "failed to read message");
+        logger.error(logPrefix(), "failed to read message");
         reconnect();
     }
 }

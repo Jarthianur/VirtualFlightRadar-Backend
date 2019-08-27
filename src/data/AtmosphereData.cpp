@@ -25,26 +25,27 @@ using namespace object;
 
 namespace data
 {
-AtmosphereData::AtmosphereData() : Data() {}
+AtmosphereData::AtmosphereData(AccessFn&& fn) : Data(std::move(fn)) {}
 
-AtmosphereData::AtmosphereData(const Atmosphere& atmosphere) : Data(), m_atmosphere(atmosphere) {}
+AtmosphereData::AtmosphereData(AccessFn&& fn, Atmosphere const& atmosphere)
+    : Data(std::move(fn)), m_atmosphere(atmosphere)
+{}
 
-void AtmosphereData::access(const accessor_fn& func)
+void AtmosphereData::access()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    func(++m_atmosphere);
+    std::lock_guard lk(m_mutex);
+    m_accessFn(++m_atmosphere);
 }
 
 bool AtmosphereData::update(Object&& atmosphere)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     return m_atmosphere.tryUpdate(std::move(atmosphere));
 }
 
 auto AtmosphereData::atmPressure() const -> decltype(m_atmosphere.pressure())
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard lk(m_mutex);
     return m_atmosphere.pressure();
 }
-
 }  // namespace data
