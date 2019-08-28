@@ -23,7 +23,10 @@
 
 #include <istream>
 
+#include "error/Exception.hpp"
+
 #include "Properties.h"
+#include "types.h"
 
 namespace vfrb::config
 {
@@ -44,4 +47,18 @@ public:
      */
     Properties read();
 };
+
+namespace error
+{
+class ReadFileError : public vfrb::error::Exception
+{
+    str const m_fname;
+
+public:
+    ReadFileError(str const& file);
+    ~ReadFileError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
 }  // namespace vfrb::config

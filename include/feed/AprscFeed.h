@@ -46,8 +46,8 @@ class AprscFeed : public Feed
 
     static constexpr auto LOG_PREFIX = "(AprscFeed) ";
 
-    static parser::AprsParser      s_parser;  ///< Parser to unpack response from Client
-    concurrency::WorkerThread<str> m_worker;
+    static parser::AprsParser     s_parser;  ///< Parser to unpack response from Client
+    concurrent::WorkerThread<str> m_worker;
 
 public:
     /**

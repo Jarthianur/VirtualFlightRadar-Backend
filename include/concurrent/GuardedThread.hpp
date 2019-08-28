@@ -22,14 +22,29 @@
 #pragma once
 
 #include <future>
-#include <stdexcept>
 #include <thread>
 #include <utility>
 
+#include "error/Exception.hpp"
 #include "util/defines.h"
 
-namespace vfrb::concurrency
+namespace vfrb::concurrent
 {
+namespace error
+{
+class ThreadUsedError : public vfrb::error::Exception
+{
+public:
+    ThreadUsedError() : vfrb::error::Exception() {}
+    ~ThreadUsedError() noexcept override = default;
+
+    char const* what() const noexcept override
+    {
+        return "thread already used";
+    }
+};
+}  // namespace error
+
 class GuardedThread
 {
     NOT_COPYABLE(GuardedThread)
@@ -72,7 +87,7 @@ public:
     {
         if (m_state.valid())
         {
-            throw std::logic_error("thread already running");
+            throw error::ThreadUsedError();
         }
         m_thread = std::move(other.m_thread);
         m_state  = std::move(other.m_state);
@@ -82,7 +97,7 @@ public:
     {
         if (m_state.valid())
         {
-            throw std::logic_error("thread already running");
+            throw error::ThreadUsedError();
         }
         m_thread = std::move(other.m_thread);
         m_state  = std::move(other.m_state);
@@ -94,9 +109,9 @@ public:
     {
         if (m_state.valid())
         {
-            throw std::logic_error("thread already running");
+            throw error::ThreadUsedError();
         }
         init<FnT>(std::forward<FnT>(fn));
     }
 };
-}  // namespace vfrb::concurrency
+}  // namespace vfrb::concurrent

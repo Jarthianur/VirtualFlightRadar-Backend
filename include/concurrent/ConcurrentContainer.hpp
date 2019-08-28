@@ -26,9 +26,9 @@
 #include <utility>
 
 #include "util/defines.h"
-#include "util/types.h"
+#include "types.h"
 
-namespace vfrb::concurrency
+namespace vfrb::concurrent
 {
 /**
  * @brief Internal container for aircrafts.
@@ -185,4 +185,4 @@ private:
     ContainerType m_container;  ///< Underlying container
     std::mutex mutable m_modMutex;
 };
-}  // namespace vfrb::concurrency
+}  // namespace vfrb::concurrent

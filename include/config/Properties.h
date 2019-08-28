@@ -25,7 +25,9 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "util/types.h"
+#include "error/Exception.hpp"
+
+#include "types.h"
 
 namespace vfrb::config
 {
@@ -58,4 +60,18 @@ public:
      */
     Properties section(str const& section) const;
 };
+
+namespace error
+{
+class PropertyNotFoundError : public vfrb::error::Exception
+{
+    str const m_property;
+
+public:
+    PropertyNotFoundError(str const& prop);
+    ~PropertyNotFoundError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
 }  // namespace vfrb::config

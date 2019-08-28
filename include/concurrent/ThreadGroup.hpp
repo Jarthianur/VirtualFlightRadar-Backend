@@ -24,10 +24,11 @@
 #include <functional>
 #include <list>
 
-#include "concurrency/GuardedThread.hpp"
 #include "util/defines.h"
 
-namespace vfrb::concurrency
+#include "GuardedThread.hpp"
+
+namespace vfrb::concurrent
 {
 class ThreadGroup
 {
@@ -53,4 +54,4 @@ public:
         m_threads.clear();
     }
 };
-}  // namespace vfrb::concurrency
+}  // namespace vfrb::concurrent

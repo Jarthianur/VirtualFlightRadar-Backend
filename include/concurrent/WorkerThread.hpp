@@ -26,11 +26,12 @@
 #include <functional>
 #include <queue>
 
-#include "concurrency/GuardedThread.hpp"
 #include "util/defines.h"
-#include "util/types.h"
 
-namespace vfrb::concurrency
+#include "GuardedThread.hpp"
+#include "types.h"
+
+namespace vfrb::concurrent
 {
 template<typename DataT, typename FnT>
 class WorkerThreadT
@@ -96,4 +97,4 @@ void WorkerThreadT<DataT, FnT>::push(DataT const& data)
 
 template<typename DataT>
 using WorkerThread = WorkerThreadT<DataT, std::function<void(DataT&&)>>;
-}  // namespace vfrb::concurrency
+}  // namespace vfrb::concurrent

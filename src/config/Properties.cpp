@@ -51,13 +51,13 @@ str Properties::property(str const& path) const
         auto p = m_pTree.get_child(path).get_value<str>();
         if (p.empty())
         {
-            throw std::out_of_range(path + " is empty");
+            throw error::PropertyNotFoundError(path);
         }
         return p;
     }
     catch (ptree_bad_path const&)
     {
-        throw std::out_of_range(path + " not found");
+        throw error::PropertyNotFoundError(path);
     }
 }
 
@@ -69,7 +69,19 @@ Properties Properties::section(str const& section) const
     }
     catch (ptree_bad_path const&)
     {
-        throw std::out_of_range(section + " not found");
+        throw error::PropertyNotFoundError(section);
     }
 }
+
+namespace error
+{
+PropertyNotFoundError::PropertyNotFoundError(str const& prop)
+    : vfrb::error::Exception(), m_property(prop + " not found")
+{}
+
+char const* PropertyNotFoundError::what() const noexcept
+{
+    return m_property.c_str();
+}
+}  // namespace error
 }  // namespace vfrb::config

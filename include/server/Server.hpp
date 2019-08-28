@@ -54,7 +54,7 @@ class Server
     u8   m_activeConnections = 0;      ///< Number of active connections
     bool m_running           = false;  ///< Running state
     std::mutex mutable m_mutex;
-    concurrency::GuardedThread m_thread;  ///< Internal thread
+    concurrent::GuardedThread m_thread;  ///< Internal thread
 
     /**
      * @brief Schedule to accept connections.

@@ -76,7 +76,7 @@ void VFRB::run() noexcept
     m_running = true;
     logger.info(LOG_PREFIX, "starting...");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    concurrency::SignalListener           signals;
+    concurrent::SignalListener            signals;
     client::ClientManager                 clientManager;
 
     signals.addHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {

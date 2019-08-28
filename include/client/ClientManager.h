@@ -71,9 +71,9 @@ class ClientManager
 {
     NOT_COPYABLE(ClientManager)
 
-    ClientSet                m_clients;   ///< Set of clients
-    concurrency::ThreadGroup m_thdGroup;  ///< Thread group for client threads
-    mutable std::mutex       m_mutex;
+    ClientSet               m_clients;   ///< Set of clients
+    concurrent::ThreadGroup m_thdGroup;  ///< Thread group for client threads
+    mutable std::mutex      m_mutex;
 
 public:
     ClientManager() = default;

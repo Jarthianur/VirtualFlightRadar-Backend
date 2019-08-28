@@ -44,8 +44,8 @@ class SbsFeed : public Feed
 {
     NOT_COPYABLE(SbsFeed)
 
-    static parser::SbsParser       s_parser;  ///< Parser to unpack response from Client
-    concurrency::WorkerThread<str> m_worker;
+    static parser::SbsParser      s_parser;  ///< Parser to unpack response from Client
+    concurrent::WorkerThread<str> m_worker;
 
 public:
     /**

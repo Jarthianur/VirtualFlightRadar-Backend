@@ -26,11 +26,12 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "concurrency/GuardedThread.hpp"
 #include "util/defines.h"
-#include "util/types.h"
 
-namespace vfrb::concurrency
+#include "GuardedThread.hpp"
+#include "types.h"
+
+namespace vfrb::concurrent
 {
 /// Handler function
 using SignalHandler = std::function<void(boost::system::error_code const&, int const)>;
@@ -70,4 +71,4 @@ public:
      */
     void addHandler(SignalHandler&& handler);
 };
-}  // namespace vfrb::concurrency
+}  // namespace vfrb::concurrent

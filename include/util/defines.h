@@ -30,13 +30,13 @@
 /// Make a class of TYPE non copyable.
 /// @param TYPE The classname
 #define NOT_COPYABLE(TYPE)      \
-    TYPE(const TYPE&) = delete; \
-    TYPE& operator=(const TYPE&) = delete;
+    TYPE(TYPE const&) = delete; \
+    TYPE& operator=(TYPE const&) = delete;
 
 /// Make a class of TYPE non copyable, but movable.
 /// @param TYPE The classname
 #define MOVABLE_BUT_NOT_COPYABLE(TYPE)     \
-    TYPE(const TYPE&) = delete;            \
-    TYPE& operator=(const TYPE&) = delete; \
+    TYPE(TYPE const&) = delete;            \
+    TYPE& operator=(TYPE const&) = delete; \
     TYPE(TYPE&&);                          \
     TYPE& operator=(TYPE&&);

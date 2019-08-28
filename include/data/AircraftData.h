@@ -39,8 +39,8 @@ class AircraftData : public Data
         object::Object::OUTDATED;                         ///< Times until FLARM status is removed
     inline static constexpr auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
 
-    concurrency::ConcurrentContainer<object::Aircraft> m_container;  ///< Internal container for aircrafts
-    processor::AircraftProcessor                       m_processor;  ///< Processor for aircrafts
+    concurrent::ConcurrentContainer<object::Aircraft> m_container;  ///< Internal container for aircrafts
+    processor::AircraftProcessor                      m_processor;  ///< Processor for aircrafts
 
 public:
     explicit AircraftData(AccessFn&& fn);

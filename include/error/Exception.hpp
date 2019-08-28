@@ -25,7 +25,7 @@
 
 #include "util/types.h"
 
-namespace vfrb::exception
+namespace vfrb::error
 {
 using Exception = std::exception;
 }

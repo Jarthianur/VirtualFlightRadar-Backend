@@ -24,8 +24,9 @@
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
+#include <string_view>
 
-#include "util/types.h"
+#include "types.h"
 
 using namespace std::literals;
 
@@ -90,16 +91,6 @@ template<typename T>
 T saturate(T val, T min, T max)
 {
     return std::max(min, std::min(val, max));
-}
-
-template<typename T>
-void checkLimits(T val, T min, T max)
-{
-    if (val < min || val > max)
-    {
-        throw std::range_error("limits exceeded "s + std::to_string(val) + " not in [" + std::to_string(min) +
-                               " , " + std::to_string(max) + "]");
-    }
 }
 
 /**

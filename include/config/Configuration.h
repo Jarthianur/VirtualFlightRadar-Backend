@@ -24,10 +24,11 @@
 #include <istream>
 #include <list>
 
+#include "error/Exception.hpp"
 #include "object/GpsPosition.h"
-#include "util/types.h"
 
 #include "Properties.h"
+#include "types.h"
 
 namespace vfrb::config
 {
@@ -134,4 +135,16 @@ public:
     explicit Configuration(std::istream& stream);
     ~Configuration() noexcept = default;
 };
+
+namespace error
+{
+class ConfigurationError : public vfrb::error::Exception
+{
+public:
+    ConfigurationError();
+    ~ConfigurationError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
 }  // namespace vfrb::config
