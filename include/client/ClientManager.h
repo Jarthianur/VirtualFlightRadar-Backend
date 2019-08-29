@@ -24,11 +24,12 @@
 #include <mutex>
 #include <unordered_set>
 
-#include "concurrency/ThreadGroup.hpp"
+#include "concurrent/ThreadGroup.hpp"
+#include "error/Exception.hpp"
 #include "util/defines.h"
-#include "util/types.h"
 
 #include "Client.h"
+#include "types.h"
 
 namespace vfrb::feed
 {
@@ -99,4 +100,18 @@ public:
      */
     void stop();
 };
+
+namespace error
+{
+class FeedSubscriptionError : public vfrb::error::Exception
+{
+    str const m_msg;
+
+public:
+    FeedSubscriptionError(str const& name);
+    ~FeedSubscriptionError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
 }  // namespace vfrb::client

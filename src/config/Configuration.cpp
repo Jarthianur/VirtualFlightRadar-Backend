@@ -40,8 +40,6 @@ using Number = std::variant<s32, u64, f64>;
 
 namespace error
 {
-ConfigurationError::ConfigurationError() : vfrb::error::Exception() {}
-
 char const* ConfigurationError::what() const noexcept
 {
     return "configuration initialization failed";
@@ -52,8 +50,7 @@ class ConversionError : public vfrb::error::Exception
     str const m_msg;
 
 public:
-    ConversionError(str const& str, char const* path)
-        : vfrb::error::Exception(), m_msg("invalid value at "s + path + " [" + str + "]")
+    ConversionError(str const& str, char const* path) : m_msg("invalid value at "s + path + " [" + str + "]")
     {}
     ~ConversionError() noexcept override = default;
 

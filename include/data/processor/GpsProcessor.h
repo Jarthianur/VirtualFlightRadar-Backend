@@ -24,9 +24,9 @@
 #include <ctime>
 
 #include "object/GpsPosition.h"
-#include "util/types.h"
 
 #include "Processor.hpp"
+#include "types.h"
 
 namespace vfrb::data::processor
 {

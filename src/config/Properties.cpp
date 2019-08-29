@@ -75,9 +75,7 @@ Properties Properties::section(str const& section) const
 
 namespace error
 {
-PropertyNotFoundError::PropertyNotFoundError(str const& prop)
-    : vfrb::error::Exception(), m_property(prop + " not found")
-{}
+PropertyNotFoundError::PropertyNotFoundError(str const& prop) : m_property(prop + " not found") {}
 
 char const* PropertyNotFoundError::what() const noexcept
 {

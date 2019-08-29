@@ -21,9 +21,8 @@
 
 #pragma once
 
-#include "util/types.h"
-
 #include "Client.h"
+#include "types.h"
 
 namespace vfrb::client
 {

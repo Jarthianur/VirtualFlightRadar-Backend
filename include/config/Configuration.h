@@ -141,7 +141,7 @@ namespace error
 class ConfigurationError : public vfrb::error::Exception
 {
 public:
-    ConfigurationError();
+    ConfigurationError()                    = default;
     ~ConfigurationError() noexcept override = default;
 
     char const* what() const noexcept override;

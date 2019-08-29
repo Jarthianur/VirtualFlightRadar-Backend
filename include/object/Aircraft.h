@@ -22,12 +22,12 @@
 #pragma once
 
 #include "impl/DateTimeImplBoost.h"
-#include "util/types.h"
-#include "util/utility.hpp"
+#include "util/CString.hpp"
 
 #include "GpsPosition.h"
 #include "Object.h"
 #include "Timestamp.hpp"
+#include "types.h"
 
 namespace vfrb::object
 {

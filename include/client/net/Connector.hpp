@@ -23,7 +23,7 @@
 
 #include <functional>
 
-#include "util/types.h"
+#include "types.h"
 
 namespace vfrb::client::net
 {

@@ -21,12 +21,12 @@
 
 #pragma once
 
-#include "concurrency/ConcurrentContainer.hpp"
+#include "concurrent/ConcurrentContainer.hpp"
 #include "object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
-#include "util/types.h"
 
 #include "Data.hpp"
+#include "types.h"
 
 namespace vfrb::data
 {

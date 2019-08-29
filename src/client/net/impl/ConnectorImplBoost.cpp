@@ -36,8 +36,7 @@ namespace vfrb::client::net
 static auto const& logger = Logger::instance();
 
 ConnectorImplBoost::ConnectorImplBoost()
-    : Connector(),
-      m_ioService(),
+    : m_ioService(),
       m_socket(m_ioService),
       m_resolver(m_ioService),
       m_timer(m_ioService),

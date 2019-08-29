@@ -30,44 +30,52 @@
 #include "feed/Feed.h"
 
 using namespace vfrb::client::net;
+using namespace vfrb::feed;
 
 namespace vfrb::client
 {
 template<>
-s_ptr<AprscClient> ClientFactory::makeClient<AprscClient>(s_ptr<feed::Feed> feed)
+s_ptr<AprscClient> ClientFactory::makeClient<AprscClient>(s_ptr<Feed> feed)
 {
-    return std::make_shared<AprscClient>(feed->endpoint(),
-                                         std::static_pointer_cast<feed::AprscFeed>(feed)->login(),
+    return std::make_shared<AprscClient>(feed->endpoint(), std::static_pointer_cast<AprscFeed>(feed)->login(),
                                          std::make_shared<ConnectorImplBoost>());
 }
 
 template<>
-s_ptr<SbsClient> ClientFactory::makeClient<SbsClient>(s_ptr<feed::Feed> feed)
+s_ptr<SbsClient> ClientFactory::makeClient<SbsClient>(s_ptr<Feed> feed)
 {
     return std::make_shared<SbsClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
 }
 
 template<>
-s_ptr<SensorClient> ClientFactory::makeClient<SensorClient>(s_ptr<feed::Feed> feed)
+s_ptr<SensorClient> ClientFactory::makeClient<SensorClient>(s_ptr<Feed> feed)
 {
     return std::make_shared<SensorClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
 }
 
 template<>
-s_ptr<GpsdClient> ClientFactory::makeClient<GpsdClient>(s_ptr<feed::Feed> feed)
+s_ptr<GpsdClient> ClientFactory::makeClient<GpsdClient>(s_ptr<Feed> feed)
 {
     return std::make_shared<GpsdClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
 }
 
-s_ptr<Client> ClientFactory::createClientFor(s_ptr<feed::Feed> feed)
+s_ptr<Client> ClientFactory::createClientFor(s_ptr<Feed> feed)
 {
     switch (feed->protocol())
     {
-        case feed::Feed::Protocol::APRS: return makeClient<AprscClient>(feed);
-        case feed::Feed::Protocol::SBS: return makeClient<SbsClient>(feed);
-        case feed::Feed::Protocol::GPS: return makeClient<GpsdClient>(feed);
-        case feed::Feed::Protocol::SENSOR: return makeClient<SensorClient>(feed);
+        case Feed::Protocol::APRS: return makeClient<AprscClient>(feed);
+        case Feed::Protocol::SBS: return makeClient<SbsClient>(feed);
+        case Feed::Protocol::GPS: return makeClient<GpsdClient>(feed);
+        case Feed::Protocol::SENSOR: return makeClient<SensorClient>(feed);
     }
-    throw std::logic_error("unknown protocol");
+    throw error::NoSuchProtocolError();
 }
+
+namespace error
+{
+char const* NoSuchProtocolError::what() const noexcept
+{
+    return "unknown protocol";
+}
+}  // namespace error
 }  // namespace vfrb::client

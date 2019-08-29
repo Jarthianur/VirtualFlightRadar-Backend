@@ -21,9 +21,8 @@
 
 #pragma once
 
-#include "util/types.h"
-
 #include "Object.h"
+#include "types.h"
 
 namespace vfrb::object
 {

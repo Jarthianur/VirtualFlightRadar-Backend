@@ -21,9 +21,10 @@
 
 #pragma once
 
-#include "util/types.h"
+#include "error/Exception.hpp"
 
 #include "Client.h"
+#include "types.h"
 
 namespace vfrb::feed
 {
@@ -57,4 +58,16 @@ public:
      */
     static s_ptr<Client> createClientFor(s_ptr<feed::Feed> feed);
 };
+
+namespace error
+{
+class NoSuchProtocolError : public vfrb::error::Exception
+{
+public:
+    NoSuchProtocolError()                    = default;
+    ~NoSuchProtocolError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
 }  // namespace vfrb::client

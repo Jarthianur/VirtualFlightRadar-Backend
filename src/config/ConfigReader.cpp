@@ -49,9 +49,7 @@ Properties ConfigReader::read()
 
 namespace error
 {
-ReadFileError::ReadFileError(str const& file)
-    : vfrb::error::Exception(), m_fname(file + " is not a valid INI file")
-{}
+ReadFileError::ReadFileError(str const& file) : m_fname(file + " is not a valid INI file") {}
 
 char const* ReadFileError::what() const noexcept
 {

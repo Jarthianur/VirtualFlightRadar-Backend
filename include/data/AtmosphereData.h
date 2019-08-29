@@ -24,9 +24,9 @@
 #include <mutex>
 
 #include "object/Atmosphere.h"
-#include "util/types.h"
 
 #include "Data.hpp"
+#include "types.h"
 
 namespace vfrb::data
 {

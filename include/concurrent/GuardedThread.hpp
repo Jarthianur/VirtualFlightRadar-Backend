@@ -35,7 +35,7 @@ namespace error
 class ThreadUsedError : public vfrb::error::Exception
 {
 public:
-    ThreadUsedError() : vfrb::error::Exception() {}
+    ThreadUsedError()                    = default;
     ~ThreadUsedError() noexcept override = default;
 
     char const* what() const noexcept override

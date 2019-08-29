@@ -20,7 +20,7 @@
 #include <typeinfo>
 #include <utility>
 
-#include "util/math.hpp"
+#include "util/utility.hpp"
 
 namespace vfrb::object
 {
@@ -38,9 +38,9 @@ GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid, f64 
       m_fixQuality(quality),
       m_timestamp(timestamp)
 {
-    math::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
-    math::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
-    math::checkLimits(m_location.altitude, Location::MIN_ALTITUDE, Location::MAX_ALTITUDE);
+    util::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
+    util::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
+    util::checkLimits(m_location.altitude, Location::MIN_ALTITUDE, Location::MAX_ALTITUDE);
 }
 
 void GpsPosition::assign(Object&& other)

@@ -24,9 +24,9 @@
 #include <mutex>
 
 #include "object/Wind.h"
-#include "util/types.h"
 
 #include "Data.hpp"
+#include "types.h"
 
 namespace vfrb::data
 {

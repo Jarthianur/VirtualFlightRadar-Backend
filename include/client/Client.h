@@ -27,7 +27,8 @@
 #include "net/Connector.hpp"
 #include "net/Endpoint.hpp"
 #include "util/defines.h"
-#include "util/types.h"
+
+#include "types.h"
 
 namespace vfrb::feed
 {

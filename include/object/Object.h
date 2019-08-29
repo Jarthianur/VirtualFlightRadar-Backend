@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "util/types.h"
-#include "util/utility.hpp"
+#include "types.h"
 
 namespace vfrb::object
 {

@@ -21,7 +21,7 @@
 
 #include "data/AircraftData.h"
 
-#include <stdexcept>
+#include "error/Exception.hpp"
 
 using namespace vfrb::object;
 
@@ -72,7 +72,7 @@ void AircraftData::access()
                 ++iter;
             }
         }
-        catch (std::exception const&)
+        catch (vfrb::error::Exception const&)
         {}
     }
 }
