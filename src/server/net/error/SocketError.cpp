@@ -19,29 +19,14 @@
  }
  */
 
-#pragma once
+#include "server/net/error/SocketError.h"
 
-#include <exception>
-
-#include "util/types.h"
-
-namespace vfrb::server::net
+namespace vfrb::server::net::error
 {
-/**
- * @brief Exception to signal socket errors.
- */
-class SocketException : public std::exception
+SocketError::SocketError(str const& msg) : m_msg(msg) {}
+
+char const* SocketError::what() const noexcept
 {
-    str const m_message;  ///< Error message
-
-public:
-    SocketException() = default;
-    explicit SocketException(str const& msg);  ///< @param msg The error message
-
-    /**
-     * @brief Get the error message.
-     * @return the message
-     */
-    char const* what() const noexcept;
-};
-}  // namespace vfrb::server::net
+    return m_msg.c_str();
+}
+}  // namespace vfrb::server::net::error

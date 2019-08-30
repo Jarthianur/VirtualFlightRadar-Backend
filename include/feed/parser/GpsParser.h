@@ -58,7 +58,7 @@ class GpsParser : public Parser<object::GpsPosition>
     object::GpsPosition parsePosition(boost::smatch const& match, u32 priority) const;
 
 public:
-    GpsParser();
+    GpsParser()                    = default;
     ~GpsParser() noexcept override = default;
 
     /**

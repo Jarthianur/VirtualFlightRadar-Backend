@@ -23,7 +23,7 @@
 
 #include <istream>
 
-#include "error/Exception.hpp"
+#include "error/Error.hpp"
 
 #include "Properties.h"
 #include "types.h"
@@ -50,12 +50,12 @@ public:
 
 namespace error
 {
-class ReadFileError : public vfrb::error::Exception
+class ReadFileError : public vfrb::error::Error
 {
     str const m_fname;
 
 public:
-    ReadFileError(str const& file);
+    explicit ReadFileError(str const& file);
     ~ReadFileError() noexcept override = default;
 
     char const* what() const noexcept override;

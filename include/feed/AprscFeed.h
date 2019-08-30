@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "concurrency/WorkerThread.hpp"
+#include "concurrent/WorkerThread.hpp"
 
 #include "Feed.h"
 

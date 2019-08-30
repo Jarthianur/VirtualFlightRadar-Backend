@@ -25,15 +25,30 @@
 #include <array>
 #include <cstdarg>
 #include <cstdio>
-#include <stdexcept>
 #include <string_view>
+
+#include "error/Error.hpp"
 
 #include "types.h"
 
 namespace vfrb::util
 {
-template<usize N, typename std::enable_if<(N > 0)>::type* = nullptr>
-class CString final
+namespace error
+{
+class OverflowError : public vfrb::error::Error
+{
+public:
+    OverflowError()                    = default;
+    ~OverflowError() noexcept override = default;
+    char const* what() const noexcept override
+    {
+        return "";
+    }
+};
+}  // namespace error
+
+template<usize N>
+class CString
 {
     std::array<char, N> m_data;
     std::string_view    m_view;
@@ -42,7 +57,7 @@ class CString final
     {
         if (sv.length() > N)
         {
-            throw std::overflow_error("");
+            throw error::OverflowError();
         }
         std::copy_n(sv.cbegin(), sv.length(), m_data.begin());
         m_view = std::string_view(m_data.data(), sv.length());
@@ -131,7 +146,7 @@ public:
     {
         if (pos >= N)
         {
-            throw std::overflow_error("");
+            throw error::OverflowError();
         }
         usize   max = N - pos;
         va_list args;
@@ -145,7 +160,7 @@ public:
         if (b < 0)
         {
             clear();
-            throw std::logic_error("");
+            throw error::OverflowError();
         }
         return b;
     }

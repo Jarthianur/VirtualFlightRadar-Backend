@@ -24,7 +24,7 @@
 #include <cstdint>
 #include <string>
 
-#include "util/defines.h"
+#include "util/class_utils.h"
 
 namespace server
 {

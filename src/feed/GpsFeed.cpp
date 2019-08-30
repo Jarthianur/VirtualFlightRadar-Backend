@@ -51,9 +51,9 @@ bool GpsFeed::process(str const& response)
     {
         m_data->update(s_parser.unpack(response, m_priority));
     }
-    catch (parser::UnpackError const&)
+    catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}
-    catch (data::GpsDataException const& e)
+    catch (data::error::GpsDataException const& e)
     {
         logger.info(LOG_PREFIX, m_name, ": ", e.what());
         return false;

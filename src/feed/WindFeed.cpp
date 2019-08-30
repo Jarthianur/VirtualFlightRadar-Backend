@@ -47,7 +47,7 @@ bool WindFeed::process(str const& response)
     {
         m_data->update(s_parser.unpack(response, m_priority));
     }
-    catch (parser::UnpackError const&)
+    catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}
     return true;
 }

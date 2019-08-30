@@ -19,14 +19,11 @@
  }
  */
 
-#include "server/net/SocketException.h"
+#pragma once
 
-namespace vfrb::server::net
-{
-SocketException::SocketException(str const& msg) : std::exception(), m_message(msg) {}
+#include <exception>
 
-char const* SocketException::what() const noexcept
+namespace vfrb::error
 {
-    return m_message.c_str();
+using Error = std::exception;
 }
-}  // namespace vfrb::server::net

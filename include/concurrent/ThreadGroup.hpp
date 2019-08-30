@@ -24,7 +24,7 @@
 #include <functional>
 #include <list>
 
-#include "util/defines.h"
+#include "util/class_utils.h"
 
 #include "GuardedThread.hpp"
 
@@ -38,20 +38,26 @@ class ThreadGroup
 
 public:
     ThreadGroup() = default;
-    ~ThreadGroup() noexcept
-    {
-        joinAll();
-    }
+    ~ThreadGroup() noexcept;
 
     template<typename FnT>
-    void createThread(FnT&& fn)
-    {
-        m_threads.push_back(GuardedThread(std::forward<FnT>(fn)));
-    }
-
-    void joinAll()
-    {
-        m_threads.clear();
-    }
+    void createThread(FnT&& fn);
+    void joinAll();
 };
+
+inline ThreadGroup::~ThreadGroup() noexcept
+{
+    joinAll();
+}
+
+template<typename FnT>
+void ThreadGroup::createThread(FnT&& fn)
+{
+    m_threads.push_back(GuardedThread(std::forward<FnT>(fn)));
+}
+
+inline void ThreadGroup::joinAll()
+{
+    m_threads.clear();
+}
 }  // namespace vfrb::concurrent

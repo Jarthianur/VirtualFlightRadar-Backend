@@ -43,15 +43,13 @@ boost::regex const AprsParser::s_APRSExtRE(
 
 s32 AprsParser::s_maxHeight = std::numeric_limits<s32>::max();
 
-AprsParser::AprsParser() : Parser<Aircraft>() {}
-
 Aircraft AprsParser::unpack(str const& sentence, u32 priority) const
 {
     boost::smatch match, com_match;
     if ((!sentence.empty() && sentence[0] == '#') || !boost::regex_match(sentence, match, s_APRS_RE) ||
         !boost::regex_match(match.str(RE_APRS_COM), com_match, s_APRSExtRE))
     {
-        throw UnpackError();
+        throw error::UnpackError();
     }
     try
     {
@@ -65,13 +63,11 @@ Aircraft AprsParser::unpack(str const& sentence, u32 priority) const
                 parseMovement(match, com_match),
                 parseTimeStamp(match)};
     }
-    catch (UnpackError const&)
-    {
-        throw;
-    }
-    catch (std::exception const&)
+    catch ([[maybe_unused]] std::logic_error const&)
     {}
-    throw UnpackError();
+    catch ([[maybe_unused]] object::error::TimestampParseError const&)
+    {}
+    throw error::UnpackError();
 }
 
 Location AprsParser::parseLocation(boost::smatch const& match) const
@@ -92,7 +88,7 @@ Location AprsParser::parseLocation(boost::smatch const& match) const
     {
         return pos;
     }
-    throw UnpackError();
+    throw error::UnpackError();
 }
 
 AprsParser::AircraftInfo AprsParser::parseComment(boost::smatch const& match) const

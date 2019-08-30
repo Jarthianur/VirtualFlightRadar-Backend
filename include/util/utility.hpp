@@ -23,7 +23,7 @@
 
 #include <type_traits>
 
-#include "error/Exception.hpp"
+#include "error/Error.hpp"
 
 #include "types.h"
 
@@ -31,15 +31,14 @@ namespace vfrb::util
 {
 namespace error
 {
-class LimitsExceededError : public vfrb::error::Exception
+class LimitsExceededError : public vfrb::error::Error
 {
     str const m_msg;
 
 public:
     template<typename T>
     LimitsExceededError(T val, T min, T max)
-        : vfrb::error::Exception(),
-          m_msg(std::to_string(val) + " not in [" + std::to_string(min) + "," + std::to_string(max) + "]")
+        : m_msg(std::to_string(val) + " not in [" + std::to_string(min) + "," + std::to_string(max) + "]")
     {}
     ~LimitsExceededError() noexcept override = default;
 

@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "config/Properties.h"
-#include "util/types.h"
+#include "error/Error.hpp"
+#include "util/class_utils.h"
+
+#include "types.h"
 
 namespace vfrb::config
 {
@@ -62,7 +63,7 @@ class FeedFactory
      * @return a pointer to the concrete Feed
      * @throw std::logic_error from invoked constructors
      */
-    template<typename T, typename std::enable_if<std::is_base_of<Feed, T>::value>::type* = nullptr>
+    template<typename T, ENABLE_IF(EXTENDS(T, Feed))>
     s_ptr<T> makeFeed(str const& name);
 
 public:
@@ -86,4 +87,18 @@ public:
      */
     s_ptr<Feed> createFeed(str const& name);
 };
+
+namespace error
+{
+class FeedCreationError : public vfrb::error::Error
+{
+    str const m_msg;
+
+public:
+    FeedCreationError();
+    ~FeedCreationError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
 }  // namespace vfrb::feed

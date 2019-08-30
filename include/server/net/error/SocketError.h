@@ -21,11 +21,28 @@
 
 #pragma once
 
-#include <exception>
+#include "error/Error.hpp"
 
-#include "util/types.h"
+#include "types.h"
 
-namespace vfrb::error
+namespace vfrb::server::net::error
 {
-using Exception = std::exception;
-}
+/**
+ * @brief Exception to signal socket errors.
+ */
+class SocketError : public vfrb::error::Error
+{
+    str const m_msg;  ///< Error message
+
+public:
+    SocketError() = default;
+    explicit SocketError(str const& msg);  ///< @param msg The error message
+    ~SocketError() noexcept override = default;
+
+    /**
+     * @brief Get the error message.
+     * @return the message
+     */
+    char const* what() const noexcept override;
+};
+}  // namespace vfrb::server::net::error

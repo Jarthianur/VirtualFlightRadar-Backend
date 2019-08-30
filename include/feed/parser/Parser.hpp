@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include <exception>
+#include "error/Error.hpp"
 
-#include "util/types.h"
+#include "types.h"
 
 namespace vfrb::feed::parser
 {
@@ -47,14 +47,17 @@ public:
     virtual ObjectT unpack(str const& sentence, u32 priority) const = 0;
 };
 
-class UnpackError : public std::exception
+namespace error
+{
+class UnpackError : public vfrb::error::Error
 {
 public:
-    UnpackError() : std::exception() {}
-    virtual ~UnpackError() noexcept = default;
-    char const* what() const noexcept
+    UnpackError()                    = default;
+    ~UnpackError() noexcept override = default;
+    char const* what() const noexcept override
     {
-        return "unpack failed";
+        return "";
     }
 };
+}  // namespace error
 }  // namespace vfrb::feed::parser

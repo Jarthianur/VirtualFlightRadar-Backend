@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include "error/Exception.hpp"
+#include "error/Error.hpp"
+#include "util/class_utils.h"
 
 #include "Client.h"
 #include "types.h"
@@ -44,7 +45,7 @@ class ClientFactory
      * @param feed The feed to create for
      * @return the client as pointer
      */
-    template<typename T, typename std::enable_if<std::is_base_of<Client, T>::value>::type* = nullptr>
+    template<typename T, ENABLE_IF(EXTENDS(T, Client))>
     static s_ptr<T> makeClient(s_ptr<feed::Feed> feed);
 
 public:
@@ -61,7 +62,7 @@ public:
 
 namespace error
 {
-class NoSuchProtocolError : public vfrb::error::Exception
+class NoSuchProtocolError : public vfrb::error::Error
 {
 public:
     NoSuchProtocolError()                    = default;

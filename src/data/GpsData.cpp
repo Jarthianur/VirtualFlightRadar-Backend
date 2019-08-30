@@ -39,7 +39,7 @@ void GpsData::access()
         m_processor.process(m_position);
         m_accessFn(++m_position);
     }
-    catch (vfrb::error::Exception const&)
+    catch (vfrb::error::Error const&)
     {}
 }
 

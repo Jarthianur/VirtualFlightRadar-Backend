@@ -21,12 +21,14 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <boost/asio.hpp>
 #include <boost/move/move.hpp>
 
-#include "util/defines.h"
-#include "util/types.h"
-#include "util/utility.hpp"
+#include "util/class_utils.h"
+
+#include "types.h"
 
 namespace vfrb::server::net
 {

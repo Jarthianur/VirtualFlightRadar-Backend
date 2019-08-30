@@ -21,8 +21,6 @@
 
 #include "feed/FeedFactory.h"
 
-#include <stdexcept>
-
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
@@ -103,9 +101,20 @@ s_ptr<Feed> FeedFactory::createFeed(str const& name)
     {
         return makeFeed<AtmosphereFeed>(name);
     }
-    throw std::invalid_argument("no keywords found; be sure feed names contain one of "s +
-                                Configuration::SECT_KEY_APRSC + ", " + Configuration::SECT_KEY_SBS + ", " +
-                                Configuration::SECT_KEY_WIND + ", " + Configuration::SECT_KEY_ATMOS + ", " +
-                                Configuration::SECT_KEY_GPS);
+    throw error::FeedCreationError();
 }
+
+namespace error
+{
+FeedCreationError::FeedCreationError()
+    : m_msg("no keywords found; be sure feed names contain one of "s + Configuration::SECT_KEY_APRSC + ", " +
+            Configuration::SECT_KEY_SBS + ", " + Configuration::SECT_KEY_WIND + ", " +
+            Configuration::SECT_KEY_ATMOS + ", " + Configuration::SECT_KEY_GPS)
+{}
+
+char const* FeedCreationError::what() const noexcept
+{
+    return m_msg.c_str();
+}
+}  // namespace error
 }  // namespace vfrb::feed

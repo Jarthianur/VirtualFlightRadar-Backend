@@ -23,7 +23,7 @@
 
 #include <stdexcept>
 
-#include "error/Exception.hpp"
+#include "error/Error.hpp"
 
 #include "types.h"
 
@@ -43,7 +43,7 @@ namespace vfrb::object
 {
 namespace error
 {
-class TimestampParseError : public vfrb::error::Exception
+class TimestampParseError : public vfrb::error::Error
 {
 public:
     TimestampParseError()                    = default;

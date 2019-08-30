@@ -26,7 +26,7 @@
 #include <functional>
 #include <queue>
 
-#include "util/defines.h"
+#include "util/class_utils.h"
 
 #include "GuardedThread.hpp"
 #include "types.h"
@@ -45,7 +45,7 @@ class WorkerThreadT
     GuardedThread           m_worker;
 
 public:
-    WorkerThreadT(FnT&& fn);
+    explicit WorkerThreadT(FnT&& fn);
     ~WorkerThreadT() noexcept;
 
     void push(DataT const& data);

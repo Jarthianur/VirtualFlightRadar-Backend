@@ -27,7 +27,7 @@
 #include <boost/system/error_code.hpp>
 
 #include "client/net/Connector.hpp"
-#include "util/defines.h"
+#include "util/class_utils.h"
 
 namespace vfrb::client::net
 {

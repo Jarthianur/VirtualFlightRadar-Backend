@@ -29,14 +29,12 @@ using namespace vfrb::object;
 
 namespace vfrb::feed::parser
 {
-AtmosphereParser::AtmosphereParser() : Parser<Atmosphere>() {}
-
 Atmosphere AtmosphereParser::unpack(str const& sentence, u32 priority) const
 {
     try
     {
         if ((std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
-             math::checksum(sentence.c_str(), sentence.length())) &&
+             math::checksum({sentence.c_str(), sentence.length()}, 0)) &&
             (sentence.find("MDA") != str::npos))
         {
             usize tmpB   = sentence.find('B') - 1;
@@ -52,8 +50,8 @@ Atmosphere AtmosphereParser::unpack(str const& sentence, u32 priority) const
             }
         }
     }
-    catch (std::exception const&)
+    catch ([[maybe_unused]] std::logic_error const&)
     {}
-    throw UnpackError();
+    throw error::UnpackError();
 }
 }  // namespace vfrb::feed::parser

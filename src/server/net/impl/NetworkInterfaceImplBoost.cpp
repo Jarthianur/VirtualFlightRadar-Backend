@@ -105,7 +105,7 @@ u_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startConnection()
 {
     if (!m_socket.get().is_open())
     {
-        throw SocketException("cannot start connection on closed socket");
+        throw error::SocketError("cannot start connection on closed socket");
     }
     return Connection<SocketImplBoost>::create(std::move(m_socket));
 }

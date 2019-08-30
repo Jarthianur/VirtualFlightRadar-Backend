@@ -25,8 +25,8 @@
 #include <unordered_set>
 
 #include "concurrent/ThreadGroup.hpp"
-#include "error/Exception.hpp"
-#include "util/defines.h"
+#include "error/Error.hpp"
+#include "util/class_utils.h"
 
 #include "Client.h"
 #include "types.h"
@@ -103,12 +103,12 @@ public:
 
 namespace error
 {
-class FeedSubscriptionError : public vfrb::error::Exception
+class FeedSubscriptionError : public vfrb::error::Error
 {
     str const m_msg;
 
 public:
-    FeedSubscriptionError(str const& name);
+    explicit FeedSubscriptionError(str const& name);
     ~FeedSubscriptionError() noexcept override = default;
 
     char const* what() const noexcept override;

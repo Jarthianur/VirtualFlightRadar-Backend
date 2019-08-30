@@ -24,7 +24,7 @@
 #include <istream>
 #include <list>
 
-#include "error/Exception.hpp"
+#include "error/Error.hpp"
 #include "object/GpsPosition.h"
 
 #include "Properties.h"
@@ -138,7 +138,7 @@ public:
 
 namespace error
 {
-class ConfigurationError : public vfrb::error::Exception
+class ConfigurationError : public vfrb::error::Error
 {
 public:
     ConfigurationError()                    = default;

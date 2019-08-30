@@ -27,7 +27,6 @@
 #include <variant>
 
 #include "config/ConfigReader.h"
-#include "error/Exception.hpp"
 #include "util/Logger.hpp"
 #include "util/utility.hpp"
 
@@ -45,7 +44,7 @@ char const* ConfigurationError::what() const noexcept
     return "configuration initialization failed";
 }
 
-class ConversionError : public vfrb::error::Exception
+class ConversionError : public vfrb::error::Error
 {
     str const m_msg;
 
@@ -136,7 +135,7 @@ try :
 {
     dumpInfo();
 }
-catch (vfrb::error::Exception const& e)
+catch (vfrb::error::Error const& e)
 {
     logger.error(LOG_PREFIX, "init: ", e.what());
     throw error::ConfigurationError();
@@ -162,7 +161,7 @@ u16 Configuration::resolveServerPort(const Properties& properties) const
         util::checkLimits<u64>(port, 0, std::numeric_limits<u16>::max());
         return port & 0xFFFF;
     }
-    catch (vfrb::error::Exception const& e)
+    catch (vfrb::error::Error const& e)
     {
         logger.warn(LOG_PREFIX, "resolving server port: ", e.what());
         return 4353;

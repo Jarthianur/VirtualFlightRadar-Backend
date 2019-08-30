@@ -26,7 +26,7 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "util/defines.h"
+#include "util/class_utils.h"
 
 #include "GuardedThread.hpp"
 #include "types.h"

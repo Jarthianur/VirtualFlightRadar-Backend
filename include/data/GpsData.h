@@ -23,7 +23,7 @@
 
 #include <mutex>
 
-#include "error/Exception.hpp"
+#include "error/Error.hpp"
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
 
@@ -82,11 +82,11 @@ public:
 
 namespace error
 {
-class GpsDataException : public vfrb::error::Exception
+class GpsDataException : public vfrb::error::Error
 {
 protected:
-    GpsDataException()                   = default;
-    virtual ~GpsDataException() noexcept = default;
+    GpsDataException()                            = default;
+    virtual ~GpsDataException() noexcept override = default;
 };
 
 /**

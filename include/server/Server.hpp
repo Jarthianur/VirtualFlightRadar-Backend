@@ -22,17 +22,16 @@
 #pragma once
 
 #include <array>
-#include <memory>
+#include <string_view>
 
-#include "concurrency/GuardedThread.hpp"
+#include "concurrent/GuardedThread.hpp"
 #include "net/impl/NetworkInterfaceImplBoost.h"
 #include "util/Logger.hpp"
-#include "util/defines.h"
-#include "util/types.h"
-#include "util/utility.hpp"
+#include "util/class_utils.h"
 
 #include "Connection.hpp"
 #include "parameters.h"
+#include "types.h"
 
 namespace vfrb::server
 {
@@ -228,7 +227,7 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
                 m_netInterface->close();
             }
         }
-        catch (net::SocketException const& e)
+        catch (net::error::SocketError const& e)
         {
             logger.warn(LOG_PREFIX, "connection failed: ", e.what());
             m_netInterface->close();

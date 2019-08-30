@@ -38,7 +38,7 @@ SbsFeed::SbsFeed(str const& name, Properties const& properties, s_ptr<data::Airc
           {
               m_data->update(s_parser.unpack(work, m_priority));
           }
-          catch (parser::UnpackError const&)
+          catch ([[maybe_unused]] parser::error::UnpackError const&)
           {}
       })
 {

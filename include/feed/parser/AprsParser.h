@@ -91,7 +91,7 @@ class AprsParser : public Parser<object::Aircraft>
 public:
     static s32 s_maxHeight;  ///< The max height filter
 
-    AprsParser();
+    AprsParser()                    = default;
     ~AprsParser() noexcept override = default;
 
     /**

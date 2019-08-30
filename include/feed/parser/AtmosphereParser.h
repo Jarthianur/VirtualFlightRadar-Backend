@@ -33,7 +33,7 @@ namespace vfrb::feed::parser
 class AtmosphereParser : public Parser<object::Atmosphere>
 {
 public:
-    AtmosphereParser();
+    AtmosphereParser()                    = default;
     ~AtmosphereParser() noexcept override = default;
 
     /**

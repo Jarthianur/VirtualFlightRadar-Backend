@@ -26,7 +26,7 @@
 
 #include "net/Connector.hpp"
 #include "net/Endpoint.hpp"
-#include "util/defines.h"
+#include "util/class_utils.h"
 
 #include "types.h"
 

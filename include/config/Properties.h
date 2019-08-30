@@ -25,7 +25,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "error/Exception.hpp"
+#include "error/Error.hpp"
 
 #include "types.h"
 
@@ -63,12 +63,12 @@ public:
 
 namespace error
 {
-class PropertyNotFoundError : public vfrb::error::Exception
+class PropertyNotFoundError : public vfrb::error::Error
 {
     str const m_property;
 
 public:
-    PropertyNotFoundError(str const& prop);
+    explicit PropertyNotFoundError(str const& prop);
     ~PropertyNotFoundError() noexcept override = default;
 
     char const* what() const noexcept override;

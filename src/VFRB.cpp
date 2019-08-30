@@ -22,12 +22,11 @@
 #include "VFRB.h"
 
 #include <csignal>
-#include <exception>
 #include <sstream>
 
 #include "client/ClientManager.h"
 #include "client/net/impl/ConnectorImplBoost.h"
-#include "concurrency/SignalListener.h"
+#include "concurrent/SignalListener.h"
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
@@ -90,7 +89,7 @@ void VFRB::run() noexcept
         {
             clientManager.subscribe(it);
         }
-        catch (std::logic_error const& e)
+        catch (client::error::FeedSubscriptionError const& e)
         {
             logger.error(LOG_PREFIX, ": ", e.what());
         }
@@ -121,7 +120,7 @@ void VFRB::serve()
             m_windData->access();
             std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
         }
-        catch (std::exception const& e)
+        catch (error::Error const& e)
         {
             logger.error(LOG_PREFIX, "fatal: ", e.what());
             m_running = false;
@@ -138,7 +137,7 @@ void VFRB::createFeeds(s_ptr<Configuration> config)
         {
             m_feeds.push_back(factory.createFeed(name));
         }
-        catch (std::exception const& e)
+        catch (feed::error::FeedCreationError const& e)
         {
             logger.warn(LOG_PREFIX, "can not create feed ", name, ": ", e.what());
         }

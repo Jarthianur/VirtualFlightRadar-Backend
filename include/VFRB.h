@@ -24,13 +24,13 @@
 #include <atomic>
 #include <chrono>
 #include <list>
-#include <memory>
 
 #include "server/Server.hpp"
 #include "server/net/impl/NetworkInterfaceImplBoost.h"
 #include "server/net/impl/SocketImplBoost.h"
-#include "util/defines.h"
-#include "util/types.h"
+#include "util/class_utils.h"
+
+#include "types.h"
 
 namespace vfrb::config
 {

@@ -39,11 +39,11 @@ Feed::Feed(str const& name, Properties const& properties, s_ptr<data::Data> data
 {
     if (properties.property(Configuration::KV_KEY_HOST, "").empty())
     {
-        throw std::logic_error("could not find: "s + name + "." + Configuration::KV_KEY_HOST);
+        throw error::InvalidPropertyError("could not find: "s + name + "." + Configuration::KV_KEY_HOST);
     }
     if (properties.property(Configuration::KV_KEY_PORT, "").empty())
     {
-        throw std::logic_error("could not find: "s + name + "." + Configuration::KV_KEY_PORT);
+        throw error::InvalidPropertyError("could not find: "s + name + "." + Configuration::KV_KEY_PORT);
     }
 }
 
@@ -55,10 +55,9 @@ u32 Feed::initPriority() const
             0, std::min<u64>(std::stoul(m_properties.property(Configuration::KV_KEY_PRIORITY, "0")),
                              std::numeric_limits<u32>::max())));
     }
-    catch (std::logic_error const&)
-    {
-        throw std::logic_error("invalid priority given");
-    }
+    catch ([[maybe_unused]] std::logic_error const&)
+    {}
+    throw error::InvalidPropertyError("invalid priority given");
 }
 
 client::net::Endpoint Feed::endpoint() const
@@ -71,4 +70,14 @@ auto Feed::name() const -> decltype(m_name) const&
 {
     return m_name;
 }
+
+namespace error
+{
+InvalidPropertyError::InvalidPropertyError(str const& msg) : m_msg(msg) {}
+
+char const* InvalidPropertyError::what() const noexcept
+{
+    return m_msg.c_str();
+}
+}  // namespace error
 }  // namespace vfrb::feed
