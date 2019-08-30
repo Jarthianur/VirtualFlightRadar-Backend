@@ -27,9 +27,9 @@
 #include "object/GpsPosition.h"
 #include "util/math.hpp"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 s32 SbsParser::s_maxHeight = std::numeric_limits<s32>::max();
 
@@ -55,7 +55,7 @@ Aircraft SbsParser::unpack(str const& sentence, u32 priority) const
                         id = sentence.substr(p, delim - p);
                         if (id.size() >= Aircraft::ID_SIZE)
                         {
-                            throw std::range_error("");
+                            throw error::UnpackError();
                         }
                         break;
                     case SBS_FIELD_TIME:
@@ -79,8 +79,10 @@ Aircraft SbsParser::unpack(str const& sentence, u32 priority) const
             return {priority, id, Aircraft::IdType::ICAO, Aircraft::AircraftType::POWERED_AIRCRAFT, loc, ts};
         }
     }
-    catch (std::exception const&)
+    catch ([[maybe_unused]] std::logic_error const&)
     {}
-    throw UnpackError();
+    catch ([[maybe_unused]] object::error::TimestampParseError const&)
+    {}
+    throw error::UnpackError();
 }
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

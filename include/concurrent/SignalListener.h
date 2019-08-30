@@ -22,15 +22,16 @@
 #pragma once
 
 #include <functional>
-#include <thread>
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "util/defines.h"
-#include "util/types.h"
+#include "util/class_utils.h"
 
-namespace util
+#include "GuardedThread.hpp"
+#include "types.h"
+
+namespace vfrb::concurrent
 {
 /// Handler function
 using SignalHandler = std::function<void(boost::system::error_code const&, int const)>;
@@ -44,7 +45,7 @@ class SignalListener
 
     boost::asio::io_service m_ioService;  ///< Internal IO-service
     boost::asio::signal_set m_sigSet;     ///< Internal signal set
-    std::thread             m_thread;     ///< Thread to run this
+    GuardedThread           m_thread;     ///< Thread to run this
     std::mutex mutable m_mutex;
 
 public:
@@ -68,6 +69,6 @@ public:
      * @param handler The handler to invoke when signal caught
      * @threadsafe
      */
-    void addHandler(SignalHandler const& handler);
+    void addHandler(SignalHandler&& handler);
 };
-}  // namespace util
+}  // namespace vfrb::concurrent

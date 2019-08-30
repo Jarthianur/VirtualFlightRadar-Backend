@@ -21,58 +21,58 @@
 
 #include <fstream>
 #include <iostream>
-#include <memory>
-#include <stdexcept>
 
 #include <boost/program_options.hpp>
 
 #include "config/Configuration.h"
+#include "error/Error.hpp"
 #include "util/Logger.hpp"
 
 #include "VFRB.h"
 
 #ifndef VERSION
-#    define VERSION "DEMO"
+constexpr auto VERSION = "DEMO";
 #endif
 
-using namespace config;
+using namespace vfrb;
+using namespace vfrb::config;
 using namespace boost;
+using namespace std::literals;
 
 static auto& logger = Logger::instance();
 
-program_options::variables_map evalArgs(int argc, char** argv);
-
-s_ptr<Configuration> get_config(const program_options::variables_map& variables);
-
-/**
- * @fn main
- * @brief The application start point.
- * @param argc The argument count
- * @param argv The arguments
- * @return 0 on success, else -1
- */
-int main(int argc, char** argv)
+namespace error
 {
-    try
+class ConfigFileError : public vfrb::error::Error
+{
+    str const m_msg;
+
+public:
+    explicit ConfigFileError(str const& msg) : m_msg(msg) {}
+    ~ConfigFileError() noexcept override = default;
+
+    char const* what() const noexcept override
     {
-        VFRB vfrb(get_config(evalArgs(argc, argv)));
-        vfrb.run();
+        return m_msg.c_str();
     }
-    catch (const std::exception& e)
+};
+
+class ArgumentError : public vfrb::error::Error
+{
+public:
+    ArgumentError()                    = default;
+    ~ArgumentError() noexcept override = default;
+
+    char const* what() const noexcept override
     {
-        logger.error("(VFRB) fatal: ", e.what());
-        return 1;
+        return "";
     }
-    catch (...)
-    {
-        return 1;
-    }
-    return 0;
-}
+};
+}  // namespace error
 
 program_options::variables_map evalArgs(int argc, char** argv)
 {
-    program_options::options_description cmdline_options("VirtualFlightRadar-Backend -- " VERSION);
+    program_options::options_description cmdline_options("VirtualFlightRadar-Backend -- "s + VERSION);
     cmdline_options.add_options()("help,h", "show this message");
     cmdline_options.add_options()("verbose,v", "enable debug logging");
     cmdline_options.add_options()(
@@ -86,7 +86,7 @@ program_options::variables_map evalArgs(int argc, char** argv)
     if (argc < 3 || variables.count("help"))
     {
         std::cout << cmdline_options << std::endl;
-        throw 1;
+        throw ::error::ArgumentError();
     }
     return variables;
 }
@@ -107,7 +107,7 @@ s_ptr<Configuration> get_config(const program_options::variables_map& variables)
         std::ifstream file(variables["config"].as<std::string>());
         if (!file)
         {
-            throw std::logic_error(variables["config"].as<std::string>() + " is not accessible");
+            throw ::error::ConfigFileError(variables["config"].as<std::string>() + " is not accessible");
         }
         auto conf = std::make_shared<Configuration>(file);
         if (variables.count("ground-mode"))
@@ -119,6 +119,32 @@ s_ptr<Configuration> get_config(const program_options::variables_map& variables)
     }
     else
     {
-        throw std::logic_error("No config file given.");
+        throw ::error::ConfigFileError("No config file given.");
     }
+}
+
+/**
+ * @fn main
+ * @brief The application start point.
+ * @param argc The argument count
+ * @param argv The arguments
+ * @return 0 on success, else -1
+ */
+int main(int argc, char** argv)
+{
+    try
+    {
+        VFRB vfrb(get_config(evalArgs(argc, argv)));
+        vfrb.run();
+    }
+    catch ([[maybe_unused]] ::error::ArgumentError const&)
+    {
+        return 1;
+    }
+    catch (vfrb::error::Error const& e)
+    {
+        logger.error("(VFRB) fatal: ", e.what());
+        return 1;
+    }
+    return 0;
 }

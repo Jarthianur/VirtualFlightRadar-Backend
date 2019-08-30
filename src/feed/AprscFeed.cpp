@@ -28,10 +28,10 @@
 #include "feed/parser/AprsParser.h"
 #include "object/Aircraft.h"
 
-using namespace config;
+using namespace vfrb::config;
 using namespace std::literals;
 
-namespace feed
+namespace vfrb::feed
 {
 parser::AprsParser AprscFeed::s_parser;
 
@@ -42,7 +42,7 @@ AprscFeed::AprscFeed(str const& name, Properties const& properties, s_ptr<data::
           {
               m_data->update(s_parser.unpack(work, m_priority));
           }
-          catch (parser::UnpackError const&)
+          catch ([[maybe_unused]] parser::error::UnpackError const&)
           {}
       })
 {
@@ -51,9 +51,9 @@ AprscFeed::AprscFeed(str const& name, Properties const& properties, s_ptr<data::
     {
         properties.property(Configuration::KV_KEY_LOGIN);
     }
-    catch (std::out_of_range const&)
+    catch ([[maybe_unused]] config::error::PropertyNotFoundError const&)
     {
-        throw std::logic_error("could not find: "s + name + "." + Configuration::KV_KEY_LOGIN);
+        throw error::InvalidPropertyError("could not find: "s + name + "." + Configuration::KV_KEY_LOGIN);
     }
 }
 
@@ -72,4 +72,4 @@ str AprscFeed::login() const
 {
     return m_properties.property(Configuration::KV_KEY_LOGIN);
 }
-}  // namespace feed
+}  // namespace vfrb::feed

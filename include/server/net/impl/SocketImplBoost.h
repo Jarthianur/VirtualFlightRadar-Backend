@@ -21,14 +21,16 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <boost/asio.hpp>
 #include <boost/move/move.hpp>
 
-#include "util/defines.h"
-#include "util/types.h"
-#include "util/utility.hpp"
+#include "util/class_utils.h"
 
-namespace server::net
+#include "types.h"
+
+namespace vfrb::server::net
 {
 /**
  * @brief Socket implementation using boost
@@ -70,4 +72,4 @@ public:
      */
     boost::asio::ip::tcp::socket& get();
 };
-}  // namespace server::net
+}  // namespace vfrb::server::net

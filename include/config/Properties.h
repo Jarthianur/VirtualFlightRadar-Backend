@@ -25,9 +25,11 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "util/types.h"
+#include "error/Error.hpp"
 
-namespace config
+#include "types.h"
+
+namespace vfrb::config
 {
 /**
  * @brief Store key-value pairs sectionwise.
@@ -58,4 +60,18 @@ public:
      */
     Properties section(str const& section) const;
 };
-}  // namespace config
+
+namespace error
+{
+class PropertyNotFoundError : public vfrb::error::Error
+{
+    str const m_property;
+
+public:
+    explicit PropertyNotFoundError(str const& prop);
+    ~PropertyNotFoundError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
+}  // namespace vfrb::config

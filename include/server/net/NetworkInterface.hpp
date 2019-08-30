@@ -24,9 +24,9 @@
 #include <functional>
 #include <mutex>
 
-#include "util/types.h"
+#include "types.h"
 
-namespace server
+namespace vfrb::server
 {
 template<typename SocketT>
 class Connection;
@@ -81,4 +81,4 @@ public:
     virtual str stagedAddress() const = 0;
 };
 }  // namespace net
-}  // namespace server
+}  // namespace vfrb::server

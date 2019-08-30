@@ -28,10 +28,11 @@
 
 #include "server/net/NetworkInterface.hpp"
 #include "server/net/impl/SocketImplBoost.h"
-#include "util/defines.h"
-#include "util/types.h"
+#include "util/class_utils.h"
 
-namespace server::net
+#include "types.h"
+
+namespace vfrb::server::net
 {
 /**
  * @brief Implement NetworkInterface using boost.
@@ -92,4 +93,4 @@ public:
      */
     str stagedAddress() const override;
 };
-}  // namespace server::net
+}  // namespace vfrb::server::net

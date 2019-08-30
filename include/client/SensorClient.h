@@ -23,7 +23,7 @@
 
 #include "Client.h"
 
-namespace client
+namespace vfrb::client
 {
 /**
  * @brief Client for sensor servers
@@ -59,4 +59,4 @@ public:
     SensorClient(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
     ~SensorClient() noexcept override = default;
 };
-}  // namespace client
+}  // namespace vfrb::client

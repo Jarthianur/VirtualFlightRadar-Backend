@@ -27,9 +27,9 @@
 #include <boost/system/error_code.hpp>
 
 #include "client/net/Connector.hpp"
-#include "util/defines.h"
+#include "util/class_utils.h"
 
-namespace client::net
+namespace vfrb::client::net
 {
 /**
  * @brief Implement the Connector interface using boost::asio.
@@ -150,4 +150,4 @@ public:
      */
     bool timerExpired() override;
 };
-}  // namespace client::net
+}  // namespace vfrb::client::net

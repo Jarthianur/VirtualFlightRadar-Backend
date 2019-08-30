@@ -29,7 +29,7 @@
 
 #include "Parser.hpp"
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 /**
  * @brief Implement Parser for APRS sentences.
@@ -91,7 +91,7 @@ class AprsParser : public Parser<object::Aircraft>
 public:
     static s32 s_maxHeight;  ///< The max height filter
 
-    AprsParser();
+    AprsParser()                    = default;
     ~AprsParser() noexcept override = default;
 
     /**
@@ -102,4 +102,4 @@ public:
      */
     object::Aircraft unpack(str const& sentence, u32 priority) const override;
 };
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

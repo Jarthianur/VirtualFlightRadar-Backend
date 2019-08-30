@@ -31,13 +31,12 @@
 using namespace boost::asio;
 using namespace boost::system;
 
-namespace client::net
+namespace vfrb::client::net
 {
 static auto const& logger = Logger::instance();
 
 ConnectorImplBoost::ConnectorImplBoost()
-    : Connector(),
-      m_ioService(),
+    : m_ioService(),
       m_socket(m_ioService),
       m_resolver(m_ioService),
       m_timer(m_ioService),
@@ -179,4 +178,4 @@ void ConnectorImplBoost::handleRead(error_code const&   error, [[maybe_unused]] 
     }
     callback(bool(error), m_response);
 }
-}  // namespace client::net
+}  // namespace vfrb::client::net

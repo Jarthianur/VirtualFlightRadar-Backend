@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 /**
  * @file Defines.h
  *
@@ -30,13 +32,21 @@
 /// Make a class of TYPE non copyable.
 /// @param TYPE The classname
 #define NOT_COPYABLE(TYPE)      \
-    TYPE(const TYPE&) = delete; \
-    TYPE& operator=(const TYPE&) = delete;
+    TYPE(TYPE const&) = delete; \
+    TYPE& operator=(TYPE const&) = delete;
 
 /// Make a class of TYPE non copyable, but movable.
 /// @param TYPE The classname
 #define MOVABLE_BUT_NOT_COPYABLE(TYPE)     \
-    TYPE(const TYPE&) = delete;            \
-    TYPE& operator=(const TYPE&) = delete; \
+    TYPE(TYPE const&) = delete;            \
+    TYPE& operator=(TYPE const&) = delete; \
     TYPE(TYPE&&);                          \
     TYPE& operator=(TYPE&&);
+
+#define ENABLE_IF(C) typename std::enable_if<C>::type* = nullptr
+#define AND &&
+#define OR ||
+#define NOT !
+#define IS(T, ...) (T<__VA_ARGS__>::value)
+#define IS_TYPE(T, R) (IS(std::is_same, T, R))
+#define EXTENDS(T, R) (IS(std::is_base_of, R, T))

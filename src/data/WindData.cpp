@@ -21,9 +21,9 @@
 
 #include "data/WindData.h"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace data
+namespace vfrb::data
 {
 WindData::WindData(AccessFn&& fn) : Data(std::move(fn)) {}
 
@@ -41,4 +41,4 @@ void WindData::access()
     m_accessFn(++m_wind);
     (*m_wind).clear();
 }
-}  // namespace data
+}  // namespace vfrb::data

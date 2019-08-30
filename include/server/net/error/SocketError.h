@@ -21,23 +21,28 @@
 
 #pragma once
 
-namespace vfrb::data::processor
+#include "error/Error.hpp"
+
+#include "types.h"
+
+namespace vfrb::server::net::error
 {
 /**
- * @brief Processor base class/interface.
- * @tparam T The type of object to process
+ * @brief Exception to signal socket errors.
  */
-template<typename T>
-class Processor
+class SocketError : public vfrb::error::Error
 {
+    str const m_msg;  ///< Error message
+
 public:
-    Processor()                   = default;
-    virtual ~Processor() noexcept = default;
+    SocketError() = default;
+    explicit SocketError(str const& msg);  ///< @param msg The error message
+    ~SocketError() noexcept override = default;
 
     /**
-     * @brief Process an object.
-     * @param _1 The object of type T
+     * @brief Get the error message.
+     * @return the message
      */
-    virtual void process(T& _1) const = 0;
+    char const* what() const noexcept override;
 };
-}  // namespace vfrb::data::processor
+}  // namespace vfrb::server::net::error

@@ -24,7 +24,9 @@
 #include "client/ClientFactory.h"
 #include "feed/Feed.h"
 
-namespace client
+using namespace std::literals;
+
+namespace vfrb::client
 {
 ClientManager::~ClientManager() noexcept
 {
@@ -42,7 +44,7 @@ void ClientManager::subscribe(s_ptr<feed::Feed> feed)
     }
     else
     {
-        throw std::logic_error("could not subscribe feed " + feed->name());
+        throw error::FeedSubscriptionError(feed->name());
     }
 }
 
@@ -51,7 +53,7 @@ void ClientManager::run()
     std::lock_guard lk(m_mutex);
     for (auto it : m_clients)
     {
-        m_thdGroup.create_thread([this, it] {
+        m_thdGroup.createThread([this, it] {
             it->run();
             std::lock_guard lk(m_mutex);
             m_clients.erase(it);
@@ -68,6 +70,17 @@ void ClientManager::stop()
             it->scheduleStop();
         }
     }
-    m_thdGroup.join_all();
 }
-}  // namespace client
+
+namespace error
+{
+FeedSubscriptionError::FeedSubscriptionError(str const& name)
+    : m_msg("failed to subscribe "s + name + " to client")
+{}
+
+char const* FeedSubscriptionError::what() const noexcept
+{
+    return m_msg.c_str();
+}
+}  // namespace error
+}  // namespace vfrb::client

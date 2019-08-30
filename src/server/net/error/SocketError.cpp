@@ -19,25 +19,14 @@
  }
  */
 
-#pragma once
+#include "server/net/error/SocketError.h"
 
-namespace vfrb::data::processor
+namespace vfrb::server::net::error
 {
-/**
- * @brief Processor base class/interface.
- * @tparam T The type of object to process
- */
-template<typename T>
-class Processor
-{
-public:
-    Processor()                   = default;
-    virtual ~Processor() noexcept = default;
+SocketError::SocketError(str const& msg) : m_msg(msg) {}
 
-    /**
-     * @brief Process an object.
-     * @param _1 The object of type T
-     */
-    virtual void process(T& _1) const = 0;
-};
-}  // namespace vfrb::data::processor
+char const* SocketError::what() const noexcept
+{
+    return m_msg.c_str();
+}
+}  // namespace vfrb::server::net::error

@@ -23,9 +23,11 @@
 
 #include <stdexcept>
 
-#include "util/types.h"
+#include "error/Error.hpp"
 
-namespace object::time
+#include "types.h"
+
+namespace vfrb::object::time
 {
 /**
  * @brief Format of a given time string.
@@ -35,11 +37,25 @@ enum class Format : enum_t
     HHMMSS,
     HH_MM_SS_FFF
 };
+}  // namespace vfrb::object::time
 
-}  // namespace object::time
-
-namespace object
+namespace vfrb::object
 {
+namespace error
+{
+class TimestampParseError : public vfrb::error::Error
+{
+public:
+    TimestampParseError()                    = default;
+    ~TimestampParseError() noexcept override = default;
+
+    char const* what() const noexcept override
+    {
+        return "";
+    }
+};
+}  // namespace error
+
 /**
  * @brief A timestamp
  * @tparam DateTimeT The provider of time functions
@@ -104,11 +120,11 @@ Timestamp<DateTimeT>::Timestamp(str const& value, time::Format format) : m_day(D
     }
     catch (std::out_of_range const&)
     {
-        throw std::invalid_argument("");
+        throw error::TimestampParseError();
     }
     if (h > 23 || m > 59 || s > 59 || f > 999)
     {
-        throw std::invalid_argument("");
+        throw error::TimestampParseError();
     }
     m_value = static_cast<s64>(h * 3600000 + m * 60000 + s * 1000 + f);
     if (m_value >= DateTimeT::now())
@@ -135,4 +151,4 @@ bool Timestamp<DateTimeT>::operator>(Timestamp<DateTimeT> const& other) const
 {
     return (this->m_day > other.m_day) || ((this->m_day == other.m_day) && this->m_value > other.m_value);
 }
-}  // namespace object
+}  // namespace vfrb::object

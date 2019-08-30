@@ -23,19 +23,42 @@
 
 #include <limits>
 #include <sstream>
-#include <stdexcept>
 #include <utility>
 #include <variant>
 
 #include "config/ConfigReader.h"
 #include "util/Logger.hpp"
+#include "util/utility.hpp"
 
-using namespace util;
+using namespace vfrb::util;
 using namespace std::literals;
 
-namespace config
+namespace vfrb::config
 {
 using Number = std::variant<s32, u64, f64>;
+
+namespace error
+{
+char const* ConfigurationError::what() const noexcept
+{
+    return "configuration initialization failed";
+}
+
+class ConversionError : public vfrb::error::Error
+{
+    str const m_msg;
+
+public:
+    ConversionError(str const& str, char const* path) : m_msg("invalid value at "s + path + " [" + str + "]")
+    {}
+    ~ConversionError() noexcept override = default;
+
+    char const* what() const noexcept override
+    {
+        return m_msg.c_str();
+    }
+};
+}  // namespace error
 
 constexpr auto     LOG_PREFIX = "(Config) ";
 static auto const& logger     = Logger::instance();
@@ -55,7 +78,7 @@ Number strToNumber(str const& str, char const* path)
     {
         return Number(result);
     }
-    throw std::invalid_argument("invalid value at "s + path);
+    throw error::ConversionError(str, path);
 }
 
 /**
@@ -112,9 +135,10 @@ try :
 {
     dumpInfo();
 }
-catch (std::exception const& e)
+catch (vfrb::error::Error const& e)
 {
     logger.error(LOG_PREFIX, "init: ", e.what());
+    throw error::ConfigurationError();
 }
 
 object::GpsPosition Configuration::resolvePosition(Properties const& properties) const
@@ -134,13 +158,10 @@ u16 Configuration::resolveServerPort(const Properties& properties) const
     {
         u64 port =
             std::get<u64>(strToNumber<u64>(properties.property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT));
-        if (port > std::numeric_limits<u16>::max())
-        {
-            throw std::invalid_argument("invalid port number");
-        }
+        util::checkLimits<u64>(port, 0, std::numeric_limits<u16>::max());
         return port & 0xFFFF;
     }
-    catch (std::logic_error const& e)
+    catch (vfrb::error::Error const& e)
     {
         logger.warn(LOG_PREFIX, "resolving server port: ", e.what());
         return 4353;
@@ -154,7 +175,7 @@ s32 Configuration::resolveFilter(Properties const& properties, char const* path)
         s32 filter = std::get<s32>(strToNumber<s32>(properties.property(path, "-1"), path));
         return filter < 0 ? std::numeric_limits<s32>::max() : filter;
     }
-    catch (std::invalid_argument const&)
+    catch ([[maybe_unused]] error::ConversionError const&)
     {
         return std::numeric_limits<s32>::max();
     }
@@ -169,7 +190,7 @@ std::unordered_map<str, Properties> Configuration::resolveFeeds(Properties const
         {
             map.emplace(it, properties.section(it));
         }
-        catch (std::out_of_range const& e)
+        catch (error::PropertyNotFoundError const& e)
         {
             logger.warn(LOG_PREFIX, "resolving feeds: ", e.what(), " for ", it);
         }
@@ -190,4 +211,4 @@ void Configuration::dumpInfo() const
     logger.info(LOG_PREFIX, PATH_GND_MODE, ": ", groundMode ? "Yes" : "No");
     logger.info(LOG_PREFIX, "number of feeds: ", feedProperties.size());
 }
-}  // namespace config
+}  // namespace vfrb::config

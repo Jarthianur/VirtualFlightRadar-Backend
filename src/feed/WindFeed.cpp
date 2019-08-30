@@ -26,9 +26,9 @@
 #include "feed/parser/WindParser.h"
 #include "object/Wind.h"
 
-using namespace config;
+using namespace vfrb::config;
 
-namespace feed
+namespace vfrb::feed
 {
 parser::WindParser WindFeed::s_parser;
 
@@ -47,8 +47,8 @@ bool WindFeed::process(str const& response)
     {
         m_data->update(s_parser.unpack(response, m_priority));
     }
-    catch (parser::UnpackError const&)
+    catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}
     return true;
 }
-}  // namespace feed
+}  // namespace vfrb::feed

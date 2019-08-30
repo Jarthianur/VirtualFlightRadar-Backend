@@ -21,27 +21,43 @@
 
 #pragma once
 
-#include <exception>
+#include <functional>
+#include <list>
 
-#include "util/types.h"
+#include "util/class_utils.h"
 
-namespace server::net
+#include "GuardedThread.hpp"
+
+namespace vfrb::concurrent
 {
-/**
- * @brief Exception to signal socket errors.
- */
-class SocketException : public std::exception
+class ThreadGroup
 {
-    str const m_message;  ///< Error message
+    NOT_COPYABLE(ThreadGroup)
+
+    std::list<GuardedThread> m_threads;
 
 public:
-    SocketException() = default;
-    explicit SocketException(str const& msg);  ///< @param msg The error message
+    ThreadGroup() = default;
+    ~ThreadGroup() noexcept;
 
-    /**
-     * @brief Get the error message.
-     * @return the message
-     */
-    char const* what() const noexcept;
+    template<typename FnT>
+    void createThread(FnT&& fn);
+    void joinAll();
 };
-}  // namespace server::net
+
+inline ThreadGroup::~ThreadGroup() noexcept
+{
+    joinAll();
+}
+
+template<typename FnT>
+void ThreadGroup::createThread(FnT&& fn)
+{
+    m_threads.push_back(GuardedThread(std::forward<FnT>(fn)));
+}
+
+inline void ThreadGroup::joinAll()
+{
+    m_threads.clear();
+}
+}  // namespace vfrb::concurrent

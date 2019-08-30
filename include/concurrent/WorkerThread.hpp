@@ -25,13 +25,13 @@
 #include <condition_variable>
 #include <functional>
 #include <queue>
-#include <thread>
-#include <utility>
 
-#include "util/defines.h"
-#include "util/types.h"
+#include "util/class_utils.h"
 
-namespace util
+#include "GuardedThread.hpp"
+#include "types.h"
+
+namespace vfrb::concurrent
 {
 template<typename DataT, typename FnT>
 class WorkerThreadT
@@ -42,10 +42,10 @@ class WorkerThreadT
     std::queue<DataT> m_workQ;
     std::mutex mutable m_mutex;
     std::condition_variable m_cv;
-    std::thread             m_worker;
+    GuardedThread           m_worker;
 
 public:
-    WorkerThreadT(FnT&& fn);
+    explicit WorkerThreadT(FnT&& fn);
     ~WorkerThreadT() noexcept;
 
     void push(DataT const& data);
@@ -53,7 +53,7 @@ public:
 
 template<typename DataT, typename FnT>
 WorkerThreadT<DataT, FnT>::WorkerThreadT(FnT&& fn)
-    : m_running(false), m_worker([this, fn = std::move(fn)] {
+    : m_running(false), m_worker([this, fn = std::forward<FnT>(fn)] {
           std::unique_lock lk(m_mutex);
           m_running = true;
           while (m_running)
@@ -78,19 +78,13 @@ WorkerThreadT<DataT, FnT>::WorkerThreadT(FnT&& fn)
 template<typename DataT, typename FnT>
 WorkerThreadT<DataT, FnT>::~WorkerThreadT() noexcept
 {
+    std::lock_guard lk(m_mutex);
+    while (!m_workQ.empty())
     {
-        std::lock_guard lk(m_mutex);
-        while (!m_workQ.empty())
-        {
-            m_workQ.pop();
-        }
-        m_running = false;
-        m_cv.notify_one();
+        m_workQ.pop();
     }
-    if (m_worker.joinable())
-    {
-        m_worker.join();
-    }
+    m_running = false;
+    m_cv.notify_one();
 }
 
 template<typename DataT, typename FnT>
@@ -103,4 +97,4 @@ void WorkerThreadT<DataT, FnT>::push(DataT const& data)
 
 template<typename DataT>
 using WorkerThread = WorkerThreadT<DataT, std::function<void(DataT&&)>>;
-}  // namespace util
+}  // namespace vfrb::concurrent

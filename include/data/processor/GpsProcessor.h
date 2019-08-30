@@ -24,11 +24,11 @@
 #include <ctime>
 
 #include "object/GpsPosition.h"
-#include "util/types.h"
 
 #include "Processor.hpp"
+#include "types.h"
 
-namespace data::processor
+namespace vfrb::data::processor
 {
 /**
  * @brief Process GPS positions to NMEA GGA and RMC sentences.
@@ -72,4 +72,4 @@ public:
      */
     void process(object::GpsPosition& position) const override;
 };
-}  // namespace data::processor
+}  // namespace vfrb::data::processor

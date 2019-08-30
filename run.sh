@@ -22,7 +22,7 @@
 set -e
 
 # set env vars
-VFRB_ROOT=${WORKSPACE:-$PWD}
+VFRB_ROOT=${BUILD_DIR:-$PWD}
 export VFRB_VERSION=$(cat "$VFRB_ROOT/version.txt" | tr -d '\n')
 export VFRB_INI="vfrb.ini"
 

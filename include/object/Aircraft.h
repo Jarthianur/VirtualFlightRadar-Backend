@@ -22,14 +22,14 @@
 #pragma once
 
 #include "impl/DateTimeImplBoost.h"
-#include "util/types.h"
-#include "util/utility.hpp"
+#include "util/CString.hpp"
 
 #include "GpsPosition.h"
 #include "Object.h"
 #include "Timestamp.hpp"
+#include "types.h"
 
-namespace object
+namespace vfrb::object
 {
 /**
  * @brief Extend Object to an aircraft.
@@ -145,4 +145,4 @@ public:
     auto             hasFullInfo() const -> decltype(m_fullInfo);
     void             targetType(TargetType tt);
 };
-}  // namespace object
+}  // namespace vfrb::object

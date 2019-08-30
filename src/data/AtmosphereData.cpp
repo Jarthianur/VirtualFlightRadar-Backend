@@ -21,9 +21,9 @@
 
 #include "data/AtmosphereData.h"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace data
+namespace vfrb::data
 {
 AtmosphereData::AtmosphereData(AccessFn&& fn) : Data(std::move(fn)) {}
 
@@ -48,4 +48,4 @@ auto AtmosphereData::atmPressure() const -> decltype(m_atmosphere.pressure())
     std::lock_guard lk(m_mutex);
     return m_atmosphere.pressure();
 }
-}  // namespace data
+}  // namespace vfrb::data

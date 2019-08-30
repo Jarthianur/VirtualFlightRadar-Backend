@@ -23,15 +23,17 @@
 
 #include "client/net/Endpoint.hpp"
 #include "config/Properties.h"
-#include "util/defines.h"
-#include "util/types.h"
+#include "error/Error.hpp"
+#include "util/class_utils.h"
 
-namespace data
+#include "types.h"
+
+namespace vfrb::data
 {
 class Data;
-}  // namespace data
+}  // namespace vfrb::data
 
-namespace feed
+namespace vfrb::feed
 {
 /**
  * @brief Base class for input feeds.
@@ -93,4 +95,18 @@ public:
 
     auto name() const -> decltype(m_name) const&;
 };
-}  // namespace feed
+
+namespace error
+{
+class InvalidPropertyError : public vfrb::error::Error
+{
+    str const m_msg;
+
+public:
+    explicit InvalidPropertyError(str const& msg);
+    ~InvalidPropertyError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
+}  // namespace vfrb::feed

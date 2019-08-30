@@ -20,12 +20,12 @@
 #include <functional>
 #include <utility>
 
-namespace object
+namespace vfrb::object
 {
 class Object;
-}  // namespace object
+}  // namespace vfrb::object
 
-namespace data
+namespace vfrb::data
 {
 using AccessFn = std::function<void(object::Object const&)>;
 
@@ -50,4 +50,4 @@ public:
 
     virtual void access() = 0;
 };
-}  // namespace data
+}  // namespace vfrb::data

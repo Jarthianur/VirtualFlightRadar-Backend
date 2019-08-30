@@ -24,30 +24,32 @@
 #include <atomic>
 #include <chrono>
 #include <list>
-#include <memory>
 
 #include "server/Server.hpp"
 #include "server/net/impl/NetworkInterfaceImplBoost.h"
 #include "server/net/impl/SocketImplBoost.h"
-#include "util/defines.h"
-#include "util/types.h"
+#include "util/class_utils.h"
 
-namespace config
+#include "types.h"
+
+namespace vfrb::config
 {
 class Configuration;
-}  // namespace config
-namespace data
+}  // namespace vfrb::config
+namespace vfrb::data
 {
 class AircraftData;
 class AtmosphereData;
 class GpsData;
 class WindData;
-}  // namespace data
-namespace feed
+}  // namespace vfrb::data
+namespace vfrb::feed
 {
 class Feed;
-}  // namespace feed
+}  // namespace vfrb::feed
 
+namespace vfrb
+{
 /**
  * @brief Combine all features and is the main entry point for the actual VFR-B.
  */
@@ -90,3 +92,4 @@ public:
      */
     void run() noexcept;
 };
+}  // namespace vfrb

@@ -21,14 +21,14 @@
 
 #pragma once
 
+#include "concurrent/ConcurrentContainer.hpp"
 #include "object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
-#include "util/ConcurrentContainer.hpp"
-#include "util/types.h"
 
 #include "Data.hpp"
+#include "types.h"
 
-namespace data
+namespace vfrb::data
 {
 /**
  * @brief Store aircrafts.
@@ -39,8 +39,8 @@ class AircraftData : public Data
         object::Object::OUTDATED;                         ///< Times until FLARM status is removed
     inline static constexpr auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
 
-    util::ConcurrentContainer<object::Aircraft> m_container;  ///< Internal container for aircrafts
-    processor::AircraftProcessor                m_processor;  ///< Processor for aircrafts
+    concurrent::ConcurrentContainer<object::Aircraft> m_container;  ///< Internal container for aircrafts
+    processor::AircraftProcessor                      m_processor;  ///< Processor for aircrafts
 
 public:
     explicit AircraftData(AccessFn&& fn);
@@ -65,4 +65,4 @@ public:
      */
     void access() override;
 };
-}  // namespace data
+}  // namespace vfrb::data

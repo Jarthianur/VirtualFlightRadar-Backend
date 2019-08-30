@@ -24,11 +24,11 @@
 #include <mutex>
 
 #include "object/Wind.h"
-#include "util/types.h"
 
 #include "Data.hpp"
+#include "types.h"
 
-namespace data
+namespace vfrb::data
 {
 /**
  * @brief Store wind information.
@@ -53,4 +53,4 @@ public:
 
     void access() override;
 };
-}  // namespace data
+}  // namespace vfrb::data

@@ -20,9 +20,9 @@
 #include <typeinfo>
 #include <utility>
 
-#include "util/math.hpp"
+#include "util/utility.hpp"
 
-namespace object
+namespace vfrb::object
 {
 Atmosphere::Atmosphere() : Object() {}
 
@@ -30,7 +30,7 @@ Atmosphere::Atmosphere(u32 priority) : Object(priority) {}
 
 Atmosphere::Atmosphere(u32 priority, f64 pressure) : Object(priority), m_pressure(pressure)
 {
-    math::checkLimits(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
+    util::checkLimits(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
 }
 
 void Atmosphere::assign(Object&& other)
@@ -59,4 +59,4 @@ str& Atmosphere::operator*()
 {
     return m_nmea;
 }
-}  // namespace object
+}  // namespace vfrb::object

@@ -21,16 +21,16 @@
 
 #pragma once
 
-#include <exception>
 #include <mutex>
 
+#include "error/Error.hpp"
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
-#include "util/types.h"
 
 #include "Data.hpp"
+#include "types.h"
 
-namespace data
+namespace vfrb::data
 {
 /**
  * @brief Store GPS information.
@@ -80,11 +80,13 @@ public:
     auto location() const -> decltype(m_position.location());
 };
 
-class GpsDataException : public std::exception
+namespace error
+{
+class GpsDataException : public vfrb::error::Error
 {
 protected:
-    GpsDataException();
-    virtual ~GpsDataException() noexcept = default;
+    GpsDataException()                            = default;
+    virtual ~GpsDataException() noexcept override = default;
 };
 
 /**
@@ -93,7 +95,7 @@ protected:
 class PositionAlreadyLocked : public GpsDataException
 {
 public:
-    PositionAlreadyLocked();
+    PositionAlreadyLocked()                    = default;
     ~PositionAlreadyLocked() noexcept override = default;
     char const* what() const noexcept override;
 };
@@ -104,8 +106,9 @@ public:
 class ReceivedGoodPosition : public GpsDataException
 {
 public:
-    ReceivedGoodPosition();
+    ReceivedGoodPosition()                    = default;
     ~ReceivedGoodPosition() noexcept override = default;
     char const* what() const noexcept override;
 };
-}  // namespace data
+}  // namespace error
+}  // namespace vfrb::data

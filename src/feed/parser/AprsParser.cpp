@@ -29,9 +29,9 @@
 #include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 boost::regex const AprsParser::s_APRS_RE(
     "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
@@ -43,15 +43,13 @@ boost::regex const AprsParser::s_APRSExtRE(
 
 s32 AprsParser::s_maxHeight = std::numeric_limits<s32>::max();
 
-AprsParser::AprsParser() : Parser<Aircraft>() {}
-
 Aircraft AprsParser::unpack(str const& sentence, u32 priority) const
 {
     boost::smatch match, com_match;
     if ((!sentence.empty() && sentence[0] == '#') || !boost::regex_match(sentence, match, s_APRS_RE) ||
         !boost::regex_match(match.str(RE_APRS_COM), com_match, s_APRSExtRE))
     {
-        throw UnpackError();
+        throw error::UnpackError();
     }
     try
     {
@@ -65,13 +63,11 @@ Aircraft AprsParser::unpack(str const& sentence, u32 priority) const
                 parseMovement(match, com_match),
                 parseTimeStamp(match)};
     }
-    catch (UnpackError const&)
-    {
-        throw;
-    }
-    catch (std::exception const&)
+    catch ([[maybe_unused]] std::logic_error const&)
     {}
-    throw UnpackError();
+    catch ([[maybe_unused]] object::error::TimestampParseError const&)
+    {}
+    throw error::UnpackError();
 }
 
 Location AprsParser::parseLocation(boost::smatch const& match) const
@@ -92,7 +88,7 @@ Location AprsParser::parseLocation(boost::smatch const& match) const
     {
         return pos;
     }
-    throw UnpackError();
+    throw error::UnpackError();
 }
 
 AprsParser::AircraftInfo AprsParser::parseComment(boost::smatch const& match) const
@@ -114,4 +110,4 @@ Timestamp<time::DateTimeImplBoost> AprsParser::parseTimeStamp(boost::smatch cons
 {
     return Timestamp<time::DateTimeImplBoost>(match.str(RE_APRS_TIME), time::Format::HHMMSS);
 }
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

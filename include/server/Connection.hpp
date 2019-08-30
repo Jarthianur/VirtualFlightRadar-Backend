@@ -21,22 +21,23 @@
 
 #pragma once
 
+#include <string_view>
 #include <utility>
 
-#include "net/SocketException.h"
+#include "net/error/SocketError.h"
 #include "util/Logger.hpp"
-#include "util/defines.h"
-#include "util/types.h"
-#include "util/utility.hpp"
+#include "util/class_utils.h"
 
-namespace server
+#include "types.h"
+
+namespace vfrb::server
 {
 /**
  * @brief TCP connection opened by the Server.
  * @tparam SocketT The type of socket implementation
  */
 template<typename SocketT>
-class Connection final
+class Connection
 {
     NOT_COPYABLE(Connection)
 
@@ -81,7 +82,7 @@ bool Connection<SocketT>::write(std::string_view const& msg)
     {
         return m_socket.write(msg);
     }
-    catch (net::SocketException const& e)
+    catch (net::error::SocketError const& e)
     {
         Logger::instance().debug("(Connection) write: ", e.what());
     }
@@ -91,4 +92,4 @@ bool Connection<SocketT>::write(std::string_view const& msg)
 template<typename SocketT>
 Connection<SocketT>::Connection(SocketT&& socket) : m_socket(std::move(socket)), address(m_socket.address())
 {}
-}  // namespace server
+}  // namespace vfrb::server

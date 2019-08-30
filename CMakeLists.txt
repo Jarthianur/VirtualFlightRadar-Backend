@@ -28,7 +28,7 @@ file(GLOB_RECURSE vfrb_sources src/*.cpp)
 file(GLOB_RECURSE vfrb_test_sources test/*.cpp)
 
 set(CMAKE_BUILD_TYPE staged)
-set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Werror")
+set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Werror -Wno-error=attributes")
 
 if(DEFINED BOOST_STATIC)
     message(STATUS "Linking boost statically")
@@ -55,7 +55,7 @@ target_link_libraries(release PUBLIC Boost::regex Boost::system Boost::program_o
 # target: regression
 #
 add_executable(regression ${vfrb_sources})
-target_compile_options(regression PUBLIC -O0 -g -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
+target_compile_options(regression PUBLIC -O0 -g --coverage -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
 set_target_properties(regression PROPERTIES OUTPUT_NAME ${vfrb_regression_bin})
 target_include_directories(regression PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(regression PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)

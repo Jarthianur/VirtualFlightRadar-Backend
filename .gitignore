@@ -15,6 +15,7 @@
 !.gitignore
 !.gitmodules
 !.clang-format
+!.clang-tidy
 !Dockerfile
 !.dockerignore
 !*.sh

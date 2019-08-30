@@ -23,9 +23,12 @@
 
 #include <istream>
 
-#include "Properties.h"
+#include "error/Error.hpp"
 
-namespace config
+#include "Properties.h"
+#include "types.h"
+
+namespace vfrb::config
 {
 /**
  * @brief Read a config in INI format.
@@ -44,4 +47,18 @@ public:
      */
     Properties read();
 };
-}  // namespace config
+
+namespace error
+{
+class ReadFileError : public vfrb::error::Error
+{
+    str const m_fname;
+
+public:
+    explicit ReadFileError(str const& file);
+    ~ReadFileError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
+}  // namespace vfrb::config

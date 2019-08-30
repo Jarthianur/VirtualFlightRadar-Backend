@@ -21,11 +21,9 @@
 
 #include "data/GpsData.h"
 
-#include <stdexcept>
+using namespace vfrb::object;
 
-using namespace object;
-
-namespace data
+namespace vfrb::data
 {
 GpsData::GpsData(AccessFn&& fn, GpsPosition const& position, bool ground)
     : Data(std::move(fn)), m_position(position), m_groundMode(ground)
@@ -41,7 +39,7 @@ void GpsData::access()
         m_processor.process(m_position);
         m_accessFn(++m_position);
     }
-    catch (std::exception const&)
+    catch (vfrb::error::Error const&)
     {}
 }
 
@@ -50,7 +48,7 @@ bool GpsData::update(Object&& position)
     std::lock_guard lk(m_mutex);
     if (m_positionLocked)
     {
-        throw PositionAlreadyLocked();
+        throw error::PositionAlreadyLocked();
     }
     bool updated = m_position.tryUpdate(std::move(position));
     if (updated)
@@ -58,7 +56,7 @@ bool GpsData::update(Object&& position)
         m_processor.process(m_position);
         if (m_groundMode && isPositionGood())
         {
-            throw ReceivedGoodPosition();
+            throw error::ReceivedGoodPosition();
         }
     }
     return updated;
@@ -76,19 +74,16 @@ bool GpsData::isPositionGood() const
            m_position.dilution() <= GPS_HOR_DILUTION_GOOD;
 }
 
-GpsDataException::GpsDataException() : std::exception() {}
-
-PositionAlreadyLocked::PositionAlreadyLocked() : GpsDataException() {}
-
+namespace error
+{
 char const* PositionAlreadyLocked::what() const noexcept
 {
     return "position was locked before";
 }
 
-ReceivedGoodPosition::ReceivedGoodPosition() : GpsDataException() {}
-
 char const* ReceivedGoodPosition::what() const noexcept
 {
     return "received good position";
 }
-}  // namespace data
+}  // namespace error
+}  // namespace vfrb::data

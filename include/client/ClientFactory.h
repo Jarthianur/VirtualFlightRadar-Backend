@@ -21,16 +21,18 @@
 
 #pragma once
 
-#include "util/types.h"
+#include "error/Error.hpp"
+#include "util/class_utils.h"
 
 #include "Client.h"
+#include "types.h"
 
-namespace feed
+namespace vfrb::feed
 {
 class Feed;
-}  // namespace feed
+}  // namespace vfrb::feed
 
-namespace client
+namespace vfrb::client
 {
 /**
  * @brief A factory for clients.
@@ -43,7 +45,7 @@ class ClientFactory
      * @param feed The feed to create for
      * @return the client as pointer
      */
-    template<typename T, typename std::enable_if<std::is_base_of<Client, T>::value>::type* = nullptr>
+    template<typename T, ENABLE_IF(EXTENDS(T, Client))>
     static s_ptr<T> makeClient(s_ptr<feed::Feed> feed);
 
 public:
@@ -57,4 +59,16 @@ public:
      */
     static s_ptr<Client> createClientFor(s_ptr<feed::Feed> feed);
 };
-}  // namespace client
+
+namespace error
+{
+class NoSuchProtocolError : public vfrb::error::Error
+{
+public:
+    NoSuchProtocolError()                    = default;
+    ~NoSuchProtocolError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
+}  // namespace vfrb::client

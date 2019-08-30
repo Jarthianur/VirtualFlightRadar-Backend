@@ -26,11 +26,12 @@
 #include <mutex>
 #include <utility>
 
-#include "util/defines.h"
-#include "util/types.h"
+#include "util/class_utils.h"
 
-#define PREFIX(S, P) *S << "\r" P "  " << time() << ":: "
+#include "types.h"
 
+namespace vfrb
+{
 /**
  * @brief Logger with different levels.
  */
@@ -49,6 +50,8 @@ class Logger
      */
     static str time();
 
+    void prefix(std::ostream& stream, char const* msg) const;
+
     Logger() = default;
 
 public:
@@ -63,12 +66,7 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void info(Args&&... args) const
-    {
-        std::lock_guard lk(m_mutex);
-        PREFIX(m_outStream, "[INFO ]");
-        (*m_outStream << ... << args) << std::endl;
-    }
+    void info(Args&&... args) const;
 
     /**
      * @brief Log on DEBUG level.
@@ -77,14 +75,7 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void debug([[maybe_unused]] Args&&... args) const
-    {
-#ifdef LOG_ENABLE_DEBUG
-        std::lock_guard lk(m_mutex);
-        PREFIX(m_outStream, "[DEBUG]");
-        (*m_outStream << ... << args) << std::endl;
-#endif
-    }
+    void debug(Args&&... args) const;
 
     /**
      * @brief Log on WARN level.
@@ -93,12 +84,7 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void warn(Args&&... args) const
-    {
-        std::lock_guard lk(m_mutex);
-        PREFIX(m_outStream, "[WARN ]");
-        (*m_outStream << ... << args) << std::endl;
-    }
+    void warn(Args&&... args) const;
 
     /**
      * @brief Log on ERROR level.
@@ -107,12 +93,7 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void error(Args&&... args) const
-    {
-        std::lock_guard lk(m_mutex);
-        PREFIX(m_errStream, "[ERROR]");
-        (*m_errStream << ... << args) << std::endl;
-    }
+    void error(Args&&... args) const;
 
     /**
      * @brief Set a logfile instead of stdout/stderr.
@@ -121,4 +102,42 @@ public:
     void logFile(str const& file);
 };
 
-#undef PREFIX
+[[gnu::always_inline]] inline void Logger::prefix(std::ostream& stream, char const* msg) const
+{
+    stream << "\r" << msg << "  " << time() << ":: ";
+}
+
+template<typename... Args>
+void Logger::info(Args&&... args) const
+{
+    std::lock_guard lk(m_mutex);
+    prefix(*m_outStream, "[INFO ]");
+    (*m_outStream << ... << args) << std::endl;
+}
+
+template<typename... Args>
+void Logger::debug([[maybe_unused]] Args&&... args) const
+{
+#ifdef LOG_ENABLE_DEBUG
+    std::lock_guard lk(m_mutex);
+    prefix(*m_outStream, "[DEBUG]");
+    (*m_outStream << ... << args) << std::endl;
+#endif
+}
+
+template<typename... Args>
+void Logger::warn(Args&&... args) const
+{
+    std::lock_guard lk(m_mutex);
+    prefix(*m_outStream, "[WARN ]");
+    (*m_outStream << ... << args) << std::endl;
+}
+
+template<typename... Args>
+void Logger::error(Args&&... args) const
+{
+    std::lock_guard lk(m_mutex);
+    prefix(*m_errStream, "[ERROR]");
+    (*m_errStream << ... << args) << std::endl;
+}
+}  // namespace vfrb

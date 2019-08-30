@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include "util/types.h"
+#include "types.h"
 
-namespace client::net
+namespace vfrb::client::net
 {
 /**
  * @brief A remote endpoint
@@ -43,4 +43,4 @@ struct Endpoint
         return host == other.host && port == other.port;
     }
 };
-}  // namespace client::net
+}  // namespace vfrb::client::net

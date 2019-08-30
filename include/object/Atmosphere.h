@@ -21,11 +21,10 @@
 
 #pragma once
 
-#include "util/types.h"
-
 #include "Object.h"
+#include "types.h"
 
-namespace object
+namespace vfrb::object
 {
 struct Climate;
 
@@ -63,4 +62,4 @@ public:
     std::string_view nmea() const override;
     auto             pressure() const -> decltype(m_pressure);
 };
-}  // namespace object
+}  // namespace vfrb::object

@@ -28,30 +28,30 @@
 #include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 boost::regex const GpsParser::s_GPGGA_RE(
     "^\\$[A-Z]{2}GGA,(\\d{6}),(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
     boost::regex::optimize | boost::regex::icase);
-
-GpsParser::GpsParser() : Parser<GpsPosition>() {}
 
 GpsPosition GpsParser::unpack(str const& sentence, u32 priority) const
 {
     try
     {
         if (boost::smatch match; std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
-                                     math::checksum(sentence.c_str(), sentence.length()) &&
+                                     math::checksum({sentence.c_str(), sentence.length()}, 0) &&
                                  boost::regex_match(sentence, match, s_GPGGA_RE))
         {
             return parsePosition(match, priority);
         }
     }
-    catch (std::exception const&)
+    catch ([[maybe_unused]] std::logic_error const&)
     {}
-    throw UnpackError();
+    catch ([[maybe_unused]] object::error::TimestampParseError const&)
+    {}
+    throw error::UnpackError();
 }
 
 GpsPosition GpsParser::parsePosition(boost::smatch const& match, u32 priority) const
@@ -75,4 +75,4 @@ GpsPosition GpsParser::parsePosition(boost::smatch const& match, u32 priority) c
             static_cast<s8>(std::stoi(match.str(RE_GGA_FIX))),
             Timestamp<time::DateTimeImplBoost>(match.str(RE_GGA_TIME), time::Format::HHMMSS)};
 }
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser

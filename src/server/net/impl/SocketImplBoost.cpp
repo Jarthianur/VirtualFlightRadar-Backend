@@ -23,9 +23,9 @@
 
 #include <boost/system/error_code.hpp>
 
-#include "server/net/SocketException.h"
+#include "server/net/error/SocketError.h"
 
-namespace server::net
+namespace vfrb::server::net
 {
 SocketImplBoost::SocketImplBoost(SocketImplBoost&& other) : m_socket(boost::move(other.m_socket)) {}
 
@@ -53,7 +53,7 @@ str SocketImplBoost::address() const
 {
     if (!m_socket.is_open())
     {
-        throw SocketException("cannot get address from closed socket");
+        throw error::SocketError("cannot get address from closed socket");
     }
     return m_socket.remote_endpoint().address().to_string();
 }
@@ -62,7 +62,7 @@ bool SocketImplBoost::write(std::string_view const& msg)
 {
     if (!m_socket.is_open())
     {
-        throw SocketException("cannot write on closed socket");
+        throw error::SocketError("cannot write on closed socket");
     }
     boost::system::error_code ec;
     boost::asio::write(m_socket, boost::asio::buffer(msg.data(), msg.length()), ec);
@@ -83,4 +83,4 @@ boost::asio::ip::tcp::socket& SocketImplBoost::get()
 {
     return m_socket;
 }
-}  // namespace server::net
+}  // namespace vfrb::server::net

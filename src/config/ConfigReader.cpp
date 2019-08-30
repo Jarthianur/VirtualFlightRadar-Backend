@@ -21,7 +21,6 @@
 
 #include "config/ConfigReader.h"
 
-#include <stdexcept>
 #include <utility>
 
 #include <boost/property_tree/exceptions.hpp>
@@ -30,7 +29,7 @@
 
 using namespace boost::property_tree;
 
-namespace config
+namespace vfrb::config
 {
 ConfigReader::ConfigReader(std::istream& stream) : m_stream(stream) {}
 
@@ -43,8 +42,18 @@ Properties ConfigReader::read()
     }
     catch (ini_parser_error const& e)
     {
-        throw std::invalid_argument(e.filename() + " is not a valid INI file");
+        throw error::ReadFileError(e.filename());
     }
     return Properties(std::move(tree));
 }
-}  // namespace config
+
+namespace error
+{
+ReadFileError::ReadFileError(str const& file) : m_fname(file + " is not a valid INI file") {}
+
+char const* ReadFileError::what() const noexcept
+{
+    return m_fname.c_str();
+}
+}  // namespace error
+}  // namespace vfrb::config

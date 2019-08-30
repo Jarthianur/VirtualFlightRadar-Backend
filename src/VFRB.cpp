@@ -22,12 +22,11 @@
 #include "VFRB.h"
 
 #include <csignal>
-#include <exception>
 #include <sstream>
-#include <thread>
 
 #include "client/ClientManager.h"
 #include "client/net/impl/ConnectorImplBoost.h"
+#include "concurrent/SignalListener.h"
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "data/AtmosphereData.h"
@@ -38,12 +37,13 @@
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
 #include "util/Logger.hpp"
-#include "util/SignalListener.h"
 
-using namespace data;
-using namespace object;
-using namespace config;
+using namespace vfrb::data;
+using namespace vfrb::object;
+using namespace vfrb::config;
 
+namespace vfrb
+{
 constexpr auto PROCESS_INTERVAL = 1;
 constexpr auto LOG_PREFIX       = "(VFRB) ";
 
@@ -75,7 +75,7 @@ void VFRB::run() noexcept
     m_running = true;
     logger.info(LOG_PREFIX, "starting...");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    util::SignalListener                  signals;
+    concurrent::SignalListener            signals;
     client::ClientManager                 clientManager;
 
     signals.addHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {
@@ -89,7 +89,7 @@ void VFRB::run() noexcept
         {
             clientManager.subscribe(it);
         }
-        catch (std::logic_error const& e)
+        catch (client::error::FeedSubscriptionError const& e)
         {
             logger.error(LOG_PREFIX, ": ", e.what());
         }
@@ -120,7 +120,7 @@ void VFRB::serve()
             m_windData->access();
             std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
         }
-        catch (std::exception const& e)
+        catch (error::Error const& e)
         {
             logger.error(LOG_PREFIX, "fatal: ", e.what());
             m_running = false;
@@ -137,7 +137,7 @@ void VFRB::createFeeds(s_ptr<Configuration> config)
         {
             m_feeds.push_back(factory.createFeed(name));
         }
-        catch (std::exception const& e)
+        catch (feed::error::FeedCreationError const& e)
         {
             logger.warn(LOG_PREFIX, "can not create feed ", name, ": ", e.what());
         }
@@ -155,3 +155,4 @@ str VFRB::duration(std::chrono::steady_clock::time_point start) const
     ss << d << "d " << h << ":" << m;
     return ss.str();
 }
+}  // namespace vfrb

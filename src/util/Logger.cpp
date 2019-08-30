@@ -25,6 +25,8 @@
 #include <ctime>
 #include <stdexcept>
 
+namespace vfrb
+{
 void Logger::logFile(str const& file)
 {
     std::lock_guard lk(m_mutex);
@@ -50,3 +52,4 @@ Logger& Logger::instance()
     static Logger log;
     return log;
 }
+}  // namespace vfrb

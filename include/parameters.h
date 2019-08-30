@@ -31,7 +31,7 @@
  * even may cause the program not to work properly !!!
  */
 
-namespace param
+namespace vfrb::param
 {
 /**
  * Input-clients wait for this duration, in seconds, until
@@ -63,4 +63,4 @@ inline constexpr auto WINDCLIENT_RECEIVE_TIMEOUT = 5;
  * somewhere else, like pilots and flight instructors.
  */
 inline constexpr auto SERVER_MAX_CLIENTS = 3;
-}  // namespace param
+}  // namespace vfrb::param

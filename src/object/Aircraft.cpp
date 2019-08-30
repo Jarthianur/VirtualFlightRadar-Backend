@@ -23,9 +23,9 @@
 
 #include <typeinfo>
 
-#include "util/math.hpp"
+#include "util/utility.hpp"
 
-namespace object
+namespace vfrb::object
 {
 Aircraft::Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
                    Movement const& move, Timestamp<time::DateTimeImplBoost> const& timestamp)
@@ -39,8 +39,8 @@ Aircraft::Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Loc
       m_timestamp(timestamp),
       m_fullInfo(true)
 {
-    math::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
-    math::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
+    util::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
+    util::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
 }
 
 Aircraft::Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
@@ -150,4 +150,4 @@ void Aircraft::targetType(TargetType tt)
 {
     m_targetType = tt;
 }
-}  // namespace object
+}  // namespace vfrb::object

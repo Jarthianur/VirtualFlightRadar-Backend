@@ -24,12 +24,13 @@
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
+#include <string_view>
 
-#include "util/types.h"
+#include "types.h"
 
 using namespace std::literals;
 
-namespace math
+namespace vfrb::math
 {
 inline constexpr auto KTS_2_KMH = 1.852;            ///< Convert knots to km/h
 inline constexpr auto KMH_2_KTS = 0.539957;         ///< Convert km/h to knots
@@ -92,16 +93,6 @@ T saturate(T val, T min, T max)
     return std::max(min, std::min(val, max));
 }
 
-template<typename T>
-void checkLimits(T val, T min, T max)
-{
-    if (val < min || val > max)
-    {
-        throw std::range_error("limits exceeded "s + std::to_string(val) + " not in [" + std::to_string(min) +
-                               " , " + std::to_string(max) + "]");
-    }
-}
-
 /**
  * @brief Calculate height difference from QNE to Pressure in meters with ICAO height
  * formula.
@@ -129,4 +120,4 @@ inline s32 checksum(std::string_view const& sv, usize pos)
     }
     return csum;
 }
-}  // namespace math
+}  // namespace vfrb::math

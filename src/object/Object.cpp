@@ -19,7 +19,7 @@
 
 #include <utility>
 
-namespace object
+namespace vfrb::object
 {
 Object::Object(u32 priority) : m_lastPriority(priority) {}
 
@@ -54,4 +54,4 @@ auto Object::updateAge() const -> decltype(m_updateAge)
 {
     return m_updateAge;
 }
-}  // namespace object
+}  // namespace vfrb::object

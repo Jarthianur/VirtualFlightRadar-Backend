@@ -21,21 +21,21 @@
 
 #pragma once
 
-#include "util/WorkerThread.hpp"
+#include "concurrent/WorkerThread.hpp"
 
 #include "Feed.h"
 
-namespace feed::parser
+namespace vfrb::feed::parser
 {
 class AprsParser;
-}  // namespace feed::parser
+}  // namespace vfrb::feed::parser
 
-namespace data
+namespace vfrb::data
 {
 class AircraftData;
-}  // namespace data
+}  // namespace vfrb::data
 
-namespace feed
+namespace vfrb::feed
 {
 /**
  * @brief Extend Feed for APRSC protocol.
@@ -46,8 +46,8 @@ class AprscFeed : public Feed
 
     static constexpr auto LOG_PREFIX = "(AprscFeed) ";
 
-    static parser::AprsParser s_parser;  ///< Parser to unpack response from Client
-    util::WorkerThread<str>   m_worker;
+    static parser::AprsParser     s_parser;  ///< Parser to unpack response from Client
+    concurrent::WorkerThread<str> m_worker;
 
 public:
     /**
@@ -78,4 +78,4 @@ public:
      */
     str login() const;
 };
-}  // namespace feed
+}  // namespace vfrb::feed

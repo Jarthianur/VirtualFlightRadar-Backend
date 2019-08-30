@@ -21,11 +21,10 @@
 
 #pragma once
 
-#include "util/types.h"
-
 #include "Client.h"
+#include "types.h"
 
-namespace client
+namespace vfrb::client
 {
 /**
  * @brief Client for APRSC servers
@@ -75,4 +74,4 @@ public:
     bool  equals(Client const& other) const override;
     usize hash() const override;
 };
-}  // namespace client
+}  // namespace vfrb::client

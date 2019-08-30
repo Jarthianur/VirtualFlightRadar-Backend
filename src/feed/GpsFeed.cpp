@@ -27,9 +27,9 @@
 #include "object/GpsPosition.h"
 #include "util/Logger.hpp"
 
-using namespace config;
+using namespace vfrb::config;
 
-namespace feed
+namespace vfrb::feed
 {
 constexpr auto     LOG_PREFIX = "(GpsFeed) ";
 static auto const& logger     = Logger::instance();
@@ -51,13 +51,13 @@ bool GpsFeed::process(str const& response)
     {
         m_data->update(s_parser.unpack(response, m_priority));
     }
-    catch (parser::UnpackError const&)
+    catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}
-    catch (data::GpsDataException const& e)
+    catch (data::error::GpsDataException const& e)
     {
         logger.info(LOG_PREFIX, m_name, ": ", e.what());
         return false;
     }
     return true;
 }
-}  // namespace feed
+}  // namespace vfrb::feed

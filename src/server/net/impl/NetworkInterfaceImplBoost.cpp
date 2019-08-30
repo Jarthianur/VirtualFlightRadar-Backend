@@ -27,7 +27,7 @@
 #include "server/Connection.hpp"
 #include "util/Logger.hpp"
 
-namespace server::net
+namespace vfrb::server::net
 {
 constexpr auto     LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
 static auto const& logger     = Logger::instance();
@@ -105,7 +105,7 @@ u_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startConnection()
 {
     if (!m_socket.get().is_open())
     {
-        throw SocketException("cannot start connection on closed socket");
+        throw error::SocketError("cannot start connection on closed socket");
     }
     return Connection<SocketImplBoost>::create(std::move(m_socket));
 }
@@ -114,4 +114,4 @@ str NetworkInterfaceImplBoost::stagedAddress() const
 {
     return m_socket.address();
 }
-}  // namespace server::net
+}  // namespace vfrb::server::net

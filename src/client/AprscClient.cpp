@@ -28,9 +28,9 @@
 
 #include "util/Logger.hpp"
 
-using namespace client::net;
+using namespace vfrb::client::net;
 
-namespace client
+namespace vfrb::client
 {
 constexpr auto     LOG_PREFIX = "(AprscClient) ";
 static auto const& logger     = Logger::instance();
@@ -116,4 +116,4 @@ char const* AprscClient::logPrefix() const
 {
     return LOG_PREFIX;
 }
-}  // namespace client
+}  // namespace vfrb::client

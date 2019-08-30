@@ -23,11 +23,11 @@
 
 #include "object/Aircraft.h"
 #include "object/GpsPosition.h"
-#include "util/types.h"
 
 #include "Processor.hpp"
+#include "types.h"
 
-namespace data::processor
+namespace vfrb::data::processor
 {
 /**
  * @brief Process aircrafts to NMEA relative to the refered position.
@@ -86,4 +86,4 @@ public:
      */
     void referTo(object::Location const& location, f64 atmPress);
 };
-}  // namespace data::processor
+}  // namespace vfrb::data::processor

@@ -23,9 +23,9 @@
 
 #include <functional>
 
-#include "util/types.h"
+#include "types.h"
 
-namespace client::net
+namespace vfrb::client::net
 {
 struct Endpoint;
 
@@ -98,4 +98,4 @@ public:
      */
     virtual bool timerExpired() = 0;
 };
-}  // namespace client::net
+}  // namespace vfrb::client::net

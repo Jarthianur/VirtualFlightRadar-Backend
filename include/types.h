@@ -26,6 +26,8 @@
 #include <memory>
 #include <string>
 
+namespace vfrb
+{
 using u8    = std::uint8_t;
 using s8    = std::int8_t;
 using u16   = std::uint16_t;
@@ -47,3 +49,4 @@ using s_ptr = std::shared_ptr<T>;
 
 template<typename T>
 using u_ptr = std::unique_ptr<T>;
+}  // namespace vfrb

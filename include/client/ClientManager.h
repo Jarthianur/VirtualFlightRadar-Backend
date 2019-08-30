@@ -21,44 +21,22 @@
 
 #pragma once
 
-#include <algorithm>
-#include <list>
 #include <mutex>
-#include <thread>
 #include <unordered_set>
 
-#include "util/defines.h"
-#include "util/types.h"
+#include "concurrent/ThreadGroup.hpp"
+#include "error/Error.hpp"
+#include "util/class_utils.h"
 
 #include "Client.h"
+#include "types.h"
 
-namespace feed
+namespace vfrb::feed
 {
 class Feed;
-}  // namespace feed
+}  // namespace vfrb::feed
 
-struct thread_group
-{
-    void create_thread(std::function<void()> const& func)
-    {
-        m_threads.push_back(std::thread(func));
-    }
-
-    void join_all()
-    {
-        std::for_each(m_threads.begin(), m_threads.end(), [](std::thread& thd) {
-            if (thd.joinable())
-            {
-                thd.join();
-            }
-        });
-    }
-
-private:
-    std::list<std::thread> m_threads;
-};
-
-namespace client
+namespace vfrb::client
 {
 /**
  * @brief Functor for hashing clients.
@@ -94,9 +72,9 @@ class ClientManager
 {
     NOT_COPYABLE(ClientManager)
 
-    ClientSet          m_clients;   ///< Set of clients
-    thread_group       m_thdGroup;  ///< Thread group for client threads
-    mutable std::mutex m_mutex;
+    ClientSet               m_clients;   ///< Set of clients
+    concurrent::ThreadGroup m_thdGroup;  ///< Thread group for client threads
+    mutable std::mutex      m_mutex;
 
 public:
     ClientManager() = default;
@@ -122,4 +100,18 @@ public:
      */
     void stop();
 };
-}  // namespace client
+
+namespace error
+{
+class FeedSubscriptionError : public vfrb::error::Error
+{
+    str const m_msg;
+
+public:
+    explicit FeedSubscriptionError(str const& name);
+    ~FeedSubscriptionError() noexcept override = default;
+
+    char const* what() const noexcept override;
+};
+}  // namespace error
+}  // namespace vfrb::client

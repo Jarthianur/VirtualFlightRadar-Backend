@@ -21,11 +21,11 @@
 
 #include "data/AircraftData.h"
 
-#include <stdexcept>
+#include "error/Error.hpp"
 
-using namespace object;
+using namespace vfrb::object;
 
-namespace data
+namespace vfrb::data
 {
 AircraftData::AircraftData(AccessFn&& fn) : AircraftData(std::move(fn), 0) {}
 
@@ -34,8 +34,7 @@ AircraftData::AircraftData(AccessFn&& fn, s32 maxDist) : Data(std::move(fn)), m_
 bool AircraftData::update(Object&& aircraft)
 {
     auto&& update = static_cast<Aircraft&&>(aircraft);
-    auto   result = m_container.insert(std::hash<std::string_view>()(*update.id()),
-                                     std::move(update));  // TODO: provide char* based hashing
+    auto   result = m_container.insert(std::hash<std::string_view>()(*update.id()), std::move(update));
     if (!result.second)
     {
         result.first->value.tryUpdate(std::move(update));
@@ -73,8 +72,8 @@ void AircraftData::access()
                 ++iter;
             }
         }
-        catch (std::exception const&)
+        catch (vfrb::error::Error const&)
         {}
     }
 }
-}  // namespace data
+}  // namespace vfrb::data

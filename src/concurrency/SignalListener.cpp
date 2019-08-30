@@ -19,9 +19,9 @@
  }
  */
 
-#include "util/SignalListener.h"
+#include "concurrent/SignalListener.h"
 
-namespace util
+namespace vfrb::concurrent
 {
 SignalListener::SignalListener() : m_ioService(), m_sigSet(m_ioService)
 {
@@ -40,27 +40,20 @@ SignalListener::~SignalListener() noexcept
 void SignalListener::run()
 {
     std::lock_guard lk(m_mutex);
-    m_thread = std::thread([this]() { m_ioService.run(); });
+    m_thread.spawn([this]() { m_ioService.run(); });
 }
 
 void SignalListener::stop()
 {
+    if (std::lock_guard lk(m_mutex); !m_ioService.stopped())
     {
-        std::lock_guard lk(m_mutex);
-        if (!m_ioService.stopped())
-        {
-            m_ioService.stop();
-        }
-    }
-    if (m_thread.joinable())
-    {
-        m_thread.join();
+        m_ioService.stop();
     }
 }
 
-void SignalListener::addHandler(SignalHandler const& handler)
+void SignalListener::addHandler(SignalHandler&& handler)
 {
     std::lock_guard lk(m_mutex);
-    m_sigSet.async_wait(handler);
+    m_sigSet.async_wait(std::move(handler));
 }
-}  // namespace util
+}  // namespace vfrb::concurrent
