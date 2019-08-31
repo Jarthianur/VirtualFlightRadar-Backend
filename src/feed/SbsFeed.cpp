@@ -36,7 +36,7 @@ SbsFeed::SbsFeed(str const& name, Properties const& properties, s_ptr<data::Airc
     : Feed(name, properties, data), m_worker([this](str&& work) {
           try
           {
-              m_data->update(s_parser.unpack(work, m_priority));
+              m_data->update(s_parser.unpack(std::move(work), m_priority));
           }
           catch ([[maybe_unused]] parser::error::UnpackError const&)
           {}
@@ -50,9 +50,9 @@ Feed::Protocol SbsFeed::protocol() const
     return Protocol::SBS;
 }
 
-bool SbsFeed::process(str const& response)
+bool SbsFeed::process(str response)
 {
-    m_worker.push(response);
+    m_worker.push(std::move(response));
     return true;
 }
 }  // namespace vfrb::feed

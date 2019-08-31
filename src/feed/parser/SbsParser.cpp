@@ -35,7 +35,7 @@ s32 SbsParser::s_maxHeight = std::numeric_limits<s32>::max();
 
 SbsParser::SbsParser() : Parser<Aircraft>() {}
 
-Aircraft SbsParser::unpack(str const& sentence, u32 priority) const
+Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
 {
     u32                                i = 2;
     Location                           loc;

@@ -44,7 +44,7 @@ public:
      * @param _1       The target object
      * @return true on success, else false
      */
-    virtual ObjectT unpack(str const& sentence, u32 priority) const = 0;
+    virtual ObjectT unpack(str&& sentence, u32 priority) const = 0;
 };
 
 namespace error

@@ -41,11 +41,11 @@ Feed::Protocol WindFeed::protocol() const
     return Protocol::SENSOR;
 }
 
-bool WindFeed::process(str const& response)
+bool WindFeed::process(str response)
 {
     try
     {
-        m_data->update(s_parser.unpack(response, m_priority));
+        m_data->update(s_parser.unpack(std::move(response), m_priority));
     }
     catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}

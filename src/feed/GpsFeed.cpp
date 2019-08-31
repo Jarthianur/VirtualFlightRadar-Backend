@@ -45,11 +45,11 @@ Feed::Protocol GpsFeed::protocol() const
     return Protocol::GPS;
 }
 
-bool GpsFeed::process(str const& response)
+bool GpsFeed::process(str response)
 {
     try
     {
-        m_data->update(s_parser.unpack(response, m_priority));
+        m_data->update(s_parser.unpack(std::move(response), m_priority));
     }
     catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}

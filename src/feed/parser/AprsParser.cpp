@@ -43,7 +43,7 @@ boost::regex const AprsParser::s_APRSExtRE(
 
 s32 AprsParser::s_maxHeight = std::numeric_limits<s32>::max();
 
-Aircraft AprsParser::unpack(str const& sentence, u32 priority) const
+Aircraft AprsParser::unpack(str&& sentence, u32 priority) const
 {
     boost::smatch match, com_match;
     if ((!sentence.empty() && sentence[0] == '#') || !boost::regex_match(sentence, match, s_APRS_RE) ||

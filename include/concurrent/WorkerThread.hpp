@@ -33,10 +33,10 @@
 
 namespace vfrb::concurrent
 {
-template<typename DataT, typename FnT>
-class WorkerThreadT
+template<typename DataT>
+class WorkerThread
 {
-    NOT_COPYABLE(WorkerThreadT)
+    NOT_COPYABLE(WorkerThread)
 
     bool              m_running;
     std::queue<DataT> m_workQ;
@@ -45,14 +45,16 @@ class WorkerThreadT
     GuardedThread           m_worker;
 
 public:
-    explicit WorkerThreadT(FnT&& fn);
-    ~WorkerThreadT() noexcept;
+    template<typename FnT>
+    explicit WorkerThread(FnT&& fn);
+    ~WorkerThread() noexcept;
 
-    void push(DataT const& data);
+    void push(DataT&& data);
 };
 
-template<typename DataT, typename FnT>
-WorkerThreadT<DataT, FnT>::WorkerThreadT(FnT&& fn)
+template<typename DataT>
+template<typename FnT>
+WorkerThread<DataT>::WorkerThread(FnT&& fn)
     : m_running(false), m_worker([this, fn = std::forward<FnT>(fn)] {
           std::unique_lock lk(m_mutex);
           m_running = true;
@@ -75,8 +77,8 @@ WorkerThreadT<DataT, FnT>::WorkerThreadT(FnT&& fn)
       })
 {}
 
-template<typename DataT, typename FnT>
-WorkerThreadT<DataT, FnT>::~WorkerThreadT() noexcept
+template<typename DataT>
+WorkerThread<DataT>::~WorkerThread() noexcept
 {
     std::lock_guard lk(m_mutex);
     while (!m_workQ.empty())
@@ -87,14 +89,11 @@ WorkerThreadT<DataT, FnT>::~WorkerThreadT() noexcept
     m_cv.notify_one();
 }
 
-template<typename DataT, typename FnT>
-void WorkerThreadT<DataT, FnT>::push(DataT const& data)
+template<typename DataT>
+void WorkerThread<DataT>::push(DataT&& data)
 {
     std::lock_guard lk(m_mutex);
-    m_workQ.push(data);
+    m_workQ.push(std::move(data));
     m_cv.notify_one();
 }
-
-template<typename DataT>
-using WorkerThread = WorkerThreadT<DataT, std::function<void(DataT&&)>>;
 }  // namespace vfrb::concurrent

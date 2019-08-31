@@ -42,11 +42,11 @@ Feed::Protocol AtmosphereFeed::protocol() const
     return Protocol::SENSOR;
 }
 
-bool AtmosphereFeed::process(str const& response)
+bool AtmosphereFeed::process(str response)
 {
     try
     {
-        m_data->update(s_parser.unpack(response, m_priority));
+        m_data->update(s_parser.unpack(std::move(response), m_priority));
     }
     catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}
