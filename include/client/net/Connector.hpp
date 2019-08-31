@@ -29,8 +29,14 @@ namespace vfrb::client::net
 {
 struct Endpoint;
 
-using Callback     = std::function<void(bool)>;              ///< Common callback function
-using ReadCallback = std::function<void(bool, str const&)>;  ///< Callback function for read
+enum class ErrorCode : enum_t
+{
+    SUCCESS,
+    FAILURE
+};
+
+using Callback     = std::function<void(ErrorCode)>;              ///< Common callback function
+using ReadCallback = std::function<void(ErrorCode, str const&)>;  ///< Callback function for read
 
 /**
  * @brief The async TCP interface for clients

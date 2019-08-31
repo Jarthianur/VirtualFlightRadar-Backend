@@ -36,7 +36,7 @@ class SbsClient : public Client
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(bool error) override;
+    void handleConnect(net::ErrorCode error) override;
 
     char const* logPrefix() const override;
 

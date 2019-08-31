@@ -32,17 +32,20 @@ static auto const& logger     = Logger::instance();
 
 SbsClient::SbsClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Client(endpoint, connector) {}
 
-void SbsClient::handleConnect(bool error)
+void SbsClient::handleConnect(ErrorCode error)
 {
-    if (!error)
+    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
     {
-        std::lock_guard lk(m_mutex);
-        read();
-    }
-    else
-    {
-        logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
-        reconnect();
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_state = State::RUNNING;
+            read();
+        }
+        else
+        {
+            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+            reconnect();
+        }
     }
 }
 

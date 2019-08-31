@@ -36,24 +36,25 @@ namespace vfrb::client::net
 static auto const& logger = Logger::instance();
 
 ConnectorImplBoost::ConnectorImplBoost()
-    : m_ioService(),
-      m_socket(m_ioService),
-      m_resolver(m_ioService),
-      m_timer(m_ioService),
-      m_istream(&m_buffer)
+    : m_ioCtx(), m_socket(m_ioCtx), m_resolver(m_ioCtx), m_timer(m_ioCtx), m_istream(&m_buffer)
 {}
+
+ErrorCode ConnectorImplBoost::evalErrorCode(boost::system::error_code const& error) const
+{
+    return !error ? ErrorCode::SUCCESS : ErrorCode::FAILURE;
+}
 
 void ConnectorImplBoost::run()
 {
-    m_ioService.run();
+    m_ioCtx.run();
 }
 
 void ConnectorImplBoost::stop()
 {
     close();
-    if (!m_ioService.stopped())
+    if (!m_ioCtx.stopped())
     {
-        m_ioService.stop();
+        m_ioCtx.stop();
     }
 }
 
@@ -71,9 +72,9 @@ void ConnectorImplBoost::close()
 
 void ConnectorImplBoost::onConnect(Endpoint const& endpoint, Callback const& callback)
 {
-    ip::tcp::resolver::query query(endpoint.host, endpoint.port, ip::tcp::resolver::query::canonical_name);
-    m_resolver.async_resolve(query, boost::bind(&ConnectorImplBoost::handleResolve, this, placeholders::error,
-                                                placeholders::iterator, callback));
+    m_resolver.async_resolve(endpoint.host, endpoint.port, ip::tcp::resolver::query::canonical_name,
+                             boost::bind(&ConnectorImplBoost::handleResolve, this, placeholders::error,
+                                         placeholders::results, callback));
 }
 
 void ConnectorImplBoost::onRead(ReadCallback const& callback)
@@ -118,64 +119,67 @@ bool ConnectorImplBoost::timerExpired()
 void ConnectorImplBoost::handleWrite(error_code const& error, [[maybe_unused]] usize,
                                      Callback const&   callback) noexcept
 {
-    if (error)
+    ErrorCode const ec = evalErrorCode(error);
+    if (ec != ErrorCode::SUCCESS)
     {
         logger.debug("(Client) failed to write: ", error.message());
     }
-    callback(bool(error));
+    callback(ec);
 }
 
-void ConnectorImplBoost::handleResolve(error_code const& error, ip::tcp::resolver::iterator resolverIt,
+void ConnectorImplBoost::handleResolve(error_code const& error, ip::tcp::resolver::results_type results,
                                        Callback const& callback) noexcept
 {
-    if (!error)
+    ErrorCode const ec = evalErrorCode(error);
+    if (ec == ErrorCode::SUCCESS)
     {
-        async_connect(m_socket, resolverIt,
-                      boost::bind(&ConnectorImplBoost::handleConnect, this, placeholders::error,
-                                  placeholders::iterator, callback));
+        async_connect(m_socket, results,
+                      boost::bind(&ConnectorImplBoost::handleConnect, this, placeholders::error, callback));
     }
     else
     {
         logger.debug("(Client) failed to resolve host: ", error.message());
-        callback(true);
+        callback(ec);
     }
 }
 
-void ConnectorImplBoost::handleConnect(error_code const& error, [[maybe_unused]] ip::tcp::resolver::iterator,
-                                       Callback const&   callback) noexcept
+void ConnectorImplBoost::handleConnect(error_code const& error, Callback const& callback) noexcept
 {
-    if (error)
-    {
-        logger.debug("(Client) failed to connect: ", error.message());
-    }
-    else
+    ErrorCode const ec = evalErrorCode(error);
+    if (ec == ErrorCode::SUCCESS)
     {
         m_socket.set_option(socket_base::keep_alive(true));
     }
-    callback(bool(error));
+    else
+    {
+        logger.debug("(Client) failed to connect: ", error.message());
+    }
+    callback(ec);
 }
 
 void ConnectorImplBoost::handleTimeout(error_code const& error, Callback const& callback) noexcept
 {
-    if (error)
+    ErrorCode const ec = evalErrorCode(error);
+    if (ec != ErrorCode::SUCCESS)
     {
         logger.debug("(Client) timeout: ", error.message());
     }
-    callback(bool(error));
+    callback(ec);
 }
 
 void ConnectorImplBoost::handleRead(error_code const&   error, [[maybe_unused]] usize,
                                     ReadCallback const& callback) noexcept
 {
-    if (error)
-    {
-        logger.debug("(Client) read: ", error.message());
-    }
-    else
+    ErrorCode const ec = evalErrorCode(error);
+    if (ec == ErrorCode::SUCCESS)
     {
         std::getline(m_istream, m_response);
         m_response.append("\n");
     }
-    callback(bool(error), m_response);
+    else
+    {
+        logger.debug("(Client) read: ", error.message());
+    }
+    callback(ec, m_response);
 }
 }  // namespace vfrb::client::net

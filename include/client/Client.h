@@ -44,11 +44,19 @@ class Client
     NOT_COPYABLE(Client)
 
 protected:
-    s_ptr<net::Connector>          m_connector;        /// Connector interface
-    bool                           m_running = false;  /// Run state indicator
-    net::Endpoint const            m_endpoint;         /// Remote endpoint
-    std::vector<s_ptr<feed::Feed>> m_feeds;            /// Container for subscribed feeds
-    mutable std::mutex             m_mutex;
+    enum class State : enum_t
+    {
+        NONE,
+        CONNECTING,
+        RUNNING,
+        STOPPING
+    };
+
+    s_ptr<net::Connector>          m_connector;            /// Connector interface
+    State                          m_state = State::NONE;  /// Run state indicator
+    net::Endpoint const            m_endpoint;             /// Remote endpoint
+    std::vector<s_ptr<feed::Feed>> m_feeds;                /// Container for subscribed feeds
+    std::mutex mutable m_mutex;
 
     /**
      * @param endpoint  The connection Endpoint
@@ -61,7 +69,7 @@ protected:
      * @brief Handler for connect
      * @param error The error indicator
      */
-    virtual void handleConnect(bool error) = 0;
+    virtual void handleConnect(net::ErrorCode error) = 0;
 
     virtual char const* logPrefix() const = 0;
 
@@ -95,14 +103,14 @@ protected:
      * @brief Handler for timedConnect
      * @param error The error indicator
      */
-    void handleTimedConnect(bool error);
+    void handleTimedConnect(net::ErrorCode error);
 
     /**
      * @brief Handler for read
      * @param error    The error indicator
      * @param response The received string
      */
-    void handleRead(bool error, str const& response);
+    void handleRead(net::ErrorCode, str const& response);
 
 public:
     virtual ~Client() noexcept = default;

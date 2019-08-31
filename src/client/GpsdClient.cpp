@@ -37,50 +37,56 @@ static auto const& logger     = Logger::instance();
 
 GpsdClient::GpsdClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Client(endpoint, connector) {}
 
-void GpsdClient::handleConnect(bool error)
+void GpsdClient::handleConnect(ErrorCode error)
 {
-    if (!error)
+    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
     {
-        std::lock_guard lk(m_mutex);
-        m_connector->onWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
-                             std::bind(&GpsdClient::handleWatch, this, std::placeholders::_1));
-    }
-    else
-    {
-        logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
-        reconnect();
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_connector->onWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
+                                 std::bind(&GpsdClient::handleWatch, this, std::placeholders::_1));
+        }
+        else
+        {
+            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+            reconnect();
+        }
     }
 }
 
 void GpsdClient::stop()
 {
-    std::mutex              sync;
-    std::unique_lock        lk(sync);
-    std::condition_variable cv;
-    bool                    sent = false;
-    if (m_running)
+    if (m_state == State::RUNNING)
     {
-        m_connector->onWrite("?WATCH={\"enable\":false}\r\n", [&sent, &cv](bool) {
+        std::mutex              sync;
+        std::unique_lock        lk(sync);
+        std::condition_variable cv;
+        bool                    sent = false;
+        m_connector->onWrite("?WATCH={\"enable\":false}\r\n", [&sent, &cv]([[maybe_unused]] ErrorCode) {
             logger.info(LOG_PREFIX, "stopped watch");
             sent = true;
             cv.notify_one();
         });
+        cv.wait_for(lk, std::chrono::milliseconds(500), [&] { return sent; });
     }
-    cv.wait_for(lk, std::chrono::milliseconds(500), [&] { return sent; });
     Client::stop();
 }
 
-void GpsdClient::handleWatch(bool error)
+void GpsdClient::handleWatch(ErrorCode error)
 {
-    if (!error)
+    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
     {
-        logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
-        std::lock_guard lk(m_mutex);
-        read();
-    }
-    else
-    {
-        logger.error(LOG_PREFIX, "send watch request failed");
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_state = State::RUNNING;
+            logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
+            read();
+        }
+        else
+        {
+            logger.error(LOG_PREFIX, "send watch request failed");
+            reconnect();
+        }
     }
 }
 
