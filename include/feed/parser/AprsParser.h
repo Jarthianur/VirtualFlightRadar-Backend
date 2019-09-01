@@ -21,9 +21,8 @@
 
 #pragma once
 
+#include <regex>
 #include <tuple>
-
-#include <boost/regex.hpp>
 
 #include "object/Aircraft.h"
 
@@ -52,8 +51,8 @@ class AprsParser : public Parser<object::Aircraft>
     inline static constexpr auto RE_APRS_COM_CR   = 3;  ///< APRS regex match group of climb rate
     inline static constexpr auto RE_APRS_COM_TR   = 4;  ///< APRS regex match group of turn rate
 
-    static boost::regex const s_APRS_RE;    ///< Regular expression for APRS protocol
-    static boost::regex const s_APRSExtRE;  ///< Regular expression for OGN specific APRS extension
+    static std::regex const s_APRS_RE;    ///< Regular expression for APRS protocol
+    static std::regex const s_APRSExtRE;  ///< Regular expression for OGN specific APRS extension
 
     /**
      * @brief Parse a Position.
@@ -61,7 +60,7 @@ class AprsParser : public Parser<object::Aircraft>
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    object::Location parseLocation(boost::smatch const& match) const;
+    object::Location parseLocation(std::smatch const& match) const;
 
     /**
      * @brief Parse the APRS comment.
@@ -69,7 +68,7 @@ class AprsParser : public Parser<object::Aircraft>
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    AircraftInfo parseComment(boost::smatch const& match) const;
+    AircraftInfo parseComment(std::smatch const& match) const;
 
     /**
      * @brief Parse the Movement information.
@@ -78,7 +77,7 @@ class AprsParser : public Parser<object::Aircraft>
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    object::Aircraft::Movement parseMovement(boost::smatch const& match, boost::smatch const& comMatch) const;
+    object::Aircraft::Movement parseMovement(std::smatch const& match, std::smatch const& comMatch) const;
 
     /**
      * @brief Parse the Timestamp information.
@@ -86,7 +85,7 @@ class AprsParser : public Parser<object::Aircraft>
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    object::Timestamp<object::time::DateTimeImplBoost> parseTimeStamp(boost::smatch const& match) const;
+    object::Timestamp<object::time::DateTimeImplBoost> parseTimeStamp(std::smatch const& match) const;
 
 public:
     static s32 s_maxHeight;  ///< The max height filter

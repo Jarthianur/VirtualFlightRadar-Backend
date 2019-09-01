@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <charconv>
+#include <string_view>
 #include <type_traits>
 
 #include "error/Error.hpp"
@@ -67,5 +69,39 @@ void checkLimits(T val, T min, T max)
     {
         throw error::LimitsExceededError(val, min, max);
     }
+}
+
+/**
+ * @brief Compute checksum of nmea string.
+ * @param sentence The sentence to eval
+ * @param length   The sentences size
+ * @return the checksum
+ */
+inline s32 checksum(std::string_view const& sv, usize pos)
+{
+    s32   csum = 0;
+    usize i    = 1 + pos;  // $ in nmea str not included
+    while (i < sv.length() && sv[i] != '*')
+    {
+        csum ^= static_cast<s32>(sv[i++]);
+    }
+    return csum;
+}
+
+inline bool matchChecksum(std::string_view const& sv)
+{
+    auto const cs_begin = sv.rfind('*');
+    if (cs_begin == std::string_view::npos || cs_begin + 3 >= sv.length())
+    {
+        return false;
+    }
+    s32  csum;
+    bool match = false;
+    if (auto [p, ec] = std::from_chars(sv.data() + cs_begin + 1, sv.data() + sv.length(), csum, 16);
+        ec == std::errc())
+    {
+        match = csum == checksum(sv, 0);
+    }
+    return match;
 }
 }  // namespace vfrb::util

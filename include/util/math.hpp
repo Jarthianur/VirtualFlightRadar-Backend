@@ -23,8 +23,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <stdexcept>
-#include <string_view>
 
 #include "types.h"
 
@@ -102,22 +100,5 @@ T saturate(T val, T min, T max)
 inline s32 icaoHeight(f64 pressure)
 {
     return doubleToInt(288.15 * (1.0 - std::pow((pressure / 1013.25), 0.190295)) / 0.0065);
-}
-
-/**
- * @brief Compute checksum of nmea string.
- * @param sentence The sentence to eval
- * @param length   The sentences size
- * @return the checksum
- */
-inline s32 checksum(std::string_view const& sv, usize pos)
-{
-    s32   csum = 0;
-    usize i    = 1 + pos;  // $ in nmea str not included
-    while (i < sv.length() && sv[i] != '*')
-    {
-        csum ^= static_cast<s32>(sv[i++]);
-    }
-    return csum;
 }
 }  // namespace vfrb::math

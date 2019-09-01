@@ -21,9 +21,7 @@
 
 #include "feed/parser/WindParser.h"
 
-#include <stdexcept>
-
-#include "util/math.hpp"
+#include "util/utility.hpp"
 
 using namespace vfrb::object;
 
@@ -33,19 +31,12 @@ WindParser::WindParser() : Parser<Wind>() {}
 
 Wind WindParser::unpack(str&& sentence, u32 priority) const
 {
-    try
+    if (util::matchChecksum({sentence.c_str(), sentence.length()}) && sentence.find("MWV") != str::npos)
     {
-        if ((std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
-             math::checksum({sentence.c_str(), sentence.length()}, 0)) &&
-            (sentence.find("MWV") != str::npos))
-        {
-            Wind wind{priority};
-            *wind = std::move(sentence);
-            return wind;
-        }
+        Wind wind{priority};
+        *wind = std::move(sentence);
+        return wind;
     }
-    catch ([[maybe_unused]] std::logic_error const&)
-    {}
     throw error::UnpackError();
 }
 }  // namespace vfrb::feed::parser

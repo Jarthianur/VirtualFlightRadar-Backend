@@ -27,22 +27,22 @@
 #include "object/Timestamp.hpp"
 #include "object/impl/DateTimeImplBoost.h"
 #include "util/math.hpp"
+#include "util/utility.hpp"
 
 using namespace vfrb::object;
 
 namespace vfrb::feed::parser
 {
-boost::regex const GpsParser::s_GPGGA_RE(
+std::regex const GpsParser::s_GPGGA_RE(
     "^\\$[A-Z]{2}GGA,(\\d{6}),(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
-    boost::regex::optimize | boost::regex::icase);
+    std::regex::optimize | std::regex::icase);
 
 GpsPosition GpsParser::unpack(str&& sentence, u32 priority) const
 {
     try
     {
-        if (boost::smatch match; std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
-                                     math::checksum({sentence.c_str(), sentence.length()}, 0) &&
-                                 boost::regex_match(sentence, match, s_GPGGA_RE))
+        if (std::smatch match; util::matchChecksum({sentence.c_str(), sentence.length()}) &&
+                               std::regex_match(sentence, match, s_GPGGA_RE))
         {
             return parsePosition(match, priority);
         }
@@ -54,7 +54,7 @@ GpsPosition GpsParser::unpack(str&& sentence, u32 priority) const
     throw error::UnpackError();
 }
 
-GpsPosition GpsParser::parsePosition(boost::smatch const& match, u32 priority) const
+GpsPosition GpsParser::parsePosition(std::smatch const& match, u32 priority) const
 {
     auto latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
     if (match.str(RE_GGA_LAT_DIR).compare("S") == 0)

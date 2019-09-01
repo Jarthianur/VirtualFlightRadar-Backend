@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <boost/regex.hpp>
+#include <regex>
 
 #include "object/GpsPosition.h"
 
@@ -47,7 +47,7 @@ class GpsParser : public Parser<object::GpsPosition>
     inline static constexpr auto RE_GGA_ALT   = 9;   ///< GGA regex match capture group of altitude
     inline static constexpr auto RE_GGA_GEOID = 10;  ///< GGA regex match capture group of geoid separation
 
-    static boost::regex const s_GPGGA_RE;  ///< Regular expression to parse GGA
+    static std::regex const s_GPGGA_RE;  ///< Regular expression to parse GGA
 
     /**
      * @brief Parse a Position.
@@ -55,7 +55,7 @@ class GpsParser : public Parser<object::GpsPosition>
      * @param position The target position
      * @return true on success, else false
      */
-    object::GpsPosition parsePosition(boost::smatch const& match, u32 priority) const;
+    object::GpsPosition parsePosition(std::smatch const& match, u32 priority) const;
 
 public:
     GpsParser()                    = default;

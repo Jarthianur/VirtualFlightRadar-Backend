@@ -23,7 +23,7 @@
 
 #include <stdexcept>
 
-#include "util/math.hpp"
+#include "util/utility.hpp"
 
 using namespace vfrb::object;
 
@@ -33,9 +33,7 @@ Atmosphere AtmosphereParser::unpack(str&& sentence, u32 priority) const
 {
     try
     {
-        if ((std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
-             math::checksum({sentence.c_str(), sentence.length()}, 0)) &&
-            (sentence.find("MDA") != str::npos))
+        if (util::matchChecksum({sentence.c_str(), sentence.length()}) && sentence.find("MDA") != str::npos)
         {
             usize tmpB   = sentence.find('B') - 1;
             usize tmpS   = sentence.substr(0, tmpB).find_last_of(',') + 1;
