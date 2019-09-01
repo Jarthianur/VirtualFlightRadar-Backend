@@ -91,7 +91,7 @@ public:
      * @brief Handle client's response.
      * @param response The response
      */
-    virtual bool process(str const& response) = 0;
+    virtual bool process(str response) = 0;
 
     auto name() const -> decltype(m_name) const&;
 };

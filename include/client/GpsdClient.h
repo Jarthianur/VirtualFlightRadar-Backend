@@ -41,14 +41,14 @@ class GpsdClient : public Client
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(bool error) override;
+    void handleConnect(net::ErrorCode error) override;
 
     /**
      * @brief Handler for watch-request sending
      * @param error The error indicator
      * @threadsafe
      */
-    void handleWatch(bool error);
+    void handleWatch(net::ErrorCode error);
 
     char const* logPrefix() const override;
 

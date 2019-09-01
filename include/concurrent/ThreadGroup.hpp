@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <functional>
 #include <list>
 
 #include "util/class_utils.h"

@@ -40,7 +40,7 @@ AprscFeed::AprscFeed(str const& name, Properties const& properties, s_ptr<data::
     : Feed(name, properties, data), m_worker([this](str&& work) {
           try
           {
-              m_data->update(s_parser.unpack(work, m_priority));
+              m_data->update(s_parser.unpack(std::move(work), m_priority));
           }
           catch ([[maybe_unused]] parser::error::UnpackError const&)
           {}
@@ -62,9 +62,9 @@ Feed::Protocol AprscFeed::protocol() const
     return Protocol::APRS;
 }
 
-bool AprscFeed::process(str const& response)
+bool AprscFeed::process(str response)
 {
-    m_worker.push(response);
+    m_worker.push(std::move(response));
     return true;
 }
 

@@ -38,13 +38,15 @@ class ConnectorImplBoost : public Connector
 {
     NOT_COPYABLE(ConnectorImplBoost)
 
-    boost::asio::io_service        m_ioService;  ///< Internal IO-service
-    boost::asio::ip::tcp::socket   m_socket;     ///< Connection socket
-    boost::asio::ip::tcp::resolver m_resolver;   ///< Host resolver
-    boost::asio::deadline_timer    m_timer;      ///< Timer
-    boost::asio::streambuf         m_buffer;     ///< Read buffer
-    str                            m_response;   ///< Read message
-    std::istream                   m_istream;    ///< Message stream for conversion
+    boost::asio::io_context        m_ioCtx;     ///< Internal IO-service
+    boost::asio::ip::tcp::socket   m_socket;    ///< Connection socket
+    boost::asio::ip::tcp::resolver m_resolver;  ///< Host resolver
+    boost::asio::deadline_timer    m_timer;     ///< Timer
+    boost::asio::streambuf         m_buffer;    ///< Read buffer
+    str                            m_response;  ///< Read message
+    std::istream                   m_istream;   ///< Message stream for conversion
+
+    ErrorCode evalErrorCode(boost::system::error_code const& error) const;
 
     /**
      * @brief Handler for resolving endpoint
@@ -52,9 +54,9 @@ class ConnectorImplBoost : public Connector
      * @param resolverIt The resolved host
      * @param callback   The callback to invoke
      */
-    void handleResolve(boost::system::error_code const&         error,
-                       boost::asio::ip::tcp::resolver::iterator resolverIt,
-                       Callback const&                          callback) noexcept;
+    void handleResolve(boost::system::error_code const&             error,
+                       boost::asio::ip::tcp::resolver::results_type resolverIt,
+                       Callback const&                              callback) noexcept;
 
     /**
      * @brief Handler for connecting to endpoint
@@ -62,9 +64,7 @@ class ConnectorImplBoost : public Connector
      * @param resolverIt The resolved host
      * @param callback   The callback to invoke
      */
-    void handleConnect(boost::system::error_code const&         error,
-                       boost::asio::ip::tcp::resolver::iterator resolverIt,
-                       Callback const&                          callback) noexcept;
+    void handleConnect(boost::system::error_code const& error, Callback const& callback) noexcept;
 
     /**
      * @brief Handler for timed out timer

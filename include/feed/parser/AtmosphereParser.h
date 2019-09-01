@@ -41,6 +41,6 @@ public:
      * @param sentence   The string to unpack
      * @param atmosphere The Atmosphere to unpack into
      */
-    object::Atmosphere unpack(str const& sentence, u32 priority) const override;
+    object::Atmosphere unpack(str&& sentence, u32 priority) const override;
 };
 }  // namespace vfrb::feed::parser

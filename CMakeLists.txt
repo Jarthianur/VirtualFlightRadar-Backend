@@ -38,7 +38,6 @@ endif()
 #
 # dependencies
 #
-
 find_package(Boost REQUIRED COMPONENTS regex system program_options)
 find_package(Threads REQUIRED)
 
@@ -55,10 +54,10 @@ target_link_libraries(release PUBLIC Boost::regex Boost::system Boost::program_o
 # target: regression
 #
 add_executable(regression ${vfrb_sources})
-target_compile_options(regression PUBLIC -O0 -g --coverage -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
+target_compile_options(regression PUBLIC -O0 -g --coverage -DLOG_ENABLE_DEBUG -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
 set_target_properties(regression PROPERTIES OUTPUT_NAME ${vfrb_regression_bin})
 target_include_directories(regression PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_link_libraries(regression PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
+target_link_libraries(regression PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads gcov)
 
 #
 # target: test
@@ -66,10 +65,10 @@ target_link_libraries(regression PUBLIC Boost::regex Boost::system Boost::progra
 list(REMOVE_ITEM vfrb_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
 list(APPEND vfrb_test_sources ${vfrb_sources})
 add_executable(unittest ${vfrb_test_sources})
-target_compile_options(unittest PUBLIC -O0 -g --coverage -fopenmp -DSCTF_CUSTOM_EPSILON=0.000001)
+target_compile_options(unittest PUBLIC -O0 -g --coverage -fopenmp -DLOG_ENABLE_DEBUG -DSCTF_CUSTOM_EPSILON=0.000001)
 set_target_properties(unittest PROPERTIES OUTPUT_NAME ${vfrb_test_bin})
 target_include_directories(unittest PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(unittest PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
+target_link_libraries(unittest PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads gcov)
 
 #
 # target: install

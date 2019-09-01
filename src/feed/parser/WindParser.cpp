@@ -31,7 +31,7 @@ namespace vfrb::feed::parser
 {
 WindParser::WindParser() : Parser<Wind>() {}
 
-Wind WindParser::unpack(str const& sentence, u32 priority) const
+Wind WindParser::unpack(str&& sentence, u32 priority) const
 {
     try
     {
@@ -40,7 +40,7 @@ Wind WindParser::unpack(str const& sentence, u32 priority) const
             (sentence.find("MWV") != str::npos))
         {
             Wind wind{priority};
-            *wind = sentence;
+            *wind = std::move(sentence);
             return wind;
         }
     }

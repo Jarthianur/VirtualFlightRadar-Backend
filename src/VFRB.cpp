@@ -152,7 +152,7 @@ str VFRB::duration(std::chrono::steady_clock::time_point start) const
     s64               h = runtime.count() / 60 - d * 24;
     s64               m = runtime.count() % 60;
     std::stringstream ss;
-    ss << d << "d " << h << ":" << m;
+    ss << d << "d " << (h < 10 ? "0" : "") << h << ":" << (m < 10 ? "0" : "") << m;
     return ss.str();
 }
 }  // namespace vfrb

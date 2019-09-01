@@ -59,18 +59,19 @@ usize AprscClient::hash() const
     return seed;
 }
 
-void AprscClient::handleConnect(bool error)
+void AprscClient::handleConnect(ErrorCode error)
 {
-    if (!error)
+    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
     {
-        std::lock_guard lk(m_mutex);
-        m_connector->onWrite(m_login, std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
-        sendKeepAlive();
-    }
-    else
-    {
-        logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
-        reconnect();
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_connector->onWrite(m_login, std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
+        }
+        else
+        {
+            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+            reconnect();
+        }
     }
 }
 
@@ -79,36 +80,46 @@ void AprscClient::sendKeepAlive()
     m_connector->onTimeout(std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1), 600);
 }
 
-void AprscClient::handleLogin(bool error)
+void AprscClient::handleLogin(ErrorCode error)
 {
-    if (!error)
+    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
     {
-        logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
-        std::lock_guard lk(m_mutex);
-        read();
-    }
-    else
-    {
-        logger.error(LOG_PREFIX, "send login failed");
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_state = State::RUNNING;
+            logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
+            sendKeepAlive();
+            read();
+        }
+        else
+        {
+            logger.error(LOG_PREFIX, "send login failed");
+            reconnect();
+        }
     }
 }
 
-void AprscClient::handleSendKeepAlive(bool error)
+void AprscClient::handleSendKeepAlive(ErrorCode error)
 {
-    if (!error)
+    if (std::lock_guard lk(m_mutex); m_state == State::RUNNING)
     {
-        std::lock_guard lk(m_mutex);
-        m_connector->onWrite("#keep-alive beacon\r\n", [this](bool error) {
-            if (!error)
-            {
-                sendKeepAlive();
-            }
-            else
-            {
-                logger.error(LOG_PREFIX, "send keep-alive beacon failed");
-                reconnect();
-            }
-        });
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_connector->onWrite("#keep-alive beacon\r\n", [this](ErrorCode error) {
+                if (std::lock_guard lk(m_mutex); m_state == State::RUNNING)
+                {
+                    if (error != ErrorCode::SUCCESS)
+                    {
+                        logger.error(LOG_PREFIX, "send keep-alive beacon failed");
+                        reconnect();
+                    }
+                }
+            });
+        }
+        else
+        {
+            sendKeepAlive();
+        }
     }
 }
 

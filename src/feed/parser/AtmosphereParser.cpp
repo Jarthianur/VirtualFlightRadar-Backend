@@ -29,7 +29,7 @@ using namespace vfrb::object;
 
 namespace vfrb::feed::parser
 {
-Atmosphere AtmosphereParser::unpack(str const& sentence, u32 priority) const
+Atmosphere AtmosphereParser::unpack(str&& sentence, u32 priority) const
 {
     try
     {
@@ -45,7 +45,7 @@ Atmosphere AtmosphereParser::unpack(str const& sentence, u32 priority) const
             if (numIdx == subLen)
             {
                 Atmosphere atmos{priority, tmpPress};
-                *atmos = sentence;
+                *atmos = std::move(sentence);
                 return atmos;
             }
         }

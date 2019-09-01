@@ -64,6 +64,6 @@ public:
     /**
      * @brief Implement Feed::process.
      */
-    bool process(str const& response) override;
+    bool process(str response) override;
 };
 }  // namespace vfrb::feed

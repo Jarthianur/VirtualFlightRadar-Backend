@@ -100,6 +100,6 @@ public:
      * @param aircraft The Aircraft to unpack into
      * @return true on success, else false
      */
-    object::Aircraft unpack(str const& sentence, u32 priority) const override;
+    object::Aircraft unpack(str&& sentence, u32 priority) const override;
 };
 }  // namespace vfrb::feed::parser
