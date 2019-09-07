@@ -69,7 +69,7 @@ add_executable(unittest ${vfrb_test_sources})
 set_target_properties(unittest PROPERTIES OUTPUT_NAME ${vfrb_test_bin})
 target_compile_options(unittest PUBLIC -O0 -g --coverage -fopenmp -DLOG_ENABLE_DEBUG -DSCTF_CUSTOM_EPSILON=0.000001)
 target_include_directories(unittest PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include ${PROJECT_SOURCE_DIR}/test/framework)
-target_link_libraries(unittest PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads gcov)
+target_link_libraries(unittest PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads gcov gomp)
 
 #
 # target: install

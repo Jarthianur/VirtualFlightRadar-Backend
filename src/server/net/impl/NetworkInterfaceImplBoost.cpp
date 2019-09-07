@@ -99,7 +99,7 @@ void NetworkInterfaceImplBoost::handleAccept(const boost::system::error_code& er
     {
         logger.debug("(Server) accept: ", error.message());
     }
-    callback(error);
+    callback(bool(error));
 }
 
 std::unique_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startConnection()
