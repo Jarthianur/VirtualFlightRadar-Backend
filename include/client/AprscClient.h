@@ -59,21 +59,21 @@ private:
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(bool error) override;
+    void handleConnect(net::ErrorCode error) override;
 
     /**
      * @brief Handler for sending of the login string.
      * @param error The error indicator
      * @threadsafe
      */
-    void handleLogin(bool error);
+    void handleLogin(net::ErrorCode error);
 
     /**
      * @brief Handler for sending a keep-alive beacon.
      * @param error The error indicator
      * @threadsafe
      */
-    void handleSendKeepAlive(bool error);
+    void handleSendKeepAlive(net::ErrorCode error);
 
     /// Login string
     const std::string m_login;

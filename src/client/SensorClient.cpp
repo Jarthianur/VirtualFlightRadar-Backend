@@ -44,12 +44,12 @@ void SensorClient::read()
     Client::read();
 }
 
-void SensorClient::checkDeadline(bool error)
+void SensorClient::checkDeadline(ErrorCode error)
 {
-    if (!error)
+    std::lock_guard<std::mutex> lk(m_mutex);
+    if (m_state == State::RUNNING)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_connector->timerExpired())
+        if (error == ErrorCode::SUCCESS)
         {
             logger.debug(m_component, " timed out, reconnect ...");
             reconnect();
@@ -62,20 +62,26 @@ void SensorClient::checkDeadline(bool error)
     }
 }
 
-void SensorClient::handleConnect(bool error)
+void SensorClient::handleConnect(ErrorCode error)
 {
-    if (!error)
+    std::lock_guard<std::mutex> lk(m_mutex);
+    if (m_state == State::CONNECTING)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
-        m_connector->onTimeout(std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1),
-                               WC_RCV_TIMEOUT);
-        read();
-    }
-    else
-    {
-        logger.warn(m_component, " failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
-        reconnect();
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_state = State::RUNNING;
+            logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
+            m_connector->onTimeout(
+                std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1),
+                WC_RCV_TIMEOUT);
+            read();
+        }
+        else
+        {
+            logger.warn(m_component, " failed to connect to ", m_endpoint.host, ":",
+                        m_endpoint.port);
+            reconnect();
+        }
     }
 }
 }  // namespace client
