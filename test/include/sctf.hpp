@@ -60,9 +60,9 @@ return instance;
 }
 };
 }// namespace _
-using reporter_shared = s_ptr<_::abstract_reporter>;
+using reporter_shared = std::shared_ptr<_::abstract_reporter>;
 class testsuite;
-using testsuite_shared = s_ptr<testsuite>;
+using testsuite_shared = std::shared_ptr<testsuite>;
 }// namespace sctf
 #endif// SCTF_COMMON_TYPES_HPP
 #ifndef SCTF_COMMON_TRAITS_HPP

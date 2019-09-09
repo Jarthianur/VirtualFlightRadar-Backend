@@ -115,6 +115,7 @@ void AprscClient::handleSendKeepAlive(ErrorCode error)
                     }
                 }
             });
+            sendKeepAlive();
         }
         else
         {
