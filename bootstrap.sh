@@ -154,7 +154,7 @@ function install_deps() {
         local UPDATE='apt-get update'
         local SETUP=''
         local INSTALL='install -y'
-        local BOOST='libboost-dev libboost-system-dev libboost-regex-dev libboost-program-options-dev'
+        local BOOST='libboost-dev libboost-system-dev libboost-program-options-dev'
         local GCC="g++ make cmake"
     ;;
     *yum)
@@ -175,7 +175,7 @@ function install_deps() {
         local UPDATE='apk update'
         local SETUP=''
         local INSTALL='add'
-        local BOOST='boost-dev boost-system boost-regex boost-program_options'
+        local BOOST='boost-dev boost-system boost-program_options'
         local GCC='g++ make cmake'
     ;;
     esac
