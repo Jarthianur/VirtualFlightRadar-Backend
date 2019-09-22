@@ -21,15 +21,13 @@
 
 #include "feed/parser/GpsParser.h"
 
-#include <stdexcept>
-
 #include "object/GpsPosition.h"
-#include "object/Timestamp.hpp"
-#include "object/impl/DateTimeImplBoost.h"
+#include "object/Timestamp.h"
 #include "util/math.hpp"
-#include "util/utility.hpp"
+#include "util/string_utils.hpp"
 
 using namespace vfrb::object;
+using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
@@ -41,38 +39,38 @@ GpsPosition GpsParser::unpack(str&& sentence, u32 priority) const
 {
     try
     {
-        if (std::smatch match; util::matchChecksum({sentence.c_str(), sentence.length()}) &&
-                               std::regex_match(sentence, match, s_GPGGA_RE))
+        if (std::cmatch match; matchChecksum({sentence.c_str(), sentence.length()}) &&
+                               std::regex_match(sentence.c_str(), match, s_GPGGA_RE))
         {
             return parsePosition(match, priority);
         }
     }
-    catch ([[maybe_unused]] std::logic_error const&)
+    catch ([[maybe_unused]] str_util::error::ConversionError const&)
     {}
     catch ([[maybe_unused]] object::error::TimestampParseError const&)
     {}
     throw error::UnpackError();
 }
 
-GpsPosition GpsParser::parsePosition(std::smatch const& match, u32 priority) const
+GpsPosition GpsParser::parsePosition(std::cmatch const& match, u32 priority) const
 {
-    auto latitude = math::dmToDeg(std::stod(match.str(RE_GGA_LAT)));
-    if (match.str(RE_GGA_LAT_DIR).compare("S") == 0)
+    auto latitude = math::dmToDeg(parse<f64>(match[RE_GGA_LAT]));
+    if (match[RE_GGA_LAT_DIR] == "S")
     {
         latitude = -latitude;
     }
-    auto longitude = math::dmToDeg(std::stod(match.str(RE_GGA_LON)));
-    if (match.str(RE_GGA_LON_DIR).compare("W") == 0)
+    auto longitude = math::dmToDeg(parse<f64>(match[RE_GGA_LON]));
+    if (match[RE_GGA_LON_DIR] == "W")
     {
         longitude = -longitude;
     }
-    auto altitude = math::doubleToInt(std::stod(match.str(RE_GGA_ALT)));
+    auto altitude = math::doubleToInt(parse<f64>(match[RE_GGA_ALT]));
     return {priority,
             {latitude, longitude, altitude},
-            std::stod(match.str(RE_GGA_GEOID)),
-            std::stod(match.str(RE_GGA_DIL)),
-            static_cast<u8>(std::stoi(match.str(RE_GGA_SAT))),
-            static_cast<s8>(std::stoi(match.str(RE_GGA_FIX))),
-            Timestamp<time::DateTimeImplBoost>(match.str(RE_GGA_TIME), time::Format::HHMMSS)};
+            parse<f64>(match[RE_GGA_GEOID]),
+            parse<f64>(match[RE_GGA_DIL]),
+            parse<u8>(match[RE_GGA_SAT]),
+            parse<s8>(match[RE_GGA_FIX]),
+            Timestamp(to_str_view(match[RE_GGA_TIME]))};
 }
 }  // namespace vfrb::feed::parser

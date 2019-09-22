@@ -157,6 +157,7 @@ constexpr auto TEST_SIZE = 100000;
 
 static auto const& p_ts1 = ProfilerBuilder()
                                .withDescription("parseTime (HHMMSS)       [Spirit.Qi]")
+                               .withGroup("Timestamp")
                                .withTestSize(TEST_SIZE)
                                .withTestFn([](Profiler& self) {
                                    self.profile([&self] {
@@ -169,6 +170,7 @@ static auto const& p_ts1 = ProfilerBuilder()
 
 static auto const& p_ts2 = ProfilerBuilder()
                                .withDescription("parseTime (HH:MM:SS.FFF) [Spirit.Qi]")
+                               .withGroup("Timestamp")
                                .withTestSize(TEST_SIZE)
                                .withTestFn([](Profiler& self) {
                                    self.profile([&self] {
@@ -181,6 +183,7 @@ static auto const& p_ts2 = ProfilerBuilder()
 
 static auto const& p_ts3 = ProfilerBuilder()
                                .withDescription("parseTime (HHMMSS)       [charconv ]")
+                               .withGroup("Timestamp")
                                .withTestSize(TEST_SIZE)
                                .withTestFn([](Profiler& self) {
                                    self.profile([&self] {
@@ -192,6 +195,7 @@ static auto const& p_ts3 = ProfilerBuilder()
 
 static auto const& p_ts4 = ProfilerBuilder()
                                .withDescription("parseTime (HH:MM:SS.FFF) [charconv ]")
+                               .withGroup("Timestamp")
                                .withTestSize(TEST_SIZE)
                                .withTestFn([](Profiler& self) {
                                    self.profile([&self] {
@@ -203,6 +207,7 @@ static auto const& p_ts4 = ProfilerBuilder()
 
 static auto const& p_ts5 = ProfilerBuilder()
                                .withDescription("parseTime (HHMMSS)       [stoi     ]")
+                               .withGroup("Timestamp")
                                .withTestSize(TEST_SIZE)
                                .withTestFn([](Profiler& self) {
                                    self.profile([&self] {
@@ -214,6 +219,7 @@ static auto const& p_ts5 = ProfilerBuilder()
 
 static auto const& p_ts6 = ProfilerBuilder()
                                .withDescription("parseTime (HH:MM:SS.FFF) [stoi     ]")
+                               .withGroup("Timestamp")
                                .withTestSize(TEST_SIZE)
                                .withTestFn([](Profiler& self) {
                                    self.profile([&self] {

@@ -25,9 +25,9 @@ using namespace vfrb::profiling;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-    std::for_each(ProfilerBuilder::profilers().begin(), ProfilerBuilder::profilers().end(), [](Profiler& p) {
-        p.run();
-        p.print(TimeVal::MICROS);
+    std::for_each(ProfilerBuilder::profilers().begin(), ProfilerBuilder::profilers().end(), [](auto& p) {
+        p.second.run();
+        p.second.print(TimeVal::MICROS);
     });
     return 0;
 }

@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <iostream>
 #include <list>
+#include <map>
 #include <utility>
 
 #include "types.h"
@@ -103,25 +104,58 @@ public:
     }
 };
 
+class ProfilerGroup
+{
+    std::list<Profiler> m_profilers;
+    char const*         m_name;
+
+    friend class ProfilerBuilder;
+
+public:
+    ProfilerGroup(char const* name) : m_name(name) {}
+    ~ProfilerGroup() noexcept = default;
+
+    void run()
+    {
+        for (auto& p : m_profilers)
+        {
+            p.run();
+        }
+    }
+
+    void print(TimeVal t) const
+    {
+        std::cout << m_name << ": " << std::endl;
+        for (auto const& p : m_profilers)
+        {
+            p.print(t);
+        }
+        std::cout << std::endl;
+    }
+};
+
 class ProfilerBuilder
 {
     usize                          m_testSize = 0;
     std::function<void(Profiler&)> m_fn;
     char const*                    m_descr = nullptr;
+    char const*                    m_group = nullptr;
 
 public:
     ProfilerBuilder()           = default;
     ~ProfilerBuilder() noexcept = default;
 
-    static std::list<Profiler>& profilers()
+    static std::map<char const*, ProfilerGroup>& profilers()
     {
-        static std::list<Profiler> profiler_list;
+        static std::map<char const*, ProfilerGroup> profiler_list;
         return profiler_list;
     }
 
     ProfilerBuilder const& build()
     {
-        profilers().push_back(Profiler(std::move(m_fn), m_testSize, m_descr));
+        profilers()
+            .emplace(m_group, ProfilerGroup(m_group))
+            .first->second.m_profilers.push_back(Profiler(std::move(m_fn), m_testSize, m_descr));
         return *this;
     }
 
@@ -140,6 +174,12 @@ public:
     ProfilerBuilder& withDescription(char const* descr)
     {
         m_descr = descr;
+        return *this;
+    }
+
+    ProfilerBuilder& withGroup(char const* group)
+    {
+        m_group = group;
         return *this;
     }
 };

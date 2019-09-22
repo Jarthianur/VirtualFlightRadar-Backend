@@ -55,7 +55,7 @@ class GpsParser : public Parser<object::GpsPosition>
      * @param position The target position
      * @return true on success, else false
      */
-    object::GpsPosition parsePosition(std::smatch const& match, u32 priority) const;
+    object::GpsPosition parsePosition(std::cmatch const& match, u32 priority) const;
 
 public:
     GpsParser()                    = default;

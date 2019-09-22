@@ -36,6 +36,7 @@ namespace vfrb::object
 class Aircraft : public Object
 {
 public:
+    inline static constexpr auto ID_LEN    = 6;
     inline static constexpr auto ID_SIZE   = 8;
     inline static constexpr auto NMEA_SIZE = 192;
 
@@ -123,9 +124,9 @@ private:
     bool canUpdate(Object const& other) const override;
 
 public:
-    Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
+    Aircraft(u32 priority, std::string_view const& id, IdType idT, AircraftType aT, Location const& loc,
              Movement const& move, Timestamp const& timestamp);
-    Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
+    Aircraft(u32 priority, std::string_view const& id, IdType idT, AircraftType aT, Location const& loc,
              Timestamp const& timestamp);
     Aircraft(Aircraft&& other);
     ~Aircraft() noexcept override = default;
