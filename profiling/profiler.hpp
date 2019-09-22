@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <functional>
+#include <iomanip>
 #include <iostream>
 #include <list>
 #include <utility>
@@ -70,6 +71,10 @@ public:
     template<typename FnT>
     void profile(FnT&& fn)
     {
+        for (usize x = 0; x < std::max<usize>(1, m_testSize / 2); ++x)
+        {
+            std::invoke(std::forward<FnT>(fn));
+        }
         m_tickCount = 0;
         for (usize x = 0; x < m_testSize; ++x)
         {
@@ -86,7 +91,7 @@ public:
 
     void print(TimeVal t) const
     {
-        std::cout << m_descr << " - avg. duration: " << avgTime(t);
+        std::cout << m_descr << " - avg. duration: " << std::fixed << std::setprecision(6) << avgTime(t);
         switch (t)
         {
             case TimeVal::SECONDS: std::cout << " s"; break;

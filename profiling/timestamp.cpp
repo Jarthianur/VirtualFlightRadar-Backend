@@ -84,6 +84,30 @@ std::string generateTS(bool format)
     return ts.str();
 }
 
+s64 parseTimeStoI(std::string const& value)
+{
+    s32 h = 99, m = 99, s = 99, f = 9999;
+    if (value.length() > 3 && value[2] == ':')
+    {
+        h = std::stoi(value.substr(0, 2));
+        m = std::stoi(value.substr(3, 2));
+        s = std::stoi(value.substr(6, 2));
+        f = std::stoi(value.substr(9, 3));
+    }
+    else
+    {
+        h = std::stoi(value.substr(0, 2));
+        m = std::stoi(value.substr(2, 2));
+        s = std::stoi(value.substr(4, 2));
+        f = 0;
+    }
+    if (h > 23 || m > 59 || s > 59 || f > 999)
+    {
+        throw std::logic_error("");
+    }
+    return static_cast<s64>(h * 3600000 + m * 60000 + s * 1000 + f);
+}
+
 s64 parseTimeCharconv(std::string const& value)
 {
     s32 h = 99, m = 99, s = 99, f = 9999;
@@ -155,21 +179,47 @@ static auto const& p_ts2 = ProfilerBuilder()
                                })
                                .build();
 
-static auto const& p_ts3 =
-    ProfilerBuilder()
-        .withDescription("parseTime (HHMMSS)       [charconv ]")
-        .withTestSize(TEST_SIZE)
-        .withTestFn([](Profiler& self) {
-            self.profile([&self] { self.measure([] { parseTimeCharconv(generateTS(true)); }); });
-        })
-        .build();
+static auto const& p_ts3 = ProfilerBuilder()
+                               .withDescription("parseTime (HHMMSS)       [charconv ]")
+                               .withTestSize(TEST_SIZE)
+                               .withTestFn([](Profiler& self) {
+                                   self.profile([&self] {
+                                       auto s = generateTS(true);
+                                       self.measure([&] { parseTimeCharconv(s); });
+                                   });
+                               })
+                               .build();
 
-static auto const& p_ts4 =
-    ProfilerBuilder()
-        .withDescription("parseTime (HH:MM:SS.FFF) [charconv ]")
-        .withTestSize(TEST_SIZE)
-        .withTestFn([](Profiler& self) {
-            self.profile([&self] { self.measure([] { parseTimeCharconv(generateTS(false)); }); });
-        })
-        .build();
+static auto const& p_ts4 = ProfilerBuilder()
+                               .withDescription("parseTime (HH:MM:SS.FFF) [charconv ]")
+                               .withTestSize(TEST_SIZE)
+                               .withTestFn([](Profiler& self) {
+                                   self.profile([&self] {
+                                       auto s = generateTS(false);
+                                       self.measure([&] { parseTimeCharconv(s); });
+                                   });
+                               })
+                               .build();
+
+static auto const& p_ts5 = ProfilerBuilder()
+                               .withDescription("parseTime (HHMMSS)       [stoi     ]")
+                               .withTestSize(TEST_SIZE)
+                               .withTestFn([](Profiler& self) {
+                                   self.profile([&self] {
+                                       auto s = generateTS(true);
+                                       self.measure([&] { parseTimeStoI(s); });
+                                   });
+                               })
+                               .build();
+
+static auto const& p_ts6 = ProfilerBuilder()
+                               .withDescription("parseTime (HH:MM:SS.FFF) [stoi     ]")
+                               .withTestSize(TEST_SIZE)
+                               .withTestFn([](Profiler& self) {
+                                   self.profile([&self] {
+                                       auto s = generateTS(false);
+                                       self.measure([&] { parseTimeStoI(s); });
+                                   });
+                               })
+                               .build();
 }  // namespace vfrb::profiling
