@@ -25,11 +25,11 @@
 namespace vfrb::object
 {
 GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid)
-    : GpsPosition(priority, location, geoid, 1.0, 3, 5, Timestamp<time::DateTimeImplBoost>())
+    : GpsPosition(priority, location, geoid, 1.0, 3, 5, Timestamp())
 {}
 
 GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid, f64 dilution, u8 satellites,
-                         s8 quality, Timestamp<time::DateTimeImplBoost> const& timestamp)
+                         s8 quality, Timestamp const& timestamp)
     : Object(priority),
       m_location(location),
       m_geoid(geoid),

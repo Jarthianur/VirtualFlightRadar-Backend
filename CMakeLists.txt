@@ -30,6 +30,7 @@ file(GLOB_RECURSE vfrb_test_sources test/*.cpp)
 file(GLOB_RECURSE vfrb_prof_sources profiling/*.cpp)
 list(APPEND vfrb_test_sources ${vfrb_sources})
 list(REMOVE_ITEM vfrb_test_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
+list(REMOVE_ITEM vfrb_test_sources ${PROJECT_SOURCE_DIR}/src/object/impl/DateTimeImplBoost.cpp)
 #list(APPEND vfrb_prof_sources ${vfrb_sources})
 #list(REMOVE_ITEM vfrb_prof_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
 

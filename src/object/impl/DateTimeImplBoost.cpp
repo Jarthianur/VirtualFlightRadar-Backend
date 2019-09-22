@@ -19,21 +19,21 @@
  }
  */
 
-#include "object/impl/DateTimeImplBoost.h"
-
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-namespace vfrb::object::time
+#include "types.h"
+
+namespace vfrb::object::date_time
 {
-s64 DateTimeImplBoost::now()
+s64 now()
 {
     return static_cast<s64>(
         boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
             .total_milliseconds());
 }
 
-u32 DateTimeImplBoost::day()
+u32 day()
 {
     return static_cast<u32>(boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
 }
-}  // namespace vfrb::object::time
+}  // namespace vfrb::object::date_time

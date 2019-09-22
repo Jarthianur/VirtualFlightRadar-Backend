@@ -21,12 +21,11 @@
 
 #pragma once
 
-#include "impl/DateTimeImplBoost.h"
 #include "util/CString.hpp"
 
 #include "GpsPosition.h"
 #include "Object.h"
-#include "Timestamp.hpp"
+#include "Timestamp.h"
 #include "types.h"
 
 namespace vfrb::object
@@ -102,15 +101,15 @@ public:
     };
 
 private:
-    util::CString<ID_SIZE>             m_id;                ///< Aircraft identifier
-    IdType                             m_idType;            ///< Id type
-    AircraftType                       m_aircraftType;      ///< Aircraft type
-    TargetType                         m_targetType;        ///< Target type
-    Location                           m_location;          ///< Currently known position.
-    Movement                           m_movement;          ///< Currently known movement.
-    Timestamp<time::DateTimeImplBoost> m_timestamp;         ///< The timestamp of the last report.
-    bool                               m_fullInfo = false;  ///< Is full set of information available?
-    util::CString<NMEA_SIZE>           m_nmea;
+    util::CString<ID_SIZE>   m_id;                ///< Aircraft identifier
+    IdType                   m_idType;            ///< Id type
+    AircraftType             m_aircraftType;      ///< Aircraft type
+    TargetType               m_targetType;        ///< Target type
+    Location                 m_location;          ///< Currently known position.
+    Movement                 m_movement;          ///< Currently known movement.
+    Timestamp                m_timestamp;         ///< The timestamp of the last report.
+    bool                     m_fullInfo = false;  ///< Is full set of information available?
+    util::CString<NMEA_SIZE> m_nmea;
 
     /**
      * @brief Assign an other aircrafts values to this.
@@ -125,9 +124,9 @@ private:
 
 public:
     Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
-             Movement const& move, Timestamp<time::DateTimeImplBoost> const& timestamp);
+             Movement const& move, Timestamp const& timestamp);
     Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
-             Timestamp<time::DateTimeImplBoost> const& timestamp);
+             Timestamp const& timestamp);
     Aircraft(Aircraft&& other);
     ~Aircraft() noexcept override = default;
 
