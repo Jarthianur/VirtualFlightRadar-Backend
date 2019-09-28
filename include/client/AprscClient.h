@@ -24,6 +24,13 @@
 #include <string>
 
 #include "Client.h"
+#include "parameters.h"
+
+#ifdef APRSCCLIENT_BEACON_INTERVAL
+#    define AC_BEACON_INT APRSCCLIENT_BEACON_INTERVAL
+#else
+#    define AC_BEACON_INT 600
+#endif
 
 namespace client
 {

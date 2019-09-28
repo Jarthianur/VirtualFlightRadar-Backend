@@ -84,7 +84,7 @@ void AprscClient::handleConnect(ErrorCode error)
 void AprscClient::sendKeepAlive()
 {
     m_connector->onTimeout(
-        std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1), 600);
+        std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1), AC_BEACON_INT);
 }
 
 void AprscClient::handleLogin(ErrorCode error)

@@ -25,6 +25,9 @@ case "$1" in
     "receive")
     nc localhost $REGR_PORT_VFRB > vfrb.log &
     ;;
+    "await-timeout")
+    nc -nlvp $REGR_PORT_SENS 
+    ;;
     "check")
     LOG=$(cat aprs.log | grep -o "regression")
     if [ "$LOG" == "" ]; then

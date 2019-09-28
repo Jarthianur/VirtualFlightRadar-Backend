@@ -33,9 +33,9 @@
 
 /**
  * @def CLIENT_CONNECT_WAIT_TIMEVAL
- * Input-clients wait for this duration, in seconds, until
+ * Input-clients wait for this duration until
  * attempting a connect (reconnect).
- * [1 <= x]
+ * [1 <= x] seconds
  * This value depends on Your infrastructure.
  * E.g. if Your receivers run on different hosts, which get
  * turned on 1 hour after VFR-B, it is pointless to attempt connect
@@ -45,10 +45,18 @@
 #define CLIENT_CONNECT_WAIT_TIMEVAL 120
 
 /**
+ * @def APRSCCLIENT_BEACON_INTERVAL
+ * APRSC servers are often configured to disconnect clients after some time without any sign of
+ * being alive. Hence a keep-alive beacon is sent to the server in this interval. [1 <= x] seconds
+ * OGN servers have a timeout of 30 minutes, so 10 minutes are absolutely ok.
+ */
+#define APRSCCLIENT_BEACON_INTERVAL 600
+
+/**
  * @def WINDCLIENT_RECEIVE_TIMEOUT
  * Due to unstable hardware/drivers, it became apparent that
  * it is necessary to timeout the wind-sensors input.
- * [1 <= x]
+ * [1 <= x] seconds
  * A good way is to set this value to 1.5 * Y, where
  * Y is the time interval the wind-sensor sends its data.
  */
