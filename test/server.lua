@@ -24,7 +24,7 @@ signal.signal(
     end
 )
 
-function recv(client)
+function Recv(client)
     local m, e = client:receive()
     if not e then
         --print('received from ' .. client:getpeername() .. ': ' .. m)
@@ -34,7 +34,7 @@ function recv(client)
     end
 end
 
-function send(client, msg)
+function Send(client, msg)
     local _, e = client:send(msg)
     if not e then
         --print('sent successfully to ' .. client:getpeername())
@@ -43,29 +43,29 @@ function send(client, msg)
     end
 end
 
-function makesender(client)
+function MakeSender(client)
     return coroutine.create(
         function()
             while running do
-                send(client, _msg)
+                Send(client, _msg)
                 coroutine.yield()
             end
         end
     )
 end
 
-function makereceiver(client)
+function MakeReceiver(client)
     return coroutine.create(
         function()
             while running do
-                recv(client)
+                Recv(client)
                 coroutine.yield()
             end
         end
     )
 end
 
-function isrunning(co)
+function IsRunning(co)
     return not co or coroutine.status(co) ~= "dead"
 end
 
@@ -82,13 +82,13 @@ while running do
 
         local sender, receiver
         if _msg then
-            sender = makesender(client)
+            sender = MakeSender(client)
         end
         if _recv then
-            receiver = makereceiver(client)
+            receiver = MakeReceiver(client)
         end
 
-        while running and isrunning(sender) and isrunning(receiver) do
+        while running and IsRunning(sender) and IsRunning(receiver) do
             if sender then
                 coroutine.resume(sender)
             end
