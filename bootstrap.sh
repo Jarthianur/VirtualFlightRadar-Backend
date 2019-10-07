@@ -237,7 +237,7 @@ function install_test_deps() {
     require PKG_MANAGER
     case $PKG_MANAGER in
     *apt-get)
-        local TOOLS='cppcheck clang-format-6.0 wget netcat procps perl lcov'
+        local TOOLS='cppcheck clang-format-6.0 wget netcat procps perl lcov lua5.3 lua-argparse lua-socket lua-posix'
         ;;
     *dnf)
         local TOOLS='cppcheck wget perl lcov nmap-ncat procps-ng clang'
