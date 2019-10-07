@@ -5,30 +5,28 @@ REGR_PORT_GPS=44402
 REGR_PORT_SENS=44403
 REGR_PORT_VFRB=44404
 
-function serve {
-    local count=0
-    while [ $count -le 15 ]
-    do
-    sleep 1
-    count=$[count+1]
-    cat $1
-    done | nc -C -nlvp $2 > $3 &
+function cleanup() {
+    kill -9 $(cat sbs_srv.pid) $(cat aprs_srv.pid) $(cat gps_srv.pid) $(cat sens_srv.pid)
+    rm *.pid *.log
+    trap - ERR
 }
 
 case "$1" in
-    "serve")
-    serve resources/sbs_regr.txt $REGR_PORT_SBS /dev/null
-    serve resources/aprs_regr.txt $REGR_PORT_APRS aprs.log
-    serve resources/gps_regr.txt $REGR_PORT_GPS gps.log
-    serve resources/sens_regr.txt $REGR_PORT_SENS /dev/null
+"serve")
+    lua server.lua -m "$(cat resources/sbs_regr.txt)" $REGR_PORT_SBS &
+    echo -en $! >sbs_srv.pid
+    lua server.lua -m "$(cat resources/aprs_regr.txt)" -r $REGR_PORT_APRS >aprs.log &
+    echo -en $! >aprs_srv.pid
+    lua server.lua -m "$(cat resources/gps_regr.txt)" -r $REGR_PORT_GPS >gps.log &
+    echo -en $! >gps_srv.pid
+    lua server.lua -m "$(cat resources/sens_regr.txt)" $REGR_PORT_SENS &
+    echo -en $! >sens_srv.pid
     ;;
-    "receive")
-    nc localhost $REGR_PORT_VFRB > vfrb.log &
+"receive")
+    nc localhost $REGR_PORT_VFRB >vfrb.log &
     ;;
-    "await-timeout")
-    nc -nlvp $REGR_PORT_SENS 
-    ;;
-    "check")
+"check")
+    trap cleanup ERR
     LOG=$(cat aprs.log | grep -o "regression")
     if [ "$LOG" == "" ]; then
         echo "APRS regression failed"
@@ -75,9 +73,9 @@ case "$1" in
         exit 1
     fi
     ;;
-    *)
-    echo "Run this script with 'serve' to start regression (netcat) servers."
-    echo "Run this script with 'receive' to connect to regression (netcat) servers from 'serve' call."
+*)
+    echo "Run this script with 'serve' to start regression servers."
+    echo "Run this script with 'receive' to connect to regression servers from 'serve' call."
     ;;
 esac
 exit 0

@@ -30,17 +30,20 @@ export PROMPT="$(basename $0)"
 # param 1 may indicate log level
 # all other params are printed
 function log() {
-    local TIME=`date +"%T"`
+    local TIME=$(date +"%T")
     case $1 in
     -i)
-        echo -en "\033[0;32m[INFO ]\033[0m"; shift
-    ;;
+        echo -en "\033[0;32m[INFO ]\033[0m"
+        shift
+        ;;
     -w)
-        echo -en "\033[0;33m[WARN ]\033[0m"; shift
-    ;;
+        echo -en "\033[0;33m[WARN ]\033[0m"
+        shift
+        ;;
     -e)
-        echo -en "\033[0;31m[ERROR]\033[0m"; shift
-    ;;
+        echo -en "\033[0;31m[ERROR]\033[0m"
+        shift
+        ;;
     esac
     local ROUTINE=''
     if [ -n "${FUNCNAME[1]}" ]; then
@@ -72,10 +75,10 @@ function fail() {
         -e)
             $2
             shift
-        ;;
+            ;;
         *)
             MSG="${MSG} $1"
-        ;;
+            ;;
         esac
         shift
     done
@@ -93,10 +96,10 @@ function confirm() {
         case ${READ} in
         [yY] | yes | YES)
             return 0
-        ;;
+            ;;
         *)
             return 1
-        ;;
+            ;;
         esac
     fi
     log -w Automatically confirmed.
@@ -156,28 +159,28 @@ function install_deps() {
         local INSTALL='install -y'
         local BOOST='libboost-dev libboost-system-dev libboost-regex-dev libboost-program-options-dev'
         local GCC="g++ make cmake"
-    ;;
+        ;;
     *yum)
         local UPDATE=''
         local SETUP='yum -y install epel-release'
         local INSTALL='install -y'
         local BOOST='boost boost-devel'
         local GCC="gcc-c++ make cmake"
-    ;;
+        ;;
     *dnf)
         local UPDATE=''
         local SETUP=''
         local INSTALL='install -y'
         local BOOST='boost boost-devel'
         local GCC="gcc-c++ make cmake"
-    ;;
+        ;;
     *apk)
         local UPDATE='apk update'
         local SETUP=''
         local INSTALL='add'
         local BOOST='boost-dev boost-system boost-regex boost-program_options'
         local GCC='g++ make cmake'
-    ;;
+        ;;
     esac
     require GCC BOOST INSTALL
     ALL="$GCC"
@@ -235,14 +238,14 @@ function install_test_deps() {
     case $PKG_MANAGER in
     *apt-get)
         local TOOLS='cppcheck clang-format-6.0 wget netcat procps perl lcov'
-    ;;
+        ;;
     *dnf)
         local TOOLS='cppcheck wget perl lcov nmap-ncat procps-ng clang'
-    ;;
+        ;;
     *)
         log -e Tests currently only run under ubuntu/debian systems.
         return 1
-    ;;
+        ;;
     esac
     require TOOLS
     ALL="$TOOLS"
@@ -271,15 +274,15 @@ function static_analysis() {
     require VFRB_ROOT
     trap "fail -e popd Static code analysis failed!" ERR
     pushd $VFRB_ROOT
-    cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -q -I include/  src/
+    cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -q -I include/ src/
     local FORMAT="clang-format-6.0"
-    ! $FORMAT --version > /dev/null 2>&1
+    ! $FORMAT --version >/dev/null 2>&1
     if [ $? -eq 0 ]; then
         FORMAT="clang-format"
     fi
     for f in $(find src/ include/ -type f); do
         diff -u <(cat $f) <($FORMAT -style=file $f) || true
-    done &> /tmp/format.diff
+    done &>/tmp/format.diff
     if [ "$(wc -l /tmp/format.diff | cut -d' ' -f1)" -gt 0 ]; then
         log -e Code format does not comply to the specification.
         cat /tmp/format.diff
@@ -301,7 +304,7 @@ function run_unit_test() {
     trap "fail -e popd Unit tests failed!" ERR
     pushd $VFRB_ROOT
     lcov -i -d build/CMakeFiles/unittest.dir -c -o reports/test_base.info
-    ! $VFRB_UUT &> reports/unittests.xml
+    ! $VFRB_UUT &>reports/unittests.xml
     if [ $? -eq 1 ]; then
         error=0
     fi
