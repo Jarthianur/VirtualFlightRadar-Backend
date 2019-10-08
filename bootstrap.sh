@@ -349,7 +349,7 @@ function run_regression() {
         $(exit 1)
     fi
     log -i Test windclient timeout
-    lua server.lua 44405 nil >serv.log 2>&1 &
+    lua server.lua 44403 nil >serv.log 2>&1 &
     local S_PID=$!
     $VFRB_UUT -c test.ini >/dev/null 2>&1 &
     sleep 10
