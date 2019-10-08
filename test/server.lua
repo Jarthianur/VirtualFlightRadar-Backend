@@ -1,20 +1,23 @@
 #!/usr/bin/lua
+local os = require("os")
 local socket = require("socket")
 local unistd = require("posix.unistd")
 local signal = require("posix.signal")
 local parser = require("argparse")()
 
 parser:argument "port"
-parser:option "-m" "--msg"
+parser:argument "type"
 parser:flag "-r" "--recv"
 
 local args = parser:parse(arg)
-local _host, _port, _msg, _recv = "127.0.0.1", args["port"], args["msg"], args["recv"]
+local _host, _port, _type, _recv = "127.0.0.1", args["port"], args["type"], args["recv"]
 local running = true
 
-if _msg then
-    _msg = _msg .. "\r\n"
-end
+local _aprs_msg =
+    "FLRAAAAAA>APRS,qAS,XXXX:/TIMEh4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4\r\n"
+local _sbs_msg = "MSG,3,0,0,BBBBBB,0,TIME,TIME,,1000,,,49.000000,8.000000,,,,,,0\r\n"
+local _sens_msg = "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n$WIMWV,242.8,R,6.9,N,A*20\r\n"
+local _gps_msg = "$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49\r\n"
 
 signal.signal(
     signal.SIGINT,
@@ -43,11 +46,25 @@ function Send(client, msg)
     end
 end
 
+function GenerateMsg()
+    if _type == "aprs" then
+        return _aprs_msg:gsub("%TIME", os.date("%H%M%S"))
+    elseif _type == "sbs" then
+        return _sbs_msg:gsub("%TIME", os.date("%Y/%m/%d,%H:%M:%S.000"))
+    elseif _type == "sens" then
+        return _sens_msg
+    elseif _type == "gps" then
+        return _gps_msg
+    else
+        print("Invalid type")
+    end
+end
+
 function MakeSender(client)
     return coroutine.create(
         function()
             while running do
-                Send(client, _msg)
+                Send(client, GenerateMsg())
                 coroutine.yield()
             end
         end
@@ -81,17 +98,13 @@ while running do
         client:settimeout(0)
 
         local sender, receiver
-        if _msg then
-            sender = MakeSender(client)
-        end
+        sender = MakeSender(client)
         if _recv then
             receiver = MakeReceiver(client)
         end
 
         while running and IsRunning(sender) and IsRunning(receiver) do
-            if sender then
-                coroutine.resume(sender)
-            end
+            coroutine.resume(sender)
             if receiver then
                 coroutine.resume(receiver)
             end

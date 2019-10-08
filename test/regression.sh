@@ -14,13 +14,13 @@ function cleanup() {
 
 case "$1" in
 "serve")
-    lua server.lua -m "$(cat resources/sbs_regr.txt)" $REGR_PORT_SBS &
+    lua server.lua $REGR_PORT_SBS sbs >/dev/null &
     echo -en $! >sbs_srv.pid
-    lua server.lua -m "$(cat resources/aprs_regr.txt)" -r $REGR_PORT_APRS >aprs.log &
+    lua server.lua -r $REGR_PORT_APRS aprs >aprs.log &
     echo -en $! >aprs_srv.pid
-    lua server.lua -m "$(cat resources/gps_regr.txt)" -r $REGR_PORT_GPS >gps.log &
+    lua server.lua -r $REGR_PORT_GPS gps >gps.log &
     echo -en $! >gps_srv.pid
-    lua server.lua -m "$(cat resources/sens_regr.txt)" $REGR_PORT_SENS &
+    lua server.lua $REGR_PORT_SENS sens >/dev/null &
     echo -en $! >sens_srv.pid
     ;;
 "receive")

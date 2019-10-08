@@ -57,10 +57,11 @@ Feed::Protocol AprscFeed::get_protocol() const
 
 bool AprscFeed::process(const std::string& response)
 {
+    logger.debug(response);
     object::Aircraft ac(get_priority());
     if (s_parser.unpack(response, ac))
     {
-        m_data->update(std::move(ac));
+        if (m_data->update(std::move(ac))) logger.debug("updated");
     }
     return true;
 }
