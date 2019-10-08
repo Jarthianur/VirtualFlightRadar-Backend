@@ -239,9 +239,6 @@ function install_test_deps() {
     *apt-get)
         local TOOLS='cppcheck clang-format-6.0 wget netcat procps perl lcov lua5.3 lua-argparse lua-socket lua-posix'
         ;;
-    *dnf)
-        local TOOLS='cppcheck wget perl lcov nmap-ncat procps-ng clang'
-        ;;
     *)
         log -e Tests currently only run under ubuntu/debian systems.
         return 1
@@ -339,6 +336,30 @@ function run_regression() {
     $SUDO pkill -2 -f $VFRB_UUT || true
     sleep 4
     ./regression.sh check
+    log -i "Test for reconnects"
+    $VFRB_UUT -c resources/test.ini >vfrb.log 2>&1 &
+    sleep 5
+    ./regression.sh serve
+    $SUDO pkill -2 -f $VFRB_UUT || true
+    # just to cleanup servers
+    ./regression.sh check >/dev/null 2>&1 || true
+    local OUTPUT="$(cat vfrb.log)"
+    if [ $(echo $OUTPUT | grep -o 'connected to' | wc -l) -lt 4 ]; then
+        log -e "reconnect test failed"
+        $(exit 1)
+    fi
+    log -i Test windclient timeout
+    lua server.lua 44405 nil >serv.log 2>&1 &
+    local S_PID=$!
+    $VFRB_UUT -c resources/test.ini >/dev/null 2>&1 &
+    sleep 10
+    $SUDO pkill -2 -f $VFRB_UUT || true
+    kill -9 $S_PID
+    OUTPUT="$(cat serv.log)"
+    if [ $(echo $OUTPUT | grep -o 'Connection from' | wc -l) -lt 2 ]; then
+        log -e "timeout test failed"
+        $(exit 1)
+    fi
     popd
     trap - ERR
 }

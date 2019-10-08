@@ -56,7 +56,7 @@ function GenerateMsg()
     elseif _type == "gps" then
         return _gps_msg
     else
-        print("Invalid type")
+        error("no msg")
     end
 end
 
@@ -64,7 +64,10 @@ function MakeSender(client)
     return coroutine.create(
         function()
             while running do
-                Send(client, GenerateMsg())
+                local m, e = GenerateMsg()
+                if not e then
+                    Send(client, m)
+                end
                 coroutine.yield()
             end
         end
