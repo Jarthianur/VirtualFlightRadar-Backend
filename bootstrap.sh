@@ -338,8 +338,9 @@ function run_regression() {
     ./regression.sh check
     log -i "Test for reconnects"
     $VFRB_UUT -c test.ini >vfrb.log 2>&1 &
-    sleep 10
+    sleep 5
     ./regression.sh serve
+    sleep 5
     $SUDO pkill -2 -f $VFRB_UUT || true
     # just to cleanup servers
     ./regression.sh check >/dev/null 2>&1 || true
