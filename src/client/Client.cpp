@@ -41,13 +41,13 @@ Client::Client(const Endpoint& endpoint, const char* component,
 
 void Client::run()
 {
-    std::unique_lock<std::mutex> lock(m_mutex);
-    if (!m_running)
+    std::unique_lock<std::mutex> lk(m_mutex);
+    if (m_state == State::NONE)
     {
-        m_running = true;
         connect();
-        lock.unlock();
+        lk.unlock();
         m_connector->run();
+        m_state = State::NONE;
     }
 }
 
@@ -72,15 +72,16 @@ void Client::subscribe(std::shared_ptr<feed::Feed> feed)
 
 void Client::connect()
 {
+    m_state = State::CONNECTING;
     m_connector->onConnect(m_endpoint,
                            std::bind(&Client::handleConnect, this, std::placeholders::_1));
 }
 
 void Client::reconnect()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_running)
+    if (m_state != State::STOPPING)
     {
+        m_state = State::CONNECTING;
         logger.info(m_component, " schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->close();
         timedConnect();
@@ -95,9 +96,9 @@ void Client::timedConnect()
 
 void Client::stop()
 {
-    if (m_running)
+    if (m_state == State::RUNNING || m_state == State::CONNECTING)
     {
-        m_running = false;
+        m_state = State::STOPPING;
         logger.info(m_component, " disconnect from ", m_endpoint.host, ":", m_endpoint.port);
         m_connector->stop();
     }
@@ -106,8 +107,9 @@ void Client::stop()
 void Client::scheduleStop()
 {
     std::condition_variable      cond_ready;
-    std::unique_lock<std::mutex> lock(m_mutex);
-    cond_ready.wait_for(lock, std::chrono::milliseconds(100), [this] { return m_running; });
+    std::unique_lock<std::mutex> lk(m_mutex);
+    cond_ready.wait_for(lk, std::chrono::milliseconds(100),
+                        [this] { return m_state != State::NONE; });
     stop();
 }
 
@@ -117,11 +119,11 @@ void Client::read()
         std::bind(&Client::handleRead, this, std::placeholders::_1, std::placeholders::_2));
 }
 
-void Client::handleTimedConnect(bool error)
+void Client::handleTimedConnect(ErrorCode error)
 {
-    if (!error)
+    if (error == ErrorCode::SUCCESS)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<std::mutex> lk(m_mutex);
         logger.info(m_component, " try connect to ", m_endpoint.host, ":", m_endpoint.port);
         connect();
     }
@@ -132,24 +134,27 @@ void Client::handleTimedConnect(bool error)
     }
 }
 
-void Client::handleRead(bool error, const std::string& response)
+void Client::handleRead(ErrorCode error, const std::string& response)
 {
-    if (!error)
+    std::lock_guard<std::mutex> lk(m_mutex);
+    if (m_state == State::RUNNING)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        for (auto& it : m_feeds)
+        if (error == ErrorCode::SUCCESS)
         {
-            if (!it->process(response))
+            for (auto& it : m_feeds)
             {
-                stop();
+                if (!it->process(response))
+                {
+                    stop();
+                }
             }
+            read();
         }
-        read();
-    }
-    else
-    {
-        logger.error(m_component, " failed to read message");
-        reconnect();
+        else
+        {
+            logger.error(m_component, " failed to read message");
+            reconnect();
+        }
     }
 }
 }  // namespace client

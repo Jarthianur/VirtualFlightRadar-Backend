@@ -33,13 +33,19 @@ namespace net
 {
 struct Endpoint;
 
+enum class ErrorCode : std::uint_fast8_t
+{
+    SUCCESS,
+    FAILURE
+};
+
 /// @typedef Callback
 /// Common callback function
-using Callback = std::function<void(bool)>;
+using Callback = std::function<void(ErrorCode)>;
 
 /// @typedef ReadCallback
 /// Callback function for read
-using ReadCallback = std::function<void(bool, const std::string&)>;
+using ReadCallback = std::function<void(ErrorCode, const std::string&)>;
 
 /**
  * @brief The async TCP interface for clients

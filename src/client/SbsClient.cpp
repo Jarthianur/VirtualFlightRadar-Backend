@@ -36,17 +36,23 @@ SbsClient::SbsClient(const Endpoint& endpoint, std::shared_ptr<Connector> connec
     : Client(endpoint, COMPONENT, connector)
 {}
 
-void SbsClient::handleConnect(bool error)
+void SbsClient::handleConnect(ErrorCode error)
 {
-    if (!error)
+    std::lock_guard<std::mutex> lk(m_mutex);
+    if (m_state == State::CONNECTING)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        read();
-    }
-    else
-    {
-        logger.warn(m_component, " failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
-        reconnect();
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_state = State::RUNNING;
+            logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
+            read();
+        }
+        else
+        {
+            logger.warn(m_component, " failed to connect to ", m_endpoint.host, ":",
+                        m_endpoint.port);
+            reconnect();
+        }
     }
 }
 }  // namespace client

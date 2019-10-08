@@ -62,58 +62,75 @@ std::size_t AprscClient::hash() const
     return seed;
 }
 
-void AprscClient::handleConnect(bool error)
+void AprscClient::handleConnect(ErrorCode error)
 {
-    if (!error)
+    std::lock_guard<std::mutex> lk(m_mutex);
+    if (m_state == State::CONNECTING)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_connector->onWrite(m_login,
-                             std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
-        sendKeepAlive();
-    }
-    else
-    {
-        logger.warn(m_component, " failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
-        reconnect();
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_connector->onWrite(m_login,
+                                 std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
+        }
+        else
+        {
+            logger.warn(m_component, " failed to connect to ", m_endpoint.host, ":",
+                        m_endpoint.port);
+            reconnect();
+        }
     }
 }
 
 void AprscClient::sendKeepAlive()
 {
     m_connector->onTimeout(
-        std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1), 600);
+        std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1), AC_BEACON_INT);
 }
 
-void AprscClient::handleLogin(bool error)
+void AprscClient::handleLogin(ErrorCode error)
 {
-    if (!error)
+    std::lock_guard<std::mutex> lk(m_mutex);
+    if (m_state == State::CONNECTING)
     {
-        logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
-        std::lock_guard<std::mutex> lock(m_mutex);
-        read();
-    }
-    else
-    {
-        logger.error(m_component, " send login failed");
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_state = State::RUNNING;
+            logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
+            sendKeepAlive();
+            read();
+        }
+        else
+        {
+            logger.error(m_component, " send login failed");
+            reconnect();
+        }
     }
 }
 
-void AprscClient::handleSendKeepAlive(bool error)
+void AprscClient::handleSendKeepAlive(ErrorCode error)
 {
-    if (!error)
+    std::lock_guard<std::mutex> lk(m_mutex);
+    if (m_state == State::RUNNING)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_connector->onWrite("#keep-alive beacon\r\n", [this](bool error) {
-            if (!error)
-            {
-                sendKeepAlive();
-            }
-            else
-            {
-                logger.error(m_component, " send keep-alive beacon failed");
-                reconnect();
-            }
-        });
+        if (error == ErrorCode::SUCCESS)
+        {
+            m_connector->onWrite("#keep-alive beacon\r\n", [this](ErrorCode error) {
+                std::lock_guard<std::mutex> lk(m_mutex);
+                if (m_state == State::RUNNING)
+                {
+                    if (error != ErrorCode::SUCCESS)
+                    {
+                        logger.error(m_component, " send keep-alive beacon failed");
+                        reconnect();
+                    }
+                }
+            });
+            sendKeepAlive();
+        }
+        else
+        {
+            sendKeepAlive();
+        }
     }
 }
 }  // namespace client

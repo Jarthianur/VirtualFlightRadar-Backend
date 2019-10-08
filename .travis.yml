@@ -9,12 +9,12 @@ git:
     submodules: true
 
 before_install:
-    - docker pull debian:stretch-slim
+    - docker pull debian:buster-slim
 
 before_script:
-    - docker run -e "WORKSPACE=$TRAVIS_BUILD_DIR" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:stretch-slim bash
+    - docker run -e "WORKSPACE=$TRAVIS_BUILD_DIR" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:buster-slim bash
     - docker ps -a
-    - docker exec -it vfrb sh -c "echo 'deb http://ftp.debian.org/debian stretch-backports main' >> /etc/apt/sources.list"
+    - docker exec -it vfrb sh -c "echo 'deb http://ftp.debian.org/debian buster-backports main' >> /etc/apt/sources.list"
 
 script:
     # build production docker image

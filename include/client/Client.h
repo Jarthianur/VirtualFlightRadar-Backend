@@ -91,6 +91,14 @@ public:
     void subscribe(std::shared_ptr<feed::Feed> feed);
 
 protected:
+    enum class State : std::uint_fast8_t
+    {
+        NONE,
+        CONNECTING,
+        RUNNING,
+        STOPPING
+    };
+
     /**
      * @brief Constructor
      * @param endpoint  The connection Endpoint
@@ -130,26 +138,26 @@ protected:
      * @brief Handler for timedConnect
      * @param error The error indicator
      */
-    void handleTimedConnect(bool error);
+    void handleTimedConnect(net::ErrorCode error);
 
     /**
      * @brief Handler for read
      * @param error    The error indicator
      * @param response The received string
      */
-    void handleRead(bool error, const std::string& response);
+    void handleRead(net::ErrorCode error, const std::string& response);
 
     /**
      * @brief Handler for connect
      * @param error The error indicator
      */
-    virtual void handleConnect(bool error) = 0;
+    virtual void handleConnect(net::ErrorCode error) = 0;
 
     /// Connector interface
     std::shared_ptr<net::Connector> m_connector;
 
     /// Run state indicator
-    bool m_running = false;
+    State m_state = State::NONE;
 
     /// Component string used for logging
     const char* const m_component;

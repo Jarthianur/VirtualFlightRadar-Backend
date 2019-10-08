@@ -33,26 +33,40 @@
 
 /**
  * @def CLIENT_CONNECT_WAIT_TIMEVAL
- * Input-clients wait for this duration, in seconds, until
+ * Input-clients wait for this duration until
  * attempting a connect (reconnect).
- * [1 <= x]
+ * [1 <= x] seconds
  * This value depends on Your infrastructure.
  * E.g. if Your receivers run on different hosts, which get
  * turned on 1 hour after VFR-B, it is pointless to attempt connect
  * every second. As well as waiting 1 hour if all receivers are up
  * after 2 minutes.
  */
-#define CLIENT_CONNECT_WAIT_TIMEVAL 120
+#ifndef CLIENT_CONNECT_WAIT_TIMEVAL
+#    define CLIENT_CONNECT_WAIT_TIMEVAL 120
+#endif
+
+/**
+ * @def APRSCCLIENT_BEACON_INTERVAL
+ * APRSC servers are often configured to disconnect clients after some time without any sign of
+ * being alive. Hence a keep-alive beacon is sent to the server in this interval. [1 <= x] seconds
+ * OGN servers have a timeout of 30 minutes, so 10 minutes are absolutely ok.
+ */
+#ifndef APRSCCLIENT_BEACON_INTERVAL
+#    define APRSCCLIENT_BEACON_INTERVAL 600
+#endif
 
 /**
  * @def WINDCLIENT_RECEIVE_TIMEOUT
  * Due to unstable hardware/drivers, it became apparent that
  * it is necessary to timeout the wind-sensors input.
- * [1 <= x]
+ * [1 <= x] seconds
  * A good way is to set this value to 1.5 * Y, where
  * Y is the time interval the wind-sensor sends its data.
  */
-#define WINDCLIENT_RECEIVE_TIMEOUT 5
+#ifndef WINDCLIENT_RECEIVE_TIMEOUT
+#    define WINDCLIENT_RECEIVE_TIMEOUT 5
+#endif
 
 /**
  * @def SERVER_MAX_CLIENTS
@@ -63,7 +77,9 @@
  * Consider someone else wants surrounding traffic displayed from
  * somewhere else, like pilots and flight instructors.
  */
-#define SERVER_MAX_CLIENTS 3
+#ifndef SERVER_MAX_CLIENTS
+#    define SERVER_MAX_CLIENTS 3
+#endif
 
 /**
  * @def ESTIMATED_TRAFFIC
@@ -76,4 +92,6 @@
  * there is no need to set it higher than that.
  * In doubt, set it to a lower value.
  */
-#define ESTIMATED_TRAFFIC 10
+#ifndef ESTIMATED_TRAFFIC
+#    define ESTIMATED_TRAFFIC 10
+#endif

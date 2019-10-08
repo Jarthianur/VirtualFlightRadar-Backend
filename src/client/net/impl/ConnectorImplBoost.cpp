@@ -32,6 +32,11 @@ namespace client
 {
 using namespace net;
 
+ErrorCode evalErrorCode(boost::system::error_code const& error)
+{
+    return !error ? ErrorCode::SUCCESS : ErrorCode::FAILURE;
+}
+
 ConnectorImplBoost::ConnectorImplBoost()
     : Connector(),
       m_ioService(),
@@ -121,18 +126,20 @@ bool ConnectorImplBoost::timerExpired()
 void ConnectorImplBoost::handleWrite(const boost::system::error_code& error, std::size_t,
                                      const Callback&                  callback) noexcept
 {
-    if (error)
+    ErrorCode const ec = evalErrorCode(error);
+    if (ec != ErrorCode::SUCCESS)
     {
         logger.debug("(Client) failed to write: ", error.message());
     }
-    callback(error);
+    callback(ec);
 }
 
 void ConnectorImplBoost::handleResolve(const boost::system::error_code&         error,
                                        boost::asio::ip::tcp::resolver::iterator resolverIt,
                                        const Callback&                          callback) noexcept
 {
-    if (!error)
+    ErrorCode const ec = evalErrorCode(error);
+    if (ec == ErrorCode::SUCCESS)
     {
         boost::asio::async_connect(m_socket, resolverIt,
                                    boost::bind(&ConnectorImplBoost::handleConnect, this,
@@ -142,7 +149,7 @@ void ConnectorImplBoost::handleResolve(const boost::system::error_code&         
     else
     {
         logger.debug("(Client) failed to resolve host: ", error.message());
-        callback(true);
+        callback(ec);
     }
 }
 
@@ -150,39 +157,42 @@ void ConnectorImplBoost::handleConnect(const boost::system::error_code& error,
                                        boost::asio::ip::tcp::resolver::iterator,
                                        const Callback& callback) noexcept
 {
-    if (error)
-    {
-        logger.debug("(Client) failed to connect: ", error.message());
-    }
-    else
+    ErrorCode const ec = evalErrorCode(error);
+    if (ec == ErrorCode::SUCCESS)
     {
         m_socket.set_option(boost::asio::socket_base::keep_alive(true));
     }
-    callback(error);
+    else
+    {
+        logger.debug("(Client) failed to connect: ", error.message());
+    }
+    callback(ec);
 }
 
 void ConnectorImplBoost::handleTimeout(const boost::system::error_code& error,
                                        const Callback&                  callback) noexcept
 {
-    if (error)
+    ErrorCode const ec = evalErrorCode(error);
+    if (ec != ErrorCode::SUCCESS)
     {
         logger.debug("(Client) timeout: ", error.message());
     }
-    callback(error);
+    callback(ec);
 }
 
 void ConnectorImplBoost::handleRead(const boost::system::error_code& error, std::size_t,
                                     const ReadCallback&              callback) noexcept
 {
-    if (error)
-    {
-        logger.debug("(Client) read: ", error.message());
-    }
-    else
+    ErrorCode const ec = evalErrorCode(error);
+    if (ec == ErrorCode::SUCCESS)
     {
         std::getline(m_istream, m_response);
         m_response.append("\n");
     }
-    callback(error, m_response);
+    else
+    {
+        logger.debug("(Client) read: ", error.message());
+    }
+    callback(ec, m_response);
 }
 }  // namespace client

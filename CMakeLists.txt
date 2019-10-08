@@ -28,6 +28,7 @@ file(GLOB_RECURSE vfrb_sources src/*.cpp)
 file(GLOB_RECURSE vfrb_test_sources test/*.cpp)
 
 set(CMAKE_BUILD_TYPE staged)
+set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic")
 
 if(DEFINED BOOST_STATIC)
     message(STATUS "Linking boost statically")
@@ -44,33 +45,31 @@ find_package(Threads REQUIRED)
 #
 # target: release
 #
-set(CMAKE_CXX_FLAGS_STAGED "-O3 -DNDEBUG -Wall -Wextra -Werror")
 add_executable(release ${vfrb_sources})
 set_target_properties(release PROPERTIES OUTPUT_NAME ${vfrb_prod_bin})
-set_target_properties(release PROPERTIES COMPILE_FLAGS "-DVERSION=\\\"${CMAKE_PROJECT_VERSION}\\\"")
+target_compile_options(release PUBLIC -O3 -DNDEBUG -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
 target_include_directories(release PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(release PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
 
 #
 # target: regression
 #
-set(CMAKE_CXX_FLAGS_STAGED "-O0 -g --coverage")
 add_executable(regression ${vfrb_sources})
 set_target_properties(regression PROPERTIES OUTPUT_NAME ${vfrb_regression_bin})
-set_target_properties(regression PROPERTIES COMPILE_FLAGS "-DVERSION=\\\"${CMAKE_PROJECT_VERSION}\\\"")
+target_compile_options(regression PUBLIC -O0 -g --coverage -DLOG_ENABLE_DEBUG -DVERSION=\"${CMAKE_PROJECT_VERSION}\" -DAPRSCCLIENT_BEACON_INTERVAL=1 -DCLIENT_CONNECT_WAIT_TIMEVAL=2)
 target_include_directories(regression PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_link_libraries(regression PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
+target_link_libraries(regression PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads gcov)
 
 #
 # target: test
 #
-set(CMAKE_CXX_FLAGS_STAGED "-O0 -g --coverage -fopenmp -DSCTF_CUSTOM_EPSILON=0.000001")
 list(REMOVE_ITEM vfrb_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
 list(APPEND vfrb_test_sources ${vfrb_sources})
 add_executable(unittest ${vfrb_test_sources})
 set_target_properties(unittest PROPERTIES OUTPUT_NAME ${vfrb_test_bin})
+target_compile_options(unittest PUBLIC -O0 -g --coverage -fopenmp -DLOG_ENABLE_DEBUG -DSCTF_CUSTOM_EPSILON=0.000001)
 target_include_directories(unittest PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include ${PROJECT_SOURCE_DIR}/test/framework)
-target_link_libraries(unittest PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
+target_link_libraries(unittest PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads gcov gomp)
 
 #
 # target: install
