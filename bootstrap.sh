@@ -344,6 +344,7 @@ function run_regression() {
     # just to cleanup servers
     ./regression.sh check >/dev/null 2>&1 || true
     local OUTPUT="$(cat vfrb.log)"
+    echo $OUTPUT
     if [ $(echo $OUTPUT | grep -o 'connected to' | wc -l) -lt 4 ]; then
         log -e "reconnect test failed"
         $(exit 1)
