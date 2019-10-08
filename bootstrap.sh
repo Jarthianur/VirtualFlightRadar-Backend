@@ -321,12 +321,12 @@ function run_regression() {
     if ! $VFRB_UUT; then $(exit 0); fi
     if ! $VFRB_UUT -v -g -c bla.txt; then $(exit 0); fi
     trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
-    pushd $VFRB_ROOT/test
+    pushd $VFRB_ROOT/test/resources
     log -i Start mocking servers
     ./regression.sh serve
     sleep 2
     log -i Start vfrb
-    $VFRB_UUT -c resources/test.ini &
+    $VFRB_UUT -c test.ini &
     sleep 2
     log -i Connect to vfrb
     ./regression.sh receive
@@ -337,7 +337,7 @@ function run_regression() {
     sleep 4
     ./regression.sh check
     log -i "Test for reconnects"
-    $VFRB_UUT -c resources/test.ini >vfrb.log 2>&1 &
+    $VFRB_UUT -c test.ini >vfrb.log 2>&1 &
     sleep 5
     ./regression.sh serve
     $SUDO pkill -2 -f $VFRB_UUT || true
@@ -351,7 +351,7 @@ function run_regression() {
     log -i Test windclient timeout
     lua server.lua 44405 nil >serv.log 2>&1 &
     local S_PID=$!
-    $VFRB_UUT -c resources/test.ini >/dev/null 2>&1 &
+    $VFRB_UUT -c test.ini >/dev/null 2>&1 &
     sleep 10
     $SUDO pkill -2 -f $VFRB_UUT || true
     kill -9 $S_PID
