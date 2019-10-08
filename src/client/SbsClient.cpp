@@ -44,6 +44,7 @@ void SbsClient::handleConnect(ErrorCode error)
         if (error == ErrorCode::SUCCESS)
         {
             m_state = State::RUNNING;
+            logger.info(m_component, " connected to ", m_endpoint.host, ":", m_endpoint.port);
             read();
         }
         else

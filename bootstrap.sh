@@ -338,14 +338,12 @@ function run_regression() {
     ./regression.sh check
     log -i "Test for reconnects"
     $VFRB_UUT -c test.ini >vfrb.log 2>&1 &
-    sleep 5
+    sleep 10
     ./regression.sh serve
     $SUDO pkill -2 -f $VFRB_UUT || true
     # just to cleanup servers
     ./regression.sh check >/dev/null 2>&1 || true
-    local OUTPUT="$(cat vfrb.log)"
-    echo $OUTPUT
-    if [ $(echo $OUTPUT | grep -o 'connected to' | wc -l) -lt 4 ]; then
+    if [ $(cat vfrb.log | grep -o 'connected to' | wc -l) -lt 4 ]; then
         log -e "reconnect test failed"
         $(exit 1)
     fi
@@ -356,8 +354,7 @@ function run_regression() {
     sleep 10
     $SUDO pkill -2 -f $VFRB_UUT || true
     kill -9 $S_PID
-    OUTPUT="$(cat serv.log)"
-    if [ $(echo $OUTPUT | grep -o 'Connection from' | wc -l) -lt 2 ]; then
+    if [ $(cat serv.log | grep -o 'Connection from' | wc -l) -lt 2 ]; then
         log -e "timeout test failed"
         $(exit 1)
     fi
