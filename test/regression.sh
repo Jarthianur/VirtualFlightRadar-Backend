@@ -30,7 +30,12 @@ case "$1" in
     trap cleanup ERR
     LOG=$(cat aprs.log | grep -o "regression")
     if [ "$LOG" == "" ]; then
-        echo "APRS regression failed"
+        echo "APRS login regression failed"
+        $(exit 1)
+    fi
+    LOG=$(cat aprs.log | grep -o "#keep-alive beacon" | wc -l)
+    if [ $LOG -lt 5 ]; then
+        echo "APRS keep-alive beacon regression failed"
         $(exit 1)
     fi
     LOG=$(cat gps.log | grep -o "?WATCH={\"enable\":true,\"nmea\":true}")
