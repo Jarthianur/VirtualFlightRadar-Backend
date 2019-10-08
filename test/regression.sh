@@ -58,22 +58,22 @@ case "$1" in
         echo "VFRB - gpgga regression failed"
         $(exit 1)
     fi
-    LOG=$(cat recv.log | grep -o -P 'PFLAU,,,,1,0,-180,0,-105' | head -n1)
+    LOG=$(cat recv.log | grep -o 'PFLAU,,,,1,0,-180,0,-105' | head -n1)
     if [ "$LOG" == "" ]; then
         echo "VFRB - pflau regression failed"
         $(exit 1)
     fi
-    LOG=$(cat recv.log | grep -o -P 'PFLAA,0,-11008362,-33512,-105' | head -n1)
+    LOG=$(cat recv.log | grep -o 'PFLAA,0,-11008362,-33512,-105' | head -n1)
     if [ "$LOG" == "" ]; then
         echo "VFRB - pflaa regression failed"
         $(exit 1)
     fi
-    LOG=$(cat recv.log | grep -o -P 'WIMDA,29.7987,I,1.0091,B,14.8' | head -n1)
+    LOG=$(cat recv.log | grep -o 'WIMDA,29.7987,I,1.0091,B,14.8' | head -n1)
     if [ "$LOG" == "" ]; then
         echo "VFRB - wimda regression failed"
         $(exit 1)
     fi
-    LOG=$(cat recv.log | grep -o -P 'WIMWV,242.8,R,6.9,N,A' | head -n1)
+    LOG=$(cat recv.log | grep -o 'WIMWV,242.8,R,6.9,N,A' | head -n1)
     if [ "$LOG" == "" ]; then
         echo "VFRB - wimwv regression failed"
         $(exit 1)

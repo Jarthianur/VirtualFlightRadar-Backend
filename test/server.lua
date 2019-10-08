@@ -47,17 +47,19 @@ function Send(client, msg)
 end
 
 function GenerateMsg()
+    local msg = ""
     if _type == "aprs" then
-        return _aprs_msg:gsub("%TIME", os.date("%H%M%S"))
+        msg, _ = _aprs_msg:gsub("%TIME", os.date("%H%M%S"))
     elseif _type == "sbs" then
-        return _sbs_msg:gsub("%TIME", os.date("%Y/%m/%d,%H:%M:%S.000"))
+        msg, _ = _sbs_msg:gsub("%TIME", os.date("%Y/%m/%d,%H:%M:%S.000"))
     elseif _type == "sens" then
-        return _sens_msg
+        msg = _sens_msg
     elseif _type == "gps" then
-        return _gps_msg
+        msg = _gps_msg
     else
         error("no msg")
     end
+    return msg
 end
 
 function MakeSender(client)
