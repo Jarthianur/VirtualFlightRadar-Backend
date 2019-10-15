@@ -106,11 +106,11 @@ Result<T> convert(char const* first, char const* last)
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, s32))>
-Result<T> convert(char const* first, char const* last)
+Result<T> convert(char const* first, char const* last, s32 base = 10)
 {
     T    result;
     Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::int_, result) || first != last)
+    if (auto [p, e] = std::from_chars(first, last, result, base); e != std::errc())
     {
         ec = Errc::ERR;
     }
@@ -167,6 +167,16 @@ template<typename T>
 T parse(std::csub_match const& sub)
 {
     if (auto [v, ec] = convert<T>(sub.first, sub.second); ec == Errc::OK)
+    {
+        return v;
+    }
+    throw error::ConversionError();
+}
+
+template<typename T>
+T parseHex(std::csub_match const& sub)
+{
+    if (auto [v, ec] = convert<T>(sub.first, sub.second, 16); ec == Errc::OK)
     {
         return v;
     }
