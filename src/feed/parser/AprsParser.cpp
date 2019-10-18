@@ -91,8 +91,8 @@ Location AprsParser::parseLocation(std::cmatch const& match) const
 AprsParser::AircraftInfo AprsParser::parseComment(std::cmatch const& match) const
 {
     return {to_str_view(match[RE_APRS_ID]),
-            static_cast<Aircraft::IdType>(parseHex<s32>(match[RE_APRS_TYPE]) & 0x03),
-            static_cast<Aircraft::AircraftType>((parseHex<s32>(match[RE_APRS_TYPE]) & 0x7C) >> 2)};
+            static_cast<Aircraft::IdType>(parse<x32>(match[RE_APRS_TYPE]) & 0x03),
+            static_cast<Aircraft::AircraftType>((parse<x32>(match[RE_APRS_TYPE]) & 0x7C) >> 2)};
 }
 
 Aircraft::Movement AprsParser::parseMovement(std::cmatch const& match) const
