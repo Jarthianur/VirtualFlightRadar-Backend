@@ -25,6 +25,8 @@
 #include <limits>
 #include <regex>
 #include <string_view>
+#include <tuple>
+#include <type_traits>
 
 #include <boost/spirit/include/qi.hpp>
 
@@ -32,6 +34,7 @@
 
 #include "class_utils.h"
 #include "types.h"
+#include "utility.hpp"
 
 namespace vfrb::str_util
 {
@@ -43,6 +46,9 @@ enum class Errc : enum_t
 
 template<typename T>
 using Result = std::tuple<T, Errc>;
+
+struct x32
+{};
 
 namespace error
 {
@@ -106,11 +112,11 @@ Result<T> convert(char const* first, char const* last)
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, s32))>
-Result<T> convert(char const* first, char const* last, s32 base = 10)
+Result<T> convert(char const* first, char const* last)
 {
     T    result;
     Errc ec = Errc::OK;
-    if (auto [p, e] = std::from_chars(first, last, result, base); e != std::errc())
+    if (auto [p, e] = std::from_chars(first, last, result); e != std::errc())
     {
         ec = Errc::ERR;
     }
@@ -129,17 +135,30 @@ Result<T> convert(char const* first, char const* last)
     return {result, ec};
 }
 
+template<typename T, ENABLE_IF(IS_TYPE(T, x32))>
+Result<s32> convert(char const* first, char const* last)
+{
+    s32  result;
+    Errc ec = Errc::OK;
+    if (auto [p, e] = std::from_chars(first, last, result, 16); e != std::errc())
+    {
+        ec = Errc::ERR;
+    }
+    return {result, ec};
+}
+
 template<typename T, ENABLE_IF(IS_TYPE(T, s8))>
 Result<T> convert(char const* first, char const* last)
 {
     s32  result;
     Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::int_, result) || first != last ||
-        result < std::numeric_limits<s8>::min() || result > std::numeric_limits<s8>::max())
+    if (auto [p, e] = std::from_chars(first, last, result); e != std::errc() ||
+                                                            result < std::numeric_limits<s8>::min() ||
+                                                            result > std::numeric_limits<s8>::max())
     {
         ec = Errc::ERR;
     }
-    return {result, ec};
+    return {static_cast<s8>(result), ec};
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, u8))>
@@ -152,7 +171,7 @@ Result<T> convert(char const* first, char const* last)
     {
         ec = Errc::ERR;
     }
-    return {result, ec};
+    return {static_cast<u8>(result), ec};
 }
 
 template<typename T>
@@ -164,19 +183,9 @@ Errc convert(char const* first, char const* last, T& dest)
 }
 
 template<typename T>
-T parse(std::csub_match const& sub)
+auto parse(std::csub_match const& sub)
 {
     if (auto [v, ec] = convert<T>(sub.first, sub.second); ec == Errc::OK)
-    {
-        return v;
-    }
-    throw error::ConversionError();
-}
-
-template<typename T>
-T parseHex(std::csub_match const& sub)
-{
-    if (auto [v, ec] = convert<T>(sub.first, sub.second, 16); ec == Errc::OK)
     {
         return v;
     }
