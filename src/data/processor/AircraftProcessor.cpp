@@ -26,9 +26,11 @@
 #include <limits>
 
 #include "util/math.hpp"
+#include "util/string_utils.hpp"
 #include "util/utility.hpp"
 
 using namespace vfrb::object;
+using namespace vfrb::str_util;
 
 namespace vfrb::data::processor
 {
@@ -87,7 +89,7 @@ usize AircraftProcessor::appendPFLAU(Aircraft& aircraft, usize pos) const
 {
     int next = (*aircraft).format(pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::doubleToInt(m_relBearing),
                                   m_relVertical, m_distance, (*aircraft.id()).data());
-    next += (*aircraft).format(pos, "%02x\r\n", math::checksum(**aircraft, pos));
+    next += (*aircraft).format(pos, "%02x\r\n", checksum(**aircraft, pos));
     return pos + static_cast<usize>(next);
 }
 
@@ -114,7 +116,7 @@ usize AircraftProcessor::appendPFLAA(Aircraft& aircraft, usize pos) const
             (*aircraft).format(pos, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
                                (*aircraft.id()).data(), util::raw_type(aircraft.aircraftType()));
     }
-    next += (*aircraft).format(pos, "%02x\r\n", math::checksum(**aircraft, pos));
+    next += (*aircraft).format(pos, "%02x\r\n", checksum(**aircraft, pos));
     return pos + static_cast<usize>(next);
 }
 }  // namespace vfrb::data::processor

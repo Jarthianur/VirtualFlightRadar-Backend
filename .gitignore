@@ -5,6 +5,7 @@
 !/test/
 !/src/
 !/include/
+!/profiling/
 !/docs/
 !.github/**
 !/docs/_includes/**

@@ -21,11 +21,10 @@
 
 #include "feed/parser/AtmosphereParser.h"
 
-#include <stdexcept>
-
-#include "util/math.hpp"
+#include "util/string_utils.hpp"
 
 using namespace vfrb::object;
+using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
@@ -33,24 +32,35 @@ Atmosphere AtmosphereParser::unpack(str&& sentence, u32 priority) const
 {
     try
     {
-        if ((std::stoi(sentence.substr(sentence.rfind('*') + 1, 2), nullptr, 16) ==
-             math::checksum({sentence.c_str(), sentence.length()}, 0)) &&
-            (sentence.find("MDA") != str::npos))
+        if (matchChecksum({sentence.c_str(), sentence.length()}) && sentence.find("MDA") != str::npos)
         {
-            usize tmpB   = sentence.find('B') - 1;
-            usize tmpS   = sentence.substr(0, tmpB).find_last_of(',') + 1;
-            usize subLen = tmpB - tmpS;
-            usize numIdx;
-            f64   tmpPress = std::stod(sentence.substr(tmpS, subLen), &numIdx) * 1000.0;
-            if (numIdx == subLen)
+            usize tmpB;
+            if ((tmpB = sentence.find('B')) != str::npos)
             {
-                Atmosphere atmos{priority, tmpPress};
+                --tmpB;
+            }
+            else
+            {
+                throw error::UnpackError();
+            }
+            usize tmpS;
+            if ((tmpS = std::string_view(sentence.c_str(), tmpB).find_last_of(',')) != str::npos)
+            {
+                ++tmpS;
+            }
+            else
+            {
+                throw error::UnpackError();
+            }
+            if (auto [v, ec] = convert<f64>(sentence.c_str() + tmpS, sentence.c_str() + tmpB); ec == Errc::OK)
+            {
+                Atmosphere atmos{priority, v * 1000.0};
                 *atmos = std::move(sentence);
                 return atmos;
             }
         }
     }
-    catch ([[maybe_unused]] std::logic_error const&)
+    catch ([[maybe_unused]] str_util::error::ConversionError const&)
     {}
     throw error::UnpackError();
 }

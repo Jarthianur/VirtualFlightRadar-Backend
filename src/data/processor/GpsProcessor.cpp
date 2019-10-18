@@ -25,8 +25,10 @@
 #include <cstdio>
 
 #include "util/math.hpp"
+#include "util/string_utils.hpp"
 
 using namespace vfrb::object;
+using namespace vfrb::str_util;
 
 namespace vfrb::data::processor
 {
@@ -50,7 +52,7 @@ usize GpsProcessor::appendGPGGA(GpsPosition& position, std::tm const* utc, usize
         utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude,
         m_minLongitude, m_directionEW, /*pos.fixQa,*/ position.nrOfSatellites(), position.location().altitude,
         math::saturate(position.geoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
-    next += (*position).format(pos, "%02x\r\n", math::checksum(**position, pos));
+    next += (*position).format(pos, "%02x\r\n", checksum(**position, pos));
     return pos + static_cast<usize>(next);
 }
 
@@ -60,7 +62,7 @@ usize GpsProcessor::appendGPRMC(GpsPosition& position, std::tm const* utc, usize
         pos, "$GPRMC,%.2d%.2d%.2d,A,%02.0lf%06.3lf,%c,%03.0lf%06.3lf,%c,0,0,%.2d%.2d%.2d,001.0,W*",
         utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude,
         m_minLongitude, m_directionEW, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
-    next += (*position).format(pos, "%02x\r\n", math::checksum(**position, pos));
+    next += (*position).format(pos, "%02x\r\n", checksum(**position, pos));
     return pos + static_cast<usize>(next);
 }
 

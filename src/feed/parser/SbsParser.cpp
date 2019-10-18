@@ -22,12 +22,13 @@
 #include "feed/parser/SbsParser.h"
 
 #include <limits>
-#include <stdexcept>
 
 #include "object/GpsPosition.h"
 #include "util/math.hpp"
+#include "util/string_utils.hpp"
 
 using namespace vfrb::object;
+using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
@@ -37,10 +38,10 @@ SbsParser::SbsParser() : Parser<Aircraft>() {}
 
 Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
 {
-    u32                                i = 2;
-    Location                           loc;
-    str                                id;
-    Timestamp<time::DateTimeImplBoost> ts;
+    u32              i = 2;
+    Location         loc;
+    std::string_view id;
+    Timestamp        ts;
 
     try
     {
@@ -52,22 +53,42 @@ Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
                 switch (i)
                 {
                     case SBS_FIELD_ID:
-                        id = sentence.substr(p, delim - p);
-                        if (id.size() >= Aircraft::ID_SIZE)
+                        id = std::string_view(sentence.c_str() + p, delim - p);
+                        if (id.size() != Aircraft::ID_LEN)
                         {
                             throw error::UnpackError();
                         }
                         break;
                     case SBS_FIELD_TIME:
-                        ts = Timestamp<time::DateTimeImplBoost>(sentence.substr(p, delim - p),
-                                                                time::Format::HH_MM_SS_FFF);
+                        ts = Timestamp(std::string_view(sentence.c_str() + p, delim - p));
                         break;
                     case SBS_FIELD_ALT:
-                        loc.altitude =
-                            math::doubleToInt(std::stod(sentence.substr(p, delim - p)) * math::FEET_2_M);
+                        if (auto [v, ec] = convert<f64>(sentence.c_str() + p, sentence.c_str() + delim);
+                            ec == Errc::OK)
+                        {
+                            loc.altitude = math::doubleToInt(v * math::FEET_2_M);
+                        }
+                        else
+                        {
+                            throw error::UnpackError();
+                        }
                         break;
-                    case SBS_FIELD_LAT: loc.latitude = std::stod(sentence.substr(p, delim - p)); break;
-                    case SBS_FIELD_LON: loc.longitude = std::stod(sentence.substr(p, delim - p)); break;
+                    case SBS_FIELD_LAT:
+                        if (auto ec =
+                                convert<f64>(sentence.c_str() + p, sentence.c_str() + delim, loc.latitude);
+                            ec == Errc::ERR)
+                        {
+                            throw error::UnpackError();
+                        }
+                        break;
+                    case SBS_FIELD_LON:
+                        if (auto ec =
+                                convert<f64>(sentence.c_str() + p, sentence.c_str() + delim, loc.longitude);
+                            ec == Errc::ERR)
+                        {
+                            throw error::UnpackError();
+                        }
+                        break;
                     default: break;
                 }
                 p = delim + 1;
@@ -79,8 +100,6 @@ Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
             return {priority, id, Aircraft::IdType::ICAO, Aircraft::AircraftType::POWERED_AIRCRAFT, loc, ts};
         }
     }
-    catch ([[maybe_unused]] std::logic_error const&)
-    {}
     catch ([[maybe_unused]] object::error::TimestampParseError const&)
     {}
     throw error::UnpackError();

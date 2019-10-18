@@ -55,12 +55,24 @@ class CString
 
     void copy(std::string_view const& sv)
     {
-        if (sv.length() > N)
+        usize len = sv.length();
+        if (len > N)
         {
             throw error::OverflowError();
         }
-        std::copy_n(sv.cbegin(), sv.length(), m_data.begin());
-        m_view = std::string_view(m_data.data(), sv.length());
+        std::copy_n(sv.cbegin(), len, m_data.begin());
+        if (m_data[len - 1] != '\0')
+        {
+            if (len < N)
+            {
+                m_data[len++] = '\0';
+            }
+            else
+            {
+                throw error::OverflowError();
+            }
+        }
+        m_view = std::string_view(m_data.data(), len);
     }
 
     void copy(CString const& other)

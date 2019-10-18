@@ -27,8 +27,8 @@
 
 namespace vfrb::object
 {
-Aircraft::Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
-                   Movement const& move, Timestamp<time::DateTimeImplBoost> const& timestamp)
+Aircraft::Aircraft(u32 priority, std::string_view const& id, IdType idT, AircraftType aT, Location const& loc,
+                   Movement const& move, Timestamp const& timestamp)
     : Object(priority),
       m_id(id),
       m_idType(idT > IdType::OGN ? IdType::RANDOM : idT),
@@ -43,8 +43,8 @@ Aircraft::Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Loc
     util::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
 }
 
-Aircraft::Aircraft(u32 priority, str const& id, IdType idT, AircraftType aT, Location const& loc,
-                   Timestamp<time::DateTimeImplBoost> const& timestamp)
+Aircraft::Aircraft(u32 priority, std::string_view const& id, IdType idT, AircraftType aT, Location const& loc,
+                   Timestamp const& timestamp)
     : Aircraft(priority, id, idT, aT, loc, {.0, .0, .0}, timestamp)
 {
     m_targetType = TargetType::TRANSPONDER;

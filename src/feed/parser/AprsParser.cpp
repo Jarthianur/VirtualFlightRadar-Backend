@@ -25,65 +25,62 @@
 #include <limits>
 #include <stdexcept>
 
-#include "object/Timestamp.hpp"
-#include "object/impl/DateTimeImplBoost.h"
+#include "object/Timestamp.h"
 #include "util/math.hpp"
+#include "util/string_utils.hpp"
 
 using namespace vfrb::object;
+using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
-boost::regex const AprsParser::s_APRS_RE(
-    "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/(\\d{6})h(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?([\\S\\s]+?)$",
-    boost::regex::optimize | boost::regex::icase);
-
-boost::regex const AprsParser::s_APRSExtRE(
-    "^(?:[\\S\\s]+?)?id([0-9A-F]{2})([0-9A-F]{6})\\s?(?:([\\+-]\\d{3})fpm\\s+?)?(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",
-    boost::regex::optimize | boost::regex::icase);
+std::regex const AprsParser::s_APRS_RE("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/"
+                                       "(\\d{6})h"                               // time
+                                       "(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?"       // lat, lat-dir
+                                       "(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?"       // lon, lon-dir
+                                       "(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?"  // head.gnd-spd,alt
+                                       "(?:[\\S\\s]+?)?"
+                                       "id([0-9A-F]{2})([0-9A-F]{6})\\s?"                // type,id
+                                       "(?:([\\+-]\\d{3})fpm\\s+?)?"                     // climb
+                                       "(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",  // turn
+                                       std::regex::optimize | std::regex::icase);
 
 s32 AprsParser::s_maxHeight = std::numeric_limits<s32>::max();
 
 Aircraft AprsParser::unpack(str&& sentence, u32 priority) const
 {
-    boost::smatch match, com_match;
-    if ((!sentence.empty() && sentence[0] == '#') || !boost::regex_match(sentence, match, s_APRS_RE) ||
-        !boost::regex_match(match.str(RE_APRS_COM), com_match, s_APRSExtRE))
+    std::cmatch match;
+    if ((!sentence.empty() && sentence[0] == '#') || !std::regex_match(sentence.c_str(), match, s_APRS_RE))
     {
         throw error::UnpackError();
     }
     try
     {
-        auto [id, idT, aT] = parseComment(com_match);
+        auto [id, idT, aT] = parseComment(match);
         // relies on TargetType::FLARM in ctor
-        return {priority,
-                id,
-                idT,
-                aT,
-                parseLocation(match),
-                parseMovement(match, com_match),
-                parseTimeStamp(match)};
+        return {priority, id, idT, aT, parseLocation(match), parseMovement(match), parseTimeStamp(match)};
     }
-    catch ([[maybe_unused]] std::logic_error const&)
+    catch ([[maybe_unused]] str_util::error::ConversionError const&)
     {}
     catch ([[maybe_unused]] object::error::TimestampParseError const&)
     {}
     throw error::UnpackError();
 }
 
-Location AprsParser::parseLocation(boost::smatch const& match) const
+Location AprsParser::parseLocation(std::cmatch const& match) const
 {
     Location pos;
-    pos.latitude = math::dmToDeg(std::stod(match.str(RE_APRS_LAT)));
-    if (match.str(RE_APRS_LAT_DIR).compare("S") == 0)
+    pos.latitude = math::dmToDeg(parse<f64>(match[RE_APRS_LAT]));
+    if (to_str_view(match[RE_APRS_LAT_DIR]) == "S")
     {
         pos.latitude = -pos.latitude;
     }
-    pos.longitude = math::dmToDeg(std::stod(match.str(RE_APRS_LON)));
-    if (match.str(RE_APRS_LON_DIR).compare("W") == 0)
+    pos.longitude = math::dmToDeg(parse<f64>(match[RE_APRS_LON]));
+    if (to_str_view(match[RE_APRS_LON_DIR]) == "W")
     {
         pos.longitude = -pos.longitude;
     }
-    pos.altitude = math::doubleToInt(std::stod(match.str(RE_APRS_ALT)) * math::FEET_2_M);
+    pos.altitude = math::doubleToInt(parse<f64>(match[RE_APRS_ALT]) * math::FEET_2_M);
     if (pos.altitude <= s_maxHeight)
     {
         return pos;
@@ -91,23 +88,22 @@ Location AprsParser::parseLocation(boost::smatch const& match) const
     throw error::UnpackError();
 }
 
-AprsParser::AircraftInfo AprsParser::parseComment(boost::smatch const& match) const
+AprsParser::AircraftInfo AprsParser::parseComment(std::cmatch const& match) const
 {
-    return {match.str(RE_APRS_COM_ID),
-            static_cast<Aircraft::IdType>(std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x03),
-            static_cast<Aircraft::AircraftType>(
-                (std::stoi(match.str(RE_APRS_COM_TYPE), nullptr, 16) & 0x7C) >> 2)};
+    return {to_str_view(match[RE_APRS_ID]),
+            static_cast<Aircraft::IdType>(parse<x32>(match[RE_APRS_TYPE]) & 0x03),
+            static_cast<Aircraft::AircraftType>((parse<x32>(match[RE_APRS_TYPE]) & 0x7C) >> 2)};
 }
 
-Aircraft::Movement AprsParser::parseMovement(boost::smatch const& match, boost::smatch const& comMatch) const
+Aircraft::Movement AprsParser::parseMovement(std::cmatch const& match) const
 {
     // This needs to be split later to parse independently.
-    return {std::stod(match.str(RE_APRS_HEAD)), std::stod(match.str(RE_APRS_GND_SPD)) * math::KTS_2_MS,
-            std::max(-10000.0, std::min(10000.0, std::stod(comMatch.str(RE_APRS_COM_CR)) * math::FPM_2_MS))};
+    return {parse<f64>(match[RE_APRS_HEAD]), parse<f64>(match[RE_APRS_GND_SPD]) * math::KTS_2_MS,
+            std::max(-10000.0, std::min(10000.0, parse<f64>(match[RE_APRS_CR]) * math::FPM_2_MS))};
 }
 
-Timestamp<time::DateTimeImplBoost> AprsParser::parseTimeStamp(boost::smatch const& match) const
+Timestamp AprsParser::parseTimeStamp(std::cmatch const& match) const
 {
-    return Timestamp<time::DateTimeImplBoost>(match.str(RE_APRS_TIME), time::Format::HHMMSS);
+    return Timestamp(to_str_view(match[RE_APRS_TIME]));
 }
 }  // namespace vfrb::feed::parser

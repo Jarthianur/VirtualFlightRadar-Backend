@@ -21,11 +21,10 @@
 
 #pragma once
 
-#include "impl/DateTimeImplBoost.h"
 #include "util/CString.hpp"
 
 #include "Object.h"
-#include "Timestamp.hpp"
+#include "Timestamp.h"
 #include "types.h"
 
 namespace vfrb::object
@@ -58,13 +57,13 @@ public:
     inline static constexpr auto MIN_GEOID = -108.0;
 
 private:
-    Location                           m_location;        ///< The location
-    f64                                m_geoid;           ///< The geoid separation
-    f64                                m_dilution;        ///< The position dilution
-    u8                                 m_nrOfSatellites;  ///< The number of satellites
-    s8                                 m_fixQuality;      ///< The GPS fix quality
-    Timestamp<time::DateTimeImplBoost> m_timestamp;       ///< The timestamp of this position
-    util::CString<NMEA_SIZE>           m_nmea;
+    Location                 m_location;        ///< The location
+    f64                      m_geoid;           ///< The geoid separation
+    f64                      m_dilution;        ///< The position dilution
+    u8                       m_nrOfSatellites;  ///< The number of satellites
+    s8                       m_fixQuality;      ///< The GPS fix quality
+    Timestamp                m_timestamp;       ///< The timestamp of this position
+    util::CString<NMEA_SIZE> m_nmea;
 
     /**
      * @brief Override Object::assign.
@@ -84,7 +83,7 @@ public:
      * @param geoid    The geoid
      */
     GpsPosition(u32 priority, Location const& location, f64 geoid, f64 dilution, u8 satellites, s8 quality,
-                Timestamp<time::DateTimeImplBoost> const& timestamp);
+                Timestamp const& timestamp);
     ~GpsPosition() noexcept override = default;
 
     util::CString<NMEA_SIZE>& operator*();

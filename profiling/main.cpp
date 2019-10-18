@@ -19,31 +19,15 @@
  }
  */
 
-#pragma once
+#include "profiler.hpp"
 
-#include "types.h"
+using namespace vfrb::profiling;
 
-namespace vfrb::object::time
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-/**
- * @brief Provide time functions using boost.
- */
-class DateTimeImplBoost
-{
-public:
-    DateTimeImplBoost()           = default;
-    ~DateTimeImplBoost() noexcept = default;
-
-    /**
-     * @brief Get the amount of milliseconds since 00:00 UTC.
-     * @return the milliseconds
-     */
-    static s64 now();
-
-    /**
-     * @brief Get the current day as incremental number.
-     * @return the current day
-     */
-    static u32 day();
-};
-}  // namespace vfrb::object::time
+    std::for_each(ProfilerBuilder::profilers().begin(), ProfilerBuilder::profilers().end(), [](auto& p) {
+        p.second.run();
+        p.second.print(TimeVal::MICROS);
+    });
+    return 0;
+}
