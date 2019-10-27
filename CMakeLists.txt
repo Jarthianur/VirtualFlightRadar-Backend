@@ -47,7 +47,7 @@ find_package(Threads REQUIRED)
 #
 add_executable(release ${vfrb_sources})
 set_target_properties(release PROPERTIES OUTPUT_NAME ${vfrb_prod_bin})
-target_compile_options(release PUBLIC -O3 -DNDEBUG -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
+target_compile_options(release PUBLIC -O2 -DNDEBUG -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
 target_include_directories(release PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(release PUBLIC Boost::regex Boost::system Boost::program_options Threads::Threads)
 
