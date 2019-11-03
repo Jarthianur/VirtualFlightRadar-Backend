@@ -71,6 +71,11 @@ auto Feed::name() const -> decltype(m_name) const&
     return m_name;
 }
 
+auto Feed::priority() const -> std::remove_const<decltype(m_priority)>::type
+{
+    return m_priority;
+}
+
 namespace error
 {
 InvalidPropertyError::InvalidPropertyError(str const& msg) : m_msg(msg) {}
