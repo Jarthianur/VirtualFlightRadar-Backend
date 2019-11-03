@@ -27,7 +27,13 @@ class Object;
 
 namespace vfrb::data
 {
-using AccessFn = std::function<void(object::Object const&)>;
+struct Accessor
+{
+    object::Object const& obj;
+    std::string_view      nmea;
+};
+
+using AccessFn = std::function<void(Accessor const&)>;
 
 /**
  * @brief The Data interface

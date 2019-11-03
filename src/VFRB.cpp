@@ -51,19 +51,19 @@ static auto const& logger = Logger::instance();
 
 VFRB::VFRB(s_ptr<Configuration> config)
     : m_aircraftData(std::make_shared<AircraftData>(
-          [this](Object const& it) {
-              if (it.updateAge() < Object::OUTDATED)
+          [this](Accessor const& it) {
+              if (it.obj.updateAge() < Object::OUTDATED)
               {
-                  m_server.send(it.nmea());
+                  m_server.send(it.nmea);
               }
           },
           config->maxDistance)),
       m_atmosphereData(
-          std::make_shared<AtmosphereData>([this](Object const& it) { m_server.send(it.nmea()); },
+          std::make_shared<AtmosphereData>([this](Accessor const& it) { m_server.send(it.nmea); },
                                            object::Atmosphere{0, config->atmPressure})),
-      m_gpsData(std::make_shared<GpsData>([this](Object const& it) { m_server.send(it.nmea()); },
+      m_gpsData(std::make_shared<GpsData>([this](Accessor const& it) { m_server.send(it.nmea); },
                                           config->gpsPosition, config->groundMode)),
-      m_windData(std::make_shared<WindData>([this](Object const& it) { m_server.send(it.nmea()); })),
+      m_windData(std::make_shared<WindData>([this](Accessor const& it) { m_server.send(it.nmea); })),
       m_server(config->serverPort),
       m_running(false)
 {

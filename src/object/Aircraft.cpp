@@ -90,16 +90,6 @@ bool Aircraft::canUpdate(Object const& other) const
     }
 }
 
-std::string_view Aircraft::nmea() const
-{
-    return m_nmea;
-}
-
-util::CString<Aircraft::NMEA_SIZE>& Aircraft::operator*()
-{
-    return m_nmea;
-}
-
 Aircraft& Aircraft::operator=(Aircraft&& other)
 {
     tryUpdate(std::move(other));

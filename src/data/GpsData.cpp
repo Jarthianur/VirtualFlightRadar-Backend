@@ -26,9 +26,10 @@ using namespace vfrb::object;
 namespace vfrb::data
 {
 GpsData::GpsData(AccessFn&& fn, GpsPosition const& position, bool ground)
-    : Data(std::move(fn)), m_position(position), m_groundMode(ground)
+    : Data(std::move(fn)), m_position(std::make_tuple(position, "")), m_groundMode(ground)
 {
-    m_processor.process(m_position);
+    auto& [pos, cstr] = m_position;
+    m_processor.process(pos, cstr);
 }
 
 void GpsData::access()
@@ -36,10 +37,11 @@ void GpsData::access()
     std::lock_guard lk(m_mutex);
     try
     {
-        m_processor.process(m_position);
-        m_accessFn(++m_position);
+        auto& [pos, cstr] = m_position;
+        m_processor.process(pos, cstr);
+        m_accessFn({++pos, cstr});
     }
-    catch (vfrb::error::Error const&)
+    catch ([[maybe_unused]] vfrb::error::Error const&)
     {}
 }
 
@@ -50,10 +52,11 @@ bool GpsData::update(Object&& position)
     {
         throw error::PositionAlreadyLocked();
     }
-    bool updated = m_position.tryUpdate(std::move(position));
+    auto& [pos, cstr] = m_position;
+    bool updated      = pos.tryUpdate(std::move(position));
     if (updated)
     {
-        m_processor.process(m_position);
+        m_processor.process(pos, cstr);
         if (m_groundMode && isPositionGood())
         {
             throw error::ReceivedGoodPosition();
@@ -62,16 +65,17 @@ bool GpsData::update(Object&& position)
     return updated;
 }
 
-auto GpsData::location() const -> decltype(m_position.location())
+auto GpsData::location() const -> decltype(std::get<0>(m_position).location())
 {
     std::lock_guard lk(m_mutex);
-    return m_position.location();
+    return std::get<0>(m_position).location();
 }
 
 bool GpsData::isPositionGood() const
 {
-    return m_position.nrOfSatellites() >= GPS_NR_SATS_GOOD && m_position.fixQuality() >= GPS_FIX_GOOD &&
-           m_position.dilution() <= GPS_HOR_DILUTION_GOOD;
+    auto const& pos = std::get<0>(m_position);
+    return pos.nrOfSatellites() >= GPS_NR_SATS_GOOD && pos.fixQuality() >= GPS_FIX_GOOD &&
+           pos.dilution() <= GPS_HOR_DILUTION_GOOD;
 }
 
 namespace error

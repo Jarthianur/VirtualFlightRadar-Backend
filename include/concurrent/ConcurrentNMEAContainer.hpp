@@ -25,6 +25,7 @@
 #include <mutex>
 #include <utility>
 
+#include "util/CString.hpp"
 #include "util/class_utils.h"
 
 #include "types.h"
@@ -35,12 +36,12 @@ namespace vfrb::concurrent
  * @brief Internal container for aircrafts.
  * Allows concurrent access to elements.
  */
-template<typename T>
-class ConcurrentContainer
+template<typename T, usize NMEA_SIZE>
+class ConcurrentNMEAContainer
 {
 public:
-    ConcurrentContainer()           = default;
-    ~ConcurrentContainer() noexcept = default;
+    ConcurrentNMEAContainer()           = default;
+    ~ConcurrentNMEAContainer() noexcept = default;
 
     struct Iterator;
 
@@ -57,10 +58,11 @@ public:
 
         ValueType& operator=(ValueType&& other);
 
-        T value;
+        T                        value;
+        util::CString<NMEA_SIZE> nmea;
 
     protected:
-        friend struct ConcurrentContainer::Iterator;
+        friend struct ConcurrentNMEAContainer::Iterator;
         std::mutex mutable mutex;
     };
 
@@ -75,11 +77,11 @@ public:
     {
         NOT_COPYABLE(Iterator)
 
-        explicit Iterator(ConcurrentContainer& c);
+        explicit Iterator(ConcurrentNMEAContainer& c);
 
         Iterator(Iterator&& other);
 
-        Iterator(typename ContainerType::iterator iter, ConcurrentContainer const& c);
+        Iterator(typename ContainerType::iterator iter, ConcurrentNMEAContainer const& c);
 
         Iterator& operator=(Iterator&& other);
 
@@ -98,7 +100,7 @@ public:
     protected:
         typename ContainerType::iterator iterator;
         std::unique_lock<std::mutex>     valueLock;
-        ConcurrentContainer const&       container;
+        ConcurrentNMEAContainer const&   container;
     };
 
     Iterator begin();
@@ -114,34 +116,36 @@ private:
     std::mutex mutable m_modMutex;
 };
 
-template<typename T>
-ConcurrentContainer<T>::ValueType::ValueType(T&& val) : value(std::move(val))
+template<typename T, usize NMEA_SIZE>
+ConcurrentNMEAContainer<T, NMEA_SIZE>::ValueType::ValueType(T&& val) : value(std::move(val))
 {}
 
-template<typename T>
-ConcurrentContainer<T>::ValueType::ValueType(ValueType&& other) : value(std::move(other.value))
+template<typename T, usize NMEA_SIZE>
+ConcurrentNMEAContainer<T, NMEA_SIZE>::ValueType::ValueType(ValueType&& other)
+    : value(std::move(other.value)), nmea(other.nmea)
 {}
 
-template<typename T>
-auto ConcurrentContainer<T>::ValueType::operator=(ValueType&& other) -> ValueType&
+template<typename T, usize NMEA_SIZE>
+auto ConcurrentNMEAContainer<T, NMEA_SIZE>::ValueType::operator=(ValueType&& other) -> ValueType&
 {
     value = std::move(other.value);
+    nmea  = other.nmea;
     return *this;
 }
 
-template<typename T>
-ConcurrentContainer<T>::Iterator::Iterator(ConcurrentContainer<T>& c)
+template<typename T, usize NMEA_SIZE>
+ConcurrentNMEAContainer<T, NMEA_SIZE>::Iterator::Iterator(ConcurrentNMEAContainer<T, NMEA_SIZE>& c)
     : iterator(c.m_container.end()), container(c)
 {}
 
-template<typename T>
-ConcurrentContainer<T>::Iterator::Iterator(Iterator&& other)
+template<typename T, usize NMEA_SIZE>
+ConcurrentNMEAContainer<T, NMEA_SIZE>::Iterator::Iterator(Iterator&& other)
     : iterator(std::move(other.iterator)), valueLock(std::move(other.valueLock)), container(other.container)
 {}
 
-template<typename T>
-ConcurrentContainer<T>::Iterator::Iterator(typename ContainerType::iterator iter,
-                                           ConcurrentContainer const&       c)
+template<typename T, usize NMEA_SIZE>
+ConcurrentNMEAContainer<T, NMEA_SIZE>::Iterator::Iterator(typename ContainerType::iterator iter,
+                                                          ConcurrentNMEAContainer const&   c)
     : iterator(iter), container(c)
 {
     if (iterator != container.m_container.end())
@@ -150,16 +154,16 @@ ConcurrentContainer<T>::Iterator::Iterator(typename ContainerType::iterator iter
     }
 }
 
-template<typename T>
-auto ConcurrentContainer<T>::Iterator::operator=(Iterator&& other) -> Iterator&
+template<typename T, usize NMEA_SIZE>
+auto ConcurrentNMEAContainer<T, NMEA_SIZE>::Iterator::operator=(Iterator&& other) -> Iterator&
 {
     iterator  = std::move(other.iterator);
     valueLock = std::move(other.valueLock);
     container = other.container;
 }
 
-template<typename T>
-auto ConcurrentContainer<T>::Iterator::operator++() -> Iterator&
+template<typename T, usize NMEA_SIZE>
+auto ConcurrentNMEAContainer<T, NMEA_SIZE>::Iterator::operator++() -> Iterator&
 {
     if (iterator != container.m_container.end())
     {
@@ -173,51 +177,51 @@ auto ConcurrentContainer<T>::Iterator::operator++() -> Iterator&
     return *this;
 }
 
-template<typename T>
-auto ConcurrentContainer<T>::Iterator::operator*() -> ValueType&
+template<typename T, usize NMEA_SIZE>
+auto ConcurrentNMEAContainer<T, NMEA_SIZE>::Iterator::operator*() -> ValueType&
 {
     return iterator->second;
 }
 
-template<typename T>
-auto ConcurrentContainer<T>::Iterator::operator-> () -> ValueType*
+template<typename T, usize NMEA_SIZE>
+auto ConcurrentNMEAContainer<T, NMEA_SIZE>::Iterator::operator-> () -> ValueType*
 {
     return &iterator->second;
 }
 
-template<typename T>
-auto ConcurrentContainer<T>::Iterator::key() const -> KeyType
+template<typename T, usize NMEA_SIZE>
+auto ConcurrentNMEAContainer<T, NMEA_SIZE>::Iterator::key() const -> KeyType
 {
     return iterator->first;
 }
 
-template<typename T>
-bool ConcurrentContainer<T>::Iterator::operator==(Iterator const& other) const
+template<typename T, usize NMEA_SIZE>
+bool ConcurrentNMEAContainer<T, NMEA_SIZE>::Iterator::operator==(Iterator const& other) const
 {
     return iterator == other.iterator;
 }
 
-template<typename T>
-bool ConcurrentContainer<T>::Iterator::operator!=(Iterator const& other) const
+template<typename T, usize NMEA_SIZE>
+bool ConcurrentNMEAContainer<T, NMEA_SIZE>::Iterator::operator!=(Iterator const& other) const
 {
     return iterator != other.iterator;
 }
 
-template<typename T>
-auto ConcurrentContainer<T>::begin() -> Iterator
+template<typename T, usize NMEA_SIZE>
+auto ConcurrentNMEAContainer<T, NMEA_SIZE>::begin() -> Iterator
 {
     std::lock_guard lk(m_modMutex);
     return Iterator(m_container.begin(), *this);
 }
 
-template<typename T>
-auto ConcurrentContainer<T>::end() -> Iterator
+template<typename T, usize NMEA_SIZE>
+auto ConcurrentNMEAContainer<T, NMEA_SIZE>::end() -> Iterator
 {
     return Iterator(*this);
 }
 
-template<typename T>
-auto ConcurrentContainer<T>::insert(KeyType key, T&& value) -> std::pair<Iterator, bool>
+template<typename T, usize NMEA_SIZE>
+auto ConcurrentNMEAContainer<T, NMEA_SIZE>::insert(KeyType key, T&& value) -> std::pair<Iterator, bool>
 {
     std::lock_guard lk(m_modMutex);
     Iterator        iter(m_container.find(key), *this);
@@ -229,8 +233,8 @@ auto ConcurrentContainer<T>::insert(KeyType key, T&& value) -> std::pair<Iterato
     return std::make_pair(std::move(iter), false);
 }
 
-template<typename T>
-void ConcurrentContainer<T>::erase(KeyType key)
+template<typename T, usize NMEA_SIZE>
+void ConcurrentNMEAContainer<T, NMEA_SIZE>::erase(KeyType key)
 {
     std::lock_guard lk(m_modMutex);
     auto            entry = m_container.find(key);

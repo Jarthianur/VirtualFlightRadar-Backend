@@ -22,6 +22,7 @@
 #pragma once
 
 #include <mutex>
+#include <tuple>
 
 #include "error/Error.hpp"
 #include "object/GpsPosition.h"
@@ -40,11 +41,12 @@ class GpsData : public Data
     inline static constexpr auto GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
     inline static constexpr auto GPS_FIX_GOOD          = 1;    ///< Good fix quality
     inline static constexpr auto GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
+    inline static constexpr auto NMEA_SIZE             = processor::GpsProcessor::NMEA_SIZE;
 
-    object::GpsPosition     m_position;                ///< The position
-    processor::GpsProcessor m_processor;               ///< Processor for GPS information
-    bool                    m_positionLocked = false;  ///< Locking state of the current position
-    bool                    m_groundMode     = false;  ///< Ground mode state
+    std::tuple<object::GpsPosition, util::CString<NMEA_SIZE>> m_position;   ///< The position
+    processor::GpsProcessor                                   m_processor;  ///< Processor for GPS information
+    bool m_positionLocked = false;  ///< Locking state of the current position
+    bool m_groundMode     = false;  ///< Ground mode state
     std::mutex mutable m_mutex;
 
     /**
@@ -77,7 +79,7 @@ public:
      * @return the position
      * @threadsafe
      */
-    auto location() const -> decltype(m_position.location());
+    auto location() const -> decltype(std::get<0>(m_position).location());
 };
 
 namespace error

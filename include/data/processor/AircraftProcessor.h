@@ -24,7 +24,6 @@
 #include "object/Aircraft.h"
 #include "object/GpsPosition.h"
 
-#include "Processor.hpp"
 #include "types.h"
 
 namespace vfrb::data::processor
@@ -32,8 +31,12 @@ namespace vfrb::data::processor
 /**
  * @brief Process aircrafts to NMEA relative to the refered position.
  */
-class AircraftProcessor : public Processor<object::Aircraft>
+class AircraftProcessor
 {
+public:
+    inline static constexpr auto NMEA_SIZE = 192;
+
+private:
     s32 const        m_maxDistance;               ///< Max distance to process an aircraft
     object::Location m_refLocation{0.0, 0.0, 0};  ///< Refered position
     f64              m_refAtmPressure = 1013.25;  ///< Refered pressure; hPa
@@ -60,24 +63,24 @@ class AircraftProcessor : public Processor<object::Aircraft>
      * @brief Append PFLAU sentence to processing string.
      * @param aircraft The Aircaft
      */
-    usize appendPFLAU(object::Aircraft& aircraft, usize pos) const;
+    usize appendPFLAU(object::Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea, usize pos) const;
 
     /**
      * @brief Append PFLAA sentence to processing string.
      * @param aircraft The Aircaft
      */
-    usize appendPFLAA(object::Aircraft& aircraft, usize pos) const;
+    usize appendPFLAA(object::Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea, usize pos) const;
 
 public:
     AircraftProcessor();
     explicit AircraftProcessor(s32 maxDist);  ///< @param maxDist The max distance filter
-    ~AircraftProcessor() noexcept override = default;
+    ~AircraftProcessor() noexcept = default;
 
     /**
      * @brief Process an aircraft.
      * @param aircraft The Aircraft to process
      */
-    void process(object::Aircraft& aircraft) const override;
+    void process(object::Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea) const;
 
     /**
      * @brief Set the refered position and atmospheric pressure.

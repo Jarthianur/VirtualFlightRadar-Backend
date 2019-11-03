@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "concurrent/ConcurrentContainer.hpp"
+#include "concurrent/ConcurrentNMEAContainer.hpp"
 #include "object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
 
@@ -38,9 +38,11 @@ class AircraftData : public Data
     inline static constexpr auto NO_FLARM_THRESHOLD =
         object::Object::OUTDATED;                         ///< Times until FLARM status is removed
     inline static constexpr auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
+    inline static constexpr auto NMEA_SIZE        = processor::AircraftProcessor::NMEA_SIZE;
 
-    concurrent::ConcurrentContainer<object::Aircraft> m_container;  ///< Internal container for aircrafts
-    processor::AircraftProcessor                      m_processor;  ///< Processor for aircrafts
+    concurrent::ConcurrentNMEAContainer<object::Aircraft, NMEA_SIZE>
+                                 m_container;  ///< Internal container for aircrafts
+    processor::AircraftProcessor m_processor;  ///< Processor for aircrafts
 
 public:
     explicit AircraftData(AccessFn&& fn);

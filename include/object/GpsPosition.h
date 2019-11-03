@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "util/CString.hpp"
-
 #include "Object.h"
 #include "Timestamp.h"
 #include "types.h"
@@ -52,18 +50,16 @@ struct Location
 class GpsPosition : public Object
 {
 public:
-    inline static constexpr auto NMEA_SIZE = 192;
     inline static constexpr auto MAX_GEOID = 86.0;
     inline static constexpr auto MIN_GEOID = -108.0;
 
 private:
-    Location                 m_location;        ///< The location
-    f64                      m_geoid;           ///< The geoid separation
-    f64                      m_dilution;        ///< The position dilution
-    u8                       m_nrOfSatellites;  ///< The number of satellites
-    s8                       m_fixQuality;      ///< The GPS fix quality
-    Timestamp                m_timestamp;       ///< The timestamp of this position
-    util::CString<NMEA_SIZE> m_nmea;
+    Location  m_location;        ///< The location
+    f64       m_geoid;           ///< The geoid separation
+    f64       m_dilution;        ///< The position dilution
+    u8        m_nrOfSatellites;  ///< The number of satellites
+    s8        m_fixQuality;      ///< The GPS fix quality
+    Timestamp m_timestamp;       ///< The timestamp of this position
 
     /**
      * @brief Override Object::assign.
@@ -86,14 +82,11 @@ public:
                 Timestamp const& timestamp);
     ~GpsPosition() noexcept override = default;
 
-    util::CString<NMEA_SIZE>& operator*();
-
-    std::string_view nmea() const override;
-    auto             location() const -> decltype(m_location) const&;
-    auto             geoid() const -> decltype(m_geoid);
-    auto             timestamp() const -> decltype(m_timestamp) const&;
-    auto             dilution() const -> decltype(m_dilution);
-    auto             nrOfSatellites() const -> decltype(m_nrOfSatellites);
-    auto             fixQuality() const -> decltype(m_fixQuality);
+    auto location() const -> decltype(m_location) const&;
+    auto geoid() const -> decltype(m_geoid);
+    auto timestamp() const -> decltype(m_timestamp) const&;
+    auto dilution() const -> decltype(m_dilution);
+    auto nrOfSatellites() const -> decltype(m_nrOfSatellites);
+    auto fixQuality() const -> decltype(m_fixQuality);
 };
 }  // namespace vfrb::object

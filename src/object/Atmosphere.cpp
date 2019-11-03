@@ -45,11 +45,6 @@ void Atmosphere::assign(Object&& other)
     {}
 }
 
-std::string_view Atmosphere::nmea() const
-{
-    return {m_nmea.c_str(), m_nmea.size()};
-}
-
 auto Atmosphere::pressure() const -> decltype(m_pressure)
 {
     return m_pressure;
