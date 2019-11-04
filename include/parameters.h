@@ -34,25 +34,13 @@
 namespace vfrb::param
 {
 /**
- * Input-clients wait for this duration, in seconds, until
- * attempting a connect (reconnect).
- * [1 <= x]
- * This value depends on Your infrastructure.
- * E.g. if Your receivers run on different hosts, which get
- * turned on 1 hour after VFR-B, it is pointless to attempt connect
- * every second. As well as waiting 1 hour if all receivers are up
- * after 2 minutes.
- */
-inline constexpr auto CLIENT_CONNECT_WAIT_TIMEVAL = 120;
-
-/**
  * Due to unstable hardware/drivers, it became apparent that
  * it is necessary to timeout the wind-sensors input.
  * [1 <= x]
  * A good way is to set this value to 1.5 * Y, where
  * Y is the time interval the wind-sensor sends its data.
  */
-inline constexpr auto WINDCLIENT_RECEIVE_TIMEOUT = 5;
+inline constexpr auto WINDCLIENT_RECEIVE_TIMEOUT = 3;
 
 /**
  * Max amount of clients, which can connect to the VFR-B's
