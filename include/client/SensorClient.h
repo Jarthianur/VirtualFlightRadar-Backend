@@ -32,6 +32,8 @@ class SensorClient : public Client
 {
     NOT_COPYABLE(SensorClient)
 
+    inline static constexpr auto RECEIVE_TIMEOUT = 3;  ///< seconds
+
     /**
      * @brief Override Client::read, use timeout
      */

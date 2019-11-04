@@ -23,6 +23,7 @@
 
 #include <istream>
 #include <list>
+#include <tuple>
 
 #include "error/Error.hpp"
 #include "object/GpsPosition.h"
@@ -44,20 +45,15 @@ class Configuration final
      * @param properties The properties
      * @return the position
      */
-    object::GpsPosition resolvePosition(Properties const& properties) const;
-
-    /**
-     * @brief Resolve the server port.
-     * @param properties The properties
-     * @return the port number
-     */
-    u16 resolveServerPort(Properties const& properties) const;
+    object::GpsPosition resolvePosition() const;
 
     /**
      * @brief Resolve the feeds and their config.
      * @param properties The properties
      */
-    std::unordered_map<str, Properties> resolveFeeds(Properties const& properties);
+    std::unordered_map<str, Properties> resolveFeeds() const;
+
+    std::list<str> resolveFeedNames() const;
 
     /**
      * @brief Resolve a filter value.
@@ -66,7 +62,7 @@ class Configuration final
      * @param path       The filter key
      * @return the filter value
      */
-    s32 resolveFilter(Properties const& properties, char const* key) const;
+    s32 resolveFilter(char const* key) const;
 
     /**
      * @brief Dump the current config state as info log.
@@ -78,6 +74,7 @@ public:
     inline static constexpr auto SECT_KEY_FALLBACK = "fallback";
     inline static constexpr auto SECT_KEY_GENERAL  = "general";
     inline static constexpr auto SECT_KEY_FILTER   = "filter";
+    inline static constexpr auto SECT_KEY_SERVER   = "server";
 
     // Keywords for feeds
     inline static constexpr auto SECT_KEY_APRSC = "aprs";
@@ -87,9 +84,11 @@ public:
     inline static constexpr auto SECT_KEY_ATMOS = "atm";
 
     // Property keys for section "general"
-    inline static constexpr auto KV_KEY_FEEDS       = "feeds";
-    inline static constexpr auto KV_KEY_GND_MODE    = "gndMode";
-    inline static constexpr auto KV_KEY_SERVER_PORT = "serverPort";
+    inline static constexpr auto KV_KEY_FEEDS    = "feeds";
+    inline static constexpr auto KV_KEY_GND_MODE = "gndMode";
+
+    // Property keys for section "server"
+    inline static constexpr auto KV_KEY_MAX_CON = "maxConnections";
 
     // Property keys for section "fallback"
     inline static constexpr auto KV_KEY_LATITUDE  = "latitude";
@@ -108,23 +107,24 @@ public:
     inline static constexpr auto KV_KEY_PRIORITY = "priority";
     inline static constexpr auto KV_KEY_LOGIN    = "login";
 
-    inline static constexpr auto PATH_FEEDS       = "general.feeds";
-    inline static constexpr auto PATH_GND_MODE    = "general.gndMode";
-    inline static constexpr auto PATH_SERVER_PORT = "general.serverPort";
-    inline static constexpr auto PATH_LATITUDE    = "fallback.latitude";
-    inline static constexpr auto PATH_LONGITUDE   = "fallback.longitude";
-    inline static constexpr auto PATH_ALTITUDE    = "fallback.altitude";
-    inline static constexpr auto PATH_GEOID       = "fallback.geoid";
-    inline static constexpr auto PATH_PRESSURE    = "fallback.pressure";
-    inline static constexpr auto PATH_MAX_DIST    = "filter.maxDistance";
-    inline static constexpr auto PATH_MAX_HEIGHT  = "filter.maxHeight";
+    inline static constexpr auto PATH_FEEDS          = "general.feeds";
+    inline static constexpr auto PATH_GND_MODE       = "general.gndMode";
+    inline static constexpr auto PATH_SERVER_PORT    = "server.port";
+    inline static constexpr auto PATH_SERVER_MAX_CON = "server.maxConnections";
+    inline static constexpr auto PATH_LATITUDE       = "fallback.latitude";
+    inline static constexpr auto PATH_LONGITUDE      = "fallback.longitude";
+    inline static constexpr auto PATH_ALTITUDE       = "fallback.altitude";
+    inline static constexpr auto PATH_GEOID          = "fallback.geoid";
+    inline static constexpr auto PATH_PRESSURE       = "fallback.pressure";
+    inline static constexpr auto PATH_MAX_DIST       = "filter.maxDistance";
+    inline static constexpr auto PATH_MAX_HEIGHT     = "filter.maxHeight";
 
     bool                                      groundMode;      ///< Ground mode state
     object::GpsPosition const                 gpsPosition;     ///< Fallback position
     f64 const                                 atmPressure;     ///< Atmospheric fallback pressure
     s32 const                                 maxHeight;       ///< Maximum height for reported aircrafts
     s32 const                                 maxDistance;     ///< Maximum distance for reported aircrafts
-    u16 const                                 serverPort;      ///< Port where to serve reports
+    std::tuple<u16, usize> const              serverConfig;    ///< Port where to serve reports
     std::list<str> const                      feedNames;       ///< List of feed names
     std::unordered_map<str, Properties> const feedProperties;  ///< Map feed names to their properties
 

@@ -9,10 +9,14 @@
 ; Keywords: aprs, sbs, gps, atm, wind
 ; Example: aprsc1,aprsc2,sbs,gps,atm1,wind2
 feeds      =
-; Serve NMEA output on this port
-serverPort =
 ; Assign anything to enable
 gndMode    =
+
+[server]
+; Serve NMEA output on this port
+port           =
+; Allow up to this count of active connections
+maxConnections =
 
 [fallback]
 ; format (degree): x.xxxxxx

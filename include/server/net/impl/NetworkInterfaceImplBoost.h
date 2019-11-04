@@ -84,7 +84,7 @@ public:
      * @return the Connection
      * @throw SocketException if the current socket is not open
      */
-    u_ptr<Connection<SocketImplBoost>> startConnection() override;
+    Connection<SocketImplBoost> startConnection() override;
 
     /**
      * @brief Get the current connected address.

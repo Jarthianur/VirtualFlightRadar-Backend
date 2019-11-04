@@ -39,9 +39,11 @@ namespace vfrb::server
 template<typename SocketT>
 class Connection
 {
-    NOT_COPYABLE(Connection)
+    SocketT m_socket;   ///< Socket
+    str     m_address;  ///< IP address
 
-    SocketT m_socket;  ///< Socket
+public:
+    MOVABLE_BUT_NOT_COPYABLE(Connection)
 
     /**
      * @brief Constructor
@@ -49,17 +51,7 @@ class Connection
      */
     explicit Connection(SocketT&& socket);
 
-public:
-    str const address;  ///< IP address
-
     ~Connection() noexcept = default;
-
-    /**
-     * @brief Start a Connection.
-     * @param socket The socket
-     * @return a shared ptr to the Connection object
-     */
-    static u_ptr<Connection<SocketT>> create(SocketT&& socket);
 
     /**
      * @brief Write a message to the endpoint.
@@ -67,12 +59,25 @@ public:
      * @return true on success, else false
      */
     bool write(std::string_view const& msg);
+
+    auto address() const -> decltype(m_address) const&;
 };
 
 template<typename SocketT>
-u_ptr<Connection<SocketT>> Connection<SocketT>::create(SocketT&& socket)
+Connection<SocketT>::Connection(SocketT&& socket) : m_socket(std::move(socket)), m_address(m_socket.address())
+{}
+
+template<typename SocketT>
+Connection<SocketT>::Connection(Connection&& other)
+    : m_socket(std::move(other.m_socket)), m_address(std::move(other.m_address))
+{}
+
+template<typename SocketT>
+Connection<SocketT>& Connection<SocketT>::operator=(Connection&& other)
 {
-    return u_ptr<Connection<SocketT>>(new Connection<SocketT>(std::move(socket)));
+    m_socket  = std::move(other.m_socket);
+    m_address = std::move(other.m_address);
+    return *this;
 }
 
 template<typename SocketT>
@@ -90,6 +95,8 @@ bool Connection<SocketT>::write(std::string_view const& msg)
 }
 
 template<typename SocketT>
-Connection<SocketT>::Connection(SocketT&& socket) : m_socket(std::move(socket)), address(m_socket.address())
-{}
+auto Connection<SocketT>::address() const -> decltype(m_address) const&
+{
+    return m_address;
+}
 }  // namespace vfrb::server

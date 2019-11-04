@@ -25,8 +25,6 @@
 
 #include "util/Logger.hpp"
 
-#include "parameters.h"
-
 using namespace vfrb::client::net;
 
 namespace vfrb::client
@@ -39,13 +37,12 @@ SensorClient::SensorClient(Endpoint const& endpoint, s_ptr<Connector> connector)
 
 void SensorClient::read()
 {
-    m_connector->resetTimer(param::WINDCLIENT_RECEIVE_TIMEOUT);
+    m_connector->resetTimer(RECEIVE_TIMEOUT);
     Client::read();
 }
 
 void SensorClient::checkDeadline(ErrorCode error)
 {
-    logger.debug(LOG_PREFIX, __FUNCTION__);
     if (std::lock_guard lk(m_mutex); m_state == State::RUNNING)
     {
         if (error == ErrorCode::SUCCESS)
@@ -70,7 +67,7 @@ void SensorClient::handleConnect(ErrorCode error)
             m_backoff.reset();
             logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
             m_connector->onTimeout(std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1),
-                                   param::WINDCLIENT_RECEIVE_TIMEOUT);
+                                   RECEIVE_TIMEOUT);
             read();
         }
         else

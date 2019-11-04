@@ -21,8 +21,9 @@
 
 #pragma once
 
-#include <array>
+#include <algorithm>
 #include <string_view>
+#include <vector>
 
 #include "concurrent/GuardedThread.hpp"
 #include "net/impl/NetworkInterfaceImplBoost.h"
@@ -30,7 +31,6 @@
 #include "util/class_utils.h"
 
 #include "Connection.hpp"
-#include "parameters.h"
 #include "types.h"
 
 namespace vfrb::server
@@ -48,10 +48,9 @@ class Server
     static Logger const& logger;
 
     s_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
-    std::array<u_ptr<Connection<SocketT>>, param::SERVER_MAX_CLIENTS>
-         m_connections;                ///< Connections container
-    u8   m_activeConnections = 0;      ///< Number of active connections
-    bool m_running           = false;  ///< Running state
+    std::vector<Connection<SocketT>>      m_connections;   ///< Connections container
+    usize                                 m_maxConnections;
+    bool                                  m_running = false;  ///< Running state
     std::mutex mutable m_mutex;
     concurrent::GuardedThread m_thread;  ///< Internal thread
 
@@ -74,10 +73,9 @@ class Server
     void attemptConnection(bool error) noexcept;
 
 public:
-    Server();
-    explicit Server(u16 port);  ///< @param port The port
-    explicit Server(
-        s_ptr<net::NetworkInterface<SocketT>> interface);  ///< @param interface The NetworkInterface to use
+    Server(u16 port, usize maxCon);  ///< @param port The port
+    Server(s_ptr<net::NetworkInterface<SocketT>> interface,
+           usize                                 maxCon);  ///< @param interface The NetworkInterface to use
     ~Server() noexcept;
 
     /**
@@ -107,16 +105,16 @@ template<typename SocketT>
 Logger const& Server<SocketT>::logger = Logger::instance();
 
 template<typename SocketT>
-Server<SocketT>::Server(u16 port) : m_netInterface(std::make_shared<net::NetworkInterfaceImplBoost>(port))
+Server<SocketT>::Server(u16 port, usize maxCon)
+    : Server(std::make_shared<net::NetworkInterfaceImplBoost>(port), maxCon)
 {}
 
 template<typename SocketT>
-Server<SocketT>::Server(s_ptr<net::NetworkInterface<SocketT>> interface) : m_netInterface(interface)
-{}
-
-template<typename SocketT>
-Server<SocketT>::Server() : Server<SocketT>(4353)
-{}
+Server<SocketT>::Server(s_ptr<net::NetworkInterface<SocketT>> interface, usize maxCon)
+    : m_netInterface(interface), m_maxConnections(maxCon)
+{
+    m_connections.reserve(maxCon);
+}
 
 template<typename SocketT>
 Server<SocketT>::~Server() noexcept
@@ -145,14 +143,7 @@ void Server<SocketT>::stop()
     {
         m_running = false;
         logger.info(LOG_PREFIX, "stopping all connections...");
-        for (auto& it : m_connections)
-        {
-            if (it)
-            {
-                it.reset();
-            }
-        }
-        m_activeConnections = 0;
+        m_connections.clear();
         m_netInterface->stop();
     }
 }
@@ -161,20 +152,20 @@ template<typename SocketT>
 void Server<SocketT>::send(std::string_view const& msg)
 {
     std::lock_guard lk(m_mutex);
-    if (msg.length() == 0 || m_activeConnections == 0)
+    if (msg.empty() || m_connections.empty())
     {
         return;
     }
-    for (auto& it : m_connections)
+    for (auto it = m_connections.begin(); it != m_connections.end();)
     {
-        if (it)
+        if (!it->write(msg))
         {
-            if (!it.get()->write(msg))
-            {
-                logger.warn(LOG_PREFIX, "lost connection to: ", it.get()->address);
-                it.reset();
-                --m_activeConnections;
-            }
+            logger.warn(LOG_PREFIX, "lost connection to: ", it->address());
+            it = m_connections.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
 }
@@ -189,14 +180,8 @@ void Server<SocketT>::accept()
 template<typename SocketT>
 bool Server<SocketT>::isConnected(str const& address)
 {
-    for (auto const& it : m_connections)
-    {
-        if (it && it.get()->address == address)
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::find_if(m_connections.begin(), m_connections.end(),
+                        [&](auto const& it) { return it.address() == address; }) != m_connections.end();
 }
 
 template<typename SocketT>
@@ -207,19 +192,10 @@ void Server<SocketT>::attemptConnection(bool error) noexcept
         std::lock_guard lk(m_mutex);
         try
         {
-            if (m_activeConnections < param::SERVER_MAX_CLIENTS &&
-                !isConnected(m_netInterface->stagedAddress()))
+            if (m_connections.size() < m_maxConnections && !isConnected(m_netInterface->stagedAddress()))
             {
-                for (auto& it : m_connections)
-                {
-                    if (!it)
-                    {
-                        it = m_netInterface->startConnection();
-                        ++m_activeConnections;
-                        logger.info(LOG_PREFIX, "connection from: ", it->address);
-                        break;
-                    }
-                }
+                m_connections.push_back(m_netInterface->startConnection());
+                logger.info(LOG_PREFIX, "connection from: ", m_connections.crbegin()->address());
             }
             else
             {
