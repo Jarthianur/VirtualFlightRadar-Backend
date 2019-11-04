@@ -67,12 +67,12 @@ void AircraftData::access()
             }
             else
             {
-                m_processor.process(iter->value);
-                m_accessFn(iter->value);
+                m_processor.process(iter->value, iter->nmea);
+                m_accessFn({iter->value, iter->nmea});
                 ++iter;
             }
         }
-        catch (vfrb::error::Error const&)
+        catch ([[maybe_unused]] vfrb::error::Error const&)
         {}
     }
 }

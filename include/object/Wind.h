@@ -40,7 +40,5 @@ public:
     ~Wind() noexcept override = default;
 
     str& operator*();
-
-    std::string_view nmea() const override;
 };
 }  // namespace vfrb::object

@@ -24,8 +24,8 @@
 #include <ctime>
 
 #include "object/GpsPosition.h"
+#include "util/CString.hpp"
 
-#include "Processor.hpp"
 #include "types.h"
 
 namespace vfrb::data::processor
@@ -33,8 +33,12 @@ namespace vfrb::data::processor
 /**
  * @brief Process GPS positions to NMEA GGA and RMC sentences.
  */
-class GpsProcessor : public Processor<object::GpsPosition>
+class GpsProcessor
 {
+public:
+    inline static constexpr auto NMEA_SIZE = 192;
+
+private:
     char mutable m_directionSN = 'x';  ///< Orientation of the latitude (S,N)
     char mutable m_directionEW = 'x';  ///< Orientation of the longitude (E,W)
     f64 mutable m_degLatitude  = 0.0;  ///< Degrees of latitude
@@ -47,13 +51,14 @@ class GpsProcessor : public Processor<object::GpsPosition>
      * @param position The position
      * @param utc      The current utc time
      */
-    usize appendGPGGA(object::GpsPosition& position, std::tm const* utc, usize pos) const;
+    usize appendGPGGA(object::GpsPosition const& position, util::CString<NMEA_SIZE>& nmea, std::tm const* utc,
+                      usize pos) const;
 
     /**
      * @brief Append GPRMC sentence to processing string.
      * @param utc The current utc time
      */
-    usize appendGPRMC(object::GpsPosition& position, std::tm const* utc, usize pos) const;
+    usize appendGPRMC(util::CString<NMEA_SIZE>& nmea, std::tm const* utc, usize pos) const;
 
     /**
      * @brief Evaluate position for given latitude and longitude.
@@ -63,13 +68,13 @@ class GpsProcessor : public Processor<object::GpsPosition>
     void evalPosition(f64 latitude, f64 longitude) const;
 
 public:
-    GpsProcessor();
-    ~GpsProcessor() noexcept override = default;
+    GpsProcessor()           = default;
+    ~GpsProcessor() noexcept = default;
 
     /**
      * @brief Process a GPS position.
      * @param rPosition The position
      */
-    void process(object::GpsPosition& position) const override;
+    void process(object::GpsPosition const& position, util::CString<NMEA_SIZE>& nmea) const;
 };
 }  // namespace vfrb::data::processor

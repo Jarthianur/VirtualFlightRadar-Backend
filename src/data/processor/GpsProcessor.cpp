@@ -32,37 +32,36 @@ using namespace vfrb::str_util;
 
 namespace vfrb::data::processor
 {
-GpsProcessor::GpsProcessor() : Processor<object::GpsPosition>() {}
-
-void GpsProcessor::process(object::GpsPosition& position) const
+void GpsProcessor::process(object::GpsPosition const& position, util::CString<NMEA_SIZE>& nmea) const
 {
     std::time_t now = std::time(nullptr);
     std::tm*    utc = std::gmtime(&now);
     evalPosition(position.location().latitude, position.location().longitude);
-    appendGPGGA(position, utc, appendGPRMC(position, utc, 0));
+    appendGPGGA(position, nmea, utc, appendGPRMC(nmea, utc, 0));
 }
 
-usize GpsProcessor::appendGPGGA(GpsPosition& position, std::tm const* utc, usize pos) const
+usize GpsProcessor::appendGPGGA(GpsPosition const& position, util::CString<NMEA_SIZE>& nmea,
+                                std::tm const* utc, usize pos) const
 {
     // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
     // support others.
     // "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"
-    int next = (*position).format(
+    int next = nmea.format(
         pos, "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*",
         utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude,
         m_minLongitude, m_directionEW, /*pos.fixQa,*/ position.nrOfSatellites(), position.location().altitude,
         math::saturate(position.geoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
-    next += (*position).format(pos, "%02x\r\n", checksum(**position, pos));
+    next += nmea.format(pos, "%02x\r\n", checksum(*nmea, pos));
     return pos + static_cast<usize>(next);
 }
 
-usize GpsProcessor::appendGPRMC(GpsPosition& position, std::tm const* utc, usize pos) const
+usize GpsProcessor::appendGPRMC(util::CString<NMEA_SIZE>& nmea, std::tm const* utc, usize pos) const
 {
-    int next = (*position).format(
+    int next = nmea.format(
         pos, "$GPRMC,%.2d%.2d%.2d,A,%02.0lf%06.3lf,%c,%03.0lf%06.3lf,%c,0,0,%.2d%.2d%.2d,001.0,W*",
         utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude,
         m_minLongitude, m_directionEW, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
-    next += (*position).format(pos, "%02x\r\n", checksum(**position, pos));
+    next += nmea.format(pos, "%02x\r\n", checksum(*nmea, pos));
     return pos + static_cast<usize>(next);
 }
 

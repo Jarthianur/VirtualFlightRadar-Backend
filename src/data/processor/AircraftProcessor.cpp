@@ -36,18 +36,18 @@ namespace vfrb::data::processor
 {
 AircraftProcessor::AircraftProcessor() : AircraftProcessor(std::numeric_limits<s32>::max()) {}
 
-AircraftProcessor::AircraftProcessor(s32 maxDist) : Processor<object::Aircraft>(), m_maxDistance(maxDist) {}
+AircraftProcessor::AircraftProcessor(s32 maxDist) : m_maxDistance(maxDist) {}
 
-void AircraftProcessor::process(Aircraft& aircraft) const
+void AircraftProcessor::process(Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea) const
 {
     calculateRelPosition(aircraft);
     if (m_distance <= m_maxDistance)
     {
-        appendPFLAA(aircraft, appendPFLAU(aircraft, 0));
+        appendPFLAA(aircraft, nmea, appendPFLAU(aircraft, nmea, 0));
     }
     else
     {
-        (*aircraft).clear();
+        nmea.clear();
     }
 }
 
@@ -85,20 +85,22 @@ void AircraftProcessor::calculateRelPosition(Aircraft const& aircraft) const
                         aircraft.location().altitude - m_refLocation.altitude;
 }
 
-usize AircraftProcessor::appendPFLAU(Aircraft& aircraft, usize pos) const
+usize AircraftProcessor::appendPFLAU(Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
+                                     usize pos) const
 {
-    int next = (*aircraft).format(pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::doubleToInt(m_relBearing),
-                                  m_relVertical, m_distance, (*aircraft.id()).data());
-    next += (*aircraft).format(pos, "%02x\r\n", checksum(**aircraft, pos));
+    int next = nmea.format(pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::doubleToInt(m_relBearing),
+                           m_relVertical, m_distance, (*aircraft.id()).data());
+    next += nmea.format(pos, "%02x\r\n", checksum(*nmea, pos));
     return pos + static_cast<usize>(next);
 }
 
-usize AircraftProcessor::appendPFLAA(Aircraft& aircraft, usize pos) const
+usize AircraftProcessor::appendPFLAA(Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
+                                     usize pos) const
 {
     int next = 0;
     if (aircraft.hasFullInfo())
     {
-        next = (*aircraft).format(
+        next = nmea.format(
             pos, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast, m_relVertical,
             util::raw_type(aircraft.idType()), (*aircraft.id()).data(),
             math::doubleToInt(math::saturate(aircraft.movement().heading, Aircraft::Movement::MIN_HEADING,
@@ -112,11 +114,10 @@ usize AircraftProcessor::appendPFLAA(Aircraft& aircraft, usize pos) const
     }
     else
     {
-        next =
-            (*aircraft).format(pos, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
-                               (*aircraft.id()).data(), util::raw_type(aircraft.aircraftType()));
+        next = nmea.format(pos, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
+                           (*aircraft.id()).data(), util::raw_type(aircraft.aircraftType()));
     }
-    next += (*aircraft).format(pos, "%02x\r\n", checksum(**aircraft, pos));
+    next += nmea.format(pos, "%02x\r\n", checksum(*nmea, pos));
     return pos + static_cast<usize>(next);
 }
 }  // namespace vfrb::data::processor

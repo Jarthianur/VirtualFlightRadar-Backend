@@ -34,7 +34,7 @@ AtmosphereData::AtmosphereData(AccessFn&& fn, Atmosphere const& atmosphere)
 void AtmosphereData::access()
 {
     std::lock_guard lk(m_mutex);
-    m_accessFn(++m_atmosphere);
+    m_accessFn({++m_atmosphere, {*m_atmosphere}});
 }
 
 bool AtmosphereData::update(Object&& atmosphere)

@@ -73,16 +73,6 @@ bool GpsPosition::canUpdate(Object const& other) const
     }
 }
 
-std::string_view GpsPosition::nmea() const
-{
-    return m_nmea;
-}
-
-util::CString<GpsPosition::NMEA_SIZE>& GpsPosition::operator*()
-{
-    return m_nmea;
-}
-
 auto GpsPosition::location() const -> decltype(m_location) const&
 {
     return m_location;

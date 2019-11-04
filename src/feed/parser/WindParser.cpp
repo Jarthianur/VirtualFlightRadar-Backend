@@ -21,7 +21,7 @@
 
 #include "feed/parser/WindParser.h"
 
-#include "util/utility.hpp"
+#include "util/string_utils.hpp"
 
 using namespace vfrb::object;
 
@@ -31,7 +31,7 @@ WindParser::WindParser() : Parser<Wind>() {}
 
 Wind WindParser::unpack(str&& sentence, u32 priority) const
 {
-    if (util::matchChecksum({sentence.c_str(), sentence.length()}) && sentence.find("MWV") != str::npos)
+    if (str_util::matchChecksum({sentence.c_str(), sentence.length()}) && sentence.find("MWV") != str::npos)
     {
         Wind wind{priority};
         *wind = std::move(sentence);

@@ -23,11 +23,6 @@ Wind::Wind() : Object() {}
 
 Wind::Wind(u32 priority) : Object(priority) {}
 
-std::string_view Wind::nmea() const
-{
-    return {m_nmea.c_str(), m_nmea.size()};
-}
-
 str& Wind::operator*()
 {
     return m_nmea;

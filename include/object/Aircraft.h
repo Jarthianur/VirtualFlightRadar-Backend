@@ -36,9 +36,8 @@ namespace vfrb::object
 class Aircraft : public Object
 {
 public:
-    inline static constexpr auto ID_LEN    = 6;
-    inline static constexpr auto ID_SIZE   = 8;
-    inline static constexpr auto NMEA_SIZE = 192;
+    inline static constexpr auto ID_LEN  = 6;
+    inline static constexpr auto ID_SIZE = 8;
 
     /**
      * @brief Device type from which the information is received.
@@ -102,15 +101,14 @@ public:
     };
 
 private:
-    util::CString<ID_SIZE>   m_id;                ///< Aircraft identifier
-    IdType                   m_idType;            ///< Id type
-    AircraftType             m_aircraftType;      ///< Aircraft type
-    TargetType               m_targetType;        ///< Target type
-    Location                 m_location;          ///< Currently known position.
-    Movement                 m_movement;          ///< Currently known movement.
-    Timestamp                m_timestamp;         ///< The timestamp of the last report.
-    bool                     m_fullInfo = false;  ///< Is full set of information available?
-    util::CString<NMEA_SIZE> m_nmea;
+    util::CString<ID_SIZE> m_id;                ///< Aircraft identifier
+    IdType                 m_idType;            ///< Id type
+    AircraftType           m_aircraftType;      ///< Aircraft type
+    TargetType             m_targetType;        ///< Target type
+    Location               m_location;          ///< Currently known position.
+    Movement               m_movement;          ///< Currently known movement.
+    Timestamp              m_timestamp;         ///< The timestamp of the last report.
+    bool                   m_fullInfo = false;  ///< Is full set of information available?
 
     /**
      * @brief Assign an other aircrafts values to this.
@@ -131,18 +129,16 @@ public:
     Aircraft(Aircraft&& other);
     ~Aircraft() noexcept override = default;
 
-    util::CString<NMEA_SIZE>& operator*();
-    Aircraft&                 operator=(Aircraft&& other);
+    Aircraft& operator=(Aircraft&& other);
 
-    std::string_view nmea() const override;
-    auto             idType() const -> decltype(m_idType);
-    auto             aircraftType() const -> decltype(m_aircraftType);
-    auto             id() const -> decltype(m_id) const&;
-    auto             targetType() const -> decltype(m_targetType);
-    auto             location() const -> decltype(m_location) const&;
-    auto             movement() const -> decltype(m_movement) const&;
-    auto             timestamp() const -> decltype(m_timestamp) const&;
-    auto             hasFullInfo() const -> decltype(m_fullInfo);
-    void             targetType(TargetType tt);
+    auto idType() const -> decltype(m_idType);
+    auto aircraftType() const -> decltype(m_aircraftType);
+    auto id() const -> decltype(m_id) const&;
+    auto targetType() const -> decltype(m_targetType);
+    auto location() const -> decltype(m_location) const&;
+    auto movement() const -> decltype(m_movement) const&;
+    auto timestamp() const -> decltype(m_timestamp) const&;
+    auto hasFullInfo() const -> decltype(m_fullInfo);
+    void targetType(TargetType tt);
 };
 }  // namespace vfrb::object

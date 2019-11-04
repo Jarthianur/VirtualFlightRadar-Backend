@@ -21,6 +21,7 @@
 
 #include "client/Client.h"
 
+#include <algorithm>
 #include <chrono>
 #include <condition_variable>
 #include <utility>
@@ -59,6 +60,9 @@ void Client::subscribe(s_ptr<feed::Feed> feed)
 {
     std::lock_guard lk(m_mutex);
     m_feeds.push_back(feed);
+    std::sort(m_feeds.begin(), m_feeds.end(), [](s_ptr<feed::Feed> const& f1, s_ptr<feed::Feed> const& f2) {
+        return f1->priority() > f2->priority();
+    });
 }
 
 void Client::run()

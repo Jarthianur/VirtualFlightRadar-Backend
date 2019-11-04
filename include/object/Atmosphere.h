@@ -59,7 +59,6 @@ public:
 
     str& operator*();
 
-    std::string_view nmea() const override;
-    auto             pressure() const -> decltype(m_pressure);
+    auto pressure() const -> decltype(m_pressure);
 };
 }  // namespace vfrb::object

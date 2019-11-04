@@ -94,6 +94,7 @@ public:
     virtual bool process(str response) = 0;
 
     auto name() const -> decltype(m_name) const&;
+    auto priority() const -> std::remove_const<decltype(m_priority)>::type;
 };
 
 namespace error

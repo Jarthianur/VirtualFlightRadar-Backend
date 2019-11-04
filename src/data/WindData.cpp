@@ -38,7 +38,7 @@ bool WindData::update(Object&& wind)
 void WindData::access()
 {
     std::lock_guard lk(m_mutex);
-    m_accessFn(++m_wind);
+    m_accessFn({++m_wind, {*m_wind}});
     (*m_wind).clear();
 }
 }  // namespace vfrb::data
