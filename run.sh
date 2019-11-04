@@ -65,36 +65,36 @@ for arg in $@; do
     case $arg in
     --ini=*)
         VFRB_INI="${arg#*=}"
-    ;;
+        ;;
     -y | --confirm-yes)
         export AUTO_CONFIRM=1
-    ;;
+        ;;
     build)
         DO_BUILD=1
-    ;;
+        ;;
     install)
         DO_INSTALL=1
         DO_BUILD=1
-    ;;
+        ;;
     test)
         DO_TEST=1
-    ;;
+        ;;
     docker)
         DO_DOCKER=1
-    ;;
+        ;;
     format)
         for f in $(find "$VFRB_ROOT/src" "$VFRB_ROOT/include" -type f); do
             echo $f
             clang-format -i -style=file $f
         done
-    ;;
+        ;;
     -n | --no-update)
         NO_UPDATE=1
-    ;;
+        ;;
     -h | --help | *)
         print_help
         exit 1
-    ;;
+        ;;
     esac
 done
 
@@ -138,7 +138,7 @@ if [ -n "$DO_INSTALL" ]; then
         log -w "\"$VFRB_ROOT/build/$VFRB_INI\"" already exists.
         ! confirm Replace the existing one\?
         if [ $? -eq 0 ]; then
-            sed "s|%VERSION%|${VFRB_VERSION}|" <"$VFRB_ROOT/vfrb.ini.in" > "$VFRB_ROOT/build/$VFRB_INI"
+            sed "s|%VERSION%|${VFRB_VERSION}|" <"$VFRB_ROOT/vfrb.ini.in" >"$VFRB_ROOT/build/$VFRB_INI"
             log -i "$VFRB_INI" created.
         fi
     fi

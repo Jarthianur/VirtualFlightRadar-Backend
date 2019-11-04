@@ -31,6 +31,7 @@
 !*.yaml
 !*.css
 !*.xml
+!*.lua
 !.gitkeep
 !CMakeLists.txt
 !version.txt

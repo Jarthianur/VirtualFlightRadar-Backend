@@ -31,8 +31,6 @@ file(GLOB_RECURSE vfrb_prof_sources profiling/*.cpp)
 list(APPEND vfrb_test_sources ${vfrb_sources})
 list(REMOVE_ITEM vfrb_test_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
 list(REMOVE_ITEM vfrb_test_sources ${PROJECT_SOURCE_DIR}/src/object/impl/DateTimeImplBoost.cpp)
-#list(APPEND vfrb_prof_sources ${vfrb_sources})
-#list(REMOVE_ITEM vfrb_prof_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
 
 set(CMAKE_BUILD_TYPE staged)
 set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror -Wno-error=attributes")
@@ -54,7 +52,7 @@ find_package(Threads REQUIRED)
 # target: release
 #
 add_executable(release ${vfrb_sources})
-target_compile_options(release PUBLIC -O3 -DNDEBUG -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
+target_compile_options(release PUBLIC -O2 -DNDEBUG -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
 set_target_properties(release PROPERTIES OUTPUT_NAME ${vfrb_release_bin})
 target_include_directories(release PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(release PUBLIC ${VFRB_LINK_LIBS})
@@ -81,7 +79,7 @@ target_link_libraries(unittest PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
 # target: profiling
 #
 add_executable(profiling ${vfrb_prof_sources})
-target_compile_options(profiling PUBLIC -O3 -DNDEBUG)
+target_compile_options(profiling PUBLIC -O2 -DNDEBUG)
 set_target_properties(profiling PROPERTIES OUTPUT_NAME ${vfrb_prof_bin})
 target_include_directories(profiling PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/profiling/include)
 target_link_libraries(profiling PUBLIC ${VFRB_LINK_LIBS})
