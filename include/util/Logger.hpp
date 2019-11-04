@@ -104,7 +104,7 @@ public:
 
 [[gnu::always_inline]] inline void Logger::prefix(std::ostream& stream, char const* msg) const
 {
-    stream  << msg << "  " << time() << ":: ";
+    stream << msg << "  " << time() << ":: ";
 }
 
 template<typename... Args>

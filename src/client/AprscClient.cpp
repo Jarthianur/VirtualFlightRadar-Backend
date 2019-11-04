@@ -77,7 +77,8 @@ void AprscClient::handleConnect(ErrorCode error)
 
 void AprscClient::sendKeepAlive()
 {
-    m_connector->onTimeout(std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1), KEEPALIVE_INTERVAL);
+    m_connector->onTimeout(std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1),
+                           KEEPALIVE_INTERVAL);
 }
 
 void AprscClient::handleLogin(ErrorCode error)

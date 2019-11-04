@@ -33,6 +33,8 @@ class AprscClient : public Client
 {
     NOT_COPYABLE(AprscClient)
 
+    inline static constexpr auto KEEPALIVE_INTERVAL = 600;
+
     str const m_login;  ///< Login string
 
     /**
