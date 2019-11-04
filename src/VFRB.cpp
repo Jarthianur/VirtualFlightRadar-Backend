@@ -64,7 +64,7 @@ VFRB::VFRB(s_ptr<Configuration> config)
       m_gpsData(std::make_shared<GpsData>([this](Accessor const& it) { m_server.send(it.nmea); },
                                           config->gpsPosition, config->groundMode)),
       m_windData(std::make_shared<WindData>([this](Accessor const& it) { m_server.send(it.nmea); })),
-      m_server(config->serverPort),
+      m_server(std::get<0>(config->serverConfig), std::get<1>(config->serverConfig)),
       m_running(false)
 {
     createFeeds(config);

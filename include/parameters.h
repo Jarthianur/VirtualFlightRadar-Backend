@@ -41,14 +41,4 @@ namespace vfrb::param
  * Y is the time interval the wind-sensor sends its data.
  */
 inline constexpr auto WINDCLIENT_RECEIVE_TIMEOUT = 3;
-
-/**
- * Max amount of clients, which can connect to the VFR-B's
- * internal NMEA-server.
- * [1 <= x]
- * More clients, more network traffic; but at least 1 client is recommended.
- * Consider someone else wants surrounding traffic displayed from
- * somewhere else, like pilots and flight instructors.
- */
-inline constexpr auto SERVER_MAX_CLIENTS = 3;
 }  // namespace vfrb::param

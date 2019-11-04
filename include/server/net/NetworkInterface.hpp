@@ -72,7 +72,7 @@ public:
      * @brief Start and get the current Connection.
      * @return the Connection
      */
-    virtual u_ptr<Connection<SocketT>> startConnection() = 0;
+    virtual Connection<SocketT> startConnection() = 0;
 
     /**
      * @brief Get the current connection address.

@@ -129,7 +129,7 @@ try :
                                                PATH_PRESSURE))),
     maxHeight(resolveFilter(m_properties, PATH_MAX_HEIGHT)),
     maxDistance(resolveFilter(m_properties, PATH_MAX_DIST)),
-    serverPort(resolveServerPort(m_properties)),
+    serverConfig(resolveServerConfig(m_properties)),
     feedNames(split(m_properties.property(PATH_FEEDS, ""))),
     feedProperties(resolveFeeds(m_properties))
 {
@@ -152,20 +152,33 @@ object::GpsPosition Configuration::resolvePosition(Properties const& properties)
     return object::GpsPosition(0, pos, geoid);
 }
 
-u16 Configuration::resolveServerPort(const Properties& properties) const
+std::tuple<u16, usize> Configuration::resolveServerConfig(const Properties& properties) const
 {
+    u16   port;
+    usize maxCon;
     try
     {
-        u64 port =
+        u64 p =
             std::get<u64>(strToNumber<u64>(properties.property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT));
-        util::checkLimits<u64>(port, 0, std::numeric_limits<u16>::max());
-        return port & 0xFFFF;
+        util::checkLimits<u64>(p, 0, std::numeric_limits<u16>::max());
+        port = p & 0xFFFF;
     }
     catch (vfrb::error::Error const& e)
     {
         logger.warn(LOG_PREFIX, "resolving server port: ", e.what());
-        return 4353;
+        port = 4353;
     }
+    try
+    {
+        maxCon = std::get<u64>(
+            strToNumber<u64>(properties.property(PATH_SERVER_MAX_CON, "5"), PATH_SERVER_MAX_CON));
+    }
+    catch (vfrb::error::Error const& e)
+    {
+        logger.warn(LOG_PREFIX, "resolving server max connections: ", e.what());
+        maxCon = 5;
+    }
+    return std::make_tuple(port, maxCon);
 }
 
 s32 Configuration::resolveFilter(Properties const& properties, char const* path) const
@@ -207,7 +220,8 @@ void Configuration::dumpInfo() const
     logger.info(LOG_PREFIX, PATH_PRESSURE, ": ", atmPressure);
     logger.info(LOG_PREFIX, PATH_MAX_HEIGHT, ": ", maxHeight);
     logger.info(LOG_PREFIX, PATH_MAX_DIST, ": ", maxDistance);
-    logger.info(LOG_PREFIX, PATH_SERVER_PORT, ": ", serverPort);
+    logger.info(LOG_PREFIX, PATH_SERVER_PORT, ": ", std::get<0>(serverConfig));
+    logger.info(LOG_PREFIX, PATH_SERVER_MAX_CON, ": ", std::get<1>(serverConfig));
     logger.info(LOG_PREFIX, PATH_GND_MODE, ": ", groundMode ? "Yes" : "No");
     logger.info(LOG_PREFIX, "number of feeds: ", feedProperties.size());
 }

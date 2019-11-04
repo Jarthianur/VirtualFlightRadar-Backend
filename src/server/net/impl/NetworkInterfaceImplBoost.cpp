@@ -101,13 +101,13 @@ void NetworkInterfaceImplBoost::handleAccept(boost::system::error_code const& er
     callback(bool(error));
 }
 
-u_ptr<Connection<SocketImplBoost>> NetworkInterfaceImplBoost::startConnection()
+Connection<SocketImplBoost> NetworkInterfaceImplBoost::startConnection()
 {
     if (!m_socket.get().is_open())
     {
         throw error::SocketError("cannot start connection on closed socket");
     }
-    return Connection<SocketImplBoost>::create(std::move(m_socket));
+    return Connection<SocketImplBoost>(std::move(m_socket));
 }
 
 str NetworkInterfaceImplBoost::stagedAddress() const
