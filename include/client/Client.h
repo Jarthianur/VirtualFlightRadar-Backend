@@ -28,6 +28,7 @@
 #include "net/Endpoint.hpp"
 #include "util/class_utils.h"
 
+#include "TimeoutBackoff.h"
 #include "types.h"
 
 namespace vfrb::feed
@@ -52,6 +53,7 @@ protected:
         STOPPING
     };
 
+    TimeoutBackoff                 m_backoff;
     s_ptr<net::Connector>          m_connector;            /// Connector interface
     State                          m_state = State::NONE;  /// Run state indicator
     net::Endpoint const            m_endpoint;             /// Remote endpoint

@@ -31,8 +31,6 @@
 #include "feed/Feed.h"
 #include "util/Logger.hpp"
 
-#include "parameters.h"
-
 static auto const& logger = vfrb::Logger::instance();
 
 using namespace vfrb::client::net;
@@ -96,7 +94,7 @@ void Client::reconnect()
 void Client::timedConnect()
 {
     m_connector->onTimeout(std::bind(&Client::handleTimedConnect, this, std::placeholders::_1),
-                           param::CLIENT_CONNECT_WAIT_TIMEVAL);
+                           m_backoff.next());
 }
 
 void Client::stop()

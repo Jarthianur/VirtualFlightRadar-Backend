@@ -67,6 +67,7 @@ void SensorClient::handleConnect(ErrorCode error)
         if (error == ErrorCode::SUCCESS)
         {
             m_state = State::RUNNING;
+            m_backoff.reset();
             logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
             m_connector->onTimeout(std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1),
                                    param::WINDCLIENT_RECEIVE_TIMEOUT);

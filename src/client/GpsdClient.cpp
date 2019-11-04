@@ -79,6 +79,7 @@ void GpsdClient::handleWatch(ErrorCode error)
         if (error == ErrorCode::SUCCESS)
         {
             m_state = State::RUNNING;
+            m_backoff.reset();
             logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
             read();
         }

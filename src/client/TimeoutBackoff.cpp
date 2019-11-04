@@ -19,39 +19,21 @@
  }
  */
 
-#include "client/SbsClient.h"
-
-#include "util/Logger.hpp"
-
-using namespace vfrb::client::net;
+#include "client/TimeoutBackoff.h"
 
 namespace vfrb::client
 {
-constexpr auto     LOG_PREFIX = "(SbsClient) ";
-static auto const& logger     = Logger::instance();
-
-SbsClient::SbsClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Client(endpoint, connector) {}
-
-void SbsClient::handleConnect(ErrorCode error)
+u32 TimeoutBackoff::next()
 {
-    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
-    {
-        if (error == ErrorCode::SUCCESS)
-        {
-            m_state = State::RUNNING;
-            m_backoff.reset();
-            read();
-        }
-        else
-        {
-            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
-            reconnect();
-        }
-    }
+    auto to  = m_timeout;
+    m_factor = m_factor > 1 ? m_factor - 1 : 1;
+    m_timeout *= m_factor;
+    return to;
 }
 
-char const* SbsClient::logPrefix() const
+void TimeoutBackoff::reset()
 {
-    return LOG_PREFIX;
+    m_timeout = INITIAL_TIMEOUT;
+    m_factor  = INITIAL_FACTOR;
 }
 }  // namespace vfrb::client
