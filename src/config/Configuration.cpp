@@ -22,21 +22,16 @@
 #include "config/Configuration.h"
 
 #include <limits>
-#include <sstream>
 #include <utility>
-#include <variant>
 
 #include "config/ConfigReader.h"
 #include "util/Logger.hpp"
-#include "util/utility.hpp"
+#include "util/string_utils.hpp"
 
-using namespace vfrb::util;
 using namespace std::literals;
 
 namespace vfrb::config
 {
-using Number = std::variant<s32, u64, f64>;
-
 namespace error
 {
 char const* ConfigurationError::what() const noexcept
@@ -60,9 +55,6 @@ public:
 };
 }  // namespace error
 
-constexpr auto     LOG_PREFIX = "(Config) ";
-static auto const& logger     = Logger::instance();
-
 /**
  * @brief Convert a string to number.
  * @tparam T    The number type
@@ -70,68 +62,34 @@ static auto const& logger     = Logger::instance();
  * @return an optional number, which may be invalid
  */
 template<typename T>
-Number strToNumber(str const& str, char const* path)
+T parse(str const& str, char const* path)
 {
-    std::stringstream ss(str);
-    T                 result;
-    if (ss >> result)
+    try
     {
-        return Number(result);
+        return str_util::parse<T>(str);
     }
-    throw error::ConversionError(str, path);
+    catch ([[maybe_unused]] vfrb::str_util::error::ConversionError const&)
+    {
+        throw error::ConversionError(str, path);
+    }
 }
 
-/**
- * @brief Trim a string on both sides.
- * @param str The string to trim
- * @return the trimmed string
- */
-inline str& trimString(str& str)
-{
-    usize f = str.find_first_not_of(' ');
-    if (f != str::npos)
-    {
-        str = str.substr(f);
-    }
-    f = str.find_last_not_of(' ');
-    if (f != str::npos)
-    {
-        str = str.substr(0, f + 1);
-    }
-    return str;
-}
-
-/**
- * @brief Split a string, separated at commata.
- * @param str The string to split
- * @return a list of strings
- */
-inline std::list<str> split(str const& s, char delim = ',')
-{
-    std::list<str>    list;
-    std::stringstream ss;
-    ss.str(s);
-    str item;
-
-    while (std::getline(ss, item, delim))
-    {
-        list.push_back(trimString(item));
-    }
-    return list;
-}
+constexpr auto     LOG_PREFIX = "(Config) ";
+static auto const& logger     = Logger::instance();
 
 Configuration::Configuration(std::istream& stream)
 try :
     m_properties(ConfigReader(stream).read()),
     groundMode(m_properties.property(PATH_GND_MODE, "no") == "no"),
-    gpsPosition(resolvePosition(m_properties)),
-    atmPressure(std::get<f64>(strToNumber<f64>(m_properties.property(PATH_PRESSURE, "1013.25"),
-                                               PATH_PRESSURE))),
-    maxHeight(resolveFilter(m_properties, PATH_MAX_HEIGHT)),
-    maxDistance(resolveFilter(m_properties, PATH_MAX_DIST)),
-    serverConfig(resolveServerConfig(m_properties)),
-    feedNames(split(m_properties.property(PATH_FEEDS, ""))),
-    feedProperties(resolveFeeds(m_properties))
+    gpsPosition(resolvePosition()),
+    atmPressure(parse<f64>(m_properties.property(PATH_PRESSURE, "1013.25"), PATH_PRESSURE)),
+    maxHeight(resolveFilter(PATH_MAX_HEIGHT)),
+    maxDistance(resolveFilter(PATH_MAX_DIST)),
+    serverConfig(
+        std::make_tuple(parse<u16>(m_properties.property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT),
+                        parse<u64>(m_properties.property(PATH_SERVER_MAX_CON, "5"), PATH_SERVER_MAX_CON))),
+    feedNames(resolveFeedNames()),
+    feedProperties(resolveFeeds())
 {
     dumpInfo();
 }
@@ -141,51 +99,21 @@ catch (vfrb::error::Error const& e)
     throw error::ConfigurationError();
 }
 
-object::GpsPosition Configuration::resolvePosition(Properties const& properties) const
+object::GpsPosition Configuration::resolvePosition() const
 {
     object::Location pos;
-    pos.latitude = std::get<f64>(strToNumber<f64>(properties.property(PATH_LATITUDE, "0.0"), PATH_LATITUDE));
-    pos.longitude =
-        std::get<f64>(strToNumber<f64>(properties.property(PATH_LONGITUDE, "0.0"), PATH_LONGITUDE));
-    pos.altitude = std::get<s32>(strToNumber<s32>(properties.property(PATH_ALTITUDE, "0"), PATH_ALTITUDE));
-    f64 geoid    = std::get<f64>(strToNumber<f64>(properties.property(PATH_GEOID, "0.0"), PATH_GEOID));
+    pos.latitude  = parse<f64>(m_properties.property(PATH_LATITUDE, "0.0"), PATH_LATITUDE);
+    pos.longitude = parse<f64>(m_properties.property(PATH_LONGITUDE, "0.0"), PATH_LONGITUDE);
+    pos.altitude  = parse<s32>(m_properties.property(PATH_ALTITUDE, "0"), PATH_ALTITUDE);
+    f64 geoid     = parse<f64>(m_properties.property(PATH_GEOID, "0.0"), PATH_GEOID);
     return object::GpsPosition(0, pos, geoid);
 }
 
-std::tuple<u16, usize> Configuration::resolveServerConfig(const Properties& properties) const
-{
-    u16   port;
-    usize maxCon;
-    try
-    {
-        u64 p =
-            std::get<u64>(strToNumber<u64>(properties.property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT));
-        util::checkLimits<u64>(p, 0, std::numeric_limits<u16>::max());
-        port = p & 0xFFFF;
-    }
-    catch (vfrb::error::Error const& e)
-    {
-        logger.warn(LOG_PREFIX, "resolving server port: ", e.what());
-        port = 4353;
-    }
-    try
-    {
-        maxCon = std::get<u64>(
-            strToNumber<u64>(properties.property(PATH_SERVER_MAX_CON, "5"), PATH_SERVER_MAX_CON));
-    }
-    catch (vfrb::error::Error const& e)
-    {
-        logger.warn(LOG_PREFIX, "resolving server max connections: ", e.what());
-        maxCon = 5;
-    }
-    return std::make_tuple(port, maxCon);
-}
-
-s32 Configuration::resolveFilter(Properties const& properties, char const* path) const
+s32 Configuration::resolveFilter(char const* path) const
 {
     try
     {
-        s32 filter = std::get<s32>(strToNumber<s32>(properties.property(path, "-1"), path));
+        s32 filter = parse<s32>(m_properties.property(path, "-1"), path);
         return filter < 0 ? std::numeric_limits<s32>::max() : filter;
     }
     catch ([[maybe_unused]] error::ConversionError const&)
@@ -194,14 +122,14 @@ s32 Configuration::resolveFilter(Properties const& properties, char const* path)
     }
 }
 
-std::unordered_map<str, Properties> Configuration::resolveFeeds(Properties const& properties)
+std::unordered_map<str, Properties> Configuration::resolveFeeds() const
 {
     std::unordered_map<str, Properties> map;
     for (auto const& it : feedNames)
     {
         try
         {
-            map.emplace(it, properties.section(it));
+            map.emplace(it, m_properties.section(it));
         }
         catch (error::PropertyNotFoundError const& e)
         {
@@ -209,6 +137,30 @@ std::unordered_map<str, Properties> Configuration::resolveFeeds(Properties const
         }
     }
     return map;
+}
+
+std::list<str> Configuration::resolveFeedNames() const
+{
+    std::list<str>    list;
+    std::stringstream ss;
+    ss.str(m_properties.property(PATH_FEEDS, ""));
+    str item;
+
+    while (std::getline(ss, item, ','))
+    {
+        usize f = item.find_first_not_of(' ');
+        if (f != str::npos)
+        {
+            item = item.substr(f);
+        }
+        f = item.find_last_not_of(' ');
+        if (f != str::npos)
+        {
+            item = item.substr(0, f + 1);
+        }
+        list.push_back(item);
+    }
+    return list;
 }
 
 void Configuration::dumpInfo() const

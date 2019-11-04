@@ -45,20 +45,15 @@ class Configuration final
      * @param properties The properties
      * @return the position
      */
-    object::GpsPosition resolvePosition(Properties const& properties) const;
-
-    /**
-     * @brief Resolve the server port.
-     * @param properties The properties
-     * @return the port number
-     */
-    std::tuple<u16, usize> resolveServerConfig(Properties const& properties) const;
+    object::GpsPosition resolvePosition() const;
 
     /**
      * @brief Resolve the feeds and their config.
      * @param properties The properties
      */
-    std::unordered_map<str, Properties> resolveFeeds(Properties const& properties);
+    std::unordered_map<str, Properties> resolveFeeds() const;
+
+    std::list<str> resolveFeedNames() const;
 
     /**
      * @brief Resolve a filter value.
@@ -67,7 +62,7 @@ class Configuration final
      * @param path       The filter key
      * @return the filter value
      */
-    s32 resolveFilter(Properties const& properties, char const* key) const;
+    s32 resolveFilter(char const* key) const;
 
     /**
      * @brief Dump the current config state as info log.

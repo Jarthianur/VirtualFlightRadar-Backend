@@ -135,6 +135,18 @@ Result<T> convert(char const* first, char const* last)
     return {result, ec};
 }
 
+template<typename T, ENABLE_IF(IS_TYPE(T, u64))>
+Result<T> convert(char const* first, char const* last)
+{
+    T    result;
+    Errc ec = Errc::OK;
+    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::ulong_, result) || first != last)
+    {
+        ec = Errc::ERR;
+    }
+    return {result, ec};
+}
+
 template<typename T, ENABLE_IF(IS_TYPE(T, x32))>
 Result<s32> convert(char const* first, char const* last)
 {
@@ -150,28 +162,32 @@ Result<s32> convert(char const* first, char const* last)
 template<typename T, ENABLE_IF(IS_TYPE(T, s8))>
 Result<T> convert(char const* first, char const* last)
 {
-    s32  result;
+    T    result;
     Errc ec = Errc::OK;
-    if (auto [p, e] = std::from_chars(first, last, result); e != std::errc() ||
-                                                            result < std::numeric_limits<s8>::min() ||
-                                                            result > std::numeric_limits<s8>::max())
+    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::byte_, result) || first != last)
     {
         ec = Errc::ERR;
     }
-    return {static_cast<s8>(result), ec};
+    return {result, ec};
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, u8))>
 Result<T> convert(char const* first, char const* last)
 {
-    u32  result;
+    auto [v, ec] = convert<s8>(first, last);
+    return {static_cast<u8>(v), ec};
+}
+
+template<typename T, ENABLE_IF(IS_TYPE(T, u16))>
+Result<T> convert(char const* first, char const* last)
+{
+    T    result;
     Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::uint_, result) || first != last ||
-        result > std::numeric_limits<u8>::max())
+    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::ushort_, result) || first != last)
     {
         ec = Errc::ERR;
     }
-    return {static_cast<u8>(result), ec};
+    return {result, ec};
 }
 
 template<typename T>
@@ -186,6 +202,16 @@ template<typename T>
 auto parse(std::csub_match const& sub)
 {
     if (auto [v, ec] = convert<T>(sub.first, sub.second); ec == Errc::OK)
+    {
+        return v;
+    }
+    throw error::ConversionError();
+}
+
+template<typename T>
+auto parse(str const& s)
+{
+    if (auto [v, ec] = convert<T>(s.c_str(), s.c_str() + s.size()); ec == Errc::OK)
     {
         return v;
     }
