@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include <mutex>
 #include <tuple>
 
+#include "concurrent/Mutex.h"
 #include "error/Error.hpp"
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
@@ -43,17 +43,18 @@ class GpsData : public Data
     inline static constexpr auto GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
     inline static constexpr auto NMEA_SIZE             = processor::GpsProcessor::NMEA_SIZE;
 
-    std::tuple<object::GpsPosition, util::CString<NMEA_SIZE>> m_position;   ///< The position
-    processor::GpsProcessor                                   m_processor;  ///< Processor for GPS information
-    bool m_positionLocked = false;  ///< Locking state of the current position
-    bool m_groundMode     = false;  ///< Ground mode state
-    std::mutex mutable m_mutex;
+    concurrent::Mutex mutable m_mutex;
+    std::tuple<object::GpsPosition, util::CString<NMEA_SIZE>>
+                            GUARDED_BY(m_mutex) m_position;   ///< The position
+    processor::GpsProcessor GUARDED_BY(m_mutex) m_processor;  ///< Processor for GPS information
+    bool GUARDED_BY(m_mutex) m_positionLocked = false;        ///< Locking state of the current position
+    bool GUARDED_BY(m_mutex) m_groundMode     = false;        ///< Ground mode state
 
     /**
      * @brief Check whether the position is good enough.
      * @return true if yes, else false
      */
-    bool isPositionGood() const;
+    bool isPositionGood() const REQUIRES(m_mutex);
 
 public:
     /**
@@ -70,16 +71,16 @@ public:
      * @throw ReceivedGoodPosition if the position was good and ground mode is enabled, hence locked
      * @threadsafe
      */
-    bool update(object::Object&& position) override;
+    bool update(object::Object&& position) override REQUIRES(!m_mutex);
 
-    void access() override;
+    void access() override REQUIRES(!m_mutex);
 
     /**
      * @brief Get the position.
      * @return the position
      * @threadsafe
      */
-    auto location() const -> decltype(std::get<0>(m_position).location());
+    decltype(std::get<0>(m_position).location()) location() const REQUIRES(!m_mutex);
 };
 
 namespace error

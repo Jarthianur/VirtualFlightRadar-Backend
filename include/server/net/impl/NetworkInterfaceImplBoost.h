@@ -61,7 +61,7 @@ public:
      * @note Blocks until all handlers have returned.
      * @param lock The lock to release before entering blocking section
      */
-    void run(std::unique_lock<std::mutex>& lk) override;
+    void run() override;
 
     /**
      * @brief Stop the event handler queue.

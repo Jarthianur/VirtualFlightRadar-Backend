@@ -22,6 +22,7 @@
 #include "data/WindData.h"
 
 using namespace vfrb::object;
+using namespace vfrb::concurrent;
 
 namespace vfrb::data
 {
@@ -31,13 +32,13 @@ WindData::WindData(AccessFn&& fn, object::Wind const& wind) : Data(std::move(fn)
 
 bool WindData::update(Object&& wind)
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     return m_wind.tryUpdate(std::move(wind));
 }
 
 void WindData::access()
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     m_accessFn({++m_wind, {*m_wind}});
     (*m_wind).clear();
 }

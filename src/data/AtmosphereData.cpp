@@ -22,6 +22,7 @@
 #include "data/AtmosphereData.h"
 
 using namespace vfrb::object;
+using namespace vfrb::concurrent;
 
 namespace vfrb::data
 {
@@ -33,19 +34,19 @@ AtmosphereData::AtmosphereData(AccessFn&& fn, Atmosphere const& atmosphere)
 
 void AtmosphereData::access()
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     m_accessFn({++m_atmosphere, {*m_atmosphere}});
 }
 
 bool AtmosphereData::update(Object&& atmosphere)
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     return m_atmosphere.tryUpdate(std::move(atmosphere));
 }
 
 auto AtmosphereData::atmPressure() const -> decltype(m_atmosphere.pressure())
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     return m_atmosphere.pressure();
 }
 }  // namespace vfrb::data

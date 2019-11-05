@@ -38,10 +38,9 @@ class SbsParser : public Parser<object::Aircraft>
     inline static constexpr auto SBS_FIELD_LAT  = 14;  ///< Field number of latitude
     inline static constexpr auto SBS_FIELD_LON  = 15;  ///< Field number of longitude
 
+    s32 const m_maxHeight;  ///< The max height filter
 public:
-    static s32 s_maxHeight;  ///< The max height filter
-
-    SbsParser();
+    explicit SbsParser(s32 maxHeight);
     ~SbsParser() noexcept override = default;
 
     /**

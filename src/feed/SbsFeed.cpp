@@ -30,20 +30,16 @@ using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-parser::SbsParser SbsFeed::s_parser;
-
 SbsFeed::SbsFeed(str const& name, Properties const& properties, s_ptr<data::AircraftData> data, s32 maxHeight)
-    : Feed(name, properties, data), m_worker([this](str&& work) {
+    : Feed(name, properties, data), m_parser(maxHeight), m_worker([this](str&& work) {
           try
           {
-              m_data->update(s_parser.unpack(std::move(work), m_priority));
+              m_data->update(m_parser.unpack(std::move(work), m_priority));
           }
           catch ([[maybe_unused]] parser::error::UnpackError const&)
           {}
       })
-{
-    parser::SbsParser::s_maxHeight = maxHeight;
-}
+{}
 
 Feed::Protocol SbsFeed::protocol() const
 {

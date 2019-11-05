@@ -22,13 +22,9 @@
 #pragma once
 
 #include "concurrent/WorkerThread.hpp"
+#include "parser/SbsParser.h"
 
 #include "Feed.h"
-
-namespace vfrb::feed::parser
-{
-class SbsParser;
-}  // namespace vfrb::feed::parser
 
 namespace vfrb::data
 {
@@ -44,7 +40,7 @@ class SbsFeed : public Feed
 {
     NOT_COPYABLE(SbsFeed)
 
-    static parser::SbsParser      s_parser;  ///< Parser to unpack response from Client
+    parser::SbsParser const       m_parser;  ///< Parser to unpack response from Client
     concurrent::WorkerThread<str> m_worker;
 
 public:

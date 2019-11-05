@@ -19,37 +19,55 @@
  }
  */
 
-#include "util/Logger.hpp"
+#include "concurrent/Mutex.h"
 
-#include <chrono>
-#include <ctime>
-#include <stdexcept>
+#include <utility>
 
-namespace vfrb
+namespace vfrb::concurrent
 {
-void Logger::logFile(str const& file)
+void Mutex::lock()
 {
-    concurrent::LockGuard lk(m_mutex);
-    m_logFile = std::ofstream(file);
-    if (!m_logFile)
-    {
-        throw std::runtime_error("Could not open log file");
-    }
-    m_outStream = &m_logFile;
-    m_errStream = &m_logFile;
+    m_mutex.lock();
 }
 
-str Logger::time()
+void Mutex::unlock()
 {
-    std::time_t tt       = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    static char time[32] = "";
-    std::strftime(time, 32, "%c", gmtime(&tt));
-    return time;
+    m_mutex.unlock();
 }
 
-Logger& Logger::instance()
+bool Mutex::try_lock()
 {
-    static Logger log;
-    return log;
+    return m_mutex.try_lock();
 }
-}  // namespace vfrb
+
+Mutex const& Mutex::operator!() const
+{
+    return *this;
+}
+
+LockGuard::LockGuard(Mutex& mu) : m_lock(mu) {}
+
+LockGuard::~LockGuard() noexcept {}
+
+UniqueLock::UniqueLock(Mutex& mu) : m_lock(mu) {}
+
+UniqueLock::UniqueLock(UniqueLock&& other) : m_lock(std::move(other.m_lock)) {}
+
+UniqueLock::~UniqueLock() noexcept {}
+
+void UniqueLock::lock()
+{
+    m_lock.lock();
+}
+
+void UniqueLock::unlock()
+{
+    m_lock.unlock();
+}
+
+UniqueLock& UniqueLock::operator=(UniqueLock&& other)
+{
+    m_lock = std::move(other.m_lock);
+    return *this;
+}
+}  // namespace vfrb::concurrent

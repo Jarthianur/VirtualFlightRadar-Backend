@@ -39,13 +39,12 @@ SignalListener::~SignalListener() noexcept
 
 void SignalListener::run()
 {
-    std::lock_guard lk(m_mutex);
     m_thread.spawn([this]() { m_ioService.run(); });
 }
 
 void SignalListener::stop()
 {
-    if (std::lock_guard lk(m_mutex); !m_ioService.stopped())
+    if (!m_ioService.stopped())
     {
         m_ioService.stop();
     }
@@ -53,7 +52,6 @@ void SignalListener::stop()
 
 void SignalListener::addHandler(SignalHandler&& handler)
 {
-    std::lock_guard lk(m_mutex);
     m_sigSet.async_wait(std::move(handler));
 }
 }  // namespace vfrb::concurrent

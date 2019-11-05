@@ -22,6 +22,7 @@
 #include "data/GpsData.h"
 
 using namespace vfrb::object;
+using namespace vfrb::concurrent;
 
 namespace vfrb::data
 {
@@ -34,7 +35,7 @@ GpsData::GpsData(AccessFn&& fn, GpsPosition const& position, bool ground)
 
 void GpsData::access()
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     try
     {
         auto& [pos, cstr] = m_position;
@@ -47,7 +48,7 @@ void GpsData::access()
 
 bool GpsData::update(Object&& position)
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     if (m_positionLocked)
     {
         throw error::PositionAlreadyLocked();
@@ -67,7 +68,7 @@ bool GpsData::update(Object&& position)
 
 auto GpsData::location() const -> decltype(std::get<0>(m_position).location())
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     return std::get<0>(m_position).location();
 }
 

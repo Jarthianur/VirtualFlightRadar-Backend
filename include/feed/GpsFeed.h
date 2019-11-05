@@ -21,12 +21,9 @@
 
 #pragma once
 
-#include "Feed.h"
+#include "parser/GpsParser.h"
 
-namespace vfrb::feed::parser
-{
-class GpsParser;
-}  // namespace vfrb::feed::parser
+#include "Feed.h"
 
 namespace vfrb::data
 {
@@ -42,7 +39,7 @@ class GpsFeed : public Feed
 {
     NOT_COPYABLE(GpsFeed)
 
-    static parser::GpsParser s_parser;  ///< Parser to unpack response from Client
+    parser::GpsParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
     /**

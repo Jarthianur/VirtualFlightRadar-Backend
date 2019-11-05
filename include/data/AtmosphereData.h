@@ -21,8 +21,7 @@
 
 #pragma once
 
-#include <mutex>
-
+#include "concurrent/Mutex.h"
 #include "object/Atmosphere.h"
 
 #include "Data.hpp"
@@ -35,8 +34,8 @@ namespace vfrb::data
  */
 class AtmosphereData : public Data
 {
-    object::Atmosphere m_atmosphere;  ///< Atmospheric information
-    std::mutex mutable m_mutex;
+    concurrent::Mutex mutable m_mutex;
+    object::Atmosphere GUARDED_BY(m_mutex) m_atmosphere;  ///< Atmospheric information
 
 public:
     explicit AtmosphereData(AccessFn&& fn);
@@ -50,15 +49,15 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& atmosphere) override;
+    bool update(object::Object&& atmosphere) override REQUIRES(!m_mutex);
 
-    void access() override;
+    void access() override REQUIRES(!m_mutex);
 
     /**
      * @brief Get the atmospheric pressure.
      * @return the pressure
      * @threadsafe
      */
-    auto atmPressure() const -> decltype(m_atmosphere.pressure());
+    decltype(m_atmosphere.pressure()) atmPressure() const REQUIRES(!m_mutex);
 };
 }  // namespace vfrb::data

@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "concurrent/GuardedThread.hpp"
+#include "concurrent/Mutex.h"
 #include "net/impl/NetworkInterfaceImplBoost.h"
 #include "util/Logger.hpp"
 #include "util/class_utils.h"
@@ -47,30 +48,30 @@ class Server
     static char const*   LOG_PREFIX;
     static Logger const& logger;
 
-    s_ptr<net::NetworkInterface<SocketT>> m_netInterface;  ///< NetworkInterface
-    std::vector<Connection<SocketT>>      m_connections;   ///< Connections container
-    usize                                 m_maxConnections;
-    bool                                  m_running = false;  ///< Running state
-    std::mutex mutable m_mutex;
-    concurrent::GuardedThread m_thread;  ///< Internal thread
+    concurrent::Mutex mutable m_mutex;
+    s_ptr<net::NetworkInterface<SocketT>> GUARDED_BY(m_mutex) m_netInterface;  ///< NetworkInterface
+    std::vector<Connection<SocketT>>      GUARDED_BY(m_mutex) m_connections;   ///< Connections container
+    usize const                           GUARDED_BY(m_mutex) m_maxConnections;
+    bool                                  GUARDED_BY(m_mutex) m_running = false;  ///< Running state
+    concurrent::GuardedThread             GUARDED_BY(m_mutex) m_thread;           ///< Internal thread
 
     /**
      * @brief Schedule to accept connections.
      */
-    void accept();
+    void accept() REQUIRES(!m_mutex);
 
     /**
      * @brief Check whether an ip address already exists in the Connection container.
      * @param address The ip address to check
      * @return true if the ip is already registered, else false
      */
-    bool isConnected(str const& address);
+    bool isConnected(str const& address) REQUIRES(m_mutex);
 
     /**
      * @brief Handler for accepting connections.
      * @param error The error indicator
      */
-    void attemptConnection(bool error) noexcept;
+    void attemptConnection(bool error) noexcept REQUIRES(!m_mutex);
 
 public:
     Server(u16 port, usize maxCon);  ///< @param port The port
@@ -82,20 +83,20 @@ public:
      * @brief Run the Server.
      * @threadsafe
      */
-    void run();
+    void run() REQUIRES(!m_mutex);
 
     /**
      * @brief Stop all connections.
      * @threadsafe
      */
-    void stop();
+    void stop() REQUIRES(!m_mutex);
 
     /**
      * @brief Write a message to all clients.
      * @param msg The msg to write
      * @threadsafe
      */
-    void send(std::string_view const& msg);
+    void send(std::string_view const& msg) REQUIRES(!m_mutex);
 };
 
 template<typename SocketT>
@@ -123,23 +124,23 @@ Server<SocketT>::~Server() noexcept
 }
 
 template<typename SocketT>
-void Server<SocketT>::run()
+void Server<SocketT>::run() REQUIRES(!m_mutex)
 {
-    std::lock_guard lk(m_mutex);
+    concurrent::LockGuard lk(m_mutex);
     logger.info(LOG_PREFIX, "starting...");
     m_running = true;
     m_thread.spawn([this]() {
         accept();
-        std::unique_lock lk(m_mutex);
-        m_netInterface->run(lk);
+        m_netInterface->run();
         logger.debug(LOG_PREFIX, "stopped");
     });
 }
 
 template<typename SocketT>
-void Server<SocketT>::stop()
+void Server<SocketT>::stop() REQUIRES(!m_mutex)
 {
-    if (std::lock_guard lk(m_mutex); m_running)
+    concurrent::LockGuard lk(m_mutex);
+    if (m_running)
     {
         m_running = false;
         logger.info(LOG_PREFIX, "stopping all connections...");
@@ -149,9 +150,9 @@ void Server<SocketT>::stop()
 }
 
 template<typename SocketT>
-void Server<SocketT>::send(std::string_view const& msg)
+void Server<SocketT>::send(std::string_view const& msg) REQUIRES(!m_mutex)
 {
-    std::lock_guard lk(m_mutex);
+    concurrent::LockGuard lk(m_mutex);
     if (msg.empty() || m_connections.empty())
     {
         return;
@@ -171,25 +172,25 @@ void Server<SocketT>::send(std::string_view const& msg)
 }
 
 template<typename SocketT>
-void Server<SocketT>::accept()
+void Server<SocketT>::accept() REQUIRES(!m_mutex)
 {
-    std::lock_guard lk(m_mutex);
+    concurrent::LockGuard lk(m_mutex);
     m_netInterface->onAccept(std::bind(&Server<SocketT>::attemptConnection, this, std::placeholders::_1));
 }
 
 template<typename SocketT>
-bool Server<SocketT>::isConnected(str const& address)
+bool Server<SocketT>::isConnected(str const& address) REQUIRES(m_mutex)
 {
     return std::find_if(m_connections.begin(), m_connections.end(),
                         [&](auto const& it) { return it.address() == address; }) != m_connections.end();
 }
 
 template<typename SocketT>
-void Server<SocketT>::attemptConnection(bool error) noexcept
+void Server<SocketT>::attemptConnection(bool error) noexcept REQUIRES(!m_mutex)
 {
     if (!error)
     {
-        std::lock_guard lk(m_mutex);
+        concurrent::LockGuard lk(m_mutex);
         try
         {
             if (m_connections.size() < m_maxConnections && !isConnected(m_netInterface->stagedAddress()))

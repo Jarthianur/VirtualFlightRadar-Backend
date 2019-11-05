@@ -25,7 +25,6 @@
 
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
-#include "feed/parser/AprsParser.h"
 #include "object/Aircraft.h"
 
 using namespace vfrb::config;
@@ -33,20 +32,17 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-parser::AprsParser AprscFeed::s_parser;
-
 AprscFeed::AprscFeed(str const& name, Properties const& properties, s_ptr<data::AircraftData> data,
                      s32 maxHeight)
-    : Feed(name, properties, data), m_worker([this](str&& work) {
+    : Feed(name, properties, data), m_parser(maxHeight), m_worker([this](str&& work) {
           try
           {
-              m_data->update(s_parser.unpack(std::move(work), m_priority));
+              m_data->update(m_parser.unpack(std::move(work), m_priority));
           }
           catch ([[maybe_unused]] parser::error::UnpackError const&)
           {}
       })
 {
-    parser::AprsParser::s_maxHeight = maxHeight;
     try
     {
         properties.property(Configuration::KV_KEY_LOGIN);

@@ -46,7 +46,6 @@ class SignalListener
     boost::asio::io_service m_ioService;  ///< Internal IO-service
     boost::asio::signal_set m_sigSet;     ///< Internal signal set
     GuardedThread           m_thread;     ///< Thread to run this
-    std::mutex mutable m_mutex;
 
 public:
     SignalListener();

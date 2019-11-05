@@ -23,15 +23,12 @@
 
 #include "config/Configuration.h"
 #include "data/AtmosphereData.h"
-#include "feed/parser/AtmosphereParser.h"
 #include "object/Atmosphere.h"
 
 using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-parser::AtmosphereParser AtmosphereFeed::s_parser;
-
 AtmosphereFeed::AtmosphereFeed(str const& name, Properties const& properties,
                                s_ptr<data::AtmosphereData> data)
     : Feed(name, properties, data)
@@ -46,7 +43,7 @@ bool AtmosphereFeed::process(str response)
 {
     try
     {
-        m_data->update(s_parser.unpack(std::move(response), m_priority));
+        m_data->update(m_parser.unpack(std::move(response), m_priority));
     }
     catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}

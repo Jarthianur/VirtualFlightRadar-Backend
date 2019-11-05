@@ -23,9 +23,9 @@
 
 #include <fstream>
 #include <iostream>
-#include <mutex>
 #include <utility>
 
+#include "concurrent/Mutex.h"
 #include "util/class_utils.h"
 
 #include "types.h"
@@ -39,10 +39,10 @@ class Logger
 {
     NOT_COPYABLE(Logger)
 
-    std::ofstream      m_logFile;                 ///< The logfile stream
-    std::ostream*      m_outStream = &std::cout;  ///< Stream to log INFO,DEBUG,WARN
-    std::ostream*      m_errStream = &std::cerr;  ///< Stream to log ERROR
-    mutable std::mutex m_mutex;
+    concurrent::Mutex mutable m_mutex;
+    std::ofstream GUARDED_BY(m_mutex) m_logFile;                    ///< The logfile stream
+    std::ostream* PT_GUARDED_BY(m_mutex) m_outStream = &std::cout;  ///< Stream to log INFO,DEBUG,WARN
+    std::ostream* PT_GUARDED_BY(m_mutex) m_errStream = &std::cerr;  ///< Stream to log ERROR
 
     /**
      * @brief Get current date-time as string.
@@ -50,7 +50,7 @@ class Logger
      */
     static str time();
 
-    void prefix(std::ostream& stream, char const* msg) const;
+    void prefix(std::ostream& stream, char const* msg) const REQUIRES(m_mutex);
 
     Logger() = default;
 
@@ -66,7 +66,7 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void info(Args&&... args) const;
+    void info(Args&&... args) const REQUIRES(!m_mutex);
 
     /**
      * @brief Log on DEBUG level.
@@ -75,7 +75,7 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void debug(Args&&... args) const;
+    void debug(Args&&... args) const REQUIRES(!m_mutex);
 
     /**
      * @brief Log on WARN level.
@@ -84,7 +84,7 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void warn(Args&&... args) const;
+    void warn(Args&&... args) const REQUIRES(!m_mutex);
 
     /**
      * @brief Log on ERROR level.
@@ -93,50 +93,51 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void error(Args&&... args) const;
+    void error(Args&&... args) const REQUIRES(!m_mutex);
 
     /**
      * @brief Set a logfile instead of stdout/stderr.
      * @param file The filename
      */
-    void logFile(str const& file);
+    void logFile(str const& file) REQUIRES(!m_mutex);
 };
 
 [[gnu::always_inline]] inline void Logger::prefix(std::ostream& stream, char const* msg) const
+    REQUIRES(m_mutex)
 {
     stream << msg << "  " << time() << ":: ";
 }
 
 template<typename... Args>
-void Logger::info(Args&&... args) const
+void Logger::info(Args&&... args) const REQUIRES(!m_mutex)
 {
-    std::lock_guard lk(m_mutex);
+    concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, "[INFO ]");
     (*m_outStream << ... << args) << std::endl;
 }
 
 template<typename... Args>
-void Logger::debug([[maybe_unused]] Args&&... args) const
+void Logger::debug([[maybe_unused]] Args&&... args) const REQUIRES(!m_mutex)
 {
 #ifdef LOG_ENABLE_DEBUG
-    std::lock_guard lk(m_mutex);
+    concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, "[DEBUG]");
     (*m_outStream << ... << args) << std::endl;
 #endif
 }
 
 template<typename... Args>
-void Logger::warn(Args&&... args) const
+void Logger::warn(Args&&... args) const REQUIRES(!m_mutex)
 {
-    std::lock_guard lk(m_mutex);
+    concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, "[WARN ]");
     (*m_outStream << ... << args) << std::endl;
 }
 
 template<typename... Args>
-void Logger::error(Args&&... args) const
+void Logger::error(Args&&... args) const REQUIRES(!m_mutex)
 {
-    std::lock_guard lk(m_mutex);
+    concurrent::LockGuard lk(m_mutex);
     prefix(*m_errStream, "[ERROR]");
     (*m_errStream << ... << args) << std::endl;
 }

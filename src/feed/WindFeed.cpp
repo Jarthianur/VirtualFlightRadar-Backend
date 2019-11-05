@@ -30,8 +30,6 @@ using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-parser::WindParser WindFeed::s_parser;
-
 WindFeed::WindFeed(str const& name, Properties const& properties, s_ptr<data::WindData> data)
     : Feed(name, properties, data)
 {}
@@ -45,7 +43,7 @@ bool WindFeed::process(str response)
 {
     try
     {
-        m_data->update(s_parser.unpack(std::move(response), m_priority));
+        m_data->update(m_parser.unpack(std::move(response), m_priority));
     }
     catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}
