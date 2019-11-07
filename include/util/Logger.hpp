@@ -25,7 +25,7 @@
 #include <iostream>
 #include <utility>
 
-#include "concurrent/Mutex.h"
+#include "concurrent/Mutex.hpp"
 #include "util/class_utils.h"
 
 #include "types.h"
