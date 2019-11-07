@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "concurrent/Mutex.h"
+#include "concurrent/Mutex.hpp"
 #include "object/Atmosphere.h"
 
 #include "Data.hpp"

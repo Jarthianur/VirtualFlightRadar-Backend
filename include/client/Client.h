@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include <mutex>
 #include <vector>
 
+#include "concurrent/Mutex.hpp"
 #include "net/Connector.hpp"
 #include "net/Endpoint.hpp"
 #include "util/class_utils.h"
@@ -53,12 +53,12 @@ protected:
         STOPPING
     };
 
-    TimeoutBackoff                 m_backoff;
-    s_ptr<net::Connector>          m_connector;            /// Connector interface
-    State                          m_state = State::NONE;  /// Run state indicator
-    net::Endpoint const            m_endpoint;             /// Remote endpoint
-    std::vector<s_ptr<feed::Feed>> m_feeds;                /// Container for subscribed feeds
-    std::mutex mutable m_mutex;
+    concurrent::Mutex mutable m_mutex;
+    TimeoutBackoff                 GUARDED_BY(m_mutex) m_backoff;
+    s_ptr<net::Connector>          GUARDED_BY(m_mutex) m_connector;            /// Connector interface
+    State                          GUARDED_BY(m_mutex) m_state = State::NONE;  /// Run state indicator
+    net::Endpoint const            m_endpoint;                                 /// Remote endpoint
+    std::vector<s_ptr<feed::Feed>> GUARDED_BY(m_mutex) m_feeds;  /// Container for subscribed feeds
 
     /**
      * @param endpoint  The connection Endpoint
@@ -78,41 +78,41 @@ protected:
     /**
      * @brief Stop and close the connection.
      */
-    virtual void stop();
+    virtual void stop() REQUIRES(m_mutex);
 
     /**
      * @brief Schedule to read from endpoint.
      */
-    virtual void read();
+    virtual void read() REQUIRES(m_mutex);
 
     /**
      * @brief Schedule to connect after some timeout.
      */
-    void timedConnect();
+    void timedConnect() REQUIRES(m_mutex);
 
     /**
      * @brief Schedule to connect to endpoint.
      */
-    void connect();
+    void connect() REQUIRES(m_mutex);
 
     /**
      * @brief Close connection and schedule to connect after timeout.
      * @threadsafe
      */
-    void reconnect();
+    void reconnect() REQUIRES(m_mutex);
 
     /**
      * @brief Handler for timedConnect
      * @param error The error indicator
      */
-    void handleTimedConnect(net::ErrorCode error);
+    void handleTimedConnect(net::ErrorCode error) REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for read
      * @param error    The error indicator
      * @param response The received string
      */
-    void handleRead(net::ErrorCode, str const& response);
+    void handleRead(net::ErrorCode, str const& response) REQUIRES(!m_mutex);
 
 public:
     virtual ~Client() noexcept = default;
@@ -122,21 +122,21 @@ public:
      * @note Returns after all queued handlers have returned.
      * @threadsafe
      */
-    void run();
+    void run() REQUIRES(!m_mutex);
 
     /**
      * @brief Stop after client has been started.
      * @note Wait until run has been called.
      * @threadsafe
      */
-    void scheduleStop();
+    void scheduleStop() REQUIRES(!m_mutex);
 
     /**
      * @brief Subscribe a Feed to this client.
      * @param feed The Feed to subscribe
      * @threadsafe
      */
-    void subscribe(s_ptr<feed::Feed> feed);
+    void subscribe(s_ptr<feed::Feed> feed) REQUIRES(!m_mutex);
 
     /**
      * @brief Compare to another client by value.

@@ -29,6 +29,7 @@
 #include "util/Logger.hpp"
 
 using namespace vfrb::client::net;
+using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
@@ -39,7 +40,8 @@ GpsdClient::GpsdClient(Endpoint const& endpoint, s_ptr<Connector> connector) : C
 
 void GpsdClient::handleConnect(ErrorCode error)
 {
-    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
+    LockGuard lk(m_mutex);
+    if (m_state == State::CONNECTING)
     {
         if (error == ErrorCode::SUCCESS)
         {
@@ -58,10 +60,10 @@ void GpsdClient::stop()
 {
     if (m_state == State::RUNNING)
     {
-        std::mutex              sync;
-        std::unique_lock        lk(sync);
-        std::condition_variable cv;
-        bool                    sent = false;
+        Mutex                       sync;
+        UniqueLock                  lk(sync);
+        std::condition_variable_any cv;
+        bool                        sent = false;
         m_connector->onWrite("?WATCH={\"enable\":false}\r\n", [&sent, &cv]([[maybe_unused]] ErrorCode) {
             logger.info(LOG_PREFIX, "stopped watch");
             sent = true;
@@ -74,7 +76,8 @@ void GpsdClient::stop()
 
 void GpsdClient::handleWatch(ErrorCode error)
 {
-    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
+    LockGuard lk(m_mutex);
+    if (m_state == State::CONNECTING)
     {
         if (error == ErrorCode::SUCCESS)
         {

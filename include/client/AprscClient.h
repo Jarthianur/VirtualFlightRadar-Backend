@@ -40,27 +40,27 @@ class AprscClient : public Client
     /**
      * @brief Schedule sending of a keep-alive beacon.
      */
-    void sendKeepAlive();
+    void sendKeepAlive() REQUIRES(m_mutex);
 
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::ErrorCode error) override;
+    void handleConnect(net::ErrorCode error) override REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for sending of the login string.
      * @param error The error indicator
      * @threadsafe
      */
-    void handleLogin(net::ErrorCode error);
+    void handleLogin(net::ErrorCode error) REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for sending a keep-alive beacon.
      * @param error The error indicator
      * @threadsafe
      */
-    void handleSendKeepAlive(net::ErrorCode error);
+    void handleSendKeepAlive(net::ErrorCode error) REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 

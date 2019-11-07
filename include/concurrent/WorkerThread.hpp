@@ -29,7 +29,7 @@
 #include "util/class_utils.h"
 
 #include "GuardedThread.hpp"
-#include "Mutex.h"
+#include "Mutex.hpp"
 #include "types.h"
 
 namespace vfrb::concurrent

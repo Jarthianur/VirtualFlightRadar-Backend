@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "concurrent/GuardedThread.hpp"
-#include "concurrent/Mutex.h"
+#include "concurrent/Mutex.hpp"
 #include "net/impl/NetworkInterfaceImplBoost.h"
 #include "util/Logger.hpp"
 #include "util/class_utils.h"

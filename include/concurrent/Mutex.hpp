@@ -65,6 +65,8 @@
 
 namespace vfrb::concurrent
 {
+#if defined(__clang__) && (!defined(SWIG))
+
 class CAPABILITY("mutex") Mutex
 {
     NOT_COPYABLE(Mutex)
@@ -75,13 +77,25 @@ public:
     Mutex()           = default;
     ~Mutex() noexcept = default;
 
-    void lock() ACQUIRE();
+    void lock() ACQUIRE()
+    {
+        m_mutex.lock();
+    }
 
-    void unlock() RELEASE();
+    void unlock() RELEASE()
+    {
+        m_mutex.unlock();
+    }
 
-    bool try_lock() TRY_ACQUIRE(true);
+    bool try_lock() TRY_ACQUIRE(true)
+    {
+        return m_mutex.try_lock();
+    }
 
-    Mutex const& operator!() const;
+    Mutex const& operator!() const
+    {
+        return *this;
+    }
 };
 
 class SCOPED_CAPABILITY LockGuard
@@ -91,24 +105,16 @@ class SCOPED_CAPABILITY LockGuard
     std::lock_guard<Mutex> m_lock;
 
 public:
-    LockGuard(Mutex& mu) ACQUIRE(mu);
-    ~LockGuard() noexcept RELEASE();
+    LockGuard(Mutex& mu) ACQUIRE(mu) : m_lock(mu) {}
+    ~LockGuard() noexcept RELEASE() {}
 };
 
-class SCOPED_CAPABILITY UniqueLock
-{
-    NOT_COPYABLE(UniqueLock)
+#else
 
-    std::unique_lock<Mutex> m_lock;
+using Mutex     = std::mutex;
+using LockGuard = std::lock_guard<std::mutex>;
 
-public:
-    UniqueLock(Mutex& mu) ACQUIRE(mu);
-    UniqueLock(UniqueLock&& other) ACQUIRE();
-    ~UniqueLock() noexcept RELEASE();
+#endif
 
-    void lock() ACQUIRE();
-    void unlock() RELEASE();
-
-    UniqueLock& operator=(UniqueLock&& other) ACQUIRE();
-};
+using UniqueLock = std::unique_lock<Mutex>;
 }  // namespace vfrb::concurrent

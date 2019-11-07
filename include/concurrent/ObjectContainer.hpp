@@ -27,7 +27,7 @@
 #include "util/CString.hpp"
 #include "util/class_utils.h"
 
-#include "Mutex.h"
+#include "Mutex.hpp"
 #include "types.h"
 
 namespace vfrb::concurrent
@@ -58,8 +58,8 @@ public:
 
         ValueType& operator=(ValueType&& other);
 
-        T value                   GUARDED_BY(mutex);
-        util::CString<CstrS> nmea GUARDED_BY(mutex);
+        T                    value;
+        util::CString<CstrS> nmea;
 
     protected:
         friend struct ObjectContainer::Iterator;
@@ -100,7 +100,7 @@ public:
     protected:
         typename ContainerType::iterator iterator;
         UniqueLock                       valueLock;
-        ObjectContainer const& container GUARDED_BY(container.m_modMutex);
+        ObjectContainer const&           container;
     };
 
     Iterator begin() REQUIRES(!m_modMutex);
@@ -207,7 +207,7 @@ bool ObjectContainer<T, CstrS>::Iterator::operator!=(Iterator const& other) cons
 }
 
 template<typename T, usize CstrS>
-auto ObjectContainer<T, CstrS>::begin() -> Iterator
+typename ObjectContainer<T, CstrS>::Iterator ObjectContainer<T, CstrS>::begin() REQUIRES(!m_modMutex)
 {
     LockGuard lk(m_modMutex);
     return Iterator(m_container.begin(), *this);
@@ -220,7 +220,9 @@ auto ObjectContainer<T, CstrS>::end() -> Iterator
 }
 
 template<typename T, usize CstrS>
-auto ObjectContainer<T, CstrS>::insert(KeyType key, T&& value) -> std::pair<Iterator, bool>
+std::pair<typename ObjectContainer<T, CstrS>::Iterator, bool> ObjectContainer<T, CstrS>::insert(KeyType key,
+                                                                                                T&&     value)
+    REQUIRES(!m_modMutex)
 {
     LockGuard lk(m_modMutex);
     Iterator  iter(m_container.find(key), *this);
@@ -233,7 +235,7 @@ auto ObjectContainer<T, CstrS>::insert(KeyType key, T&& value) -> std::pair<Iter
 }
 
 template<typename T, usize CstrS>
-void ObjectContainer<T, CstrS>::erase(KeyType key)
+void ObjectContainer<T, CstrS>::erase(KeyType key) REQUIRES(!m_modMutex)
 {
     LockGuard lk(m_modMutex);
     auto      entry = m_container.find(key);

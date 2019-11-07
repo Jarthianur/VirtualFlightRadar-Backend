@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include <mutex>
 #include <unordered_set>
 
+#include "concurrent/Mutex.hpp"
 #include "concurrent/ThreadGroup.hpp"
 #include "error/Error.hpp"
 #include "util/class_utils.h"
@@ -72,9 +72,9 @@ class ClientManager
 {
     NOT_COPYABLE(ClientManager)
 
-    ClientSet               m_clients;   ///< Set of clients
-    concurrent::ThreadGroup m_thdGroup;  ///< Thread group for client threads
-    mutable std::mutex      m_mutex;
+    concurrent::Mutex mutable m_mutex;
+    ClientSet               GUARDED_BY(m_mutex) m_clients;   ///< Set of clients
+    concurrent::ThreadGroup GUARDED_BY(m_mutex) m_thdGroup;  ///< Thread group for client threads
 
 public:
     ClientManager() = default;
@@ -85,20 +85,20 @@ public:
      * @param feed The feed to subscribe
      * @threadsafe
      */
-    void subscribe(s_ptr<feed::Feed> feed);
+    void subscribe(s_ptr<feed::Feed> feed) REQUIRES(!m_mutex);
 
     /**
      * @brief Run all clients in their own thread.
      * @threadsafe
      */
-    void run();
+    void run() REQUIRES(!m_mutex);
 
     /**
      * @brief Stop all clients.
      * @note Blocks until all clients have stopped.
      * @threadsafe
      */
-    void stop();
+    void stop() REQUIRES(!m_mutex);
 };
 
 namespace error

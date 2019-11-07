@@ -35,20 +35,20 @@ class GpsdClient : public Client
     /**
      * @brief Send unwatch-request and stop this client.
      */
-    void stop() override;
+    void stop() override REQUIRES(m_mutex);
 
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::ErrorCode error) override;
+    void handleConnect(net::ErrorCode error) override REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for watch-request sending
      * @param error The error indicator
      * @threadsafe
      */
-    void handleWatch(net::ErrorCode error);
+    void handleWatch(net::ErrorCode error) REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 

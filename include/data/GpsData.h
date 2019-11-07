@@ -23,7 +23,7 @@
 
 #include <tuple>
 
-#include "concurrent/Mutex.h"
+#include "concurrent/Mutex.hpp"
 #include "error/Error.hpp"
 #include "object/GpsPosition.h"
 #include "processor/GpsProcessor.h"
