@@ -51,7 +51,8 @@ class AprsParser : public Parser<object::Aircraft>
     inline static constexpr auto RE_APRS_CR      = 11;  ///< APRS regex match group of climb rate
     inline static constexpr auto RE_APRS_TR      = 12;  ///< APRS regex match group of turn rate
 
-    static std::regex const s_APRS_RE;  ///< Regular expression for APRS protocol
+    std::regex const m_APRS_RE;    ///< Regular expression for APRS protocol
+    s32 const        m_maxHeight;  ///< The max height filter
 
     /**
      * @brief Parse a Position.
@@ -87,9 +88,7 @@ class AprsParser : public Parser<object::Aircraft>
     object::Timestamp parseTimeStamp(std::cmatch const& match) const;
 
 public:
-    static s32 s_maxHeight;  ///< The max height filter
-
-    AprsParser()                    = default;
+    explicit AprsParser(s32 maxHeight);
     ~AprsParser() noexcept override = default;
 
     /**

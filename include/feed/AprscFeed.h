@@ -22,13 +22,9 @@
 #pragma once
 
 #include "concurrent/WorkerThread.hpp"
+#include "parser/AprsParser.h"
 
 #include "Feed.h"
-
-namespace vfrb::feed::parser
-{
-class AprsParser;
-}  // namespace vfrb::feed::parser
 
 namespace vfrb::data
 {
@@ -46,7 +42,7 @@ class AprscFeed : public Feed
 
     static constexpr auto LOG_PREFIX = "(AprscFeed) ";
 
-    static parser::AprsParser     s_parser;  ///< Parser to unpack response from Client
+    parser::AprsParser const      m_parser;  ///< Parser to unpack response from Client
     concurrent::WorkerThread<str> m_worker;
 
 public:

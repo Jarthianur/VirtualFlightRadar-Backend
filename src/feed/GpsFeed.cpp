@@ -34,8 +34,6 @@ namespace vfrb::feed
 constexpr auto     LOG_PREFIX = "(GpsFeed) ";
 static auto const& logger     = Logger::instance();
 
-parser::GpsParser GpsFeed::s_parser;
-
 GpsFeed::GpsFeed(str const& name, Properties const& properties, s_ptr<data::GpsData> data)
     : Feed(name, properties, data)
 {}
@@ -49,7 +47,7 @@ bool GpsFeed::process(str response)
 {
     try
     {
-        m_data->update(s_parser.unpack(std::move(response), m_priority));
+        m_data->update(m_parser.unpack(std::move(response), m_priority));
     }
     catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}

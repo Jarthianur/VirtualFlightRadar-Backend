@@ -21,12 +21,9 @@
 
 #pragma once
 
-#include "Feed.h"
+#include "parser/WindParser.h"
 
-namespace vfrb::feed::parser
-{
-class WindParser;
-}  // namespace vfrb::feed::parser
+#include "Feed.h"
 
 namespace vfrb::data
 {
@@ -42,7 +39,7 @@ class WindFeed : public Feed
 {
     NOT_COPYABLE(WindFeed)
 
-    static parser::WindParser s_parser;  ///< Parser to unpack response from Client
+    parser::WindParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
     /**

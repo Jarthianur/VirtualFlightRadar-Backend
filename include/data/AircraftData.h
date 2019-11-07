@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "concurrent/ConcurrentNMEAContainer.hpp"
+#include "concurrent/ObjectContainer.hpp"
 #include "object/Aircraft.h"
 #include "processor/AircraftProcessor.h"
 
@@ -40,7 +40,7 @@ class AircraftData : public Data
     inline static constexpr auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
     inline static constexpr auto NMEA_SIZE        = processor::AircraftProcessor::NMEA_SIZE;
 
-    concurrent::ConcurrentNMEAContainer<object::Aircraft, NMEA_SIZE>
+    concurrent::ObjectContainer<object::Aircraft, NMEA_SIZE>
                                  m_container;  ///< Internal container for aircrafts
     processor::AircraftProcessor m_processor;  ///< Processor for aircrafts
 

@@ -37,19 +37,19 @@ class SensorClient : public Client
     /**
      * @brief Override Client::read, use timeout
      */
-    void read() override;
+    void read() override REQUIRES(m_mutex);
 
     /**
      * @brief Check read timeout deadline reached.
      * @threadsafe
      */
-    void checkDeadline(net::ErrorCode error);
+    void checkDeadline(net::ErrorCode error) REQUIRES(!m_mutex);
 
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::ErrorCode error) override;
+    void handleConnect(net::ErrorCode error) override REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 

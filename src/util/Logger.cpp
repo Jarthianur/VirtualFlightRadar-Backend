@@ -29,7 +29,7 @@ namespace vfrb
 {
 void Logger::logFile(str const& file)
 {
-    std::lock_guard lk(m_mutex);
+    concurrent::LockGuard lk(m_mutex);
     m_logFile = std::ofstream(file);
     if (!m_logFile)
     {
@@ -42,7 +42,7 @@ void Logger::logFile(str const& file)
 str Logger::time()
 {
     std::time_t tt       = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    char        time[32] = "";
+    static char time[32] = "";
     std::strftime(time, 32, "%c", gmtime(&tt));
     return time;
 }

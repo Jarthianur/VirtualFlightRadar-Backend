@@ -21,8 +21,7 @@
 
 #pragma once
 
-#include <mutex>
-
+#include "concurrent/Mutex.hpp"
 #include "object/Wind.h"
 
 #include "Data.hpp"
@@ -35,8 +34,9 @@ namespace vfrb::data
  */
 class WindData : public Data
 {
-    object::Wind m_wind;  ///< The Wind information
-    std::mutex mutable m_mutex;
+    concurrent::Mutex mutable m_mutex;
+
+    object::Wind GUARDED_BY(m_mutex) m_wind;  ///< The Wind information
 
 public:
     explicit WindData(AccessFn&& fn);
@@ -49,8 +49,8 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& wind) override;
+    bool update(object::Object&& wind) override REQUIRES(!m_mutex);
 
-    void access() override;
+    void access() override REQUIRES(!m_mutex);
 };
 }  // namespace vfrb::data

@@ -34,6 +34,7 @@
 static auto const& logger = vfrb::Logger::instance();
 
 using namespace vfrb::client::net;
+using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
@@ -56,7 +57,7 @@ usize Client::hash() const
 
 void Client::subscribe(s_ptr<feed::Feed> feed)
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     m_feeds.push_back(feed);
     std::sort(m_feeds.begin(), m_feeds.end(), [](s_ptr<feed::Feed> const& f1, s_ptr<feed::Feed> const& f2) {
         return f1->priority() > f2->priority();
@@ -65,7 +66,8 @@ void Client::subscribe(s_ptr<feed::Feed> feed)
 
 void Client::run()
 {
-    if (std::unique_lock lk(m_mutex); m_state == State::NONE)
+    UniqueLock lk(m_mutex);
+    if (m_state == State::NONE)
     {
         connect();
         lk.unlock();
@@ -109,8 +111,8 @@ void Client::stop()
 
 void Client::scheduleStop()
 {
-    std::condition_variable cond_ready;
-    std::unique_lock        lk(m_mutex);
+    std::condition_variable_any cond_ready;
+    UniqueLock                  lk(m_mutex);
     cond_ready.wait_for(lk, std::chrono::milliseconds(100), [this] { return m_state != State::NONE; });
     stop();
 }
@@ -124,7 +126,7 @@ void Client::handleTimedConnect(ErrorCode error)
 {
     if (error == ErrorCode::SUCCESS)
     {
-        std::lock_guard lk(m_mutex);
+        LockGuard lk(m_mutex);
         logger.info(logPrefix(), "try connect to ", m_endpoint.host, ":", m_endpoint.port);
         connect();
     }
@@ -137,7 +139,8 @@ void Client::handleTimedConnect(ErrorCode error)
 
 void Client::handleRead(ErrorCode error, str const& response)
 {
-    if (std::lock_guard lk(m_mutex); m_state == State::RUNNING)
+    LockGuard lk(m_mutex);
+    if (m_state == State::RUNNING)
     {
         if (error == ErrorCode::SUCCESS)
         {

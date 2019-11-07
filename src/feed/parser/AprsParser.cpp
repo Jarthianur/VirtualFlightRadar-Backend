@@ -34,23 +34,25 @@ using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
-std::regex const AprsParser::s_APRS_RE("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/"
-                                       "(\\d{6})h"                               // time
-                                       "(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?"       // lat, lat-dir
-                                       "(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?"       // lon, lon-dir
-                                       "(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?"  // head.gnd-spd,alt
-                                       "(?:[\\S\\s]+?)?"
-                                       "id([0-9A-F]{2})([0-9A-F]{6})\\s?"                // type,id
-                                       "(?:([\\+-]\\d{3})fpm\\s+?)?"                     // climb
-                                       "(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",  // turn
-                                       std::regex::optimize | std::regex::icase);
-
-s32 AprsParser::s_maxHeight = std::numeric_limits<s32>::max();
+AprsParser::AprsParser(s32 maxHeight)
+    : Parser<Aircraft>(),
+      m_APRS_RE("^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/"
+                "(\\d{6})h"                               // time
+                "(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?"       // lat, lat-dir
+                "(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?"       // lon, lon-dir
+                "(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?"  // head.gnd-spd,alt
+                "(?:[\\S\\s]+?)?"
+                "id([0-9A-F]{2})([0-9A-F]{6})\\s?"                // type,id
+                "(?:([\\+-]\\d{3})fpm\\s+?)?"                     // climb
+                "(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",  // turn
+                std::regex::optimize | std::regex::icase),
+      m_maxHeight(maxHeight)
+{}
 
 Aircraft AprsParser::unpack(str&& sentence, u32 priority) const
 {
     std::cmatch match;
-    if ((!sentence.empty() && sentence[0] == '#') || !std::regex_match(sentence.c_str(), match, s_APRS_RE))
+    if ((!sentence.empty() && sentence[0] == '#') || !std::regex_match(sentence.c_str(), match, m_APRS_RE))
     {
         throw error::UnpackError();
     }
@@ -81,7 +83,7 @@ Location AprsParser::parseLocation(std::cmatch const& match) const
         pos.longitude = -pos.longitude;
     }
     pos.altitude = math::doubleToInt(parse<f64>(match[RE_APRS_ALT]) * math::FEET_2_M);
-    if (pos.altitude <= s_maxHeight)
+    if (pos.altitude <= m_maxHeight)
     {
         return pos;
     }

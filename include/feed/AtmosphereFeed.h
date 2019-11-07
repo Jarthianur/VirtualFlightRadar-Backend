@@ -21,12 +21,9 @@
 
 #pragma once
 
-#include "Feed.h"
+#include "parser/AtmosphereParser.h"
 
-namespace vfrb::feed::parser
-{
-class AtmosphereParser;
-}  // namespace vfrb::feed::parser
+#include "Feed.h"
 
 namespace vfrb::data
 {
@@ -42,7 +39,7 @@ class AtmosphereFeed : public Feed
 {
     NOT_COPYABLE(AtmosphereFeed)
 
-    static parser::AtmosphereParser s_parser;  ///< Parser to unpack response from Client
+    parser::AtmosphereParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
     /**

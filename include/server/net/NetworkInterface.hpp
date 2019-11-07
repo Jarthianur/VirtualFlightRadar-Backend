@@ -22,7 +22,6 @@
 #pragma once
 
 #include <functional>
-#include <mutex>
 
 #include "types.h"
 
@@ -50,7 +49,7 @@ public:
      * @brief Run this interface.
      * @param lock The lock that may be hold and released inside
      */
-    virtual void run(std::unique_lock<std::mutex>& lk) = 0;
+    virtual void run() = 0;
 
     /**
      * @brief Stop this interface.

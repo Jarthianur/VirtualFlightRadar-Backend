@@ -25,6 +25,7 @@
 #include "feed/Feed.h"
 
 using namespace std::literals;
+using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
@@ -35,9 +36,9 @@ ClientManager::~ClientManager() noexcept
 
 void ClientManager::subscribe(s_ptr<feed::Feed> feed)
 {
-    std::lock_guard lk(m_mutex);
-    ClientIter      it = m_clients.end();
-    it                 = m_clients.insert(ClientFactory::createClientFor(feed)).first;
+    LockGuard  lk(m_mutex);
+    ClientIter it = m_clients.end();
+    it            = m_clients.insert(ClientFactory::createClientFor(feed)).first;
     if (it != m_clients.end())
     {
         (*it)->subscribe(feed);
@@ -50,12 +51,12 @@ void ClientManager::subscribe(s_ptr<feed::Feed> feed)
 
 void ClientManager::run()
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     for (auto it : m_clients)
     {
         m_thdGroup.createThread([this, it] {
             it->run();
-            std::lock_guard lk(m_mutex);
+            LockGuard lk(m_mutex);
             m_clients.erase(it);
         });
     }
@@ -63,12 +64,10 @@ void ClientManager::run()
 
 void ClientManager::stop()
 {
+    LockGuard lk(m_mutex);
+    for (auto it : m_clients)
     {
-        std::lock_guard lk(m_mutex);
-        for (auto it : m_clients)
-        {
-            it->scheduleStop();
-        }
+        it->scheduleStop();
     }
 }
 

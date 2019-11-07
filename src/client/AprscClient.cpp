@@ -29,6 +29,7 @@
 #include "util/Logger.hpp"
 
 using namespace vfrb::client::net;
+using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
@@ -61,7 +62,8 @@ usize AprscClient::hash() const
 
 void AprscClient::handleConnect(ErrorCode error)
 {
-    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
+    LockGuard lk(m_mutex);
+    if (m_state == State::CONNECTING)
     {
         if (error == ErrorCode::SUCCESS)
         {
@@ -83,7 +85,8 @@ void AprscClient::sendKeepAlive()
 
 void AprscClient::handleLogin(ErrorCode error)
 {
-    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
+    LockGuard lk(m_mutex);
+    if (m_state == State::CONNECTING)
     {
         if (error == ErrorCode::SUCCESS)
         {
@@ -103,7 +106,8 @@ void AprscClient::handleLogin(ErrorCode error)
 
 void AprscClient::handleSendKeepAlive(ErrorCode error)
 {
-    if (std::lock_guard lk(m_mutex); m_state == State::RUNNING)
+    LockGuard lk(m_mutex);
+    if (m_state == State::RUNNING)
     {
         if (error == ErrorCode::SUCCESS)
         {

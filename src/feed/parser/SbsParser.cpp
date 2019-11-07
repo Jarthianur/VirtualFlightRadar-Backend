@@ -21,8 +21,6 @@
 
 #include "feed/parser/SbsParser.h"
 
-#include <limits>
-
 #include "object/GpsPosition.h"
 #include "util/math.hpp"
 #include "util/string_utils.hpp"
@@ -32,9 +30,7 @@ using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
-s32 SbsParser::s_maxHeight = std::numeric_limits<s32>::max();
-
-SbsParser::SbsParser() : Parser<Aircraft>() {}
+SbsParser::SbsParser(s32 maxHeight) : Parser<Aircraft>(), m_maxHeight(maxHeight) {}
 
 Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
 {
@@ -95,7 +91,7 @@ Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
                 i += 1;
             }
         }
-        if (i == 16 && loc.altitude <= s_maxHeight)
+        if (i == 16 && loc.altitude <= m_maxHeight)
         {
             return {priority, id, Aircraft::IdType::ICAO, Aircraft::AircraftType::POWERED_AIRCRAFT, loc, ts};
         }

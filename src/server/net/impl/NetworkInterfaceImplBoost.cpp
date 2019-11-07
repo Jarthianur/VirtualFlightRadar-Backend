@@ -45,13 +45,12 @@ NetworkInterfaceImplBoost::~NetworkInterfaceImplBoost() noexcept
     stop();
 }
 
-void NetworkInterfaceImplBoost::run(std::unique_lock<std::mutex>& lk)
+void NetworkInterfaceImplBoost::run()
 {
     try
     {
         if (m_acceptor.is_open())
         {
-            lk.unlock();
             m_ioService.run();
         }
     }

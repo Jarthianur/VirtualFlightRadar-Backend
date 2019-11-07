@@ -24,6 +24,7 @@
 #include "util/Logger.hpp"
 
 using namespace vfrb::client::net;
+using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
@@ -34,7 +35,8 @@ SbsClient::SbsClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Cli
 
 void SbsClient::handleConnect(ErrorCode error)
 {
-    if (std::lock_guard lk(m_mutex); m_state == State::CONNECTING)
+    LockGuard lk(m_mutex);
+    if (m_state == State::CONNECTING)
     {
         if (error == ErrorCode::SUCCESS)
         {
