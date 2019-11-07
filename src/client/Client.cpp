@@ -57,7 +57,7 @@ usize Client::hash() const
 
 void Client::subscribe(s_ptr<feed::Feed> feed)
 {
-    std::lock_guard lk(m_mutex);
+    LockGuard lk(m_mutex);
     m_feeds.push_back(feed);
     std::sort(m_feeds.begin(), m_feeds.end(), [](s_ptr<feed::Feed> const& f1, s_ptr<feed::Feed> const& f2) {
         return f1->priority() > f2->priority();
@@ -66,7 +66,8 @@ void Client::subscribe(s_ptr<feed::Feed> feed)
 
 void Client::run()
 {
-    if (std::unique_lock lk(m_mutex); m_state == State::NONE)
+    UniqueLock lk(m_mutex);
+    if (m_state == State::NONE)
     {
         connect();
         lk.unlock();
