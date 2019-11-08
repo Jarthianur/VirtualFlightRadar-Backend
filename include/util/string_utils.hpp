@@ -38,7 +38,7 @@
 
 namespace vfrb::str_util
 {
-enum class Errc : enum_t
+enum class Errc : enum_type
 {
     OK,
     ERR
@@ -71,40 +71,40 @@ public:
  * @param length   The sentences size
  * @return the checksum
  */
-inline s32 checksum(std::string_view const& sv, usize pos)
+inline s32 Checksum(std::string_view const& sv_, usize pos_)
 {
     s32   csum = 0;
-    usize i    = 1 + pos;  // $ in nmea str not included
-    while (i < sv.length() && sv[i] != '*')
+    usize i    = 1 + pos_;  // $ in nmea str not included
+    while (i < sv_.length() && sv_[i] != '*')
     {
-        csum ^= static_cast<s32>(sv[i++]);
+        csum ^= static_cast<s32>(sv_[i++]);
     }
     return csum;
 }
 
-inline bool matchChecksum(std::string_view const& sv)
+inline bool MatchChecksum(std::string_view const& sv_)
 {
-    auto const cs_begin = sv.rfind('*');
-    if (cs_begin == std::string_view::npos || cs_begin + 3 >= sv.length())
+    auto const cs_begin = sv_.rfind('*');
+    if (cs_begin == std::string_view::npos || cs_begin + 3 >= sv_.length())
     {
         return false;
     }
     s32  csum;
     bool match = false;
-    if (auto [p, ec] = std::from_chars(sv.data() + cs_begin + 1, sv.data() + sv.length(), csum, 16);
+    if (auto [p, ec] = std::from_chars(sv_.data() + cs_begin + 1, sv_.data() + sv_.length(), csum, 16);
         ec == std::errc())
     {
-        match = csum == checksum(sv, 0);
+        match = csum == Checksum(sv_, 0);
     }
     return match;
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, f64))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
     T    result;
     Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::double_, result) || first != last)
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::double_, result) || first_ != last_)
     {
         ec = Errc::ERR;
     }
@@ -112,11 +112,11 @@ Result<T> convert(char const* first, char const* last)
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, s32))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
     T    result;
     Errc ec = Errc::OK;
-    if (auto [p, e] = std::from_chars(first, last, result); e != std::errc())
+    if (auto [p, e] = std::from_chars(first_, last_, result); e != std::errc())
     {
         ec = Errc::ERR;
     }
@@ -124,11 +124,11 @@ Result<T> convert(char const* first, char const* last)
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, u32))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
     T    result;
     Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::uint_, result) || first != last)
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::uint_, result) || first_ != last_)
     {
         ec = Errc::ERR;
     }
@@ -136,11 +136,11 @@ Result<T> convert(char const* first, char const* last)
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, u64))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
     T    result;
     Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::ulong_, result) || first != last)
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ulong_, result) || first_ != last_)
     {
         ec = Errc::ERR;
     }
@@ -148,11 +148,11 @@ Result<T> convert(char const* first, char const* last)
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, x32))>
-Result<s32> convert(char const* first, char const* last)
+Result<s32> Convert(char const* first_, char const* last_)
 {
     s32  result;
     Errc ec = Errc::OK;
-    if (auto [p, e] = std::from_chars(first, last, result, 16); e != std::errc())
+    if (auto [p, e] = std::from_chars(first_, last_, result, 16); e != std::errc())
     {
         ec = Errc::ERR;
     }
@@ -160,11 +160,11 @@ Result<s32> convert(char const* first, char const* last)
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, s8))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
     T    result;
     Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::byte_, result) || first != last)
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::byte_, result) || first_ != last_)
     {
         ec = Errc::ERR;
     }
@@ -172,18 +172,18 @@ Result<T> convert(char const* first, char const* last)
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, u8))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
-    auto [v, ec] = convert<s8>(first, last);
+    auto [v, ec] = Convert<s8>(first_, last_);
     return {static_cast<u8>(v), ec};
 }
 
 template<typename T, ENABLE_IF(IS_TYPE(T, u16))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
     T    result;
     Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::ushort_, result) || first != last)
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_)
     {
         ec = Errc::ERR;
     }
@@ -191,17 +191,17 @@ Result<T> convert(char const* first, char const* last)
 }
 
 template<typename T>
-Errc convert(char const* first, char const* last, T& dest)
+Errc Convert(char const* first_, char const* last_, T& dest_)
 {
-    auto [v, ec] = convert<T>(first, last);
-    dest         = v;
+    auto [v, ec] = Convert<T>(first_, last_);
+    dest_        = v;
     return ec;
 }
 
 template<typename T>
-auto parse(std::csub_match const& sub)
+auto Parse(std::csub_match const& sub_)
 {
-    if (auto [v, ec] = convert<T>(sub.first, sub.second); ec == Errc::OK)
+    if (auto [v, ec] = Convert<T>(sub_.first, sub_.second); ec == Errc::OK)
     {
         return v;
     }
@@ -209,22 +209,22 @@ auto parse(std::csub_match const& sub)
 }
 
 template<typename T>
-auto parse(str const& s)
+auto Parse(Str const& s_)
 {
-    if (auto [v, ec] = convert<T>(s.c_str(), s.c_str() + s.size()); ec == Errc::OK)
+    if (auto [v, ec] = Convert<T>(s_.c_str(), s_.c_str() + s_.size()); ec == Errc::OK)
     {
         return v;
     }
     throw error::ConversionError();
 }
 
-inline std::string_view to_str_view(std::csub_match const& sub)
+inline std::string_view ToStrView(std::csub_match const& sub_)
 {
-    return std::string_view(sub.first, static_cast<usize>(sub.second - sub.first));
+    return std::string_view(sub_.first, static_cast<usize>(sub_.second - sub_.first));
 }
 
-inline bool operator==(std::csub_match const& sub, char const* s)
+inline bool operator==(std::csub_match const& sub_, char const* s_)
 {
-    return to_str_view(sub) == s;
+    return ToStrView(sub_) == s_;
 }
 }  // namespace vfrb::str_util

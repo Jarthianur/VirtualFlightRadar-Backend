@@ -42,6 +42,6 @@ public:
      * @param wind     The Wind to unpack into
      * @return true on success, else false
      */
-    object::Wind unpack(str&& sentence, u32 priority) const override;
+    object::Wind unpack(Str&& sentence, u32 priority) const override;
 };
 }  // namespace vfrb::feed::parser

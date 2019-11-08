@@ -50,25 +50,25 @@ public:
      * @param alternative The default value (default: empty)
      * @return the value at path if found and not empty, else the default value
      */
-    str property(str const& path, str const& defVal) const noexcept;
-    str property(str const& path) const;
+    Str property(Str const& path, Str const& defVal) const noexcept;
+    Str property(Str const& path) const;
     /**
      * @brief Get the Properties for a section.
      * @param section The section
      * @return the Properties for that section
      * @throw std::out_of_range if the section is not found
      */
-    Properties section(str const& section) const;
+    Properties section(Str const& section) const;
 };
 
 namespace error
 {
 class PropertyNotFoundError : public vfrb::error::Error
 {
-    str const m_property;
+    Str const m_property;
 
 public:
-    explicit PropertyNotFoundError(str const& prop);
+    explicit PropertyNotFoundError(Str const& prop);
     ~PropertyNotFoundError() noexcept override = default;
 
     char const* what() const noexcept override;

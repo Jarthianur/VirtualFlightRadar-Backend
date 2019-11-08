@@ -30,7 +30,7 @@
 namespace vfrb::server::net
 {
 constexpr auto     LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
-static auto const& logger     = Logger::instance();
+static auto const& logger     = Logger::Instance();
 
 NetworkInterfaceImplBoost::NetworkInterfaceImplBoost(u16 port)
     : NetworkInterface<SocketImplBoost>(),
@@ -109,7 +109,7 @@ Connection<SocketImplBoost> NetworkInterfaceImplBoost::startConnection()
     return Connection<SocketImplBoost>(std::move(m_socket));
 }
 
-str NetworkInterfaceImplBoost::stagedAddress() const
+Str NetworkInterfaceImplBoost::stagedAddress() const
 {
     return m_socket.address();
 }

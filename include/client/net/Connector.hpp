@@ -29,14 +29,14 @@ namespace vfrb::client::net
 {
 struct Endpoint;
 
-enum class ErrorCode : enum_t
+enum class ErrorCode : enum_type
 {
     SUCCESS,
     FAILURE
 };
 
 using Callback     = std::function<void(ErrorCode)>;              ///< Common callback function
-using ReadCallback = std::function<void(ErrorCode, str const&)>;  ///< Callback function for read
+using ReadCallback = std::function<void(ErrorCode, Str const&)>;  ///< Callback function for read
 
 /**
  * @brief The async TCP interface for clients
@@ -83,7 +83,7 @@ public:
      * @param msg      The message to send
      * @param callback The callback to execute when done
      */
-    virtual void onWrite(str const& msg, Callback const& callback) = 0;
+    virtual void onWrite(Str const& msg, Callback const& callback) = 0;
 
     /**
      * @brief Execute function after timeout.

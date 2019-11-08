@@ -38,8 +38,8 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-FeedFactory::FeedFactory(s_ptr<config::Configuration> config, s_ptr<AircraftData> aircraftData,
-                         s_ptr<AtmosphereData> atmosData, s_ptr<GpsData> gpsData, s_ptr<WindData> windData)
+FeedFactory::FeedFactory(SPtr<config::Configuration> config, SPtr<AircraftData> aircraftData,
+                         SPtr<AtmosphereData> atmosData, SPtr<GpsData> gpsData, SPtr<WindData> windData)
     : m_config(config),
       m_aircraftData(aircraftData),
       m_atmosData(atmosData),
@@ -48,56 +48,56 @@ FeedFactory::FeedFactory(s_ptr<config::Configuration> config, s_ptr<AircraftData
 {}
 
 template<>
-s_ptr<AprscFeed> FeedFactory::makeFeed<AprscFeed>(str const& name)
+SPtr<AprscFeed> FeedFactory::makeFeed<AprscFeed>(Str const& name)
 {
     return std::make_shared<AprscFeed>(name, m_config->feedProperties.at(name), m_aircraftData,
                                        m_config->maxHeight);
 }
 
 template<>
-s_ptr<GpsFeed> FeedFactory::makeFeed<GpsFeed>(str const& name)
+SPtr<GpsFeed> FeedFactory::makeFeed<GpsFeed>(Str const& name)
 {
     return std::make_shared<GpsFeed>(name, m_config->feedProperties.at(name), m_gpsData);
 }
 
 template<>
-s_ptr<SbsFeed> FeedFactory::makeFeed<SbsFeed>(str const& name)
+SPtr<SbsFeed> FeedFactory::makeFeed<SbsFeed>(Str const& name)
 {
     return std::make_shared<SbsFeed>(name, m_config->feedProperties.at(name), m_aircraftData,
                                      m_config->maxHeight);
 }
 
 template<>
-s_ptr<WindFeed> FeedFactory::makeFeed<WindFeed>(str const& name)
+SPtr<WindFeed> FeedFactory::makeFeed<WindFeed>(Str const& name)
 {
     return std::make_shared<WindFeed>(name, m_config->feedProperties.at(name), m_windData);
 }
 
 template<>
-s_ptr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(str const& name)
+SPtr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(Str const& name)
 {
     return std::make_shared<AtmosphereFeed>(name, m_config->feedProperties.at(name), m_atmosData);
 }
 
-s_ptr<Feed> FeedFactory::createFeed(str const& name)
+SPtr<Feed> FeedFactory::createFeed(Str const& name)
 {
-    if (name.find(Configuration::SECT_KEY_APRSC) != str::npos)
+    if (name.find(Configuration::SECT_KEY_APRSC) != Str::npos)
     {
         return makeFeed<AprscFeed>(name);
     }
-    if (name.find(Configuration::SECT_KEY_SBS) != str::npos)
+    if (name.find(Configuration::SECT_KEY_SBS) != Str::npos)
     {
         return makeFeed<SbsFeed>(name);
     }
-    if (name.find(Configuration::SECT_KEY_GPS) != str::npos)
+    if (name.find(Configuration::SECT_KEY_GPS) != Str::npos)
     {
         return makeFeed<GpsFeed>(name);
     }
-    if (name.find(Configuration::SECT_KEY_WIND) != str::npos)
+    if (name.find(Configuration::SECT_KEY_WIND) != Str::npos)
     {
         return makeFeed<WindFeed>(name);
     }
-    if (name.find(Configuration::SECT_KEY_ATMOS) != str::npos)
+    if (name.find(Configuration::SECT_KEY_ATMOS) != Str::npos)
     {
         return makeFeed<AtmosphereFeed>(name);
     }

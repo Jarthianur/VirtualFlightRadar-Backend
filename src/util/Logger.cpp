@@ -27,7 +27,7 @@
 
 namespace vfrb
 {
-void Logger::logFile(str const& file)
+void Logger::logFile(Str const& file)
 {
     concurrent::LockGuard lk(m_mutex);
     m_logFile = std::ofstream(file);
@@ -39,7 +39,7 @@ void Logger::logFile(str const& file)
     m_errStream = &m_logFile;
 }
 
-str Logger::time()
+Str Logger::time()
 {
     std::time_t tt       = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     static char time[32] = "";
@@ -47,7 +47,7 @@ str Logger::time()
     return time;
 }
 
-Logger& Logger::instance()
+Logger& Logger::Instance()
 {
     static Logger log;
     return log;

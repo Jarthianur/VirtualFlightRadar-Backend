@@ -51,9 +51,9 @@ class Configuration final
      * @brief Resolve the feeds and their config.
      * @param properties The properties
      */
-    std::unordered_map<str, Properties> resolveFeeds() const;
+    std::unordered_map<Str, Properties> resolveFeeds() const;
 
-    std::list<str> resolveFeedNames() const;
+    std::list<Str> resolveFeedNames() const;
 
     /**
      * @brief Resolve a filter value.
@@ -125,8 +125,8 @@ public:
     s32 const                                 maxHeight;       ///< Maximum height for reported aircrafts
     s32 const                                 maxDistance;     ///< Maximum distance for reported aircrafts
     std::tuple<u16, usize> const              serverConfig;    ///< Port where to serve reports
-    std::list<str> const                      feedNames;       ///< List of feed names
-    std::unordered_map<str, Properties> const feedProperties;  ///< Map feed names to their properties
+    std::list<Str> const                      feedNames;       ///< List of feed names
+    std::unordered_map<Str, Properties> const feedProperties;  ///< Map feed names to their properties
 
     /**
      * @param stream The input stream

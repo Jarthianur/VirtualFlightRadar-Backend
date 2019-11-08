@@ -35,31 +35,31 @@ using namespace vfrb::feed;
 namespace vfrb::client
 {
 template<>
-s_ptr<AprscClient> ClientFactory::makeClient<AprscClient>(s_ptr<Feed> feed)
+SPtr<AprscClient> ClientFactory::makeClient<AprscClient>(SPtr<Feed> feed)
 {
     return std::make_shared<AprscClient>(feed->endpoint(), std::static_pointer_cast<AprscFeed>(feed)->login(),
                                          std::make_shared<ConnectorImplBoost>());
 }
 
 template<>
-s_ptr<SbsClient> ClientFactory::makeClient<SbsClient>(s_ptr<Feed> feed)
+SPtr<SbsClient> ClientFactory::makeClient<SbsClient>(SPtr<Feed> feed)
 {
     return std::make_shared<SbsClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
 }
 
 template<>
-s_ptr<SensorClient> ClientFactory::makeClient<SensorClient>(s_ptr<Feed> feed)
+SPtr<SensorClient> ClientFactory::makeClient<SensorClient>(SPtr<Feed> feed)
 {
     return std::make_shared<SensorClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
 }
 
 template<>
-s_ptr<GpsdClient> ClientFactory::makeClient<GpsdClient>(s_ptr<Feed> feed)
+SPtr<GpsdClient> ClientFactory::makeClient<GpsdClient>(SPtr<Feed> feed)
 {
     return std::make_shared<GpsdClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
 }
 
-s_ptr<Client> ClientFactory::createClientFor(s_ptr<Feed> feed)
+SPtr<Client> ClientFactory::createClientFor(SPtr<Feed> feed)
 {
     switch (feed->protocol())
     {

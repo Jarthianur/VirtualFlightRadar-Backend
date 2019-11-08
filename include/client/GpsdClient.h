@@ -57,7 +57,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    GpsdClient(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
+    GpsdClient(net::Endpoint const& endpoint, SPtr<net::Connector> connector);
     ~GpsdClient() noexcept override = default;
 };
 }  // namespace vfrb::client

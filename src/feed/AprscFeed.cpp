@@ -32,9 +32,9 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-AprscFeed::AprscFeed(str const& name, Properties const& properties, s_ptr<data::AircraftData> data,
+AprscFeed::AprscFeed(Str const& name, Properties const& properties, SPtr<data::AircraftData> data,
                      s32 maxHeight)
-    : Feed(name, properties, data), m_parser(maxHeight), m_worker([this](str&& work) {
+    : Feed(name, properties, data), m_parser(maxHeight), m_worker([this](Str&& work) {
           try
           {
               m_data->update(m_parser.unpack(std::move(work), m_priority));
@@ -58,13 +58,13 @@ Feed::Protocol AprscFeed::protocol() const
     return Protocol::APRS;
 }
 
-bool AprscFeed::process(str response)
+bool AprscFeed::process(Str response)
 {
     m_worker.push(std::move(response));
     return true;
 }
 
-str AprscFeed::login() const
+Str AprscFeed::login() const
 {
     return m_properties.property(Configuration::KV_KEY_LOGIN);
 }

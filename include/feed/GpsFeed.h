@@ -48,7 +48,7 @@ public:
      * @param data       The GpsData container
      * @throw std::logic_error from parent constructor
      */
-    GpsFeed(str const& m_name, config::Properties const& m_properties, s_ptr<data::GpsData> data);
+    GpsFeed(Str const& m_name, config::Properties const& m_properties, SPtr<data::GpsData> data);
     ~GpsFeed() noexcept override = default;
 
     /**
@@ -60,6 +60,6 @@ public:
     /**
      * @brief Implement Feed::process.
      */
-    bool process(str response) override;
+    bool process(Str response) override;
 };
 }  // namespace vfrb::feed

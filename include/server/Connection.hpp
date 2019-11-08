@@ -40,7 +40,7 @@ template<typename SocketT>
 class Connection
 {
     SocketT m_socket;   ///< Socket
-    str     m_address;  ///< IP address
+    Str     m_address;  ///< IP address
 
 public:
     MOVABLE_BUT_NOT_COPYABLE(Connection)
@@ -89,7 +89,7 @@ bool Connection<SocketT>::write(std::string_view const& msg)
     }
     catch (net::error::SocketError const& e)
     {
-        Logger::instance().debug("(Connection) write: ", e.what());
+        Logger::Instance().debug("(Connection) write: ", e.what());
     }
     return false;
 }

@@ -31,11 +31,11 @@ Properties::Properties(ptree const& ptree) : m_pTree(ptree) {}
 
 Properties::Properties(ptree&& ptree) : m_pTree(std::move(ptree)) {}
 
-str Properties::property(str const& path, str const& defVal) const noexcept
+Str Properties::property(Str const& path, Str const& defVal) const noexcept
 {
     try
     {
-        auto p = m_pTree.get_child(path).get_value<str>();
+        auto p = m_pTree.get_child(path).get_value<Str>();
         return p.empty() ? defVal : p;
     }
     catch (ptree_bad_path const&)
@@ -44,11 +44,11 @@ str Properties::property(str const& path, str const& defVal) const noexcept
     }
 }
 
-str Properties::property(str const& path) const
+Str Properties::property(Str const& path) const
 {
     try
     {
-        auto p = m_pTree.get_child(path).get_value<str>();
+        auto p = m_pTree.get_child(path).get_value<Str>();
         if (p.empty())
         {
             throw error::PropertyNotFoundError(path);
@@ -61,7 +61,7 @@ str Properties::property(str const& path) const
     }
 }
 
-Properties Properties::section(str const& section) const
+Properties Properties::section(Str const& section) const
 {
     try
     {
@@ -75,7 +75,7 @@ Properties Properties::section(str const& section) const
 
 namespace error
 {
-PropertyNotFoundError::PropertyNotFoundError(str const& prop) : m_property(prop + " not found") {}
+PropertyNotFoundError::PropertyNotFoundError(Str const& prop) : m_property(prop + " not found") {}
 
 char const* PropertyNotFoundError::what() const noexcept
 {

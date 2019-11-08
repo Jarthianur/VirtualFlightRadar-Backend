@@ -40,13 +40,13 @@ using usize = std::size_t;
 using f32   = float;
 using f64   = double;
 
-using enum_t = std::uint_fast8_t;
+using enum_type = std::uint_fast8_t;
 
-using str = std::string;
-
-template<typename T>
-using s_ptr = std::shared_ptr<T>;
+using Str = std::string;
 
 template<typename T>
-using u_ptr = std::unique_ptr<T>;
+using SPtr = std::shared_ptr<T>;
+
+template<typename T>
+using UPtr = std::unique_ptr<T>;
 }  // namespace vfrb

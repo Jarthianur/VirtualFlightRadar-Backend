@@ -30,7 +30,7 @@ Atmosphere::Atmosphere(u32 priority) : Object(priority) {}
 
 Atmosphere::Atmosphere(u32 priority, f64 pressure) : Object(priority), m_pressure(pressure)
 {
-    util::checkLimits(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
+    util::CheckLimits(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
 }
 
 void Atmosphere::assign(Object&& other)
@@ -50,7 +50,7 @@ auto Atmosphere::pressure() const -> decltype(m_pressure)
     return m_pressure;
 }
 
-str& Atmosphere::operator*()
+Str& Atmosphere::operator*()
 {
     return m_nmea;
 }

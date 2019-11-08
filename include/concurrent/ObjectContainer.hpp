@@ -36,7 +36,7 @@ namespace vfrb::concurrent
  * @brief Internal container for aircrafts.
  * Allows concurrent access to elements.
  */
-template<typename T, usize CstrS>
+template<typename T, usize CstrSz>
 class ObjectContainer
 {
 public:
@@ -52,18 +52,18 @@ public:
     {
         NOT_COPYABLE(ValueType)
 
-        ValueType(T&& val);
+        ValueType(T&& val_);
 
-        ValueType(ValueType&& other);
+        ValueType(ValueType&& other_);
 
-        ValueType& operator=(ValueType&& other);
+        ValueType& operator=(ValueType&& other_);
 
-        T                    value;
-        util::CString<CstrS> nmea;
+        T                     value;
+        util::CString<CstrSz> nmea;
 
-    protected:
+    private:
         friend struct ObjectContainer::Iterator;
-        Mutex mutable mutex;
+        Mutex mutable m_mutex;
     };
 
     using KeyType       = usize;
@@ -77,13 +77,13 @@ public:
     {
         NOT_COPYABLE(Iterator)
 
-        explicit Iterator(ObjectContainer& c);
+        explicit Iterator(ObjectContainer& c_);
 
-        Iterator(Iterator&& other);
+        Iterator(Iterator&& other_);
 
-        Iterator(typename ContainerType::iterator iter, ObjectContainer const& c);
+        Iterator(typename ContainerType::iterator iter_, ObjectContainer const& c_);
 
-        Iterator& operator=(Iterator&& other);
+        Iterator& operator=(Iterator&& other_);
 
         Iterator& operator++();
 
@@ -91,158 +91,160 @@ public:
 
         ValueType* operator->();
 
-        KeyType key() const;
+        KeyType Key() const;
 
-        bool operator==(Iterator const& other) const;
+        bool operator==(Iterator const& other_) const;
 
-        bool operator!=(Iterator const& other) const;
+        bool operator!=(Iterator const& other_) const;
 
-    protected:
-        typename ContainerType::iterator iterator;
-        UniqueLock                       valueLock;
-        ObjectContainer const&           container;
+    private:
+        typename ContainerType::iterator m_iterator;
+        UniqueLock                       m_valueLock;
+        ObjectContainer const&           m_container;
     };
 
-    Iterator begin() REQUIRES(!m_modMutex);
+    Iterator Begin() REQUIRES(!m_modMutex);
 
-    Iterator end();
+    Iterator End();
 
-    std::pair<Iterator, bool> insert(KeyType key, T&& value) REQUIRES(!m_modMutex);
+    std::pair<Iterator, bool> Insert(KeyType key_, T&& value_) REQUIRES(!m_modMutex);
 
-    void erase(KeyType key) REQUIRES(!m_modMutex);
+    void Erase(KeyType key_) REQUIRES(!m_modMutex);
 
 private:
-    ContainerType GUARDED_BY(m_modMutex) m_container;  ///< Underlying container
     Mutex mutable m_modMutex;
+    ContainerType GUARDED_BY(m_modMutex) m_container;  ///< Underlying container
 };
 
-template<typename T, usize CstrS>
-ObjectContainer<T, CstrS>::ValueType::ValueType(T&& val) : value(std::move(val))
+template<typename T, usize CstrSz>
+ObjectContainer<T, CstrSz>::ValueType::ValueType(T&& val_) : value(std::move(val_))
 {}
 
-template<typename T, usize CstrS>
-ObjectContainer<T, CstrS>::ValueType::ValueType(ValueType&& other)
-    : value(std::move(other.value)), nmea(other.nmea)
+template<typename T, usize CstrSz>
+ObjectContainer<T, CstrSz>::ValueType::ValueType(ValueType&& other_)
+    : value(std::move(other_.value)), nmea(other_.nmea)
 {}
 
-template<typename T, usize CstrS>
-auto ObjectContainer<T, CstrS>::ValueType::operator=(ValueType&& other) -> ValueType&
+template<typename T, usize CstrSz>
+auto ObjectContainer<T, CstrSz>::ValueType::operator=(ValueType&& other_) -> ValueType&
 {
-    value = std::move(other.value);
-    nmea  = other.nmea;
+    value = std::move(other_.value);
+    nmea  = other_.nmea;
     return *this;
 }
 
-template<typename T, usize CstrS>
-ObjectContainer<T, CstrS>::Iterator::Iterator(ObjectContainer<T, CstrS>& c)
-    : iterator(c.m_container.end()), container(c)
+template<typename T, usize CstrSz>
+ObjectContainer<T, CstrSz>::Iterator::Iterator(ObjectContainer<T, CstrSz>& c_)
+    : m_iterator(c_.m_container.end()), m_container(c_)
 {}
 
-template<typename T, usize CstrS>
-ObjectContainer<T, CstrS>::Iterator::Iterator(Iterator&& other)
-    : iterator(std::move(other.iterator)), valueLock(std::move(other.valueLock)), container(other.container)
+template<typename T, usize CstrSz>
+ObjectContainer<T, CstrSz>::Iterator::Iterator(Iterator&& other_)
+    : m_iterator(std::move(other_.m_iterator)),
+      m_valueLock(std::move(other_.m_valueLock)),
+      m_container(other_.m_container)
 {}
 
-template<typename T, usize CstrS>
-ObjectContainer<T, CstrS>::Iterator::Iterator(typename ContainerType::iterator iter, ObjectContainer const& c)
-    : iterator(iter), container(c)
+template<typename T, usize CstrSz>
+ObjectContainer<T, CstrSz>::Iterator::Iterator(typename ContainerType::iterator iter_,
+                                               ObjectContainer const&           c_)
+    : m_iterator(iter_), m_container(c_)
 {
-    if (iterator != container.m_container.end())
+    if (m_iterator != m_container.m_container.end())
     {
-        valueLock = UniqueLock(iterator->second.mutex);
+        m_valueLock = UniqueLock(m_iterator->second.m_mutex);
     }
 }
 
-template<typename T, usize CstrS>
-auto ObjectContainer<T, CstrS>::Iterator::operator=(Iterator&& other) -> Iterator&
+template<typename T, usize CstrSz>
+auto ObjectContainer<T, CstrSz>::Iterator::operator=(Iterator&& other_) -> Iterator&
 {
-    iterator  = std::move(other.iterator);
-    valueLock = std::move(other.valueLock);
-    container = other.container;
+    m_iterator  = std::move(other_.m_iterator);
+    m_valueLock = std::move(other_.m_valueLock);
+    m_container = other_.m_container;
 }
 
-template<typename T, usize CstrS>
-auto ObjectContainer<T, CstrS>::Iterator::operator++() -> Iterator&
+template<typename T, usize CstrSz>
+auto ObjectContainer<T, CstrSz>::Iterator::operator++() -> Iterator&
 {
-    if (iterator != container.m_container.end())
+    if (m_iterator != m_container.m_container.end())
     {
-        valueLock.unlock();
-        LockGuard lk(container.m_modMutex);
-        if (++iterator != container.m_container.end())
+        m_valueLock.unlock();
+        LockGuard lk(m_container.m_modMutex);
+        if (++m_iterator != m_container.m_container.end())
         {
-            valueLock = UniqueLock(iterator->second.mutex);
+            m_valueLock = UniqueLock(m_iterator->second.m_mutex);
         }
     }
     return *this;
 }
 
-template<typename T, usize CstrS>
-auto ObjectContainer<T, CstrS>::Iterator::operator*() -> ValueType&
+template<typename T, usize CstrSz>
+auto ObjectContainer<T, CstrSz>::Iterator::operator*() -> ValueType&
 {
-    return iterator->second;
+    return m_iterator->second;
 }
 
-template<typename T, usize CstrS>
-auto ObjectContainer<T, CstrS>::Iterator::operator-> () -> ValueType*
+template<typename T, usize CstrSz>
+auto ObjectContainer<T, CstrSz>::Iterator::operator-> () -> ValueType*
 {
-    return &iterator->second;
+    return &m_iterator->second;
 }
 
-template<typename T, usize CstrS>
-auto ObjectContainer<T, CstrS>::Iterator::key() const -> KeyType
+template<typename T, usize CstrSz>
+auto ObjectContainer<T, CstrSz>::Iterator::Key() const -> KeyType
 {
-    return iterator->first;
+    return m_iterator->first;
 }
 
-template<typename T, usize CstrS>
-bool ObjectContainer<T, CstrS>::Iterator::operator==(Iterator const& other) const
+template<typename T, usize CstrSz>
+bool ObjectContainer<T, CstrSz>::Iterator::operator==(Iterator const& other_) const
 {
-    return iterator == other.iterator;
+    return m_iterator == other_.m_iterator;
 }
 
-template<typename T, usize CstrS>
-bool ObjectContainer<T, CstrS>::Iterator::operator!=(Iterator const& other) const
+template<typename T, usize CstrSz>
+bool ObjectContainer<T, CstrSz>::Iterator::operator!=(Iterator const& other_) const
 {
-    return iterator != other.iterator;
+    return m_iterator != other_.m_iterator;
 }
 
-template<typename T, usize CstrS>
-typename ObjectContainer<T, CstrS>::Iterator ObjectContainer<T, CstrS>::begin() REQUIRES(!m_modMutex)
+template<typename T, usize CstrSz>
+typename ObjectContainer<T, CstrSz>::Iterator ObjectContainer<T, CstrSz>::Begin() REQUIRES(!m_modMutex)
 {
     LockGuard lk(m_modMutex);
     return Iterator(m_container.begin(), *this);
 }
 
-template<typename T, usize CstrS>
-auto ObjectContainer<T, CstrS>::end() -> Iterator
+template<typename T, usize CstrSz>
+auto ObjectContainer<T, CstrSz>::End() -> Iterator
 {
     return Iterator(*this);
 }
 
-template<typename T, usize CstrS>
-std::pair<typename ObjectContainer<T, CstrS>::Iterator, bool> ObjectContainer<T, CstrS>::insert(KeyType key,
-                                                                                                T&&     value)
-    REQUIRES(!m_modMutex)
+template<typename T, usize CstrSz>
+std::pair<typename ObjectContainer<T, CstrSz>::Iterator, bool>
+    ObjectContainer<T, CstrSz>::Insert(KeyType key_, T&& value_) REQUIRES(!m_modMutex)
 {
     LockGuard lk(m_modMutex);
-    Iterator  iter(m_container.find(key), *this);
-    if (iter == end())
+    Iterator  iter(m_container.find(key_), *this);
+    if (iter == End())
     {
-        return std::make_pair(Iterator(m_container.emplace(key, ValueType(std::move(value))).first, *this),
+        return std::make_pair(Iterator(m_container.emplace(key_, ValueType(std::move(value_))).first, *this),
                               true);
     }
     return std::make_pair(std::move(iter), false);
 }
 
-template<typename T, usize CstrS>
-void ObjectContainer<T, CstrS>::erase(KeyType key) REQUIRES(!m_modMutex)
+template<typename T, usize CstrSz>
+void ObjectContainer<T, CstrSz>::Erase(KeyType key_) REQUIRES(!m_modMutex)
 {
     LockGuard lk(m_modMutex);
-    auto      entry = m_container.find(key);
+    auto      entry = m_container.find(key_);
     if (entry != m_container.end())
     {
         Iterator iter(std::move(entry), *this);
-        m_container.erase(key);
+        m_container.erase(key_);
     }
 }
 }  // namespace vfrb::concurrent

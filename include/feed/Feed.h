@@ -49,9 +49,9 @@ class Feed
 
 protected:
     config::Properties const m_properties;  ///< Properties
-    str const                m_name;        ///< Unique name
+    Str const                m_name;        ///< Unique name
     u32 const                m_priority;    ///< Priority
-    s_ptr<data::Data>        m_data;        ///< Respective Data container
+    SPtr<data::Data>        m_data;        ///< Respective Data container
 
     /**
      * @param name       The Feeds unique name
@@ -59,13 +59,13 @@ protected:
      * @param properties The Properties
      * @throw std::logic_error if host or port are not given in properties
      */
-    Feed(str const& m_name, config::Properties const& propertyMap, s_ptr<data::Data> data);
+    Feed(Str const& m_name, config::Properties const& propertyMap, SPtr<data::Data> data);
 
 public:
     /**
      * @brief The protocol that the Feed supports.
      */
-    enum class Protocol : enum_t
+    enum class Protocol : enum_type
     {
         APRS,
         SBS,
@@ -91,7 +91,7 @@ public:
      * @brief Handle client's response.
      * @param response The response
      */
-    virtual bool process(str response) = 0;
+    virtual bool process(Str response) = 0;
 
     auto name() const -> decltype(m_name) const&;
     auto priority() const -> std::remove_const<decltype(m_priority)>::type;
@@ -101,10 +101,10 @@ namespace error
 {
 class InvalidPropertyError : public vfrb::error::Error
 {
-    str const m_msg;
+    Str const m_msg;
 
 public:
-    explicit InvalidPropertyError(str const& msg);
+    explicit InvalidPropertyError(Str const& msg);
     ~InvalidPropertyError() noexcept override = default;
 
     char const* what() const noexcept override;

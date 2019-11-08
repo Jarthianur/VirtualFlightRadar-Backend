@@ -35,7 +35,7 @@ class AprscClient : public Client
 
     inline static constexpr auto KEEPALIVE_INTERVAL = 600;
 
-    str const m_login;  ///< Login string
+    Str const m_login;  ///< Login string
 
     /**
      * @brief Schedule sending of a keep-alive beacon.
@@ -70,7 +70,7 @@ public:
      * @param login     The login string
      * @param connector The Connector interface
      */
-    AprscClient(net::Endpoint const& endpoint, str const& login, s_ptr<net::Connector> connector);
+    AprscClient(net::Endpoint const& endpoint, Str const& login, SPtr<net::Connector> connector);
     ~AprscClient() noexcept override = default;
 
     bool  equals(Client const& other) const override;

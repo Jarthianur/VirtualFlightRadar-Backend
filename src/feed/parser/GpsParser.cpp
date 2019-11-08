@@ -35,11 +35,11 @@ std::regex const GpsParser::s_GPGGA_RE(
     "^\\$[A-Z]{2}GGA,(\\d{6}),(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
     std::regex::optimize | std::regex::icase);
 
-GpsPosition GpsParser::unpack(str&& sentence, u32 priority) const
+GpsPosition GpsParser::unpack(Str&& sentence, u32 priority) const
 {
     try
     {
-        if (std::cmatch match; matchChecksum({sentence.c_str(), sentence.length()}) &&
+        if (std::cmatch match; MatchChecksum({sentence.c_str(), sentence.length()}) &&
                                std::regex_match(sentence.c_str(), match, s_GPGGA_RE))
         {
             return parsePosition(match, priority);
@@ -54,23 +54,23 @@ GpsPosition GpsParser::unpack(str&& sentence, u32 priority) const
 
 GpsPosition GpsParser::parsePosition(std::cmatch const& match, u32 priority) const
 {
-    auto latitude = math::dmToDeg(parse<f64>(match[RE_GGA_LAT]));
+    auto latitude = math::DmToDeg(Parse<f64>(match[RE_GGA_LAT]));
     if (match[RE_GGA_LAT_DIR] == "S")
     {
         latitude = -latitude;
     }
-    auto longitude = math::dmToDeg(parse<f64>(match[RE_GGA_LON]));
+    auto longitude = math::DmToDeg(Parse<f64>(match[RE_GGA_LON]));
     if (match[RE_GGA_LON_DIR] == "W")
     {
         longitude = -longitude;
     }
-    auto altitude = math::doubleToInt(parse<f64>(match[RE_GGA_ALT]));
+    auto altitude = math::DoubleToInt(Parse<f64>(match[RE_GGA_ALT]));
     return {priority,
             {latitude, longitude, altitude},
-            parse<f64>(match[RE_GGA_GEOID]),
-            parse<f64>(match[RE_GGA_DIL]),
-            parse<u8>(match[RE_GGA_SAT]),
-            parse<s8>(match[RE_GGA_FIX]),
-            Timestamp(to_str_view(match[RE_GGA_TIME]))};
+            Parse<f64>(match[RE_GGA_GEOID]),
+            Parse<f64>(match[RE_GGA_DIL]),
+            Parse<u8>(match[RE_GGA_SAT]),
+            Parse<s8>(match[RE_GGA_FIX]),
+            Timestamp(ToStrView(match[RE_GGA_TIME]))};
 }
 }  // namespace vfrb::feed::parser

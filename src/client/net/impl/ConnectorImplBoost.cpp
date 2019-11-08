@@ -33,7 +33,7 @@ using namespace boost::system;
 
 namespace vfrb::client::net
 {
-static auto const& logger = Logger::instance();
+static auto const& logger = Logger::Instance();
 
 ConnectorImplBoost::ConnectorImplBoost()
     : m_ioCtx(), m_socket(m_ioCtx), m_resolver(m_ioCtx), m_timer(m_ioCtx), m_istream(&m_buffer)
@@ -87,7 +87,7 @@ void ConnectorImplBoost::onRead(ReadCallback const& callback)
     }
 }
 
-void ConnectorImplBoost::onWrite(str const& msg, Callback const& callback)
+void ConnectorImplBoost::onWrite(Str const& msg, Callback const& callback)
 {
     if (m_socket.is_open())
     {

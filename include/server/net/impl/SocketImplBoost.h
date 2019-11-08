@@ -51,7 +51,7 @@ public:
      * @return the address
      * @throw SocketException if the socket is closed
      */
-    str address() const;
+    Str address() const;
 
     /**
      * @brief Write a message on the socket to the endpoint.

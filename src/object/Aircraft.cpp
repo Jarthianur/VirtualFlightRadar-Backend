@@ -39,8 +39,8 @@ Aircraft::Aircraft(u32 priority, std::string_view const& id, IdType idT, Aircraf
       m_timestamp(timestamp),
       m_fullInfo(true)
 {
-    util::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
-    util::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
+    util::CheckLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
+    util::CheckLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
 }
 
 Aircraft::Aircraft(u32 priority, std::string_view const& id, IdType idT, AircraftType aT, Location const& loc,

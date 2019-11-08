@@ -49,7 +49,7 @@ AprsParser::AprsParser(s32 maxHeight)
       m_maxHeight(maxHeight)
 {}
 
-Aircraft AprsParser::unpack(str&& sentence, u32 priority) const
+Aircraft AprsParser::unpack(Str&& sentence, u32 priority) const
 {
     std::cmatch match;
     if ((!sentence.empty() && sentence[0] == '#') || !std::regex_match(sentence.c_str(), match, m_APRS_RE))
@@ -72,17 +72,17 @@ Aircraft AprsParser::unpack(str&& sentence, u32 priority) const
 Location AprsParser::parseLocation(std::cmatch const& match) const
 {
     Location pos;
-    pos.latitude = math::dmToDeg(parse<f64>(match[RE_APRS_LAT]));
-    if (to_str_view(match[RE_APRS_LAT_DIR]) == "S")
+    pos.latitude = math::DmToDeg(Parse<f64>(match[RE_APRS_LAT]));
+    if (ToStrView(match[RE_APRS_LAT_DIR]) == "S")
     {
         pos.latitude = -pos.latitude;
     }
-    pos.longitude = math::dmToDeg(parse<f64>(match[RE_APRS_LON]));
-    if (to_str_view(match[RE_APRS_LON_DIR]) == "W")
+    pos.longitude = math::DmToDeg(Parse<f64>(match[RE_APRS_LON]));
+    if (ToStrView(match[RE_APRS_LON_DIR]) == "W")
     {
         pos.longitude = -pos.longitude;
     }
-    pos.altitude = math::doubleToInt(parse<f64>(match[RE_APRS_ALT]) * math::FEET_2_M);
+    pos.altitude = math::DoubleToInt(Parse<f64>(match[RE_APRS_ALT]) * math::FEET_2_M);
     if (pos.altitude <= m_maxHeight)
     {
         return pos;
@@ -92,20 +92,20 @@ Location AprsParser::parseLocation(std::cmatch const& match) const
 
 AprsParser::AircraftInfo AprsParser::parseComment(std::cmatch const& match) const
 {
-    return {to_str_view(match[RE_APRS_ID]),
-            static_cast<Aircraft::IdType>(parse<x32>(match[RE_APRS_TYPE]) & 0x03),
-            static_cast<Aircraft::AircraftType>((parse<x32>(match[RE_APRS_TYPE]) & 0x7C) >> 2)};
+    return {ToStrView(match[RE_APRS_ID]),
+            static_cast<Aircraft::IdType>(Parse<x32>(match[RE_APRS_TYPE]) & 0x03),
+            static_cast<Aircraft::AircraftType>((Parse<x32>(match[RE_APRS_TYPE]) & 0x7C) >> 2)};
 }
 
 Aircraft::Movement AprsParser::parseMovement(std::cmatch const& match) const
 {
     // This needs to be split later to parse independently.
-    return {parse<f64>(match[RE_APRS_HEAD]), parse<f64>(match[RE_APRS_GND_SPD]) * math::KTS_2_MS,
-            std::max(-10000.0, std::min(10000.0, parse<f64>(match[RE_APRS_CR]) * math::FPM_2_MS))};
+    return {Parse<f64>(match[RE_APRS_HEAD]), Parse<f64>(match[RE_APRS_GND_SPD]) * math::KTS_2_MS,
+            std::max(-10000.0, std::min(10000.0, Parse<f64>(match[RE_APRS_CR]) * math::FPM_2_MS))};
 }
 
 Timestamp AprsParser::parseTimeStamp(std::cmatch const& match) const
 {
-    return Timestamp(to_str_view(match[RE_APRS_TIME]));
+    return Timestamp(ToStrView(match[RE_APRS_TIME]));
 }
 }  // namespace vfrb::feed::parser

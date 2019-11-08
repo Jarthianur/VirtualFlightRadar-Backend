@@ -32,13 +32,13 @@ struct Climate;
  */
 class Wind : public Object
 {
-    str m_nmea;
+    Str m_nmea;
 
 public:
     Wind();
     explicit Wind(u32 priority);  ///< @param priority The initial priority
     ~Wind() noexcept override = default;
 
-    str& operator*();
+    Str& operator*();
 };
 }  // namespace vfrb::object

@@ -46,7 +46,7 @@ class ClientFactory
      * @return the client as pointer
      */
     template<typename T, ENABLE_IF(EXTENDS(T, Client))>
-    static s_ptr<T> makeClient(s_ptr<feed::Feed> feed);
+    static SPtr<T> makeClient(SPtr<feed::Feed> feed);
 
 public:
     ClientFactory()           = default;
@@ -57,7 +57,7 @@ public:
      * @param feed The feed to create for
      * @return the client as pointer
      */
-    static s_ptr<Client> createClientFor(s_ptr<feed::Feed> feed);
+    static SPtr<Client> createClientFor(SPtr<feed::Feed> feed);
 };
 
 namespace error

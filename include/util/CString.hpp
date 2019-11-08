@@ -53,14 +53,14 @@ class CString
     std::array<char, N> m_data;
     std::string_view    m_view;
 
-    void copy(std::string_view const& sv)
+    void copy(std::string_view const& sv_)
     {
-        usize len = sv.length();
+        usize len = sv_.length();
         if (len > N)
         {
             throw error::OverflowError();
         }
-        std::copy_n(sv.cbegin(), len, m_data.begin());
+        std::copy_n(sv_.cbegin(), len, m_data.begin());
         if (m_data[len - 1] != '\0')
         {
             if (len < N)
@@ -75,61 +75,61 @@ class CString
         m_view = std::string_view(m_data.data(), len);
     }
 
-    void copy(CString const& other)
+    void copy(CString const& other_)
     {
-        std::copy(other.m_data.cbegin(), other.m_data.cend(), m_data.begin());
-        m_view = std::string_view(m_data.data(), other.m_view.length());
+        std::copy(other_.m_data.cbegin(), other_.m_data.cend(), m_data.begin());
+        m_view = std::string_view(m_data.data(), other_.m_view.length());
     }
 
 public:
     CString()
     {
-        clear();
+        Clear();
     }
 
-    CString(char const* init)  ///< @param init The initial cstring to copy
+    CString(char const* init_)  ///< @param init The initial cstring to copy
     {
-        operator=(init);
+        operator=(init_);
     }
 
-    CString(str const& init)  ///< @param init The initial string to copy
+    CString(Str const& init_)  ///< @param init The initial string to copy
     {
-        operator=(init);
+        operator=(init_);
     }
 
-    CString(CString const& other)  ///< @param other The other CString to copy
+    CString(CString const& other_)  ///< @param other The other CString to copy
     {
-        operator=(other);
+        operator=(other_);
     }
 
-    CString(std::string_view const& other)  ///< @param other The other CString to copy
+    CString(std::string_view const& other_)  ///< @param other The other CString to copy
     {
-        operator=(other);
+        operator=(other_);
     }
 
     ~CString() noexcept = default;
 
-    CString& operator=(char const* other)
+    CString& operator=(char const* other_)
     {
-        copy(std::string_view(other));
+        copy(std::string_view(other_));
         return *this;
     }
 
-    CString& operator=(str const& other)
+    CString& operator=(Str const& other_)
     {
-        copy(std::string_view(other));
+        copy(std::string_view(other_));
         return *this;
     }
 
-    CString& operator=(CString const& other)
+    CString& operator=(CString const& other_)
     {
-        copy(other);
+        copy(other_);
         return *this;
     }
 
-    CString& operator=(std::string_view const& other)
+    CString& operator=(std::string_view const& other_)
     {
-        copy(other);
+        copy(other_);
         return *this;
     }
 
@@ -143,41 +143,41 @@ public:
         return m_view;
     }
 
-    bool operator==(CString const& other) const
+    bool operator==(CString const& other_) const
     {
-        return m_view == other.m_view;
+        return m_view == other_.m_view;
     }
 
-    void clear()
+    void Clear()
     {
         m_data[0] = '\0';
         m_view    = std::string_view(m_data.data(), 0);
     }
 
-    int format(usize pos, char const* fmt, ...)
+    int Format(usize pos_, char const* fmt_, ...)
     {
-        if (pos >= N)
+        if (pos_ >= N)
         {
             throw error::OverflowError();
         }
-        usize   max = N - pos;
+        usize   max = N - pos_;
         va_list args;
-        va_start(args, fmt);
+        va_start(args, fmt_);
         int b = 0;
-        if ((b = std::vsnprintf(m_data.data() + pos, max, fmt, args)) >= 0)
+        if ((b = std::vsnprintf(m_data.data() + pos_, max, fmt_, args)) >= 0)
         {
-            m_view = std::string_view(m_data.data(), pos + b + 1);
+            m_view = std::string_view(m_data.data(), pos_ + b + 1);
         }
         va_end(args);
         if (b < 0)
         {
-            clear();
+            Clear();
             throw error::OverflowError();
         }
         return b;
     }
 
-    inline usize length() const
+    inline usize Length() const
     {
         return m_view.length();
     }

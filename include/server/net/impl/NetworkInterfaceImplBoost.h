@@ -91,6 +91,6 @@ public:
      * @return the address
      * @throw SocketException if the current socket is not open
      */
-    str stagedAddress() const override;
+    Str stagedAddress() const override;
 };
 }  // namespace vfrb::server::net

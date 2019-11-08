@@ -52,10 +52,10 @@ namespace error
 {
 class ReadFileError : public vfrb::error::Error
 {
-    str const m_fname;
+    Str const m_fname;
 
 public:
-    explicit ReadFileError(str const& file);
+    explicit ReadFileError(Str const& file);
     ~ReadFileError() noexcept override = default;
 
     char const* what() const noexcept override;

@@ -47,16 +47,16 @@ class WorkerThread
 
 public:
     template<typename FnT>
-    explicit WorkerThread(FnT&& fn);
+    explicit WorkerThread(FnT&& fn_);
     ~WorkerThread() noexcept;
 
-    void push(DataT&& data) REQUIRES(!m_mutex);
+    void Push(DataT&& data_) REQUIRES(!m_mutex);
 };
 
 template<typename DataT>
 template<typename FnT>
-WorkerThread<DataT>::WorkerThread(FnT&& fn)
-    : m_running(false), m_worker([this, fn = std::forward<FnT>(fn)]() EXCLUDES(m_mutex) {
+WorkerThread<DataT>::WorkerThread(FnT&& fn_)
+    : m_running(false), m_worker([this, fn = std::forward<FnT>(fn_)]() EXCLUDES(m_mutex) {
           UniqueLock lk(m_mutex);
           m_running = true;
           while (m_running)
@@ -91,10 +91,10 @@ WorkerThread<DataT>::~WorkerThread() noexcept
 }
 
 template<typename DataT>
-void WorkerThread<DataT>::push(DataT&& data) REQUIRES(!m_mutex)
+void WorkerThread<DataT>::Push(DataT&& data_) REQUIRES(!m_mutex)
 {
     LockGuard lk(m_mutex);
-    m_workQ.push(std::move(data));
+    m_workQ.push(std::move(data_));
     m_cv.notify_one();
 }
 }  // namespace vfrb::concurrent

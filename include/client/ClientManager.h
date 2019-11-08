@@ -43,7 +43,7 @@ namespace vfrb::client
  */
 struct ClientHasher
 {
-    usize operator()(s_ptr<Client> const& client) const
+    usize operator()(SPtr<Client> const& client) const
     {
         return client->hash();
     }
@@ -54,14 +54,14 @@ struct ClientHasher
  */
 struct ClientComparator
 {
-    bool operator()(s_ptr<Client> const& client1, s_ptr<Client> const& client2) const
+    bool operator()(SPtr<Client> const& client1, SPtr<Client> const& client2) const
     {
         return client1->equals(*client2);
     }
 };
 
 /// Set of clients with custom hasher and comparator
-using ClientSet = std::unordered_set<s_ptr<Client>, ClientHasher, ClientComparator>;
+using ClientSet = std::unordered_set<SPtr<Client>, ClientHasher, ClientComparator>;
 /// Iterator in ClientSet
 using ClientIter = ClientSet::iterator;
 
@@ -105,10 +105,10 @@ namespace error
 {
 class FeedSubscriptionError : public vfrb::error::Error
 {
-    str const m_msg;
+    Str const m_msg;
 
 public:
-    explicit FeedSubscriptionError(str const& name);
+    explicit FeedSubscriptionError(Str const& name);
     ~FeedSubscriptionError() noexcept override = default;
 
     char const* what() const noexcept override;

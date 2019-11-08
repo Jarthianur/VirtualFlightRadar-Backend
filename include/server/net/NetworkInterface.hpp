@@ -77,7 +77,7 @@ public:
      * @brief Get the current connection address.
      * @return the address
      */
-    virtual str stagedAddress() const = 0;
+    virtual Str stagedAddress() const = 0;
 };
 }  // namespace net
 }  // namespace vfrb::server

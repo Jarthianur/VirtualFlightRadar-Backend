@@ -34,7 +34,7 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-Feed::Feed(str const& name, Properties const& properties, s_ptr<data::Data> data)
+Feed::Feed(Str const& name, Properties const& properties, SPtr<data::Data> data)
     : m_properties(properties), m_name(name), m_priority(initPriority()), m_data(data)
 {
     if (properties.property(Configuration::KV_KEY_HOST, "").empty())
@@ -78,7 +78,7 @@ auto Feed::priority() const -> std::remove_const<decltype(m_priority)>::type
 
 namespace error
 {
-InvalidPropertyError::InvalidPropertyError(str const& msg) : m_msg(msg) {}
+InvalidPropertyError::InvalidPropertyError(Str const& msg) : m_msg(msg) {}
 
 char const* InvalidPropertyError::what() const noexcept
 {

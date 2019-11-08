@@ -47,9 +47,9 @@ namespace vfrb
 constexpr auto PROCESS_INTERVAL = 1;
 constexpr auto LOG_PREFIX       = "(VFRB) ";
 
-static auto const& logger = Logger::instance();
+static auto const& logger = Logger::Instance();
 
-VFRB::VFRB(s_ptr<Configuration> config)
+VFRB::VFRB(SPtr<Configuration> config)
     : m_aircraftData(std::make_shared<AircraftData>(
           [this](Accessor const& it) {
               if (it.obj.updateAge() < Object::OUTDATED)
@@ -128,7 +128,7 @@ void VFRB::serve()
     }
 }
 
-void VFRB::createFeeds(s_ptr<Configuration> config)
+void VFRB::createFeeds(SPtr<Configuration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
     for (auto const& name : config->feedNames)
@@ -144,7 +144,7 @@ void VFRB::createFeeds(s_ptr<Configuration> config)
     }
 }
 
-str VFRB::duration(std::chrono::steady_clock::time_point start) const
+Str VFRB::duration(std::chrono::steady_clock::time_point start) const
 {
     std::chrono::minutes runtime =
         std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start);

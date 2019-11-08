@@ -48,7 +48,7 @@ public:
      * @param data       The WindData contianer
      * @throw std::logic_error from parent constructor
      */
-    WindFeed(str const& m_name, config::Properties const& m_properties, s_ptr<data::WindData> data);
+    WindFeed(Str const& m_name, config::Properties const& m_properties, SPtr<data::WindData> data);
     ~WindFeed() noexcept override = default;
 
     /**
@@ -60,6 +60,6 @@ public:
     /**
      * @brief Feed::process.
      */
-    bool process(str response) override;
+    bool process(Str response) override;
 };
 }  // namespace vfrb::feed

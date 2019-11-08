@@ -75,7 +75,7 @@ class Server
 
 public:
     Server(u16 port, usize maxCon);  ///< @param port The port
-    Server(s_ptr<net::NetworkInterface<SocketT>> interface,
+    Server(SPtr<net::NetworkInterface<SocketT>> interface,
            usize                                 maxCon);  ///< @param interface The NetworkInterface to use
     ~Server() noexcept;
 
@@ -103,7 +103,7 @@ template<typename SocketT>
 char const* Server<SocketT>::LOG_PREFIX = "(Server) ";
 
 template<typename SocketT>
-Logger const& Server<SocketT>::logger = Logger::instance();
+Logger const& Server<SocketT>::logger = Logger::Instance();
 
 template<typename SocketT>
 Server<SocketT>::Server(u16 port, usize maxCon)
@@ -111,7 +111,7 @@ Server<SocketT>::Server(u16 port, usize maxCon)
 {}
 
 template<typename SocketT>
-Server<SocketT>::Server(s_ptr<net::NetworkInterface<SocketT>> interface, usize maxCon)
+Server<SocketT>::Server(SPtr<net::NetworkInterface<SocketT>> interface, usize maxCon)
     : m_netInterface(interface), m_maxConnections(maxCon)
 {
     m_connections.reserve(maxCon);

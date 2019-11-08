@@ -1,5 +1,7 @@
 # changelog
 
+## 4.0.0
+
 ## 3.0.3
 
 + changed default compiler optimization level to 2

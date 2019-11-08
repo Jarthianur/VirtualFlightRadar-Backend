@@ -55,19 +55,19 @@ public:
      * @brief Run this signal listener.
      * @threadsafe
      */
-    void run();
+    void Run();
 
     /**
      * @brief Stop this signal listener.
      * @threadsafe
      */
-    void stop();
+    void Stop();
 
     /**
      * @brief Add a SignalHandler.
      * @param handler The handler to invoke when signal caught
      * @threadsafe
      */
-    void addHandler(SignalHandler&& handler);
+    void AddHandler(SignalHandler&& handler_);
 };
 }  // namespace vfrb::concurrent

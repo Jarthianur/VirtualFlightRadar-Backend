@@ -48,16 +48,16 @@ class Logger
      * @brief Get current date-time as string.
      * @return the date-time-string
      */
-    static str time();
+    static Str time();
 
-    void prefix(std::ostream& stream, char const* msg) const REQUIRES(m_mutex);
+    void prefix(std::ostream& stream_, char const* msg_) const REQUIRES(m_mutex);
 
     Logger() = default;
 
 public:
     ~Logger() noexcept = default;
 
-    static Logger& instance();
+    static Logger& Instance();
 
     /**
      * @brief Log on INFO level.
@@ -66,7 +66,7 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void info(Args&&... args) const REQUIRES(!m_mutex);
+    void Info(Args&&... args_) const REQUIRES(!m_mutex);
 
     /**
      * @brief Log on DEBUG level.
@@ -75,7 +75,7 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void debug(Args&&... args) const REQUIRES(!m_mutex);
+    void Debug(Args&&... args_) const REQUIRES(!m_mutex);
 
     /**
      * @brief Log on WARN level.
@@ -84,7 +84,7 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void warn(Args&&... args) const REQUIRES(!m_mutex);
+    void Warn(Args&&... args_) const REQUIRES(!m_mutex);
 
     /**
      * @brief Log on ERROR level.
@@ -93,52 +93,52 @@ public:
      * @threadsafe
      */
     template<typename... Args>
-    void error(Args&&... args) const REQUIRES(!m_mutex);
+    void Error(Args&&... args_) const REQUIRES(!m_mutex);
 
     /**
      * @brief Set a logfile instead of stdout/stderr.
      * @param file The filename
      */
-    void logFile(str const& file) REQUIRES(!m_mutex);
+    void LogFile(Str const& file_) REQUIRES(!m_mutex);
 };
 
-[[gnu::always_inline]] inline void Logger::prefix(std::ostream& stream, char const* msg) const
+[[gnu::always_inline]] inline void Logger::prefix(std::ostream& stream_, char const* msg_) const
     REQUIRES(m_mutex)
 {
-    stream << msg << "  " << time() << ":: ";
+    stream_ << msg_ << "  " << time() << ":: ";
 }
 
 template<typename... Args>
-void Logger::info(Args&&... args) const REQUIRES(!m_mutex)
+void Logger::Info(Args&&... args_) const REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, "[INFO ]");
-    (*m_outStream << ... << args) << std::endl;
+    (*m_outStream << ... << args_) << std::endl;
 }
 
 template<typename... Args>
-void Logger::debug([[maybe_unused]] Args&&... args) const REQUIRES(!m_mutex)
+void Logger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex)
 {
 #ifdef LOG_ENABLE_DEBUG
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, "[DEBUG]");
-    (*m_outStream << ... << args) << std::endl;
+    (*m_outStream << ... << args_) << std::endl;
 #endif
 }
 
 template<typename... Args>
-void Logger::warn(Args&&... args) const REQUIRES(!m_mutex)
+void Logger::Warn(Args&&... args_) const REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, "[WARN ]");
-    (*m_outStream << ... << args) << std::endl;
+    (*m_outStream << ... << args_) << std::endl;
 }
 
 template<typename... Args>
-void Logger::error(Args&&... args) const REQUIRES(!m_mutex)
+void Logger::Error(Args&&... args_) const REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_errStream, "[ERROR]");
-    (*m_errStream << ... << args) << std::endl;
+    (*m_errStream << ... << args_) << std::endl;
 }
 }  // namespace vfrb

@@ -29,8 +29,8 @@ using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-AtmosphereFeed::AtmosphereFeed(str const& name, Properties const& properties,
-                               s_ptr<data::AtmosphereData> data)
+AtmosphereFeed::AtmosphereFeed(Str const& name, Properties const& properties,
+                               SPtr<data::AtmosphereData> data)
     : Feed(name, properties, data)
 {}
 
@@ -39,7 +39,7 @@ Feed::Protocol AtmosphereFeed::protocol() const
     return Protocol::SENSOR;
 }
 
-bool AtmosphereFeed::process(str response)
+bool AtmosphereFeed::process(Str response)
 {
     try
     {

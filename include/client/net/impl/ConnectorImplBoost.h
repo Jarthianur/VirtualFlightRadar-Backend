@@ -43,7 +43,7 @@ class ConnectorImplBoost : public Connector
     boost::asio::ip::tcp::resolver m_resolver;  ///< Host resolver
     boost::asio::deadline_timer    m_timer;     ///< Timer
     boost::asio::streambuf         m_buffer;    ///< Read buffer
-    str                            m_response;  ///< Read message
+    Str                            m_response;  ///< Read message
     std::istream                   m_istream;   ///< Message stream for conversion
 
     ErrorCode evalErrorCode(boost::system::error_code const& error) const;
@@ -128,7 +128,7 @@ public:
      * @param msg      The message to send
      * @param callback The callback to invoke when done
      */
-    void onWrite(str const& msg, Callback const& callback) override;
+    void onWrite(Str const& msg, Callback const& callback) override;
 
     /**
      * @brief Schedule an action after a timeout.

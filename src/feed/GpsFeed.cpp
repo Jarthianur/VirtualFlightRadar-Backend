@@ -32,9 +32,9 @@ using namespace vfrb::config;
 namespace vfrb::feed
 {
 constexpr auto     LOG_PREFIX = "(GpsFeed) ";
-static auto const& logger     = Logger::instance();
+static auto const& logger     = Logger::Instance();
 
-GpsFeed::GpsFeed(str const& name, Properties const& properties, s_ptr<data::GpsData> data)
+GpsFeed::GpsFeed(Str const& name, Properties const& properties, SPtr<data::GpsData> data)
     : Feed(name, properties, data)
 {}
 
@@ -43,7 +43,7 @@ Feed::Protocol GpsFeed::protocol() const
     return Protocol::GPS;
 }
 
-bool GpsFeed::process(str response)
+bool GpsFeed::process(Str response)
 {
     try
     {

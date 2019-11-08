@@ -38,9 +38,9 @@ GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid, f64 
       m_fixQuality(quality),
       m_timestamp(timestamp)
 {
-    util::checkLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
-    util::checkLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
-    util::checkLimits(m_location.altitude, Location::MIN_ALTITUDE, Location::MAX_ALTITUDE);
+    util::CheckLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
+    util::CheckLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
+    util::CheckLimits(m_location.altitude, Location::MIN_ALTITUDE, Location::MAX_ALTITUDE);
 }
 
 void GpsPosition::assign(Object&& other)

@@ -31,14 +31,14 @@
 #include "feed/Feed.h"
 #include "util/Logger.hpp"
 
-static auto const& logger = vfrb::Logger::instance();
+static auto const& logger = vfrb::Logger::Instance();
 
 using namespace vfrb::client::net;
 using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
-Client::Client(Endpoint const& endpoint, s_ptr<Connector> connector)
+Client::Client(Endpoint const& endpoint, SPtr<Connector> connector)
     : m_connector(connector), m_endpoint(endpoint)
 {}
 
@@ -55,11 +55,11 @@ usize Client::hash() const
     return seed;
 }
 
-void Client::subscribe(s_ptr<feed::Feed> feed)
+void Client::subscribe(SPtr<feed::Feed> feed)
 {
     LockGuard lk(m_mutex);
     m_feeds.push_back(feed);
-    std::sort(m_feeds.begin(), m_feeds.end(), [](s_ptr<feed::Feed> const& f1, s_ptr<feed::Feed> const& f2) {
+    std::sort(m_feeds.begin(), m_feeds.end(), [](SPtr<feed::Feed> const& f1, SPtr<feed::Feed> const& f2) {
         return f1->priority() > f2->priority();
     });
 }
@@ -137,7 +137,7 @@ void Client::handleTimedConnect(ErrorCode error)
     }
 }
 
-void Client::handleRead(ErrorCode error, str const& response)
+void Client::handleRead(ErrorCode error, Str const& response)
 {
     LockGuard lk(m_mutex);
     if (m_state == State::RUNNING)

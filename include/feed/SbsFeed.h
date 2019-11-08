@@ -41,7 +41,7 @@ class SbsFeed : public Feed
     NOT_COPYABLE(SbsFeed)
 
     parser::SbsParser const       m_parser;  ///< Parser to unpack response from Client
-    concurrent::WorkerThread<str> m_worker;
+    concurrent::WorkerThread<Str> m_worker;
 
 public:
     /**
@@ -51,7 +51,7 @@ public:
      * @param maxHeight  The max height filter
      * @throw std::logic_error from parent constructor
      */
-    SbsFeed(str const& m_name, config::Properties const& m_properties, s_ptr<data::AircraftData> data,
+    SbsFeed(Str const& m_name, config::Properties const& m_properties, SPtr<data::AircraftData> data,
             s32 maxHeight);
     ~SbsFeed() noexcept override = default;
 
@@ -64,6 +64,6 @@ public:
     /**
      * @brief Feed::process.
      */
-    bool process(str response) override;
+    bool process(Str response) override;
 };
 }  // namespace vfrb::feed

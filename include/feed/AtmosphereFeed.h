@@ -48,8 +48,8 @@ public:
      * @param data       The WindData container
      * @throw std::logic_error from parent constructor
      */
-    AtmosphereFeed(str const& m_name, config::Properties const& m_properties,
-                   s_ptr<data::AtmosphereData> data);
+    AtmosphereFeed(Str const& m_name, config::Properties const& m_properties,
+                   SPtr<data::AtmosphereData> data);
     ~AtmosphereFeed() noexcept override = default;
 
     /**
@@ -61,6 +61,6 @@ public:
     /**
      * @brief Implement Feed::process.
      */
-    bool process(str response) override;
+    bool process(Str response) override;
 };
 }  // namespace vfrb::feed

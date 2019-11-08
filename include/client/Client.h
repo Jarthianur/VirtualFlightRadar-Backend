@@ -45,7 +45,7 @@ class Client
     NOT_COPYABLE(Client)
 
 protected:
-    enum class State : enum_t
+    enum class State : enum_type
     {
         NONE,
         CONNECTING,
@@ -65,7 +65,7 @@ protected:
      * @param component The component name
      * @param connector The Connector interface
      */
-    Client(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
+    Client(net::Endpoint const& endpoint, SPtr<net::Connector> connector);
 
     /**
      * @brief Handler for connect

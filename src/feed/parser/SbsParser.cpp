@@ -32,7 +32,7 @@ namespace vfrb::feed::parser
 {
 SbsParser::SbsParser(s32 maxHeight) : Parser<Aircraft>(), m_maxHeight(maxHeight) {}
 
-Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
+Aircraft SbsParser::unpack(Str&& sentence, u32 priority) const
 {
     u32              i = 2;
     Location         loc;
@@ -42,9 +42,9 @@ Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
     try
     {
         if (usize p = 6, delim = 0;
-            sentence.size() > 4 && sentence[4] == '3' && sentence.find(',', p) != str::npos)
+            sentence.size() > 4 && sentence[4] == '3' && sentence.find(',', p) != Str::npos)
         {
-            while ((delim = sentence.find(',', p)) != str::npos && i < 16)
+            while ((delim = sentence.find(',', p)) != Str::npos && i < 16)
             {
                 switch (i)
                 {
@@ -59,10 +59,10 @@ Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
                         ts = Timestamp(std::string_view(sentence.c_str() + p, delim - p));
                         break;
                     case SBS_FIELD_ALT:
-                        if (auto [v, ec] = convert<f64>(sentence.c_str() + p, sentence.c_str() + delim);
+                        if (auto [v, ec] = Convert<f64>(sentence.c_str() + p, sentence.c_str() + delim);
                             ec == Errc::OK)
                         {
-                            loc.altitude = math::doubleToInt(v * math::FEET_2_M);
+                            loc.altitude = math::DoubleToInt(v * math::FEET_2_M);
                         }
                         else
                         {
@@ -71,7 +71,7 @@ Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
                         break;
                     case SBS_FIELD_LAT:
                         if (auto ec =
-                                convert<f64>(sentence.c_str() + p, sentence.c_str() + delim, loc.latitude);
+                                Convert<f64>(sentence.c_str() + p, sentence.c_str() + delim, loc.latitude);
                             ec == Errc::ERR)
                         {
                             throw error::UnpackError();
@@ -79,7 +79,7 @@ Aircraft SbsParser::unpack(str&& sentence, u32 priority) const
                         break;
                     case SBS_FIELD_LON:
                         if (auto ec =
-                                convert<f64>(sentence.c_str() + p, sentence.c_str() + delim, loc.longitude);
+                                Convert<f64>(sentence.c_str() + p, sentence.c_str() + delim, loc.longitude);
                             ec == Errc::ERR)
                         {
                             throw error::UnpackError();

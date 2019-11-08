@@ -30,7 +30,7 @@ using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-WindFeed::WindFeed(str const& name, Properties const& properties, s_ptr<data::WindData> data)
+WindFeed::WindFeed(Str const& name, Properties const& properties, SPtr<data::WindData> data)
     : Feed(name, properties, data)
 {}
 
@@ -39,7 +39,7 @@ Feed::Protocol WindFeed::protocol() const
     return Protocol::SENSOR;
 }
 
-bool WindFeed::process(str response)
+bool WindFeed::process(Str response)
 {
     try
     {

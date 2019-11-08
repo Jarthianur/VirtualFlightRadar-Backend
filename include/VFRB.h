@@ -57,19 +57,19 @@ class VFRB
 {
     NOT_COPYABLE(VFRB)
 
-    s_ptr<data::AircraftData>                    m_aircraftData;    ///< Aircraft container
-    s_ptr<data::AtmosphereData>                  m_atmosphereData;  ///< Atmospheric data container
-    s_ptr<data::GpsData>                         m_gpsData;         ///< GPS data container
-    s_ptr<data::WindData>                        m_windData;        ///< Wind data container
+    SPtr<data::AircraftData>                    m_aircraftData;    ///< Aircraft container
+    SPtr<data::AtmosphereData>                  m_atmosphereData;  ///< Atmospheric data container
+    SPtr<data::GpsData>                         m_gpsData;         ///< GPS data container
+    SPtr<data::WindData>                        m_windData;        ///< Wind data container
     server::Server<server::net::SocketImplBoost> m_server;          ///< Manage clients and sending of data
-    std::list<s_ptr<feed::Feed>>                 m_feeds;           ///< List of all active feeds
+    std::list<SPtr<feed::Feed>>                 m_feeds;           ///< List of all active feeds
     std::atomic<bool>                            m_running;         ///< Atomic run-status
 
     /**
      * @brief Create all input feeds.
      * @param config The Configuration
      */
-    void createFeeds(s_ptr<config::Configuration> config);
+    void createFeeds(SPtr<config::Configuration> config);
 
     /**
      * @brief Serve the data frequently every second.
@@ -81,10 +81,10 @@ class VFRB
      * @param start The start value
      * @return the duration string
      */
-    str duration(std::chrono::steady_clock::time_point start) const;
+    Str duration(std::chrono::steady_clock::time_point start) const;
 
 public:
-    explicit VFRB(s_ptr<config::Configuration> config);  ///< @param config The Configuration
+    explicit VFRB(SPtr<config::Configuration> config);  ///< @param config The Configuration
     ~VFRB() noexcept = default;
 
     /**

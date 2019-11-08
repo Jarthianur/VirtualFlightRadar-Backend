@@ -34,7 +34,7 @@ ClientManager::~ClientManager() noexcept
     stop();
 }
 
-void ClientManager::subscribe(s_ptr<feed::Feed> feed)
+void ClientManager::subscribe(SPtr<feed::Feed> feed)
 {
     LockGuard  lk(m_mutex);
     ClientIter it = m_clients.end();
@@ -54,7 +54,7 @@ void ClientManager::run()
     LockGuard lk(m_mutex);
     for (auto it : m_clients)
     {
-        m_thdGroup.createThread([this, it] {
+        m_thdGroup.CreateThread([this, it] {
             it->run();
             LockGuard lk(m_mutex);
             m_clients.erase(it);
@@ -73,7 +73,7 @@ void ClientManager::stop()
 
 namespace error
 {
-FeedSubscriptionError::FeedSubscriptionError(str const& name)
+FeedSubscriptionError::FeedSubscriptionError(Str const& name)
     : m_msg("failed to subscribe "s + name + " to client")
 {}
 

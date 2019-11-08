@@ -105,7 +105,7 @@ class SCOPED_CAPABILITY LockGuard
     std::lock_guard<Mutex> m_lock;
 
 public:
-    LockGuard(Mutex& mu) ACQUIRE(mu) : m_lock(mu) {}
+    LockGuard(Mutex& mu_) ACQUIRE(mu_) : m_lock(mu_) {}
     ~LockGuard() noexcept RELEASE() {}
 };
 

@@ -44,7 +44,7 @@ public:
      * @note FLARM is preferred over TRANSPONDER,
      *       in case an aircraft has both available.
      */
-    enum class TargetType : enum_t
+    enum class TargetType : enum_type
     {
         FLARM,
         TRANSPONDER
@@ -53,7 +53,7 @@ public:
     /**
      * @brief Aircraft types with their protocol codes.
      */
-    enum class AircraftType : enum_t
+    enum class AircraftType : enum_type
     {
         UNKNOWN               = 0,
         GLIDER                = 1,
@@ -75,7 +75,7 @@ public:
     /**
      * @brief Id (address) types with their protocol codes.
      */
-    enum class IdType : enum_t
+    enum class IdType : enum_type
     {
         RANDOM = 0,
         ICAO   = 1,

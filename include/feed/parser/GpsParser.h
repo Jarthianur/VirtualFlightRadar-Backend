@@ -67,6 +67,6 @@ public:
      * @param position The position to unpack into
      * @return true on success, else false
      */
-    object::GpsPosition unpack(str&& sentence, u32 priority) const override;
+    object::GpsPosition unpack(Str&& sentence, u32 priority) const override;
 };
 }  // namespace vfrb::feed::parser

@@ -23,7 +23,7 @@ Wind::Wind() : Object() {}
 
 Wind::Wind(u32 priority) : Object(priority) {}
 
-str& Wind::operator*()
+Str& Wind::operator*()
 {
     return m_nmea;
 }

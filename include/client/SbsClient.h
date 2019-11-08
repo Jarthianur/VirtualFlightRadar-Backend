@@ -45,7 +45,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    SbsClient(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
+    SbsClient(net::Endpoint const& endpoint, SPtr<net::Connector> connector);
     ~SbsClient() noexcept override = default;
 };
 }  // namespace vfrb::client

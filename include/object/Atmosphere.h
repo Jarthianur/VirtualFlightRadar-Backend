@@ -38,7 +38,7 @@ class Atmosphere : public Object
     inline static constexpr auto MIN_PRESSURE = 0.0;
 
     f64 m_pressure = ICAO_STD;  ///< The atmospheric pressure
-    str m_nmea;
+    Str m_nmea;
 
     /**
      * @brief Extend Object::assign.
@@ -57,7 +57,7 @@ public:
     Atmosphere(u32 priority, f64 pressure);
     ~Atmosphere() noexcept override = default;
 
-    str& operator*();
+    Str& operator*();
 
     auto pressure() const -> decltype(m_pressure);
 };

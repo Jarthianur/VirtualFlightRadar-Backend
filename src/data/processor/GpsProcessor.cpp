@@ -46,22 +46,22 @@ usize GpsProcessor::appendGPGGA(GpsPosition const& position, util::CString<NMEA_
     // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
     // support others.
     // "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"
-    int next = nmea.format(
+    int next = nmea.Format(
         pos, "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*",
         utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude,
         m_minLongitude, m_directionEW, /*pos.fixQa,*/ position.nrOfSatellites(), position.location().altitude,
-        math::saturate(position.geoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
-    next += nmea.format(pos, "%02x\r\n", checksum(*nmea, pos));
+        math::Saturate(position.geoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
+    next += nmea.Format(pos, "%02x\r\n", Checksum(*nmea, pos));
     return pos + static_cast<usize>(next);
 }
 
 usize GpsProcessor::appendGPRMC(util::CString<NMEA_SIZE>& nmea, std::tm const* utc, usize pos) const
 {
-    int next = nmea.format(
+    int next = nmea.Format(
         pos, "$GPRMC,%.2d%.2d%.2d,A,%02.0lf%06.3lf,%c,%03.0lf%06.3lf,%c,0,0,%.2d%.2d%.2d,001.0,W*",
         utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude,
         m_minLongitude, m_directionEW, utc->tm_mday, utc->tm_mon + 1, utc->tm_year - 100);
-    next += nmea.format(pos, "%02x\r\n", checksum(*nmea, pos));
+    next += nmea.Format(pos, "%02x\r\n", Checksum(*nmea, pos));
     return pos + static_cast<usize>(next);
 }
 

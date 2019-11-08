@@ -34,15 +34,15 @@ SignalListener::SignalListener() : m_ioService(), m_sigSet(m_ioService)
 
 SignalListener::~SignalListener() noexcept
 {
-    stop();
+    Stop();
 }
 
-void SignalListener::run()
+void SignalListener::Run()
 {
-    m_thread.spawn([this]() { m_ioService.run(); });
+    m_thread.Spawn([this]() { m_ioService.run(); });
 }
 
-void SignalListener::stop()
+void SignalListener::Stop()
 {
     if (!m_ioService.stopped())
     {
@@ -50,7 +50,7 @@ void SignalListener::stop()
     }
 }
 
-void SignalListener::addHandler(SignalHandler&& handler)
+void SignalListener::AddHandler(SignalHandler&& handler)
 {
     m_sigSet.async_wait(std::move(handler));
 }

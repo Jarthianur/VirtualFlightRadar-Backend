@@ -32,11 +32,11 @@ namespace vfrb::server::net::error
  */
 class SocketError : public vfrb::error::Error
 {
-    str const m_msg;  ///< Error message
+    Str const m_msg;  ///< Error message
 
 public:
     SocketError() = default;
-    explicit SocketError(str const& msg);  ///< @param msg The error message
+    explicit SocketError(Str const& msg);  ///< @param msg The error message
     ~SocketError() noexcept override = default;
 
     /**

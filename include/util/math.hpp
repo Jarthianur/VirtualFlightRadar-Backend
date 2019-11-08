@@ -47,9 +47,9 @@ const auto            PI        = std::acos(-1.0);  ///< The circular number
  * @param degree The degrees
  * @return the radian
  */
-inline f64 radian(f64 degree)
+inline f64 Radian(f64 degree_)
 {
-    return ((degree * PI) / 180.0);
+    return ((degree_ * PI) / 180.0);
 }
 
 /**
@@ -57,9 +57,9 @@ inline f64 radian(f64 degree)
  * @param radian The radian
  * @return the degrees
  */
-inline f64 degree(f64 radian)
+inline f64 Degree(f64 radian_)
 {
-    return (radian * 180.0) / PI;
+    return (radian_ * 180.0) / PI;
 }
 
 /**
@@ -67,9 +67,9 @@ inline f64 degree(f64 radian)
  * @param value The floating point value
  * @return the rounded integer
  */
-inline s32 doubleToInt(f64 value)
+inline s32 DoubleToInt(f64 value_)
 {
-    return (value >= 0.0) ? static_cast<s32>(value + 0.5) : static_cast<s32>(value - 0.5);
+    return (value_ >= 0.0) ? static_cast<s32>(value_ + 0.5) : static_cast<s32>(value_ - 0.5);
 }
 
 /**
@@ -77,18 +77,18 @@ inline s32 doubleToInt(f64 value)
  * @param degMin The degree-minute value
  * @return the degree value
  */
-inline f64 dmToDeg(f64 degMin)
+inline f64 DmToDeg(f64 degMin_)
 {
-    f64 absDm = std::abs(degMin / 100.0);
+    f64 absDm = std::abs(degMin_ / 100.0);
     f64 d     = std::floor(absDm);
     f64 m     = (absDm - d) * 100.0 / 60.0;
     return d + m;
 }
 
 template<typename T>
-T saturate(T val, T min, T max)
+T Saturate(T val_, T min_, T max_)
 {
-    return std::max(min, std::min(val, max));
+    return std::max(min_, std::min(val_, max_));
 }
 
 /**
@@ -97,8 +97,8 @@ T saturate(T val, T min, T max)
  * @param pressure The air pressure
  * @return the height difference to QNE
  */
-inline s32 icaoHeight(f64 pressure)
+inline s32 IcaoHeight(f64 pressure_)
 {
-    return doubleToInt(288.15 * (1.0 - std::pow((pressure / 1013.25), 0.190295)) / 0.0065);
+    return DoubleToInt(288.15 * (1.0 - std::pow((pressure_ / 1013.25), 0.190295)) / 0.0065);
 }
 }  // namespace vfrb::math

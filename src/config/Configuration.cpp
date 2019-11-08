@@ -41,7 +41,7 @@ char const* ConfigurationError::what() const noexcept
 
 class ConversionError : public vfrb::error::Error
 {
-    str const m_msg;
+    Str const m_msg;
 
 public:
     ConversionError(str const& str, char const* path) : m_msg("invalid value at "s + path + " [" + str + "]")

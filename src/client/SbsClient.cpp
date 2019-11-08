@@ -29,9 +29,9 @@ using namespace vfrb::concurrent;
 namespace vfrb::client
 {
 constexpr auto     LOG_PREFIX = "(SbsClient) ";
-static auto const& logger     = Logger::instance();
+static auto const& logger     = Logger::Instance();
 
-SbsClient::SbsClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Client(endpoint, connector) {}
+SbsClient::SbsClient(Endpoint const& endpoint, SPtr<Connector> connector) : Client(endpoint, connector) {}
 
 void SbsClient::handleConnect(ErrorCode error)
 {

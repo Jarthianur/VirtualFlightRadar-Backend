@@ -40,22 +40,22 @@ public:
     ~ThreadGroup() noexcept;
 
     template<typename FnT>
-    void createThread(FnT&& fn);
-    void joinAll();
+    void CreateThread(FnT&& fn_);
+    void JoinAll();
 };
 
 inline ThreadGroup::~ThreadGroup() noexcept
 {
-    joinAll();
+    JoinAll();
 }
 
 template<typename FnT>
-void ThreadGroup::createThread(FnT&& fn)
+void ThreadGroup::CreateThread(FnT&& fn_)
 {
-    m_threads.push_back(GuardedThread(std::forward<FnT>(fn)));
+    m_threads.push_back(GuardedThread(std::forward<FnT>(fn_)));
 }
 
-inline void ThreadGroup::joinAll()
+inline void ThreadGroup::JoinAll()
 {
     m_threads.clear();
 }

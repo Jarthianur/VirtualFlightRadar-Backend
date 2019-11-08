@@ -28,14 +28,14 @@ using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
-Atmosphere AtmosphereParser::unpack(str&& sentence, u32 priority) const
+Atmosphere AtmosphereParser::unpack(Str&& sentence, u32 priority) const
 {
     try
     {
-        if (matchChecksum({sentence.c_str(), sentence.length()}) && sentence.find("MDA") != str::npos)
+        if (MatchChecksum({sentence.c_str(), sentence.length()}) && sentence.find("MDA") != Str::npos)
         {
             usize tmpB;
-            if ((tmpB = sentence.find('B')) != str::npos)
+            if ((tmpB = sentence.find('B')) != Str::npos)
             {
                 --tmpB;
             }
@@ -44,7 +44,7 @@ Atmosphere AtmosphereParser::unpack(str&& sentence, u32 priority) const
                 throw error::UnpackError();
             }
             usize tmpS;
-            if ((tmpS = std::string_view(sentence.c_str(), tmpB).find_last_of(',')) != str::npos)
+            if ((tmpS = std::string_view(sentence.c_str(), tmpB).find_last_of(',')) != Str::npos)
             {
                 ++tmpS;
             }
@@ -52,7 +52,7 @@ Atmosphere AtmosphereParser::unpack(str&& sentence, u32 priority) const
             {
                 throw error::UnpackError();
             }
-            if (auto [v, ec] = convert<f64>(sentence.c_str() + tmpS, sentence.c_str() + tmpB); ec == Errc::OK)
+            if (auto [v, ec] = Convert<f64>(sentence.c_str() + tmpS, sentence.c_str() + tmpB); ec == Errc::OK)
             {
                 Atmosphere atmos{priority, v * 1000.0};
                 *atmos = std::move(sentence);

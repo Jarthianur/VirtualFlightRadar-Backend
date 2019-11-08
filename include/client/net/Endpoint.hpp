@@ -30,8 +30,8 @@ namespace vfrb::client::net
  */
 struct Endpoint
 {
-    str const host;  ///< Hostname
-    str const port;  ///< Port number
+    Str const host;  ///< Hostname
+    Str const port;  ///< Port number
 
     /**
      * @brief Equality comparison by value

@@ -33,12 +33,12 @@ namespace error
 {
 class LimitsExceededError : public vfrb::error::Error
 {
-    str const m_msg;
+    Str const m_msg;
 
 public:
     template<typename T>
-    LimitsExceededError(T val, T min, T max)
-        : m_msg(std::to_string(val) + " not in [" + std::to_string(min) + "," + std::to_string(max) + "]")
+    LimitsExceededError(T val_, T min_, T max_)
+        : m_msg(std::to_string(val_) + " not in [" + std::to_string(min_) + "," + std::to_string(max_) + "]")
     {}
     ~LimitsExceededError() noexcept override = default;
 
@@ -55,17 +55,17 @@ public:
  * @return the value as its underlyig type
  */
 template<typename T>
-constexpr auto raw_type(T value) -> typename std::underlying_type<T>::type
+constexpr auto RawType(T value_) -> typename std::underlying_type<T>::type
 {
-    return static_cast<typename std::underlying_type<T>::type>(value);
+    return static_cast<typename std::underlying_type<T>::type>(value_);
 }
 
 template<typename T>
-void checkLimits(T val, T min, T max)
+void CheckLimits(T val_, T min_, T max_)
 {
-    if (val < min || val > max)
+    if (val_ < min_ || val_ > max_)
     {
-        throw error::LimitsExceededError(val, min, max);
+        throw error::LimitsExceededError(val_, min_, max_);
     }
 }
 }  // namespace vfrb::util

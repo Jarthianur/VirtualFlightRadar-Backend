@@ -38,22 +38,22 @@ class GuardedThread
     std::future<void> m_state;
 
     template<typename FnT>
-    void init(FnT&& fn);
+    void init(FnT&& fn_);
 
 public:
     GuardedThread() = default;
 
     template<typename FnT>
-    explicit GuardedThread(FnT&& fn);
+    explicit GuardedThread(FnT&& fn_);
 
     ~GuardedThread() noexcept;
 
-    GuardedThread(GuardedThread&& other);
+    GuardedThread(GuardedThread&& other_);
 
-    GuardedThread& operator=(GuardedThread&& other);
+    GuardedThread& operator=(GuardedThread&& other_);
 
     template<typename FnT>
-    void spawn(FnT&& fn);
+    void Spawn(FnT&& fn_);
 };
 
 namespace error
@@ -72,17 +72,17 @@ public:
 }  // namespace error
 
 template<typename FnT>
-[[gnu::always_inline]] inline void GuardedThread::init(FnT&& fn)
+[[gnu::always_inline]] inline void GuardedThread::init(FnT&& fn_)
 {
-    auto task = std::packaged_task<void()>(std::forward<FnT>(fn));
+    auto task = std::packaged_task<void()>(std::forward<FnT>(fn_));
     m_state   = task.get_future();
     m_thread  = std::thread(std::move(task));
 }
 
 template<typename FnT>
-GuardedThread::GuardedThread(FnT&& fn)
+GuardedThread::GuardedThread(FnT&& fn_)
 {
-    init<FnT>(std::forward<FnT>(fn));
+    init<FnT>(std::forward<FnT>(fn_));
 }
 
 inline GuardedThread::~GuardedThread() noexcept
@@ -99,34 +99,34 @@ inline GuardedThread::~GuardedThread() noexcept
     }
 }
 
-inline GuardedThread::GuardedThread(GuardedThread&& other)
+inline GuardedThread::GuardedThread(GuardedThread&& other_)
 {
     if (m_state.valid())
     {
         throw error::ThreadUsedError();
     }
-    m_thread = std::move(other.m_thread);
-    m_state  = std::move(other.m_state);
+    m_thread = std::move(other_.m_thread);
+    m_state  = std::move(other_.m_state);
 }
 
-inline GuardedThread& GuardedThread::operator=(GuardedThread&& other)
+inline GuardedThread& GuardedThread::operator=(GuardedThread&& other_)
 {
     if (m_state.valid())
     {
         throw error::ThreadUsedError();
     }
-    m_thread = std::move(other.m_thread);
-    m_state  = std::move(other.m_state);
+    m_thread = std::move(other_.m_thread);
+    m_state  = std::move(other_.m_state);
     return *this;
 }
 
 template<typename FnT>
-void GuardedThread::spawn(FnT&& fn)
+void GuardedThread::Spawn(FnT&& fn_)
 {
     if (m_state.valid())
     {
         throw error::ThreadUsedError();
     }
-    init<FnT>(std::forward<FnT>(fn));
+    init<FnT>(std::forward<FnT>(fn_));
 }
 }  // namespace vfrb::concurrent

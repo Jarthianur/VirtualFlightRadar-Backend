@@ -39,16 +39,16 @@ using namespace vfrb::config;
 using namespace boost;
 using namespace std::literals;
 
-static auto& logger = Logger::instance();
+static auto& logger = Logger::Instance();
 
 namespace error
 {
 class ConfigFileError : public vfrb::error::Error
 {
-    str const m_msg;
+    Str const m_msg;
 
 public:
-    explicit ConfigFileError(str const& msg) : m_msg(msg) {}
+    explicit ConfigFileError(Str const& msg) : m_msg(msg) {}
     ~ConfigFileError() noexcept override = default;
 
     char const* what() const noexcept override
@@ -91,7 +91,7 @@ program_options::variables_map evalArgs(int argc, char** argv)
     return variables;
 }
 
-s_ptr<Configuration> get_config(const program_options::variables_map& variables)
+SPtr<Configuration> get_config(const program_options::variables_map& variables)
 {
     if (variables.count("verbose"))
     {

@@ -48,6 +48,6 @@ public:
      * @param sentence The string to unpack
      * @param aircraft The Aircraft to unpack into
      */
-    object::Aircraft unpack(str&& sentence, u32 priority) const override;
+    object::Aircraft unpack(Str&& sentence, u32 priority) const override;
 };
 }  // namespace vfrb::feed::parser
