@@ -39,17 +39,17 @@ using SignalHandler = std::function<void(boost::system::error_code const&, int c
 /**
  * @brief Catch and handle system signals.
  */
-class SignalListener
+class CSignalListener
 {
-    NOT_COPYABLE(SignalListener)
+    NOT_COPYABLE(CSignalListener)
 
     boost::asio::io_service m_ioService;  ///< Internal IO-service
     boost::asio::signal_set m_sigSet;     ///< Internal signal set
-    GuardedThread           m_thread;     ///< Thread to run this
+    CGuardedThread          m_thread;     ///< Thread to run this
 
 public:
-    SignalListener();
-    ~SignalListener() noexcept;
+    CSignalListener();
+    ~CSignalListener() noexcept;
 
     /**
      * @brief Run this signal listener.

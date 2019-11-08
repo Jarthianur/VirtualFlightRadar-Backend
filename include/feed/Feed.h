@@ -48,7 +48,7 @@ class Feed
     u32 initPriority() const;
 
 protected:
-    config::Properties const m_properties;  ///< Properties
+    config::CProperties const m_properties;  ///< Properties
     Str const                m_name;        ///< Unique name
     u32 const                m_priority;    ///< Priority
     SPtr<data::Data>        m_data;        ///< Respective Data container
@@ -59,7 +59,7 @@ protected:
      * @param properties The Properties
      * @throw std::logic_error if host or port are not given in properties
      */
-    Feed(Str const& m_name, config::Properties const& propertyMap, SPtr<data::Data> data);
+    Feed(Str const& m_name, config::CProperties const& propertyMap, SPtr<data::Data> data);
 
 public:
     /**

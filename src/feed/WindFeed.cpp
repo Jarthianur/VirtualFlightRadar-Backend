@@ -30,7 +30,7 @@ using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-WindFeed::WindFeed(Str const& name, Properties const& properties, SPtr<data::WindData> data)
+WindFeed::WindFeed(Str const& name, CProperties const& properties, SPtr<data::WindData> data)
     : Feed(name, properties, data)
 {}
 

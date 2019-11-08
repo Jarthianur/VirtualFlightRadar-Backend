@@ -48,7 +48,7 @@ public:
      * @param data       The WindData contianer
      * @throw std::logic_error from parent constructor
      */
-    WindFeed(Str const& m_name, config::Properties const& m_properties, SPtr<data::WindData> data);
+    WindFeed(Str const& m_name, config::CProperties const& m_properties, SPtr<data::WindData> data);
     ~WindFeed() noexcept override = default;
 
     /**

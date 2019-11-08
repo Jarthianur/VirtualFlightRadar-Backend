@@ -91,7 +91,7 @@ program_options::variables_map evalArgs(int argc, char** argv)
     return variables;
 }
 
-SPtr<Configuration> get_config(const program_options::variables_map& variables)
+SPtr<CConfiguration> get_config(const program_options::variables_map& variables)
 {
     if (variables.count("verbose"))
     {
@@ -109,10 +109,10 @@ SPtr<Configuration> get_config(const program_options::variables_map& variables)
         {
             throw ::error::ConfigFileError(variables["config"].as<std::string>() + " is not accessible");
         }
-        auto conf = std::make_shared<Configuration>(file);
+        auto conf = std::make_shared<CConfiguration>(file);
         if (variables.count("ground-mode"))
         {
-            conf->groundMode = true;
+            conf->GroundMode = true;
             logger.info("(VFRB) Override ground mode: Yes");
         }
         return conf;

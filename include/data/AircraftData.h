@@ -40,7 +40,7 @@ class AircraftData : public Data
     inline static constexpr auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
     inline static constexpr auto NMEA_SIZE        = processor::AircraftProcessor::NMEA_SIZE;
 
-    concurrent::ObjectContainer<object::CAircraft, NMEA_SIZE>
+    concurrent::CObjectContainer<object::CAircraft, NMEA_SIZE>
                                  m_container;  ///< Internal container for aircrafts
     processor::AircraftProcessor m_processor;  ///< Processor for aircrafts
 

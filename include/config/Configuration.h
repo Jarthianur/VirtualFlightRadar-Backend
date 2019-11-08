@@ -36,9 +36,9 @@ namespace vfrb::config
 /**
  * @brief VFRB Configuration
  */
-class Configuration final
+class CConfiguration final
 {
-    Properties const m_properties;  ///< Properties from file
+    CProperties const m_properties;  ///< Properties from file
 
     /**
      * @brief Resolve the fallback position.
@@ -51,7 +51,7 @@ class Configuration final
      * @brief Resolve the feeds and their config.
      * @param properties The properties
      */
-    std::unordered_map<Str, Properties> resolveFeeds() const;
+    std::unordered_map<Str, CProperties> resolveFeeds() const;
 
     std::list<Str> resolveFeedNames() const;
 
@@ -62,7 +62,7 @@ class Configuration final
      * @param path       The filter key
      * @return the filter value
      */
-    s32 resolveFilter(char const* key) const;
+    s32 resolveFilter(char const* key_) const;
 
     /**
      * @brief Dump the current config state as info log.
@@ -119,32 +119,32 @@ public:
     inline static constexpr auto PATH_MAX_DIST       = "filter.maxDistance";
     inline static constexpr auto PATH_MAX_HEIGHT     = "filter.maxHeight";
 
-    bool                                      groundMode;      ///< Ground mode state
-    object::CGpsPosition const                 gpsPosition;     ///< Fallback position
-    f64 const                                 atmPressure;     ///< Atmospheric fallback pressure
-    s32 const                                 maxHeight;       ///< Maximum height for reported aircrafts
-    s32 const                                 maxDistance;     ///< Maximum distance for reported aircrafts
-    std::tuple<u16, usize> const              serverConfig;    ///< Port where to serve reports
-    std::list<Str> const                      feedNames;       ///< List of feed names
-    std::unordered_map<Str, Properties> const feedProperties;  ///< Map feed names to their properties
+    bool                                       GroundMode;      ///< Ground mode state
+    object::CGpsPosition const                 GpsPosition;     ///< Fallback position
+    f64 const                                  AtmPressure;     ///< Atmospheric fallback pressure
+    s32 const                                  MaxHeight;       ///< Maximum height for reported aircrafts
+    s32 const                                  MaxDistance;     ///< Maximum distance for reported aircrafts
+    std::tuple<u16, usize> const               ServerConfig;    ///< Port where to serve reports
+    std::list<Str> const                       FeedNames;       ///< List of feed names
+    std::unordered_map<Str, CProperties> const FeedProperties;  ///< Map feed names to their properties
 
     /**
      * @param stream The input stream
      * @throw std::logic_error if any error occurres
      */
-    explicit Configuration(std::istream& stream);
-    ~Configuration() noexcept = default;
+    explicit CConfiguration(std::istream& stream_);
+    ~CConfiguration() noexcept = default;
 };
 
 namespace error
 {
-class ConfigurationError : public vfrb::error::IError
+class CConfigurationError : public vfrb::error::IError
 {
 public:
-    ConfigurationError()                    = default;
-    ~ConfigurationError() noexcept override = default;
+    CConfigurationError()                    = default;
+    ~CConfigurationError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* What() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::config

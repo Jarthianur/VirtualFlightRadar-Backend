@@ -48,7 +48,7 @@ public:
      * @param data       The WindData container
      * @throw std::logic_error from parent constructor
      */
-    AtmosphereFeed(Str const& m_name, config::Properties const& m_properties,
+    AtmosphereFeed(Str const& m_name, config::CProperties const& m_properties,
                    SPtr<data::AtmosphereData> data);
     ~AtmosphereFeed() noexcept override = default;
 

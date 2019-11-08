@@ -32,7 +32,7 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-AprscFeed::AprscFeed(Str const& name, Properties const& properties, SPtr<data::AircraftData> data,
+AprscFeed::AprscFeed(Str const& name, CProperties const& properties, SPtr<data::AircraftData> data,
                      s32 maxHeight)
     : Feed(name, properties, data), m_parser(maxHeight), m_worker([this](Str&& work) {
           try
@@ -45,11 +45,11 @@ AprscFeed::AprscFeed(Str const& name, Properties const& properties, SPtr<data::A
 {
     try
     {
-        properties.property(Configuration::KV_KEY_LOGIN);
+        properties.Property(CConfiguration::KV_KEY_LOGIN);
     }
-    catch ([[maybe_unused]] config::error::PropertyNotFoundError const&)
+    catch ([[maybe_unused]] config::error::CPropertyNotFoundError const&)
     {
-        throw error::InvalidPropertyError("could not find: "s + name + "." + Configuration::KV_KEY_LOGIN);
+        throw error::InvalidPropertyError("could not find: "s + name + "." + CConfiguration::KV_KEY_LOGIN);
     }
 }
 
@@ -66,6 +66,6 @@ bool AprscFeed::process(Str response)
 
 Str AprscFeed::login() const
 {
-    return m_properties.property(Configuration::KV_KEY_LOGIN);
+    return m_properties.Property(CConfiguration::KV_KEY_LOGIN);
 }
 }  // namespace vfrb::feed

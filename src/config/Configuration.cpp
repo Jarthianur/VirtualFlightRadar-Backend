@@ -34,7 +34,7 @@ namespace vfrb::config
 {
 namespace error
 {
-char const* ConfigurationError::what() const noexcept
+char const* CConfigurationError::what() const noexcept
 {
     return "configuration initialization failed";
 }

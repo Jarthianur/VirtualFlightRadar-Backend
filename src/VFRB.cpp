@@ -49,7 +49,7 @@ constexpr auto LOG_PREFIX       = "(VFRB) ";
 
 static auto const& logger = CLogger::Instance();
 
-VFRB::VFRB(SPtr<Configuration> config)
+VFRB::VFRB(SPtr<CConfiguration> config)
     : m_aircraftData(std::make_shared<AircraftData>(
           [this](Accessor const& it) {
               if (it.obj.UpdateAge() < CObject::OUTDATED)
@@ -75,7 +75,7 @@ void VFRB::run() noexcept
     m_running = true;
     logger.info(LOG_PREFIX, "starting...");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    concurrent::SignalListener            signals;
+    concurrent::CSignalListener            signals;
     client::ClientManager                 clientManager;
 
     signals.addHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {
@@ -128,7 +128,7 @@ void VFRB::serve()
     }
 }
 
-void VFRB::createFeeds(SPtr<Configuration> config)
+void VFRB::createFeeds(SPtr<CConfiguration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
     for (auto const& name : config->feedNames)

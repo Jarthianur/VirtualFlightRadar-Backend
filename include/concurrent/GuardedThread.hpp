@@ -30,9 +30,9 @@
 
 namespace vfrb::concurrent
 {
-class GuardedThread
+class CGuardedThread
 {
-    NOT_COPYABLE(GuardedThread)
+    NOT_COPYABLE(CGuardedThread)
 
     std::thread       m_thread;
     std::future<void> m_state;
@@ -41,16 +41,16 @@ class GuardedThread
     void init(FnT&& fn_);
 
 public:
-    GuardedThread() = default;
+    CGuardedThread() = default;
 
     template<typename FnT>
-    explicit GuardedThread(FnT&& fn_);
+    explicit CGuardedThread(FnT&& fn_);
 
-    ~GuardedThread() noexcept;
+    ~CGuardedThread() noexcept;
 
-    GuardedThread(GuardedThread&& other_);
+    CGuardedThread(CGuardedThread&& other_);
 
-    GuardedThread& operator=(GuardedThread&& other_);
+    CGuardedThread& operator=(CGuardedThread&& other_);
 
     template<typename FnT>
     void Spawn(FnT&& fn_);
@@ -58,13 +58,13 @@ public:
 
 namespace error
 {
-class ThreadUsedError : public vfrb::error::IError
+class CThreadUsedError : public vfrb::error::IError
 {
 public:
-    ThreadUsedError()                    = default;
-    ~ThreadUsedError() noexcept override = default;
+    CThreadUsedError()                    = default;
+    ~CThreadUsedError() noexcept override = default;
 
-    char const* what() const noexcept override
+    char const* What() const noexcept override
     {
         return "thread already used";
     }
@@ -72,7 +72,7 @@ public:
 }  // namespace error
 
 template<typename FnT>
-[[gnu::always_inline]] inline void GuardedThread::init(FnT&& fn_)
+[[gnu::always_inline]] inline void CGuardedThread::init(FnT&& fn_)
 {
     auto task = std::packaged_task<void()>(std::forward<FnT>(fn_));
     m_state   = task.get_future();
@@ -80,12 +80,12 @@ template<typename FnT>
 }
 
 template<typename FnT>
-GuardedThread::GuardedThread(FnT&& fn_)
+CGuardedThread::CGuardedThread(FnT&& fn_)
 {
     init<FnT>(std::forward<FnT>(fn_));
 }
 
-inline GuardedThread::~GuardedThread() noexcept
+inline CGuardedThread::~CGuardedThread() noexcept
 {
     try
     {
@@ -99,21 +99,21 @@ inline GuardedThread::~GuardedThread() noexcept
     }
 }
 
-inline GuardedThread::GuardedThread(GuardedThread&& other_)
+inline CGuardedThread::CGuardedThread(CGuardedThread&& other_)
 {
     if (m_state.valid())
     {
-        throw error::ThreadUsedError();
+        throw error::CThreadUsedError();
     }
     m_thread = std::move(other_.m_thread);
     m_state  = std::move(other_.m_state);
 }
 
-inline GuardedThread& GuardedThread::operator=(GuardedThread&& other_)
+inline CGuardedThread& CGuardedThread::operator=(CGuardedThread&& other_)
 {
     if (m_state.valid())
     {
-        throw error::ThreadUsedError();
+        throw error::CThreadUsedError();
     }
     m_thread = std::move(other_.m_thread);
     m_state  = std::move(other_.m_state);
@@ -121,11 +121,11 @@ inline GuardedThread& GuardedThread::operator=(GuardedThread&& other_)
 }
 
 template<typename FnT>
-void GuardedThread::Spawn(FnT&& fn_)
+void CGuardedThread::Spawn(FnT&& fn_)
 {
     if (m_state.valid())
     {
-        throw error::ThreadUsedError();
+        throw error::CThreadUsedError();
     }
     init<FnT>(std::forward<FnT>(fn_));
 }

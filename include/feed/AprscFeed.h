@@ -43,7 +43,7 @@ class AprscFeed : public Feed
     static constexpr auto LOG_PREFIX = "(AprscFeed) ";
 
     parser::AprsParser const      m_parser;  ///< Parser to unpack response from Client
-    concurrent::WorkerThread<Str> m_worker;
+    concurrent::CWorkerThread<Str> m_worker;
 
 public:
     /**
@@ -53,7 +53,7 @@ public:
      * @param maxHeight  The max height filter
      * @throw std::logic_error if login is not given, or from parent constructor
      */
-    AprscFeed(Str const& m_name, config::Properties const& propertyMap, SPtr<data::AircraftData> data,
+    AprscFeed(Str const& m_name, config::CProperties const& propertyMap, SPtr<data::AircraftData> data,
               s32 maxHeight);
     ~AprscFeed() noexcept override = default;
 

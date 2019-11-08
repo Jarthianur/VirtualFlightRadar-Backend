@@ -23,7 +23,7 @@
 
 namespace vfrb::concurrent
 {
-SignalListener::SignalListener() : m_ioService(), m_sigSet(m_ioService)
+CSignalListener::CSignalListener() : m_ioService(), m_sigSet(m_ioService)
 {
     m_sigSet.add(SIGINT);
     m_sigSet.add(SIGTERM);
@@ -32,17 +32,17 @@ SignalListener::SignalListener() : m_ioService(), m_sigSet(m_ioService)
 #endif
 }
 
-SignalListener::~SignalListener() noexcept
+CSignalListener::~CSignalListener() noexcept
 {
     Stop();
 }
 
-void SignalListener::Run()
+void CSignalListener::Run()
 {
     m_thread.Spawn([this]() { m_ioService.run(); });
 }
 
-void SignalListener::Stop()
+void CSignalListener::Stop()
 {
     if (!m_ioService.stopped())
     {
@@ -50,7 +50,7 @@ void SignalListener::Stop()
     }
 }
 
-void SignalListener::AddHandler(SignalHandler&& handler)
+void CSignalListener::AddHandler(SignalHandler&& handler)
 {
     m_sigSet.async_wait(std::move(handler));
 }

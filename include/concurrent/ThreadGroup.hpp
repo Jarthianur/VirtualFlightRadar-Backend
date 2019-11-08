@@ -29,33 +29,33 @@
 
 namespace vfrb::concurrent
 {
-class ThreadGroup
+class CThreadGroup
 {
-    NOT_COPYABLE(ThreadGroup)
+    NOT_COPYABLE(CThreadGroup)
 
-    std::list<GuardedThread> m_threads;
+    std::list<CGuardedThread> m_threads;
 
 public:
-    ThreadGroup() = default;
-    ~ThreadGroup() noexcept;
+    CThreadGroup() = default;
+    ~CThreadGroup() noexcept;
 
     template<typename FnT>
     void CreateThread(FnT&& fn_);
     void JoinAll();
 };
 
-inline ThreadGroup::~ThreadGroup() noexcept
+inline CThreadGroup::~CThreadGroup() noexcept
 {
     JoinAll();
 }
 
 template<typename FnT>
-void ThreadGroup::CreateThread(FnT&& fn_)
+void CThreadGroup::CreateThread(FnT&& fn_)
 {
-    m_threads.push_back(GuardedThread(std::forward<FnT>(fn_)));
+    m_threads.push_back(CGuardedThread(std::forward<FnT>(fn_)));
 }
 
-inline void ThreadGroup::JoinAll()
+inline void CThreadGroup::JoinAll()
 {
     m_threads.clear();
 }

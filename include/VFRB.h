@@ -34,7 +34,7 @@
 
 namespace vfrb::config
 {
-class Configuration;
+class CConfiguration;
 }  // namespace vfrb::config
 namespace vfrb::data
 {
@@ -69,7 +69,7 @@ class VFRB
      * @brief Create all input feeds.
      * @param config The Configuration
      */
-    void createFeeds(SPtr<config::Configuration> config);
+    void createFeeds(SPtr<config::CConfiguration> config);
 
     /**
      * @brief Serve the data frequently every second.
@@ -84,7 +84,7 @@ class VFRB
     Str duration(std::chrono::steady_clock::time_point start) const;
 
 public:
-    explicit VFRB(SPtr<config::Configuration> config);  ///< @param config The Configuration
+    explicit VFRB(SPtr<config::CConfiguration> config);  ///< @param config The Configuration
     ~VFRB() noexcept = default;
 
     /**

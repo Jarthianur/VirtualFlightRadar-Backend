@@ -34,15 +34,15 @@ namespace vfrb::config
 /**
  * @brief Store key-value pairs sectionwise.
  */
-class Properties
+class CProperties
 {
     boost::property_tree::ptree m_pTree;  ///< The underlying property tree
 
 public:
-    explicit Properties(
-        boost::property_tree::ptree const& ptree);             ///< @param ptree The property tree to copy
-    explicit Properties(boost::property_tree::ptree&& ptree);  ///< @param ptree The property tree to move
-    ~Properties() noexcept = default;
+    explicit CProperties(
+        boost::property_tree::ptree const& ptree_);              ///< @param ptree The property tree to copy
+    explicit CProperties(boost::property_tree::ptree&& ptree_);  ///< @param ptree The property tree to move
+    ~CProperties() noexcept = default;
 
     /**
      * @brief Get the value at a property path (section.key), or a default value.
@@ -50,28 +50,28 @@ public:
      * @param alternative The default value (default: empty)
      * @return the value at path if found and not empty, else the default value
      */
-    Str property(Str const& path, Str const& defVal) const noexcept;
-    Str property(Str const& path) const;
+    Str Property(Str const& path_, Str const& defVal_) const noexcept;
+    Str Property(Str const& path_) const;
     /**
      * @brief Get the Properties for a section.
      * @param section The section
      * @return the Properties for that section
      * @throw std::out_of_range if the section is not found
      */
-    Properties section(Str const& section) const;
+    CProperties Section(Str const& section_) const;
 };
 
 namespace error
 {
-class PropertyNotFoundError : public vfrb::error::IError
+class CPropertyNotFoundError : public vfrb::error::IError
 {
     Str const m_property;
 
 public:
-    explicit PropertyNotFoundError(Str const& prop);
-    ~PropertyNotFoundError() noexcept override = default;
+    explicit CPropertyNotFoundError(Str const& prop_);
+    ~CPropertyNotFoundError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* What() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::config

@@ -34,16 +34,16 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-Feed::Feed(Str const& name, Properties const& properties, SPtr<data::Data> data)
+Feed::Feed(Str const& name, CProperties const& properties, SPtr<data::Data> data)
     : m_properties(properties), m_name(name), m_priority(initPriority()), m_data(data)
 {
-    if (properties.property(Configuration::KV_KEY_HOST, "").empty())
+    if (properties.Property(CConfiguration::KV_KEY_HOST, "").empty())
     {
-        throw error::InvalidPropertyError("could not find: "s + name + "." + Configuration::KV_KEY_HOST);
+        throw error::InvalidPropertyError("could not find: "s + name + "." + CConfiguration::KV_KEY_HOST);
     }
-    if (properties.property(Configuration::KV_KEY_PORT, "").empty())
+    if (properties.Property(CConfiguration::KV_KEY_PORT, "").empty())
     {
-        throw error::InvalidPropertyError("could not find: "s + name + "." + Configuration::KV_KEY_PORT);
+        throw error::InvalidPropertyError("could not find: "s + name + "." + CConfiguration::KV_KEY_PORT);
     }
 }
 
@@ -52,7 +52,7 @@ u32 Feed::initPriority() const
     try
     {
         return static_cast<u32>(std::max<u64>(
-            0, std::min<u64>(std::stoul(m_properties.property(Configuration::KV_KEY_PRIORITY, "0")),
+            0, std::min<u64>(std::stoul(m_properties.Property(CConfiguration::KV_KEY_PRIORITY, "0")),
                              std::numeric_limits<u32>::max())));
     }
     catch ([[maybe_unused]] std::logic_error const&)
@@ -62,8 +62,8 @@ u32 Feed::initPriority() const
 
 client::net::Endpoint Feed::endpoint() const
 {
-    return {m_properties.property(Configuration::KV_KEY_HOST),
-            m_properties.property(Configuration::KV_KEY_PORT)};
+    return {m_properties.Property(CConfiguration::KV_KEY_HOST),
+            m_properties.Property(CConfiguration::KV_KEY_PORT)};
 }
 
 auto Feed::name() const -> decltype(m_name) const&

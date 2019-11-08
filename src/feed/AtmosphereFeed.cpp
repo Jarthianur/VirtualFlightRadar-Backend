@@ -29,7 +29,7 @@ using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-AtmosphereFeed::AtmosphereFeed(Str const& name, Properties const& properties,
+AtmosphereFeed::AtmosphereFeed(Str const& name, CProperties const& properties,
                                SPtr<data::AtmosphereData> data)
     : Feed(name, properties, data)
 {}

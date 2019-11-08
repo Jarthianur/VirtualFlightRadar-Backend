@@ -33,32 +33,32 @@ namespace vfrb::config
 /**
  * @brief Read a config in INI format.
  */
-class ConfigReader
+class CConfigReader
 {
     std::istream& m_stream;  ///< The input stream
 
 public:
-    explicit ConfigReader(std::istream& stream);  ///< @param stream The input stream to read from
-    ~ConfigReader() noexcept = default;
+    explicit CConfigReader(std::istream& stream_);  ///< @param stream The input stream to read from
+    ~CConfigReader() noexcept = default;
 
     /**
      * @brief Read the given stream and return read properties.
      * @return the Properties
      */
-    Properties read();
+    CProperties Read();
 };
 
 namespace error
 {
-class ReadFileError : public vfrb::error::IError
+class CReadFileError : public vfrb::error::IError
 {
     Str const m_fname;
 
 public:
-    explicit ReadFileError(Str const& file);
-    ~ReadFileError() noexcept override = default;
+    explicit CReadFileError(Str const& file_);
+    ~CReadFileError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* What() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::config

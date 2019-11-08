@@ -38,7 +38,7 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-FeedFactory::FeedFactory(SPtr<config::Configuration> config, SPtr<AircraftData> aircraftData,
+FeedFactory::FeedFactory(SPtr<config::CConfiguration> config, SPtr<AircraftData> aircraftData,
                          SPtr<AtmosphereData> atmosData, SPtr<GpsData> gpsData, SPtr<WindData> windData)
     : m_config(config),
       m_aircraftData(aircraftData),
@@ -81,23 +81,23 @@ SPtr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(Str const& name)
 
 SPtr<Feed> FeedFactory::createFeed(Str const& name)
 {
-    if (name.find(Configuration::SECT_KEY_APRSC) != Str::npos)
+    if (name.find(CConfiguration::SECT_KEY_APRSC) != Str::npos)
     {
         return makeFeed<AprscFeed>(name);
     }
-    if (name.find(Configuration::SECT_KEY_SBS) != Str::npos)
+    if (name.find(CConfiguration::SECT_KEY_SBS) != Str::npos)
     {
         return makeFeed<SbsFeed>(name);
     }
-    if (name.find(Configuration::SECT_KEY_GPS) != Str::npos)
+    if (name.find(CConfiguration::SECT_KEY_GPS) != Str::npos)
     {
         return makeFeed<GpsFeed>(name);
     }
-    if (name.find(Configuration::SECT_KEY_WIND) != Str::npos)
+    if (name.find(CConfiguration::SECT_KEY_WIND) != Str::npos)
     {
         return makeFeed<WindFeed>(name);
     }
-    if (name.find(Configuration::SECT_KEY_ATMOS) != Str::npos)
+    if (name.find(CConfiguration::SECT_KEY_ATMOS) != Str::npos)
     {
         return makeFeed<AtmosphereFeed>(name);
     }

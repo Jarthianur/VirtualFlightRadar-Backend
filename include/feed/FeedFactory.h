@@ -29,7 +29,7 @@
 
 namespace vfrb::config
 {
-class Configuration;
+class CConfiguration;
 }  // namespace vfrb::config
 
 namespace vfrb::data
@@ -49,7 +49,7 @@ class Feed;
  */
 class FeedFactory
 {
-    SPtr<config::Configuration> m_config;        ///< Pointer to the Configuration
+    SPtr<config::CConfiguration> m_config;        ///< Pointer to the Configuration
     SPtr<data::AircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
     SPtr<data::AtmosphereData>  m_atmosData;     ///< Pointer to the AtmosphereData
     SPtr<data::GpsData>         m_gpsData;       ///< Pointer to the GpsData
@@ -74,7 +74,7 @@ public:
      * @param gpsData      The GpsData pointer
      * @param windData     The WindData pointer
      */
-    FeedFactory(SPtr<config::Configuration> config, SPtr<data::AircraftData> aircraftData,
+    FeedFactory(SPtr<config::CConfiguration> config, SPtr<data::AircraftData> aircraftData,
                 SPtr<data::AtmosphereData> atmosData, SPtr<data::GpsData> gpsData,
                 SPtr<data::WindData> windData);
     ~FeedFactory() noexcept = default;
