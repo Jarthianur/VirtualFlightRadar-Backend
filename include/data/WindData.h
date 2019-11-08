@@ -40,7 +40,7 @@ class WindData : public Data
 
 public:
     explicit WindData(AccessFn&& fn);
-    WindData(AccessFn&& fn, object::Wind const& wind);  ///< @param wind The initial wind information
+    WindData(AccessFn&& fn, object::CWind const& wind);  ///< @param wind The initial wind information
     ~WindData() noexcept override = default;
 
     /**

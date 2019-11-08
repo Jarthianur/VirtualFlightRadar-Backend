@@ -38,7 +38,7 @@ public:
 
 private:
     s32 const        m_maxDistance;               ///< Max distance to process an aircraft
-    object::Location m_refLocation{0.0, 0.0, 0};  ///< Refered position
+    object::SLocation m_refLocation{0.0, 0.0, 0};  ///< Refered position
     f64              m_refAtmPressure = 1013.25;  ///< Refered pressure; hPa
     f64 mutable m_refRadLatitude      = 0.0;      ///< Refered latitude as radian
     f64 mutable m_aircraftRadLatitude = 0.0;      ///< Aircraft latitude as radian
@@ -57,19 +57,19 @@ private:
      * @brief Calcutale an aircrafts position relative to the refered one.
      * @param aircraft The Aircraft
      */
-    void calculateRelPosition(object::Aircraft const& aircraft) const;
+    void calculateRelPosition(object::CAircraft const& aircraft) const;
 
     /**
      * @brief Append PFLAU sentence to processing string.
      * @param aircraft The Aircaft
      */
-    usize appendPFLAU(object::Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea, usize pos) const;
+    usize appendPFLAU(object::CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea, usize pos) const;
 
     /**
      * @brief Append PFLAA sentence to processing string.
      * @param aircraft The Aircaft
      */
-    usize appendPFLAA(object::Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea, usize pos) const;
+    usize appendPFLAA(object::CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea, usize pos) const;
 
 public:
     AircraftProcessor();
@@ -80,13 +80,13 @@ public:
      * @brief Process an aircraft.
      * @param aircraft The Aircraft to process
      */
-    void process(object::Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea) const;
+    void process(object::CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea) const;
 
     /**
      * @brief Set the refered position and atmospheric pressure.
      * @param position The position
      * @param atmPress The pressure
      */
-    void referTo(object::Location const& location, f64 atmPress);
+    void referTo(object::SLocation const& location, f64 atmPress);
 };
 }  // namespace vfrb::data::processor

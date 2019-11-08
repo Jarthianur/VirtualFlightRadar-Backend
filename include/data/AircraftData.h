@@ -36,11 +36,11 @@ namespace vfrb::data
 class AircraftData : public Data
 {
     inline static constexpr auto NO_FLARM_THRESHOLD =
-        object::Object::OUTDATED;                         ///< Times until FLARM status is removed
+        object::CObject::OUTDATED;                         ///< Times until FLARM status is removed
     inline static constexpr auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
     inline static constexpr auto NMEA_SIZE        = processor::AircraftProcessor::NMEA_SIZE;
 
-    concurrent::ObjectContainer<object::Aircraft, NMEA_SIZE>
+    concurrent::ObjectContainer<object::CAircraft, NMEA_SIZE>
                                  m_container;  ///< Internal container for aircrafts
     processor::AircraftProcessor m_processor;  ///< Processor for aircrafts
 
@@ -55,9 +55,9 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& aircraft) override;
+    bool update(object::CObject&& aircraft) override;
 
-    void environment(object::Location const& position, f64 atmPress);
+    void environment(object::SLocation const& position, f64 atmPress);
 
     /**
      * @brief Process all aircrafts.

@@ -34,7 +34,7 @@ using namespace vfrb::concurrent;
 namespace vfrb::client
 {
 constexpr auto     LOG_PREFIX = "(GpsdClient) ";
-static auto const& logger     = Logger::Instance();
+static auto const& logger     = CLogger::Instance();
 
 GpsdClient::GpsdClient(Endpoint const& endpoint, SPtr<Connector> connector) : Client(endpoint, connector) {}
 

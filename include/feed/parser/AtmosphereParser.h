@@ -30,7 +30,7 @@ namespace vfrb::feed::parser
 /**
  * @brief Implement Parser for NMEA sentences from sensors.
  */
-class AtmosphereParser : public Parser<object::Atmosphere>
+class AtmosphereParser : public Parser<object::CAtmosphere>
 {
 public:
     AtmosphereParser()                    = default;
@@ -41,6 +41,6 @@ public:
      * @param sentence   The string to unpack
      * @param atmosphere The Atmosphere to unpack into
      */
-    object::Atmosphere unpack(Str&& sentence, u32 priority) const override;
+    object::CAtmosphere unpack(Str&& sentence, u32 priority) const override;
 };
 }  // namespace vfrb::feed::parser

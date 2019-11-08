@@ -50,7 +50,7 @@ public:
 
 namespace error
 {
-class ReadFileError : public vfrb::error::Error
+class ReadFileError : public vfrb::error::IError
 {
     Str const m_fname;
 

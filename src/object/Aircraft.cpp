@@ -27,41 +27,41 @@
 
 namespace vfrb::object
 {
-Aircraft::Aircraft(u32 priority, std::string_view const& id, IdType idT, AircraftType aT, Location const& loc,
-                   Movement const& move, Timestamp const& timestamp)
-    : Object(priority),
+CAircraft::CAircraft(u32 priority, std::string_view const& id, EIdType idT, EAircraftType aT, SLocation const& loc,
+                   SMovement const& move, CTimestamp const& timestamp)
+    : CObject(priority),
       m_id(id),
-      m_idType(idT > IdType::OGN ? IdType::RANDOM : idT),
-      m_aircraftType(aT > AircraftType::STATIC_OBJECT ? AircraftType::UNKNOWN : aT),
-      m_targetType(TargetType::FLARM),
+      m_idType(idT > EIdType::OGN ? EIdType::RANDOM : idT),
+      m_aircraftType(aT > EAircraftType::STATIC_OBJECT ? EAircraftType::UNKNOWN : aT),
+      m_targetType(ETargetType::FLARM),
       m_location(loc),
       m_movement(move),
       m_timestamp(timestamp),
       m_fullInfo(true)
 {
-    util::CheckLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
-    util::CheckLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
+    util::CheckLimits(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
+    util::CheckLimits(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
 }
 
-Aircraft::Aircraft(u32 priority, std::string_view const& id, IdType idT, AircraftType aT, Location const& loc,
-                   Timestamp const& timestamp)
-    : Aircraft(priority, id, idT, aT, loc, {.0, .0, .0}, timestamp)
+CAircraft::CAircraft(u32 priority, std::string_view const& id, EIdType idT, EAircraftType aT, SLocation const& loc,
+                   CTimestamp const& timestamp)
+    : CAircraft(priority, id, idT, aT, loc, {.0, .0, .0}, timestamp)
 {
-    m_targetType = TargetType::TRANSPONDER;
+    m_targetType = ETargetType::TRANSPONDER;
     m_fullInfo   = false;
 }
 
-Aircraft::Aircraft(Aircraft&& other) : m_id(other.m_id)
+CAircraft::CAircraft(CAircraft&& other) : m_id(other.m_id)
 {
     assign(std::move(other));
 }
 
-void Aircraft::assign(Object&& other)
+void CAircraft::assign(CObject&& other)
 {
     try
     {
-        auto&& update = dynamic_cast<Aircraft&&>(other);
-        Object::assign(std::move(other));
+        auto&& update = dynamic_cast<CAircraft&&>(other);
+        CObject::assign(std::move(other));
         this->m_idType       = update.m_idType;
         this->m_aircraftType = update.m_aircraftType;
         this->m_targetType   = update.m_targetType;
@@ -74,15 +74,15 @@ void Aircraft::assign(Object&& other)
     {}
 }
 
-bool Aircraft::canUpdate(Object const& other) const
+bool CAircraft::canUpdate(CObject const& other) const
 {
     try
     {
-        auto const& toUpdate = dynamic_cast<Aircraft const&>(other);
+        auto const& toUpdate = dynamic_cast<CAircraft const&>(other);
         return (this->m_timestamp > toUpdate.m_timestamp) &&
-               (toUpdate.m_targetType == TargetType::TRANSPONDER ||
-                this->m_targetType == TargetType::FLARM) &&
-               Object::canUpdate(other);
+               (toUpdate.m_targetType == ETargetType::TRANSPONDER ||
+                this->m_targetType == ETargetType::FLARM) &&
+               CObject::canUpdate(other);
     }
     catch (std::bad_cast const&)
     {
@@ -90,53 +90,53 @@ bool Aircraft::canUpdate(Object const& other) const
     }
 }
 
-Aircraft& Aircraft::operator=(Aircraft&& other)
+CAircraft& CAircraft::operator=(CAircraft&& other)
 {
-    tryUpdate(std::move(other));
+    TryUpdate(std::move(other));
     return *this;
 }
 
-auto Aircraft::idType() const -> decltype(m_idType)
+auto CAircraft::IdType() const -> decltype(m_idType)
 {
     return m_idType;
 }
 
-auto Aircraft::aircraftType() const -> decltype(m_aircraftType)
+auto CAircraft::AircraftType() const -> decltype(m_aircraftType)
 {
     return m_aircraftType;
 }
 
-auto Aircraft::id() const -> decltype(m_id) const&
+auto CAircraft::Id() const -> decltype(m_id) const&
 {
     return m_id;
 }
 
-auto Aircraft::targetType() const -> decltype(m_targetType)
+auto CAircraft::TargetType() const -> decltype(m_targetType)
 {
     return m_targetType;
 }
 
-auto Aircraft::location() const -> decltype(m_location) const&
+auto CAircraft::Location() const -> decltype(m_location) const&
 {
     return m_location;
 }
 
-auto Aircraft::movement() const -> decltype(m_movement) const&
+auto CAircraft::Movement() const -> decltype(m_movement) const&
 {
     return m_movement;
 }
 
-auto Aircraft::timestamp() const -> decltype(m_timestamp) const&
+auto CAircraft::Timestamp() const -> decltype(m_timestamp) const&
 {
     return m_timestamp;
 }
 
-auto Aircraft::hasFullInfo() const -> decltype(m_fullInfo)
+auto CAircraft::HasFullInfo() const -> decltype(m_fullInfo)
 {
     return m_fullInfo;
 }
 
-void Aircraft::targetType(TargetType tt)
+void CAircraft::TargetType(ETargetType tt)
 {
     m_targetType = tt;
 }

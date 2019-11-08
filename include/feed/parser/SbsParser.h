@@ -30,7 +30,7 @@ namespace vfrb::feed::parser
 /**
  * @brief Implement Parser for SBS sentences.
  */
-class SbsParser : public Parser<object::Aircraft>
+class SbsParser : public Parser<object::CAircraft>
 {
     inline static constexpr auto SBS_FIELD_ID   = 4;   ///< Field number of aircraft id
     inline static constexpr auto SBS_FIELD_TIME = 7;   ///< Field number of time
@@ -48,6 +48,6 @@ public:
      * @param sentence The string to unpack
      * @param aircraft The Aircraft to unpack into
      */
-    object::Aircraft unpack(Str&& sentence, u32 priority) const override;
+    object::CAircraft unpack(Str&& sentence, u32 priority) const override;
 };
 }  // namespace vfrb::feed::parser

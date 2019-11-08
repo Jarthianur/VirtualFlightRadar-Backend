@@ -30,14 +30,14 @@ using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
-SbsParser::SbsParser(s32 maxHeight) : Parser<Aircraft>(), m_maxHeight(maxHeight) {}
+SbsParser::SbsParser(s32 maxHeight) : Parser<CAircraft>(), m_maxHeight(maxHeight) {}
 
-Aircraft SbsParser::unpack(Str&& sentence, u32 priority) const
+CAircraft SbsParser::unpack(Str&& sentence, u32 priority) const
 {
     u32              i = 2;
-    Location         loc;
+    SLocation         loc;
     std::string_view id;
-    Timestamp        ts;
+    CTimestamp        ts;
 
     try
     {
@@ -50,19 +50,19 @@ Aircraft SbsParser::unpack(Str&& sentence, u32 priority) const
                 {
                     case SBS_FIELD_ID:
                         id = std::string_view(sentence.c_str() + p, delim - p);
-                        if (id.size() != Aircraft::ID_LEN)
+                        if (id.size() != CAircraft::ID_LEN)
                         {
                             throw error::UnpackError();
                         }
                         break;
                     case SBS_FIELD_TIME:
-                        ts = Timestamp(std::string_view(sentence.c_str() + p, delim - p));
+                        ts = CTimestamp(std::string_view(sentence.c_str() + p, delim - p));
                         break;
                     case SBS_FIELD_ALT:
                         if (auto [v, ec] = Convert<f64>(sentence.c_str() + p, sentence.c_str() + delim);
-                            ec == Errc::OK)
+                            ec == EErrc::OK)
                         {
-                            loc.altitude = math::DoubleToInt(v * math::FEET_2_M);
+                            loc.Altitude = math::DoubleToInt(v * math::FEET_2_M);
                         }
                         else
                         {
@@ -71,16 +71,16 @@ Aircraft SbsParser::unpack(Str&& sentence, u32 priority) const
                         break;
                     case SBS_FIELD_LAT:
                         if (auto ec =
-                                Convert<f64>(sentence.c_str() + p, sentence.c_str() + delim, loc.latitude);
-                            ec == Errc::ERR)
+                                Convert<f64>(sentence.c_str() + p, sentence.c_str() + delim, loc.Latitude);
+                            ec == EErrc::ERR)
                         {
                             throw error::UnpackError();
                         }
                         break;
                     case SBS_FIELD_LON:
                         if (auto ec =
-                                Convert<f64>(sentence.c_str() + p, sentence.c_str() + delim, loc.longitude);
-                            ec == Errc::ERR)
+                                Convert<f64>(sentence.c_str() + p, sentence.c_str() + delim, loc.Longitude);
+                            ec == EErrc::ERR)
                         {
                             throw error::UnpackError();
                         }
@@ -91,12 +91,12 @@ Aircraft SbsParser::unpack(Str&& sentence, u32 priority) const
                 i += 1;
             }
         }
-        if (i == 16 && loc.altitude <= m_maxHeight)
+        if (i == 16 && loc.Altitude <= m_maxHeight)
         {
-            return {priority, id, Aircraft::IdType::ICAO, Aircraft::AircraftType::POWERED_AIRCRAFT, loc, ts};
+            return {priority, id, CAircraft::EIdType::ICAO, CAircraft::EAircraftType::POWERED_AIRCRAFT, loc, ts};
         }
     }
-    catch ([[maybe_unused]] object::error::TimestampParseError const&)
+    catch ([[maybe_unused]] object::error::CTimestampParseError const&)
     {}
     throw error::UnpackError();
 }

@@ -34,7 +34,7 @@ extern u32 day();
 
 namespace error
 {
-char const* TimestampParseError::what() const noexcept
+char const* CTimestampParseError::what() const noexcept
 {
     return "";
 }
@@ -56,16 +56,16 @@ std::tuple<u32, u32, u32, u32> parseTime(std::string_view::const_iterator&      
     {
         return time;
     }
-    throw error::TimestampParseError();
+    throw error::CTimestampParseError();
 }
 
-Timestamp::Timestamp(std::string_view const& value) : m_day(date_time::day())
+CTimestamp::CTimestamp(std::string_view const& value) : m_day(date_time::day())
 {
     auto it           = value.begin();
     auto [h, m, s, f] = parseTime(it, value.end());
     if (h > 23 || m > 59 || s > 59 || f > 999)
     {
-        throw error::TimestampParseError();
+        throw error::CTimestampParseError();
     }
     m_value = static_cast<s64>(h * 3600000 + m * 60000 + s * 1000 + f);
     if (m_value >= date_time::now())
@@ -74,16 +74,16 @@ Timestamp::Timestamp(std::string_view const& value) : m_day(date_time::day())
     }
 }
 
-Timestamp::Timestamp(Timestamp const& other) : m_value(other.m_value), m_day(other.m_day) {}
+CTimestamp::CTimestamp(CTimestamp const& other) : m_value(other.m_value), m_day(other.m_day) {}
 
-Timestamp& Timestamp::operator=(Timestamp const& other)
+CTimestamp& CTimestamp::operator=(CTimestamp const& other)
 {
     this->m_value = other.m_value;
     this->m_day   = other.m_day;
     return *this;
 }
 
-bool Timestamp::operator>(Timestamp const& other) const
+bool CTimestamp::operator>(CTimestamp const& other) const
 {
     return (this->m_day > other.m_day) || ((this->m_day == other.m_day) && this->m_value > other.m_value);
 }

@@ -60,7 +60,7 @@ public:
     /**
      * @param crPosition The initial info
      */
-    GpsData(AccessFn&& fn, object::GpsPosition const& position, bool ground);
+    GpsData(AccessFn&& fn, object::CGpsPosition const& position, bool ground);
     ~GpsData() noexcept override = default;
 
     /**
@@ -85,7 +85,7 @@ public:
 
 namespace error
 {
-class GpsDataException : public vfrb::error::Error
+class GpsDataException : public vfrb::error::IError
 {
 protected:
     GpsDataException()                            = default;

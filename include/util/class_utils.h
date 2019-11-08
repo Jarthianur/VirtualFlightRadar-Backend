@@ -22,6 +22,7 @@
 #pragma once
 
 #include <type_traits>
+#include <utility>
 
 /**
  * @file Defines.h
@@ -42,6 +43,13 @@
     TYPE& operator=(TYPE const&) = delete; \
     TYPE(TYPE&&);                          \
     TYPE& operator=(TYPE&&);
+
+#define FUNCTION_ALIAS(ALIAS, FN)                                                \
+    template<typename... Args>                                                   \
+    inline auto ALIAS(Args&&... args)->decltype(FN(std::forward<Args>(args)...)) \
+    {                                                                            \
+        return FN(std::forward<Args>(args)...);                                  \
+    }
 
 #define ENABLE_IF(C) typename std::enable_if<C>::type* = nullptr
 #define AND &&

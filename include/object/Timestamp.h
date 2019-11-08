@@ -31,13 +31,13 @@ namespace vfrb::object
 {
 namespace error
 {
-class TimestampParseError : public vfrb::error::Error
+class CTimestampParseError : public vfrb::error::IError
 {
 public:
-    TimestampParseError()                    = default;
-    ~TimestampParseError() noexcept override = default;
+    CTimestampParseError()                    = default;
+    ~CTimestampParseError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* What() const noexcept override;
 };
 }  // namespace error
 
@@ -45,34 +45,34 @@ public:
  * @brief A timestamp
  * @tparam DateTimeT The provider of time functions
  */
-class Timestamp
+class CTimestamp
 {
     s64 m_value = 0;  ///< Time in milliseconds
     u32 m_day   = 0;  ///< Incremental day number
 
 public:
-    Timestamp() = default;
+    CTimestamp() = default;
     /**
      * @param value  The time string
      * @param format The format
      * @throw std::invalid_argument if the time string is invalid
      */
-    Timestamp(std::string_view const& value);
-    Timestamp(Timestamp const& other);  ///< @param other The other Timestamp
-    ~Timestamp() noexcept = default;
+    CTimestamp(std::string_view const& value_);
+    CTimestamp(CTimestamp const& other_);  ///< @param other The other Timestamp
+    ~CTimestamp() noexcept = default;
 
     /**
      * @brief Assign other TimeStamps value.
      * @param other The other Timestamp
      * @return this
      */
-    Timestamp& operator=(Timestamp const& other);
+    CTimestamp& operator=(CTimestamp const& other_);
 
     /**
      * @brief Compare this value to be less than, or equals others.
      * @param other The other Timestamp
      * @return true if less, or equals, else false
      */
-    bool operator>(Timestamp const& other) const;
+    bool operator>(CTimestamp const& other_) const;
 };
 }  // namespace vfrb::object

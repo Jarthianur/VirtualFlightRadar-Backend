@@ -27,13 +27,13 @@ using namespace vfrb::object;
 
 namespace vfrb::feed::parser
 {
-WindParser::WindParser() : Parser<Wind>() {}
+WindParser::WindParser() : Parser<CWind>() {}
 
-Wind WindParser::unpack(Str&& sentence, u32 priority) const
+CWind WindParser::unpack(Str&& sentence, u32 priority) const
 {
     if (str_util::MatchChecksum({sentence.c_str(), sentence.length()}) && sentence.find("MWV") != Str::npos)
     {
-        Wind wind{priority};
+        CWind wind{priority};
         *wind = std::move(sentence);
         return wind;
     }

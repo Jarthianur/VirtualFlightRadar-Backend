@@ -62,7 +62,7 @@ public:
 
 namespace error
 {
-class NoSuchProtocolError : public vfrb::error::Error
+class NoSuchProtocolError : public vfrb::error::IError
 {
 public:
     NoSuchProtocolError()                    = default;

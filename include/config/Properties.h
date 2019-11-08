@@ -63,7 +63,7 @@ public:
 
 namespace error
 {
-class PropertyNotFoundError : public vfrb::error::Error
+class PropertyNotFoundError : public vfrb::error::IError
 {
     Str const m_property;
 

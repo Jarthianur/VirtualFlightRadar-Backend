@@ -26,12 +26,12 @@
 
 namespace vfrb::object
 {
-struct Climate;
+struct SClimate;
 
 /**
  * @brief Extend Object to atmospheric information.
  */
-class Atmosphere : public Object
+class CAtmosphere : public CObject
 {
     inline static constexpr auto ICAO_STD     = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
     inline static constexpr auto MAX_PRESSURE = 2000.0;
@@ -43,22 +43,22 @@ class Atmosphere : public Object
     /**
      * @brief Extend Object::assign.
      */
-    void assign(Object&& other) override;
+    void assign(CObject&& other_) override;
 
 public:
-    Atmosphere();
-    explicit Atmosphere(u32 priority);  ///< @param priority The initial priority
+    CAtmosphere();
+    explicit CAtmosphere(u32 priority_);  ///< @param priority The initial priority
 
     /**
      * @brief Constructor
      * @param pressure The initial pressure
      * @param priority The initial priority
      */
-    Atmosphere(u32 priority, f64 pressure);
-    ~Atmosphere() noexcept override = default;
+    CAtmosphere(u32 priority_, f64 pressure_);
+    ~CAtmosphere() noexcept override = default;
 
     Str& operator*();
 
-    auto pressure() const -> decltype(m_pressure);
+    auto Pressure() const -> decltype(m_pressure);
 };
 }  // namespace vfrb::object

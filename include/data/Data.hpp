@@ -22,14 +22,14 @@
 
 namespace vfrb::object
 {
-class Object;
+class CObject;
 }  // namespace vfrb::object
 
 namespace vfrb::data
 {
 struct Accessor
 {
-    object::Object const& obj;
+    object::CObject const& obj;
     std::string_view      nmea;
 };
 
@@ -52,7 +52,7 @@ public:
      * @param _1 The new Object
      * @return true on success, else false
      */
-    virtual bool update(object::Object&& _1) = 0;
+    virtual bool update(object::CObject&& _1) = 0;
 
     virtual void access() = 0;
 };

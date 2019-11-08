@@ -29,7 +29,7 @@ using namespace vfrb::concurrent;
 namespace vfrb::client
 {
 constexpr auto     LOG_PREFIX = "(SbsClient) ";
-static auto const& logger     = Logger::Instance();
+static auto const& logger     = CLogger::Instance();
 
 SbsClient::SbsClient(Endpoint const& endpoint, SPtr<Connector> connector) : Client(endpoint, connector) {}
 

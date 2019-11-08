@@ -30,7 +30,7 @@
 namespace vfrb::server::net
 {
 constexpr auto     LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
-static auto const& logger     = Logger::Instance();
+static auto const& logger     = CLogger::Instance();
 
 NetworkInterfaceImplBoost::NetworkInterfaceImplBoost(u16 port)
     : NetworkInterface<SocketImplBoost>(),

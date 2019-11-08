@@ -46,7 +46,7 @@ class Server
     NOT_COPYABLE(Server)
 
     static char const*   LOG_PREFIX;
-    static Logger const& logger;
+    static CLogger const& logger;
 
     concurrent::Mutex mutable m_mutex;
     s_ptr<net::NetworkInterface<SocketT>> GUARDED_BY(m_mutex) m_netInterface;  ///< NetworkInterface
@@ -103,7 +103,7 @@ template<typename SocketT>
 char const* Server<SocketT>::LOG_PREFIX = "(Server) ";
 
 template<typename SocketT>
-Logger const& Server<SocketT>::logger = Logger::Instance();
+CLogger const& Server<SocketT>::logger = CLogger::Instance();
 
 template<typename SocketT>
 Server<SocketT>::Server(u16 port, usize maxCon)

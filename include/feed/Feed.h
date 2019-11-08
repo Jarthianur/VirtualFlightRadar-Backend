@@ -99,7 +99,7 @@ public:
 
 namespace error
 {
-class InvalidPropertyError : public vfrb::error::Error
+class InvalidPropertyError : public vfrb::error::IError
 {
     Str const m_msg;
 

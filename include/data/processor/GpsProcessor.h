@@ -51,7 +51,7 @@ private:
      * @param position The position
      * @param utc      The current utc time
      */
-    usize appendGPGGA(object::GpsPosition const& position, util::CString<NMEA_SIZE>& nmea, std::tm const* utc,
+    usize appendGPGGA(object::CGpsPosition const& position, util::CString<NMEA_SIZE>& nmea, std::tm const* utc,
                       usize pos) const;
 
     /**
@@ -75,6 +75,6 @@ public:
      * @brief Process a GPS position.
      * @param rPosition The position
      */
-    void process(object::GpsPosition const& position, util::CString<NMEA_SIZE>& nmea) const;
+    void process(object::CGpsPosition const& position, util::CString<NMEA_SIZE>& nmea) const;
 };
 }  // namespace vfrb::data::processor

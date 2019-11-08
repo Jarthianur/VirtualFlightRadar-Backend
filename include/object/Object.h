@@ -24,38 +24,38 @@ namespace vfrb::object
 /**
  * @brief Base object class
  */
-class Object
+class CObject
 {
 protected:
     u32 m_lastPriority = 0;  ///< Got last update with this priority.
     u32 m_updateAge    = 0;  ///< Times processed without update.
 
-    Object() = default;
-    explicit Object(u32 priority);  ///< @param priority The initial priority
+    CObject() = default;
+    explicit CObject(u32 priority_);  ///< @param priority The initial priority
 
     /**
      * @brief Assign other objects values to this.
      * @param other The other Object
      */
-    virtual void assign(Object&& other);
+    virtual void assign(CObject&& other_);
 
     /**
      * @brief Check whether this Object can update the other one.
      * @param other   The other Object
      * @return true if yes, else false
      */
-    virtual bool canUpdate(Object const& other) const;
+    virtual bool canUpdate(CObject const& other_) const;
 
 public:
     inline static constexpr auto OUTDATED = 4;
 
-    virtual ~Object() noexcept = default;
+    virtual ~CObject() noexcept = default;
 
     /**
      * @brief Increment the update age.
      * @return this
      */
-    Object& operator++();
+    CObject& operator++();
 
     /**
      * @brief Try to update this Object.
@@ -63,8 +63,8 @@ public:
      * @param other   The other Object
      * @return true on success, else false
      */
-    virtual bool tryUpdate(Object&& other);
+    virtual bool TryUpdate(CObject&& other_);
 
-    auto updateAge() const -> decltype(m_updateAge);
+    auto UpdateAge() const -> decltype(m_updateAge);
 };
 }  // namespace vfrb::object

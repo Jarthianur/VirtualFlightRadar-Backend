@@ -31,7 +31,7 @@ using namespace vfrb::concurrent;
 namespace vfrb::client
 {
 constexpr auto     LOG_PREFIX = "(SensorClient) ";
-static auto const& logger     = Logger::Instance();
+static auto const& logger     = CLogger::Instance();
 
 SensorClient::SensorClient(Endpoint const& endpoint, SPtr<Connector> connector) : Client(endpoint, connector)
 {}

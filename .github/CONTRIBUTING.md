@@ -77,9 +77,13 @@ We have some simple, but effective guidelines, on how the code should look like.
 + Namespaces are named in `snake_case`.
 + Primitive types and their aliases are named in `snake_case`.
 + Objects and their aliases are named in `PascalCase`.
-+ Member fields are prefixed by `m_`
-+ Static fields are prefixed by `s_` (private/protected), `S_` (public)
++ Member fields are prefixed by `m_`.
++ Static fields are prefixed by `s_`.
 + Function arguments are suffixed by `_`.
++ Classes are prefixed by `C`.
++ Pure virtual (interface) classes are prefixed by `I`.
++ Structs are prefixed by `S`.
++ Enums are prefixed by `E`.
 
 ### Code guidelines
 
@@ -87,6 +91,7 @@ We have some simple, but effective guidelines, on how the code should look like.
 + Prefer classes over structs.
 + Member fields are generally not public and accessed by getter/setter functions.
 + Avoid setters where possible, rather use constructors and interfaces.
++ Use structs only for plain recordtypes, otherwise use classes.
 + Recordtype structs are allowed with all public members.
 + Use `const` wherever applicable.
 + Do not use plain mutexes for locking, always wrap them in RAII guards.

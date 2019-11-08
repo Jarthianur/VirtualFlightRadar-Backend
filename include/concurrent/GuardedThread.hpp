@@ -58,7 +58,7 @@ public:
 
 namespace error
 {
-class ThreadUsedError : public vfrb::error::Error
+class ThreadUsedError : public vfrb::error::IError
 {
 public:
     ThreadUsedError()                    = default;

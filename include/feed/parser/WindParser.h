@@ -30,7 +30,7 @@ namespace vfrb::feed::parser
 /**
  * @brief Implement Parser for NMEA wind sentences.
  */
-class WindParser : public Parser<object::Wind>
+class WindParser : public Parser<object::CWind>
 {
 public:
     WindParser();
@@ -42,6 +42,6 @@ public:
      * @param wind     The Wind to unpack into
      * @return true on success, else false
      */
-    object::Wind unpack(Str&& sentence, u32 priority) const override;
+    object::CWind unpack(Str&& sentence, u32 priority) const override;
 };
 }  // namespace vfrb::feed::parser

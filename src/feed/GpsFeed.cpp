@@ -32,7 +32,7 @@ using namespace vfrb::config;
 namespace vfrb::feed
 {
 constexpr auto     LOG_PREFIX = "(GpsFeed) ";
-static auto const& logger     = Logger::Instance();
+static auto const& logger     = CLogger::Instance();
 
 GpsFeed::GpsFeed(Str const& name, Properties const& properties, SPtr<data::GpsData> data)
     : Feed(name, properties, data)

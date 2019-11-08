@@ -90,7 +90,7 @@ public:
 
 namespace error
 {
-class FeedCreationError : public vfrb::error::Error
+class FeedCreationError : public vfrb::error::IError
 {
     Str const m_msg;
 

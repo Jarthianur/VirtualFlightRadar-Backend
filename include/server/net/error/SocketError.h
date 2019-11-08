@@ -30,7 +30,7 @@ namespace vfrb::server::net::error
 /**
  * @brief Exception to signal socket errors.
  */
-class SocketError : public vfrb::error::Error
+class SocketError : public vfrb::error::IError
 {
     Str const m_msg;  ///< Error message
 

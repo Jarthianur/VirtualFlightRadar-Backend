@@ -31,7 +31,7 @@
 #include "feed/Feed.h"
 #include "util/Logger.hpp"
 
-static auto const& logger = vfrb::Logger::Instance();
+static auto const& logger = vfrb::CLogger::Instance();
 
 using namespace vfrb::client::net;
 using namespace vfrb::concurrent;

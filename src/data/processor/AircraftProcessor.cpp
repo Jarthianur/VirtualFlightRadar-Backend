@@ -38,7 +38,7 @@ AircraftProcessor::AircraftProcessor() : AircraftProcessor(std::numeric_limits<s
 
 AircraftProcessor::AircraftProcessor(s32 maxDist) : m_maxDistance(maxDist) {}
 
-void AircraftProcessor::process(Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea) const
+void AircraftProcessor::process(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea) const
 {
     calculateRelPosition(aircraft);
     if (m_distance <= m_maxDistance)
@@ -51,18 +51,18 @@ void AircraftProcessor::process(Aircraft const& aircraft, util::CString<NMEA_SIZ
     }
 }
 
-void AircraftProcessor::referTo(Location const& location, f64 atmPress)
+void AircraftProcessor::referTo(SLocation const& location, f64 atmPress)
 {
     m_refLocation    = location;
     m_refAtmPressure = atmPress;
 }
 
-void AircraftProcessor::calculateRelPosition(Aircraft const& aircraft) const
+void AircraftProcessor::calculateRelPosition(CAircraft const& aircraft) const
 {
-    m_refRadLatitude       = math::Radian(m_refLocation.latitude);
-    m_refRadLongitude      = math::Radian(m_refLocation.longitude);
-    m_aircraftRadLongitude = math::Radian(aircraft.location().longitude);
-    m_aircraftRadLatitude  = math::Radian(aircraft.location().latitude);
+    m_refRadLatitude       = math::Radian(m_refLocation.Latitude);
+    m_refRadLongitude      = math::Radian(m_refLocation.Longitude);
+    m_aircraftRadLongitude = math::Radian(aircraft.Location().longitude);
+    m_aircraftRadLatitude  = math::Radian(aircraft.Location().latitude);
     m_lonDistance          = m_aircraftRadLongitude - m_refRadLongitude;
     m_latDistance          = m_aircraftRadLatitude - m_refRadLatitude;
 
@@ -80,42 +80,42 @@ void AircraftProcessor::calculateRelPosition(Aircraft const& aircraft) const
 
     m_relNorth    = math::DoubleToInt(std::cos(math::Radian(m_absBearing)) * m_distance);
     m_relEast     = math::DoubleToInt(std::sin(math::Radian(m_absBearing)) * m_distance);
-    m_relVertical = aircraft.targetType() == Aircraft::TargetType::TRANSPONDER ?
-                        aircraft.location().altitude - math::IcaoHeight(m_refAtmPressure) :
-                        aircraft.location().altitude - m_refLocation.altitude;
+    m_relVertical = aircraft.TargetType() == CAircraft::ETargetType::TRANSPONDER ?
+                        aircraft.Location().altitude - math::IcaoHeight(m_refAtmPressure) :
+                        aircraft.Location().altitude - m_refLocation.Altitude;
 }
 
-usize AircraftProcessor::appendPFLAU(Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
+usize AircraftProcessor::appendPFLAU(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
                                      usize pos) const
 {
     int next = nmea.Format(pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::DoubleToInt(m_relBearing),
-                           m_relVertical, m_distance, (*aircraft.id()).data());
+                           m_relVertical, m_distance, (*aircraft.Id()).data());
     next += nmea.Format(pos, "%02x\r\n", Checksum(*nmea, pos));
     return pos + static_cast<usize>(next);
 }
 
-usize AircraftProcessor::appendPFLAA(Aircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
+usize AircraftProcessor::appendPFLAA(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
                                      usize pos) const
 {
     int next = 0;
-    if (aircraft.hasFullInfo())
+    if (aircraft.HasFullInfo())
     {
         next = nmea.Format(
             pos, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast, m_relVertical,
-            util::RawType(aircraft.idType()), (*aircraft.id()).data(),
-            math::DoubleToInt(math::Saturate(aircraft.movement().heading, Aircraft::Movement::MIN_HEADING,
-                                             Aircraft::Movement::MAX_HEADING)),
-            math::DoubleToInt(math::Saturate(aircraft.movement().gndSpeed * math::MS_2_KMH,
-                                             Aircraft::Movement::MIN_GND_SPEED,
-                                             Aircraft::Movement::MAX_GND_SPEED)),
-            math::Saturate(aircraft.movement().climbRate, Aircraft::Movement::MIN_CLIMB_RATE,
-                           Aircraft::Movement::MAX_CLIMB_RATE),
-            util::RawType(aircraft.aircraftType()));
+            util::EnumType(aircraft.IdType()), (*aircraft.Id()).data(),
+            math::DoubleToInt(math::Saturate(aircraft.Movement().heading, CAircraft::SMovement::MIN_HEADING,
+                                             CAircraft::SMovement::MAX_HEADING)),
+            math::DoubleToInt(math::Saturate(aircraft.Movement().gndSpeed * math::MS_2_KMH,
+                                             CAircraft::SMovement::MIN_GND_SPEED,
+                                             CAircraft::SMovement::MAX_GND_SPEED)),
+            math::Saturate(aircraft.Movement().climbRate, CAircraft::SMovement::MIN_CLIMB_RATE,
+                           CAircraft::SMovement::MAX_CLIMB_RATE),
+            util::EnumType(aircraft.AircraftType()));
     }
     else
     {
         next = nmea.Format(pos, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
-                           (*aircraft.id()).data(), util::RawType(aircraft.aircraftType()));
+                           (*aircraft.Id()).data(), util::EnumType(aircraft.AircraftType()));
     }
     next += nmea.Format(pos, "%02x\r\n", Checksum(*nmea, pos));
     return pos + static_cast<usize>(next);

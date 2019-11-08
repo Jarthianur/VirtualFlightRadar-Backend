@@ -19,11 +19,11 @@
 
 namespace vfrb::object
 {
-Wind::Wind() : Object() {}
+CWind::CWind() : CObject() {}
 
-Wind::Wind(u32 priority) : Object(priority) {}
+CWind::CWind(u32 priority) : CObject(priority) {}
 
-Str& Wind::operator*()
+Str& CWind::operator*()
 {
     return m_nmea;
 }

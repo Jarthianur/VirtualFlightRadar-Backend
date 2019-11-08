@@ -49,7 +49,7 @@ public:
 
 namespace error
 {
-class UnpackError : public vfrb::error::Error
+class UnpackError : public vfrb::error::IError
 {
 public:
     UnpackError()                    = default;

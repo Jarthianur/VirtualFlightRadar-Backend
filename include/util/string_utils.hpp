@@ -38,27 +38,27 @@
 
 namespace vfrb::str_util
 {
-enum class Errc : enum_type
+enum class EErrc : enum_type
 {
     OK,
     ERR
 };
 
 template<typename T>
-using Result = std::tuple<T, Errc>;
+using Result = std::tuple<T, EErrc>;
 
 struct x32
 {};
 
 namespace error
 {
-class ConversionError : public vfrb::error::Error
+class CConversionError : public vfrb::error::IError
 {
 public:
-    ConversionError()                    = default;
-    ~ConversionError() noexcept override = default;
+    CConversionError()                    = default;
+    ~CConversionError() noexcept override = default;
 
-    char const* what() const noexcept override
+    char const* What() const noexcept override
     {
         return "conversion failed";
     }
@@ -102,11 +102,11 @@ inline bool MatchChecksum(std::string_view const& sv_)
 template<typename T, ENABLE_IF(IS_TYPE(T, f64))>
 Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
+    T     result;
+    EErrc ec = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::double_, result) || first_ != last_)
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
@@ -114,11 +114,11 @@ Result<T> Convert(char const* first_, char const* last_)
 template<typename T, ENABLE_IF(IS_TYPE(T, s32))>
 Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
+    T     result;
+    EErrc ec = EErrc::OK;
     if (auto [p, e] = std::from_chars(first_, last_, result); e != std::errc())
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
@@ -126,11 +126,11 @@ Result<T> Convert(char const* first_, char const* last_)
 template<typename T, ENABLE_IF(IS_TYPE(T, u32))>
 Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
+    T     result;
+    EErrc ec = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::uint_, result) || first_ != last_)
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
@@ -138,11 +138,11 @@ Result<T> Convert(char const* first_, char const* last_)
 template<typename T, ENABLE_IF(IS_TYPE(T, u64))>
 Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
+    T     result;
+    EErrc ec = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ulong_, result) || first_ != last_)
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
@@ -150,11 +150,11 @@ Result<T> Convert(char const* first_, char const* last_)
 template<typename T, ENABLE_IF(IS_TYPE(T, x32))>
 Result<s32> Convert(char const* first_, char const* last_)
 {
-    s32  result;
-    Errc ec = Errc::OK;
+    s32   result;
+    EErrc ec = EErrc::OK;
     if (auto [p, e] = std::from_chars(first_, last_, result, 16); e != std::errc())
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
@@ -162,11 +162,11 @@ Result<s32> Convert(char const* first_, char const* last_)
 template<typename T, ENABLE_IF(IS_TYPE(T, s8))>
 Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
+    T     result;
+    EErrc ec = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::byte_, result) || first_ != last_)
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
@@ -181,17 +181,17 @@ Result<T> Convert(char const* first_, char const* last_)
 template<typename T, ENABLE_IF(IS_TYPE(T, u16))>
 Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
+    T     result;
+    EErrc ec = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_)
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
 
 template<typename T>
-Errc Convert(char const* first_, char const* last_, T& dest_)
+EErrc Convert(char const* first_, char const* last_, T& dest_)
 {
     auto [v, ec] = Convert<T>(first_, last_);
     dest_        = v;
@@ -201,21 +201,21 @@ Errc Convert(char const* first_, char const* last_, T& dest_)
 template<typename T>
 auto Parse(std::csub_match const& sub_)
 {
-    if (auto [v, ec] = Convert<T>(sub_.first, sub_.second); ec == Errc::OK)
+    if (auto [v, ec] = Convert<T>(sub_.first, sub_.second); ec == EErrc::OK)
     {
         return v;
     }
-    throw error::ConversionError();
+    throw error::CConversionError();
 }
 
 template<typename T>
 auto Parse(Str const& s_)
 {
-    if (auto [v, ec] = Convert<T>(s_.c_str(), s_.c_str() + s_.size()); ec == Errc::OK)
+    if (auto [v, ec] = Convert<T>(s_.c_str(), s_.c_str() + s_.size()); ec == EErrc::OK)
     {
         return v;
     }
-    throw error::ConversionError();
+    throw error::CConversionError();
 }
 
 inline std::string_view ToStrView(std::csub_match const& sub_)

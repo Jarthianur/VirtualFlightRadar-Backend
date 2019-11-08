@@ -32,7 +32,7 @@ namespace vfrb::feed::parser
 /**
  * @brief Implement Parser for GPS NMEA sentences.
  */
-class GpsParser : public Parser<object::GpsPosition>
+class GpsParser : public Parser<object::CGpsPosition>
 {
     inline static constexpr auto RE_GGA_TIME = 1;  ///< GGA regex match capture group of time
     inline static constexpr auto RE_GGA_LAT  = 2;  ///< GGA regex match capture group of latitude
@@ -55,7 +55,7 @@ class GpsParser : public Parser<object::GpsPosition>
      * @param position The target position
      * @return true on success, else false
      */
-    object::GpsPosition parsePosition(std::cmatch const& match, u32 priority) const;
+    object::CGpsPosition parsePosition(std::cmatch const& match, u32 priority) const;
 
 public:
     GpsParser()                    = default;
@@ -67,6 +67,6 @@ public:
      * @param position The position to unpack into
      * @return true on success, else false
      */
-    object::GpsPosition unpack(Str&& sentence, u32 priority) const override;
+    object::CGpsPosition unpack(Str&& sentence, u32 priority) const override;
 };
 }  // namespace vfrb::feed::parser

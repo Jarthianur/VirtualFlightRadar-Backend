@@ -103,7 +103,7 @@ public:
 
 namespace error
 {
-class FeedSubscriptionError : public vfrb::error::Error
+class FeedSubscriptionError : public vfrb::error::IError
 {
     Str const m_msg;
 

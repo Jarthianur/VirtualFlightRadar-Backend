@@ -39,7 +39,7 @@ char const* ConfigurationError::what() const noexcept
     return "configuration initialization failed";
 }
 
-class ConversionError : public vfrb::error::Error
+class ConversionError : public vfrb::error::IError
 {
     Str const m_msg;
 
@@ -68,7 +68,7 @@ T parse(str const& str, char const* path)
     {
         return str_util::parse<T>(str);
     }
-    catch ([[maybe_unused]] vfrb::str_util::error::ConversionError const&)
+    catch ([[maybe_unused]] vfrb::str_util::error::CConversionError const&)
     {
         throw error::ConversionError(str, path);
     }
@@ -93,7 +93,7 @@ try :
 {
     dumpInfo();
 }
-catch (vfrb::error::Error const& e)
+catch (vfrb::error::IError const& e)
 {
     logger.error(LOG_PREFIX, "init: ", e.what());
     throw error::ConfigurationError();

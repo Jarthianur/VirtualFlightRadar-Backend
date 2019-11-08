@@ -24,13 +24,13 @@
 
 namespace vfrb::object
 {
-GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid)
-    : GpsPosition(priority, location, geoid, 1.0, 3, 5, Timestamp())
+CGpsPosition::CGpsPosition(u32 priority, SLocation const& location, f64 geoid)
+    : CGpsPosition(priority, location, geoid, 1.0, 3, 5, CTimestamp())
 {}
 
-GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid, f64 dilution, u8 satellites,
-                         s8 quality, Timestamp const& timestamp)
-    : Object(priority),
+CGpsPosition::CGpsPosition(u32 priority, SLocation const& location, f64 geoid, f64 dilution, u8 satellites,
+                         s8 quality, CTimestamp const& timestamp)
+    : CObject(priority),
       m_location(location),
       m_geoid(geoid),
       m_dilution(dilution),
@@ -38,17 +38,17 @@ GpsPosition::GpsPosition(u32 priority, Location const& location, f64 geoid, f64 
       m_fixQuality(quality),
       m_timestamp(timestamp)
 {
-    util::CheckLimits(m_location.latitude, Location::MIN_LATITUDE, Location::MAX_LATITUDE);
-    util::CheckLimits(m_location.longitude, Location::MIN_LONGITUDE, Location::MAX_LONGITUDE);
-    util::CheckLimits(m_location.altitude, Location::MIN_ALTITUDE, Location::MAX_ALTITUDE);
+    util::CheckLimits(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
+    util::CheckLimits(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
+    util::CheckLimits(m_location.Altitude, SLocation::MIN_ALTITUDE, SLocation::MAX_ALTITUDE);
 }
 
-void GpsPosition::assign(Object&& other)
+void CGpsPosition::assign(CObject&& other)
 {
     try
     {
-        auto&& update = dynamic_cast<GpsPosition&&>(other);
-        Object::assign(std::move(other));
+        auto&& update = dynamic_cast<CGpsPosition&&>(other);
+        CObject::assign(std::move(other));
         this->m_location       = update.m_location;
         this->m_timestamp      = update.m_timestamp;
         this->m_nrOfSatellites = update.m_nrOfSatellites;
@@ -60,12 +60,12 @@ void GpsPosition::assign(Object&& other)
     {}
 }
 
-bool GpsPosition::canUpdate(Object const& other) const
+bool CGpsPosition::canUpdate(CObject const& other) const
 {
     try
     {
-        auto const& toUpdate = dynamic_cast<const GpsPosition&>(other);
-        return (this->m_timestamp > toUpdate.m_timestamp) && Object::canUpdate(other);
+        auto const& toUpdate = dynamic_cast<const CGpsPosition&>(other);
+        return (this->m_timestamp > toUpdate.m_timestamp) && CObject::canUpdate(other);
     }
     catch (std::bad_cast const&)
     {
@@ -73,32 +73,32 @@ bool GpsPosition::canUpdate(Object const& other) const
     }
 }
 
-auto GpsPosition::location() const -> decltype(m_location) const&
+auto CGpsPosition::Location() const -> decltype(m_location) const&
 {
     return m_location;
 }
 
-auto GpsPosition::geoid() const -> decltype(m_geoid)
+auto CGpsPosition::Geoid() const -> decltype(m_geoid)
 {
     return m_geoid;
 }
 
-auto GpsPosition::timestamp() const -> decltype(m_timestamp) const&
+auto CGpsPosition::Timestamp() const -> decltype(m_timestamp) const&
 {
     return m_timestamp;
 }
 
-auto GpsPosition::dilution() const -> decltype(m_dilution)
+auto CGpsPosition::Dilution() const -> decltype(m_dilution)
 {
     return m_dilution;
 }
 
-auto GpsPosition::nrOfSatellites() const -> decltype(m_nrOfSatellites)
+auto CGpsPosition::NrOfSatellites() const -> decltype(m_nrOfSatellites)
 {
     return m_nrOfSatellites;
 }
 
-auto GpsPosition::fixQuality() const -> decltype(m_fixQuality)
+auto CGpsPosition::FixQuality() const -> decltype(m_fixQuality)
 {
     return m_fixQuality;
 }

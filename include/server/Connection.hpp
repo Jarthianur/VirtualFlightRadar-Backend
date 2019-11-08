@@ -89,7 +89,7 @@ bool Connection<SocketT>::write(std::string_view const& msg)
     }
     catch (net::error::SocketError const& e)
     {
-        Logger::Instance().debug("(Connection) write: ", e.what());
+        CLogger::Instance().debug("(Connection) write: ", e.what());
     }
     return false;
 }

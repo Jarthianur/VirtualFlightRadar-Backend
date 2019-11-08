@@ -35,9 +35,9 @@ namespace vfrb
 /**
  * @brief Logger with different levels.
  */
-class Logger
+class CLogger
 {
-    NOT_COPYABLE(Logger)
+    NOT_COPYABLE(CLogger)
 
     concurrent::Mutex mutable m_mutex;
     std::ofstream GUARDED_BY(m_mutex) m_logFile;                    ///< The logfile stream
@@ -52,12 +52,12 @@ class Logger
 
     void prefix(std::ostream& stream_, char const* msg_) const REQUIRES(m_mutex);
 
-    Logger() = default;
+    CLogger() = default;
 
 public:
-    ~Logger() noexcept = default;
+    ~CLogger() noexcept = default;
 
-    static Logger& Instance();
+    static CLogger& Instance();
 
     /**
      * @brief Log on INFO level.
@@ -102,14 +102,14 @@ public:
     void LogFile(Str const& file_) REQUIRES(!m_mutex);
 };
 
-[[gnu::always_inline]] inline void Logger::prefix(std::ostream& stream_, char const* msg_) const
+[[gnu::always_inline]] inline void CLogger::prefix(std::ostream& stream_, char const* msg_) const
     REQUIRES(m_mutex)
 {
     stream_ << msg_ << "  " << time() << ":: ";
 }
 
 template<typename... Args>
-void Logger::Info(Args&&... args_) const REQUIRES(!m_mutex)
+void CLogger::Info(Args&&... args_) const REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, "[INFO ]");
@@ -117,7 +117,7 @@ void Logger::Info(Args&&... args_) const REQUIRES(!m_mutex)
 }
 
 template<typename... Args>
-void Logger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex)
+void CLogger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex)
 {
 #ifdef LOG_ENABLE_DEBUG
     concurrent::LockGuard lk(m_mutex);
@@ -127,7 +127,7 @@ void Logger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex)
 }
 
 template<typename... Args>
-void Logger::Warn(Args&&... args_) const REQUIRES(!m_mutex)
+void CLogger::Warn(Args&&... args_) const REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, "[WARN ]");
@@ -135,7 +135,7 @@ void Logger::Warn(Args&&... args_) const REQUIRES(!m_mutex)
 }
 
 template<typename... Args>
-void Logger::Error(Args&&... args_) const REQUIRES(!m_mutex)
+void CLogger::Error(Args&&... args_) const REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_errStream, "[ERROR]");

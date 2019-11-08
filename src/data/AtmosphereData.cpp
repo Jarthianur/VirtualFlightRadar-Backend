@@ -28,7 +28,7 @@ namespace vfrb::data
 {
 AtmosphereData::AtmosphereData(AccessFn&& fn) : Data(std::move(fn)) {}
 
-AtmosphereData::AtmosphereData(AccessFn&& fn, Atmosphere const& atmosphere)
+AtmosphereData::AtmosphereData(AccessFn&& fn, CAtmosphere const& atmosphere)
     : Data(std::move(fn)), m_atmosphere(atmosphere)
 {}
 
@@ -38,10 +38,10 @@ void AtmosphereData::access()
     m_accessFn({++m_atmosphere, {*m_atmosphere}});
 }
 
-bool AtmosphereData::update(Object&& atmosphere)
+bool AtmosphereData::update(CObject&& atmosphere)
 {
     LockGuard lk(m_mutex);
-    return m_atmosphere.tryUpdate(std::move(atmosphere));
+    return m_atmosphere.TryUpdate(std::move(atmosphere));
 }
 
 auto AtmosphereData::atmPressure() const -> decltype(m_atmosphere.pressure())

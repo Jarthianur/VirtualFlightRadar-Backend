@@ -28,7 +28,7 @@ using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
-Atmosphere AtmosphereParser::unpack(Str&& sentence, u32 priority) const
+CAtmosphere AtmosphereParser::unpack(Str&& sentence, u32 priority) const
 {
     try
     {
@@ -52,15 +52,15 @@ Atmosphere AtmosphereParser::unpack(Str&& sentence, u32 priority) const
             {
                 throw error::UnpackError();
             }
-            if (auto [v, ec] = Convert<f64>(sentence.c_str() + tmpS, sentence.c_str() + tmpB); ec == Errc::OK)
+            if (auto [v, ec] = Convert<f64>(sentence.c_str() + tmpS, sentence.c_str() + tmpB); ec == EErrc::OK)
             {
-                Atmosphere atmos{priority, v * 1000.0};
+                CAtmosphere atmos{priority, v * 1000.0};
                 *atmos = std::move(sentence);
                 return atmos;
             }
         }
     }
-    catch ([[maybe_unused]] str_util::error::ConversionError const&)
+    catch ([[maybe_unused]] str_util::error::CConversionError const&)
     {}
     throw error::UnpackError();
 }

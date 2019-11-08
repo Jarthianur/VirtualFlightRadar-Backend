@@ -35,12 +35,13 @@ namespace vfrb::util
 {
 namespace error
 {
-class OverflowError : public vfrb::error::Error
+class COverflowError : public vfrb::error::IError
 {
 public:
-    OverflowError()                    = default;
-    ~OverflowError() noexcept override = default;
-    char const* what() const noexcept override
+    COverflowError()                    = default;
+    ~COverflowError() noexcept override = default;
+
+    char const* What() const noexcept override
     {
         return "";
     }
@@ -58,7 +59,7 @@ class CString
         usize len = sv_.length();
         if (len > N)
         {
-            throw error::OverflowError();
+            throw error::COverflowError();
         }
         std::copy_n(sv_.cbegin(), len, m_data.begin());
         if (m_data[len - 1] != '\0')
@@ -69,7 +70,7 @@ class CString
             }
             else
             {
-                throw error::OverflowError();
+                throw error::COverflowError();
             }
         }
         m_view = std::string_view(m_data.data(), len);
@@ -158,7 +159,7 @@ public:
     {
         if (pos_ >= N)
         {
-            throw error::OverflowError();
+            throw error::COverflowError();
         }
         usize   max = N - pos_;
         va_list args;
@@ -172,7 +173,7 @@ public:
         if (b < 0)
         {
             Clear();
-            throw error::OverflowError();
+            throw error::COverflowError();
         }
         return b;
     }

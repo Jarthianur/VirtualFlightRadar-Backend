@@ -45,7 +45,7 @@ class Configuration final
      * @param properties The properties
      * @return the position
      */
-    object::GpsPosition resolvePosition() const;
+    object::CGpsPosition resolvePosition() const;
 
     /**
      * @brief Resolve the feeds and their config.
@@ -120,7 +120,7 @@ public:
     inline static constexpr auto PATH_MAX_HEIGHT     = "filter.maxHeight";
 
     bool                                      groundMode;      ///< Ground mode state
-    object::GpsPosition const                 gpsPosition;     ///< Fallback position
+    object::CGpsPosition const                 gpsPosition;     ///< Fallback position
     f64 const                                 atmPressure;     ///< Atmospheric fallback pressure
     s32 const                                 maxHeight;       ///< Maximum height for reported aircrafts
     s32 const                                 maxDistance;     ///< Maximum distance for reported aircrafts
@@ -138,7 +138,7 @@ public:
 
 namespace error
 {
-class ConfigurationError : public vfrb::error::Error
+class ConfigurationError : public vfrb::error::IError
 {
 public:
     ConfigurationError()                    = default;

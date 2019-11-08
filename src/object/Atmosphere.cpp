@@ -24,33 +24,33 @@
 
 namespace vfrb::object
 {
-Atmosphere::Atmosphere() : Object() {}
+CAtmosphere::CAtmosphere() : CObject() {}
 
-Atmosphere::Atmosphere(u32 priority) : Object(priority) {}
+CAtmosphere::CAtmosphere(u32 priority) : CObject(priority) {}
 
-Atmosphere::Atmosphere(u32 priority, f64 pressure) : Object(priority), m_pressure(pressure)
+CAtmosphere::CAtmosphere(u32 priority, f64 pressure) : CObject(priority), m_pressure(pressure)
 {
     util::CheckLimits(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
 }
 
-void Atmosphere::assign(Object&& other)
+void CAtmosphere::assign(CObject&& other)
 {
     try
     {
-        auto&& update = dynamic_cast<Atmosphere&&>(other);
-        Object::assign(std::move(other));
+        auto&& update = dynamic_cast<CAtmosphere&&>(other);
+        CObject::assign(std::move(other));
         this->m_pressure = update.m_pressure;
     }
     catch (std::bad_cast const&)
     {}
 }
 
-auto Atmosphere::pressure() const -> decltype(m_pressure)
+auto CAtmosphere::Pressure() const -> decltype(m_pressure)
 {
     return m_pressure;
 }
 
-Str& Atmosphere::operator*()
+Str& CAtmosphere::operator*()
 {
     return m_nmea;
 }

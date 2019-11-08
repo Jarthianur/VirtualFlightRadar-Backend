@@ -47,12 +47,12 @@ namespace vfrb
 constexpr auto PROCESS_INTERVAL = 1;
 constexpr auto LOG_PREFIX       = "(VFRB) ";
 
-static auto const& logger = Logger::Instance();
+static auto const& logger = CLogger::Instance();
 
 VFRB::VFRB(SPtr<Configuration> config)
     : m_aircraftData(std::make_shared<AircraftData>(
           [this](Accessor const& it) {
-              if (it.obj.updateAge() < Object::OUTDATED)
+              if (it.obj.UpdateAge() < CObject::OUTDATED)
               {
                   m_server.send(it.nmea);
               }
@@ -60,7 +60,7 @@ VFRB::VFRB(SPtr<Configuration> config)
           config->maxDistance)),
       m_atmosphereData(
           std::make_shared<AtmosphereData>([this](Accessor const& it) { m_server.send(it.nmea); },
-                                           object::Atmosphere{0, config->atmPressure})),
+                                           object::CAtmosphere{0, config->atmPressure})),
       m_gpsData(std::make_shared<GpsData>([this](Accessor const& it) { m_server.send(it.nmea); },
                                           config->gpsPosition, config->groundMode)),
       m_windData(std::make_shared<WindData>([this](Accessor const& it) { m_server.send(it.nmea); })),
@@ -120,7 +120,7 @@ void VFRB::serve()
             m_windData->access();
             std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
         }
-        catch (error::Error const& e)
+        catch (error::IError const& e)
         {
             logger.error(LOG_PREFIX, "fatal: ", e.what());
             m_running = false;

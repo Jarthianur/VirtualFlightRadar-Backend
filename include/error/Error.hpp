@@ -25,5 +25,17 @@
 
 namespace vfrb::error
 {
-using Error = std::exception;
-}
+class IError : public std::exception
+{
+    inline char const* what() const noexcept override
+    {
+        return What();
+    }
+
+public:
+    IError()                            = default;
+    virtual ~IError() noexcept override = default;
+
+    virtual char const* What() const noexcept = 0;
+};
+}  // namespace vfrb::error

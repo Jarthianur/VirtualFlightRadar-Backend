@@ -40,7 +40,7 @@ class AtmosphereData : public Data
 public:
     explicit AtmosphereData(AccessFn&& fn);
     AtmosphereData(AccessFn&&                fn,
-                   object::Atmosphere const& atmosphere);  ///< @param atmosphere The initial atm info
+                   object::CAtmosphere const& atmosphere);  ///< @param atmosphere The initial atm info
     ~AtmosphereData() noexcept override = default;
 
     /**

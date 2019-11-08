@@ -39,11 +39,11 @@ using namespace vfrb::config;
 using namespace boost;
 using namespace std::literals;
 
-static auto& logger = Logger::Instance();
+static auto& logger = CLogger::Instance();
 
 namespace error
 {
-class ConfigFileError : public vfrb::error::Error
+class ConfigFileError : public vfrb::error::IError
 {
     Str const m_msg;
 
@@ -57,7 +57,7 @@ public:
     }
 };
 
-class ArgumentError : public vfrb::error::Error
+class ArgumentError : public vfrb::error::IError
 {
 public:
     ArgumentError()                    = default;
@@ -141,7 +141,7 @@ int main(int argc, char** argv)
     {
         return 1;
     }
-    catch (vfrb::error::Error const& e)
+    catch (vfrb::error::IError const& e)
     {
         logger.error("(VFRB) fatal: ", e.what());
         return 1;

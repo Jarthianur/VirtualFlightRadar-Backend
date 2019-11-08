@@ -31,10 +31,10 @@ AircraftData::AircraftData(AccessFn&& fn) : AircraftData(std::move(fn), 0) {}
 
 AircraftData::AircraftData(AccessFn&& fn, s32 maxDist) : Data(std::move(fn)), m_processor(maxDist) {}
 
-bool AircraftData::update(Object&& aircraft)
+bool AircraftData::update(CObject&& aircraft)
 {
-    auto&& update = static_cast<Aircraft&&>(aircraft);
-    auto   result = m_container.insert(std::hash<std::string_view>()(*update.id()), std::move(update));
+    auto&& update = static_cast<CAircraft&&>(aircraft);
+    auto   result = m_container.insert(std::hash<std::string_view>()(*update.Id()), std::move(update));
     if (!result.second)
     {
         result.first->value.tryUpdate(std::move(update));
@@ -42,7 +42,7 @@ bool AircraftData::update(Object&& aircraft)
     return true;
 }
 
-void AircraftData::environment(Location const& position, f64 atmPress)
+void AircraftData::environment(SLocation const& position, f64 atmPress)
 {
     m_processor.referTo(position, atmPress);
 }
@@ -57,7 +57,7 @@ void AircraftData::access()
         {
             if (iter->value.updateAge() == NO_FLARM_THRESHOLD)
             {
-                iter->value.targetType(Aircraft::TargetType::TRANSPONDER);
+                iter->value.targetType(CAircraft::ETargetType::TRANSPONDER);
             }
             if (iter->value.updateAge() >= DELETE_THRESHOLD)
             {
@@ -72,7 +72,7 @@ void AircraftData::access()
                 ++iter;
             }
         }
-        catch ([[maybe_unused]] vfrb::error::Error const&)
+        catch ([[maybe_unused]] vfrb::error::IError const&)
         {}
     }
 }

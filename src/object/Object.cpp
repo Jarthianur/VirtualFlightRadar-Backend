@@ -21,15 +21,15 @@
 
 namespace vfrb::object
 {
-Object::Object(u32 priority) : m_lastPriority(priority) {}
+CObject::CObject(u32 priority) : m_lastPriority(priority) {}
 
-void Object::assign(Object&& other)
+void CObject::assign(CObject&& other)
 {
     this->m_lastPriority = other.m_lastPriority;
     this->m_updateAge    = 0;
 }
 
-bool Object::tryUpdate(Object&& other)
+bool CObject::TryUpdate(CObject&& other)
 {
     if (other.canUpdate(*this))
     {
@@ -39,18 +39,18 @@ bool Object::tryUpdate(Object&& other)
     return false;
 }
 
-bool Object::canUpdate(Object const& other) const
+bool CObject::canUpdate(CObject const& other) const
 {
     return this->m_lastPriority >= other.m_lastPriority || other.m_updateAge >= OUTDATED;
 }
 
-Object& Object::operator++()
+CObject& CObject::operator++()
 {
     ++m_updateAge;
     return *this;
 }
 
-auto Object::updateAge() const -> decltype(m_updateAge)
+auto CObject::UpdateAge() const -> decltype(m_updateAge)
 {
     return m_updateAge;
 }

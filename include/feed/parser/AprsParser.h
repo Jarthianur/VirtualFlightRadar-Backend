@@ -33,10 +33,10 @@ namespace vfrb::feed::parser
 /**
  * @brief Implement Parser for APRS sentences.
  */
-class AprsParser : public Parser<object::Aircraft>
+class AprsParser : public Parser<object::CAircraft>
 {
     using AircraftInfo =
-        std::tuple<std::string_view, object::Aircraft::IdType, object::Aircraft::AircraftType>;
+        std::tuple<std::string_view, object::CAircraft::EIdType, object::CAircraft::EAircraftType>;
 
     inline static constexpr auto RE_APRS_TIME    = 1;   ///< APRS regex match group of time
     inline static constexpr auto RE_APRS_LAT     = 2;   ///< APRS regex match group of latitude
@@ -60,7 +60,7 @@ class AprsParser : public Parser<object::Aircraft>
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    object::Location parseLocation(std::cmatch const& match) const;
+    object::SLocation parseLocation(std::cmatch const& match) const;
 
     /**
      * @brief Parse the APRS comment.
@@ -77,7 +77,7 @@ class AprsParser : public Parser<object::Aircraft>
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    object::Aircraft::Movement parseMovement(std::cmatch const& match) const;
+    object::CAircraft::SMovement parseMovement(std::cmatch const& match) const;
 
     /**
      * @brief Parse the Timestamp information.
@@ -85,7 +85,7 @@ class AprsParser : public Parser<object::Aircraft>
      * @param aircraft The target Aircraft
      * @return true on success, else false
      */
-    object::Timestamp parseTimeStamp(std::cmatch const& match) const;
+    object::CTimestamp parseTimeStamp(std::cmatch const& match) const;
 
 public:
     explicit AprsParser(s32 maxHeight);
@@ -97,6 +97,6 @@ public:
      * @param aircraft The Aircraft to unpack into
      * @return true on success, else false
      */
-    object::Aircraft unpack(Str&& sentence, u32 priority) const override;
+    object::CAircraft unpack(Str&& sentence, u32 priority) const override;
 };
 }  // namespace vfrb::feed::parser

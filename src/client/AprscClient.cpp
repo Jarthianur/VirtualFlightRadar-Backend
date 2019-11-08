@@ -34,7 +34,7 @@ using namespace vfrb::concurrent;
 namespace vfrb::client
 {
 constexpr auto     LOG_PREFIX = "(AprscClient) ";
-static auto const& logger     = Logger::Instance();
+static auto const& logger     = CLogger::Instance();
 
 AprscClient::AprscClient(Endpoint const& endpoint, Str const& login, SPtr<Connector> connector)
     : Client(endpoint, connector), m_login(login + "\r\n")

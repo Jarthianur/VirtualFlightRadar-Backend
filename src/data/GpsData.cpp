@@ -26,7 +26,7 @@ using namespace vfrb::concurrent;
 
 namespace vfrb::data
 {
-GpsData::GpsData(AccessFn&& fn, GpsPosition const& position, bool ground)
+GpsData::GpsData(AccessFn&& fn, CGpsPosition const& position, bool ground)
     : Data(std::move(fn)), m_position(std::make_tuple(position, "")), m_groundMode(ground)
 {
     auto& [pos, cstr] = m_position;
@@ -42,11 +42,11 @@ void GpsData::access()
         m_processor.process(pos, cstr);
         m_accessFn({++pos, cstr});
     }
-    catch ([[maybe_unused]] vfrb::error::Error const&)
+    catch ([[maybe_unused]] vfrb::error::IError const&)
     {}
 }
 
-bool GpsData::update(Object&& position)
+bool GpsData::update(CObject&& position)
 {
     LockGuard lk(m_mutex);
     if (m_positionLocked)

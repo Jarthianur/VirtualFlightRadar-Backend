@@ -32,15 +32,15 @@ using namespace vfrb::str_util;
 
 namespace vfrb::data::processor
 {
-void GpsProcessor::process(object::GpsPosition const& position, util::CString<NMEA_SIZE>& nmea) const
+void GpsProcessor::process(object::CGpsPosition const& position, util::CString<NMEA_SIZE>& nmea) const
 {
     std::time_t now = std::time(nullptr);
     std::tm*    utc = std::gmtime(&now);
-    evalPosition(position.location().latitude, position.location().longitude);
+    evalPosition(position.Location().latitude, position.Location().longitude);
     appendGPGGA(position, nmea, utc, appendGPRMC(nmea, utc, 0));
 }
 
-usize GpsProcessor::appendGPGGA(GpsPosition const& position, util::CString<NMEA_SIZE>& nmea,
+usize GpsProcessor::appendGPGGA(CGpsPosition const& position, util::CString<NMEA_SIZE>& nmea,
                                 std::tm const* utc, usize pos) const
 {
     // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
@@ -49,8 +49,8 @@ usize GpsProcessor::appendGPGGA(GpsPosition const& position, util::CString<NMEA_
     int next = nmea.Format(
         pos, "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*",
         utc->tm_hour, utc->tm_min, utc->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude,
-        m_minLongitude, m_directionEW, /*pos.fixQa,*/ position.nrOfSatellites(), position.location().altitude,
-        math::Saturate(position.geoid(), GpsPosition::MIN_GEOID, GpsPosition::MAX_GEOID));
+        m_minLongitude, m_directionEW, /*pos.fixQa,*/ position.NrOfSatellites(), position.Location().altitude,
+        math::Saturate(position.Geoid(), CGpsPosition::MIN_GEOID, CGpsPosition::MAX_GEOID));
     next += nmea.Format(pos, "%02x\r\n", Checksum(*nmea, pos));
     return pos + static_cast<usize>(next);
 }
