@@ -33,21 +33,21 @@ namespace vfrb::data
 /**
  * @brief Store aircrafts.
  */
-class AircraftData : public Data
+class CAircraftData : public IData
 {
     inline static constexpr auto NO_FLARM_THRESHOLD =
-        object::CObject::OUTDATED;                         ///< Times until FLARM status is removed
+        object::CObject::OUTDATED;                        ///< Times until FLARM status is removed
     inline static constexpr auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
-    inline static constexpr auto NMEA_SIZE        = processor::AircraftProcessor::NMEA_SIZE;
+    inline static constexpr auto NMEA_SIZE        = processor::CAircraftProcessor::NMEA_SIZE;
 
     concurrent::CObjectContainer<object::CAircraft, NMEA_SIZE>
-                                 m_container;  ///< Internal container for aircrafts
-    processor::AircraftProcessor m_processor;  ///< Processor for aircrafts
+                                  m_container;  ///< Internal container for aircrafts
+    processor::CAircraftProcessor m_processor;  ///< Processor for aircrafts
 
 public:
-    explicit AircraftData(AccessFn&& fn);
-    AircraftData(AccessFn&& fn, s32 maxDist);  ///< @param maxDist The max distance filter
-    ~AircraftData() noexcept override = default;
+    explicit CAircraftData(AccessFn&& fn_);
+    CAircraftData(AccessFn&& fn_, s32 maxDist_);  ///< @param maxDist The max distance filter
+    ~CAircraftData() noexcept override = default;
 
     /**
      * @brief Insert or update an Aircraft.
@@ -55,9 +55,9 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::CObject&& aircraft) override;
+    bool Update(object::CObject&& aircraft_) override;
 
-    void environment(object::SLocation const& position, f64 atmPress);
+    void Environment(object::SLocation const& position_, f64 atmPress_);
 
     /**
      * @brief Process all aircrafts.
@@ -65,6 +65,6 @@ public:
      * @param atmPress The atmospheric pressure
      * @threadsafe
      */
-    void access() override;
+    void Access() override;
 };
 }  // namespace vfrb::data

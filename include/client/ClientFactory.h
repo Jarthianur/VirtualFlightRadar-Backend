@@ -37,7 +37,7 @@ namespace vfrb::client
 /**
  * @brief A factory for clients.
  */
-class ClientFactory
+class CClientFactory
 {
     /**
      * @brief Factory method for Client creation.
@@ -45,30 +45,30 @@ class ClientFactory
      * @param feed The feed to create for
      * @return the client as pointer
      */
-    template<typename T, ENABLE_IF(EXTENDS(T, Client))>
-    static SPtr<T> makeClient(SPtr<feed::Feed> feed);
+    template<typename T, ENABLE_IF(EXTENDS(T, IClient))>
+    static SPtr<T> makeClient(SPtr<feed::Feed> feed_);
 
 public:
-    ClientFactory()           = default;
-    ~ClientFactory() noexcept = default;
+    CClientFactory()           = default;
+    ~CClientFactory() noexcept = default;
 
     /**
      * @brief Create a Client needed by a Feed.
      * @param feed The feed to create for
      * @return the client as pointer
      */
-    static SPtr<Client> createClientFor(SPtr<feed::Feed> feed);
+    static SPtr<IClient> CreateClientFor(SPtr<feed::Feed> feed_);
 };
 
 namespace error
 {
-class NoSuchProtocolError : public vfrb::error::IError
+class CNoSuchProtocolError : public vfrb::error::IError
 {
 public:
-    NoSuchProtocolError()                    = default;
-    ~NoSuchProtocolError() noexcept override = default;
+    CNoSuchProtocolError()                    = default;
+    ~CNoSuchProtocolError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* What() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::client

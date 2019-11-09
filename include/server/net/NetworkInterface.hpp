@@ -28,7 +28,7 @@
 namespace vfrb::server
 {
 template<typename SocketT>
-class Connection;
+class CConnection;
 
 namespace net
 {
@@ -37,47 +37,47 @@ namespace net
  * @tparam SocketT The socket implementation
  */
 template<typename SocketT>
-class NetworkInterface
+class IAcceptor
 {
 public:
     using Callback = std::function<void(bool)>;
 
-    NetworkInterface()                   = default;
-    virtual ~NetworkInterface() noexcept = default;
+    IAcceptor()                   = default;
+    virtual ~IAcceptor() noexcept = default;
 
     /**
      * @brief Run this interface.
      * @param lock The lock that may be hold and released inside
      */
-    virtual void run() = 0;
+    virtual void Run() = 0;
 
     /**
      * @brief Stop this interface.
      */
-    virtual void stop() = 0;
+    virtual void Stop() = 0;
 
     /**
      * @brief Schedule an accept call.
      * @param callback The callback to invoke when done
      */
-    virtual void onAccept(Callback const& callback) = 0;
+    virtual void OnAccept(Callback const& callback_) = 0;
 
     /**
      * @brief Close the connection.
      */
-    virtual void close() = 0;
+    virtual void Close() = 0;
 
     /**
      * @brief Start and get the current Connection.
      * @return the Connection
      */
-    virtual Connection<SocketT> startConnection() = 0;
+    virtual CConnection<SocketT> StartConnection() = 0;
 
     /**
      * @brief Get the current connection address.
      * @return the address
      */
-    virtual Str stagedAddress() const = 0;
+    virtual Str StagedAddress() const = 0;
 };
 }  // namespace net
 }  // namespace vfrb::server

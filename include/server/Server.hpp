@@ -41,19 +41,19 @@ namespace vfrb::server
  * @tparam SocketT The socket implementation
  */
 template<typename SocketT>
-class Server
+class CServer
 {
-    NOT_COPYABLE(Server)
+    NOT_COPYABLE(CServer)
 
-    static char const*   LOG_PREFIX;
-    static CLogger const& logger;
+    static char const*    LOG_PREFIX;
+    static CLogger const& s_logger;
 
     concurrent::Mutex mutable m_mutex;
-    s_ptr<net::NetworkInterface<SocketT>> GUARDED_BY(m_mutex) m_netInterface;  ///< NetworkInterface
-    std::vector<Connection<SocketT>>      GUARDED_BY(m_mutex) m_connections;   ///< Connections container
-    usize const                           GUARDED_BY(m_mutex) m_maxConnections;
-    bool                                  GUARDED_BY(m_mutex) m_running = false;  ///< Running state
-    concurrent::GuardedThread             GUARDED_BY(m_mutex) m_thread;           ///< Internal thread
+    SPtr<net::IAcceptor<SocketT>>     GUARDED_BY(m_mutex) m_acceptor;     ///< NetworkInterface
+    std::vector<CConnection<SocketT>> GUARDED_BY(m_mutex) m_connections;  ///< Connections container
+    usize const                       GUARDED_BY(m_mutex) m_maxConnections;
+    bool                              GUARDED_BY(m_mutex) m_running = false;  ///< Running state
+    concurrent::CGuardedThread        GUARDED_BY(m_mutex) m_thread;           ///< Internal thread
 
     /**
      * @brief Schedule to accept connections.
@@ -65,103 +65,103 @@ class Server
      * @param address The ip address to check
      * @return true if the ip is already registered, else false
      */
-    bool isConnected(str const& address) REQUIRES(m_mutex);
+    bool isConnected(Str const& address_) REQUIRES(m_mutex);
 
     /**
      * @brief Handler for accepting connections.
      * @param error The error indicator
      */
-    void attemptConnection(bool error) noexcept REQUIRES(!m_mutex);
+    void attemptConnection(bool error_) noexcept REQUIRES(!m_mutex);
 
 public:
-    Server(u16 port, usize maxCon);  ///< @param port The port
-    Server(SPtr<net::NetworkInterface<SocketT>> interface,
-           usize                                 maxCon);  ///< @param interface The NetworkInterface to use
-    ~Server() noexcept;
+    CServer(u16 port_, usize maxCon_);  ///< @param port The port
+    CServer(SPtr<net::IAcceptor<SocketT>> interface_,
+            usize                         maxCon_);  ///< @param interface The NetworkInterface to use
+    ~CServer() noexcept;
 
     /**
      * @brief Run the Server.
      * @threadsafe
      */
-    void run() REQUIRES(!m_mutex);
+    void Run() REQUIRES(!m_mutex);
 
     /**
      * @brief Stop all connections.
      * @threadsafe
      */
-    void stop() REQUIRES(!m_mutex);
+    void Stop() REQUIRES(!m_mutex);
 
     /**
      * @brief Write a message to all clients.
      * @param msg The msg to write
      * @threadsafe
      */
-    void send(std::string_view const& msg) REQUIRES(!m_mutex);
+    void Send(std::string_view const& msg_) REQUIRES(!m_mutex);
 };
 
 template<typename SocketT>
-char const* Server<SocketT>::LOG_PREFIX = "(Server) ";
+char const* CServer<SocketT>::LOG_PREFIX = "(Server) ";
 
 template<typename SocketT>
-CLogger const& Server<SocketT>::logger = CLogger::Instance();
+CLogger const& CServer<SocketT>::s_logger = CLogger::Instance();
 
 template<typename SocketT>
-Server<SocketT>::Server(u16 port, usize maxCon)
-    : Server(std::make_shared<net::NetworkInterfaceImplBoost>(port), maxCon)
+CServer<SocketT>::CServer(u16 port_, usize maxCon_)
+    : CServer(std::make_shared<net::CAcceptorBoost>(port_), maxCon_)
 {}
 
 template<typename SocketT>
-Server<SocketT>::Server(SPtr<net::NetworkInterface<SocketT>> interface, usize maxCon)
-    : m_netInterface(interface), m_maxConnections(maxCon)
+CServer<SocketT>::CServer(SPtr<net::IAcceptor<SocketT>> interface_, usize maxCon_)
+    : m_acceptor(interface_), m_maxConnections(maxCon_)
 {
-    m_connections.reserve(maxCon);
+    m_connections.reserve(maxCon_);
 }
 
 template<typename SocketT>
-Server<SocketT>::~Server() noexcept
+CServer<SocketT>::~CServer() noexcept
 {
-    stop();
+    Stop();
 }
 
 template<typename SocketT>
-void Server<SocketT>::run() REQUIRES(!m_mutex)
+void CServer<SocketT>::Run() REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
-    logger.info(LOG_PREFIX, "starting...");
+    s_logger.Info(LOG_PREFIX, "starting...");
     m_running = true;
-    m_thread.spawn([this]() {
+    m_thread.Spawn([this]() {
         accept();
-        m_netInterface->run();
-        logger.debug(LOG_PREFIX, "stopped");
+        m_acceptor->Run();
+        s_logger.Debug(LOG_PREFIX, "stopped");
     });
 }
 
 template<typename SocketT>
-void Server<SocketT>::stop() REQUIRES(!m_mutex)
+void CServer<SocketT>::Stop() REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
     if (m_running)
     {
         m_running = false;
-        logger.info(LOG_PREFIX, "stopping all connections...");
+        s_logger.Info(LOG_PREFIX, "stopping all connections...");
         m_connections.clear();
-        m_netInterface->stop();
+        m_acceptor->Stop();
     }
 }
 
 template<typename SocketT>
-void Server<SocketT>::send(std::string_view const& msg) REQUIRES(!m_mutex)
+void CServer<SocketT>::Send(std::string_view const& msg_) REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
-    if (msg.empty() || m_connections.empty())
+    if (msg_.empty() || m_connections.empty())
     {
         return;
     }
     for (auto it = m_connections.begin(); it != m_connections.end();)
     {
-        if (!it->write(msg))
+        if (!it->Write(msg_))
         {
-            logger.warn(LOG_PREFIX, "lost connection to: ", it->address());
+            s_logger.Warn(LOG_PREFIX, "lost connection to: ", it->Address());
             it = m_connections.erase(it);
         }
         else
@@ -172,47 +172,47 @@ void Server<SocketT>::send(std::string_view const& msg) REQUIRES(!m_mutex)
 }
 
 template<typename SocketT>
-void Server<SocketT>::accept() REQUIRES(!m_mutex)
+void CServer<SocketT>::accept() REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
-    m_netInterface->onAccept(std::bind(&Server<SocketT>::attemptConnection, this, std::placeholders::_1));
+    m_acceptor->OnAccept(std::bind(&CServer<SocketT>::attemptConnection, this, std::placeholders::_1));
 }
 
 template<typename SocketT>
-bool Server<SocketT>::isConnected(str const& address) REQUIRES(m_mutex)
+bool CServer<SocketT>::isConnected(Str const& address_) REQUIRES(m_mutex)
 {
     return std::find_if(m_connections.begin(), m_connections.end(),
-                        [&](auto const& it) { return it.address() == address; }) != m_connections.end();
+                        [&](auto const& it_) { return it_.Address() == address_; }) != m_connections.end();
 }
 
 template<typename SocketT>
-void Server<SocketT>::attemptConnection(bool error) noexcept REQUIRES(!m_mutex)
+void CServer<SocketT>::attemptConnection(bool error_) noexcept REQUIRES(!m_mutex)
 {
-    if (!error)
+    if (!error_)
     {
         concurrent::LockGuard lk(m_mutex);
         try
         {
-            if (m_connections.size() < m_maxConnections && !isConnected(m_netInterface->stagedAddress()))
+            if (m_connections.size() < m_maxConnections && !isConnected(m_acceptor->StagedAddress()))
             {
-                m_connections.push_back(m_netInterface->startConnection());
-                logger.info(LOG_PREFIX, "connection from: ", m_connections.crbegin()->address());
+                m_connections.push_back(m_acceptor->StartConnection());
+                s_logger.Info(LOG_PREFIX, "connection from: ", m_connections.crbegin()->Address());
             }
             else
             {
-                logger.info(LOG_PREFIX, "refused connection to ", m_netInterface->stagedAddress());
-                m_netInterface->close();
+                s_logger.Info(LOG_PREFIX, "refused connection to ", m_acceptor->StagedAddress());
+                m_acceptor->Close();
             }
         }
-        catch (net::error::SocketError const& e)
+        catch (net::error::CSocketError const& e)
         {
-            logger.warn(LOG_PREFIX, "connection failed: ", e.what());
-            m_netInterface->close();
+            s_logger.Warn(LOG_PREFIX, "connection failed: ", e.What());
+            m_acceptor->Close();
         }
     }
     else
     {
-        logger.warn(LOG_PREFIX, "could not accept connection");
+        s_logger.Warn(LOG_PREFIX, "could not accept connection");
     }
     accept();
 }

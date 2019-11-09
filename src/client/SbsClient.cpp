@@ -31,29 +31,29 @@ namespace vfrb::client
 constexpr auto     LOG_PREFIX = "(SbsClient) ";
 static auto const& logger     = CLogger::Instance();
 
-SbsClient::SbsClient(Endpoint const& endpoint, SPtr<Connector> connector) : Client(endpoint, connector) {}
+CSbsClient::CSbsClient(SEndpoint const& endpoint, SPtr<IConnector> connector) : IClient(endpoint, connector) {}
 
-void SbsClient::handleConnect(ErrorCode error)
+void CSbsClient::handleConnect(EErrc error)
 {
     LockGuard lk(m_mutex);
-    if (m_state == State::CONNECTING)
+    if (m_state == EState::CONNECTING)
     {
-        if (error == ErrorCode::SUCCESS)
+        if (error == EErrc::SUCCESS)
         {
-            m_state = State::RUNNING;
+            m_state = EState::RUNNING;
             m_backoff.reset();
-            logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
-            read();
+            logger.info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
+            Read();
         }
         else
         {
-            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
         }
     }
 }
 
-char const* SbsClient::logPrefix() const
+char const* CSbsClient::logPrefix() const
 {
     return LOG_PREFIX;
 }

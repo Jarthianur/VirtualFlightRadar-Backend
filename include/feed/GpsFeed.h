@@ -27,7 +27,7 @@
 
 namespace vfrb::data
 {
-class GpsData;
+class CGpsData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
@@ -48,7 +48,7 @@ public:
      * @param data       The GpsData container
      * @throw std::logic_error from parent constructor
      */
-    GpsFeed(Str const& m_name, config::CProperties const& m_properties, SPtr<data::GpsData> data);
+    GpsFeed(Str const& m_name, config::CProperties const& m_properties, SPtr<data::CGpsData> data);
     ~GpsFeed() noexcept override = default;
 
     /**

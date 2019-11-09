@@ -27,11 +27,11 @@ using namespace vfrb::object;
 
 namespace vfrb::data
 {
-AircraftData::AircraftData(AccessFn&& fn) : AircraftData(std::move(fn), 0) {}
+CAircraftData::CAircraftData(AccessFn&& fn) : CAircraftData(std::move(fn), 0) {}
 
-AircraftData::AircraftData(AccessFn&& fn, s32 maxDist) : Data(std::move(fn)), m_processor(maxDist) {}
+CAircraftData::CAircraftData(AccessFn&& fn, s32 maxDist) : IData(std::move(fn)), m_processor(maxDist) {}
 
-bool AircraftData::update(CObject&& aircraft)
+bool CAircraftData::Update(CObject&& aircraft)
 {
     auto&& update = static_cast<CAircraft&&>(aircraft);
     auto   result = m_container.insert(std::hash<std::string_view>()(*update.Id()), std::move(update));
@@ -42,12 +42,12 @@ bool AircraftData::update(CObject&& aircraft)
     return true;
 }
 
-void AircraftData::environment(SLocation const& position, f64 atmPress)
+void CAircraftData::Environment(SLocation const& position, f64 atmPress)
 {
-    m_processor.referTo(position, atmPress);
+    m_processor.ReferTo(position, atmPress);
 }
 
-void AircraftData::access()
+void CAircraftData::Access()
 {
     auto iter = m_container.begin();
     while (iter != m_container.end())
@@ -67,7 +67,7 @@ void AircraftData::access()
             }
             else
             {
-                m_processor.process(iter->value, iter->nmea);
+                m_processor.Process(iter->value, iter->nmea);
                 m_accessFn({iter->value, iter->nmea});
                 ++iter;
             }

@@ -34,7 +34,7 @@ namespace vfrb::feed
 constexpr auto     LOG_PREFIX = "(GpsFeed) ";
 static auto const& logger     = CLogger::Instance();
 
-GpsFeed::GpsFeed(Str const& name, CProperties const& properties, SPtr<data::GpsData> data)
+GpsFeed::GpsFeed(Str const& name, CProperties const& properties, SPtr<data::CGpsData> data)
     : Feed(name, properties, data)
 {}
 
@@ -51,7 +51,7 @@ bool GpsFeed::process(Str response)
     }
     catch ([[maybe_unused]] parser::error::UnpackError const&)
     {}
-    catch (data::error::GpsDataException const& e)
+    catch (data::error::IGpsDataException const& e)
     {
         logger.info(LOG_PREFIX, m_name, ": ", e.what());
         return false;

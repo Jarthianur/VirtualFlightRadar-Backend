@@ -38,8 +38,8 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-FeedFactory::FeedFactory(SPtr<config::CConfiguration> config, SPtr<AircraftData> aircraftData,
-                         SPtr<AtmosphereData> atmosData, SPtr<GpsData> gpsData, SPtr<WindData> windData)
+FeedFactory::FeedFactory(SPtr<config::CConfiguration> config, SPtr<CAircraftData> aircraftData,
+                         SPtr<CAtmosphereData> atmosData, SPtr<CGpsData> gpsData, SPtr<CWindData> windData)
     : m_config(config),
       m_aircraftData(aircraftData),
       m_atmosData(atmosData),

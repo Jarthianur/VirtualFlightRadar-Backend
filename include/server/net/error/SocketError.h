@@ -30,19 +30,19 @@ namespace vfrb::server::net::error
 /**
  * @brief Exception to signal socket errors.
  */
-class SocketError : public vfrb::error::IError
+class CSocketError : public vfrb::error::IError
 {
     Str const m_msg;  ///< Error message
 
 public:
-    SocketError() = default;
-    explicit SocketError(Str const& msg);  ///< @param msg The error message
-    ~SocketError() noexcept override = default;
+    CSocketError() = default;
+    explicit CSocketError(Str const& msg_);  ///< @param msg The error message
+    ~CSocketError() noexcept override = default;
 
     /**
      * @brief Get the error message.
      * @return the message
      */
-    char const* what() const noexcept override;
+    char const* What() const noexcept override;
 };
 }  // namespace vfrb::server::net::error

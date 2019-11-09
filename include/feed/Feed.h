@@ -30,7 +30,7 @@
 
 namespace vfrb::data
 {
-class Data;
+class IData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
@@ -51,7 +51,7 @@ protected:
     config::CProperties const m_properties;  ///< Properties
     Str const                m_name;        ///< Unique name
     u32 const                m_priority;    ///< Priority
-    SPtr<data::Data>        m_data;        ///< Respective Data container
+    SPtr<data::IData>        m_data;        ///< Respective Data container
 
     /**
      * @param name       The Feeds unique name
@@ -59,7 +59,7 @@ protected:
      * @param properties The Properties
      * @throw std::logic_error if host or port are not given in properties
      */
-    Feed(Str const& m_name, config::CProperties const& propertyMap, SPtr<data::Data> data);
+    Feed(Str const& m_name, config::CProperties const& propertyMap, SPtr<data::IData> data);
 
 public:
     /**
@@ -85,7 +85,7 @@ public:
      * @brief Get the feeds required Endpoint.
      * @return the endpoint
      */
-    client::net::Endpoint endpoint() const;
+    client::net::SEndpoint endpoint() const;
 
     /**
      * @brief Handle client's response.

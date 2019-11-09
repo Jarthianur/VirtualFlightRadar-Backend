@@ -49,34 +49,34 @@ constexpr auto LOG_PREFIX       = "(VFRB) ";
 
 static auto const& logger = CLogger::Instance();
 
-VFRB::VFRB(SPtr<CConfiguration> config)
-    : m_aircraftData(std::make_shared<AircraftData>(
-          [this](Accessor const& it) {
-              if (it.obj.UpdateAge() < CObject::OUTDATED)
+CVfrb::CVfrb(SPtr<CConfiguration> config)
+    : m_aircraftData(std::make_shared<CAircraftData>(
+          [this](SAccessor const& it) {
+              if (it.Obj.UpdateAge() < CObject::OUTDATED)
               {
-                  m_server.send(it.nmea);
+                  m_server.send(it.Nmea);
               }
           },
           config->maxDistance)),
       m_atmosphereData(
-          std::make_shared<AtmosphereData>([this](Accessor const& it) { m_server.send(it.nmea); },
+          std::make_shared<CAtmosphereData>([this](SAccessor const& it) { m_server.send(it.Nmea); },
                                            object::CAtmosphere{0, config->atmPressure})),
-      m_gpsData(std::make_shared<GpsData>([this](Accessor const& it) { m_server.send(it.nmea); },
+      m_gpsData(std::make_shared<CGpsData>([this](SAccessor const& it) { m_server.send(it.Nmea); },
                                           config->gpsPosition, config->groundMode)),
-      m_windData(std::make_shared<WindData>([this](Accessor const& it) { m_server.send(it.nmea); })),
+      m_windData(std::make_shared<CWindData>([this](SAccessor const& it) { m_server.send(it.Nmea); })),
       m_server(std::get<0>(config->serverConfig), std::get<1>(config->serverConfig)),
       m_running(false)
 {
     createFeeds(config);
 }
 
-void VFRB::run() noexcept
+void CVfrb::Run() noexcept
 {
     m_running = true;
     logger.info(LOG_PREFIX, "starting...");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     concurrent::CSignalListener            signals;
-    client::ClientManager                 clientManager;
+    client::CClientManager                 clientManager;
 
     signals.addHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {
         logger.info(LOG_PREFIX, "caught signal to shutdown...");
@@ -89,14 +89,14 @@ void VFRB::run() noexcept
         {
             clientManager.subscribe(it);
         }
-        catch (client::error::FeedSubscriptionError const& e)
+        catch (client::error::CFeedSubscriptionError const& e)
         {
             logger.error(LOG_PREFIX, ": ", e.what());
         }
     }
     m_feeds.clear();
 
-    signals.run();
+    signals.Run();
     m_server.run();
     clientManager.run();
     serve();
@@ -106,7 +106,7 @@ void VFRB::run() noexcept
     logger.info(LOG_PREFIX, "stopped after ", duration(start));
 }
 
-void VFRB::serve()
+void CVfrb::serve()
 {
     std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
     while (m_running)
@@ -128,7 +128,7 @@ void VFRB::serve()
     }
 }
 
-void VFRB::createFeeds(SPtr<CConfiguration> config)
+void CVfrb::createFeeds(SPtr<CConfiguration> config)
 {
     feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
     for (auto const& name : config->feedNames)
@@ -144,7 +144,7 @@ void VFRB::createFeeds(SPtr<CConfiguration> config)
     }
 }
 
-Str VFRB::duration(std::chrono::steady_clock::time_point start) const
+Str CVfrb::duration(std::chrono::steady_clock::time_point start) const
 {
     std::chrono::minutes runtime =
         std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start);

@@ -33,55 +33,55 @@ namespace vfrb::client
 constexpr auto     LOG_PREFIX = "(SensorClient) ";
 static auto const& logger     = CLogger::Instance();
 
-SensorClient::SensorClient(Endpoint const& endpoint, SPtr<Connector> connector) : Client(endpoint, connector)
+CSensorClient::CSensorClient(SEndpoint const& endpoint, SPtr<IConnector> connector) : IClient(endpoint, connector)
 {}
 
-void SensorClient::read()
+void CSensorClient::Read()
 {
     m_connector->resetTimer(RECEIVE_TIMEOUT);
-    Client::read();
+    IClient::Read();
 }
 
-void SensorClient::checkDeadline(ErrorCode error)
+void CSensorClient::checkDeadline(EErrc error)
 {
     LockGuard lk(m_mutex);
-    if (m_state == State::RUNNING)
+    if (m_state == EState::RUNNING)
     {
-        if (error == ErrorCode::SUCCESS)
+        if (error == EErrc::SUCCESS)
         {
             logger.debug(LOG_PREFIX, "timed out, reconnect ...");
             reconnect();
         }
         else
         {
-            m_connector->onTimeout(std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1));
+            m_connector->onTimeout(std::bind(&CSensorClient::checkDeadline, this, std::placeholders::_1));
         }
     }
 }
 
-void SensorClient::handleConnect(ErrorCode error)
+void CSensorClient::handleConnect(EErrc error)
 {
     LockGuard lk(m_mutex);
-    if (m_state == State::CONNECTING)
+    if (m_state == EState::CONNECTING)
     {
-        if (error == ErrorCode::SUCCESS)
+        if (error == EErrc::SUCCESS)
         {
-            m_state = State::RUNNING;
+            m_state = EState::RUNNING;
             m_backoff.reset();
-            logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
-            m_connector->onTimeout(std::bind(&SensorClient::checkDeadline, this, std::placeholders::_1),
+            logger.info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
+            m_connector->onTimeout(std::bind(&CSensorClient::checkDeadline, this, std::placeholders::_1),
                                    RECEIVE_TIMEOUT);
-            read();
+            Read();
         }
         else
         {
-            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
         }
     }
 }
 
-char const* SensorClient::logPrefix() const
+char const* CSensorClient::logPrefix() const
 {
     return LOG_PREFIX;
 }

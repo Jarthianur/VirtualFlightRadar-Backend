@@ -134,8 +134,8 @@ int main(int argc, char** argv)
 {
     try
     {
-        VFRB vfrb(get_config(evalArgs(argc, argv)));
-        vfrb.run();
+        CVfrb vfrb(get_config(evalArgs(argc, argv)));
+        vfrb.Run();
     }
     catch ([[maybe_unused]] ::error::ArgumentError const&)
     {

@@ -27,7 +27,7 @@
 
 namespace vfrb::data
 {
-class WindData;
+class CWindData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
@@ -48,7 +48,7 @@ public:
      * @param data       The WindData contianer
      * @throw std::logic_error from parent constructor
      */
-    WindFeed(Str const& m_name, config::CProperties const& m_properties, SPtr<data::WindData> data);
+    WindFeed(Str const& m_name, config::CProperties const& m_properties, SPtr<data::CWindData> data);
     ~WindFeed() noexcept override = default;
 
     /**

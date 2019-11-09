@@ -30,7 +30,7 @@ using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-SbsFeed::SbsFeed(Str const& name, CProperties const& properties, SPtr<data::AircraftData> data, s32 maxHeight)
+SbsFeed::SbsFeed(Str const& name, CProperties const& properties, SPtr<data::CAircraftData> data, s32 maxHeight)
     : Feed(name, properties, data), m_parser(maxHeight), m_worker([this](Str&& work) {
           try
           {

@@ -23,9 +23,9 @@
 
 namespace vfrb::server::net::error
 {
-SocketError::SocketError(Str const& msg) : m_msg(msg) {}
+CSocketError::CSocketError(Str const& msg) : m_msg(msg) {}
 
-char const* SocketError::what() const noexcept
+char const* CSocketError::what() const noexcept
 {
     return m_msg.c_str();
 }

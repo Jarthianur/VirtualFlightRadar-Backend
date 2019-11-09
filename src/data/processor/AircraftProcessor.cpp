@@ -34,16 +34,16 @@ using namespace vfrb::str_util;
 
 namespace vfrb::data::processor
 {
-AircraftProcessor::AircraftProcessor() : AircraftProcessor(std::numeric_limits<s32>::max()) {}
+CAircraftProcessor::CAircraftProcessor() : CAircraftProcessor(std::numeric_limits<s32>::max()) {}
 
-AircraftProcessor::AircraftProcessor(s32 maxDist) : m_maxDistance(maxDist) {}
+CAircraftProcessor::CAircraftProcessor(s32 maxDist) : m_maxDistance(maxDist) {}
 
-void AircraftProcessor::process(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea) const
+void CAircraftProcessor::Process(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea) const
 {
     calculateRelPosition(aircraft);
     if (m_distance <= m_maxDistance)
     {
-        appendPFLAA(aircraft, nmea, appendPFLAU(aircraft, nmea, 0));
+        appendPflaa(aircraft, nmea, appendPflau(aircraft, nmea, 0));
     }
     else
     {
@@ -51,13 +51,13 @@ void AircraftProcessor::process(CAircraft const& aircraft, util::CString<NMEA_SI
     }
 }
 
-void AircraftProcessor::referTo(SLocation const& location, f64 atmPress)
+void CAircraftProcessor::ReferTo(SLocation const& location, f64 atmPress)
 {
     m_refLocation    = location;
     m_refAtmPressure = atmPress;
 }
 
-void AircraftProcessor::calculateRelPosition(CAircraft const& aircraft) const
+void CAircraftProcessor::calculateRelPosition(CAircraft const& aircraft) const
 {
     m_refRadLatitude       = math::Radian(m_refLocation.Latitude);
     m_refRadLongitude      = math::Radian(m_refLocation.Longitude);
@@ -85,7 +85,7 @@ void AircraftProcessor::calculateRelPosition(CAircraft const& aircraft) const
                         aircraft.Location().altitude - m_refLocation.Altitude;
 }
 
-usize AircraftProcessor::appendPFLAU(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
+usize CAircraftProcessor::appendPflau(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
                                      usize pos) const
 {
     int next = nmea.Format(pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::DoubleToInt(m_relBearing),
@@ -94,7 +94,7 @@ usize AircraftProcessor::appendPFLAU(CAircraft const& aircraft, util::CString<NM
     return pos + static_cast<usize>(next);
 }
 
-usize AircraftProcessor::appendPFLAA(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
+usize CAircraftProcessor::appendPflaa(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
                                      usize pos) const
 {
     int next = 0;

@@ -35,45 +35,45 @@ using namespace vfrb::feed;
 namespace vfrb::client
 {
 template<>
-SPtr<AprscClient> ClientFactory::makeClient<AprscClient>(SPtr<Feed> feed)
+SPtr<CAprscClient> CClientFactory::makeClient<CAprscClient>(SPtr<Feed> feed)
 {
-    return std::make_shared<AprscClient>(feed->endpoint(), std::static_pointer_cast<AprscFeed>(feed)->login(),
-                                         std::make_shared<ConnectorImplBoost>());
+    return std::make_shared<CAprscClient>(feed->endpoint(), std::static_pointer_cast<AprscFeed>(feed)->login(),
+                                         std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<SbsClient> ClientFactory::makeClient<SbsClient>(SPtr<Feed> feed)
+SPtr<CSbsClient> CClientFactory::makeClient<CSbsClient>(SPtr<Feed> feed)
 {
-    return std::make_shared<SbsClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
+    return std::make_shared<CSbsClient>(feed->endpoint(), std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<SensorClient> ClientFactory::makeClient<SensorClient>(SPtr<Feed> feed)
+SPtr<CSensorClient> CClientFactory::makeClient<CSensorClient>(SPtr<Feed> feed)
 {
-    return std::make_shared<SensorClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
+    return std::make_shared<CSensorClient>(feed->endpoint(), std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<GpsdClient> ClientFactory::makeClient<GpsdClient>(SPtr<Feed> feed)
+SPtr<CGpsdClient> CClientFactory::makeClient<CGpsdClient>(SPtr<Feed> feed)
 {
-    return std::make_shared<GpsdClient>(feed->endpoint(), std::make_shared<ConnectorImplBoost>());
+    return std::make_shared<CGpsdClient>(feed->endpoint(), std::make_shared<CConnectorBoost>());
 }
 
-SPtr<Client> ClientFactory::createClientFor(SPtr<Feed> feed)
+SPtr<IClient> CClientFactory::CreateClientFor(SPtr<Feed> feed)
 {
     switch (feed->protocol())
     {
-        case Feed::Protocol::APRS: return makeClient<AprscClient>(feed);
-        case Feed::Protocol::SBS: return makeClient<SbsClient>(feed);
-        case Feed::Protocol::GPS: return makeClient<GpsdClient>(feed);
-        case Feed::Protocol::SENSOR: return makeClient<SensorClient>(feed);
+        case Feed::Protocol::APRS: return makeClient<CAprscClient>(feed);
+        case Feed::Protocol::SBS: return makeClient<CSbsClient>(feed);
+        case Feed::Protocol::GPS: return makeClient<CGpsdClient>(feed);
+        case Feed::Protocol::SENSOR: return makeClient<CSensorClient>(feed);
     }
-    throw error::NoSuchProtocolError();
+    throw error::CNoSuchProtocolError();
 }
 
 namespace error
 {
-char const* NoSuchProtocolError::what() const noexcept
+char const* CNoSuchProtocolError::what() const noexcept
 {
     return "unknown protocol";
 }

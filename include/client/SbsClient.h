@@ -28,15 +28,15 @@ namespace vfrb::client
 /**
  * @brief Client for SBS servers
  */
-class SbsClient : public Client
+class CSbsClient : public IClient
 {
-    NOT_COPYABLE(SbsClient)
+    NOT_COPYABLE(CSbsClient)
 
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::ErrorCode error) override REQUIRES(!m_mutex);
+    void handleConnect(net::EErrc error_) override REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 
@@ -45,7 +45,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    SbsClient(net::Endpoint const& endpoint, SPtr<net::Connector> connector);
-    ~SbsClient() noexcept override = default;
+    CSbsClient(net::SEndpoint const& endpoint_, SPtr<net::IConnector> connector_);
+    ~CSbsClient() noexcept override = default;
 };
 }  // namespace vfrb::client

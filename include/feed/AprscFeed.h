@@ -28,7 +28,7 @@
 
 namespace vfrb::data
 {
-class AircraftData;
+class CAircraftData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
@@ -53,7 +53,7 @@ public:
      * @param maxHeight  The max height filter
      * @throw std::logic_error if login is not given, or from parent constructor
      */
-    AprscFeed(Str const& m_name, config::CProperties const& propertyMap, SPtr<data::AircraftData> data,
+    AprscFeed(Str const& m_name, config::CProperties const& propertyMap, SPtr<data::CAircraftData> data,
               s32 maxHeight);
     ~AprscFeed() noexcept override = default;
 

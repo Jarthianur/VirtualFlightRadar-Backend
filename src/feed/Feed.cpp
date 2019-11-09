@@ -34,7 +34,7 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-Feed::Feed(Str const& name, CProperties const& properties, SPtr<data::Data> data)
+Feed::Feed(Str const& name, CProperties const& properties, SPtr<data::IData> data)
     : m_properties(properties), m_name(name), m_priority(initPriority()), m_data(data)
 {
     if (properties.Property(CConfiguration::KV_KEY_HOST, "").empty())
@@ -60,7 +60,7 @@ u32 Feed::initPriority() const
     throw error::InvalidPropertyError("invalid priority given");
 }
 
-client::net::Endpoint Feed::endpoint() const
+client::net::SEndpoint Feed::endpoint() const
 {
     return {m_properties.Property(CConfiguration::KV_KEY_HOST),
             m_properties.Property(CConfiguration::KV_KEY_PORT)};

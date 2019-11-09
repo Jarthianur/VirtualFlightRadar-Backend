@@ -34,10 +34,10 @@ class CConfiguration;
 
 namespace vfrb::data
 {
-class AircraftData;
-class AtmosphereData;
-class GpsData;
-class WindData;
+class CAircraftData;
+class CAtmosphereData;
+class CGpsData;
+class CWindData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
@@ -50,10 +50,10 @@ class Feed;
 class FeedFactory
 {
     SPtr<config::CConfiguration> m_config;        ///< Pointer to the Configuration
-    SPtr<data::AircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
-    SPtr<data::AtmosphereData>  m_atmosData;     ///< Pointer to the AtmosphereData
-    SPtr<data::GpsData>         m_gpsData;       ///< Pointer to the GpsData
-    SPtr<data::WindData>        m_windData;      ///< Pointer to the WindData
+    SPtr<data::CAircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
+    SPtr<data::CAtmosphereData>  m_atmosData;     ///< Pointer to the AtmosphereData
+    SPtr<data::CGpsData>         m_gpsData;       ///< Pointer to the GpsData
+    SPtr<data::CWindData>        m_windData;      ///< Pointer to the WindData
 
     /**
      * @brief Make a new Feed.
@@ -74,9 +74,9 @@ public:
      * @param gpsData      The GpsData pointer
      * @param windData     The WindData pointer
      */
-    FeedFactory(SPtr<config::CConfiguration> config, SPtr<data::AircraftData> aircraftData,
-                SPtr<data::AtmosphereData> atmosData, SPtr<data::GpsData> gpsData,
-                SPtr<data::WindData> windData);
+    FeedFactory(SPtr<config::CConfiguration> config, SPtr<data::CAircraftData> aircraftData,
+                SPtr<data::CAtmosphereData> atmosData, SPtr<data::CGpsData> gpsData,
+                SPtr<data::CWindData> windData);
     ~FeedFactory() noexcept = default;
 
     /**

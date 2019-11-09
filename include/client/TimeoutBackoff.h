@@ -29,7 +29,7 @@ namespace vfrb::client
  * @brief The TimeoutBackoff class
  * Produces backoff sequence 1s,5s,20s,1m,2m
  */
-class TimeoutBackoff
+class CTimeoutBackoff
 {
     inline static constexpr auto INITIAL_TIMEOUT = 1;
     inline static constexpr auto INITIAL_FACTOR  = 5;
@@ -38,10 +38,10 @@ class TimeoutBackoff
     u32 m_factor  = INITIAL_FACTOR;
 
 public:
-    TimeoutBackoff()           = default;
-    ~TimeoutBackoff() noexcept = default;
+    CTimeoutBackoff()           = default;
+    ~CTimeoutBackoff() noexcept = default;
 
-    u32  next();
-    void reset();
+    u32  Next();
+    void Reset();
 };
 }  // namespace vfrb::client

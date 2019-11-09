@@ -37,60 +37,60 @@ namespace vfrb::server::net
 /**
  * @brief Implement NetworkInterface using boost.
  */
-class NetworkInterfaceImplBoost : public NetworkInterface<SocketImplBoost>
+class CAcceptorBoost : public IAcceptor<CSocketBoost>
 {
-    NOT_COPYABLE(NetworkInterfaceImplBoost)
+    NOT_COPYABLE(CAcceptorBoost)
 
     boost::asio::io_service        m_ioService;  ///< Internal IO-service
     boost::asio::ip::tcp::acceptor m_acceptor;   ///< Acceptor
-    SocketImplBoost                m_socket;     ///< Current socket
+    CSocketBoost                   m_socket;     ///< Current socket
 
     /**
      * @brief Handler for accept calls
      * @param error    The error code
      * @param callback The callback to invoke
      */
-    void handleAccept(boost::system::error_code const& error, Callback const& callback);
+    void handleAccept(boost::system::error_code const& error_, Callback const& callback_);
 
 public:
-    explicit NetworkInterfaceImplBoost(u16 port);  ///< @param port The port number
-    ~NetworkInterfaceImplBoost() noexcept override;
+    explicit CAcceptorBoost(u16 port_);  ///< @param port The port number
+    ~CAcceptorBoost() noexcept override;
 
     /**
      * @brief Run the event handler queue.
      * @note Blocks until all handlers have returned.
      * @param lock The lock to release before entering blocking section
      */
-    void run() override;
+    void Run() override;
 
     /**
      * @brief Stop the event handler queue.
      */
-    void stop() override;
+    void Stop() override;
 
     /**
      * @brief Schedule an accept call.
      * @param callback The callback to invoke when done
      */
-    void onAccept(Callback const& callback) override;
+    void OnAccept(Callback const& callback_) override;
 
     /**
      * @brief Close current connection.
      */
-    void close() override;
+    void Close() override;
 
     /**
      * @brief Start and get the Connection on current socket.
      * @return the Connection
      * @throw SocketException if the current socket is not open
      */
-    Connection<SocketImplBoost> startConnection() override;
+    CConnection<CSocketBoost> StartConnection() override;
 
     /**
      * @brief Get the current connected address.
      * @return the address
      * @throw SocketException if the current socket is not open
      */
-    Str stagedAddress() const override;
+    Str StagedAddress() const override;
 };
 }  // namespace vfrb::server::net

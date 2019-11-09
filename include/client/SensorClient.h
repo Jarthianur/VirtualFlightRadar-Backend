@@ -28,9 +28,9 @@ namespace vfrb::client
 /**
  * @brief Client for sensor servers
  */
-class SensorClient : public Client
+class CSensorClient : public IClient
 {
-    NOT_COPYABLE(SensorClient)
+    NOT_COPYABLE(CSensorClient)
 
     inline static constexpr auto RECEIVE_TIMEOUT = 3;  ///< seconds
 
@@ -43,13 +43,13 @@ class SensorClient : public Client
      * @brief Check read timeout deadline reached.
      * @threadsafe
      */
-    void checkDeadline(net::ErrorCode error) REQUIRES(!m_mutex);
+    void checkDeadline(net::EErrc error_) REQUIRES(!m_mutex);
 
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::ErrorCode error) override REQUIRES(!m_mutex);
+    void handleConnect(net::EErrc error_) override REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 
@@ -58,7 +58,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    SensorClient(net::Endpoint const& endpoint, SPtr<net::Connector> connector);
-    ~SensorClient() noexcept override = default;
+    CSensorClient(net::SEndpoint const& endpoint_, SPtr<net::IConnector> connector_);
+    ~CSensorClient() noexcept override = default;
 };
 }  // namespace vfrb::client

@@ -36,16 +36,16 @@ namespace vfrb::client
 constexpr auto     LOG_PREFIX = "(AprscClient) ";
 static auto const& logger     = CLogger::Instance();
 
-AprscClient::AprscClient(Endpoint const& endpoint, Str const& login, SPtr<Connector> connector)
-    : Client(endpoint, connector), m_login(login + "\r\n")
+CAprscClient::CAprscClient(SEndpoint const& endpoint, Str const& login, SPtr<IConnector> connector)
+    : IClient(endpoint, connector), m_login(login + "\r\n")
 {}
 
-bool AprscClient::equals(Client const& other) const
+bool CAprscClient::Equals(IClient const& other) const
 {
     try
     {
-        auto const& derived = dynamic_cast<AprscClient const&>(other);
-        return Client::equals(other) && this->m_login == derived.m_login;
+        auto const& derived = dynamic_cast<CAprscClient const&>(other);
+        return IClient::Equals(other) && this->m_login == derived.m_login;
     }
     catch (std::bad_cast const&)
     {
@@ -53,48 +53,48 @@ bool AprscClient::equals(Client const& other) const
     }
 }
 
-usize AprscClient::hash() const
+usize CAprscClient::Hash() const
 {
-    usize seed = Client::hash();
+    usize seed = IClient::Hash();
     boost::hash_combine(seed, boost::hash_value(m_login));
     return seed;
 }
 
-void AprscClient::handleConnect(ErrorCode error)
+void CAprscClient::handleConnect(EErrc error)
 {
     LockGuard lk(m_mutex);
-    if (m_state == State::CONNECTING)
+    if (m_state == EState::CONNECTING)
     {
-        if (error == ErrorCode::SUCCESS)
+        if (error == EErrc::SUCCESS)
         {
-            m_connector->onWrite(m_login, std::bind(&AprscClient::handleLogin, this, std::placeholders::_1));
+            m_connector->onWrite(m_login, std::bind(&CAprscClient::handleLogin, this, std::placeholders::_1));
         }
         else
         {
-            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
         }
     }
 }
 
-void AprscClient::sendKeepAlive()
+void CAprscClient::sendKeepAlive()
 {
-    m_connector->onTimeout(std::bind(&AprscClient::handleSendKeepAlive, this, std::placeholders::_1),
+    m_connector->onTimeout(std::bind(&CAprscClient::handleSendKeepAlive, this, std::placeholders::_1),
                            KEEPALIVE_INTERVAL);
 }
 
-void AprscClient::handleLogin(ErrorCode error)
+void CAprscClient::handleLogin(EErrc error)
 {
     LockGuard lk(m_mutex);
-    if (m_state == State::CONNECTING)
+    if (m_state == EState::CONNECTING)
     {
-        if (error == ErrorCode::SUCCESS)
+        if (error == EErrc::SUCCESS)
         {
-            m_state = State::RUNNING;
+            m_state = EState::RUNNING;
             m_backoff.reset();
-            logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
+            logger.info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
             sendKeepAlive();
-            read();
+            Read();
         }
         else
         {
@@ -104,17 +104,17 @@ void AprscClient::handleLogin(ErrorCode error)
     }
 }
 
-void AprscClient::handleSendKeepAlive(ErrorCode error)
+void CAprscClient::handleSendKeepAlive(EErrc error)
 {
     LockGuard lk(m_mutex);
-    if (m_state == State::RUNNING)
+    if (m_state == EState::RUNNING)
     {
-        if (error == ErrorCode::SUCCESS)
+        if (error == EErrc::SUCCESS)
         {
-            m_connector->onWrite("#keep-alive beacon\r\n", [this](ErrorCode error) {
-                if (std::lock_guard lk(m_mutex); m_state == State::RUNNING)
+            m_connector->onWrite("#keep-alive beacon\r\n", [this](EErrc error) {
+                if (std::lock_guard lk(m_mutex); m_state == EState::RUNNING)
                 {
-                    if (error != ErrorCode::SUCCESS)
+                    if (error != EErrc::SUCCESS)
                     {
                         logger.error(LOG_PREFIX, "send keep-alive beacon failed");
                         reconnect();
@@ -130,7 +130,7 @@ void AprscClient::handleSendKeepAlive(ErrorCode error)
     }
 }
 
-char const* AprscClient::logPrefix() const
+char const* CAprscClient::logPrefix() const
 {
     return LOG_PREFIX;
 }

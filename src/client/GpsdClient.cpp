@@ -36,55 +36,55 @@ namespace vfrb::client
 constexpr auto     LOG_PREFIX = "(GpsdClient) ";
 static auto const& logger     = CLogger::Instance();
 
-GpsdClient::GpsdClient(Endpoint const& endpoint, SPtr<Connector> connector) : Client(endpoint, connector) {}
+CGpsdClient::CGpsdClient(SEndpoint const& endpoint, SPtr<IConnector> connector) : IClient(endpoint, connector) {}
 
-void GpsdClient::handleConnect(ErrorCode error)
+void CGpsdClient::handleConnect(EErrc error)
 {
     LockGuard lk(m_mutex);
-    if (m_state == State::CONNECTING)
+    if (m_state == EState::CONNECTING)
     {
-        if (error == ErrorCode::SUCCESS)
+        if (error == EErrc::SUCCESS)
         {
             m_connector->onWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
-                                 std::bind(&GpsdClient::handleWatch, this, std::placeholders::_1));
+                                 std::bind(&CGpsdClient::handleWatch, this, std::placeholders::_1));
         }
         else
         {
-            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
         }
     }
 }
 
-void GpsdClient::stop()
+void CGpsdClient::stop()
 {
-    if (m_state == State::RUNNING)
+    if (m_state == EState::RUNNING)
     {
         Mutex                       sync;
         UniqueLock                  lk(sync);
         std::condition_variable_any cv;
         bool                        sent = false;
-        m_connector->onWrite("?WATCH={\"enable\":false}\r\n", [&sent, &cv]([[maybe_unused]] ErrorCode) {
+        m_connector->onWrite("?WATCH={\"enable\":false}\r\n", [&sent, &cv]([[maybe_unused]] EErrc) {
             logger.info(LOG_PREFIX, "stopped watch");
             sent = true;
             cv.notify_one();
         });
         cv.wait_for(lk, std::chrono::milliseconds(500), [&] { return sent; });
     }
-    Client::stop();
+    IClient::stop();
 }
 
-void GpsdClient::handleWatch(ErrorCode error)
+void CGpsdClient::handleWatch(EErrc error)
 {
     LockGuard lk(m_mutex);
-    if (m_state == State::CONNECTING)
+    if (m_state == EState::CONNECTING)
     {
-        if (error == ErrorCode::SUCCESS)
+        if (error == EErrc::SUCCESS)
         {
-            m_state = State::RUNNING;
+            m_state = EState::RUNNING;
             m_backoff.reset();
-            logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
-            read();
+            logger.info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
+            Read();
         }
         else
         {
@@ -94,7 +94,7 @@ void GpsdClient::handleWatch(ErrorCode error)
     }
 }
 
-char const* GpsdClient::logPrefix() const
+char const* CGpsdClient::logPrefix() const
 {
     return LOG_PREFIX;
 }

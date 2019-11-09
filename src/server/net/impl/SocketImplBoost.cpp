@@ -27,9 +27,9 @@
 
 namespace vfrb::server::net
 {
-SocketImplBoost::SocketImplBoost(SocketImplBoost&& other) : m_socket(boost::move(other.m_socket)) {}
+CSocketBoost::CSocketBoost(CSocketBoost&& other) : m_socket(boost::move(other.m_socket)) {}
 
-SocketImplBoost& SocketImplBoost::operator=(SocketImplBoost&& other)
+CSocketBoost& CSocketBoost::operator=(CSocketBoost&& other)
 {
     m_socket = boost::move(other.m_socket);
     return *this;

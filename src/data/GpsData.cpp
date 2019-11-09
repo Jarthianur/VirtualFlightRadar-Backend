@@ -26,14 +26,14 @@ using namespace vfrb::concurrent;
 
 namespace vfrb::data
 {
-GpsData::GpsData(AccessFn&& fn, CGpsPosition const& position, bool ground)
-    : Data(std::move(fn)), m_position(std::make_tuple(position, "")), m_groundMode(ground)
+CGpsData::CGpsData(AccessFn&& fn, CGpsPosition const& position, bool ground)
+    : IData(std::move(fn)), m_position(std::make_tuple(position, "")), m_groundMode(ground)
 {
     auto& [pos, cstr] = m_position;
     m_processor.process(pos, cstr);
 }
 
-void GpsData::access()
+void CGpsData::Access()
 {
     LockGuard lk(m_mutex);
     try
@@ -46,12 +46,12 @@ void GpsData::access()
     {}
 }
 
-bool GpsData::update(CObject&& position)
+bool CGpsData::Update(CObject&& position)
 {
     LockGuard lk(m_mutex);
     if (m_positionLocked)
     {
-        throw error::PositionAlreadyLocked();
+        throw error::CPositionAlreadyLocked();
     }
     auto& [pos, cstr] = m_position;
     bool updated      = pos.tryUpdate(std::move(position));
@@ -60,19 +60,19 @@ bool GpsData::update(CObject&& position)
         m_processor.process(pos, cstr);
         if (m_groundMode && isPositionGood())
         {
-            throw error::ReceivedGoodPosition();
+            throw error::CReceivedGoodPosition();
         }
     }
     return updated;
 }
 
-auto GpsData::location() const -> decltype(std::get<0>(m_position).location())
+auto CGpsData::location() const -> decltype(std::get<0>(m_position).location())
 {
     LockGuard lk(m_mutex);
     return std::get<0>(m_position).location();
 }
 
-bool GpsData::isPositionGood() const
+bool CGpsData::isPositionGood() const
 {
     auto const& pos = std::get<0>(m_position);
     return pos.nrOfSatellites() >= GPS_NR_SATS_GOOD && pos.fixQuality() >= GPS_FIX_GOOD &&
@@ -81,12 +81,12 @@ bool GpsData::isPositionGood() const
 
 namespace error
 {
-char const* PositionAlreadyLocked::what() const noexcept
+char const* CPositionAlreadyLocked::what() const noexcept
 {
     return "position was locked before";
 }
 
-char const* ReceivedGoodPosition::what() const noexcept
+char const* CReceivedGoodPosition::what() const noexcept
 {
     return "received good position";
 }

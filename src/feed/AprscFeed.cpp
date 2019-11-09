@@ -32,7 +32,7 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-AprscFeed::AprscFeed(Str const& name, CProperties const& properties, SPtr<data::AircraftData> data,
+AprscFeed::AprscFeed(Str const& name, CProperties const& properties, SPtr<data::CAircraftData> data,
                      s32 maxHeight)
     : Feed(name, properties, data), m_parser(maxHeight), m_worker([this](Str&& work) {
           try

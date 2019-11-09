@@ -29,27 +29,27 @@ using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
-ClientManager::~ClientManager() noexcept
+CClientManager::~CClientManager() noexcept
 {
     stop();
 }
 
-void ClientManager::subscribe(SPtr<feed::Feed> feed)
+void CClientManager::subscribe(SPtr<feed::Feed> feed)
 {
     LockGuard  lk(m_mutex);
     ClientIter it = m_clients.end();
-    it            = m_clients.insert(ClientFactory::createClientFor(feed)).first;
+    it            = m_clients.insert(CClientFactory::CreateClientFor(feed)).first;
     if (it != m_clients.end())
     {
         (*it)->subscribe(feed);
     }
     else
     {
-        throw error::FeedSubscriptionError(feed->name());
+        throw error::CFeedSubscriptionError(feed->name());
     }
 }
 
-void ClientManager::run()
+void CClientManager::run()
 {
     LockGuard lk(m_mutex);
     for (auto it : m_clients)
@@ -62,7 +62,7 @@ void ClientManager::run()
     }
 }
 
-void ClientManager::stop()
+void CClientManager::stop()
 {
     LockGuard lk(m_mutex);
     for (auto it : m_clients)
@@ -73,7 +73,7 @@ void ClientManager::stop()
 
 namespace error
 {
-FeedSubscriptionError::FeedSubscriptionError(Str const& name)
+CFeedSubscriptionError::CFeedSubscriptionError(Str const& name)
     : m_msg("failed to subscribe "s + name + " to client")
 {}
 

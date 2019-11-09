@@ -27,7 +27,7 @@
 
 namespace vfrb::data
 {
-class AtmosphereData;
+class CAtmosphereData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
@@ -49,7 +49,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     AtmosphereFeed(Str const& m_name, config::CProperties const& m_properties,
-                   SPtr<data::AtmosphereData> data);
+                   SPtr<data::CAtmosphereData> data);
     ~AtmosphereFeed() noexcept override = default;
 
     /**
