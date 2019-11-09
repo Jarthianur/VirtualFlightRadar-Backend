@@ -71,6 +71,6 @@ CGpsPosition GpsParser::parsePosition(std::cmatch const& match, u32 priority) co
             Parse<f64>(match[RE_GGA_DIL]),
             Parse<u8>(match[RE_GGA_SAT]),
             Parse<s8>(match[RE_GGA_FIX]),
-            CTimestamp(ToStrView(match[RE_GGA_TIME]))};
+            CTimestamp(AsStrView(match[RE_GGA_TIME]))};
 }
 }  // namespace vfrb::feed::parser

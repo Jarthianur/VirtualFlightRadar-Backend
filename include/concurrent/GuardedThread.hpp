@@ -64,7 +64,7 @@ public:
     CThreadUsedError()                    = default;
     ~CThreadUsedError() noexcept override = default;
 
-    char const* What() const noexcept override
+    char const* Message() const noexcept override
     {
         return "thread already used";
     }

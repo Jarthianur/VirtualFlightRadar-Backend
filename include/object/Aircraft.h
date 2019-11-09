@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "util/CString.hpp"
+#include "String.hpp"
 
 #include "GpsPosition.h"
 #include "Object.h"

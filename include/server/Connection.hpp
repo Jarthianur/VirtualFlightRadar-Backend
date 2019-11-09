@@ -90,7 +90,7 @@ bool CConnection<SocketT>::Write(std::string_view const& msg_)
     }
     catch (net::error::CSocketError const& e)
     {
-        CLogger::Instance().Debug("(Connection) write: ", e.What());
+        CLogger::Instance().Debug("(Connection) write: ", e.Message());
     }
     return false;
 }

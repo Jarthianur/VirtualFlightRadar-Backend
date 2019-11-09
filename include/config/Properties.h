@@ -71,7 +71,7 @@ public:
     explicit CPropertyNotFoundError(Str const& prop_);
     ~CPropertyNotFoundError() noexcept override = default;
 
-    char const* What() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::config

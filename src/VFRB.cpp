@@ -36,7 +36,7 @@
 #include "feed/FeedFactory.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
-#include "util/Logger.hpp"
+#include "Logger.hpp"
 
 using namespace vfrb::data;
 using namespace vfrb::object;

@@ -100,7 +100,7 @@ class CPositionAlreadyLocked : public IGpsDataException
 public:
     CPositionAlreadyLocked()                    = default;
     ~CPositionAlreadyLocked() noexcept override = default;
-    char const* What() const noexcept override;
+    char const* Message() const noexcept override;
 };
 
 /**
@@ -111,7 +111,7 @@ class CReceivedGoodPosition : public IGpsDataException
 public:
     CReceivedGoodPosition()                    = default;
     ~CReceivedGoodPosition() noexcept override = default;
-    char const* What() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::data

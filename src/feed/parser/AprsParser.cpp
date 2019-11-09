@@ -73,12 +73,12 @@ SLocation AprsParser::parseLocation(std::cmatch const& match) const
 {
     SLocation pos;
     pos.Latitude = math::DmToDeg(Parse<f64>(match[RE_APRS_LAT]));
-    if (ToStrView(match[RE_APRS_LAT_DIR]) == "S")
+    if (AsStrView(match[RE_APRS_LAT_DIR]) == "S")
     {
         pos.Latitude = -pos.Latitude;
     }
     pos.Longitude = math::DmToDeg(Parse<f64>(match[RE_APRS_LON]));
-    if (ToStrView(match[RE_APRS_LON_DIR]) == "W")
+    if (AsStrView(match[RE_APRS_LON_DIR]) == "W")
     {
         pos.Longitude = -pos.Longitude;
     }
@@ -92,7 +92,7 @@ SLocation AprsParser::parseLocation(std::cmatch const& match) const
 
 AprsParser::AircraftInfo AprsParser::parseComment(std::cmatch const& match) const
 {
-    return {ToStrView(match[RE_APRS_ID]),
+    return {AsStrView(match[RE_APRS_ID]),
             static_cast<CAircraft::EIdType>(Parse<x32>(match[RE_APRS_TYPE]) & 0x03),
             static_cast<CAircraft::EAircraftType>((Parse<x32>(match[RE_APRS_TYPE]) & 0x7C) >> 2)};
 }
@@ -106,6 +106,6 @@ CAircraft::SMovement AprsParser::parseMovement(std::cmatch const& match) const
 
 CTimestamp AprsParser::parseTimeStamp(std::cmatch const& match) const
 {
-    return CTimestamp(ToStrView(match[RE_APRS_TIME]));
+    return CTimestamp(AsStrView(match[RE_APRS_TIME]));
 }
 }  // namespace vfrb::feed::parser

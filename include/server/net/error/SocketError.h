@@ -43,6 +43,6 @@ public:
      * @brief Get the error message.
      * @return the message
      */
-    char const* What() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace vfrb::server::net::error

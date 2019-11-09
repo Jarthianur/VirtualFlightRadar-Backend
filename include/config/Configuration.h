@@ -144,7 +144,7 @@ public:
     CConfigurationError()                    = default;
     ~CConfigurationError() noexcept override = default;
 
-    char const* What() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::config

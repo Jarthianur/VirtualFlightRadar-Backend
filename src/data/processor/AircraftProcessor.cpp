@@ -25,7 +25,8 @@
 #include <cstdio>
 #include <limits>
 
-#include "util/math.hpp"
+#include "math/math.hpp"
+#include "math/constants.h"
 #include "util/string_utils.hpp"
 #include "util/utility.hpp"
 
@@ -102,7 +103,7 @@ usize CAircraftProcessor::appendPflaa(CAircraft const& aircraft, util::CString<N
     {
         next = nmea.Format(
             pos, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast, m_relVertical,
-            util::EnumType(aircraft.IdType()), (*aircraft.Id()).data(),
+            util::AsUnderlyingType(aircraft.IdType()), (*aircraft.Id()).data(),
             math::DoubleToInt(math::Saturate(aircraft.Movement().heading, CAircraft::SMovement::MIN_HEADING,
                                              CAircraft::SMovement::MAX_HEADING)),
             math::DoubleToInt(math::Saturate(aircraft.Movement().gndSpeed * math::MS_2_KMH,
@@ -110,12 +111,12 @@ usize CAircraftProcessor::appendPflaa(CAircraft const& aircraft, util::CString<N
                                              CAircraft::SMovement::MAX_GND_SPEED)),
             math::Saturate(aircraft.Movement().climbRate, CAircraft::SMovement::MIN_CLIMB_RATE,
                            CAircraft::SMovement::MAX_CLIMB_RATE),
-            util::EnumType(aircraft.AircraftType()));
+            util::AsUnderlyingType(aircraft.AircraftType()));
     }
     else
     {
         next = nmea.Format(pos, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
-                           (*aircraft.Id()).data(), util::EnumType(aircraft.AircraftType()));
+                           (*aircraft.Id()).data(), util::AsUnderlyingType(aircraft.AircraftType()));
     }
     next += nmea.Format(pos, "%02x\r\n", Checksum(*nmea, pos));
     return pos + static_cast<usize>(next);

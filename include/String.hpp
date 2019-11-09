@@ -31,7 +31,7 @@
 
 #include "types.h"
 
-namespace vfrb::util
+namespace vfrb
 {
 namespace error
 {
@@ -41,7 +41,7 @@ public:
     COverflowError()                    = default;
     ~COverflowError() noexcept override = default;
 
-    char const* What() const noexcept override
+    char const* Message() const noexcept override
     {
         return "";
     }

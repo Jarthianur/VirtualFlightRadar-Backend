@@ -26,15 +26,14 @@
 #include <utility>
 
 #include "concurrent/Mutex.hpp"
+#include "error/Error.hpp"
 #include "util/class_utils.h"
 
 #include "types.h"
 
 namespace vfrb
 {
-/**
- * @brief Logger with different levels.
- */
+/// Application wide logger
 class CLogger
 {
     NOT_COPYABLE(CLogger)
@@ -45,10 +44,10 @@ class CLogger
     std::ostream* PT_GUARDED_BY(m_mutex) m_errStream = &std::cerr;  ///< Stream to log ERROR
 
     /**
-     * @brief Get current date-time as string.
+     * Get current date-time as string.
      * @return the date-time-string
      */
-    static Str time();
+    Str time() const REQUIRES(m_mutex);
 
     void prefix(std::ostream& stream_, char const* msg_) const REQUIRES(m_mutex);
 
@@ -141,4 +140,16 @@ void CLogger::Error(Args&&... args_) const REQUIRES(!m_mutex)
     prefix(*m_errStream, "[ERROR]");
     (*m_errStream << ... << args_) << std::endl;
 }
+
+namespace error
+{
+class COpenLogfileError : public vfrb::error::IError
+{
+public:
+    COpenLogfileError()                    = default;
+    ~COpenLogfileError() noexcept override = default;
+
+    char const* Message() const noexcept override;
+};
+}  // namespace error
 }  // namespace vfrb

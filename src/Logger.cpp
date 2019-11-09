@@ -19,7 +19,7 @@
  }
  */
 
-#include "util/Logger.hpp"
+#include "Logger.hpp"
 
 #include <chrono>
 #include <ctime>
@@ -27,22 +27,22 @@
 
 namespace vfrb
 {
-void CLogger::logFile(Str const& file)
+void CLogger::LogFile(Str const& file_)
 {
     concurrent::LockGuard lk(m_mutex);
-    m_logFile = std::ofstream(file);
+    m_logFile = std::ofstream(file_);
     if (!m_logFile)
     {
-        throw std::runtime_error("Could not open log file");
+        throw error::COpenLogfileError();
     }
     m_outStream = &m_logFile;
     m_errStream = &m_logFile;
 }
 
-Str CLogger::time()
+Str CLogger::time() const
 {
     std::time_t tt       = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    static char time[32] = "";
+    char        time[32] = "";
     std::strftime(time, 32, "%c", gmtime(&tt));
     return time;
 }
@@ -52,4 +52,12 @@ CLogger& CLogger::Instance()
     static CLogger log;
     return log;
 }
+
+namespace error
+{
+char const* COpenLogfileError::Message() const noexcept
+{
+    return "failed to open logfile";
+}
+}  // namespace error
 }  // namespace vfrb
