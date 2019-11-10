@@ -35,6 +35,7 @@ namespace vfrb
 {
 namespace error
 {
+/// Error to indicate an overflow would occur.
 class COverflowError : public vfrb::error::IError
 {
 public:
@@ -48,12 +49,21 @@ public:
 };
 }  // namespace error
 
+/**
+ * A fixed size, stack located string.
+ * @tparam N The size
+ */
 template<usize N>
 class CString
 {
-    std::array<char, N> m_data;
-    std::string_view    m_view;
+    std::array<char, N> m_data;  ///< The underlying array
+    std::string_view    m_view;  ///< A view on the data
 
+    /**
+     * Copy into own data.
+     * @param sv_ The string to copy
+     * @throw vfrb::error::COverflowError
+     */
     void copy(std::string_view const& sv_)
     {
         usize len = sv_.length();
@@ -76,6 +86,10 @@ class CString
         m_view = std::string_view(m_data.data(), len);
     }
 
+    /**
+     * Copy into own data.
+     * @param other_ The string to copy
+     */
     void copy(CString const& other_)
     {
         std::copy(other_.m_data.cbegin(), other_.m_data.cend(), m_data.begin());
@@ -88,22 +102,22 @@ public:
         Clear();
     }
 
-    CString(char const* init_)  ///< @param init The initial cstring to copy
+    CString(char const* init_)
     {
         operator=(init_);
     }
 
-    CString(Str const& init_)  ///< @param init The initial string to copy
+    CString(Str const& init_)
     {
         operator=(init_);
     }
 
-    CString(CString const& other_)  ///< @param other The other CString to copy
+    CString(std::string_view const& init_)
     {
-        operator=(other_);
+        operator=(init_);
     }
 
-    CString(std::string_view const& other_)  ///< @param other The other CString to copy
+    CString(CString const& other_)
     {
         operator=(other_);
     }
@@ -149,12 +163,20 @@ public:
         return m_view == other_.m_view;
     }
 
+    /// Clear this string, thus making it to look empty.
     void Clear()
     {
         m_data[0] = '\0';
         m_view    = std::string_view(m_data.data(), 0);
     }
 
+    /**
+     * Write a formatted string into this.
+     * @param pos_ The index to start writing
+     * @param fmt_ The format string
+     * @return the amount of bytes written
+     * @throw vfrb::error::COverflowError
+     */
     int Format(usize pos_, char const* fmt_, ...)
     {
         if (pos_ >= N)
@@ -178,9 +200,10 @@ public:
         return b;
     }
 
+    /// Get the length of seen characters.
     inline usize Length() const
     {
         return m_view.length();
     }
 };
-}  // namespace vfrb::util
+}  // namespace vfrb
