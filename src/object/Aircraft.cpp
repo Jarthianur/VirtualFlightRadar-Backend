@@ -27,62 +27,61 @@
 
 namespace vfrb::object
 {
-CAircraft::CAircraft(u32 priority, std::string_view const& id, EIdType idT, EAircraftType aT, SLocation const& loc,
-                   SMovement const& move, CTimestamp const& timestamp)
-    : CObject(priority),
-      m_id(id),
-      m_idType(idT > EIdType::OGN ? EIdType::RANDOM : idT),
-      m_aircraftType(aT > EAircraftType::STATIC_OBJECT ? EAircraftType::UNKNOWN : aT),
+CAircraft::CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAircraftType aT_,
+                     SLocation const& loc_, SMovement const& move_, CTimestamp const& ts_)
+    : CObject(prio_),
+      m_id(id_),
+      m_idType(idT_ > EIdType::OGN ? EIdType::RANDOM : idT_),
+      m_aircraftType(aT_ > EAircraftType::STATIC_OBJECT ? EAircraftType::UNKNOWN : aT_),
       m_targetType(ETargetType::FLARM),
-      m_location(loc),
-      m_movement(move),
-      m_timestamp(timestamp),
+      m_location(loc_),
+      m_movement(move_),
+      m_timestamp(ts_),
       m_fullInfo(true)
 {
     util::CheckLimits(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
     util::CheckLimits(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
 }
 
-CAircraft::CAircraft(u32 priority, std::string_view const& id, EIdType idT, EAircraftType aT, SLocation const& loc,
-                   CTimestamp const& timestamp)
-    : CAircraft(priority, id, idT, aT, loc, {.0, .0, .0}, timestamp)
+CAircraft::CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAircraftType aT_,
+                     SLocation const& loc_, CTimestamp const& ts_)
+    : CAircraft(prio_, id_, idT_, aT_, loc_, {.0, .0, .0}, ts_)
 {
     m_targetType = ETargetType::TRANSPONDER;
     m_fullInfo   = false;
 }
 
-CAircraft::CAircraft(CAircraft&& other) : m_id(other.m_id)
+CAircraft::CAircraft(CAircraft&& other_) : m_id(other_.m_id)
 {
-    assign(std::move(other));
+    assign(std::move(other_));
 }
 
-void CAircraft::assign(CObject&& other)
+void CAircraft::assign(CObject&& other_)
 {
     try
     {
-        auto&& update = dynamic_cast<CAircraft&&>(other);
-        CObject::assign(std::move(other));
-        this->m_idType       = update.m_idType;
-        this->m_aircraftType = update.m_aircraftType;
-        this->m_targetType   = update.m_targetType;
-        this->m_location     = update.m_location;
-        this->m_movement     = update.m_movement;
-        this->m_timestamp    = update.m_timestamp;
-        this->m_fullInfo     = update.m_fullInfo;
+        auto&& other = dynamic_cast<CAircraft&&>(other_);
+        CObject::assign(std::move(other_));
+        this->m_idType       = other.m_idType;
+        this->m_aircraftType = other.m_aircraftType;
+        this->m_targetType   = other.m_targetType;
+        this->m_location     = other.m_location;
+        this->m_movement     = other.m_movement;
+        this->m_timestamp    = other.m_timestamp;
+        this->m_fullInfo     = other.m_fullInfo;
     }
     catch (std::bad_cast const&)
     {}
 }
 
-bool CAircraft::canUpdate(CObject const& other) const
+bool CAircraft::canUpdate(CObject const& other_) const
 {
     try
     {
-        auto const& toUpdate = dynamic_cast<CAircraft const&>(other);
-        return (this->m_timestamp > toUpdate.m_timestamp) &&
-               (toUpdate.m_targetType == ETargetType::TRANSPONDER ||
-                this->m_targetType == ETargetType::FLARM) &&
-               CObject::canUpdate(other);
+        auto const& other = dynamic_cast<CAircraft const&>(other_);
+        return (this->m_timestamp > other.m_timestamp) &&
+               (other.m_targetType == ETargetType::TRANSPONDER || this->m_targetType == ETargetType::FLARM) &&
+               CObject::canUpdate(other_);
     }
     catch (std::bad_cast const&)
     {
@@ -90,9 +89,9 @@ bool CAircraft::canUpdate(CObject const& other) const
     }
 }
 
-CAircraft& CAircraft::operator=(CAircraft&& other)
+CAircraft& CAircraft::operator=(CAircraft&& other_)
 {
-    TryUpdate(std::move(other));
+    TryUpdate(std::move(other_));
     return *this;
 }
 
