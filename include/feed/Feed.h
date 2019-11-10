@@ -38,9 +38,9 @@ namespace vfrb::feed
 /**
  * @brief Base class for input feeds.
  */
-class Feed
+class IFeed
 {
-    NOT_COPYABLE(Feed)
+    NOT_COPYABLE(IFeed)
 
     /**
      * @brief Initialize the priority from the given properties.
@@ -49,9 +49,9 @@ class Feed
 
 protected:
     config::CProperties const m_properties;  ///< Properties
-    Str const                m_name;        ///< Unique name
-    u32 const                m_priority;    ///< Priority
-    SPtr<data::IData>        m_data;        ///< Respective Data container
+    Str const                 m_name;        ///< Unique name
+    u32 const                 m_priority;    ///< Priority
+    SPtr<data::IData>         m_data;        ///< Respective Data container
 
     /**
      * @param name       The Feeds unique name
@@ -59,13 +59,13 @@ protected:
      * @param properties The Properties
      * @throw std::logic_error if host or port are not given in properties
      */
-    Feed(Str const& m_name, config::CProperties const& propertyMap, SPtr<data::IData> data);
+    IFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::IData> data_);
 
 public:
     /**
      * @brief The protocol that the Feed supports.
      */
-    enum class Protocol : enum_type
+    enum class EProtocol : enum_type
     {
         APRS,
         SBS,
@@ -73,41 +73,41 @@ public:
         SENSOR
     };
 
-    virtual ~Feed() noexcept = default;
+    virtual ~IFeed() noexcept = default;
 
     /**
      * @brief Get the supported Protocol.
      * @return the protocol
      */
-    virtual Protocol protocol() const = 0;
+    virtual EProtocol Protocol() const = 0;
 
     /**
      * @brief Get the feeds required Endpoint.
      * @return the endpoint
      */
-    client::net::SEndpoint endpoint() const;
+    client::net::SEndpoint Endpoint() const;
 
     /**
      * @brief Handle client's response.
      * @param response The response
      */
-    virtual bool process(Str response) = 0;
+    virtual bool Process(Str str_) = 0;
 
-    auto name() const -> decltype(m_name) const&;
-    auto priority() const -> std::remove_const<decltype(m_priority)>::type;
+    auto Name() const -> decltype(m_name) const&;
+    auto Priority() const -> std::remove_const<decltype(m_priority)>::type;
 };
 
 namespace error
 {
-class InvalidPropertyError : public vfrb::error::IError
+class CInvalidPropertyError : public vfrb::error::IError
 {
     Str const m_msg;
 
 public:
-    explicit InvalidPropertyError(Str const& msg);
-    ~InvalidPropertyError() noexcept override = default;
+    explicit CInvalidPropertyError(Str const& msg_);
+    ~CInvalidPropertyError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::feed

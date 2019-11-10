@@ -38,68 +38,68 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-FeedFactory::FeedFactory(SPtr<config::CConfiguration> config, SPtr<CAircraftData> aircraftData,
-                         SPtr<CAtmosphereData> atmosData, SPtr<CGpsData> gpsData, SPtr<CWindData> windData)
-    : m_config(config),
-      m_aircraftData(aircraftData),
-      m_atmosData(atmosData),
-      m_gpsData(gpsData),
-      m_windData(windData)
+FeedFactory::FeedFactory(SPtr<config::CConfiguration> config_, SPtr<CAircraftData> aircraftData_,
+                         SPtr<CAtmosphereData> atmosData_, SPtr<CGpsData> gpsData_, SPtr<CWindData> windData_)
+    : m_config(config_),
+      m_aircraftData(aircraftData_),
+      m_atmosData(atmosData_),
+      m_gpsData(gpsData_),
+      m_windData(windData_)
 {}
 
 template<>
-SPtr<AprscFeed> FeedFactory::makeFeed<AprscFeed>(Str const& name)
+SPtr<CAprscFeed> FeedFactory::makeFeed<CAprscFeed>(Str const& name_)
 {
-    return std::make_shared<AprscFeed>(name, m_config->feedProperties.at(name), m_aircraftData,
-                                       m_config->maxHeight);
+    return std::make_shared<CAprscFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData,
+                                       m_config->MaxHeight);
 }
 
 template<>
-SPtr<GpsFeed> FeedFactory::makeFeed<GpsFeed>(Str const& name)
+SPtr<CGpsFeed> FeedFactory::makeFeed<CGpsFeed>(Str const& name_)
 {
-    return std::make_shared<GpsFeed>(name, m_config->feedProperties.at(name), m_gpsData);
+    return std::make_shared<CGpsFeed>(name_, m_config->FeedProperties.at(name_), m_gpsData);
 }
 
 template<>
-SPtr<SbsFeed> FeedFactory::makeFeed<SbsFeed>(Str const& name)
+SPtr<CSbsFeed> FeedFactory::makeFeed<CSbsFeed>(Str const& name_)
 {
-    return std::make_shared<SbsFeed>(name, m_config->feedProperties.at(name), m_aircraftData,
-                                     m_config->maxHeight);
+    return std::make_shared<CSbsFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData,
+                                      m_config->MaxHeight);
 }
 
 template<>
-SPtr<WindFeed> FeedFactory::makeFeed<WindFeed>(Str const& name)
+SPtr<CWindFeed> FeedFactory::makeFeed<CWindFeed>(Str const& name_)
 {
-    return std::make_shared<WindFeed>(name, m_config->feedProperties.at(name), m_windData);
+    return std::make_shared<CWindFeed>(name_, m_config->FeedProperties.at(name_), m_windData);
 }
 
 template<>
-SPtr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(Str const& name)
+SPtr<CAtmosphereFeed> FeedFactory::makeFeed<CAtmosphereFeed>(Str const& name_)
 {
-    return std::make_shared<AtmosphereFeed>(name, m_config->feedProperties.at(name), m_atmosData);
+    return std::make_shared<CAtmosphereFeed>(name_, m_config->FeedProperties.at(name_), m_atmosData);
 }
 
-SPtr<Feed> FeedFactory::createFeed(Str const& name)
+SPtr<IFeed> FeedFactory::createFeed(Str const& name_)
 {
-    if (name.find(CConfiguration::SECT_KEY_APRSC) != Str::npos)
+    if (name_.find(CConfiguration::SECT_KEY_APRSC) != Str::npos)
     {
-        return makeFeed<AprscFeed>(name);
+        return makeFeed<CAprscFeed>(name_);
     }
-    if (name.find(CConfiguration::SECT_KEY_SBS) != Str::npos)
+    if (name_.find(CConfiguration::SECT_KEY_SBS) != Str::npos)
     {
-        return makeFeed<SbsFeed>(name);
+        return makeFeed<CSbsFeed>(name_);
     }
-    if (name.find(CConfiguration::SECT_KEY_GPS) != Str::npos)
+    if (name_.find(CConfiguration::SECT_KEY_GPS) != Str::npos)
     {
-        return makeFeed<GpsFeed>(name);
+        return makeFeed<CGpsFeed>(name_);
     }
-    if (name.find(CConfiguration::SECT_KEY_WIND) != Str::npos)
+    if (name_.find(CConfiguration::SECT_KEY_WIND) != Str::npos)
     {
-        return makeFeed<WindFeed>(name);
+        return makeFeed<CWindFeed>(name_);
     }
-    if (name.find(CConfiguration::SECT_KEY_ATMOS) != Str::npos)
+    if (name_.find(CConfiguration::SECT_KEY_ATMOS) != Str::npos)
     {
-        return makeFeed<AtmosphereFeed>(name);
+        return makeFeed<CAtmosphereFeed>(name_);
     }
     throw error::FeedCreationError();
 }
@@ -107,12 +107,12 @@ SPtr<Feed> FeedFactory::createFeed(Str const& name)
 namespace error
 {
 FeedCreationError::FeedCreationError()
-    : m_msg("no keywords found; be sure feed names contain one of "s + Configuration::SECT_KEY_APRSC + ", " +
-            Configuration::SECT_KEY_SBS + ", " + Configuration::SECT_KEY_WIND + ", " +
-            Configuration::SECT_KEY_ATMOS + ", " + Configuration::SECT_KEY_GPS)
+    : m_msg("no keywords found; be sure feed names contain one of "s + CConfiguration::SECT_KEY_APRSC + ", " +
+            CConfiguration::SECT_KEY_SBS + ", " + CConfiguration::SECT_KEY_WIND + ", " +
+            CConfiguration::SECT_KEY_ATMOS + ", " + CConfiguration::SECT_KEY_GPS)
 {}
 
-char const* FeedCreationError::what() const noexcept
+char const* FeedCreationError::Message() const noexcept
 {
     return m_msg.c_str();
 }

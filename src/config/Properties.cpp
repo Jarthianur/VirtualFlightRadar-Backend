@@ -75,11 +75,11 @@ CProperties CProperties::Section(Str const& section) const
 
 namespace error
 {
-CPropertyNotFoundError::CPropertyNotFoundError(Str const& prop) : m_property(prop + " not found") {}
+CPropertyNotFoundError::CPropertyNotFoundError(Str const& prop_) : m_msg(prop_ + " not found") {}
 
-char const* CPropertyNotFoundError::what() const noexcept
+char const* CPropertyNotFoundError::Message() const noexcept
 {
-    return m_property.c_str();
+    return m_msg.c_str();
 }
 }  // namespace error
 }  // namespace vfrb::config

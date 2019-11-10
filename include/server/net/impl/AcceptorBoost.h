@@ -26,8 +26,8 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "server/net/NetworkInterface.hpp"
-#include "server/net/impl/SocketImplBoost.h"
+#include "server/net/Acceptor.hpp"
+#include "server/net/impl/SocketBoost.h"
 #include "util/class_utils.h"
 
 #include "types.h"
@@ -42,55 +42,23 @@ class CAcceptorBoost : public IAcceptor<CSocketBoost>
     NOT_COPYABLE(CAcceptorBoost)
 
     boost::asio::io_service        m_ioService;  ///< Internal IO-service
-    boost::asio::ip::tcp::acceptor m_acceptor;   ///< Acceptor
-    CSocketBoost                   m_socket;     ///< Current socket
+    boost::asio::ip::tcp::acceptor m_acceptor;   ///< Internal acceptor
+    CSocketBoost                   m_socket;     ///< Staging socket
 
-    /**
-     * @brief Handler for accept calls
-     * @param error    The error code
-     * @param callback The callback to invoke
-     */
-    void handleAccept(boost::system::error_code const& error_, Callback const& callback_);
+    /// Intermediate handler for accept event
+    void handleAccept(boost::system::error_code const& err_, Callback const& cb_);
 
 public:
-    explicit CAcceptorBoost(u16 port_);  ///< @param port The port number
+    explicit CAcceptorBoost(u16 port_);
     ~CAcceptorBoost() noexcept override;
 
-    /**
-     * @brief Run the event handler queue.
-     * @note Blocks until all handlers have returned.
-     * @param lock The lock to release before entering blocking section
-     */
     void Run() override;
-
-    /**
-     * @brief Stop the event handler queue.
-     */
     void Stop() override;
-
-    /**
-     * @brief Schedule an accept call.
-     * @param callback The callback to invoke when done
-     */
-    void OnAccept(Callback const& callback_) override;
-
-    /**
-     * @brief Close current connection.
-     */
+    void OnAccept(Callback&& cb_) override;
     void Close() override;
 
-    /**
-     * @brief Start and get the Connection on current socket.
-     * @return the Connection
-     * @throw SocketException if the current socket is not open
-     */
+    /// @throw vfrb::server::net::error::CSocketError
     CConnection<CSocketBoost> StartConnection() override;
-
-    /**
-     * @brief Get the current connected address.
-     * @return the address
-     * @throw SocketException if the current socket is not open
-     */
-    Str StagedAddress() const override;
+    Str                       StagedAddress() const override;
 };
 }  // namespace vfrb::server::net

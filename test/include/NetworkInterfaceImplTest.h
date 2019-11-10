@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "server/net/NetworkInterface.hpp"
+#include "server/net/Acceptor.hpp"
 
 namespace server
 {

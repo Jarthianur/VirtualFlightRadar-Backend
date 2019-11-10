@@ -27,20 +27,13 @@
 
 namespace vfrb::feed::parser
 {
-/**
- * @brief Implement Parser for NMEA sentences from sensors.
- */
-class AtmosphereParser : public Parser<object::CAtmosphere>
+/// A parser for NMEA atmosphere sentences
+class CAtmosphereParser : public IParser<object::CAtmosphere>
 {
 public:
-    AtmosphereParser()                    = default;
-    ~AtmosphereParser() noexcept override = default;
+    CAtmosphereParser()                    = default;
+    ~CAtmosphereParser() noexcept override = default;
 
-    /**
-     * @brief Unpack into Atmosphere.
-     * @param sentence   The string to unpack
-     * @param atmosphere The Atmosphere to unpack into
-     */
-    object::CAtmosphere unpack(Str&& sentence, u32 priority) const override;
+    object::CAtmosphere Parse(Str&& str_, u32 prio_) const override;
 };
 }  // namespace vfrb::feed::parser

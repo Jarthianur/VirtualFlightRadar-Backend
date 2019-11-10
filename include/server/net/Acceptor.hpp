@@ -33,7 +33,7 @@ class CConnection;
 namespace net
 {
 /**
- * @brief Network interface for TCP a server.
+ * Acceptor interface for a TCP server.
  * @tparam SocketT The socket implementation
  */
 template<typename SocketT>
@@ -45,38 +45,28 @@ public:
     IAcceptor()                   = default;
     virtual ~IAcceptor() noexcept = default;
 
-    /**
-     * @brief Run this interface.
-     * @param lock The lock that may be hold and released inside
-     */
+    /// Run the accept loop.
     virtual void Run() = 0;
 
-    /**
-     * @brief Stop this interface.
-     */
+    /// Stop the accept loop.
     virtual void Stop() = 0;
 
     /**
-     * @brief Schedule an accept call.
-     * @param callback The callback to invoke when done
+     * Execute a callback on accept event.
+     * @param cb_ The callback to invoke
      */
-    virtual void OnAccept(Callback const& callback_) = 0;
+    virtual void OnAccept(Callback&& cb_) = 0;
 
-    /**
-     * @brief Close the connection.
-     */
+    /// Close the staged connection
     virtual void Close() = 0;
 
     /**
-     * @brief Start and get the current Connection.
-     * @return the Connection
+     * Start the staged connection.
+     * @return the connection
      */
     virtual CConnection<SocketT> StartConnection() = 0;
 
-    /**
-     * @brief Get the current connection address.
-     * @return the address
-     */
+    /// Get the address of the staged connection endpoint.
     virtual Str StagedAddress() const = 0;
 };
 }  // namespace net

@@ -30,10 +30,8 @@
 
 namespace vfrb::feed::parser
 {
-/**
- * @brief Implement Parser for APRS sentences.
- */
-class AprsParser : public Parser<object::CAircraft>
+/// A parser for APRS sentences.
+class CAprsParser : public IParser<object::CAircraft>
 {
     using AircraftInfo =
         std::tuple<std::string_view, object::CAircraft::EIdType, object::CAircraft::EAircraftType>;
@@ -51,52 +49,29 @@ class AprsParser : public Parser<object::CAircraft>
     inline static constexpr auto RE_APRS_CR      = 11;  ///< APRS regex match group of climb rate
     inline static constexpr auto RE_APRS_TR      = 12;  ///< APRS regex match group of turn rate
 
-    std::regex const m_APRS_RE;    ///< Regular expression for APRS protocol
+    std::regex const m_aprsRe;     ///< Regular expression for APRS protocol
     s32 const        m_maxHeight;  ///< The max height filter
 
     /**
-     * @brief Parse a Position.
-     * @param match    The regex match
-     * @param aircraft The target Aircraft
-     * @return true on success, else false
+     * @throw vfrb::feed::parser::error::CParseError
+     * @throw vfrb::str_util::error::CConversionError
      */
-    object::SLocation parseLocation(std::cmatch const& match) const;
+    object::SLocation parseLocation(std::cmatch const& match_) const;
 
-    /**
-     * @brief Parse the APRS comment.
-     * @param match    The regex match
-     * @param aircraft The target Aircraft
-     * @return true on success, else false
-     */
-    AircraftInfo parseComment(std::cmatch const& match) const;
+    /// @throw vfrb::str_util::error::CConversionError
+    AircraftInfo parseComment(std::cmatch const& match_) const;
 
-    /**
-     * @brief Parse the Movement information.
-     * @param match    The regex match
-     * @param comMatch The comment regex match
-     * @param aircraft The target Aircraft
-     * @return true on success, else false
-     */
-    object::CAircraft::SMovement parseMovement(std::cmatch const& match) const;
+    /// @throw vfrb::str_util::error::CConversionError
+    object::CAircraft::SMovement parseMovement(std::cmatch const& match_) const;
 
-    /**
-     * @brief Parse the Timestamp information.
-     * @param match    The regex match
-     * @param aircraft The target Aircraft
-     * @return true on success, else false
-     */
-    object::CTimestamp parseTimeStamp(std::cmatch const& match) const;
+    /// @throw vfrb::object::error::CTimestampParseError
+    object::CTimestamp parseTimeStamp(std::cmatch const& match_) const;
 
 public:
-    explicit AprsParser(s32 maxHeight);
-    ~AprsParser() noexcept override = default;
+    /// @param maxHeight_ The filter for max height
+    explicit CAprsParser(s32 maxHeight_);
+    ~CAprsParser() noexcept override = default;
 
-    /**
-     * @brief Unpack into Aircraft.
-     * @param sentence The string to unpack
-     * @param aircraft The Aircraft to unpack into
-     * @return true on success, else false
-     */
-    object::CAircraft unpack(Str&& sentence, u32 priority) const override;
+    object::CAircraft Parse(Str&& str_, u32 prio_) const override;
 };
 }  // namespace vfrb::feed::parser

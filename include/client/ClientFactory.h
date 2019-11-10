@@ -29,7 +29,7 @@
 
 namespace vfrb::feed
 {
-class Feed;
+class IFeed;
 }  // namespace vfrb::feed
 
 namespace vfrb::client
@@ -46,7 +46,7 @@ class CClientFactory
      * @return the client as pointer
      */
     template<typename T, ENABLE_IF(EXTENDS(T, IClient))>
-    static SPtr<T> makeClient(SPtr<feed::Feed> feed_);
+    static SPtr<T> makeClient(SPtr<feed::IFeed> feed_);
 
 public:
     CClientFactory()           = default;
@@ -57,7 +57,7 @@ public:
      * @param feed The feed to create for
      * @return the client as pointer
      */
-    static SPtr<IClient> CreateClientFor(SPtr<feed::Feed> feed_);
+    static SPtr<IClient> CreateClientFor(SPtr<feed::IFeed> feed_);
 };
 
 namespace error

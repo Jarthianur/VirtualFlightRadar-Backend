@@ -55,11 +55,11 @@ usize IClient::Hash() const
     return seed;
 }
 
-void IClient::subscribe(SPtr<feed::Feed> feed)
+void IClient::subscribe(SPtr<feed::IFeed> feed)
 {
     LockGuard lk(m_mutex);
     m_feeds.push_back(feed);
-    std::sort(m_feeds.begin(), m_feeds.end(), [](SPtr<feed::Feed> const& f1, SPtr<feed::Feed> const& f2) {
+    std::sort(m_feeds.begin(), m_feeds.end(), [](SPtr<feed::IFeed> const& f1, SPtr<feed::IFeed> const& f2) {
         return f1->priority() > f2->priority();
     });
 }

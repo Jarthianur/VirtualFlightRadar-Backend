@@ -32,39 +32,39 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-AprscFeed::AprscFeed(Str const& name, CProperties const& properties, SPtr<data::CAircraftData> data,
-                     s32 maxHeight)
-    : Feed(name, properties, data), m_parser(maxHeight), m_worker([this](Str&& work) {
+CAprscFeed::CAprscFeed(Str const& name_, CProperties const& prop_, SPtr<data::CAircraftData> data_,
+                       s32 maxHeight_)
+    : IFeed(name_, prop_, data_), m_parser(maxHeight_), m_worker([this](Str&& work) {
           try
           {
-              m_data->update(m_parser.unpack(std::move(work), m_priority));
+              m_data->Update(m_parser.Parse(std::move(work), m_priority));
           }
-          catch ([[maybe_unused]] parser::error::UnpackError const&)
+          catch ([[maybe_unused]] parser::error::CParseError const&)
           {}
       })
 {
     try
     {
-        properties.Property(CConfiguration::KV_KEY_LOGIN);
+        prop_.Property(CConfiguration::KV_KEY_LOGIN);
     }
     catch ([[maybe_unused]] config::error::CPropertyNotFoundError const&)
     {
-        throw error::InvalidPropertyError("could not find: "s + name + "." + CConfiguration::KV_KEY_LOGIN);
+        throw error::CInvalidPropertyError("could not find: "s + name_ + "." + CConfiguration::KV_KEY_LOGIN);
     }
 }
 
-Feed::Protocol AprscFeed::protocol() const
+IFeed::EProtocol CAprscFeed::Protocol() const
 {
-    return Protocol::APRS;
+    return EProtocol::APRS;
 }
 
-bool AprscFeed::process(Str response)
+bool CAprscFeed::Process(Str str_)
 {
-    m_worker.push(std::move(response));
+    m_worker.Push(std::move(str_));
     return true;
 }
 
-Str AprscFeed::login() const
+Str CAprscFeed::Login() const
 {
     return m_properties.Property(CConfiguration::KV_KEY_LOGIN);
 }

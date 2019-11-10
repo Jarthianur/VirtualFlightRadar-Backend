@@ -42,7 +42,7 @@ class CWindData;
 
 namespace vfrb::feed
 {
-class Feed;
+class IFeed;
 
 /**
  * @brief Factory for Feed creation.
@@ -63,8 +63,8 @@ class FeedFactory
      * @return a pointer to the concrete Feed
      * @throw std::logic_error from invoked constructors
      */
-    template<typename T, ENABLE_IF(EXTENDS(T, Feed))>
-    SPtr<T> makeFeed(Str const& name);
+    template<typename T, ENABLE_IF(EXTENDS(T, IFeed))>
+    SPtr<T> makeFeed(Str const& name_);
 
 public:
     /**
@@ -74,9 +74,9 @@ public:
      * @param gpsData      The GpsData pointer
      * @param windData     The WindData pointer
      */
-    FeedFactory(SPtr<config::CConfiguration> config, SPtr<data::CAircraftData> aircraftData,
-                SPtr<data::CAtmosphereData> atmosData, SPtr<data::CGpsData> gpsData,
-                SPtr<data::CWindData> windData);
+    FeedFactory(SPtr<config::CConfiguration> config_, SPtr<data::CAircraftData> aircraftData_,
+                SPtr<data::CAtmosphereData> atmosData_, SPtr<data::CGpsData> gpsData_,
+                SPtr<data::CWindData> windData_);
     ~FeedFactory() noexcept = default;
 
     /**
@@ -85,7 +85,7 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    SPtr<Feed> createFeed(Str const& name);
+    SPtr<IFeed> createFeed(Str const& name_);
 };
 
 namespace error
@@ -98,7 +98,7 @@ public:
     FeedCreationError();
     ~FeedCreationError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::feed

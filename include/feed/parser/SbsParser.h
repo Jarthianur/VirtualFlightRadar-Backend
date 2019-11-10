@@ -27,10 +27,8 @@
 
 namespace vfrb::feed::parser
 {
-/**
- * @brief Implement Parser for SBS sentences.
- */
-class SbsParser : public Parser<object::CAircraft>
+/// A parser for SBS sentences
+class CSbsParser : public IParser<object::CAircraft>
 {
     inline static constexpr auto SBS_FIELD_ID   = 4;   ///< Field number of aircraft id
     inline static constexpr auto SBS_FIELD_TIME = 7;   ///< Field number of time
@@ -39,15 +37,11 @@ class SbsParser : public Parser<object::CAircraft>
     inline static constexpr auto SBS_FIELD_LON  = 15;  ///< Field number of longitude
 
     s32 const m_maxHeight;  ///< The max height filter
-public:
-    explicit SbsParser(s32 maxHeight);
-    ~SbsParser() noexcept override = default;
 
-    /**
-     * @brief Unpack into Aircraft.
-     * @param sentence The string to unpack
-     * @param aircraft The Aircraft to unpack into
-     */
-    object::CAircraft unpack(Str&& sentence, u32 priority) const override;
+public:
+    explicit CSbsParser(s32 maxHeight_);
+    ~CSbsParser() noexcept override = default;
+
+    object::CAircraft Parse(Str&& str_, u32 prio_) const override;
 };
 }  // namespace vfrb::feed::parser

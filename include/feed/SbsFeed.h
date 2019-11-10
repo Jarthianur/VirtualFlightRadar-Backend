@@ -36,11 +36,11 @@ namespace vfrb::feed
 /**
  * @brief Extend Feed for SBS protocol.
  */
-class SbsFeed : public Feed
+class CSbsFeed : public IFeed
 {
-    NOT_COPYABLE(SbsFeed)
+    NOT_COPYABLE(CSbsFeed)
 
-    parser::SbsParser const       m_parser;  ///< Parser to unpack response from Client
+    parser::CSbsParser const       m_parser;  ///< Parser to unpack response from Client
     concurrent::CWorkerThread<Str> m_worker;
 
 public:
@@ -51,19 +51,19 @@ public:
      * @param maxHeight  The max height filter
      * @throw std::logic_error from parent constructor
      */
-    SbsFeed(Str const& m_name, config::CProperties const& m_properties, SPtr<data::CAircraftData> data,
-            s32 maxHeight);
-    ~SbsFeed() noexcept override = default;
+    CSbsFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
+             s32 maxHeight_);
+    ~CSbsFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::SBS
      */
-    Protocol protocol() const override;
+    EProtocol Protocol() const override;
 
     /**
      * @brief Feed::process.
      */
-    bool process(Str response) override;
+    bool Process(Str str_) override;
 };
 }  // namespace vfrb::feed

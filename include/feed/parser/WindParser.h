@@ -27,21 +27,13 @@
 
 namespace vfrb::feed::parser
 {
-/**
- * @brief Implement Parser for NMEA wind sentences.
- */
-class WindParser : public Parser<object::CWind>
+/// A parser for NMEA wind sentences
+class CWindParser : public IParser<object::CWind>
 {
 public:
-    WindParser();
-    ~WindParser() noexcept override = default;
+    CWindParser();
+    ~CWindParser() noexcept override = default;
 
-    /**
-     * @brief Unpack into Wind.
-     * @param sentence The string to unpack
-     * @param wind     The Wind to unpack into
-     * @return true on success, else false
-     */
-    object::CWind unpack(Str&& sentence, u32 priority) const override;
+    object::CWind Parse(Str&& str_, u32 prio_) const override;
 };
 }  // namespace vfrb::feed::parser

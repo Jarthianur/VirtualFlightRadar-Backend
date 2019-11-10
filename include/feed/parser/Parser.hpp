@@ -28,33 +28,36 @@
 namespace vfrb::feed::parser
 {
 /**
- * @brief Interface for parsers.
- * @tparam T The corresponding object type
+ * Parser interface
+ * @tparam ObjectT The object type to parse
  */
 template<typename ObjectT>
-class Parser
+class IParser
 {
 public:
-    Parser()                   = default;
-    virtual ~Parser() noexcept = default;
+    IParser()                   = default;
+    virtual ~IParser() noexcept = default;
 
     /**
-     * @brief Unpack a given string into the templated object.
-     * @param sentence The string to unpack
-     * @param _1       The target object
-     * @return true on success, else false
+     * Parse an object from string.
+     * @param str_  The string to parse
+     * @param prio_ The priority to pass
+     * @return the parsed object
+     * @throw vfrb::feed::parser::error::CParseError
      */
-    virtual ObjectT unpack(Str&& sentence, u32 priority) const = 0;
+    virtual ObjectT Parse(Str&& str_, u32 prio_) const = 0;
 };
 
 namespace error
 {
-class UnpackError : public vfrb::error::IError
+/// Error to indicate that unpacking failed
+class CParseError : public vfrb::error::IError
 {
 public:
-    UnpackError()                    = default;
-    ~UnpackError() noexcept override = default;
-    char const* what() const noexcept override
+    CParseError()                    = default;
+    ~CParseError() noexcept override = default;
+
+    char const* Message() const noexcept override
     {
         return "";
     }

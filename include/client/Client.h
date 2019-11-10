@@ -33,7 +33,7 @@
 
 namespace vfrb::feed
 {
-class Feed;
+class IFeed;
 }  // namespace vfrb::feed
 namespace vfrb::client
 {

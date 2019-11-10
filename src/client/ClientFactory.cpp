@@ -35,38 +35,38 @@ using namespace vfrb::feed;
 namespace vfrb::client
 {
 template<>
-SPtr<CAprscClient> CClientFactory::makeClient<CAprscClient>(SPtr<Feed> feed)
+SPtr<CAprscClient> CClientFactory::makeClient<CAprscClient>(SPtr<IFeed> feed)
 {
-    return std::make_shared<CAprscClient>(feed->endpoint(), std::static_pointer_cast<AprscFeed>(feed)->login(),
+    return std::make_shared<CAprscClient>(feed->endpoint(), std::static_pointer_cast<CAprscFeed>(feed)->Login(),
                                          std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<CSbsClient> CClientFactory::makeClient<CSbsClient>(SPtr<Feed> feed)
+SPtr<CSbsClient> CClientFactory::makeClient<CSbsClient>(SPtr<IFeed> feed)
 {
     return std::make_shared<CSbsClient>(feed->endpoint(), std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<CSensorClient> CClientFactory::makeClient<CSensorClient>(SPtr<Feed> feed)
+SPtr<CSensorClient> CClientFactory::makeClient<CSensorClient>(SPtr<IFeed> feed)
 {
     return std::make_shared<CSensorClient>(feed->endpoint(), std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<CGpsdClient> CClientFactory::makeClient<CGpsdClient>(SPtr<Feed> feed)
+SPtr<CGpsdClient> CClientFactory::makeClient<CGpsdClient>(SPtr<IFeed> feed)
 {
     return std::make_shared<CGpsdClient>(feed->endpoint(), std::make_shared<CConnectorBoost>());
 }
 
-SPtr<IClient> CClientFactory::CreateClientFor(SPtr<Feed> feed)
+SPtr<IClient> CClientFactory::CreateClientFor(SPtr<IFeed> feed)
 {
     switch (feed->protocol())
     {
-        case Feed::Protocol::APRS: return makeClient<CAprscClient>(feed);
-        case Feed::Protocol::SBS: return makeClient<CSbsClient>(feed);
-        case Feed::Protocol::GPS: return makeClient<CGpsdClient>(feed);
-        case Feed::Protocol::SENSOR: return makeClient<CSensorClient>(feed);
+        case IFeed::EProtocol::APRS: return makeClient<CAprscClient>(feed);
+        case IFeed::EProtocol::SBS: return makeClient<CSbsClient>(feed);
+        case IFeed::EProtocol::GPS: return makeClient<CGpsdClient>(feed);
+        case IFeed::EProtocol::SENSOR: return makeClient<CSensorClient>(feed);
     }
     throw error::CNoSuchProtocolError();
 }

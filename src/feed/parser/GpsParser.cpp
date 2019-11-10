@@ -21,9 +21,9 @@
 
 #include "feed/parser/GpsParser.h"
 
+#include "math/math.hpp"
 #include "object/GpsPosition.h"
 #include "object/Timestamp.h"
-#include "util/math.hpp"
 #include "util/string_utils.hpp"
 
 using namespace vfrb::object;
@@ -31,46 +31,53 @@ using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
-std::regex const GpsParser::s_GPGGA_RE(
-    "^\\$[A-Z]{2}GGA,(\\d{6}),(\\d{4}\\.\\d{3,4}),([NS]),(\\d{5}\\.\\d{3,4}),([EW]),(\\d),(\\d{2}),(\\d+(?:\\.\\d+)?),(\\d+(?:\\.\\d+)?),M,(\\d+(?:\\.\\d+)?),M,,\\*[0-9A-F]{2}\\s*?$",
-    std::regex::optimize | std::regex::icase);
+CGpsParser::CGpsParser()
+    : m_gpggaRe("^\\$[A-Z]{2}GGA,(\\d{6}),"    // time
+                "(\\d{4}\\.\\d{3,4}),([NS]),"  // latitude, direction
+                "(\\d{5}\\.\\d{3,4}),([EW]),"  // longitude, direction
+                "(\\d),(\\d{2}),"              // fix quality, number of satellites
+                "(\\d+(?:\\.\\d+)?),"          // dilution
+                "(\\d+(?:\\.\\d+)?),M,"        // altitude
+                "(\\d+(?:\\.\\d+)?)"           // geoid
+                ",M,,\\*[0-9A-F]{2}\\s*?$",
+                std::regex::optimize | std::regex::icase){};
 
-CGpsPosition GpsParser::unpack(Str&& sentence, u32 priority) const
+CGpsPosition CGpsParser::Parse(Str&& str_, u32 prio_) const
 {
     try
     {
-        if (std::cmatch match; MatchChecksum({sentence.c_str(), sentence.length()}) &&
-                               std::regex_match(sentence.c_str(), match, s_GPGGA_RE))
+        if (std::cmatch match;
+            MatchChecksum({str_.c_str(), str_.length()}) && std::regex_match(str_.c_str(), match, m_gpggaRe))
         {
-            return parsePosition(match, priority);
+            return parsePosition(match, prio_);
         }
     }
     catch ([[maybe_unused]] str_util::error::CConversionError const&)
     {}
     catch ([[maybe_unused]] object::error::CTimestampParseError const&)
     {}
-    throw error::UnpackError();
+    throw error::CParseError();
 }
 
-CGpsPosition GpsParser::parsePosition(std::cmatch const& match, u32 priority) const
+CGpsPosition CGpsParser::parsePosition(std::cmatch const& match_, u32 prio_) const
 {
-    auto latitude = math::DmToDeg(Parse<f64>(match[RE_GGA_LAT]));
-    if (match[RE_GGA_LAT_DIR] == "S")
+    auto latitude = math::DmToDeg(::Parse<f64>(match_[RE_GGA_LAT]));
+    if (match_[RE_GGA_LAT_DIR] == "S")
     {
         latitude = -latitude;
     }
-    auto longitude = math::DmToDeg(Parse<f64>(match[RE_GGA_LON]));
-    if (match[RE_GGA_LON_DIR] == "W")
+    auto longitude = math::DmToDeg(::Parse<f64>(match_[RE_GGA_LON]));
+    if (match_[RE_GGA_LON_DIR] == "W")
     {
         longitude = -longitude;
     }
-    auto altitude = math::DoubleToInt(Parse<f64>(match[RE_GGA_ALT]));
-    return {priority,
+    auto altitude = math::DoubleToInt(::Parse<f64>(match_[RE_GGA_ALT]));
+    return {prio_,
             {latitude, longitude, altitude},
-            Parse<f64>(match[RE_GGA_GEOID]),
-            Parse<f64>(match[RE_GGA_DIL]),
-            Parse<u8>(match[RE_GGA_SAT]),
-            Parse<s8>(match[RE_GGA_FIX]),
-            CTimestamp(AsStrView(match[RE_GGA_TIME]))};
+            ::Parse<f64>(match_[RE_GGA_GEOID]),
+            ::Parse<f64>(match_[RE_GGA_DIL]),
+            ::Parse<u8>(match_[RE_GGA_SAT]),
+            ::Parse<s8>(match_[RE_GGA_FIX]),
+            CTimestamp(AsStrView(match_[RE_GGA_TIME]))};
 }
 }  // namespace vfrb::feed::parser

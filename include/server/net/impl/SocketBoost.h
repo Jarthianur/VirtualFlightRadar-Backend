@@ -32,9 +32,7 @@
 
 namespace vfrb::server::net
 {
-/**
- * @brief Socket implementation using boost
- */
+/// Socket implementation using boost
 class CSocketBoost
 {
     boost::asio::ip::tcp::socket m_socket;  ///< Underlying socket
@@ -42,34 +40,22 @@ class CSocketBoost
 public:
     MOVABLE_BUT_NOT_COPYABLE(CSocketBoost)
 
-    explicit CSocketBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket)
-                              socket_);  ///< @param socket The underlying socket
+    explicit CSocketBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) sock_);
     ~CSocketBoost() noexcept;
 
-    /**
-     * @brief Get the remote IP address.
-     * @return the address
-     * @throw SocketException if the socket is closed
-     */
+    /// @throw vfrb::server::net::error::CSocketError
     Str Address() const;
 
     /**
-     * @brief Write a message on the socket to the endpoint.
-     * @param msg The message
+     * Write a message on the socket to the endpoint.
+     * @param sv_ The message
      * @return true on success, else false
-     * @throw SocketException if the socket is closed
+     * @throw vfrb::server::net::error::CSocketError
      */
-    bool Write(std::string_view const& msg_);
-
-    /**
-     * @brief Close the socket.
-     */
+    bool Write(std::string_view const& sv_);
     void Close();
 
-    /**
-     * @brief Get the underlying socket.
-     * @return the socket
-     */
+    /// Get the underlying socket.
     boost::asio::ip::tcp::socket& Get();
 };
 }  // namespace vfrb::server::net

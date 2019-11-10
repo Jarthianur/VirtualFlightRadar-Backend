@@ -30,25 +30,26 @@ using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-SbsFeed::SbsFeed(Str const& name, CProperties const& properties, SPtr<data::CAircraftData> data, s32 maxHeight)
-    : Feed(name, properties, data), m_parser(maxHeight), m_worker([this](Str&& work) {
+CSbsFeed::CSbsFeed(Str const& name_, CProperties const& prop_, SPtr<data::CAircraftData> data_,
+                   s32 maxHeight_)
+    : IFeed(name_, prop_, data_), m_parser(maxHeight_), m_worker([this](Str&& work_) {
           try
           {
-              m_data->update(m_parser.unpack(std::move(work), m_priority));
+              m_data->Update(m_parser.Parse(std::move(work_), m_priority));
           }
-          catch ([[maybe_unused]] parser::error::UnpackError const&)
+          catch ([[maybe_unused]] parser::error::CParseError const&)
           {}
       })
 {}
 
-Feed::Protocol SbsFeed::protocol() const
+IFeed::EProtocol CSbsFeed::Protocol() const
 {
-    return Protocol::SBS;
+    return EProtocol::SBS;
 }
 
-bool SbsFeed::process(Str response)
+bool CSbsFeed::Process(Str str_)
 {
-    m_worker.push(std::move(response));
+    m_worker.Push(std::move(str_));
     return true;
 }
 }  // namespace vfrb::feed

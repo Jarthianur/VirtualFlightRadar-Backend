@@ -26,8 +26,8 @@
 #include <list>
 
 #include "server/Server.hpp"
-#include "server/net/impl/NetworkInterfaceImplBoost.h"
-#include "server/net/impl/SocketImplBoost.h"
+#include "server/net/impl/AcceptorBoost.h"
+#include "server/net/impl/SocketBoost.h"
 #include "util/class_utils.h"
 
 #include "types.h"
@@ -45,7 +45,7 @@ class CWindData;
 }  // namespace vfrb::data
 namespace vfrb::feed
 {
-class Feed;
+class IFeed;
 }  // namespace vfrb::feed
 
 namespace vfrb
@@ -62,7 +62,7 @@ class CVfrb
     SPtr<data::CGpsData>                       m_gpsData;         ///< GPS data container
     SPtr<data::CWindData>                      m_windData;        ///< Wind data container
     server::CServer<server::net::CSocketBoost> m_server;          ///< Manage clients and sending of data
-    std::list<SPtr<feed::Feed>>                m_feeds;           ///< List of all active feeds
+    std::list<SPtr<feed::IFeed>>                m_feeds;           ///< List of all active feeds
     std::atomic<bool>                          m_running;         ///< Atomic run-status
 
     /**

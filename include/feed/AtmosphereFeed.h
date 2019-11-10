@@ -35,11 +35,11 @@ namespace vfrb::feed
 /**
  * @brief Extend Feed for sensor input.
  */
-class AtmosphereFeed : public Feed
+class CAtmosphereFeed : public IFeed
 {
-    NOT_COPYABLE(AtmosphereFeed)
+    NOT_COPYABLE(CAtmosphereFeed)
 
-    parser::AtmosphereParser const m_parser;  ///< Parser to unpack response from Client
+    parser::CAtmosphereParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
     /**
@@ -48,19 +48,18 @@ public:
      * @param data       The WindData container
      * @throw std::logic_error from parent constructor
      */
-    AtmosphereFeed(Str const& m_name, config::CProperties const& m_properties,
-                   SPtr<data::CAtmosphereData> data);
-    ~AtmosphereFeed() noexcept override = default;
+    CAtmosphereFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::CAtmosphereData> data_);
+    ~CAtmosphereFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::SENSOR
      */
-    Protocol protocol() const override;
+    EProtocol Protocol() const override;
 
     /**
      * @brief Implement Feed::process.
      */
-    bool process(Str response) override;
+    bool Process(Str str_) override;
 };
 }  // namespace vfrb::feed

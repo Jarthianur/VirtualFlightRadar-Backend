@@ -30,29 +30,25 @@
 
 namespace vfrb::config
 {
-/**
- * @brief Read a config in INI format.
- */
+/// Read a config in INI format.
 class CConfigReader
 {
     std::istream& m_stream;  ///< The input stream
 
 public:
-    explicit CConfigReader(std::istream& stream_);  ///< @param stream The input stream to read from
+    explicit CConfigReader(std::istream& stream_);
     ~CConfigReader() noexcept = default;
 
-    /**
-     * @brief Read the given stream and return read properties.
-     * @return the Properties
-     */
+    /// @throw vfrb::config::error::CReadFileError
     CProperties Read();
 };
 
 namespace error
 {
+/// Error to indicate that file read failed
 class CReadFileError : public vfrb::error::IError
 {
-    Str const m_fname;
+    Str const m_fname;  ///< The name of file tried to read
 
 public:
     explicit CReadFileError(Str const& file_);

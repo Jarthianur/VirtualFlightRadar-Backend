@@ -34,7 +34,7 @@ CClientManager::~CClientManager() noexcept
     stop();
 }
 
-void CClientManager::subscribe(SPtr<feed::Feed> feed)
+void CClientManager::subscribe(SPtr<feed::IFeed> feed)
 {
     LockGuard  lk(m_mutex);
     ClientIter it = m_clients.end();

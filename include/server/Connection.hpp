@@ -25,9 +25,9 @@
 #include <utility>
 
 #include "net/error/SocketError.h"
-#include "util/Logger.hpp"
 #include "util/class_utils.h"
 
+#include "Logger.hpp"
 #include "types.h"
 
 namespace vfrb::server
@@ -45,27 +45,22 @@ class CConnection
 public:
     MOVABLE_BUT_NOT_COPYABLE(CConnection)
 
-    /**
-     * @brief Constructor
-     * @param socket The socket
-     */
-    explicit CConnection(SocketT&& socket_);
+    explicit CConnection(SocketT&& sock_);
 
     ~CConnection() noexcept = default;
 
     /**
-     * @brief Write a message to the endpoint.
-     * @param msg The message
+     * Write a message to the endpoint.
+     * @param sv_ The message
      * @return true on success, else false
      */
-    bool Write(std::string_view const& msg_);
+    bool Write(std::string_view const& sv_);
 
     auto Address() const -> decltype(m_address) const&;
 };
 
 template<typename SocketT>
-CConnection<SocketT>::CConnection(SocketT&& socket_)
-    : m_socket(std::move(socket_)), m_address(m_socket.Address())
+CConnection<SocketT>::CConnection(SocketT&& sock_) : m_socket(std::move(sock_)), m_address(m_socket.Address())
 {}
 
 template<typename SocketT>
@@ -82,11 +77,11 @@ CConnection<SocketT>& CConnection<SocketT>::operator=(CConnection&& other_)
 }
 
 template<typename SocketT>
-bool CConnection<SocketT>::Write(std::string_view const& msg_)
+bool CConnection<SocketT>::Write(std::string_view const& sv_)
 {
     try
     {
-        return m_socket.write(msg_);
+        return m_socket.write(sv_);
     }
     catch (net::error::CSocketError const& e)
     {
