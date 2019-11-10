@@ -27,9 +27,7 @@
 
 namespace vfrb::object
 {
-/**
- * @brief A position on earth.
- */
+/// A 3D position on earth
 struct SLocation
 {
     inline static constexpr auto MAX_LATITUDE  = 90.0;
@@ -44,16 +42,9 @@ struct SLocation
     s32 Altitude;   ///< Altitude; m
 };
 
-/**
- * @brief Extend Object to a GPS position.
- */
+/// GPS position object
 class CGpsPosition : public CObject
 {
-public:
-    inline static constexpr auto MAX_GEOID = 86.0;
-    inline static constexpr auto MIN_GEOID = -108.0;
-
-private:
     SLocation  m_location;        ///< The location
     f64        m_geoid;           ///< The geoid separation
     f64        m_dilution;        ///< The position dilution
@@ -61,25 +52,19 @@ private:
     s8         m_fixQuality;      ///< The GPS fix quality
     CTimestamp m_timestamp;       ///< The timestamp of this position
 
-    /**
-     * @brief Override Object::assign.
-     */
     void assign(CObject&& other_) override;
-
-    /**
-     * @brief Override Object::canUpdate.
-     */
     bool canUpdate(CObject const& other_) const override;
 
 public:
-    CGpsPosition(u32 priority_, SLocation const& location_, f64 geoid_);
+    inline static constexpr auto MAX_GEOID = 86.0;
+    inline static constexpr auto MIN_GEOID = -108.0;
 
-    /**
-     * @param position The position
-     * @param geoid    The geoid
-     */
-    CGpsPosition(u32 priority_, SLocation const& location_, f64 geoid_, f64 dilution_, u8 satellites_,
-                 s8 quality_, CTimestamp const& timestamp_);
+    /// @param prio_ The initial priority
+    CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_);
+
+    /// @param prio_ The initial priority
+    CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_, u8 sat_, s8 qual_,
+                 CTimestamp const& ts_);
     ~CGpsPosition() noexcept override = default;
 
     auto Location() const -> decltype(m_location) const&;

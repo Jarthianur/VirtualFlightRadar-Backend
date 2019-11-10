@@ -34,22 +34,31 @@
 
 namespace vfrb::concurrent
 {
+/**
+ * A thread that executes a function on elements in a work queue.
+ * @tparam DataT The element type of the work queue
+ */
 template<typename DataT>
 class CWorkerThread
 {
     NOT_COPYABLE(CWorkerThread)
 
     Mutex mutable m_mutex;
-    bool                        GUARDED_BY(m_mutex) m_running;
-    std::queue<DataT>           GUARDED_BY(m_mutex) m_workQ;
-    std::condition_variable_any GUARDED_BY(m_mutex) m_cv;
-    CGuardedThread              m_worker;
+    CGuardedThread              m_worker;                       ///< The underlying worker thread
+    std::condition_variable_any GUARDED_BY(m_mutex) m_cv;       ///< Wait and notify for work
+    bool                        GUARDED_BY(m_mutex) m_running;  ///< Is thread running?
+    std::queue<DataT>           GUARDED_BY(m_mutex) m_workQ;    ///< The work queue
 
 public:
+    /// @param fn_ The function to execute for each element
     template<typename FnT>
     explicit CWorkerThread(FnT&& fn_);
     ~CWorkerThread() noexcept;
 
+    /**
+     * Push an element into the work queue.
+     * @param data_ The element to push
+     */
     void Push(DataT&& data_) REQUIRES(!m_mutex);
 };
 
@@ -61,7 +70,7 @@ CWorkerThread<DataT>::CWorkerThread(FnT&& fn_)
           m_running = true;
           while (m_running)
           {
-              m_cv.wait_for(lk, std::chrono::milliseconds(500));
+              m_cv.wait_for(lk, std::chrono::milliseconds(200));
               if (!m_running)
               {
                   break;

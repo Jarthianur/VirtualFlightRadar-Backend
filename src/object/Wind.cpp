@@ -21,7 +21,7 @@ namespace vfrb::object
 {
 CWind::CWind() : CObject() {}
 
-CWind::CWind(u32 priority) : CObject(priority) {}
+CWind::CWind(u32 prio_) : CObject(prio_) {}
 
 Str& CWind::operator*()
 {

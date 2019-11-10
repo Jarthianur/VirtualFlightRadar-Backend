@@ -26,20 +26,20 @@ namespace vfrb::object
 {
 CAtmosphere::CAtmosphere() : CObject() {}
 
-CAtmosphere::CAtmosphere(u32 priority) : CObject(priority) {}
+CAtmosphere::CAtmosphere(u32 prio_) : CObject(prio_) {}
 
-CAtmosphere::CAtmosphere(u32 priority, f64 pressure) : CObject(priority), m_pressure(pressure)
+CAtmosphere::CAtmosphere(u32 prio_, f64 press_) : CObject(prio_), m_pressure(press_)
 {
     util::CheckLimits(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
 }
 
-void CAtmosphere::assign(CObject&& other)
+void CAtmosphere::assign(CObject&& other_)
 {
     try
     {
-        auto&& update = dynamic_cast<CAtmosphere&&>(other);
-        CObject::assign(std::move(other));
-        this->m_pressure = update.m_pressure;
+        auto&& other = dynamic_cast<CAtmosphere&&>(other_);
+        CObject::assign(std::move(other_));
+        this->m_pressure = other.m_pressure;
     }
     catch (std::bad_cast const&)
     {}

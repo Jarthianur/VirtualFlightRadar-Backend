@@ -24,19 +24,16 @@
 #include <map>
 #include <utility>
 
-#include "util/CString.hpp"
 #include "util/class_utils.h"
 
 #include "Mutex.hpp"
+#include "String.hpp"
 #include "types.h"
 
 namespace vfrb::concurrent
 {
-/**
- * @brief Internal container for aircrafts.
- * Allows concurrent access to elements.
- */
-template<typename T, usize CstrSz>
+/// An container for objects bundled with NMEA string, that allows concurrent access.
+template<typename ObjectT, usize StringSize>
 class CObjectContainer
 {
 public:
@@ -45,69 +42,69 @@ public:
 
     class CIterator;
 
-    /**
-     * @brief Wrapper for Aircraft stored in the container.
-     */
+    /// Value type stored in the container
     class CValueType
     {
         NOT_COPYABLE(CValueType)
 
         friend class CObjectContainer::CIterator;
-        Mutex mutable m_mutex;
+        Mutex mutable m_mutex;  ///< Locked when this element is accessed
 
     public:
-        CValueType(T&& val_);
-
+        CValueType(ObjectT&& val_);
         CValueType(CValueType&& other_);
 
         CValueType& operator=(CValueType&& other_);
 
-        T                     value;
-        util::CString<CstrSz> nmea;
+        ObjectT             Value;
+        CString<StringSize> Nmea;
     };
 
     using KeyType       = usize;
     using ContainerType = std::map<KeyType, CValueType>;
 
-    /**
-     * @brief Iterator to access elements.
-     * Takes care about data locking and concurrent access.
-     */
+    /// A threadsafe iterator to access elements in the container.
     class CIterator
     {
         NOT_COPYABLE(CIterator)
-        typename ContainerType::iterator m_iterator;
-        UniqueLock                       m_valueLock;
-        CObjectContainer const&          m_container;
+        typename ContainerType::iterator m_iterator;   ///< The underlying iterator
+        UniqueLock                       m_valueLock;  ///< The lock that is hold while iterator is valid
+        CObjectContainer const&          m_container;  ///< The container where elements belong to
 
     public:
         explicit CIterator(CObjectContainer& c_);
-
         CIterator(CIterator&& other_);
-
         CIterator(typename ContainerType::iterator iter_, CObjectContainer const& c_);
 
-        CIterator& operator=(CIterator&& other_);
-
-        CIterator& operator++();
-
+        CIterator&  operator=(CIterator&& other_);
+        CIterator&  operator++();
         CValueType& operator*();
-
         CValueType* operator->();
 
         KeyType Key() const;
 
         bool operator==(CIterator const& other_) const;
-
         bool operator!=(CIterator const& other_) const;
     };
 
+    /**
+     * Get an iterator to the first element in container.
+     * @return a valid iterator, or the end-iterator
+     */
     CIterator begin() REQUIRES(!m_modMutex);
 
+    /// Get an iterator to the end of the container, thus pointing nowhere.
     CIterator end();
 
-    std::pair<CIterator, bool> insert(KeyType key_, T&& value_) REQUIRES(!m_modMutex);
+    /**
+     * Insert an object at the given key, if not existing yet.
+     * @param key_ The key where to insert
+     * @param val_ The object to insert
+     * @return an iterator to the element at key and true if it was inserted, or false if not
+     */
+    std::pair<CIterator, bool> insert(KeyType key_, ObjectT&& val_) REQUIRES(!m_modMutex);
 
+    /// Erase the element at key.
     void erase(KeyType key_) REQUIRES(!m_modMutex);
 
     FUNCTION_ALIAS(Begin, begin)
@@ -120,38 +117,38 @@ private:
     ContainerType GUARDED_BY(m_modMutex) m_container;  ///< Underlying container
 };
 
-template<typename T, usize CstrSz>
-CObjectContainer<T, CstrSz>::CValueType::CValueType(T&& val_) : value(std::move(val_))
+template<typename ObjectT, usize StringSize>
+CObjectContainer<ObjectT, StringSize>::CValueType::CValueType(ObjectT&& val_) : Value(std::move(val_))
 {}
 
-template<typename T, usize CstrSz>
-CObjectContainer<T, CstrSz>::CValueType::CValueType(CValueType&& other_)
-    : value(std::move(other_.value)), nmea(other_.nmea)
+template<typename ObjectT, usize StringSize>
+CObjectContainer<ObjectT, StringSize>::CValueType::CValueType(CValueType&& other_)
+    : Value(std::move(other_.Value)), Nmea(other_.Nmea)
 {}
 
-template<typename T, usize CstrSz>
-auto CObjectContainer<T, CstrSz>::CValueType::operator=(CValueType&& other_) -> CValueType&
+template<typename ObjectT, usize StringSize>
+auto CObjectContainer<ObjectT, StringSize>::CValueType::operator=(CValueType&& other_) -> CValueType&
 {
-    value = std::move(other_.value);
-    nmea  = other_.nmea;
+    Value = std::move(other_.Value);
+    Nmea  = other_.Nmea;
     return *this;
 }
 
-template<typename T, usize CstrSz>
-CObjectContainer<T, CstrSz>::CIterator::CIterator(CObjectContainer<T, CstrSz>& c_)
+template<typename ObjectT, usize StringSize>
+CObjectContainer<ObjectT, StringSize>::CIterator::CIterator(CObjectContainer<ObjectT, StringSize>& c_)
     : m_iterator(c_.m_container.end()), m_container(c_)
 {}
 
-template<typename T, usize CstrSz>
-CObjectContainer<T, CstrSz>::CIterator::CIterator(CIterator&& other_)
+template<typename ObjectT, usize StringSize>
+CObjectContainer<ObjectT, StringSize>::CIterator::CIterator(CIterator&& other_)
     : m_iterator(std::move(other_.m_iterator)),
       m_valueLock(std::move(other_.m_valueLock)),
       m_container(other_.m_container)
 {}
 
-template<typename T, usize CstrSz>
-CObjectContainer<T, CstrSz>::CIterator::CIterator(typename ContainerType::iterator iter_,
-                                                  CObjectContainer const&          c_)
+template<typename ObjectT, usize StringSize>
+CObjectContainer<ObjectT, StringSize>::CIterator::CIterator(typename ContainerType::iterator iter_,
+                                                            CObjectContainer const&          c_)
     : m_iterator(iter_), m_container(c_)
 {
     if (m_iterator != m_container.m_container.end())
@@ -160,16 +157,16 @@ CObjectContainer<T, CstrSz>::CIterator::CIterator(typename ContainerType::iterat
     }
 }
 
-template<typename T, usize CstrSz>
-auto CObjectContainer<T, CstrSz>::CIterator::operator=(CIterator&& other_) -> CIterator&
+template<typename ObjectT, usize StringSize>
+auto CObjectContainer<ObjectT, StringSize>::CIterator::operator=(CIterator&& other_) -> CIterator&
 {
     m_iterator  = std::move(other_.m_iterator);
     m_valueLock = std::move(other_.m_valueLock);
     m_container = other_.m_container;
 }
 
-template<typename T, usize CstrSz>
-auto CObjectContainer<T, CstrSz>::CIterator::operator++() -> CIterator&
+template<typename ObjectT, usize StringSize>
+auto CObjectContainer<ObjectT, StringSize>::CIterator::operator++() -> CIterator&
 {
     if (m_iterator != m_container.m_container.end())
     {
@@ -183,52 +180,53 @@ auto CObjectContainer<T, CstrSz>::CIterator::operator++() -> CIterator&
     return *this;
 }
 
-template<typename T, usize CstrSz>
-auto CObjectContainer<T, CstrSz>::CIterator::operator*() -> CValueType&
+template<typename ObjectT, usize StringSize>
+auto CObjectContainer<ObjectT, StringSize>::CIterator::operator*() -> CValueType&
 {
     return m_iterator->second;
 }
 
-template<typename T, usize CstrSz>
-auto CObjectContainer<T, CstrSz>::CIterator::operator-> () -> CValueType*
+template<typename ObjectT, usize StringSize>
+auto CObjectContainer<ObjectT, StringSize>::CIterator::operator-> () -> CValueType*
 {
     return &m_iterator->second;
 }
 
-template<typename T, usize CstrSz>
-auto CObjectContainer<T, CstrSz>::CIterator::Key() const -> KeyType
+template<typename ObjectT, usize StringSize>
+auto CObjectContainer<ObjectT, StringSize>::CIterator::Key() const -> KeyType
 {
     return m_iterator->first;
 }
 
-template<typename T, usize CstrSz>
-bool CObjectContainer<T, CstrSz>::CIterator::operator==(CIterator const& other_) const
+template<typename ObjectT, usize StringSize>
+bool CObjectContainer<ObjectT, StringSize>::CIterator::operator==(CIterator const& other_) const
 {
     return m_iterator == other_.m_iterator;
 }
 
-template<typename T, usize CstrSz>
-bool CObjectContainer<T, CstrSz>::CIterator::operator!=(CIterator const& other_) const
+template<typename ObjectT, usize StringSize>
+bool CObjectContainer<ObjectT, StringSize>::CIterator::operator!=(CIterator const& other_) const
 {
     return m_iterator != other_.m_iterator;
 }
 
-template<typename T, usize CstrSz>
-typename CObjectContainer<T, CstrSz>::CIterator CObjectContainer<T, CstrSz>::begin() REQUIRES(!m_modMutex)
+template<typename ObjectT, usize StringSize>
+typename CObjectContainer<ObjectT, StringSize>::CIterator CObjectContainer<ObjectT, StringSize>::begin()
+    REQUIRES(!m_modMutex)
 {
     LockGuard lk(m_modMutex);
     return Iterator(m_container.begin(), *this);
 }
 
-template<typename T, usize CstrSz>
-auto CObjectContainer<T, CstrSz>::end() -> CIterator
+template<typename ObjectT, usize StringSize>
+auto CObjectContainer<ObjectT, StringSize>::end() -> CIterator
 {
     return CIterator(*this);
 }
 
-template<typename T, usize CstrSz>
-std::pair<typename CObjectContainer<T, CstrSz>::CIterator, bool>
-    CObjectContainer<T, CstrSz>::insert(KeyType key_, T&& value_) REQUIRES(!m_modMutex)
+template<typename ObjectT, usize StringSize>
+std::pair<typename CObjectContainer<ObjectT, StringSize>::CIterator, bool>
+    CObjectContainer<ObjectT, StringSize>::insert(KeyType key_, ObjectT&& value_) REQUIRES(!m_modMutex)
 {
     LockGuard lk(m_modMutex);
     CIterator iter(m_container.find(key_), *this);
@@ -240,8 +238,8 @@ std::pair<typename CObjectContainer<T, CstrSz>::CIterator, bool>
     return std::make_pair(std::move(iter), false);
 }
 
-template<typename T, usize CstrSz>
-void CObjectContainer<T, CstrSz>::erase(KeyType key_) REQUIRES(!m_modMutex)
+template<typename ObjectT, usize StringSize>
+void CObjectContainer<ObjectT, StringSize>::erase(KeyType key_) REQUIRES(!m_modMutex)
 {
     LockGuard lk(m_modMutex);
     auto      entry = m_container.find(key_);

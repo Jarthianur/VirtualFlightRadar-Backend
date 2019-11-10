@@ -50,8 +50,8 @@ void CSignalListener::Stop()
     }
 }
 
-void CSignalListener::AddHandler(SignalHandler&& handler)
+void CSignalListener::AddHandler(SignalHandler&& handler_)
 {
-    m_sigSet.async_wait(std::move(handler));
+    m_sigSet.async_wait(std::move(handler_));
 }
 }  // namespace vfrb::concurrent

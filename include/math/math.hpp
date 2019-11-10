@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "constants.h"
 #include "types.h"
 
 using namespace std::literals;
@@ -31,7 +32,7 @@ using namespace std::literals;
 namespace vfrb::math
 {
 /**
- *  Convert degrees to radian.
+ * Convert degrees to radian.
  * @param deg_ The degrees
  * @return the radian
  */
@@ -41,7 +42,7 @@ inline f64 Radian(f64 deg_)
 }
 
 /**
- *  Convert radian to degrees.
+ * Convert radian to degrees.
  * @param radian The radian
  * @return the degrees
  */

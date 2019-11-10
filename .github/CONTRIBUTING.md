@@ -109,5 +109,6 @@ The code documentation should follow some guidelines listed here.
 + Every code containing file begins with the copyright license.
 + Descriptions are short, but expressive.
 + The code documentation is based on Doxygen.
-+ Class and function descriptions should not contain implementation details.
++ Class and function descriptions should not contain implementation details, unless it is of use.
++ Do not play *Captain Obvious*, only document what is not clear by the code itself.
 + See [Doxygen](http://www.stack.nl/~dimitri/doxygen/manual/commands.html) for a command list.

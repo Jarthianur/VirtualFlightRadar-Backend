@@ -30,34 +30,48 @@
 
 namespace vfrb::concurrent
 {
+/// RAII style, self joining thread
 class CGuardedThread
 {
     NOT_COPYABLE(CGuardedThread)
 
-    std::thread       m_thread;
-    std::future<void> m_state;
+    std::thread       m_thread;  ///< The underlying thread
+    std::future<void> m_state;   ///< The run state, if valid then is thread running
 
+    /**
+     * Initialize this thread with a function.
+     * @param fn_ The function to run
+     */
     template<typename FnT>
     void init(FnT&& fn_);
 
 public:
     CGuardedThread() = default;
 
+    /// @param fn_ The function to run
     template<typename FnT>
     explicit CGuardedThread(FnT&& fn_);
 
     ~CGuardedThread() noexcept;
 
+    /// @throw vfrb::concurrent::error::CThreadUsedError
     CGuardedThread(CGuardedThread&& other_);
 
+    /// @throw vfrb::concurrent::error::CThreadUsedError
     CGuardedThread& operator=(CGuardedThread&& other_);
 
+    /**
+     * Spawn this thread with given function if not done on construction yet.
+     * @param fn_ The function to run
+     * @throw vfrb::concurrent::error::CThreadUsedError
+     */
     template<typename FnT>
     void Spawn(FnT&& fn_);
 };
 
 namespace error
 {
+/// Error to indicate that a thread is already running.
 class CThreadUsedError : public vfrb::error::IError
 {
 public:

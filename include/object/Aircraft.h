@@ -102,10 +102,17 @@ private:
     bool canUpdate(CObject const& other_) const override;
 
 public:
-    /// Initialize as FLARM starget.
+    /**
+     * Initialize as FLARM starget.
+     * @param prio_ The initial priority
+     */
     CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
               SMovement const& move_, CTimestamp const& ts_);
-    /// Initialize as TRANSPONDER target.
+
+    /**
+     * Initialize as TRANSPONDER target.
+     * @param prio_ The initial priority
+     */
     CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
               CTimestamp const& ts_);
     CAircraft(CAircraft&& other_);

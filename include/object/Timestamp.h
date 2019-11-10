@@ -31,6 +31,7 @@ namespace vfrb::object
 {
 namespace error
 {
+/// Error to indicate timestamp parsing failure.
 class CTimestampParseError : public vfrb::error::IError
 {
 public:
@@ -41,10 +42,7 @@ public:
 };
 }  // namespace error
 
-/**
- * @brief A timestamp
- * @tparam DateTimeT The provider of time functions
- */
+/// A self parsing Timestamp
 class CTimestamp
 {
     s64 m_value = 0;  ///< Time in milliseconds
@@ -52,27 +50,17 @@ class CTimestamp
 
 public:
     CTimestamp() = default;
+
     /**
-     * @param value  The time string
-     * @param format The format
-     * @throw std::invalid_argument if the time string is invalid
+     * @param sv_ The time string
+     * @throw vfrb::object::error::CTimestampParseError
      */
-    CTimestamp(std::string_view const& value_);
-    CTimestamp(CTimestamp const& other_);  ///< @param other The other Timestamp
+    CTimestamp(std::string_view const& sv_);
+    CTimestamp(CTimestamp const& other_);
     ~CTimestamp() noexcept = default;
 
-    /**
-     * @brief Assign other TimeStamps value.
-     * @param other The other Timestamp
-     * @return this
-     */
     CTimestamp& operator=(CTimestamp const& other_);
 
-    /**
-     * @brief Compare this value to be less than, or equals others.
-     * @param other The other Timestamp
-     * @return true if less, or equals, else false
-     */
     bool operator>(CTimestamp const& other_) const;
 };
 }  // namespace vfrb::object
