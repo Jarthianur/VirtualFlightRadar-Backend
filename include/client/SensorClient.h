@@ -43,13 +43,13 @@ class CSensorClient : public IClient
      * @brief Check read timeout deadline reached.
      * @threadsafe
      */
-    void checkDeadline(net::EErrc error_) REQUIRES(!m_mutex);
+    void checkDeadline(net::EErrc err_) REQUIRES(!m_mutex);
 
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::EErrc error_) override REQUIRES(!m_mutex);
+    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 
@@ -58,7 +58,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    CSensorClient(net::SEndpoint const& endpoint_, SPtr<net::IConnector> connector_);
+    CSensorClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
     ~CSensorClient() noexcept override = default;
 };
 }  // namespace vfrb::client

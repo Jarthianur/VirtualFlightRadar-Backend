@@ -35,7 +35,6 @@ namespace vfrb::data
 class CWindData : public IData
 {
     concurrent::Mutex mutable m_mutex;
-
     object::CWind GUARDED_BY(m_mutex) m_wind;  ///< The Wind information
 
 public:

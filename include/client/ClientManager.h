@@ -43,25 +43,25 @@ namespace vfrb::client
  */
 struct SClientHasher
 {
-    usize operator()(SPtr<IClient> const& client_) const
+    usize operator()(SPtr<IClient> const& c_) const
     {
-        return client_->Hash();
+        return c_->Hash();
     }
 };
 
 /**
  * @brief Functor for comparing clients.
  */
-struct CClientComparator
+struct SClientComparator
 {
-    bool operator()(SPtr<IClient> const& client1_, SPtr<IClient> const& client2_) const
+    bool operator()(SPtr<IClient> const& c1_, SPtr<IClient> const& c2_) const
     {
-        return client1_->Equals(*client2_);
+        return c1_->Equals(*c2_);
     }
 };
 
 /// Set of clients with custom hasher and comparator
-using ClientSet = std::unordered_set<SPtr<IClient>, SClientHasher, CClientComparator>;
+using ClientSet = std::unordered_set<SPtr<IClient>, SClientHasher, SClientComparator>;
 /// Iterator in ClientSet
 using ClientIter = ClientSet::iterator;
 
@@ -85,7 +85,7 @@ public:
      * @param feed The feed to subscribe
      * @threadsafe
      */
-    void Subscribe(SPtr<feed::Feed> feed_) REQUIRES(!m_mutex);
+    void Subscribe(SPtr<feed::IFeed> feed_) REQUIRES(!m_mutex);
 
     /**
      * @brief Run all clients in their own thread.

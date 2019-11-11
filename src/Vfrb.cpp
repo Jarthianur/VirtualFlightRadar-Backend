@@ -25,7 +25,7 @@
 #include <sstream>
 
 #include "client/ClientManager.h"
-#include "client/net/impl/ConnectorImplBoost.h"
+#include "client/net/impl/ConnectorBoost.h"
 #include "concurrent/SignalListener.h"
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
@@ -36,6 +36,7 @@
 #include "feed/FeedFactory.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
+
 #include "Logger.hpp"
 
 using namespace vfrb::data;
@@ -49,61 +50,61 @@ constexpr auto LOG_PREFIX       = "(VFRB) ";
 
 static auto const& logger = CLogger::Instance();
 
-CVfrb::CVfrb(SPtr<CConfiguration> config)
+CVfrb::CVfrb(SPtr<CConfiguration> conf_)
     : m_aircraftData(std::make_shared<CAircraftData>(
           [this](SAccessor const& it) {
               if (it.Obj.UpdateAge() < CObject::OUTDATED)
               {
-                  m_server.send(it.Nmea);
+                  m_server.Send(it.Nmea);
               }
           },
-          config->maxDistance)),
+          conf_->MaxDistance)),
       m_atmosphereData(
-          std::make_shared<CAtmosphereData>([this](SAccessor const& it) { m_server.send(it.Nmea); },
-                                           object::CAtmosphere{0, config->atmPressure})),
-      m_gpsData(std::make_shared<CGpsData>([this](SAccessor const& it) { m_server.send(it.Nmea); },
-                                          config->gpsPosition, config->groundMode)),
-      m_windData(std::make_shared<CWindData>([this](SAccessor const& it) { m_server.send(it.Nmea); })),
-      m_server(std::get<0>(config->serverConfig), std::get<1>(config->serverConfig)),
+          std::make_shared<CAtmosphereData>([this](SAccessor const& it) { m_server.Send(it.Nmea); },
+                                            object::CAtmosphere{0, conf_->AtmPressure})),
+      m_gpsData(std::make_shared<CGpsData>([this](SAccessor const& it) { m_server.Send(it.Nmea); },
+                                           conf_->GpsPosition, conf_->GroundMode)),
+      m_windData(std::make_shared<CWindData>([this](SAccessor const& it) { m_server.Send(it.Nmea); })),
+      m_server(std::get<0>(conf_->ServerConfig), std::get<1>(conf_->ServerConfig)),
       m_running(false)
 {
-    createFeeds(config);
+    createFeeds(conf_);
 }
 
 void CVfrb::Run() noexcept
 {
     m_running = true;
-    logger.info(LOG_PREFIX, "starting...");
+    logger.Info(LOG_PREFIX, "starting...");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    concurrent::CSignalListener            signals;
-    client::CClientManager                 clientManager;
+    concurrent::CSignalListener           signals;
+    client::CClientManager                clientManager;
 
-    signals.addHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {
-        logger.info(LOG_PREFIX, "caught signal to shutdown...");
+    signals.AddHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {
+        logger.Info(LOG_PREFIX, "caught signal to shutdown...");
         m_running = false;
     });
     for (auto it : m_feeds)
     {
-        logger.info(LOG_PREFIX, "run feed: ", it->name());
+        logger.Info(LOG_PREFIX, "run feed: ", it->Name());
         try
         {
-            clientManager.subscribe(it);
+            clientManager.Subscribe(it);
         }
         catch (client::error::CFeedSubscriptionError const& e)
         {
-            logger.error(LOG_PREFIX, ": ", e.what());
+            logger.Error(LOG_PREFIX, ": ", e.Message());
         }
     }
     m_feeds.clear();
 
     signals.Run();
-    m_server.run();
-    clientManager.run();
+    m_server.Run();
+    clientManager.Run();
     serve();
-    clientManager.stop();
-    m_server.stop();
-    signals.stop();
-    logger.info(LOG_PREFIX, "stopped after ", duration(start));
+    clientManager.Stop();
+    m_server.Stop();
+    signals.Stop();
+    logger.Info(LOG_PREFIX, "stopped after ", duration(start));
 }
 
 void CVfrb::serve()
@@ -113,41 +114,41 @@ void CVfrb::serve()
     {
         try
         {
-            m_aircraftData->environment(m_gpsData->location(), m_atmosphereData->atmPressure());
-            m_aircraftData->access();
-            m_gpsData->access();
-            m_atmosphereData->access();
-            m_windData->access();
+            m_aircraftData->Environment(m_gpsData->Location(), m_atmosphereData->Pressure());
+            m_aircraftData->Access();
+            m_gpsData->Access();
+            m_atmosphereData->Access();
+            m_windData->Access();
             std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
         }
         catch (error::IError const& e)
         {
-            logger.error(LOG_PREFIX, "fatal: ", e.what());
+            logger.Error(LOG_PREFIX, "fatal: ", e.Message());
             m_running = false;
         }
     }
 }
 
-void CVfrb::createFeeds(SPtr<CConfiguration> config)
+void CVfrb::createFeeds(SPtr<CConfiguration> conf_)
 {
-    feed::FeedFactory factory(config, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
-    for (auto const& name : config->feedNames)
+    feed::CFeedFactory factory(conf_, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
+    for (auto const& name : conf_->FeedNames)
     {
         try
         {
             m_feeds.push_back(factory.createFeed(name));
         }
-        catch (feed::error::FeedCreationError const& e)
+        catch (feed::error::CFeedCreationError const& e)
         {
-            logger.warn(LOG_PREFIX, "can not create feed ", name, ": ", e.what());
+            logger.Warn(LOG_PREFIX, "can not create feed ", name, ": ", e.Message());
         }
     }
 }
 
-Str CVfrb::duration(std::chrono::steady_clock::time_point start) const
+Str CVfrb::duration(std::chrono::steady_clock::time_point start_) const
 {
     std::chrono::minutes runtime =
-        std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start);
+        std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start_);
     s64               d = runtime.count() / 60 / 24;
     s64               h = runtime.count() / 60 - d * 24;
     s64               m = runtime.count() % 60;

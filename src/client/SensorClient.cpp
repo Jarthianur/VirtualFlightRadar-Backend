@@ -23,7 +23,7 @@
 
 #include <utility>
 
-#include "util/Logger.hpp"
+#include "Logger.hpp"
 
 using namespace vfrb::client::net;
 using namespace vfrb::concurrent;
@@ -33,49 +33,48 @@ namespace vfrb::client
 constexpr auto     LOG_PREFIX = "(SensorClient) ";
 static auto const& logger     = CLogger::Instance();
 
-CSensorClient::CSensorClient(SEndpoint const& endpoint, SPtr<IConnector> connector) : IClient(endpoint, connector)
-{}
+CSensorClient::CSensorClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
 
-void CSensorClient::Read()
+void CSensorClient::read()
 {
-    m_connector->resetTimer(RECEIVE_TIMEOUT);
-    IClient::Read();
+    m_connector->ResetTimer(RECEIVE_TIMEOUT);
+    IClient::read();
 }
 
-void CSensorClient::checkDeadline(EErrc error)
+void CSensorClient::checkDeadline(EErrc err_)
 {
     LockGuard lk(m_mutex);
     if (m_state == EState::RUNNING)
     {
-        if (error == EErrc::SUCCESS)
+        if (err_ == EErrc::OK)
         {
-            logger.debug(LOG_PREFIX, "timed out, reconnect ...");
+            logger.Debug(LOG_PREFIX, "timed out, reconnect ...");
             reconnect();
         }
         else
         {
-            m_connector->onTimeout(std::bind(&CSensorClient::checkDeadline, this, std::placeholders::_1));
+            m_connector->OnTimeout(std::bind(&CSensorClient::checkDeadline, this, std::placeholders::_1));
         }
     }
 }
 
-void CSensorClient::handleConnect(EErrc error)
+void CSensorClient::handleConnect(EErrc err_)
 {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING)
     {
-        if (error == EErrc::SUCCESS)
+        if (err_ == EErrc::OK)
         {
             m_state = EState::RUNNING;
-            m_backoff.reset();
-            logger.info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
-            m_connector->onTimeout(std::bind(&CSensorClient::checkDeadline, this, std::placeholders::_1),
+            m_backoff.Reset();
+            logger.Info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
+            m_connector->OnTimeout(std::bind(&CSensorClient::checkDeadline, this, std::placeholders::_1),
                                    RECEIVE_TIMEOUT);
-            Read();
+            read();
         }
         else
         {
-            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
+            logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
         }
     }

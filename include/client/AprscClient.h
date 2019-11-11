@@ -46,21 +46,21 @@ class CAprscClient : public IClient
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::EErrc error_) override REQUIRES(!m_mutex);
+    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for sending of the login string.
      * @param error The error indicator
      * @threadsafe
      */
-    void handleLogin(net::EErrc error_) REQUIRES(!m_mutex);
+    void handleLogin(net::EErrc err_) REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for sending a keep-alive beacon.
      * @param error The error indicator
      * @threadsafe
      */
-    void handleSendKeepAlive(net::EErrc error_) REQUIRES(!m_mutex);
+    void handleSendKeepAlive(net::EErrc err_) REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 
@@ -70,7 +70,7 @@ public:
      * @param login     The login string
      * @param connector The Connector interface
      */
-    CAprscClient(net::SEndpoint const& endpoint_, Str const& login_, SPtr<net::IConnector> connector_);
+    CAprscClient(net::SEndpoint const& ep_, Str const& login_, SPtr<net::IConnector> con_);
     ~CAprscClient() noexcept override = default;
 
     bool  Equals(IClient const& other_) const override;

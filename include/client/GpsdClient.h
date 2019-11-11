@@ -41,14 +41,14 @@ class CGpsdClient : public IClient
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::EErrc error_) override REQUIRES(!m_mutex);
+    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for watch-request sending
      * @param error The error indicator
      * @threadsafe
      */
-    void handleWatch(net::EErrc error_) REQUIRES(!m_mutex);
+    void handleWatch(net::EErrc err_) REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 
@@ -57,7 +57,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    CGpsdClient(net::SEndpoint const& endpoint_, SPtr<net::IConnector> connector_);
+    CGpsdClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
     ~CGpsdClient() noexcept override = default;
 };
 }  // namespace vfrb::client

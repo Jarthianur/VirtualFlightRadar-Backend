@@ -47,7 +47,7 @@ class IFeed;
 /**
  * @brief Factory for Feed creation.
  */
-class FeedFactory
+class CFeedFactory
 {
     SPtr<config::CConfiguration> m_config;        ///< Pointer to the Configuration
     SPtr<data::CAircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
@@ -74,10 +74,10 @@ public:
      * @param gpsData      The GpsData pointer
      * @param windData     The WindData pointer
      */
-    FeedFactory(SPtr<config::CConfiguration> config_, SPtr<data::CAircraftData> aircraftData_,
-                SPtr<data::CAtmosphereData> atmosData_, SPtr<data::CGpsData> gpsData_,
-                SPtr<data::CWindData> windData_);
-    ~FeedFactory() noexcept = default;
+    CFeedFactory(SPtr<config::CConfiguration> config_, SPtr<data::CAircraftData> aircraftData_,
+                 SPtr<data::CAtmosphereData> atmosData_, SPtr<data::CGpsData> gpsData_,
+                 SPtr<data::CWindData> windData_);
+    ~CFeedFactory() noexcept = default;
 
     /**
      * @brief Create a Feed.
@@ -90,13 +90,13 @@ public:
 
 namespace error
 {
-class FeedCreationError : public vfrb::error::IError
+class CFeedCreationError : public vfrb::error::IError
 {
     Str const m_msg;
 
 public:
-    FeedCreationError();
-    ~FeedCreationError() noexcept override = default;
+    CFeedCreationError();
+    ~CFeedCreationError() noexcept override = default;
 
     char const* Message() const noexcept override;
 };

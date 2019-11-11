@@ -44,8 +44,7 @@ class CGpsData : public IData
     inline static constexpr auto NMEA_SIZE             = processor::CGpsProcessor::NMEA_SIZE;
 
     concurrent::Mutex mutable m_mutex;
-    std::tuple<object::CGpsPosition, util::CString<NMEA_SIZE>>
-                             GUARDED_BY(m_mutex) m_position;   ///< The position
+    std::tuple<object::CGpsPosition, CString<NMEA_SIZE>> GUARDED_BY(m_mutex) m_position;  ///< The position
     processor::CGpsProcessor GUARDED_BY(m_mutex) m_processor;  ///< Processor for GPS information
     bool GUARDED_BY(m_mutex) m_positionLocked = false;         ///< Locking state of the current position
     bool GUARDED_BY(m_mutex) m_groundMode     = false;         ///< Ground mode state
@@ -60,7 +59,7 @@ public:
     /**
      * @param crPosition The initial info
      */
-    CGpsData(AccessFn&& fn_, object::CGpsPosition const& position_, bool ground_);
+    CGpsData(AccessFn&& fn_, object::CGpsPosition const& pos_, bool gnd_);
     ~CGpsData() noexcept override = default;
 
     /**
@@ -71,7 +70,7 @@ public:
      * @throw ReceivedGoodPosition if the position was good and ground mode is enabled, hence locked
      * @threadsafe
      */
-    bool Update(object::CObject&& position_) override REQUIRES(!m_mutex);
+    bool Update(object::CObject&& pos_) override REQUIRES(!m_mutex);
 
     void Access() override REQUIRES(!m_mutex);
 
@@ -100,6 +99,7 @@ class CPositionAlreadyLocked : public IGpsDataException
 public:
     CPositionAlreadyLocked()                    = default;
     ~CPositionAlreadyLocked() noexcept override = default;
+
     char const* Message() const noexcept override;
 };
 
@@ -111,6 +111,7 @@ class CReceivedGoodPosition : public IGpsDataException
 public:
     CReceivedGoodPosition()                    = default;
     ~CReceivedGoodPosition() noexcept override = default;
+
     char const* Message() const noexcept override;
 };
 }  // namespace error

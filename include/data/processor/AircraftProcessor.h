@@ -63,13 +63,13 @@ private:
      * @brief Append PFLAU sentence to processing string.
      * @param aircraft The Aircaft
      */
-    usize appendPflau(object::CAircraft const& aircraft_, util::CString<NMEA_SIZE>& nmea_, usize pos_) const;
+    usize appendPflau(object::CAircraft const& aircraft_, CString<NMEA_SIZE>& nmea_, usize idx_) const;
 
     /**
      * @brief Append PFLAA sentence to processing string.
      * @param aircraft The Aircaft
      */
-    usize appendPflaa(object::CAircraft const& aircraft_, util::CString<NMEA_SIZE>& nmea_, usize pos_) const;
+    usize appendPflaa(object::CAircraft const& aircraft_, CString<NMEA_SIZE>& nmea_, usize idx_) const;
 
 public:
     CAircraftProcessor();
@@ -80,13 +80,13 @@ public:
      * @brief Process an aircraft.
      * @param aircraft The Aircraft to process
      */
-    void Process(object::CAircraft const& aircraft_, util::CString<NMEA_SIZE>& nmea_) const;
+    void Process(object::CAircraft const& aircraft_, CString<NMEA_SIZE>& nmea_) const;
 
     /**
      * @brief Set the refered position and atmospheric pressure.
      * @param position The position
      * @param atmPress The pressure
      */
-    void ReferTo(object::SLocation const& location_, f64 atmPress_);
+    void ReferTo(object::SLocation const& loc_, f64 press_);
 };
 }  // namespace vfrb::data::processor

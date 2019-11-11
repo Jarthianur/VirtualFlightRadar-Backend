@@ -52,7 +52,7 @@ public:
      * @param _1 The new Object
      * @return true on success, else false
      */
-    virtual bool Update(object::CObject&& _1) = 0;
+    virtual bool Update(object::CObject&& obj_) = 0;
 
     virtual void Access() = 0;
 };

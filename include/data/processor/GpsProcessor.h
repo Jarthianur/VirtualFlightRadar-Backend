@@ -24,8 +24,8 @@
 #include <ctime>
 
 #include "object/GpsPosition.h"
-#include "util/CString.hpp"
 
+#include "String.hpp"
 #include "types.h"
 
 namespace vfrb::data::processor
@@ -51,21 +51,21 @@ private:
      * @param position The position
      * @param utc      The current utc time
      */
-    usize appendGpgga(object::CGpsPosition const& position_, util::CString<NMEA_SIZE>& nmea_,
-                      std::tm const* utc_, usize pos_) const;
+    usize appendGpgga(object::CGpsPosition const& pos_, CString<NMEA_SIZE>& nmea_, std::tm const* utc_,
+                      usize idx_) const;
 
     /**
      * @brief Append GPRMC sentence to processing string.
      * @param utc The current utc time
      */
-    usize appendGprmc(util::CString<NMEA_SIZE>& nmea_, std::tm const* utc_, usize pos_) const;
+    usize appendGprmc(CString<NMEA_SIZE>& nmea_, std::tm const* utc_, usize idx_) const;
 
     /**
      * @brief Evaluate position for given latitude and longitude.
      * @param latitude  The latitude
      * @param longitude The longitude
      */
-    void evalPosition(f64 latitude_, f64 longitude_) const;
+    void evalPosition(f64 lat_, f64 lon_) const;
 
 public:
     CGpsProcessor()           = default;
@@ -75,6 +75,6 @@ public:
      * @brief Process a GPS position.
      * @param rPosition The position
      */
-    void Process(object::CGpsPosition const& position_, util::CString<NMEA_SIZE>& nmea_) const;
+    void Process(object::CGpsPosition const& pos_, CString<NMEA_SIZE>& nmea_) const;
 };
 }  // namespace vfrb::data::processor

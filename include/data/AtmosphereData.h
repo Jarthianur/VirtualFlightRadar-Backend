@@ -40,7 +40,7 @@ class CAtmosphereData : public IData
 public:
     explicit CAtmosphereData(AccessFn&& fn_);
     CAtmosphereData(AccessFn&&                 fn_,
-                    object::CAtmosphere const& atmosphere_);  ///< @param atmosphere The initial atm info
+                    object::CAtmosphere const& atm_);  ///< @param atmosphere The initial atm info
     ~CAtmosphereData() noexcept override = default;
 
     /**
@@ -49,7 +49,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool Update(object::CObject&& atmosphere_) override REQUIRES(!m_mutex);
+    bool Update(object::CObject&& atm_) override REQUIRES(!m_mutex);
 
     void Access() override REQUIRES(!m_mutex);
 
@@ -58,6 +58,6 @@ public:
      * @return the pressure
      * @threadsafe
      */
-    decltype(m_atmosphere.Pressure()) AtmPressure() const REQUIRES(!m_mutex);
+    decltype(m_atmosphere.Pressure()) Pressure() const REQUIRES(!m_mutex);
 };
 }  // namespace vfrb::data

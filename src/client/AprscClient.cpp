@@ -26,7 +26,7 @@
 
 #include <boost/functional/hash.hpp>
 
-#include "util/Logger.hpp"
+#include "Logger.hpp"
 
 using namespace vfrb::client::net;
 using namespace vfrb::concurrent;
@@ -36,16 +36,16 @@ namespace vfrb::client
 constexpr auto     LOG_PREFIX = "(AprscClient) ";
 static auto const& logger     = CLogger::Instance();
 
-CAprscClient::CAprscClient(SEndpoint const& endpoint, Str const& login, SPtr<IConnector> connector)
-    : IClient(endpoint, connector), m_login(login + "\r\n")
+CAprscClient::CAprscClient(SEndpoint const& ep_, Str const& login_, SPtr<IConnector> con_)
+    : IClient(ep_, con_), m_login(login_ + "\r\n")
 {}
 
-bool CAprscClient::Equals(IClient const& other) const
+bool CAprscClient::Equals(IClient const& other_) const
 {
     try
     {
-        auto const& derived = dynamic_cast<CAprscClient const&>(other);
-        return IClient::Equals(other) && this->m_login == derived.m_login;
+        auto const& other = dynamic_cast<CAprscClient const&>(other_);
+        return IClient::Equals(other_) && this->m_login == other.m_login;
     }
     catch (std::bad_cast const&)
     {
@@ -60,18 +60,18 @@ usize CAprscClient::Hash() const
     return seed;
 }
 
-void CAprscClient::handleConnect(EErrc error)
+void CAprscClient::handleConnect(EErrc err_)
 {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING)
     {
-        if (error == EErrc::SUCCESS)
+        if (err_ == EErrc::OK)
         {
-            m_connector->onWrite(m_login, std::bind(&CAprscClient::handleLogin, this, std::placeholders::_1));
+            m_connector->OnWrite(m_login, std::bind(&CAprscClient::handleLogin, this, std::placeholders::_1));
         }
         else
         {
-            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
+            logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
         }
     }
@@ -79,44 +79,45 @@ void CAprscClient::handleConnect(EErrc error)
 
 void CAprscClient::sendKeepAlive()
 {
-    m_connector->onTimeout(std::bind(&CAprscClient::handleSendKeepAlive, this, std::placeholders::_1),
+    m_connector->OnTimeout(std::bind(&CAprscClient::handleSendKeepAlive, this, std::placeholders::_1),
                            KEEPALIVE_INTERVAL);
 }
 
-void CAprscClient::handleLogin(EErrc error)
+void CAprscClient::handleLogin(EErrc err_)
 {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING)
     {
-        if (error == EErrc::SUCCESS)
+        if (err_ == EErrc::OK)
         {
             m_state = EState::RUNNING;
-            m_backoff.reset();
-            logger.info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
+            m_backoff.Reset();
+            logger.Info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
             sendKeepAlive();
-            Read();
+            read();
         }
         else
         {
-            logger.error(LOG_PREFIX, "send login failed");
+            logger.Error(LOG_PREFIX, "send login failed");
             reconnect();
         }
     }
 }
 
-void CAprscClient::handleSendKeepAlive(EErrc error)
+void CAprscClient::handleSendKeepAlive(EErrc err_)
 {
     LockGuard lk(m_mutex);
     if (m_state == EState::RUNNING)
     {
-        if (error == EErrc::SUCCESS)
+        if (err_ == EErrc::OK)
         {
-            m_connector->onWrite("#keep-alive beacon\r\n", [this](EErrc error) {
-                if (std::lock_guard lk(m_mutex); m_state == EState::RUNNING)
+            m_connector->OnWrite("#keep-alive beacon\r\n", [this](EErrc err_) {
+                LockGuard lk(m_mutex);
+                if (m_state == EState::RUNNING)
                 {
-                    if (error != EErrc::SUCCESS)
+                    if (err_ != EErrc::OK)
                     {
-                        logger.error(LOG_PREFIX, "send keep-alive beacon failed");
+                        logger.Error(LOG_PREFIX, "send keep-alive beacon failed");
                         reconnect();
                     }
                 }

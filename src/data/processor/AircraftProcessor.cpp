@@ -26,7 +26,6 @@
 #include <limits>
 
 #include "math/math.hpp"
-#include "math/constants.h"
 #include "util/string_utils.hpp"
 #include "util/utility.hpp"
 
@@ -37,33 +36,33 @@ namespace vfrb::data::processor
 {
 CAircraftProcessor::CAircraftProcessor() : CAircraftProcessor(std::numeric_limits<s32>::max()) {}
 
-CAircraftProcessor::CAircraftProcessor(s32 maxDist) : m_maxDistance(maxDist) {}
+CAircraftProcessor::CAircraftProcessor(s32 maxDist_) : m_maxDistance(maxDist_) {}
 
-void CAircraftProcessor::Process(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea) const
+void CAircraftProcessor::Process(CAircraft const& aircraft_, CString<NMEA_SIZE>& nmea_) const
 {
-    calculateRelPosition(aircraft);
+    calculateRelPosition(aircraft_);
     if (m_distance <= m_maxDistance)
     {
-        appendPflaa(aircraft, nmea, appendPflau(aircraft, nmea, 0));
+        appendPflaa(aircraft_, nmea_, appendPflau(aircraft_, nmea_, 0));
     }
     else
     {
-        nmea.Clear();
+        nmea_.Clear();
     }
 }
 
-void CAircraftProcessor::ReferTo(SLocation const& location, f64 atmPress)
+void CAircraftProcessor::ReferTo(SLocation const& loc_, f64 press_)
 {
-    m_refLocation    = location;
-    m_refAtmPressure = atmPress;
+    m_refLocation    = loc_;
+    m_refAtmPressure = press_;
 }
 
-void CAircraftProcessor::calculateRelPosition(CAircraft const& aircraft) const
+void CAircraftProcessor::calculateRelPosition(CAircraft const& aircraft_) const
 {
     m_refRadLatitude       = math::Radian(m_refLocation.Latitude);
     m_refRadLongitude      = math::Radian(m_refLocation.Longitude);
-    m_aircraftRadLongitude = math::Radian(aircraft.Location().longitude);
-    m_aircraftRadLatitude  = math::Radian(aircraft.Location().latitude);
+    m_aircraftRadLongitude = math::Radian(aircraft_.Location().Longitude);
+    m_aircraftRadLatitude  = math::Radian(aircraft_.Location().Latitude);
     m_lonDistance          = m_aircraftRadLongitude - m_refRadLongitude;
     m_latDistance          = m_aircraftRadLatitude - m_refRadLatitude;
 
@@ -81,44 +80,42 @@ void CAircraftProcessor::calculateRelPosition(CAircraft const& aircraft) const
 
     m_relNorth    = math::DoubleToInt(std::cos(math::Radian(m_absBearing)) * m_distance);
     m_relEast     = math::DoubleToInt(std::sin(math::Radian(m_absBearing)) * m_distance);
-    m_relVertical = aircraft.TargetType() == CAircraft::ETargetType::TRANSPONDER ?
-                        aircraft.Location().altitude - math::IcaoHeight(m_refAtmPressure) :
-                        aircraft.Location().altitude - m_refLocation.Altitude;
+    m_relVertical = aircraft_.TargetType() == CAircraft::ETargetType::TRANSPONDER ?
+                        aircraft_.Location().Altitude - math::IcaoHeight(m_refAtmPressure) :
+                        aircraft_.Location().Altitude - m_refLocation.Altitude;
 }
 
-usize CAircraftProcessor::appendPflau(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
-                                     usize pos) const
+usize CAircraftProcessor::appendPflau(CAircraft const& aircraft_, CString<NMEA_SIZE>& nmea_, usize idx_) const
 {
-    int next = nmea.Format(pos, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::DoubleToInt(m_relBearing),
-                           m_relVertical, m_distance, (*aircraft.Id()).data());
-    next += nmea.Format(pos, "%02x\r\n", Checksum(*nmea, pos));
-    return pos + static_cast<usize>(next);
+    int next = nmea_.Format(idx_, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::DoubleToInt(m_relBearing),
+                            m_relVertical, m_distance, (*aircraft_.Id()).data());
+    next += nmea_.Format(idx_, "%02x\r\n", Checksum(*nmea_, idx_));
+    return idx_ + static_cast<usize>(next);
 }
 
-usize CAircraftProcessor::appendPflaa(CAircraft const& aircraft, util::CString<NMEA_SIZE>& nmea,
-                                     usize pos) const
+usize CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, CString<NMEA_SIZE>& nmea_, usize idx_) const
 {
     int next = 0;
-    if (aircraft.HasFullInfo())
+    if (aircraft_.HasFullInfo())
     {
-        next = nmea.Format(
-            pos, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast, m_relVertical,
-            util::AsUnderlyingType(aircraft.IdType()), (*aircraft.Id()).data(),
-            math::DoubleToInt(math::Saturate(aircraft.Movement().heading, CAircraft::SMovement::MIN_HEADING,
+        next = nmea_.Format(
+            idx_, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast, m_relVertical,
+            util::AsUnderlyingType(aircraft_.IdType()), (*aircraft_.Id()).data(),
+            math::DoubleToInt(math::Saturate(aircraft_.Movement().Heading, CAircraft::SMovement::MIN_HEADING,
                                              CAircraft::SMovement::MAX_HEADING)),
-            math::DoubleToInt(math::Saturate(aircraft.Movement().gndSpeed * math::MS_2_KMH,
+            math::DoubleToInt(math::Saturate(aircraft_.Movement().GndSpeed * math::MS_2_KMH,
                                              CAircraft::SMovement::MIN_GND_SPEED,
                                              CAircraft::SMovement::MAX_GND_SPEED)),
-            math::Saturate(aircraft.Movement().climbRate, CAircraft::SMovement::MIN_CLIMB_RATE,
+            math::Saturate(aircraft_.Movement().ClimbRate, CAircraft::SMovement::MIN_CLIMB_RATE,
                            CAircraft::SMovement::MAX_CLIMB_RATE),
-            util::AsUnderlyingType(aircraft.AircraftType()));
+            util::AsUnderlyingType(aircraft_.AircraftType()));
     }
     else
     {
-        next = nmea.Format(pos, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
-                           (*aircraft.Id()).data(), util::AsUnderlyingType(aircraft.AircraftType()));
+        next = nmea_.Format(idx_, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
+                            (*aircraft_.Id()).data(), util::AsUnderlyingType(aircraft_.AircraftType()));
     }
-    next += nmea.Format(pos, "%02x\r\n", Checksum(*nmea, pos));
-    return pos + static_cast<usize>(next);
+    next += nmea_.Format(idx_, "%02x\r\n", Checksum(*nmea_, idx_));
+    return idx_ + static_cast<usize>(next);
 }
 }  // namespace vfrb::data::processor

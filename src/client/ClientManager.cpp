@@ -31,53 +31,53 @@ namespace vfrb::client
 {
 CClientManager::~CClientManager() noexcept
 {
-    stop();
+    Stop();
 }
 
-void CClientManager::subscribe(SPtr<feed::IFeed> feed)
+void CClientManager::Subscribe(SPtr<feed::IFeed> feed_)
 {
     LockGuard  lk(m_mutex);
     ClientIter it = m_clients.end();
-    it            = m_clients.insert(CClientFactory::CreateClientFor(feed)).first;
+    it            = m_clients.insert(CClientFactory::CreateClientFor(feed_)).first;
     if (it != m_clients.end())
     {
-        (*it)->subscribe(feed);
+        (*it)->Subscribe(feed_);
     }
     else
     {
-        throw error::CFeedSubscriptionError(feed->name());
+        throw error::CFeedSubscriptionError(feed_->Name());
     }
 }
 
-void CClientManager::run()
+void CClientManager::Run()
 {
     LockGuard lk(m_mutex);
     for (auto it : m_clients)
     {
         m_thdGroup.CreateThread([this, it] {
-            it->run();
+            it->Run();
             LockGuard lk(m_mutex);
             m_clients.erase(it);
         });
     }
 }
 
-void CClientManager::stop()
+void CClientManager::Stop()
 {
     LockGuard lk(m_mutex);
     for (auto it : m_clients)
     {
-        it->scheduleStop();
+        it->ScheduleStop();
     }
 }
 
 namespace error
 {
-CFeedSubscriptionError::CFeedSubscriptionError(Str const& name)
-    : m_msg("failed to subscribe "s + name + " to client")
+CFeedSubscriptionError::CFeedSubscriptionError(Str const& name_)
+    : m_msg("failed to subscribe "s + name_ + " to client")
 {}
 
-char const* FeedSubscriptionError::what() const noexcept
+char const* CFeedSubscriptionError::Message() const noexcept
 {
     return m_msg.c_str();
 }

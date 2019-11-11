@@ -27,24 +27,24 @@ using namespace vfrb::object;
 
 namespace vfrb::data
 {
-CAircraftData::CAircraftData(AccessFn&& fn) : CAircraftData(std::move(fn), 0) {}
+CAircraftData::CAircraftData(AccessFn&& fn_) : CAircraftData(std::move(fn_), 0) {}
 
-CAircraftData::CAircraftData(AccessFn&& fn, s32 maxDist) : IData(std::move(fn)), m_processor(maxDist) {}
+CAircraftData::CAircraftData(AccessFn&& fn_, s32 maxDist_) : IData(std::move(fn_)), m_processor(maxDist_) {}
 
-bool CAircraftData::Update(CObject&& aircraft)
+bool CAircraftData::Update(CObject&& aircraft_)
 {
-    auto&& update = static_cast<CAircraft&&>(aircraft);
-    auto   result = m_container.insert(std::hash<std::string_view>()(*update.Id()), std::move(update));
+    auto&& aircraft = static_cast<CAircraft&&>(aircraft_);
+    auto   result   = m_container.insert(std::hash<std::string_view>()(*aircraft.Id()), std::move(aircraft));
     if (!result.second)
     {
-        result.first->value.tryUpdate(std::move(update));
+        result.first->Value.TryUpdate(std::move(aircraft));
     }
     return true;
 }
 
-void CAircraftData::Environment(SLocation const& position, f64 atmPress)
+void CAircraftData::Environment(SLocation const& loc_, f64 press_)
 {
-    m_processor.ReferTo(position, atmPress);
+    m_processor.ReferTo(loc_, press_);
 }
 
 void CAircraftData::Access()
@@ -52,23 +52,23 @@ void CAircraftData::Access()
     auto iter = m_container.begin();
     while (iter != m_container.end())
     {
-        ++(iter->value);
+        ++(iter->Value);
         try
         {
-            if (iter->value.updateAge() == NO_FLARM_THRESHOLD)
+            if (iter->Value.UpdateAge() == NO_FLARM_THRESHOLD)
             {
-                iter->value.targetType(CAircraft::ETargetType::TRANSPONDER);
+                iter->Value.TargetType(CAircraft::ETargetType::TRANSPONDER);
             }
-            if (iter->value.updateAge() >= DELETE_THRESHOLD)
+            if (iter->Value.UpdateAge() >= DELETE_THRESHOLD)
             {
-                auto key = iter.key();
+                auto key = iter.Key();
                 ++iter;
                 m_container.erase(key);
             }
             else
             {
-                m_processor.Process(iter->value, iter->nmea);
-                m_accessFn({iter->value, iter->nmea});
+                m_processor.Process(iter->Value, iter->Nmea);
+                m_accessFn({iter->Value, iter->Nmea});
                 ++iter;
             }
         }

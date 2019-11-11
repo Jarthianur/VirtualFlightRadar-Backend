@@ -57,7 +57,7 @@ public:
      */
     bool Update(object::CObject&& aircraft_) override;
 
-    void Environment(object::SLocation const& position_, f64 atmPress_);
+    void Environment(object::SLocation const& loc_, f64 press_);
 
     /**
      * @brief Process all aircrafts.

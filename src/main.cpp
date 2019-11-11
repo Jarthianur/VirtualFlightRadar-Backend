@@ -26,9 +26,9 @@
 
 #include "config/Configuration.h"
 #include "error/Error.hpp"
-#include "util/Logger.hpp"
 
-#include "VFRB.h"
+#include "Logger.hpp"
+#include "Vfrb.h"
 
 #ifndef VERSION
 constexpr auto VERSION = "DEMO";
@@ -43,83 +43,78 @@ static auto& logger = CLogger::Instance();
 
 namespace error
 {
-class ConfigFileError : public vfrb::error::IError
+class CConfigFileError : public vfrb::error::IError
 {
     Str const m_msg;
 
 public:
-    explicit ConfigFileError(Str const& msg) : m_msg(msg) {}
-    ~ConfigFileError() noexcept override = default;
+    explicit CConfigFileError(Str const& msg_) : m_msg(msg_) {}
+    ~CConfigFileError() noexcept override = default;
 
-    char const* what() const noexcept override
+    char const* Message() const noexcept override
     {
         return m_msg.c_str();
     }
 };
 
-class ArgumentError : public vfrb::error::IError
+class CArgumentError : public vfrb::error::IError
 {
 public:
-    ArgumentError()                    = default;
-    ~ArgumentError() noexcept override = default;
+    CArgumentError()                    = default;
+    ~CArgumentError() noexcept override = default;
 
-    char const* what() const noexcept override
+    char const* Message() const noexcept override
     {
         return "";
     }
 };
 }  // namespace error
 
-program_options::variables_map evalArgs(int argc, char** argv)
+program_options::variables_map evalArgs(int argc_, char** argv_)
 {
     program_options::options_description cmdline_options("VirtualFlightRadar-Backend -- "s + VERSION);
     cmdline_options.add_options()("help,h", "show this message");
-    cmdline_options.add_options()("verbose,v", "enable debug logging");
     cmdline_options.add_options()(
         "ground-mode,g", "forcibly enable ground mode; GPS feeds will stop when a good position is received");
     cmdline_options.add_options()("config,c", program_options::value<std::string>(), "config file");
     cmdline_options.add_options()("output,o", program_options::value<std::string>(), "specify where to log");
     program_options::variables_map variables;
-    program_options::store(program_options::parse_command_line(argc, argv, cmdline_options), variables);
+    program_options::store(program_options::parse_command_line(argc_, argv_, cmdline_options), variables);
     program_options::notify(variables);
 
-    if (argc < 3 || variables.count("help"))
+    if (argc_ < 3 || variables.count("help"))
     {
         std::cout << cmdline_options << std::endl;
-        throw ::error::ArgumentError();
+        throw ::error::CArgumentError();
     }
     return variables;
 }
 
-SPtr<CConfiguration> get_config(const program_options::variables_map& variables)
+SPtr<CConfiguration> getConfig(const program_options::variables_map& vars_)
 {
-    if (variables.count("verbose"))
+    if (vars_.count("output"))
     {
-        logger.debug();
+        logger.LogFile(vars_["output"].as<std::string>());
     }
-    if (variables.count("output"))
+    logger.Info("VirtualFlightRadar-Backend -- " VERSION);
+    if (vars_.count("config"))
     {
-        logger.logFile(variables["output"].as<std::string>());
-    }
-    logger.info("VirtualFlightRadar-Backend -- " VERSION);
-    if (variables.count("config"))
-    {
-        std::ifstream file(variables["config"].as<std::string>());
+        std::ifstream file(vars_["config"].as<std::string>());
         if (!file)
         {
-            throw ::error::ConfigFileError(variables["config"].as<std::string>() + " is not accessible");
+            throw ::error::CConfigFileError(vars_["config"].as<std::string>() + " is not accessible");
         }
         auto conf = std::make_shared<CConfiguration>(file);
-        if (variables.count("ground-mode"))
+        if (vars_.count("ground-mode"))
         {
             conf->GroundMode = true;
-            logger.info("(VFRB) Override ground mode: Yes");
+            logger.Info("(VFRB) Override ground mode: Yes");
         }
         return conf;
     }
     else
     {
-        throw ::error::ConfigFileError("No config file given.");
+        throw ::error::CConfigFileError("No config file given.");
     }
 }
 
@@ -130,20 +125,20 @@ SPtr<CConfiguration> get_config(const program_options::variables_map& variables)
  * @param argv The arguments
  * @return 0 on success, else -1
  */
-int main(int argc, char** argv)
+int main(int argc_, char** argv_)
 {
     try
     {
-        CVfrb vfrb(get_config(evalArgs(argc, argv)));
+        CVfrb vfrb(getConfig(evalArgs(argc_, argv_)));
         vfrb.Run();
     }
-    catch ([[maybe_unused]] ::error::ArgumentError const&)
+    catch ([[maybe_unused]] ::error::CArgumentError const&)
     {
         return 1;
     }
     catch (vfrb::error::IError const& e)
     {
-        logger.error("(VFRB) fatal: ", e.what());
+        logger.Error("(VFRB) fatal: ", e.Message());
         return 1;
     }
     return 0;

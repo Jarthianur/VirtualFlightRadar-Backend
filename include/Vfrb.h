@@ -62,14 +62,14 @@ class CVfrb
     SPtr<data::CGpsData>                       m_gpsData;         ///< GPS data container
     SPtr<data::CWindData>                      m_windData;        ///< Wind data container
     server::CServer<server::net::CSocketBoost> m_server;          ///< Manage clients and sending of data
-    std::list<SPtr<feed::IFeed>>                m_feeds;           ///< List of all active feeds
+    std::list<SPtr<feed::IFeed>>               m_feeds;           ///< List of all active feeds
     std::atomic<bool>                          m_running;         ///< Atomic run-status
 
     /**
      * @brief Create all input feeds.
      * @param config The Configuration
      */
-    void createFeeds(SPtr<config::CConfiguration> config_);
+    void createFeeds(SPtr<config::CConfiguration> conf_);
 
     /**
      * @brief Serve the data frequently every second.
@@ -84,7 +84,7 @@ class CVfrb
     Str duration(std::chrono::steady_clock::time_point start_) const;
 
 public:
-    explicit CVfrb(SPtr<config::CConfiguration> config_);  ///< @param config The Configuration
+    explicit CVfrb(SPtr<config::CConfiguration> conf_);  ///< @param config The Configuration
     ~CVfrb() noexcept = default;
 
     /**

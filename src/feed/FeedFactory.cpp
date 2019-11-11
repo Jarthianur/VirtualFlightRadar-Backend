@@ -38,7 +38,7 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-FeedFactory::FeedFactory(SPtr<config::CConfiguration> config_, SPtr<CAircraftData> aircraftData_,
+CFeedFactory::CFeedFactory(SPtr<config::CConfiguration> config_, SPtr<CAircraftData> aircraftData_,
                          SPtr<CAtmosphereData> atmosData_, SPtr<CGpsData> gpsData_, SPtr<CWindData> windData_)
     : m_config(config_),
       m_aircraftData(aircraftData_),
@@ -48,38 +48,38 @@ FeedFactory::FeedFactory(SPtr<config::CConfiguration> config_, SPtr<CAircraftDat
 {}
 
 template<>
-SPtr<CAprscFeed> FeedFactory::makeFeed<CAprscFeed>(Str const& name_)
+SPtr<CAprscFeed> CFeedFactory::makeFeed<CAprscFeed>(Str const& name_)
 {
     return std::make_shared<CAprscFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData,
                                        m_config->MaxHeight);
 }
 
 template<>
-SPtr<CGpsFeed> FeedFactory::makeFeed<CGpsFeed>(Str const& name_)
+SPtr<CGpsFeed> CFeedFactory::makeFeed<CGpsFeed>(Str const& name_)
 {
     return std::make_shared<CGpsFeed>(name_, m_config->FeedProperties.at(name_), m_gpsData);
 }
 
 template<>
-SPtr<CSbsFeed> FeedFactory::makeFeed<CSbsFeed>(Str const& name_)
+SPtr<CSbsFeed> CFeedFactory::makeFeed<CSbsFeed>(Str const& name_)
 {
     return std::make_shared<CSbsFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData,
                                       m_config->MaxHeight);
 }
 
 template<>
-SPtr<CWindFeed> FeedFactory::makeFeed<CWindFeed>(Str const& name_)
+SPtr<CWindFeed> CFeedFactory::makeFeed<CWindFeed>(Str const& name_)
 {
     return std::make_shared<CWindFeed>(name_, m_config->FeedProperties.at(name_), m_windData);
 }
 
 template<>
-SPtr<CAtmosphereFeed> FeedFactory::makeFeed<CAtmosphereFeed>(Str const& name_)
+SPtr<CAtmosphereFeed> CFeedFactory::makeFeed<CAtmosphereFeed>(Str const& name_)
 {
     return std::make_shared<CAtmosphereFeed>(name_, m_config->FeedProperties.at(name_), m_atmosData);
 }
 
-SPtr<IFeed> FeedFactory::createFeed(Str const& name_)
+SPtr<IFeed> CFeedFactory::createFeed(Str const& name_)
 {
     if (name_.find(CConfiguration::SECT_KEY_APRSC) != Str::npos)
     {
@@ -101,18 +101,18 @@ SPtr<IFeed> FeedFactory::createFeed(Str const& name_)
     {
         return makeFeed<CAtmosphereFeed>(name_);
     }
-    throw error::FeedCreationError();
+    throw error::CFeedCreationError();
 }
 
 namespace error
 {
-FeedCreationError::FeedCreationError()
+CFeedCreationError::CFeedCreationError()
     : m_msg("no keywords found; be sure feed names contain one of "s + CConfiguration::SECT_KEY_APRSC + ", " +
             CConfiguration::SECT_KEY_SBS + ", " + CConfiguration::SECT_KEY_WIND + ", " +
             CConfiguration::SECT_KEY_ATMOS + ", " + CConfiguration::SECT_KEY_GPS)
 {}
 
-char const* FeedCreationError::Message() const noexcept
+char const* CFeedCreationError::Message() const noexcept
 {
     return m_msg.c_str();
 }

@@ -29,7 +29,8 @@
 #include <boost/functional/hash.hpp>
 
 #include "feed/Feed.h"
-#include "util/Logger.hpp"
+
+#include "Logger.hpp"
 
 static auto const& logger = vfrb::CLogger::Instance();
 
@@ -38,13 +39,11 @@ using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
-IClient::IClient(SEndpoint const& endpoint, SPtr<IConnector> connector)
-    : m_connector(connector), m_endpoint(endpoint)
-{}
+IClient::IClient(SEndpoint const& ep_, SPtr<IConnector> con_) : m_connector(con_), m_endpoint(ep_) {}
 
-bool IClient::Equals(IClient const& other) const
+bool IClient::Equals(IClient const& other_) const
 {
-    return this->m_endpoint == other.m_endpoint;
+    return this->m_endpoint == other_.m_endpoint;
 }
 
 usize IClient::Hash() const
@@ -55,23 +54,23 @@ usize IClient::Hash() const
     return seed;
 }
 
-void IClient::subscribe(SPtr<feed::IFeed> feed)
+void IClient::Subscribe(SPtr<feed::IFeed> feed_)
 {
     LockGuard lk(m_mutex);
-    m_feeds.push_back(feed);
-    std::sort(m_feeds.begin(), m_feeds.end(), [](SPtr<feed::IFeed> const& f1, SPtr<feed::IFeed> const& f2) {
-        return f1->priority() > f2->priority();
+    m_feeds.push_back(feed_);
+    std::sort(m_feeds.begin(), m_feeds.end(), [](SPtr<feed::IFeed> const& f1_, SPtr<feed::IFeed> const& f2_) {
+        return f1_->Priority() > f2_->Priority();
     });
 }
 
-void IClient::run()
+void IClient::Run() NO_THREAD_SAFETY_ANALYSIS
 {
     UniqueLock lk(m_mutex);
     if (m_state == EState::NONE)
     {
         connect();
         lk.unlock();
-        m_connector->run();
+        m_connector->Run();
         m_state = EState::NONE;
     }
 }
@@ -79,7 +78,7 @@ void IClient::run()
 void IClient::connect()
 {
     m_state = EState::CONNECTING;
-    m_connector->onConnect(m_endpoint, std::bind(&IClient::handleConnect, this, std::placeholders::_1));
+    m_connector->OnConnect(m_endpoint, std::bind(&IClient::handleConnect, this, std::placeholders::_1));
 }
 
 void IClient::reconnect()
@@ -87,16 +86,16 @@ void IClient::reconnect()
     if (m_state != EState::STOPPING)
     {
         m_state = EState::CONNECTING;
-        logger.info(logPrefix(), "schedule reconnect to ", m_endpoint.Host, ":", m_endpoint.Port);
-        m_connector->close();
+        logger.Info(logPrefix(), "schedule reconnect to ", m_endpoint.Host, ":", m_endpoint.Port);
+        m_connector->Close();
         timedConnect();
     }
 }
 
 void IClient::timedConnect()
 {
-    m_connector->onTimeout(std::bind(&IClient::handleTimedConnect, this, std::placeholders::_1),
-                           m_backoff.next());
+    m_connector->OnTimeout(std::bind(&IClient::handleTimedConnect, this, std::placeholders::_1),
+                           m_backoff.Next());
 }
 
 void IClient::stop()
@@ -104,58 +103,59 @@ void IClient::stop()
     if (m_state == EState::RUNNING || m_state == EState::CONNECTING)
     {
         m_state = EState::STOPPING;
-        logger.info(logPrefix(), "disconnect from ", m_endpoint.Host, ":", m_endpoint.Port);
-        m_connector->stop();
+        logger.Info(logPrefix(), "disconnect from ", m_endpoint.Host, ":", m_endpoint.Port);
+        m_connector->Stop();
     }
 }
 
-void IClient::scheduleStop()
+void IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS
 {
     std::condition_variable_any cond_ready;
     UniqueLock                  lk(m_mutex);
-    cond_ready.wait_for(lk, std::chrono::milliseconds(100), [this] { return m_state != EState::NONE; });
+    cond_ready.wait_for(lk, std::chrono::milliseconds(100),
+                        [this]() NO_THREAD_SAFETY_ANALYSIS { return m_state != EState::NONE; });
     stop();
 }
 
-void IClient::Read()
+void IClient::read()
 {
-    m_connector->onRead(std::bind(&IClient::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+    m_connector->OnRead(std::bind(&IClient::handleRead, this, std::placeholders::_1, std::placeholders::_2));
 }
 
-void IClient::handleTimedConnect(EErrc error)
+void IClient::handleTimedConnect(EErrc err_)
 {
-    if (error == EErrc::SUCCESS)
+    if (err_ == EErrc::OK)
     {
         LockGuard lk(m_mutex);
-        logger.info(logPrefix(), "try connect to ", m_endpoint.Host, ":", m_endpoint.Port);
+        logger.Info(logPrefix(), "try connect to ", m_endpoint.Host, ":", m_endpoint.Port);
         connect();
     }
     else
     {
-        logger.error(logPrefix(), "failed to connect after timeout");
-        scheduleStop();
+        logger.Error(logPrefix(), "failed to connect after timeout");
+        ScheduleStop();
     }
 }
 
-void IClient::handleRead(EErrc error, Str const& response)
+void IClient::handleRead(EErrc err_, Str const& str_)
 {
     LockGuard lk(m_mutex);
     if (m_state == EState::RUNNING)
     {
-        if (error == EErrc::SUCCESS)
+        if (err_ == EErrc::OK)
         {
             for (auto& it : m_feeds)
             {
-                if (!it->process(response))
+                if (!it->Process(str_))
                 {
                     stop();
                 }
             }
-            Read();
+            read();
         }
         else
         {
-            logger.error(logPrefix(), "failed to read message");
+            logger.Error(logPrefix(), "failed to read message");
             reconnect();
         }
     }

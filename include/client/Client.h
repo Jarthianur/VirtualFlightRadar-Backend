@@ -54,24 +54,24 @@ protected:
     };
 
     concurrent::Mutex mutable m_mutex;
-    CTimeoutBackoff               GUARDED_BY(m_mutex) m_backoff;
-    SPtr<net::IConnector>         GUARDED_BY(m_mutex) m_connector;             /// Connector interface
-    EState                        GUARDED_BY(m_mutex) m_state = EState::NONE;  /// Run state indicator
-    net::SEndpoint const          m_endpoint;                                  /// Remote endpoint
-    std::vector<SPtr<feed::Feed>> GUARDED_BY(m_mutex) m_feeds;  /// Container for subscribed feeds
+    CTimeoutBackoff                GUARDED_BY(m_mutex) m_backoff;
+    SPtr<net::IConnector>          GUARDED_BY(m_mutex) m_connector;             /// Connector interface
+    EState                         GUARDED_BY(m_mutex) m_state = EState::NONE;  /// Run state indicator
+    net::SEndpoint const           m_endpoint;                                  /// Remote endpoint
+    std::vector<SPtr<feed::IFeed>> GUARDED_BY(m_mutex) m_feeds;  /// Container for subscribed feeds
 
     /**
      * @param endpoint  The connection Endpoint
      * @param component The component name
      * @param connector The Connector interface
      */
-    IClient(net::SEndpoint const& endpoint_, SPtr<net::IConnector> connector_);
+    IClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
 
     /**
      * @brief Handler for connect
      * @param error The error indicator
      */
-    virtual void handleConnect(net::EErrc error_) = 0;
+    virtual void handleConnect(net::EErrc err_) = 0;
 
     virtual char const* logPrefix() const = 0;
 
@@ -105,14 +105,14 @@ protected:
      * @brief Handler for timedConnect
      * @param error The error indicator
      */
-    void handleTimedConnect(net::EErrc error_) REQUIRES(!m_mutex);
+    void handleTimedConnect(net::EErrc err_) REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for read
      * @param error    The error indicator
      * @param response The received string
      */
-    void handleRead(net::EErrc, Str const& response_) REQUIRES(!m_mutex);
+    void handleRead(net::EErrc, Str const& str_) REQUIRES(!m_mutex);
 
 public:
     virtual ~IClient() noexcept = default;
@@ -136,7 +136,7 @@ public:
      * @param feed The Feed to subscribe
      * @threadsafe
      */
-    void Subscribe(SPtr<feed::Feed> feed_) REQUIRES(!m_mutex);
+    void Subscribe(SPtr<feed::IFeed> feed_) REQUIRES(!m_mutex);
 
     /**
      * @brief Compare to another client by value.

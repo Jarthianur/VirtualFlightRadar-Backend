@@ -36,7 +36,7 @@ class CSbsClient : public IClient
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::EErrc error_) override REQUIRES(!m_mutex);
+    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 
@@ -45,7 +45,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    CSbsClient(net::SEndpoint const& endpoint_, SPtr<net::IConnector> connector_);
+    CSbsClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
     ~CSbsClient() noexcept override = default;
 };
 }  // namespace vfrb::client

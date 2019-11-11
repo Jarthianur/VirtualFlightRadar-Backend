@@ -26,10 +26,10 @@ using namespace vfrb::concurrent;
 
 namespace vfrb::data
 {
-CAtmosphereData::CAtmosphereData(AccessFn&& fn) : IData(std::move(fn)) {}
+CAtmosphereData::CAtmosphereData(AccessFn&& fn_) : IData(std::move(fn_)) {}
 
-CAtmosphereData::CAtmosphereData(AccessFn&& fn, CAtmosphere const& atmosphere)
-    : IData(std::move(fn)), m_atmosphere(atmosphere)
+CAtmosphereData::CAtmosphereData(AccessFn&& fn_, CAtmosphere const& atm_)
+    : IData(std::move(fn_)), m_atmosphere(atm_)
 {}
 
 void CAtmosphereData::Access()
@@ -38,15 +38,15 @@ void CAtmosphereData::Access()
     m_accessFn({++m_atmosphere, {*m_atmosphere}});
 }
 
-bool CAtmosphereData::Update(CObject&& atmosphere)
+bool CAtmosphereData::Update(CObject&& atm_)
 {
     LockGuard lk(m_mutex);
-    return m_atmosphere.TryUpdate(std::move(atmosphere));
+    return m_atmosphere.TryUpdate(std::move(atm_));
 }
 
-auto CAtmosphereData::atmPressure() const -> decltype(m_atmosphere.pressure())
+auto CAtmosphereData::Pressure() const -> decltype(m_atmosphere.Pressure())
 {
     LockGuard lk(m_mutex);
-    return m_atmosphere.pressure();
+    return m_atmosphere.Pressure();
 }
 }  // namespace vfrb::data
