@@ -40,7 +40,8 @@ CGpsParser::CGpsParser()
                 "(\\d+(?:\\.\\d+)?),M,"        // altitude
                 "(\\d+(?:\\.\\d+)?)"           // geoid
                 ",M,,\\*[0-9A-F]{2}\\s*?$",
-                std::regex::optimize | std::regex::icase){};
+                std::regex::optimize | std::regex::icase)
+{}
 
 CGpsPosition CGpsParser::Parse(Str&& str_, u32 prio_) const
 {

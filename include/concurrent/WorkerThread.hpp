@@ -44,10 +44,10 @@ class CWorkerThread
     NOT_COPYABLE(CWorkerThread)
 
     Mutex mutable m_mutex;
-    CGuardedThread              m_worker;                       ///< The underlying worker thread
     std::condition_variable_any GUARDED_BY(m_mutex) m_cv;       ///< Wait and notify for work
     bool                        GUARDED_BY(m_mutex) m_running;  ///< Is thread running?
     std::queue<DataT>           GUARDED_BY(m_mutex) m_workQ;    ///< The work queue
+    CGuardedThread              m_worker;                       ///< The underlying worker thread
 
 public:
     /// @param fn_ The function to execute for each element

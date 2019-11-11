@@ -81,7 +81,7 @@ bool CConnection<SocketT>::Write(std::string_view const& sv_)
 {
     try
     {
-        return m_socket.write(sv_);
+        return m_socket.Write(sv_);
     }
     catch (net::error::CSocketError const& e)
     {

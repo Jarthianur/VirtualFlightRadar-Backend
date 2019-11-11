@@ -19,7 +19,7 @@
  }
  */
 
-#include "VFRB.h"
+#include "Vfrb.h"
 
 #include <csignal>
 #include <sstream>

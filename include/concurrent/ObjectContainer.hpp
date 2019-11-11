@@ -215,7 +215,7 @@ typename CObjectContainer<ObjectT, StringSize>::CIterator CObjectContainer<Objec
     REQUIRES(!m_modMutex)
 {
     LockGuard lk(m_modMutex);
-    return Iterator(m_container.begin(), *this);
+    return CIterator(m_container.begin(), *this);
 }
 
 template<typename ObjectT, usize StringSize>
@@ -232,8 +232,8 @@ std::pair<typename CObjectContainer<ObjectT, StringSize>::CIterator, bool>
     CIterator iter(m_container.find(key_), *this);
     if (iter == End())
     {
-        return std::make_pair(Iterator(m_container.emplace(key_, ValueType(std::move(value_))).first, *this),
-                              true);
+        return std::make_pair(
+            CIterator(m_container.emplace(key_, CValueType(std::move(value_))).first, *this), true);
     }
     return std::make_pair(std::move(iter), false);
 }

@@ -34,7 +34,7 @@ CAircraftData::CAircraftData(AccessFn&& fn_, s32 maxDist_) : IData(std::move(fn_
 bool CAircraftData::Update(CObject&& aircraft_)
 {
     auto&& aircraft = static_cast<CAircraft&&>(aircraft_);
-    auto   result   = m_container.insert(std::hash<std::string_view>()(*aircraft.Id()), std::move(aircraft));
+    auto   result   = m_container.Insert(std::hash<std::string_view>()(*aircraft.Id()), std::move(aircraft));
     if (!result.second)
     {
         result.first->Value.TryUpdate(std::move(aircraft));
@@ -49,8 +49,8 @@ void CAircraftData::Environment(SLocation const& loc_, f64 press_)
 
 void CAircraftData::Access()
 {
-    auto iter = m_container.begin();
-    while (iter != m_container.end())
+    auto iter = m_container.Begin();
+    while (iter != m_container.End())
     {
         ++(iter->Value);
         try
@@ -63,7 +63,7 @@ void CAircraftData::Access()
             {
                 auto key = iter.Key();
                 ++iter;
-                m_container.erase(key);
+                m_container.Erase(key);
             }
             else
             {
