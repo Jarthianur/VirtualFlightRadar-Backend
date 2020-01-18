@@ -19,24 +19,33 @@
  }
  */
 
-#include "DateTimeImplTest.h"
+#include "types.h"
 
-std::int64_t DateTimeImplTest::_now  = 0;
-std::uint32_t DateTimeImplTest::_day = 0;
+namespace vfrb::object::date_time
+{
+namespace
+{
+static thread_local u32 s_Day = 0;
+static thread_local s64 s_Now = 0;
+}  // namespace
 
-std::int64_t DateTimeImplTest::now()
+void Day(u32 d_)
 {
-    return _now;
+    s_Day = d_;
 }
-std::uint32_t DateTimeImplTest::day()
+
+void Now(u32 h_, u32 m_, u32 s_)
 {
-    return _day;
+    s_Now = h_ * 3600000 + m_ * 60000 + s_ * 1000;
 }
-void DateTimeImplTest::set_day(std::uint32_t d)
+
+s64 Now()
 {
-    _day = d;
+    return s_Now;
 }
-void DateTimeImplTest::set_now(std::uint32_t h, std::uint32_t m, std::uint32_t s)
+
+u32 Day()
 {
-    _now = h * 3600000 + m * 60000 + s * 1000;
+    return s_Day;
 }
+}  // namespace vfrb::object::date_time

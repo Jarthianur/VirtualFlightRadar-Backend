@@ -22,17 +22,20 @@
 #include "object/Aircraft.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
-#include "object/Timestamp.hpp"
+#include "object/Timestamp.h"
 #include "object/Wind.h"
 
-#include "DateTimeImplTest.h"
 #include "helper.hpp"
 
+using namespace vfrb;
 using namespace object;
-using namespace time;
 using namespace sctf;
 
-using TS = Timestamp<DateTimeImplTest>;
+namespace vfrb::object::date_time
+{
+extern void Now(u32, u32, u32);
+extern void Day(s64);
+}  // namespace vfrb::object::date_time
 
 TEST_MODULE(test_object, {
     test("aging", [] {
@@ -125,61 +128,65 @@ TEST_MODULE(test_aircraft, {
 
 void test_timestamp()
 {
-    describe<TS>("Basic Timestamp tests")
+    suite<CTimestamp>("Basic Timestamp tests")
         ->setup([] {
-            DateTimeImplTest::set_day(1);
-            DateTimeImplTest::set_now(12, 0, 0);
+            date_time::Day(1);
+            date_time::Now(12, 0, 0);
         })
         ->test("creation - valid format",
                [] {
-                   assertNoExcept(TS("120000", Format::HHMMSS));
-                   assertNoExcept(TS("12:00:00.000", Format::HH_MM_SS_FFF));
+                   ASSERT_NOTHROW(CTimestamp("120000"));
+                   ASSERT_NOTHROW(CTimestamp("12:00:00.000"));
                })
         ->test("creation - invalid format",
                [] {
-                   assertException(TS("", Format::HHMMSS), std::invalid_argument);
-                   assertException(TS("adgjhag", Format::HHMMSS), std::invalid_argument);
-                   assertException(TS("36:60:11.11111", Format::HH_MM_SS_FFF), std::invalid_argument);
-                   assertException(TS("366022", Format::HHMMSS), std::invalid_argument);
+                   ASSERT_THROWS(CTimestamp(""), vfrb::object::error::CTimestampParseError);
+                   ASSERT_THROWS(CTimestamp("adgjhag"), vfrb::object::error::CTimestampParseError);
+                   ASSERT_THROWS(CTimestamp("36:60:11.11111"), vfrb::object::error::CTimestampParseError);
+                   ASSERT_THROWS(CTimestamp("366022"), vfrb::object::error::CTimestampParseError);
                })
         ->test("comparison - incremental time",
                [] {
-                   DateTimeImplTest::set_day(1);
-                   DateTimeImplTest::set_now(13, 0, 0);
-                   TS t1("120000", Format::HHMMSS);
-                   TS t2("120001", Format::HHMMSS);
-                   assertTrue(t2 > t1);
-                   assertFalse(t1 > t2);
+                   date_time::Day(1);
+                   date_time::Now(13, 0, 0);
+                   CTimestamp const t1("120000");
+                   CTimestamp const t2("120001");
+
+                   ASSERT(t2, GT, t1);
+                   ASSERT_FALSE(t1 > t2);
                })
         ->test("comparison - old day msg",
                [] {
-                   DateTimeImplTest::set_day(1);
-                   DateTimeImplTest::set_now(23, 59, 0);
-                   TS t1("235800", Format::HHMMSS);
-                   DateTimeImplTest::set_day(2);
-                   DateTimeImplTest::set_now(0, 0, 0);
-                   TS t2("235900", Format::HHMMSS);
-                   assertTrue(t2 > t1);
-                   assertFalse(t1 > t2);
+                   date_time::Day(1);
+                   date_time::Now(23, 59, 0);
+                   CTimestamp const t1("235800");
+                   date_time::Day(2);
+                   date_time::Now(0, 0, 0);
+                   CTimestamp const t2("235900");
+
+                   ASSERT(t2, GT, t1);
+                   ASSERT_FALSE(t1 > t2);
                })
         ->test("comparison - new day msg",
                [] {
-                   DateTimeImplTest::set_day(1);
-                   DateTimeImplTest::set_now(23, 59, 0);
-                   TS t1("235800", Format::HHMMSS);
-                   DateTimeImplTest::set_day(2);
-                   DateTimeImplTest::set_now(0, 1, 0);
-                   TS t2("000000", Format::HHMMSS);
-                   assertTrue(t2 > t1);
-                   assertFalse(t1 > t2);
+                   date_time::Day(1);
+                   date_time::Now(23, 59, 0);
+                   CTimestamp const t1("235800");
+                   date_time::Day(2);
+                   date_time::Now(0, 1, 0);
+                   CTimestamp const t2("000000");
+
+                   ASSERT(t2, GT, t1);
+                   ASSERT_FALSE(t1 > t2);
                })
         ->test("comparison - incremental day", [] {
-            DateTimeImplTest::set_day(1);
-            DateTimeImplTest::set_now(13, 0, 0);
-            TS t1("120000", Format::HHMMSS);
-            DateTimeImplTest::set_day(2);
-            TS t2("110000", Format::HHMMSS);
-            assertTrue(t2 > t1);
-            assertFalse(t1 > t2);
+            date_time::Day(1);
+            date_time::Now(13, 0, 0);
+            CTimestamp const t1("120000");
+            date_time::Day(2);
+            CTimestamp const t2("110000");
+
+            ASSERT(t2, GT, t1);
+            ASSERT(t1, !GT, t2);
         });
 }

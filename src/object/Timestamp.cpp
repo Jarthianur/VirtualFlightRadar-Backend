@@ -28,8 +28,8 @@ namespace vfrb::object
 {
 namespace date_time
 {
-extern s64 now();
-extern u32 day();
+extern s64 Now();
+extern u32 Day();
 }  // namespace date_time
 
 namespace error
@@ -60,7 +60,7 @@ std::tuple<u32, u32, u32, u32> parseTime(std::string_view::const_iterator&      
     throw error::CTimestampParseError();
 }
 
-CTimestamp::CTimestamp(std::string_view const& sv_) : m_day(date_time::day())
+CTimestamp::CTimestamp(std::string_view const& sv_) : m_day(date_time::Day())
 {
     auto it           = sv_.begin();
     auto [h, m, s, f] = parseTime(it, sv_.end());
@@ -69,7 +69,7 @@ CTimestamp::CTimestamp(std::string_view const& sv_) : m_day(date_time::day())
         throw error::CTimestampParseError();
     }
     m_value = static_cast<s64>(h * 3600000 + m * 60000 + s * 1000 + f);
-    if (m_value >= date_time::now())
+    if (m_value >= date_time::Now())
     {
         --m_day;
     }

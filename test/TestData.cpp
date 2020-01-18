@@ -39,7 +39,7 @@ using namespace object;
 
 void test_data(test::TestSuitesRunner& runner)
 {
-    describe<AircraftData>("Container functions", runner)
+    suite<AircraftData>("Container functions", runner)
         ->test(
             "invalidate aircraft",
             [] {
@@ -105,7 +105,7 @@ void test_data(test::TestSuitesRunner& runner)
                 data.update(std::move(ac));
                 data.processAircrafts(pos, press);
                 data.get_serialized(serial);
-                bool matched = boost::regex_search(serial, match, helper::pflauRe);
+                bool matched = boost::regex_search(serial, match, helper::PflauRE);
                 assertTrue(matched);
                 assertEqStr(match.str(2), "610");
                 for (int i = 0; i < AC_NO_FLARM_THRESHOLD; ++i)
@@ -119,7 +119,7 @@ void test_data(test::TestSuitesRunner& runner)
                 data.processAircrafts(pos, press);
                 serial.clear();
                 data.get_serialized(serial);
-                matched = boost::regex_search(serial, match, helper::pflauRe);
+                matched = boost::regex_search(serial, match, helper::PflauRE);
                 assertTrue(matched);
                 assertEqStr(match.str(2), "1000");
             })
@@ -149,7 +149,7 @@ void test_data(test::TestSuitesRunner& runner)
             data.processAircrafts(pos, press);
             data.get_serialized(dest);
             boost::smatch match;
-            assertTrue(boost::regex_search(dest, match, helper::pflauRe));
+            assertTrue(boost::regex_search(dest, match, helper::PflauRE));
             assertEqStr(match.str(2), "305");
         });
 
@@ -167,7 +167,7 @@ void test_data(test::TestSuitesRunner& runner)
                    assertEquals(data.location().altitude, 100);
                    data.get_serialized(fix);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(fix, match, helper::gpsRe);
+                   bool          matched = boost::regex_search(fix, match, helper::GpsRE);
                    assertTrue(matched);
                })
         ->test("write higher priority",

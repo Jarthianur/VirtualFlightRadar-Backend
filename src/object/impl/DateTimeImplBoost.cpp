@@ -25,14 +25,14 @@
 
 namespace vfrb::object::date_time
 {
-s64 now()
+s64 Now()
 {
     return static_cast<s64>(
         boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
             .total_milliseconds());
 }
 
-u32 day()
+u32 Day()
 {
     return static_cast<u32>(boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
 }

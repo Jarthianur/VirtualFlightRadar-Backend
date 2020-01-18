@@ -19,8 +19,7 @@
  }
  */
 
-#include "util/Logger.hpp"
-
+#include "Logger.hpp"
 #include "helper.hpp"
 
 using namespace sctf;
@@ -32,4 +31,4 @@ void dispatch()
     test_timestamp();
 }
 
-SCTF_DEFAULT_MAIN(createPlainTextReporter(true), dispatch())
+SCTF_DEFAULT_MAIN(create_console_reporter(true), dispatch())

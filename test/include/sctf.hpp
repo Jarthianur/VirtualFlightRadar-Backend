@@ -47,22 +47,22 @@
 #define SCTF_COMMON_TYPES_HPP
 namespace sctf {
 namespace _ {
-class abstract_reporter;
+class reporter;
 using test_function = std::function<void()>;
-struct location final {
-const char* file;
-const int line;
+struct code_location final {
+char const* file;
+int const line;
 };
 template<typename T> struct singleton final {
-static T& instance() {
-static T instance;
+template<typename... Args> static T& instance(Args&&... args_) {
+static T instance(std::forward<Args>(args_)...);
 return instance;
 }
 };
 }// namespace _
-using reporter_shared = std::shared_ptr<_::abstract_reporter>;
 class testsuite;
-using testsuite_shared = std::shared_ptr<testsuite>;
+using reporter_ptr = std::shared_ptr<_::reporter>;
+using testsuite_ptr = std::shared_ptr<testsuite>;
 }// namespace sctf
 #endif// SCTF_COMMON_TYPES_HPP
 #ifndef SCTF_COMMON_TRAITS_HPP
@@ -115,28 +115,29 @@ static const bool value = decltype(test<S, T>(0))::value;
 #ifndef SCTF_COMMON_DURATION_HPP
 #define SCTF_COMMON_DURATION_HPP
 namespace sctf { namespace _ {
-struct duration final {
-duration() : _start(std::chrono::steady_clock::now()) {}
-~duration() noexcept {}
-double get() { return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - _start).count(); }
-protected:
-const std::chrono::steady_clock::time_point _start;
+class duration final {
+public:
+duration() : m_start(std::chrono::steady_clock::now()) {}
+~duration() noexcept = default;
+double get() { return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - m_start).count(); }
+private:
+std::chrono::steady_clock::time_point const m_start;
 };
 }}// namespace sctf::_
 #endif// SCTF_COMMON_DURATION_HPP
 #ifndef SCTF_COMMON_STRINGIFY_HPP
 #define SCTF_COMMON_STRINGIFY_HPP
 namespace sctf { namespace _ {
-template<typename T> static const char* name_for_type() {
+template<typename T> static char const* name_for_type() {
 static thread_local std::string name;
 if(name.length() > 0) { return name.c_str(); }
 #if defined(__GNUG__) || defined(__clang__)
-const std::string sig(__PRETTY_FUNCTION__);
-const auto b = sig.rfind("T = ") + 4;
+std::string const sig(__PRETTY_FUNCTION__);
+auto const b = sig.rfind("T = ") + 4;
 name = sig.substr(b, sig.rfind(']') - b);
 name.erase(std::remove(name.begin(), name.end(), ' '), name.end());
 #else
-const std::string sig(typeid(T).name());
+std::string const sig(typeid(T).name());
 auto b = sig.find("struct ");
 if(b != std::string::npos) {
 name = sig.substr(b + 7);
@@ -151,19 +152,19 @@ name = std::move(sig);
 #endif
 return name.c_str();
 }
-template<typename T, ENABLE_IF(IS_STREAMABLE(T, std::ostringstream) AND NOT IS_FLOAT(T))> std::string to_string(const T& arg) {
+template<typename T, ENABLE_IF(IS_STREAMABLE(T, std::ostringstream) AND NOT IS_FLOAT(T))> std::string to_string(T const& arg_) {
 std::ostringstream oss;
-oss << arg;
+oss << arg_;
 return oss.str();
 }
-template<typename T, ENABLE_IF(IS_STREAMABLE(T, std::ostringstream) AND IS_FLOAT(T))> std::string to_string(const T& arg) {
+template<typename T, ENABLE_IF(IS_STREAMABLE(T, std::ostringstream) AND IS_FLOAT(T))> std::string to_string(T const& arg_) {
 std::ostringstream oss;
-oss << std::setprecision(std::numeric_limits<T>::max_digits10) << arg;
+oss << std::setprecision(std::numeric_limits<T>::max_digits10) << arg_;
 return oss.str();
 }
-template<typename T, ENABLE_IF(NOT IS_STREAMABLE(T, std::ostringstream))> std::string to_string(const T&) { return name_for_type<T>(); }
-inline std::string to_string(const std::nullptr_t&) { return "0"; }
-inline std::string to_string(const bool& arg) { return arg ? "true" : "false"; }
+template<typename T, ENABLE_IF(NOT IS_STREAMABLE(T, std::ostringstream))> std::string to_string(T const&) { return name_for_type<T>(); }
+inline std::string to_string(std::nullptr_t const&) { return "0"; }
+inline std::string to_string(bool const& arg) { return arg ? "true" : "false"; }
 }}// namespace sctf::_
 #endif// SCTF_COMMON_STRINGIFY_HPP
 #ifndef SCTF_COMMON_STREAMBUF_PROXY_OMP_HPP
@@ -178,13 +179,13 @@ namespace sctf { namespace _ {
 class streambuf_proxy_omp : public std::streambuf {
 #define CURRENT_THREAD_BUFFER() (m_thd_buffers.at(static_cast<std::size_t>(omp_get_thread_num())))
 public:
-streambuf_proxy_omp(std::ostream& stream) : m_orig_buf(stream.rdbuf(this)), m_orig_stream(stream), m_thd_buffers(static_cast<std::size_t>(omp_get_max_threads())) {}
+streambuf_proxy_omp(std::ostream& stream_) : m_orig_buf(stream_.rdbuf(this)), m_orig_stream(stream_), m_thd_buffers(static_cast<std::size_t>(omp_get_max_threads())) {}
 virtual ~streambuf_proxy_omp() noexcept override { m_orig_stream.rdbuf(m_orig_buf); }
 std::string str() const { return CURRENT_THREAD_BUFFER().str(); }
 void clear() { CURRENT_THREAD_BUFFER().str(""); }
 protected:
-virtual int_type overflow(int_type c) override { return CURRENT_THREAD_BUFFER().sputc(std::stringbuf::traits_type::to_char_type(c)); }
-virtual std::streamsize xsputn(const char* s, std::streamsize n) override { return CURRENT_THREAD_BUFFER().sputn(s, n); }
+virtual int_type overflow(int_type c_) override { return CURRENT_THREAD_BUFFER().sputc(std::stringbuf::traits_type::to_char_type(c_)); }
+virtual std::streamsize xsputn(char const* s_, std::streamsize n_) override { return CURRENT_THREAD_BUFFER().sputn(s_, n_); }
 std::streambuf* m_orig_buf;
 std::ostream& m_orig_stream;
 std::vector<std::stringbuf> m_thd_buffers;
@@ -201,13 +202,13 @@ std::vector<std::stringbuf> m_thd_buffers;
 namespace sctf { namespace _ {
 class streambuf_proxy : public std::streambuf {
 public:
-streambuf_proxy(std::ostream& stream) : m_orig_buf(stream.rdbuf(this)), m_orig_stream(stream) {}
+streambuf_proxy(std::ostream& stream_) : m_orig_buf(stream_.rdbuf(this)), m_orig_stream(stream_) {}
 virtual ~streambuf_proxy() noexcept override { m_orig_stream.rdbuf(m_orig_buf); }
 std::string str() const { return m_buffer.str(); }
 void clear() { m_buffer.str(""); }
 protected:
-virtual int_type overflow(int_type c) override { return m_buffer.sputc(std::stringbuf::traits_type::to_char_type(c)); }
-virtual std::streamsize xsputn(const char* s, std::streamsize n) override { return m_buffer.sputn(s, n); }
+virtual int_type overflow(int_type c_) override { return m_buffer.sputc(std::stringbuf::traits_type::to_char_type(c_)); }
+virtual std::streamsize xsputn(char const* s_, std::streamsize n_) override { return m_buffer.sputn(s_, n_); }
 std::streambuf* m_orig_buf;
 std::ostream& m_orig_stream;
 std::stringbuf m_buffer;
@@ -219,11 +220,11 @@ std::stringbuf m_buffer;
 namespace sctf { namespace _ {
 class assertion_failure : public std::exception {
 public:
-assertion_failure(const std::string& msg, const location& loc) : std::exception(), m_msg(msg + " at " + loc.file + ":" + std::to_string(loc.line)) {}
+assertion_failure(std::string const& msg_, code_location const& loc_) : m_msg(msg_ + " at " + loc_.file + ":" + std::to_string(loc_.line)) {}
 virtual ~assertion_failure() noexcept override = default;
 inline const char* what() const noexcept override { return m_msg.c_str(); }
 protected:
-const std::string m_msg;
+std::string const m_msg;
 };
 }}// namespace sctf::_
 #endif// SCTF_COMMON_ASSERTION_FAILURE_HPP
@@ -256,53 +257,58 @@ std::size_t m_num_of_errs = 0;
 namespace sctf { namespace _ {
 class testcase {
 public:
-testcase(const testcase&) = delete;
-testcase& operator=(const testcase&) = delete;
+testcase(testcase const&) = delete;
+testcase& operator=(testcase const&) = delete;
 ~testcase() noexcept = default;
-testcase(const char* name, const char* context, test_function&& t_func) : m_name(name), m_context(context), m_test_func(std::move(t_func)) {}
-testcase(testcase&& other) : m_name(other.m_name), m_context(other.m_context), m_state(other.m_state), m_duration(other.m_duration), m_err_msg(std::move(other.m_err_msg)), m_test_func(std::move(other.m_test_func)) {}
-testcase& operator=(testcase&& other) {
-m_name = other.m_name;
-m_context = other.m_context;
-m_state = other.m_state;
-m_duration = other.m_duration;
-m_err_msg = std::move(other.m_err_msg);
-m_test_func = std::move(other.m_test_func);
+testcase(char const* name_, char const* ctx_, test_function&& fn_) : m_name(name_), m_context(ctx_), m_test_func(std::move(fn_)) {}
+testcase(testcase&& other_) : m_name(other_.m_name), m_context(other_.m_context), m_state(other_.m_state), m_duration(other_.m_duration), m_err_msg(std::move(other_.m_err_msg)), m_test_func(std::move(other_.m_test_func)) {}
+testcase& operator=(testcase&& other_) {
+m_name = other_.m_name;
+m_context = other_.m_context;
+m_state = other_.m_state;
+m_duration = other_.m_duration;
+m_err_msg = std::move(other_.m_err_msg);
+m_test_func = std::move(other_.m_test_func);
 return *this;
 }
-enum class result : std::int_fast8_t { NONE, PASSED, FAILED, ERROR };
+enum class result : std::int_fast8_t {
+NONE,///< not yet executed
+PASSED,
+FAILED,
+ERROR
+};
 void operator()() {
 if(m_state != result::NONE) return;
-struct duration dur;
+class duration dur;
 try {
 m_test_func();
 pass();
-} catch(const assertion_failure& e) { fail(e.what()); } catch(const std::exception& e) {
+} catch(assertion_failure const& e) { fail(e.what()); } catch(std::exception const& e) {
 erroneous(e.what());
 } catch(...) { erroneous(); }
 m_duration = dur.get();
 }
 inline result state() const { return m_state; }
 inline double duration() const { return m_duration; }
-inline const std::string& err_msg() const { return m_err_msg; }
-inline const char* name() const { return m_name; }
-inline const char* context() const { return m_context; }
-inline void set_cout(const std::string& str) { m_cout = str; }
-inline void set_cerr(const std::string& str) { m_cerr = str; }
-inline const std::string& cout() const { return m_cout; }
-inline const std::string& cerr() const { return m_cerr; }
+inline std::string const& err_msg() const { return m_err_msg; }
+inline char const* name() const { return m_name; }
+inline char const* context() const { return m_context; }
+inline void cout(std::string const& str_) { m_cout = str_; }
+inline void cerr(std::string const& str_) { m_cerr = str_; }
+inline std::string const& cout() const { return m_cout; }
+inline std::string const& cerr() const { return m_cerr; }
 private:
 inline void pass() { m_state = result::PASSED; }
-inline void fail(const char* msg) {
+inline void fail(char const* msg_) {
 m_state = result::FAILED;
-m_err_msg = msg;
+m_err_msg = msg_;
 }
-inline void erroneous(const char* error = "unknown error") {
+inline void erroneous(char const* err_ = "unknown error") {
 m_state = result::ERROR;
-m_err_msg = error;
+m_err_msg = err_;
 }
-const char* m_name;
-const char* m_context;
+char const* m_name;
+char const* m_context;
 result m_state = result::NONE;
 double m_duration = 0.0;
 std::string m_err_msg;
@@ -324,78 +330,84 @@ namespace sctf {
 class testsuite : public std::enable_shared_from_this<testsuite> {
 public:
 virtual ~testsuite() noexcept = default;
-static testsuite_shared create(const char* name, const char* context) { return testsuite_shared(new testsuite(name, context)); }
+static testsuite_ptr create(char const* name_, char const* ctx_) { return testsuite_ptr(new testsuite(name_, ctx_)); }
 virtual void run() {
 if(m_state != execution_state::DONE) {
 m_stats.m_num_of_tests = m_testcases.size();
 _::streambuf_proxy buf_cout(std::cout);
 _::streambuf_proxy buf_cerr(std::cerr);
-SCTF_EXEC_SILENT(m_setup_func)
-std::for_each(m_testcases.begin(), m_testcases.end(), [this, &buf_cerr, &buf_cout](_::testcase& tc) {
-if(tc.state() == _::testcase::result::NONE) {
-SCTF_EXEC_SILENT(m_pre_test_func)
-tc();
-switch(tc.state()) {
+SCTF_EXEC_SILENT(m_setup_fn)
+std::for_each(m_testcases.begin(), m_testcases.end(), [this, &buf_cerr, &buf_cout](_::testcase& tc_) {
+if(tc_.state() == _::testcase::result::NONE) {
+SCTF_EXEC_SILENT(m_pretest_fn)
+tc_();
+switch(tc_.state()) {
 case _::testcase::result::FAILED: ++m_stats.m_num_of_fails; break;
 case _::testcase::result::ERROR: ++m_stats.m_num_of_errs; break;
 default: break;
 }
-m_time += tc.duration();
-SCTF_EXEC_SILENT(m_post_test_func)
-tc.set_cout(buf_cout.str());
-tc.set_cerr(buf_cerr.str());
+m_time += tc_.duration();
+SCTF_EXEC_SILENT(m_posttest_fn)
+tc_.cout(buf_cout.str());
+tc_.cerr(buf_cerr.str());
 buf_cout.clear();
 buf_cerr.clear();
 }
 });
+SCTF_EXEC_SILENT(m_teardown_fn)
 m_state = execution_state::DONE;
 }
 }
-template<typename T> testsuite_shared test(const char* name, _::test_function&& t_func) {
-m_testcases.push_back(_::testcase(name, _::name_for_type<T>(), std::move(t_func)));
+template<typename T> testsuite_ptr test(char const* name_, _::test_function&& fn_) {
+m_testcases.push_back(_::testcase(name_, _::name_for_type<T>(), std::move(fn_)));
 m_state = execution_state::PENDING;
 return shared_from_this();
 }
-testsuite_shared test(const char* name, const char* context, _::test_function&& t_func) {
-m_testcases.push_back(_::testcase(name, context, std::move(t_func)));
+testsuite_ptr test(char const* name_, char const* ctx_, _::test_function&& fn_) {
+m_testcases.push_back(_::testcase(name_, ctx_, std::move(fn_)));
 m_state = execution_state::PENDING;
 return shared_from_this();
 }
-testsuite_shared test(const char* name, _::test_function&& t_func) {
-m_testcases.push_back(_::testcase(name, m_context, std::move(t_func)));
+testsuite_ptr test(char const* name_, _::test_function&& fn_) {
+m_testcases.push_back(_::testcase(name_, m_context, std::move(fn_)));
 m_state = execution_state::PENDING;
 return shared_from_this();
 }
-testsuite_shared setup(_::test_function&& t_func) {
-m_setup_func = std::move(t_func);
+testsuite_ptr setup(_::test_function&& fn_) {
+m_setup_fn = std::move(fn_);
 return shared_from_this();
 }
-testsuite_shared before(_::test_function&& t_func) {
-m_pre_test_func = std::move(t_func);
+testsuite_ptr teardown(_::test_function&& fn_) {
+m_teardown_fn = std::move(fn_);
 return shared_from_this();
 }
-testsuite_shared after(_::test_function&& t_func) {
-m_post_test_func = std::move(t_func);
+testsuite_ptr before_each(_::test_function&& fn_) {
+m_pretest_fn = std::move(fn_);
 return shared_from_this();
 }
-inline const char* name() const { return m_name; }
-inline const std::chrono::system_clock::time_point& timestamp() const { return m_timestamp; }
-inline const _::statistics& statistics() const { return m_stats; }
+testsuite_ptr after_each(_::test_function&& fn_) {
+m_posttest_fn = std::move(fn_);
+return shared_from_this();
+}
+inline char const* name() const { return m_name; }
+inline std::chrono::system_clock::time_point const& timestamp() const { return m_timestamp; }
+inline _::statistics const& statistics() const { return m_stats; }
 inline double time() const { return m_time; }
-inline const std::vector<_::testcase>& testcases() const { return m_testcases; }
+inline std::vector<_::testcase> const& testcases() const { return m_testcases; }
 protected:
 enum class execution_state : std::int_fast8_t { PENDING, DONE };
-testsuite(const char* name, const char* context) : m_name(name), m_context(context), m_timestamp(std::chrono::system_clock::now()) {}
-const char* m_name;
-const char* m_context;
-const std::chrono::system_clock::time_point m_timestamp;
+testsuite(char const* name_, char const* ctx_) : m_name(name_), m_context(ctx_), m_timestamp(std::chrono::system_clock::now()) {}
+char const* m_name;
+char const* m_context;
+std::chrono::system_clock::time_point const m_timestamp;
 double m_time = 0.0;
 _::statistics m_stats;
 std::vector<_::testcase> m_testcases;
 execution_state m_state = execution_state::PENDING;
-_::test_function m_setup_func;
-_::test_function m_pre_test_func;
-_::test_function m_post_test_func;
+_::test_function m_setup_fn;
+_::test_function m_teardown_fn;
+_::test_function m_pretest_fn;
+_::test_function m_posttest_fn;
 };
 }// namespace sctf
 #endif// SCTF_TESTSUITE_TESTSUITE_HPP
@@ -404,8 +416,10 @@ _::test_function m_post_test_func;
 namespace sctf {
 class testsuite_parallel : public testsuite {
 public:
+testsuite_parallel(testsuite_parallel const&) = delete;
+testsuite_parallel& operator=(testsuite_parallel const&) = delete;
 ~testsuite_parallel() noexcept override = default;
-static testsuite_shared create(const char* name, const char* context) { return testsuite_shared(new testsuite_parallel(name, context)); }
+static testsuite_ptr create(char const* name_, char const* ctx_) { return testsuite_ptr(new testsuite_parallel(name_, ctx_)); }
 void run() override {
 if(m_state != execution_state::DONE) {
 if(m_testcases.size() > std::numeric_limits<long>::max()) { throw std::overflow_error("Too many testcases! Size would overflow loop variant."); }
@@ -413,7 +427,7 @@ const long tc_size = static_cast<long>(m_testcases.size());
 m_stats.m_num_of_tests = m_testcases.size();
 _::streambuf_proxy_omp mt_buf_cout(std::cout);
 _::streambuf_proxy_omp mt_buf_cerr(std::cerr);
-SCTF_EXEC_SILENT(m_setup_func)
+SCTF_EXEC_SILENT(m_setup_fn)
 #pragma omp parallel
 {
 double tmp = 0.0;
@@ -424,7 +438,7 @@ std::size_t errs = 0;
 for(long i = 0; i < tc_size; ++i) {
 auto& tc = m_testcases[static_cast<std::size_t>(i)];
 if(tc.state() == _::testcase::result::NONE) {
-SCTF_EXEC_SILENT(m_pre_test_func)
+SCTF_EXEC_SILENT(m_pretest_fn)
 tc();
 switch(tc.state()) {
 case _::testcase::result::FAILED: ++fails; break;
@@ -432,9 +446,9 @@ case _::testcase::result::ERROR: ++errs; break;
 default: break;
 }
 tmp += tc.duration();
-SCTF_EXEC_SILENT(m_post_test_func)
-tc.set_cout(mt_buf_cout.str());
-tc.set_cerr(mt_buf_cerr.str());
+SCTF_EXEC_SILENT(m_posttest_fn)
+tc.cout(mt_buf_cout.str());
+tc.cerr(mt_buf_cerr.str());
 mt_buf_cout.clear();
 mt_buf_cerr.clear();
 }
@@ -446,11 +460,12 @@ m_stats.m_num_of_errs += errs;
 m_time = std::max(m_time, tmp);
 }
 }
+SCTF_EXEC_SILENT(m_teardown_fn)
 m_state = execution_state::DONE;
 }
 }
 private:
-testsuite_parallel(const char* name, const char* context) : testsuite(name, context) {}
+testsuite_parallel(char const* name_, char const* ctx_) : testsuite(name_, ctx_) {}
 };
 }// namespace sctf
 #endif// SCTF_TESTSUITE_TESTSUITE_PARALLEL_HPP
@@ -461,25 +476,25 @@ class runner {
 public:
 runner() = default;
 ~runner() noexcept = default;
-testsuite_shared register_ts(testsuite_shared ts) {
-m_testsuites.push_back(ts);
-return ts;
+testsuite_ptr add_testsuite(testsuite_ptr ts_) {
+m_testsuites.push_back(ts_);
+return ts_;
 }
 void run() noexcept {
-std::for_each(m_testsuites.begin(), m_testsuites.end(), [](testsuite_shared& ts) { ts->run(); });
+std::for_each(m_testsuites.begin(), m_testsuites.end(), [](testsuite_ptr& ts_) { ts_->run(); });
 }
-const std::vector<testsuite_shared>& testsuites() { return m_testsuites; }
+std::vector<testsuite_ptr> const& testsuites() { return m_testsuites; }
 static runner& default_instance() {
 static runner r;
 return r;
 }
 private:
-std::vector<testsuite_shared> m_testsuites;
+std::vector<testsuite_ptr> m_testsuites;
 };
-inline static testsuite_shared describeParallel(const char* name, const char* context = "main", runner& runner = runner::default_instance()) { return runner.register_ts(testsuite_parallel::create(name, context)); }
-template<typename T> static testsuite_shared describeParallel(const char* name, runner& runner = runner::default_instance()) { return runner.register_ts(testsuite_parallel::create(name, _::name_for_type<T>())); }
-inline static testsuite_shared describe(const char* name, const char* context = "main", runner& runner = runner::default_instance()) { return runner.register_ts(testsuite::create(name, context)); }
-template<typename T> static testsuite_shared describe(const char* name, runner& runner = runner::default_instance()) { return runner.register_ts(testsuite::create(name, _::name_for_type<T>())); }
+inline static testsuite_ptr suite_par(char const* name_, char const* ctx_ = "main", runner& runner_ = runner::default_instance()) { return runner_.add_testsuite(testsuite_parallel::create(name_, ctx_)); }
+template<typename T> static testsuite_ptr suite_par(char const* name_, runner& runner_ = runner::default_instance()) { return runner_.add_testsuite(testsuite_parallel::create(name_, _::name_for_type<T>())); }
+inline static testsuite_ptr suite(char const* name_, char const* ctx_ = "main", runner& runner_ = runner::default_instance()) { return runner_.add_testsuite(testsuite::create(name_, ctx_)); }
+template<typename T> static testsuite_ptr suite(char const* name_, runner& runner_ = runner::default_instance()) { return runner_.add_testsuite(testsuite::create(name_, _::name_for_type<T>())); }
 }// namespace sctf
 #endif// SCTF_TESTSUITE_RUNNER_HPP
 #ifndef SCTF_TESTSUITE_TESTMODULE_HPP
@@ -487,29 +502,30 @@ template<typename T> static testsuite_shared describe(const char* name, runner& 
 namespace sctf { namespace _ {
 class test_module {
 protected:
-test_module(const testsuite_shared& ts) : m_ts(ts) {}
+test_module(testsuite_ptr const& ts_) : m_ts(ts_) {}
 virtual ~test_module() noexcept = default;
-inline void test(const char* name, _::test_function&& fn) { m_ts->test(name, std::move(fn)); }
-inline void setup(_::test_function&& fn) { m_ts->setup(std::move(fn)); }
-inline void before(_::test_function&& fn) { m_ts->before(std::move(fn)); }
-inline void after(_::test_function&& fn) { m_ts->after(std::move(fn)); }
-testsuite_shared m_ts;
+inline void test(char const* name_, _::test_function&& fn_) { m_ts->test(name_, std::move(fn_)); }
+inline void setup(_::test_function&& fn_) { m_ts->setup(std::move(fn_)); }
+inline void teardown(_::test_function&& fn_) { m_ts->teardown(std::move(fn_)); }
+inline void before_each(_::test_function&& fn_) { m_ts->before_each(std::move(fn_)); }
+inline void after_each(_::test_function&& fn_) { m_ts->after_each(std::move(fn_)); }
+testsuite_ptr m_ts;
 };
 }}// namespace sctf::_
 #define TEST_MODULE(NAME, FN, ...) \
 class NAME : public sctf::_::test_module { \
 public: \
-NAME() : sctf::_::test_module(sctf::describe(#NAME, #NAME, ##__VA_ARGS__)) { FN; } \
+NAME() : sctf::_::test_module(sctf::suite(#NAME, #NAME, ##__VA_ARGS__)) { FN; } \
 ~NAME() noexcept override = default; \
 }; \
 namespace sctf { namespace _ { \
 static const auto& mods_##NAME = singleton<NAME>::instance(); \
 } \
 }
-#define TEST_MODULE_PARALLEL(NAME, FN, ...) \
+#define TEST_MODULE_PAR(NAME, FN, ...) \
 class NAME : public sctf::_::test_module { \
 public: \
-NAME() : sctf::_::test_module(sctf::describeParallel(#NAME, #NAME, ##__VA_ARGS__)) { FN; } \
+NAME() : sctf::_::test_module(sctf::suite_par(#NAME, #NAME, ##__VA_ARGS__)) { FN; } \
 ~NAME() noexcept override = default; \
 }; \
 namespace sctf { namespace _ { \
@@ -527,39 +543,39 @@ static const auto& modp_##NAME = singleton<NAME>::instance(); \
 #define SCTF_SPACE "  "
 #define SCTF_XSPACE "    "
 namespace sctf { namespace _ {
-class abstract_reporter {
+class reporter {
 public:
-virtual ~abstract_reporter() noexcept = default;
-std::size_t report(runner& runner = runner::default_instance()) {
+virtual ~reporter() noexcept = default;
+std::size_t report(runner& runner_ = runner::default_instance()) {
 m_abs_errs = 0;
 m_abs_fails = 0;
 m_abs_tests = 0;
 m_abs_time = 0.0;
-runner.run();
+runner_.run();
 begin_report();
-std::for_each(runner.testsuites().begin(), runner.testsuites().end(), [this](const testsuite_shared& ts) {
-m_abs_errs += ts->statistics().errors();
-m_abs_fails += ts->statistics().failures();
-m_abs_tests += ts->statistics().tests();
-m_abs_time += ts->time();
-report_ts(ts);
+std::for_each(runner_.testsuites().begin(), runner_.testsuites().end(), [this](testsuite_ptr const& ts_) {
+m_abs_errs += ts_->statistics().errors();
+m_abs_fails += ts_->statistics().failures();
+m_abs_tests += ts_->statistics().tests();
+m_abs_time += ts_->time();
+report_testsuite(ts_);
 });
 end_report();
 return m_abs_errs + m_abs_fails;
 }
 protected:
-explicit abstract_reporter(std::ostream& stream) : mr_out_stream(stream) {}
-explicit abstract_reporter(const char* fname) : m_out_file(fname), mr_out_stream(m_out_file) {
+explicit reporter(std::ostream& stream_) : mr_out_stream(stream_) {}
+explicit reporter(char const* fname_) : m_out_file(fname_), mr_out_stream(m_out_file) {
 if(!mr_out_stream) { throw std::runtime_error("Could not open file."); }
 }
-inline virtual void report_ts(const testsuite_shared ts) {
-std::for_each(ts->testcases().begin(), ts->testcases().end(), [this](const _::testcase& tc) { report_tc(tc); });
+inline virtual void report_testsuite(testsuite_ptr const ts_) {
+std::for_each(ts_->testcases().begin(), ts_->testcases().end(), [this](const _::testcase& tc) { report_testcase(tc); });
 }
-virtual void report_tc(const testcase& tc) = 0;
+virtual void report_testcase(testcase const& tc_) = 0;
 virtual void begin_report() = 0;
 virtual void end_report() = 0;
-template<typename T> std::ostream& operator<<(const T& _1) {
-mr_out_stream << _1;
+template<typename T> std::ostream& operator<<(T const& t_) {
+mr_out_stream << t_;
 return mr_out_stream;
 }
 std::ofstream m_out_file;
@@ -574,25 +590,25 @@ double m_abs_time = 0;
 #ifndef SCTF_REPORTER_XML_REPORTER_HPP
 #define SCTF_REPORTER_XML_REPORTER_HPP
 namespace sctf {
-class xml_reporter : public _::abstract_reporter {
+class xml_reporter : public _::reporter {
 public:
 ~xml_reporter() noexcept override = default;
-explicit xml_reporter(std::ostream& stream) : abstract_reporter(stream) {}
-explicit xml_reporter(const char* fname) : abstract_reporter(fname) {}
+explicit xml_reporter(std::ostream& stream_) : reporter(stream_) {}
+explicit xml_reporter(char const* fname_) : reporter(fname_) {}
 protected:
-void report_ts(const testsuite_shared ts) override {
-std::time_t stamp = std::chrono::system_clock::to_time_t(ts->timestamp());
+void report_testsuite(testsuite_ptr const ts_) override {
+std::time_t stamp = std::chrono::system_clock::to_time_t(ts_->timestamp());
 char buff[128];
 std::strftime(buff, 127, "%FT%T", std::localtime(&stamp));
-*this << SCTF_SPACE << "<testsuite id=\"" << m_id++ << "\" name=\"" << ts->name() << "\" errors=\"" << ts->statistics().errors() << "\" tests=\"" << ts->statistics().tests() << "\" failures=\"" << ts->statistics().failures() << "\" skipped=\"0\" time=\"" << ts->time() << "\" timestamp=\"" << buff << "\">" << SCTF_LF;
-abstract_reporter::report_ts(ts);
+*this << SCTF_SPACE << "<testsuite id=\"" << m_id++ << "\" name=\"" << ts_->name() << "\" errors=\"" << ts_->statistics().errors() << "\" tests=\"" << ts_->statistics().tests() << "\" failures=\"" << ts_->statistics().failures() << "\" skipped=\"0\" time=\"" << ts_->time() << "\" timestamp=\"" << buff << "\">" << SCTF_LF;
+reporter::report_testsuite(ts_);
 *this << SCTF_SPACE << "</testsuite>" << SCTF_LF;
 }
-void report_tc(const _::testcase& tc) override {
-*this << SCTF_XSPACE << "<testcase name=\"" << tc.name() << "\" classname=\"" << tc.context() << "\" time=\"" << tc.duration() << "\"";
-switch(tc.state()) {
-case _::testcase::result::ERROR: *this << ">" << SCTF_LF << SCTF_XSPACE << SCTF_SPACE << "<error message=\"" << tc.err_msg() << "\"></error>" << SCTF_LF << SCTF_XSPACE << "</testcase>"; break;
-case _::testcase::result::FAILED: *this << ">" << SCTF_LF << SCTF_XSPACE << SCTF_SPACE << "<failure message=\"" << tc.err_msg() << "\"></failure>" << SCTF_LF << SCTF_XSPACE << "</testcase>"; break;
+void report_testcase(_::testcase const& tc_) override {
+*this << SCTF_XSPACE << "<testcase name=\"" << tc_.name() << "\" classname=\"" << tc_.context() << "\" time=\"" << tc_.duration() << "\"";
+switch(tc_.state()) {
+case _::testcase::result::ERROR: *this << ">" << SCTF_LF << SCTF_XSPACE << SCTF_SPACE << "<error message=\"" << tc_.err_msg() << "\"></error>" << SCTF_LF << SCTF_XSPACE << "</testcase>"; break;
+case _::testcase::result::FAILED: *this << ">" << SCTF_LF << SCTF_XSPACE << SCTF_SPACE << "<failure message=\"" << tc_.err_msg() << "\"></failure>" << SCTF_LF << SCTF_XSPACE << "</testcase>"; break;
 case _::testcase::result::PASSED: *this << "/>"; break;
 default: break;
 }
@@ -600,10 +616,10 @@ default: break;
 }
 void begin_report() override { *this << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" << SCTF_LF << "<testsuites>" << SCTF_LF; }
 void end_report() override { *this << "</testsuites>" << SCTF_LF; }
-mutable std::size_t m_id = 0;
+std::size_t mutable m_id = 0;
 };
-static reporter_shared createXmlReporter(std::ostream& stream = std::cout) { return std::make_shared<xml_reporter>(stream); }
-static reporter_shared createXmlReporter(const char* file) { return std::make_shared<xml_reporter>(file); }
+static reporter_ptr create_xml_reporter(std::ostream& stream_ = std::cout) { return std::make_shared<xml_reporter>(stream_); }
+static reporter_ptr create_xml_reporter(char const* fname_) { return std::make_shared<xml_reporter>(fname_); }
 }// namespace sctf
 #endif// SCTF_REPORTER_XML_REPORTER_HPP
 #ifndef SCTF_REPORTER_PLAINTEXT_REPORTER_HPP
@@ -616,25 +632,25 @@ static reporter_shared createXmlReporter(const char* file) { return std::make_sh
 #define ANSI_CYAN "\x1b[36m"
 #define ANSI_RESET "\x1b[0m"
 namespace sctf {
-class plaintext_reporter : public _::abstract_reporter {
+class console_reporter : public _::reporter {
 public:
-~plaintext_reporter() noexcept override = default;
-explicit plaintext_reporter(std::ostream& stream, bool color = false, bool out = false) : abstract_reporter(stream), m_color(color), m_out(out) {}
-explicit plaintext_reporter(const char* fname, bool color = false, bool out = false) : abstract_reporter(fname), m_color(color), m_out(out) {}
+~console_reporter() noexcept override = default;
+explicit console_reporter(std::ostream& stream_, bool color_ = false, bool capture_ = false) : reporter(stream_), m_color(color_), m_capture(capture_) {}
+explicit console_reporter(char const* fname_, bool color_ = false, bool capture_ = false) : reporter(fname_), m_color(color_), m_capture(capture_) {}
 protected:
-void report_ts(const testsuite_shared ts) override {
-*this << "Run Testsuite [" << ts->name() << "]; time = " << ts->time() << "ms" << SCTF_LF;
-abstract_reporter::report_ts(ts);
+void report_testsuite(testsuite_ptr const ts_) override {
+*this << "Run Testsuite [" << ts_->name() << "]; time = " << ts_->time() << "ms" << SCTF_LF;
+reporter::report_testsuite(ts_);
 }
-void report_tc(const _::testcase& tc) override {
-*this << SCTF_SPACE << "Run Testcase [" << tc.name() << "](" << tc.context() << "); time = " << tc.duration() << "ms" << SCTF_LF << SCTF_XSPACE;
-if(m_out) {
-*this << "stdout = '" << tc.cout() << '\'' << SCTF_LF << SCTF_XSPACE;
-*this << "stderr = '" << tc.cerr() << '\'' << SCTF_LF << SCTF_XSPACE;
+void report_testcase(_::testcase const& tc_) override {
+*this << SCTF_SPACE << "Run Testcase [" << tc_.name() << "](" << tc_.context() << "); time = " << tc_.duration() << "ms" << SCTF_LF << SCTF_XSPACE;
+if(m_capture) {
+*this << "stdout = '" << tc_.cout() << '\'' << SCTF_LF << SCTF_XSPACE;
+*this << "stderr = '" << tc_.cerr() << '\'' << SCTF_LF << SCTF_XSPACE;
 }
-switch(tc.state()) {
-case _::testcase::result::ERROR: *this << (m_color ? ANSI_MAGENTA : "") << "ERROR! " << tc.err_msg(); break;
-case _::testcase::result::FAILED: *this << (m_color ? ANSI_RED : "") << "FAILED! " << tc.err_msg(); break;
+switch(tc_.state()) {
+case _::testcase::result::ERROR: *this << (m_color ? ANSI_MAGENTA : "") << "ERROR! " << tc_.err_msg(); break;
+case _::testcase::result::FAILED: *this << (m_color ? ANSI_RED : "") << "FAILED! " << tc_.err_msg(); break;
 case _::testcase::result::PASSED: *this << (m_color ? ANSI_GREEN : "") << "PASSED!"; break;
 default: break;
 }
@@ -650,11 +666,11 @@ if(m_abs_fails >= (m_abs_tests + 1) / 2) {
 *this << "Result:: passed: " << m_abs_tests - m_abs_fails - m_abs_errs << "/" << m_abs_tests << " ; failed: " << m_abs_fails << "/" << m_abs_tests << " ; errors: " << m_abs_errs << "/" << m_abs_tests << " ; time = " << m_abs_time << "ms" << (m_color ? ANSI_RESET : "") << SCTF_LF;
 }
 bool m_color;
-bool m_out;
+bool m_capture;
 };
-static reporter_shared createPlainTextReporter(std::ostream& stream, bool color = false, bool out = false) { return std::make_shared<plaintext_reporter>(stream, color, out); }
-static reporter_shared createPlainTextReporter(bool color = false, bool out = false) { return std::make_shared<plaintext_reporter>(std::cout, color, out); }
-static reporter_shared createPlainTextReporter(const char* file, bool color = false, bool out = false) { return std::make_shared<plaintext_reporter>(file, color, out); }
+static reporter_ptr create_console_reporter(std::ostream& stream_, bool color_ = false, bool capture_ = false) { return std::make_shared<console_reporter>(stream_, color_, capture_); }
+static reporter_ptr create_console_reporter(bool color_ = false, bool capture_ = false) { return std::make_shared<console_reporter>(std::cout, color_, capture_); }
+static reporter_ptr create_console_reporter(char const* fname_, bool color_ = false, bool capture_ = false) { return std::make_shared<console_reporter>(fname_, color_, capture_); }
 }// namespace sctf
 #undef ANSI_RED
 #undef ANSI_BLUE
@@ -666,53 +682,36 @@ static reporter_shared createPlainTextReporter(const char* file, bool color = fa
 #endif// SCTF_REPORTER_PLAINTEXT_REPORTER_HPP
 #ifndef SCTF_REPORTER_HTML_REPORTER_HPP
 #define SCTF_REPORTER_HTML_REPORTER_HPP
-#define TD "<td>"
-#define TD_ "</td>"
-#define TR "<tr>"
-#define TR_ "</tr>"
-#define TH "<th>"
-#define TH_ "</th>"
+#define SCTF_XLF (SCTF_LF SCTF_LF)
 namespace sctf {
-class html_reporter : public _::abstract_reporter {
+class markdown_reporter : public _::reporter {
 public:
-~html_reporter() noexcept override = default;
-explicit html_reporter(std::ostream& stream) : abstract_reporter(stream) {}
-explicit html_reporter(const char* fname) : abstract_reporter(fname) {}
+~markdown_reporter() noexcept override = default;
+explicit markdown_reporter(std::ostream& stream_) : reporter(stream_) {}
+explicit markdown_reporter(char const* fname_) : reporter(fname_) {}
 protected:
-void report_ts(const testsuite_shared ts) override {
-*this << "<h3>" << ts->name() << "</h3>"
-      << "<p>Tests: " << ts->statistics().tests() << " Failures: " << ts->statistics().failures() << " Errors: " << ts->statistics().errors() << " Time: " << ts->time() << "ms</p><table><thead>" << TR << TH << "Name" << TH_ << TH << "Context" << TH_ << TH << "Time" << TH_ << TH << "Status" << TH_ << TR_ << "</thead><tbody>";
-abstract_reporter::report_ts(ts);
-*this << "</tbody></table>";
+void report_testsuite(testsuite_ptr const ts_) override {
+*this << "## " << ts_->name() << SCTF_XLF << "|Tests|Successes|Failures|Errors|Time|" << SCTF_LF << "|-|-|-|-|-|" << SCTF_LF << "|" << ts_->statistics().tests() << "|" << ts_->statistics().successes() << "|" << ts_->statistics().failures() << "|" << ts_->statistics().errors() << "|" << ts_->time() << "ms|" << SCTF_XLF << "### Tests" << SCTF_XLF << "|Name|Context|Time|Status|" << SCTF_LF << "|-|-|-|-|" << SCTF_LF;
+reporter::report_testsuite(ts_);
+*this << SCTF_XLF;
 }
-void report_tc(const _::testcase& tc) override {
-std::string status;
-switch(tc.state()) {
-case _::testcase::result::ERROR: status = "error"; break;
-case _::testcase::result::FAILED: status = "failed"; break;
-case _::testcase::result::PASSED: status = "passed"; break;
+void report_testcase(_::testcase const& tc_) override {
+char const* status = "";
+switch(tc_.state()) {
+case _::testcase::result::ERROR: status = "ERROR"; break;
+case _::testcase::result::FAILED: status = "FAILED"; break;
+case _::testcase::result::PASSED: status = "PASSED"; break;
 default: break;
 }
-*this << "<tr class=\"" << status << "\">" << TD << tc.name() << TD_ << TD << tc.context() << TD_ << TD << tc.duration() << "ms" << TD_ << TD << status << TD_ << TR_;
+*this << "|" << tc_.name() << "|" << tc_.context() << "|" << tc_.duration() << "ms|" << status << "|" << SCTF_LF;
 }
-void begin_report() override {
-*this << "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/>"
-         "<style>table{border-collapse: collapse;min-width: 50%}"
-         "tr,th,td{border: 1px solid black;padding: 2px}.failed{background: lightskyblue}"
-         ".passed{background: lightgreen}.error{background: lightcoral}</style>"
-         "</head><body><header><h1>Test Report</h1></header>";
-}
-void end_report() override { *this << "<footer><h3>Summary</h3><p>Tests: " << m_abs_tests << " Failures: " << m_abs_fails << " Errors: " << m_abs_errs << " Time: " << m_abs_time << "ms</p></footer></body></html>"; }
+void begin_report() override { *this << "# Test Report" << SCTF_XLF; }
+void end_report() override { *this << "## Summary" << SCTF_XLF << "|Tests|Successes|Failures|Errors|Time|" << SCTF_LF << "|-|-|-|-|-|" << SCTF_LF << "|" << m_abs_tests << "|" << (m_abs_tests - m_abs_errs - m_abs_fails) << "|" << m_abs_fails << "|" << m_abs_errs << "|" << m_abs_time << "ms|" << SCTF_LF; }
 };
-static reporter_shared createHtmlReporter(std::ostream& stream = std::cout) { return std::make_shared<html_reporter>(stream); }
-static reporter_shared createHtmlReporter(const char* file) { return std::make_shared<html_reporter>(file); }
+static reporter_ptr create_markdown_reporter(std::ostream& stream_ = std::cout) { return std::make_shared<markdown_reporter>(stream_); }
+static reporter_ptr create_markdown_reporter(char const* file_) { return std::make_shared<markdown_reporter>(file_); }
 }// namespace sctf
-#undef TD
-#undef TD_
-#undef TR
-#undef TR_
-#undef TH
-#undef TH_
+#undef SCTF_XLF
 #endif// SCTF_REPORTER_HTML_REPORTER_HPP
 #ifndef SCTF_COMPARATOR_COMPARATORS_HPP
 #define SCTF_COMPARATOR_COMPARATORS_HPP
@@ -730,36 +729,35 @@ using std::experimental::optional;
 namespace sctf { namespace _ {
 struct comparison final {
 #if __cplusplus >= 201402L
-constexpr comparison() : _failure(nullopt) {}
-comparison(const char* comp_str, const std::string& value, const std::string& expect) : _failure("Expected '" + value + "' " + comp_str + " '" + expect + "'") {}
-explicit operator bool() { return !_failure; }
-const std::string& operator*() const { return *_failure; }
-protected:
-const optional<std::string> _failure;
+constexpr comparison() : m_failure(nullopt) {}
+comparison(char const* comp_str_, std::string const& val_, std::string const& expect_) : m_failure("Expected '" + val_ + "' " + comp_str_ + " '" + expect_ + "'") {}
+explicit operator bool() { return !m_failure; }
+std::string const& operator*() const { return *m_failure; }
+private:
+optional<std::string> const m_failure;
 #else
-constexpr comparison() : _success(true) {}
-comparison(const char* comp_str, const std::string& value, const std::string& expect) : _success(false) {
+constexpr comparison() : m_success(true) {}
+comparison(char const* comp_str_, std::string const& val_, std::string const& expect_) : m_success(false) {
 std::string msg;
-msg.reserve(15 + std::strlen(comp_str) + value.length() + expect.length());
+msg.reserve(15 + std::strlen(comp_str_) + val_.length() + expect_.length());
 msg = "Expected '";
-msg.append(value).append("' ").append(comp_str).append(" '").append(expect).append("'");
+msg.append(val_).append("' ").append(comp_str_).append(" '").append(expect_).append("'");
 error() = msg;
 }
-explicit operator bool() { return _success; }
+explicit operator bool() { return m_success; }
 const std::string& operator*() const { return error(); }
-protected:
-const bool _success;
+private:
+bool const m_success;
 std::string& error() const {
 static thread_local std::string err_msg;
 return err_msg;
 }
 #endif
 };
-template<typename V, typename E = V> using comparator = comparison (*)(const V&, const E&);
 #if __cplusplus >= 201402L
-#define success comparison()
+#define SUCCESS comparison()
 #else
-constexpr comparison success = comparison();
+constexpr comparison SUCCESS = comparison();
 #endif
 #ifdef SCTF_EPSILON
 static double epsilon = SCTF_EPSILON;
@@ -767,15 +765,24 @@ static double epsilon = SCTF_EPSILON;
 extern double epsilon;
 #endif
 }}// namespace sctf::_
+#define COMPARATOR(NAME, CMPSTR, PRED) \
+namespace sctf { namespace _ { \
+class NAME { \
+static constexpr char const* m_cmp_str = "to be " CMPSTR; \
+static constexpr char const* m_neg_cmp_str = "to be not " CMPSTR; \
+bool m_neg = false; \
+public: \
+NAME& operator!() { \
+m_neg = !m_neg; \
+return *this; \
+} \
+template<typename V, typename E = V> comparison operator()(V const& actual_value, E const& expected_value) { return (PRED) != m_neg ? SUCCESS : comparison(m_neg ? m_neg_cmp_str : m_cmp_str, to_string(actual_value), to_string(expected_value)); } \
+}; \
+} \
+}
 #define PROVIDE_COMPARATOR(COMP, NAME) \
 namespace sctf { \
-template<typename V, typename E = V> static _::comparator<V, E> NAME() { return &_::COMP<V, E>; } \
-}
-#define COMPARATOR(NAME, COMPSTR, PRED) \
-namespace sctf { namespace _ { \
-constexpr const char* NAME##_comp_str = COMPSTR; \
-template<typename V, typename E = V> static comparison NAME(const V& value, const E& expect) { return (PRED) ? success : comparison(NAME##_comp_str, to_string(value), to_string(expect)); } \
-} \
+static _::COMP NAME() { return _::COMP(); } \
 }
 #define SCTF_SET_EPSILON(E) \
 namespace sctf { namespace _ { \
@@ -785,34 +792,53 @@ double epsilon = E; \
 #endif// SCTF_COMPARATOR_COMPARATORS_HPP
 #ifndef SCTF_COMPARATOR_LESS_HPP
 #define SCTF_COMPARATOR_LESS_HPP
-COMPARATOR(less_than, "to be less than", value < expect)
+COMPARATOR(less_than, "less than", actual_value < expected_value)
+PROVIDE_COMPARATOR(less_than, LESS_THAN)
 PROVIDE_COMPARATOR(less_than, LESS)
 PROVIDE_COMPARATOR(less_than, LT)
 #endif// SCTF_COMPARATOR_LESS_HPP
-#ifndef SCTF_COMPARATOR_CONTAINS_HPP
-#define SCTF_COMPARATOR_CONTAINS_HPP
+#ifndef SCTF_COMPARATOR_INRANGE_HPP
+#define SCTF_COMPARATOR_INRANGE_HPP
 namespace sctf { namespace _ {
-constexpr const char* in_range_comp_str = "to be in range of";
-template<typename V, typename R, ENABLE_IF(IS_ITERABLE(R) AND NOT IS_TYPE(R, std::string))> static comparison in_range(const V& value, const R& range) { return std::find(range.begin(), range.end(), value) != range.end() ? success : comparison(in_range_comp_str, to_string(value), to_string(range)); }
-template<typename V, typename R = V, ENABLE_IF(IS_TYPE(R, std::string))> comparison in_range(const V& value, const R& range) { return range.find(value) != std::string::npos ? success : comparison(in_range_comp_str, to_string(value), to_string(range)); }
+class in_range {
+static constexpr char const* m_cmp_str = "to be in range of";
+static constexpr char const* m_neg_cmp_str = "to be not in range of";
+bool m_neg = false;
+public:
+in_range& operator!() {
+m_neg = !m_neg;
+return *this;
+}
+template<typename V, typename E = V, ENABLE_IF(IS_ITERABLE(E) AND NOT IS_TYPE(E, std::string))> comparison operator()(V const& actual_value, E const& expected_value) { return (std::find(expected_value.cbegin(), expected_value.cend(), actual_value) != expected_value.cend()) != m_neg ? SUCCESS : comparison(m_neg ? m_neg_cmp_str : m_cmp_str, to_string(actual_value), to_string(expected_value)); }
+template<typename V, typename E = V, ENABLE_IF(IS_TYPE(E, std::string))> comparison operator()(V const& actual_value, E const& expected_value) { return (expected_value.find(actual_value) != std::string::npos) != m_neg ? SUCCESS : comparison(m_neg ? m_neg_cmp_str : m_cmp_str, to_string(actual_value), to_string(expected_value)); }
+};
 }}// namespace sctf::_
 PROVIDE_COMPARATOR(in_range, IN_RANGE)
 PROVIDE_COMPARATOR(in_range, IN)
-#endif// SCTF_COMPARATOR_CONTAINS_HPP
+#endif// SCTF_COMPARATOR_INRANGE_HPP
 #ifndef SCTF_COMPARATOR_UNEQUALS_HPP
 #define SCTF_COMPARATOR_UNEQUALS_HPP
 namespace sctf { namespace _ {
-constexpr const char* unequals_comp_str = "to be unequals";
-template<typename V, typename E = V, ENABLE_IF(NOT IS_FLOAT(V) AND IS_UNEQUAL_COMPARABLE(V, E))> static comparison unequals(const V& value, const E& expect) { return value != expect ? success : comparison(unequals_comp_str, to_string(value), to_string(expect)); }
-template<typename V, typename E = V, ENABLE_IF(NOT IS_FLOAT(V) AND NOT IS_UNEQUAL_COMPARABLE(V, E) AND IS_EQUAL_COMPARABLE(V, E))> static comparison unequals(const V& value, const E& expect) { return value == expect ? comparison(unequals_comp_str, to_string(value), to_string(expect)) : success; }
-template<typename V, typename E = V, ENABLE_IF(IS_FLOAT(V) AND IS_FLOAT(E))> comparison unequals(const V& value, const E& expect) {
+class unequals {
+static constexpr char const* m_cmp_str = "to be unequals";
+static constexpr char const* m_neg_cmp_str = "to be not unequals";
+bool m_neg = false;
+public:
+unequals& operator!() {
+m_neg = !m_neg;
+return *this;
+}
+template<typename V, typename E = V, ENABLE_IF(NOT IS_FLOAT(V) AND IS_UNEQUAL_COMPARABLE(V, E))> comparison operator()(V const& actual_value, E const& expected_value) { return (actual_value != expected_value) != m_neg ? SUCCESS : comparison(m_neg ? m_neg_cmp_str : m_cmp_str, to_string(actual_value), to_string(expected_value)); }
+template<typename V, typename E = V, ENABLE_IF(NOT IS_FLOAT(V) AND NOT IS_UNEQUAL_COMPARABLE(V, E) AND IS_EQUAL_COMPARABLE(V, E))> comparison operator()(V const& actual_value, E const& expected_value) { return (actual_value == expected_value) != m_neg ? comparison(m_neg ? m_neg_cmp_str : m_cmp_str, to_string(actual_value), to_string(expected_value)) : SUCCESS; }
+template<typename V, typename E = V, ENABLE_IF(IS_FLOAT(V) AND IS_FLOAT(E))> comparison operator()(V const& actual_value, E const& expected_value) {
 #if defined(SCTF_EXTERN_EPSILON) || defined(SCTF_EPSILON)
 static V epsilon_ = static_cast<V>(epsilon);
 #else
 static V epsilon_ = std::numeric_limits<V>::epsilon();
 #endif
-return (std::abs(value - expect) <= std::max(std::abs(value), std::abs(expect)) * epsilon_) ? comparison(unequals_comp_str, to_string(value), to_string(expect)) : success;
+return (std::abs(actual_value - expected_value) <= std::max(std::abs(actual_value), std::abs(expected_value)) * epsilon_) != m_neg ? comparison(m_neg ? m_neg_cmp_str : m_cmp_str, to_string(actual_value), to_string(expected_value)) : SUCCESS;
 }
+};
 }}// namespace sctf::_
 PROVIDE_COMPARATOR(unequals, UNEQUALS)
 PROVIDE_COMPARATOR(unequals, NE)
@@ -820,78 +846,85 @@ PROVIDE_COMPARATOR(unequals, NE)
 #ifndef SCTF_COMPARATOR_EQUALS_HPP
 #define SCTF_COMPARATOR_EQUALS_HPP
 namespace sctf { namespace _ {
-constexpr const char* equals_comp_str = "to be equals";
-template<typename V, typename E = V, ENABLE_IF(NOT IS_FLOAT(V) AND IS_EQUAL_COMPARABLE(V, E))> static comparison equals(const V& value, const E& expect) { return value == expect ? success : comparison(equals_comp_str, to_string(value), to_string(expect)); }
-template<typename V, typename E = V, ENABLE_IF(NOT IS_FLOAT(V) AND NOT IS_EQUAL_COMPARABLE(V, E) AND IS_UNEQUAL_COMPARABLE(V, E))> static comparison equals(const V& value, const E& expect) { return value != expect ? comparison(equals_comp_str, to_string(value), to_string(expect)) : success; }
-template<typename V, typename E = V, ENABLE_IF(IS_FLOAT(V) AND IS_FLOAT(E))> comparison equals(const V& value, const E& expect) {
+class equals {
+static constexpr char const* m_cmp_str = "to be equals";
+static constexpr char const* m_neg_cmp_str = "to be not equals";
+bool m_neg = false;
+public:
+equals& operator!() {
+m_neg = !m_neg;
+return *this;
+}
+template<typename V, typename E = V, ENABLE_IF(NOT IS_FLOAT(V) AND IS_EQUAL_COMPARABLE(V, E))> comparison operator()(V const& actual_value, E const& expected_value) { return (actual_value == expected_value) != m_neg ? SUCCESS : comparison(m_neg ? m_neg_cmp_str : m_cmp_str, to_string(actual_value), to_string(expected_value)); }
+template<typename V, typename E = V, ENABLE_IF(NOT IS_FLOAT(V) AND NOT IS_EQUAL_COMPARABLE(V, E) AND IS_UNEQUAL_COMPARABLE(V, E))> comparison operator()(V const& actual_value, E const& expected_value) { return (actual_value != expected_value) != m_neg ? comparison(m_neg ? m_neg_cmp_str : m_cmp_str, to_string(actual_value), to_string(expected_value)) : SUCCESS; }
+template<typename V, typename E = V, ENABLE_IF(IS_FLOAT(V) AND IS_FLOAT(E))> comparison operator()(V const& actual_value, E const& expected_value) {
 #if defined(SCTF_EXTERN_EPSILON) || defined(SCTF_EPSILON)
 static V epsilon_ = static_cast<V>(epsilon);
 #else
 static V epsilon_ = std::numeric_limits<V>::epsilon();
 #endif
-return (std::abs(value - expect) <= std::max(std::abs(value), std::abs(expect)) * epsilon_) ? success : comparison(equals_comp_str, to_string(value), to_string(expect));
+return (std::abs(actual_value - expected_value) <= std::max(std::abs(actual_value), std::abs(expected_value)) * epsilon_) != m_neg ? SUCCESS : comparison(m_neg ? m_neg_cmp_str : m_cmp_str, to_string(actual_value), to_string(expected_value));
 }
+};
 }}// namespace sctf::_
 PROVIDE_COMPARATOR(equals, EQUALS)
 PROVIDE_COMPARATOR(equals, EQ)
 #endif// SCTF_COMPARATOR_EQUALS_HPP
 #ifndef SCTF_COMPARATOR_GREATER_HPP
 #define SCTF_COMPARATOR_GREATER_HPP
-COMPARATOR(greater_than, "to be greater than", value > expect)
+COMPARATOR(greater_than, "greater than", actual_value > expected_value)
+PROVIDE_COMPARATOR(greater_than, GREATER_THAN)
 PROVIDE_COMPARATOR(greater_than, GREATER)
 PROVIDE_COMPARATOR(greater_than, GT)
 #endif// SCTF_COMPARATOR_GREATER_HPP
 #ifndef SCTF_ASSERT_HPP
 #define SCTF_ASSERT_HPP
-// disable assert macro
-#ifdef assert
-#undef assert
-#endif
-// provide assertion macros and wrappers
-#define assert(VALUE, COMP, EXPECT) sctf::_::_assertStatement(VALUE, EXPECT, COMP<decltype(VALUE), decltype(EXPECT)>(), sctf::_::location{__FILE__, __LINE__})
-#define assertT(VALUE, COMP, EXPECT, TYPE) sctf::_::_assertStatement<TYPE, TYPE>(VALUE, EXPECT, COMP<TYPE, TYPE>(), sctf::_::location{__FILE__, __LINE__})
-#define assertEquals(VALUE, EXPECT) assertT(VALUE, EQUALS, EXPECT, decltype(VALUE))
-#define assertTrue(VALUE) sctf::_::_assertStatement<bool>(VALUE, true, sctf::EQUALS<bool>(), sctf::_::location{__FILE__, __LINE__})
-#define assertFalse(VALUE) sctf::_::_assertStatement<bool>(VALUE, false, sctf::EQUALS<bool>(), sctf::_::location{__FILE__, __LINE__})
-#define assertNotNull(VALUE) sctf::_::_assertStatement(static_cast<void* const>(VALUE), nullptr, sctf::UNEQUALS<void* const, std::nullptr_t>(), sctf::_::location{__FILE__, __LINE__})
-#define assertZero(VALUE) sctf::_::_assertStatement(VALUE, static_cast<decltype(VALUE)>(0), sctf::EQUALS<decltype(VALUE)>(), sctf::_::location{__FILE__, __LINE__})
-#define assertException(FUNC, TYPE) sctf::_::_assertException<TYPE>([&] { FUNC; }, sctf::_::location{__FILE__, __LINE__})
-#define assertNoExcept(FUNC) sctf::_::_assertNoExcept([&] { FUNC; }, sctf::_::location{__FILE__, __LINE__})
-#define assertPerformance(FUNC, MILLIS) sctf::_::_assertPerformance([&] { FUNC; }, MILLIS, sctf::_::location{__FILE__, __LINE__})
+#define ASSERT(VALUE, COMP, EXPECT) sctf::_::assert_statement(VALUE, EXPECT, COMP(), sctf::_::code_location{__FILE__, __LINE__})
+#define ASSERT_NOT(VALUE, COMP, EXPECT) sctf::_::assert_statement(VALUE, EXPECT, !COMP(), sctf::_::code_location{__FILE__, __LINE__})
+#define ASSERT_EQUALS(VALUE, EXPECT) sctf::_::assert_statement(VALUE, EXPECT, sctf::EQUALS(), sctf::_::code_location{__FILE__, __LINE__})
+#define ASSERT_TRUE(VALUE) sctf::_::assert_statement(VALUE, true, sctf::EQUALS(), sctf::_::code_location{__FILE__, __LINE__})
+#define ASSERT_FALSE(VALUE) sctf::_::assert_statement(VALUE, false, sctf::EQUALS(), sctf::_::code_location{__FILE__, __LINE__})
+#define ASSERT_NULL(VALUE) sctf::_::assert_statement(static_cast<void const*>(VALUE), nullptr, sctf::EQUALS(), sctf::_::code_location{__FILE__, __LINE__})
+#define ASSERT_NOT_NULL(VALUE) sctf::_::assert_statement(static_cast<void const*>(VALUE), nullptr, sctf::UNEQUALS(), sctf::_::code_location{__FILE__, __LINE__})
+#define ASSERT_ZERO(VALUE) sctf::_::assert_statement(VALUE, static_cast<decltype(VALUE)>(0), sctf::EQUALS(), sctf::_::code_location{__FILE__, __LINE__})
+#define ASSERT_THROWS(FUNC, TYPE) sctf::_::assert_throws<TYPE>([&] { FUNC; }, sctf::_::code_location{__FILE__, __LINE__})
+#define ASSERT_NOTHROW(FUNC) sctf::_::assert_nothrow([&] { FUNC; }, sctf::_::code_location{__FILE__, __LINE__})
+#define ASSERT_PERFORMANCE(FUNC, MILLIS) sctf::_::assert_performance([&] { FUNC; }, MILLIS, sctf::_::code_location{__FILE__, __LINE__})
 namespace sctf { namespace _ {
-template<typename V, typename E = V> static void _assertStatement(const V& value, const E& expect, comparator<V, E> comp, const location& loc) {
-comparison res = (*comp)(value, expect);
-if(!res) { throw assertion_failure(*res, loc); }
+template<typename C, typename V, typename E = V> static void assert_statement(V const& val_, E const& expect_, C&& cmp_, code_location const& loc_) {
+comparison res = cmp_(val_, expect_);
+if(!res) { throw assertion_failure(*res, loc_); }
 }
-template<typename T> static void _assertException(const test_function& func, const location& loc) {
+template<typename T> static void assert_throws(test_function&& fn_, code_location const& loc_) {
 try {
-func();
-} catch(const T&) { return; } catch(const std::exception& e) {
-throw assertion_failure(std::string("Wrong exception thrown, caught '") + to_string(e) + "'", loc);
-} catch(...) { throw assertion_failure("Wrong exception thrown", loc); }
-throw assertion_failure(std::string("No exception thrown, expected '") + name_for_type<T>() + "'", loc);
+fn_();
+} catch(T const&) { return; } catch(std::exception const& e) {
+throw assertion_failure(std::string("Wrong exception thrown, caught '") + to_string(e) + "'", loc_);
+} catch(...) { throw assertion_failure("Wrong exception thrown", loc_); }
+throw assertion_failure(std::string("No exception thrown, expected '") + name_for_type<T>() + "'", loc_);
 }
-static void _assertNoExcept(const test_function& func, const location& loc) {
+static void assert_nothrow(test_function&& fn_, code_location const& loc_) {
 try {
-func();
-} catch(const std::exception& e) { throw assertion_failure(std::string("Expected no exception, caught '") + to_string(e) + "'", loc); } catch(...) {
-throw assertion_failure("Expected no exception", loc);
+fn_();
+} catch(const std::exception& e) { throw assertion_failure(std::string("Expected no exception, caught '") + to_string(e) + "'", loc_); } catch(...) {
+throw assertion_failure("Expected no exception", loc_);
 }
 }
-static void _assertPerformance(const test_function& func, double max_millis, const location& loc) {
+static void assert_performance(test_function&& fn_, double max_ms_, code_location const& loc_) {
 try {
 duration dur;
-func();
+fn_();
 double dur_ms = dur.get();
-if(dur_ms > max_millis) { throw assertion_failure(std::string("runtime > ") + to_string(max_millis) + "ms", loc); }
-} catch(const std::exception& e) { throw assertion_failure(e.what(), loc); } catch(...) {
-throw assertion_failure("Unknown exception thrown", loc);
+if(dur_ms > max_ms_) { throw assertion_failure(std::string("runtime > ") + to_string(max_ms_) + "ms", loc_); }
+} catch(std::exception const& e) { throw assertion_failure(e.what(), loc_); } catch(...) {
+throw assertion_failure("Unknown exception thrown", loc_);
 }
 }
 }}// namespace sctf::_
 #endif// SCTF_ASSERT_HPP
 #ifndef SCTF_SCTF_HPP
 #define SCTF_SCTF_HPP
+#define SCFT_VERSION "1.2-rc0"
 #define SCTF_DEFAULT_MAIN(REPORTER, ...) \
 int main(int, char**) { \
 __VA_ARGS__; \

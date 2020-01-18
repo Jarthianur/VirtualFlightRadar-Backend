@@ -19,54 +19,47 @@
  }
  */
 
-#include "util/math.hpp"
+#include "math/math.hpp"
 
 #include "helper.hpp"
 
 using namespace sctf;
+using namespace vfrb;
 
 TEST_MODULE(test_math, {
     test("radian", [] {
-        assertEquals(math::radian(45.0), 0.785398);
-        assertEquals(math::radian(0.0), 0.0);
-        assertEquals(math::radian(360.0), 6.28319);
+        ASSERT_EQUALS(math::Radian(45.0), 0.785398);
+        ASSERT_EQUALS(math::Radian(0.0), 0.0);
+        ASSERT_EQUALS(math::Radian(360.0), 6.28319);
     });
     test("degree", [] {
-        assertEquals(math::degree(0.785398), 45.0);
-        assertEquals(math::degree(0.0), 0.0);
-        assertEquals(math::degree(6.28319), 360.0);
+        ASSERT_EQUALS(math::Degree(0.785398), 45.0);
+        ASSERT_EQUALS(math::Degree(0.0), 0.0);
+        ASSERT_EQUALS(math::Degree(6.28319), 360.0);
     });
     test("doubleToInt", [] {
-        assertEquals(math::doubleToInt(0.0), 0);
-        assertEquals(math::doubleToInt(1.4), 1);
-        assertEquals(math::doubleToInt(1.5), 2);
-        assertEquals(math::doubleToInt(-1.4), -1);
-        assertEquals(math::doubleToInt(-1.5), -2);
+        ASSERT_EQUALS(math::DoubleToInt(0.0), 0);
+        ASSERT_EQUALS(math::DoubleToInt(1.4), 1);
+        ASSERT_EQUALS(math::DoubleToInt(1.5), 2);
+        ASSERT_EQUALS(math::DoubleToInt(-1.4), -1);
+        ASSERT_EQUALS(math::DoubleToInt(-1.5), -2);
     });
     test("dmToDeg", [] {
-        assertEquals(math::dmToDeg(0.0), 0.0);
-        assertEquals(math::dmToDeg(9030.50), 90.508333);
-        assertEquals(math::dmToDeg(18000.0), 180.0);
-        assertEquals(math::dmToDeg(-4512.3456), 45.205760);
+        ASSERT_EQUALS(math::DmToDeg(0.0), 0.0);
+        ASSERT_EQUALS(math::DmToDeg(9030.50), 90.508333);
+        ASSERT_EQUALS(math::DmToDeg(18000.0), 180.0);
+        ASSERT_EQUALS(math::DmToDeg(-4512.3456), 45.205760);
     });
     test("calcIcaoHeight", [] {
-        assertEquals(math::icaoHeight(0.0), 44331);
-        assertEquals(math::icaoHeight(1013.25), 0);
-        assertEquals(math::icaoHeight(980.0), 281);
-    });
-    test("checksum", [] {
-        assertEquals(math::checksum("", sizeof("")), 0);
-        assertEquals(math::checksum("\0", sizeof("\0")), 0);
-        assertEquals(math::checksum("$abc*", sizeof("$abc*")), 96);
+        ASSERT_EQUALS(math::IcaoHeight(0.0), 44331);
+        ASSERT_EQUALS(math::IcaoHeight(1013.25), 0);
+        ASSERT_EQUALS(math::IcaoHeight(980.0), 281);
     });
     test("saturate", [] {
-        assertEquals(math::saturate(15, 0, 10), 10);
-        assertEquals(math::saturate(9, 0, 10), 9);
-        assertEquals(math::saturate(1, 3, 10), 3);
-        assertEquals(math::saturate(-5, -10, 10), -5);
-        assertEquals(math::saturate(-5, 0, 10), 0);
-    });
-    test("checkLimits", [] {
-
+        ASSERT_EQUALS(math::Saturate(15, 0, 10), 10);
+        ASSERT_EQUALS(math::Saturate(9, 0, 10), 9);
+        ASSERT_EQUALS(math::Saturate(1, 3, 10), 3);
+        ASSERT_EQUALS(math::Saturate(-5, -10, 10), -5);
+        ASSERT_EQUALS(math::Saturate(-5, 0, 10), 0);
     });
 })

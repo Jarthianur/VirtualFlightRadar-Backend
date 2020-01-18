@@ -31,16 +31,16 @@ using namespace sctf;
 
 void test_data_processor(test::TestSuitesRunner& runner)
 {
-    describe<GpsProcessor>("Process GPS data", runner)->test("process", [] {
+    suite<GpsProcessor>("Process GPS data", runner)->test("process", [] {
         GpsProcessor  gpsp;
         boost::smatch match;
         GpsPosition   pos({0.0, 0.0, 0}, 48.0);
         gpsp.process(pos);
-        bool matched = boost::regex_search(pos.get_serialized(), match, helper::gpsRe);
+        bool matched = boost::regex_search(pos.get_serialized(), match, helper::GpsRE);
         assertTrue(matched);
     });
 
-    describe<AircraftProcessor>("Process Aircrafts", runner)
+    suite<AircraftProcessor>("Process Aircrafts", runner)
         ->test("Aircraft at,above base pos",
                [] {
                    AircraftProcessor proc;
@@ -52,13 +52,13 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({49.0, 8.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "0");
                    assertEqStr(match.str(2), "1000");
                    assertEqStr(match.str(3), "0");
                    assertEqStr(match.str(4), "BBBBBB");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "0");
                    assertEqStr(match.str(2), "0");
@@ -90,11 +90,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({-0.1, 0.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "0");
                    assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "22239");
                    assertEqStr(match.str(2), "0");
@@ -111,11 +111,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({0.1, 0.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "180");
                    assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-22239");
                    assertEqStr(match.str(2), "0");
@@ -132,11 +132,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({89.9, 180.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "0");
                    assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "22239");
                    assertEqStr(match.str(2), "0");
@@ -153,11 +153,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({-89.9, 180.0, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-180");
                    assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-22239");
                    assertEqStr(match.str(2), "0");
@@ -174,11 +174,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({0.0, 0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-90");
                    assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "0");
                    assertEqStr(match.str(2), "-22239");
@@ -195,11 +195,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({0.0, -0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "90");
                    assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "0");
                    assertEqStr(match.str(2), "22239");
@@ -216,11 +216,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({60.0, 0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-90");
                    assertEqStr(match.str(3), "11119");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "17");
                    assertEqStr(match.str(2), "-11119");
@@ -237,11 +237,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({-60.0, -0.1, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "90");
                    assertEqStr(match.str(3), "11119");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-17");
                    assertEqStr(match.str(2), "11119");
@@ -258,11 +258,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({0.0, 179.9, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "90");
                    assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "0");
                    assertEqStr(match.str(2), "22239");
@@ -279,11 +279,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({0.0, -179.9, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-90");
                    assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "0");
                    assertEqStr(match.str(2), "-22239");
@@ -300,11 +300,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({33.653124, -112.692253, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "66");
                    assertEqStr(match.str(3), "47768");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "19302");
                    assertEqStr(match.str(2), "43695");
@@ -321,11 +321,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({-34.680059, -58.818111, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "132");
                    assertEqStr(match.str(3), "3260");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-2199");
                    assertEqStr(match.str(2), "2407");
@@ -342,11 +342,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({5.392435, -5.748392, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-161");
                    assertEqStr(match.str(3), "674");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-638");
                    assertEqStr(match.str(2), "-219");
@@ -363,11 +363,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({-26.069244, 15.484389, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-8");
                    assertEqStr(match.str(3), "318804");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "315692");
                    assertEqStr(match.str(2), "-44437");
@@ -384,11 +384,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({-25.278208, 133.366885, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "179");
                    assertEqStr(match.str(3), "97188");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-97183");
                    assertEqStr(match.str(2), "978");
@@ -405,11 +405,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
                    proc.referTo({49.719521, 9.083279, 0}, 1013.25);
                    proc.process(ac);
                    boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "92");
                    assertEqStr(match.str(3), "314");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+                   matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
                    assertTrue(matched);
                    assertEqStr(match.str(1), "-8");
                    assertEqStr(match.str(2), "314");
@@ -425,11 +425,11 @@ void test_data_processor(test::TestSuitesRunner& runner)
             proc.referTo({65.900837, 101.570680, 0}, 1013.25);
             proc.process(ac);
             boost::smatch match;
-            bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
+            bool          matched = boost::regex_search(ac.get_serialized(), match, helper::PflauRE);
             assertTrue(matched);
             assertEqStr(match.str(1), "176");
             assertEqStr(match.str(3), "3673118");
-            matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
+            matched = boost::regex_search(ac.get_serialized(), match, helper::PflaaRE);
             assertTrue(matched);
             assertEqStr(match.str(1), "-3666184");
             assertEqStr(match.str(2), "225589");

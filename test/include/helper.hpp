@@ -34,33 +34,31 @@
 #pragma clang diagnostic ignored "-Wweak-vtables"
 #include "sctf.hpp"
 
-#define syso(M) std::cout << M << std::endl
-#define assertEqStr(V, E) assertT(V, EQUALS, E, std::string)
-
 namespace sctf
 {
 namespace _
 {
 template<>
-inline std::string to_string<object::Aircraft::TargetType>(const object::Aircraft::TargetType& crTargetType)
+inline std::string
+    to_string<vfrb::object::CAircraft::ETargetType>(vfrb::object::CAircraft::ETargetType const& tt_)
 {
-    return std::to_string(util::raw_type(crTargetType));
+    return std::to_string(vfrb::util::AsUnderlyingType(tt_));
 }
 }  // namespace _
 }  // namespace sctf
 
 namespace helper
 {
-static boost::regex pflauRe("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
-static boost::regex pflaaRe(
+static boost::regex const PflauRE("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
+static boost::regex const PflaaRE(
     "\\$PFLAA,0,([-]?\\d+?),([-]?\\d+?),([-]?\\d+?),(\\d+?),(\\S{6}),(\\d{3})?,,(\\d+?)?,([-]?\\d+?\\.\\d+?)?,([0-9A-F]{1,2})\\*(?:\\S{2})");
-static boost::regex gpsRe(
+static boost::regex const GpsRE(
     "(\\$GPRMC,\\d{6},A,0000\\.00,N,00000\\.00,E,0,0,\\d{6},001\\.0,W\\*[0-9a-fA-F]{2}\\s*)?(\\$GPGGA,\\d{6},0000\\.0000,N,00000\\.0000,E,1,00,1,0,M,0\\.0,M,,\\*[0-9a-fA-F]{2}\\s*)?");
 
-static std::string timePlus(std::int32_t val)
+static std::string TimePlus(std::int32_t val_)
 {
     return boost::posix_time::to_iso_string(
         boost::posix_time::time_duration(boost::posix_time::second_clock::local_time().time_of_day()) +
-        boost::posix_time::seconds(val));
+        boost::posix_time::seconds(val_));
 }
 }  // namespace helper
