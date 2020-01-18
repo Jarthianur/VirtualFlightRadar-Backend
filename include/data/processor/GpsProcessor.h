@@ -24,8 +24,8 @@
 #include <ctime>
 
 #include "object/GpsPosition.h"
-#include "util/CString.hpp"
 
+#include "String.hpp"
 #include "types.h"
 
 namespace vfrb::data::processor
@@ -33,7 +33,7 @@ namespace vfrb::data::processor
 /**
  * @brief Process GPS positions to NMEA GGA and RMC sentences.
  */
-class GpsProcessor
+class CGpsProcessor
 {
 public:
     inline static constexpr auto NMEA_SIZE = 192;
@@ -51,30 +51,30 @@ private:
      * @param position The position
      * @param utc      The current utc time
      */
-    usize appendGPGGA(object::GpsPosition const& position, util::CString<NMEA_SIZE>& nmea, std::tm const* utc,
-                      usize pos) const;
+    usize appendGpgga(object::CGpsPosition const& pos_, CString<NMEA_SIZE>& nmea_, std::tm const* utc_,
+                      usize idx_) const;
 
     /**
      * @brief Append GPRMC sentence to processing string.
      * @param utc The current utc time
      */
-    usize appendGPRMC(util::CString<NMEA_SIZE>& nmea, std::tm const* utc, usize pos) const;
+    usize appendGprmc(CString<NMEA_SIZE>& nmea_, std::tm const* utc_, usize idx_) const;
 
     /**
      * @brief Evaluate position for given latitude and longitude.
      * @param latitude  The latitude
      * @param longitude The longitude
      */
-    void evalPosition(f64 latitude, f64 longitude) const;
+    void evalPosition(f64 lat_, f64 lon_) const;
 
 public:
-    GpsProcessor()           = default;
-    ~GpsProcessor() noexcept = default;
+    CGpsProcessor()           = default;
+    ~CGpsProcessor() noexcept = default;
 
     /**
      * @brief Process a GPS position.
      * @param rPosition The position
      */
-    void process(object::GpsPosition const& position, util::CString<NMEA_SIZE>& nmea) const;
+    void Process(object::CGpsPosition const& pos_, CString<NMEA_SIZE>& nmea_) const;
 };
 }  // namespace vfrb::data::processor

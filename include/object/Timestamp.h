@@ -31,48 +31,36 @@ namespace vfrb::object
 {
 namespace error
 {
-class TimestampParseError : public vfrb::error::Error
+/// Error to indicate timestamp parsing failure.
+class CTimestampParseError : public vfrb::error::IError
 {
 public:
-    TimestampParseError()                    = default;
-    ~TimestampParseError() noexcept override = default;
+    CTimestampParseError()                    = default;
+    ~CTimestampParseError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 
-/**
- * @brief A timestamp
- * @tparam DateTimeT The provider of time functions
- */
-class Timestamp
+/// A self parsing Timestamp
+class CTimestamp
 {
     s64 m_value = 0;  ///< Time in milliseconds
     u32 m_day   = 0;  ///< Incremental day number
 
 public:
-    Timestamp() = default;
-    /**
-     * @param value  The time string
-     * @param format The format
-     * @throw std::invalid_argument if the time string is invalid
-     */
-    Timestamp(std::string_view const& value);
-    Timestamp(Timestamp const& other);  ///< @param other The other Timestamp
-    ~Timestamp() noexcept = default;
+    CTimestamp() = default;
 
     /**
-     * @brief Assign other TimeStamps value.
-     * @param other The other Timestamp
-     * @return this
+     * @param sv_ The time string
+     * @throw vfrb::object::error::CTimestampParseError
      */
-    Timestamp& operator=(Timestamp const& other);
+    CTimestamp(std::string_view const& sv_);
+    CTimestamp(CTimestamp const& other_);
+    ~CTimestamp() noexcept = default;
 
-    /**
-     * @brief Compare this value to be less than, or equals others.
-     * @param other The other Timestamp
-     * @return true if less, or equals, else false
-     */
-    bool operator>(Timestamp const& other) const;
+    CTimestamp& operator=(CTimestamp const& other_);
+
+    bool operator>(CTimestamp const& other_) const;
 };
 }  // namespace vfrb::object

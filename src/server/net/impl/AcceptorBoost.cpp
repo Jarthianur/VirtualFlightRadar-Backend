@@ -19,33 +19,34 @@
  }
  */
 
-#include "server/net/impl/NetworkInterfaceImplBoost.h"
+#include "server/net/impl/AcceptorBoost.h"
 
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
 
 #include "server/Connection.hpp"
-#include "util/Logger.hpp"
+
+#include "Logger.hpp"
 
 namespace vfrb::server::net
 {
 constexpr auto     LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
-static auto const& logger     = Logger::instance();
+static auto const& logger     = CLogger::Instance();
 
-NetworkInterfaceImplBoost::NetworkInterfaceImplBoost(u16 port)
-    : NetworkInterface<SocketImplBoost>(),
+CAcceptorBoost::CAcceptorBoost(u16 port_)
+    : IAcceptor<CSocketBoost>(),
       m_ioService(),
-      m_acceptor(m_ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port),
+      m_acceptor(m_ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port_),
                  boost::asio::ip::tcp::acceptor::reuse_address(true)),
       m_socket(boost::move(boost::asio::ip::tcp::socket(m_ioService)))
 {}
 
-NetworkInterfaceImplBoost::~NetworkInterfaceImplBoost() noexcept
+CAcceptorBoost::~CAcceptorBoost() noexcept
 {
-    stop();
+    Stop();
 }
 
-void NetworkInterfaceImplBoost::run()
+void CAcceptorBoost::Run()
 {
     try
     {
@@ -56,15 +57,15 @@ void NetworkInterfaceImplBoost::run()
     }
     catch (std::exception const& e)
     {
-        logger.error(LOG_PREFIX, ": ", e.what());
+        logger.Error(LOG_PREFIX, ": ", e.what());
     }
     catch (...)
     {
-        logger.error(LOG_PREFIX, ": unknown error");
+        logger.Error(LOG_PREFIX, ": unknown error");
     }
 }
 
-void NetworkInterfaceImplBoost::stop()
+void CAcceptorBoost::Stop()
 {
     if (m_acceptor.is_open())
     {
@@ -74,43 +75,43 @@ void NetworkInterfaceImplBoost::stop()
     {
         m_ioService.stop();
     }
-    m_socket.close();
+    m_socket.Close();
 }
 
-void NetworkInterfaceImplBoost::onAccept(Callback const& callback)
+void CAcceptorBoost::OnAccept(Callback&& cb_)
 {
     if (m_acceptor.is_open())
     {
-        m_acceptor.async_accept(m_socket.get(), boost::bind(&NetworkInterfaceImplBoost::handleAccept, this,
-                                                            boost::asio::placeholders::error, callback));
+        m_acceptor.async_accept(m_socket.Get(), boost::bind(&CAcceptorBoost::handleAccept, this,
+                                                            boost::asio::placeholders::error, cb_));
     }
 }
 
-void NetworkInterfaceImplBoost::close()
+void CAcceptorBoost::Close()
 {
-    m_socket.close();
+    m_socket.Close();
 }
 
-void NetworkInterfaceImplBoost::handleAccept(boost::system::error_code const& error, Callback const& callback)
+void CAcceptorBoost::handleAccept(boost::system::error_code const& err_, Callback const& cb_)
 {
-    if (error)
+    if (err_)
     {
-        logger.debug(LOG_PREFIX, "accept: ", error.message());
+        logger.Debug(LOG_PREFIX, "accept: ", err_.message());
     }
-    callback(bool(error));
+    cb_(bool(err_));
 }
 
-Connection<SocketImplBoost> NetworkInterfaceImplBoost::startConnection()
+CConnection<CSocketBoost> CAcceptorBoost::StartConnection()
 {
-    if (!m_socket.get().is_open())
+    if (!m_socket.Get().is_open())
     {
-        throw error::SocketError("cannot start connection on closed socket");
+        throw error::CSocketError("cannot start connection on closed socket");
     }
-    return Connection<SocketImplBoost>(std::move(m_socket));
+    return CConnection<CSocketBoost>(std::move(m_socket));
 }
 
-str NetworkInterfaceImplBoost::stagedAddress() const
+Str CAcceptorBoost::StagedAddress() const
 {
-    return m_socket.address();
+    return m_socket.Address();
 }
 }  // namespace vfrb::server::net

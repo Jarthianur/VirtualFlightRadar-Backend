@@ -32,16 +32,15 @@ namespace vfrb::data
 /**
  * @brief Store wind information.
  */
-class WindData : public Data
+class CWindData : public IData
 {
     concurrent::Mutex mutable m_mutex;
-
-    object::Wind GUARDED_BY(m_mutex) m_wind;  ///< The Wind information
+    object::CWind GUARDED_BY(m_mutex) m_wind;  ///< The Wind information
 
 public:
-    explicit WindData(AccessFn&& fn);
-    WindData(AccessFn&& fn, object::Wind const& wind);  ///< @param wind The initial wind information
-    ~WindData() noexcept override = default;
+    explicit CWindData(AccessFn&& fn_);
+    CWindData(AccessFn&& fn_, object::CWind const& wind_);  ///< @param wind The initial wind information
+    ~CWindData() noexcept override = default;
 
     /**
      * @brief Update the wind information.
@@ -49,8 +48,8 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& wind) override REQUIRES(!m_mutex);
+    bool Update(object::CObject&& wind_) override REQUIRES(!m_mutex);
 
-    void access() override REQUIRES(!m_mutex);
+    void Access() override REQUIRES(!m_mutex);
 };
 }  // namespace vfrb::data

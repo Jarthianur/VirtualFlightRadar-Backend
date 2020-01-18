@@ -30,41 +30,55 @@
 
 namespace vfrb::concurrent
 {
-class GuardedThread
+/// RAII style, self joining thread
+class CGuardedThread
 {
-    NOT_COPYABLE(GuardedThread)
+    NOT_COPYABLE(CGuardedThread)
 
-    std::thread       m_thread;
-    std::future<void> m_state;
+    std::thread       m_thread;  ///< The underlying thread
+    std::future<void> m_state;   ///< The run state, if valid then is thread running
 
+    /**
+     * Initialize this thread with a function.
+     * @param fn_ The function to run
+     */
     template<typename FnT>
-    void init(FnT&& fn);
+    void init(FnT&& fn_);
 
 public:
-    GuardedThread() = default;
+    CGuardedThread() = default;
 
+    /// @param fn_ The function to run
     template<typename FnT>
-    explicit GuardedThread(FnT&& fn);
+    explicit CGuardedThread(FnT&& fn_);
 
-    ~GuardedThread() noexcept;
+    ~CGuardedThread() noexcept;
 
-    GuardedThread(GuardedThread&& other);
+    /// @throw vfrb::concurrent::error::CThreadUsedError
+    CGuardedThread(CGuardedThread&& other_);
 
-    GuardedThread& operator=(GuardedThread&& other);
+    /// @throw vfrb::concurrent::error::CThreadUsedError
+    CGuardedThread& operator=(CGuardedThread&& other_);
 
+    /**
+     * Spawn this thread with given function if not done on construction yet.
+     * @param fn_ The function to run
+     * @throw vfrb::concurrent::error::CThreadUsedError
+     */
     template<typename FnT>
-    void spawn(FnT&& fn);
+    void Spawn(FnT&& fn_);
 };
 
 namespace error
 {
-class ThreadUsedError : public vfrb::error::Error
+/// Error to indicate that a thread is already running.
+class CThreadUsedError : public vfrb::error::IError
 {
 public:
-    ThreadUsedError()                    = default;
-    ~ThreadUsedError() noexcept override = default;
+    CThreadUsedError()                    = default;
+    ~CThreadUsedError() noexcept override = default;
 
-    char const* what() const noexcept override
+    char const* Message() const noexcept override
     {
         return "thread already used";
     }
@@ -72,20 +86,20 @@ public:
 }  // namespace error
 
 template<typename FnT>
-[[gnu::always_inline]] inline void GuardedThread::init(FnT&& fn)
+[[gnu::always_inline]] inline void CGuardedThread::init(FnT&& fn_)
 {
-    auto task = std::packaged_task<void()>(std::forward<FnT>(fn));
+    auto task = std::packaged_task<void()>(std::forward<FnT>(fn_));
     m_state   = task.get_future();
     m_thread  = std::thread(std::move(task));
 }
 
 template<typename FnT>
-GuardedThread::GuardedThread(FnT&& fn)
+CGuardedThread::CGuardedThread(FnT&& fn_)
 {
-    init<FnT>(std::forward<FnT>(fn));
+    init<FnT>(std::forward<FnT>(fn_));
 }
 
-inline GuardedThread::~GuardedThread() noexcept
+inline CGuardedThread::~CGuardedThread() noexcept
 {
     try
     {
@@ -99,34 +113,34 @@ inline GuardedThread::~GuardedThread() noexcept
     }
 }
 
-inline GuardedThread::GuardedThread(GuardedThread&& other)
+inline CGuardedThread::CGuardedThread(CGuardedThread&& other_)
 {
     if (m_state.valid())
     {
-        throw error::ThreadUsedError();
+        throw error::CThreadUsedError();
     }
-    m_thread = std::move(other.m_thread);
-    m_state  = std::move(other.m_state);
+    m_thread = std::move(other_.m_thread);
+    m_state  = std::move(other_.m_state);
 }
 
-inline GuardedThread& GuardedThread::operator=(GuardedThread&& other)
+inline CGuardedThread& CGuardedThread::operator=(CGuardedThread&& other_)
 {
     if (m_state.valid())
     {
-        throw error::ThreadUsedError();
+        throw error::CThreadUsedError();
     }
-    m_thread = std::move(other.m_thread);
-    m_state  = std::move(other.m_state);
+    m_thread = std::move(other_.m_thread);
+    m_state  = std::move(other_.m_state);
     return *this;
 }
 
 template<typename FnT>
-void GuardedThread::spawn(FnT&& fn)
+void CGuardedThread::Spawn(FnT&& fn_)
 {
     if (m_state.valid())
     {
-        throw error::ThreadUsedError();
+        throw error::CThreadUsedError();
     }
-    init<FnT>(std::forward<FnT>(fn));
+    init<FnT>(std::forward<FnT>(fn_));
 }
 }  // namespace vfrb::concurrent

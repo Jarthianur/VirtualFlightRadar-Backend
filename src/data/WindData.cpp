@@ -26,17 +26,17 @@ using namespace vfrb::concurrent;
 
 namespace vfrb::data
 {
-WindData::WindData(AccessFn&& fn) : Data(std::move(fn)) {}
+CWindData::CWindData(AccessFn&& fn_) : IData(std::move(fn_)) {}
 
-WindData::WindData(AccessFn&& fn, object::Wind const& wind) : Data(std::move(fn)), m_wind(wind) {}
+CWindData::CWindData(AccessFn&& fn_, object::CWind const& wind_) : IData(std::move(fn_)), m_wind(wind_) {}
 
-bool WindData::update(Object&& wind)
+bool CWindData::Update(CObject&& wind_)
 {
     LockGuard lk(m_mutex);
-    return m_wind.tryUpdate(std::move(wind));
+    return m_wind.TryUpdate(std::move(wind_));
 }
 
-void WindData::access()
+void CWindData::Access()
 {
     LockGuard lk(m_mutex);
     m_accessFn({++m_wind, {*m_wind}});

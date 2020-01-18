@@ -29,124 +29,124 @@
 #include <boost/functional/hash.hpp>
 
 #include "feed/Feed.h"
-#include "util/Logger.hpp"
 
-static auto const& logger = vfrb::Logger::instance();
+#include "Logger.hpp"
+
+static auto const& logger = vfrb::CLogger::Instance();
 
 using namespace vfrb::client::net;
 using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
-Client::Client(Endpoint const& endpoint, s_ptr<Connector> connector)
-    : m_connector(connector), m_endpoint(endpoint)
-{}
+IClient::IClient(SEndpoint const& ep_, SPtr<IConnector> con_) : m_connector(con_), m_endpoint(ep_) {}
 
-bool Client::equals(Client const& other) const
+bool IClient::Equals(IClient const& other_) const
 {
-    return this->m_endpoint == other.m_endpoint;
+    return this->m_endpoint == other_.m_endpoint;
 }
 
-usize Client::hash() const
+usize IClient::Hash() const
 {
     usize seed = 0;
-    boost::hash_combine(seed, boost::hash_value(m_endpoint.host));
-    boost::hash_combine(seed, boost::hash_value(m_endpoint.port));
+    boost::hash_combine(seed, boost::hash_value(m_endpoint.Host));
+    boost::hash_combine(seed, boost::hash_value(m_endpoint.Port));
     return seed;
 }
 
-void Client::subscribe(s_ptr<feed::Feed> feed)
+void IClient::Subscribe(SPtr<feed::IFeed> feed_)
 {
     LockGuard lk(m_mutex);
-    m_feeds.push_back(feed);
-    std::sort(m_feeds.begin(), m_feeds.end(), [](s_ptr<feed::Feed> const& f1, s_ptr<feed::Feed> const& f2) {
-        return f1->priority() > f2->priority();
+    m_feeds.push_back(feed_);
+    std::sort(m_feeds.begin(), m_feeds.end(), [](SPtr<feed::IFeed> const& f1_, SPtr<feed::IFeed> const& f2_) {
+        return f1_->Priority() > f2_->Priority();
     });
 }
 
-void Client::run()
+void IClient::Run() NO_THREAD_SAFETY_ANALYSIS
 {
     UniqueLock lk(m_mutex);
-    if (m_state == State::NONE)
+    if (m_state == EState::NONE)
     {
         connect();
         lk.unlock();
-        m_connector->run();
-        m_state = State::NONE;
+        m_connector->Run();
+        m_state = EState::NONE;
     }
 }
 
-void Client::connect()
+void IClient::connect()
 {
-    m_state = State::CONNECTING;
-    m_connector->onConnect(m_endpoint, std::bind(&Client::handleConnect, this, std::placeholders::_1));
+    m_state = EState::CONNECTING;
+    m_connector->OnConnect(m_endpoint, std::bind(&IClient::handleConnect, this, std::placeholders::_1));
 }
 
-void Client::reconnect()
+void IClient::reconnect()
 {
-    if (m_state != State::STOPPING)
+    if (m_state != EState::STOPPING)
     {
-        m_state = State::CONNECTING;
-        logger.info(logPrefix(), "schedule reconnect to ", m_endpoint.host, ":", m_endpoint.port);
-        m_connector->close();
+        m_state = EState::CONNECTING;
+        logger.Info(logPrefix(), "schedule reconnect to ", m_endpoint.Host, ":", m_endpoint.Port);
+        m_connector->Close();
         timedConnect();
     }
 }
 
-void Client::timedConnect()
+void IClient::timedConnect()
 {
-    m_connector->onTimeout(std::bind(&Client::handleTimedConnect, this, std::placeholders::_1),
-                           m_backoff.next());
+    m_connector->OnTimeout(std::bind(&IClient::handleTimedConnect, this, std::placeholders::_1),
+                           m_backoff.Next());
 }
 
-void Client::stop()
+void IClient::stop()
 {
-    if (m_state == State::RUNNING || m_state == State::CONNECTING)
+    if (m_state == EState::RUNNING || m_state == EState::CONNECTING)
     {
-        m_state = State::STOPPING;
-        logger.info(logPrefix(), "disconnect from ", m_endpoint.host, ":", m_endpoint.port);
-        m_connector->stop();
+        m_state = EState::STOPPING;
+        logger.Info(logPrefix(), "disconnect from ", m_endpoint.Host, ":", m_endpoint.Port);
+        m_connector->Stop();
     }
 }
 
-void Client::scheduleStop()
+void IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS
 {
     std::condition_variable_any cond_ready;
     UniqueLock                  lk(m_mutex);
-    cond_ready.wait_for(lk, std::chrono::milliseconds(100), [this] { return m_state != State::NONE; });
+    cond_ready.wait_for(lk, std::chrono::milliseconds(100),
+                        [this]() NO_THREAD_SAFETY_ANALYSIS { return m_state != EState::NONE; });
     stop();
 }
 
-void Client::read()
+void IClient::read()
 {
-    m_connector->onRead(std::bind(&Client::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+    m_connector->OnRead(std::bind(&IClient::handleRead, this, std::placeholders::_1, std::placeholders::_2));
 }
 
-void Client::handleTimedConnect(ErrorCode error)
+void IClient::handleTimedConnect(EErrc err_)
 {
-    if (error == ErrorCode::SUCCESS)
+    if (err_ == EErrc::OK)
     {
         LockGuard lk(m_mutex);
-        logger.info(logPrefix(), "try connect to ", m_endpoint.host, ":", m_endpoint.port);
+        logger.Info(logPrefix(), "try connect to ", m_endpoint.Host, ":", m_endpoint.Port);
         connect();
     }
     else
     {
-        logger.error(logPrefix(), "failed to connect after timeout");
-        scheduleStop();
+        logger.Error(logPrefix(), "failed to connect after timeout");
+        ScheduleStop();
     }
 }
 
-void Client::handleRead(ErrorCode error, str const& response)
+void IClient::handleRead(EErrc err_, Str const& str_)
 {
     LockGuard lk(m_mutex);
-    if (m_state == State::RUNNING)
+    if (m_state == EState::RUNNING)
     {
-        if (error == ErrorCode::SUCCESS)
+        if (err_ == EErrc::OK)
         {
             for (auto& it : m_feeds)
             {
-                if (!it->process(response))
+                if (!it->Process(str_))
                 {
                     stop();
                 }
@@ -155,7 +155,7 @@ void Client::handleRead(ErrorCode error, str const& response)
         }
         else
         {
-            logger.error(logPrefix(), "failed to read message");
+            logger.Error(logPrefix(), "failed to read message");
             reconnect();
         }
     }

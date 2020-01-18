@@ -29,31 +29,31 @@
 
 namespace vfrb::config
 {
-class Configuration;
+class CConfiguration;
 }  // namespace vfrb::config
 
 namespace vfrb::data
 {
-class AircraftData;
-class AtmosphereData;
-class GpsData;
-class WindData;
+class CAircraftData;
+class CAtmosphereData;
+class CGpsData;
+class CWindData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
 {
-class Feed;
+class IFeed;
 
 /**
  * @brief Factory for Feed creation.
  */
-class FeedFactory
+class CFeedFactory
 {
-    s_ptr<config::Configuration> m_config;        ///< Pointer to the Configuration
-    s_ptr<data::AircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
-    s_ptr<data::AtmosphereData>  m_atmosData;     ///< Pointer to the AtmosphereData
-    s_ptr<data::GpsData>         m_gpsData;       ///< Pointer to the GpsData
-    s_ptr<data::WindData>        m_windData;      ///< Pointer to the WindData
+    SPtr<config::CConfiguration> m_config;        ///< Pointer to the Configuration
+    SPtr<data::CAircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
+    SPtr<data::CAtmosphereData>  m_atmosData;     ///< Pointer to the AtmosphereData
+    SPtr<data::CGpsData>         m_gpsData;       ///< Pointer to the GpsData
+    SPtr<data::CWindData>        m_windData;      ///< Pointer to the WindData
 
     /**
      * @brief Make a new Feed.
@@ -63,8 +63,8 @@ class FeedFactory
      * @return a pointer to the concrete Feed
      * @throw std::logic_error from invoked constructors
      */
-    template<typename T, ENABLE_IF(EXTENDS(T, Feed))>
-    s_ptr<T> makeFeed(str const& name);
+    template<typename T, ENABLE_IF(EXTENDS(T, IFeed))>
+    SPtr<T> makeFeed(Str const& name_);
 
 public:
     /**
@@ -74,10 +74,10 @@ public:
      * @param gpsData      The GpsData pointer
      * @param windData     The WindData pointer
      */
-    FeedFactory(s_ptr<config::Configuration> config, s_ptr<data::AircraftData> aircraftData,
-                s_ptr<data::AtmosphereData> atmosData, s_ptr<data::GpsData> gpsData,
-                s_ptr<data::WindData> windData);
-    ~FeedFactory() noexcept = default;
+    CFeedFactory(SPtr<config::CConfiguration> config_, SPtr<data::CAircraftData> aircraftData_,
+                 SPtr<data::CAtmosphereData> atmosData_, SPtr<data::CGpsData> gpsData_,
+                 SPtr<data::CWindData> windData_);
+    ~CFeedFactory() noexcept = default;
 
     /**
      * @brief Create a Feed.
@@ -85,20 +85,20 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    s_ptr<Feed> createFeed(str const& name);
+    SPtr<IFeed> createFeed(Str const& name_);
 };
 
 namespace error
 {
-class FeedCreationError : public vfrb::error::Error
+class CFeedCreationError : public vfrb::error::IError
 {
-    str const m_msg;
+    Str const m_msg;
 
 public:
-    FeedCreationError();
-    ~FeedCreationError() noexcept override = default;
+    CFeedCreationError();
+    ~CFeedCreationError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::feed

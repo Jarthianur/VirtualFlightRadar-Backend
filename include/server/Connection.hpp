@@ -25,9 +25,9 @@
 #include <utility>
 
 #include "net/error/SocketError.h"
-#include "util/Logger.hpp"
 #include "util/class_utils.h"
 
+#include "Logger.hpp"
 #include "types.h"
 
 namespace vfrb::server
@@ -37,65 +37,61 @@ namespace vfrb::server
  * @tparam SocketT The type of socket implementation
  */
 template<typename SocketT>
-class Connection
+class CConnection
 {
     SocketT m_socket;   ///< Socket
-    str     m_address;  ///< IP address
+    Str     m_address;  ///< IP address
 
 public:
-    MOVABLE_BUT_NOT_COPYABLE(Connection)
+    MOVABLE_BUT_NOT_COPYABLE(CConnection)
+
+    explicit CConnection(SocketT&& sock_);
+
+    ~CConnection() noexcept = default;
 
     /**
-     * @brief Constructor
-     * @param socket The socket
-     */
-    explicit Connection(SocketT&& socket);
-
-    ~Connection() noexcept = default;
-
-    /**
-     * @brief Write a message to the endpoint.
-     * @param msg The message
+     * Write a message to the endpoint.
+     * @param sv_ The message
      * @return true on success, else false
      */
-    bool write(std::string_view const& msg);
+    bool Write(std::string_view const& sv_);
 
-    auto address() const -> decltype(m_address) const&;
+    auto Address() const -> decltype(m_address) const&;
 };
 
 template<typename SocketT>
-Connection<SocketT>::Connection(SocketT&& socket) : m_socket(std::move(socket)), m_address(m_socket.address())
+CConnection<SocketT>::CConnection(SocketT&& sock_) : m_socket(std::move(sock_)), m_address(m_socket.Address())
 {}
 
 template<typename SocketT>
-Connection<SocketT>::Connection(Connection&& other)
-    : m_socket(std::move(other.m_socket)), m_address(std::move(other.m_address))
+CConnection<SocketT>::CConnection(CConnection&& other_)
+    : m_socket(std::move(other_.m_socket)), m_address(std::move(other_.m_address))
 {}
 
 template<typename SocketT>
-Connection<SocketT>& Connection<SocketT>::operator=(Connection&& other)
+CConnection<SocketT>& CConnection<SocketT>::operator=(CConnection&& other_)
 {
-    m_socket  = std::move(other.m_socket);
-    m_address = std::move(other.m_address);
+    m_socket  = std::move(other_.m_socket);
+    m_address = std::move(other_.m_address);
     return *this;
 }
 
 template<typename SocketT>
-bool Connection<SocketT>::write(std::string_view const& msg)
+bool CConnection<SocketT>::Write(std::string_view const& sv_)
 {
     try
     {
-        return m_socket.write(msg);
+        return m_socket.Write(sv_);
     }
-    catch (net::error::SocketError const& e)
+    catch (net::error::CSocketError const& e)
     {
-        Logger::instance().debug("(Connection) write: ", e.what());
+        CLogger::Instance().Debug("(Connection) write: ", e.Message());
     }
     return false;
 }
 
 template<typename SocketT>
-auto Connection<SocketT>::address() const -> decltype(m_address) const&
+auto CConnection<SocketT>::Address() const -> decltype(m_address) const&
 {
     return m_address;
 }

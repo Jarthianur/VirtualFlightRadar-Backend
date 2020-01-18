@@ -19,9 +19,7 @@
  }
  */
 
-/**
- * @see https://clang.llvm.org/docs/ThreadSafetyAnalysis.html#mutexheader
- */
+/// @see https://clang.llvm.org/docs/ThreadSafetyAnalysis.html#mutexheader
 
 #pragma once
 
@@ -35,38 +33,41 @@
 #    define THREAD_ANNOTATION_ATTRIBUTE__(x)  // no-op
 #endif
 
+/// A capability is basically a lockable type.
 #define CAPABILITY(x) THREAD_ANNOTATION_ATTRIBUTE__(capability(x))
 
+/// A capability with RAII style.
 #define SCOPED_CAPABILITY THREAD_ANNOTATION_ATTRIBUTE__(scoped_lockable)
 
+/// A resource is guarded by the given capability.
 #define GUARDED_BY(x) THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
 
+/// The resource behind a pointer is guarded by the given capability.
 #define PT_GUARDED_BY(x) THREAD_ANNOTATION_ATTRIBUTE__(pt_guarded_by(x))
 
-#define ACQUIRED_BEFORE(...) THREAD_ANNOTATION_ATTRIBUTE__(acquired_before(__VA_ARGS__))
-
-#define ACQUIRED_AFTER(...) THREAD_ANNOTATION_ATTRIBUTE__(acquired_after(__VA_ARGS__))
-
+/// A function requires the given capabilities to be (not) locked.
 #define REQUIRES(...) THREAD_ANNOTATION_ATTRIBUTE__(requires_capability(__VA_ARGS__))
 
+/// A function aquires a lock.
 #define ACQUIRE(...) THREAD_ANNOTATION_ATTRIBUTE__(acquire_capability(__VA_ARGS__))
 
-#define RELEASE(...) THREAD_ANNOTATION_ATTRIBUTE__(release_capability(__VA_ARGS__))
-
+/// A function tries to aquire a lock.
 #define TRY_ACQUIRE(...) THREAD_ANNOTATION_ATTRIBUTE__(try_acquire_capability(__VA_ARGS__))
 
+/// A function releases a lock.
+#define RELEASE(...) THREAD_ANNOTATION_ATTRIBUTE__(release_capability(__VA_ARGS__))
+
+/// A function does not need the given capabilities to be locked.
 #define EXCLUDES(...) THREAD_ANNOTATION_ATTRIBUTE__(locks_excluded(__VA_ARGS__))
 
-#define ASSERT_CAPABILITY(x) THREAD_ANNOTATION_ATTRIBUTE__(assert_capability(x))
-
-#define RETURN_CAPABILITY(x) THREAD_ANNOTATION_ATTRIBUTE__(lock_returned(x))
-
+/// Do not perform thread safety analysis.
 #define NO_THREAD_SAFETY_ANALYSIS THREAD_ANNOTATION_ATTRIBUTE__(no_thread_safety_analysis)
 
 namespace vfrb::concurrent
 {
 #if defined(__clang__) && (!defined(SWIG))
 
+/// Mutex wrapper for thread safety analysis
 class CAPABILITY("mutex") Mutex
 {
     NOT_COPYABLE(Mutex)
@@ -98,6 +99,7 @@ public:
     }
 };
 
+/// Lock guard wrapper for thread safety analysis
 class SCOPED_CAPABILITY LockGuard
 {
     NOT_COPYABLE(LockGuard)
@@ -105,7 +107,7 @@ class SCOPED_CAPABILITY LockGuard
     std::lock_guard<Mutex> m_lock;
 
 public:
-    LockGuard(Mutex& mu) ACQUIRE(mu) : m_lock(mu) {}
+    LockGuard(Mutex& mu_) ACQUIRE(mu_) : m_lock(mu_) {}
     ~LockGuard() noexcept RELEASE() {}
 };
 

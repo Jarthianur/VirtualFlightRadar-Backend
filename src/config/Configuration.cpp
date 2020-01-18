@@ -25,8 +25,9 @@
 #include <utility>
 
 #include "config/ConfigReader.h"
-#include "util/Logger.hpp"
 #include "util/string_utils.hpp"
+
+#include "Logger.hpp"
 
 using namespace std::literals;
 
@@ -34,127 +35,116 @@ namespace vfrb::config
 {
 namespace error
 {
-char const* ConfigurationError::what() const noexcept
+char const* CConfigurationError::Message() const noexcept
 {
     return "configuration initialization failed";
 }
 
-class ConversionError : public vfrb::error::Error
+CConversionError::CConversionError(Str const& str_, char const* path_)
+    : m_msg("invalid value at "s + path_ + " [" + str_ + "]")
+{}
+
+char const* CConversionError::Message() const noexcept
 {
-    str const m_msg;
-
-public:
-    ConversionError(str const& str, char const* path) : m_msg("invalid value at "s + path + " [" + str + "]")
-    {}
-    ~ConversionError() noexcept override = default;
-
-    char const* what() const noexcept override
-    {
-        return m_msg.c_str();
-    }
-};
+    return m_msg.c_str();
+}
 }  // namespace error
 
-/**
- * @brief Convert a string to number.
- * @tparam T    The number type
- * @param str The string to convert
- * @return an optional number, which may be invalid
- */
+/// Wrapper for parse function
 template<typename T>
-T parse(str const& str, char const* path)
+T parse(Str const& str_, char const* path_)
 {
     try
     {
-        return str_util::parse<T>(str);
+        return str_util::Parse<T>(str_);
     }
-    catch ([[maybe_unused]] vfrb::str_util::error::ConversionError const&)
+    catch ([[maybe_unused]] vfrb::str_util::error::CConversionError const&)
     {
-        throw error::ConversionError(str, path);
+        throw error::CConversionError(str_, path_);
     }
 }
 
 constexpr auto     LOG_PREFIX = "(Config) ";
-static auto const& logger     = Logger::instance();
+static auto const& logger     = CLogger::Instance();
 
-Configuration::Configuration(std::istream& stream)
+CConfiguration::CConfiguration(std::istream& stream_)
 try :
-    m_properties(ConfigReader(stream).read()),
-    groundMode(m_properties.property(PATH_GND_MODE, "no") == "no"),
-    gpsPosition(resolvePosition()),
-    atmPressure(parse<f64>(m_properties.property(PATH_PRESSURE, "1013.25"), PATH_PRESSURE)),
-    maxHeight(resolveFilter(PATH_MAX_HEIGHT)),
-    maxDistance(resolveFilter(PATH_MAX_DIST)),
-    serverConfig(
-        std::make_tuple(parse<u16>(m_properties.property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT),
-                        parse<u64>(m_properties.property(PATH_SERVER_MAX_CON, "5"), PATH_SERVER_MAX_CON))),
-    feedNames(resolveFeedNames()),
-    feedProperties(resolveFeeds())
+    m_properties(CConfigReader(stream_).Read()),
+    GroundMode(m_properties.Property(PATH_GND_MODE, "no") == "no"),
+    GpsPosition(resolvePosition()),
+    AtmPressure(parse<f64>(m_properties.Property(PATH_PRESSURE, "1013.25"), PATH_PRESSURE)),
+    MaxHeight(resolveFilter(PATH_MAX_HEIGHT)),
+    MaxDistance(resolveFilter(PATH_MAX_DIST)),
+    ServerConfig(
+        std::make_tuple(parse<u16>(m_properties.Property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT),
+                        parse<u64>(m_properties.Property(PATH_SERVER_MAX_CON, "5"), PATH_SERVER_MAX_CON))),
+    FeedNames(resolveFeedNames()),
+    FeedProperties(resolveFeeds())
 {
     dumpInfo();
 }
-catch (vfrb::error::Error const& e)
+catch (vfrb::error::IError const& e)
 {
-    logger.error(LOG_PREFIX, "init: ", e.what());
-    throw error::ConfigurationError();
+    logger.Error(LOG_PREFIX, "init: ", e.Message());
+    throw error::CConfigurationError();
 }
 
-object::GpsPosition Configuration::resolvePosition() const
+object::CGpsPosition CConfiguration::resolvePosition() const
 {
-    object::Location pos;
-    pos.latitude  = parse<f64>(m_properties.property(PATH_LATITUDE, "0.0"), PATH_LATITUDE);
-    pos.longitude = parse<f64>(m_properties.property(PATH_LONGITUDE, "0.0"), PATH_LONGITUDE);
-    pos.altitude  = parse<s32>(m_properties.property(PATH_ALTITUDE, "0"), PATH_ALTITUDE);
-    f64 geoid     = parse<f64>(m_properties.property(PATH_GEOID, "0.0"), PATH_GEOID);
-    return object::GpsPosition(0, pos, geoid);
+    object::SLocation loc;
+    loc.Latitude  = parse<f64>(m_properties.Property(PATH_LATITUDE, "0.0"), PATH_LATITUDE);
+    loc.Longitude = parse<f64>(m_properties.Property(PATH_LONGITUDE, "0.0"), PATH_LONGITUDE);
+    loc.Altitude  = parse<s32>(m_properties.Property(PATH_ALTITUDE, "0"), PATH_ALTITUDE);
+    f64 geoid     = parse<f64>(m_properties.Property(PATH_GEOID, "0.0"), PATH_GEOID);
+    return object::CGpsPosition(0, loc, geoid);
 }
 
-s32 Configuration::resolveFilter(char const* path) const
+s32 CConfiguration::resolveFilter(char const* path_) const
 {
     try
     {
-        s32 filter = parse<s32>(m_properties.property(path, "-1"), path);
+        s32 filter = parse<s32>(m_properties.Property(path_, "-1"), path_);
         return filter < 0 ? std::numeric_limits<s32>::max() : filter;
     }
-    catch ([[maybe_unused]] error::ConversionError const&)
+    catch ([[maybe_unused]] error::CConversionError const&)
     {
         return std::numeric_limits<s32>::max();
     }
 }
 
-std::unordered_map<str, Properties> Configuration::resolveFeeds() const
+std::unordered_map<Str, CProperties> CConfiguration::resolveFeeds() const
 {
-    std::unordered_map<str, Properties> map;
-    for (auto const& it : feedNames)
+    std::unordered_map<Str, CProperties> map;
+    for (auto const& it : FeedNames)
     {
         try
         {
-            map.emplace(it, m_properties.section(it));
+            map.emplace(it, m_properties.Section(it));
         }
-        catch (error::PropertyNotFoundError const& e)
+        catch (error::CPropertyNotFoundError const& e)
         {
-            logger.warn(LOG_PREFIX, "resolving feeds: ", e.what(), " for ", it);
+            logger.Warn(LOG_PREFIX, "resolving feeds: ", e.Message(), " for ", it);
         }
     }
     return map;
 }
 
-std::list<str> Configuration::resolveFeedNames() const
+std::list<Str> CConfiguration::resolveFeedNames() const
 {
-    std::list<str>    list;
+    std::list<Str>    list;
     std::stringstream ss;
-    ss.str(m_properties.property(PATH_FEEDS, ""));
-    str item;
+    ss.str(m_properties.Property(PATH_FEEDS, ""));
+    Str item;
 
     while (std::getline(ss, item, ','))
     {
         usize f = item.find_first_not_of(' ');
-        if (f != str::npos)
+        if (f != Str::npos)
         {
             item = item.substr(f);
         }
         f = item.find_last_not_of(' ');
-        if (f != str::npos)
+        if (f != Str::npos)
         {
             item = item.substr(0, f + 1);
         }
@@ -163,18 +153,18 @@ std::list<str> Configuration::resolveFeedNames() const
     return list;
 }
 
-void Configuration::dumpInfo() const
+void CConfiguration::dumpInfo() const
 {
-    logger.info(LOG_PREFIX, PATH_LATITUDE, ": ", gpsPosition.location().latitude);
-    logger.info(LOG_PREFIX, PATH_LONGITUDE, ": ", gpsPosition.location().longitude);
-    logger.info(LOG_PREFIX, PATH_ALTITUDE, ": ", gpsPosition.location().altitude);
-    logger.info(LOG_PREFIX, PATH_GEOID, ": ", gpsPosition.geoid());
-    logger.info(LOG_PREFIX, PATH_PRESSURE, ": ", atmPressure);
-    logger.info(LOG_PREFIX, PATH_MAX_HEIGHT, ": ", maxHeight);
-    logger.info(LOG_PREFIX, PATH_MAX_DIST, ": ", maxDistance);
-    logger.info(LOG_PREFIX, PATH_SERVER_PORT, ": ", std::get<0>(serverConfig));
-    logger.info(LOG_PREFIX, PATH_SERVER_MAX_CON, ": ", std::get<1>(serverConfig));
-    logger.info(LOG_PREFIX, PATH_GND_MODE, ": ", groundMode ? "Yes" : "No");
-    logger.info(LOG_PREFIX, "number of feeds: ", feedProperties.size());
+    logger.Info(LOG_PREFIX, PATH_LATITUDE, ": ", GpsPosition.Location().Latitude);
+    logger.Info(LOG_PREFIX, PATH_LONGITUDE, ": ", GpsPosition.Location().Longitude);
+    logger.Info(LOG_PREFIX, PATH_ALTITUDE, ": ", GpsPosition.Location().Altitude);
+    logger.Info(LOG_PREFIX, PATH_GEOID, ": ", GpsPosition.Geoid());
+    logger.Info(LOG_PREFIX, PATH_PRESSURE, ": ", AtmPressure);
+    logger.Info(LOG_PREFIX, PATH_MAX_HEIGHT, ": ", MaxHeight);
+    logger.Info(LOG_PREFIX, PATH_MAX_DIST, ": ", MaxDistance);
+    logger.Info(LOG_PREFIX, PATH_SERVER_PORT, ": ", std::get<0>(ServerConfig));
+    logger.Info(LOG_PREFIX, PATH_SERVER_MAX_CON, ": ", std::get<1>(ServerConfig));
+    logger.Info(LOG_PREFIX, PATH_GND_MODE, ": ", GroundMode ? "Yes" : "No");
+    logger.Info(LOG_PREFIX, "number of feeds: ", FeedProperties.size());
 }
 }  // namespace vfrb::config

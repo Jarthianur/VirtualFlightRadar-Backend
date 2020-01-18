@@ -26,26 +26,26 @@
 #include <list>
 
 #include "server/Server.hpp"
-#include "server/net/impl/NetworkInterfaceImplBoost.h"
-#include "server/net/impl/SocketImplBoost.h"
+#include "server/net/impl/AcceptorBoost.h"
+#include "server/net/impl/SocketBoost.h"
 #include "util/class_utils.h"
 
 #include "types.h"
 
 namespace vfrb::config
 {
-class Configuration;
+class CConfiguration;
 }  // namespace vfrb::config
 namespace vfrb::data
 {
-class AircraftData;
-class AtmosphereData;
-class GpsData;
-class WindData;
+class CAircraftData;
+class CAtmosphereData;
+class CGpsData;
+class CWindData;
 }  // namespace vfrb::data
 namespace vfrb::feed
 {
-class Feed;
+class IFeed;
 }  // namespace vfrb::feed
 
 namespace vfrb
@@ -53,23 +53,23 @@ namespace vfrb
 /**
  * @brief Combine all features and is the main entry point for the actual VFR-B.
  */
-class VFRB
+class CVfrb
 {
-    NOT_COPYABLE(VFRB)
+    NOT_COPYABLE(CVfrb)
 
-    s_ptr<data::AircraftData>                    m_aircraftData;    ///< Aircraft container
-    s_ptr<data::AtmosphereData>                  m_atmosphereData;  ///< Atmospheric data container
-    s_ptr<data::GpsData>                         m_gpsData;         ///< GPS data container
-    s_ptr<data::WindData>                        m_windData;        ///< Wind data container
-    server::Server<server::net::SocketImplBoost> m_server;          ///< Manage clients and sending of data
-    std::list<s_ptr<feed::Feed>>                 m_feeds;           ///< List of all active feeds
-    std::atomic<bool>                            m_running;         ///< Atomic run-status
+    SPtr<data::CAircraftData>                  m_aircraftData;    ///< Aircraft container
+    SPtr<data::CAtmosphereData>                m_atmosphereData;  ///< Atmospheric data container
+    SPtr<data::CGpsData>                       m_gpsData;         ///< GPS data container
+    SPtr<data::CWindData>                      m_windData;        ///< Wind data container
+    server::CServer<server::net::CSocketBoost> m_server;          ///< Manage clients and sending of data
+    std::list<SPtr<feed::IFeed>>               m_feeds;           ///< List of all active feeds
+    std::atomic<bool>                          m_running;         ///< Atomic run-status
 
     /**
      * @brief Create all input feeds.
      * @param config The Configuration
      */
-    void createFeeds(s_ptr<config::Configuration> config);
+    void createFeeds(SPtr<config::CConfiguration> conf_);
 
     /**
      * @brief Serve the data frequently every second.
@@ -81,15 +81,15 @@ class VFRB
      * @param start The start value
      * @return the duration string
      */
-    str duration(std::chrono::steady_clock::time_point start) const;
+    Str duration(std::chrono::steady_clock::time_point start_) const;
 
 public:
-    explicit VFRB(s_ptr<config::Configuration> config);  ///< @param config The Configuration
-    ~VFRB() noexcept = default;
+    explicit CVfrb(SPtr<config::CConfiguration> conf_);  ///< @param config The Configuration
+    ~CVfrb() noexcept = default;
 
     /**
      * @brief The VFRB's main method, runs the VFR-B.
      */
-    void run() noexcept;
+    void Run() noexcept;
 };
 }  // namespace vfrb

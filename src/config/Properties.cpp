@@ -27,15 +27,15 @@ using namespace boost::property_tree;
 
 namespace vfrb::config
 {
-Properties::Properties(ptree const& ptree) : m_pTree(ptree) {}
+CProperties::CProperties(ptree const& ptree) : m_pTree(ptree) {}
 
-Properties::Properties(ptree&& ptree) : m_pTree(std::move(ptree)) {}
+CProperties::CProperties(ptree&& ptree) : m_pTree(std::move(ptree)) {}
 
-str Properties::property(str const& path, str const& defVal) const noexcept
+Str CProperties::Property(Str const& path, Str const& defVal) const noexcept
 {
     try
     {
-        auto p = m_pTree.get_child(path).get_value<str>();
+        auto p = m_pTree.get_child(path).get_value<Str>();
         return p.empty() ? defVal : p;
     }
     catch (ptree_bad_path const&)
@@ -44,42 +44,42 @@ str Properties::property(str const& path, str const& defVal) const noexcept
     }
 }
 
-str Properties::property(str const& path) const
+Str CProperties::Property(Str const& path) const
 {
     try
     {
-        auto p = m_pTree.get_child(path).get_value<str>();
+        auto p = m_pTree.get_child(path).get_value<Str>();
         if (p.empty())
         {
-            throw error::PropertyNotFoundError(path);
+            throw error::CPropertyNotFoundError(path);
         }
         return p;
     }
     catch (ptree_bad_path const&)
     {
-        throw error::PropertyNotFoundError(path);
+        throw error::CPropertyNotFoundError(path);
     }
 }
 
-Properties Properties::section(str const& section) const
+CProperties CProperties::Section(Str const& section) const
 {
     try
     {
-        return Properties(m_pTree.get_child(section));
+        return CProperties(m_pTree.get_child(section));
     }
     catch (ptree_bad_path const&)
     {
-        throw error::PropertyNotFoundError(section);
+        throw error::CPropertyNotFoundError(section);
     }
 }
 
 namespace error
 {
-PropertyNotFoundError::PropertyNotFoundError(str const& prop) : m_property(prop + " not found") {}
+CPropertyNotFoundError::CPropertyNotFoundError(Str const& prop_) : m_msg(prop_ + " not found") {}
 
-char const* PropertyNotFoundError::what() const noexcept
+char const* CPropertyNotFoundError::Message() const noexcept
 {
-    return m_property.c_str();
+    return m_msg.c_str();
 }
 }  // namespace error
 }  // namespace vfrb::config

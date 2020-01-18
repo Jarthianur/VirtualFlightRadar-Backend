@@ -28,9 +28,9 @@ namespace vfrb::client
 /**
  * @brief Client for GPSD servers
  */
-class GpsdClient : public Client
+class CGpsdClient : public IClient
 {
-    NOT_COPYABLE(GpsdClient)
+    NOT_COPYABLE(CGpsdClient)
 
     /**
      * @brief Send unwatch-request and stop this client.
@@ -41,14 +41,14 @@ class GpsdClient : public Client
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::ErrorCode error) override REQUIRES(!m_mutex);
+    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for watch-request sending
      * @param error The error indicator
      * @threadsafe
      */
-    void handleWatch(net::ErrorCode error) REQUIRES(!m_mutex);
+    void handleWatch(net::EErrc err_) REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 
@@ -57,7 +57,7 @@ public:
      * @param endpoint  The remote endpoint
      * @param connector The Connector interface
      */
-    GpsdClient(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
-    ~GpsdClient() noexcept override = default;
+    CGpsdClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
+    ~CGpsdClient() noexcept override = default;
 };
 }  // namespace vfrb::client

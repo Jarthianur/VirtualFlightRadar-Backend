@@ -29,23 +29,23 @@ using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-AtmosphereFeed::AtmosphereFeed(str const& name, Properties const& properties,
-                               s_ptr<data::AtmosphereData> data)
-    : Feed(name, properties, data)
+CAtmosphereFeed::CAtmosphereFeed(Str const& name_, CProperties const& prop_,
+                                 SPtr<data::CAtmosphereData> data_)
+    : IFeed(name_, prop_, data_)
 {}
 
-Feed::Protocol AtmosphereFeed::protocol() const
+IFeed::EProtocol CAtmosphereFeed::Protocol() const
 {
-    return Protocol::SENSOR;
+    return EProtocol::SENSOR;
 }
 
-bool AtmosphereFeed::process(str response)
+bool CAtmosphereFeed::Process(Str str_)
 {
     try
     {
-        m_data->update(m_parser.unpack(std::move(response), m_priority));
+        m_data->Update(m_parser.Parse(std::move(str_), m_priority));
     }
-    catch ([[maybe_unused]] parser::error::UnpackError const&)
+    catch ([[maybe_unused]] parser::error::CParseError const&)
     {}
     return true;
 }

@@ -34,19 +34,19 @@ namespace vfrb::client::net
 /**
  * @brief Implement the Connector interface using boost::asio.
  */
-class ConnectorImplBoost : public Connector
+class CConnectorBoost : public IConnector
 {
-    NOT_COPYABLE(ConnectorImplBoost)
+    NOT_COPYABLE(CConnectorBoost)
 
     boost::asio::io_context        m_ioCtx;     ///< Internal IO-service
     boost::asio::ip::tcp::socket   m_socket;    ///< Connection socket
     boost::asio::ip::tcp::resolver m_resolver;  ///< Host resolver
     boost::asio::deadline_timer    m_timer;     ///< Timer
     boost::asio::streambuf         m_buffer;    ///< Read buffer
-    str                            m_response;  ///< Read message
+    Str                            m_response;  ///< Read message
     std::istream                   m_istream;   ///< Message stream for conversion
 
-    ErrorCode evalErrorCode(boost::system::error_code const& error) const;
+    EErrc evalErrorCode(boost::system::error_code const& err_) const;
 
     /**
      * @brief Handler for resolving endpoint
@@ -54,9 +54,8 @@ class ConnectorImplBoost : public Connector
      * @param resolverIt The resolved host
      * @param callback   The callback to invoke
      */
-    void handleResolve(boost::system::error_code const&             error,
-                       boost::asio::ip::tcp::resolver::results_type resolverIt,
-                       Callback const&                              callback) noexcept;
+    void handleResolve(boost::system::error_code const&             err_,
+                       boost::asio::ip::tcp::resolver::results_type res_, Callback const& cb_) noexcept;
 
     /**
      * @brief Handler for connecting to endpoint
@@ -64,14 +63,14 @@ class ConnectorImplBoost : public Connector
      * @param resolverIt The resolved host
      * @param callback   The callback to invoke
      */
-    void handleConnect(boost::system::error_code const& error, Callback const& callback) noexcept;
+    void handleConnect(boost::system::error_code const& err_, Callback const& cb_) noexcept;
 
     /**
      * @brief Handler for timed out timer
      * @param error    The error code
      * @param callback The callback to invoke
      */
-    void handleTimeout(boost::system::error_code const& error, Callback const& callback) noexcept;
+    void handleTimeout(boost::system::error_code const& err_, Callback const& cb_) noexcept;
 
     /**
      * @brief Handler for reading from endpoint
@@ -79,8 +78,7 @@ class ConnectorImplBoost : public Connector
      * @param bytes    The amount of read bytes
      * @param callback The callback to invoke
      */
-    void handleRead(boost::system::error_code const& error, usize bytes,
-                    ReadCallback const& callback) noexcept;
+    void handleRead(boost::system::error_code const& err_, usize bytes_, ReadCallback const& cb_) noexcept;
 
     /**
      * @brief Handler for writing to endpoint
@@ -88,47 +86,47 @@ class ConnectorImplBoost : public Connector
      * @param bytes    The amount of sent bytes
      * @param callback The callback to invoke
      */
-    void handleWrite(boost::system::error_code const& error, usize bytes, Callback const& callback) noexcept;
+    void handleWrite(boost::system::error_code const& err_, usize bytes_, Callback const& cb_) noexcept;
 
 public:
-    ConnectorImplBoost();
-    ~ConnectorImplBoost() noexcept override = default;
+    CConnectorBoost();
+    ~CConnectorBoost() noexcept override = default;
 
     /**
      * @brief Run the internal event handler queue.
      * @note Blocks until all handlers have returned.
      */
-    void run() override;
+    void Run() override;
 
     /**
      * @brief Stop the internal event handler queue and close the connection.
      */
-    void stop() override;
+    void Stop() override;
 
     /**
      * @brief Close the connection and cancel all timers.
      */
-    void close() override;
+    void Close() override;
 
     /**
      * @brief Schedule to connect.
      * @param endpoint The endpoint to connect to
      * @param callback The callback to invoke when done
      */
-    void onConnect(Endpoint const& endpoint, Callback const& callback) override;
+    void OnConnect(SEndpoint const& ep_, Callback const& cb_) override;
 
     /**
      * @brief Schedule to read from endpoint.
      * @param callback The callback to invoke when done
      */
-    void onRead(ReadCallback const& callback) override;
+    void OnRead(ReadCallback const& cb_) override;
 
     /**
      * @brief Schedule to write to endpoint.
      * @param msg      The message to send
      * @param callback The callback to invoke when done
      */
-    void onWrite(str const& msg, Callback const& callback) override;
+    void OnWrite(Str const& str_, Callback const& cb_) override;
 
     /**
      * @brief Schedule an action after a timeout.
@@ -136,18 +134,18 @@ public:
      * @param callback The callback to invoke when timeout is reached
      * @param timeout  The timeout in seconds (default: 0)
      */
-    void onTimeout(Callback const& callback, u32 timeout = 0) override;
+    void OnTimeout(Callback const& cb_, u32 to_ = 0) override;
 
     /**
      * @brief Reset the timer to this value.
      * @param timeout The new timeout
      */
-    void resetTimer(u32 timeout) override;
+    void ResetTimer(u32 to_) override;
 
     /**
      * @brief Check whether the timer is expired.
      * @return true if expired, else false
      */
-    bool timerExpired() override;
+    bool TimerExpired() override;
 };
 }  // namespace vfrb::client::net

@@ -25,20 +25,21 @@
 
 namespace vfrb::object
 {
-struct Climate;
+struct SClimate;
 
-/**
- * @brief Extend Object to wind information.
- */
-class Wind : public Object
+/// Wind information object
+class CWind : public CObject
 {
-    str m_nmea;
+    Str m_nmea;  ///< The NMEA string
 
 public:
-    Wind();
-    explicit Wind(u32 priority);  ///< @param priority The initial priority
-    ~Wind() noexcept override = default;
+    CWind();
 
-    str& operator*();
+    /// @param prio_ The initial priority
+    explicit CWind(u32 prio_);
+    ~CWind() noexcept override = default;
+
+    /// Get the NMEA string.
+    Str& operator*();
 };
 }  // namespace vfrb::object

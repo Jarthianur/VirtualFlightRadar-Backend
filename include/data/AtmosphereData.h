@@ -32,16 +32,16 @@ namespace vfrb::data
 /**
  * @brief Store atmospheric information.
  */
-class AtmosphereData : public Data
+class CAtmosphereData : public IData
 {
     concurrent::Mutex mutable m_mutex;
-    object::Atmosphere GUARDED_BY(m_mutex) m_atmosphere;  ///< Atmospheric information
+    object::CAtmosphere GUARDED_BY(m_mutex) m_atmosphere;  ///< Atmospheric information
 
 public:
-    explicit AtmosphereData(AccessFn&& fn);
-    AtmosphereData(AccessFn&&                fn,
-                   object::Atmosphere const& atmosphere);  ///< @param atmosphere The initial atm info
-    ~AtmosphereData() noexcept override = default;
+    explicit CAtmosphereData(AccessFn&& fn_);
+    CAtmosphereData(AccessFn&&                 fn_,
+                    object::CAtmosphere const& atm_);  ///< @param atmosphere The initial atm info
+    ~CAtmosphereData() noexcept override = default;
 
     /**
      * @brief Update he athmosphere data.
@@ -49,15 +49,15 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool update(object::Object&& atmosphere) override REQUIRES(!m_mutex);
+    bool Update(object::CObject&& atm_) override REQUIRES(!m_mutex);
 
-    void access() override REQUIRES(!m_mutex);
+    void Access() override REQUIRES(!m_mutex);
 
     /**
      * @brief Get the atmospheric pressure.
      * @return the pressure
      * @threadsafe
      */
-    decltype(m_atmosphere.pressure()) atmPressure() const REQUIRES(!m_mutex);
+    decltype(m_atmosphere.Pressure()) Pressure() const REQUIRES(!m_mutex);
 };
 }  // namespace vfrb::data

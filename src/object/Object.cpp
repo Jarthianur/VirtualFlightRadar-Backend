@@ -21,36 +21,36 @@
 
 namespace vfrb::object
 {
-Object::Object(u32 priority) : m_lastPriority(priority) {}
+CObject::CObject(u32 prio_) : m_lastPriority(prio_) {}
 
-void Object::assign(Object&& other)
+void CObject::assign(CObject&& other_)
 {
-    this->m_lastPriority = other.m_lastPriority;
+    this->m_lastPriority = other_.m_lastPriority;
     this->m_updateAge    = 0;
 }
 
-bool Object::tryUpdate(Object&& other)
+bool CObject::TryUpdate(CObject&& other_)
 {
-    if (other.canUpdate(*this))
+    if (other_.canUpdate(*this))
     {
-        this->assign(std::move(other));
+        this->assign(std::move(other_));
         return true;
     }
     return false;
 }
 
-bool Object::canUpdate(Object const& other) const
+bool CObject::canUpdate(CObject const& other_) const
 {
-    return this->m_lastPriority >= other.m_lastPriority || other.m_updateAge >= OUTDATED;
+    return this->m_lastPriority >= other_.m_lastPriority || other_.m_updateAge >= OUTDATED;
 }
 
-Object& Object::operator++()
+CObject& CObject::operator++()
 {
     ++m_updateAge;
     return *this;
 }
 
-auto Object::updateAge() const -> decltype(m_updateAge)
+auto CObject::UpdateAge() const -> decltype(m_updateAge)
 {
     return m_updateAge;
 }

@@ -27,22 +27,16 @@
 
 namespace vfrb::server::net::error
 {
-/**
- * @brief Exception to signal socket errors.
- */
-class SocketError : public vfrb::error::Error
+/// Error to indicate that an operation on a socket failed
+class CSocketError : public vfrb::error::IError
 {
-    str const m_msg;  ///< Error message
+    Str const m_msg;  ///< Error message
 
 public:
-    SocketError() = default;
-    explicit SocketError(str const& msg);  ///< @param msg The error message
-    ~SocketError() noexcept override = default;
+    CSocketError() = default;
+    explicit CSocketError(Str const& msg_);
+    ~CSocketError() noexcept override = default;
 
-    /**
-     * @brief Get the error message.
-     * @return the message
-     */
-    char const* what() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace vfrb::server::net::error

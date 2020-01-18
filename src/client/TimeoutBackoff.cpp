@@ -23,7 +23,7 @@
 
 namespace vfrb::client
 {
-u32 TimeoutBackoff::next()
+u32 CTimeoutBackoff::Next()
 {
     auto to  = m_timeout;
     m_factor = m_factor > 1 ? m_factor - 1 : 1;
@@ -31,7 +31,7 @@ u32 TimeoutBackoff::next()
     return to;
 }
 
-void TimeoutBackoff::reset()
+void CTimeoutBackoff::Reset()
 {
     m_timeout = INITIAL_TIMEOUT;
     m_factor  = INITIAL_FACTOR;

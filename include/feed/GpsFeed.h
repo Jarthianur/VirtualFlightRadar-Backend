@@ -27,7 +27,7 @@
 
 namespace vfrb::data
 {
-class GpsData;
+class CGpsData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
@@ -35,11 +35,11 @@ namespace vfrb::feed
 /**
  * @brief Extend Feed for GPS input.
  */
-class GpsFeed : public Feed
+class CGpsFeed : public IFeed
 {
-    NOT_COPYABLE(GpsFeed)
+    NOT_COPYABLE(CGpsFeed)
 
-    parser::GpsParser const m_parser;  ///< Parser to unpack response from Client
+    parser::CGpsParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
     /**
@@ -48,18 +48,18 @@ public:
      * @param data       The GpsData container
      * @throw std::logic_error from parent constructor
      */
-    GpsFeed(str const& m_name, config::Properties const& m_properties, s_ptr<data::GpsData> data);
-    ~GpsFeed() noexcept override = default;
+    CGpsFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::CGpsData> data_);
+    ~CGpsFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::GPS
      */
-    Protocol protocol() const override;
+    EProtocol Protocol() const override;
 
     /**
      * @brief Implement Feed::process.
      */
-    bool process(str response) override;
+    bool Process(Str str_) override;
 };
 }  // namespace vfrb::feed

@@ -22,31 +22,70 @@
 #pragma once
 
 #include <type_traits>
+#include <utility>
 
 /**
- * @file Defines.h
- *
- * This header contains come common macros, used throughout the software.
+ * Make a class non copyable.
+ * @param TYPE The classname
  */
-
-/// Make a class of TYPE non copyable.
-/// @param TYPE The classname
 #define NOT_COPYABLE(TYPE)      \
     TYPE(TYPE const&) = delete; \
     TYPE& operator=(TYPE const&) = delete;
 
-/// Make a class of TYPE non copyable, but movable.
-/// @param TYPE The classname
+/**
+ * Make a class non copyable, but movable.
+ * @param TYPE The classname
+ */
 #define MOVABLE_BUT_NOT_COPYABLE(TYPE)     \
     TYPE(TYPE const&) = delete;            \
     TYPE& operator=(TYPE const&) = delete; \
     TYPE(TYPE&&);                          \
     TYPE& operator=(TYPE&&);
 
+/**
+ * Define an alias for a function. This is useful for keeping compatibility to STL interfaces.
+ * @param ALIAS The alias name
+ * @param FN    The original function
+ */
+#define FUNCTION_ALIAS(ALIAS, FN)                                                \
+    template<typename... Args>                                                   \
+    inline auto ALIAS(Args&&... args)->decltype(FN(std::forward<Args>(args)...)) \
+    {                                                                            \
+        return FN(std::forward<Args>(args)...);                                  \
+    }
+
+/**
+ * Wrapper for template enabling expression.
+ * @param C The condition to enable on
+ */
 #define ENABLE_IF(C) typename std::enable_if<C>::type* = nullptr
+
+/// Logical and
 #define AND &&
+
+/// Logical or
 #define OR ||
+
+/// Invert
 #define NOT !
-#define IS(T, ...) (T<__VA_ARGS__>::value)
+
+/**
+ * Template constraint
+ * @param C   The constraint
+ * @param ... The contraints args
+ */
+#define IS(C, ...) (C<__VA_ARGS__>::value)
+
+/**
+ * Template constraint for same type
+ * @param T The type to check
+ * @param R The required type
+ */
 #define IS_TYPE(T, R) (IS(std::is_same, T, R))
+
+/**
+ * Template constraint for inherited type
+ * @param T The type to check
+ * @param R The type required to be derived from
+ */
 #define EXTENDS(T, R) (IS(std::is_base_of, R, T))

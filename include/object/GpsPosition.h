@@ -27,10 +27,8 @@
 
 namespace vfrb::object
 {
-/**
- * @brief A position on earth.
- */
-struct Location
+/// A 3D position on earth
+struct SLocation
 {
     inline static constexpr auto MAX_LATITUDE  = 90.0;
     inline static constexpr auto MIN_LATITUDE  = -90.0;
@@ -39,54 +37,41 @@ struct Location
     inline static constexpr auto MAX_ALTITUDE  = 100000;
     inline static constexpr auto MIN_ALTITUDE  = -11000;
 
-    f64 latitude;   ///< Latitude; deg
-    f64 longitude;  ///< Longitude; deg
-    s32 altitude;   ///< Altitude; m
+    f64 Latitude;   ///< Latitude; deg
+    f64 Longitude;  ///< Longitude; deg
+    s32 Altitude;   ///< Altitude; m
 };
 
-/**
- * @brief Extend Object to a GPS position.
- */
-class GpsPosition : public Object
+/// GPS position object
+class CGpsPosition : public CObject
 {
+    SLocation  m_location;        ///< The location
+    f64        m_geoid;           ///< The geoid separation
+    f64        m_dilution;        ///< The position dilution
+    u8         m_nrOfSatellites;  ///< The number of satellites
+    s8         m_fixQuality;      ///< The GPS fix quality
+    CTimestamp m_timestamp;       ///< The timestamp of this position
+
+    void assign(CObject&& other_) override;
+    bool canUpdate(CObject const& other_) const override;
+
 public:
     inline static constexpr auto MAX_GEOID = 86.0;
     inline static constexpr auto MIN_GEOID = -108.0;
 
-private:
-    Location  m_location;        ///< The location
-    f64       m_geoid;           ///< The geoid separation
-    f64       m_dilution;        ///< The position dilution
-    u8        m_nrOfSatellites;  ///< The number of satellites
-    s8        m_fixQuality;      ///< The GPS fix quality
-    Timestamp m_timestamp;       ///< The timestamp of this position
+    /// @param prio_ The initial priority
+    CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_);
 
-    /**
-     * @brief Override Object::assign.
-     */
-    void assign(Object&& other) override;
+    /// @param prio_ The initial priority
+    CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_, u8 sat_, s8 qual_,
+                 CTimestamp const& ts_);
+    ~CGpsPosition() noexcept override = default;
 
-    /**
-     * @brief Override Object::canUpdate.
-     */
-    bool canUpdate(Object const& other) const override;
-
-public:
-    GpsPosition(u32 priority, Location const& location, f64 geoid);
-
-    /**
-     * @param position The position
-     * @param geoid    The geoid
-     */
-    GpsPosition(u32 priority, Location const& location, f64 geoid, f64 dilution, u8 satellites, s8 quality,
-                Timestamp const& timestamp);
-    ~GpsPosition() noexcept override = default;
-
-    auto location() const -> decltype(m_location) const&;
-    auto geoid() const -> decltype(m_geoid);
-    auto timestamp() const -> decltype(m_timestamp) const&;
-    auto dilution() const -> decltype(m_dilution);
-    auto nrOfSatellites() const -> decltype(m_nrOfSatellites);
-    auto fixQuality() const -> decltype(m_fixQuality);
+    auto Location() const -> decltype(m_location) const&;
+    auto Geoid() const -> decltype(m_geoid);
+    auto Timestamp() const -> decltype(m_timestamp) const&;
+    auto Dilution() const -> decltype(m_dilution);
+    auto NrOfSatellites() const -> decltype(m_nrOfSatellites);
+    auto FixQuality() const -> decltype(m_fixQuality);
 };
 }  // namespace vfrb::object

@@ -34,34 +34,43 @@
 
 namespace vfrb::concurrent
 {
+/**
+ * A thread that executes a function on elements in a work queue.
+ * @tparam DataT The element type of the work queue
+ */
 template<typename DataT>
-class WorkerThread
+class CWorkerThread
 {
-    NOT_COPYABLE(WorkerThread)
+    NOT_COPYABLE(CWorkerThread)
 
     Mutex mutable m_mutex;
-    bool                    GUARDED_BY(m_mutex) m_running;
-    std::queue<DataT>       GUARDED_BY(m_mutex) m_workQ;
-    std::condition_variable GUARDED_BY(m_mutex) m_cv;
-    GuardedThread           m_worker;
+    std::condition_variable_any GUARDED_BY(m_mutex) m_cv;       ///< Wait and notify for work
+    bool                        GUARDED_BY(m_mutex) m_running;  ///< Is thread running?
+    std::queue<DataT>           GUARDED_BY(m_mutex) m_workQ;    ///< The work queue
+    CGuardedThread              m_worker;                       ///< The underlying worker thread
 
 public:
+    /// @param fn_ The function to execute for each element
     template<typename FnT>
-    explicit WorkerThread(FnT&& fn);
-    ~WorkerThread() noexcept;
+    explicit CWorkerThread(FnT&& fn_);
+    ~CWorkerThread() noexcept;
 
-    void push(DataT&& data) REQUIRES(!m_mutex);
+    /**
+     * Push an element into the work queue.
+     * @param data_ The element to push
+     */
+    void Push(DataT&& data_) REQUIRES(!m_mutex);
 };
 
 template<typename DataT>
 template<typename FnT>
-WorkerThread<DataT>::WorkerThread(FnT&& fn)
-    : m_running(false), m_worker([this, fn = std::forward<FnT>(fn)]() EXCLUDES(m_mutex) {
+CWorkerThread<DataT>::CWorkerThread(FnT&& fn_)
+    : m_running(false), m_worker([this, fn = std::forward<FnT>(fn_)]() EXCLUDES(m_mutex) {
           UniqueLock lk(m_mutex);
           m_running = true;
           while (m_running)
           {
-              m_cv.wait_for(lk, std::chrono::milliseconds(500));
+              m_cv.wait_for(lk, std::chrono::milliseconds(200));
               if (!m_running)
               {
                   break;
@@ -79,7 +88,7 @@ WorkerThread<DataT>::WorkerThread(FnT&& fn)
 {}
 
 template<typename DataT>
-WorkerThread<DataT>::~WorkerThread() noexcept
+CWorkerThread<DataT>::~CWorkerThread() noexcept
 {
     LockGuard lk(m_mutex);
     while (!m_workQ.empty())
@@ -91,10 +100,10 @@ WorkerThread<DataT>::~WorkerThread() noexcept
 }
 
 template<typename DataT>
-void WorkerThread<DataT>::push(DataT&& data) REQUIRES(!m_mutex)
+void CWorkerThread<DataT>::Push(DataT&& data_) REQUIRES(!m_mutex)
 {
     LockGuard lk(m_mutex);
-    m_workQ.push(std::move(data));
+    m_workQ.push(std::move(data_));
     m_cv.notify_one();
 }
 }  // namespace vfrb::concurrent

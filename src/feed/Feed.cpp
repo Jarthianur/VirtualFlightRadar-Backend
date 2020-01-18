@@ -34,53 +34,53 @@ using namespace std::literals;
 
 namespace vfrb::feed
 {
-Feed::Feed(str const& name, Properties const& properties, s_ptr<data::Data> data)
-    : m_properties(properties), m_name(name), m_priority(initPriority()), m_data(data)
+IFeed::IFeed(Str const& name_, CProperties const& prop_, SPtr<data::IData> data_)
+    : m_properties(prop_), m_name(name_), m_priority(initPriority()), m_data(data_)
 {
-    if (properties.property(Configuration::KV_KEY_HOST, "").empty())
+    if (prop_.Property(CConfiguration::KV_KEY_HOST, "").empty())
     {
-        throw error::InvalidPropertyError("could not find: "s + name + "." + Configuration::KV_KEY_HOST);
+        throw error::CInvalidPropertyError("could not find: "s + name_ + "." + CConfiguration::KV_KEY_HOST);
     }
-    if (properties.property(Configuration::KV_KEY_PORT, "").empty())
+    if (prop_.Property(CConfiguration::KV_KEY_PORT, "").empty())
     {
-        throw error::InvalidPropertyError("could not find: "s + name + "." + Configuration::KV_KEY_PORT);
+        throw error::CInvalidPropertyError("could not find: "s + name_ + "." + CConfiguration::KV_KEY_PORT);
     }
 }
 
-u32 Feed::initPriority() const
+u32 IFeed::initPriority() const
 {
     try
     {
         return static_cast<u32>(std::max<u64>(
-            0, std::min<u64>(std::stoul(m_properties.property(Configuration::KV_KEY_PRIORITY, "0")),
+            0, std::min<u64>(std::stoul(m_properties.Property(CConfiguration::KV_KEY_PRIORITY, "0")),
                              std::numeric_limits<u32>::max())));
     }
     catch ([[maybe_unused]] std::logic_error const&)
     {}
-    throw error::InvalidPropertyError("invalid priority given");
+    throw error::CInvalidPropertyError("invalid priority given");
 }
 
-client::net::Endpoint Feed::endpoint() const
+client::net::SEndpoint IFeed::Endpoint() const
 {
-    return {m_properties.property(Configuration::KV_KEY_HOST),
-            m_properties.property(Configuration::KV_KEY_PORT)};
+    return {m_properties.Property(CConfiguration::KV_KEY_HOST),
+            m_properties.Property(CConfiguration::KV_KEY_PORT)};
 }
 
-auto Feed::name() const -> decltype(m_name) const&
+auto IFeed::Name() const -> decltype(m_name) const&
 {
     return m_name;
 }
 
-auto Feed::priority() const -> std::remove_const<decltype(m_priority)>::type
+auto IFeed::Priority() const -> std::remove_const<decltype(m_priority)>::type
 {
     return m_priority;
 }
 
 namespace error
 {
-InvalidPropertyError::InvalidPropertyError(str const& msg) : m_msg(msg) {}
+CInvalidPropertyError::CInvalidPropertyError(Str const& msg_) : m_msg(msg_) {}
 
-char const* InvalidPropertyError::what() const noexcept
+char const* CInvalidPropertyError::Message() const noexcept
 {
     return m_msg.c_str();
 }

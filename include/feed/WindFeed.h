@@ -27,7 +27,7 @@
 
 namespace vfrb::data
 {
-class WindData;
+class CWindData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
@@ -35,11 +35,11 @@ namespace vfrb::feed
 /**
  * @brief Extend Feed for windsensor input.
  */
-class WindFeed : public Feed
+class CWindFeed : public IFeed
 {
-    NOT_COPYABLE(WindFeed)
+    NOT_COPYABLE(CWindFeed)
 
-    parser::WindParser const m_parser;  ///< Parser to unpack response from Client
+    parser::CWindParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
     /**
@@ -48,18 +48,18 @@ public:
      * @param data       The WindData contianer
      * @throw std::logic_error from parent constructor
      */
-    WindFeed(str const& m_name, config::Properties const& m_properties, s_ptr<data::WindData> data);
-    ~WindFeed() noexcept override = default;
+    CWindFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::CWindData> data_);
+    ~CWindFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::SENSOR
      */
-    Protocol protocol() const override;
+    EProtocol Protocol() const override;
 
     /**
      * @brief Feed::process.
      */
-    bool process(str response) override;
+    bool Process(Str str_) override;
 };
 }  // namespace vfrb::feed

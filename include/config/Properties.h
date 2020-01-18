@@ -31,47 +31,54 @@
 
 namespace vfrb::config
 {
-/**
- * @brief Store key-value pairs sectionwise.
- */
-class Properties
+/// An INI format property store
+class CProperties
 {
     boost::property_tree::ptree m_pTree;  ///< The underlying property tree
 
 public:
-    explicit Properties(
-        boost::property_tree::ptree const& ptree);             ///< @param ptree The property tree to copy
-    explicit Properties(boost::property_tree::ptree&& ptree);  ///< @param ptree The property tree to move
-    ~Properties() noexcept = default;
+    explicit CProperties(boost::property_tree::ptree const& ptree_);
+    explicit CProperties(boost::property_tree::ptree&& ptree_);
+    ~CProperties() noexcept = default;
 
     /**
-     * @brief Get the value at a property path (section.key), or a default value.
-     * @param path        The property path
-     * @param alternative The default value (default: empty)
-     * @return the value at path if found and not empty, else the default value
+     * Get a property at path (section.key).
+     * @param path_ The property path
+     * @param def_  The default value
+     * @return the value at path if found, else the default value
      */
-    str property(str const& path, str const& defVal) const noexcept;
-    str property(str const& path) const;
+    Str Property(Str const& path_, Str const& def_) const noexcept;
+
     /**
-     * @brief Get the Properties for a section.
-     * @param section The section
-     * @return the Properties for that section
-     * @throw std::out_of_range if the section is not found
+     * Get a property at path (section.key).
+     * @param path_ The property path
+     * @return the value at path
+     * @throw vfrb::config::error::CPropertyNotFoundError
      */
-    Properties section(str const& section) const;
+    Str Property(Str const& path_) const;
+
+    /**
+     * Get the properties for a section.
+     * @param sect_ The section
+     * @return the properties for that section
+     * @throw vfrb::config::error::CPropertyNotFoundError
+     */
+    CProperties Section(Str const& sect_) const;
 };
 
 namespace error
 {
-class PropertyNotFoundError : public vfrb::error::Error
+/// Error to indicate that a property was not found or is empty
+class CPropertyNotFoundError : public vfrb::error::IError
 {
-    str const m_property;
+    Str const m_msg;
 
 public:
-    explicit PropertyNotFoundError(str const& prop);
-    ~PropertyNotFoundError() noexcept override = default;
+    /// @param prop_ The property name
+    explicit CPropertyNotFoundError(Str const& prop_);
+    ~CPropertyNotFoundError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::config

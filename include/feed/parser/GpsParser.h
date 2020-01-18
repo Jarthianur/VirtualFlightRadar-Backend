@@ -32,41 +32,31 @@ namespace vfrb::feed::parser
 /**
  * @brief Implement Parser for GPS NMEA sentences.
  */
-class GpsParser : public Parser<object::GpsPosition>
+class CGpsParser : public IParser<object::CGpsPosition>
 {
-    inline static constexpr auto RE_GGA_TIME = 1;  ///< GGA regex match capture group of time
-    inline static constexpr auto RE_GGA_LAT  = 2;  ///< GGA regex match capture group of latitude
-    inline static constexpr auto RE_GGA_LAT_DIR =
-        3;                                        ///< GGA regex match capture group of latitude orientation
-    inline static constexpr auto RE_GGA_LON = 4;  ///< GGA regex match capture group of longitude
-    inline static constexpr auto RE_GGA_LON_DIR =
-        5;  ///< GGA regex match capture group of longitude orientation
-    inline static constexpr auto RE_GGA_FIX   = 6;   ///< GGA regex match capture group of fix quality
-    inline static constexpr auto RE_GGA_SAT   = 7;   ///< GGA regex match capture group of sitallite count
-    inline static constexpr auto RE_GGA_DIL   = 8;   ///< GGA regex match capture group of dilution
-    inline static constexpr auto RE_GGA_ALT   = 9;   ///< GGA regex match capture group of altitude
-    inline static constexpr auto RE_GGA_GEOID = 10;  ///< GGA regex match capture group of geoid separation
+    inline static constexpr auto RE_GGA_TIME    = 1;   ///< GGA regex capture group of time
+    inline static constexpr auto RE_GGA_LAT     = 2;   ///< GGA regex capture group of latitude
+    inline static constexpr auto RE_GGA_LAT_DIR = 3;   ///< GGA regex capture group of latitude orientation
+    inline static constexpr auto RE_GGA_LON     = 4;   ///< GGA regex capture group of longitude
+    inline static constexpr auto RE_GGA_LON_DIR = 5;   ///< GGA regex capture group of longitude orientation
+    inline static constexpr auto RE_GGA_FIX     = 6;   ///< GGA regex capture group of fix quality
+    inline static constexpr auto RE_GGA_SAT     = 7;   ///< GGA regex capture group of sitallite count
+    inline static constexpr auto RE_GGA_DIL     = 8;   ///< GGA regex capture group of dilution
+    inline static constexpr auto RE_GGA_ALT     = 9;   ///< GGA regex capture group of altitude
+    inline static constexpr auto RE_GGA_GEOID   = 10;  ///< GGA regex capture group of geoid separation
 
-    static std::regex const s_GPGGA_RE;  ///< Regular expression to parse GGA
+    std::regex const m_gpggaRe;  ///< Regular expression to parse GGA
 
     /**
-     * @brief Parse a Position.
-     * @param match    The regex match
-     * @param position The target position
-     * @return true on success, else false
+     * @throw vfrb::str_util::error::CConversionError
+     * @throw vfrb::object::error::CTimestampParseError
      */
-    object::GpsPosition parsePosition(std::cmatch const& match, u32 priority) const;
+    object::CGpsPosition parsePosition(std::cmatch const& match_, u32 prio_) const;
 
 public:
-    GpsParser()                    = default;
-    ~GpsParser() noexcept override = default;
+    CGpsParser();
+    ~CGpsParser() noexcept override = default;
 
-    /**
-     * @brief Unpack into GpsPosition.
-     * @param sentence The string to unpack
-     * @param position The position to unpack into
-     * @return true on success, else false
-     */
-    object::GpsPosition unpack(str&& sentence, u32 priority) const override;
+    object::CGpsPosition Parse(Str&& str_, u32 prio_) const override;
 };
 }  // namespace vfrb::feed::parser

@@ -38,27 +38,31 @@
 
 namespace vfrb::str_util
 {
-enum class Errc : enum_t
+/// Error code
+enum class EErrc : enum_type
 {
     OK,
     ERR
 };
 
+/// Result type
 template<typename T>
-using Result = std::tuple<T, Errc>;
+using Result = std::tuple<T, EErrc>;
 
+/// Helper type to use for hex conversion.
 struct x32
 {};
 
 namespace error
 {
-class ConversionError : public vfrb::error::Error
+/// Error to indicate failed conversion.
+class CConversionError : public vfrb::error::IError
 {
 public:
-    ConversionError()                    = default;
-    ~ConversionError() noexcept override = default;
+    CConversionError()                    = default;
+    ~CConversionError() noexcept override = default;
 
-    char const* what() const noexcept override
+    char const* Message() const noexcept override
     {
         return "conversion failed";
     }
@@ -66,165 +70,251 @@ public:
 }  // namespace error
 
 /**
- * @brief Compute checksum of nmea string.
- * @param sentence The sentence to eval
- * @param length   The sentences size
+ * Compute checksum of nmea string.
+ * @param sv_  The string
+ * @param pos_ The index to start from
  * @return the checksum
  */
-inline s32 checksum(std::string_view const& sv, usize pos)
+inline s32 Checksum(std::string_view const& sv_, usize pos_)
 {
     s32   csum = 0;
-    usize i    = 1 + pos;  // $ in nmea str not included
-    while (i < sv.length() && sv[i] != '*')
+    usize i    = 1 + pos_;  // $ in nmea str not included
+    while (i < sv_.length() && sv_[i] != '*')
     {
-        csum ^= static_cast<s32>(sv[i++]);
+        csum ^= static_cast<s32>(sv_[i++]);
     }
     return csum;
 }
 
-inline bool matchChecksum(std::string_view const& sv)
+/**
+ * Find the checksum in a nmea string and compare it against the computed one.
+ * @param sv_ The string
+ * @return true if equal, else false
+ */
+inline bool MatchChecksum(std::string_view const& sv_)
 {
-    auto const cs_begin = sv.rfind('*');
-    if (cs_begin == std::string_view::npos || cs_begin + 3 >= sv.length())
+    auto const cs_begin = sv_.rfind('*');
+    if (cs_begin == std::string_view::npos || cs_begin + 3 >= sv_.length())
     {
         return false;
     }
     s32  csum;
     bool match = false;
-    if (auto [p, ec] = std::from_chars(sv.data() + cs_begin + 1, sv.data() + sv.length(), csum, 16);
+    if (auto [p, ec] = std::from_chars(sv_.data() + cs_begin + 1, sv_.data() + sv_.length(), csum, 16);
         ec == std::errc())
     {
-        match = csum == checksum(sv, 0);
+        match = csum == Checksum(sv_, 0);
     }
     return match;
 }
 
+/**
+ * Parse a charcter sequence as 64 bit floating point.
+ * @param first_ Pointer to first character
+ * @param last_  Pointer to one past the last character
+ * @return the conversion result
+ */
 template<typename T, ENABLE_IF(IS_TYPE(T, f64))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::double_, result) || first != last)
+    T     result;
+    EErrc ec = EErrc::OK;
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::double_, result) || first_ != last_)
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
 
+/**
+ * Parse a charcter sequence as signed 32 bit integer.
+ * @param first_ Pointer to first character
+ * @param last_  Pointer to one past the last character
+ * @return the conversion result
+ */
 template<typename T, ENABLE_IF(IS_TYPE(T, s32))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
-    if (auto [p, e] = std::from_chars(first, last, result); e != std::errc())
+    T     result;
+    EErrc ec = EErrc::OK;
+    if (auto [p, e] = std::from_chars(first_, last_, result); e != std::errc())
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
 
+/**
+ * Parse a charcter sequence as unsigned 32 bit integer.
+ * @param first_ Pointer to first character
+ * @param last_  Pointer to one past the last character
+ * @return the conversion result
+ */
 template<typename T, ENABLE_IF(IS_TYPE(T, u32))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::uint_, result) || first != last)
+    T     result;
+    EErrc ec = EErrc::OK;
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::uint_, result) || first_ != last_)
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
 
+/**
+ * Parse a charcter sequence as unsigned 64 bit integer.
+ * @param first_ Pointer to first character
+ * @param last_  Pointer to one past the last character
+ * @return the conversion result
+ */
 template<typename T, ENABLE_IF(IS_TYPE(T, u64))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::ulong_, result) || first != last)
+    T     result;
+    EErrc ec = EErrc::OK;
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ulong_, result) || first_ != last_)
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
 
+/**
+ * Parse a charcter sequence as signed 32 bit integer from hex.
+ * @param first_ Pointer to first character
+ * @param last_  Pointer to one past the last character
+ * @return the conversion result
+ */
 template<typename T, ENABLE_IF(IS_TYPE(T, x32))>
-Result<s32> convert(char const* first, char const* last)
+Result<s32> Convert(char const* first_, char const* last_)
 {
-    s32  result;
-    Errc ec = Errc::OK;
-    if (auto [p, e] = std::from_chars(first, last, result, 16); e != std::errc())
+    s32   result;
+    EErrc ec = EErrc::OK;
+    if (auto [p, e] = std::from_chars(first_, last_, result, 16); e != std::errc())
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
 
+/**
+ * Parse a charcter sequence as signed 8 bit integer.
+ * @param first_ Pointer to first character
+ * @param last_  Pointer to one past the last character
+ * @return the conversion result
+ */
 template<typename T, ENABLE_IF(IS_TYPE(T, s8))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::byte_, result) || first != last)
+    T     result;
+    EErrc ec = EErrc::OK;
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::byte_, result) || first_ != last_)
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
 
+/**
+ * Parse a charcter sequence as unsigned 8 bit integer.
+ * @param first_ Pointer to first character
+ * @param last_  Pointer to one past the last character
+ * @return the conversion result
+ */
 template<typename T, ENABLE_IF(IS_TYPE(T, u8))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
-    auto [v, ec] = convert<s8>(first, last);
+    auto [v, ec] = Convert<s8>(first_, last_);
     return {static_cast<u8>(v), ec};
 }
 
+/**
+ * Parse a charcter sequence as unsigned 16 bit integer.
+ * @param first_ Pointer to first character
+ * @param last_  Pointer to one past the last character
+ * @return the conversion result
+ */
 template<typename T, ENABLE_IF(IS_TYPE(T, u16))>
-Result<T> convert(char const* first, char const* last)
+Result<T> Convert(char const* first_, char const* last_)
 {
-    T    result;
-    Errc ec = Errc::OK;
-    if (!boost::spirit::qi::parse(first, last, boost::spirit::qi::ushort_, result) || first != last)
+    T     result;
+    EErrc ec = EErrc::OK;
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_)
     {
-        ec = Errc::ERR;
+        ec = EErrc::ERR;
     }
     return {result, ec};
 }
 
+/**
+ * Parse a charcter sequence into destination.
+ * @tparam The type to parse
+ * @param first_ Pointer to first character
+ * @param last_  Pointer to one past the last character
+ * @param dest_  The destination variable
+ * @return the resulting error code
+ */
 template<typename T>
-Errc convert(char const* first, char const* last, T& dest)
+EErrc Convert(char const* first_, char const* last_, T& dest_)
 {
-    auto [v, ec] = convert<T>(first, last);
-    dest         = v;
+    auto [v, ec] = Convert<T>(first_, last_);
+    dest_        = v;
     return ec;
 }
 
+/**
+ * Parse and convert from a regex sub match.
+ * @tparam The resulting type
+ * @param sub_ The sub match
+ * @return the conversion result
+ * @throw vfrb::str_util::error::CConversionError
+ */
 template<typename T>
-auto parse(std::csub_match const& sub)
+auto Parse(std::csub_match const& sub_)
 {
-    if (auto [v, ec] = convert<T>(sub.first, sub.second); ec == Errc::OK)
+    if (auto [v, ec] = Convert<T>(sub_.first, sub_.second); ec == EErrc::OK)
     {
         return v;
     }
-    throw error::ConversionError();
+    throw error::CConversionError();
 }
 
+/**
+ * Parse and convert from a string.
+ * @tparam The resulting type
+ * @param str_ The string
+ * @return the conversion result
+ * @throw vfrb::str_util::error::CConversionError
+ */
 template<typename T>
-auto parse(str const& s)
+auto Parse(Str const& str_)
 {
-    if (auto [v, ec] = convert<T>(s.c_str(), s.c_str() + s.size()); ec == Errc::OK)
+    if (auto [v, ec] = Convert<T>(str_.c_str(), str_.c_str() + str_.size()); ec == EErrc::OK)
     {
         return v;
     }
-    throw error::ConversionError();
+    throw error::CConversionError();
 }
 
-inline std::string_view to_str_view(std::csub_match const& sub)
+/**
+ * Get a string view on a regex sub match.
+ * @param sub_ The sub match
+ * @return the string view
+ */
+inline std::string_view AsStrView(std::csub_match const& sub_)
 {
-    return std::string_view(sub.first, static_cast<usize>(sub.second - sub.first));
+    return std::string_view(sub_.first, static_cast<usize>(sub_.second - sub_.first));
 }
 
-inline bool operator==(std::csub_match const& sub, char const* s)
+/**
+ * Compare a regex sub match and a character sequence for equality.
+ * @param sub_ The regex sub match
+ * @param s_   The character sequence
+ * @return true if equal, else false
+ */
+inline bool operator==(std::csub_match const& sub_, char const* cstr_)
 {
-    return to_str_view(sub) == s;
+    return AsStrView(sub_) == cstr_;
 }
 }  // namespace vfrb::str_util

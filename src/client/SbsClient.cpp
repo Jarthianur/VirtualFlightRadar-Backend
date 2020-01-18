@@ -21,7 +21,7 @@
 
 #include "client/SbsClient.h"
 
-#include "util/Logger.hpp"
+#include "Logger.hpp"
 
 using namespace vfrb::client::net;
 using namespace vfrb::concurrent;
@@ -29,31 +29,31 @@ using namespace vfrb::concurrent;
 namespace vfrb::client
 {
 constexpr auto     LOG_PREFIX = "(SbsClient) ";
-static auto const& logger     = Logger::instance();
+static auto const& logger     = CLogger::Instance();
 
-SbsClient::SbsClient(Endpoint const& endpoint, s_ptr<Connector> connector) : Client(endpoint, connector) {}
+CSbsClient::CSbsClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
 
-void SbsClient::handleConnect(ErrorCode error)
+void CSbsClient::handleConnect(EErrc err_)
 {
     LockGuard lk(m_mutex);
-    if (m_state == State::CONNECTING)
+    if (m_state == EState::CONNECTING)
     {
-        if (error == ErrorCode::SUCCESS)
+        if (err_ == EErrc::OK)
         {
-            m_state = State::RUNNING;
-            m_backoff.reset();
-            logger.info(LOG_PREFIX, "connected to ", m_endpoint.host, ":", m_endpoint.port);
+            m_state = EState::RUNNING;
+            m_backoff.Reset();
+            logger.Info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
             read();
         }
         else
         {
-            logger.warn(LOG_PREFIX, "failed to connect to ", m_endpoint.host, ":", m_endpoint.port);
+            logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
         }
     }
 }
 
-char const* SbsClient::logPrefix() const
+char const* CSbsClient::logPrefix() const
 {
     return LOG_PREFIX;
 }

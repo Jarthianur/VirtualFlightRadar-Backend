@@ -29,13 +29,13 @@ namespace vfrb::client
 /**
  * @brief Client for APRSC servers
  */
-class AprscClient : public Client
+class CAprscClient : public IClient
 {
-    NOT_COPYABLE(AprscClient)
+    NOT_COPYABLE(CAprscClient)
 
     inline static constexpr auto KEEPALIVE_INTERVAL = 600;
 
-    str const m_login;  ///< Login string
+    Str const m_login;  ///< Login string
 
     /**
      * @brief Schedule sending of a keep-alive beacon.
@@ -46,21 +46,21 @@ class AprscClient : public Client
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::ErrorCode error) override REQUIRES(!m_mutex);
+    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for sending of the login string.
      * @param error The error indicator
      * @threadsafe
      */
-    void handleLogin(net::ErrorCode error) REQUIRES(!m_mutex);
+    void handleLogin(net::EErrc err_) REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for sending a keep-alive beacon.
      * @param error The error indicator
      * @threadsafe
      */
-    void handleSendKeepAlive(net::ErrorCode error) REQUIRES(!m_mutex);
+    void handleSendKeepAlive(net::EErrc err_) REQUIRES(!m_mutex);
 
     char const* logPrefix() const override;
 
@@ -70,10 +70,10 @@ public:
      * @param login     The login string
      * @param connector The Connector interface
      */
-    AprscClient(net::Endpoint const& endpoint, str const& login, s_ptr<net::Connector> connector);
-    ~AprscClient() noexcept override = default;
+    CAprscClient(net::SEndpoint const& ep_, Str const& login_, SPtr<net::IConnector> con_);
+    ~CAprscClient() noexcept override = default;
 
-    bool  equals(Client const& other) const override;
-    usize hash() const override;
+    bool  Equals(IClient const& other_) const override;
+    usize Hash() const override;
 };
 }  // namespace vfrb::client

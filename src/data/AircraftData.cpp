@@ -27,52 +27,52 @@ using namespace vfrb::object;
 
 namespace vfrb::data
 {
-AircraftData::AircraftData(AccessFn&& fn) : AircraftData(std::move(fn), 0) {}
+CAircraftData::CAircraftData(AccessFn&& fn_) : CAircraftData(std::move(fn_), 0) {}
 
-AircraftData::AircraftData(AccessFn&& fn, s32 maxDist) : Data(std::move(fn)), m_processor(maxDist) {}
+CAircraftData::CAircraftData(AccessFn&& fn_, s32 maxDist_) : IData(std::move(fn_)), m_processor(maxDist_) {}
 
-bool AircraftData::update(Object&& aircraft)
+bool CAircraftData::Update(CObject&& aircraft_)
 {
-    auto&& update = static_cast<Aircraft&&>(aircraft);
-    auto   result = m_container.insert(std::hash<std::string_view>()(*update.id()), std::move(update));
+    auto&& aircraft = static_cast<CAircraft&&>(aircraft_);
+    auto   result   = m_container.Insert(std::hash<std::string_view>()(*aircraft.Id()), std::move(aircraft));
     if (!result.second)
     {
-        result.first->value.tryUpdate(std::move(update));
+        result.first->Value.TryUpdate(std::move(aircraft));
     }
     return true;
 }
 
-void AircraftData::environment(Location const& position, f64 atmPress)
+void CAircraftData::Environment(SLocation const& loc_, f64 press_)
 {
-    m_processor.referTo(position, atmPress);
+    m_processor.ReferTo(loc_, press_);
 }
 
-void AircraftData::access()
+void CAircraftData::Access()
 {
-    auto iter = m_container.begin();
-    while (iter != m_container.end())
+    auto iter = m_container.Begin();
+    while (iter != m_container.End())
     {
-        ++(iter->value);
+        ++(iter->Value);
         try
         {
-            if (iter->value.updateAge() == NO_FLARM_THRESHOLD)
+            if (iter->Value.UpdateAge() == NO_FLARM_THRESHOLD)
             {
-                iter->value.targetType(Aircraft::TargetType::TRANSPONDER);
+                iter->Value.TargetType(CAircraft::ETargetType::TRANSPONDER);
             }
-            if (iter->value.updateAge() >= DELETE_THRESHOLD)
+            if (iter->Value.UpdateAge() >= DELETE_THRESHOLD)
             {
-                auto key = iter.key();
+                auto key = iter.Key();
                 ++iter;
-                m_container.erase(key);
+                m_container.Erase(key);
             }
             else
             {
-                m_processor.process(iter->value, iter->nmea);
-                m_accessFn({iter->value, iter->nmea});
+                m_processor.Process(iter->Value, iter->Nmea);
+                m_accessFn({iter->Value, iter->Nmea});
                 ++iter;
             }
         }
-        catch ([[maybe_unused]] vfrb::error::Error const&)
+        catch ([[maybe_unused]] vfrb::error::IError const&)
         {}
     }
 }

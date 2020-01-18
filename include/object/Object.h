@@ -21,50 +21,46 @@
 
 namespace vfrb::object
 {
-/**
- * @brief Base object class
- */
-class Object
+/// Base class for objects
+class CObject
 {
 protected:
-    u32 m_lastPriority = 0;  ///< Got last update with this priority.
-    u32 m_updateAge    = 0;  ///< Times processed without update.
+    u32 m_lastPriority = 0;  ///< Got last update with this priority
+    u32 m_updateAge    = 0;  ///< Times processed without update
 
-    Object() = default;
-    explicit Object(u32 priority);  ///< @param priority The initial priority
+    CObject() = default;
+
+    /// @param prio_ The initial priority
+    explicit CObject(u32 prio_);
 
     /**
-     * @brief Assign other objects values to this.
-     * @param other The other Object
+     * Assign other objects values to this.
+     * @param other_ The other object
      */
-    virtual void assign(Object&& other);
+    virtual void assign(CObject&& other_);
 
     /**
-     * @brief Check whether this Object can update the other one.
-     * @param other   The other Object
+     * Check whether this object can update an other one.
+     * @param other_   The other object
      * @return true if yes, else false
      */
-    virtual bool canUpdate(Object const& other) const;
+    virtual bool canUpdate(CObject const& other_) const;
 
 public:
-    inline static constexpr auto OUTDATED = 4;
+    inline static constexpr auto OUTDATED = 4;  ///< Cycles until an object is considered outdated
 
-    virtual ~Object() noexcept = default;
+    virtual ~CObject() noexcept = default;
 
-    /**
-     * @brief Increment the update age.
-     * @return this
-     */
-    Object& operator++();
+    /// Increment the update age.
+    CObject& operator++();
 
     /**
-     * @brief Try to update this Object.
-     * @note If the other Object cannot update this, nothing happens.
-     * @param other   The other Object
+     * Try to update this object.
+     * @param other_   The other object
      * @return true on success, else false
      */
-    virtual bool tryUpdate(Object&& other);
+    virtual bool TryUpdate(CObject&& other_);
 
-    auto updateAge() const -> decltype(m_updateAge);
+    auto UpdateAge() const -> decltype(m_updateAge);
 };
 }  // namespace vfrb::object

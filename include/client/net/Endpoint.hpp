@@ -28,19 +28,19 @@ namespace vfrb::client::net
 /**
  * @brief A remote endpoint
  */
-struct Endpoint
+struct SEndpoint
 {
-    str const host;  ///< Hostname
-    str const port;  ///< Port number
+    Str const Host;  ///< Hostname
+    Str const Port;  ///< Port number
 
     /**
      * @brief Equality comparison by value
      * @param other The other endpoint
      * @return true if both are equal, else false
      */
-    bool operator==(Endpoint const& other) const
+    bool operator==(SEndpoint const& other_) const
     {
-        return host == other.host && port == other.port;
+        return Host == other_.Host && Port == other_.Port;
     }
 };
 }  // namespace vfrb::client::net

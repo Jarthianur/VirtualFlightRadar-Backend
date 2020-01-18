@@ -21,39 +21,31 @@
 
 #pragma once
 
-#include "util/CString.hpp"
-
 #include "GpsPosition.h"
 #include "Object.h"
+#include "String.hpp"
 #include "Timestamp.h"
 #include "types.h"
 
 namespace vfrb::object
 {
-/**
- * @brief Extend Object to an aircraft.
- */
-class Aircraft : public Object
+/// An aircraft object
+class CAircraft : public CObject
 {
-public:
-    inline static constexpr auto ID_LEN  = 6;
-    inline static constexpr auto ID_SIZE = 8;
+    inline static constexpr auto ID_SIZE = 8;  ///< Size allocated for ID
 
-    /**
-     * @brief Device type from which the information is received.
-     * @note FLARM is preferred over TRANSPONDER,
-     *       in case an aircraft has both available.
-     */
-    enum class TargetType : enum_t
+public:
+    inline static constexpr auto ID_LEN = 6;  ///< Length of the ID
+
+    /// Device type from which the information is received
+    enum class ETargetType : enum_type
     {
         FLARM,
         TRANSPONDER
     };
 
-    /**
-     * @brief Aircraft types with their protocol codes.
-     */
-    enum class AircraftType : enum_t
+    /// Aircraft types with their protocol codes
+    enum class EAircraftType : enum_type
     {
         UNKNOWN               = 0,
         GLIDER                = 1,
@@ -72,10 +64,8 @@ public:
         STATIC_OBJECT         = 15
     };
 
-    /**
-     * @brief Id (address) types with their protocol codes.
-     */
-    enum class IdType : enum_t
+    /// Id (address) types with their protocol codes
+    enum class EIdType : enum_type
     {
         RANDOM = 0,
         ICAO   = 1,
@@ -83,10 +73,8 @@ public:
         OGN    = 3
     };
 
-    /**
-     * @brief Hold information about an Aircrafts movement.
-     */
-    struct Movement
+    /// Information about an Aircrafts movement
+    struct SMovement
     {
         inline static constexpr auto MAX_GND_SPEED  = 10000.0;
         inline static constexpr auto MIN_GND_SPEED  = -10000.0;
@@ -95,50 +83,51 @@ public:
         inline static constexpr auto MAX_CLIMB_RATE = 10000.0;
         inline static constexpr auto MIN_CLIMB_RATE = -10000.0;
 
-        f64 gndSpeed;   ///< Speed over ground; m/s
-        f64 heading;    ///< Heading; deg [0-359]
-        f64 climbRate;  ///< Climb rate; m/s
+        f64 GndSpeed;   ///< Speed over ground; m/s
+        f64 Heading;    ///< Heading; deg [0-359]
+        f64 ClimbRate;  ///< Climb rate; m/s
     };
 
 private:
-    util::CString<ID_SIZE> m_id;                ///< Aircraft identifier
-    IdType                 m_idType;            ///< Id type
-    AircraftType           m_aircraftType;      ///< Aircraft type
-    TargetType             m_targetType;        ///< Target type
-    Location               m_location;          ///< Currently known position.
-    Movement               m_movement;          ///< Currently known movement.
-    Timestamp              m_timestamp;         ///< The timestamp of the last report.
-    bool                   m_fullInfo = false;  ///< Is full set of information available?
+    CString<ID_SIZE> m_id;                ///< Aircraft identifier
+    EIdType          m_idType;            ///< Id type
+    EAircraftType    m_aircraftType;      ///< Aircraft type
+    ETargetType      m_targetType;        ///< Target type
+    SLocation        m_location;          ///< Currently known position
+    SMovement        m_movement;          ///< Currently known movement
+    CTimestamp       m_timestamp;         ///< The timestamp of the last report
+    bool             m_fullInfo = false;  ///< Is full set of information available?
 
-    /**
-     * @brief Assign an other aircrafts values to this.
-     * @param other The other Aircraft
-     */
-    void assign(Object&& other) override;
-
-    /**
-     * @brief Override Object::canUpdate.
-     */
-    bool canUpdate(Object const& other) const override;
+    void assign(CObject&& other_) override;
+    bool canUpdate(CObject const& other_) const override;
 
 public:
-    Aircraft(u32 priority, std::string_view const& id, IdType idT, AircraftType aT, Location const& loc,
-             Movement const& move, Timestamp const& timestamp);
-    Aircraft(u32 priority, std::string_view const& id, IdType idT, AircraftType aT, Location const& loc,
-             Timestamp const& timestamp);
-    Aircraft(Aircraft&& other);
-    ~Aircraft() noexcept override = default;
+    /**
+     * Initialize as FLARM starget.
+     * @param prio_ The initial priority
+     */
+    CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
+              SMovement const& move_, CTimestamp const& ts_);
 
-    Aircraft& operator=(Aircraft&& other);
+    /**
+     * Initialize as TRANSPONDER target.
+     * @param prio_ The initial priority
+     */
+    CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
+              CTimestamp const& ts_);
+    CAircraft(CAircraft&& other_);
+    ~CAircraft() noexcept override = default;
 
-    auto idType() const -> decltype(m_idType);
-    auto aircraftType() const -> decltype(m_aircraftType);
-    auto id() const -> decltype(m_id) const&;
-    auto targetType() const -> decltype(m_targetType);
-    auto location() const -> decltype(m_location) const&;
-    auto movement() const -> decltype(m_movement) const&;
-    auto timestamp() const -> decltype(m_timestamp) const&;
-    auto hasFullInfo() const -> decltype(m_fullInfo);
-    void targetType(TargetType tt);
+    CAircraft& operator=(CAircraft&& other_);
+
+    auto IdType() const -> decltype(m_idType);
+    auto AircraftType() const -> decltype(m_aircraftType);
+    auto Id() const -> decltype(m_id) const&;
+    auto TargetType() const -> decltype(m_targetType);
+    auto Location() const -> decltype(m_location) const&;
+    auto Movement() const -> decltype(m_movement) const&;
+    auto Timestamp() const -> decltype(m_timestamp) const&;
+    auto HasFullInfo() const -> decltype(m_fullInfo);
+    void TargetType(ETargetType tt_);
 };
 }  // namespace vfrb::object

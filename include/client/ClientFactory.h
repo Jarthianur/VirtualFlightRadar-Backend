@@ -29,7 +29,7 @@
 
 namespace vfrb::feed
 {
-class Feed;
+class IFeed;
 }  // namespace vfrb::feed
 
 namespace vfrb::client
@@ -37,7 +37,7 @@ namespace vfrb::client
 /**
  * @brief A factory for clients.
  */
-class ClientFactory
+class CClientFactory
 {
     /**
      * @brief Factory method for Client creation.
@@ -45,30 +45,30 @@ class ClientFactory
      * @param feed The feed to create for
      * @return the client as pointer
      */
-    template<typename T, ENABLE_IF(EXTENDS(T, Client))>
-    static s_ptr<T> makeClient(s_ptr<feed::Feed> feed);
+    template<typename T, ENABLE_IF(EXTENDS(T, IClient))>
+    static SPtr<T> makeClient(SPtr<feed::IFeed> feed_);
 
 public:
-    ClientFactory()           = default;
-    ~ClientFactory() noexcept = default;
+    CClientFactory()           = default;
+    ~CClientFactory() noexcept = default;
 
     /**
      * @brief Create a Client needed by a Feed.
      * @param feed The feed to create for
      * @return the client as pointer
      */
-    static s_ptr<Client> createClientFor(s_ptr<feed::Feed> feed);
+    static SPtr<IClient> CreateClientFor(SPtr<feed::IFeed> feed_);
 };
 
 namespace error
 {
-class NoSuchProtocolError : public vfrb::error::Error
+class CNoSuchProtocolError : public vfrb::error::IError
 {
 public:
-    NoSuchProtocolError()                    = default;
-    ~NoSuchProtocolError() noexcept override = default;
+    CNoSuchProtocolError()                    = default;
+    ~CNoSuchProtocolError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::client

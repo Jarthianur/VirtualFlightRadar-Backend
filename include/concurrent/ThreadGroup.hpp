@@ -29,33 +29,40 @@
 
 namespace vfrb::concurrent
 {
-class ThreadGroup
+/// A self joining thread group
+class CThreadGroup
 {
-    NOT_COPYABLE(ThreadGroup)
+    NOT_COPYABLE(CThreadGroup)
 
-    std::list<GuardedThread> m_threads;
+    std::list<CGuardedThread> m_threads;  ///< The grouped threads
 
 public:
-    ThreadGroup() = default;
-    ~ThreadGroup() noexcept;
+    CThreadGroup() = default;
+    ~CThreadGroup() noexcept;
 
+    /**
+     * Create and put a thread into this group.
+     * @param fn_ The function for the thread to run
+     */
     template<typename FnT>
-    void createThread(FnT&& fn);
-    void joinAll();
+    void CreateThread(FnT&& fn_);
+
+    /// Clear the thread group and join all threads.
+    void JoinAll();
 };
 
-inline ThreadGroup::~ThreadGroup() noexcept
+inline CThreadGroup::~CThreadGroup() noexcept
 {
-    joinAll();
+    JoinAll();
 }
 
 template<typename FnT>
-void ThreadGroup::createThread(FnT&& fn)
+void CThreadGroup::CreateThread(FnT&& fn_)
 {
-    m_threads.push_back(GuardedThread(std::forward<FnT>(fn)));
+    m_threads.push_back(CGuardedThread(std::forward<FnT>(fn_)));
 }
 
-inline void ThreadGroup::joinAll()
+inline void CThreadGroup::JoinAll()
 {
     m_threads.clear();
 }

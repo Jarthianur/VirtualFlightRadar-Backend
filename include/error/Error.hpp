@@ -25,5 +25,22 @@
 
 namespace vfrb::error
 {
-using Error = std::exception;
-}
+/// Interface for a generic exception type.
+class IError : public std::exception
+{
+    inline char const* what() const noexcept override
+    {
+        return Message();
+    }
+
+public:
+    IError()                            = default;
+    virtual ~IError() noexcept override = default;
+
+    /**
+     * Get the message for this error.
+     * @return the error message
+     */
+    virtual char const* Message() const noexcept = 0;
+};
+}  // namespace vfrb::error

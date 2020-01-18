@@ -28,40 +28,40 @@ using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
-Atmosphere AtmosphereParser::unpack(str&& sentence, u32 priority) const
+CAtmosphere CAtmosphereParser::Parse(Str&& str_, u32 prio_) const
 {
     try
     {
-        if (matchChecksum({sentence.c_str(), sentence.length()}) && sentence.find("MDA") != str::npos)
+        if (MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MDA") != Str::npos)
         {
             usize tmpB;
-            if ((tmpB = sentence.find('B')) != str::npos)
+            if ((tmpB = str_.find('B')) != Str::npos)
             {
                 --tmpB;
             }
             else
             {
-                throw error::UnpackError();
+                throw error::CParseError();
             }
             usize tmpS;
-            if ((tmpS = std::string_view(sentence.c_str(), tmpB).find_last_of(',')) != str::npos)
+            if ((tmpS = std::string_view(str_.c_str(), tmpB).find_last_of(',')) != Str::npos)
             {
                 ++tmpS;
             }
             else
             {
-                throw error::UnpackError();
+                throw error::CParseError();
             }
-            if (auto [v, ec] = convert<f64>(sentence.c_str() + tmpS, sentence.c_str() + tmpB); ec == Errc::OK)
+            if (auto [v, ec] = Convert<f64>(str_.c_str() + tmpS, str_.c_str() + tmpB); ec == EErrc::OK)
             {
-                Atmosphere atmos{priority, v * 1000.0};
-                *atmos = std::move(sentence);
+                CAtmosphere atmos{prio_, v * 1000.0};
+                *atmos = std::move(str_);
                 return atmos;
             }
         }
     }
-    catch ([[maybe_unused]] str_util::error::ConversionError const&)
+    catch ([[maybe_unused]] str_util::error::CConversionError const&)
     {}
-    throw error::UnpackError();
+    throw error::CParseError();
 }
 }  // namespace vfrb::feed::parser

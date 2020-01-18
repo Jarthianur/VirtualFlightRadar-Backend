@@ -31,9 +31,9 @@ using namespace boost::property_tree;
 
 namespace vfrb::config
 {
-ConfigReader::ConfigReader(std::istream& stream) : m_stream(stream) {}
+CConfigReader::CConfigReader(std::istream& stream_) : m_stream(stream_) {}
 
-Properties ConfigReader::read()
+CProperties CConfigReader::Read()
 {
     ptree tree;
     try
@@ -42,16 +42,16 @@ Properties ConfigReader::read()
     }
     catch (ini_parser_error const& e)
     {
-        throw error::ReadFileError(e.filename());
+        throw error::CReadFileError(e.filename());
     }
-    return Properties(std::move(tree));
+    return CProperties(std::move(tree));
 }
 
 namespace error
 {
-ReadFileError::ReadFileError(str const& file) : m_fname(file + " is not a valid INI file") {}
+CReadFileError::CReadFileError(Str const& file_) : m_fname(file_ + " is not a valid INI file") {}
 
-char const* ReadFileError::what() const noexcept
+char const* CReadFileError::Message() const noexcept
 {
     return m_fname.c_str();
 }

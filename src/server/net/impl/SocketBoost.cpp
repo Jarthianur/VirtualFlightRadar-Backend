@@ -19,7 +19,7 @@
  }
  */
 
-#include "server/net/impl/SocketImplBoost.h"
+#include "server/net/impl/SocketBoost.h"
 
 #include <boost/system/error_code.hpp>
 
@@ -27,16 +27,15 @@
 
 namespace vfrb::server::net
 {
-SocketImplBoost::SocketImplBoost(SocketImplBoost&& other) : m_socket(boost::move(other.m_socket)) {}
+CSocketBoost::CSocketBoost(CSocketBoost&& other_) : m_socket(boost::move(other_.m_socket)) {}
 
-SocketImplBoost& SocketImplBoost::operator=(SocketImplBoost&& other)
+CSocketBoost& CSocketBoost::operator=(CSocketBoost&& other_)
 {
-    m_socket = boost::move(other.m_socket);
+    m_socket = boost::move(other_.m_socket);
     return *this;
 }
 
-SocketImplBoost::SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) socket)
-    : m_socket(boost::move(socket))
+CSocketBoost::CSocketBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) sock_) : m_socket(boost::move(sock_))
 {
     if (m_socket.is_open())
     {
@@ -44,32 +43,32 @@ SocketImplBoost::SocketImplBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) sock
     }
 }
 
-SocketImplBoost::~SocketImplBoost() noexcept
+CSocketBoost::~CSocketBoost() noexcept
 {
-    close();
+    Close();
 }
 
-str SocketImplBoost::address() const
+Str CSocketBoost::Address() const
 {
     if (!m_socket.is_open())
     {
-        throw error::SocketError("cannot get address from closed socket");
+        throw error::CSocketError("cannot get address from closed socket");
     }
     return m_socket.remote_endpoint().address().to_string();
 }
 
-bool SocketImplBoost::write(std::string_view const& msg)
+bool CSocketBoost::Write(std::string_view const& sv_)
 {
     if (!m_socket.is_open())
     {
-        throw error::SocketError("cannot write on closed socket");
+        throw error::CSocketError("cannot write on closed socket");
     }
     boost::system::error_code ec;
-    boost::asio::write(m_socket, boost::asio::buffer(msg.data(), msg.length()), ec);
+    boost::asio::write(m_socket, boost::asio::buffer(sv_.data(), sv_.length()), ec);
     return !ec;
 }
 
-void SocketImplBoost::close()
+void CSocketBoost::Close()
 {
     if (m_socket.is_open())
     {
@@ -79,7 +78,7 @@ void SocketImplBoost::close()
     }
 }
 
-boost::asio::ip::tcp::socket& SocketImplBoost::get()
+boost::asio::ip::tcp::socket& CSocketBoost::Get()
 {
     return m_socket;
 }

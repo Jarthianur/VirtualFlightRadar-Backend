@@ -25,35 +25,36 @@
 #include "data/GpsData.h"
 #include "feed/parser/GpsParser.h"
 #include "object/GpsPosition.h"
-#include "util/Logger.hpp"
+
+#include "Logger.hpp"
 
 using namespace vfrb::config;
 
 namespace vfrb::feed
 {
 constexpr auto     LOG_PREFIX = "(GpsFeed) ";
-static auto const& logger     = Logger::instance();
+static auto const& logger     = CLogger::Instance();
 
-GpsFeed::GpsFeed(str const& name, Properties const& properties, s_ptr<data::GpsData> data)
-    : Feed(name, properties, data)
+CGpsFeed::CGpsFeed(Str const& name_, CProperties const& prop_, SPtr<data::CGpsData> data_)
+    : IFeed(name_, prop_, data_)
 {}
 
-Feed::Protocol GpsFeed::protocol() const
+IFeed::EProtocol CGpsFeed::Protocol() const
 {
-    return Protocol::GPS;
+    return EProtocol::GPS;
 }
 
-bool GpsFeed::process(str response)
+bool CGpsFeed::Process(Str str_)
 {
     try
     {
-        m_data->update(m_parser.unpack(std::move(response), m_priority));
+        m_data->Update(m_parser.Parse(std::move(str_), m_priority));
     }
-    catch ([[maybe_unused]] parser::error::UnpackError const&)
+    catch ([[maybe_unused]] parser::error::CParseError const&)
     {}
-    catch (data::error::GpsDataException const& e)
+    catch (data::error::IGpsDataException const& e)
     {
-        logger.info(LOG_PREFIX, m_name, ": ", e.what());
+        logger.Info(LOG_PREFIX, m_name, ": ", e.Message());
         return false;
     }
     return true;

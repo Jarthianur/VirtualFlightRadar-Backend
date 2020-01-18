@@ -33,7 +33,7 @@
 
 namespace vfrb::feed
 {
-class Feed;
+class IFeed;
 }  // namespace vfrb::feed
 
 namespace vfrb::client
@@ -41,77 +41,77 @@ namespace vfrb::client
 /**
  * @brief Functor for hashing clients.
  */
-struct ClientHasher
+struct SClientHasher
 {
-    usize operator()(s_ptr<Client> const& client) const
+    usize operator()(SPtr<IClient> const& c_) const
     {
-        return client->hash();
+        return c_->Hash();
     }
 };
 
 /**
  * @brief Functor for comparing clients.
  */
-struct ClientComparator
+struct SClientComparator
 {
-    bool operator()(s_ptr<Client> const& client1, s_ptr<Client> const& client2) const
+    bool operator()(SPtr<IClient> const& c1_, SPtr<IClient> const& c2_) const
     {
-        return client1->equals(*client2);
+        return c1_->Equals(*c2_);
     }
 };
 
 /// Set of clients with custom hasher and comparator
-using ClientSet = std::unordered_set<s_ptr<Client>, ClientHasher, ClientComparator>;
+using ClientSet = std::unordered_set<SPtr<IClient>, SClientHasher, SClientComparator>;
 /// Iterator in ClientSet
 using ClientIter = ClientSet::iterator;
 
 /**
  * @brief Managing multi-threaded clients.
  */
-class ClientManager
+class CClientManager
 {
-    NOT_COPYABLE(ClientManager)
+    NOT_COPYABLE(CClientManager)
 
     concurrent::Mutex mutable m_mutex;
-    ClientSet               GUARDED_BY(m_mutex) m_clients;   ///< Set of clients
-    concurrent::ThreadGroup GUARDED_BY(m_mutex) m_thdGroup;  ///< Thread group for client threads
+    ClientSet                GUARDED_BY(m_mutex) m_clients;   ///< Set of clients
+    concurrent::CThreadGroup GUARDED_BY(m_mutex) m_thdGroup;  ///< Thread group for client threads
 
 public:
-    ClientManager() = default;
-    ~ClientManager() noexcept;
+    CClientManager() = default;
+    ~CClientManager() noexcept;
 
     /**
      * @brief Subscribe a Feed to the respective Client.
      * @param feed The feed to subscribe
      * @threadsafe
      */
-    void subscribe(s_ptr<feed::Feed> feed) REQUIRES(!m_mutex);
+    void Subscribe(SPtr<feed::IFeed> feed_) REQUIRES(!m_mutex);
 
     /**
      * @brief Run all clients in their own thread.
      * @threadsafe
      */
-    void run() REQUIRES(!m_mutex);
+    void Run() REQUIRES(!m_mutex);
 
     /**
      * @brief Stop all clients.
      * @note Blocks until all clients have stopped.
      * @threadsafe
      */
-    void stop() REQUIRES(!m_mutex);
+    void Stop() REQUIRES(!m_mutex);
 };
 
 namespace error
 {
-class FeedSubscriptionError : public vfrb::error::Error
+class CFeedSubscriptionError : public vfrb::error::IError
 {
-    str const m_msg;
+    Str const m_msg;
 
 public:
-    explicit FeedSubscriptionError(str const& name);
-    ~FeedSubscriptionError() noexcept override = default;
+    explicit CFeedSubscriptionError(Str const& name_);
+    ~CFeedSubscriptionError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::client

@@ -34,38 +34,39 @@ extern u32 day();
 
 namespace error
 {
-char const* TimestampParseError::what() const noexcept
+char const* CTimestampParseError::Message() const noexcept
 {
     return "";
 }
 }  // namespace error
 
-std::tuple<u32, u32, u32, u32> parseTime(std::string_view::const_iterator&       first,
-                                         std::string_view::const_iterator const& last)
+std::tuple<u32, u32, u32, u32> parseTime(std::string_view::const_iterator&       first_,
+                                         std::string_view::const_iterator const& last_)
 {
     namespace qi = boost::spirit::qi;
 
-    static const qi::int_parser<u32, 10, 2, 2> _2digit = {};
-    static const qi::int_parser<u32, 10, 3, 3> _3digit = {};
-    static const qi::rule<std::string_view::const_iterator, std::tuple<u32, u32, u32, u32>(), qi::space_type>
+    static thread_local const qi::int_parser<u32, 10, 2, 2> _2digit = {};
+    static thread_local const qi::int_parser<u32, 10, 3, 3> _3digit = {};
+    static thread_local const qi::rule<std::string_view::const_iterator, std::tuple<u32, u32, u32, u32>(),
+                                       qi::space_type>
         time_r = (_2digit >> _2digit >> _2digit >> qi::attr(0)) |
                  (_2digit >> ":" >> _2digit >> ":" >> _2digit >> "." >> _3digit);
 
     std::tuple<u32, u32, u32, u32> time;
-    if (qi::phrase_parse(first, last, time_r, qi::space, time) && (first == last))
+    if (qi::phrase_parse(first_, last_, time_r, qi::space, time) && (first_ == last_))
     {
         return time;
     }
-    throw error::TimestampParseError();
+    throw error::CTimestampParseError();
 }
 
-Timestamp::Timestamp(std::string_view const& value) : m_day(date_time::day())
+CTimestamp::CTimestamp(std::string_view const& sv_) : m_day(date_time::day())
 {
-    auto it           = value.begin();
-    auto [h, m, s, f] = parseTime(it, value.end());
+    auto it           = sv_.begin();
+    auto [h, m, s, f] = parseTime(it, sv_.end());
     if (h > 23 || m > 59 || s > 59 || f > 999)
     {
-        throw error::TimestampParseError();
+        throw error::CTimestampParseError();
     }
     m_value = static_cast<s64>(h * 3600000 + m * 60000 + s * 1000 + f);
     if (m_value >= date_time::now())
@@ -74,17 +75,17 @@ Timestamp::Timestamp(std::string_view const& value) : m_day(date_time::day())
     }
 }
 
-Timestamp::Timestamp(Timestamp const& other) : m_value(other.m_value), m_day(other.m_day) {}
+CTimestamp::CTimestamp(CTimestamp const& other_) : m_value(other_.m_value), m_day(other_.m_day) {}
 
-Timestamp& Timestamp::operator=(Timestamp const& other)
+CTimestamp& CTimestamp::operator=(CTimestamp const& other_)
 {
-    this->m_value = other.m_value;
-    this->m_day   = other.m_day;
+    this->m_value = other_.m_value;
+    this->m_day   = other_.m_day;
     return *this;
 }
 
-bool Timestamp::operator>(Timestamp const& other) const
+bool CTimestamp::operator>(CTimestamp const& other_) const
 {
-    return (this->m_day > other.m_day) || ((this->m_day == other.m_day) && this->m_value > other.m_value);
+    return (this->m_day > other_.m_day) || ((this->m_day == other_.m_day) && this->m_value > other_.m_value);
 }
 }  // namespace vfrb::object

@@ -33,75 +33,49 @@
 
 namespace vfrb::config
 {
-/**
- * @brief VFRB Configuration
- */
-class Configuration final
+/// Extractor for configuration file
+class CConfiguration
 {
-    Properties const m_properties;  ///< Properties from file
+    CProperties const m_properties;  ///< The properties from file
 
-    /**
-     * @brief Resolve the fallback position.
-     * @param properties The properties
-     * @return the position
-     */
-    object::GpsPosition resolvePosition() const;
+    /// @throw vfrb::config::error::CConversionError
+    object::CGpsPosition resolvePosition() const;
 
-    /**
-     * @brief Resolve the feeds and their config.
-     * @param properties The properties
-     */
-    std::unordered_map<str, Properties> resolveFeeds() const;
+    std::unordered_map<Str, CProperties> resolveFeeds() const;
+    std::list<Str>                       resolveFeedNames() const;
 
-    std::list<str> resolveFeedNames() const;
+    /// @param key_ The filters property name
+    s32 resolveFilter(char const* key_) const;
 
-    /**
-     * @brief Resolve a filter value.
-     * @note An invalid/negative value results in the max value which means disabled.
-     * @param properties The properties
-     * @param path       The filter key
-     * @return the filter value
-     */
-    s32 resolveFilter(char const* key) const;
-
-    /**
-     * @brief Dump the current config state as info log.
-     */
+    /// Dump the configuration to INFO log.
     void dumpInfo() const;
 
 public:
-    // Configuration section keys
     inline static constexpr auto SECT_KEY_FALLBACK = "fallback";
     inline static constexpr auto SECT_KEY_GENERAL  = "general";
     inline static constexpr auto SECT_KEY_FILTER   = "filter";
     inline static constexpr auto SECT_KEY_SERVER   = "server";
 
-    // Keywords for feeds
     inline static constexpr auto SECT_KEY_APRSC = "aprs";
     inline static constexpr auto SECT_KEY_SBS   = "sbs";
     inline static constexpr auto SECT_KEY_GPS   = "gps";
     inline static constexpr auto SECT_KEY_WIND  = "wind";
     inline static constexpr auto SECT_KEY_ATMOS = "atm";
 
-    // Property keys for section "general"
     inline static constexpr auto KV_KEY_FEEDS    = "feeds";
     inline static constexpr auto KV_KEY_GND_MODE = "gndMode";
 
-    // Property keys for section "server"
     inline static constexpr auto KV_KEY_MAX_CON = "maxConnections";
 
-    // Property keys for section "fallback"
     inline static constexpr auto KV_KEY_LATITUDE  = "latitude";
     inline static constexpr auto KV_KEY_LONGITUDE = "longitude";
     inline static constexpr auto KV_KEY_ALTITUDE  = "altitude";
     inline static constexpr auto KV_KEY_GEOID     = "geoid";
     inline static constexpr auto KV_KEY_PRESSURE  = "pressure";
 
-    // Property keys for section "filter"
     inline static constexpr auto KV_KEY_MAX_DIST   = "maxDistance";
     inline static constexpr auto KV_KEY_MAX_HEIGHT = "maxHeight";
 
-    // Property keys for feed sections
     inline static constexpr auto KV_KEY_HOST     = "host";
     inline static constexpr auto KV_KEY_PORT     = "port";
     inline static constexpr auto KV_KEY_PRIORITY = "priority";
@@ -119,32 +93,49 @@ public:
     inline static constexpr auto PATH_MAX_DIST       = "filter.maxDistance";
     inline static constexpr auto PATH_MAX_HEIGHT     = "filter.maxHeight";
 
-    bool                                      groundMode;      ///< Ground mode state
-    object::GpsPosition const                 gpsPosition;     ///< Fallback position
-    f64 const                                 atmPressure;     ///< Atmospheric fallback pressure
-    s32 const                                 maxHeight;       ///< Maximum height for reported aircrafts
-    s32 const                                 maxDistance;     ///< Maximum distance for reported aircrafts
-    std::tuple<u16, usize> const              serverConfig;    ///< Port where to serve reports
-    std::list<str> const                      feedNames;       ///< List of feed names
-    std::unordered_map<str, Properties> const feedProperties;  ///< Map feed names to their properties
+    bool                                       GroundMode;      ///< Ground mode enabled?
+    object::CGpsPosition const                 GpsPosition;     ///< Fallback position
+    f64 const                                  AtmPressure;     ///< Atmospheric fallback pressure
+    s32 const                                  MaxHeight;       ///< Maximum height for reported aircrafts
+    s32 const                                  MaxDistance;     ///< Maximum distance for reported aircrafts
+    std::tuple<u16, usize> const               ServerConfig;    ///< Port where to serve reports
+    std::list<Str> const                       FeedNames;       ///< List of feed names
+    std::unordered_map<Str, CProperties> const FeedProperties;  ///< Map feed names to their properties
 
     /**
      * @param stream The input stream
-     * @throw std::logic_error if any error occurres
+     * @throw vfrb::config::error::CConfigurationError
      */
-    explicit Configuration(std::istream& stream);
-    ~Configuration() noexcept = default;
+    explicit CConfiguration(std::istream& stream_);
+    ~CConfiguration() noexcept = default;
 };
 
 namespace error
 {
-class ConfigurationError : public vfrb::error::Error
+/// Error indicating that the configuration is not valid
+class CConfigurationError : public vfrb::error::IError
 {
 public:
-    ConfigurationError()                    = default;
-    ~ConfigurationError() noexcept override = default;
+    CConfigurationError()                    = default;
+    ~CConfigurationError() noexcept override = default;
 
-    char const* what() const noexcept override;
+    char const* Message() const noexcept override;
+};
+
+/// Error indicating that a string to number conversion failed
+class CConversionError : public vfrb::error::IError
+{
+    Str const m_msg;
+
+public:
+    /**
+     * @param str_  The value found at path
+     * @param path_ The property path
+     */
+    CConversionError(Str const& str_, char const* path_);
+    ~CConversionError() noexcept override = default;
+
+    char const* Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::config

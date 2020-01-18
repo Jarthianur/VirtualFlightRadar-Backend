@@ -33,19 +33,19 @@
 
 namespace vfrb::feed
 {
-class Feed;
+class IFeed;
 }  // namespace vfrb::feed
 namespace vfrb::client
 {
 /**
  * @brief Base class for an async TCP client
  */
-class Client
+class IClient
 {
-    NOT_COPYABLE(Client)
+    NOT_COPYABLE(IClient)
 
 protected:
-    enum class State : enum_t
+    enum class EState : enum_type
     {
         NONE,
         CONNECTING,
@@ -54,24 +54,24 @@ protected:
     };
 
     concurrent::Mutex mutable m_mutex;
-    TimeoutBackoff                 GUARDED_BY(m_mutex) m_backoff;
-    s_ptr<net::Connector>          GUARDED_BY(m_mutex) m_connector;            /// Connector interface
-    State                          GUARDED_BY(m_mutex) m_state = State::NONE;  /// Run state indicator
-    net::Endpoint const            m_endpoint;                                 /// Remote endpoint
-    std::vector<s_ptr<feed::Feed>> GUARDED_BY(m_mutex) m_feeds;  /// Container for subscribed feeds
+    CTimeoutBackoff                GUARDED_BY(m_mutex) m_backoff;
+    SPtr<net::IConnector>          GUARDED_BY(m_mutex) m_connector;             /// Connector interface
+    EState                         GUARDED_BY(m_mutex) m_state = EState::NONE;  /// Run state indicator
+    net::SEndpoint const           m_endpoint;                                  /// Remote endpoint
+    std::vector<SPtr<feed::IFeed>> GUARDED_BY(m_mutex) m_feeds;  /// Container for subscribed feeds
 
     /**
      * @param endpoint  The connection Endpoint
      * @param component The component name
      * @param connector The Connector interface
      */
-    Client(net::Endpoint const& endpoint, s_ptr<net::Connector> connector);
+    IClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
 
     /**
      * @brief Handler for connect
      * @param error The error indicator
      */
-    virtual void handleConnect(net::ErrorCode error) = 0;
+    virtual void handleConnect(net::EErrc err_) = 0;
 
     virtual char const* logPrefix() const = 0;
 
@@ -105,50 +105,50 @@ protected:
      * @brief Handler for timedConnect
      * @param error The error indicator
      */
-    void handleTimedConnect(net::ErrorCode error) REQUIRES(!m_mutex);
+    void handleTimedConnect(net::EErrc err_) REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for read
      * @param error    The error indicator
      * @param response The received string
      */
-    void handleRead(net::ErrorCode, str const& response) REQUIRES(!m_mutex);
+    void handleRead(net::EErrc, Str const& str_) REQUIRES(!m_mutex);
 
 public:
-    virtual ~Client() noexcept = default;
+    virtual ~IClient() noexcept = default;
 
     /**
      * @brief Run the clients connection- and eventhandlers.
      * @note Returns after all queued handlers have returned.
      * @threadsafe
      */
-    void run() REQUIRES(!m_mutex);
+    void Run() REQUIRES(!m_mutex);
 
     /**
      * @brief Stop after client has been started.
      * @note Wait until run has been called.
      * @threadsafe
      */
-    void scheduleStop() REQUIRES(!m_mutex);
+    void ScheduleStop() REQUIRES(!m_mutex);
 
     /**
      * @brief Subscribe a Feed to this client.
      * @param feed The Feed to subscribe
      * @threadsafe
      */
-    void subscribe(s_ptr<feed::Feed> feed) REQUIRES(!m_mutex);
+    void Subscribe(SPtr<feed::IFeed> feed_) REQUIRES(!m_mutex);
 
     /**
      * @brief Compare to another client by value.
      * @param other The other Client
      * @return true if equals, else false
      */
-    virtual bool equals(Client const& other) const;
+    virtual bool Equals(IClient const& other_) const;
 
     /**
      * @brief Get a hash value of this client.
      * @return the hash value
      */
-    virtual usize hash() const;
+    virtual usize Hash() const;
 };
 }  // namespace vfrb::client

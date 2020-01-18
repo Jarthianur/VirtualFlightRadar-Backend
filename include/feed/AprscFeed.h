@@ -28,7 +28,7 @@
 
 namespace vfrb::data
 {
-class AircraftData;
+class CAircraftData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
@@ -36,14 +36,14 @@ namespace vfrb::feed
 /**
  * @brief Extend Feed for APRSC protocol.
  */
-class AprscFeed : public Feed
+class CAprscFeed : public IFeed
 {
-    NOT_COPYABLE(AprscFeed)
+    NOT_COPYABLE(CAprscFeed)
 
     static constexpr auto LOG_PREFIX = "(AprscFeed) ";
 
-    parser::AprsParser const      m_parser;  ///< Parser to unpack response from Client
-    concurrent::WorkerThread<str> m_worker;
+    parser::CAprsParser const      m_parser;  ///< Parser to unpack response from Client
+    concurrent::CWorkerThread<Str> m_worker;
 
 public:
     /**
@@ -53,25 +53,25 @@ public:
      * @param maxHeight  The max height filter
      * @throw std::logic_error if login is not given, or from parent constructor
      */
-    AprscFeed(str const& m_name, config::Properties const& propertyMap, s_ptr<data::AircraftData> data,
-              s32 maxHeight);
-    ~AprscFeed() noexcept override = default;
+    CAprscFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
+               s32 maxHeight_);
+    ~CAprscFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
      * @return Protocol::APRS
      */
-    Protocol protocol() const override;
+    EProtocol Protocol() const override;
 
     /**
      * @brief Implement Feed::process.
      */
-    bool process(str response) override;
+    bool Process(Str str_) override;
 
     /**
      * @brief Get the login string.
      * @return the login
      */
-    str login() const;
+    Str Login() const;
 };
 }  // namespace vfrb::feed

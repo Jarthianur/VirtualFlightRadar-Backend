@@ -33,41 +33,28 @@
 
 namespace vfrb::concurrent
 {
-/// Handler function
 using SignalHandler = std::function<void(boost::system::error_code const&, int const)>;
 
-/**
- * @brief Catch and handle system signals.
- */
-class SignalListener
+/// Catch and handle system signals.
+class CSignalListener
 {
-    NOT_COPYABLE(SignalListener)
+    NOT_COPYABLE(CSignalListener)
 
     boost::asio::io_service m_ioService;  ///< Internal IO-service
     boost::asio::signal_set m_sigSet;     ///< Internal signal set
-    GuardedThread           m_thread;     ///< Thread to run this
+    CGuardedThread          m_thread;     ///< The underlying thread
 
 public:
-    SignalListener();
-    ~SignalListener() noexcept;
+    CSignalListener();
+    ~CSignalListener() noexcept;
+
+    void Run();
+    void Stop();
 
     /**
-     * @brief Run this signal listener.
-     * @threadsafe
+     * Add a handler function to be executed when a signal is caught.
+     * @param handler_ The handler to invoke
      */
-    void run();
-
-    /**
-     * @brief Stop this signal listener.
-     * @threadsafe
-     */
-    void stop();
-
-    /**
-     * @brief Add a SignalHandler.
-     * @param handler The handler to invoke when signal caught
-     * @threadsafe
-     */
-    void addHandler(SignalHandler&& handler);
+    void AddHandler(SignalHandler&& handler_);
 };
 }  // namespace vfrb::concurrent
