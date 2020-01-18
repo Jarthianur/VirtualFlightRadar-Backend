@@ -77,7 +77,7 @@ constexpr auto AsUnderlyingType(T val_) -> typename std::underlying_type<T>::typ
  * @throw vfrb::util::error::CLimitsExceededError
  */
 template<typename T>
-void CheckLimits(T val_, T min_, T max_)
+void FailOutsideBounds(T val_, T min_, T max_)
 {
     if (val_ < min_ || val_ > max_)
     {

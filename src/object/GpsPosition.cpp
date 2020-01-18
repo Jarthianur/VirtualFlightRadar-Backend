@@ -38,9 +38,9 @@ CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_,
       m_fixQuality(qual_),
       m_timestamp(ts_)
 {
-    util::CheckLimits(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
-    util::CheckLimits(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
-    util::CheckLimits(m_location.Altitude, SLocation::MIN_ALTITUDE, SLocation::MAX_ALTITUDE);
+    util::FailOutsideBounds(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
+    util::FailOutsideBounds(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
+    util::FailOutsideBounds(m_location.Altitude, SLocation::MIN_ALTITUDE, SLocation::MAX_ALTITUDE);
 }
 
 void CGpsPosition::assign(CObject&& other_)

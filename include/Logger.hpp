@@ -41,7 +41,7 @@ class CLogger
     NOT_COPYABLE(CLogger)
 
     /// Log levels
-    enum class Elevel : enum_type
+    enum class ELevel : enum_type
     {
         INFO  = 0,
         WARN  = 1,
@@ -55,7 +55,7 @@ class CLogger
      * @param l_      The log level
      * @return an expression to log the prefix
      */
-    constexpr auto prefix(std::ostream& stream_, Elevel l_) const
+    constexpr auto prefix(std::ostream& stream_, ELevel l_) const
     {
         constexpr std::array<char const*, 4> levels = {"[INFO ]  ", "[WARN ]  ", "[ERROR]  ", "[DEBUG]  "};
         return [&, l = levels[util::AsUnderlyingType(l_)]] { stream_ << l << time() << ":: "; };
@@ -123,7 +123,7 @@ template<typename... Args>
 void CLogger::Info(Args&&... args_) const REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
-    prefix(*m_outStream, Elevel::INFO)();
+    prefix(*m_outStream, ELevel::INFO)();
     (*m_outStream << ... << args_) << std::endl;
 }
 
@@ -132,7 +132,7 @@ void CLogger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex)
 {
 #ifdef LOG_ENABLE_DEBUG
     concurrent::LockGuard lk(m_mutex);
-    prefix(*m_outStream, Elevel::DEBUG)();
+    prefix(*m_outStream, ELevel::DEBUG)();
     (*m_outStream << ... << args_) << std::endl;
 #endif
 }
@@ -141,7 +141,7 @@ template<typename... Args>
 void CLogger::Warn(Args&&... args_) const REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
-    prefix(*m_outStream, Elevel::WARN)();
+    prefix(*m_outStream, ELevel::WARN)();
     (*m_outStream << ... << args_) << std::endl;
 }
 
@@ -149,7 +149,7 @@ template<typename... Args>
 void CLogger::Error(Args&&... args_) const REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
-    prefix(*m_errStream, Elevel::ERROR)();
+    prefix(*m_errStream, ELevel::ERROR)();
     (*m_errStream << ... << args_) << std::endl;
 }
 

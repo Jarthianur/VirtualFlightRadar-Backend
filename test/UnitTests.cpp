@@ -25,10 +25,14 @@
 using namespace sctf;
 
 extern void test_timestamp();
+extern void test_utility();
+extern void test_string_utils();
 
 void dispatch()
 {
     test_timestamp();
+    test_utility();
+    test_string_utils();
 }
 
 SCTF_DEFAULT_MAIN(create_console_reporter(true), dispatch())

@@ -39,8 +39,8 @@ CAircraft::CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAirc
       m_timestamp(ts_),
       m_fullInfo(true)
 {
-    util::CheckLimits(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
-    util::CheckLimits(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
+    util::FailOutsideBounds(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
+    util::FailOutsideBounds(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
 }
 
 CAircraft::CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAircraftType aT_,

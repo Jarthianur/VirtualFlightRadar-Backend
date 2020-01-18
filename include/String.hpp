@@ -90,7 +90,7 @@ class CString
      * Copy into own data.
      * @param other_ The string to copy
      */
-    void copy(CString const& other_)
+    void copy(CString<N> const& other_)
     {
         std::copy(other_.m_data.cbegin(), other_.m_data.cend(), m_data.begin());
         m_view = std::string_view(m_data.data(), other_.m_view.length());
@@ -117,7 +117,7 @@ public:
         operator=(init_);
     }
 
-    CString(CString const& other_)
+    CString(CString<N> const& other_)
     {
         operator=(other_);
     }
@@ -136,7 +136,7 @@ public:
         return *this;
     }
 
-    CString& operator=(CString const& other_)
+    CString& operator=(CString<N> const& other_)
     {
         copy(other_);
         return *this;
@@ -158,7 +158,7 @@ public:
         return m_view;
     }
 
-    bool operator==(CString const& other_) const
+    bool operator==(CString<N> const& other_) const
     {
         return m_view == other_.m_view;
     }

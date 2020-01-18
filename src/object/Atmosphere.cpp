@@ -30,7 +30,7 @@ CAtmosphere::CAtmosphere(u32 prio_) : CObject(prio_) {}
 
 CAtmosphere::CAtmosphere(u32 prio_, f64 press_) : CObject(prio_), m_pressure(press_)
 {
-    util::CheckLimits(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
+    util::FailOutsideBounds(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
 }
 
 void CAtmosphere::assign(CObject&& other_)
