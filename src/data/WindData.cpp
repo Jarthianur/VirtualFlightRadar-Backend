@@ -28,7 +28,7 @@ namespace vfrb::data
 {
 CWindData::CWindData(AccessFn&& fn_) : IData(std::move(fn_)) {}
 
-CWindData::CWindData(AccessFn&& fn_, object::CWind const& wind_) : IData(std::move(fn_)), m_wind(wind_) {}
+CWindData::CWindData(AccessFn&& fn_, object::CWind wind_) : IData(std::move(fn_)), m_wind(wind_) {}
 
 bool CWindData::Update(CObject&& wind_)
 {
@@ -39,7 +39,7 @@ bool CWindData::Update(CObject&& wind_)
 void CWindData::Access()
 {
     LockGuard lk(m_mutex);
-    m_accessFn({++m_wind, {*m_wind}});
-    (*m_wind).clear();
+    m_accessFn({++m_wind, {m_wind.Nmea()}});
+    m_wind.Clear();
 }
 }  // namespace vfrb::data

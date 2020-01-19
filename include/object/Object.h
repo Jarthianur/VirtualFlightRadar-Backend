@@ -59,7 +59,7 @@ public:
      * @param other_   The other object
      * @return true on success, else false
      */
-    virtual bool TryUpdate(CObject&& other_);
+    bool TryUpdate(CObject&& other_);
 
     auto UpdateAge() const -> decltype(m_updateAge);
 };

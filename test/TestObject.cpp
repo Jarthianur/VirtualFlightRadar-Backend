@@ -39,7 +39,7 @@ extern void Day(s64);
 
 TEST_MODULE(test_object, {
     test("aging", [] {
-        Object o;
+        CObject o(0);
         assertEquals(o.get_updateAge(), 0);
         assertEquals((++o).get_updateAge(), 1);
     });
@@ -126,6 +126,34 @@ TEST_MODULE(test_aircraft, {
     });
 })
 
+TEST_MODULE(test_wind, {
+    test("aging", [] {
+        CWind w;
+        ASSERT_EQUALS(w.UpdateAge(), 0);
+        ++w;
+        ASSERT_EQUALS(w.UpdateAge(), 1);
+    });
+    test("TryUpdate - higher priority", [] {
+        CWind w(0);
+        CWind w2(1);
+        ++w;
+        ASSERT_EQUALS(w.UpdateAge(), 1);
+        ASSERT_TRUE(w.TryUpdate(std::move(w2)));
+        ASSERT_EQUALS(w.UpdateAge(), 0);
+    });
+    test("TryUpdate - outdated", [] {
+        CWind w(1);
+        CWind w2(0);
+        while (w.UpdateAge() < CObject::OUTDATED)
+        {
+            ++w;
+        }
+        ASSERT_EQUALS(w.UpdateAge(), CObject::OUTDATED);
+        ASSERT_TRUE(w.TryUpdate(std::move(w2)));
+        ASSERT_EQUALS(w.UpdateAge(), 0);
+    });
+})
+
 void test_timestamp()
 {
     suite<CTimestamp>("Basic Timestamp tests")
@@ -153,7 +181,7 @@ void test_timestamp()
                    CTimestamp const t2("120001");
 
                    ASSERT(t2, GT, t1);
-                   ASSERT_FALSE(t1 > t2);
+                   ASSERT(t1, !GT, t2);
                })
         ->test("comparison - old day msg",
                [] {
@@ -165,7 +193,7 @@ void test_timestamp()
                    CTimestamp const t2("235900");
 
                    ASSERT(t2, GT, t1);
-                   ASSERT_FALSE(t1 > t2);
+                   ASSERT(t1, !GT, t2);
                })
         ->test("comparison - new day msg",
                [] {
@@ -177,7 +205,7 @@ void test_timestamp()
                    CTimestamp const t2("000000");
 
                    ASSERT(t2, GT, t1);
-                   ASSERT_FALSE(t1 > t2);
+                   ASSERT(t1, !GT, t2);
                })
         ->test("comparison - incremental day", [] {
             date_time::Day(1);

@@ -33,9 +33,7 @@ CWind CWindParser::Parse(Str&& str_, u32 prio_) const
 {
     if (str_util::MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MWV") != Str::npos)
     {
-        CWind wind{prio_};
-        *wind = std::move(str_);
-        return wind;
+        return {prio_, std::move(str_)};
     }
     throw error::CParseError();
 }

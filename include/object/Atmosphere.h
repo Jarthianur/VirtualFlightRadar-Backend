@@ -41,17 +41,16 @@ class CAtmosphere : public CObject
     void assign(CObject&& other_) override;
 
 public:
-    CAtmosphere();
+    CAtmosphere() = default;
 
     /// @param prio_ The initial priority
-    explicit CAtmosphere(u32 prio_);
+    CAtmosphere(u32 prio_, Str&& nmea_);
 
     /// @param prio_ The initial priority
-    CAtmosphere(u32 prio_, f64 press_);
+    CAtmosphere(u32 prio_, f64 press_, Str&& nmea_);
     ~CAtmosphere() noexcept override = default;
 
-    Str& operator*();
-
+    auto Nmea() const -> decltype(m_nmea) const&;
     auto Pressure() const -> decltype(m_pressure);
 };
 }  // namespace vfrb::object

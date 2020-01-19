@@ -24,11 +24,10 @@
 
 namespace vfrb::object
 {
-CAtmosphere::CAtmosphere() : CObject() {}
+CAtmosphere::CAtmosphere(u32 prio_, Str&& nmea_) : CObject(prio_), m_nmea(std::move(nmea_)) {}
 
-CAtmosphere::CAtmosphere(u32 prio_) : CObject(prio_) {}
-
-CAtmosphere::CAtmosphere(u32 prio_, f64 press_) : CObject(prio_), m_pressure(press_)
+CAtmosphere::CAtmosphere(u32 prio_, f64 press_, Str&& nmea_)
+    : CObject(prio_), m_pressure(press_), m_nmea(std::move(nmea_))
 {
     util::FailOutsideBounds(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
 }
@@ -40,18 +39,19 @@ void CAtmosphere::assign(CObject&& other_)
         auto&& other = dynamic_cast<CAtmosphere&&>(other_);
         CObject::assign(std::move(other_));
         this->m_pressure = other.m_pressure;
+        this->m_nmea     = std::move(other.m_nmea);
     }
-    catch (std::bad_cast const&)
+    catch ([[maybe_unused]] std::bad_cast const&)
     {}
+}
+
+auto CAtmosphere::Nmea() const -> decltype(m_nmea) const&
+{
+    return m_nmea;
 }
 
 auto CAtmosphere::Pressure() const -> decltype(m_pressure)
 {
     return m_pressure;
-}
-
-Str& CAtmosphere::operator*()
-{
-    return m_nmea;
 }
 }  // namespace vfrb::object

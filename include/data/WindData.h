@@ -39,7 +39,7 @@ class CWindData : public IData
 
 public:
     explicit CWindData(AccessFn&& fn_);
-    CWindData(AccessFn&& fn_, object::CWind const& wind_);  ///< @param wind The initial wind information
+    CWindData(AccessFn&& fn_, object::CWind wind_);  ///< @param wind The initial wind information
     ~CWindData() noexcept override = default;
 
     /**

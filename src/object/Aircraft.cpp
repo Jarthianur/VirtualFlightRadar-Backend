@@ -70,7 +70,7 @@ void CAircraft::assign(CObject&& other_)
         this->m_timestamp    = other.m_timestamp;
         this->m_fullInfo     = other.m_fullInfo;
     }
-    catch (std::bad_cast const&)
+    catch ([[maybe_unused]] std::bad_cast const&)
     {}
 }
 
@@ -83,7 +83,7 @@ bool CAircraft::canUpdate(CObject const& other_) const
                (other.m_targetType == ETargetType::TRANSPONDER || this->m_targetType == ETargetType::FLARM) &&
                CObject::canUpdate(other_);
     }
-    catch (std::bad_cast const&)
+    catch ([[maybe_unused]] std::bad_cast const&)
     {
         return false;
     }

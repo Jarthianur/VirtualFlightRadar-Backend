@@ -28,14 +28,13 @@ namespace vfrb::data
 {
 CAtmosphereData::CAtmosphereData(AccessFn&& fn_) : IData(std::move(fn_)) {}
 
-CAtmosphereData::CAtmosphereData(AccessFn&& fn_, CAtmosphere const& atm_)
-    : IData(std::move(fn_)), m_atmosphere(atm_)
+CAtmosphereData::CAtmosphereData(AccessFn&& fn_, CAtmosphere atm_) : IData(std::move(fn_)), m_atmosphere(atm_)
 {}
 
 void CAtmosphereData::Access()
 {
     LockGuard lk(m_mutex);
-    m_accessFn({++m_atmosphere, {*m_atmosphere}});
+    m_accessFn({++m_atmosphere, {m_atmosphere.Nmea()}});
 }
 
 bool CAtmosphereData::Update(CObject&& atm_)

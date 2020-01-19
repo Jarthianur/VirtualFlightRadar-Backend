@@ -19,11 +19,26 @@
 
 namespace vfrb::object
 {
-CWind::CWind() : CObject() {}
+CWind::CWind(u32 prio_, Str&& nmea_) : CObject(prio_), m_nmea(std::move(nmea_)) {}
 
-CWind::CWind(u32 prio_) : CObject(prio_) {}
+void CWind::Clear()
+{
+    m_nmea.clear();
+}
 
-Str& CWind::operator*()
+void CWind::assign(CObject&& other_)
+{
+    try
+    {
+        auto&& other = dynamic_cast<CWind&&>(other_);
+        CObject::assign(std::move(other_));
+        this->m_nmea = std::move(other.m_nmea);
+    }
+    catch ([[maybe_unused]] std::bad_cast const&)
+    {}
+}
+
+auto CWind::Nmea() const -> decltype(m_nmea) const&
 {
     return m_nmea;
 }

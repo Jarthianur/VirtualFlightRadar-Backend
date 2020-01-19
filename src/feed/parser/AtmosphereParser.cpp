@@ -54,9 +54,7 @@ CAtmosphere CAtmosphereParser::Parse(Str&& str_, u32 prio_) const
             }
             if (auto [v, ec] = Convert<f64>(str_.c_str() + tmpS, str_.c_str() + tmpB); ec == EErrc::OK)
             {
-                CAtmosphere atmos{prio_, v * 1000.0};
-                *atmos = std::move(str_);
-                return atmos;
+                return {prio_, v * 1000.0, std::move(str_)};
             }
         }
     }

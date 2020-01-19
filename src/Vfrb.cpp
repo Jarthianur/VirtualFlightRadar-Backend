@@ -61,7 +61,7 @@ CVfrb::CVfrb(SPtr<CConfiguration> conf_)
           conf_->MaxDistance)),
       m_atmosphereData(
           std::make_shared<CAtmosphereData>([this](SAccessor const& it) { m_server.Send(it.Nmea); },
-                                            object::CAtmosphere{0, conf_->AtmPressure})),
+                                            object::CAtmosphere{0, conf_->AtmPressure, ""})),
       m_gpsData(std::make_shared<CGpsData>([this](SAccessor const& it) { m_server.Send(it.Nmea); },
                                            conf_->GpsPosition, conf_->GroundMode)),
       m_windData(std::make_shared<CWindData>([this](SAccessor const& it) { m_server.Send(it.Nmea); })),

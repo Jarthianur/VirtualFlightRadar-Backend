@@ -33,13 +33,17 @@ class CWind : public CObject
     Str m_nmea;  ///< The NMEA string
 
 public:
-    CWind();
+    CWind() = default;
 
     /// @param prio_ The initial priority
-    explicit CWind(u32 prio_);
+    CWind(u32 prio_, Str&& nmea_);
     ~CWind() noexcept override = default;
 
+    void assign(CObject&& other_) override;
+
+    void Clear();
+
     /// Get the NMEA string.
-    Str& operator*();
+    auto Nmea() const -> decltype(m_nmea) const&;
 };
 }  // namespace vfrb::object

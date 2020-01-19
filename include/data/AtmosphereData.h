@@ -39,8 +39,8 @@ class CAtmosphereData : public IData
 
 public:
     explicit CAtmosphereData(AccessFn&& fn_);
-    CAtmosphereData(AccessFn&&                 fn_,
-                    object::CAtmosphere const& atm_);  ///< @param atmosphere The initial atm info
+    CAtmosphereData(AccessFn&&          fn_,
+                    object::CAtmosphere atm_);  ///< @param atmosphere The initial atm info
     ~CAtmosphereData() noexcept override = default;
 
     /**

@@ -56,7 +56,7 @@ void CGpsPosition::assign(CObject&& other_)
         this->m_geoid          = other.m_geoid;
         this->m_dilution       = other.m_dilution;
     }
-    catch (std::bad_cast const&)
+    catch ([[maybe_unused]] std::bad_cast const&)
     {}
 }
 
@@ -67,7 +67,7 @@ bool CGpsPosition::canUpdate(CObject const& other_) const
         auto const& other = dynamic_cast<const CGpsPosition&>(other_);
         return (this->m_timestamp > other.m_timestamp) && CObject::canUpdate(other_);
     }
-    catch (std::bad_cast const&)
+    catch ([[maybe_unused]] std::bad_cast const&)
     {
         return false;
     }
