@@ -30,6 +30,7 @@
 using namespace vfrb;
 using namespace object;
 using namespace sctf;
+using namespace std::literals;
 
 namespace vfrb::object::date_time
 {
@@ -37,32 +38,107 @@ extern void Now(u32, u32, u32);
 extern void Day(s64);
 }  // namespace vfrb::object::date_time
 
-TEST_MODULE(test_object, {
+TEST_MODULE(test_Wind, {
     test("aging", [] {
-        CObject o(0);
-        assertEquals(o.get_updateAge(), 0);
-        assertEquals((++o).get_updateAge(), 1);
+        CWind w;
+        ASSERT_EQUALS(w.UpdateAge(), 0);
+        ++w;
+        ASSERT_EQUALS(w.UpdateAge(), 1);
     });
-    test("tryUpdate", [] {
-        Object o1;
-        Object o2(1);
-        Object o3(2);
-        o1.set_serialized("");
-        o2.set_serialized("a");
-        o3.set_serialized("b");
-        assertEquals(o1.get_serialized().size(), 0);
-        assertTrue(o1.tryUpdate(std::move(o2)));
-        assertEqStr(o1.get_serialized(), "a");
-        for (int i = 0; i < OBJ_OUTDATED; ++i)
-        {
-            assertFalse(o3.tryUpdate(std::move(o1)));
-            ++o3;
-        }
-        assertTrue(o3.tryUpdate(std::move(o1)));
+    test("TryUpdate - higher priority", [] {
+        CWind w(0, "1");
+        CWind w2(1, "2");
+        ++w;
+        ASSERT_EQUALS(w.UpdateAge(), 1);
+        ASSERT_TRUE(w.TryUpdate(std::move(w2)));
+        ASSERT_EQUALS(w.UpdateAge(), 0);
+        ASSERT_EQUALS(w.Nmea(), "2"s);
+    });
+    test("TryUpdate - equal priority", [] {
+        CWind w(0, "1");
+        CWind w2(0, "2");
+        ++w;
+        ASSERT_EQUALS(w.UpdateAge(), 1);
+        ASSERT_TRUE(w.TryUpdate(std::move(w2)));
+        ASSERT_EQUALS(w.UpdateAge(), 0);
+        ASSERT_EQUALS(w.Nmea(), "2"s);
+    });
+    test("TryUpdate - outdated", [] {
+        CWind w(1, "1");
+        CWind w2(0, "2");
+        while ((++w).UpdateAge() < CObject::OUTDATED)
+            ;
+        ASSERT_EQUALS(w.UpdateAge(), CObject::OUTDATED);
+        ASSERT_TRUE(w.TryUpdate(std::move(w2)));
+        ASSERT_EQUALS(w.UpdateAge(), 0);
+        ASSERT_EQUALS(w.Nmea(), "2"s);
+    });
+    test("TryUpdate - lower priority", [] {
+        CWind w(1, "1");
+        CWind w2(0, "2");
+        ++w;
+        ASSERT_EQUALS(w.UpdateAge(), 1);
+        ASSERT_FALSE(w.TryUpdate(std::move(w2)));
+        ASSERT_EQUALS(w.UpdateAge(), 1);
+        ASSERT_EQUALS(w.Nmea(), "1"s);
     });
 })
 
-TEST_MODULE(test_gps_position, {
+TEST_MODULE(test_Atmosphere, {
+    test("aging", [] {
+        CAtmosphere a;
+        ASSERT_EQUALS(a.UpdateAge(), 0);
+        ++a;
+        ASSERT_EQUALS(a.UpdateAge(), 1);
+    });
+    test("TryUpdate - higher priority", [] {
+        CAtmosphere a(0, "1");
+        CAtmosphere a2(1, 1.0, "2");
+        ++a;
+        ASSERT_EQUALS(a.UpdateAge(), 1);
+        ASSERT_TRUE(a.TryUpdate(std::move(a2)));
+        ASSERT_EQUALS(a.UpdateAge(), 0);
+        ASSERT_EQUALS(a.Nmea(), "2"s);
+        ASSERT_EQUALS(a.Pressure(), 1.0);
+    });
+    test("TryUpdate - equal priority", [] {
+        CAtmosphere a(0, "1");
+        CAtmosphere a2(0, 1.0, "2");
+        ++a;
+        ASSERT_EQUALS(a.UpdateAge(), 1);
+        ASSERT_TRUE(a.TryUpdate(std::move(a2)));
+        ASSERT_EQUALS(a.UpdateAge(), 0);
+        ASSERT_EQUALS(a.Nmea(), "2"s);
+        ASSERT_EQUALS(a.Pressure(), 1.0);
+    });
+    test("TryUpdate - outdated", [] {
+        CAtmosphere a(1, "1");
+        CAtmosphere a2(0, 1.0, "2");
+        while ((++a).UpdateAge() < CObject::OUTDATED)
+            ;
+        ASSERT_EQUALS(a.UpdateAge(), CObject::OUTDATED);
+        ASSERT_TRUE(a.TryUpdate(std::move(a2)));
+        ASSERT_EQUALS(a.UpdateAge(), 0);
+        ASSERT_EQUALS(a.Nmea(), "2"s);
+        ASSERT_EQUALS(a.Pressure(), 1.0);
+    });
+    test("TryUpdate - lower priority", [] {
+        CAtmosphere a(1, 2.0, "1");
+        CAtmosphere a2(0, 1.0, "2");
+        ++a;
+        ASSERT_EQUALS(a.UpdateAge(), 1);
+        ASSERT_FALSE(a.TryUpdate(std::move(a2)));
+        ASSERT_EQUALS(a.UpdateAge(), 1);
+        ASSERT_EQUALS(a.Nmea(), "1"s);
+        ASSERT_EQUALS(a.Pressure(), 2.0);
+    });
+    test("init - fail", [] {
+        ASSERT_THROWS(CAtmosphere(0, -1.0, ""), util::error::CLimitsExceededError);
+        ASSERT_THROWS(CAtmosphere(0, 2001.0, ""), util::error::CLimitsExceededError);
+    });
+})
+
+TEST_MODULE(test_GpsPosition, {
     test("update - successful", [] {
         GpsPosition pos1({2.0, 2.0, 2}, 41.0, 0);
         GpsPosition pos2({1.0, 1.0, 1}, 48.0, 0,
@@ -79,21 +155,6 @@ TEST_MODULE(test_gps_position, {
         assertFalse(pos1.tryUpdate(std::move(pos2)));
         assertEquals(pos1.get_geoid(), 41.0);
         assertEquals(pos1.get_position().latitude, 2.0);
-    });
-})
-
-TEST_MODULE(test_atmosphere, {
-    test("update - successful", [] {
-        Atmosphere a1(1.0, 0);
-        Atmosphere a2(2.0, 1);
-        assertTrue(a1.tryUpdate(std::move(a2)));
-        assertEquals(a1.get_pressure(), 2.0);
-    });
-    test("update - failing", [] {
-        Atmosphere a1(1.0, 0);
-        Atmosphere a2(2.0, 1);
-        assertFalse(a2.tryUpdate(std::move(a1)));
-        assertEquals(a2.get_pressure(), 2.0);
     });
 })
 
@@ -123,34 +184,6 @@ TEST_MODULE(test_aircraft, {
         } while (a2.get_updateAge() <= OBJ_OUTDATED);
         a1.set_timeStamp(Timestamp<DateTimeImplBoost>("120100", time::Format::HHMMSS));
         assertTrue(a2.tryUpdate(std::move(a1)));
-    });
-})
-
-TEST_MODULE(test_wind, {
-    test("aging", [] {
-        CWind w;
-        ASSERT_EQUALS(w.UpdateAge(), 0);
-        ++w;
-        ASSERT_EQUALS(w.UpdateAge(), 1);
-    });
-    test("TryUpdate - higher priority", [] {
-        CWind w(0);
-        CWind w2(1);
-        ++w;
-        ASSERT_EQUALS(w.UpdateAge(), 1);
-        ASSERT_TRUE(w.TryUpdate(std::move(w2)));
-        ASSERT_EQUALS(w.UpdateAge(), 0);
-    });
-    test("TryUpdate - outdated", [] {
-        CWind w(1);
-        CWind w2(0);
-        while (w.UpdateAge() < CObject::OUTDATED)
-        {
-            ++w;
-        }
-        ASSERT_EQUALS(w.UpdateAge(), CObject::OUTDATED);
-        ASSERT_TRUE(w.TryUpdate(std::move(w2)));
-        ASSERT_EQUALS(w.UpdateAge(), 0);
     });
 })
 
