@@ -139,22 +139,95 @@ TEST_MODULE(test_Atmosphere, {
 })
 
 TEST_MODULE(test_GpsPosition, {
-    test("update - successful", [] {
-        GpsPosition pos1({2.0, 2.0, 2}, 41.0, 0);
-        GpsPosition pos2({1.0, 1.0, 1}, 48.0, 0,
-                         Timestamp<time::DateTimeImplBoost>("120000", time::Format::HHMMSS));
-        assertTrue(pos1.tryUpdate(std::move(pos2)));
-        assertEquals(pos1.get_geoid(), 48.0);
-        assertEquals(pos1.get_position().latitude, 1.0);
+    setup([] {
+        date_time::Day(1);
+        date_time::Now(12, 0, 0);
     });
-    test("update - failing", [] {
-        GpsPosition pos1({2.0, 2.0, 2}, 41.0);
-        GpsPosition pos2({1.0, 1.0, 1}, 48.0);
-        pos1.set_timeStamp(Timestamp<time::DateTimeImplBoost>("120100", time::Format::HHMMSS));
-        pos2.set_timeStamp(Timestamp<time::DateTimeImplBoost>("120000", time::Format::HHMMSS));
-        assertFalse(pos1.tryUpdate(std::move(pos2)));
-        assertEquals(pos1.get_geoid(), 41.0);
-        assertEquals(pos1.get_position().latitude, 2.0);
+    test("aging", [] {
+        CGpsPosition p(0, {1., 1., 1}, 1.);
+        ASSERT_EQUALS(p.UpdateAge(), 0);
+        ++p;
+        ASSERT_EQUALS(p.UpdateAge(), 1);
+    });
+    test("TryUpdate - higher priority", [] {
+        CGpsPosition p(0, {1., 1., 1}, 1.);
+        CGpsPosition p2(1, {2., 2., 2}, 2., 2., 4, 6, CTimestamp("115900"));
+        ++p;
+        ASSERT_EQUALS(p.UpdateAge(), 1);
+        ASSERT_TRUE(p.TryUpdate(std::move(p2)));
+        ASSERT_EQUALS(p.UpdateAge(), 0);
+        ASSERT_EQUALS(p.Geoid(), 2.);
+        ASSERT_EQUALS(p.Dilution(), 2.);
+        ASSERT_EQUALS(p.FixQuality(), 6);
+        ASSERT_EQUALS(p.NrOfSatellites(), 4);
+        ASSERT_EQUALS(p.Location(), (SLocation{2., 2., 2}));
+    });
+    test("TryUpdate - equal priority", [] {
+        CGpsPosition p(0, {1., 1., 1}, 1.);
+        CGpsPosition p2(0, {2., 2., 2}, 2., 2., 4, 6, CTimestamp("115900"));
+        ++p;
+        ASSERT_EQUALS(p.UpdateAge(), 1);
+        ASSERT_TRUE(p.TryUpdate(std::move(p2)));
+        ASSERT_EQUALS(p.UpdateAge(), 0);
+        ASSERT_EQUALS(p.Geoid(), 2.);
+        ASSERT_EQUALS(p.Dilution(), 2.);
+        ASSERT_EQUALS(p.FixQuality(), 6);
+        ASSERT_EQUALS(p.NrOfSatellites(), 4);
+        ASSERT_EQUALS(p.Location(), (SLocation{2., 2., 2}));
+    });
+    test("TryUpdate - outdated", [] {
+        CGpsPosition p(1, {1., 1., 1}, 1.);
+        CGpsPosition p2(0, {2., 2., 2}, 2., 2., 4, 6, CTimestamp("115900"));
+        while ((++p).UpdateAge() < CObject::OUTDATED)
+            ;
+        ASSERT_EQUALS(p.UpdateAge(), CObject::OUTDATED);
+        ASSERT_TRUE(p.TryUpdate(std::move(p2)));
+        ASSERT_EQUALS(p.UpdateAge(), 0);
+        ASSERT_EQUALS(p.Geoid(), 2.);
+        ASSERT_EQUALS(p.Dilution(), 2.);
+        ASSERT_EQUALS(p.FixQuality(), 6);
+        ASSERT_EQUALS(p.NrOfSatellites(), 4);
+        ASSERT_EQUALS(p.Location(), (SLocation{2., 2., 2}));
+    });
+    test("TryUpdate - lower priority", [] {
+        CGpsPosition p(1, {1., 1., 1}, 1., 1., 3, 5, CTimestamp("115800"));
+        CGpsPosition p2(0, {2., 2., 2}, 2., 2., 4, 6, CTimestamp("115900"));
+        ++p;
+        ASSERT_EQUALS(p.UpdateAge(), 1);
+        ASSERT_FALSE(p.TryUpdate(std::move(p2)));
+        ASSERT_EQUALS(p.UpdateAge(), 1);
+        ASSERT_EQUALS(p.Geoid(), 1.);
+        ASSERT_EQUALS(p.Dilution(), 1.);
+        ASSERT_EQUALS(p.FixQuality(), 5);
+        ASSERT_EQUALS(p.NrOfSatellites(), 3);
+        ASSERT_EQUALS(p.Location(), (SLocation{1., 1., 1}));
+    });
+    test("TryUpdate - older timestamp", [] {
+        CGpsPosition p(0, {1., 1., 1}, 1., 1., 3, 5, CTimestamp("115900"));
+        CGpsPosition p2(1, {2., 2., 2}, 2., 2., 4, 6, CTimestamp("115800"));
+        ++p;
+        ASSERT_EQUALS(p.UpdateAge(), 1);
+        ASSERT_FALSE(p.TryUpdate(std::move(p2)));
+        ASSERT_EQUALS(p.UpdateAge(), 1);
+        ASSERT_EQUALS(p.Geoid(), 1.);
+        ASSERT_EQUALS(p.Dilution(), 1.);
+        ASSERT_EQUALS(p.FixQuality(), 5);
+        ASSERT_EQUALS(p.NrOfSatellites(), 3);
+        ASSERT_EQUALS(p.Location(), (SLocation{1., 1., 1}));
+    });
+    test("init - fail", [] {
+        ASSERT_THROWS(CGpsPosition p(0, {SLocation::MIN_LATITUDE - 1., 1., 1}, 1.);
+                      , util::error::CLimitsExceededError);
+        ASSERT_THROWS(CGpsPosition p(0, {SLocation::MAX_LATITUDE + 1., 1., 1}, 1.);
+                      , util::error::CLimitsExceededError);
+        ASSERT_THROWS(CGpsPosition p(0, {1., SLocation::MIN_LONGITUDE - 1., 1}, 1.);
+                      , util::error::CLimitsExceededError);
+        ASSERT_THROWS(CGpsPosition p(0, {1., SLocation::MAX_LONGITUDE + 1., 1}, 1.);
+                      , util::error::CLimitsExceededError);
+        ASSERT_THROWS(CGpsPosition p(0, {1., 1., SLocation::MIN_ALTITUDE - 1}, 1.);
+                      , util::error::CLimitsExceededError);
+        ASSERT_THROWS(CGpsPosition p(0, {1., 1., SLocation::MAX_ALTITUDE + 1}, 1.);
+                      , util::error::CLimitsExceededError);
     });
 })
 
