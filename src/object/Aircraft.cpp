@@ -79,9 +79,16 @@ bool CAircraft::canUpdate(CObject const& other_) const
     try
     {
         auto const& other = dynamic_cast<CAircraft const&>(other_);
+        // timestamp must always be more up to date (1)
+        // other aircraft is outdated anyway (2)
+        // FLARM can always update TRANSPONDER if (1) holds
+        // equal types require at least equal priority
+        // TRANSPONDER can only update FLARM if (2) holds
         return (this->m_timestamp > other.m_timestamp) &&
-               (other.m_targetType == ETargetType::TRANSPONDER || this->m_targetType == ETargetType::FLARM) &&
-               CObject::canUpdate(other_);
+               (other.m_updateAge >= OUTDATED ||
+                (other.m_targetType == ETargetType::TRANSPONDER &&
+                 this->m_targetType == ETargetType::FLARM) ||
+                (other.m_targetType == this->m_targetType && this->m_lastPriority >= other.m_lastPriority));
     }
     catch ([[maybe_unused]] std::bad_cast const&)
     {
