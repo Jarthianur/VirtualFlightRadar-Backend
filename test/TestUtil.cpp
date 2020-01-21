@@ -39,7 +39,7 @@ void test_utility()
 
 void test_string_utils()
 {
-    suite("string_utils")
+    suite_par("string_utils")
         ->test("Checksum",
                [] {
                    ASSERT_EQUALS(Checksum("", 0), 0);

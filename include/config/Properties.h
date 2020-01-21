@@ -37,6 +37,7 @@ class CProperties
     boost::property_tree::ptree m_pTree;  ///< The underlying property tree
 
 public:
+    CProperties() = default;
     explicit CProperties(boost::property_tree::ptree const& ptree_);
     explicit CProperties(boost::property_tree::ptree&& ptree_);
     ~CProperties() noexcept = default;

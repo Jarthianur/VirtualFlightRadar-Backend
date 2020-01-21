@@ -38,7 +38,7 @@ Str CProperties::Property(Str const& path, Str const& defVal) const noexcept
         auto p = m_pTree.get_child(path).get_value<Str>();
         return p.empty() ? defVal : p;
     }
-    catch (ptree_bad_path const&)
+    catch ([[maybe_unused]] ptree_bad_path const&)
     {
         return defVal;
     }
@@ -55,7 +55,7 @@ Str CProperties::Property(Str const& path) const
         }
         return p;
     }
-    catch (ptree_bad_path const&)
+    catch ([[maybe_unused]] ptree_bad_path const&)
     {
         throw error::CPropertyNotFoundError(path);
     }
@@ -67,7 +67,7 @@ CProperties CProperties::Section(Str const& section) const
     {
         return CProperties(m_pTree.get_child(section));
     }
-    catch (ptree_bad_path const&)
+    catch ([[maybe_unused]] ptree_bad_path const&)
     {
         throw error::CPropertyNotFoundError(section);
     }

@@ -24,13 +24,13 @@
 
 using namespace sctf;
 
-extern void test_timestamp();
+extern void test_math();
 extern void test_utility();
 extern void test_string_utils();
 
 void dispatch()
 {
-    test_timestamp();
+    test_math();
     test_utility();
     test_string_utils();
 }

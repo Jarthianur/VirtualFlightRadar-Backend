@@ -499,67 +499,60 @@ TEST_MODULE_PAR(test_aircraft, {
     });
 })
 
-void test_timestamp()
-{
-    suite<CTimestamp>("Basic Timestamp tests")
-        ->setup([] {
-            date_time::Day(1);
-            date_time::Now(12, 0, 0);
-        })
-        ->test("creation - valid format",
-               [] {
-                   ASSERT_NOTHROW(CTimestamp("120000"));
-                   ASSERT_NOTHROW(CTimestamp("12:00:00.000"));
-               })
-        ->test("creation - invalid format",
-               [] {
-                   ASSERT_THROWS(CTimestamp(""), vfrb::object::error::CTimestampParseError);
-                   ASSERT_THROWS(CTimestamp("adgjhag"), vfrb::object::error::CTimestampParseError);
-                   ASSERT_THROWS(CTimestamp("36:60:11.11111"), vfrb::object::error::CTimestampParseError);
-                   ASSERT_THROWS(CTimestamp("366022"), vfrb::object::error::CTimestampParseError);
-               })
-        ->test("comparison - incremental time",
-               [] {
-                   date_time::Day(1);
-                   date_time::Now(13, 0, 0);
-                   CTimestamp const t1("120000");
-                   CTimestamp const t2("120001");
+TEST_MODULE_PAR(test_timestamp, {
+    setup([] {
+        date_time::Day(1);
+        date_time::Now(12, 0, 0);
+    });
+    test("creation - valid format", [] {
+        ASSERT_NOTHROW(CTimestamp("120000"));
+        ASSERT_NOTHROW(CTimestamp("12:00:00.000"));
+    });
+    test("creation - invalid format", [] {
+        ASSERT_THROWS(CTimestamp(""), vfrb::object::error::CTimestampParseError);
+        ASSERT_THROWS(CTimestamp("adgjhag"), vfrb::object::error::CTimestampParseError);
+        ASSERT_THROWS(CTimestamp("36:60:11.11111"), vfrb::object::error::CTimestampParseError);
+        ASSERT_THROWS(CTimestamp("366022"), vfrb::object::error::CTimestampParseError);
+    });
+    test("comparison - incremental time", [] {
+        date_time::Day(1);
+        date_time::Now(13, 0, 0);
+        CTimestamp const t1("120000");
+        CTimestamp const t2("120001");
 
-                   ASSERT(t2, GT, t1);
-                   ASSERT(t1, !GT, t2);
-               })
-        ->test("comparison - old day msg",
-               [] {
-                   date_time::Day(1);
-                   date_time::Now(23, 59, 0);
-                   CTimestamp const t1("235800");
-                   date_time::Day(2);
-                   date_time::Now(0, 0, 0);
-                   CTimestamp const t2("235900");
+        ASSERT(t2, GT, t1);
+        ASSERT(t1, !GT, t2);
+    });
+    test("comparison - old day msg", [] {
+        date_time::Day(1);
+        date_time::Now(23, 59, 0);
+        CTimestamp const t1("235800");
+        date_time::Day(2);
+        date_time::Now(0, 0, 0);
+        CTimestamp const t2("235900");
 
-                   ASSERT(t2, GT, t1);
-                   ASSERT(t1, !GT, t2);
-               })
-        ->test("comparison - new day msg",
-               [] {
-                   date_time::Day(1);
-                   date_time::Now(23, 59, 0);
-                   CTimestamp const t1("235800");
-                   date_time::Day(2);
-                   date_time::Now(0, 1, 0);
-                   CTimestamp const t2("000000");
+        ASSERT(t2, GT, t1);
+        ASSERT(t1, !GT, t2);
+    });
+    test("comparison - new day msg", [] {
+        date_time::Day(1);
+        date_time::Now(23, 59, 0);
+        CTimestamp const t1("235800");
+        date_time::Day(2);
+        date_time::Now(0, 1, 0);
+        CTimestamp const t2("000000");
 
-                   ASSERT(t2, GT, t1);
-                   ASSERT(t1, !GT, t2);
-               })
-        ->test("comparison - incremental day", [] {
-            date_time::Day(1);
-            date_time::Now(13, 0, 0);
-            CTimestamp const t1("120000");
-            date_time::Day(2);
-            CTimestamp const t2("110000");
+        ASSERT(t2, GT, t1);
+        ASSERT(t1, !GT, t2);
+    });
+    test("comparison - incremental day", [] {
+        date_time::Day(1);
+        date_time::Now(13, 0, 0);
+        CTimestamp const t1("120000");
+        date_time::Day(2);
+        CTimestamp const t2("110000");
 
-            ASSERT(t2, GT, t1);
-            ASSERT(t1, !GT, t2);
-        });
-}
+        ASSERT(t2, GT, t1);
+        ASSERT(t1, !GT, t2);
+    });
+})

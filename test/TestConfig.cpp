@@ -23,14 +23,46 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <boost/property_tree/ini_parser.hpp>
+
 #include "config/ConfigReader.h"
 #include "config/Configuration.h"
 #include "config/Properties.h"
 
 #include "helper.hpp"
 
-using namespace config;
 using namespace sctf;
+using namespace vfrb;
+using namespace config;
+
+TEST_MODULE_PAR(test_Properties, {
+    test("Property - default value", [] {
+        boost::property_tree::ptree t;
+        boost::property_tree::read_ini("[main]\nkey=value\n", t);
+        CProperties p(std::move(t));
+        ASSERT_EQUALS(p.Property("main.key", "default"), "value");
+        ASSERT_EQUALS(p.Property("main.nokey", "default"), "default");
+        ASSERT_EQUALS(p.Property("nosect.nokey", "default"), "default");
+    });
+    test("Property", [] {
+        boost::property_tree::ptree t;
+        boost::property_tree::read_ini("[main]\nkey=value\n", t);
+        CProperties p(std::move(t));
+        ASSERT_NOTHROW(p.Property("main.key"));
+        ASSERT_EQUALS(p.Property("main.key"), "value");
+        ASSERT_THROWS(p.Property("main.nokey"), config::error::CPropertyNotFoundError);
+        ASSERT_THROWS(p.Property("nosect.nokey"), config::error::CPropertyNotFoundError);
+    });
+    test("Section", [] {
+        boost::property_tree::ptree t;
+        boost::property_tree::read_ini("[main]\nkey=value\n", t);
+        CProperties p(std::move(t));
+        CProperties c;
+        ASSERT_NOTHROW(c = p.Section("main"));
+        ASSERT_EQUALS(c.Property("key"), "value");
+        ASSERT_THROWS(p.Section("nosect"), config::error::CPropertyNotFoundError);
+    });
+})
 
 TEST_MODULE(test_config_reader, {
     test("read config", [] {

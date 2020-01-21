@@ -26,40 +26,47 @@
 using namespace sctf;
 using namespace vfrb;
 
-TEST_MODULE(test_math, {
-    test("Radian", [] {
-        ASSERT_EQUALS(math::Radian(45.0), 0.785398);
-        ASSERT_EQUALS(math::Radian(0.0), 0.0);
-        ASSERT_EQUALS(math::Radian(360.0), 6.28319);
-    });
-    test("Degree", [] {
-        ASSERT_EQUALS(math::Degree(0.785398), 45.0);
-        ASSERT_EQUALS(math::Degree(0.0), 0.0);
-        ASSERT_EQUALS(math::Degree(6.28319), 360.0);
-    });
-    test("DoubleToInt", [] {
-        ASSERT_EQUALS(math::DoubleToInt(0.0), 0);
-        ASSERT_EQUALS(math::DoubleToInt(1.4), 1);
-        ASSERT_EQUALS(math::DoubleToInt(1.5), 2);
-        ASSERT_EQUALS(math::DoubleToInt(-1.4), -1);
-        ASSERT_EQUALS(math::DoubleToInt(-1.5), -2);
-    });
-    test("DmToDeg", [] {
-        ASSERT_EQUALS(math::DmToDeg(0.0), 0.0);
-        ASSERT_EQUALS(math::DmToDeg(9030.50), 90.508333);
-        ASSERT_EQUALS(math::DmToDeg(18000.0), 180.0);
-        ASSERT_EQUALS(math::DmToDeg(-4512.3456), 45.205760);
-    });
-    test("IcaoHeight", [] {
-        ASSERT_EQUALS(math::IcaoHeight(0.0), 44331);
-        ASSERT_EQUALS(math::IcaoHeight(1013.25), 0);
-        ASSERT_EQUALS(math::IcaoHeight(980.0), 281);
-    });
-    test("Saturate", [] {
-        ASSERT_EQUALS(math::Saturate(15, 0, 10), 10);
-        ASSERT_EQUALS(math::Saturate(9, 0, 10), 9);
-        ASSERT_EQUALS(math::Saturate(1, 3, 10), 3);
-        ASSERT_EQUALS(math::Saturate(-5, -10, 10), -5);
-        ASSERT_EQUALS(math::Saturate(-5, 0, 10), 0);
-    });
-})
+void test_math()
+{
+    suite_par("math")
+        ->test("Radian",
+               [] {
+                   ASSERT_EQUALS(math::Radian(45.0), 0.785398);
+                   ASSERT_EQUALS(math::Radian(0.0), 0.0);
+                   ASSERT_EQUALS(math::Radian(360.0), 6.28319);
+               })
+        ->test("Degree",
+               [] {
+                   ASSERT_EQUALS(math::Degree(0.785398), 45.0);
+                   ASSERT_EQUALS(math::Degree(0.0), 0.0);
+                   ASSERT_EQUALS(math::Degree(6.28319), 360.0);
+               })
+        ->test("DoubleToInt",
+               [] {
+                   ASSERT_EQUALS(math::DoubleToInt(0.0), 0);
+                   ASSERT_EQUALS(math::DoubleToInt(1.4), 1);
+                   ASSERT_EQUALS(math::DoubleToInt(1.5), 2);
+                   ASSERT_EQUALS(math::DoubleToInt(-1.4), -1);
+                   ASSERT_EQUALS(math::DoubleToInt(-1.5), -2);
+               })
+        ->test("DmToDeg",
+               [] {
+                   ASSERT_EQUALS(math::DmToDeg(0.0), 0.0);
+                   ASSERT_EQUALS(math::DmToDeg(9030.50), 90.508333);
+                   ASSERT_EQUALS(math::DmToDeg(18000.0), 180.0);
+                   ASSERT_EQUALS(math::DmToDeg(-4512.3456), 45.205760);
+               })
+        ->test("IcaoHeight",
+               [] {
+                   ASSERT_EQUALS(math::IcaoHeight(0.0), 44331);
+                   ASSERT_EQUALS(math::IcaoHeight(1013.25), 0);
+                   ASSERT_EQUALS(math::IcaoHeight(980.0), 281);
+               })
+        ->test("Saturate", [] {
+            ASSERT_EQUALS(math::Saturate(15, 0, 10), 10);
+            ASSERT_EQUALS(math::Saturate(9, 0, 10), 9);
+            ASSERT_EQUALS(math::Saturate(1, 3, 10), 3);
+            ASSERT_EQUALS(math::Saturate(-5, -10, 10), -5);
+            ASSERT_EQUALS(math::Saturate(-5, 0, 10), 0);
+        });
+}
