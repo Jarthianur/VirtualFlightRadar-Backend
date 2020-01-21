@@ -31,15 +31,17 @@
 #include "feed/GpsFeed.h"
 #include "feed/SbsFeed.h"
 #include "feed/WindFeed.h"
+#include "util/string_utils.hpp"
 
 using namespace vfrb::config;
 using namespace vfrb::data;
-using namespace std::literals;
+using namespace vfrb::str_util;
 
 namespace vfrb::feed
 {
 CFeedFactory::CFeedFactory(SPtr<config::CConfiguration> config_, SPtr<CAircraftData> aircraftData_,
-                         SPtr<CAtmosphereData> atmosData_, SPtr<CGpsData> gpsData_, SPtr<CWindData> windData_)
+                           SPtr<CAtmosphereData> atmosData_, SPtr<CGpsData> gpsData_,
+                           SPtr<CWindData> windData_)
     : m_config(config_),
       m_aircraftData(aircraftData_),
       m_atmosData(atmosData_),
@@ -51,7 +53,7 @@ template<>
 SPtr<CAprscFeed> CFeedFactory::makeFeed<CAprscFeed>(Str const& name_)
 {
     return std::make_shared<CAprscFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData,
-                                       m_config->MaxHeight);
+                                        m_config->MaxHeight);
 }
 
 template<>
@@ -107,9 +109,9 @@ SPtr<IFeed> CFeedFactory::createFeed(Str const& name_)
 namespace error
 {
 CFeedCreationError::CFeedCreationError()
-    : m_msg("no keywords found; be sure feed names contain one of "s + CConfiguration::SECT_KEY_APRSC + ", " +
-            CConfiguration::SECT_KEY_SBS + ", " + CConfiguration::SECT_KEY_WIND + ", " +
-            CConfiguration::SECT_KEY_ATMOS + ", " + CConfiguration::SECT_KEY_GPS)
+    : m_msg(MakeStr("no keywords found; be sure feed names contain one of ", CConfiguration::SECT_KEY_APRSC,
+                    ", ", CConfiguration::SECT_KEY_SBS, ", ", CConfiguration::SECT_KEY_WIND, ", ",
+                    CConfiguration::SECT_KEY_ATMOS, ", ", CConfiguration::SECT_KEY_GPS))
 {}
 
 char const* CFeedCreationError::Message() const noexcept

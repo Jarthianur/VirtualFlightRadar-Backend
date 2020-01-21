@@ -27,7 +27,6 @@
 #include "util/string_utils.hpp"
 
 using namespace vfrb::object;
-using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
@@ -47,8 +46,8 @@ CGpsPosition CGpsParser::Parse(Str&& str_, u32 prio_) const
 {
     try
     {
-        if (std::cmatch match;
-            MatchChecksum({str_.c_str(), str_.length()}) && std::regex_match(str_.c_str(), match, m_gpggaRe))
+        if (std::cmatch match; str_util::MatchChecksum({str_.c_str(), str_.length()}) &&
+                               std::regex_match(str_.c_str(), match, m_gpggaRe))
         {
             return parsePosition(match, prio_);
         }
@@ -62,23 +61,23 @@ CGpsPosition CGpsParser::Parse(Str&& str_, u32 prio_) const
 
 CGpsPosition CGpsParser::parsePosition(std::cmatch const& match_, u32 prio_) const
 {
-    auto latitude = math::DmToDeg(::Parse<f64>(match_[RE_GGA_LAT]));
+    auto latitude = math::DmToDeg(str_util::Parse<f64>(match_[RE_GGA_LAT]));
     if (match_[RE_GGA_LAT_DIR] == "S")
     {
         latitude = -latitude;
     }
-    auto longitude = math::DmToDeg(::Parse<f64>(match_[RE_GGA_LON]));
+    auto longitude = math::DmToDeg(str_util::Parse<f64>(match_[RE_GGA_LON]));
     if (match_[RE_GGA_LON_DIR] == "W")
     {
         longitude = -longitude;
     }
-    auto altitude = math::DoubleToInt(::Parse<f64>(match_[RE_GGA_ALT]));
+    auto altitude = math::DoubleToInt(str_util::Parse<f64>(match_[RE_GGA_ALT]));
     return {prio_,
             {latitude, longitude, altitude},
-            ::Parse<f64>(match_[RE_GGA_GEOID]),
-            ::Parse<f64>(match_[RE_GGA_DIL]),
-            ::Parse<u8>(match_[RE_GGA_SAT]),
-            ::Parse<s8>(match_[RE_GGA_FIX]),
-            CTimestamp(AsStrView(match_[RE_GGA_TIME]))};
+            str_util::Parse<f64>(match_[RE_GGA_GEOID]),
+            str_util::Parse<f64>(match_[RE_GGA_DIL]),
+            str_util::Parse<u8>(match_[RE_GGA_SAT]),
+            str_util::Parse<s8>(match_[RE_GGA_FIX]),
+            CTimestamp(str_util::AsStrView(match_[RE_GGA_TIME]))};
 }
 }  // namespace vfrb::feed::parser
