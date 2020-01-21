@@ -108,6 +108,19 @@ inline bool MatchChecksum(std::string_view const& sv_)
     return match;
 }
 
+usize constexpr len(char const* s_)
+{
+    return *s_ ? 1 + len(s_ + 1) : 0;
+}
+
+template<typename... Args>
+Str MakeStr(Args&&... args_)
+{
+    Str s;
+    s.reserve((0 + ... + len(args_)));
+    return (s + ... + args_);
+}
+
 /**
  * Parse a charcter sequence as 64 bit floating point.
  * @param first_ Pointer to first character
