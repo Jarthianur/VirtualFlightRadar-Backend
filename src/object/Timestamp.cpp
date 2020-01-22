@@ -40,14 +40,14 @@ char const* CTimestampParseError::Message() const noexcept
 }
 }  // namespace error
 
-std::tuple<u32, u32, u32, u32> parseTime(std::string_view::const_iterator&       first_,
-                                         std::string_view::const_iterator const& last_)
+std::tuple<u32, u32, u32, u32> parseTime(StrView::const_iterator&       first_,
+                                         StrView::const_iterator const& last_)
 {
     namespace qi = boost::spirit::qi;
 
     static thread_local const qi::int_parser<u32, 10, 2, 2> _2digit = {};
     static thread_local const qi::int_parser<u32, 10, 3, 3> _3digit = {};
-    static thread_local const qi::rule<std::string_view::const_iterator, std::tuple<u32, u32, u32, u32>(),
+    static thread_local const qi::rule<StrView::const_iterator, std::tuple<u32, u32, u32, u32>(),
                                        qi::space_type>
         time_r = (_2digit >> _2digit >> _2digit >> qi::attr(0)) |
                  (_2digit >> ":" >> _2digit >> ":" >> _2digit >> "." >> _3digit);
@@ -60,7 +60,7 @@ std::tuple<u32, u32, u32, u32> parseTime(std::string_view::const_iterator&      
     throw error::CTimestampParseError();
 }
 
-CTimestamp::CTimestamp(std::string_view const& sv_) : m_day(date_time::Day())
+CTimestamp::CTimestamp(StrView const& sv_) : m_day(date_time::Day())
 {
     auto it           = sv_.begin();
     auto [h, m, s, f] = parseTime(it, sv_.end());

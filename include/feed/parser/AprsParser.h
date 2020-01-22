@@ -33,8 +33,7 @@ namespace vfrb::feed::parser
 /// A parser for APRS sentences.
 class CAprsParser : public IParser<object::CAircraft>
 {
-    using AircraftInfo =
-        std::tuple<std::string_view, object::CAircraft::EIdType, object::CAircraft::EAircraftType>;
+    using AircraftInfo = std::tuple<StrView, object::CAircraft::EIdType, object::CAircraft::EAircraftType>;
 
     inline static constexpr auto RE_APRS_TIME    = 1;   ///< APRS regex match group of time
     inline static constexpr auto RE_APRS_LAT     = 2;   ///< APRS regex match group of latitude

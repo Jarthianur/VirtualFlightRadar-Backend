@@ -21,34 +21,32 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-
 #include "util/class_utils.h"
 
+#include "types.h"
+
+namespace vfrb
+{
 namespace server
 {
 namespace net
 {
-class SocketImplTest
+class CSocketImplTest
 {
-    std::string  m_buffer;
-    std::int32_t m_socket;
-    std::string  m_address;
+    SPtr<Str> m_buffer;
+    Str       m_address;
+    bool      m_failWrite = false;
 
 public:
-    MOVABLE_BUT_NOT_COPYABLE(SocketImplTest)
+    MOVABLE_BUT_NOT_COPYABLE(CSocketImplTest)
 
-    explicit SocketImplTest(int&& socket);
-    ~SocketImplTest() noexcept;
+    CSocketImplTest(Str const& addr_, SPtr<Str> buf_, bool fail_);
+    ~CSocketImplTest() noexcept = default;
 
-    std::string getAddress() const;
-    bool        write(const std::string& msg);
-    void        close();
-    int&        get();
-
-    auto getBuffer() -> const decltype(m_buffer)&;
-    void setAddress(const decltype(m_address)&);
+    Str  Address() const;
+    bool Write(StrView const& msg_);
+    void Close();
 };
 }  // namespace net
 }  // namespace server
+}  // namespace vfrb

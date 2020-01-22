@@ -57,7 +57,7 @@ Str CSocketBoost::Address() const
     return m_socket.remote_endpoint().address().to_string();
 }
 
-bool CSocketBoost::Write(std::string_view const& sv_)
+bool CSocketBoost::Write(StrView const& sv_)
 {
     if (!m_socket.is_open())
     {

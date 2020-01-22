@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <string_view>
-
 #include "error/Error.hpp"
 
 #include "types.h"
@@ -55,7 +53,7 @@ public:
      * @param sv_ The time string
      * @throw vfrb::object::error::CTimestampParseError
      */
-    CTimestamp(std::string_view const& sv_);
+    CTimestamp(StrView const& sv_);
     CTimestamp(CTimestamp const& other_);
     ~CTimestamp() noexcept = default;
 

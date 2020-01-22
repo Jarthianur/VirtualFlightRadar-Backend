@@ -44,7 +44,7 @@ CAtmosphere CAtmosphereParser::Parse(Str&& str_, u32 prio_) const
                 throw error::CParseError();
             }
             usize tmpS;
-            if ((tmpS = std::string_view(str_.c_str(), tmpB).find_last_of(',')) != Str::npos)
+            if ((tmpS = StrView(str_.c_str(), tmpB).find_last_of(',')) != Str::npos)
             {
                 ++tmpS;
             }

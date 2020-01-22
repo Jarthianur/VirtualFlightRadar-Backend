@@ -25,7 +25,6 @@
 #include <array>
 #include <cstdarg>
 #include <cstdio>
-#include <string_view>
 
 #include "error/Error.hpp"
 
@@ -57,14 +56,14 @@ template<usize N>
 class CString
 {
     std::array<char, N> m_data;  ///< The underlying array
-    std::string_view    m_view;  ///< A view on the data
+    StrView             m_view;  ///< A view on the data
 
     /**
      * Copy into own data.
      * @param sv_ The string to copy
      * @throw vfrb::error::COverflowError
      */
-    void copy(std::string_view const& sv_)
+    void copy(StrView const& sv_)
     {
         usize len = sv_.length();
         if (len > N)
@@ -83,7 +82,7 @@ class CString
                 throw error::COverflowError();
             }
         }
-        m_view = std::string_view(m_data.data(), len);
+        m_view = StrView(m_data.data(), len);
     }
 
     /**
@@ -93,7 +92,7 @@ class CString
     void copy(CString<N> const& other_)
     {
         std::copy(other_.m_data.cbegin(), other_.m_data.cend(), m_data.begin());
-        m_view = std::string_view(m_data.data(), other_.m_view.length());
+        m_view = StrView(m_data.data(), other_.m_view.length());
     }
 
 public:
@@ -112,7 +111,7 @@ public:
         operator=(init_);
     }
 
-    CString(std::string_view const& init_)
+    CString(StrView const& init_)
     {
         operator=(init_);
     }
@@ -126,13 +125,13 @@ public:
 
     CString& operator=(char const* other_)
     {
-        copy(std::string_view(other_));
+        copy(StrView(other_));
         return *this;
     }
 
     CString& operator=(Str const& other_)
     {
-        copy(std::string_view(other_));
+        copy(StrView(other_));
         return *this;
     }
 
@@ -142,18 +141,18 @@ public:
         return *this;
     }
 
-    CString& operator=(std::string_view const& other_)
+    CString& operator=(StrView const& other_)
     {
         copy(other_);
         return *this;
     }
 
-    std::string_view const& operator*() const
+    StrView const& operator*() const
     {
         return m_view;
     }
 
-    operator std::string_view() const
+    operator StrView() const
     {
         return m_view;
     }
@@ -167,7 +166,7 @@ public:
     void Clear()
     {
         m_data[0] = '\0';
-        m_view    = std::string_view(m_data.data(), 0);
+        m_view    = StrView(m_data.data(), 0);
     }
 
     /**
@@ -189,7 +188,7 @@ public:
         int b = 0;
         if ((b = std::vsnprintf(m_data.data() + pos_, max, fmt_, args)) >= 0)
         {
-            m_view = std::string_view(m_data.data(), pos_ + b + 1);
+            m_view = StrView(m_data.data(), pos_ + b + 1);
         }
         va_end(args);
         if (b < 0)

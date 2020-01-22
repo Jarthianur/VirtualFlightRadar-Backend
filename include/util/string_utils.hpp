@@ -24,7 +24,6 @@
 #include <charconv>
 #include <limits>
 #include <regex>
-#include <string_view>
 #include <tuple>
 #include <type_traits>
 
@@ -75,7 +74,7 @@ public:
  * @param pos_ The index to start from
  * @return the checksum
  */
-inline s32 Checksum(std::string_view const& sv_, usize pos_)
+inline s32 Checksum(StrView const& sv_, usize pos_)
 {
     s32   csum = 0;
     usize i    = 1 + pos_;  // $ in nmea str not included
@@ -91,10 +90,10 @@ inline s32 Checksum(std::string_view const& sv_, usize pos_)
  * @param sv_ The string
  * @return true if equal, else false
  */
-inline bool MatchChecksum(std::string_view const& sv_)
+inline bool MatchChecksum(StrView const& sv_)
 {
     auto const cs_begin = sv_.rfind('*');
-    if (cs_begin == std::string_view::npos || cs_begin + 3 >= sv_.length())
+    if (cs_begin == StrView::npos || cs_begin + 3 >= sv_.length())
     {
         return false;
     }
@@ -315,9 +314,9 @@ auto Parse(Str const& str_)
  * @param sub_ The sub match
  * @return the string view
  */
-inline std::string_view AsStrView(std::csub_match const& sub_)
+inline StrView AsStrView(std::csub_match const& sub_)
 {
-    return std::string_view(sub_.first, static_cast<usize>(sub_.second - sub_.first));
+    return StrView(sub_.first, static_cast<usize>(sub_.second - sub_.first));
 }
 
 /**

@@ -21,18 +21,77 @@
 
 #include "server/Server.hpp"
 
-#include "NetworkInterfaceImplTest.h"
+#include "AcceptorImplTest.h"
 #include "SocketImplTest.h"
 #include "helper.hpp"
 
 using namespace sctf;
+using namespace vfrb;
 using namespace server;
 
-/*void test_server(test::TestSuitesRunner& runner)
-{
-    describe("Basic Server tests", runner)->test("accept connection", [] {
-        auto                   ifc = std::make_shared<NetworkInterfaceImplTests>();
-        Server<SocketImplTest> server(ifc);
-        server.run();
+TEST_MODULE(test_Server, {
+    test("connect twice", [] {
+        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
+        CServer<net::CSocketImplTest> s(a, 2);
+        s.Run();
+        usize c1 = a->Connect("#1", false, false);
+        ASSERT_EQUALS(a->Socket(c1).Address(), "#1");
+        a->Connect("#1", false, false);
+        ASSERT(a->Sockets(), LT, 2);
     });
-}*/
+    test("max connections", [] {
+        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
+        CServer<net::CSocketImplTest> s(a, 1);
+        s.Run();
+        a->Connect("#1", false, false);
+        ASSERT_EQUALS(a->Sockets(), 1);
+        a->Connect("#2", false, false);
+        ASSERT_EQUALS(a->Sockets(), 1);
+    });
+    test("failed connect", [] {
+        auto                          a = std::make_shared<net::CAcceptorImplTest>(true);
+        CServer<net::CSocketImplTest> s(a, 1);
+        s.Run();
+        a->Connect("#1", false, false);
+        ASSERT_EQUALS(a->Sockets(), 0);
+    });
+    test("failed connect - error in handler", [] {
+        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
+        CServer<net::CSocketImplTest> s(a, 1);
+        s.Run();
+        a->Connect("#1", true, false);
+        ASSERT_EQUALS(a->Sockets(), 0);
+    });
+    test("Send", [] {
+        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
+        CServer<net::CSocketImplTest> s(a, 2);
+        s.Run();
+        usize c1 = a->Connect("#1", false, false);
+        usize c2 = a->Connect("#2", false, false);
+        ASSERT_EQUALS(a->Sockets(), 2);
+        ASSERT_EQUALS(a->Socket(c1).Address(), "#1");
+        ASSERT_EQUALS(a->Socket(c2).Address(), "#2");
+        s.Send("hello");
+        ASSERT_EQUALS(a->Buffer(c1), "hello");
+        ASSERT_EQUALS(a->Buffer(c2), "hello");
+    });
+    test("Send - empty msg", [] {
+        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
+        CServer<net::CSocketImplTest> s(a, 2);
+        s.Run();
+        usize c = a->Connect("#1", false, false);
+        s.Send("hello");
+        ASSERT_EQUALS(a->Buffer(c), "hello");
+        s.Send("");
+        ASSERT_EQUALS(a->Buffer(c), "hello");
+    });
+    test("Send - fail write", [] {
+        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
+        CServer<net::CSocketImplTest> s(a, 2);
+        s.Run();
+        usize c = a->Connect("#1", false, true);
+        s.Send("hello");
+        s.Send("world");
+        ASSERT_EQUALS(a->Buffer(c), "");
+    });
+})

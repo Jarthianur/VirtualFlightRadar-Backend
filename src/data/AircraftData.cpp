@@ -34,7 +34,7 @@ CAircraftData::CAircraftData(AccessFn&& fn_, s32 maxDist_) : IData(std::move(fn_
 bool CAircraftData::Update(CObject&& aircraft_)
 {
     auto&& aircraft = static_cast<CAircraft&&>(aircraft_);
-    auto   result   = m_container.Insert(std::hash<std::string_view>()(*aircraft.Id()), std::move(aircraft));
+    auto   result   = m_container.Insert(std::hash<StrView>()(*aircraft.Id()), std::move(aircraft));
     if (!result.second)
     {
         result.first->Value.TryUpdate(std::move(aircraft));

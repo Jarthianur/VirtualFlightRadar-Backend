@@ -22,7 +22,6 @@
 #pragma once
 
 #include <algorithm>
-#include <string_view>
 #include <vector>
 
 #include "concurrent/GuardedThread.hpp"
@@ -82,7 +81,7 @@ public:
      * Send a message to all clients.
      * @param sv_ The message
      */
-    void Send(std::string_view const& sv_) REQUIRES(!m_mutex);
+    void Send(StrView const& sv_) REQUIRES(!m_mutex);
 };
 
 template<typename SocketT>
@@ -136,7 +135,7 @@ void CServer<SocketT>::Stop() REQUIRES(!m_mutex)
 }
 
 template<typename SocketT>
-void CServer<SocketT>::Send(std::string_view const& sv_) REQUIRES(!m_mutex)
+void CServer<SocketT>::Send(StrView const& sv_) REQUIRES(!m_mutex)
 {
     concurrent::LockGuard lk(m_mutex);
     if (sv_.empty() || m_connections.empty())

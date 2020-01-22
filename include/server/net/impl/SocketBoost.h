@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <string_view>
-
 #include <boost/asio.hpp>
 #include <boost/move/move.hpp>
 
@@ -52,7 +50,7 @@ public:
      * @return true on success, else false
      * @throw vfrb::server::net::error::CSocketError
      */
-    bool Write(std::string_view const& sv_);
+    bool Write(StrView const& sv_);
     void Close();
 
     /// Get the underlying socket.

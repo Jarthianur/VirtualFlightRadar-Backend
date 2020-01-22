@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <string_view>
 #include <utility>
 
 #include "net/error/SocketError.h"
@@ -54,7 +53,7 @@ public:
      * @param sv_ The message
      * @return true on success, else false
      */
-    bool Write(std::string_view const& sv_);
+    bool Write(StrView const& sv_);
 
     auto Address() const -> decltype(m_address) const&;
 };
@@ -77,7 +76,7 @@ CConnection<SocketT>& CConnection<SocketT>::operator=(CConnection&& other_)
 }
 
 template<typename SocketT>
-bool CConnection<SocketT>::Write(std::string_view const& sv_)
+bool CConnection<SocketT>::Write(StrView const& sv_)
 {
     try
     {

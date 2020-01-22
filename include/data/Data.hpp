@@ -20,6 +20,8 @@
 #include <functional>
 #include <utility>
 
+#include "types.h"
+
 namespace vfrb::object
 {
 class CObject;
@@ -30,7 +32,7 @@ namespace vfrb::data
 struct SAccessor
 {
     object::CObject const& Obj;
-    std::string_view       Nmea;
+    StrView                Nmea;
 };
 
 using AccessFn = std::function<void(SAccessor const&)>;

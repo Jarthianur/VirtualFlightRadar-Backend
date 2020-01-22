@@ -21,52 +21,47 @@
 
 #include "SocketImplTest.h"
 
+#include "server/net/error/SocketError.h"
+
+namespace vfrb
+{
 namespace server
 {
 namespace net
 {
-SocketImplTest::SocketImplTest(SocketImplTest&& other) : m_socket(other.m_socket) {}
+CSocketImplTest::CSocketImplTest(CSocketImplTest&& other_)
+    : m_buffer(other_.m_buffer), m_address(other_.m_address), m_failWrite(other_.m_failWrite)
+{}
 
-SocketImplTest& SocketImplTest::operator=(SocketImplTest&& other)
+CSocketImplTest& CSocketImplTest::operator=(CSocketImplTest&& other_)
 {
-    m_socket = other.m_socket;
+    m_address   = other_.m_address;
+    m_buffer    = other_.m_buffer;
+    m_failWrite = other_.m_failWrite;
     return *this;
 }
 
-SocketImplTest::SocketImplTest(int&& socket) : m_socket(socket) {}
+CSocketImplTest::CSocketImplTest(Str const& addr_, SPtr<Str> buf_, bool fail_)
+    : m_buffer(buf_), m_address(addr_), m_failWrite(fail_)
+{}
 
-SocketImplTest::~SocketImplTest() noexcept {}
-
-std::string SocketImplTest::getAddress() const
+Str CSocketImplTest::Address() const
 {
     return m_address;
 }
 
-bool SocketImplTest::write(const std::string& msg)
+bool CSocketImplTest::Write(StrView const& msg_)
 {
-    m_buffer = msg;
+    if (m_failWrite)
+    {
+        throw error::CSocketError();
+    }
+    m_buffer->clear();
+    m_buffer->append(msg_);
     return true;
 }
 
-void SocketImplTest::close()
-{
-    m_socket = 0;
-}
-
-int& SocketImplTest::get()
-{
-    return m_socket;
-}
-
-auto SocketImplTest::getBuffer() -> const decltype(m_buffer)&
-{
-    return m_buffer;
-}
-
-void SocketImplTest::setAddress(const decltype(m_address)& addr)
-{
-    m_address = addr;
-}
-
+void CSocketImplTest::Close() {}
 }  // namespace net
 }  // namespace server
+}  // namespace vfrb

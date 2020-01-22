@@ -27,8 +27,8 @@
 
 namespace vfrb::object
 {
-CAircraft::CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAircraftType aT_,
-                     SLocation const& loc_, SMovement const& move_, CTimestamp const& ts_)
+CAircraft::CAircraft(u32 prio_, StrView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
+                     SMovement const& move_, CTimestamp const& ts_)
     : CObject(prio_),
       m_id(id_),
       m_idType(idT_ > EIdType::OGN ? EIdType::RANDOM : idT_),
@@ -43,8 +43,8 @@ CAircraft::CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAirc
     util::FailOutsideBounds(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
 }
 
-CAircraft::CAircraft(u32 prio_, std::string_view const& id_, EIdType idT_, EAircraftType aT_,
-                     SLocation const& loc_, CTimestamp const& ts_)
+CAircraft::CAircraft(u32 prio_, StrView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
+                     CTimestamp const& ts_)
     : CAircraft(prio_, id_, idT_, aT_, loc_, {.0, .0, .0}, ts_)
 {
     m_targetType = ETargetType::TRANSPONDER;

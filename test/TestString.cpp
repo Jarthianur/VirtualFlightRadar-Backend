@@ -29,13 +29,13 @@ TEST_MODULE(test_String, {
     test("init", [] {
         ASSERT_NOTHROW(CString<4>("a"));
         ASSERT_NOTHROW(CString<4>(Str("b")));
-        ASSERT_NOTHROW(CString<4>(std::string_view("c")));
+        ASSERT_NOTHROW(CString<4>(StrView("c")));
         ASSERT_NOTHROW(CString<4>(CString<4>("d")));
         ASSERT_NOTHROW(CString<4>());
 
         CString<4> a("a");
         CString<4> b(Str("b"));
-        CString<4> c(std::string_view("c"));
+        CString<4> c(StrView("c"));
         CString<4> d(CString<4>("d"));
         CString<4> e;
         ASSERT_EQUALS(*a, {"a"});
@@ -47,7 +47,7 @@ TEST_MODULE(test_String, {
     test("init overflow", [] {
         ASSERT_THROWS(CString<4>("12345"), error::COverflowError);
         ASSERT_THROWS(CString<4>(Str("12345")), error::COverflowError);
-        ASSERT_THROWS(CString<4>(std::string_view("12345")), error::COverflowError);
+        ASSERT_THROWS(CString<4>(StrView("12345")), error::COverflowError);
     });
     test("Length", [] {
         CString<4> a("abc");
@@ -68,7 +68,7 @@ TEST_MODULE(test_String, {
 
         ASSERT_NOTHROW(a = "a");
         ASSERT_NOTHROW(b = Str("b"));
-        ASSERT_NOTHROW(c = std::string_view("c"));
+        ASSERT_NOTHROW(c = StrView("c"));
         ASSERT_NOTHROW(d = CString<4>("d"));
         ASSERT_EQUALS(*a, {"a"});
         ASSERT_EQUALS(*b, {"b"});
@@ -82,7 +82,7 @@ TEST_MODULE(test_String, {
 
         ASSERT_THROWS(a = "12345", error::COverflowError);
         ASSERT_THROWS(b = Str("12345"), error::COverflowError);
-        ASSERT_THROWS(c = std::string_view("12345"), error::COverflowError);
+        ASSERT_THROWS(c = StrView("12345"), error::COverflowError);
     });
     test("Format", [] {
         CString<8> a;

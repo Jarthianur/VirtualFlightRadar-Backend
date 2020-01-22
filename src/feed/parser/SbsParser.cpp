@@ -34,10 +34,10 @@ CSbsParser::CSbsParser(s32 maxHeight_) : IParser<CAircraft>(), m_maxHeight(maxHe
 
 CAircraft CSbsParser::Parse(Str&& str_, u32 prio_) const
 {
-    u32              i = 2;
-    SLocation        loc;
-    std::string_view id;
-    CTimestamp       ts;
+    u32        i = 2;
+    SLocation  loc;
+    StrView    id;
+    CTimestamp ts;
 
     try
     {
@@ -48,15 +48,13 @@ CAircraft CSbsParser::Parse(Str&& str_, u32 prio_) const
                 switch (i)
                 {
                     case SBS_FIELD_ID:
-                        id = std::string_view(str_.c_str() + p, delim - p);
+                        id = StrView(str_.c_str() + p, delim - p);
                         if (id.size() != CAircraft::ID_LEN)
                         {
                             throw error::CParseError();
                         }
                         break;
-                    case SBS_FIELD_TIME:
-                        ts = CTimestamp(std::string_view(str_.c_str() + p, delim - p));
-                        break;
+                    case SBS_FIELD_TIME: ts = CTimestamp(StrView(str_.c_str() + p, delim - p)); break;
                     case SBS_FIELD_ALT:
                         if (auto [v, ec] = Convert<f64>(str_.c_str() + p, str_.c_str() + delim);
                             ec == EErrc::OK)

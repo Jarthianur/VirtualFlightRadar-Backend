@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <string_view>
 
 namespace vfrb
 {
@@ -42,7 +43,8 @@ using f64   = double;
 
 using enum_type = std::uint_fast8_t;
 
-using Str = std::string;
+using Str     = std::string;
+using StrView = std::string_view;
 
 template<typename T>
 using SPtr = std::shared_ptr<T>;
