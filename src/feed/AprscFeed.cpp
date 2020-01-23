@@ -21,14 +21,12 @@
 
 #include "feed/AprscFeed.h"
 
-#include <stdexcept>
-
 #include "config/Configuration.h"
 #include "data/AircraftData.h"
 #include "object/Aircraft.h"
+#include "util/string_utils.hpp"
 
 using namespace vfrb::config;
-using namespace std::literals;
 
 namespace vfrb::feed
 {
@@ -49,7 +47,8 @@ CAprscFeed::CAprscFeed(Str const& name_, CProperties const& prop_, SPtr<data::CA
     }
     catch ([[maybe_unused]] config::error::CPropertyNotFoundError const&)
     {
-        throw error::CInvalidPropertyError("could not find: "s + name_ + "." + CConfiguration::KV_KEY_LOGIN);
+        throw error::CInvalidPropertyError(
+            str_util::MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_LOGIN));
     }
 }
 

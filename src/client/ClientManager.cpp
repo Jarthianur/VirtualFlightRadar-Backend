@@ -23,8 +23,8 @@
 
 #include "client/ClientFactory.h"
 #include "feed/Feed.h"
+#include "util/string_utils.hpp"
 
-using namespace std::literals;
 using namespace vfrb::concurrent;
 
 namespace vfrb::client
@@ -74,7 +74,7 @@ void CClientManager::Stop()
 namespace error
 {
 CFeedSubscriptionError::CFeedSubscriptionError(Str const& name_)
-    : m_msg("failed to subscribe "s + name_ + " to client")
+    : m_msg(str_util::MakeStr("failed to subscribe ", name_, " to client"))
 {}
 
 char const* CFeedSubscriptionError::Message() const noexcept

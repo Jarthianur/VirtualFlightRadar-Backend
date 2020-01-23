@@ -35,6 +35,13 @@
 #include "types.h"
 #include "utility.hpp"
 
+namespace vfrb
+{
+/// Helper type to use for hex conversion.
+struct x32
+{};
+}  // namespace vfrb
+
 namespace vfrb::str_util
 {
 /// Error code
@@ -47,10 +54,6 @@ enum class EErrc : enum_type
 /// Result type
 template<typename T>
 using Result = std::tuple<T, EErrc>;
-
-/// Helper type to use for hex conversion.
-struct x32
-{};
 
 namespace error
 {
@@ -110,6 +113,11 @@ inline bool MatchChecksum(StrView const& sv_)
 usize constexpr len(char const* s_)
 {
     return *s_ ? 1 + len(s_ + 1) : 0;
+}
+
+usize len(Str const& s_)
+{
+    return s_.length();
 }
 
 template<typename... Args>

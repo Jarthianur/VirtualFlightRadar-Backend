@@ -29,8 +29,6 @@
 
 #include "Logger.hpp"
 
-using namespace std::literals;
-
 namespace vfrb::config
 {
 namespace error
@@ -41,7 +39,7 @@ char const* CConfigurationError::Message() const noexcept
 }
 
 CConversionError::CConversionError(Str const& str_, char const* path_)
-    : m_msg("invalid value at "s + path_ + " [" + str_ + "]")
+    : m_msg(str_util::MakeStr("invalid value at ", path_, " [", str_, "]"))
 {}
 
 char const* CConversionError::Message() const noexcept

@@ -28,9 +28,11 @@
 
 #include "config/Configuration.h"
 #include "data/Data.hpp"
+#include "util/string_utils.hpp"
 
 using namespace vfrb::config;
-using namespace std::literals;
+
+using vfrb::str_util::MakeStr;
 
 namespace vfrb::feed
 {
@@ -39,11 +41,13 @@ IFeed::IFeed(Str const& name_, CProperties const& prop_, SPtr<data::IData> data_
 {
     if (prop_.Property(CConfiguration::KV_KEY_HOST, "").empty())
     {
-        throw error::CInvalidPropertyError("could not find: "s + name_ + "." + CConfiguration::KV_KEY_HOST);
+        throw error::CInvalidPropertyError(
+            MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_HOST));
     }
     if (prop_.Property(CConfiguration::KV_KEY_PORT, "").empty())
     {
-        throw error::CInvalidPropertyError("could not find: "s + name_ + "." + CConfiguration::KV_KEY_PORT);
+        throw error::CInvalidPropertyError(
+            MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_PORT));
     }
 }
 

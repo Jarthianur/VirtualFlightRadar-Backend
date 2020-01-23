@@ -19,83 +19,77 @@
  }
  */
 
-#include <stdexcept>
-#include <string>
-
 #include "feed/parser/AprsParser.h"
 #include "feed/parser/AtmosphereParser.h"
 #include "feed/parser/GpsParser.h"
 #include "feed/parser/SbsParser.h"
 #include "feed/parser/WindParser.h"
+#include "math/math.hpp"
 #include "object/Aircraft.h"
 #include "object/Atmosphere.h"
 #include "object/GpsPosition.h"
-#include "object/Timestamp.hpp"
+#include "object/Timestamp.h"
 #include "object/Wind.h"
-#include "util/math.hpp"
 
 #include "helper.hpp"
 
+using namespace vfrb;
 using namespace feed::parser;
 using namespace sctf;
 
-TEST_MODULE(test_sbs_parser, {
+TEST_MODULE(test_SbsParser, {
     test("valid msg", [] {
-        SbsParser sbsParser;
-        assertNoExcept(sbsParser.unpack(
+        CSbsParser p(100000);
+        ASSERT_NOTHROW(p.Parse(
             "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
             0));
-        auto ac = sbsParser.unpack(
+        auto ac = p.Parse(
             "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
             0);
-        assertEquals(ac.getId(), "AAAAAA");
-        assertEquals(ac.getTargetType(), object::Aircraft::TargetType::TRANSPONDER);
-        assertEquals(ac.getLocation().altitude, math::doubleToInt(math::FEET_2_M * 1000));
-        assertEquals(ac.getLocation().latitude, 49.0);
-        assertEquals(ac.getLocation().longitude, 8.0);
-        assertFalse(ac.hasFullInfo());
+        ASSERT_EQUALS(ac.Id(), "AAAAAA");
+        ASSERT_EQUALS(ac.TargetType(), object::CAircraft::ETargetType::TRANSPONDER);
+        ASSERT_EQUALS(ac.Location().Altitude, math::DoubleToInt(math::FEET_2_M * 1000));
+        ASSERT_EQUALS(ac.Location().Latitude, 49.0);
+        ASSERT_EQUALS(ac.Location().Longitude, 8.0);
+        ASSERT_FALSE(ac.HasFullInfo());
     });
     test("invalid msg", [] {
-        SbsParser sbsParser;
-        assertException(
-            sbsParser.unpack(
-                "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0", 0),
-            UnpackError);
-        assertException(
-            sbsParser.unpack("MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0",
-                             0),
-            UnpackError);
-        assertException(
-            sbsParser.unpack(
+        CSbsParser p(100000);
+        ASSERT_THROWS(
+            p.Parse("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0", 0),
+            feed::parser::error::CParseError);
+        ASSERT_THROWS(
+            p.Parse("MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", 0),
+            feed::parser::error::CParseError);
+        ASSERT_THROWS(
+            p.Parse(
                 "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0",
                 0),
-            UnpackError);
-        assertException(sbsParser.unpack("MSG,someCrap in, here", 0), UnpackError);
-        assertException(sbsParser.unpack("MSG,4,0,,,,,,", 0), UnpackError);
-        assertException(
-            sbsParser.unpack(
-                "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", 0),
-            UnpackError);
-        assertException(
-            sbsParser.unpack("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0",
-                             0),
-            UnpackError);
-        assertException(sbsParser.unpack("", 0), UnpackError);
+            feed::parser::error::CParseError);
+        ASSERT_THROWS(p.Parse("MSG,someCrap in, here", 0), feed::parser::error::CParseError);
+        ASSERT_THROWS(p.Parse("MSG,4,0,,,,,,", 0), feed::parser::error::CParseError);
+        ASSERT_THROWS(
+            p.Parse("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0",
+                    0),
+            feed::parser::error::CParseError);
+        ASSERT_THROWS(
+            p.Parse("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", 0),
+            feed::parser::error::CParseError);
+        ASSERT_THROWS(p.Parse("", 0), feed::parser::error::CParseError);
     });
     test("filter height", [] {
-        SbsParser tmpSbs;
-        SbsParser::s_maxHeight = 0;
-        assertException(
-            tmpSbs.unpack(
+        CSbsParser p(0);
+        ASSERT_THROWS(
+            p.Parse(
                 "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
                 0),
-            UnpackError);
+            feed::parser::error::CParseError);
     });
 })
 
-TEST_MODULE(test_aprs_parser, {
+TEST_MODULE(test_AprsParser, {
     test("valid msg", [] {
-        AprsParser aprsParser;
+        CAprsParser p;
         assertNoExcept(aprsParser.unpack(
             "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA", 0));
         assertNoExcept(aprsParser.unpack(

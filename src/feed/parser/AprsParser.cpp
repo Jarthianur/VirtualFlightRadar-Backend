@@ -30,7 +30,8 @@
 #include "util/string_utils.hpp"
 
 using namespace vfrb::object;
-using namespace vfrb::str_util;
+
+using vfrb::str_util::AsStrView;
 
 namespace vfrb::feed::parser
 {
@@ -71,17 +72,17 @@ CAircraft CAprsParser::Parse(Str&& str_, u32 prio_) const
 SLocation CAprsParser::parseLocation(std::cmatch const& match_) const
 {
     SLocation pos;
-    pos.Latitude = math::DmToDeg(::Parse<f64>(match_[RE_APRS_LAT]));
+    pos.Latitude = math::DmToDeg(str_util::Parse<f64>(match_[RE_APRS_LAT]));
     if (AsStrView(match_[RE_APRS_LAT_DIR]) == "S")
     {
         pos.Latitude = -pos.Latitude;
     }
-    pos.Longitude = math::DmToDeg(::Parse<f64>(match_[RE_APRS_LON]));
+    pos.Longitude = math::DmToDeg(str_util::Parse<f64>(match_[RE_APRS_LON]));
     if (AsStrView(match_[RE_APRS_LON_DIR]) == "W")
     {
         pos.Longitude = -pos.Longitude;
     }
-    pos.Altitude = math::DoubleToInt(::Parse<f64>(match_[RE_APRS_ALT]) * math::FEET_2_M);
+    pos.Altitude = math::DoubleToInt(str_util::Parse<f64>(match_[RE_APRS_ALT]) * math::FEET_2_M);
     if (pos.Altitude <= m_maxHeight)
     {
         return pos;
@@ -92,15 +93,16 @@ SLocation CAprsParser::parseLocation(std::cmatch const& match_) const
 CAprsParser::AircraftInfo CAprsParser::parseComment(std::cmatch const& match_) const
 {
     return {AsStrView(match_[RE_APRS_ID]),
-            static_cast<CAircraft::EIdType>(::Parse<x32>(match_[RE_APRS_TYPE]) & 0x03),
-            static_cast<CAircraft::EAircraftType>((::Parse<x32>(match_[RE_APRS_TYPE]) & 0x7C) >> 2)};
+            static_cast<CAircraft::EIdType>(str_util::Parse<x32>(match_[RE_APRS_TYPE]) & 0x03),
+            static_cast<CAircraft::EAircraftType>((str_util::Parse<x32>(match_[RE_APRS_TYPE]) & 0x7C) >> 2)};
 }
 
 CAircraft::SMovement CAprsParser::parseMovement(std::cmatch const& match_) const
 {
     // This needs to be split later to parse independently.
-    return {::Parse<f64>(match_[RE_APRS_HEAD]), ::Parse<f64>(match_[RE_APRS_GND_SPD]) * math::KTS_2_MS,
-            std::max(-10000.0, std::min(10000.0, ::Parse<f64>(match_[RE_APRS_CR]) * math::FPM_2_MS))};
+    return {str_util::Parse<f64>(match_[RE_APRS_HEAD]),
+            str_util::Parse<f64>(match_[RE_APRS_GND_SPD]) * math::KTS_2_MS,
+            std::max(-10000.0, std::min(10000.0, str_util::Parse<f64>(match_[RE_APRS_CR]) * math::FPM_2_MS))};
 }
 
 CTimestamp CAprsParser::parseTimeStamp(std::cmatch const& match_) const
