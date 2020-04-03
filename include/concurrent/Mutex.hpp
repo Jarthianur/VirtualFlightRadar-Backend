@@ -25,7 +25,7 @@
 
 #include <mutex>
 
-#include "util/class_utils.h"
+#include "util/class_utils.hpp"
 
 #if defined(__clang__) && (!defined(SWIG))
 #    define THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
@@ -78,23 +78,19 @@ public:
     Mutex()           = default;
     ~Mutex() noexcept = default;
 
-    void lock() ACQUIRE()
-    {
+    void lock() ACQUIRE() {
         m_mutex.lock();
     }
 
-    void unlock() RELEASE()
-    {
+    void unlock() RELEASE() {
         m_mutex.unlock();
     }
 
-    bool try_lock() TRY_ACQUIRE(true)
-    {
+    bool try_lock() TRY_ACQUIRE(true) {
         return m_mutex.try_lock();
     }
 
-    Mutex const& operator!() const
-    {
+    Mutex const& operator!() const {
         return *this;
     }
 };
@@ -107,8 +103,8 @@ class SCOPED_CAPABILITY LockGuard
     std::lock_guard<Mutex> m_lock;
 
 public:
-    LockGuard(Mutex& mu_) ACQUIRE(mu_) : m_lock(mu_) {}
-    ~LockGuard() noexcept RELEASE() {}
+    explicit LockGuard(Mutex& mu_) ACQUIRE(mu_) : m_lock(mu_) {}
+    ~LockGuard() noexcept RELEASE() = default;
 };
 
 #else

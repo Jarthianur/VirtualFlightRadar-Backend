@@ -24,8 +24,8 @@
 #include <algorithm>
 #include <cmath>
 
-#include "constants.h"
-#include "types.h"
+#include "constants.hpp"
+#include "types.hpp"
 
 using namespace std::literals;
 
@@ -36,8 +36,7 @@ namespace vfrb::math
  * @param deg_ The degrees
  * @return the radian
  */
-inline f64 Radian(f64 deg_)
-{
+inline f64 Radian(f64 deg_) {
     return ((deg_ * PI) / 180.0);
 }
 
@@ -46,8 +45,7 @@ inline f64 Radian(f64 deg_)
  * @param radian The radian
  * @return the degrees
  */
-inline f64 Degree(f64 rad_)
-{
+inline f64 Degree(f64 rad_) {
     return (rad_ * 180.0) / PI;
 }
 
@@ -56,8 +54,7 @@ inline f64 Degree(f64 rad_)
  * @param value The floating point value
  * @return the rounded integer
  */
-inline s32 DoubleToInt(f64 val_)
-{
+inline s32 DoubleToInt(f64 val_) {
     return (val_ >= 0.0) ? static_cast<s32>(val_ + 0.5) : static_cast<s32>(val_ - 0.5);
 }
 
@@ -66,8 +63,7 @@ inline s32 DoubleToInt(f64 val_)
  * @param degMin_ The degree-minute value
  * @return the degree value
  */
-inline f64 DmToDeg(f64 degMin_)
-{
+inline f64 DmToDeg(f64 degMin_) {
     f64 absDm = std::abs(degMin_ / 100.0);
     f64 d     = std::floor(absDm);
     f64 m     = (absDm - d) * 100.0 / 60.0;
@@ -82,8 +78,7 @@ inline f64 DmToDeg(f64 degMin_)
  * @return the saturated value
  */
 template<typename T>
-T Saturate(T val_, T min_, T max_)
-{
+T Saturate(T val_, T min_, T max_) {
     return std::max(min_, std::min(val_, max_));
 }
 
@@ -92,8 +87,7 @@ T Saturate(T val_, T min_, T max_)
  * @param press_ The air pressure
  * @return the height difference to QNE
  */
-inline s32 IcaoHeight(f64 press_)
-{
+inline s32 IcaoHeight(f64 press_) {
     return DoubleToInt(288.15 * (1.0 - std::pow((press_ / 1013.25), 0.190295)) / 0.0065);
 }
 }  // namespace vfrb::math

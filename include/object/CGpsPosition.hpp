@@ -21,9 +21,11 @@
 
 #pragma once
 
-#include "Object.h"
-#include "Timestamp.h"
-#include "types.h"
+#include "util/class_utils.hpp"
+
+#include "CObject.hpp"
+#include "CTimestamp.hpp"
+#include "types.hpp"
 
 namespace vfrb::object
 {
@@ -56,6 +58,8 @@ class CGpsPosition : public CObject
     bool canUpdate(CObject const& other_) const override;
 
 public:
+    COPYABLE_BUT_NOT_MOVABLE(CGpsPosition)
+
     inline static constexpr auto MAX_GEOID = 86.0;
     inline static constexpr auto MIN_GEOID = -108.0;
 

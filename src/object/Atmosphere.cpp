@@ -15,43 +15,46 @@
  }
  */
 
-#include "object/Atmosphere.h"
-
 #include <typeinfo>
 #include <utility>
 
-#include "util/utility.hpp"
+#include "object/CAtmosphere.hpp"
+#include "util/bounds.hpp"
 
 namespace vfrb::object
 {
-CAtmosphere::CAtmosphere(u32 prio_, Str&& nmea_) : CObject(prio_), m_nmea(std::move(nmea_)) {}
+CAtmosphere::CAtmosphere(u32 prio_, String&& nmea_) : CObject(prio_), m_nmea(std::move(nmea_)) {}
 
-CAtmosphere::CAtmosphere(u32 prio_, f64 press_, Str&& nmea_)
-    : CObject(prio_), m_pressure(press_), m_nmea(std::move(nmea_))
-{
+CAtmosphere::CAtmosphere(CAtmosphere&& other_) noexcept
+    : CObject(other_), m_pressure(other_.m_pressure), m_nmea(std::move(other_.m_nmea)) {}
+
+CAtmosphere& CAtmosphere::operator=(CAtmosphere&& other_) noexcept {
+    CObject::operator=(other_);
+    m_pressure       = other_.m_pressure;
+    m_nmea           = std::move(other_.m_nmea);
+    return *this;
+}
+
+CAtmosphere::CAtmosphere(u32 prio_, f64 press_, String&& nmea_)
+    : CObject(prio_), m_pressure(press_), m_nmea(std::move(nmea_)) {
     util::FailOutsideBounds(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
 }
 
-void CAtmosphere::assign(CObject&& other_)
-{
-    try
-    {
+void CAtmosphere::assign(CObject&& other_) {
+    try {
         auto&& other = dynamic_cast<CAtmosphere&&>(other_);
         CObject::assign(std::move(other_));
         this->m_pressure = other.m_pressure;
         this->m_nmea     = std::move(other.m_nmea);
+    } catch ([[maybe_unused]] std::bad_cast const&) {
     }
-    catch ([[maybe_unused]] std::bad_cast const&)
-    {}
 }
 
-auto CAtmosphere::Nmea() const -> decltype(m_nmea) const&
-{
+auto CAtmosphere::Nmea() const -> decltype(m_nmea) const& {
     return m_nmea;
 }
 
-auto CAtmosphere::Pressure() const -> decltype(m_pressure)
-{
+auto CAtmosphere::Pressure() const -> decltype(m_pressure) {
     return m_pressure;
 }
 }  // namespace vfrb::object

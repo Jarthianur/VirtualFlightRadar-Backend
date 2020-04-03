@@ -21,7 +21,9 @@
 
 #pragma once
 
-#include "Object.h"
+#include "util/class_utils.hpp"
+
+#include "CObject.hpp"
 
 namespace vfrb::object
 {
@@ -30,13 +32,15 @@ struct SClimate;
 /// Wind information object
 class CWind : public CObject
 {
-    Str m_nmea;  ///< The NMEA string
+    String m_nmea;  ///< The NMEA string
 
 public:
+    MOVABLE_BUT_NOT_COPYABLE(CWind)
+
     CWind() = default;
 
     /// @param prio_ The initial priority
-    CWind(u32 prio_, Str&& nmea_);
+    CWind(u32 prio_, String&& nmea_);
     ~CWind() noexcept override = default;
 
     void assign(CObject&& other_) override;

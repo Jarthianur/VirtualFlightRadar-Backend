@@ -23,9 +23,9 @@
 
 #include <list>
 
-#include "util/class_utils.h"
+#include "util/class_utils.hpp"
 
-#include "GuardedThread.hpp"
+#include "CGuardedThread.hpp"
 
 namespace vfrb::concurrent
 {
@@ -51,19 +51,16 @@ public:
     void JoinAll();
 };
 
-inline CThreadGroup::~CThreadGroup() noexcept
-{
+inline CThreadGroup::~CThreadGroup() noexcept {
     JoinAll();
 }
 
 template<typename FnT>
-void CThreadGroup::CreateThread(FnT&& fn_)
-{
+void CThreadGroup::CreateThread(FnT&& fn_) {
     m_threads.push_back(CGuardedThread(std::forward<FnT>(fn_)));
 }
 
-inline void CThreadGroup::JoinAll()
-{
+inline void CThreadGroup::JoinAll() {
     m_threads.clear();
 }
 }  // namespace vfrb::concurrent

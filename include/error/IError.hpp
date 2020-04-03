@@ -21,34 +21,24 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <string_view>
+#include <exception>
 
-namespace vfrb
+#include "types.hpp"
+
+namespace vfrb::error
 {
-using u8    = std::uint8_t;
-using s8    = std::int8_t;
-using u16   = std::uint16_t;
-using s16   = std::int16_t;
-using u32   = std::uint32_t;
-using s32   = std::int32_t;
-using u64   = std::uint64_t;
-using s64   = std::int64_t;
-using usize = std::size_t;
-using f32   = float;
-using f64   = double;
+/// Interface for a generic exception type.
+class IError : public std::exception
+{
+    str what() const noexcept override {
+        return Message();
+    }
 
-using enum_type = std::uint_fast8_t;
-
-using Str     = std::string;
-using StrView = std::string_view;
-
-template<typename T>
-using SPtr = std::shared_ptr<T>;
-
-template<typename T>
-using UPtr = std::unique_ptr<T>;
-}  // namespace vfrb
+public:
+    /**
+     * Get the message for this error.
+     * @return the error message
+     */
+    virtual str Message() const noexcept = 0;
+};
+}  // namespace vfrb::error

@@ -28,9 +28,11 @@
  * Make a class non copyable.
  * @param TYPE The classname
  */
-#define NOT_COPYABLE(TYPE)      \
-    TYPE(TYPE const&) = delete; \
-    TYPE& operator=(TYPE const&) = delete;
+#define NOT_COPYABLE(TYPE)                 \
+    TYPE(TYPE const&) = delete;            \
+    TYPE& operator=(TYPE const&) = delete; \
+    TYPE(TYPE&&)                 = delete; \
+    TYPE& operator=(TYPE&&) noexcept = delete;
 
 /**
  * Make a class non copyable, but movable.
@@ -39,19 +41,24 @@
 #define MOVABLE_BUT_NOT_COPYABLE(TYPE)     \
     TYPE(TYPE const&) = delete;            \
     TYPE& operator=(TYPE const&) = delete; \
-    TYPE(TYPE&&);                          \
-    TYPE& operator=(TYPE&&);
+    TYPE(TYPE&&) noexcept;                 \
+    TYPE& operator=(TYPE&&) noexcept;
+
+#define COPYABLE_BUT_NOT_MOVABLE(TYPE)      \
+    TYPE(TYPE const&) = default;            \
+    TYPE& operator=(TYPE const&) = default; \
+    TYPE(TYPE&&) noexcept        = delete;  \
+    TYPE& operator=(TYPE&&) noexcept = delete;
 
 /**
  * Define an alias for a function. This is useful for keeping compatibility to STL interfaces.
  * @param ALIAS The alias name
  * @param FN    The original function
  */
-#define FUNCTION_ALIAS(ALIAS, FN)                                                \
-    template<typename... Args>                                                   \
-    inline auto ALIAS(Args&&... args)->decltype(FN(std::forward<Args>(args)...)) \
-    {                                                                            \
-        return FN(std::forward<Args>(args)...);                                  \
+#define FUNCTION_ALIAS(ALIAS, FN)                                                  \
+    template<typename... Args>                                                     \
+    inline auto ALIAS(Args&&... args)->decltype(FN(std::forward<Args>(args)...)) { \
+        return FN(std::forward<Args>(args)...);                                    \
     }
 
 /**

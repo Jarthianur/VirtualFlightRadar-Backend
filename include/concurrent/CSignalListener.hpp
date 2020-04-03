@@ -26,10 +26,10 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "util/class_utils.h"
+#include "util/class_utils.hpp"
 
 #include "GuardedThread.hpp"
-#include "types.h"
+#include "types.hpp"
 
 namespace vfrb::concurrent
 {

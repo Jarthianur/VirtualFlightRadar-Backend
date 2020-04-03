@@ -23,39 +23,8 @@
 
 #include <type_traits>
 
-#include "error/Error.hpp"
-
-#include "class_utils.h"
-#include "types.h"
-
 namespace vfrb::util
 {
-namespace error
-{
-/// Error to indicate a value was not between required limits.
-class CLimitsExceededError : public vfrb::error::IError
-{
-    Str const m_msg;  ///< The error message
-
-public:
-    /**
-     * @tparam T The value type
-     * @param min_ The lower limit
-     * @param max_ The upper limit
-     */
-    template<typename T>
-    CLimitsExceededError(T val_, T min_, T max_)
-        : m_msg(std::to_string(val_) + " not in [" + std::to_string(min_) + "," + std::to_string(max_) + "]")
-    {}
-    ~CLimitsExceededError() noexcept override = default;
-
-    char const* Message() const noexcept override
-    {
-        return m_msg.c_str();
-    }
-};
-}  // namespace error
-
 /**
  * Get an enum value as the underlying type.
  * @tparam T The enum type
@@ -63,25 +32,7 @@ public:
  * @return the value as its underlyig type
  */
 template<typename T>
-constexpr auto AsUnderlyingType(T val_) -> typename std::underlying_type<T>::type
-{
+constexpr auto AsUnderlyingType(T val_) -> typename std::underlying_type<T>::type {
     return static_cast<typename std::underlying_type<T>::type>(val_);
-}
-
-/**
- * Check a value to be between given limits.
- * @tparam T The value type
- * @param val_ The value
- * @param min_ The lower limit
- * @param max_ The upper limit
- * @throw vfrb::util::error::CLimitsExceededError
- */
-template<typename T>
-void FailOutsideBounds(T val_, T min_, T max_)
-{
-    if (val_ < min_ || val_ > max_)
-    {
-        throw error::CLimitsExceededError(val_, min_, max_);
-    }
 }
 }  // namespace vfrb::util

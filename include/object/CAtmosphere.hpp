@@ -21,8 +21,9 @@
 
 #pragma once
 
-#include "Object.h"
-#include "types.h"
+#include "util/class_utils.hpp"
+
+#include "CObject.hpp"
 
 namespace vfrb::object
 {
@@ -35,19 +36,21 @@ class CAtmosphere : public CObject
     inline static constexpr auto MAX_PRESSURE = 2000.0;
     inline static constexpr auto MIN_PRESSURE = 0.0;
 
-    f64 m_pressure = ICAO_STD;  ///< The atmospheric pressure
-    Str m_nmea;                 ///< The NMEA string
+    f64    m_pressure = ICAO_STD;  ///< The atmospheric pressure
+    String m_nmea;                 ///< The NMEA string
 
     void assign(CObject&& other_) override;
 
 public:
+    MOVABLE_BUT_NOT_COPYABLE(CAtmosphere)
+
     CAtmosphere() = default;
 
     /// @param prio_ The initial priority
-    CAtmosphere(u32 prio_, Str&& nmea_);
+    CAtmosphere(u32 prio_, String&& nmea_);
 
     /// @param prio_ The initial priority
-    CAtmosphere(u32 prio_, f64 press_, Str&& nmea_);
+    CAtmosphere(u32 prio_, f64 press_, String&& nmea_);
     ~CAtmosphere() noexcept override = default;
 
     auto Nmea() const -> decltype(m_nmea) const&;

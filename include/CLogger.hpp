@@ -24,14 +24,11 @@
 #include <array>
 #include <fstream>
 #include <iostream>
-#include <utility>
 
 #include "concurrent/Mutex.hpp"
-#include "error/Error.hpp"
-#include "util/class_utils.h"
+#include "error/IError.hpp"
+#include "util/class_utils.hpp"
 #include "util/utility.hpp"
-
-#include "types.h"
 
 namespace vfrb
 {
@@ -55,9 +52,8 @@ class CLogger
      * @param l_      The log level
      * @return an expression to log the prefix
      */
-    constexpr auto prefix(std::ostream& stream_, ELevel l_) const
-    {
-        constexpr std::array<char const*, 4> levels = {"[INFO ]  ", "[WARN ]  ", "[ERROR]  ", "[DEBUG]  "};
+    constexpr auto prefix(std::ostream& stream_, ELevel l_) const {
+        constexpr std::array<str, 4> levels = {"[INFO ]  ", "[WARN ]  ", "[ERROR]  ", "[DEBUG]  "};
         return [&, l = levels[util::AsUnderlyingType(l_)]] { stream_ << l << time() << ":: "; };
     }
 
@@ -70,7 +66,7 @@ class CLogger
      * Get current date and time.
      * @return the date-time
      */
-    Str time() const;
+    String time() const;
 
     CLogger() = default;
 
@@ -116,20 +112,18 @@ public:
      * Set a logfile instead of stdout/stderr.
      * @param file_ The filename
      */
-    void LogFile(Str const& file_) REQUIRES(!m_mutex);
+    void LogFile(String const& file_) REQUIRES(!m_mutex);
 };
 
 template<typename... Args>
-void CLogger::Info(Args&&... args_) const REQUIRES(!m_mutex)
-{
+void CLogger::Info(Args&&... args_) const REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, ELevel::INFO)();
     (*m_outStream << ... << args_) << std::endl;
 }
 
 template<typename... Args>
-void CLogger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex)
-{
+void CLogger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex) {
 #ifdef LOG_ENABLE_DEBUG
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, ELevel::DEBUG)();
@@ -138,16 +132,14 @@ void CLogger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex)
 }
 
 template<typename... Args>
-void CLogger::Warn(Args&&... args_) const REQUIRES(!m_mutex)
-{
+void CLogger::Warn(Args&&... args_) const REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_outStream, ELevel::WARN)();
     (*m_outStream << ... << args_) << std::endl;
 }
 
 template<typename... Args>
-void CLogger::Error(Args&&... args_) const REQUIRES(!m_mutex)
-{
+void CLogger::Error(Args&&... args_) const REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
     prefix(*m_errStream, ELevel::ERROR)();
     (*m_errStream << ... << args_) << std::endl;
@@ -159,10 +151,7 @@ namespace error
 class COpenLogfileError : public vfrb::error::IError
 {
 public:
-    COpenLogfileError()                    = default;
-    ~COpenLogfileError() noexcept override = default;
-
-    char const* Message() const noexcept override;
+    str Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb

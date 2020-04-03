@@ -17,7 +17,9 @@
 
 #pragma once
 
-#include "types.h"
+#include "util/class_utils.hpp"
+
+#include "types.hpp"
 
 namespace vfrb::object
 {
@@ -47,7 +49,9 @@ protected:
     virtual bool canUpdate(CObject const& other_) const;
 
 public:
-    inline static constexpr auto OUTDATED = 4;  ///< Cycles until an object is considered outdated
+    COPYABLE_BUT_NOT_MOVABLE(CObject)
+
+    inline static constexpr auto const OUTDATED = 4;  ///< Cycles until an object is considered outdated
 
     virtual ~CObject() noexcept = default;
 

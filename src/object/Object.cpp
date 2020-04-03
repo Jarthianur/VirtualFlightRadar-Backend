@@ -15,43 +15,37 @@
  }
  */
 
-#include "object/Object.h"
-
 #include <utility>
+
+#include "object/CObject.hpp"
 
 namespace vfrb::object
 {
 CObject::CObject(u32 prio_) : m_lastPriority(prio_) {}
 
-void CObject::assign(CObject&& other_)
-{
+void CObject::assign(CObject&& other_) {
     this->m_lastPriority = other_.m_lastPriority;
     this->m_updateAge    = 0;
 }
 
-bool CObject::TryUpdate(CObject&& other_)
-{
-    if (other_.canUpdate(*this))
-    {
+bool CObject::TryUpdate(CObject&& other_) {
+    if (other_.canUpdate(*this)) {
         this->assign(std::move(other_));
         return true;
     }
     return false;
 }
 
-bool CObject::canUpdate(CObject const& other_) const
-{
+bool CObject::canUpdate(CObject const& other_) const {
     return this->m_lastPriority >= other_.m_lastPriority || other_.m_updateAge >= OUTDATED;
 }
 
-CObject& CObject::operator++()
-{
+CObject& CObject::operator++() {
     ++m_updateAge;
     return *this;
 }
 
-auto CObject::UpdateAge() const -> decltype(m_updateAge)
-{
+auto CObject::UpdateAge() const -> decltype(m_updateAge) {
     return m_updateAge;
 }
 }  // namespace vfrb::object

@@ -15,18 +15,16 @@
  }
  */
 
-#include "object/GpsPosition.h"
-
 #include <typeinfo>
 #include <utility>
 
-#include "util/utility.hpp"
+#include "object/CGpsPosition.hpp"
+#include "util/bounds.hpp"
 
 namespace vfrb::object
 {
 CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_)
-    : CGpsPosition(prio_, loc_, geo_, 1.0, 3, 5, CTimestamp())
-{}
+    : CGpsPosition(prio_, loc_, geo_, 1.0, 3, 5, CTimestamp()) {}
 
 CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_, u8 sat_, s8 qual_,
                            CTimestamp const& ts_)
@@ -36,17 +34,14 @@ CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_,
       m_dilution(dil_),
       m_nrOfSatellites(sat_),
       m_fixQuality(qual_),
-      m_timestamp(ts_)
-{
+      m_timestamp(ts_) {
     util::FailOutsideBounds(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
     util::FailOutsideBounds(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
     util::FailOutsideBounds(m_location.Altitude, SLocation::MIN_ALTITUDE, SLocation::MAX_ALTITUDE);
 }
 
-void CGpsPosition::assign(CObject&& other_)
-{
-    try
-    {
+void CGpsPosition::assign(CObject&& other_) {
+    try {
         auto&& other = dynamic_cast<CGpsPosition&&>(other_);
         CObject::assign(std::move(other_));
         this->m_location       = other.m_location;
@@ -55,51 +50,40 @@ void CGpsPosition::assign(CObject&& other_)
         this->m_fixQuality     = other.m_fixQuality;
         this->m_geoid          = other.m_geoid;
         this->m_dilution       = other.m_dilution;
+    } catch ([[maybe_unused]] std::bad_cast const&) {
     }
-    catch ([[maybe_unused]] std::bad_cast const&)
-    {}
 }
 
-bool CGpsPosition::canUpdate(CObject const& other_) const
-{
-    try
-    {
+bool CGpsPosition::canUpdate(CObject const& other_) const {
+    try {
         auto const& other = dynamic_cast<const CGpsPosition&>(other_);
         return (this->m_timestamp > other.m_timestamp) && CObject::canUpdate(other_);
-    }
-    catch ([[maybe_unused]] std::bad_cast const&)
-    {
+    } catch ([[maybe_unused]] std::bad_cast const&) {
         return false;
     }
 }
 
-auto CGpsPosition::Location() const -> decltype(m_location) const&
-{
+auto CGpsPosition::Location() const -> decltype(m_location) const& {
     return m_location;
 }
 
-auto CGpsPosition::Geoid() const -> decltype(m_geoid)
-{
+auto CGpsPosition::Geoid() const -> decltype(m_geoid) {
     return m_geoid;
 }
 
-auto CGpsPosition::Timestamp() const -> decltype(m_timestamp) const&
-{
+auto CGpsPosition::Timestamp() const -> decltype(m_timestamp) const& {
     return m_timestamp;
 }
 
-auto CGpsPosition::Dilution() const -> decltype(m_dilution)
-{
+auto CGpsPosition::Dilution() const -> decltype(m_dilution) {
     return m_dilution;
 }
 
-auto CGpsPosition::NrOfSatellites() const -> decltype(m_nrOfSatellites)
-{
+auto CGpsPosition::NrOfSatellites() const -> decltype(m_nrOfSatellites) {
     return m_nrOfSatellites;
 }
 
-auto CGpsPosition::FixQuality() const -> decltype(m_fixQuality)
-{
+auto CGpsPosition::FixQuality() const -> decltype(m_fixQuality) {
     return m_fixQuality;
 }
 }  // namespace vfrb::object

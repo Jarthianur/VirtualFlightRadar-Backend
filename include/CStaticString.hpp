@@ -26,9 +26,7 @@
 #include <cstdarg>
 #include <cstdio>
 
-#include "error/Error.hpp"
-
-#include "types.h"
+#include "error/IError.hpp"
 
 namespace vfrb
 {
@@ -38,11 +36,7 @@ namespace error
 class COverflowError : public vfrb::error::IError
 {
 public:
-    COverflowError()                    = default;
-    ~COverflowError() noexcept override = default;
-
-    char const* Message() const noexcept override
-    {
+    str Message() const noexcept override {
         return "";
     }
 };
@@ -53,120 +47,109 @@ public:
  * @tparam N The size
  */
 template<usize N>
-class CString
+class CStaticString final
 {
     std::array<char, N> m_data;  ///< The underlying array
-    StrView             m_view;  ///< A view on the data
+    StringView          m_view;  ///< A view on the data
 
     /**
      * Copy into own data.
      * @param sv_ The string to copy
      * @throw vfrb::error::COverflowError
      */
-    void copy(StrView const& sv_)
-    {
+    void copy(StringView const& sv_) {
         usize len = sv_.length();
-        if (len > N)
-        {
+        if (len > N) {
             throw error::COverflowError();
         }
         std::copy_n(sv_.cbegin(), len, m_data.begin());
-        if (m_data[len - 1] != '\0')
-        {
-            if (len < N)
-            {
+        if (m_data[len - 1] != '\0') {
+            if (len < N) {
                 m_data[len++] = '\0';
-            }
-            else
-            {
+            } else {
                 throw error::COverflowError();
             }
         }
-        m_view = StrView(m_data.data(), len);
+        m_view = StringView(m_data.data(), len);
     }
 
     /**
      * Copy into own data.
      * @param other_ The string to copy
      */
-    void copy(CString<N> const& other_)
-    {
+    void copy(CStaticString<N> const& other_) {
         std::copy(other_.m_data.cbegin(), other_.m_data.cend(), m_data.begin());
-        m_view = StrView(m_data.data(), other_.m_view.length());
+        m_view = StringView(m_data.data(), other_.m_view.length());
     }
 
 public:
-    CString()
-    {
+    CStaticString() {
         Clear();
     }
 
-    CString(char const* init_)
-    {
+    CStaticString(str init_) {
         operator=(init_);
     }
 
-    CString(Str const& init_)
-    {
+    CStaticString(String const& init_) {
         operator=(init_);
     }
 
-    CString(StrView const& init_)
-    {
+    CStaticString(StringView const& init_) {
         operator=(init_);
     }
 
-    CString(CString<N> const& other_)
-    {
+    CStaticString(CStaticString<N> const& other_) {
         operator=(other_);
     }
 
-    ~CString() noexcept = default;
+    CStaticString(CStaticString<N>&& other_) noexcept {
+        operator=(other_);
+    }
 
-    CString& operator=(char const* other_)
-    {
-        copy(StrView(other_));
+    ~CStaticString() noexcept = default;
+
+    CStaticString& operator=(str other_) {
+        copy(StringView(other_));
         return *this;
     }
 
-    CString& operator=(Str const& other_)
-    {
-        copy(StrView(other_));
+    CStaticString& operator=(String const& other_) {
+        copy(StringView(other_));
         return *this;
     }
 
-    CString& operator=(CString<N> const& other_)
-    {
+    CStaticString& operator=(CStaticString<N> const& other_) {
         copy(other_);
         return *this;
     }
 
-    CString& operator=(StrView const& other_)
-    {
+    CStaticString& operator=(StringView const& other_) {
         copy(other_);
         return *this;
     }
 
-    StrView const& operator*() const
-    {
+    CStaticString& operator=(CStaticString<N>&& other_) noexcept {
+        copy(other_);
+        return *this;
+    }
+
+    StringView const& operator*() const {
         return m_view;
     }
 
-    operator StrView() const
-    {
+    operator StringView() const {
         return m_view;
     }
 
-    bool operator==(CString<N> const& other_) const
-    {
+    bool operator==(CStaticString<N> const& other_) const {
         return m_view == other_.m_view;
     }
 
     /// Clear this string, thus making it to look empty.
-    void Clear()
-    {
+    void Clear() {
         m_data[0] = '\0';
-        m_view    = StrView(m_data.data(), 0);
+        m_view    = StringView(m_data.data(), 0);
     }
 
     /**
@@ -176,23 +159,19 @@ public:
      * @return the amount of bytes written
      * @throw vfrb::error::COverflowError
      */
-    int Format(usize pos_, char const* fmt_, ...)
-    {
-        if (pos_ >= N)
-        {
+    int Format(usize pos_, str fmt_, ...) {
+        if (pos_ >= N) {
             throw error::COverflowError();
         }
         usize   max = N - pos_;
         va_list args;
         va_start(args, fmt_);
         int b = 0;
-        if ((b = std::vsnprintf(m_data.data() + pos_, max, fmt_, args)) >= 0)
-        {
+        if ((b = std::vsnprintf(m_data.data() + pos_, max, fmt_, args)) >= 0) {
             m_view = StrView(m_data.data(), pos_ + b + 1);
         }
         va_end(args);
-        if (b < 0)
-        {
+        if (b < 0) {
             Clear();
             throw error::COverflowError();
         }
@@ -200,8 +179,7 @@ public:
     }
 
     /// Get the length of seen characters.
-    inline usize Length() const
-    {
+    inline usize Length() const {
         return m_view.length();
     }
 };

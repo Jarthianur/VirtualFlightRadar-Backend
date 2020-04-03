@@ -15,31 +15,34 @@
  }
  */
 
-#include "object/Wind.h"
+#include "object/CWind.hpp"
 
 namespace vfrb::object
 {
-CWind::CWind(u32 prio_, Str&& nmea_) : CObject(prio_), m_nmea(std::move(nmea_)) {}
+CWind::CWind(u32 prio_, String&& nmea_) : CObject(prio_), m_nmea(std::move(nmea_)) {}
 
-void CWind::Clear()
-{
+CWind::CWind(CWind&& other_) noexcept : CObject(other_), m_nmea(std::move(other_.m_nmea)) {}
+
+CWind& CWind::operator=(CWind&& other_) noexcept {
+    CObject::operator=(other_);
+    m_nmea           = std::move(other_.m_nmea);
+    return *this;
+}
+
+void CWind::Clear() {
     m_nmea.clear();
 }
 
-void CWind::assign(CObject&& other_)
-{
-    try
-    {
+void CWind::assign(CObject&& other_) {
+    try {
         auto&& other = dynamic_cast<CWind&&>(other_);
         CObject::assign(std::move(other_));
         this->m_nmea = std::move(other.m_nmea);
+    } catch ([[maybe_unused]] std::bad_cast const&) {
     }
-    catch ([[maybe_unused]] std::bad_cast const&)
-    {}
 }
 
-auto CWind::Nmea() const -> decltype(m_nmea) const&
-{
+auto CWind::Nmea() const -> decltype(m_nmea) const& {
     return m_nmea;
 }
 }  // namespace vfrb::object

@@ -21,11 +21,13 @@
 
 #pragma once
 
-#include "GpsPosition.h"
-#include "Object.h"
-#include "String.hpp"
-#include "Timestamp.h"
-#include "types.h"
+#include "util/class_utils.hpp"
+
+#include "CGpsPosition.hpp"
+#include "CObject.hpp"
+#include "CStaticString.hpp"
+#include "CTimestamp.hpp"
+#include "types.hpp"
 
 namespace vfrb::object
 {
@@ -35,6 +37,8 @@ class CAircraft : public CObject
     inline static constexpr auto ID_SIZE = 8;  ///< Size allocated for ID
 
 public:
+    COPYABLE_BUT_NOT_MOVABLE(CAircraft)
+
     inline static constexpr auto ID_LEN = 6;  ///< Length of the ID
 
     /// Device type from which the information is received
@@ -89,14 +93,14 @@ public:
     };
 
 private:
-    CString<ID_SIZE> m_id;                ///< Aircraft identifier
-    EIdType          m_idType;            ///< Id type
-    EAircraftType    m_aircraftType;      ///< Aircraft type
-    ETargetType      m_targetType;        ///< Target type
-    SLocation        m_location;          ///< Currently known position
-    SMovement        m_movement;          ///< Currently known movement
-    CTimestamp       m_timestamp;         ///< The timestamp of the last report
-    bool             m_fullInfo = false;  ///< Is full set of information available?
+    CStaticString<ID_SIZE> m_id;                ///< Aircraft identifier
+    EIdType                m_idType;            ///< Id type
+    EAircraftType          m_aircraftType;      ///< Aircraft type
+    ETargetType            m_targetType;        ///< Target type
+    SLocation              m_location;          ///< Currently known position
+    SMovement              m_movement;          ///< Currently known movement
+    CTimestamp             m_timestamp;         ///< The timestamp of the last report
+    bool                   m_fullInfo = false;  ///< Is full set of information available?
 
     void assign(CObject&& other_) override;
     bool canUpdate(CObject const& other_) const override;
@@ -106,19 +110,17 @@ public:
      * Initialize as FLARM starget.
      * @param prio_ The initial priority
      */
-    CAircraft(u32 prio_, StrView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
+    CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
               SMovement const& move_, CTimestamp const& ts_);
 
     /**
      * Initialize as TRANSPONDER target.
      * @param prio_ The initial priority
      */
-    CAircraft(u32 prio_, StrView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
+    CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
               CTimestamp const& ts_);
-    CAircraft(CAircraft&& other_);
-    ~CAircraft() noexcept override = default;
 
-    CAircraft& operator=(CAircraft&& other_);
+    ~CAircraft() noexcept override = default;
 
     auto IdType() const -> decltype(m_idType);
     auto AircraftType() const -> decltype(m_aircraftType);

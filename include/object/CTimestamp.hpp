@@ -21,9 +21,10 @@
 
 #pragma once
 
-#include "error/Error.hpp"
+#include "error/IError.hpp"
+#include "util/class_utils.hpp"
 
-#include "types.h"
+#include "types.hpp"
 
 namespace vfrb::object
 {
@@ -33,10 +34,7 @@ namespace error
 class CTimestampParseError : public vfrb::error::IError
 {
 public:
-    CTimestampParseError()                    = default;
-    ~CTimestampParseError() noexcept override = default;
-
-    char const* Message() const noexcept override;
+    str Message() const noexcept override;
 };
 }  // namespace error
 
@@ -47,17 +45,16 @@ class CTimestamp
     u32 m_day   = 0;  ///< Incremental day number
 
 public:
+    COPYABLE_BUT_NOT_MOVABLE(CTimestamp)
+
     CTimestamp() = default;
 
     /**
      * @param sv_ The time string
      * @throw vfrb::object::error::CTimestampParseError
      */
-    CTimestamp(StrView const& sv_);
-    CTimestamp(CTimestamp const& other_);
+    explicit CTimestamp(StringView const& sv_);
     ~CTimestamp() noexcept = default;
-
-    CTimestamp& operator=(CTimestamp const& other_);
 
     bool operator>(CTimestamp const& other_) const;
 };
