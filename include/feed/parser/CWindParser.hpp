@@ -21,46 +21,18 @@
 
 #pragma once
 
-#include "error/Error.hpp"
+#include "object/CWind.hpp"
 
-#include "types.h"
+#include "IParser.hpp"
 
 namespace vfrb::feed::parser
 {
-/**
- * Parser interface
- * @tparam ObjectT The object type to parse
- */
-template<typename ObjectT>
-class IParser
+/// A parser for NMEA wind sentences
+class CWindParser : public IParser<object::CWind>
 {
 public:
-    IParser()                   = default;
-    virtual ~IParser() noexcept = default;
+    CWindParser();
 
-    /**
-     * Parse an object from string.
-     * @param str_  The string to parse
-     * @param prio_ The priority to pass
-     * @return the parsed object
-     * @throw vfrb::feed::parser::error::CParseError
-     */
-    virtual ObjectT Parse(Str&& str_, u32 prio_) const = 0;
+    object::CWind Parse(String&& str_, u32 prio_) const override;
 };
-
-namespace error
-{
-/// Error to indicate that unpacking failed
-class CParseError : public vfrb::error::IError
-{
-public:
-    CParseError()                    = default;
-    ~CParseError() noexcept override = default;
-
-    char const* Message() const noexcept override
-    {
-        return "";
-    }
-};
-}  // namespace error
 }  // namespace vfrb::feed::parser

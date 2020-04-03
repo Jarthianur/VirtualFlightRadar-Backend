@@ -26,11 +26,11 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "server/net/Acceptor.hpp"
-#include "server/net/impl/SocketBoost.h"
-#include "util/class_utils.h"
+#include "server/net/IAcceptor.hpp"
+#include "server/net/impl/CSocketBoost.hpp"
+#include "util/class_utils.hpp"
 
-#include "types.h"
+#include "types.hpp"
 
 namespace vfrb::server::net
 {
@@ -59,6 +59,6 @@ public:
 
     /// @throw vfrb::server::net::error::CSocketError
     CConnection<CSocketBoost> StartConnection() override;
-    Str                       StagedAddress() const override;
+    String                    StagedAddress() const override;
 };
 }  // namespace vfrb::server::net

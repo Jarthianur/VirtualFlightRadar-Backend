@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "Client.h"
+#include "IClient.hpp"
 
 namespace vfrb::client
 {
@@ -50,7 +50,7 @@ class CGpsdClient : public IClient
      */
     void handleWatch(net::EErrc err_) REQUIRES(!m_mutex);
 
-    char const* logPrefix() const override;
+    str logPrefix() const override;
 
 public:
     /**

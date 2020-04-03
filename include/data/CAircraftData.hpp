@@ -21,12 +21,12 @@
 
 #pragma once
 
-#include "concurrent/ObjectContainer.hpp"
-#include "object/Aircraft.h"
-#include "processor/AircraftProcessor.h"
+#include "concurrent/CObjectContainer.hpp"
+#include "object/CAircraft.hpp"
+#include "processor/CAircraftProcessor.hpp"
 
-#include "Data.hpp"
-#include "types.h"
+#include "IData.hpp"
+#include "types.hpp"
 
 namespace vfrb::data
 {
@@ -35,10 +35,10 @@ namespace vfrb::data
  */
 class CAircraftData : public IData
 {
-    inline static constexpr auto NO_FLARM_THRESHOLD =
-        object::CObject::OUTDATED;                        ///< Times until FLARM status is removed
-    inline static constexpr auto DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
-    inline static constexpr auto NMEA_SIZE        = processor::CAircraftProcessor::NMEA_SIZE;
+    inline static constexpr auto const NO_FLARM_THRESHOLD =
+        object::CObject::OUTDATED;                              ///< Times until FLARM status is removed
+    inline static constexpr auto const DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
+    inline static constexpr auto const NMEA_SIZE        = processor::CAircraftProcessor::NMEA_SIZE;
 
     concurrent::CObjectContainer<object::CAircraft, NMEA_SIZE>
                                   m_container;  ///< Internal container for aircrafts
@@ -47,7 +47,6 @@ class CAircraftData : public IData
 public:
     explicit CAircraftData(AccessFn&& fn_);
     CAircraftData(AccessFn&& fn_, s32 maxDist_);  ///< @param maxDist The max distance filter
-    ~CAircraftData() noexcept override = default;
 
     /**
      * @brief Insert or update an Aircraft.

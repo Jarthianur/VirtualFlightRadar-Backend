@@ -21,31 +21,20 @@
 
 #pragma once
 
-#include "Client.h"
+#include "error/IError.hpp"
 
-namespace vfrb::client
+#include "types.hpp"
+
+namespace vfrb::server::net::error
 {
-/**
- * @brief Client for SBS servers
- */
-class CSbsClient : public IClient
+/// Error to indicate that an operation on a socket failed
+class CSocketError : public vfrb::error::IError
 {
-    NOT_COPYABLE(CSbsClient)
-
-    /**
-     * @brief Implement Client::handleConnect
-     * @threadsafe
-     */
-    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
-
-    char const* logPrefix() const override;
+    String const m_msg;  ///< Error message
 
 public:
-    /**
-     * @param endpoint  The remote endpoint
-     * @param connector The Connector interface
-     */
-    CSbsClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
-    ~CSbsClient() noexcept override = default;
+    explicit CSocketError(String const& msg_);
+
+    str Message() const noexcept override;
 };
-}  // namespace vfrb::client
+}  // namespace vfrb::server::net::error

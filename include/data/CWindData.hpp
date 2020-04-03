@@ -21,22 +21,34 @@
 
 #pragma once
 
-#include "error/Error.hpp"
+#include "concurrent/Mutex.hpp"
+#include "object/CWind.hpp"
 
-#include "types.h"
+#include "IData.hpp"
+#include "types.hpp"
 
-namespace vfrb::server::net::error
+namespace vfrb::data
 {
-/// Error to indicate that an operation on a socket failed
-class CSocketError : public vfrb::error::IError
+/**
+ * @brief Store wind information.
+ */
+class CWindData : public IData
 {
-    Str const m_msg;  ///< Error message
+    concurrent::Mutex mutable m_mutex;
+    object::CWind GUARDED_BY(m_mutex) m_wind;  ///< The Wind information
 
 public:
-    CSocketError() = default;
-    explicit CSocketError(Str const& msg_);
-    ~CSocketError() noexcept override = default;
+    explicit CWindData(AccessFn&& fn_);
+    CWindData(AccessFn&& fn_, object::CWind wind_);  ///< @param wind The initial wind information
 
-    char const* Message() const noexcept override;
+    /**
+     * @brief Update the wind information.
+     * @param wind The new wind information.
+     * @return true on success, else false
+     * @threadsafe
+     */
+    bool Update(object::CObject&& wind_) override REQUIRES(!m_mutex);
+
+    void Access() override REQUIRES(!m_mutex);
 };
-}  // namespace vfrb::server::net::error
+}  // namespace vfrb::data

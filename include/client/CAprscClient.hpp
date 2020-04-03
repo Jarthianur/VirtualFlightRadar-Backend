@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include "Client.h"
-#include "types.h"
+#include "IClient.hpp"
+#include "types.hpp"
 
 namespace vfrb::client
 {
@@ -33,9 +33,9 @@ class CAprscClient : public IClient
 {
     NOT_COPYABLE(CAprscClient)
 
-    inline static constexpr auto KEEPALIVE_INTERVAL = 600;
+    inline static constexpr auto const KEEPALIVE_INTERVAL = 600;
 
-    Str const m_login;  ///< Login string
+    String const m_login;  ///< Login string
 
     /**
      * @brief Schedule sending of a keep-alive beacon.
@@ -62,7 +62,7 @@ class CAprscClient : public IClient
      */
     void handleSendKeepAlive(net::EErrc err_) REQUIRES(!m_mutex);
 
-    char const* logPrefix() const override;
+    str logPrefix() const override;
 
 public:
     /**
@@ -70,7 +70,7 @@ public:
      * @param login     The login string
      * @param connector The Connector interface
      */
-    CAprscClient(net::SEndpoint const& ep_, Str const& login_, SPtr<net::IConnector> con_);
+    CAprscClient(net::SEndpoint const& ep_, String const& login_, SPtr<net::IConnector> con_);
     ~CAprscClient() noexcept override = default;
 
     bool  Equals(IClient const& other_) const override;

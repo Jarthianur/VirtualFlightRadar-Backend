@@ -25,9 +25,9 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "error/Error.hpp"
+#include "error/IError.hpp"
 
-#include "types.h"
+#include "types.hpp"
 
 namespace vfrb::config
 {
@@ -37,10 +37,8 @@ class CProperties
     boost::property_tree::ptree m_pTree;  ///< The underlying property tree
 
 public:
-    CProperties() = default;
     explicit CProperties(boost::property_tree::ptree const& ptree_);
     explicit CProperties(boost::property_tree::ptree&& ptree_);
-    ~CProperties() noexcept = default;
 
     /**
      * Get a property at path (section.key).
@@ -48,7 +46,7 @@ public:
      * @param def_  The default value
      * @return the value at path if found, else the default value
      */
-    Str Property(Str const& path_, Str const& def_) const noexcept;
+    String Property(String const& path_, String const& def_) const noexcept;
 
     /**
      * Get a property at path (section.key).
@@ -56,7 +54,7 @@ public:
      * @return the value at path
      * @throw vfrb::config::error::CPropertyNotFoundError
      */
-    Str Property(Str const& path_) const;
+    String Property(String const& path_) const;
 
     /**
      * Get the properties for a section.
@@ -64,7 +62,7 @@ public:
      * @return the properties for that section
      * @throw vfrb::config::error::CPropertyNotFoundError
      */
-    CProperties Section(Str const& sect_) const;
+    CProperties Section(String const& sect_) const;
 };
 
 namespace error
@@ -72,14 +70,13 @@ namespace error
 /// Error to indicate that a property was not found or is empty
 class CPropertyNotFoundError : public vfrb::error::IError
 {
-    Str const m_msg;
+    String const m_msg;
 
 public:
     /// @param prop_ The property name
-    explicit CPropertyNotFoundError(Str const& prop_);
-    ~CPropertyNotFoundError() noexcept override = default;
+    explicit CPropertyNotFoundError(String const& prop_);
 
-    char const* Message() const noexcept override;
+    str Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::config

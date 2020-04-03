@@ -21,19 +21,38 @@
 
 #pragma once
 
-#include "object/Wind.h"
+#include <istream>
 
-#include "Parser.hpp"
+#include "error/IError.hpp"
 
-namespace vfrb::feed::parser
+#include "CProperties.hpp"
+#include "types.hpp"
+
+namespace vfrb::config
 {
-/// A parser for NMEA wind sentences
-class CWindParser : public IParser<object::CWind>
+/// Read a config in INI format.
+class CConfigReader
 {
+    std::istream& m_stream;  ///< The input stream
+
 public:
-    CWindParser();
-    ~CWindParser() noexcept override = default;
+    explicit CConfigReader(std::istream& stream_);
 
-    object::CWind Parse(Str&& str_, u32 prio_) const override;
+    /// @throw vfrb::config::error::CReadFileError
+    CProperties Read();
 };
-}  // namespace vfrb::feed::parser
+
+namespace error
+{
+/// Error to indicate that file read failed
+class CReadFileError : public vfrb::error::IError
+{
+    String const m_fname;  ///< The name of file tried to read
+
+public:
+    explicit CReadFileError(String const& file_);
+
+    str Message() const noexcept override;
+};
+}  // namespace error
+}  // namespace vfrb::config

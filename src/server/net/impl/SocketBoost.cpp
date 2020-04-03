@@ -19,48 +19,39 @@
  }
  */
 
-#include "server/net/impl/SocketBoost.h"
-
 #include <boost/system/error_code.hpp>
 
-#include "server/net/error/SocketError.h"
+#include "server/net/error/CSocketError.hpp"
+#include "server/net/impl/CSocketBoost.hpp"
 
 namespace vfrb::server::net
 {
-CSocketBoost::CSocketBoost(CSocketBoost&& other_) : m_socket(boost::move(other_.m_socket)) {}
+CSocketBoost::CSocketBoost(CSocketBoost&& other_) noexcept : m_socket(boost::move(other_.m_socket)) {}
 
-CSocketBoost& CSocketBoost::operator=(CSocketBoost&& other_)
-{
+CSocketBoost& CSocketBoost::operator=(CSocketBoost&& other_) noexcept {
     m_socket = boost::move(other_.m_socket);
     return *this;
 }
 
-CSocketBoost::CSocketBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) sock_) : m_socket(boost::move(sock_))
-{
-    if (m_socket.is_open())
-    {
+CSocketBoost::CSocketBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) sock_) : m_socket(boost::move(sock_)) {
+    if (m_socket.is_open()) {
         m_socket.non_blocking(true);
     }
 }
 
-CSocketBoost::~CSocketBoost() noexcept
-{
+CSocketBoost::~CSocketBoost() noexcept {
     Close();
 }
 
-Str CSocketBoost::Address() const
-{
-    if (!m_socket.is_open())
-    {
+String CSocketBoost::Address() const {
+    if (!m_socket.is_open()) {
         throw error::CSocketError("cannot get address from closed socket");
     }
     return m_socket.remote_endpoint().address().to_string();
 }
 
-bool CSocketBoost::Write(StrView const& sv_)
-{
-    if (!m_socket.is_open())
-    {
+bool CSocketBoost::Write(StringView const& sv_) {
+    if (!m_socket.is_open()) {
         throw error::CSocketError("cannot write on closed socket");
     }
     boost::system::error_code ec;
@@ -68,18 +59,15 @@ bool CSocketBoost::Write(StrView const& sv_)
     return !ec;
 }
 
-void CSocketBoost::Close()
-{
-    if (m_socket.is_open())
-    {
+void CSocketBoost::Close() {
+    if (m_socket.is_open()) {
         boost::system::error_code ignored_ec;
         m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ignored_ec);
         m_socket.close();
     }
 }
 
-boost::asio::ip::tcp::socket& CSocketBoost::Get()
-{
+boost::asio::ip::tcp::socket& CSocketBoost::Get() {
     return m_socket;
 }
 }  // namespace vfrb::server::net

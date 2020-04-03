@@ -23,9 +23,9 @@
 
 #include <regex>
 
-#include "object/GpsPosition.h"
+#include "object/CGpsPosition.hpp"
 
-#include "Parser.hpp"
+#include "IParser.hpp"
 
 namespace vfrb::feed::parser
 {
@@ -34,16 +34,18 @@ namespace vfrb::feed::parser
  */
 class CGpsParser : public IParser<object::CGpsPosition>
 {
-    inline static constexpr auto RE_GGA_TIME    = 1;   ///< GGA regex capture group of time
-    inline static constexpr auto RE_GGA_LAT     = 2;   ///< GGA regex capture group of latitude
-    inline static constexpr auto RE_GGA_LAT_DIR = 3;   ///< GGA regex capture group of latitude orientation
-    inline static constexpr auto RE_GGA_LON     = 4;   ///< GGA regex capture group of longitude
-    inline static constexpr auto RE_GGA_LON_DIR = 5;   ///< GGA regex capture group of longitude orientation
-    inline static constexpr auto RE_GGA_FIX     = 6;   ///< GGA regex capture group of fix quality
-    inline static constexpr auto RE_GGA_SAT     = 7;   ///< GGA regex capture group of sitallite count
-    inline static constexpr auto RE_GGA_DIL     = 8;   ///< GGA regex capture group of dilution
-    inline static constexpr auto RE_GGA_ALT     = 9;   ///< GGA regex capture group of altitude
-    inline static constexpr auto RE_GGA_GEOID   = 10;  ///< GGA regex capture group of geoid separation
+    inline static constexpr auto const RE_GGA_TIME = 1;  ///< GGA regex capture group of time
+    inline static constexpr auto const RE_GGA_LAT  = 2;  ///< GGA regex capture group of latitude
+    inline static constexpr auto const RE_GGA_LAT_DIR =
+        3;                                              ///< GGA regex capture group of latitude orientation
+    inline static constexpr auto const RE_GGA_LON = 4;  ///< GGA regex capture group of longitude
+    inline static constexpr auto const RE_GGA_LON_DIR =
+        5;  ///< GGA regex capture group of longitude orientation
+    inline static constexpr auto const RE_GGA_FIX   = 6;   ///< GGA regex capture group of fix quality
+    inline static constexpr auto const RE_GGA_SAT   = 7;   ///< GGA regex capture group of sitallite count
+    inline static constexpr auto const RE_GGA_DIL   = 8;   ///< GGA regex capture group of dilution
+    inline static constexpr auto const RE_GGA_ALT   = 9;   ///< GGA regex capture group of altitude
+    inline static constexpr auto const RE_GGA_GEOID = 10;  ///< GGA regex capture group of geoid separation
 
     std::regex const m_gpggaRe;  ///< Regular expression to parse GGA
 
@@ -55,8 +57,7 @@ class CGpsParser : public IParser<object::CGpsPosition>
 
 public:
     CGpsParser();
-    ~CGpsParser() noexcept override = default;
 
-    object::CGpsPosition Parse(Str&& str_, u32 prio_) const override;
+    object::CGpsPosition Parse(String&& str_, u32 prio_) const override;
 };
 }  // namespace vfrb::feed::parser

@@ -21,11 +21,11 @@
 
 #pragma once
 
-#include "error/Error.hpp"
-#include "util/class_utils.h"
+#include "error/IError.hpp"
+#include "util/class_utils.hpp"
 
-#include "Client.h"
-#include "types.h"
+#include "IClient.hpp"
+#include "types.hpp"
 
 namespace vfrb::feed
 {
@@ -49,9 +49,6 @@ class CClientFactory
     static SPtr<T> makeClient(SPtr<feed::IFeed> feed_);
 
 public:
-    CClientFactory()           = default;
-    ~CClientFactory() noexcept = default;
-
     /**
      * @brief Create a Client needed by a Feed.
      * @param feed The feed to create for
@@ -65,10 +62,7 @@ namespace error
 class CNoSuchProtocolError : public vfrb::error::IError
 {
 public:
-    CNoSuchProtocolError()                    = default;
-    ~CNoSuchProtocolError() noexcept override = default;
-
-    char const* Message() const noexcept override;
+    str Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::client

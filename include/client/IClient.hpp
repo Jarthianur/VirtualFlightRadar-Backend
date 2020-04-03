@@ -24,12 +24,12 @@
 #include <vector>
 
 #include "concurrent/Mutex.hpp"
-#include "net/Connector.hpp"
-#include "net/Endpoint.hpp"
-#include "util/class_utils.h"
+#include "net/IConnector.hpp"
+#include "net/SEndpoint.hpp"
+#include "util/class_utils.hpp"
 
-#include "TimeoutBackoff.h"
-#include "types.h"
+#include "CTimeoutBackoff.hpp"
+#include "types.hpp"
 
 namespace vfrb::feed
 {
@@ -73,7 +73,7 @@ protected:
      */
     virtual void handleConnect(net::EErrc err_) = 0;
 
-    virtual char const* logPrefix() const = 0;
+    virtual str logPrefix() const = 0;
 
     /**
      * @brief Stop and close the connection.
@@ -112,7 +112,7 @@ protected:
      * @param error    The error indicator
      * @param response The received string
      */
-    void handleRead(net::EErrc, Str const& str_) REQUIRES(!m_mutex);
+    void handleRead(net::EErrc, String const& str_) REQUIRES(!m_mutex);
 
 public:
     virtual ~IClient() noexcept = default;

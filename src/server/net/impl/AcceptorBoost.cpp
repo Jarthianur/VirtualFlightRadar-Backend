@@ -19,14 +19,13 @@
  }
  */
 
-#include "server/net/impl/AcceptorBoost.h"
-
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
 
-#include "server/Connection.hpp"
+#include "server/CConnection.hpp"
+#include "server/net/impl/CAcceptorBoost.hpp"
 
-#include "Logger.hpp"
+#include "CLogger.hpp"
 
 namespace vfrb::server::net
 {
@@ -38,80 +37,60 @@ CAcceptorBoost::CAcceptorBoost(u16 port_)
       m_ioService(),
       m_acceptor(m_ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port_),
                  boost::asio::ip::tcp::acceptor::reuse_address(true)),
-      m_socket(boost::move(boost::asio::ip::tcp::socket(m_ioService)))
-{}
+      m_socket(boost::move(boost::asio::ip::tcp::socket(m_ioService))) {}
 
-CAcceptorBoost::~CAcceptorBoost() noexcept
-{
+CAcceptorBoost::~CAcceptorBoost() noexcept {
     Stop();
 }
 
-void CAcceptorBoost::Run()
-{
-    try
-    {
-        if (m_acceptor.is_open())
-        {
+void CAcceptorBoost::Run() {
+    try {
+        if (m_acceptor.is_open()) {
             m_ioService.run();
         }
-    }
-    catch (std::exception const& e)
-    {
+    } catch (std::exception const& e) {
         logger.Error(LOG_PREFIX, ": ", e.what());
-    }
-    catch (...)
-    {
+    } catch (...) {
         logger.Error(LOG_PREFIX, ": unknown error");
     }
 }
 
-void CAcceptorBoost::Stop()
-{
-    if (m_acceptor.is_open())
-    {
+void CAcceptorBoost::Stop() {
+    if (m_acceptor.is_open()) {
         m_acceptor.close();
     }
-    if (!m_ioService.stopped())
-    {
+    if (!m_ioService.stopped()) {
         m_ioService.stop();
     }
     m_socket.Close();
 }
 
-void CAcceptorBoost::OnAccept(Callback&& cb_)
-{
-    if (m_acceptor.is_open())
-    {
+void CAcceptorBoost::OnAccept(Callback&& cb_) {
+    if (m_acceptor.is_open()) {
         m_acceptor.async_accept(m_socket.Get(), boost::bind(&CAcceptorBoost::handleAccept, this,
                                                             boost::asio::placeholders::error, cb_));
     }
 }
 
-void CAcceptorBoost::Close()
-{
+void CAcceptorBoost::Close() {
     m_socket.Close();
 }
 
-void CAcceptorBoost::handleAccept(boost::system::error_code const& err_, Callback const& cb_)
-{
-    if (err_)
-    {
+void CAcceptorBoost::handleAccept(boost::system::error_code const& err_, Callback const& cb_) {
+    if (err_) {
         logger.Debug(LOG_PREFIX, "accept: ", err_.message());
     }
     cb_(bool(err_));
 }
 
-CConnection<CSocketBoost> CAcceptorBoost::StartConnection()
-{
-    if (!m_socket.Get().is_open())
-    {
+CConnection<CSocketBoost> CAcceptorBoost::StartConnection() {
+    if (!m_socket.Get().is_open()) {
         throw error::CSocketError("cannot start connection on closed socket");
     }
     return CConnection<CSocketBoost>(std::move(m_socket));
 }
 
-Str CAcceptorBoost::StagedAddress() const
-{
+String CAcceptorBoost::StagedAddress() const {
     return m_socket.Address();
 }
 }  // namespace vfrb::server::net

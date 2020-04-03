@@ -23,7 +23,9 @@
 
 #include <functional>
 
-#include "types.h"
+#include "util/class_utils.hpp"
+
+#include "types.hpp"
 
 namespace vfrb::server
 {
@@ -40,6 +42,8 @@ template<typename SocketT>
 class IAcceptor
 {
 public:
+    NOT_COPYABLE(IAcceptor)
+
     using Callback = std::function<void(bool)>;
 
     IAcceptor()                   = default;
@@ -67,7 +71,7 @@ public:
     virtual CConnection<SocketT> StartConnection() = 0;
 
     /// Get the address of the staged connection endpoint.
-    virtual Str StagedAddress() const = 0;
+    virtual String StagedAddress() const = 0;
 };
 }  // namespace net
 }  // namespace vfrb::server

@@ -21,27 +21,44 @@
 
 #pragma once
 
-#include "types.h"
+#include "IClient.hpp"
 
 namespace vfrb::client
 {
 /**
- * @brief The TimeoutBackoff class
- * Produces backoff sequence 1s,5s,20s,1m,2m
+ * @brief Client for sensor servers
  */
-class CTimeoutBackoff
+class CSensorClient : public IClient
 {
-    inline static constexpr auto INITIAL_TIMEOUT = 1;
-    inline static constexpr auto INITIAL_FACTOR  = 5;
+    NOT_COPYABLE(CSensorClient)
 
-    u32 m_timeout = INITIAL_TIMEOUT;  ///< seconds
-    u32 m_factor  = INITIAL_FACTOR;
+    inline static constexpr auto RECEIVE_TIMEOUT = 3;  ///< seconds
+
+    /**
+     * @brief Override Client::read, use timeout
+     */
+    void read() override REQUIRES(m_mutex);
+
+    /**
+     * @brief Check read timeout deadline reached.
+     * @threadsafe
+     */
+    void checkDeadline(net::EErrc err_) REQUIRES(!m_mutex);
+
+    /**
+     * @brief Implement Client::handleConnect
+     * @threadsafe
+     */
+    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
+
+    str logPrefix() const override;
 
 public:
-    CTimeoutBackoff()           = default;
-    ~CTimeoutBackoff() noexcept = default;
-
-    u32  Next();
-    void Reset();
+    /**
+     * @param endpoint  The remote endpoint
+     * @param connector The Connector interface
+     */
+    CSensorClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
+    ~CSensorClient() noexcept override = default;
 };
 }  // namespace vfrb::client

@@ -21,40 +21,31 @@
 
 #pragma once
 
-#include <istream>
+#include "IClient.hpp"
 
-#include "error/Error.hpp"
-
-#include "Properties.h"
-#include "types.h"
-
-namespace vfrb::config
+namespace vfrb::client
 {
-/// Read a config in INI format.
-class CConfigReader
+/**
+ * @brief Client for SBS servers
+ */
+class CSbsClient : public IClient
 {
-    std::istream& m_stream;  ///< The input stream
+    NOT_COPYABLE(CSbsClient)
+
+    /**
+     * @brief Implement Client::handleConnect
+     * @threadsafe
+     */
+    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
+
+    str logPrefix() const override;
 
 public:
-    explicit CConfigReader(std::istream& stream_);
-    ~CConfigReader() noexcept = default;
-
-    /// @throw vfrb::config::error::CReadFileError
-    CProperties Read();
+    /**
+     * @param endpoint  The remote endpoint
+     * @param connector The Connector interface
+     */
+    CSbsClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
+    ~CSbsClient() noexcept override = default;
 };
-
-namespace error
-{
-/// Error to indicate that file read failed
-class CReadFileError : public vfrb::error::IError
-{
-    Str const m_fname;  ///< The name of file tried to read
-
-public:
-    explicit CReadFileError(Str const& file_);
-    ~CReadFileError() noexcept override = default;
-
-    char const* Message() const noexcept override;
-};
-}  // namespace error
-}  // namespace vfrb::config
+}  // namespace vfrb::client

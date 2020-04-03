@@ -23,13 +23,13 @@
 
 #include <unordered_set>
 
+#include "concurrent/CThreadGroup.hpp"
 #include "concurrent/Mutex.hpp"
-#include "concurrent/ThreadGroup.hpp"
-#include "error/Error.hpp"
-#include "util/class_utils.h"
+#include "error/IError.hpp"
+#include "util/class_utils.hpp"
 
-#include "Client.h"
-#include "types.h"
+#include "IClient.hpp"
+#include "types.hpp"
 
 namespace vfrb::feed
 {
@@ -43,8 +43,7 @@ namespace vfrb::client
  */
 struct SClientHasher
 {
-    usize operator()(SPtr<IClient> const& c_) const
-    {
+    usize operator()(SPtr<IClient> const& c_) const {
         return c_->Hash();
     }
 };
@@ -54,8 +53,7 @@ struct SClientHasher
  */
 struct SClientComparator
 {
-    bool operator()(SPtr<IClient> const& c1_, SPtr<IClient> const& c2_) const
-    {
+    bool operator()(SPtr<IClient> const& c1_, SPtr<IClient> const& c2_) const {
         return c1_->Equals(*c2_);
     }
 };
@@ -105,13 +103,12 @@ namespace error
 {
 class CFeedSubscriptionError : public vfrb::error::IError
 {
-    Str const m_msg;
+    String const m_msg;
 
 public:
-    explicit CFeedSubscriptionError(Str const& name_);
-    ~CFeedSubscriptionError() noexcept override = default;
+    explicit CFeedSubscriptionError(String const& name_);
 
-    char const* Message() const noexcept override;
+    str Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::client

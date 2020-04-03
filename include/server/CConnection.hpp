@@ -23,11 +23,11 @@
 
 #include <utility>
 
-#include "net/error/SocketError.h"
-#include "util/class_utils.h"
+#include "net/error/CSocketError.hpp"
+#include "util/class_utils.hpp"
 
-#include "Logger.hpp"
-#include "types.h"
+#include "CLogger.hpp"
+#include "types.hpp"
 
 namespace vfrb::server
 {
@@ -39,7 +39,7 @@ template<typename SocketT>
 class CConnection
 {
     SocketT m_socket;   ///< Socket
-    Str     m_address;  ///< IP address
+    String  m_address;  ///< IP address
 
 public:
     MOVABLE_BUT_NOT_COPYABLE(CConnection)
@@ -53,45 +53,38 @@ public:
      * @param sv_ The message
      * @return true on success, else false
      */
-    bool Write(StrView const& sv_);
+    bool Write(StringView const& sv_);
 
     auto Address() const -> decltype(m_address) const&;
 };
 
 template<typename SocketT>
-CConnection<SocketT>::CConnection(SocketT&& sock_) : m_socket(std::move(sock_)), m_address(m_socket.Address())
-{}
+CConnection<SocketT>::CConnection(SocketT&& sock_)
+    : m_socket(std::move(sock_)), m_address(m_socket.Address()) {}
 
 template<typename SocketT>
-CConnection<SocketT>::CConnection(CConnection&& other_)
-    : m_socket(std::move(other_.m_socket)), m_address(std::move(other_.m_address))
-{}
+CConnection<SocketT>::CConnection(CConnection&& other_) noexcept
+    : m_socket(std::move(other_.m_socket)), m_address(std::move(other_.m_address)) {}
 
 template<typename SocketT>
-CConnection<SocketT>& CConnection<SocketT>::operator=(CConnection&& other_)
-{
+CConnection<SocketT>& CConnection<SocketT>::operator=(CConnection&& other_) noexcept {
     m_socket  = std::move(other_.m_socket);
     m_address = std::move(other_.m_address);
     return *this;
 }
 
 template<typename SocketT>
-bool CConnection<SocketT>::Write(StrView const& sv_)
-{
-    try
-    {
+bool CConnection<SocketT>::Write(StringView const& sv_) {
+    try {
         return m_socket.Write(sv_);
-    }
-    catch (net::error::CSocketError const& e)
-    {
+    } catch (net::error::CSocketError const& e) {
         CLogger::Instance().Debug("(Connection) write: ", e.Message());
     }
     return false;
 }
 
 template<typename SocketT>
-auto CConnection<SocketT>::Address() const -> decltype(m_address) const&
-{
+auto CConnection<SocketT>::Address() const -> decltype(m_address) const& {
     return m_address;
 }
 }  // namespace vfrb::server

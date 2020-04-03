@@ -23,7 +23,9 @@
 
 #include <functional>
 
-#include "types.h"
+#include "util/class_utils.hpp"
+
+#include "types.hpp"
 
 namespace vfrb::client::net
 {
@@ -35,8 +37,8 @@ enum class EErrc : enum_type
     Err
 };
 
-using Callback     = std::function<void(EErrc)>;              ///< Common callback function
-using ReadCallback = std::function<void(EErrc, Str const&)>;  ///< Callback function for read
+using Callback     = std::function<void(EErrc)>;                 ///< Common callback function
+using ReadCallback = std::function<void(EErrc, String const&)>;  ///< Callback function for read
 
 /**
  * @brief The async TCP interface for clients
@@ -47,6 +49,8 @@ using ReadCallback = std::function<void(EErrc, Str const&)>;  ///< Callback func
 class IConnector
 {
 public:
+    NOT_COPYABLE(IConnector)
+
     IConnector()                   = default;
     virtual ~IConnector() noexcept = default;
 
@@ -83,7 +87,7 @@ public:
      * @param msg      The message to send
      * @param callback The callback to execute when done
      */
-    virtual void OnWrite(Str const& str_, Callback const& cb_) = 0;
+    virtual void OnWrite(String const& str_, Callback const& cb_) = 0;
 
     /**
      * @brief Execute function after timeout.

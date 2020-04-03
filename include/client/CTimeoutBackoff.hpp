@@ -21,35 +21,24 @@
 
 #pragma once
 
-#include "concurrent/Mutex.hpp"
-#include "object/Wind.h"
+#include "types.hpp"
 
-#include "Data.hpp"
-#include "types.h"
-
-namespace vfrb::data
+namespace vfrb::client
 {
 /**
- * @brief Store wind information.
+ * @brief The TimeoutBackoff class
+ * Produces backoff sequence 1s,5s,20s,1m,2m
  */
-class CWindData : public IData
+class CTimeoutBackoff
 {
-    concurrent::Mutex mutable m_mutex;
-    object::CWind GUARDED_BY(m_mutex) m_wind;  ///< The Wind information
+    inline static constexpr auto const INITIAL_TIMEOUT = 1;
+    inline static constexpr auto const INITIAL_FACTOR  = 5;
+
+    u32 m_timeout = INITIAL_TIMEOUT;  ///< seconds
+    u32 m_factor  = INITIAL_FACTOR;
 
 public:
-    explicit CWindData(AccessFn&& fn_);
-    CWindData(AccessFn&& fn_, object::CWind wind_);  ///< @param wind The initial wind information
-    ~CWindData() noexcept override = default;
-
-    /**
-     * @brief Update the wind information.
-     * @param wind The new wind information.
-     * @return true on success, else false
-     * @threadsafe
-     */
-    bool Update(object::CObject&& wind_) override REQUIRES(!m_mutex);
-
-    void Access() override REQUIRES(!m_mutex);
+    u32  Next();
+    void Reset();
 };
-}  // namespace vfrb::data
+}  // namespace vfrb::client

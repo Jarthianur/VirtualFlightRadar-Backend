@@ -26,8 +26,8 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "client/net/Connector.hpp"
-#include "util/class_utils.h"
+#include "client/net/IConnector.hpp"
+#include "util/class_utils.hpp"
 
 namespace vfrb::client::net
 {
@@ -43,7 +43,7 @@ class CConnectorBoost : public IConnector
     boost::asio::ip::tcp::resolver m_resolver;  ///< Host resolver
     boost::asio::deadline_timer    m_timer;     ///< Timer
     boost::asio::streambuf         m_buffer;    ///< Read buffer
-    Str                            m_response;  ///< Read message
+    String                         m_response;  ///< Read message
     std::istream                   m_istream;   ///< Message stream for conversion
 
     EErrc evalErrorCode(boost::system::error_code const& err_) const;
@@ -126,7 +126,7 @@ public:
      * @param msg      The message to send
      * @param callback The callback to invoke when done
      */
-    void OnWrite(Str const& str_, Callback const& cb_) override;
+    void OnWrite(String const& str_, Callback const& cb_) override;
 
     /**
      * @brief Schedule an action after a timeout.

@@ -19,20 +19,18 @@
  }
  */
 
-#include "client/TimeoutBackoff.h"
+#include "client/CTimeoutBackoff.hpp"
 
 namespace vfrb::client
 {
-u32 CTimeoutBackoff::Next()
-{
+u32 CTimeoutBackoff::Next() {
     auto to  = m_timeout;
     m_factor = m_factor > 1 ? m_factor - 1 : 1;
     m_timeout *= m_factor;
     return to;
 }
 
-void CTimeoutBackoff::Reset()
-{
+void CTimeoutBackoff::Reset() {
     m_timeout = INITIAL_TIMEOUT;
     m_factor  = INITIAL_FACTOR;
 }

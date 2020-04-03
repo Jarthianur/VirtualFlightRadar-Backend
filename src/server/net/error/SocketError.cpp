@@ -19,14 +19,13 @@
  }
  */
 
-#include "server/net/error/SocketError.h"
+#include "server/net/error/CSocketError.hpp"
 
 namespace vfrb::server::net::error
 {
-CSocketError::CSocketError(Str const& msg_) : m_msg(msg_) {}
+CSocketError::CSocketError(String const& msg_) : m_msg(msg_) {}
 
-char const* CSocketError::Message() const noexcept
-{
+str CSocketError::Message() const noexcept {
     return m_msg.c_str();
 }
 }  // namespace vfrb::server::net::error

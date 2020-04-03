@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "types.h"
+#include "types.hpp"
 
 namespace vfrb::client::net
 {
@@ -30,16 +30,15 @@ namespace vfrb::client::net
  */
 struct SEndpoint
 {
-    Str const Host;  ///< Hostname
-    Str const Port;  ///< Port number
+    String const Host;  ///< Hostname
+    String const Port;  ///< Port number
 
     /**
      * @brief Equality comparison by value
      * @param other The other endpoint
      * @return true if both are equal, else false
      */
-    bool operator==(SEndpoint const& other_) const
-    {
+    bool operator==(SEndpoint const& other_) const {
         return Host == other_.Host && Port == other_.Port;
     }
 };

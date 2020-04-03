@@ -24,12 +24,12 @@
 #include <tuple>
 
 #include "concurrent/Mutex.hpp"
-#include "error/Error.hpp"
-#include "object/GpsPosition.h"
-#include "processor/GpsProcessor.h"
+#include "error/IError.hpp"
+#include "object/CGpsPosition.hpp"
+#include "processor/CGpsProcessor.hpp"
 
-#include "Data.hpp"
-#include "types.h"
+#include "IData.hpp"
+#include "types.hpp"
 
 namespace vfrb::data
 {
@@ -38,13 +38,14 @@ namespace vfrb::data
  */
 class CGpsData : public IData
 {
-    inline static constexpr auto GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
-    inline static constexpr auto GPS_FIX_GOOD          = 1;    ///< Good fix quality
-    inline static constexpr auto GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
-    inline static constexpr auto NMEA_SIZE             = processor::CGpsProcessor::NMEA_SIZE;
+    inline static constexpr auto const GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
+    inline static constexpr auto const GPS_FIX_GOOD          = 1;    ///< Good fix quality
+    inline static constexpr auto const GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
+    inline static constexpr auto const NMEA_SIZE             = processor::CGpsProcessor::NMEA_SIZE;
 
     concurrent::Mutex mutable m_mutex;
-    std::tuple<object::CGpsPosition, CString<NMEA_SIZE>> GUARDED_BY(m_mutex) m_position;  ///< The position
+    std::tuple<object::CGpsPosition, CStaticString<NMEA_SIZE>>
+                             GUARDED_BY(m_mutex) m_position;   ///< The position
     processor::CGpsProcessor GUARDED_BY(m_mutex) m_processor;  ///< Processor for GPS information
     bool GUARDED_BY(m_mutex) m_positionLocked = false;         ///< Locking state of the current position
     bool GUARDED_BY(m_mutex) m_groundMode     = false;         ///< Ground mode state
@@ -60,7 +61,6 @@ public:
      * @param crPosition The initial info
      */
     CGpsData(AccessFn&& fn_, object::CGpsPosition const& pos_, bool gnd_);
-    ~CGpsData() noexcept override = default;
 
     /**
      * @brief Update the position.
@@ -85,11 +85,7 @@ public:
 namespace error
 {
 class IGpsDataException : public vfrb::error::IError
-{
-protected:
-    IGpsDataException()                            = default;
-    virtual ~IGpsDataException() noexcept override = default;
-};
+{};
 
 /**
  * @brief Exception to signal that position was already locked.
@@ -97,10 +93,7 @@ protected:
 class CPositionAlreadyLocked : public IGpsDataException
 {
 public:
-    CPositionAlreadyLocked()                    = default;
-    ~CPositionAlreadyLocked() noexcept override = default;
-
-    char const* Message() const noexcept override;
+    str Message() const noexcept override;
 };
 
 /**
@@ -109,10 +102,7 @@ public:
 class CReceivedGoodPosition : public IGpsDataException
 {
 public:
-    CReceivedGoodPosition()                    = default;
-    ~CReceivedGoodPosition() noexcept override = default;
-
-    char const* Message() const noexcept override;
+    str Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::data
