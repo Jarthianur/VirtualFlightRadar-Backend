@@ -19,8 +19,6 @@
  }
  */
 
-#include "client/Client.h"
-
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
@@ -28,9 +26,10 @@
 
 #include <boost/functional/hash.hpp>
 
-#include "feed/Feed.h"
+#include "client/IClient.hpp"
+#include "feed/IFeed.hpp"
 
-#include "Logger.hpp"
+#include "CLogger.hpp"
 
 static auto const& logger = vfrb::CLogger::Instance();
 
@@ -41,21 +40,18 @@ namespace vfrb::client
 {
 IClient::IClient(SEndpoint const& ep_, SPtr<IConnector> con_) : m_connector(con_), m_endpoint(ep_) {}
 
-bool IClient::Equals(IClient const& other_) const
-{
+bool IClient::Equals(IClient const& other_) const {
     return this->m_endpoint == other_.m_endpoint;
 }
 
-usize IClient::Hash() const
-{
+usize IClient::Hash() const {
     usize seed = 0;
     boost::hash_combine(seed, boost::hash_value(m_endpoint.Host));
     boost::hash_combine(seed, boost::hash_value(m_endpoint.Port));
     return seed;
 }
 
-void IClient::Subscribe(SPtr<feed::IFeed> feed_)
-{
+void IClient::Subscribe(SPtr<feed::IFeed> feed_) {
     LockGuard lk(m_mutex);
     m_feeds.push_back(feed_);
     std::sort(m_feeds.begin(), m_feeds.end(), [](SPtr<feed::IFeed> const& f1_, SPtr<feed::IFeed> const& f2_) {
@@ -63,11 +59,9 @@ void IClient::Subscribe(SPtr<feed::IFeed> feed_)
     });
 }
 
-void IClient::Run() NO_THREAD_SAFETY_ANALYSIS
-{
+void IClient::Run() NO_THREAD_SAFETY_ANALYSIS {
     UniqueLock lk(m_mutex);
-    if (m_state == EState::NONE)
-    {
+    if (m_state == EState::NONE) {
         connect();
         lk.unlock();
         m_connector->Run();
@@ -75,16 +69,13 @@ void IClient::Run() NO_THREAD_SAFETY_ANALYSIS
     }
 }
 
-void IClient::connect()
-{
+void IClient::connect() {
     m_state = EState::CONNECTING;
     m_connector->OnConnect(m_endpoint, std::bind(&IClient::handleConnect, this, std::placeholders::_1));
 }
 
-void IClient::reconnect()
-{
-    if (m_state != EState::STOPPING)
-    {
+void IClient::reconnect() {
+    if (m_state != EState::STOPPING) {
         m_state = EState::CONNECTING;
         logger.Info(logPrefix(), "schedule reconnect to ", m_endpoint.Host, ":", m_endpoint.Port);
         m_connector->Close();
@@ -92,24 +83,20 @@ void IClient::reconnect()
     }
 }
 
-void IClient::timedConnect()
-{
+void IClient::timedConnect() {
     m_connector->OnTimeout(std::bind(&IClient::handleTimedConnect, this, std::placeholders::_1),
                            m_backoff.Next());
 }
 
-void IClient::stop()
-{
-    if (m_state == EState::RUNNING || m_state == EState::CONNECTING)
-    {
+void IClient::stop() {
+    if (m_state == EState::RUNNING || m_state == EState::CONNECTING) {
         m_state = EState::STOPPING;
         logger.Info(logPrefix(), "disconnect from ", m_endpoint.Host, ":", m_endpoint.Port);
         m_connector->Stop();
     }
 }
 
-void IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS
-{
+void IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS {
     std::condition_variable_any cond_ready;
     UniqueLock                  lk(m_mutex);
     cond_ready.wait_for(lk, std::chrono::milliseconds(100),
@@ -117,44 +104,32 @@ void IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS
     stop();
 }
 
-void IClient::read()
-{
+void IClient::read() {
     m_connector->OnRead(std::bind(&IClient::handleRead, this, std::placeholders::_1, std::placeholders::_2));
 }
 
-void IClient::handleTimedConnect(EErrc err_)
-{
-    if (err_ == EErrc::OK)
-    {
+void IClient::handleTimedConnect(EErrc err_) {
+    if (err_ == EErrc::OK) {
         LockGuard lk(m_mutex);
         logger.Info(logPrefix(), "try connect to ", m_endpoint.Host, ":", m_endpoint.Port);
         connect();
-    }
-    else
-    {
+    } else {
         logger.Error(logPrefix(), "failed to connect after timeout");
         ScheduleStop();
     }
 }
 
-void IClient::handleRead(EErrc err_, Str const& str_)
-{
+void IClient::handleRead(EErrc err_, String const& str_) {
     LockGuard lk(m_mutex);
-    if (m_state == EState::RUNNING)
-    {
-        if (err_ == EErrc::OK)
-        {
-            for (auto& it : m_feeds)
-            {
-                if (!it->Process(str_))
-                {
+    if (m_state == EState::RUNNING) {
+        if (err_ == EErrc::OK) {
+            for (auto& it : m_feeds) {
+                if (!it->Process(str_)) {
                     stop();
                 }
             }
             read();
-        }
-        else
-        {
+        } else {
             logger.Error(logPrefix(), "failed to read message");
             reconnect();
         }

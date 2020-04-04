@@ -19,41 +19,34 @@
  }
  */
 
-#include "client/ClientManager.h"
+#include "client/CClientManager.hpp"
 
-#include "client/ClientFactory.h"
-#include "feed/Feed.h"
+#include "client/CClientFactory.hpp"
+#include "feed/IFeed.hpp"
 #include "util/string_utils.hpp"
 
 using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
-CClientManager::~CClientManager() noexcept
-{
+CClientManager::~CClientManager() noexcept {
     Stop();
 }
 
-void CClientManager::Subscribe(SPtr<feed::IFeed> feed_)
-{
-    LockGuard  lk(m_mutex);
-    ClientIter it = m_clients.end();
-    it            = m_clients.insert(CClientFactory::CreateClientFor(feed_)).first;
-    if (it != m_clients.end())
-    {
+void CClientManager::Subscribe(SPtr<feed::IFeed> feed_) {
+    LockGuard lk(m_mutex);
+    auto      it = m_clients.end();
+    it           = m_clients.insert(CClientFactory::CreateClientFor(feed_)).first;
+    if (it != m_clients.end()) {
         (*it)->Subscribe(feed_);
-    }
-    else
-    {
+    } else {
         throw error::CFeedSubscriptionError(feed_->Name());
     }
 }
 
-void CClientManager::Run()
-{
+void CClientManager::Run() {
     LockGuard lk(m_mutex);
-    for (auto it : m_clients)
-    {
+    for (auto it : m_clients) {
         m_thdGroup.CreateThread([this, it] {
             it->Run();
             LockGuard lk(m_mutex);
@@ -62,23 +55,19 @@ void CClientManager::Run()
     }
 }
 
-void CClientManager::Stop()
-{
+void CClientManager::Stop() {
     LockGuard lk(m_mutex);
-    for (auto it : m_clients)
-    {
+    for (auto it : m_clients) {
         it->ScheduleStop();
     }
 }
 
 namespace error
 {
-CFeedSubscriptionError::CFeedSubscriptionError(Str const& name_)
-    : m_msg(str_util::MakeStr("failed to subscribe ", name_, " to client"))
-{}
+CFeedSubscriptionError::CFeedSubscriptionError(String const& name_)
+    : m_msg(str_util::MakeStr("failed to subscribe ", name_, " to client")) {}
 
-char const* CFeedSubscriptionError::Message() const noexcept
-{
+str CFeedSubscriptionError::Message() const noexcept {
     return m_msg.c_str();
 }
 }  // namespace error

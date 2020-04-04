@@ -19,33 +19,30 @@
  }
  */
 
-#include "concurrent/SignalListener.hpp"
+#include "data/CAtmosphereData.hpp"
 
-namespace vfrb::concurrent
+using namespace vfrb::object;
+using namespace vfrb::concurrent;
+
+namespace vfrb::data
 {
-CSignalListener::CSignalListener() : m_ioService(), m_sigSet(m_ioService) {
-    m_sigSet.add(SIGINT);
-    m_sigSet.add(SIGTERM);
-#ifdef SIGQUIT
-    m_sigSet.add(SIGQUIT);
-#endif
+CAtmosphereData::CAtmosphereData(AccessFn&& fn_) : IData(std::move(fn_)) {}
+
+CAtmosphereData::CAtmosphereData(AccessFn&& fn_, CAtmosphere&& atm_)
+    : IData(std::move(fn_)), m_atmosphere(std::move(atm_)) {}
+
+void CAtmosphereData::Access() {
+    LockGuard lk(m_mutex);
+    m_accessFn({++m_atmosphere, {m_atmosphere.Nmea()}});
 }
 
-CSignalListener::~CSignalListener() noexcept {
-    Stop();
+bool CAtmosphereData::Update(CObject&& atm_) {
+    LockGuard lk(m_mutex);
+    return m_atmosphere.TryUpdate(std::move(atm_));
 }
 
-void CSignalListener::Run() {
-    m_thread.Spawn([this]() { m_ioService.run(); });
+auto CAtmosphereData::Pressure() const -> decltype(m_atmosphere.Pressure()) {
+    LockGuard lk(m_mutex);
+    return m_atmosphere.Pressure();
 }
-
-void CSignalListener::Stop() {
-    if (!m_ioService.stopped()) {
-        m_ioService.stop();
-    }
-}
-
-void CSignalListener::AddHandler(SignalHandler&& handler_) {
-    m_sigSet.async_wait(std::move(handler_));
-}
-}  // namespace vfrb::concurrent
+}  // namespace vfrb::data

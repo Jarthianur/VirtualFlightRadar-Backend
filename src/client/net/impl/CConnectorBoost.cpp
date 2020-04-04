@@ -19,12 +19,13 @@
  }
  */
 
+#include "client/net/impl/CConnectorBoost.hpp"
+
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/move/move.hpp>
 
 #include "client/net/SEndpoint.hpp"
-#include "client/net/impl/CConnectorBoost.hpp"
 
 #include "CLogger.hpp"
 

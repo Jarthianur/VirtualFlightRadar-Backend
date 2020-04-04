@@ -19,33 +19,26 @@
  }
  */
 
-#include "data/AtmosphereData.h"
+#include "data/CWindData.hpp"
 
 using namespace vfrb::object;
 using namespace vfrb::concurrent;
 
 namespace vfrb::data
 {
-CAtmosphereData::CAtmosphereData(AccessFn&& fn_) : IData(std::move(fn_)) {}
+CWindData::CWindData(AccessFn&& fn_) : IData(std::move(fn_)) {}
 
-CAtmosphereData::CAtmosphereData(AccessFn&& fn_, CAtmosphere atm_) : IData(std::move(fn_)), m_atmosphere(atm_)
-{}
+CWindData::CWindData(AccessFn&& fn_, object::CWind&& wind_)
+    : IData(std::move(fn_)), m_wind(std::move(wind_)) {}
 
-void CAtmosphereData::Access()
-{
+bool CWindData::Update(CObject&& wind_) {
     LockGuard lk(m_mutex);
-    m_accessFn({++m_atmosphere, {m_atmosphere.Nmea()}});
+    return m_wind.TryUpdate(std::move(wind_));
 }
 
-bool CAtmosphereData::Update(CObject&& atm_)
-{
+void CWindData::Access() {
     LockGuard lk(m_mutex);
-    return m_atmosphere.TryUpdate(std::move(atm_));
-}
-
-auto CAtmosphereData::Pressure() const -> decltype(m_atmosphere.Pressure())
-{
-    LockGuard lk(m_mutex);
-    return m_atmosphere.Pressure();
+    m_accessFn({++m_wind, {m_wind.Nmea()}});
+    m_wind.Clear();
 }
 }  // namespace vfrb::data

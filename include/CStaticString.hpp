@@ -23,8 +23,8 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdarg>
 #include <cstdio>
+#include <utility>
 
 #include "error/IError.hpp"
 
@@ -159,18 +159,16 @@ public:
      * @return the amount of bytes written
      * @throw vfrb::error::COverflowError
      */
-    int Format(usize pos_, str fmt_, ...) {
+    template<typename... Args>
+    int Format(usize pos_, str fmt_, Args... args_) {
         if (pos_ >= N) {
             throw error::COverflowError();
         }
-        usize   max = N - pos_;
-        va_list args;
-        va_start(args, fmt_);
-        int b = 0;
-        if ((b = std::vsnprintf(m_data.data() + pos_, max, fmt_, args)) >= 0) {
-            m_view = StrView(m_data.data(), pos_ + b + 1);
+        usize max = N - pos_;
+        int   b   = 0;
+        if ((b = std::snprintf(m_data.data() + pos_, max, fmt_, std::forward<Args>(args_)...)) >= 0) {
+            m_view = StringView(m_data.data(), pos_ + b + 1);
         }
-        va_end(args);
         if (b < 0) {
             Clear();
             throw error::COverflowError();

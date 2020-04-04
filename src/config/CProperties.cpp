@@ -19,7 +19,7 @@
  }
  */
 
-#include "config/Properties.h"
+#include "config/CProperties.hpp"
 
 #include <boost/property_tree/exceptions.hpp>
 
@@ -31,54 +31,40 @@ CProperties::CProperties(ptree const& ptree) : m_pTree(ptree) {}
 
 CProperties::CProperties(ptree&& ptree) : m_pTree(std::move(ptree)) {}
 
-Str CProperties::Property(Str const& path, Str const& defVal) const noexcept
-{
-    try
-    {
-        auto p = m_pTree.get_child(path).get_value<Str>();
+String CProperties::Property(String const& path, String const& defVal) const noexcept {
+    try {
+        auto p = m_pTree.get_child(path).get_value<String>();
         return p.empty() ? defVal : p;
-    }
-    catch ([[maybe_unused]] ptree_bad_path const&)
-    {
+    } catch ([[maybe_unused]] ptree_bad_path const&) {
         return defVal;
     }
 }
 
-Str CProperties::Property(Str const& path) const
-{
-    try
-    {
-        auto p = m_pTree.get_child(path).get_value<Str>();
-        if (p.empty())
-        {
+String CProperties::Property(String const& path) const {
+    try {
+        auto p = m_pTree.get_child(path).get_value<String>();
+        if (p.empty()) {
             throw error::CPropertyNotFoundError(path);
         }
         return p;
-    }
-    catch ([[maybe_unused]] ptree_bad_path const&)
-    {
+    } catch ([[maybe_unused]] ptree_bad_path const&) {
         throw error::CPropertyNotFoundError(path);
     }
 }
 
-CProperties CProperties::Section(Str const& section) const
-{
-    try
-    {
+CProperties CProperties::Section(String const& section) const {
+    try {
         return CProperties(m_pTree.get_child(section));
-    }
-    catch ([[maybe_unused]] ptree_bad_path const&)
-    {
+    } catch ([[maybe_unused]] ptree_bad_path const&) {
         throw error::CPropertyNotFoundError(section);
     }
 }
 
 namespace error
 {
-CPropertyNotFoundError::CPropertyNotFoundError(Str const& prop_) : m_msg(prop_ + " not found") {}
+CPropertyNotFoundError::CPropertyNotFoundError(String const& prop_) : m_msg(prop_ + " not found") {}
 
-char const* CPropertyNotFoundError::Message() const noexcept
-{
+str CPropertyNotFoundError::Message() const noexcept {
     return m_msg.c_str();
 }
 }  // namespace error

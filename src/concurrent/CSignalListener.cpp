@@ -19,27 +19,33 @@
  }
  */
 
-#include "data/WindData.h"
+#include "concurrent/CSignalListener.hpp"
 
-using namespace vfrb::object;
-using namespace vfrb::concurrent;
-
-namespace vfrb::data
+namespace vfrb::concurrent
 {
-CWindData::CWindData(AccessFn&& fn_) : IData(std::move(fn_)) {}
-
-CWindData::CWindData(AccessFn&& fn_, object::CWind wind_) : IData(std::move(fn_)), m_wind(wind_) {}
-
-bool CWindData::Update(CObject&& wind_)
-{
-    LockGuard lk(m_mutex);
-    return m_wind.TryUpdate(std::move(wind_));
+CSignalListener::CSignalListener() : m_ioService(), m_sigSet(m_ioService) {
+    m_sigSet.add(SIGINT);
+    m_sigSet.add(SIGTERM);
+#ifdef SIGQUIT
+    m_sigSet.add(SIGQUIT);
+#endif
 }
 
-void CWindData::Access()
-{
-    LockGuard lk(m_mutex);
-    m_accessFn({++m_wind, {m_wind.Nmea()}});
-    m_wind.Clear();
+CSignalListener::~CSignalListener() noexcept {
+    Stop();
 }
-}  // namespace vfrb::data
+
+void CSignalListener::Run() {
+    m_thread.Spawn([this]() { m_ioService.run(); });
+}
+
+void CSignalListener::Stop() {
+    if (!m_ioService.stopped()) {
+        m_ioService.stop();
+    }
+}
+
+void CSignalListener::AddHandler(SignalHandler&& handler_) {
+    m_sigSet.async_wait(std::move(handler_));
+}
+}  // namespace vfrb::concurrent

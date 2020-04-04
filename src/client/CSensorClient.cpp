@@ -19,69 +19,57 @@
  }
  */
 
-#include "client/SensorClient.h"
+#include "client/CSensorClient.hpp"
 
 #include <utility>
 
-#include "Logger.hpp"
+#include "CLogger.hpp"
 
 using namespace vfrb::client::net;
 using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
-constexpr auto     LOG_PREFIX = "(SensorClient) ";
+CTCONST            LOG_PREFIX = "(SensorClient) ";
 static auto const& logger     = CLogger::Instance();
 
 CSensorClient::CSensorClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
 
-void CSensorClient::read()
-{
+void CSensorClient::read() {
     m_connector->ResetTimer(RECEIVE_TIMEOUT);
     IClient::read();
 }
 
-void CSensorClient::checkDeadline(EErrc err_)
-{
+void CSensorClient::checkDeadline(EErrc err_) {
     LockGuard lk(m_mutex);
-    if (m_state == EState::RUNNING)
-    {
-        if (err_ == EErrc::OK)
-        {
+    if (m_state == EState::RUNNING) {
+        if (err_ == EErrc::OK) {
             logger.Debug(LOG_PREFIX, "timed out, reconnect ...");
             reconnect();
-        }
-        else
-        {
+        } else {
             m_connector->OnTimeout(std::bind(&CSensorClient::checkDeadline, this, std::placeholders::_1));
         }
     }
 }
 
-void CSensorClient::handleConnect(EErrc err_)
-{
+void CSensorClient::handleConnect(EErrc err_) {
     LockGuard lk(m_mutex);
-    if (m_state == EState::CONNECTING)
-    {
-        if (err_ == EErrc::OK)
-        {
+    if (m_state == EState::CONNECTING) {
+        if (err_ == EErrc::OK) {
             m_state = EState::RUNNING;
             m_backoff.Reset();
             logger.Info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
             m_connector->OnTimeout(std::bind(&CSensorClient::checkDeadline, this, std::placeholders::_1),
                                    RECEIVE_TIMEOUT);
             read();
-        }
-        else
-        {
+        } else {
             logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
         }
     }
 }
 
-char const* CSensorClient::logPrefix() const
-{
+str CSensorClient::logPrefix() const {
     return LOG_PREFIX;
 }
 }  // namespace vfrb::client

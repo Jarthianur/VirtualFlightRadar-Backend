@@ -19,42 +19,36 @@
  }
  */
 
-#include "client/SbsClient.h"
+#include "client/CSbsClient.hpp"
 
-#include "Logger.hpp"
+#include "CLogger.hpp"
 
 using namespace vfrb::client::net;
 using namespace vfrb::concurrent;
 
 namespace vfrb::client
 {
-constexpr auto     LOG_PREFIX = "(SbsClient) ";
+CTCONST            LOG_PREFIX = "(SbsClient) ";
 static auto const& logger     = CLogger::Instance();
 
 CSbsClient::CSbsClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
 
-void CSbsClient::handleConnect(EErrc err_)
-{
+void CSbsClient::handleConnect(EErrc err_) {
     LockGuard lk(m_mutex);
-    if (m_state == EState::CONNECTING)
-    {
-        if (err_ == EErrc::OK)
-        {
+    if (m_state == EState::CONNECTING) {
+        if (err_ == EErrc::OK) {
             m_state = EState::RUNNING;
             m_backoff.Reset();
             logger.Info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
             read();
-        }
-        else
-        {
+        } else {
             logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
         }
     }
 }
 
-char const* CSbsClient::logPrefix() const
-{
+str CSbsClient::logPrefix() const {
     return LOG_PREFIX;
 }
 }  // namespace vfrb::client

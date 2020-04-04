@@ -19,7 +19,7 @@
  }
  */
 
-#include "config/ConfigReader.h"
+#include "config/CConfigReader.hpp"
 
 #include <utility>
 
@@ -33,15 +33,11 @@ namespace vfrb::config
 {
 CConfigReader::CConfigReader(std::istream& stream_) : m_stream(stream_) {}
 
-CProperties CConfigReader::Read()
-{
+CProperties CConfigReader::Read() {
     ptree tree;
-    try
-    {
+    try {
         read_ini(m_stream, tree);
-    }
-    catch (ini_parser_error const& e)
-    {
+    } catch (ini_parser_error const& e) {
         throw error::CReadFileError(e.filename());
     }
     return CProperties(std::move(tree));
@@ -49,10 +45,9 @@ CProperties CConfigReader::Read()
 
 namespace error
 {
-CReadFileError::CReadFileError(Str const& file_) : m_fname(file_ + " is not a valid INI file") {}
+CReadFileError::CReadFileError(String const& file_) : m_fname(file_ + " is not a valid INI file") {}
 
-char const* CReadFileError::Message() const noexcept
-{
+str CReadFileError::Message() const noexcept {
     return m_fname.c_str();
 }
 }  // namespace error

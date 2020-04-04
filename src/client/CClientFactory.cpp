@@ -19,15 +19,15 @@
  }
  */
 
-#include "client/ClientFactory.h"
+#include "client/CClientFactory.hpp"
 
-#include "client/AprscClient.h"
-#include "client/GpsdClient.h"
-#include "client/SbsClient.h"
-#include "client/SensorClient.h"
-#include "client/net/impl/ConnectorBoost.h"
-#include "feed/AprscFeed.h"
-#include "feed/Feed.h"
+#include "client/CAprscClient.hpp"
+#include "client/CGpsdClient.hpp"
+#include "client/CSbsClient.hpp"
+#include "client/CSensorClient.hpp"
+#include "client/net/impl/CConnectorBoost.hpp"
+#include "feed/CAprscFeed.hpp"
+#include "feed/IFeed.hpp"
 
 using namespace vfrb::client::net;
 using namespace vfrb::feed;
@@ -35,35 +35,29 @@ using namespace vfrb::feed;
 namespace vfrb::client
 {
 template<>
-SPtr<CAprscClient> CClientFactory::makeClient<CAprscClient>(SPtr<IFeed> feed_)
-{
+SPtr<CAprscClient> CClientFactory::makeClient<CAprscClient>(SPtr<IFeed> feed_) {
     return std::make_shared<CAprscClient>(feed_->Endpoint(),
                                           std::static_pointer_cast<CAprscFeed>(feed_)->Login(),
                                           std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<CSbsClient> CClientFactory::makeClient<CSbsClient>(SPtr<IFeed> feed_)
-{
+SPtr<CSbsClient> CClientFactory::makeClient<CSbsClient>(SPtr<IFeed> feed_) {
     return std::make_shared<CSbsClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<CSensorClient> CClientFactory::makeClient<CSensorClient>(SPtr<IFeed> feed_)
-{
+SPtr<CSensorClient> CClientFactory::makeClient<CSensorClient>(SPtr<IFeed> feed_) {
     return std::make_shared<CSensorClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<CGpsdClient> CClientFactory::makeClient<CGpsdClient>(SPtr<IFeed> feed_)
-{
+SPtr<CGpsdClient> CClientFactory::makeClient<CGpsdClient>(SPtr<IFeed> feed_) {
     return std::make_shared<CGpsdClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
 }
 
-SPtr<IClient> CClientFactory::CreateClientFor(SPtr<IFeed> feed_)
-{
-    switch (feed_->Protocol())
-    {
+SPtr<IClient> CClientFactory::CreateClientFor(SPtr<IFeed> feed_) {
+    switch (feed_->Protocol()) {
         case IFeed::EProtocol::APRS: return makeClient<CAprscClient>(feed_);
         case IFeed::EProtocol::SBS: return makeClient<CSbsClient>(feed_);
         case IFeed::EProtocol::GPS: return makeClient<CGpsdClient>(feed_);
@@ -74,8 +68,7 @@ SPtr<IClient> CClientFactory::CreateClientFor(SPtr<IFeed> feed_)
 
 namespace error
 {
-char const* CNoSuchProtocolError::Message() const noexcept
-{
+str CNoSuchProtocolError::Message() const noexcept {
     return "unknown protocol";
 }
 }  // namespace error
