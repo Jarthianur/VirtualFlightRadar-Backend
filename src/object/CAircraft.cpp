@@ -19,10 +19,13 @@
  }
  */
 
+#include "object/CAircraft.hpp"
+
 #include <typeinfo>
 
-#include "object/CAircraft.hpp"
 #include "util/bounds.hpp"
+
+using vfrb::util::FailOutsideBounds;
 
 namespace vfrb::object
 {
@@ -37,8 +40,8 @@ CAircraft::CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftTy
       m_movement(move_),
       m_timestamp(ts_),
       m_fullInfo(true) {
-    util::FailOutsideBounds(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
-    util::FailOutsideBounds(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
+    FailOutsideBounds(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
+    FailOutsideBounds(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
 }
 
 CAircraft::CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,

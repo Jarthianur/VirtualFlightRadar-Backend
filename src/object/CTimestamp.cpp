@@ -19,10 +19,10 @@
  }
  */
 
+#include "object/CTimestamp.hpp"
+
 #include <boost/fusion/adapted/std_tuple.hpp>
 #include <boost/spirit/include/qi.hpp>
-
-#include "object/CTimestamp.hpp"
 
 namespace vfrb::object
 {

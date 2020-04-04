@@ -1,4 +1,4 @@
-﻿/*
+/*
  Copyright_License {
 
  Copyright (C) 2016 VirtualFlightRadar-Backend
@@ -19,25 +19,26 @@
  }
  */
 
-#include "Vfrb.h"
+#include "CVfrb.hpp"
 
 #include <csignal>
 #include <sstream>
 
-#include "client/ClientManager.h"
-#include "client/net/impl/ConnectorBoost.h"
-#include "concurrent/SignalListener.h"
-#include "config/Configuration.h"
-#include "data/AircraftData.h"
-#include "data/AtmosphereData.h"
-#include "data/GpsData.h"
-#include "data/WindData.h"
-#include "feed/Feed.h"
-#include "feed/FeedFactory.h"
-#include "object/Atmosphere.h"
-#include "object/GpsPosition.h"
+#include "client/CClientManager.hpp"
+#include "client/net/impl/CConnectorBoost.hpp"
+#include "concurrent/CSignalListener.hpp"
+#include "config/CConfiguration.hpp"
+#include "data/CAircraftData.hpp"
+#include "data/CAtmosphereData.hpp"
+#include "data/CGpsData.hpp"
+#include "data/CWindData.hpp"
+#include "feed/CFeedFactory.hpp"
+#include "feed/IFeed.hpp"
+#include "object/CAtmosphere.hpp"
+#include "object/CGpsPosition.hpp"
+#include "util/class_utils.hpp"
 
-#include "Logger.hpp"
+#include "CLogger.hpp"
 
 using namespace vfrb::data;
 using namespace vfrb::object;
@@ -45,16 +46,15 @@ using namespace vfrb::config;
 
 namespace vfrb
 {
-constexpr auto PROCESS_INTERVAL = 1;
-constexpr auto LOG_PREFIX       = "(VFRB) ";
+CTCONST PROCESS_INTERVAL = 1;
+CTCONST LOG_PREFIX       = "(VFRB) ";
 
 static auto const& logger = CLogger::Instance();
 
 CVfrb::CVfrb(SPtr<CConfiguration> conf_)
     : m_aircraftData(std::make_shared<CAircraftData>(
           [this](SAccessor const& it) {
-              if (it.Obj.UpdateAge() < CObject::OUTDATED)
-              {
+              if (it.Obj.UpdateAge() < CObject::OUTDATED) {
                   m_server.Send(it.Nmea);
               }
           },
@@ -66,13 +66,11 @@ CVfrb::CVfrb(SPtr<CConfiguration> conf_)
                                            conf_->GpsPosition, conf_->GroundMode)),
       m_windData(std::make_shared<CWindData>([this](SAccessor const& it) { m_server.Send(it.Nmea); })),
       m_server(std::get<0>(conf_->ServerConfig), std::get<1>(conf_->ServerConfig)),
-      m_running(false)
-{
+      m_running(false) {
     createFeeds(conf_);
 }
 
-void CVfrb::Run() noexcept
-{
+void CVfrb::Run() noexcept {
     m_running = true;
     logger.Info(LOG_PREFIX, "starting...");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
@@ -83,15 +81,11 @@ void CVfrb::Run() noexcept
         logger.Info(LOG_PREFIX, "caught signal to shutdown...");
         m_running = false;
     });
-    for (auto it : m_feeds)
-    {
+    for (auto it : m_feeds) {
         logger.Info(LOG_PREFIX, "run feed: ", it->Name());
-        try
-        {
+        try {
             clientManager.Subscribe(it);
-        }
-        catch (client::error::CFeedSubscriptionError const& e)
-        {
+        } catch (client::error::CFeedSubscriptionError const& e) {
             logger.Error(LOG_PREFIX, ": ", e.Message());
         }
     }
@@ -107,46 +101,35 @@ void CVfrb::Run() noexcept
     logger.Info(LOG_PREFIX, "stopped after ", duration(start));
 }
 
-void CVfrb::serve()
-{
+void CVfrb::serve() {
     std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
-    while (m_running)
-    {
-        try
-        {
+    while (m_running) {
+        try {
             m_aircraftData->Environment(m_gpsData->Location(), m_atmosphereData->Pressure());
             m_aircraftData->Access();
             m_gpsData->Access();
             m_atmosphereData->Access();
             m_windData->Access();
             std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
-        }
-        catch (error::IError const& e)
-        {
+        } catch (error::IError const& e) {
             logger.Error(LOG_PREFIX, "fatal: ", e.Message());
             m_running = false;
         }
     }
 }
 
-void CVfrb::createFeeds(SPtr<CConfiguration> conf_)
-{
+void CVfrb::createFeeds(SPtr<CConfiguration> conf_) {
     feed::CFeedFactory factory(conf_, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
-    for (auto const& name : conf_->FeedNames)
-    {
-        try
-        {
+    for (auto const& name : conf_->FeedNames) {
+        try {
             m_feeds.push_back(factory.createFeed(name));
-        }
-        catch (feed::error::CFeedCreationError const& e)
-        {
+        } catch (feed::error::CFeedCreationError const& e) {
             logger.Warn(LOG_PREFIX, "can not create feed ", name, ": ", e.Message());
         }
     }
 }
 
-Str CVfrb::duration(std::chrono::steady_clock::time_point start_) const
-{
+String CVfrb::duration(std::chrono::steady_clock::time_point start_) const {
     std::chrono::minutes runtime =
         std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start_);
     s64               d = runtime.count() / 60 / 24;

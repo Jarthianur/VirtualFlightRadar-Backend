@@ -19,34 +19,37 @@
  }
  */
 
-#include "feed/AtmosphereFeed.h"
+#include "feed/CGpsFeed.hpp"
 
-#include "config/Configuration.h"
-#include "data/AtmosphereData.h"
-#include "object/Atmosphere.h"
+#include "config/CConfiguration.hpp"
+#include "data/CGpsData.hpp"
+#include "feed/parser/CGpsParser.hpp"
+#include "object/CGpsPosition.hpp"
+
+#include "CLogger.hpp"
 
 using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-CAtmosphereFeed::CAtmosphereFeed(Str const& name_, CProperties const& prop_,
-                                 SPtr<data::CAtmosphereData> data_)
-    : IFeed(name_, prop_, data_)
-{}
+CTCONST            LOG_PREFIX = "(GpsFeed) ";
+static auto const& logger     = CLogger::Instance();
 
-IFeed::EProtocol CAtmosphereFeed::Protocol() const
-{
-    return EProtocol::SENSOR;
+CGpsFeed::CGpsFeed(String const& name_, CProperties const& prop_, SPtr<data::CGpsData> data_)
+    : IFeed(name_, prop_, data_) {}
+
+IFeed::EProtocol CGpsFeed::Protocol() const {
+    return EProtocol::GPS;
 }
 
-bool CAtmosphereFeed::Process(Str str_)
-{
-    try
-    {
+bool CGpsFeed::Process(String str_) {
+    try {
         m_data->Update(m_parser.Parse(std::move(str_), m_priority));
+    } catch ([[maybe_unused]] parser::error::CParseError const&) {
+    } catch (data::error::IGpsDataException const& e) {
+        logger.Info(LOG_PREFIX, m_name, ": ", e.Message());
+        return false;
     }
-    catch ([[maybe_unused]] parser::error::CParseError const&)
-    {}
     return true;
 }
 }  // namespace vfrb::feed

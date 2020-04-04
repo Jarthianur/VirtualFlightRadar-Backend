@@ -15,10 +15,11 @@
  }
  */
 
+#include "object/CAtmosphere.hpp"
+
 #include <typeinfo>
 #include <utility>
 
-#include "object/CAtmosphere.hpp"
 #include "util/bounds.hpp"
 
 namespace vfrb::object

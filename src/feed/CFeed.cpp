@@ -19,15 +19,14 @@
  }
  */
 
-#include "feed/Feed.h"
-
 #include <algorithm>
 #include <limits>
 #include <stdexcept>
 #include <unordered_map>
 
-#include "config/Configuration.h"
-#include "data/Data.hpp"
+#include "config/CConfiguration.hpp"
+#include "data/IData.hpp"
+#include "feed/IFeed.hpp"
 #include "util/string_utils.hpp"
 
 using namespace vfrb::config;

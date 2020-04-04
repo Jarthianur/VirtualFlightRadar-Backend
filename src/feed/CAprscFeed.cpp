@@ -19,52 +19,43 @@
  }
  */
 
-#include "feed/AprscFeed.h"
+#include "feed/CAprscFeed.hpp"
 
-#include "config/Configuration.h"
-#include "data/AircraftData.h"
-#include "object/Aircraft.h"
+#include "config/CConfiguration.hpp"
+#include "data/CAircraftData.hpp"
+#include "object/CAircraft.hpp"
 #include "util/string_utils.hpp"
 
 using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-CAprscFeed::CAprscFeed(Str const& name_, CProperties const& prop_, SPtr<data::CAircraftData> data_,
+CAprscFeed::CAprscFeed(String const& name_, CProperties const& prop_, SPtr<data::CAircraftData> data_,
                        s32 maxHeight_)
-    : IFeed(name_, prop_, data_), m_parser(maxHeight_), m_worker([this](Str&& work) {
-          try
-          {
+    : IFeed(name_, prop_, data_), m_parser(maxHeight_), m_worker([this](String&& work) {
+          try {
               m_data->Update(m_parser.Parse(std::move(work), m_priority));
+          } catch ([[maybe_unused]] parser::error::CParseError const&) {
           }
-          catch ([[maybe_unused]] parser::error::CParseError const&)
-          {}
-      })
-{
-    try
-    {
+      }) {
+    try {
         prop_.Property(CConfiguration::KV_KEY_LOGIN);
-    }
-    catch ([[maybe_unused]] config::error::CPropertyNotFoundError const&)
-    {
+    } catch ([[maybe_unused]] config::error::CPropertyNotFoundError const&) {
         throw error::CInvalidPropertyError(
             str_util::MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_LOGIN));
     }
 }
 
-IFeed::EProtocol CAprscFeed::Protocol() const
-{
+IFeed::EProtocol CAprscFeed::Protocol() const {
     return EProtocol::APRS;
 }
 
-bool CAprscFeed::Process(Str str_)
-{
+bool CAprscFeed::Process(String str_) {
     m_worker.Push(std::move(str_));
     return true;
 }
 
-Str CAprscFeed::Login() const
-{
+String CAprscFeed::Login() const {
     return m_properties.Property(CConfiguration::KV_KEY_LOGIN);
 }
 }  // namespace vfrb::feed

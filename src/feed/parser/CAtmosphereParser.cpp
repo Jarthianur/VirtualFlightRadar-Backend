@@ -19,21 +19,35 @@
  }
  */
 
-#include "feed/parser/WindParser.h"
+#include "feed/parser/CAtmosphereParser.hpp"
 
 #include "util/string_utils.hpp"
 
 using namespace vfrb::object;
+using namespace vfrb::str_util;
 
 namespace vfrb::feed::parser
 {
-CWindParser::CWindParser() : IParser<CWind>() {}
-
-CWind CWindParser::Parse(Str&& str_, u32 prio_) const
-{
-    if (str_util::MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MWV") != Str::npos)
-    {
-        return {prio_, std::move(str_)};
+CAtmosphere CAtmosphereParser::Parse(String&& str_, u32 prio_) const {
+    try {
+        if (MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MDA") != String::npos) {
+            usize tmpB;
+            if ((tmpB = str_.find('B')) != String::npos) {
+                --tmpB;
+            } else {
+                throw error::CParseError();
+            }
+            usize tmpS;
+            if ((tmpS = StringView(str_.c_str(), tmpB).find_last_of(',')) != String::npos) {
+                ++tmpS;
+            } else {
+                throw error::CParseError();
+            }
+            if (auto [v, ec] = Convert<f64>(str_.c_str() + tmpS, str_.c_str() + tmpB); ec == EErrc::OK) {
+                return {prio_, v * 1000.0, std::move(str_)};
+            }
+        }
+    } catch ([[maybe_unused]] str_util::error::CConversionError const&) {
     }
     throw error::CParseError();
 }

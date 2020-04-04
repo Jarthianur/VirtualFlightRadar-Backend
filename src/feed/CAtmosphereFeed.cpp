@@ -19,21 +19,29 @@
  }
  */
 
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include "feed/CAtmosphereFeed.hpp"
 
-#include "types.h"
+#include "config/CConfiguration.hpp"
+#include "data/CAtmosphereData.hpp"
+#include "object/CAtmosphere.hpp"
 
-namespace vfrb::object::date_time
+using namespace vfrb::config;
+
+namespace vfrb::feed
 {
-s64 Now()
-{
-    return static_cast<s64>(
-        boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
-            .total_milliseconds());
+CAtmosphereFeed::CAtmosphereFeed(String const& name_, CProperties const& prop_,
+                                 SPtr<data::CAtmosphereData> data_)
+    : IFeed(name_, prop_, data_) {}
+
+IFeed::EProtocol CAtmosphereFeed::Protocol() const {
+    return EProtocol::SENSOR;
 }
 
-u32 Day()
-{
-    return static_cast<u32>(boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
+bool CAtmosphereFeed::Process(String str_) {
+    try {
+        m_data->Update(m_parser.Parse(std::move(str_), m_priority));
+    } catch ([[maybe_unused]] parser::error::CParseError const&) {
+    }
+    return true;
 }
-}  // namespace vfrb::object::date_time
+}  // namespace vfrb::feed

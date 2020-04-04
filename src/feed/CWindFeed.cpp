@@ -19,43 +19,28 @@
  }
  */
 
-#include "feed/GpsFeed.h"
+#include "feed/CWindFeed.hpp"
 
-#include "config/Configuration.h"
-#include "data/GpsData.h"
-#include "feed/parser/GpsParser.h"
-#include "object/GpsPosition.h"
-
-#include "Logger.hpp"
+#include "config/CConfiguration.hpp"
+#include "data/CWindData.hpp"
+#include "feed/parser/CWindParser.hpp"
+#include "object/CWind.hpp"
 
 using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-constexpr auto     LOG_PREFIX = "(GpsFeed) ";
-static auto const& logger     = CLogger::Instance();
+CWindFeed::CWindFeed(String const& name_, CProperties const& prop_, SPtr<data::CWindData> data_)
+    : IFeed(name_, prop_, data_) {}
 
-CGpsFeed::CGpsFeed(Str const& name_, CProperties const& prop_, SPtr<data::CGpsData> data_)
-    : IFeed(name_, prop_, data_)
-{}
-
-IFeed::EProtocol CGpsFeed::Protocol() const
-{
-    return EProtocol::GPS;
+IFeed::EProtocol CWindFeed::Protocol() const {
+    return EProtocol::SENSOR;
 }
 
-bool CGpsFeed::Process(Str str_)
-{
-    try
-    {
+bool CWindFeed::Process(String str_) {
+    try {
         m_data->Update(m_parser.Parse(std::move(str_), m_priority));
-    }
-    catch ([[maybe_unused]] parser::error::CParseError const&)
-    {}
-    catch (data::error::IGpsDataException const& e)
-    {
-        logger.Info(LOG_PREFIX, m_name, ": ", e.Message());
-        return false;
+    } catch ([[maybe_unused]] parser::error::CParseError const&) {
     }
     return true;
 }

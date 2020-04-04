@@ -15,11 +15,14 @@
  }
  */
 
+#include "object/CGpsPosition.hpp"
+
 #include <typeinfo>
 #include <utility>
 
-#include "object/CGpsPosition.hpp"
 #include "util/bounds.hpp"
+
+using vfrb::util::FailOutsideBounds;
 
 namespace vfrb::object
 {
@@ -35,9 +38,9 @@ CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_,
       m_nrOfSatellites(sat_),
       m_fixQuality(qual_),
       m_timestamp(ts_) {
-    util::FailOutsideBounds(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
-    util::FailOutsideBounds(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
-    util::FailOutsideBounds(m_location.Altitude, SLocation::MIN_ALTITUDE, SLocation::MAX_ALTITUDE);
+    FailOutsideBounds(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
+    FailOutsideBounds(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
+    FailOutsideBounds(m_location.Altitude, SLocation::MIN_ALTITUDE, SLocation::MAX_ALTITUDE);
 }
 
 void CGpsPosition::assign(CObject&& other_) {

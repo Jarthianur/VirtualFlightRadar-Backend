@@ -19,17 +19,18 @@
  }
  */
 
+#include "server/net/impl/CAcceptorBoost.hpp"
+
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
 
 #include "server/CConnection.hpp"
-#include "server/net/impl/CAcceptorBoost.hpp"
 
 #include "CLogger.hpp"
 
 namespace vfrb::server::net
 {
-constexpr auto     LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
+CTCONST            LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
 static auto const& logger     = CLogger::Instance();
 
 CAcceptorBoost::CAcceptorBoost(u16 port_)

@@ -19,10 +19,11 @@
  }
  */
 
+#include "server/net/impl/CSocketBoost.hpp"
+
 #include <boost/system/error_code.hpp>
 
 #include "server/net/error/CSocketError.hpp"
-#include "server/net/impl/CSocketBoost.hpp"
 
 namespace vfrb::server::net
 {

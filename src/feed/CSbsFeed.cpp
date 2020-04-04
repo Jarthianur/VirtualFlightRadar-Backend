@@ -19,36 +19,31 @@
  }
  */
 
-#include "feed/SbsFeed.h"
+#include "feed/CSbsFeed.hpp"
 
-#include "config/Configuration.h"
-#include "data/AircraftData.h"
-#include "feed/parser/SbsParser.h"
-#include "object/Aircraft.h"
+#include "config/CConfiguration.hpp"
+#include "data/CAircraftData.hpp"
+#include "feed/parser/CSbsParser.hpp"
+#include "object/CAircraft.hpp"
 
 using namespace vfrb::config;
 
 namespace vfrb::feed
 {
-CSbsFeed::CSbsFeed(Str const& name_, CProperties const& prop_, SPtr<data::CAircraftData> data_,
+CSbsFeed::CSbsFeed(String const& name_, CProperties const& prop_, SPtr<data::CAircraftData> data_,
                    s32 maxHeight_)
-    : IFeed(name_, prop_, data_), m_parser(maxHeight_), m_worker([this](Str&& work_) {
-          try
-          {
+    : IFeed(name_, prop_, data_), m_parser(maxHeight_), m_worker([this](String&& work_) {
+          try {
               m_data->Update(m_parser.Parse(std::move(work_), m_priority));
+          } catch ([[maybe_unused]] parser::error::CParseError const&) {
           }
-          catch ([[maybe_unused]] parser::error::CParseError const&)
-          {}
-      })
-{}
+      }) {}
 
-IFeed::EProtocol CSbsFeed::Protocol() const
-{
+IFeed::EProtocol CSbsFeed::Protocol() const {
     return EProtocol::SBS;
 }
 
-bool CSbsFeed::Process(Str str_)
-{
+bool CSbsFeed::Process(String str_) {
     m_worker.Push(std::move(str_));
     return true;
 }
