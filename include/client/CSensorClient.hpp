@@ -32,7 +32,7 @@ class CSensorClient : public IClient
 {
     NOT_COPYABLE(CSensorClient)
 
-    inline static constexpr auto RECEIVE_TIMEOUT = 3;  ///< seconds
+    CTCONST RECEIVE_TIMEOUT = 3;  ///< seconds
 
     /**
      * @brief Override Client::read, use timeout

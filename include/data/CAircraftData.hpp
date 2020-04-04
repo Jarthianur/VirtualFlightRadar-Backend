@@ -35,10 +35,9 @@ namespace vfrb::data
  */
 class CAircraftData : public IData
 {
-    inline static constexpr auto const NO_FLARM_THRESHOLD =
-        object::CObject::OUTDATED;                              ///< Times until FLARM status is removed
-    inline static constexpr auto const DELETE_THRESHOLD = 120;  ///< Times until aircraft gets deleted
-    inline static constexpr auto const NMEA_SIZE        = processor::CAircraftProcessor::NMEA_SIZE;
+    CTCONST NO_FLARM_THRESHOLD = object::CObject::OUTDATED;  ///< Times until FLARM status is removed
+    CTCONST DELETE_THRESHOLD   = 120;                        ///< Times until aircraft gets deleted
+    CTCONST NMEA_SIZE          = processor::CAircraftProcessor::NMEA_SIZE;
 
     concurrent::CObjectContainer<object::CAircraft, NMEA_SIZE>
                                   m_container;  ///< Internal container for aircrafts

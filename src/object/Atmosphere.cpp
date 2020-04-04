@@ -49,12 +49,4 @@ void CAtmosphere::assign(CObject&& other_) {
     } catch ([[maybe_unused]] std::bad_cast const&) {
     }
 }
-
-auto CAtmosphere::Nmea() const -> decltype(m_nmea) const& {
-    return m_nmea;
-}
-
-auto CAtmosphere::Pressure() const -> decltype(m_pressure) {
-    return m_pressure;
-}
 }  // namespace vfrb::object

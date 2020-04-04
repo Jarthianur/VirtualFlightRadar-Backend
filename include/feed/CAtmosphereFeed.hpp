@@ -21,45 +21,45 @@
 
 #pragma once
 
-#include "parser/GpsParser.h"
+#include "parser/CAtmosphereParser.hpp"
 
-#include "Feed.h"
+#include "IFeed.hpp"
 
 namespace vfrb::data
 {
-class CGpsData;
+class CAtmosphereData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
 {
 /**
- * @brief Extend Feed for GPS input.
+ * @brief Extend Feed for sensor input.
  */
-class CGpsFeed : public IFeed
+class CAtmosphereFeed : public IFeed
 {
-    NOT_COPYABLE(CGpsFeed)
+    NOT_COPYABLE(CAtmosphereFeed)
 
-    parser::CGpsParser const m_parser;  ///< Parser to unpack response from Client
+    parser::CAtmosphereParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
     /**
      * @param name       The unique name
      * @param properties The Properties
-     * @param data       The GpsData container
+     * @param data       The WindData container
      * @throw std::logic_error from parent constructor
      */
-    CGpsFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::CGpsData> data_);
-    ~CGpsFeed() noexcept override = default;
+    CAtmosphereFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAtmosphereData> data_);
+    ~CAtmosphereFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
-     * @return Protocol::GPS
+     * @return Protocol::SENSOR
      */
     EProtocol Protocol() const override;
 
     /**
      * @brief Implement Feed::process.
      */
-    bool Process(Str str_) override;
+    bool Process(String str_) override;
 };
 }  // namespace vfrb::feed

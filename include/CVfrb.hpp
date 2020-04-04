@@ -25,12 +25,12 @@
 #include <chrono>
 #include <list>
 
-#include "server/Server.hpp"
-#include "server/net/impl/AcceptorBoost.h"
-#include "server/net/impl/SocketBoost.h"
-#include "util/class_utils.h"
+#include "server/CServer.hpp"
+#include "server/net/impl/CAcceptorBoost.hpp"
+#include "server/net/impl/CSocketBoost.hpp"
+#include "util/class_utils.hpp"
 
-#include "types.h"
+#include "types.hpp"
 
 namespace vfrb::config
 {
@@ -81,7 +81,7 @@ class CVfrb
      * @param start The start value
      * @return the duration string
      */
-    Str duration(std::chrono::steady_clock::time_point start_) const;
+    String duration(std::chrono::steady_clock::time_point start_) const;
 
 public:
     explicit CVfrb(SPtr<config::CConfiguration> conf_);  ///< @param config The Configuration

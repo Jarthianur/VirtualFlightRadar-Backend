@@ -36,7 +36,7 @@ namespace vfrb::data::processor
 class CAircraftProcessor
 {
 public:
-    inline static constexpr auto const NMEA_SIZE = 192;
+    CTCONST NMEA_SIZE = 192;
 
 private:
     s32 const m_maxDistance = std::numeric_limits<s32>::max();  ///< Max distance to process an aircraft

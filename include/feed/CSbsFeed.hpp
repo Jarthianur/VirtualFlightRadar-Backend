@@ -21,10 +21,10 @@
 
 #pragma once
 
-#include "concurrent/WorkerThread.hpp"
-#include "parser/AprsParser.h"
+#include "concurrent/CWorkerThread.hpp"
+#include "parser/CSbsParser.hpp"
 
-#include "Feed.h"
+#include "IFeed.hpp"
 
 namespace vfrb::data
 {
@@ -34,16 +34,14 @@ class CAircraftData;
 namespace vfrb::feed
 {
 /**
- * @brief Extend Feed for APRSC protocol.
+ * @brief Extend Feed for SBS protocol.
  */
-class CAprscFeed : public IFeed
+class CSbsFeed : public IFeed
 {
-    NOT_COPYABLE(CAprscFeed)
+    NOT_COPYABLE(CSbsFeed)
 
-    static constexpr auto LOG_PREFIX = "(AprscFeed) ";
-
-    parser::CAprsParser const      m_parser;  ///< Parser to unpack response from Client
-    concurrent::CWorkerThread<Str> m_worker;
+    parser::CSbsParser const          m_parser;  ///< Parser to unpack response from Client
+    concurrent::CWorkerThread<String> m_worker;
 
 public:
     /**
@@ -51,27 +49,21 @@ public:
      * @param properties The Properties
      * @param data       The AircraftData container
      * @param maxHeight  The max height filter
-     * @throw std::logic_error if login is not given, or from parent constructor
+     * @throw std::logic_error from parent constructor
      */
-    CAprscFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
-               s32 maxHeight_);
-    ~CAprscFeed() noexcept override = default;
+    CSbsFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
+             s32 maxHeight_);
+    ~CSbsFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
-     * @return Protocol::APRS
+     * @return Protocol::SBS
      */
     EProtocol Protocol() const override;
 
     /**
-     * @brief Implement Feed::process.
+     * @brief Feed::process.
      */
-    bool Process(Str str_) override;
-
-    /**
-     * @brief Get the login string.
-     * @return the login
-     */
-    Str Login() const;
+    bool Process(String str_) override;
 };
 }  // namespace vfrb::feed

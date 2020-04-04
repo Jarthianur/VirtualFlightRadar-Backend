@@ -21,45 +21,57 @@
 
 #pragma once
 
-#include "parser/WindParser.h"
+#include "concurrent/CWorkerThread.hpp"
+#include "parser/CAprsParser.hpp"
 
-#include "Feed.h"
+#include "IFeed.hpp"
 
 namespace vfrb::data
 {
-class CWindData;
+class CAircraftData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
 {
 /**
- * @brief Extend Feed for windsensor input.
+ * @brief Extend Feed for APRSC protocol.
  */
-class CWindFeed : public IFeed
+class CAprscFeed : public IFeed
 {
-    NOT_COPYABLE(CWindFeed)
+    NOT_COPYABLE(CAprscFeed)
 
-    parser::CWindParser const m_parser;  ///< Parser to unpack response from Client
+    CTCONST LOG_PREFIX = "(AprscFeed) ";
+
+    parser::CAprsParser const         m_parser;  ///< Parser to unpack response from Client
+    concurrent::CWorkerThread<String> m_worker;
 
 public:
     /**
-     * @param name       The SensorFeeds unique name
+     * @param name       The unique name
      * @param properties The Properties
-     * @param data       The WindData contianer
-     * @throw std::logic_error from parent constructor
+     * @param data       The AircraftData container
+     * @param maxHeight  The max height filter
+     * @throw std::logic_error if login is not given, or from parent constructor
      */
-    CWindFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::CWindData> data_);
-    ~CWindFeed() noexcept override = default;
+    CAprscFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
+               s32 maxHeight_);
+    ~CAprscFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
-     * @return Protocol::SENSOR
+     * @return Protocol::APRS
      */
     EProtocol Protocol() const override;
 
     /**
-     * @brief Feed::process.
+     * @brief Implement Feed::process.
      */
-    bool Process(Str str_) override;
+    bool Process(String str_) override;
+
+    /**
+     * @brief Get the login string.
+     * @return the login
+     */
+    String Login() const;
 };
 }  // namespace vfrb::feed

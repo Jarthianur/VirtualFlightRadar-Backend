@@ -51,7 +51,7 @@ protected:
 public:
     COPYABLE_BUT_NOT_MOVABLE(CObject)
 
-    inline static constexpr auto const OUTDATED = 4;  ///< Cycles until an object is considered outdated
+    CTCONST OUTDATED = 4;  ///< Cycles until an object is considered outdated
 
     virtual ~CObject() noexcept = default;
 
@@ -65,6 +65,6 @@ public:
      */
     bool TryUpdate(CObject&& other_);
 
-    auto UpdateAge() const -> decltype(m_updateAge);
+    GETTER(UpdateAge, m_updateAge)
 };
 }  // namespace vfrb::object

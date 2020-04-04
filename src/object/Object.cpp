@@ -44,8 +44,4 @@ CObject& CObject::operator++() {
     ++m_updateAge;
     return *this;
 }
-
-auto CObject::UpdateAge() const -> decltype(m_updateAge) {
-    return m_updateAge;
-}
 }  // namespace vfrb::object

@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "util/class_utils.hpp"
+
 #include "types.hpp"
 
 namespace vfrb::client
@@ -31,8 +33,8 @@ namespace vfrb::client
  */
 class CTimeoutBackoff
 {
-    inline static constexpr auto const INITIAL_TIMEOUT = 1;
-    inline static constexpr auto const INITIAL_FACTOR  = 5;
+    CTCONST INITIAL_TIMEOUT = 1;
+    CTCONST INITIAL_FACTOR  = 5;
 
     u32 m_timeout = INITIAL_TIMEOUT;  ///< seconds
     u32 m_factor  = INITIAL_FACTOR;

@@ -21,35 +21,35 @@
 
 #pragma once
 
-#include "parser/AtmosphereParser.h"
+#include "parser/CWindParser.hpp"
 
-#include "Feed.h"
+#include "IFeed.hpp"
 
 namespace vfrb::data
 {
-class CAtmosphereData;
+class CWindData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
 {
 /**
- * @brief Extend Feed for sensor input.
+ * @brief Extend Feed for windsensor input.
  */
-class CAtmosphereFeed : public IFeed
+class CWindFeed : public IFeed
 {
-    NOT_COPYABLE(CAtmosphereFeed)
+    NOT_COPYABLE(CWindFeed)
 
-    parser::CAtmosphereParser const m_parser;  ///< Parser to unpack response from Client
+    parser::CWindParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
     /**
-     * @param name       The unique name
+     * @param name       The SensorFeeds unique name
      * @param properties The Properties
-     * @param data       The WindData container
+     * @param data       The WindData contianer
      * @throw std::logic_error from parent constructor
      */
-    CAtmosphereFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::CAtmosphereData> data_);
-    ~CAtmosphereFeed() noexcept override = default;
+    CWindFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CWindData> data_);
+    ~CWindFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
@@ -58,8 +58,8 @@ public:
     EProtocol Protocol() const override;
 
     /**
-     * @brief Implement Feed::process.
+     * @brief Feed::process.
      */
-    bool Process(Str str_) override;
+    bool Process(String str_) override;
 };
 }  // namespace vfrb::feed

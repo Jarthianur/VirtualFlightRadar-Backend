@@ -38,10 +38,10 @@ namespace vfrb::data
  */
 class CGpsData : public IData
 {
-    inline static constexpr auto const GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
-    inline static constexpr auto const GPS_FIX_GOOD          = 1;    ///< Good fix quality
-    inline static constexpr auto const GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
-    inline static constexpr auto const NMEA_SIZE             = processor::CGpsProcessor::NMEA_SIZE;
+    CTCONST GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
+    CTCONST GPS_FIX_GOOD          = 1;    ///< Good fix quality
+    CTCONST GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
+    CTCONST NMEA_SIZE             = processor::CGpsProcessor::NMEA_SIZE;
 
     concurrent::Mutex mutable m_mutex;
     std::tuple<object::CGpsPosition, CStaticString<NMEA_SIZE>>

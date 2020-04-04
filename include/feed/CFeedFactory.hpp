@@ -21,11 +21,11 @@
 
 #pragma once
 
-#include "config/Properties.h"
-#include "error/Error.hpp"
-#include "util/class_utils.h"
+#include "config/CProperties.hpp"
+#include "error/IError.hpp"
+#include "util/class_utils.hpp"
 
-#include "types.h"
+#include "types.hpp"
 
 namespace vfrb::config
 {
@@ -64,7 +64,7 @@ class CFeedFactory
      * @throw std::logic_error from invoked constructors
      */
     template<typename T, ENABLE_IF(EXTENDS(T, IFeed))>
-    SPtr<T> makeFeed(Str const& name_);
+    SPtr<T> makeFeed(String const& name_);
 
 public:
     /**
@@ -77,7 +77,6 @@ public:
     CFeedFactory(SPtr<config::CConfiguration> config_, SPtr<data::CAircraftData> aircraftData_,
                  SPtr<data::CAtmosphereData> atmosData_, SPtr<data::CGpsData> gpsData_,
                  SPtr<data::CWindData> windData_);
-    ~CFeedFactory() noexcept = default;
 
     /**
      * @brief Create a Feed.
@@ -85,20 +84,19 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    SPtr<IFeed> createFeed(Str const& name_);
+    SPtr<IFeed> createFeed(String const& name_);
 };
 
 namespace error
 {
 class CFeedCreationError : public vfrb::error::IError
 {
-    Str const m_msg;
+    String const m_msg;
 
 public:
     CFeedCreationError();
-    ~CFeedCreationError() noexcept override = default;
 
-    char const* Message() const noexcept override;
+    str Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::feed

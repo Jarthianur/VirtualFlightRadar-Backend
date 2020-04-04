@@ -62,28 +62,4 @@ bool CGpsPosition::canUpdate(CObject const& other_) const {
         return false;
     }
 }
-
-auto CGpsPosition::Location() const -> decltype(m_location) const& {
-    return m_location;
-}
-
-auto CGpsPosition::Geoid() const -> decltype(m_geoid) {
-    return m_geoid;
-}
-
-auto CGpsPosition::Timestamp() const -> decltype(m_timestamp) const& {
-    return m_timestamp;
-}
-
-auto CGpsPosition::Dilution() const -> decltype(m_dilution) {
-    return m_dilution;
-}
-
-auto CGpsPosition::NrOfSatellites() const -> decltype(m_nrOfSatellites) {
-    return m_nrOfSatellites;
-}
-
-auto CGpsPosition::FixQuality() const -> decltype(m_fixQuality) {
-    return m_fixQuality;
-}
 }  // namespace vfrb::object

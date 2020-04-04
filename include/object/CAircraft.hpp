@@ -34,12 +34,12 @@ namespace vfrb::object
 /// An aircraft object
 class CAircraft : public CObject
 {
-    inline static constexpr auto ID_SIZE = 8;  ///< Size allocated for ID
+    CTCONST ID_SIZE = 8;  ///< Size allocated for ID
 
 public:
     COPYABLE_BUT_NOT_MOVABLE(CAircraft)
 
-    inline static constexpr auto ID_LEN = 6;  ///< Length of the ID
+    CTCONST ID_LEN = 6;  ///< Length of the ID
 
     /// Device type from which the information is received
     enum class ETargetType : enum_type
@@ -80,12 +80,12 @@ public:
     /// Information about an Aircrafts movement
     struct SMovement
     {
-        inline static constexpr auto MAX_GND_SPEED  = 10000.0;
-        inline static constexpr auto MIN_GND_SPEED  = -10000.0;
-        inline static constexpr auto MAX_HEADING    = 359.9;
-        inline static constexpr auto MIN_HEADING    = 0.0;
-        inline static constexpr auto MAX_CLIMB_RATE = 10000.0;
-        inline static constexpr auto MIN_CLIMB_RATE = -10000.0;
+        CTCONST MAX_GND_SPEED  = 10000.0;
+        CTCONST MIN_GND_SPEED  = -10000.0;
+        CTCONST MAX_HEADING    = 359.9;
+        CTCONST MIN_HEADING    = 0.0;
+        CTCONST MAX_CLIMB_RATE = 10000.0;
+        CTCONST MIN_CLIMB_RATE = -10000.0;
 
         f64 GndSpeed;   ///< Speed over ground; m/s
         f64 Heading;    ///< Heading; deg [0-359]
@@ -122,14 +122,15 @@ public:
 
     ~CAircraft() noexcept override = default;
 
-    auto IdType() const -> decltype(m_idType);
-    auto AircraftType() const -> decltype(m_aircraftType);
-    auto Id() const -> decltype(m_id) const&;
-    auto TargetType() const -> decltype(m_targetType);
-    auto Location() const -> decltype(m_location) const&;
-    auto Movement() const -> decltype(m_movement) const&;
-    auto Timestamp() const -> decltype(m_timestamp) const&;
-    auto HasFullInfo() const -> decltype(m_fullInfo);
     void TargetType(ETargetType tt_);
+
+    GETTER_REF(Id, m_id)
+    GETTER_REF(Location, m_location)
+    GETTER_REF(Movement, m_movement)
+    GETTER_REF(Timestamp, m_timestamp)
+    GETTER(IdType, m_idType)
+    GETTER(AircraftType, m_aircraftType)
+    GETTER(TargetType, m_targetType)
+    GETTER(HasFullInfo, m_fullInfo)
 };
 }  // namespace vfrb::object

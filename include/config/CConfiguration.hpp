@@ -51,47 +51,47 @@ class CConfiguration
     void dumpInfo() const;
 
 public:
-    inline static constexpr auto const SECT_KEY_FALLBACK = "fallback";
-    inline static constexpr auto const SECT_KEY_GENERAL  = "general";
-    inline static constexpr auto const SECT_KEY_FILTER   = "filter";
-    inline static constexpr auto const SECT_KEY_SERVER   = "server";
+    CTCONST SECT_KEY_FALLBACK = "fallback";
+    CTCONST SECT_KEY_GENERAL  = "general";
+    CTCONST SECT_KEY_FILTER   = "filter";
+    CTCONST SECT_KEY_SERVER   = "server";
 
-    inline static constexpr auto const SECT_KEY_APRSC = "aprs";
-    inline static constexpr auto const SECT_KEY_SBS   = "sbs";
-    inline static constexpr auto const SECT_KEY_GPS   = "gps";
-    inline static constexpr auto const SECT_KEY_WIND  = "wind";
-    inline static constexpr auto const SECT_KEY_ATMOS = "atm";
+    CTCONST SECT_KEY_APRSC = "aprs";
+    CTCONST SECT_KEY_SBS   = "sbs";
+    CTCONST SECT_KEY_GPS   = "gps";
+    CTCONST SECT_KEY_WIND  = "wind";
+    CTCONST SECT_KEY_ATMOS = "atm";
 
-    inline static constexpr auto const KV_KEY_FEEDS    = "feeds";
-    inline static constexpr auto const KV_KEY_GND_MODE = "gndMode";
+    CTCONST KV_KEY_FEEDS    = "feeds";
+    CTCONST KV_KEY_GND_MODE = "gndMode";
 
-    inline static constexpr auto const KV_KEY_MAX_CON = "maxConnections";
+    CTCONST KV_KEY_MAX_CON = "maxConnections";
 
-    inline static constexpr auto const KV_KEY_LATITUDE  = "latitude";
-    inline static constexpr auto const KV_KEY_LONGITUDE = "longitude";
-    inline static constexpr auto const KV_KEY_ALTITUDE  = "altitude";
-    inline static constexpr auto const KV_KEY_GEOID     = "geoid";
-    inline static constexpr auto const KV_KEY_PRESSURE  = "pressure";
+    CTCONST KV_KEY_LATITUDE  = "latitude";
+    CTCONST KV_KEY_LONGITUDE = "longitude";
+    CTCONST KV_KEY_ALTITUDE  = "altitude";
+    CTCONST KV_KEY_GEOID     = "geoid";
+    CTCONST KV_KEY_PRESSURE  = "pressure";
 
-    inline static constexpr auto const KV_KEY_MAX_DIST   = "maxDistance";
-    inline static constexpr auto const KV_KEY_MAX_HEIGHT = "maxHeight";
+    CTCONST KV_KEY_MAX_DIST   = "maxDistance";
+    CTCONST KV_KEY_MAX_HEIGHT = "maxHeight";
 
-    inline static constexpr auto const KV_KEY_HOST     = "host";
-    inline static constexpr auto const KV_KEY_PORT     = "port";
-    inline static constexpr auto const KV_KEY_PRIORITY = "priority";
-    inline static constexpr auto const KV_KEY_LOGIN    = "login";
+    CTCONST KV_KEY_HOST     = "host";
+    CTCONST KV_KEY_PORT     = "port";
+    CTCONST KV_KEY_PRIORITY = "priority";
+    CTCONST KV_KEY_LOGIN    = "login";
 
-    inline static constexpr auto const PATH_FEEDS          = "general.feeds";
-    inline static constexpr auto const PATH_GND_MODE       = "general.gndMode";
-    inline static constexpr auto const PATH_SERVER_PORT    = "server.port";
-    inline static constexpr auto const PATH_SERVER_MAX_CON = "server.maxConnections";
-    inline static constexpr auto const PATH_LATITUDE       = "fallback.latitude";
-    inline static constexpr auto const PATH_LONGITUDE      = "fallback.longitude";
-    inline static constexpr auto const PATH_ALTITUDE       = "fallback.altitude";
-    inline static constexpr auto const PATH_GEOID          = "fallback.geoid";
-    inline static constexpr auto const PATH_PRESSURE       = "fallback.pressure";
-    inline static constexpr auto const PATH_MAX_DIST       = "filter.maxDistance";
-    inline static constexpr auto const PATH_MAX_HEIGHT     = "filter.maxHeight";
+    CTCONST PATH_FEEDS          = "general.feeds";
+    CTCONST PATH_GND_MODE       = "general.gndMode";
+    CTCONST PATH_SERVER_PORT    = "server.port";
+    CTCONST PATH_SERVER_MAX_CON = "server.maxConnections";
+    CTCONST PATH_LATITUDE       = "fallback.latitude";
+    CTCONST PATH_LONGITUDE      = "fallback.longitude";
+    CTCONST PATH_ALTITUDE       = "fallback.altitude";
+    CTCONST PATH_GEOID          = "fallback.geoid";
+    CTCONST PATH_PRESSURE       = "fallback.pressure";
+    CTCONST PATH_MAX_DIST       = "filter.maxDistance";
+    CTCONST PATH_MAX_HEIGHT     = "filter.maxHeight";
 
     bool                                          GroundMode;    ///< Ground mode enabled?
     object::CGpsPosition const                    GpsPosition;   ///< Fallback position

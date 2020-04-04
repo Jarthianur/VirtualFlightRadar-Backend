@@ -41,8 +41,4 @@ void CWind::assign(CObject&& other_) {
     } catch ([[maybe_unused]] std::bad_cast const&) {
     }
 }
-
-auto CWind::Nmea() const -> decltype(m_nmea) const& {
-    return m_nmea;
-}
 }  // namespace vfrb::object

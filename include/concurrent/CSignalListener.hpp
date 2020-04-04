@@ -28,7 +28,7 @@
 
 #include "util/class_utils.hpp"
 
-#include "GuardedThread.hpp"
+#include "CGuardedThread.hpp"
 #include "types.hpp"
 
 namespace vfrb::concurrent

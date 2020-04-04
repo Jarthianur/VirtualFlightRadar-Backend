@@ -32,9 +32,9 @@ struct SClimate;
 /// Atmospheric information object
 class CAtmosphere : public CObject
 {
-    inline static constexpr auto ICAO_STD     = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
-    inline static constexpr auto MAX_PRESSURE = 2000.0;
-    inline static constexpr auto MIN_PRESSURE = 0.0;
+    CTCONST ICAO_STD     = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
+    CTCONST MAX_PRESSURE = 2000.0;
+    CTCONST MIN_PRESSURE = 0.0;
 
     f64    m_pressure = ICAO_STD;  ///< The atmospheric pressure
     String m_nmea;                 ///< The NMEA string
@@ -53,7 +53,7 @@ public:
     CAtmosphere(u32 prio_, f64 press_, String&& nmea_);
     ~CAtmosphere() noexcept override = default;
 
-    auto Nmea() const -> decltype(m_nmea) const&;
-    auto Pressure() const -> decltype(m_pressure);
+    GETTER_REF(Nmea, m_nmea)
+    GETTER(Pressure, m_pressure)
 };
 }  // namespace vfrb::object

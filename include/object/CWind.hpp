@@ -47,7 +47,6 @@ public:
 
     void Clear();
 
-    /// Get the NMEA string.
-    auto Nmea() const -> decltype(m_nmea) const&;
+    GETTER_REF(Nmea, m_nmea)
 };
 }  // namespace vfrb::object

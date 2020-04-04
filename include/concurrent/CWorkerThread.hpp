@@ -43,7 +43,7 @@ class CWorkerThread
 {
     NOT_COPYABLE(CWorkerThread)
 
-    inline static constexpr auto const POLL_TIME = 200;
+    CTCONST POLL_TIME = 200;
 
     Mutex mutable m_mutex;
     std::condition_variable_any GUARDED_BY(m_mutex) m_cv;       ///< Wait and notify for work

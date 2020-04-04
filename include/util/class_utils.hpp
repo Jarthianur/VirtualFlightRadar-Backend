@@ -50,6 +50,18 @@
     TYPE(TYPE&&) noexcept        = delete;  \
     TYPE& operator=(TYPE&&) noexcept = delete;
 
+#define CTCONST inline static constexpr auto const
+
+#define GETTER(FN, MEM)                     \
+    inline auto FN() const->decltype(MEM) { \
+        return MEM;                         \
+    }
+
+#define GETTER_REF(FN, MEM)                        \
+    inline auto FN() const->decltype(MEM) const& { \
+        return MEM;                                \
+    }
+
 /**
  * Define an alias for a function. This is useful for keeping compatibility to STL interfaces.
  * @param ALIAS The alias name

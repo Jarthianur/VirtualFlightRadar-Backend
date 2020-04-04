@@ -24,29 +24,29 @@
 #include <regex>
 #include <tuple>
 
-#include "object/Aircraft.h"
+#include "object/CAircraft.hpp"
 
-#include "Parser.hpp"
+#include "IParser.hpp"
 
 namespace vfrb::feed::parser
 {
 /// A parser for APRS sentences.
 class CAprsParser : public IParser<object::CAircraft>
 {
-    using AircraftInfo = std::tuple<StrView, object::CAircraft::EIdType, object::CAircraft::EAircraftType>;
+    using AircraftInfo = std::tuple<StringView, object::CAircraft::EIdType, object::CAircraft::EAircraftType>;
 
-    inline static constexpr auto RE_APRS_TIME    = 1;   ///< APRS regex match group of time
-    inline static constexpr auto RE_APRS_LAT     = 2;   ///< APRS regex match group of latitude
-    inline static constexpr auto RE_APRS_LAT_DIR = 3;   ///< APRS regex match group of latitude orientation
-    inline static constexpr auto RE_APRS_LON     = 4;   ///< APRS regex match group of longitude
-    inline static constexpr auto RE_APRS_LON_DIR = 5;   ///< APRS regex match group of longitude orientation
-    inline static constexpr auto RE_APRS_HEAD    = 6;   ///< APRS regex match group of heading
-    inline static constexpr auto RE_APRS_GND_SPD = 7;   ///< APRS regex match group of ground speed
-    inline static constexpr auto RE_APRS_ALT     = 8;   ///< APRS regex match group of altitude
-    inline static constexpr auto RE_APRS_TYPE    = 9;   ///< APRS regex match group of id and aircraft type
-    inline static constexpr auto RE_APRS_ID      = 10;  ///< APRS regex match group of aircraft id
-    inline static constexpr auto RE_APRS_CR      = 11;  ///< APRS regex match group of climb rate
-    inline static constexpr auto RE_APRS_TR      = 12;  ///< APRS regex match group of turn rate
+    CTCONST RE_APRS_TIME    = 1;   ///< APRS regex match group of time
+    CTCONST RE_APRS_LAT     = 2;   ///< APRS regex match group of latitude
+    CTCONST RE_APRS_LAT_DIR = 3;   ///< APRS regex match group of latitude orientation
+    CTCONST RE_APRS_LON     = 4;   ///< APRS regex match group of longitude
+    CTCONST RE_APRS_LON_DIR = 5;   ///< APRS regex match group of longitude orientation
+    CTCONST RE_APRS_HEAD    = 6;   ///< APRS regex match group of heading
+    CTCONST RE_APRS_GND_SPD = 7;   ///< APRS regex match group of ground speed
+    CTCONST RE_APRS_ALT     = 8;   ///< APRS regex match group of altitude
+    CTCONST RE_APRS_TYPE    = 9;   ///< APRS regex match group of id and aircraft type
+    CTCONST RE_APRS_ID      = 10;  ///< APRS regex match group of aircraft id
+    CTCONST RE_APRS_CR      = 11;  ///< APRS regex match group of climb rate
+    CTCONST RE_APRS_TR      = 12;  ///< APRS regex match group of turn rate
 
     std::regex const m_aprsRe;     ///< Regular expression for APRS protocol
     s32 const        m_maxHeight;  ///< The max height filter
@@ -69,8 +69,7 @@ class CAprsParser : public IParser<object::CAircraft>
 public:
     /// @param maxHeight_ The filter for max height
     explicit CAprsParser(s32 maxHeight_);
-    ~CAprsParser() noexcept override = default;
 
-    object::CAircraft Parse(Str&& str_, u32 prio_) const override;
+    object::CAircraft Parse(String&& str_, u32 prio_) const override;
 };
 }  // namespace vfrb::feed::parser

@@ -36,7 +36,7 @@ namespace vfrb::data::processor
 class CGpsProcessor
 {
 public:
-    inline static constexpr auto const NMEA_SIZE = 192;
+    CTCONST NMEA_SIZE = 192;
 
 private:
     char mutable m_directionSN = 'x';  ///< Orientation of the latitude (S,N)

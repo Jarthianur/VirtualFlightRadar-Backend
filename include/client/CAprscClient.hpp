@@ -33,7 +33,7 @@ class CAprscClient : public IClient
 {
     NOT_COPYABLE(CAprscClient)
 
-    inline static constexpr auto const KEEPALIVE_INTERVAL = 600;
+    CTCONST KEEPALIVE_INTERVAL = 600;
 
     String const m_login;  ///< Login string
 

@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include "object/Atmosphere.h"
+#include "object/CAtmosphere.hpp"
 
-#include "Parser.hpp"
+#include "IParser.hpp"
 
 namespace vfrb::feed::parser
 {
@@ -31,9 +31,6 @@ namespace vfrb::feed::parser
 class CAtmosphereParser : public IParser<object::CAtmosphere>
 {
 public:
-    CAtmosphereParser()                    = default;
-    ~CAtmosphereParser() noexcept override = default;
-
-    object::CAtmosphere Parse(Str&& str_, u32 prio_) const override;
+    object::CAtmosphere Parse(String&& str_, u32 prio_) const override;
 };
 }  // namespace vfrb::feed::parser

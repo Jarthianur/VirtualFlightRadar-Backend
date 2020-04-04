@@ -81,38 +81,6 @@ bool CAircraft::canUpdate(CObject const& other_) const {
     }
 }
 
-auto CAircraft::IdType() const -> decltype(m_idType) {
-    return m_idType;
-}
-
-auto CAircraft::AircraftType() const -> decltype(m_aircraftType) {
-    return m_aircraftType;
-}
-
-auto CAircraft::Id() const -> decltype(m_id) const& {
-    return m_id;
-}
-
-auto CAircraft::TargetType() const -> decltype(m_targetType) {
-    return m_targetType;
-}
-
-auto CAircraft::Location() const -> decltype(m_location) const& {
-    return m_location;
-}
-
-auto CAircraft::Movement() const -> decltype(m_movement) const& {
-    return m_movement;
-}
-
-auto CAircraft::Timestamp() const -> decltype(m_timestamp) const& {
-    return m_timestamp;
-}
-
-auto CAircraft::HasFullInfo() const -> decltype(m_fullInfo) {
-    return m_fullInfo;
-}
-
 void CAircraft::TargetType(ETargetType tt) {
     m_targetType = tt;
 }

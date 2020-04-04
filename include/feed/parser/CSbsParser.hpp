@@ -21,27 +21,26 @@
 
 #pragma once
 
-#include "object/Aircraft.h"
+#include "object/CAircraft.hpp"
 
-#include "Parser.hpp"
+#include "IParser.hpp"
 
 namespace vfrb::feed::parser
 {
 /// A parser for SBS sentences
 class CSbsParser : public IParser<object::CAircraft>
 {
-    inline static constexpr auto SBS_FIELD_ID   = 4;   ///< Field number of aircraft id
-    inline static constexpr auto SBS_FIELD_TIME = 7;   ///< Field number of time
-    inline static constexpr auto SBS_FIELD_ALT  = 11;  ///< Field number of altitude
-    inline static constexpr auto SBS_FIELD_LAT  = 14;  ///< Field number of latitude
-    inline static constexpr auto SBS_FIELD_LON  = 15;  ///< Field number of longitude
+    CTCONST SBS_FIELD_ID   = 4;   ///< Field number of aircraft id
+    CTCONST SBS_FIELD_TIME = 7;   ///< Field number of time
+    CTCONST SBS_FIELD_ALT  = 11;  ///< Field number of altitude
+    CTCONST SBS_FIELD_LAT  = 14;  ///< Field number of latitude
+    CTCONST SBS_FIELD_LON  = 15;  ///< Field number of longitude
 
     s32 const m_maxHeight;  ///< The max height filter
 
 public:
     explicit CSbsParser(s32 maxHeight_);
-    ~CSbsParser() noexcept override = default;
 
-    object::CAircraft Parse(Str&& str_, u32 prio_) const override;
+    object::CAircraft Parse(String&& str_, u32 prio_) const override;
 };
 }  // namespace vfrb::feed::parser

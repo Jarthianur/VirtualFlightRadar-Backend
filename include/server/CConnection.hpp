@@ -55,7 +55,7 @@ public:
      */
     bool Write(StringView const& sv_);
 
-    auto Address() const -> decltype(m_address) const&;
+    GETTER_REF(Address, m_address)
 };
 
 template<typename SocketT>
@@ -81,10 +81,5 @@ bool CConnection<SocketT>::Write(StringView const& sv_) {
         CLogger::Instance().Debug("(Connection) write: ", e.Message());
     }
     return false;
-}
-
-template<typename SocketT>
-auto CConnection<SocketT>::Address() const -> decltype(m_address) const& {
-    return m_address;
 }
 }  // namespace vfrb::server

@@ -32,12 +32,12 @@ namespace vfrb::object
 /// A 3D position on earth
 struct SLocation
 {
-    inline static constexpr auto MAX_LATITUDE  = 90.0;
-    inline static constexpr auto MIN_LATITUDE  = -90.0;
-    inline static constexpr auto MAX_LONGITUDE = 180.0;
-    inline static constexpr auto MIN_LONGITUDE = 0.0;
-    inline static constexpr auto MAX_ALTITUDE  = 100000;
-    inline static constexpr auto MIN_ALTITUDE  = -11000;
+    CTCONST MAX_LATITUDE  = 90.0;
+    CTCONST MIN_LATITUDE  = -90.0;
+    CTCONST MAX_LONGITUDE = 180.0;
+    CTCONST MIN_LONGITUDE = 0.0;
+    CTCONST MAX_ALTITUDE  = 100000;
+    CTCONST MIN_ALTITUDE  = -11000;
 
     f64 Latitude;   ///< Latitude; deg
     f64 Longitude;  ///< Longitude; deg
@@ -60,8 +60,8 @@ class CGpsPosition : public CObject
 public:
     COPYABLE_BUT_NOT_MOVABLE(CGpsPosition)
 
-    inline static constexpr auto MAX_GEOID = 86.0;
-    inline static constexpr auto MIN_GEOID = -108.0;
+    CTCONST MAX_GEOID = 86.0;
+    CTCONST MIN_GEOID = -108.0;
 
     /// @param prio_ The initial priority
     CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_);
@@ -71,11 +71,11 @@ public:
                  CTimestamp const& ts_);
     ~CGpsPosition() noexcept override = default;
 
-    auto Location() const -> decltype(m_location) const&;
-    auto Geoid() const -> decltype(m_geoid);
-    auto Timestamp() const -> decltype(m_timestamp) const&;
-    auto Dilution() const -> decltype(m_dilution);
-    auto NrOfSatellites() const -> decltype(m_nrOfSatellites);
-    auto FixQuality() const -> decltype(m_fixQuality);
+    GETTER_REF(Location, m_location)
+    GETTER_REF(Timestamp, m_timestamp)
+    GETTER(Geoid, m_geoid)
+    GETTER(Dilution, m_dilution)
+    GETTER(NrOfSatellites, m_nrOfSatellites)
+    GETTER(FixQuality, m_fixQuality)
 };
 }  // namespace vfrb::object

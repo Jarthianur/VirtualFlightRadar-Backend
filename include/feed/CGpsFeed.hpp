@@ -21,49 +21,45 @@
 
 #pragma once
 
-#include "concurrent/WorkerThread.hpp"
-#include "parser/SbsParser.h"
+#include "parser/CGpsParser.hpp"
 
-#include "Feed.h"
+#include "IFeed.hpp"
 
 namespace vfrb::data
 {
-class CAircraftData;
+class CGpsData;
 }  // namespace vfrb::data
 
 namespace vfrb::feed
 {
 /**
- * @brief Extend Feed for SBS protocol.
+ * @brief Extend Feed for GPS input.
  */
-class CSbsFeed : public IFeed
+class CGpsFeed : public IFeed
 {
-    NOT_COPYABLE(CSbsFeed)
+    NOT_COPYABLE(CGpsFeed)
 
-    parser::CSbsParser const       m_parser;  ///< Parser to unpack response from Client
-    concurrent::CWorkerThread<Str> m_worker;
+    parser::CGpsParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
     /**
      * @param name       The unique name
      * @param properties The Properties
-     * @param data       The AircraftData container
-     * @param maxHeight  The max height filter
+     * @param data       The GpsData container
      * @throw std::logic_error from parent constructor
      */
-    CSbsFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
-             s32 maxHeight_);
-    ~CSbsFeed() noexcept override = default;
+    CGpsFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CGpsData> data_);
+    ~CGpsFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.
-     * @return Protocol::SBS
+     * @return Protocol::GPS
      */
     EProtocol Protocol() const override;
 
     /**
-     * @brief Feed::process.
+     * @brief Implement Feed::process.
      */
-    bool Process(Str str_) override;
+    bool Process(String str_) override;
 };
 }  // namespace vfrb::feed

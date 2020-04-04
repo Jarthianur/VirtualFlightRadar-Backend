@@ -21,12 +21,12 @@
 
 #pragma once
 
-#include "client/net/Endpoint.hpp"
-#include "config/Properties.h"
-#include "error/Error.hpp"
-#include "util/class_utils.h"
+#include "client/net/SEndpoint.hpp"
+#include "config/CProperties.hpp"
+#include "error/IError.hpp"
+#include "util/class_utils.hpp"
 
-#include "types.h"
+#include "types.hpp"
 
 namespace vfrb::data
 {
@@ -49,7 +49,7 @@ class IFeed
 
 protected:
     config::CProperties const m_properties;  ///< Properties
-    Str const                 m_name;        ///< Unique name
+    String const              m_name;        ///< Unique name
     u32 const                 m_priority;    ///< Priority
     SPtr<data::IData>         m_data;        ///< Respective Data container
 
@@ -59,7 +59,7 @@ protected:
      * @param properties The Properties
      * @throw std::logic_error if host or port are not given in properties
      */
-    IFeed(Str const& name_, config::CProperties const& prop_, SPtr<data::IData> data_);
+    IFeed(String const& name_, config::CProperties const& prop_, SPtr<data::IData> data_);
 
 public:
     /**
@@ -91,23 +91,23 @@ public:
      * @brief Handle client's response.
      * @param response The response
      */
-    virtual bool Process(Str str_) = 0;
+    virtual bool Process(String str_) = 0;
 
-    auto Name() const -> decltype(m_name) const&;
     auto Priority() const -> std::remove_const<decltype(m_priority)>::type;
+
+    GETTER_REF(Name, m_name)
 };
 
 namespace error
 {
 class CInvalidPropertyError : public vfrb::error::IError
 {
-    Str const m_msg;
+    String const m_msg;
 
 public:
-    explicit CInvalidPropertyError(Str const& msg_);
-    ~CInvalidPropertyError() noexcept override = default;
+    explicit CInvalidPropertyError(String const& msg_);
 
-    char const* Message() const noexcept override;
+    str Message() const noexcept override;
 };
 }  // namespace error
 }  // namespace vfrb::feed
