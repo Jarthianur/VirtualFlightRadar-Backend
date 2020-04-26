@@ -29,8 +29,6 @@ namespace vfrb::client
  */
 class CSensorClient : public IClient
 {
-    NOT_COPYABLE(CSensorClient)
-
     CTCONST RECEIVE_TIMEOUT = 3;  ///< seconds
 
     /**
@@ -58,6 +56,5 @@ public:
      * @param connector The Connector interface
      */
     CSensorClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
-    ~CSensorClient() noexcept override = default;
 };
 }  // namespace vfrb::client

@@ -29,8 +29,6 @@ namespace vfrb::client
  */
 class CSbsClient : public IClient
 {
-    NOT_COPYABLE(CSbsClient)
-
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
@@ -45,6 +43,5 @@ public:
      * @param connector The Connector interface
      */
     CSbsClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
-    ~CSbsClient() noexcept override = default;
 };
 }  // namespace vfrb::client

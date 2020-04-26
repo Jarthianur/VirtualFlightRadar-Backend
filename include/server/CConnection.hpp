@@ -41,7 +41,8 @@ class CConnection
     String  m_address;  ///< IP address
 
 public:
-    MOVABLE_BUT_NOT_COPYABLE(CConnection)
+    MOVABLE(CConnection)
+    NOT_COPYABLE(CConnection)
 
     explicit CConnection(SocketT&& sock_);
 

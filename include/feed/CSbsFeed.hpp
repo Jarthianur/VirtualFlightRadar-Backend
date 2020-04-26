@@ -37,8 +37,6 @@ namespace vfrb::feed
  */
 class CSbsFeed : public IFeed
 {
-    NOT_COPYABLE(CSbsFeed)
-
     parser::CSbsParser const          m_parser;  ///< Parser to unpack response from Client
     concurrent::CWorkerThread<String> m_worker;
 
@@ -52,7 +50,6 @@ public:
      */
     CSbsFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
              s32 maxHeight_);
-    ~CSbsFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.

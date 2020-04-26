@@ -37,8 +37,6 @@ namespace vfrb::feed
  */
 class CAprscFeed : public IFeed
 {
-    NOT_COPYABLE(CAprscFeed)
-
     CTCONST LOG_PREFIX = "(AprscFeed) ";
 
     parser::CAprsParser const         m_parser;  ///< Parser to unpack response from Client
@@ -54,7 +52,6 @@ public:
      */
     CAprscFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
                s32 maxHeight_);
-    ~CAprscFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.

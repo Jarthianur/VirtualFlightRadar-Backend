@@ -25,6 +25,7 @@
 #include <utility>
 
 #include "error/IError.hpp"
+#include "util/class_utils.hpp"
 
 namespace vfrb::concurrent
 {
@@ -42,21 +43,16 @@ class CGuardedThread
     void init(FnT&& fn_);
 
 public:
-    CGuardedThread() = default;
+    NOT_COPYABLE(CGuardedThread)
+    MOVABLE(CGuardedThread)
 
-    CGuardedThread(CGuardedThread const&) = delete;
+    CGuardedThread() = default;
 
     /// @param fn_ The function to run
     template<typename FnT>
     explicit CGuardedThread(FnT&& fn_);
 
     ~CGuardedThread() noexcept;
-
-    CGuardedThread(CGuardedThread&& other_) noexcept;
-
-    CGuardedThread& operator=(CGuardedThread&& other_) noexcept;
-
-    CGuardedThread& operator=(CGuardedThread const&) = delete;
 
     /**
      * Spawn this thread with given function if not done on construction yet.

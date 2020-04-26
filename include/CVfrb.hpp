@@ -54,8 +54,6 @@ namespace vfrb
  */
 class CVfrb
 {
-    NOT_COPYABLE(CVfrb)
-
     SPtr<data::CAircraftData>                  m_aircraftData;    ///< Aircraft container
     SPtr<data::CAtmosphereData>                m_atmosphereData;  ///< Atmospheric data container
     SPtr<data::CGpsData>                       m_gpsData;         ///< GPS data container
@@ -84,7 +82,6 @@ class CVfrb
 
 public:
     explicit CVfrb(SPtr<config::CConfiguration> conf_);  ///< @param config The Configuration
-    ~CVfrb() noexcept = default;
 
     /**
      * @brief The VFRB's main method, runs the VFR-B.

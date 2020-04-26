@@ -42,6 +42,7 @@ template<typename SocketT>
 class CServer
 {
     NOT_COPYABLE(CServer)
+    NOT_MOVABLE(CServer)
 
     static str const      LOG_PREFIX;
     static CLogger const& s_logger;

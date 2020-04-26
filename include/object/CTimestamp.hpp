@@ -44,7 +44,8 @@ class CTimestamp
     u32 m_day   = 0;  ///< Incremental day number
 
 public:
-    COPYABLE_BUT_NOT_MOVABLE(CTimestamp)
+    DEFAULT_COPYABLE(CTimestamp)
+    COPY_ON_MOVE(CTimestamp)
 
     CTimestamp() = default;
 

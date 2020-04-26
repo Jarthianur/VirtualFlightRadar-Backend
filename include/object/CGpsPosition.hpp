@@ -57,7 +57,8 @@ class CGpsPosition : public CObject
     bool canUpdate(CObject const& other_) const override;
 
 public:
-    COPYABLE_BUT_NOT_MOVABLE(CGpsPosition)
+    DEFAULT_COPYABLE(CGpsPosition)
+    COPY_ON_MOVE(CGpsPosition)
 
     CTCONST MAX_GEOID = 86.0;
     CTCONST MIN_GEOID = -108.0;

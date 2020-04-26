@@ -34,8 +34,6 @@ namespace vfrb
 /// Application wide logger
 class CLogger
 {
-    NOT_COPYABLE(CLogger)
-
     /// Log levels
     enum class ELevel : enum_type
     {
@@ -70,8 +68,6 @@ class CLogger
     CLogger() = default;
 
 public:
-    ~CLogger() noexcept = default;
-
     /**
      * Get the logger instance.
      * @return the logger

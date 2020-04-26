@@ -35,7 +35,8 @@ class CSocketBoost
     boost::asio::ip::tcp::socket m_socket;  ///< Underlying socket
 
 public:
-    MOVABLE_BUT_NOT_COPYABLE(CSocketBoost)
+    MOVABLE(CSocketBoost)
+    NOT_COPYABLE(CSocketBoost)
 
     explicit CSocketBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) sock_);
     ~CSocketBoost() noexcept;

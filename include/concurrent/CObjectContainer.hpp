@@ -77,7 +77,8 @@ class CObjectContainer<ObjectT, StringSize>::CValueType
     Mutex mutable m_mutex;  ///< Locked when this element is accessed
 
 public:
-    MOVABLE_BUT_NOT_COPYABLE(CValueType)
+    MOVABLE(CValueType)
+    NOT_COPYABLE(CValueType)
 
     CValueType(ObjectT&& val_);
     ~CValueType() noexcept = default;
@@ -94,7 +95,8 @@ class CObjectContainer<ObjectT, StringSize>::CIterator
     CObjectContainer const&          m_container;  ///< The container where elements belong to
 
 public:
-    MOVABLE_BUT_NOT_COPYABLE(CIterator)
+    MOVABLE(CIterator)
+    NOT_COPYABLE(CIterator)
 
     explicit CIterator(CObjectContainer& c_);
     CIterator(typename ContainerType::iterator iter_, CObjectContainer const& c_);

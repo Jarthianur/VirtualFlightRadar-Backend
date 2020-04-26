@@ -34,7 +34,7 @@ list(REMOVE_ITEM vfrb_test_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
 list(REMOVE_ITEM vfrb_test_sources ${PROJECT_SOURCE_DIR}/src/object/impl/DateTimeImplBoost.cpp)
 
 set(CMAKE_BUILD_TYPE staged)
-set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Wshadow -Werror -Wno-error=attributes")
+set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror -Wno-error=attributes")
 
 if(DEFINED BOOST_STATIC)
     message(STATUS "Linking boost statically")

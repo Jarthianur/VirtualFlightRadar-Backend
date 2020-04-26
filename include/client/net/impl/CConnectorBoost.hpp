@@ -26,7 +26,6 @@
 #include <boost/system/error_code.hpp>
 
 #include "client/net/IConnector.hpp"
-#include "util/class_utils.hpp"
 
 namespace vfrb::client::net
 {
@@ -35,8 +34,6 @@ namespace vfrb::client::net
  */
 class CConnectorBoost : public IConnector
 {
-    NOT_COPYABLE(CConnectorBoost)
-
     boost::asio::io_context        m_ioCtx;     ///< Internal IO-service
     boost::asio::ip::tcp::socket   m_socket;    ///< Connection socket
     boost::asio::ip::tcp::resolver m_resolver;  ///< Host resolver
@@ -89,7 +86,6 @@ class CConnectorBoost : public IConnector
 
 public:
     CConnectorBoost();
-    ~CConnectorBoost() noexcept override = default;
 
     /**
      * @brief Run the internal event handler queue.

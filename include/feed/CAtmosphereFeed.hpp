@@ -36,8 +36,6 @@ namespace vfrb::feed
  */
 class CAtmosphereFeed : public IFeed
 {
-    NOT_COPYABLE(CAtmosphereFeed)
-
     parser::CAtmosphereParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
@@ -48,7 +46,6 @@ public:
      * @throw std::logic_error from parent constructor
      */
     CAtmosphereFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAtmosphereData> data_);
-    ~CAtmosphereFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.

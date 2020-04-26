@@ -68,6 +68,7 @@ using ClientIter = ClientSet::iterator;
 class CClientManager
 {
     NOT_COPYABLE(CClientManager)
+    NOT_MOVABLE(CClientManager)
 
     concurrent::Mutex mutable m_mutex;
     ClientSet                GUARDED_BY(m_mutex) m_clients;   ///< Set of clients

@@ -41,7 +41,8 @@ class CAtmosphere : public CObject
     void assign(CObject&& other_) override;
 
 public:
-    MOVABLE_BUT_NOT_COPYABLE(CAtmosphere)
+    MOVABLE(CAtmosphere)
+    NOT_COPYABLE(CAtmosphere)
 
     CAtmosphere() = default;
 

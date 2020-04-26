@@ -70,6 +70,7 @@ namespace vfrb::concurrent
 class CAPABILITY("mutex") Mutex
 {
     NOT_COPYABLE(Mutex)
+    NOT_MOVABLE(Mutex)
 
     std::mutex m_mutex;
 
@@ -98,6 +99,7 @@ public:
 class SCOPED_CAPABILITY LockGuard
 {
     NOT_COPYABLE(LockGuard)
+    NOT_MOVABLE(LockGuard)
 
     std::lock_guard<Mutex> m_lock;
 

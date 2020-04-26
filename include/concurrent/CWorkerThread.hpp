@@ -41,6 +41,7 @@ template<typename DataT>
 class CWorkerThread
 {
     NOT_COPYABLE(CWorkerThread)
+    NOT_MOVABLE(CWorkerThread)
 
     CTCONST POLL_TIME = 200;
 

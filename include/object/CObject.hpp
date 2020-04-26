@@ -52,7 +52,8 @@ protected:
     virtual bool canUpdate(CObject const& other_) const;
 
 public:
-    COPYABLE_BUT_NOT_MOVABLE(CObject)
+    DEFAULT_COPYABLE(CObject)
+    COPY_ON_MOVE(CObject)
 
     CTCONST OUTDATED = 4;  ///< Cycles until an object is considered outdated
 

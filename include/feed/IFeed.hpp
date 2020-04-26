@@ -40,6 +40,7 @@ namespace vfrb::feed
 class IFeed
 {
     NOT_COPYABLE(IFeed)
+    NOT_MOVABLE(IFeed)
 
     /**
      * @brief Initialize the priority from the given properties.

@@ -34,7 +34,8 @@ class CWind : public CObject
     String m_nmea;  ///< The NMEA string
 
 public:
-    MOVABLE_BUT_NOT_COPYABLE(CWind)
+    MOVABLE(CWind)
+    NOT_COPYABLE(CWind)
 
     CWind() = default;
 

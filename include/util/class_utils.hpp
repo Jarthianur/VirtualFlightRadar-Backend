@@ -27,27 +27,36 @@
  * Make a class non copyable.
  * @param TYPE The classname
  */
-#define NOT_COPYABLE(TYPE)                 \
-    TYPE(TYPE const&) = delete;            \
-    TYPE& operator=(TYPE const&) = delete; \
-    TYPE(TYPE&&)                 = delete; \
+#define NOT_COPYABLE(TYPE)      \
+    TYPE(TYPE const&) = delete; \
+    TYPE& operator=(TYPE const&) = delete;
+
+#define NOT_MOVABLE(TYPE)   \
+    TYPE(TYPE&&)  = delete; \
     TYPE& operator=(TYPE&&) noexcept = delete;
 
 /**
  * Make a class non copyable, but movable.
  * @param TYPE The classname
  */
-#define MOVABLE_BUT_NOT_COPYABLE(TYPE)     \
-    TYPE(TYPE const&) = delete;            \
-    TYPE& operator=(TYPE const&) = delete; \
-    TYPE(TYPE&&) noexcept;                 \
+#define MOVABLE(TYPE)      \
+    TYPE(TYPE&&) noexcept; \
     TYPE& operator=(TYPE&&) noexcept;
 
-#define COPYABLE_BUT_NOT_MOVABLE(TYPE)      \
-    TYPE(TYPE const&) = default;            \
-    TYPE& operator=(TYPE const&) = default; \
-    TYPE(TYPE&&) noexcept        = delete;  \
-    TYPE& operator=(TYPE&&) noexcept = delete;
+#define COPYABLE(TYPE) \
+    TYPE(TYPE const&); \
+    TYPE& operator=(TYPE const&);
+
+#define DEFAULT_COPYABLE(TYPE)   \
+    TYPE(TYPE const&) = default; \
+    TYPE& operator=(TYPE const&) = default;
+
+#define COPY_ON_MOVE(TYPE)                 \
+    TYPE(TYPE&& o_) noexcept : TYPE(o_){}; \
+    TYPE& operator=(TYPE&& o_) noexcept {  \
+        this->operator=(o_);               \
+        return *this;                      \
+    };
 
 #define CTCONST inline static constexpr auto const
 

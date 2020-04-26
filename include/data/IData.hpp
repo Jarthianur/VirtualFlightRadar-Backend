@@ -52,6 +52,7 @@ protected:
 
 public:
     NOT_COPYABLE(IData)
+    NOT_MOVABLE(IData)
 
     explicit IData(AccessFn&& fn_) : m_accessFn(std::move(fn_)) {}
     virtual ~IData() noexcept = default;

@@ -42,6 +42,7 @@ class IAcceptor
 {
 public:
     NOT_COPYABLE(IAcceptor)
+    NOT_MOVABLE(IAcceptor)
 
     using Callback = std::function<void(bool)>;
 

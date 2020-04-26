@@ -61,11 +61,11 @@ public:
 };
 }  // namespace error
 
-usize constexpr len(str s_) {
+usize constexpr inline len(str s_) {
     return *s_ ? 1 + len(s_ + 1) : 0;
 }
 
-usize len(String const& s_) {
+usize inline len(String const& s_) {
     return s_.length();
 }
 

@@ -30,8 +30,6 @@ namespace vfrb::client
  */
 class CAprscClient : public IClient
 {
-    NOT_COPYABLE(CAprscClient)
-
     CTCONST KEEPALIVE_INTERVAL = 600;
 
     String const m_login;  ///< Login string
@@ -70,7 +68,6 @@ public:
      * @param connector The Connector interface
      */
     CAprscClient(net::SEndpoint const& ep_, String const& login_, SPtr<net::IConnector> con_);
-    ~CAprscClient() noexcept override = default;
 
     bool  Equals(IClient const& other_) const override;
     usize Hash() const override;

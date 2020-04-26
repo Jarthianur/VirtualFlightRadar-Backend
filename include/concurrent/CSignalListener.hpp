@@ -38,6 +38,7 @@ using SignalHandler = std::function<void(boost::system::error_code const&, int c
 class CSignalListener
 {
     NOT_COPYABLE(CSignalListener)
+    NOT_MOVABLE(CSignalListener)
 
     boost::asio::io_service m_ioService;  ///< Internal IO-service
     boost::asio::signal_set m_sigSet;     ///< Internal signal set

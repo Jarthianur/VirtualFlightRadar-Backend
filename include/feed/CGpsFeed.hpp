@@ -36,8 +36,6 @@ namespace vfrb::feed
  */
 class CGpsFeed : public IFeed
 {
-    NOT_COPYABLE(CGpsFeed)
-
     parser::CGpsParser const m_parser;  ///< Parser to unpack response from Client
 
 public:
@@ -48,7 +46,6 @@ public:
      * @throw std::logic_error from parent constructor
      */
     CGpsFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CGpsData> data_);
-    ~CGpsFeed() noexcept override = default;
 
     /**
      * @brief Get this feeds Protocol.

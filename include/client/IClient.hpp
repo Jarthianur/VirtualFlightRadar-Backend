@@ -42,6 +42,7 @@ namespace vfrb::client
 class IClient
 {
     NOT_COPYABLE(IClient)
+    NOT_MOVABLE(IClient)
 
 protected:
     enum class EState : enum_type

@@ -49,6 +49,7 @@ class IConnector
 {
 public:
     NOT_COPYABLE(IConnector)
+    NOT_MOVABLE(IConnector)
 
     IConnector()                   = default;
     virtual ~IConnector() noexcept = default;

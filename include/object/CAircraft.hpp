@@ -36,7 +36,8 @@ class CAircraft : public CObject
     CTCONST ID_SIZE = 8;  ///< Size allocated for ID
 
 public:
-    COPYABLE_BUT_NOT_MOVABLE(CAircraft)
+    DEFAULT_COPYABLE(CAircraft)
+    COPY_ON_MOVE(CAircraft)
 
     CTCONST ID_LEN = 6;  ///< Length of the ID
 

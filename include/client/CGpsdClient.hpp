@@ -29,8 +29,6 @@ namespace vfrb::client
  */
 class CGpsdClient : public IClient
 {
-    NOT_COPYABLE(CGpsdClient)
-
     /**
      * @brief Send unwatch-request and stop this client.
      */
@@ -57,6 +55,5 @@ public:
      * @param connector The Connector interface
      */
     CGpsdClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
-    ~CGpsdClient() noexcept override = default;
 };
 }  // namespace vfrb::client

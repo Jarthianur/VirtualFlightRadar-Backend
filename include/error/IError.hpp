@@ -38,6 +38,6 @@ public:
      * Get the message for this error.
      * @return the error message
      */
-    virtual str Message() const noexcept = 0;
+    [[nodiscard]] virtual str Message() const noexcept = 0;
 };
 }  // namespace vfrb::error

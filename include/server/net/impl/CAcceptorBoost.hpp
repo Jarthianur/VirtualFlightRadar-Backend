@@ -39,6 +39,7 @@ namespace vfrb::server::net
 class CAcceptorBoost : public IAcceptor<CSocketBoost>
 {
     NOT_COPYABLE(CAcceptorBoost)
+    NOT_MOVABLE(CAcceptorBoost)
 
     boost::asio::io_service        m_ioService;  ///< Internal IO-service
     boost::asio::ip::tcp::acceptor m_acceptor;   ///< Internal acceptor

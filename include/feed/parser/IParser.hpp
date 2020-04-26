@@ -36,6 +36,7 @@ class IParser
 {
 public:
     NOT_COPYABLE(IParser)
+    NOT_MOVABLE(IParser)
 
     IParser()                   = default;
     virtual ~IParser() noexcept = default;

@@ -32,6 +32,7 @@ namespace vfrb::concurrent
 class CThreadGroup
 {
     NOT_COPYABLE(CThreadGroup)
+    NOT_MOVABLE(CThreadGroup)
 
     std::list<CGuardedThread> m_threads;  ///< The grouped threads
 
