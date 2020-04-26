@@ -1,39 +1,33 @@
 /*
- Copyright_License {
+    Copyright (C) 2016 Jarthianur
+    A detailed list of copyright holders can be found in the file "docs/AUTHORS.md".
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
- A detailed list of copyright holders can be found in the file "AUTHORS".
+    This file is part of VirtualFlightRadar-Backend.
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License version 3
- as published by the Free Software Foundation.
+    VirtualFlightRadar-Backend is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+    VirtualFlightRadar-Backend is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- }
- */
+    You should have received a copy of the GNU General Public License
+    along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #pragma once
 
-#include <charconv>
-#include <limits>
 #include <regex>
 #include <tuple>
-#include <type_traits>
 
 #include <boost/spirit/include/qi.hpp>
 
-#include "error/Error.hpp"
+#include "error/IError.hpp"
 
-#include "class_utils.h"
-#include "types.h"
-#include "utility.hpp"
+#include "class_utils.hpp"
 
 namespace vfrb
 {
@@ -61,69 +55,23 @@ namespace error
 class CConversionError : public vfrb::error::IError
 {
 public:
-    CConversionError()                    = default;
-    ~CConversionError() noexcept override = default;
-
-    char const* Message() const noexcept override
-    {
+    str Message() const noexcept override {
         return "conversion failed";
     }
 };
 }  // namespace error
 
-/**
- * Compute checksum of nmea string.
- * @param sv_  The string
- * @param pos_ The index to start from
- * @return the checksum
- */
-inline s32 Checksum(StrView const& sv_, usize pos_)
-{
-    s32   csum = 0;
-    usize i    = 1 + pos_;  // $ in nmea str not included
-    while (i < sv_.length() && sv_[i] != '*')
-    {
-        csum ^= static_cast<s32>(sv_[i++]);
-    }
-    return csum;
-}
-
-/**
- * Find the checksum in a nmea string and compare it against the computed one.
- * @param sv_ The string
- * @return true if equal, else false
- */
-inline bool MatchChecksum(StrView const& sv_)
-{
-    auto const cs_begin = sv_.rfind('*');
-    if (cs_begin == StrView::npos || cs_begin + 3 >= sv_.length())
-    {
-        return false;
-    }
-    s32  csum;
-    bool match = false;
-    if (auto [p, ec] = std::from_chars(sv_.data() + cs_begin + 1, sv_.data() + sv_.length(), csum, 16);
-        ec == std::errc())
-    {
-        match = csum == Checksum(sv_, 0);
-    }
-    return match;
-}
-
-usize constexpr len(char const* s_)
-{
+usize constexpr inline len(str s_) {
     return *s_ ? 1 + len(s_ + 1) : 0;
 }
 
-usize len(Str const& s_)
-{
+usize inline len(String const& s_) {
     return s_.length();
 }
 
 template<typename... Args>
-Str MakeStr(Args&&... args_)
-{
-    Str s;
+String MakeStr(Args&&... args_) {
+    String s;
     s.reserve((0 + ... + len(args_)));
     return (s + ... + args_);
 }
@@ -135,12 +83,10 @@ Str MakeStr(Args&&... args_)
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, f64))>
-Result<T> Convert(char const* first_, char const* last_)
-{
+Result<T> Convert(str first_, str last_) {
     T     result;
     EErrc ec = EErrc::OK;
-    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::double_, result) || first_ != last_)
-    {
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::double_, result) || first_ != last_) {
         ec = EErrc::ERR;
     }
     return {result, ec};
@@ -153,12 +99,10 @@ Result<T> Convert(char const* first_, char const* last_)
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, s32))>
-Result<T> Convert(char const* first_, char const* last_)
-{
+Result<T> Convert(str first_, str last_) {
     T     result;
     EErrc ec = EErrc::OK;
-    if (auto [p, e] = std::from_chars(first_, last_, result); e != std::errc())
-    {
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::int_, result) || first_ != last_) {
         ec = EErrc::ERR;
     }
     return {result, ec};
@@ -171,12 +115,10 @@ Result<T> Convert(char const* first_, char const* last_)
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, u32))>
-Result<T> Convert(char const* first_, char const* last_)
-{
+Result<T> Convert(str first_, str last_) {
     T     result;
     EErrc ec = EErrc::OK;
-    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::uint_, result) || first_ != last_)
-    {
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::uint_, result) || first_ != last_) {
         ec = EErrc::ERR;
     }
     return {result, ec};
@@ -189,12 +131,10 @@ Result<T> Convert(char const* first_, char const* last_)
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, u64))>
-Result<T> Convert(char const* first_, char const* last_)
-{
+Result<T> Convert(str first_, str last_) {
     T     result;
     EErrc ec = EErrc::OK;
-    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ulong_, result) || first_ != last_)
-    {
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ulong_, result) || first_ != last_) {
         ec = EErrc::ERR;
     }
     return {result, ec};
@@ -207,12 +147,12 @@ Result<T> Convert(char const* first_, char const* last_)
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, x32))>
-Result<s32> Convert(char const* first_, char const* last_)
-{
-    s32   result;
-    EErrc ec = EErrc::OK;
-    if (auto [p, e] = std::from_chars(first_, last_, result, 16); e != std::errc())
-    {
+Result<u32> Convert(str first_, str last_) {
+    static thread_local const boost::spirit::qi::int_parser<u32, 16> hex = {};
+
+    u32   result = 0;
+    EErrc ec     = EErrc::OK;
+    if (!boost::spirit::qi::parse(first_, last_, hex, result) || first_ != last_) {
         ec = EErrc::ERR;
     }
     return {result, ec};
@@ -225,12 +165,10 @@ Result<s32> Convert(char const* first_, char const* last_)
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, s8))>
-Result<T> Convert(char const* first_, char const* last_)
-{
+Result<T> Convert(str first_, str last_) {
     T     result;
     EErrc ec = EErrc::OK;
-    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::byte_, result) || first_ != last_)
-    {
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::byte_, result) || first_ != last_) {
         ec = EErrc::ERR;
     }
     return {result, ec};
@@ -243,8 +181,7 @@ Result<T> Convert(char const* first_, char const* last_)
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, u8))>
-Result<T> Convert(char const* first_, char const* last_)
-{
+Result<T> Convert(str first_, str last_) {
     auto [v, ec] = Convert<s8>(first_, last_);
     return {static_cast<u8>(v), ec};
 }
@@ -256,12 +193,10 @@ Result<T> Convert(char const* first_, char const* last_)
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, u16))>
-Result<T> Convert(char const* first_, char const* last_)
-{
+Result<T> Convert(str first_, str last_) {
     T     result;
     EErrc ec = EErrc::OK;
-    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_)
-    {
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_) {
         ec = EErrc::ERR;
     }
     return {result, ec};
@@ -276,8 +211,7 @@ Result<T> Convert(char const* first_, char const* last_)
  * @return the resulting error code
  */
 template<typename T>
-EErrc Convert(char const* first_, char const* last_, T& dest_)
-{
+EErrc Convert(str first_, str last_, T& dest_) {
     auto [v, ec] = Convert<T>(first_, last_);
     dest_        = v;
     return ec;
@@ -291,10 +225,8 @@ EErrc Convert(char const* first_, char const* last_, T& dest_)
  * @throw vfrb::str_util::error::CConversionError
  */
 template<typename T>
-auto Parse(std::csub_match const& sub_)
-{
-    if (auto [v, ec] = Convert<T>(sub_.first, sub_.second); ec == EErrc::OK)
-    {
+auto Parse(std::csub_match const& sub_) {
+    if (auto [v, ec] = Convert<T>(sub_.first, sub_.second); ec == EErrc::OK) {
         return v;
     }
     throw error::CConversionError();
@@ -308,10 +240,8 @@ auto Parse(std::csub_match const& sub_)
  * @throw vfrb::str_util::error::CConversionError
  */
 template<typename T>
-auto Parse(Str const& str_)
-{
-    if (auto [v, ec] = Convert<T>(str_.c_str(), str_.c_str() + str_.size()); ec == EErrc::OK)
-    {
+auto Parse(String const& str_) {
+    if (auto [v, ec] = Convert<T>(str_.c_str(), str_.c_str() + str_.size()); ec == EErrc::OK) {
         return v;
     }
     throw error::CConversionError();
@@ -322,9 +252,8 @@ auto Parse(Str const& str_)
  * @param sub_ The sub match
  * @return the string view
  */
-inline StrView AsStrView(std::csub_match const& sub_)
-{
-    return StrView(sub_.first, static_cast<usize>(sub_.second - sub_.first));
+inline StringView AsStrView(std::csub_match const& sub_) {
+    return StringView(sub_.first, static_cast<usize>(sub_.second - sub_.first));
 }
 
 /**
@@ -333,8 +262,39 @@ inline StrView AsStrView(std::csub_match const& sub_)
  * @param s_   The character sequence
  * @return true if equal, else false
  */
-inline bool operator==(std::csub_match const& sub_, char const* cstr_)
-{
+inline bool operator==(std::csub_match const& sub_, str cstr_) {
     return AsStrView(sub_) == cstr_;
+}
+
+/**
+ * Compute checksum of nmea string.
+ * @param sv_  The string
+ * @param pos_ The index to start from
+ * @return the checksum
+ */
+inline u32 Checksum(StringView const& sv_, usize pos_) {
+    u32   csum = 0;
+    usize i    = 1 + pos_;  // $ in nmea str not included
+    while (i < sv_.length() && sv_[i] != '*') {
+        csum ^= static_cast<u32>(sv_[i++]);
+    }
+    return csum;
+}
+
+/**
+ * Find the checksum in a nmea string and compare it against the computed one.
+ * @param sv_ The string
+ * @return true if equal, else false
+ */
+inline bool MatchChecksum(StringView const& sv_) {
+    auto const cs_begin = sv_.rfind('*');
+    if (cs_begin == StringView::npos || cs_begin + 3 >= sv_.length()) {
+        return false;
+    }
+    bool match = false;
+    if (auto [v, ec] = Convert<x32>(sv_.data() + cs_begin + 1, sv_.data() + sv_.length()); ec == EErrc::OK) {
+        match = (v == Checksum(sv_, 0));
+    }
+    return match;
 }
 }  // namespace vfrb::str_util
