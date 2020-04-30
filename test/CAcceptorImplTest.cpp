@@ -18,13 +18,12 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "AcceptorImplTest.h"
-
 #include <thread>
 
-#include "server/Connection.hpp"
+#include "server/CConnection.hpp"
 
-#include "SocketImplTest.h"
+#include "CAcceptorImplTest.hpp"
+#include "CSocketImplTest.hpp"
 
 namespace vfrb
 {
@@ -34,65 +33,53 @@ namespace net
 {
 CAcceptorImplTest::CAcceptorImplTest(bool failConnect_) : m_fail(failConnect_) {}
 
-void CAcceptorImplTest::Run()
-{
-    while (!m_stopped)
-    {
+void CAcceptorImplTest::Run() {
+    while (!m_stopped) {
         std::this_thread::yield();
     }
     m_sockets.clear();
 }
 
-void CAcceptorImplTest::Stop()
-{
+void CAcceptorImplTest::Stop() {
     m_stopped = true;
 }
 
-void CAcceptorImplTest::OnAccept(Callback&& cb_)
-{
+void CAcceptorImplTest::OnAccept(Callback&& cb_) {
     m_onAcceptFn = std::move(cb_);
 }
 
-void CAcceptorImplTest::Close()
-{
+void CAcceptorImplTest::Close() {
     m_sockets.pop_back();
 }
 
-CConnection<CSocketImplTest> CAcceptorImplTest::StartConnection()
-{
-    if (m_fail)
-    {
-        throw net::error::CSocketError();
+CConnection<CSocketImplTest> CAcceptorImplTest::StartConnection() {
+    if (m_fail) {
+        throw net::error::CSocketError("");
     }
     return CConnection<CSocketImplTest>(std::move(m_sockets.back().first));  // copy
 }
 
-Str CAcceptorImplTest::StagedAddress() const
-{
+String CAcceptorImplTest::StagedAddress() const {
     return m_stagedAddress;
 }
 
-usize CAcceptorImplTest::Connect(Str const& addr_, bool failAccept_, bool failWrite_)
-{
+usize CAcceptorImplTest::Connect(String const& addr_, bool failAccept_, bool failWrite_) {
     m_stagedAddress = addr_;
-    auto buf        = std::make_shared<Str>("");
+    auto buf        = std::make_shared<String>("");
     m_sockets.push_back(std::make_pair(CSocketImplTest(addr_, buf, failWrite_), buf));
     m_onAcceptFn(failAccept_);  // false => no error
     return m_sockets.size() - 1;
 }
 
-auto CAcceptorImplTest::Socket(usize i_) const -> CSocketImplTest const&
-{
+auto CAcceptorImplTest::Socket(usize i_) const -> CSocketImplTest const& {
     return m_sockets.at(i_).first;
 }
 
-auto CAcceptorImplTest::Buffer(usize i_) const -> Str const&
-{
+auto CAcceptorImplTest::Buffer(usize i_) const -> String const& {
     return *m_sockets.at(i_).second;
 }
 
-usize CAcceptorImplTest::Sockets() const
-{
+usize CAcceptorImplTest::Sockets() const {
     return m_sockets.size();
 }
 }  // namespace net

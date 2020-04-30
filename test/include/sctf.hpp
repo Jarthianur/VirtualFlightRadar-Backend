@@ -1,21 +1,20 @@
 /*
-    Copyright (C) 2016 Jarthianur
-    A detailed list of copyright holders can be found in the file "docs/AUTHORS.md".
+    Copyright (C) 2017 Jarthianur
 
-    This file is part of VirtualFlightRadar-Backend.
+    This file is part of simple-cpp-test-framework.
 
-    VirtualFlightRadar-Backend is free software: you can redistribute it and/or modify
+    simple-cpp-test-framework is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    VirtualFlightRadar-Backend is distributed in the hope that it will be useful,
+    simple-cpp-test-framework is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
+    along with simple-cpp-test-framework.  If not, see <https://www.gnu.org/licenses/>.
 */
 #ifndef SCTF_RELEASE_SCTF_HPP
 #define SCTF_RELEASE_SCTF_HPP
@@ -925,7 +924,7 @@ void sctf_intern_##FN##_fn_()
 #endif// SCTF_API_HPP
 #ifndef SCTF_SCTF_HPP
 #define SCTF_SCTF_HPP
-#define SCFT_VERSION "2.0-rc1"
+#define SCFT_VERSION "2.0-rc2"
 #define SCTF_DEFAULT_MAIN(R) \
 int main(int, char**) { return static_cast<int>(sctf::R->report()); }
 #endif// SCTF_SCTF_HPP

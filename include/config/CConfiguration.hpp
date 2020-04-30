@@ -28,7 +28,7 @@
 #include "object/CGpsPosition.hpp"
 
 #include "CProperties.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::config
 {

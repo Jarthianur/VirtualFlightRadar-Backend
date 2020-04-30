@@ -26,7 +26,7 @@
 
 #include "error/IError.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::config
 {

@@ -18,20 +18,7 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Logger.hpp"
 #include "helper.hpp"
 
-using namespace sctf;
-
-extern void test_math();
-extern void test_utility();
-extern void test_string_utils();
-
-void dispatch()
-{
-    test_math();
-    test_utility();
-    test_string_utils();
-}
-
-SCTF_DEFAULT_MAIN(create_console_reporter(true), dispatch())
+SCTF_EPSILON(0.000001)
+SCTF_DEFAULT_MAIN(console_reporter::create(std::cout, true, true))

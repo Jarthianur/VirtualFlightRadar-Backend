@@ -18,9 +18,9 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "SocketImplTest.h"
+#include "CSocketImplTest.hpp"
 
-#include "server/net/error/SocketError.h"
+#include "server/net/error/CSocketError.hpp"
 
 namespace vfrb
 {
@@ -28,32 +28,26 @@ namespace server
 {
 namespace net
 {
-CSocketImplTest::CSocketImplTest(CSocketImplTest&& other_)
-    : m_buffer(other_.m_buffer), m_address(other_.m_address), m_failWrite(other_.m_failWrite)
-{}
+CSocketImplTest::CSocketImplTest(CSocketImplTest&& other_) noexcept
+    : m_buffer(other_.m_buffer), m_address(other_.m_address), m_failWrite(other_.m_failWrite) {}
 
-CSocketImplTest& CSocketImplTest::operator=(CSocketImplTest&& other_)
-{
+CSocketImplTest& CSocketImplTest::operator=(CSocketImplTest&& other_) noexcept {
     m_address   = other_.m_address;
     m_buffer    = other_.m_buffer;
     m_failWrite = other_.m_failWrite;
     return *this;
 }
 
-CSocketImplTest::CSocketImplTest(Str const& addr_, SPtr<Str> buf_, bool fail_)
-    : m_buffer(buf_), m_address(addr_), m_failWrite(fail_)
-{}
+CSocketImplTest::CSocketImplTest(String const& addr_, SPtr<String> buf_, bool fail_)
+    : m_buffer(buf_), m_address(addr_), m_failWrite(fail_) {}
 
-Str CSocketImplTest::Address() const
-{
+String CSocketImplTest::Address() const {
     return m_address;
 }
 
-bool CSocketImplTest::Write(StrView const& msg_)
-{
-    if (m_failWrite)
-    {
-        throw error::CSocketError();
+bool CSocketImplTest::Write(StringView const& msg_) {
+    if (m_failWrite) {
+        throw error::CSocketError("");
     }
     m_buffer->clear();
     m_buffer->append(msg_);

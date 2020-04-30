@@ -18,26 +18,26 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "util/bounds.hpp"
 #include "util/string_utils.hpp"
 #include "util/utility.hpp"
 
 #include "helper.hpp"
+#include "sctf.hpp"
 
 using namespace sctf;
 using namespace vfrb;
 using namespace util;
 using namespace str_util;
 
-void test_utility()
-{
-    suite("utility")->test("FailOutsideBounds", [] {
+SUITE_PAR("test_bounds") {
+    TEST("FailOutsideBounds") {
         ASSERT_NOTHROW(FailOutsideBounds(1., 2., 3.));
-        ASSERT_THROWS(FailOutsideBounds(0., 2., 3.), util::error::CLimitsExceededError);
-    });
-}
+        ASSERT_THROWS(FailOutsideBounds(0., 2., 3.), util::error::CBoundsExceededError);
+    };
+};
 
-void test_string_utils()
-{
+void test_string_utils() {
     suite_par("string_utils")
         ->test("Checksum",
                [] {

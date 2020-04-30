@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include "server/net/Acceptor.hpp"
-#include "util/class_utils.h"
+#include "server/net/IAcceptor.hpp"
+#include "util/class_utils.hpp"
 
 namespace vfrb
 {
@@ -33,13 +33,14 @@ class CSocketImplTest;
 
 class CAcceptorImplTest : public IAcceptor<CSocketImplTest>
 {
+    NOT_MOVABLE(CAcceptorImplTest)
     NOT_COPYABLE(CAcceptorImplTest)
 
-    std::function<void(bool)>                          m_onAcceptFn;
-    Str                                                m_stagedAddress;
-    bool                                               m_stopped = false;
-    bool                                               m_fail    = false;
-    std::vector<std::pair<CSocketImplTest, SPtr<Str>>> m_sockets;
+    std::function<void(bool)>                             m_onAcceptFn;
+    String                                                m_stagedAddress;
+    bool                                                  m_stopped = false;
+    bool                                                  m_fail    = false;
+    std::vector<std::pair<CSocketImplTest, SPtr<String>>> m_sockets;
 
 public:
     explicit CAcceptorImplTest(bool failConnect_);
@@ -51,11 +52,11 @@ public:
     void Close() override;
 
     CConnection<CSocketImplTest> StartConnection() override;
-    Str                          StagedAddress() const override;
+    String                       StagedAddress() const override;
 
-    usize Connect(Str const& addr_, bool failAccept_, bool failWrite_);
+    usize Connect(String const& addr_, bool failAccept_, bool failWrite_);
     auto  Socket(usize i_) const -> CSocketImplTest const&;
-    auto  Buffer(usize i_) const -> Str const&;
+    auto  Buffer(usize i_) const -> String const&;
     usize Sockets() const;
 };
 }  // namespace net

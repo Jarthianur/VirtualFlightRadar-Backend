@@ -22,7 +22,7 @@
 
 #include <exception>
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::error
 {

@@ -20,9 +20,9 @@
 
 #pragma once
 
-#include "util/class_utils.h"
+#include "util/class_utils.hpp"
 
-#include "types.h"
+#include "types.hpp"
 
 namespace vfrb
 {
@@ -32,19 +32,20 @@ namespace net
 {
 class CSocketImplTest
 {
-    SPtr<Str> m_buffer;
-    Str       m_address;
-    bool      m_failWrite = false;
+    SPtr<String> m_buffer;
+    String       m_address;
+    bool         m_failWrite = false;
 
 public:
-    MOVABLE_BUT_NOT_COPYABLE(CSocketImplTest)
+    MOVABLE(CSocketImplTest)
+    NOT_COPYABLE(CSocketImplTest)
 
-    CSocketImplTest(Str const& addr_, SPtr<Str> buf_, bool fail_);
+    CSocketImplTest(String const& addr_, SPtr<String> buf_, bool fail_);
     ~CSocketImplTest() noexcept = default;
 
-    Str  Address() const;
-    bool Write(StrView const& msg_);
-    void Close();
+    String Address() const;
+    bool   Write(StringView const& msg_);
+    void   Close();
 };
 }  // namespace net
 }  // namespace server

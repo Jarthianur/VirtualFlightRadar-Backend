@@ -19,53 +19,65 @@
 */
 
 #include <iterator>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 
 #include <boost/property_tree/ini_parser.hpp>
 
-#include "config/ConfigReader.h"
-#include "config/Configuration.h"
-#include "config/Properties.h"
-#include "util/string_utils.hpp"
+#include "config/CConfigReader.hpp"
+#include "config/CConfiguration.hpp"
+#include "config/CProperties.hpp"
+#include "util/StringUtils.hpp"
 
-#include "helper.hpp"
+#include "Helper.hpp"
+#include "sctf.hpp"
 
 using namespace sctf;
 using namespace vfrb;
 using namespace str_util;
 using namespace config;
 
-TEST_MODULE_PAR(test_Properties, {
-    test("Property - default value", [] {
-        boost::property_tree::ptree t;
-        boost::property_tree::read_ini("[main]\nkey=value\n", t);
-        CProperties p(std::move(t));
-        ASSERT_EQUALS(p.Property("main.key", "default"), "value");
-        ASSERT_EQUALS(p.Property("main.nokey", "default"), "default");
-        ASSERT_EQUALS(p.Property("nosect.nokey", "default"), "default");
-    });
-    test("Property", [] {
-        boost::property_tree::ptree t;
-        boost::property_tree::read_ini("[main]\nkey=value\n", t);
-        CProperties p(std::move(t));
-        ASSERT_NOTHROW(p.Property("main.key"));
-        ASSERT_EQUALS(p.Property("main.key"), "value");
-        ASSERT_THROWS(p.Property("main.nokey"), config::error::CPropertyNotFoundError);
-        ASSERT_THROWS(p.Property("nosect.nokey"), config::error::CPropertyNotFoundError);
-    });
-    test("Section", [] {
-        boost::property_tree::ptree t;
-        boost::property_tree::read_ini("[main]\nkey=value\n", t);
-        CProperties p(std::move(t));
-        CProperties c;
-        ASSERT_NOTHROW(c = p.Section("main"));
-        ASSERT_EQUALS(c.Property("key"), "value");
-        ASSERT_THROWS(p.Section("nosect"), config::error::CPropertyNotFoundError);
-    });
-})
+DESCRIBE_PAR("test_CProperties") {
+    SPtr<CProperties> uut;
 
-TEST_MODULE_PAR(test_ConfigReader, {
+    SETUP() {
+        boost::property_tree::ptree tree;
+        boost::property_tree::read_ini("[main]\nkey=value\n", tree);
+        uut = std::make_shared<CProperties>(std::move(tree));
+    }
+
+    // Property
+    IT("should return the correct value") {
+        ASSERT_EQ(uut->Property("main.key"), "value");
+    };
+    IT("should return the default value if key does not exist") {
+        ASSERT_EQ(uut->Property("main.nokey", "default"), "default");
+    };
+    IT("should return the default value if section does not exist") {
+        ASSERT_EQ(uut->Property("nosect.nokey", "default"), "default");
+    };
+    IT("should not throw if key exists") {
+        ASSERT_NOTHROW(uut->Property("main.key"));
+    };
+    IT("should throw if key does not exist") {
+        ASSERT_THROWS(uut->Property("main.nokey"), config::error::CPropertyNotFoundError);
+        ASSERT_THROWS(uut->Property("nosect.nokey"), config::error::CPropertyNotFoundError);
+    };
+
+    // Section
+    IT("should return nested properties as section") {
+        ASSERT_EQ(uut->Section("main").Property("key"), "value");
+    };
+    IT("should not throw if section exists") {
+        ASSERT_NOTHROW(uut->Section("main"));
+    };
+    IT("should throw if section does not exist") {
+        ASSERT_THROWS(uut->Section("nosect"), config::error::CPropertyNotFoundError);
+    };
+};
+
+DESCRIBE_PAR("test_CConfigReader") {
     test("read config success", [] {
         std::stringstream conf_in;
         conf_in << "[" << CConfiguration::SECT_KEY_FALLBACK << "]\n"
@@ -141,8 +153,7 @@ TEST_MODULE_PAR(test_Configuration, {
         CConfiguration conf(conf_in);
         Str         valid = MakeStr(CConfiguration::SECT_KEY_WIND, ",", CConfiguration::SECT_KEY_SBS, "1,,");
         std::string result;
-        for (auto const& it : conf.FeedNames)
-        {
+        for (auto const& it : conf.FeedNames) {
             result += it + ",";
         }
         ASSERT_EQUALS(result, valid);
