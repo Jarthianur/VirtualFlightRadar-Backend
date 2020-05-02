@@ -26,8 +26,8 @@
 
 #include "concurrent/Mutex.hpp"
 #include "error/IError.hpp"
-#include "util/class_utils.hpp"
-#include "util/utility.hpp"
+#include "util/ClassUtils.hpp"
+#include "util/Utility.hpp"
 
 namespace vfrb
 {
@@ -63,7 +63,7 @@ class CLogger
      * Get current date and time.
      * @return the date-time
      */
-    String time() const;
+    auto time() const -> String;
 
     CLogger() = default;
 
@@ -72,7 +72,7 @@ public:
      * Get the logger instance.
      * @return the logger
      */
-    static CLogger& Instance();
+    static auto Instance() -> CLogger&;
 
     /**
      * Log with INFO level.
@@ -146,7 +146,7 @@ namespace error
 class COpenLogfileError : public vfrb::error::IError
 {
 public:
-    str Message() const noexcept override;
+    [[nodiscard]] auto Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb

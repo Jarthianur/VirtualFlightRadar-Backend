@@ -36,6 +36,10 @@ list(REMOVE_ITEM vfrb_test_sources ${PROJECT_SOURCE_DIR}/src/object/impl/DateTim
 set(CMAKE_BUILD_TYPE staged)
 set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror -Wno-error=attributes")
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS_STAGED "${CMAKE_CXX_FLAGS_STAGED} -Wthread-safety -Wthread-safety-reference -Wthread-safety-negative")
+endif()
+
 if(DEFINED BOOST_STATIC)
     message(STATUS "Linking boost statically")
     set(Boost_USE_STATIC_LIBS ON)

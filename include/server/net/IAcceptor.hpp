@@ -22,9 +22,9 @@
 
 #include <functional>
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::server
 {
@@ -68,10 +68,10 @@ public:
      * Start the staged connection.
      * @return the connection
      */
-    virtual CConnection<SocketT> StartConnection() = 0;
+    virtual auto StartConnection() -> CConnection<SocketT> = 0;
 
     /// Get the address of the staged connection endpoint.
-    virtual String StagedAddress() const = 0;
+    [[nodiscard]] virtual auto StagedAddress() const -> String = 0;
 };
 }  // namespace net
 }  // namespace vfrb::server

@@ -27,7 +27,7 @@
 
 #include "error/IError.hpp"
 
-#include "class_utils.hpp"
+#include "ClassUtils.hpp"
 
 namespace vfrb
 {

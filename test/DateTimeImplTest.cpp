@@ -18,14 +18,14 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::object::date_time
 {
 namespace
 {
-static thread_local u32 s_Day = 0;
-static thread_local s64 s_Now = 0;
+thread_local u32 s_Day = 0;
+thread_local s64 s_Now = 0;
 }  // namespace
 
 void Day(u32 d_) {
@@ -36,11 +36,11 @@ void Now(u32 h_, u32 m_, u32 s_) {
     s_Now = h_ * 3600000 + m_ * 60000 + s_ * 1000;
 }
 
-s64 Now() {
+auto Now() -> s64 {
     return s_Now;
 }
 
-u32 Day() {
+auto Day() -> u32 {
     return s_Day;
 }
 }  // namespace vfrb::object::date_time

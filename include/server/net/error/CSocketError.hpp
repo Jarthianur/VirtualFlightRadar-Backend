@@ -22,7 +22,7 @@
 
 #include "error/IError.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::server::net::error
 {
@@ -34,6 +34,6 @@ class CSocketError : public vfrb::error::IError
 public:
     explicit CSocketError(String const& msg_);
 
-    str Message() const noexcept override;
+    [[nodiscard]] auto Message() const noexcept -> str override;
 };
 }  // namespace vfrb::server::net::error

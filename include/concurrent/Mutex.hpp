@@ -24,7 +24,7 @@
 
 #include <mutex>
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 #if defined(__clang__) && (!defined(SWIG))
 #    define THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
@@ -86,11 +86,11 @@ public:
         m_mutex.unlock();
     }
 
-    bool try_lock() TRY_ACQUIRE(true) {
+    auto try_lock() -> bool TRY_ACQUIRE(true) {
         return m_mutex.try_lock();
     }
 
-    Mutex const& operator!() const {
+    auto operator!() const -> Mutex const& {
         return *this;
     }
 };

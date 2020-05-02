@@ -22,16 +22,12 @@
 
 #include "server/net/error/CSocketError.hpp"
 
-namespace vfrb
-{
-namespace server
-{
-namespace net
+namespace vfrb::server::net
 {
 CSocketImplTest::CSocketImplTest(CSocketImplTest&& other_) noexcept
     : m_buffer(other_.m_buffer), m_address(other_.m_address), m_failWrite(other_.m_failWrite) {}
 
-CSocketImplTest& CSocketImplTest::operator=(CSocketImplTest&& other_) noexcept {
+auto CSocketImplTest::operator=(CSocketImplTest&& other_) noexcept -> CSocketImplTest& {
     m_address   = other_.m_address;
     m_buffer    = other_.m_buffer;
     m_failWrite = other_.m_failWrite;
@@ -41,11 +37,11 @@ CSocketImplTest& CSocketImplTest::operator=(CSocketImplTest&& other_) noexcept {
 CSocketImplTest::CSocketImplTest(String const& addr_, SPtr<String> buf_, bool fail_)
     : m_buffer(buf_), m_address(addr_), m_failWrite(fail_) {}
 
-String CSocketImplTest::Address() const {
+auto CSocketImplTest::Address() const -> String {
     return m_address;
 }
 
-bool CSocketImplTest::Write(StringView const& msg_) {
+auto CSocketImplTest::Write(StringView const& msg_) -> bool {
     if (m_failWrite) {
         throw error::CSocketError("");
     }
@@ -55,6 +51,4 @@ bool CSocketImplTest::Write(StringView const& msg_) {
 }
 
 void CSocketImplTest::Close() {}
-}  // namespace net
-}  // namespace server
-}  // namespace vfrb
+}  // namespace vfrb::server::net

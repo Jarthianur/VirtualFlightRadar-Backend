@@ -20,13 +20,13 @@
 
 #pragma once
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "CGpsPosition.hpp"
 #include "CObject.hpp"
 #include "CStaticString.hpp"
 #include "CTimestamp.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::object
 {

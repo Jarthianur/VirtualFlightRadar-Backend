@@ -18,7 +18,7 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "helper.hpp"
+#include "Helper.hpp"
 
 SCTF_EPSILON(0.000001)
-SCTF_DEFAULT_MAIN(console_reporter::create(std::cout, true, true))
+SCTF_DEFAULT_MAIN(console_reporter::create(std::cout)->with_captured_output()->with_color())

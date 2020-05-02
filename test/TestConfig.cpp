@@ -78,84 +78,115 @@ DESCRIBE_PAR("test_CProperties") {
 };
 
 DESCRIBE_PAR("test_CConfigReader") {
-    test("read config success", [] {
-        std::stringstream conf_in;
-        conf_in << "[" << CConfiguration::SECT_KEY_FALLBACK << "]\n"
-                << CConfiguration::KV_KEY_LATITUDE << "   = 0.000000\n";
-        conf_in << CConfiguration::KV_KEY_LONGITUDE << " = \n"
-                << CConfiguration::KV_KEY_ALTITUDE << "=1000 \n;ghsgd";
-        CProperties p;
-        ASSERT_NOTHROW(p = CConfigReader(conf_in).Read());
-        ASSERT_EQUALS(p.Property(CConfiguration::PATH_LATITUDE, "invalid"), "0.000000");
-        ASSERT_EQUALS(p.Property(CConfiguration::PATH_LONGITUDE, "invalid"), "invalid");
-        ASSERT_EQUALS(p.Property(CConfiguration::PATH_ALTITUDE, "invalid"), "1000");
-        ASSERT_EQUALS(p.Property(CConfiguration::PATH_GEOID, "invalid"), "invalid");
-        ASSERT_TRUE(p.Property("nothing", "").empty());
-    });
-    test("read config fail", [] {
-        std::stringstream conf_in;
-        conf_in << "" << CConfiguration::SECT_KEY_FALLBACK << "]\n"
-                << CConfiguration::KV_KEY_LATITUDE << "    0.000000\n";
-        conf_in << CConfiguration::KV_KEY_LONGITUDE << " = \n"
-                << CConfiguration::KV_KEY_ALTITUDE << "=1000 \n;ghsgd";
-        ASSERT_THROWS(CConfigReader(conf_in).Read(), config::error::CReadFileError);
-    });
-})
+    std::stringstream validConf;
 
-TEST_MODULE_PAR(test_Configuration, {
-    test("valid config - full, one feed", [] {
+    SETUP() {
+        validConf << "[" << CConfiguration::SECT_KEY_FALLBACK << "]\n"
+                  << CConfiguration::KV_KEY_LATITUDE << "   = 0.000000\n"
+                  << CConfiguration::KV_KEY_LONGITUDE << " = \n"
+                  << CConfiguration::KV_KEY_ALTITUDE << "=1000 \n;ghsgd";
+    }
+
+    // valid
+    IT("should not throw with valid config") {
+        ASSERT_NOTHROW(CConfigReader(validConf).Read());
+    };
+    IT("should read existing values correctly") {
+        CProperties p(CConfigReader(validConf).Read());
+        ASSERT_EQ(p.Property(CConfiguration::PATH_LATITUDE, "invalid"), "0.000000");
+        ASSERT_EQ(p.Property(CConfiguration::PATH_ALTITUDE, "invalid"), "1000");
+    };
+    IT("should return default value if key does not exist, or is empty") {
+        CProperties p(CConfigReader(validConf).Read());
+        ASSERT_EQ(p.Property(CConfiguration::PATH_LONGITUDE, "invalid"), "invalid");
+        ASSERT_EQ(p.Property(CConfiguration::PATH_GEOID, "invalid"), "invalid");
+        ASSERT_TRUE(p.Property("nothing", "").empty());
+    };
+
+    // invalid
+    IT("should throw if config is invalid") {
         std::stringstream conf_in;
+        conf_in << CConfiguration::SECT_KEY_FALLBACK << "\n"
+                << CConfiguration::KV_KEY_LATITUDE << "    0.000000\n";
+        ASSERT_THROWS(CConfigReader(conf_in).Read(), config::error::CReadFileError);
+    };
+};
+
+DESCRIBE_PAR("test_CConfiguration") {
+    SPtr<CConfiguration> uut;
+
+    SETUP() {
+        std::stringstream conf_in;
+        // general
         conf_in << "[" << CConfiguration::SECT_KEY_GENERAL << "]\n"
-                << CConfiguration::KV_KEY_FEEDS << "=" << CConfiguration::SECT_KEY_ATMOS << "1\n"
+                << CConfiguration::KV_KEY_FEEDS << "=" << CConfiguration::SECT_KEY_ATMOS << "1,"
+                << CConfiguration::SECT_KEY_WIND << "," << CConfiguration::SECT_KEY_SBS << "1 , "
+                << CConfiguration::SECT_KEY_SBS << "2, else,,\n"
                 << CConfiguration::KV_KEY_GND_MODE << "=y\n";
+        // server
         conf_in << "[" << CConfiguration::SECT_KEY_SERVER << "]\n"
                 << CConfiguration::KV_KEY_PORT << "=1234\n"
                 << CConfiguration::KV_KEY_MAX_CON << "=1\n";
+        // fallback
         conf_in << "[" << CConfiguration::SECT_KEY_FALLBACK << "]\n"
-                << CConfiguration::KV_KEY_LATITUDE << "=77.777777\n";
-        conf_in << CConfiguration::KV_KEY_LONGITUDE << "=-12.121212\n"
-                << CConfiguration::KV_KEY_ALTITUDE << "=1234\n";
-        conf_in << CConfiguration::KV_KEY_GEOID << "=40.4\n" << CConfiguration::KV_KEY_PRESSURE << "=999.9\n";
+                << CConfiguration::KV_KEY_LATITUDE << "=77.777777\n"
+                << CConfiguration::KV_KEY_LONGITUDE << "=-12.121212\n"
+                << CConfiguration::KV_KEY_ALTITUDE << "=1234\n"
+                << CConfiguration::KV_KEY_GEOID << "=40.4\n"
+                << CConfiguration::KV_KEY_PRESSURE << "=999.9\n";
+        // filter
         conf_in << "[" << CConfiguration::SECT_KEY_FILTER << "]\n"
-                << CConfiguration::KV_KEY_MAX_HEIGHT << "=-1\n";
-        conf_in << CConfiguration::KV_KEY_MAX_DIST << "=10000\n";
+                << CConfiguration::KV_KEY_MAX_HEIGHT << "=-1\n"
+                << CConfiguration::KV_KEY_MAX_DIST << "=10000\n";
+        // atm1
         conf_in << "[" << CConfiguration::SECT_KEY_ATMOS << "1]\n"
-                << CConfiguration::KV_KEY_HOST << "=localhost\n";
-        conf_in << CConfiguration::KV_KEY_PORT << "=3456\n" << CConfiguration::KV_KEY_PRIORITY << "=1\n";
-        CConfiguration conf(conf_in);
-        const auto     feed_it = conf.FeedProperties.cbegin();
-        ASSERT_EQUALS(feed_it->first, MakeStr(CConfiguration::SECT_KEY_ATMOS, "1"));
-        ASSERT_EQUALS(feed_it->second.Property(CConfiguration::KV_KEY_PRIORITY), "1");
-        ASSERT_EQUALS(std::get<0>(conf.ServerConfig), 1234);
-        ASSERT_EQUALS(std::get<1>(conf.ServerConfig), 1);
-        ASSERT_TRUE(conf.GroundMode);
-        ASSERT_EQUALS(conf.GpsPosition.Location().Latitude, 77.777777);
-        ASSERT_EQUALS(conf.GpsPosition.Location().Longitude, -12.121212);
-        ASSERT_EQUALS(conf.GpsPosition.Location().Altitude, 1234);
-        ASSERT_EQUALS(conf.GpsPosition.Geoid(), 40.4);
-        ASSERT_EQUALS(conf.AtmPressure, 999.9);
-        ASSERT_EQUALS(conf.MaxHeight, INT32_MAX);
-        ASSERT_EQUALS(conf.MaxDistance, 10000);
-    });
-    test("only valid feeds", [] {
-        std::stringstream conf_in;
-        conf_in << "[" << CConfiguration::SECT_KEY_GENERAL << "]\n"
-                << CConfiguration::KV_KEY_FEEDS << "=" << CConfiguration::SECT_KEY_WIND << ","
-                << CConfiguration::SECT_KEY_SBS << "1 , " << CConfiguration::SECT_KEY_SBS << "2, else,,\n";
+                << CConfiguration::KV_KEY_HOST << "=localhost\n"
+                << CConfiguration::KV_KEY_PORT << "=3456\n"
+                << CConfiguration::KV_KEY_PRIORITY << "=1\n";
+        // wind
         conf_in << "[" << CConfiguration::SECT_KEY_WIND << "]\n"
                 << CConfiguration::KV_KEY_HOST << "=127.0.0.1\n"
                 << CConfiguration::KV_KEY_PORT << "=3333\n"
                 << CConfiguration::KV_KEY_PRIORITY << "=0\n";
+        // sbs1
         conf_in << "[" << CConfiguration::SECT_KEY_SBS << "1]\n"
                 << CConfiguration::KV_KEY_HOST << "=127.0.0.1\n"
                 << CConfiguration::KV_KEY_PORT << "=3334\n"
                 << CConfiguration::KV_KEY_PRIORITY << "=1\n";
-        CConfiguration conf(conf_in);
-        Str         valid = MakeStr(CConfiguration::SECT_KEY_WIND, ",", CConfiguration::SECT_KEY_SBS, "1,,");
+
+        uut = std::make_shared<CConfiguration>(conf_in);
+    }
+
+    IT("should hold correct values for general") {
+        ASSERT_TRUE(uut->GroundMode);
+    };
+    IT("should hold correct values for server") {
+        ASSERT_EQ(std::get<0>(uut->ServerConfig), 1234);
+        ASSERT_EQ(std::get<1>(uut->ServerConfig), 1);
+    };
+    IT("should hold correct values for fallback") {
+        ASSERT(uut->GpsPosition.Location().Latitude, FEQ(), 77.777777);
+        ASSERT(uut->GpsPosition.Location().Longitude, FEQ(), -12.121212);
+        ASSERT_EQ(uut->GpsPosition.Location().Altitude, 1234);
+        ASSERT(uut->GpsPosition.Geoid(), FEQ(), 40.4);
+        ASSERT(uut->AtmPressure, FEQ(), 999.9);
+    };
+    IT("should hold correct values for filter") {
+        ASSERT_EQ(uut->MaxHeight, INT32_MAX);
+        ASSERT_EQ(uut->MaxDistance, 10000);
+    };
+    IT("should hold correct values for atm1") {
+        const auto feed_it = uut->FeedProperties.cbegin();
+        ASSERT_EQ(feed_it->first, MakeStr(CConfiguration::SECT_KEY_ATMOS, "1"));
+        ASSERT_EQ(feed_it->second.Property(CConfiguration::KV_KEY_PRIORITY), "1");
+    };
+    IT("should hold only values for valid feeds") {
+        String      valid = MakeStr(CConfiguration::SECT_KEY_ATMOS, "1,", CConfiguration::SECT_KEY_WIND, ",",
+                               CConfiguration::SECT_KEY_SBS, "1,", CConfiguration::SECT_KEY_SBS, "2,,");
         std::string result;
-        for (auto const& it : conf.FeedNames) {
+        for (auto const& it : uut->FeedNames) {
             result += it + ",";
         }
-        ASSERT_EQUALS(result, valid);
-    });
-})
+        ASSERT_EQ(result, valid);
+    };
+};

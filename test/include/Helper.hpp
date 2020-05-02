@@ -27,32 +27,30 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "object/CAircraft.hpp"
-#include "util/utility.hpp"
+#include "util/Utility.hpp"
 
 #pragma clang diagnostic ignored "-Wweak-vtables"
+#pragma clang diagnostic ignored "-Wunused-function"
 #include "sctf.hpp"
 
-namespace sctf
-{
-namespace intern
+namespace sctf::intern
 {
 template<>
-inline std::string
-    to_string<vfrb::object::CAircraft::ETargetType>(vfrb::object::CAircraft::ETargetType const& tt_) {
+inline auto to_string<vfrb::object::CAircraft::ETargetType>(vfrb::object::CAircraft::ETargetType const& tt_)
+    -> std::string {
     return std::to_string(vfrb::util::AsUnderlyingType(tt_));
 }
-}  // namespace intern
-}  // namespace sctf
+}  // namespace sctf::intern
 
 namespace helper
 {
-static std::regex const PflauRE("\\$PFLAU,,,,1,0,([-]?\\d+?),0,(\\d+?),(\\d+?),(\\S{6})\\*(?:\\S{2})");
+static std::regex const PflauRE(R"(\$PFLAU,,,,1,0,([-]?\d+?),0,(\d+?),(\d+?),(\S{6})\*(?:\S{2}))");
 static std::regex const PflaaRE(
-    "\\$PFLAA,0,([-]?\\d+?),([-]?\\d+?),([-]?\\d+?),(\\d+?),(\\S{6}),(\\d{3})?,,(\\d+?)?,([-]?\\d+?\\.\\d+?)?,([0-9A-F]{1,2})\\*(?:\\S{2})");
+    R"(\$PFLAA,0,([-]?\d+?),([-]?\d+?),([-]?\d+?),(\d+?),(\S{6}),(\d{3})?,,(\d+?)?,([-]?\d+?\.\d+?)?,([0-9A-F]{1,2})\*(?:\S{2}))");
 static std::regex const GpsRE(
-    "(\\$GPRMC,\\d{6},A,0000\\.00,N,00000\\.00,E,0,0,\\d{6},001\\.0,W\\*[0-9a-fA-F]{2}\\s*)?(\\$GPGGA,\\d{6},0000\\.0000,N,00000\\.0000,E,1,00,1,0,M,0\\.0,M,,\\*[0-9a-fA-F]{2}\\s*)?");
+    R"((\$GPRMC,\d{6},A,0000\.00,N,00000\.00,E,0,0,\d{6},001\.0,W\*[0-9a-fA-F]{2}\s*)?(\$GPGGA,\d{6},0000\.0000,N,00000\.0000,E,1,00,1,0,M,0\.0,M,,\*[0-9a-fA-F]{2}\s*)?)");
 
-static std::string TimePlus(std::int32_t val_) {
+static auto TimePlus(std::int32_t val_) -> std::string {
     return boost::posix_time::to_iso_string(
         boost::posix_time::time_duration(boost::posix_time::second_clock::local_time().time_of_day()) +
         boost::posix_time::seconds(val_));

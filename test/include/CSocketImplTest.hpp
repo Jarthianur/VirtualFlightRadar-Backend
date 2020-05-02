@@ -20,15 +20,11 @@
 
 #pragma once
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
-namespace vfrb
-{
-namespace server
-{
-namespace net
+namespace vfrb::server::net
 {
 class CSocketImplTest
 {
@@ -43,10 +39,8 @@ public:
     CSocketImplTest(String const& addr_, SPtr<String> buf_, bool fail_);
     ~CSocketImplTest() noexcept = default;
 
-    String Address() const;
-    bool   Write(StringView const& msg_);
-    void   Close();
+    [[nodiscard]] auto Address() const -> String;
+    auto               Write(StringView const& msg_) -> bool;
+    void               Close();
 };
-}  // namespace net
-}  // namespace server
-}  // namespace vfrb
+}  // namespace vfrb::server::net

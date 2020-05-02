@@ -21,13 +21,9 @@
 #pragma once
 
 #include "server/net/IAcceptor.hpp"
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-namespace vfrb
-{
-namespace server
-{
-namespace net
+namespace vfrb::server::net
 {
 class CSocketImplTest;
 
@@ -51,14 +47,12 @@ public:
     void OnAccept(Callback&& cb_) override;
     void Close() override;
 
-    CConnection<CSocketImplTest> StartConnection() override;
-    String                       StagedAddress() const override;
+    auto               StartConnection() -> CConnection<CSocketImplTest> override;
+    [[nodiscard]] auto StagedAddress() const -> String override;
 
-    usize Connect(String const& addr_, bool failAccept_, bool failWrite_);
-    auto  Socket(usize i_) const -> CSocketImplTest const&;
-    auto  Buffer(usize i_) const -> String const&;
-    usize Sockets() const;
+    auto               Connect(String const& addr_, bool failAccept_, bool failWrite_) -> usize;
+    [[nodiscard]] auto Socket(usize i_) const -> CSocketImplTest const&;
+    [[nodiscard]] auto Buffer(usize i_) const -> String const&;
+    [[nodiscard]] auto Sockets() const -> usize;
 };
-}  // namespace net
-}  // namespace server
-}  // namespace vfrb
+}  // namespace vfrb::server::net

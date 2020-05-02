@@ -18,6 +18,4 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "helper.hpp"
-
-using namespace sctf;
+#include "Helper.hpp"

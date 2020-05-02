@@ -23,10 +23,10 @@
 #include <utility>
 
 #include "net/error/CSocketError.hpp"
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "CLogger.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::server
 {
@@ -53,7 +53,7 @@ public:
      * @param sv_ The message
      * @return true on success, else false
      */
-    bool Write(StringView const& sv_);
+    auto Write(StringView const& sv_) -> bool;
 
     GETTER_REF(Address, m_address)
 };
@@ -67,14 +67,14 @@ CConnection<SocketT>::CConnection(CConnection&& other_) noexcept
     : m_socket(std::move(other_.m_socket)), m_address(std::move(other_.m_address)) {}
 
 template<typename SocketT>
-CConnection<SocketT>& CConnection<SocketT>::operator=(CConnection&& other_) noexcept {
+auto CConnection<SocketT>::operator=(CConnection&& other_) noexcept -> CConnection<SocketT>& {
     m_socket  = std::move(other_.m_socket);
     m_address = std::move(other_.m_address);
     return *this;
 }
 
 template<typename SocketT>
-bool CConnection<SocketT>::Write(StringView const& sv_) {
+auto CConnection<SocketT>::Write(StringView const& sv_) -> bool {
     try {
         return m_socket.Write(sv_);
     } catch (net::error::CSocketError const& e) {

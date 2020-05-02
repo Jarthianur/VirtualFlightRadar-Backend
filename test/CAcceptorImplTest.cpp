@@ -18,20 +18,17 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "CAcceptorImplTest.hpp"
+
 #include <thread>
 
 #include "server/CConnection.hpp"
 
-#include "CAcceptorImplTest.hpp"
 #include "CSocketImplTest.hpp"
 
-namespace vfrb
+namespace vfrb::server::net
 {
-namespace server
-{
-namespace net
-{
-CAcceptorImplTest::CAcceptorImplTest(bool failConnect_) : m_fail(failConnect_) {}
+CAcceptorImplTest::CAcceptorImplTest(bool failConnect_) : m_fail(failConnect_), m_sockets() {}
 
 void CAcceptorImplTest::Run() {
     while (!m_stopped) {
@@ -52,21 +49,21 @@ void CAcceptorImplTest::Close() {
     m_sockets.pop_back();
 }
 
-CConnection<CSocketImplTest> CAcceptorImplTest::StartConnection() {
+auto CAcceptorImplTest::StartConnection() -> CConnection<CSocketImplTest> {
     if (m_fail) {
         throw net::error::CSocketError("");
     }
     return CConnection<CSocketImplTest>(std::move(m_sockets.back().first));  // copy
 }
 
-String CAcceptorImplTest::StagedAddress() const {
+auto CAcceptorImplTest::StagedAddress() const -> String {
     return m_stagedAddress;
 }
 
-usize CAcceptorImplTest::Connect(String const& addr_, bool failAccept_, bool failWrite_) {
+auto CAcceptorImplTest::Connect(String const& addr_, bool failAccept_, bool failWrite_) -> usize {
     m_stagedAddress = addr_;
     auto buf        = std::make_shared<String>("");
-    m_sockets.push_back(std::make_pair(CSocketImplTest(addr_, buf, failWrite_), buf));
+    m_sockets.emplace_back(CSocketImplTest(addr_, buf, failWrite_), buf);
     m_onAcceptFn(failAccept_);  // false => no error
     return m_sockets.size() - 1;
 }
@@ -79,9 +76,7 @@ auto CAcceptorImplTest::Buffer(usize i_) const -> String const& {
     return *m_sockets.at(i_).second;
 }
 
-usize CAcceptorImplTest::Sockets() const {
+auto CAcceptorImplTest::Sockets() const -> usize {
     return m_sockets.size();
 }
-}  // namespace net
-}  // namespace server
-}  // namespace vfrb
+}  // namespace vfrb::server::net
