@@ -22,7 +22,7 @@
 
 #include <list>
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "CGuardedThread.hpp"
 

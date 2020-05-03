@@ -24,7 +24,6 @@
 #include <thread>
 #include <utility>
 
-#include "error/IError.hpp"
 #include "util/ClassUtils.hpp"
 
 namespace vfrb::concurrent
@@ -59,25 +58,12 @@ public:
     /**
      * Spawn this thread with given function if not done on construction yet.
      * @param fn_ The function to run
-     * @throw vfrb::concurrent::error::CThreadUsedError
      */
     template<typename FnT>
     void Spawn(FnT&& fn_);
 
     void Wait();
 };
-
-namespace error
-{
-/// Error to indicate that a thread is already running.
-class CThreadUsedError : public vfrb::error::IError
-{
-public:
-    [[nodiscard]] auto Message() const noexcept -> str override {
-        return "thread already used";
-    }
-};
-}  // namespace error
 
 template<typename FnT>
 [[gnu::always_inline]] inline void CGuardedThread::init(FnT&& fn_) {
