@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "CObject.hpp"
 

@@ -29,30 +29,30 @@ SUITE_PAR("testMath") {
         ASSERT(math::Radian(45.0), FEQ(), 0.785398);
         ASSERT(math::Radian(0.0), FEQ(), 0.0);
         ASSERT(math::Radian(360.0), FEQ(), 6.28319);
-    };
+    }
     TEST("Degree") {
         ASSERT(math::Degree(0.785398), FEQ(), 45.0);
         ASSERT(math::Degree(0.0), FEQ(), 0.0);
         ASSERT(math::Degree(6.28319), FEQ(), 360.0);
-    };
+    }
     TEST("DoubleToInt") {
         ASSERT_EQ(math::DoubleToInt(0.0), 0);
         ASSERT_EQ(math::DoubleToInt(1.4), 1);
         ASSERT_EQ(math::DoubleToInt(1.5), 2);
         ASSERT_EQ(math::DoubleToInt(-1.4), -1);
         ASSERT_EQ(math::DoubleToInt(-1.5), -2);
-    };
+    }
     TEST("DmToDeg") {
         ASSERT(math::DmToDeg(0.0), FEQ(), 0.0);
         ASSERT(math::DmToDeg(9030.50), FEQ(), 90.508333);
         ASSERT(math::DmToDeg(18000.0), FEQ(), 180.0);
         ASSERT(math::DmToDeg(-4512.3456), FEQ(), 45.205760);
-    };
+    }
     TEST("IcaoHeight") {
         ASSERT_EQ(math::IcaoHeight(0.0), 44331);
         ASSERT_EQ(math::IcaoHeight(1013.25), 0);
         ASSERT_EQ(math::IcaoHeight(980.0), 281);
-    };
+    }
     TEST("Saturate") {
         ASSERT_EQ(math::Saturate(15, 0, 10), 10);
         ASSERT_EQ(math::Saturate(9, 0, 10), 9);

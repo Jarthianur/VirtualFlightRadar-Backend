@@ -18,84 +18,85 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "String.hpp"
-#include "helper.hpp"
+#include "CStaticString.hpp"
+#include "Helper.hpp"
 
-using namespace sctf;
 using namespace vfrb;
 
-TEST_MODULE(test_String, {
-    test("init", [] {
-        ASSERT_NOTHROW(CString<4>("a"));
-        ASSERT_NOTHROW(CString<4>(Str("b")));
-        ASSERT_NOTHROW(CString<4>(StrView("c")));
-        ASSERT_NOTHROW(CString<4>(CString<4>("d")));
-        ASSERT_NOTHROW(CString<4>());
+DESCRIBE_PAR("test_CStatisString") {
+    IT("should not throw with valid initialization") {
+        ASSERT_NOTHROW(CStaticString<4>("a"));
+        ASSERT_NOTHROW(CStaticString<4>(String("b")));
+        ASSERT_NOTHROW(CStaticString<4>(StringView("c")));
+        ASSERT_NOTHROW(CStaticString<4>(CStaticString<4>("d")));
+        ASSERT_NOTHROW(CStaticString<4>());
+    }
+    IT("should correctly copy on construction") {
+        CStaticString<4> a("a");
+        CStaticString<4> b(String("b"));
+        CStaticString<4> c(StringView("c"));
+        auto             d(CStaticString<4>("d"));
+        CStaticString<4> e;
+        ASSERT_EQ(*a, "a");
+        ASSERT_EQ(*b, "b");
+        ASSERT_EQ(*c, "c");
+        ASSERT_EQ(*d, "d");
+        ASSERT_EQ(*e, "");
+    }
+    IT("should throw if constructor overflows") {
+        ASSERT_THROWS(CStaticString<4>("12345"), error::COverflowError);
+        ASSERT_THROWS(CStaticString<4>(String("12345")), error::COverflowError);
+        ASSERT_THROWS(CStaticString<4>(StringView("12345")), error::COverflowError);
+    }
 
-        CString<4> a("a");
-        CString<4> b(Str("b"));
-        CString<4> c(StrView("c"));
-        CString<4> d(CString<4>("d"));
-        CString<4> e;
-        ASSERT_EQUALS(*a, {"a"});
-        ASSERT_EQUALS(*b, {"b"});
-        ASSERT_EQUALS(*c, {"c"});
-        ASSERT_EQUALS(*d, {"d"});
-        ASSERT_EQUALS(*e, {""});
-    });
-    test("init overflow", [] {
-        ASSERT_THROWS(CString<4>("12345"), error::COverflowError);
-        ASSERT_THROWS(CString<4>(Str("12345")), error::COverflowError);
-        ASSERT_THROWS(CString<4>(StrView("12345")), error::COverflowError);
-    });
-    test("Length", [] {
-        CString<4> a("abc");
-        ASSERT_EQUALS(a.Length(), 3);
-    });
-    test("Clear", [] {
-        CString<4> a("abc");
-        ASSERT_EQUALS(a.Length(), 3);
+    IT("should return correct length") {
+        CStaticString<4> a("abc");
+        ASSERT_EQ(a.Length(), 3);
+    }
+    IT("should clear correctly") {
+        CStaticString<4> a("abc");
+        ASSERT_EQ(a.Length(), 3);
         a.Clear();
-        ASSERT_EQUALS(a.Length(), 0);
-        ASSERT_EQUALS(*a, {""});
-    });
-    test("assign", [] {
-        CString<4> a;
-        CString<4> b;
-        CString<4> c;
-        CString<4> d;
+        ASSERT_EQ(a.Length(), 0);
+        ASSERT_EQ(*a, "");
+    }
+    IT("should copy on assign") {
+        CStaticString<4> a;
+        CStaticString<4> b;
+        CStaticString<4> c;
+        CStaticString<4> d;
 
         ASSERT_NOTHROW(a = "a");
-        ASSERT_NOTHROW(b = Str("b"));
-        ASSERT_NOTHROW(c = StrView("c"));
-        ASSERT_NOTHROW(d = CString<4>("d"));
-        ASSERT_EQUALS(*a, {"a"});
-        ASSERT_EQUALS(*b, {"b"});
-        ASSERT_EQUALS(*c, {"c"});
-        ASSERT_EQUALS(*d, {"d"});
-    });
-    test("assign overflow", [] {
-        CString<4> a;
-        CString<4> b;
-        CString<4> c;
+        ASSERT_NOTHROW(b = String("b"));
+        ASSERT_NOTHROW(c = StringView("c"));
+        ASSERT_NOTHROW(d = CStaticString<4>("d"));
+        ASSERT_EQ(*a, "a");
+        ASSERT_EQ(*b, "b");
+        ASSERT_EQ(*c, "c");
+        ASSERT_EQ(*d, "d");
+    }
+    IT("should throw if assignment overflows") {
+        CStaticString<4> a;
+        CStaticString<4> b;
+        CStaticString<4> c;
 
         ASSERT_THROWS(a = "12345", error::COverflowError);
-        ASSERT_THROWS(b = Str("12345"), error::COverflowError);
-        ASSERT_THROWS(c = StrView("12345"), error::COverflowError);
-    });
-    test("Format", [] {
-        CString<8> a;
+        ASSERT_THROWS(b = String("12345"), error::COverflowError);
+        ASSERT_THROWS(c = StringView("12345"), error::COverflowError);
+    }
+    IT("should correctly format string") {
+        CStaticString<8> a;
         ASSERT_NOTHROW(a.Format(0, "%s", "a"));
-        ASSERT_EQUALS(*a, {"a"});
-        ASSERT_EQUALS(a.Length(), 1);
+        ASSERT_EQ(*a, "a");
+        ASSERT_EQ(a.Length(), 1);
         ASSERT_NOTHROW(a.Format(0, "%d", 1234));
-        ASSERT_EQUALS(*a, {"1234"});
-        ASSERT_EQUALS(a.Length(), 4);
-    });
-    test("Format overflow", [] {
-        CString<4> a;
+        ASSERT_EQ(*a, "1234");
+        ASSERT_EQ(a.Length(), 4);
+    }
+    IT("should throw if format overflows") {
+        CStaticString<4> a;
         ASSERT_THROWS(a.Format(0, "%s", "abcdefg"), error::COverflowError);
         ASSERT_THROWS(a.Format(0, "%s", "abcd"), error::COverflowError);
         ASSERT_THROWS(a.Format(2, "%s", "aaa"), error::COverflowError);
-    });
-})
+    };
+};

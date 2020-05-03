@@ -50,28 +50,28 @@ DESCRIBE_PAR("test_CProperties") {
     // Property
     IT("should return the correct value") {
         ASSERT_EQ(uut->Property("main.key"), "value");
-    };
+    }
     IT("should return the default value if key does not exist") {
         ASSERT_EQ(uut->Property("main.nokey", "default"), "default");
-    };
+    }
     IT("should return the default value if section does not exist") {
         ASSERT_EQ(uut->Property("nosect.nokey", "default"), "default");
-    };
+    }
     IT("should not throw if key exists") {
         ASSERT_NOTHROW(uut->Property("main.key"));
-    };
+    }
     IT("should throw if key does not exist") {
         ASSERT_THROWS(uut->Property("main.nokey"), config::error::CPropertyNotFoundError);
         ASSERT_THROWS(uut->Property("nosect.nokey"), config::error::CPropertyNotFoundError);
-    };
+    }
 
     // Section
     IT("should return nested properties as section") {
         ASSERT_EQ(uut->Section("main").Property("key"), "value");
-    };
+    }
     IT("should not throw if section exists") {
         ASSERT_NOTHROW(uut->Section("main"));
-    };
+    }
     IT("should throw if section does not exist") {
         ASSERT_THROWS(uut->Section("nosect"), config::error::CPropertyNotFoundError);
     };
@@ -90,18 +90,18 @@ DESCRIBE_PAR("test_CConfigReader") {
     // valid
     IT("should not throw with valid config") {
         ASSERT_NOTHROW(CConfigReader(validConf).Read());
-    };
+    }
     IT("should read existing values correctly") {
         CProperties p(CConfigReader(validConf).Read());
         ASSERT_EQ(p.Property(CConfiguration::PATH_LATITUDE, "invalid"), "0.000000");
         ASSERT_EQ(p.Property(CConfiguration::PATH_ALTITUDE, "invalid"), "1000");
-    };
+    }
     IT("should return default value if key does not exist, or is empty") {
         CProperties p(CConfigReader(validConf).Read());
         ASSERT_EQ(p.Property(CConfiguration::PATH_LONGITUDE, "invalid"), "invalid");
         ASSERT_EQ(p.Property(CConfiguration::PATH_GEOID, "invalid"), "invalid");
         ASSERT_TRUE(p.Property("nothing", "").empty());
-    };
+    }
 
     // invalid
     IT("should throw if config is invalid") {
@@ -159,27 +159,27 @@ DESCRIBE_PAR("test_CConfiguration") {
 
     IT("should hold correct values for general") {
         ASSERT_TRUE(uut->GroundMode);
-    };
+    }
     IT("should hold correct values for server") {
         ASSERT_EQ(std::get<0>(uut->ServerConfig), 1234);
         ASSERT_EQ(std::get<1>(uut->ServerConfig), 1);
-    };
+    }
     IT("should hold correct values for fallback") {
         ASSERT(uut->GpsPosition.Location().Latitude, FEQ(), 77.777777);
         ASSERT(uut->GpsPosition.Location().Longitude, FEQ(), -12.121212);
         ASSERT_EQ(uut->GpsPosition.Location().Altitude, 1234);
         ASSERT(uut->GpsPosition.Geoid(), FEQ(), 40.4);
         ASSERT(uut->AtmPressure, FEQ(), 999.9);
-    };
+    }
     IT("should hold correct values for filter") {
         ASSERT_EQ(uut->MaxHeight, INT32_MAX);
         ASSERT_EQ(uut->MaxDistance, 10000);
-    };
+    }
     IT("should hold correct values for atm1") {
         const auto feed_it = uut->FeedProperties.cbegin();
         ASSERT_EQ(feed_it->first, MakeStr(CConfiguration::SECT_KEY_ATMOS, "1"));
         ASSERT_EQ(feed_it->second.Property(CConfiguration::KV_KEY_PRIORITY), "1");
-    };
+    }
     IT("should hold only values for valid feeds") {
         String      valid = MakeStr(CConfiguration::SECT_KEY_ATMOS, "1,", CConfiguration::SECT_KEY_WIND, ",",
                                CConfiguration::SECT_KEY_SBS, "1,", CConfiguration::SECT_KEY_SBS, "2,,");

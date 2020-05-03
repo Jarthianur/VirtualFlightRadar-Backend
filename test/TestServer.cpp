@@ -38,23 +38,23 @@ DESCRIBE("test_CServer") {
     SETUP() {
         acceptor = std::make_shared<net::CAcceptorImplTest>();
         uut      = std::make_shared<CServer<net::CSocketImplTest>>(acceptor, 2);
-    };
+    }
 
     BEFORE_EACH() {
         acceptor->FailOnConnect(false);
         uut->Run();
-    };
+    }
 
     AFTER_EACH() {
         uut->Stop();
-    };
+    }
 
     IT("should refuse more than one connection from a client at once") {
         usize c1 = acceptor->Connect("#1", false, false);
         ASSERT_EQ(acceptor->Socket(c1).Address(), "#1");
         acceptor->Connect("#1", false, false);
         ASSERT(acceptor->Sockets(), LT(), 2);
-    };
+    }
     IT("should refuse any connection if maximum is reached") {
         acceptor->Connect("#1", false, false);
         ASSERT_EQ(acceptor->Sockets(), 1);
@@ -62,16 +62,16 @@ DESCRIBE("test_CServer") {
         ASSERT_EQ(acceptor->Sockets(), 2);
         acceptor->Connect("#3", false, false);
         ASSERT_EQ(acceptor->Sockets(), 2);
-    };
+    }
     IT("should not accept client if connection fails") {
         acceptor->FailOnConnect(true);
         acceptor->Connect("#1", false, false);
         ASSERT_EQ(acceptor->Sockets(), 0);
-    };
+    }
     IT("should not accept client if an error occurs in connection handler") {
         acceptor->Connect("#1", true, false);
         ASSERT_EQ(acceptor->Sockets(), 0);
-    };
+    }
 
     IT("should send a message to clients correctly") {
         usize c1 = acceptor->Connect("#1", false, false);
@@ -82,14 +82,14 @@ DESCRIBE("test_CServer") {
         uut->Send("hello");
         ASSERT_EQ(acceptor->Buffer(c1), "hello");
         ASSERT_EQ(acceptor->Buffer(c2), "hello");
-    };
+    }
     IT("should not send an empty message") {
         usize c = acceptor->Connect("#1", false, false);
         uut->Send("hello");
         ASSERT_EQ(acceptor->Buffer(c), "hello");
         uut->Send("");
         ASSERT_EQ(acceptor->Buffer(c), "hello");
-    };
+    }
     IT("it should close connection to client if write fails") {
         usize c = acceptor->Connect("#1", false, true);
         uut->Send("hello");
