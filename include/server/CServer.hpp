@@ -26,11 +26,11 @@
 #include "concurrent/CGuardedThread.hpp"
 #include "concurrent/Mutex.hpp"
 #include "net/impl/CAcceptorBoost.hpp"
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "CConnection.hpp"
 #include "CLogger.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::server
 {
@@ -61,7 +61,7 @@ class CServer
      * @param addr_ The ip address to check
      * @return true if the ip is already registered, else false
      */
-    bool isConnected(String const& addr_) REQUIRES(m_mutex);
+    auto isConnected(String const& addr_) -> bool REQUIRES(m_mutex);
 
     /**
      * Handler for accepting incoming connections.
@@ -151,7 +151,7 @@ void CServer<SocketT>::accept() REQUIRES(!m_mutex) {
 }
 
 template<typename SocketT>
-bool CServer<SocketT>::isConnected(String const& addr_) REQUIRES(m_mutex) {
+auto CServer<SocketT>::isConnected(String const& addr_) -> bool REQUIRES(m_mutex) {
     return std::find_if(m_connections.begin(), m_connections.end(),
                         [&](auto const& it_) { return it_.Address() == addr_; }) != m_connections.end();
 }

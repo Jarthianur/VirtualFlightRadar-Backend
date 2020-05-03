@@ -25,7 +25,7 @@
 #include <utility>
 
 #include "error/IError.hpp"
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 namespace vfrb::concurrent
 {
@@ -49,8 +49,10 @@ public:
     CGuardedThread() = default;
 
     /// @param fn_ The function to run
-    template<typename FnT>
-    explicit CGuardedThread(FnT&& fn_);
+    template<typename FnT, ENABLE_IF(NOT IS_TYPE(FnT, CGuardedThread))>
+    explicit CGuardedThread(FnT&& fn_) {
+        init<FnT>(std::forward<FnT>(fn_));
+    }
 
     ~CGuardedThread() noexcept;
 
@@ -61,6 +63,8 @@ public:
      */
     template<typename FnT>
     void Spawn(FnT&& fn_);
+
+    void Wait();
 };
 
 namespace error
@@ -69,7 +73,7 @@ namespace error
 class CThreadUsedError : public vfrb::error::IError
 {
 public:
-    char const* Message() const noexcept override {
+    [[nodiscard]] auto Message() const noexcept -> str override {
         return "thread already used";
     }
 };
@@ -82,19 +86,8 @@ template<typename FnT>
     m_thread  = std::thread(std::move(task));
 }
 
-template<typename FnT>
-CGuardedThread::CGuardedThread(FnT&& fn_) {
-    init<FnT>(std::forward<FnT>(fn_));
-}
-
 inline CGuardedThread::~CGuardedThread() noexcept {
-    try {
-        m_state.get();
-    } catch (...) {
-    }
-    if (m_thread.joinable()) {
-        m_thread.join();
-    }
+    Wait();
 }
 
 inline CGuardedThread::CGuardedThread(CGuardedThread&& other_) noexcept {
@@ -102,7 +95,7 @@ inline CGuardedThread::CGuardedThread(CGuardedThread&& other_) noexcept {
     m_state  = std::move(other_.m_state);
 }
 
-inline CGuardedThread& CGuardedThread::operator=(CGuardedThread&& other_) noexcept {
+inline auto CGuardedThread::operator=(CGuardedThread&& other_) noexcept -> CGuardedThread& {
     m_thread = std::move(other_.m_thread);
     m_state  = std::move(other_.m_state);
     return *this;
@@ -110,9 +103,19 @@ inline CGuardedThread& CGuardedThread::operator=(CGuardedThread&& other_) noexce
 
 template<typename FnT>
 void CGuardedThread::Spawn(FnT&& fn_) {
-    if (m_state.valid()) {
-        throw error::CThreadUsedError();
-    }
+    Wait();
     init<FnT>(std::forward<FnT>(fn_));
+}
+
+inline void CGuardedThread::Wait() {
+    try {
+        if (m_state.valid()) {
+            m_state.wait();
+        }
+    } catch (...) {
+    }
+    if (m_thread.joinable()) {
+        m_thread.join();
+    }
 }
 }  // namespace vfrb::concurrent

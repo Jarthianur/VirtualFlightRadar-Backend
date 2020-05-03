@@ -63,7 +63,7 @@ class CLogger
      * Get current date and time.
      * @return the date-time
      */
-    auto time() const -> String;
+    static auto time() -> String;
 
     CLogger() = default;
 
@@ -72,7 +72,7 @@ public:
      * Get the logger instance.
      * @return the logger
      */
-    static auto Instance() -> CLogger&;
+    static auto Instance() noexcept -> CLogger&;
 
     /**
      * Log with INFO level.

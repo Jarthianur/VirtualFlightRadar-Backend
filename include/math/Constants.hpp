@@ -22,7 +22,7 @@
 
 #include <cmath>
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 namespace vfrb::math
 {

@@ -28,7 +28,7 @@
 
 namespace vfrb::server::net
 {
-CAcceptorImplTest::CAcceptorImplTest(bool failConnect_) : m_fail(failConnect_), m_sockets() {}
+CAcceptorImplTest::CAcceptorImplTest() : m_sockets() {}
 
 void CAcceptorImplTest::Run() {
     while (!m_stopped) {
@@ -39,6 +39,8 @@ void CAcceptorImplTest::Run() {
 
 void CAcceptorImplTest::Stop() {
     m_stopped = true;
+    m_sockets.clear();
+    m_stagedAddress.clear();
 }
 
 void CAcceptorImplTest::OnAccept(Callback&& cb_) {
@@ -78,5 +80,9 @@ auto CAcceptorImplTest::Buffer(usize i_) const -> String const& {
 
 auto CAcceptorImplTest::Sockets() const -> usize {
     return m_sockets.size();
+}
+
+void CAcceptorImplTest::FailOnConnect(bool fail_) {
+    m_fail = fail_;
 }
 }  // namespace vfrb::server::net

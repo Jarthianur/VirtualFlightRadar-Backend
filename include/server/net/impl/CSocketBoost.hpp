@@ -23,9 +23,9 @@
 #include <boost/asio.hpp>
 #include <boost/move/move.hpp>
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::server::net
 {
@@ -42,7 +42,7 @@ public:
     ~CSocketBoost() noexcept;
 
     /// @throw vfrb::server::net::error::CSocketError
-    String Address() const;
+    [[nodiscard]] auto Address() const -> String;
 
     /**
      * Write a message on the socket to the endpoint.
@@ -50,10 +50,10 @@ public:
      * @return true on success, else false
      * @throw vfrb::server::net::error::CSocketError
      */
-    bool Write(StringView const& sv_);
+    auto Write(StringView const& sv_) -> bool;
     void Close();
 
     /// Get the underlying socket.
-    boost::asio::ip::tcp::socket& Get();
+    auto Get() -> boost::asio::ip::tcp::socket&;
 };
 }  // namespace vfrb::server::net

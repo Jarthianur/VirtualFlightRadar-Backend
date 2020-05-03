@@ -27,9 +27,9 @@
 
 #include "server/net/IAcceptor.hpp"
 #include "server/net/impl/CSocketBoost.hpp"
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::server::net
 {
@@ -58,7 +58,7 @@ public:
     void Close() override;
 
     /// @throw vfrb::server::net::error::CSocketError
-    CConnection<CSocketBoost> StartConnection() override;
-    String                    StagedAddress() const override;
+    auto               StartConnection() -> CConnection<CSocketBoost> override;
+    [[nodiscard]] auto StagedAddress() const -> String override;
 };
 }  // namespace vfrb::server::net

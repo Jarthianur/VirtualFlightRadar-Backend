@@ -39,14 +39,13 @@ class CAcceptorImplTest : public IAcceptor<CSocketImplTest>
     std::vector<std::pair<CSocketImplTest, SPtr<String>>> m_sockets;
 
 public:
-    explicit CAcceptorImplTest(bool failConnect_);
+    explicit CAcceptorImplTest();
     ~CAcceptorImplTest() noexcept override = default;
 
-    void Run() override;
-    void Stop() override;
-    void OnAccept(Callback&& cb_) override;
-    void Close() override;
-
+    void               Run() override;
+    void               Stop() override;
+    void               OnAccept(Callback&& cb_) override;
+    void               Close() override;
     auto               StartConnection() -> CConnection<CSocketImplTest> override;
     [[nodiscard]] auto StagedAddress() const -> String override;
 
@@ -54,5 +53,6 @@ public:
     [[nodiscard]] auto Socket(usize i_) const -> CSocketImplTest const&;
     [[nodiscard]] auto Buffer(usize i_) const -> String const&;
     [[nodiscard]] auto Sockets() const -> usize;
+    void               FailOnConnect(bool fail_);
 };
 }  // namespace vfrb::server::net

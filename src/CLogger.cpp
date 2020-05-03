@@ -20,6 +20,7 @@
 
 #include "CLogger.hpp"
 
+#include <array>
 #include <chrono>
 #include <ctime>
 #include <stdexcept>
@@ -36,21 +37,21 @@ void CLogger::LogFile(String const& file_) {
     m_errStream = &m_logFile;
 }
 
-String CLogger::time() const {
-    std::time_t tt       = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    char        time[32] = "";
-    std::strftime(time, 32, "%c", gmtime(&tt));
-    return time;
+auto CLogger::time() -> String {
+    std::time_t          tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::array<char, 32> time{};
+    std::strftime(time.data(), 32, "%c", gmtime(&tt));
+    return time.data();
 }
 
-CLogger& CLogger::Instance() {
+auto CLogger::Instance() noexcept -> CLogger& {
     static CLogger log;
     return log;
 }
 
 namespace error
 {
-str COpenLogfileError::Message() const noexcept {
+auto COpenLogfileError::Message() const noexcept -> str {
     return "failed to open logfile";
 }
 }  // namespace error

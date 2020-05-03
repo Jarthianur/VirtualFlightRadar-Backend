@@ -18,79 +18,82 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "server/Server.hpp"
+#include <memory>
 
-#include "AcceptorImplTest.h"
-#include "SocketImplTest.h"
-#include "helper.hpp"
+#include "server/CServer.hpp"
 
-using namespace sctf;
+#include "CAcceptorImplTest.hpp"
+#include "CSocketImplTest.hpp"
+#include "Helper.hpp"
+#include "Types.hpp"
+#include "sctf.hpp"
+
 using namespace vfrb;
 using namespace server;
 
-TEST_MODULE(test_Server, {
-    test("connect twice", [] {
-        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
-        CServer<net::CSocketImplTest> s(a, 2);
-        s.Run();
-        usize c1 = a->Connect("#1", false, false);
-        ASSERT_EQUALS(a->Socket(c1).Address(), "#1");
-        a->Connect("#1", false, false);
-        ASSERT(a->Sockets(), LT, 2);
-    });
-    test("max connections", [] {
-        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
-        CServer<net::CSocketImplTest> s(a, 1);
-        s.Run();
-        a->Connect("#1", false, false);
-        ASSERT_EQUALS(a->Sockets(), 1);
-        a->Connect("#2", false, false);
-        ASSERT_EQUALS(a->Sockets(), 1);
-    });
-    test("failed connect", [] {
-        auto                          a = std::make_shared<net::CAcceptorImplTest>(true);
-        CServer<net::CSocketImplTest> s(a, 1);
-        s.Run();
-        a->Connect("#1", false, false);
-        ASSERT_EQUALS(a->Sockets(), 0);
-    });
-    test("failed connect - error in handler", [] {
-        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
-        CServer<net::CSocketImplTest> s(a, 1);
-        s.Run();
-        a->Connect("#1", true, false);
-        ASSERT_EQUALS(a->Sockets(), 0);
-    });
-    test("Send", [] {
-        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
-        CServer<net::CSocketImplTest> s(a, 2);
-        s.Run();
-        usize c1 = a->Connect("#1", false, false);
-        usize c2 = a->Connect("#2", false, false);
-        ASSERT_EQUALS(a->Sockets(), 2);
-        ASSERT_EQUALS(a->Socket(c1).Address(), "#1");
-        ASSERT_EQUALS(a->Socket(c2).Address(), "#2");
-        s.Send("hello");
-        ASSERT_EQUALS(a->Buffer(c1), "hello");
-        ASSERT_EQUALS(a->Buffer(c2), "hello");
-    });
-    test("Send - empty msg", [] {
-        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
-        CServer<net::CSocketImplTest> s(a, 2);
-        s.Run();
-        usize c = a->Connect("#1", false, false);
-        s.Send("hello");
-        ASSERT_EQUALS(a->Buffer(c), "hello");
-        s.Send("");
-        ASSERT_EQUALS(a->Buffer(c), "hello");
-    });
-    test("Send - fail write", [] {
-        auto                          a = std::make_shared<net::CAcceptorImplTest>(false);
-        CServer<net::CSocketImplTest> s(a, 2);
-        s.Run();
-        usize c = a->Connect("#1", false, true);
-        s.Send("hello");
-        s.Send("world");
-        ASSERT_EQUALS(a->Buffer(c), "");
-    });
-})
+DESCRIBE("test_CServer") {
+    SPtr<net::CAcceptorImplTest>        acceptor;
+    SPtr<CServer<net::CSocketImplTest>> uut;
+
+    SETUP() {
+        acceptor = std::make_shared<net::CAcceptorImplTest>();
+        uut      = std::make_shared<CServer<net::CSocketImplTest>>(acceptor, 2);
+    };
+
+    BEFORE_EACH() {
+        acceptor->FailOnConnect(false);
+        uut->Run();
+    };
+
+    AFTER_EACH() {
+        uut->Stop();
+    };
+
+    IT("should refuse more than one connection from a client at once") {
+        usize c1 = acceptor->Connect("#1", false, false);
+        ASSERT_EQ(acceptor->Socket(c1).Address(), "#1");
+        acceptor->Connect("#1", false, false);
+        ASSERT(acceptor->Sockets(), LT(), 2);
+    };
+    IT("should refuse any connection if maximum is reached") {
+        acceptor->Connect("#1", false, false);
+        ASSERT_EQ(acceptor->Sockets(), 1);
+        acceptor->Connect("#2", false, false);
+        ASSERT_EQ(acceptor->Sockets(), 2);
+        acceptor->Connect("#3", false, false);
+        ASSERT_EQ(acceptor->Sockets(), 2);
+    };
+    IT("should not accept client if connection fails") {
+        acceptor->FailOnConnect(true);
+        acceptor->Connect("#1", false, false);
+        ASSERT_EQ(acceptor->Sockets(), 0);
+    };
+    IT("should not accept client if an error occurs in connection handler") {
+        acceptor->Connect("#1", true, false);
+        ASSERT_EQ(acceptor->Sockets(), 0);
+    };
+
+    IT("should send a message to clients correctly") {
+        usize c1 = acceptor->Connect("#1", false, false);
+        usize c2 = acceptor->Connect("#2", false, false);
+        ASSERT_EQ(acceptor->Sockets(), 2);
+        ASSERT_EQ(acceptor->Socket(c1).Address(), "#1");
+        ASSERT_EQ(acceptor->Socket(c2).Address(), "#2");
+        uut->Send("hello");
+        ASSERT_EQ(acceptor->Buffer(c1), "hello");
+        ASSERT_EQ(acceptor->Buffer(c2), "hello");
+    };
+    IT("should not send an empty message") {
+        usize c = acceptor->Connect("#1", false, false);
+        uut->Send("hello");
+        ASSERT_EQ(acceptor->Buffer(c), "hello");
+        uut->Send("");
+        ASSERT_EQ(acceptor->Buffer(c), "hello");
+    };
+    IT("it should close connection to client if write fails") {
+        usize c = acceptor->Connect("#1", false, true);
+        uut->Send("hello");
+        uut->Send("world");
+        ASSERT_EQ(acceptor->Buffer(c), "");
+    };
+};
