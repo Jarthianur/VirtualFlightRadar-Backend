@@ -62,13 +62,7 @@
 #else
 #error SCTF is only supported for Linux (gcc), OSX (clang), and Windows (msvc)
 #endif
-#endif// SCTF_CPP_META_HPP
-#ifndef SCTF_TYPES_HPP
-#define SCTF_TYPES_HPP
-namespace sctf { namespace intern {
-using void_function = std::function<void()>;
-}}// namespace sctf::intern
-#endif// SCTF_TYPES_HPP
+#endif
 #ifndef SCTF_LOC_HPP
 #define SCTF_LOC_HPP
 namespace sctf { namespace intern {
@@ -76,8 +70,8 @@ struct loc final {
 char const* file;
 int const line;
 };
-}}// namespace sctf::intern
-#endif// SCTF_LOC_HPP
+}}
+#endif
 #ifndef SCTF_TRAITS_HPP
 #define SCTF_TRAITS_HPP
 #define SCTF_INTERN_ENABLE_IF(C) typename std::enable_if<C>::type* = nullptr
@@ -99,8 +93,8 @@ template<typename> static auto test(...) -> std::false_type;
 public:
 static const bool value = decltype(test<T>(0))::value;
 };
-}}// namespace sctf::intern
-#endif// SCTF_TRAITS_HPP
+}}
+#endif
 #ifndef SCTF_DURATION_HPP
 #define SCTF_DURATION_HPP
 namespace sctf { namespace intern {
@@ -111,8 +105,8 @@ auto get() -> double { return std::chrono::duration<double, std::milli>(std::chr
 private:
 std::chrono::steady_clock::time_point const m_start;
 };
-}}// namespace sctf::intern
-#endif// SCTF_DURATION_HPP
+}}
+#endif
 #ifndef SCTF_REGEX_HPP
 #define SCTF_REGEX_HPP
 namespace sctf {
@@ -124,8 +118,8 @@ std::regex const re;
 };
 inline auto operator"" _re(char const* lit_, std::size_t) -> regex { return regex(lit_, std::regex::nosubs | std::regex::ECMAScript); }
 inline auto operator"" _re_i(char const* lit_, std::size_t) -> regex { return regex(lit_, std::regex::nosubs | std::regex::ECMAScript | std::regex::icase); }
-}// namespace sctf
-#endif// SCTF_REGEX_HPP
+}
+#endif
 #ifndef SCTF_STRINGIFY_HPP
 #define SCTF_STRINGIFY_HPP
 namespace sctf { namespace intern {
@@ -191,8 +185,8 @@ inline auto to_string(char const& arg_) -> std::string { return std::string("'")
 inline auto to_string(std::nullptr_t const&) -> std::string { return "0"; }
 inline auto to_string(bool const& arg_) -> std::string { return arg_ ? "true" : "false"; }
 inline auto to_string(regex const& arg_) -> std::string { return to_string(arg_.pattern); }
-}}// namespace sctf::intern
-#endif// SCTF_STRINGIFY_HPP
+}}
+#endif
 #ifndef SCTF_ASSERTION_FAILURE_HPP
 #define SCTF_ASSERTION_FAILURE_HPP
 namespace sctf { namespace intern {
@@ -203,21 +197,26 @@ inline auto what() const noexcept -> char const* override { return m_msg.c_str()
 private:
 std::string const m_msg;
 };
-}}// namespace sctf::intern
-#endif// SCTF_ASSERTION_FAILURE_HPP
+}}
+#endif
 #ifndef SCTF_TESTCASE_HPP
 #define SCTF_TESTCASE_HPP
 namespace sctf { namespace intern {
+using test_function = std::function<void()>;
+struct test_context final {
+char const* tc_name;
+char const* ts_name;
+};
 class testcase {
 public:
 testcase(testcase const&) = delete;
 auto operator=(testcase const&) -> testcase& = delete;
 ~testcase() noexcept = default;
-testcase(std::tuple<char const*, char const*>&& ctx_, void_function&& fn_) : m_name(std::get<0>(ctx_)), m_context(std::get<1>(ctx_)), m_test_func(std::move(fn_)) {}
-testcase(testcase&& other_) noexcept : m_name(other_.m_name), m_context(other_.m_context), m_state(other_.m_state), m_duration(other_.m_duration), m_err_msg(std::move(other_.m_err_msg)), m_test_func(std::move(other_.m_test_func)) {}
+testcase(test_context&& ctx_, test_function&& fn_) : m_name(ctx_.tc_name), m_suite_name(ctx_.ts_name), m_test_func(std::move(fn_)) {}
+testcase(testcase&& other_) noexcept : m_name(other_.m_name), m_suite_name(other_.m_suite_name), m_state(other_.m_state), m_duration(other_.m_duration), m_err_msg(std::move(other_.m_err_msg)), m_test_func(std::move(other_.m_test_func)) {}
 auto operator=(testcase&& other_) noexcept -> testcase& {
 m_name = other_.m_name;
-m_context = other_.m_context;
+m_suite_name = other_.m_suite_name;
 m_state = other_.m_state;
 m_duration = other_.m_duration;
 m_err_msg = std::move(other_.m_err_msg);
@@ -240,7 +239,7 @@ inline auto state() const -> result { return m_state; }
 inline auto duration() const -> double { return m_duration; }
 inline auto reason() const -> std::string const& { return m_err_msg; }
 inline auto name() const -> char const* { return m_name; }
-inline auto context() const -> char const* { return m_context; }
+inline auto suite_name() const -> char const* { return m_suite_name; }
 inline void cout(std::string const& str_) { m_cout = str_; }
 inline void cerr(std::string const& str_) { m_cerr = str_; }
 inline auto cout() const -> std::string const& { return m_cout; }
@@ -256,16 +255,16 @@ m_state = result::ERROR;
 m_err_msg = msg_;
 }
 char const* m_name;
-char const* m_context;
+char const* m_suite_name;
 result m_state = result::NONE;
 double m_duration = 0.0;
 std::string m_err_msg;
 std::string m_cout;
 std::string m_cerr;
-void_function m_test_func;
+test_function m_test_func;
 };
-}}// namespace sctf::intern
-#endif// SCTF_TESTSUITE_TESTCASE_HPP
+}}
+#endif
 #ifndef SCTF_TESTSUITE_STREAMBUF_PROXY_OMP_HPP
 #define SCTF_TESTSUITE_STREAMBUF_PROXY_OMP_HPP
 #ifdef _OPENMP
@@ -293,13 +292,13 @@ std::streambuf* m_orig_buf;
 std::ostream& m_orig_stream;
 std::vector<std::stringbuf> m_thd_buffers;
 };
-}}// namespace sctf::intern
+}}
 #ifndef _OPENMP
 #undef omp_get_max_threads
 #undef omp_get_thread_num
 #endif
 #undef SCTF_INTERN_CURRENT_THREAD_BUFFER
-#endif// SCTF_TESTSUITE_STREAMBUF_PROXY_OMP_HPP
+#endif
 #ifndef SCTF_TESTSUITE_STREAMBUF_PROXY_HPP
 #define SCTF_TESTSUITE_STREAMBUF_PROXY_HPP
 namespace sctf { namespace intern {
@@ -320,26 +319,26 @@ std::streambuf* m_orig_buf;
 std::ostream& m_orig_stream;
 std::stringbuf m_buffer;
 };
-}}// namespace sctf::intern
-#endif// SCTF_TESTSUITE_STREAMBUF_PROXY_HPP
+}}
+#endif
 #ifndef SCTF_TESTSUITE_STATISTICS_HPP
 #define SCTF_TESTSUITE_STATISTICS_HPP
 namespace sctf { namespace intern {
 class statistic {
 public:
-inline auto tests() const -> std::size_t { return m_num_of_tests; }
-inline auto successes() const -> std::size_t { return m_num_of_tests - m_num_of_errs - m_num_of_fails; }
-inline auto failures() const -> std::size_t { return m_num_of_fails; }
-inline auto errors() const -> std::size_t { return m_num_of_errs; }
+inline auto tests() const -> std::size_t { return m_num_tests; }
+inline auto successes() const -> std::size_t { return m_num_tests - m_num_errs - m_num_fails; }
+inline auto failures() const -> std::size_t { return m_num_fails; }
+inline auto errors() const -> std::size_t { return m_num_errs; }
 private:
 friend class testsuite;
 friend class testsuite_parallel;
-std::size_t m_num_of_tests = 0;
-std::size_t m_num_of_fails = 0;
-std::size_t m_num_of_errs = 0;
+std::size_t m_num_tests = 0;
+std::size_t m_num_fails = 0;
+std::size_t m_num_errs = 0;
 };
-}}// namespace sctf::intern
-#endif// SCTF_TESTSUITE_STATISTICS_HPP
+}}
+#endif
 #ifndef SCTF_TESTSUITE_TESTSUITE_HPP
 #define SCTF_TESTSUITE_TESTSUITE_HPP
 namespace sctf { namespace intern {
@@ -349,6 +348,7 @@ class testsuite {
 protected:
 struct enable {};
 public:
+using hook_function = std::function<void()>;
 testsuite(testsuite const&) = delete;
 testsuite(testsuite&&) noexcept = delete;
 auto operator=(testsuite const&) -> testsuite& = delete;
@@ -358,7 +358,7 @@ static auto create(char const* name_) -> testsuite_ptr { return std::make_shared
 virtual void run() {
 if(m_state != execution_state::DONE) {
 m_setup_fn();
-m_stats.m_num_of_tests = m_testcases.size();
+m_stats.m_num_tests = m_testcases.size();
 streambuf_proxy buf_cout(std::cout);
 streambuf_proxy buf_cerr(std::cerr);
 std::for_each(m_testcases.begin(), m_testcases.end(), [this, &buf_cerr, &buf_cout](testcase& tc_) {
@@ -366,8 +366,8 @@ if(tc_.state() == testcase::result::NONE) {
 m_pretest_fn();
 tc_();
 switch(tc_.state()) {
-case testcase::result::FAILED: ++m_stats.m_num_of_fails; break;
-case testcase::result::ERROR: ++m_stats.m_num_of_errs; break;
+case testcase::result::FAILED: ++m_stats.m_num_fails; break;
+case testcase::result::ERROR: ++m_stats.m_num_errs; break;
 default: break;
 }
 m_exec_dur += tc_.duration();
@@ -382,14 +382,14 @@ m_teardown_fn();
 m_state = execution_state::DONE;
 }
 }
-void test(char const* name_, void_function&& fn_) {
-m_testcases.emplace_back(std::forward_as_tuple(name_, m_name), std::move(fn_));
+void test(char const* name_, hook_function&& fn_) {
+m_testcases.emplace_back(test_context{name_, m_name}, std::move(fn_));
 m_state = execution_state::PENDING;
 }
-void setup(void_function&& fn_) { m_setup_fn.fn = std::move(fn_); }
-void teardown(void_function&& fn_) { m_teardown_fn.fn = std::move(fn_); }
-void before_each(void_function&& fn_) { m_pretest_fn.fn = std::move(fn_); }
-void after_each(void_function&& fn_) { m_posttest_fn.fn = std::move(fn_); }
+void setup(hook_function&& fn_) { m_setup_fn.fn = std::move(fn_); }
+void teardown(hook_function&& fn_) { m_teardown_fn.fn = std::move(fn_); }
+void before_each(hook_function&& fn_) { m_pretest_fn.fn = std::move(fn_); }
+void after_each(hook_function&& fn_) { m_posttest_fn.fn = std::move(fn_); }
 inline auto name() const -> char const* { return m_name; }
 inline auto timestamp() const -> std::chrono::system_clock::time_point const& { return m_create_time; }
 inline auto statistics() const -> statistic const& { return m_stats; }
@@ -406,7 +406,7 @@ fn();
 }
 return *this;
 }
-void_function fn;
+hook_function fn;
 };
 enum class execution_state : std::int_fast8_t { PENDING, DONE };
 char const* m_name;
@@ -420,8 +420,8 @@ silent_functor m_teardown_fn;
 silent_functor m_pretest_fn;
 silent_functor m_posttest_fn;
 };
-}}// namespace sctf::intern
-#endif// SCTF_TESTSUITE_TESTSUITE_HPP
+}}
+#endif
 #ifndef SCTF_TESTSUITE_TESTSUITE_PARALLEL_HPP
 #define SCTF_TESTSUITE_TESTSUITE_PARALLEL_HPP
 namespace sctf { namespace intern {
@@ -438,15 +438,14 @@ if(m_state != execution_state::DONE) {
 if(m_testcases.size() > static_cast<std::size_t>(std::numeric_limits<std::int64_t>::max())) { throw std::overflow_error("Too many testcases! Size would overflow loop variant."); }
 m_setup_fn();
 auto const tc_size = static_cast<std::int64_t>(m_testcases.size());
-m_stats.m_num_of_tests = m_testcases.size();
+m_stats.m_num_tests = m_testcases.size();
 streambuf_proxy_omp mt_buf_cout(std::cout);
 streambuf_proxy_omp mt_buf_cerr(std::cerr);
 #pragma omp parallel default(shared)
-{// BEGIN parallel section
+{
 double tmp = 0.0;
 std::size_t fails = 0;
 std::size_t errs = 0;
-// OpenMP 2 compatible - MSVC not supporting higher version
 #pragma omp for schedule(dynamic)
 for(std::int64_t i = 0; i < tc_size; ++i) {
 auto& tc = m_testcases[static_cast<std::size_t>(i)];
@@ -467,20 +466,20 @@ mt_buf_cerr.clear();
 }
 }
 #pragma omp critical
-{// BEGIN critical section
-m_stats.m_num_of_fails += fails;
-m_stats.m_num_of_errs += errs;
+{
+m_stats.m_num_fails += fails;
+m_stats.m_num_errs += errs;
 m_exec_dur = std::max(m_exec_dur, tmp);
-}// END critical section
-}// END parallel section
+}
+}
 m_teardown_fn();
 m_state = execution_state::DONE;
 }
 }
 explicit testsuite_parallel(enable e_, char const* name_) : testsuite(e_, name_) {}
 };
-}}// namespace sctf::intern
-#endif// SCTF_TESTSUITE_TESTSUITE_PARALLEL_HPP
+}}
+#endif
 #ifndef SCTF_RUNNER_HPP
 #define SCTF_RUNNER_HPP
 namespace sctf { namespace intern {
@@ -498,8 +497,8 @@ return r;
 private:
 std::vector<testsuite_ptr> m_testsuites;
 };
-}}// namespace sctf::intern
-#endif// SCTF_RUNNER_HPP
+}}
+#endif
 #ifndef SCTF_REPORTER_REPORTER_HPP
 #define SCTF_REPORTER_REPORTER_HPP
 namespace sctf {
@@ -557,11 +556,11 @@ static constexpr char const* const SPACE = "  ";
 static constexpr char const* const XSPACE = "    ";
 static constexpr char const* const LF = "\n";
 static constexpr char const* const XLF = "\n\n";
-}// namespace fmt
-}// namespace intern
+}
+}
 using reporter_ptr = std::shared_ptr<intern::reporter>;
-}// namespace sctf
-#endif// SCTF_REPORTER_REPORTER_HPP
+}
+#endif
 #ifndef SCTF_REPORTER_XML_REPORTER_HPP
 #define SCTF_REPORTER_XML_REPORTER_HPP
 namespace sctf {
@@ -590,7 +589,7 @@ reporter::report_testsuite(ts_);
 *this << intern::fmt::SPACE << "</testsuite>" << intern::fmt::LF;
 }
 void report_testcase(intern::testcase const& tc_) override {
-*this << intern::fmt::XSPACE << "<testcase name=\"" << tc_.name() << "\" classname=\"" << tc_.context() << "\" time=\"" << tc_.duration() << "\"";
+*this << intern::fmt::XSPACE << "<testcase name=\"" << tc_.name() << "\" classname=\"" << tc_.suite_name() << "\" time=\"" << tc_.duration() << "\"";
 switch(tc_.state()) {
 case intern::testcase::result::ERROR:
 *this << ">" << intern::fmt::LF << intern::fmt::XSPACE << intern::fmt::SPACE << "<error message=\"" << tc_.reason() << "\"></error>" << intern::fmt::LF;
@@ -623,8 +622,8 @@ void print_system_out(intern::testcase const& tc_) {
 std::size_t mutable m_id = 0;
 bool m_capture = false;
 };
-}// namespace sctf
-#endif// SCTF_REPORTER_XML_REPORTER_HPP
+}
+#endif
 #ifndef SCTF_REPORTER_CONSOLE_REPORTER_HPP
 #define SCTF_REPORTER_CONSOLE_REPORTER_HPP
 namespace sctf {
@@ -636,7 +635,7 @@ static constexpr char const* const ANSI_BLUE = "\x1b[34m";
 static constexpr char const* const ANSI_MAGENTA = "\x1b[35m";
 static constexpr char const* const ANSI_CYAN = "\x1b[36m";
 static constexpr char const* const ANSI_RESET = "\x1b[0m";
-}}// namespace intern::fmt
+}}
 class console_reporter : public intern::reporter {
 public:
 console_reporter(console_reporter const&) = delete;
@@ -662,7 +661,7 @@ void report_testsuite(intern::testsuite_ptr const& ts_) override {
 reporter::report_testsuite(ts_);
 }
 void report_testcase(intern::testcase const& tc_) override {
-*this << intern::fmt::SPACE << "Run Testcase [" << tc_.name() << "](" << tc_.context() << "); time = " << tc_.duration() << "ms" << intern::fmt::LF << intern::fmt::XSPACE;
+*this << intern::fmt::SPACE << "Run Testcase [" << tc_.name() << "](" << tc_.suite_name() << "); time = " << tc_.duration() << "ms" << intern::fmt::LF << intern::fmt::XSPACE;
 if(m_capture) {
 *this << "stdout = \"" << tc_.cout() << "\"" << intern::fmt::LF << intern::fmt::XSPACE;
 *this << "stderr = \"" << tc_.cerr() << "\"" << intern::fmt::LF << intern::fmt::XSPACE;
@@ -687,8 +686,8 @@ if(m_abs_fails >= (m_abs_tests + 1) / 2) {
 bool m_color = false;
 bool m_capture = false;
 };
-}// namespace sctf
-#endif// SCTF_REPORTER_CONSOLE_REPORTER_HPP
+}
+#endif
 #ifndef SCTF_REPORTER_MARKDOWN_REPORTER_HPP
 #define SCTF_REPORTER_MARKDOWN_REPORTER_HPP
 namespace sctf {
@@ -721,7 +720,7 @@ case intern::testcase::result::FAILED: status = "FAILED"; break;
 case intern::testcase::result::PASSED: status = "PASSED"; break;
 default: break;
 }
-*this << "|" << tc_.name() << "|" << tc_.context() << "|" << tc_.duration() << "ms|" << status << "|";
+*this << "|" << tc_.name() << "|" << tc_.suite_name() << "|" << tc_.duration() << "ms|" << status << "|";
 if(m_capture) {
 print_system_out(tc_.cout());
 print_system_out(tc_.cerr());
@@ -743,8 +742,8 @@ first = false;
 }
 bool m_capture = false;
 };
-}// namespace sctf
-#endif// SCTF_REPORTER_MARKDOWN_REPORTER_HPP
+}
+#endif
 #ifndef SCTF_COMPARATOR_COMPARATOR_HPP
 #define SCTF_COMPARATOR_COMPARATOR_HPP
 #ifdef SCTF_CPP_V17
@@ -780,7 +779,7 @@ return err_msg;
 }
 #endif
 };
-}}// namespace sctf::intern
+}}
 #define SCTF_COMPARATOR(NAME, CMPSTR, PRED) \
 namespace sctf { namespace intern { \
 class NAME { \
@@ -800,7 +799,7 @@ template<typename V, typename E = V> auto operator()(V const& actual_value, E co
 namespace sctf { \
 template<typename... Args> static auto NAME(Args&&... args) -> intern::COMP { return intern::COMP(std::forward<Args>(args)...); } \
 }
-#endif// SCTF_COMPARATOR_COMPARATOR_HPP
+#endif
 #ifndef SCTF_COMPARATOR_ORDERING_HPP
 #define SCTF_COMPARATOR_ORDERING_HPP
 SCTF_COMPARATOR(greater_than, "greater than", actual_value > expected_value)
@@ -811,7 +810,7 @@ SCTF_COMPARATOR(less_than, "less than", actual_value < expected_value)
 SCTF_PROVIDE_COMPARATOR(less_than, LESS_THAN)
 SCTF_PROVIDE_COMPARATOR(less_than, LESS)
 SCTF_PROVIDE_COMPARATOR(less_than, LT)
-#endif// SCTF_COMPARATOR_ORDERING_HPP
+#endif
 #ifndef SCTF_COMPARATOR_EQUALITY_HPP
 #define SCTF_COMPARATOR_EQUALITY_HPP
 SCTF_COMPARATOR(equals, "equals", actual_value == expected_value)
@@ -839,11 +838,11 @@ typename std::decay<V>::type epsilon_ = static_cast<V>(m_eps);
 return (std::abs(actual_value - expected_value) <= std::max(std::abs(actual_value), std::abs(expected_value)) * epsilon_) != m_neg ? comparison() : comparison(m_neg ? m_neg_cmp_str : m_cmp_str, std::forward_as_tuple(to_string(actual_value), to_string(expected_value)));
 }
 };
-}// namespace intern
-}// namespace sctf
+}
+}
 SCTF_PROVIDE_COMPARATOR(f_equals, F_EQUALS)
 SCTF_PROVIDE_COMPARATOR(f_equals, FEQ)
-#endif// SCTF_COMPARATOR_EQUALITY_HPP
+#endif
 #ifndef SCTF_COMPARATOR_RANGE_HPP
 #define SCTF_COMPARATOR_RANGE_HPP
 namespace sctf { namespace intern {
@@ -859,17 +858,17 @@ return *this;
 template<typename V, typename E = V, SCTF_INTERN_ENABLE_IF(SCTF_INTERN_HAS_ITERATOR_CAPABILITY(E) && !SCTF_INTERN_IS_TYPE(E, std::string))> auto operator()(V const& actual_value, E const& expected_value) const -> comparison { return (std::find(expected_value.cbegin(), expected_value.cend(), actual_value) != expected_value.cend()) != m_neg ? comparison() : comparison(m_neg ? m_neg_cmp_str : m_cmp_str, std::forward_as_tuple(to_string(actual_value), to_string(expected_value))); }
 template<typename V, typename E = V, SCTF_INTERN_ENABLE_IF(SCTF_INTERN_IS_TYPE(E, std::string))> auto operator()(V const& actual_value, E const& expected_value) const -> comparison { return (expected_value.find(actual_value) != std::string::npos) != m_neg ? comparison() : comparison(m_neg ? m_neg_cmp_str : m_cmp_str, std::forward_as_tuple(to_string(actual_value), to_string(expected_value))); }
 };
-}}// namespace sctf::intern
+}}
 SCTF_PROVIDE_COMPARATOR(in_range, IN_RANGE)
 SCTF_PROVIDE_COMPARATOR(in_range, IN)
-#endif// SCTF_COMPARATOR_RANGE_HPP
+#endif
 #ifndef SCTF_COMPARATOR_REGEX_HPP
 #define SCTF_COMPARATOR_REGEX_HPP
 SCTF_COMPARATOR(match, "matching", std::regex_match(actual_value, std::regex(expected_value)))
 SCTF_PROVIDE_COMPARATOR(match, MATCH)
 SCTF_COMPARATOR(like, "like", std::regex_search(actual_value, std::regex(expected_value)))
 SCTF_PROVIDE_COMPARATOR(like, LIKE)
-#endif// SCTF_COMPARATOR_REGEX_HPP
+#endif
 #ifndef SCTF_ASSERT_HPP
 #define SCTF_ASSERT_HPP
 #define ASSERT(VAL, CMP, EXP) sctf::intern::assert_statement(std::forward_as_tuple(sctf::CMP, VAL, EXP), sctf::intern::loc{__FILE__, __LINE__})
@@ -913,8 +912,8 @@ if(dur_ms > max_ms_) { throw assertion_failure("runtime > " + to_string(max_ms_)
 throw assertion_failure("Unknown exception thrown", loc_);
 }
 }
-}}// namespace sctf::intern
-#endif// SCTF_ASSERT_HPP
+}}
+#endif
 #ifndef SCTF_API_HPP
 #define SCTF_API_HPP
 namespace sctf { namespace intern {
@@ -924,7 +923,7 @@ static T const inst(std::forward<Args>(args_)...);
 return inst;
 }
 };
-}}// namespace sctf::intern
+}}
 #define SCTF_INTERN_CONCAT3(A, B, C) A##B##C
 #define SCTF_INTERN_API_TEST_NAME(ID) SCTF_INTERN_CONCAT3(sctf_intern_test_, ID, _)
 #define SCTF_INTERN_API_TEST_INST(ID) SCTF_INTERN_CONCAT3(sctf_intern_test_, ID, _inst_)
@@ -976,11 +975,11 @@ void sctf_intern_##FN##_fn_()
 #define AFTER_EACH() SCTF_INTERN_API_FN_WRAPPER(after_each)
 #define SETUP() SCTF_INTERN_API_FN_WRAPPER(setup)
 #define TEARDOWN() SCTF_INTERN_API_FN_WRAPPER(teardown)
-#endif// SCTF_API_HPP
+#endif
 #ifndef SCTF_SCTF_HPP
 #define SCTF_SCTF_HPP
 #define SCFT_VERSION "2.0-rc4"
 #define SCTF_DEFAULT_MAIN(R) \
-int main(int, char**) { return static_cast<int>(sctf::R->report()); }
-#endif// SCTF_SCTF_HPP
+auto main(int, char**)->int { return static_cast<int>(sctf::R->report()); }
+#endif
 #endif
