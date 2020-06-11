@@ -25,10 +25,10 @@
 #include "concurrent/Mutex.hpp"
 #include "net/IConnector.hpp"
 #include "net/SEndpoint.hpp"
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "CTimeoutBackoff.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::feed
 {
@@ -73,7 +73,7 @@ protected:
      */
     virtual void handleConnect(net::EErrc err_) = 0;
 
-    virtual str logPrefix() const = 0;
+    virtual auto logPrefix() const -> str = 0;
 
     /**
      * @brief Stop and close the connection.
@@ -143,12 +143,12 @@ public:
      * @param other The other Client
      * @return true if equals, else false
      */
-    virtual bool Equals(IClient const& other_) const;
+    virtual auto Equals(IClient const& other_) const -> bool;
 
     /**
      * @brief Get a hash value of this client.
      * @return the hash value
      */
-    virtual usize Hash() const;
+    virtual auto Hash() const -> usize;
 };
 }  // namespace vfrb::client

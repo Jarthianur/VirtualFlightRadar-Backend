@@ -25,8 +25,15 @@
 #include <ctime>
 #include <stdexcept>
 
+#include "util/ClassUtils.hpp"
+
 namespace vfrb
 {
+namespace
+{
+constexpr auto TIME_BUF_SIZE = 32;
+}  // namespace
+
 void CLogger::LogFile(String const& file_) {
     concurrent::LockGuard lk(m_mutex);
     m_logFile = std::ofstream(file_);
@@ -38,9 +45,9 @@ void CLogger::LogFile(String const& file_) {
 }
 
 auto CLogger::time() -> String {
-    std::time_t          tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    std::array<char, 32> time{};
-    std::strftime(time.data(), 32, "%c", gmtime(&tt));
+    std::time_t tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::array<char, TIME_BUF_SIZE> time{};
+    std::strftime(time.data(), TIME_BUF_SIZE, "%c", gmtime(&tt));
     return time.data();
 }
 

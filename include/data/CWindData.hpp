@@ -24,7 +24,7 @@
 #include "object/CWind.hpp"
 
 #include "IData.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::data
 {
@@ -46,7 +46,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool Update(object::CObject&& wind_) override REQUIRES(!m_mutex);
+    auto Update(object::CObject&& wind_) -> bool override REQUIRES(!m_mutex);
 
     void Access() override REQUIRES(!m_mutex);
 };

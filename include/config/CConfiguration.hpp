@@ -38,13 +38,13 @@ class CConfiguration
     CProperties const m_properties;  ///< The properties from file
 
     /// @throw vfrb::config::error::CConversionError
-    object::CGpsPosition resolvePosition() const;
+    auto resolvePosition() const -> object::CGpsPosition;
 
-    std::unordered_map<String, CProperties> resolveFeeds() const;
-    std::list<String>                       resolveFeedNames() const;
+    auto resolveFeeds() const -> std::unordered_map<String, CProperties>;
+    auto resolveFeedNames() const -> std::list<String>;
 
     /// @param key_ The filters property name
-    s32 resolveFilter(str key_) const;
+    auto resolveFilter(str key_) const -> s32;
 
     /// Dump the configuration to INFO log.
     void dumpInfo() const;
@@ -114,7 +114,7 @@ namespace error
 class CConfigurationError : public vfrb::error::IError
 {
 public:
-    str Message() const noexcept override;
+    [[nodiscard]] auto Message() const noexcept -> str override;
 };
 
 /// Error indicating that a string to number conversion failed
@@ -129,7 +129,7 @@ public:
      */
     CConversionError(String const& str_, str path_);
 
-    str Message() const noexcept override;
+    [[nodiscard]] auto Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb::config

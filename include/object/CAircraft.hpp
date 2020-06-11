@@ -102,8 +102,8 @@ private:
     CTimestamp             m_timestamp;         ///< The timestamp of the last report
     bool                   m_fullInfo = false;  ///< Is full set of information available?
 
-    void assign(CObject&& other_) override;
-    bool canUpdate(CObject const& other_) const override;
+    void               assign(CObject&& other_) override;
+    [[nodiscard]] auto canUpdate(CObject const& other_) const -> bool override;
 
 public:
     /**

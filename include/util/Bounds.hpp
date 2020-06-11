@@ -42,7 +42,7 @@ public:
         : m_msg(std::to_string(val_) + " not in [" + std::to_string(min_) + "," + std::to_string(max_) +
                 "]") {}
 
-    str Message() const noexcept override {
+    [[nodiscard]] auto Message() const noexcept -> str override {
         return m_msg.c_str();
     }
 };

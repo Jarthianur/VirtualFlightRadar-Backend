@@ -23,9 +23,9 @@
 #include <functional>
 #include <utility>
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::object
 {
@@ -62,7 +62,7 @@ public:
      * @param _1 The new Object
      * @return true on success, else false
      */
-    virtual bool Update(object::CObject&& obj_) = 0;
+    virtual auto Update(object::CObject&& obj_) -> bool = 0;
 
     virtual void Access() = 0;
 };

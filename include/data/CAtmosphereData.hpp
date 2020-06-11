@@ -24,7 +24,7 @@
 #include "object/CAtmosphere.hpp"
 
 #include "IData.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::data
 {
@@ -47,7 +47,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool Update(object::CObject&& atm_) override REQUIRES(!m_mutex);
+    auto Update(object::CObject&& atm_) -> bool override REQUIRES(!m_mutex);
 
     void Access() override REQUIRES(!m_mutex);
 
@@ -56,6 +56,6 @@ public:
      * @return the pressure
      * @threadsafe
      */
-    decltype(m_atmosphere.Pressure()) Pressure() const REQUIRES(!m_mutex);
+    auto Pressure() const -> decltype(m_atmosphere.Pressure()) REQUIRES(!m_mutex);
 };
 }  // namespace vfrb::data

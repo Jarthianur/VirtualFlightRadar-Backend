@@ -21,9 +21,9 @@
 #pragma once
 
 #include "error/IError.hpp"
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::feed::parser
 {
@@ -48,7 +48,7 @@ public:
      * @return the parsed object
      * @throw vfrb::feed::parser::error::CParseError
      */
-    virtual ObjectT Parse(String&& str_, u32 prio_) const = 0;
+    virtual auto Parse(String&& str_, u32 prio_) const -> ObjectT = 0;
 };
 
 namespace error
@@ -57,7 +57,7 @@ namespace error
 class CParseError : public vfrb::error::IError
 {
 public:
-    str Message() const noexcept override {
+    [[nodiscard]] auto Message() const noexcept -> str override {
         return "";
     }
 };

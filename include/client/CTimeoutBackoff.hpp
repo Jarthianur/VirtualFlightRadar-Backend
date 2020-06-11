@@ -20,9 +20,9 @@
 
 #pragma once
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::client
 {
@@ -39,7 +39,7 @@ class CTimeoutBackoff
     u32 m_factor  = INITIAL_FACTOR;
 
 public:
-    u32  Next();
+    auto Next() -> u32;
     void Reset();
 };
 }  // namespace vfrb::client

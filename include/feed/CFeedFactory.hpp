@@ -22,9 +22,9 @@
 
 #include "config/CProperties.hpp"
 #include "error/IError.hpp"
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::config
 {
@@ -63,7 +63,7 @@ class CFeedFactory
      * @throw std::logic_error from invoked constructors
      */
     template<typename T, ENABLE_IF(EXTENDS(T, IFeed))>
-    SPtr<T> makeFeed(String const& name_);
+    auto makeFeed(String const& name_) -> SPtr<T>;
 
 public:
     /**
@@ -83,7 +83,7 @@ public:
      * @return an optional unique pointer to the feed
      * @throw std::logic_error from invoked methods
      */
-    SPtr<IFeed> createFeed(String const& name_);
+    auto createFeed(String const& name_) -> SPtr<IFeed>;
 };
 
 namespace error
@@ -95,7 +95,7 @@ class CFeedCreationError : public vfrb::error::IError
 public:
     CFeedCreationError();
 
-    str Message() const noexcept override;
+    [[nodiscard]] auto Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb::feed

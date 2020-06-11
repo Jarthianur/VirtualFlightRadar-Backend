@@ -52,7 +52,7 @@ inline auto Degree(f64 rad_) -> f64 {
  * @return the rounded integer
  */
 inline auto DoubleToInt(f64 val_) -> s32 {
-    return (val_ >= 0.0) ? static_cast<s32>(val_ + 0.5) : static_cast<s32>(val_ - 0.5);
+    return static_cast<s32>(std::lround(val_));
 }
 
 /**

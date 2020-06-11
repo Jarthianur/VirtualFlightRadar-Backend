@@ -49,7 +49,7 @@ class CLogger
      * @param l_      The log level
      * @return an expression to log the prefix
      */
-    constexpr auto prefix(std::ostream& stream_, ELevel l_) const {
+    static constexpr auto prefix(std::ostream& stream_, ELevel l_) {
         constexpr std::array<str, 4> levels = {"[INFO ]  ", "[WARN ]  ", "[ERROR]  ", "[DEBUG]  "};
         return [&, l = levels[util::AsUnderlyingType(l_)]] { stream_ << l << time() << ":: "; };
     }

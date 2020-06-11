@@ -47,7 +47,7 @@ class CGpsdClient : public IClient
      */
     void handleWatch(net::EErrc err_) REQUIRES(!m_mutex);
 
-    str logPrefix() const override;
+    auto logPrefix() const -> str override;
 
 public:
     /**

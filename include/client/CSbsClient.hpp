@@ -35,7 +35,7 @@ class CSbsClient : public IClient
      */
     void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
 
-    str logPrefix() const override;
+    auto logPrefix() const -> str override;
 
 public:
     /**

@@ -50,11 +50,11 @@ class CGpsParser : public IParser<object::CGpsPosition>
      * @throw vfrb::str_util::error::CConversionError
      * @throw vfrb::object::error::CTimestampParseError
      */
-    object::CGpsPosition parsePosition(std::cmatch const& match_, u32 prio_) const;
+    [[nodiscard]] auto parsePosition(std::cmatch const& match_, u32 prio_) const -> object::CGpsPosition;
 
 public:
     CGpsParser();
 
-    object::CGpsPosition Parse(String&& str_, u32 prio_) const override;
+    auto Parse(String&& str_, u32 prio_) const -> object::CGpsPosition override;
 };
 }  // namespace vfrb::feed::parser

@@ -28,7 +28,7 @@
 #include "processor/CGpsProcessor.hpp"
 
 #include "IData.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::data
 {
@@ -53,7 +53,7 @@ class CGpsData : public IData
      * @brief Check whether the position is good enough.
      * @return true if yes, else false
      */
-    bool isPositionGood() const REQUIRES(m_mutex);
+    auto isPositionGood() const -> bool REQUIRES(m_mutex);
 
 public:
     /**
@@ -69,7 +69,7 @@ public:
      * @throw ReceivedGoodPosition if the position was good and ground mode is enabled, hence locked
      * @threadsafe
      */
-    bool Update(object::CObject&& pos_) override REQUIRES(!m_mutex);
+    auto Update(object::CObject&& pos_) -> bool override REQUIRES(!m_mutex);
 
     void Access() override REQUIRES(!m_mutex);
 
@@ -78,7 +78,7 @@ public:
      * @return the position
      * @threadsafe
      */
-    decltype(std::get<0>(m_position).Location()) Location() const REQUIRES(!m_mutex);
+    auto Location() const -> decltype(std::get<0>(m_position).Location()) REQUIRES(!m_mutex);
 };
 
 namespace error
@@ -92,7 +92,7 @@ class IGpsDataException : public vfrb::error::IError
 class CPositionAlreadyLocked : public IGpsDataException
 {
 public:
-    str Message() const noexcept override;
+    [[nodiscard]] auto Message() const noexcept -> str override;
 };
 
 /**
@@ -101,7 +101,7 @@ public:
 class CReceivedGoodPosition : public IGpsDataException
 {
 public:
-    str Message() const noexcept override;
+    [[nodiscard]] auto Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb::data

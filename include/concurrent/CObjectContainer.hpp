@@ -23,11 +23,11 @@
 #include <map>
 #include <utility>
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "CStaticString.hpp"
 #include "Mutex.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::concurrent
 {
@@ -52,7 +52,7 @@ public:
     CIterator Begin() REQUIRES(!m_modMutex);
 
     /// Get an iterator to the end of the container, thus pointing nowhere.
-    CIterator End();
+    auto End() -> CIterator;
 
     /**
      * Insert an object at the given key, if not existing yet.
@@ -60,7 +60,7 @@ public:
      * @param val_ The object to insert
      * @return an iterator to the element at key and true if it was inserted, or false if not
      */
-    std::pair<CIterator, bool> Insert(KeyType key_, ObjectT&& val_) REQUIRES(!m_modMutex);
+    std::pair<CIterator, bool> Insert(KeyType key_, ObjectT&& value_) REQUIRES(!m_modMutex);
 
     /// Erase the element at key.
     void Erase(KeyType key_) REQUIRES(!m_modMutex);
@@ -102,14 +102,14 @@ public:
     CIterator(typename ContainerType::iterator iter_, CObjectContainer const& c_);
     ~CIterator() noexcept = default;
 
-    CIterator&  operator++();
-    CValueType& operator*();
-    CValueType* operator->();
+    auto operator++() -> CIterator&;
+    auto operator*() -> CValueType&;
+    auto operator->() -> CValueType*;
 
-    KeyType Key() const;
+    [[nodiscard]] auto Key() const -> KeyType;
 
-    bool operator==(CIterator const& other_) const;
-    bool operator!=(CIterator const& other_) const;
+    auto operator==(CIterator const& other_) const -> bool;
+    auto operator!=(CIterator const& other_) const -> bool;
 };
 
 template<typename ObjectT, usize StringSize>
@@ -181,12 +181,12 @@ auto CObjectContainer<ObjectT, StringSize>::CIterator::Key() const -> KeyType {
 }
 
 template<typename ObjectT, usize StringSize>
-bool CObjectContainer<ObjectT, StringSize>::CIterator::operator==(CIterator const& other_) const {
+auto CObjectContainer<ObjectT, StringSize>::CIterator::operator==(CIterator const& other_) const -> bool {
     return m_iterator == other_.m_iterator;
 }
 
 template<typename ObjectT, usize StringSize>
-bool CObjectContainer<ObjectT, StringSize>::CIterator::operator!=(CIterator const& other_) const {
+auto CObjectContainer<ObjectT, StringSize>::CIterator::operator!=(CIterator const& other_) const -> bool {
     return m_iterator != other_.m_iterator;
 }
 

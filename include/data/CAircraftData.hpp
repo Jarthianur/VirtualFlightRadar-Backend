@@ -25,7 +25,7 @@
 #include "processor/CAircraftProcessor.hpp"
 
 #include "IData.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::data
 {
@@ -52,7 +52,7 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    bool Update(object::CObject&& aircraft_) override;
+    auto Update(object::CObject&& aircraft_) -> bool override;
 
     void Environment(object::SLocation const& loc_, f64 press_);
 

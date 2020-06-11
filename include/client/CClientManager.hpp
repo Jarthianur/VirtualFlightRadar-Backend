@@ -25,10 +25,10 @@
 #include "concurrent/CThreadGroup.hpp"
 #include "concurrent/Mutex.hpp"
 #include "error/IError.hpp"
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "IClient.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::feed
 {
@@ -42,7 +42,7 @@ namespace vfrb::client
  */
 struct SClientHasher
 {
-    usize operator()(SPtr<IClient> const& c_) const {
+    auto operator()(SPtr<IClient> const& c_) const -> usize {
         return c_->Hash();
     }
 };
@@ -52,7 +52,7 @@ struct SClientHasher
  */
 struct SClientComparator
 {
-    bool operator()(SPtr<IClient> const& c1_, SPtr<IClient> const& c2_) const {
+    auto operator()(SPtr<IClient> const& c1_, SPtr<IClient> const& c2_) const -> bool {
         return c1_->Equals(*c2_);
     }
 };
@@ -108,7 +108,7 @@ class CFeedSubscriptionError : public vfrb::error::IError
 public:
     explicit CFeedSubscriptionError(String const& name_);
 
-    str Message() const noexcept override;
+    [[nodiscard]] auto Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb::client

@@ -35,7 +35,7 @@ namespace error
 class COverflowError : public vfrb::error::IError
 {
 public:
-    str Message() const noexcept override {
+    [[nodiscard]] auto Message() const noexcept -> str override {
         return "";
     }
 };
@@ -86,15 +86,15 @@ public:
         Clear();
     }
 
-    CStaticString(str init_) {
+    explicit CStaticString(str init_) {
         operator=(init_);
     }
 
-    CStaticString(String const& init_) {
+    explicit CStaticString(String const& init_) {
         operator=(init_);
     }
 
-    CStaticString(StringView const& init_) {
+    explicit CStaticString(StringView const& init_) {
         operator=(init_);
     }
 
@@ -108,40 +108,42 @@ public:
 
     ~CStaticString() noexcept = default;
 
-    CStaticString& operator=(str other_) {
+    auto operator=(str other_) -> CStaticString& {
         copy(StringView(other_));
         return *this;
     }
 
-    CStaticString& operator=(String const& other_) {
+    auto operator=(String const& other_) -> CStaticString& {
         copy(StringView(other_));
         return *this;
     }
 
-    CStaticString& operator=(CStaticString<N> const& other_) {
+    auto operator=(CStaticString<N> const& other_) -> CStaticString& {
+        if (this != &other_) {
+            copy(other_);
+        }
+        return *this;
+    }
+
+    auto operator=(StringView const& other_) -> CStaticString& {
         copy(other_);
         return *this;
     }
 
-    CStaticString& operator=(StringView const& other_) {
+    auto operator=(CStaticString<N>&& other_) noexcept -> CStaticString& {
         copy(other_);
         return *this;
     }
 
-    CStaticString& operator=(CStaticString<N>&& other_) noexcept {
-        copy(other_);
-        return *this;
-    }
-
-    StringView const& operator*() const {
+    auto operator*() const -> StringView const& {
         return m_view;
     }
 
-    operator StringView() const {
+    explicit operator StringView() const {
         return m_view;
     }
 
-    bool operator==(CStaticString<N> const& other_) const {
+    auto operator==(CStaticString<N> const& other_) const -> bool {
         return m_view == other_.m_view;
     }
 
@@ -159,7 +161,7 @@ public:
      * @throw vfrb::error::COverflowError
      */
     template<typename... Args>
-    int Format(usize pos_, str fmt_, Args... args_) {
+    auto Format(usize pos_, str fmt_, Args... args_) -> int {
         if (pos_ >= N) {
             throw error::COverflowError();
         }
@@ -176,7 +178,7 @@ public:
     }
 
     /// Get the length of seen characters.
-    inline usize Length() const {
+    [[nodiscard]] inline auto Length() const -> usize {
         return m_view.length();
     }
 };

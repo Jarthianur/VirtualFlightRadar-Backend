@@ -22,9 +22,9 @@
 
 #include <functional>
 
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::client::net
 {
@@ -94,7 +94,7 @@ public:
      * @param callback The callback to execute
      * @param timeout  The timeout (default: 0)
      */
-    virtual void OnTimeout(Callback const& cb_, u32 to_ = 0) = 0;
+    virtual void OnTimeout(Callback const& cb_, u32 to_) = 0;
 
     /**
      * @brief Reset the timeout.
@@ -106,6 +106,6 @@ public:
      * @brief Check whether the timeout ran off.
      * @return true if it ran off, else false
      */
-    virtual bool TimerExpired() = 0;
+    virtual auto TimerExpired() -> bool = 0;
 };
 }  // namespace vfrb::client::net

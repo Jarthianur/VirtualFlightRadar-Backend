@@ -23,9 +23,9 @@
 #include "client/net/SEndpoint.hpp"
 #include "config/CProperties.hpp"
 #include "error/IError.hpp"
-#include "util/class_utils.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::data
 {
@@ -45,7 +45,7 @@ class IFeed
     /**
      * @brief Initialize the priority from the given properties.
      */
-    u32 initPriority() const;
+    [[nodiscard]] auto initPriority() const -> u32;
 
 protected:
     config::CProperties const m_properties;  ///< Properties
@@ -79,21 +79,21 @@ public:
      * @brief Get the supported Protocol.
      * @return the protocol
      */
-    virtual EProtocol Protocol() const = 0;
+    [[nodiscard]] virtual auto Protocol() const -> EProtocol = 0;
 
     /**
      * @brief Get the feeds required Endpoint.
      * @return the endpoint
      */
-    client::net::SEndpoint Endpoint() const;
+    [[nodiscard]] auto Endpoint() const -> client::net::SEndpoint;
 
     /**
      * @brief Handle client's response.
      * @param response The response
      */
-    virtual bool Process(String str_) = 0;
+    virtual auto Process(String str_) -> bool = 0;
 
-    auto Priority() const -> std::remove_const<decltype(m_priority)>::type;
+    [[nodiscard]] auto Priority() const -> std::remove_const<decltype(m_priority)>::type;
 
     GETTER_REF(Name, m_name)
 };
@@ -107,7 +107,7 @@ class CInvalidPropertyError : public vfrb::error::IError
 public:
     explicit CInvalidPropertyError(String const& msg_);
 
-    str Message() const noexcept override;
+    [[nodiscard]] auto Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb::feed

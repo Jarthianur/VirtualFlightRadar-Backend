@@ -32,6 +32,6 @@ class CWindParser : public IParser<object::CWind>
 public:
     CWindParser();
 
-    object::CWind Parse(String&& str_, u32 prio_) const override;
+    auto Parse(String&& str_, u32 prio_) const -> object::CWind override;
 };
 }  // namespace vfrb::feed::parser

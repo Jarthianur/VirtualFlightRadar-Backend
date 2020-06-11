@@ -22,8 +22,9 @@
 
 #include "object/CAircraft.hpp"
 #include "object/CGpsPosition.hpp"
+#include "util/ClassUtils.hpp"
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::data::processor
 {
@@ -36,11 +37,13 @@ public:
     CTCONST NMEA_SIZE = 192;
 
 private:
-    s32 const         m_maxDistance;               ///< Max distance to process an aircraft
-    object::SLocation m_refLocation{0.0, 0.0, 0};  ///< Refered position
-    f64               m_refAtmPressure = 1013.25;  ///< Refered pressure; hPa
-    f64 mutable m_refRadLatitude       = 0.0;      ///< Refered latitude as radian
-    f64 mutable m_aircraftRadLatitude  = 0.0;      ///< Aircraft latitude as radian
+    CTCONST ICAO_STD_ATMOSPHERE = 1013.25;
+
+    s32 const         m_maxDistance;                           ///< Max distance to process an aircraft
+    object::SLocation m_refLocation{0.0, 0.0, 0};              ///< Refered position
+    f64               m_refAtmPressure = ICAO_STD_ATMOSPHERE;  ///< Refered pressure; hPa
+    f64 mutable m_refRadLatitude       = 0.0;                  ///< Refered latitude as radian
+    f64 mutable m_aircraftRadLatitude  = 0.0;                  ///< Aircraft latitude as radian
     f64 mutable m_latDistance     = 0.0;  ///< Distance/Difference between Aircraft's and refered latitude
     f64 mutable m_refRadLongitude = 0.0;  ///< Refered longitude as radian
     f64 mutable m_aircraftRadLongitude = 0.0;  ///< Aircraft's longitude as radian
@@ -62,13 +65,15 @@ private:
      * @brief Append PFLAU sentence to processing string.
      * @param aircraft The Aircaft
      */
-    usize appendPflau(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>& nmea_, usize idx_) const;
+    auto appendPflau(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
+        -> usize;
 
     /**
      * @brief Append PFLAA sentence to processing string.
      * @param aircraft The Aircaft
      */
-    usize appendPflaa(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>& nmea_, usize idx_) const;
+    auto appendPflaa(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
+        -> usize;
 
 public:
     CAircraftProcessor();
@@ -78,7 +83,7 @@ public:
      * @brief Process an aircraft.
      * @param aircraft The Aircraft to process
      */
-    void Process(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>& nmea_) const;
+    void Process(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_) const;
 
     /**
      * @brief Set the refered position and atmospheric pressure.

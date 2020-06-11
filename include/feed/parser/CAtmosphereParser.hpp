@@ -30,6 +30,6 @@ namespace vfrb::feed::parser
 class CAtmosphereParser : public IParser<object::CAtmosphere>
 {
 public:
-    object::CAtmosphere Parse(String&& str_, u32 prio_) const override;
+    auto Parse(String&& str_, u32 prio_) const -> object::CAtmosphere override;
 };
 }  // namespace vfrb::feed::parser

@@ -21,7 +21,7 @@
 #pragma once
 
 #include "IClient.hpp"
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::client
 {
@@ -59,7 +59,7 @@ class CAprscClient : public IClient
      */
     void handleSendKeepAlive(net::EErrc err_) REQUIRES(!m_mutex);
 
-    str logPrefix() const override;
+    auto logPrefix() const -> str override;
 
 public:
     /**
@@ -69,7 +69,7 @@ public:
      */
     CAprscClient(net::SEndpoint const& ep_, String const& login_, SPtr<net::IConnector> con_);
 
-    bool  Equals(IClient const& other_) const override;
-    usize Hash() const override;
+    auto Equals(IClient const& other_) const -> bool override;
+    auto Hash() const -> usize override;
 };
 }  // namespace vfrb::client

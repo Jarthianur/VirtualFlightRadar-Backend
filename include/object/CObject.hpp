@@ -49,7 +49,7 @@ protected:
      * @param other_   The other object
      * @return true if yes, else false
      */
-    virtual bool canUpdate(CObject const& other_) const;
+    [[nodiscard]] virtual auto canUpdate(CObject const& other_) const -> bool;
 
 public:
     DEFAULT_COPYABLE(CObject)
@@ -60,14 +60,14 @@ public:
     virtual ~CObject() noexcept = default;
 
     /// Increment the update age.
-    CObject& operator++();
+    auto operator++() -> CObject&;
 
     /**
      * Try to update this object.
      * @param other_   The other object
      * @return true on success, else false
      */
-    bool TryUpdate(CObject&& other_);
+    auto TryUpdate(CObject&& other_) -> bool;
 
     GETTER(UpdateAge, m_updateAge)
 };

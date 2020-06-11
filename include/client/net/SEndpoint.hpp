@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "types.hpp"
+#include "Types.hpp"
 
 namespace vfrb::client::net
 {
@@ -37,7 +37,7 @@ struct SEndpoint
      * @param other The other endpoint
      * @return true if both are equal, else false
      */
-    bool operator==(SEndpoint const& other_) const {
+    auto operator==(SEndpoint const& other_) const -> bool {
         return Host == other_.Host && Port == other_.Port;
     }
 };
