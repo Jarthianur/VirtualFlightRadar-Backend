@@ -22,6 +22,7 @@
 #include "data/processor/AircraftProcessor.h"
 
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
 #include <limits>
 
@@ -75,8 +76,21 @@ void AircraftProcessor::calculateRelPosition(const Aircraft& aircraft)
     double a = std::pow(std::sin(m_latDistance / 2.0), 2.0) +
                std::cos(m_refRadLatitude) * std::cos(m_aircraftRadLatitude) *
                    std::pow(std::sin(m_lonDistance / 2.0), 2.0);
-    m_distance =
-        math::doubleToInt(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
+
+    std::int32_t oldDistance = aircraft.get_distance();
+    aircraft.set_distance(
+        math::doubleToInt(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a)))));
+    double distDiff = oldDistance - aircraft.get_distance();
+    double timeDiff = aircraft.get_timeStamp() - aircraft.get_oldTimeStamp();
+
+    if (timeDiff > 0)
+    {
+        aircraft.set_annealingVelocity(distDiff / timeDiff);
+    }
+    else
+    {
+        aircraft.set_annealingVelocity(0.);
+    }
 
     m_relBearing = math::degree(std::atan2(
         std::sin(m_aircraftRadLongitude - m_refRadLongitude) * std::cos(m_aircraftRadLatitude),

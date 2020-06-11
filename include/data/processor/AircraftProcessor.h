@@ -123,9 +123,6 @@ private:
 
     /// Relative vertical distance; m
     mutable std::int32_t m_relVertical = 0;
-
-    /// Distance between Aircraft and refered position; m
-    mutable std::int32_t m_distance = 0;
 };
 
 }  // namespace processor

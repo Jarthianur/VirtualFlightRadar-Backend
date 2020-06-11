@@ -40,13 +40,16 @@ void Aircraft::assign(Object&& other)
     {
         Aircraft&& update = dynamic_cast<Aircraft&&>(other);
         Object::assign(std::move(other));
-        this->m_idType       = update.m_idType;
-        this->m_aircraftType = update.m_aircraftType;
-        this->m_targetType   = update.m_targetType;
-        this->m_position     = update.m_position;
-        this->m_movement     = update.m_movement;
-        this->m_timeStamp    = update.m_timeStamp;
-        this->m_fullInfo     = update.m_fullInfo;
+        this->m_idType            = update.m_idType;
+        this->m_aircraftType      = update.m_aircraftType;
+        this->m_targetType        = update.m_targetType;
+        this->m_position          = update.m_position;
+        this->m_movement          = update.m_movement;
+        this->m_fullInfo          = update.m_fullInfo;
+        this->m_oldTimeStamp      = this->m_timeStamp;
+        this->m_timeStamp         = update.m_timeStamp;
+        this->m_distance          = update.m_distance;
+        this->m_annealingVelocity = update.m_annealingVelocity;
     }
     catch (const std::bad_cast&)
     {}

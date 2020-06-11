@@ -81,6 +81,8 @@ public:
      */
     bool operator>(const TimeStamp& other) const;
 
+    std::int64_t operator-(const TimeStamp& other) const;
+
 private:
     /// Time in milliseconds
     std::int64_t m_value = 0;
@@ -98,16 +100,14 @@ TimeStamp<DateTimeT>::TimeStamp(const std::string& value, timestamp::Format form
     {
         switch (format)
         {
-            case timestamp::Format::HHMMSS:
-            {
+            case timestamp::Format::HHMMSS: {
                 h = std::stoi(value.substr(0, 2));
                 m = std::stoi(value.substr(2, 2));
                 s = std::stoi(value.substr(4, 2));
                 f = 0;
             }
             break;
-            case timestamp::Format::HH_MM_SS_FFF:
-            {
+            case timestamp::Format::HH_MM_SS_FFF: {
                 h = std::stoi(value.substr(0, 2));
                 m = std::stoi(value.substr(3, 2));
                 s = std::stoi(value.substr(6, 2));
@@ -149,6 +149,22 @@ bool TimeStamp<DateTimeT>::operator>(const TimeStamp<DateTimeT>& other) const
 {
     return (this->m_day > other.m_day) ||
            ((this->m_day == other.m_day) && this->m_value > other.m_value);
+}
+
+template<typename DateTimeT>
+std::int64_t TimeStamp<DateTimeT>::operator-(const TimeStamp& other) const
+{
+    std::int64_t lbase = m_value;
+    std::int64_t rbase = other.m_value;
+    if (m_day > other.m_day)
+    {
+        lbase += (m_day - other.m_day) * 86400000;
+    }
+    else
+    {
+        rbase += (other.m_day - m_day) * 86400000;
+    }
+    return lbase - rbase;
 }
 
 }  // namespace object

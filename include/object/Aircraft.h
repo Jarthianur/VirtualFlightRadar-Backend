@@ -163,8 +163,13 @@ private:
     /// The timestamp of the last report.
     TimeStamp<timestamp::DateTimeImplBoost> m_timeStamp;
 
+    TimeStamp<timestamp::DateTimeImplBoost> m_oldTimeStamp;
+
     /// Is full set of information available?
     bool m_fullInfo = false;
+
+    mutable std::int32_t m_distance;
+    mutable double       m_annealingVelocity;
 
 public:
     /**
@@ -177,7 +182,20 @@ public:
     GETSET_V(fullInfo)
     GETSET_CR(position)
     GETSET_CR(movement)
-    GETSET_V(timeStamp)
+    GETSET_CR(timeStamp)
+    GETSET_CR(oldTimeStamp)
+    GETTER_V(distance)
+    GETTER_V(annealingVelocity)
+
+    void set_distance(std::int32_t dist) const
+    {
+        m_distance = dist;
+    }
+
+    void set_annealingVelocity(double v) const
+    {
+        m_annealingVelocity = v;
+    }
 };
 
 }  // namespace object
