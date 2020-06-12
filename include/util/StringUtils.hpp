@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <limits>
 #include <regex>
 #include <tuple>
 
@@ -166,12 +167,13 @@ auto Convert(str first_, str last_) -> Result<u32> {
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, s8))>
 auto Convert(str first_, str last_) -> Result<T> {
-    T     result;
-    EErrc ec = EErrc::OK;
-    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::byte_, result) || first_ != last_) {
+    s16   result = 0;
+    EErrc ec     = EErrc::OK;
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::short_, result) || first_ != last_ ||
+        result > std::numeric_limits<s8>::max() || result < std::numeric_limits<s8>::min()) {
         ec = EErrc::ERR;
     }
-    return {result, ec};
+    return {static_cast<s8>(result), ec};
 }
 
 /**
@@ -182,8 +184,13 @@ auto Convert(str first_, str last_) -> Result<T> {
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, u8))>
 auto Convert(str first_, str last_) -> Result<T> {
-    auto [v, ec] = Convert<s8>(first_, last_);
-    return {static_cast<u8>(v), ec};
+    u16   result = 0;
+    EErrc ec     = EErrc::OK;
+    if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_ ||
+        result > std::numeric_limits<u8>::max()) {
+        ec = EErrc::ERR;
+    }
+    return {static_cast<u8>(result), ec};
 }
 
 /**
@@ -288,7 +295,7 @@ inline auto Checksum(StringView const& sv_, usize pos_) -> u32 {
  */
 inline auto MatchChecksum(StringView const& sv_) -> bool {
     auto const cs_begin = sv_.rfind('*');
-    if (cs_begin == StringView::npos || cs_begin + 3 >= sv_.length()) {
+    if (cs_begin == StringView::npos || cs_begin + 3 > sv_.length()) {
         return false;
     }
     bool match = false;

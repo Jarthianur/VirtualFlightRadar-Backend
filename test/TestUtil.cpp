@@ -18,6 +18,8 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <ostream>
+
 #include "util/Bounds.hpp"
 #include "util/StringUtils.hpp"
 #include "util/Utility.hpp"
@@ -31,7 +33,7 @@ using namespace str_util;
 
 DESCRIBE_PAR("test_Bounds") {
     IT("should not throw if value is in bounds") {
-        ASSERT_NOTHROW(FailOutsideBounds(1., 2., 3.));
+        ASSERT_NOTHROW(FailOutsideBounds(2., 1., 3.));
     }
     IT("should throw if value is not in bounds") {
         ASSERT_THROWS(FailOutsideBounds(0., 2., 3.), util::error::CBoundsExceededError);
@@ -53,10 +55,10 @@ DESCRIBE_PAR("test_StringUtils") {
     }
     // f64
     IT("should convert f64 correctly") {
-        char const* nr  = "1234.0";
-        char const* nr2 = "-1234.0";
-        auto [v, e]     = Convert<f64>(nr, nr + 6);
-        auto [v2, e2]   = Convert<f64>(nr2, nr2 + 7);
+        str nr        = "1234.0";
+        str nr2       = "-1234.0";
+        auto [v, e]   = Convert<f64>(nr, nr + 6);
+        auto [v2, e2] = Convert<f64>(nr2, nr2 + 7);
         ASSERT_EQ(e, EErrc::OK);
         ASSERT(v, FEQ(), 1234.0);
         ASSERT_EQ(e2, EErrc::OK);
@@ -64,27 +66,27 @@ DESCRIBE_PAR("test_StringUtils") {
     }
     IT("should fail to convert bad f64") {
         {
-            char const* noNr = "abc";
-            auto [v, e]      = Convert<f64>(noNr, noNr + 3);
+            str noNr    = "abc";
+            auto [v, e] = Convert<f64>(noNr, noNr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* noNr = "";
-            auto [v, e]      = Convert<f64>(noNr, noNr + 1);
+            str noNr    = "";
+            auto [v, e] = Convert<f64>(noNr, noNr + 1);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* nr = "1";
-            auto [v, e]    = Convert<f64>(nr, nr + 3);
+            str nr      = "1";
+            auto [v, e] = Convert<f64>(nr, nr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
     }
     // s8
     IT("should convert s8 correctly") {
-        char const* nr  = "100";
-        char const* nr2 = "-100";
-        auto [v, e]     = Convert<s8>(nr, nr + 3);
-        auto [v2, e2]   = Convert<s8>(nr2, nr2 + 4);
+        str nr        = "100";
+        str nr2       = "-100";
+        auto [v, e]   = Convert<s8>(nr, nr + 3);
+        auto [v2, e2] = Convert<s8>(nr2, nr2 + 4);
         ASSERT_EQ(e, EErrc::OK);
         ASSERT_EQ(v, 100);
         ASSERT_EQ(e2, EErrc::OK);
@@ -92,75 +94,75 @@ DESCRIBE_PAR("test_StringUtils") {
     }
     IT("should fail to convert bad s8") {
         {
-            char const* noNr = "abc";
-            auto [v, e]      = Convert<s8>(noNr, noNr + 3);
+            str noNr    = "abc";
+            auto [v, e] = Convert<s8>(noNr, noNr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* noNr = "";
-            auto [v, e]      = Convert<s8>(noNr, noNr + 1);
+            str noNr    = "";
+            auto [v, e] = Convert<s8>(noNr, noNr + 1);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* nr = "1";
-            auto [v, e]    = Convert<s8>(nr, nr + 3);
+            str nr      = "1";
+            auto [v, e] = Convert<s8>(nr, nr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
     }
     // u8
     IT("should convert u8 correctly") {
-        char const* nr = "250";
-        auto [v, e]    = Convert<u8>(nr, nr + 3);
+        str nr      = "250";
+        auto [v, e] = Convert<u8>(nr, nr + 3);
         ASSERT_EQ(e, EErrc::OK);
         ASSERT_EQ(v, 250);
     }
     IT("should fail to convert bad u8") {
         {
-            char const* noNr = "abc";
-            auto [v, e]      = Convert<u8>(noNr, noNr + 3);
+            str noNr    = "abc";
+            auto [v, e] = Convert<u8>(noNr, noNr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* noNr = "";
-            auto [v, e]      = Convert<u8>(noNr, noNr + 1);
+            str noNr    = "";
+            auto [v, e] = Convert<u8>(noNr, noNr + 1);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* nr = "1";
-            auto [v, e]    = Convert<u8>(nr, nr + 3);
+            str nr      = "1";
+            auto [v, e] = Convert<u8>(nr, nr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
     }
     // u16
     IT("should convert u16 correctly") {
-        char const* nr = "1234";
-        auto [v, e]    = Convert<u16>(nr, nr + 4);
+        str nr      = "1234";
+        auto [v, e] = Convert<u16>(nr, nr + 4);
         ASSERT_EQ(e, EErrc::OK);
         ASSERT_EQ(v, 1234);
     }
     IT("should fail to convert bad u16") {
         {
-            char const* noNr = "abc";
-            auto [v, e]      = Convert<u16>(noNr, noNr + 3);
+            str noNr    = "abc";
+            auto [v, e] = Convert<u16>(noNr, noNr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* noNr = "";
-            auto [v, e]      = Convert<u16>(noNr, noNr + 1);
+            str noNr    = "";
+            auto [v, e] = Convert<u16>(noNr, noNr + 1);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* nr = "1";
-            auto [v, e]    = Convert<u16>(nr, nr + 3);
+            str nr      = "1";
+            auto [v, e] = Convert<u16>(nr, nr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
     }
     // s32
     IT("should convert s32 correctly") {
-        char const* nr  = "1234";
-        char const* nr2 = "-1234";
-        auto [v, e]     = Convert<s32>(nr, nr + 4);
-        auto [v2, e2]   = Convert<s32>(nr2, nr2 + 5);
+        str nr        = "1234";
+        str nr2       = "-1234";
+        auto [v, e]   = Convert<s32>(nr, nr + 4);
+        auto [v2, e2] = Convert<s32>(nr2, nr2 + 5);
         ASSERT_EQ(e, EErrc::OK);
         ASSERT_EQ(v, 1234);
         ASSERT_EQ(e2, EErrc::OK);
@@ -168,94 +170,94 @@ DESCRIBE_PAR("test_StringUtils") {
     }
     IT("should fail to convert bad s32") {
         {
-            char const* noNr = "abc";
-            auto [v, e]      = Convert<s32>(noNr, noNr + 3);
+            str noNr    = "abc";
+            auto [v, e] = Convert<s32>(noNr, noNr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* noNr = "";
-            auto [v, e]      = Convert<s32>(noNr, noNr + 1);
+            str noNr    = "";
+            auto [v, e] = Convert<s32>(noNr, noNr + 1);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* nr = "1";
-            auto [v, e]    = Convert<s32>(nr, nr + 3);
+            str nr      = "1";
+            auto [v, e] = Convert<s32>(nr, nr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
     }
     // u32
     IT("should convert u32 correctly") {
-        char const* nr = "1234";
-        auto [v, e]    = Convert<u32>(nr, nr + 4);
+        str nr      = "1234";
+        auto [v, e] = Convert<u32>(nr, nr + 4);
         ASSERT_EQ(e, EErrc::OK);
         ASSERT_EQ(v, 1234);
     }
     IT("should fail to convert bad u32") {
         {
-            char const* noNr = "abc";
-            auto [v, e]      = Convert<u32>(noNr, noNr + 3);
+            str noNr    = "abc";
+            auto [v, e] = Convert<u32>(noNr, noNr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* noNr = "";
-            auto [v, e]      = Convert<u32>(noNr, noNr + 1);
+            str noNr    = "";
+            auto [v, e] = Convert<u32>(noNr, noNr + 1);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* nr = "1";
-            auto [v, e]    = Convert<u32>(nr, nr + 3);
+            str nr      = "1";
+            auto [v, e] = Convert<u32>(nr, nr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
     }
     // x32
     IT("should convert x32 correctly") {
-        char const* nr  = "4";
-        char const* nr2 = "0x4";
-        auto [v, e]     = Convert<x32>(nr, nr + 1);
-        auto [v2, e2]   = Convert<x32>(nr2, nr2 + 3);
+        str nr        = "4";
+        str nr2       = "abc";
+        auto [v, e]   = Convert<x32>(nr, nr + 1);
+        auto [v2, e2] = Convert<x32>(nr2, nr2 + 3);
         ASSERT_EQ(e, EErrc::OK);
         ASSERT_EQ(v, 4);
         ASSERT_EQ(e2, EErrc::OK);
-        ASSERT_EQ(v2, 4);
+        ASSERT_EQ(v2, 2748);
     }
     IT("should fail to convert bad x32") {
         {
-            char const* noNr = "abc";
-            auto [v, e]      = Convert<x32>(noNr, noNr + 3);
+            str noNr    = "xyz";
+            auto [v, e] = Convert<x32>(noNr, noNr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* noNr = "";
-            auto [v, e]      = Convert<x32>(noNr, noNr + 1);
+            str noNr    = "";
+            auto [v, e] = Convert<x32>(noNr, noNr + 1);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* nr = "1";
-            auto [v, e]    = Convert<x32>(nr, nr + 3);
+            str nr      = "1";
+            auto [v, e] = Convert<x32>(nr, nr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
     }
     // u64
     IT("should convert u64 correctly") {
-        char const* nr = "1234";
-        auto [v, e]    = Convert<u64>(nr, nr + 4);
+        str nr      = "1234";
+        auto [v, e] = Convert<u64>(nr, nr + 4);
         ASSERT_EQ(e, EErrc::OK);
         ASSERT_EQ(v, 1234);
     }
     IT("should fail to convert bad u64") {
         {
-            char const* noNr = "abc";
-            auto [v, e]      = Convert<u64>(noNr, noNr + 3);
+            str noNr    = "abc";
+            auto [v, e] = Convert<u64>(noNr, noNr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* noNr = "";
-            auto [v, e]      = Convert<u64>(noNr, noNr + 1);
+            str noNr    = "";
+            auto [v, e] = Convert<u64>(noNr, noNr + 1);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
-            char const* nr = "1";
-            auto [v, e]    = Convert<u64>(nr, nr + 3);
+            str nr      = "1";
+            auto [v, e] = Convert<u64>(nr, nr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
     }
