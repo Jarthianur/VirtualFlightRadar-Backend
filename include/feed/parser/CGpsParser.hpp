@@ -50,7 +50,7 @@ class CGpsParser : public IParser<object::CGpsPosition>
      * @throw vfrb::str_util::error::CConversionError
      * @throw vfrb::object::error::CTimestampParseError
      */
-    [[nodiscard]] auto parsePosition(std::cmatch const& match_, u32 prio_) const -> object::CGpsPosition;
+    [[nodiscard]] auto static parsePosition(std::cmatch const& match_, u32 prio_) -> object::CGpsPosition;
 
 public:
     CGpsParser();

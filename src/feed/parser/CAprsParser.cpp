@@ -24,12 +24,14 @@
 #include <limits>
 #include <stdexcept>
 
-#include "math/math.hpp"
+#include "math/Math.hpp"
+#include "object/CGpsPosition.hpp"
 #include "object/CTimestamp.hpp"
-#include "util/string_utils.hpp"
+#include "util/StringUtils.hpp"
 
-using namespace vfrb::object;
-
+using vfrb::object::CAircraft;
+using vfrb::object::SLocation;
+using vfrb::object::CTimestamp;
 using vfrb::str_util::AsStrView;
 
 namespace vfrb::feed::parser
@@ -49,22 +51,28 @@ CAprsParser::CAprsParser(s32 maxHeight_)
           std::regex::optimize | std::regex::icase),
       m_maxHeight(maxHeight_) {}
 
-CAircraft CAprsParser::Parse(String&& str_, u32 prio_) const {
+auto CAprsParser::Parse(String&& str_, u32 prio_) const -> CAircraft {
     std::cmatch match;
     if ((!str_.empty() && str_[0] == '#') || !std::regex_match(str_.c_str(), match, m_aprsRe)) {
         throw error::CParseError();
     }
     try {
         auto [id, idT, aT] = parseComment(match);
-        return {prio_, id, idT, aT, parseLocation(match), parseMovement(match), parseTimeStamp(match)};
+        return {prio_,
+                id,
+                idT,
+                aT,
+                parseLocation(match, m_maxHeight),
+                parseMovement(match),
+                parseTimeStamp(match)};
     } catch ([[maybe_unused]] str_util::error::CConversionError const&) {
     } catch ([[maybe_unused]] object::error::CTimestampParseError const&) {
     }
     throw error::CParseError();
 }
 
-SLocation CAprsParser::parseLocation(std::cmatch const& match_) const {
-    SLocation pos;
+auto CAprsParser::parseLocation(std::cmatch const& match_, s32 maxHeight_) -> SLocation {
+    SLocation pos{};
     pos.Latitude = math::DmToDeg(str_util::Parse<f64>(match_[RE_APRS_LAT]));
     if (AsStrView(match_[RE_APRS_LAT_DIR]) == "S") {
         pos.Latitude = -pos.Latitude;
@@ -74,26 +82,26 @@ SLocation CAprsParser::parseLocation(std::cmatch const& match_) const {
         pos.Longitude = -pos.Longitude;
     }
     pos.Altitude = math::DoubleToInt(str_util::Parse<f64>(match_[RE_APRS_ALT]) * math::FEET_2_M);
-    if (pos.Altitude <= m_maxHeight) {
+    if (pos.Altitude <= maxHeight_) {
         return pos;
     }
     throw error::CParseError();
 }
 
-CAprsParser::AircraftInfo CAprsParser::parseComment(std::cmatch const& match_) const {
+auto CAprsParser::parseComment(std::cmatch const& match_) -> CAprsParser::AircraftInfo {
     return {AsStrView(match_[RE_APRS_ID]),
             static_cast<CAircraft::EIdType>(str_util::Parse<x32>(match_[RE_APRS_TYPE]) & 0x03),
             static_cast<CAircraft::EAircraftType>((str_util::Parse<x32>(match_[RE_APRS_TYPE]) & 0x7C) >> 2)};
 }
 
-CAircraft::SMovement CAprsParser::parseMovement(std::cmatch const& match_) const {
+auto CAprsParser::parseMovement(std::cmatch const& match_) -> CAircraft::SMovement {
     // This needs to be split later to parse independently.
     return {str_util::Parse<f64>(match_[RE_APRS_HEAD]),
             str_util::Parse<f64>(match_[RE_APRS_GND_SPD]) * math::KTS_2_MS,
             std::max(-10000.0, std::min(10000.0, str_util::Parse<f64>(match_[RE_APRS_CR]) * math::FPM_2_MS))};
 }
 
-CTimestamp CAprsParser::parseTimeStamp(std::cmatch const& match_) const {
+auto CAprsParser::parseTimeStamp(std::cmatch const& match_) -> CTimestamp {
     return CTimestamp(AsStrView(match_[RE_APRS_TIME]));
 }
 }  // namespace vfrb::feed::parser

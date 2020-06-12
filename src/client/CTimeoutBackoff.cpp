@@ -22,15 +22,15 @@
 
 namespace vfrb::client
 {
-u32 CTimeoutBackoff::Next() {
-    auto to  = m_timeout;
-    m_factor = m_factor > 1 ? m_factor - 1 : 1;
-    m_timeout *= m_factor;
-    return to;
+auto CTimeoutBackoff::Next() -> u32 {
+    auto next = m_backoffValues[m_toIndex];
+    if (m_toIndex < BACKOFF_LAST) {
+        m_toIndex += 1;
+    }
+    return next;
 }
 
 void CTimeoutBackoff::Reset() {
-    m_timeout = INITIAL_TIMEOUT;
-    m_factor  = INITIAL_FACTOR;
+    m_toIndex = 0;
 }
 }  // namespace vfrb::client

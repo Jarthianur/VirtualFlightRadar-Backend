@@ -21,10 +21,11 @@
 #include "feed/CAtmosphereFeed.hpp"
 
 #include "config/CConfiguration.hpp"
+#include "config/CProperties.hpp"
 #include "data/CAtmosphereData.hpp"
 #include "object/CAtmosphere.hpp"
 
-using namespace vfrb::config;
+using vfrb::config::CProperties;
 
 namespace vfrb::feed
 {
@@ -32,11 +33,11 @@ CAtmosphereFeed::CAtmosphereFeed(String const& name_, CProperties const& prop_,
                                  SPtr<data::CAtmosphereData> data_)
     : IFeed(name_, prop_, data_) {}
 
-IFeed::EProtocol CAtmosphereFeed::Protocol() const {
+auto CAtmosphereFeed::Protocol() const -> IFeed::EProtocol {
     return EProtocol::SENSOR;
 }
 
-bool CAtmosphereFeed::Process(String str_) {
+auto CAtmosphereFeed::Process(String str_) -> bool {
     try {
         m_data->Update(m_parser.Parse(std::move(str_), m_priority));
     } catch ([[maybe_unused]] parser::error::CParseError const&) {

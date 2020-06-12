@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <array>
+
 #include "util/ClassUtils.hpp"
 
 #include "Types.hpp"
@@ -28,15 +30,16 @@ namespace vfrb::client
 {
 /**
  * @brief The TimeoutBackoff class
- * Produces backoff sequence 1s,5s,20s,1m,2m
+ * Produces backoff sequence 1s,5s,20s,1m,2m,5m
  */
 class CTimeoutBackoff
 {
-    CTCONST INITIAL_TIMEOUT = 1;
-    CTCONST INITIAL_FACTOR  = 5;
+    CTCONST BACKOFF_SIZE = 6;
+    CTCONST BACKOFF_LAST = BACKOFF_SIZE - 1;
 
-    u32 m_timeout = INITIAL_TIMEOUT;  ///< seconds
-    u32 m_factor  = INITIAL_FACTOR;
+    usize m_toIndex = 0;
+
+    std::array<u32, BACKOFF_SIZE> const m_backoffValues = {1, 5, 20, 60, 120, 300};
 
 public:
     auto Next() -> u32;

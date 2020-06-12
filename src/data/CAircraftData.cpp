@@ -21,8 +21,15 @@
 #include "data/CAircraftData.hpp"
 
 #include "error/IError.hpp"
+#include "object/CAircraft.hpp"
+#include "object/CGpsPosition.hpp"
+#include "object/CObject.hpp"
 
-using namespace vfrb::object;
+#include "Types.hpp"
+
+using vfrb::object::CAircraft;
+using vfrb::object::CObject;
+using vfrb::object::SLocation;
 
 namespace vfrb::data
 {
@@ -30,7 +37,7 @@ CAircraftData::CAircraftData(AccessFn&& fn_) : CAircraftData(std::move(fn_), 0) 
 
 CAircraftData::CAircraftData(AccessFn&& fn_, s32 maxDist_) : IData(std::move(fn_)), m_processor(maxDist_) {}
 
-bool CAircraftData::Update(CObject&& aircraft_) {
+auto CAircraftData::Update(CObject&& aircraft_) -> bool {
     auto&& aircraft = static_cast<CAircraft&&>(aircraft_);
     auto   result   = m_container.Insert(std::hash<StringView>()(*aircraft.Id()), std::move(aircraft));
     if (!result.second) {
@@ -56,8 +63,8 @@ void CAircraftData::Access() {
                 ++iter;
                 m_container.Erase(key);
             } else {
-                m_processor.Process(iter->Value, iter->Nmea);
-                m_accessFn({iter->Value, iter->Nmea});
+                m_processor.Process(iter->Value, &iter->Nmea);
+                m_accessFn({iter->Value, {iter->Nmea}});
                 ++iter;
             }
         } catch ([[maybe_unused]] vfrb::error::IError const&) {

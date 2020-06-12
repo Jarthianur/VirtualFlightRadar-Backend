@@ -22,10 +22,14 @@
 
 #include <boost/bind.hpp>
 #include <boost/move/move.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "server/CConnection.hpp"
 
 #include "CLogger.hpp"
+
+using boost::asio::ip::tcp;
+using boost::system::error_code;
 
 namespace vfrb::server::net
 {
@@ -35,9 +39,8 @@ static auto const& logger     = CLogger::Instance();
 CAcceptorBoost::CAcceptorBoost(u16 port_)
     : IAcceptor<CSocketBoost>(),
       m_ioService(),
-      m_acceptor(m_ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port_),
-                 boost::asio::ip::tcp::acceptor::reuse_address(true)),
-      m_socket(boost::move(boost::asio::ip::tcp::socket(m_ioService))) {}
+      m_acceptor(m_ioService, tcp::endpoint(tcp::v4(), port_), tcp::acceptor::reuse_address(true)),
+      m_socket(boost::move(tcp::socket(m_ioService))) {}
 
 CAcceptorBoost::~CAcceptorBoost() noexcept {
     Stop();
@@ -67,8 +70,7 @@ void CAcceptorBoost::Stop() {
 
 void CAcceptorBoost::OnAccept(Callback&& cb_) {
     if (m_acceptor.is_open()) {
-        m_acceptor.async_accept(m_socket.Get(), boost::bind(&CAcceptorBoost::handleAccept, this,
-                                                            boost::asio::placeholders::error, cb_));
+        m_acceptor.async_accept(m_socket.Get(), [this, &cb_](error_code err_) { handleAccept(err_, cb_); });
     }
 }
 
@@ -76,21 +78,21 @@ void CAcceptorBoost::Close() {
     m_socket.Close();
 }
 
-void CAcceptorBoost::handleAccept(boost::system::error_code const& err_, Callback const& cb_) {
+void CAcceptorBoost::handleAccept(error_code err_, Callback const& cb_) {
     if (err_) {
         logger.Debug(LOG_PREFIX, "accept: ", err_.message());
     }
     cb_(bool(err_));
 }
 
-CConnection<CSocketBoost> CAcceptorBoost::StartConnection() {
+auto CAcceptorBoost::StartConnection() -> CConnection<CSocketBoost> {
     if (!m_socket.Get().is_open()) {
         throw error::CSocketError("cannot start connection on closed socket");
     }
     return CConnection<CSocketBoost>(std::move(m_socket));
 }
 
-String CAcceptorBoost::StagedAddress() const {
+auto CAcceptorBoost::StagedAddress() const -> String {
     return m_socket.Address();
 }
 }  // namespace vfrb::server::net

@@ -21,11 +21,14 @@
 #include "feed/CAprscFeed.hpp"
 
 #include "config/CConfiguration.hpp"
+#include "config/CProperties.hpp"
 #include "data/CAircraftData.hpp"
 #include "object/CAircraft.hpp"
-#include "util/string_utils.hpp"
+#include "util/StringUtils.hpp"
 
-using namespace vfrb::config;
+using vfrb::config::CProperties;
+using vfrb::config::CConfiguration;
+using vfrb::str_util::MakeStr;
 
 namespace vfrb::feed
 {
@@ -38,23 +41,23 @@ CAprscFeed::CAprscFeed(String const& name_, CProperties const& prop_, SPtr<data:
           }
       }) {
     try {
-        prop_.Property(CConfiguration::KV_KEY_LOGIN);
+        [[maybe_unused]] auto x = prop_.Property(CConfiguration::KV_KEY_LOGIN);
     } catch ([[maybe_unused]] config::error::CPropertyNotFoundError const&) {
         throw error::CInvalidPropertyError(
-            str_util::MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_LOGIN));
+            MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_LOGIN));
     }
 }
 
-IFeed::EProtocol CAprscFeed::Protocol() const {
+auto CAprscFeed::Protocol() const -> IFeed::EProtocol {
     return EProtocol::APRS;
 }
 
-bool CAprscFeed::Process(String str_) {
+auto CAprscFeed::Process(String str_) -> bool {
     m_worker.Push(std::move(str_));
     return true;
 }
 
-String CAprscFeed::Login() const {
+auto CAprscFeed::Login() const -> String {
     return m_properties.Property(CConfiguration::KV_KEY_LOGIN);
 }
 }  // namespace vfrb::feed

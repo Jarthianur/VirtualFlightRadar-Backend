@@ -78,7 +78,7 @@ class CVfrb
      * @param start The start value
      * @return the duration string
      */
-    auto duration(std::chrono::steady_clock::time_point start_) const -> String;
+    auto static duration(std::chrono::steady_clock::time_point start_) -> String;
 
 public:
     explicit CVfrb(SPtr<config::CConfiguration> conf_);  ///< @param config The Configuration

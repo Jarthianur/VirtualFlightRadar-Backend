@@ -20,28 +20,35 @@
 
 #include "data/CGpsData.hpp"
 
-using namespace vfrb::object;
-using namespace vfrb::concurrent;
+#include "concurrent/Mutex.hpp"
+#include "object/CGpsPosition.hpp"
+#include "object/CObject.hpp"
+
+#include "CStaticString.hpp"
+
+using vfrb::object::CObject;
+using vfrb::object::CGpsPosition;
+using vfrb::concurrent::LockGuard;
 
 namespace vfrb::data
 {
 CGpsData::CGpsData(AccessFn&& fn_, CGpsPosition const& pos_, bool gnd_)
     : IData(std::move(fn_)), m_position(std::make_tuple(pos_, "")), m_groundMode(gnd_) {
     auto& [pos, cstr] = m_position;
-    m_processor.Process(pos, cstr);
+    m_processor.Process(pos, &cstr);
 }
 
 void CGpsData::Access() {
     LockGuard lk(m_mutex);
     try {
         auto& [pos, cstr] = m_position;
-        m_processor.Process(pos, cstr);
-        m_accessFn({++pos, cstr});
+        m_processor.Process(pos, &cstr);
+        m_accessFn({++pos, {cstr}});
     } catch ([[maybe_unused]] vfrb::error::IError const&) {
     }
 }
 
-bool CGpsData::Update(CObject&& pos_) {
+auto CGpsData::Update(CObject&& pos_) -> bool {
     LockGuard lk(m_mutex);
     if (m_positionLocked) {
         throw error::CPositionAlreadyLocked();
@@ -49,7 +56,7 @@ bool CGpsData::Update(CObject&& pos_) {
     auto& [pos, cstr] = m_position;
     bool updated      = pos.TryUpdate(std::move(pos_));
     if (updated) {
-        m_processor.Process(pos, cstr);
+        m_processor.Process(pos, &cstr);
         if (m_groundMode && isPositionGood()) {
             throw error::CReceivedGoodPosition();
         }
@@ -62,7 +69,7 @@ auto CGpsData::Location() const -> decltype(std::get<0>(m_position).Location()) 
     return std::get<0>(m_position).Location();
 }
 
-bool CGpsData::isPositionGood() const {
+auto CGpsData::isPositionGood() const -> bool {
     auto const& pos = std::get<0>(m_position);
     return pos.NrOfSatellites() >= GPS_NR_SATS_GOOD && pos.FixQuality() >= GPS_FIX_GOOD &&
            pos.Dilution() <= GPS_HOR_DILUTION_GOOD;
@@ -70,11 +77,11 @@ bool CGpsData::isPositionGood() const {
 
 namespace error
 {
-str CPositionAlreadyLocked::Message() const noexcept {
+auto CPositionAlreadyLocked::Message() const noexcept -> str {
     return "position was locked before";
 }
 
-str CReceivedGoodPosition::Message() const noexcept {
+auto CReceivedGoodPosition::Message() const noexcept -> str {
     return "received good position";
 }
 }  // namespace error

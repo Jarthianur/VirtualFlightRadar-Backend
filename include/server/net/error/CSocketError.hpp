@@ -32,7 +32,7 @@ class CSocketError : public vfrb::error::IError
     String const m_msg;  ///< Error message
 
 public:
-    explicit CSocketError(String const& msg_);
+    explicit CSocketError(String msg_);
 
     [[nodiscard]] auto Message() const noexcept -> str override;
 };

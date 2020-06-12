@@ -26,13 +26,14 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-using namespace boost::property_tree;
+using boost::property_tree::ptree;
+using boost::property_tree::ini_parser_error;
 
 namespace vfrb::config
 {
 CConfigReader::CConfigReader(std::istream& stream_) : m_stream(stream_) {}
 
-CProperties CConfigReader::Read() {
+auto CConfigReader::Read() -> CProperties {
     ptree tree;
     try {
         read_ini(m_stream, tree);
@@ -46,7 +47,7 @@ namespace error
 {
 CReadFileError::CReadFileError(String const& file_) : m_fname(file_ + " is not a valid INI file") {}
 
-str CReadFileError::Message() const noexcept {
+auto CReadFileError::Message() const noexcept -> str {
     return m_fname.c_str();
 }
 }  // namespace error

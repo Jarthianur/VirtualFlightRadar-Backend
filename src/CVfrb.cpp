@@ -31,17 +31,23 @@
 #include "data/CAtmosphereData.hpp"
 #include "data/CGpsData.hpp"
 #include "data/CWindData.hpp"
+#include "data/IData.hpp"
 #include "feed/CFeedFactory.hpp"
 #include "feed/IFeed.hpp"
 #include "object/CAtmosphere.hpp"
 #include "object/CGpsPosition.hpp"
-#include "util/class_utils.hpp"
+#include "object/CObject.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "CLogger.hpp"
 
-using namespace vfrb::data;
-using namespace vfrb::object;
-using namespace vfrb::config;
+using vfrb::data::CAircraftData;
+using vfrb::data::CAtmosphereData;
+using vfrb::data::CWindData;
+using vfrb::data::CGpsData;
+using vfrb::data::SAccessor;
+using vfrb::object::CObject;
+using vfrb::config::CConfiguration;
 
 namespace vfrb
 {
@@ -128,7 +134,7 @@ void CVfrb::createFeeds(SPtr<CConfiguration> conf_) {
     }
 }
 
-String CVfrb::duration(std::chrono::steady_clock::time_point start_) const {
+auto CVfrb::duration(std::chrono::steady_clock::time_point start_) -> String {
     std::chrono::minutes runtime =
         std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start_);
     s64               d = runtime.count() / 60 / 24;

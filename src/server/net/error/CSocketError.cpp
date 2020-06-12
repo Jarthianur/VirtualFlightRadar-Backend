@@ -20,11 +20,13 @@
 
 #include "server/net/error/CSocketError.hpp"
 
+#include <utility>
+
 namespace vfrb::server::net::error
 {
-CSocketError::CSocketError(String const& msg_) : m_msg(msg_) {}
+CSocketError::CSocketError(String msg_) : m_msg(std::move(msg_)) {}
 
-str CSocketError::Message() const noexcept {
+auto CSocketError::Message() const noexcept -> str {
     return m_msg.c_str();
 }
 }  // namespace vfrb::server::net::error

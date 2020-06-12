@@ -20,23 +20,26 @@
 
 #include "feed/parser/CAtmosphereParser.hpp"
 
-#include "util/string_utils.hpp"
+#include "object/CAtmosphere.hpp"
+#include "util/StringUtils.hpp"
 
-using namespace vfrb::object;
-using namespace vfrb::str_util;
+using vfrb::object::CAtmosphere;
+using vfrb::str_util::MatchChecksum;
+using vfrb::str_util::Convert;
+using vfrb::str_util::EErrc;
 
 namespace vfrb::feed::parser
 {
-CAtmosphere CAtmosphereParser::Parse(String&& str_, u32 prio_) const {
+auto CAtmosphereParser::Parse(String&& str_, u32 prio_) const -> CAtmosphere {
     try {
         if (MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MDA") != String::npos) {
-            usize tmpB;
+            usize tmpB = 0;
             if ((tmpB = str_.find('B')) != String::npos) {
                 --tmpB;
             } else {
                 throw error::CParseError();
             }
-            usize tmpS;
+            usize tmpS = 0;
             if ((tmpS = StringView(str_.c_str(), tmpB).find_last_of(',')) != String::npos) {
                 ++tmpS;
             } else {

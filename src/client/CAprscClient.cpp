@@ -21,14 +21,17 @@
 #include "client/CAprscClient.hpp"
 
 #include <stdexcept>
-#include <utility>
 
 #include <boost/functional/hash.hpp>
 
+#include "client/net/IConnector.hpp"
+
 #include "CLogger.hpp"
 
-using namespace vfrb::client::net;
-using namespace vfrb::concurrent;
+using vfrb::client::net::SEndpoint;
+using vfrb::client::net::IConnector;
+using vfrb::client::net::EErrc;
+using vfrb::concurrent::LockGuard;
 
 namespace vfrb::client
 {
@@ -38,16 +41,16 @@ static auto const& logger     = CLogger::Instance();
 CAprscClient::CAprscClient(SEndpoint const& ep_, String const& login_, SPtr<IConnector> con_)
     : IClient(ep_, con_), m_login(login_ + "\r\n") {}
 
-bool CAprscClient::Equals(IClient const& other_) const {
+auto CAprscClient::Equals(IClient const& other_) const -> bool {
     try {
         auto const& other = dynamic_cast<CAprscClient const&>(other_);
         return IClient::Equals(other_) && this->m_login == other.m_login;
-    } catch (std::bad_cast const&) {
+    } catch ([[maybe_unused]] std::bad_cast const&) {
         return false;
     }
 }
 
-usize CAprscClient::Hash() const {
+auto CAprscClient::Hash() const -> usize {
     usize seed = IClient::Hash();
     boost::hash_combine(seed, boost::hash_value(m_login));
     return seed;
@@ -57,7 +60,7 @@ void CAprscClient::handleConnect(EErrc err_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (err_ == EErrc::OK) {
-            m_connector->OnWrite(m_login, std::bind(&CAprscClient::handleLogin, this, std::placeholders::_1));
+            m_connector->OnWrite(m_login, [this](EErrc err_) { handleLogin(err_); });
         } else {
             logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
@@ -66,8 +69,7 @@ void CAprscClient::handleConnect(EErrc err_) {
 }
 
 void CAprscClient::sendKeepAlive() {
-    m_connector->OnTimeout(std::bind(&CAprscClient::handleSendKeepAlive, this, std::placeholders::_1),
-                           KEEPALIVE_INTERVAL);
+    m_connector->OnTimeout([this](EErrc err_) { handleSendKeepAlive(err_); }, KEEPALIVE_INTERVAL);
 }
 
 void CAprscClient::handleLogin(EErrc err_) {
@@ -106,7 +108,7 @@ void CAprscClient::handleSendKeepAlive(EErrc err_) {
     }
 }
 
-str CAprscClient::logPrefix() const {
+auto CAprscClient::logPrefix() const -> str {
     return LOG_PREFIX;
 }
 }  // namespace vfrb::client

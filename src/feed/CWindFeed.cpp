@@ -21,22 +21,23 @@
 #include "feed/CWindFeed.hpp"
 
 #include "config/CConfiguration.hpp"
+#include "config/CProperties.hpp"
 #include "data/CWindData.hpp"
 #include "feed/parser/CWindParser.hpp"
 #include "object/CWind.hpp"
 
-using namespace vfrb::config;
+using vfrb::config::CProperties;
 
 namespace vfrb::feed
 {
 CWindFeed::CWindFeed(String const& name_, CProperties const& prop_, SPtr<data::CWindData> data_)
     : IFeed(name_, prop_, data_) {}
 
-IFeed::EProtocol CWindFeed::Protocol() const {
+auto CWindFeed::Protocol() const -> IFeed::EProtocol {
     return EProtocol::SENSOR;
 }
 
-bool CWindFeed::Process(String str_) {
+auto CWindFeed::Process(String str_) -> bool {
     try {
         m_data->Update(m_parser.Parse(std::move(str_), m_priority));
     } catch ([[maybe_unused]] parser::error::CParseError const&) {

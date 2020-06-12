@@ -28,34 +28,35 @@
 #include "feed/CAprscFeed.hpp"
 #include "feed/IFeed.hpp"
 
-using namespace vfrb::client::net;
-using namespace vfrb::feed;
+using vfrb::feed::IFeed;
+using vfrb::feed::CAprscFeed;
+using vfrb::client::net::CConnectorBoost;
 
 namespace vfrb::client
 {
 template<>
-SPtr<CAprscClient> CClientFactory::makeClient<CAprscClient>(SPtr<IFeed> feed_) {
+auto CClientFactory::makeClient<CAprscClient>(SPtr<IFeed> feed_) -> SPtr<CAprscClient> {
     return std::make_shared<CAprscClient>(feed_->Endpoint(),
                                           std::static_pointer_cast<CAprscFeed>(feed_)->Login(),
                                           std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<CSbsClient> CClientFactory::makeClient<CSbsClient>(SPtr<IFeed> feed_) {
+auto CClientFactory::makeClient<CSbsClient>(SPtr<IFeed> feed_) -> SPtr<CSbsClient> {
     return std::make_shared<CSbsClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<CSensorClient> CClientFactory::makeClient<CSensorClient>(SPtr<IFeed> feed_) {
+auto CClientFactory::makeClient<CSensorClient>(SPtr<IFeed> feed_) -> SPtr<CSensorClient> {
     return std::make_shared<CSensorClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
 }
 
 template<>
-SPtr<CGpsdClient> CClientFactory::makeClient<CGpsdClient>(SPtr<IFeed> feed_) {
+auto CClientFactory::makeClient<CGpsdClient>(SPtr<IFeed> feed_) -> SPtr<CGpsdClient> {
     return std::make_shared<CGpsdClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
 }
 
-SPtr<IClient> CClientFactory::CreateClientFor(SPtr<IFeed> feed_) {
+auto CClientFactory::CreateClientFor(SPtr<IFeed> feed_) -> SPtr<IClient> {
     switch (feed_->Protocol()) {
         case IFeed::EProtocol::APRS: return makeClient<CAprscClient>(feed_);
         case IFeed::EProtocol::SBS: return makeClient<CSbsClient>(feed_);
@@ -67,7 +68,7 @@ SPtr<IClient> CClientFactory::CreateClientFor(SPtr<IFeed> feed_) {
 
 namespace error
 {
-str CNoSuchProtocolError::Message() const noexcept {
+auto CNoSuchProtocolError::Message() const noexcept -> str {
     return "unknown protocol";
 }
 }  // namespace error

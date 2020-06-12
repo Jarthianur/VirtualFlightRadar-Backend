@@ -54,16 +54,16 @@ class CAprsParser : public IParser<object::CAircraft>
      * @throw vfrb::feed::parser::error::CParseError
      * @throw vfrb::str_util::error::CConversionError
      */
-    [[nodiscard]] auto parseLocation(std::cmatch const& match_) const -> object::SLocation;
+    [[nodiscard]] auto static parseLocation(std::cmatch const& match_, s32 maxHeight_) -> object::SLocation;
 
     /// @throw vfrb::str_util::error::CConversionError
-    [[nodiscard]] auto parseComment(std::cmatch const& match_) const -> AircraftInfo;
+    [[nodiscard]] auto static parseComment(std::cmatch const& match_) -> AircraftInfo;
 
     /// @throw vfrb::str_util::error::CConversionError
-    [[nodiscard]] auto parseMovement(std::cmatch const& match_) const -> object::CAircraft::SMovement;
+    [[nodiscard]] auto static parseMovement(std::cmatch const& match_) -> object::CAircraft::SMovement;
 
     /// @throw vfrb::object::error::CTimestampParseError
-    [[nodiscard]] auto parseTimeStamp(std::cmatch const& match_) const -> object::CTimestamp;
+    [[nodiscard]] auto static parseTimeStamp(std::cmatch const& match_) -> object::CTimestamp;
 
 public:
     /// @param maxHeight_ The filter for max height

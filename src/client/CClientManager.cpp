@@ -21,10 +21,11 @@
 #include "client/CClientManager.hpp"
 
 #include "client/CClientFactory.hpp"
+#include "concurrent/Mutex.hpp"
 #include "feed/IFeed.hpp"
-#include "util/string_utils.hpp"
+#include "util/StringUtils.hpp"
 
-using namespace vfrb::concurrent;
+using vfrb::concurrent::LockGuard;
 
 namespace vfrb::client
 {
@@ -66,7 +67,7 @@ namespace error
 CFeedSubscriptionError::CFeedSubscriptionError(String const& name_)
     : m_msg(str_util::MakeStr("failed to subscribe ", name_, " to client")) {}
 
-str CFeedSubscriptionError::Message() const noexcept {
+auto CFeedSubscriptionError::Message() const noexcept -> str {
     return m_msg.c_str();
 }
 }  // namespace error

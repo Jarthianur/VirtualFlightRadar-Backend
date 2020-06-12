@@ -31,7 +31,7 @@ void CObject::assign(CObject&& other_) {
     this->m_updateAge    = 0;
 }
 
-bool CObject::TryUpdate(CObject&& other_) {
+auto CObject::TryUpdate(CObject&& other_) -> bool {
     if (other_.canUpdate(*this)) {
         this->assign(std::move(other_));
         return true;
@@ -39,11 +39,11 @@ bool CObject::TryUpdate(CObject&& other_) {
     return false;
 }
 
-bool CObject::canUpdate(CObject const& other_) const {
+auto CObject::canUpdate(CObject const& other_) const -> bool {
     return this->m_lastPriority >= other_.m_lastPriority || other_.m_updateAge >= OUTDATED;
 }
 
-CObject& CObject::operator++() {
+auto CObject::operator++() -> CObject& {
     ++m_updateAge;
     return *this;
 }

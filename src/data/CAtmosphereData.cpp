@@ -20,8 +20,13 @@
 
 #include "data/CAtmosphereData.hpp"
 
-using namespace vfrb::object;
-using namespace vfrb::concurrent;
+#include "concurrent/Mutex.hpp"
+#include "object/CAtmosphere.hpp"
+#include "object/CObject.hpp"
+
+using vfrb::object::CAtmosphere;
+using vfrb::object::CObject;
+using vfrb::concurrent::LockGuard;
 
 namespace vfrb::data
 {
@@ -35,7 +40,7 @@ void CAtmosphereData::Access() {
     m_accessFn({++m_atmosphere, {m_atmosphere.Nmea()}});
 }
 
-bool CAtmosphereData::Update(CObject&& atm_) {
+auto CAtmosphereData::Update(CObject&& atm_) -> bool {
     LockGuard lk(m_mutex);
     return m_atmosphere.TryUpdate(std::move(atm_));
 }

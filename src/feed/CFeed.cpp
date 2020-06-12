@@ -24,11 +24,13 @@
 #include <unordered_map>
 
 #include "config/CConfiguration.hpp"
+#include "config/CProperties.hpp"
 #include "data/IData.hpp"
 #include "feed/IFeed.hpp"
-#include "util/string_utils.hpp"
+#include "util/StringUtils.hpp"
 
-using namespace vfrb::config;
+using vfrb::config::CProperties;
+using vfrb::config::CConfiguration;
 
 using vfrb::str_util::MakeStr;
 
@@ -46,7 +48,7 @@ IFeed::IFeed(String const& name_, CProperties const& prop_, SPtr<data::IData> da
     }
 }
 
-u32 IFeed::initPriority() const {
+auto IFeed::initPriority() const -> u32 {
     try {
         return static_cast<u32>(std::max<u64>(
             0, std::min<u64>(std::stoul(m_properties.Property(CConfiguration::KV_KEY_PRIORITY, "0")),
@@ -56,7 +58,7 @@ u32 IFeed::initPriority() const {
     throw error::CInvalidPropertyError("invalid priority given");
 }
 
-client::net::SEndpoint IFeed::Endpoint() const {
+auto IFeed::Endpoint() const -> client::net::SEndpoint {
     return {m_properties.Property(CConfiguration::KV_KEY_HOST),
             m_properties.Property(CConfiguration::KV_KEY_PORT)};
 }
@@ -69,7 +71,7 @@ namespace error
 {
 CInvalidPropertyError::CInvalidPropertyError(String const& msg_) : m_msg(msg_) {}
 
-str CInvalidPropertyError::Message() const noexcept {
+auto CInvalidPropertyError::Message() const noexcept -> str {
     return m_msg.c_str();
 }
 }  // namespace error

@@ -20,26 +20,38 @@
 
 #include "feed/parser/CSbsParser.hpp"
 
-#include "math/math.hpp"
+#include "math/Math.hpp"
+#include "object/CAircraft.hpp"
 #include "object/CGpsPosition.hpp"
-#include "util/string_utils.hpp"
+#include "object/CTimestamp.hpp"
+#include "util/StringUtils.hpp"
 
-using namespace vfrb::object;
-using namespace vfrb::str_util;
+using vfrb::object::CAircraft;
+using vfrb::object::SLocation;
+using vfrb::object::CTimestamp;
+using vfrb::str_util::Convert;
+using vfrb::str_util::EErrc;
 
 namespace vfrb::feed::parser
 {
+namespace
+{
+constexpr auto PROTO_START_INDEX = 6;
+constexpr auto PROTO_ITER_COUNT  = 16;
+}  // namespace
+
 CSbsParser::CSbsParser(s32 maxHeight_) : IParser<CAircraft>(), m_maxHeight(maxHeight_) {}
 
-CAircraft CSbsParser::Parse(String&& str_, u32 prio_) const {
+auto CSbsParser::Parse(String&& str_, u32 prio_) const -> CAircraft {
     u32        i = 2;
-    SLocation  loc;
+    SLocation  loc{};
     StringView id;
     CTimestamp ts;
 
     try {
-        if (usize p = 6, delim = 0; str_.size() > 4 && str_[4] == '3' && str_.find(',', p) != String::npos) {
-            while ((delim = str_.find(',', p)) != String::npos && i < 16) {
+        if (usize p = PROTO_START_INDEX, delim = 0;
+            str_.size() > 4 && str_[4] == '3' && str_.find(',', p) != String::npos) {
+            while ((delim = str_.find(',', p)) != String::npos && i < PROTO_ITER_COUNT) {
                 switch (i) {
                     case SBS_FIELD_ID:
                         id = StringView(str_.c_str() + p, delim - p);
@@ -74,7 +86,7 @@ CAircraft CSbsParser::Parse(String&& str_, u32 prio_) const {
                 i += 1;
             }
         }
-        if (i == 16 && loc.Altitude <= m_maxHeight) {
+        if (i == PROTO_ITER_COUNT && loc.Altitude <= m_maxHeight) {
             return {prio_, id, CAircraft::EIdType::ICAO, CAircraft::EAircraftType::POWERED_AIRCRAFT, loc, ts};
         }
     } catch ([[maybe_unused]] object::error::CTimestampParseError const&) {

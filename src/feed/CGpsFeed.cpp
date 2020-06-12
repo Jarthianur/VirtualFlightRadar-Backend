@@ -21,13 +21,14 @@
 #include "feed/CGpsFeed.hpp"
 
 #include "config/CConfiguration.hpp"
+#include "config/CProperties.hpp"
 #include "data/CGpsData.hpp"
 #include "feed/parser/CGpsParser.hpp"
 #include "object/CGpsPosition.hpp"
 
 #include "CLogger.hpp"
 
-using namespace vfrb::config;
+using vfrb::config::CProperties;
 
 namespace vfrb::feed
 {
@@ -37,11 +38,11 @@ static auto const& logger     = CLogger::Instance();
 CGpsFeed::CGpsFeed(String const& name_, CProperties const& prop_, SPtr<data::CGpsData> data_)
     : IFeed(name_, prop_, data_) {}
 
-IFeed::EProtocol CGpsFeed::Protocol() const {
+auto CGpsFeed::Protocol() const -> IFeed::EProtocol {
     return EProtocol::GPS;
 }
 
-bool CGpsFeed::Process(String str_) {
+auto CGpsFeed::Process(String str_) -> bool {
     try {
         m_data->Update(m_parser.Parse(std::move(str_), m_priority));
     } catch ([[maybe_unused]] parser::error::CParseError const&) {

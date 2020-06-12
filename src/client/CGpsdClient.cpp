@@ -25,13 +25,26 @@
 #include <thread>
 #include <utility>
 
+#include "client/net/IConnector.hpp"
+#include "client/net/SEndpoint.hpp"
+#include "concurrent/Mutex.hpp"
+
 #include "CLogger.hpp"
 
-using namespace vfrb::client::net;
-using namespace vfrb::concurrent;
+using vfrb::client::net::SEndpoint;
+using vfrb::client::net::IConnector;
+using vfrb::client::net::EErrc;
+using vfrb::concurrent::LockGuard;
+using vfrb::concurrent::UniqueLock;
+using vfrb::concurrent::Mutex;
 
 namespace vfrb::client
 {
+namespace
+{
+constexpr auto STOP_COND_WAIT_TIME = 500;
+}  // namespace
+
 CTCONST            LOG_PREFIX = "(GpsdClient) ";
 static auto const& logger     = CLogger::Instance();
 
@@ -42,7 +55,7 @@ void CGpsdClient::handleConnect(EErrc err_) {
     if (m_state == EState::CONNECTING) {
         if (err_ == EErrc::OK) {
             m_connector->OnWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
-                                 std::bind(&CGpsdClient::handleWatch, this, std::placeholders::_1));
+                                 [this](EErrc err_) { handleWatch(err_); });
         } else {
             logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
@@ -61,7 +74,7 @@ void CGpsdClient::stop() {
             sent = true;
             cv.notify_one();
         });
-        cv.wait_for(lk, std::chrono::milliseconds(500), [&] { return sent; });
+        cv.wait_for(lk, std::chrono::milliseconds(STOP_COND_WAIT_TIME), [&] { return sent; });
     }
     IClient::stop();
 }
@@ -81,7 +94,7 @@ void CGpsdClient::handleWatch(EErrc err_) {
     }
 }
 
-str CGpsdClient::logPrefix() const {
+auto CGpsdClient::logPrefix() const -> str {
     return LOG_PREFIX;
 }
 }  // namespace vfrb::client

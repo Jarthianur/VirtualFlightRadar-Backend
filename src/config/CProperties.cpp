@@ -21,41 +21,43 @@
 #include "config/CProperties.hpp"
 
 #include <boost/property_tree/exceptions.hpp>
+#include <boost/property_tree/ptree_fwd.hpp>
 
-using namespace boost::property_tree;
+using boost::property_tree::ptree;
+using boost::property_tree::ptree_bad_path;
 
 namespace vfrb::config
 {
-CProperties::CProperties(ptree const& ptree) : m_pTree(ptree) {}
+CProperties::CProperties(ptree const& ptree_) : m_pTree(ptree_) {}
 
-CProperties::CProperties(ptree&& ptree) : m_pTree(std::move(ptree)) {}
+CProperties::CProperties(ptree&& ptree_) : m_pTree(ptree_) {}
 
-String CProperties::Property(String const& path, String const& defVal) const noexcept {
+auto CProperties::Property(String const& path_, String const& def_) const noexcept -> String {
     try {
-        auto p = m_pTree.get_child(path).get_value<String>();
-        return p.empty() ? defVal : p;
+        auto p = m_pTree.get_child(path_).get_value<String>();
+        return p.empty() ? def_ : p;
     } catch ([[maybe_unused]] ptree_bad_path const&) {
-        return defVal;
+        return def_;
     }
 }
 
-String CProperties::Property(String const& path) const {
+auto CProperties::Property(String const& path_) const -> String {
     try {
-        auto p = m_pTree.get_child(path).get_value<String>();
+        auto p = m_pTree.get_child(path_).get_value<String>();
         if (p.empty()) {
-            throw error::CPropertyNotFoundError(path);
+            throw error::CPropertyNotFoundError(path_);
         }
         return p;
     } catch ([[maybe_unused]] ptree_bad_path const&) {
-        throw error::CPropertyNotFoundError(path);
+        throw error::CPropertyNotFoundError(path_);
     }
 }
 
-CProperties CProperties::Section(String const& section) const {
+auto CProperties::Section(String const& sect_) const -> CProperties {
     try {
-        return CProperties(m_pTree.get_child(section));
+        return CProperties(m_pTree.get_child(sect_));
     } catch ([[maybe_unused]] ptree_bad_path const&) {
-        throw error::CPropertyNotFoundError(section);
+        throw error::CPropertyNotFoundError(sect_);
     }
 }
 
@@ -63,7 +65,7 @@ namespace error
 {
 CPropertyNotFoundError::CPropertyNotFoundError(String const& prop_) : m_msg(prop_ + " not found") {}
 
-str CPropertyNotFoundError::Message() const noexcept {
+auto CPropertyNotFoundError::Message() const noexcept -> str {
     return m_msg.c_str();
 }
 }  // namespace error

@@ -21,11 +21,12 @@
 #include "feed/CSbsFeed.hpp"
 
 #include "config/CConfiguration.hpp"
+#include "config/CProperties.hpp"
 #include "data/CAircraftData.hpp"
 #include "feed/parser/CSbsParser.hpp"
 #include "object/CAircraft.hpp"
 
-using namespace vfrb::config;
+using vfrb::config::CProperties;
 
 namespace vfrb::feed
 {
@@ -38,11 +39,11 @@ CSbsFeed::CSbsFeed(String const& name_, CProperties const& prop_, SPtr<data::CAi
           }
       }) {}
 
-IFeed::EProtocol CSbsFeed::Protocol() const {
+auto CSbsFeed::Protocol() const -> IFeed::EProtocol {
     return EProtocol::SBS;
 }
 
-bool CSbsFeed::Process(String str_) {
+auto CSbsFeed::Process(String str_) -> bool {
     m_worker.Push(std::move(str_));
     return true;
 }

@@ -21,29 +21,37 @@
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
-#include <utility>
 
 #include <boost/functional/hash.hpp>
 
 #include "client/IClient.hpp"
+#include "client/net/IConnector.hpp"
 #include "feed/IFeed.hpp"
 
 #include "CLogger.hpp"
 
-static auto const& logger = vfrb::CLogger::Instance();
+using vfrb::client::net::SEndpoint;
+using vfrb::client::net::IConnector;
+using vfrb::client::net::EErrc;
+using vfrb::concurrent::LockGuard;
+using vfrb::concurrent::UniqueLock;
 
-using namespace vfrb::client::net;
-using namespace vfrb::concurrent;
+static auto const& logger = vfrb::CLogger::Instance();
 
 namespace vfrb::client
 {
+namespace
+{
+constexpr auto STOP_COND_WAIT_TIME = 100;
+}  // namespace
+
 IClient::IClient(SEndpoint const& ep_, SPtr<IConnector> con_) : m_connector(con_), m_endpoint(ep_) {}
 
-bool IClient::Equals(IClient const& other_) const {
+auto IClient::Equals(IClient const& other_) const -> bool {
     return this->m_endpoint == other_.m_endpoint;
 }
 
-usize IClient::Hash() const {
+auto IClient::Hash() const -> usize {
     usize seed = 0;
     boost::hash_combine(seed, boost::hash_value(m_endpoint.Host));
     boost::hash_combine(seed, boost::hash_value(m_endpoint.Port));
@@ -70,7 +78,7 @@ void IClient::Run() NO_THREAD_SAFETY_ANALYSIS {
 
 void IClient::connect() {
     m_state = EState::CONNECTING;
-    m_connector->OnConnect(m_endpoint, std::bind(&IClient::handleConnect, this, std::placeholders::_1));
+    m_connector->OnConnect(m_endpoint, [this](EErrc err_) { handleConnect(err_); });
 }
 
 void IClient::reconnect() {
@@ -83,8 +91,7 @@ void IClient::reconnect() {
 }
 
 void IClient::timedConnect() {
-    m_connector->OnTimeout(std::bind(&IClient::handleTimedConnect, this, std::placeholders::_1),
-                           m_backoff.Next());
+    m_connector->OnTimeout([this](EErrc err_) { handleTimedConnect(err_); }, m_backoff.Next());
 }
 
 void IClient::stop() {
@@ -98,13 +105,13 @@ void IClient::stop() {
 void IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS {
     std::condition_variable_any cond_ready;
     UniqueLock                  lk(m_mutex);
-    cond_ready.wait_for(lk, std::chrono::milliseconds(100),
+    cond_ready.wait_for(lk, std::chrono::milliseconds(STOP_COND_WAIT_TIME),
                         [this]() NO_THREAD_SAFETY_ANALYSIS { return m_state != EState::NONE; });
     stop();
 }
 
 void IClient::read() {
-    m_connector->OnRead(std::bind(&IClient::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+    m_connector->OnRead([this](EErrc err_, String const& str_) { handleRead(err_, str_); });
 }
 
 void IClient::handleTimedConnect(EErrc err_) {

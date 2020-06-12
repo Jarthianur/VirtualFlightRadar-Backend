@@ -23,7 +23,7 @@
 #include <typeinfo>
 #include <utility>
 
-#include "util/bounds.hpp"
+#include "util/Bounds.hpp"
 
 namespace vfrb::object
 {
@@ -32,7 +32,7 @@ CAtmosphere::CAtmosphere(u32 prio_, String&& nmea_) : CObject(prio_), m_nmea(std
 CAtmosphere::CAtmosphere(CAtmosphere&& other_) noexcept
     : CObject(other_), m_pressure(other_.m_pressure), m_nmea(std::move(other_.m_nmea)) {}
 
-CAtmosphere& CAtmosphere::operator=(CAtmosphere&& other_) noexcept {
+auto CAtmosphere::operator=(CAtmosphere&& other_) noexcept -> CAtmosphere& {
     CObject::operator=(other_);
     m_pressure       = other_.m_pressure;
     m_nmea           = std::move(other_.m_nmea);

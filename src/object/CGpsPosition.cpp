@@ -23,7 +23,7 @@
 #include <typeinfo>
 #include <utility>
 
-#include "util/bounds.hpp"
+#include "util/Bounds.hpp"
 
 using vfrb::util::FailOutsideBounds;
 
@@ -60,7 +60,7 @@ void CGpsPosition::assign(CObject&& other_) {
     }
 }
 
-bool CGpsPosition::canUpdate(CObject const& other_) const {
+auto CGpsPosition::canUpdate(CObject const& other_) const -> bool {
     try {
         auto const& other = dynamic_cast<const CGpsPosition&>(other_);
         return (this->m_timestamp > other.m_timestamp) && CObject::canUpdate(other_);

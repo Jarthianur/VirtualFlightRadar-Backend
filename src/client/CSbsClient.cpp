@@ -20,10 +20,16 @@
 
 #include "client/CSbsClient.hpp"
 
+#include "client/net/IConnector.hpp"
+#include "client/net/SEndpoint.hpp"
+#include "concurrent/Mutex.hpp"
+
 #include "CLogger.hpp"
 
-using namespace vfrb::client::net;
-using namespace vfrb::concurrent;
+using vfrb::client::net::SEndpoint;
+using vfrb::client::net::IConnector;
+using vfrb::client::net::EErrc;
+using vfrb::concurrent::LockGuard;
 
 namespace vfrb::client
 {
@@ -47,7 +53,7 @@ void CSbsClient::handleConnect(EErrc err_) {
     }
 }
 
-str CSbsClient::logPrefix() const {
+auto CSbsClient::logPrefix() const -> str {
     return LOG_PREFIX;
 }
 }  // namespace vfrb::client

@@ -27,19 +27,19 @@ namespace vfrb::object
 {
 namespace date_time
 {
-extern s64 Now();
-extern u32 Day();
+extern auto Now() -> s64;
+extern auto Day() -> u32;
 }  // namespace date_time
 
 namespace error
 {
-str CTimestampParseError::Message() const noexcept {
+auto CTimestampParseError::Message() const noexcept -> str {
     return "";
 }
 }  // namespace error
 
-std::tuple<u32, u32, u32, u32> parseTime(StringView::const_iterator&       first_,
-                                         StringView::const_iterator const& last_) {
+auto parseTime(StringView::const_iterator& first_, StringView::const_iterator const& last_)
+    -> std::tuple<u32, u32, u32, u32> {
     namespace qi = boost::spirit::qi;
 
     static thread_local const qi::int_parser<u32, 10, 2, 2> _2digit = {};
@@ -57,7 +57,7 @@ std::tuple<u32, u32, u32, u32> parseTime(StringView::const_iterator&       first
 }
 
 CTimestamp::CTimestamp(StringView const& sv_) : m_day(date_time::Day()) {
-    auto it           = sv_.begin();
+    auto const* it    = sv_.begin();
     auto [h, m, s, f] = parseTime(it, sv_.end());
     if (h > 23 || m > 59 || s > 59 || f > 999) {
         throw error::CTimestampParseError();
@@ -68,7 +68,7 @@ CTimestamp::CTimestamp(StringView const& sv_) : m_day(date_time::Day()) {
     }
 }
 
-bool CTimestamp::operator>(CTimestamp const& other_) const {
+auto CTimestamp::operator>(CTimestamp const& other_) const -> bool {
     return (this->m_day > other_.m_day) || ((this->m_day == other_.m_day) && this->m_value > other_.m_value);
 }
 }  // namespace vfrb::object

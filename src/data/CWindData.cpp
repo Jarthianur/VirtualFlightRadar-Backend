@@ -20,8 +20,13 @@
 
 #include "data/CWindData.hpp"
 
-using namespace vfrb::object;
-using namespace vfrb::concurrent;
+#include "concurrent/Mutex.hpp"
+#include "object/CObject.hpp"
+#include "object/CWind.hpp"
+
+using vfrb::object::CObject;
+using vfrb::object::CWind;
+using vfrb::concurrent::LockGuard;
 
 namespace vfrb::data
 {
@@ -30,7 +35,7 @@ CWindData::CWindData(AccessFn&& fn_) : IData(std::move(fn_)) {}
 CWindData::CWindData(AccessFn&& fn_, object::CWind&& wind_)
     : IData(std::move(fn_)), m_wind(std::move(wind_)) {}
 
-bool CWindData::Update(CObject&& wind_) {
+auto CWindData::Update(CObject&& wind_) -> bool {
     LockGuard lk(m_mutex);
     return m_wind.TryUpdate(std::move(wind_));
 }

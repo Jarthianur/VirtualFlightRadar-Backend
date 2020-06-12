@@ -20,12 +20,16 @@
 
 #include "client/CSensorClient.hpp"
 
-#include <utility>
+#include "client/net/IConnector.hpp"
+#include "client/net/SEndpoint.hpp"
+#include "concurrent/Mutex.hpp"
 
 #include "CLogger.hpp"
 
-using namespace vfrb::client::net;
-using namespace vfrb::concurrent;
+using vfrb::client::net::SEndpoint;
+using vfrb::client::net::IConnector;
+using vfrb::client::net::EErrc;
+using vfrb::concurrent::LockGuard;
 
 namespace vfrb::client
 {
@@ -46,7 +50,7 @@ void CSensorClient::checkDeadline(EErrc err_) {
             logger.Debug(LOG_PREFIX, "timed out, reconnect ...");
             reconnect();
         } else {
-            m_connector->OnTimeout(std::bind(&CSensorClient::checkDeadline, this, std::placeholders::_1));
+            m_connector->OnTimeout([this](EErrc err_) { checkDeadline(err_); }, 0);
         }
     }
 }
@@ -58,8 +62,7 @@ void CSensorClient::handleConnect(EErrc err_) {
             m_state = EState::RUNNING;
             m_backoff.Reset();
             logger.Info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
-            m_connector->OnTimeout(std::bind(&CSensorClient::checkDeadline, this, std::placeholders::_1),
-                                   RECEIVE_TIMEOUT);
+            m_connector->OnTimeout([this](EErrc err_) { checkDeadline(err_); }, RECEIVE_TIMEOUT);
             read();
         } else {
             logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
@@ -68,7 +71,7 @@ void CSensorClient::handleConnect(EErrc err_) {
     }
 }
 
-str CSensorClient::logPrefix() const {
+auto CSensorClient::logPrefix() const -> str {
     return LOG_PREFIX;
 }
 }  // namespace vfrb::client

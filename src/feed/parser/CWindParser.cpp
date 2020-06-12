@@ -20,16 +20,18 @@
 
 #include "feed/parser/CWindParser.hpp"
 
-#include "util/string_utils.hpp"
+#include "object/CWind.hpp"
+#include "util/StringUtils.hpp"
 
-using namespace vfrb::object;
+using vfrb::object::CWind;
+using vfrb::str_util::MatchChecksum;
 
 namespace vfrb::feed::parser
 {
 CWindParser::CWindParser() : IParser<CWind>() {}
 
-CWind CWindParser::Parse(String&& str_, u32 prio_) const {
-    if (str_util::MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MWV") != String::npos) {
+auto CWindParser::Parse(String&& str_, u32 prio_) const -> CWind {
+    if (MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MWV") != String::npos) {
         return {prio_, std::move(str_)};
     }
     throw error::CParseError();

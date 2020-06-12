@@ -22,7 +22,7 @@
 
 #include <typeinfo>
 
-#include "util/bounds.hpp"
+#include "util/Bounds.hpp"
 
 using vfrb::util::FailOutsideBounds;
 
@@ -65,7 +65,7 @@ void CAircraft::assign(CObject&& other_) {
     }
 }
 
-bool CAircraft::canUpdate(CObject const& other_) const {
+auto CAircraft::canUpdate(CObject const& other_) const -> bool {
     try {
         auto const& other = dynamic_cast<CAircraft const&>(other_);
         // timestamp must always be more up to date (1)
