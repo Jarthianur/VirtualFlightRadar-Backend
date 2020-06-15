@@ -147,7 +147,7 @@ void CServer<SocketT>::Send(StringView const& sv_) REQUIRES(!m_mutex) {
 template<typename SocketT>
 void CServer<SocketT>::accept() REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
-    m_acceptor->OnAccept(std::bind(&CServer<SocketT>::handleStagedConnection, this, std::placeholders::_1));
+    m_acceptor->OnAccept([this](bool err_) { handleStagedConnection(err_); });
 }
 
 template<typename SocketT>
@@ -174,6 +174,7 @@ void CServer<SocketT>::handleStagedConnection(bool err_) noexcept REQUIRES(!m_mu
         }
     } else {
         s_logger.Warn(LOG_PREFIX, "could not accept connection");
+        m_acceptor->Close();  // Could this cause errors?
     }
     accept();
 }

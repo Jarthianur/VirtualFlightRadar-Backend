@@ -22,23 +22,31 @@
 
 #include <thread>
 
+#include "concurrent/Mutex.hpp"
 #include "server/CConnection.hpp"
 
 #include "CSocketImplTest.hpp"
+
+using vfrb::concurrent::UniqueLock;
+using vfrb::concurrent::LockGuard;
 
 namespace vfrb::server::net
 {
 CAcceptorImplTest::CAcceptorImplTest() : m_sockets() {}
 
 void CAcceptorImplTest::Run() {
-    while (!m_stopped) {
+    UniqueLock lk(m_mutex);
+    m_running = true;
+    while (m_running) {
+        lk.unlock();
         std::this_thread::yield();
+        lk.lock();
     }
-    m_sockets.clear();
 }
 
 void CAcceptorImplTest::Stop() {
-    m_stopped = true;
+    LockGuard lk(m_mutex);
+    m_running = false;
     m_sockets.clear();
     m_stagedAddress.clear();
 }
@@ -63,6 +71,14 @@ auto CAcceptorImplTest::StagedAddress() const -> String {
 }
 
 auto CAcceptorImplTest::Connect(String const& addr_, bool failAccept_, bool failWrite_) -> usize {
+    {
+        UniqueLock lk(m_mutex);
+        while (!m_running) {
+            lk.unlock();
+            std::this_thread::yield();
+            lk.lock();
+        }
+    }
     m_stagedAddress = addr_;
     auto buf        = std::make_shared<String>("");
     m_sockets.emplace_back(CSocketImplTest(addr_, buf, failWrite_), buf);

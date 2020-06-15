@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "concurrent/Mutex.hpp"
 #include "server/net/IAcceptor.hpp"
 #include "util/ClassUtils.hpp"
 
@@ -32,9 +33,10 @@ class CAcceptorImplTest : public IAcceptor<CSocketImplTest>
     NOT_MOVABLE(CAcceptorImplTest)
     NOT_COPYABLE(CAcceptorImplTest)
 
+    vfrb::concurrent::Mutex                               m_mutex;
     std::function<void(bool)>                             m_onAcceptFn;
     String                                                m_stagedAddress;
-    bool                                                  m_stopped = false;
+    bool                                                  m_running = false;
     bool                                                  m_fail    = false;
     std::vector<std::pair<CSocketImplTest, SPtr<String>>> m_sockets;
 
