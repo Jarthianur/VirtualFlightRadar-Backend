@@ -62,14 +62,7 @@ class CStaticString final
             throw error::COverflowError();
         }
         std::copy_n(sv_.cbegin(), len, m_data.begin());
-        if (m_data[len - 1] != '\0') {
-            if (len < N) {
-                m_data[len++] = '\0';
-            } else {
-                throw error::COverflowError();
-            }
-        }
-        m_view = StringView(m_data.data(), len);
+        m_view = StringView{m_data.data(), len};
     }
 
     /**
@@ -78,7 +71,7 @@ class CStaticString final
      */
     void copy(CStaticString<N> const& other_) {
         std::copy(other_.m_data.cbegin(), other_.m_data.cend(), m_data.begin());
-        m_view = StringView(m_data.data(), other_.m_view.length());
+        m_view = StringView{m_data.data(), other_.m_view.length()};
     }
 
 public:
@@ -87,34 +80,34 @@ public:
     }
 
     explicit CStaticString(str init_) {
-        operator=(init_);
+        copy(StringView{init_});
     }
 
     explicit CStaticString(String const& init_) {
-        operator=(init_);
+        copy(StringView{init_});
     }
 
     explicit CStaticString(StringView const& init_) {
-        operator=(init_);
+        copy(init_);
     }
 
     CStaticString(CStaticString<N> const& other_) {
-        operator=(other_);
+        copy(other_);
     }
 
     CStaticString(CStaticString<N>&& other_) noexcept {
-        operator=(other_);
+        copy(other_);
     }
 
     ~CStaticString() noexcept = default;
 
     auto operator=(str other_) -> CStaticString& {
-        copy(StringView(other_));
+        copy(StringView{other_});
         return *this;
     }
 
     auto operator=(String const& other_) -> CStaticString& {
-        copy(StringView(other_));
+        copy(StringView{other_});
         return *this;
     }
 
@@ -131,7 +124,9 @@ public:
     }
 
     auto operator=(CStaticString<N>&& other_) noexcept -> CStaticString& {
-        copy(other_);
+        if (this != &other_) {
+            copy(other_);
+        }
         return *this;
     }
 
@@ -149,8 +144,7 @@ public:
 
     /// Clear this string, thus making it to look empty.
     void Clear() {
-        m_data[0] = '\0';
-        m_view    = StringView(m_data.data(), 0);
+        m_view = StringView{m_data.data(), 0};
     }
 
     /**
@@ -161,16 +155,16 @@ public:
      * @throw vfrb::error::COverflowError
      */
     template<typename... Args>
-    auto Format(usize pos_, str fmt_, Args... args_) -> int {
+    auto Format(usize pos_, str fmt_, Args... args_) -> s32 {
         if (pos_ >= N) {
             throw error::COverflowError();
         }
         usize max = N - pos_;
-        int   b   = 0;
-        if ((b = std::snprintf(m_data.data() + pos_, max, fmt_, std::forward<Args>(args_)...)) >= 0) {
-            m_view = StringView(m_data.data(), pos_ + b + 1);
-        }
-        if (b < 0) {
+        s32   b   = 0;
+        if ((b = std::snprintf(m_data.data() + pos_, max, fmt_, std::forward<Args>(args_)...)) >= 0 &&
+            static_cast<usize>(b) < max) {
+            m_view = StringView{m_data.data(), pos_ + b};  // like append
+        } else {
             Clear();
             throw error::COverflowError();
         }

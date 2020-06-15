@@ -33,6 +33,8 @@
 #pragma clang diagnostic ignored "-Wunused-function"
 #include "sctf.hpp"
 
+#define SYSO(M) std::cout << M << std::flush
+
 namespace sctf::intern
 {
 template<>

@@ -87,10 +87,10 @@ DESCRIBE_PAR("test_CStatisString") {
     IT("should correctly format string") {
         CStaticString<8> a;
         ASSERT_NOTHROW(a.Format(0, "%s", "a"));
-        ASSERT_EQ(*a, "a");
+        ASSERT_EQ(*a, StringView{"a"});
         ASSERT_EQ(a.Length(), 1);
         ASSERT_NOTHROW(a.Format(0, "%d", 1234));
-        ASSERT_EQ(*a, "1234");
+        ASSERT_EQ(*a, StringView{"1234"});
         ASSERT_EQ(a.Length(), 4);
     }
     IT("should throw if format overflows") {
