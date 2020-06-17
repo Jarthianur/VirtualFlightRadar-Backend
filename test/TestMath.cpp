@@ -22,6 +22,8 @@
 
 #include "Helper.hpp"
 
+using sctf::FEQ;
+
 using namespace vfrb;
 
 SUITE_PAR("testMath") {

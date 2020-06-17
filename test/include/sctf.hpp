@@ -357,10 +357,10 @@ virtual ~testsuite() noexcept = default;
 static auto create(char const* name_) -> testsuite_ptr { return std::make_shared<testsuite>(enable{}, name_); }
 virtual void run() {
 if(m_state != execution_state::DONE) {
-m_setup_fn();
 m_stats.m_num_tests = m_testcases.size();
 streambuf_proxy buf_cout(std::cout);
 streambuf_proxy buf_cerr(std::cerr);
+m_setup_fn();
 std::for_each(m_testcases.begin(), m_testcases.end(), [this, &buf_cerr, &buf_cout](testcase& tc_) {
 if(tc_.state() == testcase::result::NONE) {
 m_pretest_fn();
@@ -436,11 +436,11 @@ static auto create(char const* name_) -> testsuite_ptr { return std::make_shared
 void run() override {
 if(m_state != execution_state::DONE) {
 if(m_testcases.size() > static_cast<std::size_t>(std::numeric_limits<std::int64_t>::max())) { throw std::overflow_error("Too many testcases! Size would overflow loop variant."); }
-m_setup_fn();
 auto const tc_size = static_cast<std::int64_t>(m_testcases.size());
 m_stats.m_num_tests = m_testcases.size();
 streambuf_proxy_omp mt_buf_cout(std::cout);
 streambuf_proxy_omp mt_buf_cerr(std::cerr);
+m_setup_fn();
 #pragma omp parallel default(shared)
 {
 double tmp = 0.0;
@@ -871,8 +871,8 @@ SCTF_PROVIDE_COMPARATOR(like, LIKE)
 #endif
 #ifndef SCTF_ASSERT_HPP
 #define SCTF_ASSERT_HPP
-#define ASSERT(VAL, CMP, EXP) sctf::intern::assert_statement(std::forward_as_tuple(sctf::CMP, VAL, EXP), sctf::intern::loc{__FILE__, __LINE__})
-#define ASSERT_NOT(VAL, CMP, EXP) sctf::intern::assert_statement(std::forward_as_tuple(!sctf::CMP, VAL, EXP), sctf::intern::loc{__FILE__, __LINE__})
+#define ASSERT(VAL, CMP, EXP) sctf::intern::assert_statement(std::forward_as_tuple(CMP, VAL, EXP), sctf::intern::loc{__FILE__, __LINE__})
+#define ASSERT_NOT(VAL, CMP, EXP) sctf::intern::assert_statement(std::forward_as_tuple(!CMP, VAL, EXP), sctf::intern::loc{__FILE__, __LINE__})
 #define ASSERT_EQ(VAL, EXP) sctf::intern::assert_statement(std::forward_as_tuple(sctf::EQUALS(), VAL, EXP), sctf::intern::loc{__FILE__, __LINE__})
 #define ASSERT_TRUE(VAL) sctf::intern::assert_statement(std::forward_as_tuple(sctf::EQUALS(), VAL, true), sctf::intern::loc{__FILE__, __LINE__})
 #define ASSERT_FALSE(VAL) sctf::intern::assert_statement(std::forward_as_tuple(sctf::EQUALS(), VAL, false), sctf::intern::loc{__FILE__, __LINE__})
@@ -978,7 +978,7 @@ void sctf_intern_##FN##_fn_()
 #endif
 #ifndef SCTF_SCTF_HPP
 #define SCTF_SCTF_HPP
-#define SCFT_VERSION "2.0-rc4"
+#define SCFT_VERSION "2.0-rc8"
 #define SCTF_DEFAULT_MAIN(R) \
 auto main(int, char**)->int { return static_cast<int>(sctf::R->report()); }
 #endif

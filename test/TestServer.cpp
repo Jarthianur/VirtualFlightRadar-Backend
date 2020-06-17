@@ -28,6 +28,8 @@
 #include "Types.hpp"
 #include "sctf.hpp"
 
+using sctf::LT;
+
 using namespace vfrb;
 using namespace server;
 

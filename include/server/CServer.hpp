@@ -174,7 +174,7 @@ void CServer<SocketT>::handleStagedConnection(bool err_) noexcept REQUIRES(!m_mu
         }
     } else {
         s_logger.Warn(LOG_PREFIX, "could not accept connection");
-        m_acceptor->Close();  // Could this cause errors?
+        m_acceptor->Close();
     }
     accept();
 }

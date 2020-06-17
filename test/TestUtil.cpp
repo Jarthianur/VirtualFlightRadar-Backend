@@ -27,6 +27,8 @@
 #include "Helper.hpp"
 #include "sctf.hpp"
 
+using sctf::FEQ;
+
 using namespace vfrb;
 using namespace util;
 using namespace str_util;

@@ -71,4 +71,8 @@ CTimestamp::CTimestamp(StringView const& sv_) : m_day(date_time::Day()) {
 auto CTimestamp::operator>(CTimestamp const& other_) const -> bool {
     return (this->m_day > other_.m_day) || ((this->m_day == other_.m_day) && this->m_value > other_.m_value);
 }
+
+auto CTimestamp::operator==(CTimestamp const& other_) const -> bool {
+    return m_day == other_.m_day && m_value == other_.m_value;
+}
 }  // namespace vfrb::object

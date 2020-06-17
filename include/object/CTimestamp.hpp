@@ -57,5 +57,6 @@ public:
     ~CTimestamp() noexcept = default;
 
     auto operator>(CTimestamp const& other_) const -> bool;
+    auto operator==(CTimestamp const& other_) const -> bool;
 };
 }  // namespace vfrb::object
