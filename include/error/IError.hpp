@@ -29,7 +29,8 @@ namespace vfrb::error
 /// Interface for a generic exception type.
 class IError : public std::exception
 {
-    [[nodiscard]] auto what() const noexcept -> str override {
+    [[nodiscard]] auto
+    what() const noexcept -> str override {
         return Message();
     }
 
@@ -38,6 +39,7 @@ public:
      * Get the message for this error.
      * @return the error message
      */
-    [[nodiscard]] virtual auto Message() const noexcept -> str = 0;
+    [[nodiscard]] virtual auto
+    Message() const noexcept -> str = 0;
 };
 }  // namespace vfrb::error

@@ -38,7 +38,8 @@ public:
     explicit CConfigReader(std::istream& stream_);
 
     /// @throw vfrb::config::error::CReadFileError
-    auto Read() -> CProperties;
+    auto
+    Read() -> CProperties;
 };
 
 namespace error
@@ -51,7 +52,8 @@ class CReadFileError : public vfrb::error::IError
 public:
     explicit CReadFileError(String const& file_);
 
-    [[nodiscard]] auto Message() const noexcept -> str override;
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb::config

@@ -32,22 +32,26 @@ class CGpsdClient : public IClient
     /**
      * @brief Send unwatch-request and stop this client.
      */
-    void stop() override REQUIRES(m_mutex);
+    void
+    stop() override REQUIRES(m_mutex);
 
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
+    void
+    handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for watch-request sending
      * @param error The error indicator
      * @threadsafe
      */
-    void handleWatch(net::EErrc err_) REQUIRES(!m_mutex);
+    void
+    handleWatch(net::EErrc err_) REQUIRES(!m_mutex);
 
-    auto logPrefix() const -> str override;
+    auto
+    logPrefix() const -> str override;
 
 public:
     /**

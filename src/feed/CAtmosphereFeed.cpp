@@ -33,11 +33,13 @@ CAtmosphereFeed::CAtmosphereFeed(String const& name_, CProperties const& prop_,
                                  SPtr<data::CAtmosphereData> data_)
     : IFeed(name_, prop_, data_) {}
 
-auto CAtmosphereFeed::Protocol() const -> IFeed::EProtocol {
+auto
+CAtmosphereFeed::Protocol() const -> IFeed::EProtocol {
     return EProtocol::SENSOR;
 }
 
-auto CAtmosphereFeed::Process(String str_) -> bool {
+auto
+CAtmosphereFeed::Process(String str_) -> bool {
     try {
         m_data->Update(m_parser.Parse(std::move(str_), m_priority));
     } catch ([[maybe_unused]] parser::error::CParseError const&) {

@@ -38,16 +38,21 @@ class CConfiguration
     CProperties const m_properties;  ///< The properties from file
 
     /// @throw vfrb::config::error::CConversionError
-    auto resolvePosition() const -> object::CGpsPosition;
+    auto
+    resolvePosition() const -> object::CGpsPosition;
 
-    auto resolveFeeds() const -> std::unordered_map<String, CProperties>;
-    auto resolveFeedNames() const -> std::list<String>;
+    auto
+    resolveFeeds() const -> std::unordered_map<String, CProperties>;
+    auto
+    resolveFeedNames() const -> std::list<String>;
 
     /// @param key_ The filters property name
-    auto resolveFilter(str key_) const -> s32;
+    auto
+    resolveFilter(str key_) const -> s32;
 
     /// Dump the configuration to INFO log.
-    void dumpInfo() const;
+    void
+    dumpInfo() const;
 
 public:
     CTCONST SECT_KEY_FALLBACK = "fallback";
@@ -114,7 +119,8 @@ namespace error
 class CConfigurationError : public vfrb::error::IError
 {
 public:
-    [[nodiscard]] auto Message() const noexcept -> str override;
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
 };
 
 /// Error indicating that a string to number conversion failed
@@ -129,7 +135,8 @@ public:
      */
     CConversionError(String const& str_, str path_);
 
-    [[nodiscard]] auto Message() const noexcept -> str override;
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb::config

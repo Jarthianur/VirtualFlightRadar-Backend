@@ -42,7 +42,8 @@ class CConnectorBoost : public IConnector
     String                         m_response;  ///< Read message
     std::istream                   m_istream;   ///< Message stream for conversion
 
-    static auto evalErrorCode(boost::system::error_code err_) -> EErrc;
+    static auto
+    evalErrorCode(boost::system::error_code err_) -> EErrc;
 
     /**
      * @brief Handler for resolving endpoint
@@ -50,9 +51,9 @@ class CConnectorBoost : public IConnector
      * @param resolverIt The resolved host
      * @param callback   The callback to invoke
      */
-    void handleResolve(boost::system::error_code                           err_,
-                       boost::asio::ip::tcp::resolver::results_type const& res_,
-                       Callback const&                                     cb_) noexcept;
+    void
+    handleResolve(boost::system::error_code err_, boost::asio::ip::tcp::resolver::results_type const& res_,
+                  Callback const& cb_) noexcept;
 
     /**
      * @brief Handler for connecting to endpoint
@@ -60,14 +61,16 @@ class CConnectorBoost : public IConnector
      * @param resolverIt The resolved host
      * @param callback   The callback to invoke
      */
-    void handleConnect(boost::system::error_code err_, Callback const& cb_) noexcept;
+    void
+    handleConnect(boost::system::error_code err_, Callback const& cb_) noexcept;
 
     /**
      * @brief Handler for timed out timer
      * @param error    The error code
      * @param callback The callback to invoke
      */
-    void handleTimeout(boost::system::error_code err_, Callback const& cb_) noexcept;
+    void
+    handleTimeout(boost::system::error_code err_, Callback const& cb_) noexcept;
 
     /**
      * @brief Handler for reading from endpoint
@@ -75,7 +78,8 @@ class CConnectorBoost : public IConnector
      * @param bytes    The amount of read bytes
      * @param callback The callback to invoke
      */
-    void handleRead(boost::system::error_code err_, usize bytes_, ReadCallback const& cb_) noexcept;
+    void
+    handleRead(boost::system::error_code err_, usize bytes_, ReadCallback const& cb_) noexcept;
 
     /**
      * @brief Handler for writing to endpoint
@@ -83,7 +87,8 @@ class CConnectorBoost : public IConnector
      * @param bytes    The amount of sent bytes
      * @param callback The callback to invoke
      */
-    void handleWrite(boost::system::error_code err_, usize bytes_, Callback const& cb_) noexcept;
+    void
+    handleWrite(boost::system::error_code err_, usize bytes_, Callback const& cb_) noexcept;
 
 public:
     CConnectorBoost();
@@ -92,37 +97,43 @@ public:
      * @brief Run the internal event handler queue.
      * @note Blocks until all handlers have returned.
      */
-    void Run() override;
+    void
+    Run() override;
 
     /**
      * @brief Stop the internal event handler queue and close the connection.
      */
-    void Stop() override;
+    void
+    Stop() override;
 
     /**
      * @brief Close the connection and cancel all timers.
      */
-    void Close() override;
+    void
+    Close() override;
 
     /**
      * @brief Schedule to connect.
      * @param endpoint The endpoint to connect to
      * @param callback The callback to invoke when done
      */
-    void OnConnect(SEndpoint const& ep_, Callback const& cb_) override;
+    void
+    OnConnect(SEndpoint const& ep_, Callback const& cb_) override;
 
     /**
      * @brief Schedule to read from endpoint.
      * @param callback The callback to invoke when done
      */
-    void OnRead(ReadCallback const& cb_) override;
+    void
+    OnRead(ReadCallback const& cb_) override;
 
     /**
      * @brief Schedule to write to endpoint.
      * @param msg      The message to send
      * @param callback The callback to invoke when done
      */
-    void OnWrite(String const& str_, Callback const& cb_) override;
+    void
+    OnWrite(String const& str_, Callback const& cb_) override;
 
     /**
      * @brief Schedule an action after a timeout.
@@ -130,18 +141,21 @@ public:
      * @param callback The callback to invoke when timeout is reached
      * @param timeout  The timeout in seconds (default: 0)
      */
-    void OnTimeout(Callback const& cb_, u32 to_) override;
+    void
+    OnTimeout(Callback const& cb_, u32 to_) override;
 
     /**
      * @brief Reset the timer to this value.
      * @param timeout The new timeout
      */
-    void ResetTimer(u32 to_) override;
+    void
+    ResetTimer(u32 to_) override;
 
     /**
      * @brief Check whether the timer is expired.
      * @return true if expired, else false
      */
-    auto TimerExpired() -> bool override;
+    auto
+    TimerExpired() -> bool override;
 };
 }  // namespace vfrb::client::net

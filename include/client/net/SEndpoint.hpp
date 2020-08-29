@@ -37,7 +37,8 @@ struct SEndpoint
      * @param other The other endpoint
      * @return true if both are equal, else false
      */
-    auto operator==(SEndpoint const& other_) const -> bool {
+    auto
+    operator==(SEndpoint const& other_) const -> bool {
         return Host == other_.Host && Port == other_.Port;
     }
 };

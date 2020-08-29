@@ -42,14 +42,16 @@ protected:
      * Assign other objects values to this.
      * @param other_ The other object
      */
-    virtual void assign(CObject&& other_);
+    virtual void
+    assign(CObject&& other_);
 
     /**
      * Check whether this object can update an other one.
      * @param other_   The other object
      * @return true if yes, else false
      */
-    [[nodiscard]] virtual auto canUpdate(CObject const& other_) const -> bool;
+    [[nodiscard]] virtual auto
+    canUpdate(CObject const& other_) const -> bool;
 
 public:
     DEFAULT_COPYABLE(CObject)
@@ -60,14 +62,16 @@ public:
     virtual ~CObject() noexcept = default;
 
     /// Increment the update age.
-    auto operator++() -> CObject&;
+    auto
+    operator++() -> CObject&;
 
     /**
      * Try to update this object.
      * @param other_   The other object
      * @return true on success, else false
      */
-    auto TryUpdate(CObject&& other_) -> bool;
+    auto
+    TryUpdate(CObject&& other_) -> bool;
 
     GETTER(UpdateAge, m_updateAge)
 };

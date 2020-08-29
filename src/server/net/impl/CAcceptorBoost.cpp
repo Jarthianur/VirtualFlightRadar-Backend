@@ -46,7 +46,8 @@ CAcceptorBoost::~CAcceptorBoost() noexcept {
     Stop();
 }
 
-void CAcceptorBoost::Run() {
+void
+CAcceptorBoost::Run() {
     try {
         if (m_acceptor.is_open()) {
             m_ioService.run();
@@ -58,7 +59,8 @@ void CAcceptorBoost::Run() {
     }
 }
 
-void CAcceptorBoost::Stop() {
+void
+CAcceptorBoost::Stop() {
     if (m_acceptor.is_open()) {
         m_acceptor.close();
     }
@@ -68,31 +70,36 @@ void CAcceptorBoost::Stop() {
     m_socket.Close();
 }
 
-void CAcceptorBoost::OnAccept(Callback&& cb_) {
+void
+CAcceptorBoost::OnAccept(Callback&& cb_) {
     if (m_acceptor.is_open()) {
         m_acceptor.async_accept(m_socket.Get(), [this, &cb_](error_code err_) { handleAccept(err_, cb_); });
     }
 }
 
-void CAcceptorBoost::Close() {
+void
+CAcceptorBoost::Close() {
     m_socket.Close();
 }
 
-void CAcceptorBoost::handleAccept(error_code err_, Callback const& cb_) {
+void
+CAcceptorBoost::handleAccept(error_code err_, Callback const& cb_) {
     if (err_) {
         logger.Debug(LOG_PREFIX, "accept: ", err_.message());
     }
     cb_(bool(err_));
 }
 
-auto CAcceptorBoost::StartConnection() -> CConnection<CSocketBoost> {
+auto
+CAcceptorBoost::StartConnection() -> CConnection<CSocketBoost> {
     if (!m_socket.Get().is_open()) {
         throw error::CSocketError("cannot start connection on closed socket");
     }
     return CConnection<CSocketBoost>(std::move(m_socket));
 }
 
-auto CAcceptorBoost::StagedAddress() const -> String {
+auto
+CAcceptorBoost::StagedAddress() const -> String {
     return m_socket.Address();
 }
 }  // namespace vfrb::server::net

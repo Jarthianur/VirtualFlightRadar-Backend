@@ -49,7 +49,8 @@ class CConfigFileError : public vfrb::error::IError
 public:
     explicit CConfigFileError(String const& msg_) : m_msg(msg_) {}
 
-    str Message() const noexcept override {
+    str
+    Message() const noexcept override {
         return m_msg.c_str();
     }
 };
@@ -59,17 +60,19 @@ class CArgumentError : public vfrb::error::IError
 public:
     CArgumentError() = default;
 
-    str Message() const noexcept override {
+    str
+    Message() const noexcept override {
         return "";
     }
 };
 }  // namespace error
 
-program_options::variables_map evalArgs(int argc_, char** argv_) {
+program_options::variables_map
+evalArgs(int argc_, char** argv_) {
     program_options::options_description cmdline_options("VirtualFlightRadar-Backend -- "s + VERSION);
     cmdline_options.add_options()("help,h", "show this message");
     cmdline_options.add_options()(
-        "ground-mode,g", "forcibly enable ground mode; GPS feeds will stop when a good position is received");
+      "ground-mode,g", "forcibly enable ground mode; GPS feeds will stop when a good position is received");
     cmdline_options.add_options()("config,c", program_options::value<std::string>(), "config file");
     cmdline_options.add_options()("output,o", program_options::value<std::string>(), "specify where to log");
     program_options::variables_map variables;
@@ -83,7 +86,8 @@ program_options::variables_map evalArgs(int argc_, char** argv_) {
     return variables;
 }
 
-SPtr<CConfiguration> getConfig(program_options::variables_map const& vars_) {
+SPtr<CConfiguration>
+getConfig(program_options::variables_map const& vars_) {
     if (vars_.count("output")) {
         logger.LogFile(vars_["output"].as<std::string>());
     }
@@ -111,7 +115,8 @@ SPtr<CConfiguration> getConfig(program_options::variables_map const& vars_) {
  * @param argv The arguments
  * @return 0 on success, else -1
  */
-int main(int argc_, char** argv_) {
+int
+main(int argc_, char** argv_) {
     try {
         CVfrb vfrb(getConfig(evalArgs(argc_, argv_)));
         vfrb.Run();

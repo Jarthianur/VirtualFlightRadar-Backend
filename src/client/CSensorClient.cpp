@@ -38,12 +38,14 @@ static auto const& logger     = CLogger::Instance();
 
 CSensorClient::CSensorClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
 
-void CSensorClient::read() {
+void
+CSensorClient::read() {
     m_connector->ResetTimer(RECEIVE_TIMEOUT);
     IClient::read();
 }
 
-void CSensorClient::checkDeadline(EErrc err_) {
+void
+CSensorClient::checkDeadline(EErrc err_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::RUNNING) {
         if (err_ == EErrc::OK) {
@@ -55,7 +57,8 @@ void CSensorClient::checkDeadline(EErrc err_) {
     }
 }
 
-void CSensorClient::handleConnect(EErrc err_) {
+void
+CSensorClient::handleConnect(EErrc err_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (err_ == EErrc::OK) {
@@ -71,7 +74,8 @@ void CSensorClient::handleConnect(EErrc err_) {
     }
 }
 
-auto CSensorClient::logPrefix() const -> str {
+auto
+CSensorClient::logPrefix() const -> str {
     return LOG_PREFIX;
 }
 }  // namespace vfrb::client

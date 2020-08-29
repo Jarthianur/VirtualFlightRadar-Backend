@@ -55,6 +55,7 @@ class CGpsParser : public IParser<object::CGpsPosition>
 public:
     CGpsParser();
 
-    auto Parse(String&& str_, u32 prio_) const -> object::CGpsPosition override;
+    auto
+    Parse(String&& str_, u32 prio_) const -> object::CGpsPosition override;
 };
 }  // namespace vfrb::feed::parser

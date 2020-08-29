@@ -26,17 +26,20 @@ CWind::CWind(u32 prio_, String&& nmea_) : CObject(prio_), m_nmea(std::move(nmea_
 
 CWind::CWind(CWind&& other_) noexcept : CObject(other_), m_nmea(std::move(other_.m_nmea)) {}
 
-auto CWind::operator=(CWind&& other_) noexcept -> CWind& {
+auto
+CWind::operator=(CWind&& other_) noexcept -> CWind& {
     CObject::operator=(other_);
     m_nmea           = std::move(other_.m_nmea);
     return *this;
 }
 
-void CWind::Clear() {
+void
+CWind::Clear() {
     m_nmea.clear();
 }
 
-void CWind::assign(CObject&& other_) {
+void
+CWind::assign(CObject&& other_) {
     try {
         auto&& other = dynamic_cast<CWind&&>(other_);
         CObject::assign(std::move(other_));

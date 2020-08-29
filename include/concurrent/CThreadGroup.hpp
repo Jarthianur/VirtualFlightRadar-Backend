@@ -45,10 +45,12 @@ public:
      * @param fn_ The function for the thread to run
      */
     template<typename FnT>
-    void CreateThread(FnT&& fn_);
+    void
+    CreateThread(FnT&& fn_);
 
     /// Clear the thread group and join all threads.
-    void JoinAll();
+    void
+    JoinAll();
 };
 
 inline CThreadGroup::~CThreadGroup() noexcept {
@@ -56,11 +58,13 @@ inline CThreadGroup::~CThreadGroup() noexcept {
 }
 
 template<typename FnT>
-void CThreadGroup::CreateThread(FnT&& fn_) {
+void
+CThreadGroup::CreateThread(FnT&& fn_) {
     m_threads.push_back(CGuardedThread(std::forward<FnT>(fn_)));
 }
 
-inline void CThreadGroup::JoinAll() {
+inline void
+CThreadGroup::JoinAll() {
     m_threads.clear();
 }
 }  // namespace vfrb::concurrent

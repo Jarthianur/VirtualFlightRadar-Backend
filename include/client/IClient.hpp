@@ -71,48 +71,57 @@ protected:
      * @brief Handler for connect
      * @param error The error indicator
      */
-    virtual void handleConnect(net::EErrc err_) = 0;
+    virtual void
+    handleConnect(net::EErrc err_) = 0;
 
-    virtual auto logPrefix() const -> str = 0;
+    virtual auto
+    logPrefix() const -> str = 0;
 
     /**
      * @brief Stop and close the connection.
      */
-    virtual void stop() REQUIRES(m_mutex);
+    virtual void
+    stop() REQUIRES(m_mutex);
 
     /**
      * @brief Schedule to read from endpoint.
      */
-    virtual void read() REQUIRES(m_mutex);
+    virtual void
+    read() REQUIRES(m_mutex);
 
     /**
      * @brief Schedule to connect after some timeout.
      */
-    void timedConnect() REQUIRES(m_mutex);
+    void
+    timedConnect() REQUIRES(m_mutex);
 
     /**
      * @brief Schedule to connect to endpoint.
      */
-    void connect() REQUIRES(m_mutex);
+    void
+    connect() REQUIRES(m_mutex);
 
     /**
      * @brief Close connection and schedule to connect after timeout.
      * @threadsafe
      */
-    void reconnect() REQUIRES(m_mutex);
+    void
+    reconnect() REQUIRES(m_mutex);
 
     /**
      * @brief Handler for timedConnect
      * @param error The error indicator
      */
-    void handleTimedConnect(net::EErrc err_) REQUIRES(!m_mutex);
+    void
+    handleTimedConnect(net::EErrc err_) REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for read
      * @param error    The error indicator
      * @param response The received string
      */
-    void handleRead(net::EErrc, String const& str_) REQUIRES(!m_mutex);
+    void
+    handleRead(net::EErrc, String const& str_) REQUIRES(!m_mutex);
 
 public:
     virtual ~IClient() noexcept = default;
@@ -122,33 +131,38 @@ public:
      * @note Returns after all queued handlers have returned.
      * @threadsafe
      */
-    void Run() REQUIRES(!m_mutex);
+    void
+    Run() REQUIRES(!m_mutex);
 
     /**
      * @brief Stop after client has been started.
      * @note Wait until run has been called.
      * @threadsafe
      */
-    void ScheduleStop() REQUIRES(!m_mutex);
+    void
+    ScheduleStop() REQUIRES(!m_mutex);
 
     /**
      * @brief Subscribe a Feed to this client.
      * @param feed The Feed to subscribe
      * @threadsafe
      */
-    void Subscribe(SPtr<feed::IFeed> feed_) REQUIRES(!m_mutex);
+    void
+    Subscribe(SPtr<feed::IFeed> feed_) REQUIRES(!m_mutex);
 
     /**
      * @brief Compare to another client by value.
      * @param other The other Client
      * @return true if equals, else false
      */
-    virtual auto Equals(IClient const& other_) const -> bool;
+    virtual auto
+    Equals(IClient const& other_) const -> bool;
 
     /**
      * @brief Get a hash value of this client.
      * @return the hash value
      */
-    virtual auto Hash() const -> usize;
+    virtual auto
+    Hash() const -> usize;
 };
 }  // namespace vfrb::client

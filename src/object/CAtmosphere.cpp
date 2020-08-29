@@ -32,7 +32,8 @@ CAtmosphere::CAtmosphere(u32 prio_, String&& nmea_) : CObject(prio_), m_nmea(std
 CAtmosphere::CAtmosphere(CAtmosphere&& other_) noexcept
     : CObject(other_), m_pressure(other_.m_pressure), m_nmea(std::move(other_.m_nmea)) {}
 
-auto CAtmosphere::operator=(CAtmosphere&& other_) noexcept -> CAtmosphere& {
+auto
+CAtmosphere::operator=(CAtmosphere&& other_) noexcept -> CAtmosphere& {
     CObject::operator=(other_);
     m_pressure       = other_.m_pressure;
     m_nmea           = std::move(other_.m_nmea);
@@ -44,7 +45,8 @@ CAtmosphere::CAtmosphere(u32 prio_, f64 press_, String&& nmea_)
     util::FailOutsideBounds(m_pressure, MIN_PRESSURE, MAX_PRESSURE);
 }
 
-void CAtmosphere::assign(CObject&& other_) {
+void
+CAtmosphere::assign(CObject&& other_) {
     try {
         auto&& other = dynamic_cast<CAtmosphere&&>(other_);
         CObject::assign(std::move(other_));

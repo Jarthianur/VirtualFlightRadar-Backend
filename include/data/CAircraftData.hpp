@@ -52,9 +52,11 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    auto Update(object::CObject&& aircraft_) -> bool override;
+    auto
+    Update(object::CObject&& aircraft_) -> bool override;
 
-    void Environment(object::SLocation const& loc_, f64 press_);
+    void
+    Environment(object::SLocation const& loc_, f64 press_);
 
     /**
      * @brief Process all aircrafts.
@@ -62,6 +64,7 @@ public:
      * @param atmPress The atmospheric pressure
      * @threadsafe
      */
-    void Access() override;
+    void
+    Access() override;
 };
 }  // namespace vfrb::data

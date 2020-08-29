@@ -24,13 +24,15 @@
 
 namespace vfrb::object::date_time
 {
-auto Now() -> s64 {
+auto
+Now() -> s64 {
     return static_cast<s64>(
-        boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
-            .total_milliseconds());
+      boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
+        .total_milliseconds());
 }
 
-auto Day() -> u32 {
+auto
+Day() -> u32 {
     return static_cast<u32>(boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
 }
 }  // namespace vfrb::object::date_time

@@ -38,7 +38,8 @@ class CAtmosphere : public CObject
     f64    m_pressure = ICAO_STD;  ///< The atmospheric pressure
     String m_nmea;                 ///< The NMEA string
 
-    void assign(CObject&& other_) override;
+    void
+    assign(CObject&& other_) override;
 
 public:
     MOVABLE(CAtmosphere)

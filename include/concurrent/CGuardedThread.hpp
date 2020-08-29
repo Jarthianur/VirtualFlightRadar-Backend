@@ -39,7 +39,8 @@ class CGuardedThread
      * @param fn_ The function to run
      */
     template<typename FnT>
-    void init(FnT&& fn_);
+    void
+    init(FnT&& fn_);
 
 public:
     NOT_COPYABLE(CGuardedThread)
@@ -60,13 +61,16 @@ public:
      * @param fn_ The function to run
      */
     template<typename FnT>
-    void Spawn(FnT&& fn_);
+    void
+    Spawn(FnT&& fn_);
 
-    void Wait();
+    void
+    Wait();
 };
 
 template<typename FnT>
-[[gnu::always_inline]] inline void CGuardedThread::init(FnT&& fn_) {
+[[gnu::always_inline]] inline void
+CGuardedThread::init(FnT&& fn_) {
     auto task = std::packaged_task<void()>(std::forward<FnT>(fn_));
     m_state   = task.get_future();
     m_thread  = std::thread(std::move(task));
@@ -81,19 +85,22 @@ inline CGuardedThread::CGuardedThread(CGuardedThread&& other_) noexcept {
     m_state  = std::move(other_.m_state);
 }
 
-inline auto CGuardedThread::operator=(CGuardedThread&& other_) noexcept -> CGuardedThread& {
+inline auto
+CGuardedThread::operator=(CGuardedThread&& other_) noexcept -> CGuardedThread& {
     m_thread = std::move(other_.m_thread);
     m_state  = std::move(other_.m_state);
     return *this;
 }
 
 template<typename FnT>
-void CGuardedThread::Spawn(FnT&& fn_) {
+void
+CGuardedThread::Spawn(FnT&& fn_) {
     Wait();
     init<FnT>(std::forward<FnT>(fn_));
 }
 
-inline void CGuardedThread::Wait() {
+inline void
+CGuardedThread::Wait() {
     try {
         if (m_state.valid()) {
             m_state.wait();

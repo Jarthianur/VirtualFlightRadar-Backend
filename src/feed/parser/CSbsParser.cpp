@@ -42,7 +42,8 @@ constexpr auto PROTO_ITER_COUNT  = 16;
 
 CSbsParser::CSbsParser(s32 maxHeight_) : IParser<CAircraft>(), m_maxHeight(maxHeight_) {}
 
-auto CSbsParser::Parse(String&& str_, u32 prio_) const -> CAircraft {
+auto
+CSbsParser::Parse(String&& str_, u32 prio_) const -> CAircraft {
     u32        i = 2;
     SLocation  loc{};
     StringView id;
@@ -87,7 +88,13 @@ auto CSbsParser::Parse(String&& str_, u32 prio_) const -> CAircraft {
             }
         }
         if (i == PROTO_ITER_COUNT && loc.Altitude <= m_maxHeight) {
-            return {prio_, id, CAircraft::EIdType::ICAO, CAircraft::EAircraftType::POWERED_AIRCRAFT, loc, ts};
+            return {prio_,
+                    id,
+                    CAircraft::EIdType::ICAO,
+                    CAircraft::EAircraftType::POWERED_AIRCRAFT,
+                    CAircraft::ETargetType::TRANSPONDER,
+                    loc,
+                    ts};
         }
     } catch ([[maybe_unused]] object::error::CTimestampParseError const&) {
     }

@@ -50,28 +50,34 @@ public:
     virtual ~IAcceptor() noexcept = default;
 
     /// Run the accept loop.
-    virtual void Run() = 0;
+    virtual void
+    Run() = 0;
 
     /// Stop the accept loop.
-    virtual void Stop() = 0;
+    virtual void
+    Stop() = 0;
 
     /**
      * Execute a callback on accept event.
      * @param cb_ The callback to invoke
      */
-    virtual void OnAccept(Callback&& cb_) = 0;
+    virtual void
+    OnAccept(Callback&& cb_) = 0;
 
     /// Close the staged connection
-    virtual void Close() = 0;
+    virtual void
+    Close() = 0;
 
     /**
      * Start the staged connection.
      * @return the connection
      */
-    virtual auto StartConnection() -> CConnection<SocketT> = 0;
+    virtual auto
+    StartConnection() -> CConnection<SocketT> = 0;
 
     /// Get the address of the staged connection endpoint.
-    [[nodiscard]] virtual auto StagedAddress() const -> String = 0;
+    [[nodiscard]] virtual auto
+    StagedAddress() const -> String = 0;
 };
 }  // namespace net
 }  // namespace vfrb::server

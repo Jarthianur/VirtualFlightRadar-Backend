@@ -42,7 +42,8 @@ namespace vfrb::client
  */
 struct SClientHasher
 {
-    auto operator()(SPtr<IClient> const& c_) const -> usize {
+    auto
+    operator()(SPtr<IClient> const& c_) const -> usize {
         return c_->Hash();
     }
 };
@@ -52,7 +53,8 @@ struct SClientHasher
  */
 struct SClientComparator
 {
-    auto operator()(SPtr<IClient> const& c1_, SPtr<IClient> const& c2_) const -> bool {
+    auto
+    operator()(SPtr<IClient> const& c1_, SPtr<IClient> const& c2_) const -> bool {
         return c1_->Equals(*c2_);
     }
 };
@@ -83,20 +85,23 @@ public:
      * @param feed The feed to subscribe
      * @threadsafe
      */
-    void Subscribe(SPtr<feed::IFeed> feed_) REQUIRES(!m_mutex);
+    void
+    Subscribe(SPtr<feed::IFeed> feed_) REQUIRES(!m_mutex);
 
     /**
      * @brief Run all clients in their own thread.
      * @threadsafe
      */
-    void Run() REQUIRES(!m_mutex);
+    void
+    Run() REQUIRES(!m_mutex);
 
     /**
      * @brief Stop all clients.
      * @note Blocks until all clients have stopped.
      * @threadsafe
      */
-    void Stop() REQUIRES(!m_mutex);
+    void
+    Stop() REQUIRES(!m_mutex);
 };
 
 namespace error
@@ -108,7 +113,8 @@ class CFeedSubscriptionError : public vfrb::error::IError
 public:
     explicit CFeedSubscriptionError(String const& name_);
 
-    [[nodiscard]] auto Message() const noexcept -> str override;
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb::client

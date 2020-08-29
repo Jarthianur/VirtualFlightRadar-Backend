@@ -27,27 +27,31 @@ namespace vfrb::object
 {
 namespace date_time
 {
-extern auto Now() -> s64;
-extern auto Day() -> u32;
+extern auto
+Now() -> s64;
+extern auto
+Day() -> u32;
 }  // namespace date_time
 
 namespace error
 {
-auto CTimestampParseError::Message() const noexcept -> str {
+auto
+CTimestampParseError::Message() const noexcept -> str {
     return "";
 }
 }  // namespace error
 
-auto parseTime(StringView::const_iterator& first_, StringView::const_iterator const& last_)
-    -> std::tuple<u32, u32, u32, u32> {
+auto
+parseTime(StringView::const_iterator& first_, StringView::const_iterator const& last_)
+  -> std::tuple<u32, u32, u32, u32> {
     namespace qi = boost::spirit::qi;
 
     static thread_local const qi::int_parser<u32, 10, 2, 2> _2digit = {};
     static thread_local const qi::int_parser<u32, 10, 3, 3> _3digit = {};
     static thread_local const qi::rule<StringView::const_iterator, std::tuple<u32, u32, u32, u32>(),
                                        qi::space_type>
-        time_r = (_2digit >> _2digit >> _2digit >> qi::attr(0)) |
-                 (_2digit >> ":" >> _2digit >> ":" >> _2digit >> "." >> _3digit);
+      time_r = (_2digit >> _2digit >> _2digit >> qi::attr(0)) |
+               (_2digit >> ":" >> _2digit >> ":" >> _2digit >> "." >> _3digit);
 
     std::tuple<u32, u32, u32, u32> time;
     if (qi::phrase_parse(first_, last_, time_r, qi::space, time) && (first_ == last_)) {
@@ -68,11 +72,13 @@ CTimestamp::CTimestamp(StringView const& sv_) : m_day(date_time::Day()) {
     }
 }
 
-auto CTimestamp::operator>(CTimestamp const& other_) const -> bool {
+auto
+CTimestamp::operator>(CTimestamp const& other_) const -> bool {
     return (this->m_day > other_.m_day) || ((this->m_day == other_.m_day) && this->m_value > other_.m_value);
 }
 
-auto CTimestamp::operator==(CTimestamp const& other_) const -> bool {
+auto
+CTimestamp::operator==(CTimestamp const& other_) const -> bool {
     return m_day == other_.m_day && m_value == other_.m_value;
 }
 }  // namespace vfrb::object

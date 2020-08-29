@@ -48,13 +48,16 @@ public:
     CSignalListener();
     ~CSignalListener() noexcept;
 
-    void Run();
-    void Stop();
+    void
+    Run();
+    void
+    Stop();
 
     /**
      * Add a handler function to be executed when a signal is caught.
      * @param handler_ The handler to invoke
      */
-    void AddHandler(SignalHandler&& handler_);
+    void
+    AddHandler(SignalHandler&& handler_);
 };
 }  // namespace vfrb::concurrent

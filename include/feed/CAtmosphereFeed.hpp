@@ -51,11 +51,13 @@ public:
      * @brief Get this feeds Protocol.
      * @return Protocol::SENSOR
      */
-    [[nodiscard]] auto Protocol() const -> EProtocol override;
+    [[nodiscard]] auto
+    Protocol() const -> EProtocol override;
 
     /**
      * @brief Implement Feed::process.
      */
-    auto Process(String str_) -> bool override;
+    auto
+    Process(String str_) -> bool override;
 };
 }  // namespace vfrb::feed

@@ -34,21 +34,25 @@ class CSensorClient : public IClient
     /**
      * @brief Override Client::read, use timeout
      */
-    void read() override REQUIRES(m_mutex);
+    void
+    read() override REQUIRES(m_mutex);
 
     /**
      * @brief Check read timeout deadline reached.
      * @threadsafe
      */
-    void checkDeadline(net::EErrc err_) REQUIRES(!m_mutex);
+    void
+    checkDeadline(net::EErrc err_) REQUIRES(!m_mutex);
 
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
+    void
+    handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
 
-    auto logPrefix() const -> str override;
+    auto
+    logPrefix() const -> str override;
 
 public:
     /**

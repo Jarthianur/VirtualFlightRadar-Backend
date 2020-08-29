@@ -42,7 +42,9 @@ class CTimeoutBackoff
     std::array<u32, BACKOFF_SIZE> const m_backoffValues = {1, 5, 20, 60, 120, 300};
 
 public:
-    auto Next() -> u32;
-    void Reset();
+    auto
+    Next() -> u32;
+    void
+    Reset();
 };
 }  // namespace vfrb::client

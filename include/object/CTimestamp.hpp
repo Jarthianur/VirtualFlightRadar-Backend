@@ -33,7 +33,8 @@ namespace error
 class CTimestampParseError : public vfrb::error::IError
 {
 public:
-    [[nodiscard]] auto Message() const noexcept -> str override;
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
 };
 }  // namespace error
 
@@ -56,7 +57,9 @@ public:
     explicit CTimestamp(StringView const& sv_);
     ~CTimestamp() noexcept = default;
 
-    auto operator>(CTimestamp const& other_) const -> bool;
-    auto operator==(CTimestamp const& other_) const -> bool;
+    auto
+    operator>(CTimestamp const& other_) const -> bool;
+    auto
+    operator==(CTimestamp const& other_) const -> bool;
 };
 }  // namespace vfrb::object

@@ -40,30 +40,33 @@ IFeed::IFeed(String const& name_, CProperties const& prop_, SPtr<data::IData> da
     : m_properties(prop_), m_name(name_), m_priority(initPriority()), m_data(data_) {
     if (prop_.Property(CConfiguration::KV_KEY_HOST, "").empty()) {
         throw error::CInvalidPropertyError(
-            MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_HOST));
+          MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_HOST));
     }
     if (prop_.Property(CConfiguration::KV_KEY_PORT, "").empty()) {
         throw error::CInvalidPropertyError(
-            MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_PORT));
+          MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_PORT));
     }
 }
 
-auto IFeed::initPriority() const -> u32 {
+auto
+IFeed::initPriority() const -> u32 {
     try {
         return static_cast<u32>(std::max<u64>(
-            0, std::min<u64>(std::stoul(m_properties.Property(CConfiguration::KV_KEY_PRIORITY, "0")),
-                             std::numeric_limits<u32>::max())));
+          0, std::min<u64>(std::stoul(m_properties.Property(CConfiguration::KV_KEY_PRIORITY, "0")),
+                           std::numeric_limits<u32>::max())));
     } catch ([[maybe_unused]] std::logic_error const&) {
     }
     throw error::CInvalidPropertyError("invalid priority given");
 }
 
-auto IFeed::Endpoint() const -> client::net::SEndpoint {
+auto
+IFeed::Endpoint() const -> client::net::SEndpoint {
     return {m_properties.Property(CConfiguration::KV_KEY_HOST),
             m_properties.Property(CConfiguration::KV_KEY_PORT)};
 }
 
-auto IFeed::Priority() const -> std::remove_const<decltype(m_priority)>::type {
+auto
+IFeed::Priority() const -> std::remove_const<decltype(m_priority)>::type {
     return m_priority;
 }
 
@@ -71,7 +74,8 @@ namespace error
 {
 CInvalidPropertyError::CInvalidPropertyError(String const& msg_) : m_msg(msg_) {}
 
-auto CInvalidPropertyError::Message() const noexcept -> str {
+auto
+CInvalidPropertyError::Message() const noexcept -> str {
     return m_msg.c_str();
 }
 }  // namespace error

@@ -46,7 +46,8 @@ CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_,
     FailOutsideBounds(m_location.Altitude, SLocation::MIN_ALTITUDE, SLocation::MAX_ALTITUDE);
 }
 
-void CGpsPosition::assign(CObject&& other_) {
+void
+CGpsPosition::assign(CObject&& other_) {
     try {
         auto&& other = dynamic_cast<CGpsPosition&&>(other_);
         CObject::assign(std::move(other_));
@@ -60,7 +61,8 @@ void CGpsPosition::assign(CObject&& other_) {
     }
 }
 
-auto CGpsPosition::canUpdate(CObject const& other_) const -> bool {
+auto
+CGpsPosition::canUpdate(CObject const& other_) const -> bool {
     try {
         auto const& other = dynamic_cast<const CGpsPosition&>(other_);
         return (this->m_timestamp > other.m_timestamp) && CObject::canUpdate(other_);

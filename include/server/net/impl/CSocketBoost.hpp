@@ -42,7 +42,8 @@ public:
     ~CSocketBoost() noexcept;
 
     /// @throw vfrb::server::net::error::CSocketError
-    [[nodiscard]] auto Address() const -> String;
+    [[nodiscard]] auto
+    Address() const -> String;
 
     /**
      * Write a message on the socket to the endpoint.
@@ -50,10 +51,13 @@ public:
      * @return true on success, else false
      * @throw vfrb::server::net::error::CSocketError
      */
-    auto Write(StringView const& sv_) -> bool;
-    void Close();
+    auto
+    Write(StringView const& sv_) -> bool;
+    void
+    Close();
 
     /// Get the underlying socket.
-    auto Get() -> boost::asio::ip::tcp::socket&;
+    auto
+    Get() -> boost::asio::ip::tcp::socket&;
 };
 }  // namespace vfrb::server::net

@@ -45,7 +45,8 @@ class CClientFactory
      * @return the client as pointer
      */
     template<typename T, ENABLE_IF(EXTENDS(T, IClient))>
-    static auto makeClient(SPtr<feed::IFeed> feed_) -> SPtr<T>;
+    static auto
+    makeClient(SPtr<feed::IFeed> feed_) -> SPtr<T>;
 
 public:
     /**
@@ -53,7 +54,8 @@ public:
      * @param feed The feed to create for
      * @return the client as pointer
      */
-    static auto CreateClientFor(SPtr<feed::IFeed> feed_) -> SPtr<IClient>;
+    static auto
+    CreateClientFor(SPtr<feed::IFeed> feed_) -> SPtr<IClient>;
 };
 
 namespace error
@@ -61,7 +63,8 @@ namespace error
 class CNoSuchProtocolError : public vfrb::error::IError
 {
 public:
-    [[nodiscard]] auto Message() const noexcept -> str override;
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb::client

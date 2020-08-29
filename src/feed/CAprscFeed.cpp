@@ -44,20 +44,23 @@ CAprscFeed::CAprscFeed(String const& name_, CProperties const& prop_, SPtr<data:
         [[maybe_unused]] auto x = prop_.Property(CConfiguration::KV_KEY_LOGIN);
     } catch ([[maybe_unused]] config::error::CPropertyNotFoundError const&) {
         throw error::CInvalidPropertyError(
-            MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_LOGIN));
+          MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_LOGIN));
     }
 }
 
-auto CAprscFeed::Protocol() const -> IFeed::EProtocol {
+auto
+CAprscFeed::Protocol() const -> IFeed::EProtocol {
     return EProtocol::APRS;
 }
 
-auto CAprscFeed::Process(String str_) -> bool {
+auto
+CAprscFeed::Process(String str_) -> bool {
     m_worker.Push(std::move(str_));
     return true;
 }
 
-auto CAprscFeed::Login() const -> String {
+auto
+CAprscFeed::Login() const -> String {
     return m_properties.Property(CConfiguration::KV_KEY_LOGIN);
 }
 }  // namespace vfrb::feed

@@ -46,19 +46,26 @@ class CAcceptorBoost : public IAcceptor<CSocketBoost>
     CSocketBoost                   m_socket;     ///< Staging socket
 
     /// Intermediate handler for accept event
-    void handleAccept(boost::system::error_code err_, Callback const& cb_);
+    void
+    handleAccept(boost::system::error_code err_, Callback const& cb_);
 
 public:
     explicit CAcceptorBoost(u16 port_);
     ~CAcceptorBoost() noexcept override;
 
-    void Run() override;
-    void Stop() override;
-    void OnAccept(Callback&& cb_) override;
-    void Close() override;
+    void
+    Run() override;
+    void
+    Stop() override;
+    void
+    OnAccept(Callback&& cb_) override;
+    void
+    Close() override;
 
     /// @throw vfrb::server::net::error::CSocketError
-    auto               StartConnection() -> CConnection<CSocketBoost> override;
-    [[nodiscard]] auto StagedAddress() const -> String override;
+    auto
+    StartConnection() -> CConnection<CSocketBoost> override;
+    [[nodiscard]] auto
+    StagedAddress() const -> String override;
 };
 }  // namespace vfrb::server::net

@@ -33,7 +33,8 @@ namespace vfrb::config
 {
 CConfigReader::CConfigReader(std::istream& stream_) : m_stream(stream_) {}
 
-auto CConfigReader::Read() -> CProperties {
+auto
+CConfigReader::Read() -> CProperties {
     ptree tree;
     try {
         read_ini(m_stream, tree);
@@ -47,7 +48,8 @@ namespace error
 {
 CReadFileError::CReadFileError(String const& file_) : m_fname(file_ + " is not a valid INI file") {}
 
-auto CReadFileError::Message() const noexcept -> str {
+auto
+CReadFileError::Message() const noexcept -> str {
     return m_fname.c_str();
 }
 }  // namespace error

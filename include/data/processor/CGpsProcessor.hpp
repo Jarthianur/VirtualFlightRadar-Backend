@@ -50,27 +50,31 @@ private:
      * @param position The position
      * @param utc      The current utc time
      */
-    auto appendGpgga(object::CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_,
-                     usize idx_) const -> usize;
+    auto
+    appendGpgga(object::CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_,
+                usize idx_) const -> usize;
 
     /**
      * @brief Append GPRMC sentence to processing string.
      * @param utc The current utc time
      */
-    auto appendGprmc(CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_, usize idx_) const -> usize;
+    auto
+    appendGprmc(CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_, usize idx_) const -> usize;
 
     /**
      * @brief Evaluate position for given latitude and longitude.
      * @param latitude  The latitude
      * @param longitude The longitude
      */
-    void evalPosition(f64 lat_, f64 lon_) const;
+    void
+    evalPosition(f64 lat_, f64 lon_) const;
 
 public:
     /**
      * @brief Process a GPS position.
      * @param rPosition The position
      */
-    void Process(object::CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* nmea_) const;
+    void
+    Process(object::CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* nmea_) const;
 };
 }  // namespace vfrb::data::processor

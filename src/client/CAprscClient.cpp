@@ -41,7 +41,8 @@ static auto const& logger     = CLogger::Instance();
 CAprscClient::CAprscClient(SEndpoint const& ep_, String const& login_, SPtr<IConnector> con_)
     : IClient(ep_, con_), m_login(login_ + "\r\n") {}
 
-auto CAprscClient::Equals(IClient const& other_) const -> bool {
+auto
+CAprscClient::Equals(IClient const& other_) const -> bool {
     try {
         auto const& other = dynamic_cast<CAprscClient const&>(other_);
         return IClient::Equals(other_) && this->m_login == other.m_login;
@@ -50,13 +51,15 @@ auto CAprscClient::Equals(IClient const& other_) const -> bool {
     }
 }
 
-auto CAprscClient::Hash() const -> usize {
+auto
+CAprscClient::Hash() const -> usize {
     usize seed = IClient::Hash();
     boost::hash_combine(seed, boost::hash_value(m_login));
     return seed;
 }
 
-void CAprscClient::handleConnect(EErrc err_) {
+void
+CAprscClient::handleConnect(EErrc err_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (err_ == EErrc::OK) {
@@ -68,11 +71,13 @@ void CAprscClient::handleConnect(EErrc err_) {
     }
 }
 
-void CAprscClient::sendKeepAlive() {
+void
+CAprscClient::sendKeepAlive() {
     m_connector->OnTimeout([this](EErrc err_) { handleSendKeepAlive(err_); }, KEEPALIVE_INTERVAL);
 }
 
-void CAprscClient::handleLogin(EErrc err_) {
+void
+CAprscClient::handleLogin(EErrc err_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (err_ == EErrc::OK) {
@@ -88,7 +93,8 @@ void CAprscClient::handleLogin(EErrc err_) {
     }
 }
 
-void CAprscClient::handleSendKeepAlive(EErrc err_) {
+void
+CAprscClient::handleSendKeepAlive(EErrc err_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::RUNNING) {
         if (err_ == EErrc::OK) {
@@ -108,7 +114,8 @@ void CAprscClient::handleSendKeepAlive(EErrc err_) {
     }
 }
 
-auto CAprscClient::logPrefix() const -> str {
+auto
+CAprscClient::logPrefix() const -> str {
     return LOG_PREFIX;
 }
 }  // namespace vfrb::client

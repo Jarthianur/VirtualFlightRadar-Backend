@@ -31,7 +31,8 @@ namespace vfrb::util
  * @return the value as its underlyig type
  */
 template<typename T>
-constexpr auto AsUnderlyingType(T val_) -> typename std::underlying_type<T>::type {
+constexpr auto
+AsUnderlyingType(T val_) -> typename std::underlying_type<T>::type {
     return static_cast<typename std::underlying_type<T>::type>(val_);
 }
 }  // namespace vfrb::util

@@ -46,8 +46,10 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    auto Update(object::CObject&& wind_) -> bool override REQUIRES(!m_mutex);
+    auto
+    Update(object::CObject&& wind_) -> bool override REQUIRES(!m_mutex);
 
-    void Access() override REQUIRES(!m_mutex);
+    void
+    Access() override REQUIRES(!m_mutex);
 };
 }  // namespace vfrb::data

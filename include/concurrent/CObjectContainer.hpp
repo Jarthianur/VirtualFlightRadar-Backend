@@ -49,10 +49,12 @@ public:
      * Get an iterator to the first element in container.
      * @return a valid iterator, or the end-iterator
      */
-    CIterator Begin() REQUIRES(!m_modMutex);
+    CIterator
+    Begin() REQUIRES(!m_modMutex);
 
     /// Get an iterator to the end of the container, thus pointing nowhere.
-    auto End() -> CIterator;
+    auto
+    End() -> CIterator;
 
     /**
      * Insert an object at the given key, if not existing yet.
@@ -60,10 +62,12 @@ public:
      * @param val_ The object to insert
      * @return an iterator to the element at key and true if it was inserted, or false if not
      */
-    std::pair<CIterator, bool> Insert(KeyType key_, ObjectT&& value_) REQUIRES(!m_modMutex);
+    std::pair<CIterator, bool>
+    Insert(KeyType key_, ObjectT&& value_) REQUIRES(!m_modMutex);
 
     /// Erase the element at key.
-    void Erase(KeyType key_) REQUIRES(!m_modMutex);
+    void
+    Erase(KeyType key_) REQUIRES(!m_modMutex);
 
 private:
     Mutex mutable m_modMutex;
@@ -102,14 +106,20 @@ public:
     CIterator(typename ContainerType::iterator iter_, CObjectContainer const& c_);
     ~CIterator() noexcept = default;
 
-    auto operator++() -> CIterator&;
-    auto operator*() -> CValueType&;
-    auto operator->() -> CValueType*;
+    auto
+    operator++() -> CIterator&;
+    auto
+    operator*() -> CValueType&;
+    auto
+    operator->() -> CValueType*;
 
-    [[nodiscard]] auto Key() const -> KeyType;
+    [[nodiscard]] auto
+    Key() const -> KeyType;
 
-    auto operator==(CIterator const& other_) const -> bool;
-    auto operator!=(CIterator const& other_) const -> bool;
+    auto
+    operator==(CIterator const& other_) const -> bool;
+    auto
+    operator!=(CIterator const& other_) const -> bool;
 };
 
 template<typename ObjectT, usize StringSize>
@@ -120,8 +130,8 @@ CObjectContainer<ObjectT, StringSize>::CValueType::CValueType(CValueType&& other
     : Value(std::move(other_.Value)), Nmea(other_.Nmea) {}
 
 template<typename ObjectT, usize StringSize>
-auto CObjectContainer<ObjectT, StringSize>::CValueType::operator=(CValueType&& other_) noexcept
-    -> CValueType& {
+auto
+CObjectContainer<ObjectT, StringSize>::CValueType::operator=(CValueType&& other_) noexcept -> CValueType& {
     Value = std::move(other_.Value);
     Nmea  = other_.Nmea;
     return *this;
@@ -147,14 +157,16 @@ CObjectContainer<ObjectT, StringSize>::CIterator::CIterator(typename ContainerTy
 }
 
 template<typename ObjectT, usize StringSize>
-auto CObjectContainer<ObjectT, StringSize>::CIterator::operator=(CIterator&& other_) noexcept -> CIterator& {
+auto
+CObjectContainer<ObjectT, StringSize>::CIterator::operator=(CIterator&& other_) noexcept -> CIterator& {
     m_iterator  = std::move(other_.m_iterator);
     m_valueLock = std::move(other_.m_valueLock);
     m_container = other_.m_container;
 }
 
 template<typename ObjectT, usize StringSize>
-auto CObjectContainer<ObjectT, StringSize>::CIterator::operator++() -> CIterator& {
+auto
+CObjectContainer<ObjectT, StringSize>::CIterator::operator++() -> CIterator& {
     if (m_iterator != m_container.m_container.end()) {
         m_valueLock.unlock();
         LockGuard lk(m_container.m_modMutex);
@@ -166,56 +178,63 @@ auto CObjectContainer<ObjectT, StringSize>::CIterator::operator++() -> CIterator
 }
 
 template<typename ObjectT, usize StringSize>
-auto CObjectContainer<ObjectT, StringSize>::CIterator::operator*() -> CValueType& {
+auto
+CObjectContainer<ObjectT, StringSize>::CIterator::operator*() -> CValueType& {
     return m_iterator->second;
 }
 
 template<typename ObjectT, usize StringSize>
-auto CObjectContainer<ObjectT, StringSize>::CIterator::operator->() -> CValueType* {
+auto
+CObjectContainer<ObjectT, StringSize>::CIterator::operator->() -> CValueType* {
     return &m_iterator->second;
 }
 
 template<typename ObjectT, usize StringSize>
-auto CObjectContainer<ObjectT, StringSize>::CIterator::Key() const -> KeyType {
+auto
+CObjectContainer<ObjectT, StringSize>::CIterator::Key() const -> KeyType {
     return m_iterator->first;
 }
 
 template<typename ObjectT, usize StringSize>
-auto CObjectContainer<ObjectT, StringSize>::CIterator::operator==(CIterator const& other_) const -> bool {
+auto
+CObjectContainer<ObjectT, StringSize>::CIterator::operator==(CIterator const& other_) const -> bool {
     return m_iterator == other_.m_iterator;
 }
 
 template<typename ObjectT, usize StringSize>
-auto CObjectContainer<ObjectT, StringSize>::CIterator::operator!=(CIterator const& other_) const -> bool {
+auto
+CObjectContainer<ObjectT, StringSize>::CIterator::operator!=(CIterator const& other_) const -> bool {
     return m_iterator != other_.m_iterator;
 }
 
 template<typename ObjectT, usize StringSize>
-typename CObjectContainer<ObjectT, StringSize>::CIterator CObjectContainer<ObjectT, StringSize>::Begin()
-    REQUIRES(!m_modMutex) {
+typename CObjectContainer<ObjectT, StringSize>::CIterator
+CObjectContainer<ObjectT, StringSize>::Begin() REQUIRES(!m_modMutex) {
     LockGuard lk(m_modMutex);
     return CIterator(m_container.begin(), *this);
 }
 
 template<typename ObjectT, usize StringSize>
-auto CObjectContainer<ObjectT, StringSize>::End() -> CIterator {
+auto
+CObjectContainer<ObjectT, StringSize>::End() -> CIterator {
     return CIterator(*this);
 }
 
 template<typename ObjectT, usize StringSize>
 std::pair<typename CObjectContainer<ObjectT, StringSize>::CIterator, bool>
-    CObjectContainer<ObjectT, StringSize>::Insert(KeyType key_, ObjectT&& value_) REQUIRES(!m_modMutex) {
+CObjectContainer<ObjectT, StringSize>::Insert(KeyType key_, ObjectT&& value_) REQUIRES(!m_modMutex) {
     LockGuard lk(m_modMutex);
     CIterator iter(m_container.find(key_), *this);
     if (iter == End()) {
         return std::make_pair(
-            CIterator(m_container.emplace(key_, CValueType(std::move(value_))).first, *this), true);
+          CIterator(m_container.emplace(key_, CValueType(std::move(value_))).first, *this), true);
     }
     return std::make_pair(std::move(iter), false);
 }
 
 template<typename ObjectT, usize StringSize>
-void CObjectContainer<ObjectT, StringSize>::Erase(KeyType key_) REQUIRES(!m_modMutex) {
+void
+CObjectContainer<ObjectT, StringSize>::Erase(KeyType key_) REQUIRES(!m_modMutex) {
     LockGuard lk(m_modMutex);
     auto      entry = m_container.find(key_);
     if (entry != m_container.end()) {

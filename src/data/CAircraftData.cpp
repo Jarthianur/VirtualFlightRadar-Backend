@@ -37,7 +37,8 @@ CAircraftData::CAircraftData(AccessFn&& fn_) : CAircraftData(std::move(fn_), 0) 
 
 CAircraftData::CAircraftData(AccessFn&& fn_, s32 maxDist_) : IData(std::move(fn_)), m_processor(maxDist_) {}
 
-auto CAircraftData::Update(CObject&& aircraft_) -> bool {
+auto
+CAircraftData::Update(CObject&& aircraft_) -> bool {
     auto&& aircraft = static_cast<CAircraft&&>(aircraft_);
     auto   result   = m_container.Insert(std::hash<StringView>()(*aircraft.Id()), std::move(aircraft));
     if (!result.second) {
@@ -46,11 +47,13 @@ auto CAircraftData::Update(CObject&& aircraft_) -> bool {
     return true;
 }
 
-void CAircraftData::Environment(SLocation const& loc_, f64 press_) {
+void
+CAircraftData::Environment(SLocation const& loc_, f64 press_) {
     m_processor.ReferTo(loc_, press_);
 }
 
-void CAircraftData::Access() {
+void
+CAircraftData::Access() {
     auto iter = m_container.Begin();
     while (iter != m_container.End()) {
         ++(iter->Value);

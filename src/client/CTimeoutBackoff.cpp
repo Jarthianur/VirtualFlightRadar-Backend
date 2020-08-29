@@ -22,7 +22,8 @@
 
 namespace vfrb::client
 {
-auto CTimeoutBackoff::Next() -> u32 {
+auto
+CTimeoutBackoff::Next() -> u32 {
     auto next = m_backoffValues[m_toIndex];
     if (m_toIndex < BACKOFF_LAST) {
         m_toIndex += 1;
@@ -30,7 +31,8 @@ auto CTimeoutBackoff::Next() -> u32 {
     return next;
 }
 
-void CTimeoutBackoff::Reset() {
+void
+CTimeoutBackoff::Reset() {
     m_toIndex = 0;
 }
 }  // namespace vfrb::client

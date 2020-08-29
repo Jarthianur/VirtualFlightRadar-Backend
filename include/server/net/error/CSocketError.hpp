@@ -34,6 +34,7 @@ class CSocketError : public vfrb::error::IError
 public:
     explicit CSocketError(String msg_);
 
-    [[nodiscard]] auto Message() const noexcept -> str override;
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
 };
 }  // namespace vfrb::server::net::error

@@ -57,17 +57,20 @@ public:
      * @brief Get this feeds Protocol.
      * @return Protocol::APRS
      */
-    auto Protocol() const -> EProtocol override;
+    auto
+    Protocol() const -> EProtocol override;
 
     /**
      * @brief Implement Feed::process.
      */
-    auto Process(String str_) -> bool override;
+    auto
+    Process(String str_) -> bool override;
 
     /**
      * @brief Get the login string.
      * @return the login
      */
-    auto Login() const -> String;
+    auto
+    Login() const -> String;
 };
 }  // namespace vfrb::feed

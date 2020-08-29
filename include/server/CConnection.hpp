@@ -53,7 +53,8 @@ public:
      * @param sv_ The message
      * @return true on success, else false
      */
-    auto Write(StringView const& sv_) -> bool;
+    auto
+    Write(StringView const& sv_) -> bool;
 
     GETTER_REF(Address, m_address)
 };
@@ -67,14 +68,16 @@ CConnection<SocketT>::CConnection(CConnection&& other_) noexcept
     : m_socket(std::move(other_.m_socket)), m_address(std::move(other_.m_address)) {}
 
 template<typename SocketT>
-auto CConnection<SocketT>::operator=(CConnection&& other_) noexcept -> CConnection<SocketT>& {
+auto
+CConnection<SocketT>::operator=(CConnection&& other_) noexcept -> CConnection<SocketT>& {
     m_socket  = std::move(other_.m_socket);
     m_address = std::move(other_.m_address);
     return *this;
 }
 
 template<typename SocketT>
-auto CConnection<SocketT>::Write(StringView const& sv_) -> bool {
+auto
+CConnection<SocketT>::Write(StringView const& sv_) -> bool {
     try {
         return m_socket.Write(sv_);
     } catch (net::error::CSocketError const& e) {

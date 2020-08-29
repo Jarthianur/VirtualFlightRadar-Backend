@@ -34,7 +34,8 @@ namespace
 constexpr auto TIME_BUF_SIZE = 32;
 }  // namespace
 
-void CLogger::LogFile(String const& file_) {
+void
+CLogger::LogFile(String const& file_) {
     concurrent::LockGuard lk(m_mutex);
     m_logFile = std::ofstream(file_);
     if (!m_logFile) {
@@ -44,21 +45,24 @@ void CLogger::LogFile(String const& file_) {
     m_errStream = &m_logFile;
 }
 
-auto CLogger::time() -> String {
+auto
+CLogger::time() -> String {
     std::time_t tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::array<char, TIME_BUF_SIZE> time{};
     std::strftime(time.data(), TIME_BUF_SIZE, "%c", gmtime(&tt));
     return time.data();
 }
 
-auto CLogger::Instance() noexcept -> CLogger& {
+auto
+CLogger::Instance() noexcept -> CLogger& {
     static CLogger log;
     return log;
 }
 
 namespace error
 {
-auto COpenLogfileError::Message() const noexcept -> str {
+auto
+COpenLogfileError::Message() const noexcept -> str {
     return "failed to open logfile";
 }
 }  // namespace error

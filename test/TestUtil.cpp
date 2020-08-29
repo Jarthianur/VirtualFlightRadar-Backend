@@ -265,8 +265,8 @@ DESCRIBE_PAR("test_StringUtils") {
     }
 
     IT("should parse a number correctly") {
-        ASSERT_NOTHROW(Parse<s32>("1234"));
-        ASSERT_EQ(Parse<s32>("1234"), 1234);
+        auto r = ASSERT_NOTHROW(return Parse<s32>("1234"));
+        ASSERT_EQ(r, 1234);
     }
     IT("should throw on parse failure") {
         ASSERT_THROWS(Parse<s32>(""), str_util::error::CConversionError);

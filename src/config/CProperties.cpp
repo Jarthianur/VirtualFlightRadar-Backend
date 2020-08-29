@@ -32,7 +32,8 @@ CProperties::CProperties(ptree const& ptree_) : m_pTree(ptree_) {}
 
 CProperties::CProperties(ptree&& ptree_) : m_pTree(ptree_) {}
 
-auto CProperties::Property(String const& path_, String const& def_) const noexcept -> String {
+auto
+CProperties::Property(String const& path_, String const& def_) const noexcept -> String {
     try {
         auto p = m_pTree.get_child(path_).get_value<String>();
         return p.empty() ? def_ : p;
@@ -41,7 +42,8 @@ auto CProperties::Property(String const& path_, String const& def_) const noexce
     }
 }
 
-auto CProperties::Property(String const& path_) const -> String {
+auto
+CProperties::Property(String const& path_) const -> String {
     try {
         auto p = m_pTree.get_child(path_).get_value<String>();
         if (p.empty()) {
@@ -53,7 +55,8 @@ auto CProperties::Property(String const& path_) const -> String {
     }
 }
 
-auto CProperties::Section(String const& sect_) const -> CProperties {
+auto
+CProperties::Section(String const& sect_) const -> CProperties {
     try {
         return CProperties(m_pTree.get_child(sect_));
     } catch ([[maybe_unused]] ptree_bad_path const&) {
@@ -65,7 +68,8 @@ namespace error
 {
 CPropertyNotFoundError::CPropertyNotFoundError(String const& prop_) : m_msg(prop_ + " not found") {}
 
-auto CPropertyNotFoundError::Message() const noexcept -> str {
+auto
+CPropertyNotFoundError::Message() const noexcept -> str {
     return m_msg.c_str();
 }
 }  // namespace error

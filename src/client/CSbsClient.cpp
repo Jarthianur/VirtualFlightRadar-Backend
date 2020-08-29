@@ -38,7 +38,8 @@ static auto const& logger     = CLogger::Instance();
 
 CSbsClient::CSbsClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
 
-void CSbsClient::handleConnect(EErrc err_) {
+void
+CSbsClient::handleConnect(EErrc err_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (err_ == EErrc::OK) {
@@ -53,7 +54,8 @@ void CSbsClient::handleConnect(EErrc err_) {
     }
 }
 
-auto CSbsClient::logPrefix() const -> str {
+auto
+CSbsClient::logPrefix() const -> str {
     return LOG_PREFIX;
 }
 }  // namespace vfrb::client

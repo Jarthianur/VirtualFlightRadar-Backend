@@ -30,7 +30,8 @@ namespace vfrb::server::net
 {
 CSocketBoost::CSocketBoost(CSocketBoost&& other_) noexcept : m_socket(boost::move(other_.m_socket)) {}
 
-auto CSocketBoost::operator=(CSocketBoost&& other_) noexcept -> CSocketBoost& {
+auto
+CSocketBoost::operator=(CSocketBoost&& other_) noexcept -> CSocketBoost& {
     m_socket = boost::move(other_.m_socket);
     return *this;
 }
@@ -45,14 +46,16 @@ CSocketBoost::~CSocketBoost() noexcept {
     Close();
 }
 
-auto CSocketBoost::Address() const -> String {
+auto
+CSocketBoost::Address() const -> String {
     if (!m_socket.is_open()) {
         throw error::CSocketError("cannot get address from closed socket");
     }
     return m_socket.remote_endpoint().address().to_string();
 }
 
-auto CSocketBoost::Write(StringView const& sv_) -> bool {
+auto
+CSocketBoost::Write(StringView const& sv_) -> bool {
     if (!m_socket.is_open()) {
         throw error::CSocketError("cannot write on closed socket");
     }
@@ -61,7 +64,8 @@ auto CSocketBoost::Write(StringView const& sv_) -> bool {
     return !ec;
 }
 
-void CSocketBoost::Close() {
+void
+CSocketBoost::Close() {
     if (m_socket.is_open()) {
         boost::system::error_code ignored_ec;
         m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ignored_ec);
@@ -69,7 +73,8 @@ void CSocketBoost::Close() {
     }
 }
 
-auto CSocketBoost::Get() -> tcp::socket& {
+auto
+CSocketBoost::Get() -> tcp::socket& {
     return m_socket;
 }
 }  // namespace vfrb::server::net

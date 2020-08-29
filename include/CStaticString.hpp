@@ -35,7 +35,8 @@ namespace error
 class COverflowError : public vfrb::error::IError
 {
 public:
-    [[nodiscard]] auto Message() const noexcept -> str override {
+    [[nodiscard]] auto
+    Message() const noexcept -> str override {
         return "";
     }
 };
@@ -56,7 +57,8 @@ class CStaticString final
      * @param sv_ The string to copy
      * @throw vfrb::error::COverflowError
      */
-    void copy(StringView const& sv_) {
+    void
+    copy(StringView const& sv_) {
         usize len = sv_.length();
         if (len > N) {
             throw error::COverflowError();
@@ -69,7 +71,8 @@ class CStaticString final
      * Copy into own data.
      * @param other_ The string to copy
      */
-    void copy(CStaticString<N> const& other_) {
+    void
+    copy(CStaticString<N> const& other_) {
         std::copy(other_.m_data.cbegin(), other_.m_data.cend(), m_data.begin());
         m_view = StringView{m_data.data(), other_.m_view.length()};
     }
@@ -101,36 +104,42 @@ public:
 
     ~CStaticString() noexcept = default;
 
-    auto operator=(str other_) -> CStaticString& {
+    auto
+    operator=(str other_) -> CStaticString& {
         copy(StringView{other_});
         return *this;
     }
 
-    auto operator=(String const& other_) -> CStaticString& {
+    auto
+    operator=(String const& other_) -> CStaticString& {
         copy(StringView{other_});
         return *this;
     }
 
-    auto operator=(CStaticString<N> const& other_) -> CStaticString& {
+    auto
+    operator=(CStaticString<N> const& other_) -> CStaticString& {
         if (this != &other_) {
             copy(other_);
         }
         return *this;
     }
 
-    auto operator=(StringView const& other_) -> CStaticString& {
+    auto
+    operator=(StringView const& other_) -> CStaticString& {
         copy(other_);
         return *this;
     }
 
-    auto operator=(CStaticString<N>&& other_) noexcept -> CStaticString& {
+    auto
+    operator=(CStaticString<N>&& other_) noexcept -> CStaticString& {
         if (this != &other_) {
             copy(other_);
         }
         return *this;
     }
 
-    auto operator*() const -> StringView const& {
+    auto
+    operator*() const -> StringView const& {
         return m_view;
     }
 
@@ -138,12 +147,14 @@ public:
         return m_view;
     }
 
-    auto operator==(CStaticString<N> const& other_) const -> bool {
+    auto
+    operator==(CStaticString<N> const& other_) const -> bool {
         return m_view == other_.m_view;
     }
 
     /// Clear this string, thus making it to look empty.
-    void Clear() {
+    void
+    Clear() {
         m_view = StringView{m_data.data(), 0};
     }
 
@@ -155,7 +166,8 @@ public:
      * @throw vfrb::error::COverflowError
      */
     template<typename... Args>
-    auto Format(usize pos_, str fmt_, Args... args_) -> s32 {
+    auto
+    Format(usize pos_, str fmt_, Args... args_) -> s32 {
         if (pos_ >= N) {
             throw error::COverflowError();
         }
@@ -172,7 +184,8 @@ public:
     }
 
     /// Get the length of seen characters.
-    [[nodiscard]] inline auto Length() const -> usize {
+    [[nodiscard]] inline auto
+    Length() const -> usize {
         return m_view.length();
     }
 };

@@ -35,28 +35,33 @@ using vfrb::client::net::CConnectorBoost;
 namespace vfrb::client
 {
 template<>
-auto CClientFactory::makeClient<CAprscClient>(SPtr<IFeed> feed_) -> SPtr<CAprscClient> {
+auto
+CClientFactory::makeClient<CAprscClient>(SPtr<IFeed> feed_) -> SPtr<CAprscClient> {
     return std::make_shared<CAprscClient>(feed_->Endpoint(),
                                           std::static_pointer_cast<CAprscFeed>(feed_)->Login(),
                                           std::make_shared<CConnectorBoost>());
 }
 
 template<>
-auto CClientFactory::makeClient<CSbsClient>(SPtr<IFeed> feed_) -> SPtr<CSbsClient> {
+auto
+CClientFactory::makeClient<CSbsClient>(SPtr<IFeed> feed_) -> SPtr<CSbsClient> {
     return std::make_shared<CSbsClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
 }
 
 template<>
-auto CClientFactory::makeClient<CSensorClient>(SPtr<IFeed> feed_) -> SPtr<CSensorClient> {
+auto
+CClientFactory::makeClient<CSensorClient>(SPtr<IFeed> feed_) -> SPtr<CSensorClient> {
     return std::make_shared<CSensorClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
 }
 
 template<>
-auto CClientFactory::makeClient<CGpsdClient>(SPtr<IFeed> feed_) -> SPtr<CGpsdClient> {
+auto
+CClientFactory::makeClient<CGpsdClient>(SPtr<IFeed> feed_) -> SPtr<CGpsdClient> {
     return std::make_shared<CGpsdClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
 }
 
-auto CClientFactory::CreateClientFor(SPtr<IFeed> feed_) -> SPtr<IClient> {
+auto
+CClientFactory::CreateClientFor(SPtr<IFeed> feed_) -> SPtr<IClient> {
     switch (feed_->Protocol()) {
         case IFeed::EProtocol::APRS: return makeClient<CAprscClient>(feed_);
         case IFeed::EProtocol::SBS: return makeClient<CSbsClient>(feed_);
@@ -68,7 +73,8 @@ auto CClientFactory::CreateClientFor(SPtr<IFeed> feed_) -> SPtr<IClient> {
 
 namespace error
 {
-auto CNoSuchProtocolError::Message() const noexcept -> str {
+auto
+CNoSuchProtocolError::Message() const noexcept -> str {
     return "unknown protocol";
 }
 }  // namespace error

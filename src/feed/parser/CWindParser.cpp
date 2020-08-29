@@ -30,7 +30,8 @@ namespace vfrb::feed::parser
 {
 CWindParser::CWindParser() : IParser<CWind>() {}
 
-auto CWindParser::Parse(String&& str_, u32 prio_) const -> CWind {
+auto
+CWindParser::Parse(String&& str_, u32 prio_) const -> CWind {
     if (MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MWV") != String::npos) {
         return {prio_, std::move(str_)};
     }

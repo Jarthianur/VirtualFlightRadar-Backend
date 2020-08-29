@@ -40,22 +40,26 @@ static auto const& logger = CLogger::Instance();
 CConnectorBoost::CConnectorBoost()
     : m_ioCtx(), m_socket(m_ioCtx), m_resolver(m_ioCtx), m_timer(m_ioCtx), m_istream(&m_buffer) {}
 
-auto CConnectorBoost::evalErrorCode(error_code err_) -> EErrc {
+auto
+CConnectorBoost::evalErrorCode(error_code err_) -> EErrc {
     return !err_ ? EErrc::OK : EErrc::Err;
 }
 
-void CConnectorBoost::Run() {
+void
+CConnectorBoost::Run() {
     m_ioCtx.run();
 }
 
-void CConnectorBoost::Stop() {
+void
+CConnectorBoost::Stop() {
     Close();
     if (!m_ioCtx.stopped()) {
         m_ioCtx.stop();
     }
 }
 
-void CConnectorBoost::Close() {
+void
+CConnectorBoost::Close() {
     m_timer.expires_at(boost::posix_time::pos_infin);
     m_timer.cancel();
     if (m_socket.is_open()) {
@@ -65,21 +69,24 @@ void CConnectorBoost::Close() {
     }
 }
 
-void CConnectorBoost::OnConnect(SEndpoint const& ep_, Callback const& cb_) {
+void
+CConnectorBoost::OnConnect(SEndpoint const& ep_, Callback const& cb_) {
     m_resolver.async_resolve(ep_.Host, ep_.Port, tcp::resolver::query::canonical_name,
                              [this, &cb_](error_code err_, tcp::resolver::results_type const& res_) {
                                  handleResolve(err_, res_, cb_);
                              });
 }
 
-void CConnectorBoost::OnRead(ReadCallback const& cb_) {
+void
+CConnectorBoost::OnRead(ReadCallback const& cb_) {
     if (m_socket.is_open()) {
         async_read_until(m_socket, m_buffer, "\r\n",
                          [this, &cb_](error_code err_, usize b_) { handleRead(err_, b_, cb_); });
     }
 }
 
-void CConnectorBoost::OnWrite(String const& str_, Callback const& cb_) {
+void
+CConnectorBoost::OnWrite(String const& str_, Callback const& cb_) {
     if (m_socket.is_open()) {
         async_write(m_socket, buffer(str_),
                     [this, &cb_](error_code err_, usize b_) { handleWrite(err_, b_, cb_); }
@@ -88,22 +95,26 @@ void CConnectorBoost::OnWrite(String const& str_, Callback const& cb_) {
     }
 }
 
-void CConnectorBoost::OnTimeout(Callback const& cb_, u32 to_) {
+void
+CConnectorBoost::OnTimeout(Callback const& cb_, u32 to_) {
     if (to_ > 0) {
         ResetTimer(to_);
     }
     m_timer.async_wait([this, &cb_](error_code err_) { handleTimeout(err_, cb_); });
 }
 
-void CConnectorBoost::ResetTimer(u32 to_) {
+void
+CConnectorBoost::ResetTimer(u32 to_) {
     m_timer.expires_from_now(boost::posix_time::seconds(to_));
 }
 
-auto CConnectorBoost::TimerExpired() -> bool {
+auto
+CConnectorBoost::TimerExpired() -> bool {
     return m_timer.expires_at() <= deadline_timer::traits_type::now();
 }
 
-void CConnectorBoost::handleWrite(error_code err_, [[maybe_unused]] usize, Callback const& cb_) noexcept {
+void
+CConnectorBoost::handleWrite(error_code err_, [[maybe_unused]] usize, Callback const& cb_) noexcept {
     EErrc const ec = evalErrorCode(err_);
     if (ec != EErrc::OK) {
         logger.Debug("(Client) failed to write: ", err_.message());
@@ -111,8 +122,9 @@ void CConnectorBoost::handleWrite(error_code err_, [[maybe_unused]] usize, Callb
     cb_(ec);
 }
 
-void CConnectorBoost::handleResolve(error_code err_, tcp::resolver::results_type const& res_,
-                                    Callback const& cb_) noexcept {
+void
+CConnectorBoost::handleResolve(error_code err_, tcp::resolver::results_type const& res_,
+                               Callback const& cb_) noexcept {
     EErrc const ec = evalErrorCode(err_);
     if (ec == EErrc::OK) {
         async_connect(m_socket, res_, [this, &cb_](error_code err_) { handleConnect(err_, cb_); });
@@ -122,7 +134,8 @@ void CConnectorBoost::handleResolve(error_code err_, tcp::resolver::results_type
     }
 }
 
-void CConnectorBoost::handleConnect(error_code err_, Callback const& cb_) noexcept {
+void
+CConnectorBoost::handleConnect(error_code err_, Callback const& cb_) noexcept {
     EErrc const ec = evalErrorCode(err_);
     if (ec == EErrc::OK) {
         m_socket.set_option(socket_base::keep_alive(true));
@@ -132,7 +145,8 @@ void CConnectorBoost::handleConnect(error_code err_, Callback const& cb_) noexce
     cb_(ec);
 }
 
-void CConnectorBoost::handleTimeout(error_code err_, Callback const& cb_) noexcept {
+void
+CConnectorBoost::handleTimeout(error_code err_, Callback const& cb_) noexcept {
     EErrc const ec = evalErrorCode(err_);
     if (ec != EErrc::OK) {
         logger.Debug("(Client) timeout: ", err_.message());
@@ -140,7 +154,8 @@ void CConnectorBoost::handleTimeout(error_code err_, Callback const& cb_) noexce
     cb_(ec);
 }
 
-void CConnectorBoost::handleRead(error_code err_, [[maybe_unused]] usize, ReadCallback const& cb_) noexcept {
+void
+CConnectorBoost::handleRead(error_code err_, [[maybe_unused]] usize, ReadCallback const& cb_) noexcept {
     EErrc const ec = evalErrorCode(err_);
     if (ec == EErrc::OK) {
         std::getline(m_istream, m_response);

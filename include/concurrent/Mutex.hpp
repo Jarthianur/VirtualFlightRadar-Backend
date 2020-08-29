@@ -78,19 +78,23 @@ public:
     Mutex()           = default;
     ~Mutex() noexcept = default;
 
-    void lock() ACQUIRE() {
+    void
+    lock() ACQUIRE() {
         m_mutex.lock();
     }
 
-    void unlock() RELEASE() {
+    void
+    unlock() RELEASE() {
         m_mutex.unlock();
     }
 
-    auto try_lock() -> bool TRY_ACQUIRE(true) {
+    auto
+    try_lock() -> bool TRY_ACQUIRE(true) {
         return m_mutex.try_lock();
     }
 
-    auto operator!() const -> Mutex const& {
+    auto
+    operator!() const -> Mutex const& {
         return *this;
     }
 };

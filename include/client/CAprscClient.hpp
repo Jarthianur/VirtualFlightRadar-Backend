@@ -37,29 +37,34 @@ class CAprscClient : public IClient
     /**
      * @brief Schedule sending of a keep-alive beacon.
      */
-    void sendKeepAlive() REQUIRES(m_mutex);
+    void
+    sendKeepAlive() REQUIRES(m_mutex);
 
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
-    void handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
+    void
+    handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for sending of the login string.
      * @param error The error indicator
      * @threadsafe
      */
-    void handleLogin(net::EErrc err_) REQUIRES(!m_mutex);
+    void
+    handleLogin(net::EErrc err_) REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for sending a keep-alive beacon.
      * @param error The error indicator
      * @threadsafe
      */
-    void handleSendKeepAlive(net::EErrc err_) REQUIRES(!m_mutex);
+    void
+    handleSendKeepAlive(net::EErrc err_) REQUIRES(!m_mutex);
 
-    auto logPrefix() const -> str override;
+    auto
+    logPrefix() const -> str override;
 
 public:
     /**
@@ -69,7 +74,9 @@ public:
      */
     CAprscClient(net::SEndpoint const& ep_, String const& login_, SPtr<net::IConnector> con_);
 
-    auto Equals(IClient const& other_) const -> bool override;
-    auto Hash() const -> usize override;
+    auto
+    Equals(IClient const& other_) const -> bool override;
+    auto
+    Hash() const -> usize override;
 };
 }  // namespace vfrb::client

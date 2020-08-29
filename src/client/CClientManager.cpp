@@ -33,7 +33,8 @@ CClientManager::~CClientManager() noexcept {
     Stop();
 }
 
-void CClientManager::Subscribe(SPtr<feed::IFeed> feed_) {
+void
+CClientManager::Subscribe(SPtr<feed::IFeed> feed_) {
     LockGuard lk(m_mutex);
     auto      it = m_clients.end();
     it           = m_clients.insert(CClientFactory::CreateClientFor(feed_)).first;
@@ -44,7 +45,8 @@ void CClientManager::Subscribe(SPtr<feed::IFeed> feed_) {
     }
 }
 
-void CClientManager::Run() {
+void
+CClientManager::Run() {
     LockGuard lk(m_mutex);
     for (auto it : m_clients) {
         m_thdGroup.CreateThread([this, it] {
@@ -55,7 +57,8 @@ void CClientManager::Run() {
     }
 }
 
-void CClientManager::Stop() {
+void
+CClientManager::Stop() {
     LockGuard lk(m_mutex);
     for (auto it : m_clients) {
         it->ScheduleStop();
@@ -67,7 +70,8 @@ namespace error
 CFeedSubscriptionError::CFeedSubscriptionError(String const& name_)
     : m_msg(str_util::MakeStr("failed to subscribe ", name_, " to client")) {}
 
-auto CFeedSubscriptionError::Message() const noexcept -> str {
+auto
+CFeedSubscriptionError::Message() const noexcept -> str {
     return m_msg.c_str();
 }
 }  // namespace error

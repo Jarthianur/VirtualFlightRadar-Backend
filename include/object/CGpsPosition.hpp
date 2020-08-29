@@ -53,8 +53,10 @@ class CGpsPosition : public CObject
     s8         m_fixQuality;      ///< The GPS fix quality
     CTimestamp m_timestamp;       ///< The timestamp of this position
 
-    void               assign(CObject&& other_) override;
-    [[nodiscard]] auto canUpdate(CObject const& other_) const -> bool override;
+    void
+    assign(CObject&& other_) override;
+    [[nodiscard]] auto
+    canUpdate(CObject const& other_) const -> bool override;
 
 public:
     DEFAULT_COPYABLE(CGpsPosition)

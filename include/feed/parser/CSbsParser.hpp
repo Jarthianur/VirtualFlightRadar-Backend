@@ -40,6 +40,7 @@ class CSbsParser : public IParser<object::CAircraft>
 public:
     explicit CSbsParser(s32 maxHeight_);
 
-    auto Parse(String&& str_, u32 prio_) const -> object::CAircraft override;
+    auto
+    Parse(String&& str_, u32 prio_) const -> object::CAircraft override;
 };
 }  // namespace vfrb::feed::parser

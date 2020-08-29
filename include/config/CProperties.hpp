@@ -45,7 +45,8 @@ public:
      * @param def_  The default value
      * @return the value at path if found, else the default value
      */
-    [[nodiscard]] auto Property(String const& path_, String const& def_) const noexcept -> String;
+    [[nodiscard]] auto
+    Property(String const& path_, String const& def_) const noexcept -> String;
 
     /**
      * Get a property at path (section.key).
@@ -53,7 +54,8 @@ public:
      * @return the value at path
      * @throw vfrb::config::error::CPropertyNotFoundError
      */
-    [[nodiscard]] auto Property(String const& path_) const -> String;
+    [[nodiscard]] auto
+    Property(String const& path_) const -> String;
 
     /**
      * Get the properties for a section.
@@ -61,7 +63,8 @@ public:
      * @return the properties for that section
      * @throw vfrb::config::error::CPropertyNotFoundError
      */
-    [[nodiscard]] auto Section(String const& sect_) const -> CProperties;
+    [[nodiscard]] auto
+    Section(String const& sect_) const -> CProperties;
 };
 
 namespace error
@@ -75,7 +78,8 @@ public:
     /// @param prop_ The property name
     explicit CPropertyNotFoundError(String const& prop_);
 
-    [[nodiscard]] auto Message() const noexcept -> str override;
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
 };
 }  // namespace error
 }  // namespace vfrb::config

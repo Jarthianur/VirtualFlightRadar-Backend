@@ -66,12 +66,14 @@ class CVfrb
      * @brief Create all input feeds.
      * @param config The Configuration
      */
-    void createFeeds(SPtr<config::CConfiguration> conf_);
+    void
+    createFeeds(SPtr<config::CConfiguration> conf_);
 
     /**
      * @brief Serve the data frequently every second.
      */
-    void serve();
+    void
+    serve();
 
     /**
      * @brief Get the duration from given start value as formatted string.
@@ -86,6 +88,7 @@ public:
     /**
      * @brief The VFRB's main method, runs the VFR-B.
      */
-    void Run() noexcept;
+    void
+    Run() noexcept;
 };
 }  // namespace vfrb

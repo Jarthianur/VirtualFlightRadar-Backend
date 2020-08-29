@@ -32,21 +32,24 @@ namespace vfrb::config
 {
 namespace error
 {
-auto CConfigurationError::Message() const noexcept -> str {
+auto
+CConfigurationError::Message() const noexcept -> str {
     return "configuration initialization failed";
 }
 
 CConversionError::CConversionError(String const& str_, str path_)
     : m_msg(str_util::MakeStr("invalid value at ", path_, " [", str_, "]")) {}
 
-auto CConversionError::Message() const noexcept -> str {
+auto
+CConversionError::Message() const noexcept -> str {
     return m_msg.c_str();
 }
 }  // namespace error
 
 /// Wrapper for parse function
 template<typename T>
-auto parse(String const& str_, str path_) -> T {
+auto
+parse(String const& str_, str path_) -> T {
     try {
         return str_util::Parse<T>(str_);
     } catch ([[maybe_unused]] vfrb::str_util::error::CConversionError const&) {
@@ -65,8 +68,8 @@ CConfiguration::CConfiguration(std::istream& stream_) try :
     MaxHeight(resolveFilter(PATH_MAX_HEIGHT)),
     MaxDistance(resolveFilter(PATH_MAX_DIST)),
     ServerConfig(
-        std::make_tuple(parse<u16>(m_properties.Property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT),
-                        parse<u64>(m_properties.Property(PATH_SERVER_MAX_CON, "5"), PATH_SERVER_MAX_CON))),
+      std::make_tuple(parse<u16>(m_properties.Property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT),
+                      parse<u64>(m_properties.Property(PATH_SERVER_MAX_CON, "5"), PATH_SERVER_MAX_CON))),
     FeedNames(resolveFeedNames()),
     FeedProperties(resolveFeeds()) {
     dumpInfo();
@@ -75,7 +78,8 @@ CConfiguration::CConfiguration(std::istream& stream_) try :
     throw error::CConfigurationError();
 }
 
-auto CConfiguration::resolvePosition() const -> object::CGpsPosition {
+auto
+CConfiguration::resolvePosition() const -> object::CGpsPosition {
     object::SLocation loc{};
     loc.Latitude  = parse<f64>(m_properties.Property(PATH_LATITUDE, "0.0"), PATH_LATITUDE);
     loc.Longitude = parse<f64>(m_properties.Property(PATH_LONGITUDE, "0.0"), PATH_LONGITUDE);
@@ -84,7 +88,8 @@ auto CConfiguration::resolvePosition() const -> object::CGpsPosition {
     return object::CGpsPosition(0, loc, geoid);
 }
 
-auto CConfiguration::resolveFilter(str key_) const -> s32 {
+auto
+CConfiguration::resolveFilter(str key_) const -> s32 {
     try {
         s32 filter = parse<s32>(m_properties.Property(key_, "-1"), key_);
         return filter < 0 ? std::numeric_limits<s32>::max() : filter;
@@ -93,7 +98,8 @@ auto CConfiguration::resolveFilter(str key_) const -> s32 {
     }
 }
 
-auto CConfiguration::resolveFeeds() const -> std::unordered_map<String, CProperties> {
+auto
+CConfiguration::resolveFeeds() const -> std::unordered_map<String, CProperties> {
     std::unordered_map<String, CProperties> map;
     for (auto const& it : FeedNames) {
         try {
@@ -105,7 +111,8 @@ auto CConfiguration::resolveFeeds() const -> std::unordered_map<String, CPropert
     return map;
 }
 
-auto CConfiguration::resolveFeedNames() const -> std::list<String> {
+auto
+CConfiguration::resolveFeedNames() const -> std::list<String> {
     std::list<String> list;
     std::stringstream ss;
     ss.str(m_properties.Property(PATH_FEEDS, ""));
@@ -125,7 +132,8 @@ auto CConfiguration::resolveFeedNames() const -> std::list<String> {
     return list;
 }
 
-void CConfiguration::dumpInfo() const {
+void
+CConfiguration::dumpInfo() const {
     logger.Info(LOG_PREFIX, PATH_LATITUDE, ": ", GpsPosition.Location().Latitude);
     logger.Info(LOG_PREFIX, PATH_LONGITUDE, ": ", GpsPosition.Location().Longitude);
     logger.Info(LOG_PREFIX, PATH_ALTITUDE, ": ", GpsPosition.Location().Altitude);

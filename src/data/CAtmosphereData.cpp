@@ -35,17 +35,20 @@ CAtmosphereData::CAtmosphereData(AccessFn&& fn_) : IData(std::move(fn_)) {}
 CAtmosphereData::CAtmosphereData(AccessFn&& fn_, CAtmosphere&& atm_)
     : IData(std::move(fn_)), m_atmosphere(std::move(atm_)) {}
 
-void CAtmosphereData::Access() {
+void
+CAtmosphereData::Access() {
     LockGuard lk(m_mutex);
     m_accessFn({++m_atmosphere, {m_atmosphere.Nmea()}});
 }
 
-auto CAtmosphereData::Update(CObject&& atm_) -> bool {
+auto
+CAtmosphereData::Update(CObject&& atm_) -> bool {
     LockGuard lk(m_mutex);
     return m_atmosphere.TryUpdate(std::move(atm_));
 }
 
-auto CAtmosphereData::Pressure() const -> decltype(m_atmosphere.Pressure()) {
+auto
+CAtmosphereData::Pressure() const -> decltype(m_atmosphere.Pressure()) {
     LockGuard lk(m_mutex);
     return m_atmosphere.Pressure();
 }

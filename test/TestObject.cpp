@@ -358,8 +358,8 @@ DESCRIBE_PAR("test_CAircraft") {
             CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
                          {1., 1., 1.}, CTimestamp("115900"));
             a2.TargetType(CAircraft::ETargetType::TRANSPONDER);
-            while ((++a).UpdateAge() < CObject::OUTDATED)
-                ;
+            while ((++a).UpdateAge() < CObject::OUTDATED) {
+            };
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
             ASSERT_EQ(a.UpdateAge(), CObject::OUTDATED);
             ASSERT_TRUE(a.TryUpdate(std::move(a2)));
@@ -382,8 +382,8 @@ DESCRIBE_PAR("test_CAircraft") {
             CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
                          {1., 1., 1.}, CTimestamp("115900"));
             a.TargetType(CAircraft::ETargetType::FLARM);
-            while ((++a).UpdateAge() < CObject::OUTDATED)
-                ;
+            while ((++a).UpdateAge() < CObject::OUTDATED) {
+            };
             ASSERT_EQ(a2.TargetType(), CAircraft::ETargetType::FLARM);
             ASSERT_EQ(a.UpdateAge(), CObject::OUTDATED);
             ASSERT_TRUE(a.TryUpdate(std::move(a2)));

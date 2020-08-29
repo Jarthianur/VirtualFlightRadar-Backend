@@ -47,15 +47,18 @@ public:
      * @return true on success, else false
      * @threadsafe
      */
-    auto Update(object::CObject&& atm_) -> bool override REQUIRES(!m_mutex);
+    auto
+    Update(object::CObject&& atm_) -> bool override REQUIRES(!m_mutex);
 
-    void Access() override REQUIRES(!m_mutex);
+    void
+    Access() override REQUIRES(!m_mutex);
 
     /**
      * @brief Get the atmospheric pressure.
      * @return the pressure
      * @threadsafe
      */
-    auto Pressure() const -> decltype(m_atmosphere.Pressure()) REQUIRES(!m_mutex);
+    auto
+    Pressure() const -> decltype(m_atmosphere.Pressure()) REQUIRES(!m_mutex);
 };
 }  // namespace vfrb::data

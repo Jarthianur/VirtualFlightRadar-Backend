@@ -43,9 +43,11 @@ public:
     CWind(u32 prio_, String&& nmea_);
     ~CWind() noexcept override = default;
 
-    void assign(CObject&& other_) override;
+    void
+    assign(CObject&& other_) override;
 
-    void Clear();
+    void
+    Clear();
 
     GETTER_REF(Nmea, m_nmea)
 };

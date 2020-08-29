@@ -56,7 +56,8 @@ namespace error
 class CConversionError : public vfrb::error::IError
 {
 public:
-    [[nodiscard]] auto Message() const noexcept -> str override {
+    [[nodiscard]] auto
+    Message() const noexcept -> str override {
         return "conversion failed";
     }
 };
@@ -71,7 +72,8 @@ auto inline len(String const& s_) -> usize {
 }
 
 template<typename... Args>
-auto MakeStr(Args&&... args_) -> String {
+auto
+MakeStr(Args&&... args_) -> String {
     String s;
     s.reserve((0 + ... + len(args_)));
     return (s + ... + args_);
@@ -84,7 +86,8 @@ auto MakeStr(Args&&... args_) -> String {
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, f64))>
-auto Convert(str first_, str last_) -> Result<T> {
+auto
+Convert(str first_, str last_) -> Result<T> {
     T     result;
     EErrc ec = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::double_, result) || first_ != last_) {
@@ -100,7 +103,8 @@ auto Convert(str first_, str last_) -> Result<T> {
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, s32))>
-auto Convert(str first_, str last_) -> Result<T> {
+auto
+Convert(str first_, str last_) -> Result<T> {
     T     result;
     EErrc ec = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::int_, result) || first_ != last_) {
@@ -116,7 +120,8 @@ auto Convert(str first_, str last_) -> Result<T> {
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, u32))>
-auto Convert(str first_, str last_) -> Result<T> {
+auto
+Convert(str first_, str last_) -> Result<T> {
     T     result;
     EErrc ec = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::uint_, result) || first_ != last_) {
@@ -132,7 +137,8 @@ auto Convert(str first_, str last_) -> Result<T> {
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, u64))>
-auto Convert(str first_, str last_) -> Result<T> {
+auto
+Convert(str first_, str last_) -> Result<T> {
     T     result;
     EErrc ec = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ulong_, result) || first_ != last_) {
@@ -148,7 +154,8 @@ auto Convert(str first_, str last_) -> Result<T> {
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, x32))>
-auto Convert(str first_, str last_) -> Result<u32> {
+auto
+Convert(str first_, str last_) -> Result<u32> {
     static thread_local const boost::spirit::qi::int_parser<u32, 16> hex = {};
 
     u32   result = 0;
@@ -166,7 +173,8 @@ auto Convert(str first_, str last_) -> Result<u32> {
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, s8))>
-auto Convert(str first_, str last_) -> Result<T> {
+auto
+Convert(str first_, str last_) -> Result<T> {
     s16   result = 0;
     EErrc ec     = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::short_, result) || first_ != last_ ||
@@ -183,7 +191,8 @@ auto Convert(str first_, str last_) -> Result<T> {
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, u8))>
-auto Convert(str first_, str last_) -> Result<T> {
+auto
+Convert(str first_, str last_) -> Result<T> {
     u16   result = 0;
     EErrc ec     = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_ ||
@@ -200,7 +209,8 @@ auto Convert(str first_, str last_) -> Result<T> {
  * @return the conversion result
  */
 template<typename T, ENABLE_IF(IS_TYPE(T, u16))>
-auto Convert(str first_, str last_) -> Result<T> {
+auto
+Convert(str first_, str last_) -> Result<T> {
     T     result;
     EErrc ec = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_) {
@@ -218,7 +228,8 @@ auto Convert(str first_, str last_) -> Result<T> {
  * @return the resulting error code
  */
 template<typename T>
-auto Convert(str first_, str last_, T& dest_) -> EErrc {
+auto
+Convert(str first_, str last_, T& dest_) -> EErrc {
     auto [v, ec] = Convert<T>(first_, last_);
     dest_        = v;
     return ec;
@@ -232,7 +243,8 @@ auto Convert(str first_, str last_, T& dest_) -> EErrc {
  * @throw vfrb::str_util::error::CConversionError
  */
 template<typename T>
-auto Parse(std::csub_match const& sub_) {
+auto
+Parse(std::csub_match const& sub_) {
     if (auto [v, ec] = Convert<T>(sub_.first, sub_.second); ec == EErrc::OK) {
         return v;
     }
@@ -247,7 +259,8 @@ auto Parse(std::csub_match const& sub_) {
  * @throw vfrb::str_util::error::CConversionError
  */
 template<typename T>
-auto Parse(String const& str_) {
+auto
+Parse(String const& str_) {
     if (auto [v, ec] = Convert<T>(str_.c_str(), str_.c_str() + str_.size()); ec == EErrc::OK) {
         return v;
     }
@@ -259,7 +272,8 @@ auto Parse(String const& str_) {
  * @param sub_ The sub match
  * @return the string view
  */
-inline auto AsStrView(std::csub_match const& sub_) -> StringView {
+inline auto
+AsStringView(std::csub_match const& sub_) -> StringView {
     return StringView(sub_.first, static_cast<usize>(sub_.second - sub_.first));
 }
 
@@ -269,8 +283,9 @@ inline auto AsStrView(std::csub_match const& sub_) -> StringView {
  * @param s_   The character sequence
  * @return true if equal, else false
  */
-inline auto operator==(std::csub_match const& sub_, str cstr_) -> bool {
-    return AsStrView(sub_) == cstr_;
+inline auto
+operator==(std::csub_match const& sub_, str cstr_) -> bool {
+    return AsStringView(sub_) == cstr_;
 }
 
 /**
@@ -279,7 +294,8 @@ inline auto operator==(std::csub_match const& sub_, str cstr_) -> bool {
  * @param pos_ The index to start from
  * @return the checksum
  */
-inline auto Checksum(StringView const& sv_, usize pos_) -> u32 {
+inline auto
+Checksum(StringView const& sv_, usize pos_) -> u32 {
     u32   csum = 0;
     usize i    = 1 + pos_;  // $ in nmea str not included
     while (i < sv_.length() && sv_[i] != '*') {
@@ -293,7 +309,8 @@ inline auto Checksum(StringView const& sv_, usize pos_) -> u32 {
  * @param sv_ The string
  * @return true if equal, else false
  */
-inline auto MatchChecksum(StringView const& sv_) -> bool {
+inline auto
+MatchChecksum(StringView const& sv_) -> bool {
     auto const cs_begin = sv_.rfind('*');
     if (cs_begin == StringView::npos || cs_begin + 3 > sv_.length()) {
         return false;

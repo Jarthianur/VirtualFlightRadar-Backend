@@ -47,18 +47,21 @@ constexpr auto STOP_COND_WAIT_TIME = 100;
 
 IClient::IClient(SEndpoint const& ep_, SPtr<IConnector> con_) : m_connector(con_), m_endpoint(ep_) {}
 
-auto IClient::Equals(IClient const& other_) const -> bool {
+auto
+IClient::Equals(IClient const& other_) const -> bool {
     return this->m_endpoint == other_.m_endpoint;
 }
 
-auto IClient::Hash() const -> usize {
+auto
+IClient::Hash() const -> usize {
     usize seed = 0;
     boost::hash_combine(seed, boost::hash_value(m_endpoint.Host));
     boost::hash_combine(seed, boost::hash_value(m_endpoint.Port));
     return seed;
 }
 
-void IClient::Subscribe(SPtr<feed::IFeed> feed_) {
+void
+IClient::Subscribe(SPtr<feed::IFeed> feed_) {
     LockGuard lk(m_mutex);
     m_feeds.push_back(feed_);
     std::sort(m_feeds.begin(), m_feeds.end(), [](SPtr<feed::IFeed> const& f1_, SPtr<feed::IFeed> const& f2_) {
@@ -66,7 +69,8 @@ void IClient::Subscribe(SPtr<feed::IFeed> feed_) {
     });
 }
 
-void IClient::Run() NO_THREAD_SAFETY_ANALYSIS {
+void
+IClient::Run() NO_THREAD_SAFETY_ANALYSIS {
     UniqueLock lk(m_mutex);
     if (m_state == EState::NONE) {
         connect();
@@ -76,12 +80,14 @@ void IClient::Run() NO_THREAD_SAFETY_ANALYSIS {
     }
 }
 
-void IClient::connect() {
+void
+IClient::connect() {
     m_state = EState::CONNECTING;
     m_connector->OnConnect(m_endpoint, [this](EErrc err_) { handleConnect(err_); });
 }
 
-void IClient::reconnect() {
+void
+IClient::reconnect() {
     if (m_state != EState::STOPPING) {
         m_state = EState::CONNECTING;
         logger.Info(logPrefix(), "schedule reconnect to ", m_endpoint.Host, ":", m_endpoint.Port);
@@ -90,11 +96,13 @@ void IClient::reconnect() {
     }
 }
 
-void IClient::timedConnect() {
+void
+IClient::timedConnect() {
     m_connector->OnTimeout([this](EErrc err_) { handleTimedConnect(err_); }, m_backoff.Next());
 }
 
-void IClient::stop() {
+void
+IClient::stop() {
     if (m_state == EState::RUNNING || m_state == EState::CONNECTING) {
         m_state = EState::STOPPING;
         logger.Info(logPrefix(), "disconnect from ", m_endpoint.Host, ":", m_endpoint.Port);
@@ -102,7 +110,8 @@ void IClient::stop() {
     }
 }
 
-void IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS {
+void
+IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS {
     std::condition_variable_any cond_ready;
     UniqueLock                  lk(m_mutex);
     cond_ready.wait_for(lk, std::chrono::milliseconds(STOP_COND_WAIT_TIME),
@@ -110,11 +119,13 @@ void IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS {
     stop();
 }
 
-void IClient::read() {
+void
+IClient::read() {
     m_connector->OnRead([this](EErrc err_, String const& str_) { handleRead(err_, str_); });
 }
 
-void IClient::handleTimedConnect(EErrc err_) {
+void
+IClient::handleTimedConnect(EErrc err_) {
     if (err_ == EErrc::OK) {
         LockGuard lk(m_mutex);
         logger.Info(logPrefix(), "try connect to ", m_endpoint.Host, ":", m_endpoint.Port);
@@ -125,7 +136,8 @@ void IClient::handleTimedConnect(EErrc err_) {
     }
 }
 
-void IClient::handleRead(EErrc err_, String const& str_) {
+void
+IClient::handleRead(EErrc err_, String const& str_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::RUNNING) {
         if (err_ == EErrc::OK) {

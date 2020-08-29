@@ -50,7 +50,8 @@ static auto const& logger     = CLogger::Instance();
 
 CGpsdClient::CGpsdClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
 
-void CGpsdClient::handleConnect(EErrc err_) {
+void
+CGpsdClient::handleConnect(EErrc err_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (err_ == EErrc::OK) {
@@ -63,7 +64,8 @@ void CGpsdClient::handleConnect(EErrc err_) {
     }
 }
 
-void CGpsdClient::stop() {
+void
+CGpsdClient::stop() {
     if (m_state == EState::RUNNING) {
         Mutex                       sync;
         UniqueLock                  lk(sync);
@@ -79,7 +81,8 @@ void CGpsdClient::stop() {
     IClient::stop();
 }
 
-void CGpsdClient::handleWatch(EErrc err_) {
+void
+CGpsdClient::handleWatch(EErrc err_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (err_ == EErrc::OK) {
@@ -94,7 +97,8 @@ void CGpsdClient::handleWatch(EErrc err_) {
     }
 }
 
-auto CGpsdClient::logPrefix() const -> str {
+auto
+CGpsdClient::logPrefix() const -> str {
     return LOG_PREFIX;
 }
 }  // namespace vfrb::client

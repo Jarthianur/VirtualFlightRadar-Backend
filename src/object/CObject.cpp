@@ -26,12 +26,14 @@ namespace vfrb::object
 {
 CObject::CObject(u32 prio_) : m_lastPriority(prio_) {}
 
-void CObject::assign(CObject&& other_) {
+void
+CObject::assign(CObject&& other_) {
     this->m_lastPriority = other_.m_lastPriority;
     this->m_updateAge    = 0;
 }
 
-auto CObject::TryUpdate(CObject&& other_) -> bool {
+auto
+CObject::TryUpdate(CObject&& other_) -> bool {
     if (other_.canUpdate(*this)) {
         this->assign(std::move(other_));
         return true;
@@ -39,11 +41,13 @@ auto CObject::TryUpdate(CObject&& other_) -> bool {
     return false;
 }
 
-auto CObject::canUpdate(CObject const& other_) const -> bool {
+auto
+CObject::canUpdate(CObject const& other_) const -> bool {
     return this->m_lastPriority >= other_.m_lastPriority || other_.m_updateAge >= OUTDATED;
 }
 
-auto CObject::operator++() -> CObject& {
+auto
+CObject::operator++() -> CObject& {
     ++m_updateAge;
     return *this;
 }

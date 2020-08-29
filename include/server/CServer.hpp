@@ -54,34 +54,40 @@ class CServer
     bool                       GUARDED_BY(m_mutex) m_running = false;  ///< Run state
     concurrent::CGuardedThread GUARDED_BY(m_mutex) m_thread;           ///< Internal thread
 
-    void accept() REQUIRES(!m_mutex);
+    void
+    accept() REQUIRES(!m_mutex);
 
     /**
      * Check whether an ip address already exists in the connection container.
      * @param addr_ The ip address to check
      * @return true if the ip is already registered, else false
      */
-    auto isConnected(String const& addr_) -> bool REQUIRES(m_mutex);
+    auto
+    isConnected(String const& addr_) -> bool REQUIRES(m_mutex);
 
     /**
      * Handler for accepting incoming connections.
      * @param err_ The error indicator, if false connection can not be accepted
      */
-    void handleStagedConnection(bool err_) noexcept REQUIRES(!m_mutex);
+    void
+    handleStagedConnection(bool err_) noexcept REQUIRES(!m_mutex);
 
 public:
     CServer(u16 port_, usize maxCon_);
     CServer(SPtr<net::IAcceptor<SocketT>> acceptor_, usize maxCon_);
     ~CServer() noexcept;
 
-    void Run() REQUIRES(!m_mutex);
-    void Stop() REQUIRES(!m_mutex);
+    void
+    Run() REQUIRES(!m_mutex);
+    void
+    Stop() REQUIRES(!m_mutex);
 
     /**
      * Send a message to all clients.
      * @param sv_ The message
      */
-    void Send(StringView const& sv_) REQUIRES(!m_mutex);
+    void
+    Send(StringView const& sv_) REQUIRES(!m_mutex);
 };
 
 template<typename SocketT>
@@ -106,7 +112,8 @@ CServer<SocketT>::~CServer() noexcept {
 }
 
 template<typename SocketT>
-void CServer<SocketT>::Run() REQUIRES(!m_mutex) {
+void
+CServer<SocketT>::Run() REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
     s_logger.Info(LOG_PREFIX, "starting...");
     m_running = true;
@@ -118,7 +125,8 @@ void CServer<SocketT>::Run() REQUIRES(!m_mutex) {
 }
 
 template<typename SocketT>
-void CServer<SocketT>::Stop() REQUIRES(!m_mutex) {
+void
+CServer<SocketT>::Stop() REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
     if (m_running) {
         m_running = false;
@@ -129,7 +137,8 @@ void CServer<SocketT>::Stop() REQUIRES(!m_mutex) {
 }
 
 template<typename SocketT>
-void CServer<SocketT>::Send(StringView const& sv_) REQUIRES(!m_mutex) {
+void
+CServer<SocketT>::Send(StringView const& sv_) REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
     if (sv_.empty() || m_connections.empty()) {
         return;
@@ -145,19 +154,22 @@ void CServer<SocketT>::Send(StringView const& sv_) REQUIRES(!m_mutex) {
 }
 
 template<typename SocketT>
-void CServer<SocketT>::accept() REQUIRES(!m_mutex) {
+void
+CServer<SocketT>::accept() REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
     m_acceptor->OnAccept([this](bool err_) { handleStagedConnection(err_); });
 }
 
 template<typename SocketT>
-auto CServer<SocketT>::isConnected(String const& addr_) -> bool REQUIRES(m_mutex) {
+auto
+CServer<SocketT>::isConnected(String const& addr_) -> bool REQUIRES(m_mutex) {
     return std::find_if(m_connections.begin(), m_connections.end(),
                         [&](auto const& it_) { return it_.Address() == addr_; }) != m_connections.end();
 }
 
 template<typename SocketT>
-void CServer<SocketT>::handleStagedConnection(bool err_) noexcept REQUIRES(!m_mutex) {
+void
+CServer<SocketT>::handleStagedConnection(bool err_) noexcept REQUIRES(!m_mutex) {
     if (!err_) {
         concurrent::LockGuard lk(m_mutex);
         try {

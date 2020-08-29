@@ -42,7 +42,8 @@ public:
         : m_msg(std::to_string(val_) + " not in [" + std::to_string(min_) + "," + std::to_string(max_) +
                 "]") {}
 
-    [[nodiscard]] auto Message() const noexcept -> str override {
+    [[nodiscard]] auto
+    Message() const noexcept -> str override {
         return m_msg.c_str();
     }
 };
@@ -57,7 +58,8 @@ public:
  * @throw vfrb::util::error::CBoundsExceededError
  */
 template<typename T>
-void FailOutsideBounds(T val_, T min_, T max_) {
+void
+FailOutsideBounds(T val_, T min_, T max_) {
     if (val_ < min_ || val_ > max_) {
         throw error::CBoundsExceededError(val_, min_, max_);
     }

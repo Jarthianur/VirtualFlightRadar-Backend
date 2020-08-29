@@ -58,15 +58,15 @@ static auto const& logger = CLogger::Instance();
 
 CVfrb::CVfrb(SPtr<CConfiguration> conf_)
     : m_aircraftData(std::make_shared<CAircraftData>(
-          [this](SAccessor const& it) {
-              if (it.Obj.UpdateAge() < CObject::OUTDATED) {
-                  m_server.Send(it.Nmea);
-              }
-          },
-          conf_->MaxDistance)),
+        [this](SAccessor const& it) {
+            if (it.Obj.UpdateAge() < CObject::OUTDATED) {
+                m_server.Send(it.Nmea);
+            }
+        },
+        conf_->MaxDistance)),
       m_atmosphereData(
-          std::make_shared<CAtmosphereData>([this](SAccessor const& it) { m_server.Send(it.Nmea); },
-                                            object::CAtmosphere{0, conf_->AtmPressure, ""})),
+        std::make_shared<CAtmosphereData>([this](SAccessor const& it) { m_server.Send(it.Nmea); },
+                                          object::CAtmosphere{0, conf_->AtmPressure, ""})),
       m_gpsData(std::make_shared<CGpsData>([this](SAccessor const& it) { m_server.Send(it.Nmea); },
                                            conf_->GpsPosition, conf_->GroundMode)),
       m_windData(std::make_shared<CWindData>([this](SAccessor const& it) { m_server.Send(it.Nmea); })),
@@ -75,7 +75,8 @@ CVfrb::CVfrb(SPtr<CConfiguration> conf_)
     createFeeds(conf_);
 }
 
-void CVfrb::Run() noexcept {
+void
+CVfrb::Run() noexcept {
     m_running = true;
     logger.Info(LOG_PREFIX, "starting...");
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
@@ -106,7 +107,8 @@ void CVfrb::Run() noexcept {
     logger.Info(LOG_PREFIX, "stopped after ", duration(start));
 }
 
-void CVfrb::serve() {
+void
+CVfrb::serve() {
     std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
     while (m_running) {
         try {
@@ -123,7 +125,8 @@ void CVfrb::serve() {
     }
 }
 
-void CVfrb::createFeeds(SPtr<CConfiguration> conf_) {
+void
+CVfrb::createFeeds(SPtr<CConfiguration> conf_) {
     feed::CFeedFactory factory(conf_, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
     for (auto const& name : conf_->FeedNames) {
         try {
@@ -134,9 +137,10 @@ void CVfrb::createFeeds(SPtr<CConfiguration> conf_) {
     }
 }
 
-auto CVfrb::duration(std::chrono::steady_clock::time_point start_) -> String {
+auto
+CVfrb::duration(std::chrono::steady_clock::time_point start_) -> String {
     std::chrono::minutes runtime =
-        std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start_);
+      std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start_);
     s64               d = runtime.count() / 60 / 24;
     s64               h = runtime.count() / 60 - d * 24;
     s64               m = runtime.count() % 60;

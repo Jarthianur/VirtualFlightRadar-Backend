@@ -35,12 +35,14 @@ CWindData::CWindData(AccessFn&& fn_) : IData(std::move(fn_)) {}
 CWindData::CWindData(AccessFn&& fn_, object::CWind&& wind_)
     : IData(std::move(fn_)), m_wind(std::move(wind_)) {}
 
-auto CWindData::Update(CObject&& wind_) -> bool {
+auto
+CWindData::Update(CObject&& wind_) -> bool {
     LockGuard lk(m_mutex);
     return m_wind.TryUpdate(std::move(wind_));
 }
 
-void CWindData::Access() {
+void
+CWindData::Access() {
     LockGuard lk(m_mutex);
     m_accessFn({++m_wind, {m_wind.Nmea()}});
     m_wind.Clear();

@@ -28,13 +28,13 @@ using vfrb::util::FailOutsideBounds;
 
 namespace vfrb::object
 {
-CAircraft::CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
-                     SMovement const& move_, CTimestamp const& ts_)
+CAircraft::CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, ETargetType tt_,
+                     SLocation const& loc_, SMovement const& move_, CTimestamp const& ts_)
     : CObject(prio_),
       m_id(id_),
       m_idType(idT_ > EIdType::OGN ? EIdType::RANDOM : idT_),
       m_aircraftType(aT_ > EAircraftType::STATIC_OBJECT ? EAircraftType::UNKNOWN : aT_),
-      m_targetType(ETargetType::FLARM),
+      m_targetType(tt_),
       m_location(loc_),
       m_movement(move_),
       m_timestamp(ts_),
@@ -43,14 +43,14 @@ CAircraft::CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftTy
     FailOutsideBounds(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
 }
 
-CAircraft::CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
-                     CTimestamp const& ts_)
-    : CAircraft(prio_, id_, idT_, aT_, loc_, {.0, .0, .0}, ts_) {
-    m_targetType = ETargetType::TRANSPONDER;
-    m_fullInfo   = false;
+CAircraft::CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, ETargetType tt_,
+                     SLocation const& loc_, CTimestamp const& ts_)
+    : CAircraft(prio_, id_, idT_, aT_, tt_, loc_, {.0, .0, .0}, ts_) {
+    m_fullInfo = false;
 }
 
-void CAircraft::assign(CObject&& other_) {
+void
+CAircraft::assign(CObject&& other_) {
     try {
         auto&& other = dynamic_cast<CAircraft&&>(other_);
         CObject::assign(std::move(other_));
@@ -65,7 +65,8 @@ void CAircraft::assign(CObject&& other_) {
     }
 }
 
-auto CAircraft::canUpdate(CObject const& other_) const -> bool {
+auto
+CAircraft::canUpdate(CObject const& other_) const -> bool {
     try {
         auto const& other = dynamic_cast<CAircraft const&>(other_);
         // timestamp must always be more up to date (1)
@@ -83,7 +84,8 @@ auto CAircraft::canUpdate(CObject const& other_) const -> bool {
     }
 }
 
-void CAircraft::TargetType(ETargetType tt) {
+void
+CAircraft::TargetType(ETargetType tt) {
     m_targetType = tt;
 }
 }  // namespace vfrb::object

@@ -39,11 +39,13 @@ CSbsFeed::CSbsFeed(String const& name_, CProperties const& prop_, SPtr<data::CAi
           }
       }) {}
 
-auto CSbsFeed::Protocol() const -> IFeed::EProtocol {
+auto
+CSbsFeed::Protocol() const -> IFeed::EProtocol {
     return EProtocol::SBS;
 }
 
-auto CSbsFeed::Process(String str_) -> bool {
+auto
+CSbsFeed::Process(String str_) -> bool {
     m_worker.Push(std::move(str_));
     return true;
 }

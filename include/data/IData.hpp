@@ -62,8 +62,10 @@ public:
      * @param _1 The new Object
      * @return true on success, else false
      */
-    virtual auto Update(object::CObject&& obj_) -> bool = 0;
+    virtual auto
+    Update(object::CObject&& obj_) -> bool = 0;
 
-    virtual void Access() = 0;
+    virtual void
+    Access() = 0;
 };
 }  // namespace vfrb::data

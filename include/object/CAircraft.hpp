@@ -102,27 +102,30 @@ private:
     CTimestamp             m_timestamp;         ///< The timestamp of the last report
     bool                   m_fullInfo = false;  ///< Is full set of information available?
 
-    void               assign(CObject&& other_) override;
-    [[nodiscard]] auto canUpdate(CObject const& other_) const -> bool override;
+    void
+    assign(CObject&& other_) override;
+    [[nodiscard]] auto
+    canUpdate(CObject const& other_) const -> bool override;
 
 public:
     /**
      * Initialize as FLARM starget.
      * @param prio_ The initial priority
      */
-    CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
-              SMovement const& move_, CTimestamp const& ts_);
+    CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, ETargetType tt_,
+              SLocation const& loc_, SMovement const& move_, CTimestamp const& ts_);
 
     /**
      * Initialize as TRANSPONDER target.
      * @param prio_ The initial priority
      */
-    CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, SLocation const& loc_,
-              CTimestamp const& ts_);
+    CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, ETargetType tt_,
+              SLocation const& loc_, CTimestamp const& ts_);
 
     ~CAircraft() noexcept override = default;
 
-    void TargetType(ETargetType tt_);
+    void
+    TargetType(ETargetType tt_);
 
     GETTER_REF(Id, m_id)
     GETTER_REF(Location, m_location)

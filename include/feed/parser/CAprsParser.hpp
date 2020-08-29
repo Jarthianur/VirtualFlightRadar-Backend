@@ -20,10 +20,12 @@
 
 #pragma once
 
+#include <optional>
 #include <regex>
 #include <tuple>
 
 #include "object/CAircraft.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "IParser.hpp"
 
@@ -47,6 +49,11 @@ class CAprsParser : public IParser<object::CAircraft>
     CTCONST RE_APRS_CR      = 11;  ///< APRS regex match group of climb rate
     CTCONST RE_APRS_TR      = 12;  ///< APRS regex match group of turn rate
 
+    CTCONST CLIMB_RATE_MIN     = -10000.0;
+    CTCONST CLIMB_RATE_MAX     = 10000.0;
+    CTCONST ID_TYPE_BITS       = 0x03U;
+    CTCONST AIRCRAFT_TYPE_BITS = 0x7CU;
+
     std::regex const m_aprsRe;     ///< Regular expression for APRS protocol
     s32 const        m_maxHeight;  ///< The max height filter
 
@@ -60,7 +67,8 @@ class CAprsParser : public IParser<object::CAircraft>
     [[nodiscard]] auto static parseComment(std::cmatch const& match_) -> AircraftInfo;
 
     /// @throw vfrb::str_util::error::CConversionError
-    [[nodiscard]] auto static parseMovement(std::cmatch const& match_) -> object::CAircraft::SMovement;
+    [[nodiscard]] auto static parseMovement(std::cmatch const& match_)
+      -> std::optional<object::CAircraft::SMovement>;
 
     /// @throw vfrb::object::error::CTimestampParseError
     [[nodiscard]] auto static parseTimeStamp(std::cmatch const& match_) -> object::CTimestamp;
@@ -69,6 +77,7 @@ public:
     /// @param maxHeight_ The filter for max height
     explicit CAprsParser(s32 maxHeight_);
 
-    auto Parse(String&& str_, u32 prio_) const -> object::CAircraft override;
+    auto
+    Parse(String&& str_, u32 prio_) const -> object::CAircraft override;
 };
 }  // namespace vfrb::feed::parser

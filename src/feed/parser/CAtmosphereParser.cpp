@@ -30,7 +30,8 @@ using vfrb::str_util::EErrc;
 
 namespace vfrb::feed::parser
 {
-auto CAtmosphereParser::Parse(String&& str_, u32 prio_) const -> CAtmosphere {
+auto
+CAtmosphereParser::Parse(String&& str_, u32 prio_) const -> CAtmosphere {
     try {
         if (MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MDA") != String::npos) {
             usize tmpB = 0;

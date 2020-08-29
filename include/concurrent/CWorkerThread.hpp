@@ -61,7 +61,8 @@ public:
      * Push an element into the work queue.
      * @param data_ The element to push
      */
-    void Push(DataT&& data_) REQUIRES(!m_mutex);
+    void
+    Push(DataT&& data_) REQUIRES(!m_mutex);
 };
 
 template<typename DataT>
@@ -96,7 +97,8 @@ CWorkerThread<DataT>::~CWorkerThread() noexcept {
 }
 
 template<typename DataT>
-void CWorkerThread<DataT>::Push(DataT&& data_) REQUIRES(!m_mutex) {
+void
+CWorkerThread<DataT>::Push(DataT&& data_) REQUIRES(!m_mutex) {
     LockGuard lk(m_mutex);
     m_workQ.push(std::move(data_));
     m_cv.notify_one();

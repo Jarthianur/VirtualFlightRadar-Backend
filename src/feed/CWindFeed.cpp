@@ -33,11 +33,13 @@ namespace vfrb::feed
 CWindFeed::CWindFeed(String const& name_, CProperties const& prop_, SPtr<data::CWindData> data_)
     : IFeed(name_, prop_, data_) {}
 
-auto CWindFeed::Protocol() const -> IFeed::EProtocol {
+auto
+CWindFeed::Protocol() const -> IFeed::EProtocol {
     return EProtocol::SENSOR;
 }
 
-auto CWindFeed::Process(String str_) -> bool {
+auto
+CWindFeed::Process(String str_) -> bool {
     try {
         m_data->Update(m_parser.Parse(std::move(str_), m_priority));
     } catch ([[maybe_unused]] parser::error::CParseError const&) {

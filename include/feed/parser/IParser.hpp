@@ -48,7 +48,8 @@ public:
      * @return the parsed object
      * @throw vfrb::feed::parser::error::CParseError
      */
-    virtual auto Parse(String&& str_, u32 prio_) const -> ObjectT = 0;
+    virtual auto
+    Parse(String&& str_, u32 prio_) const -> ObjectT = 0;
 };
 
 namespace error
@@ -57,7 +58,8 @@ namespace error
 class CParseError : public vfrb::error::IError
 {
 public:
-    [[nodiscard]] auto Message() const noexcept -> str override {
+    [[nodiscard]] auto
+    Message() const noexcept -> str override {
         return "";
     }
 };

@@ -38,11 +38,13 @@ static auto const& logger     = CLogger::Instance();
 CGpsFeed::CGpsFeed(String const& name_, CProperties const& prop_, SPtr<data::CGpsData> data_)
     : IFeed(name_, prop_, data_) {}
 
-auto CGpsFeed::Protocol() const -> IFeed::EProtocol {
+auto
+CGpsFeed::Protocol() const -> IFeed::EProtocol {
     return EProtocol::GPS;
 }
 
-auto CGpsFeed::Process(String str_) -> bool {
+auto
+CGpsFeed::Process(String str_) -> bool {
     try {
         m_data->Update(m_parser.Parse(std::move(str_), m_priority));
     } catch ([[maybe_unused]] parser::error::CParseError const&) {

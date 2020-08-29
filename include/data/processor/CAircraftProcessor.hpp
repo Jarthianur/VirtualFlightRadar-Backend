@@ -59,21 +59,24 @@ private:
      * @brief Calcutale an aircrafts position relative to the refered one.
      * @param aircraft The Aircraft
      */
-    void calculateRelPosition(object::CAircraft const& aircraft_) const;
+    void
+    calculateRelPosition(object::CAircraft const& aircraft_) const;
 
     /**
      * @brief Append PFLAU sentence to processing string.
      * @param aircraft The Aircaft
      */
-    auto appendPflau(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-        -> usize;
+    auto
+    appendPflau(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
+      -> usize;
 
     /**
      * @brief Append PFLAA sentence to processing string.
      * @param aircraft The Aircaft
      */
-    auto appendPflaa(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-        -> usize;
+    auto
+    appendPflaa(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
+      -> usize;
 
 public:
     CAircraftProcessor();
@@ -83,13 +86,15 @@ public:
      * @brief Process an aircraft.
      * @param aircraft The Aircraft to process
      */
-    void Process(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_) const;
+    void
+    Process(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_) const;
 
     /**
      * @brief Set the refered position and atmospheric pressure.
      * @param position The position
      * @param atmPress The pressure
      */
-    void ReferTo(object::SLocation const& loc_, f64 press_);
+    void
+    ReferTo(object::SLocation const& loc_, f64 press_);
 };
 }  // namespace vfrb::data::processor

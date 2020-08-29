@@ -26,7 +26,8 @@ namespace vfrb::server::net::error
 {
 CSocketError::CSocketError(String msg_) : m_msg(std::move(msg_)) {}
 
-auto CSocketError::Message() const noexcept -> str {
+auto
+CSocketError::Message() const noexcept -> str {
     return m_msg.c_str();
 }
 }  // namespace vfrb::server::net::error

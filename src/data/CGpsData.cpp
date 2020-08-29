@@ -38,7 +38,8 @@ CGpsData::CGpsData(AccessFn&& fn_, CGpsPosition const& pos_, bool gnd_)
     m_processor.Process(pos, &cstr);
 }
 
-void CGpsData::Access() {
+void
+CGpsData::Access() {
     LockGuard lk(m_mutex);
     try {
         auto& [pos, cstr] = m_position;
@@ -48,7 +49,8 @@ void CGpsData::Access() {
     }
 }
 
-auto CGpsData::Update(CObject&& pos_) -> bool {
+auto
+CGpsData::Update(CObject&& pos_) -> bool {
     LockGuard lk(m_mutex);
     if (m_positionLocked) {
         throw error::CPositionAlreadyLocked();
@@ -64,12 +66,14 @@ auto CGpsData::Update(CObject&& pos_) -> bool {
     return updated;
 }
 
-auto CGpsData::Location() const -> decltype(std::get<0>(m_position).Location()) {
+auto
+CGpsData::Location() const -> decltype(std::get<0>(m_position).Location()) {
     LockGuard lk(m_mutex);
     return std::get<0>(m_position).Location();
 }
 
-auto CGpsData::isPositionGood() const -> bool {
+auto
+CGpsData::isPositionGood() const -> bool {
     auto const& pos = std::get<0>(m_position);
     return pos.NrOfSatellites() >= GPS_NR_SATS_GOOD && pos.FixQuality() >= GPS_FIX_GOOD &&
            pos.Dilution() <= GPS_HOR_DILUTION_GOOD;
@@ -77,11 +81,13 @@ auto CGpsData::isPositionGood() const -> bool {
 
 namespace error
 {
-auto CPositionAlreadyLocked::Message() const noexcept -> str {
+auto
+CPositionAlreadyLocked::Message() const noexcept -> str {
     return "position was locked before";
 }
 
-auto CReceivedGoodPosition::Message() const noexcept -> str {
+auto
+CReceivedGoodPosition::Message() const noexcept -> str {
     return "received good position";
 }
 }  // namespace error

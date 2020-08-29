@@ -55,11 +55,13 @@ public:
      * @brief Get this feeds Protocol.
      * @return Protocol::SBS
      */
-    auto Protocol() const -> EProtocol override;
+    auto
+    Protocol() const -> EProtocol override;
 
     /**
      * @brief Feed::process.
      */
-    auto Process(String str_) -> bool override;
+    auto
+    Process(String str_) -> bool override;
 };
 }  // namespace vfrb::feed

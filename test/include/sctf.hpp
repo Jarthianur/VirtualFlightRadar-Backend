@@ -676,8 +676,10 @@ default: break;
 }
 void begin_report() override {}
 void end_report() override {
-if(m_abs_fails >= (m_abs_tests + 1) / 2) {
+if(m_abs_errs > 0) {
 *this << (m_color ? intern::fmt::ANSI_YELLOW : "");
+} else if(m_abs_fails > 0) {
+*this << (m_color ? intern::fmt::ANSI_BLUE : "");
 } else {
 *this << (m_color ? intern::fmt::ANSI_CYAN : "");
 }
@@ -887,30 +889,40 @@ template<typename S> void assert_statement(S&& stmt_, loc const& loc_) {
 comparison res = std::get<0>(stmt_)(std::get<1>(stmt_), std::get<2>(stmt_));
 if(!res) { throw assertion_failure(*res, loc_); }
 }
-template<typename T, typename F> void assert_throws(F&& fn_, char const* tname_, loc const& loc_) {
+template<typename T, typename F> auto assert_throws(F&& fn_, char const* tname_, loc const& loc_) -> T {
 try {
 fn_();
-} catch(T const&) { return; } catch(std::exception const& e) {
+} catch(T const& e) { return e; } catch(std::exception const& e) {
 throw assertion_failure("Wrong exception thrown, caught " + to_string(e), loc_);
 } catch(...) { throw assertion_failure("Wrong exception thrown", loc_); }
 throw assertion_failure(std::string("No exception thrown, expected ") + tname_, loc_);
 }
-template<typename F> void assert_nothrow(F&& fn_, loc const& loc_) {
+template<typename F, SCTF_INTERN_ENABLE_IF(!SCTF_INTERN_IS_TYPE(decltype(std::declval<F>()()), void))> auto assert_nothrow(F&& fn_, loc const& loc_) -> decltype(fn_()) {
 try {
-fn_();
-} catch(std::exception const& e) { throw assertion_failure("Expected no exception, caught " + to_string(e), loc_); } catch(...) {
+return fn_();
+} catch(std::exception const& e) { throw assertion_failure("Expected no exception, caught " + to_string(e) + " [cause: " + e.what() + "]", loc_); } catch(...) {
 throw assertion_failure("Expected no exception", loc_);
 }
 }
-template<typename F> void assert_runtime(F&& fn_, double max_ms_, loc const& loc_) {
+template<typename F, SCTF_INTERN_ENABLE_IF(SCTF_INTERN_IS_TYPE(decltype(std::declval<F>()()), void))> void assert_nothrow(F&& fn_, loc const& loc_) {
 try {
+fn_();
+} catch(std::exception const& e) { throw assertion_failure("Expected no exception, caught " + to_string(e) + " [cause: " + e.what() + "]", loc_); } catch(...) {
+throw assertion_failure("Expected no exception", loc_);
+}
+}
+template<typename F, SCTF_INTERN_ENABLE_IF(!SCTF_INTERN_IS_TYPE(decltype(std::declval<F>()()), void))> auto assert_runtime(F&& fn_, double max_ms_, loc const& loc_) -> decltype(fn_()) {
+duration dur;
+decltype(fn_()) res = fn_();
+double dur_ms = dur.get();
+if(dur_ms > max_ms_) { throw assertion_failure("runtime > " + to_string(max_ms_) + "ms", loc_); }
+return res;
+}
+template<typename F, SCTF_INTERN_ENABLE_IF(SCTF_INTERN_IS_TYPE(decltype(std::declval<F>()()), void))> void assert_runtime(F&& fn_, double max_ms_, loc const& loc_) {
 duration dur;
 fn_();
 double dur_ms = dur.get();
 if(dur_ms > max_ms_) { throw assertion_failure("runtime > " + to_string(max_ms_) + "ms", loc_); }
-} catch(std::exception const& e) { throw assertion_failure(e.what(), loc_); } catch(...) {
-throw assertion_failure("Unknown exception thrown", loc_);
-}
 }
 }}
 #endif
@@ -978,7 +990,7 @@ void sctf_intern_##FN##_fn_()
 #endif
 #ifndef SCTF_SCTF_HPP
 #define SCTF_SCTF_HPP
-#define SCFT_VERSION "2.0-rc8"
+#define SCFT_VERSION "2.0-rc9"
 #define SCTF_DEFAULT_MAIN(R) \
 auto main(int, char**)->int { return static_cast<int>(sctf::R->report()); }
 #endif

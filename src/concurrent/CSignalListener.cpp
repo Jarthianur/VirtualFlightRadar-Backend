@@ -34,17 +34,20 @@ CSignalListener::~CSignalListener() noexcept {
     Stop();
 }
 
-void CSignalListener::Run() {
+void
+CSignalListener::Run() {
     m_thread.Spawn([this]() { m_ioService.run(); });
 }
 
-void CSignalListener::Stop() {
+void
+CSignalListener::Stop() {
     if (!m_ioService.stopped()) {
         m_ioService.stop();
     }
 }
 
-void CSignalListener::AddHandler(SignalHandler&& handler_) {
+void
+CSignalListener::AddHandler(SignalHandler&& handler_) {
     m_sigSet.async_wait(std::move(handler_));
 }
 }  // namespace vfrb::concurrent
