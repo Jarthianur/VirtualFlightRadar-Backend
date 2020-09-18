@@ -41,8 +41,8 @@ DESCRIBE_PAR("test_CSbsParser") {
     IT("should parse a valid sentence correctly") {
         CSbsParser p(100000);
         auto       ac = ASSERT_NOTHROW(return p.Parse(
-          "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
-          0));
+            "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
+            0));
         ASSERT_EQ(ac.Id(), CStaticString<8>("AAAAAA"));
         ASSERT_EQ(ac.TargetType(), object::CAircraft::ETargetType::TRANSPONDER);
         ASSERT_EQ(ac.Location().Altitude, math::DoubleToInt(math::FEET_2_M * 1000));
@@ -53,33 +53,34 @@ DESCRIBE_PAR("test_CSbsParser") {
     IT("should throw when parsing invalid sentence") {
         CSbsParser p(100000);
         ASSERT_THROWS(
-          p.Parse("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0", 0),
-          feed::parser::error::CParseError);
+            p.Parse("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,,,,,,,,,,,0", 0),
+            feed::parser::error::CParseError);
         ASSERT_THROWS(
-          p.Parse("MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", 0),
-          feed::parser::error::CParseError);
+            p.Parse("MSG,3,0,0,,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,,,,,,,,0", 0),
+            feed::parser::error::CParseError);
         ASSERT_THROWS(
-          p.Parse(
-            "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0",
-            0),
-          feed::parser::error::CParseError);
+            p.Parse(
+                "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,,,,,,,0",
+                0),
+            feed::parser::error::CParseError);
         ASSERT_THROWS(p.Parse("MSG,someCrap in, here", 0), feed::parser::error::CParseError);
         ASSERT_THROWS(p.Parse("MSG,4,0,,,,,,", 0), feed::parser::error::CParseError);
         ASSERT_THROWS(
-          p.Parse("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", 0),
-          feed::parser::error::CParseError);
+            p.Parse("MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0",
+                    0),
+            feed::parser::error::CParseError);
         ASSERT_THROWS(
-          p.Parse("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", 0),
-          feed::parser::error::CParseError);
+            p.Parse("MSG,3,0,0,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,100#0,,,,,,,,,,0", 0),
+            feed::parser::error::CParseError);
         ASSERT_THROWS(p.Parse("", 0), feed::parser::error::CParseError);
     }
     IT("should filter by height") {
         CSbsParser p(0);
         ASSERT_THROWS(
-          p.Parse(
-            "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
-            0),
-          feed::parser::error::CParseError);
+            p.Parse(
+                "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
+                0),
+            feed::parser::error::CParseError);
     };
 };
 
@@ -87,16 +88,16 @@ DESCRIBE_PAR("test_CAprsParser") {
     IT("should parse a valid sentence correctly") {
         CAprsParser p(10000);
         ASSERT_NOTHROW(
-          p.Parse("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA", 0));
+            p.Parse("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA", 0));
         ASSERT_NOTHROW(p.Parse(
-          "ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4",
-          0));
+            "ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4",
+            0));
         ASSERT_NOTHROW(p.Parse(
-          "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4",
-          0));
+            "FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00S\\00800.00E^276/014/A=000000 !W07! id22AAAAAA -019fpm +3.7rot 37.8dB 0e -51.2kHz gps2x4",
+            0));
         auto ac = ASSERT_NOTHROW(return p.Parse(
-          "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
-          0));
+            "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=000000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
+            0));
         ASSERT_EQ(ac.Id(), CStaticString<8>("AAAAAA"));
         ASSERT_EQ(ac.TargetType(), object::CAircraft::ETargetType::FLARM);
         ASSERT_EQ(ac.Location().Altitude, 0);
@@ -107,13 +108,13 @@ DESCRIBE_PAR("test_CAprsParser") {
     IT("should throw when parsing invalid sentence") {
         CAprsParser p(10000);
         ASSERT_THROWS(
-          p.Parse(
-            "Valhalla>APRS,TCPIP*,qAC,GLIDERN2:/074555h4900.00NI00800.00E&/A=000000 CPU:4.0 RAM:242.7/458.8MB NTP:0.8ms/-28.6ppm +56.2C RF:+38+2.4ppm/+1.7dB",
-            0),
-          feed::parser::error::CParseError);
+            p.Parse(
+                "Valhalla>APRS,TCPIP*,qAC,GLIDERN2:/074555h4900.00NI00800.00E&/A=000000 CPU:4.0 RAM:242.7/458.8MB NTP:0.8ms/-28.6ppm +56.2C RF:+38+2.4ppm/+1.7dB",
+                0),
+            feed::parser::error::CParseError);
         ASSERT_THROWS(
-          p.Parse("# aprsc 2.0.14-g28c5a6a 29 Jun 2014 07:46:15 GMT SERVER1 00.000.00.000:14580", 0),
-          feed::parser::error::CParseError);
+            p.Parse("# aprsc 2.0.14-g28c5a6a 29 Jun 2014 07:46:15 GMT SERVER1 00.000.00.000:14580", 0),
+            feed::parser::error::CParseError);
         ASSERT_THROWS(p.Parse("", 0), feed::parser::error::CParseError);
         ASSERT_THROWS(p.Parse("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 ", 0),
                       feed::parser::error::CParseError);
@@ -121,10 +122,10 @@ DESCRIBE_PAR("test_CAprsParser") {
     IT("should filter by height") {
         CAprsParser p(0);
         ASSERT_THROWS(
-          p.Parse(
-            "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
-            0),
-          feed::parser::error::CParseError);
+            p.Parse(
+                "FLRAAAAAA>APRS,qAS,XXXX:/074548h4900.00N/00800.00W'000/000/A=001000 id0AAAAAAA +000fpm +0.0rot 5.5dB 3e -4.3kHz",
+                0),
+            feed::parser::error::CParseError);
     };
 };
 
@@ -148,8 +149,8 @@ DESCRIBE_PAR("test_CAtmosphereParser") {
 
     IT("should parse a valid sentence correctly") {
         auto atm =
-          ASSERT_NOTHROW(return uut.Parse("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n", 0));
-        ASSERT_EQ(atm.Pressure(), 1009.1);
+            ASSERT_NOTHROW(return uut.Parse("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n", 0));
+        ASSERT(atm.Pressure(), FEQ(), 1009.1);
         ASSERT_EQ(atm.Nmea(), "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
     }
     IT("should throw when parsing invalid sentence") {
@@ -170,13 +171,13 @@ DESCRIBE_PAR("test_CGpsParser") {
 
     IT("should parse a valid sentence correctly") {
         auto pos = ASSERT_NOTHROW(
-          return uut.Parse("$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49\r\n", 0));
-        ASSERT_EQ(pos.Dilution(), 1.0);
+            return uut.Parse("$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49\r\n", 0));
+        ASSERT(pos.Dilution(), FEQ(), 1.0);
         ASSERT_EQ(pos.FixQuality(), 1);
         ASSERT_EQ(pos.NrOfSatellites(), 5);
-        ASSERT_EQ(pos.Geoid(), 48.0);
-        ASSERT_EQ(pos.Location().Latitude, -math::DmToDeg(5000.0466));
-        ASSERT_EQ(pos.Location().Longitude, -math::DmToDeg(815.7555));
+        ASSERT(pos.Geoid(), FEQ(), 48.0);
+        ASSERT(pos.Location().Latitude, FEQ(), math::DmToDeg(5000.0466));
+        ASSERT(pos.Location().Longitude, FEQ(), math::DmToDeg(815.7555));
         ASSERT_EQ(pos.Location().Altitude, 105);
     }
     IT("should throw when parsing invalid sentence") {

@@ -42,16 +42,16 @@ namespace vfrb::feed::parser
 CAprsParser::CAprsParser(s32 maxHeight_)
     : IParser<CAircraft>(),
       m_aprsRe(
-        "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/"
-        "(\\d{6})h"                               // time
-        "(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?"       // lat, lat-dir
-        "(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?"       // lon, lon-dir
-        "(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?"  // head, gnd-spd, alt
-        "(?:[\\S\\s]+?)?"
-        "id([0-9A-F]{2})([0-9A-F]{6})\\s?"                // type, id
-        "(?:([\\+-]\\d{3})fpm\\s+?)?"                     // climb
-        "(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",  // turn
-        std::regex::optimize | std::regex::icase),
+          "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/"
+          "(\\d{6})h"                               // time
+          "(\\d{4}\\.\\d{2})([NS])[\\S\\s]+?"       // lat, lat-dir
+          "(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?"       // lon, lon-dir
+          "(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?"  // head, gnd-spd, alt
+          "(?:[\\S\\s]+?)?"
+          "id([0-9A-F]{2})([0-9A-F]{6})\\s?"                // type, id
+          "(?:([\\+-]\\d{3})fpm\\s+?)?"                     // climb
+          "(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",  // turn
+          std::regex::optimize | std::regex::icase),
       m_maxHeight(maxHeight_) {}
 
 auto
@@ -115,10 +115,10 @@ auto
 CAprsParser::parseMovement(std::cmatch const& match_) -> std::optional<CAircraft::SMovement> {
     try {
         return CAircraft::SMovement{
-          str_util::Parse<f64>(match_[RE_APRS_HEAD]),
-          str_util::Parse<f64>(match_[RE_APRS_GND_SPD]) * math::KTS_2_MS,
-          std::max(CLIMB_RATE_MIN,
-                   std::min(CLIMB_RATE_MAX, str_util::Parse<f64>(match_[RE_APRS_CR]) * math::FPM_2_MS))};
+            str_util::Parse<f64>(match_[RE_APRS_HEAD]),
+            str_util::Parse<f64>(match_[RE_APRS_GND_SPD]) * math::KTS_2_MS,
+            std::max(CLIMB_RATE_MIN,
+                     std::min(CLIMB_RATE_MAX, str_util::Parse<f64>(match_[RE_APRS_CR]) * math::FPM_2_MS))};
     } catch ([[maybe_unused]] str_util::error::CConversionError const&) {
         return std::nullopt;
     }

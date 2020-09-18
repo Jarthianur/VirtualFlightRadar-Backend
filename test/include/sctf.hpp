@@ -122,28 +122,19 @@ inline auto operator"" _re_i(char const* lit_, std::size_t) -> regex { return re
 #endif
 #ifndef SCTF_STRINGIFY_HPP
 #define SCTF_STRINGIFY_HPP
-namespace sctf { namespace intern {
-template<typename T> static auto name_for_type() -> std::string const& {
-static thread_local std::string name;
-if(name.length() > 0) { return name; }
 #ifdef SCTF_SYS_UNIX
-std::string const sig(__PRETTY_FUNCTION__);
-auto const b = sig.rfind("T = ") + 4;
-name = sig.substr(b, sig.find_first_of(";]", b) - b);
-name.erase(std::remove(name.begin(), name.end(), ' '), name.end());
+#include <cxxabi.h>
+#endif
+namespace sctf { namespace intern {
+template<typename T> static auto name_for_type(T const& arg_) -> std::string const& {
+static thread_local std::string name;
+if(!name.empty()) { return name; }
+#ifdef SCTF_SYS_UNIX
+int status = -1;
+std::unique_ptr<char[]> sig(abi::__cxa_demangle(typeid(arg_).name(), nullptr, nullptr, &status));
+name = sig.get();
 #else
-std::string const sig(typeid(T).name());
-auto b = sig.find("struct ");
-if(b != std::string::npos) {
-name = sig.substr(b + 7);
-return name;
-}
-b = sig.find("class ");
-if(b != std::string::npos) {
-name = sig.substr(b + 6);
-} else {
-name = std::move(sig);
-}
+name = typeid(arg_).name();
 #endif
 return name;
 }
@@ -178,7 +169,7 @@ std::ostringstream oss;
 oss << std::setprecision(std::numeric_limits<T>::max_digits10) << arg_;
 return oss.str();
 }
-template<typename T, SCTF_INTERN_ENABLE_IF(!SCTF_INTERN_HAS_STREAM_CAPABILITY(T, std::ostringstream))> auto to_string(T const&) -> std::string { return name_for_type<T>(); }
+template<typename T, SCTF_INTERN_ENABLE_IF(!SCTF_INTERN_HAS_STREAM_CAPABILITY(T, std::ostringstream))> auto to_string(T const& arg_) -> std::string { return name_for_type<T>(arg_); }
 inline auto to_string(std::string const& arg_) -> std::string { return std::string("\"") + escaped_string(arg_) + "\""; }
 inline auto to_string(char const* const& arg_) -> std::string { return std::string("\"") + escaped_string(arg_) + "\""; }
 inline auto to_string(char const& arg_) -> std::string { return std::string("'") + escaped_char(arg_) + "'"; }
@@ -199,8 +190,8 @@ std::string const m_msg;
 };
 }}
 #endif
-#ifndef SCTF_TESTCASE_HPP
-#define SCTF_TESTCASE_HPP
+#ifndef SCTF_TESTSUITE_TESTCASE_HPP
+#define SCTF_TESTSUITE_TESTCASE_HPP
 namespace sctf { namespace intern {
 using test_function = std::function<void()>;
 struct test_context final {
@@ -210,8 +201,8 @@ char const* ts_name;
 class testcase {
 public:
 testcase(testcase const&) = delete;
-auto operator=(testcase const&) -> testcase& = delete;
 ~testcase() noexcept = default;
+auto operator=(testcase const&) -> testcase& = delete;
 testcase(test_context&& ctx_, test_function&& fn_) : m_name(ctx_.tc_name), m_suite_name(ctx_.ts_name), m_test_func(std::move(fn_)) {}
 testcase(testcase&& other_) noexcept : m_name(other_.m_name), m_suite_name(other_.m_suite_name), m_state(other_.m_state), m_duration(other_.m_duration), m_err_msg(std::move(other_.m_err_msg)), m_test_func(std::move(other_.m_test_func)) {}
 auto operator=(testcase&& other_) noexcept -> testcase& {
@@ -351,9 +342,9 @@ public:
 using hook_function = std::function<void()>;
 testsuite(testsuite const&) = delete;
 testsuite(testsuite&&) noexcept = delete;
+virtual ~testsuite() noexcept = default;
 auto operator=(testsuite const&) -> testsuite& = delete;
 auto operator=(testsuite&&) noexcept -> testsuite& = delete;
-virtual ~testsuite() noexcept = default;
 static auto create(char const* name_) -> testsuite_ptr { return std::make_shared<testsuite>(enable{}, name_); }
 virtual void run() {
 if(m_state != execution_state::DONE) {
@@ -429,9 +420,9 @@ class testsuite_parallel : public testsuite {
 public:
 testsuite_parallel(testsuite_parallel const&) = delete;
 testsuite_parallel(testsuite_parallel&&) noexcept = delete;
+~testsuite_parallel() noexcept override = default;
 auto operator=(testsuite_parallel const&) -> testsuite_parallel& = delete;
 auto operator=(testsuite_parallel&&) noexcept -> testsuite_parallel& = delete;
-~testsuite_parallel() noexcept override = default;
 static auto create(char const* name_) -> testsuite_ptr { return std::make_shared<testsuite_parallel>(enable{}, name_); }
 void run() override {
 if(m_state != execution_state::DONE) {
@@ -480,25 +471,6 @@ explicit testsuite_parallel(enable e_, char const* name_) : testsuite(e_, name_)
 };
 }}
 #endif
-#ifndef SCTF_RUNNER_HPP
-#define SCTF_RUNNER_HPP
-namespace sctf { namespace intern {
-class runner {
-public:
-void add_testsuite(testsuite_ptr const& ts_) { m_testsuites.push_back(ts_); }
-void run() noexcept {
-std::for_each(m_testsuites.begin(), m_testsuites.end(), [](testsuite_ptr& ts_) { ts_->run(); });
-}
-auto testsuites() -> std::vector<testsuite_ptr> const& { return m_testsuites; }
-static auto instance() -> runner& {
-static runner r;
-return r;
-}
-private:
-std::vector<testsuite_ptr> m_testsuites;
-};
-}}
-#endif
 #ifndef SCTF_REPORTER_REPORTER_HPP
 #define SCTF_REPORTER_REPORTER_HPP
 namespace sctf {
@@ -507,39 +479,37 @@ class reporter : public std::enable_shared_from_this<reporter> {
 public:
 reporter(reporter const&) = delete;
 reporter(reporter&&) noexcept = delete;
+virtual ~reporter() noexcept = default;
 auto operator=(reporter const&) -> reporter& = delete;
 auto operator=(reporter&&) noexcept -> reporter& = delete;
-virtual ~reporter() noexcept = default;
-auto report() -> std::size_t {
+void report(testsuite_ptr const& ts_) {
+report_testsuite(ts_);
+m_out_stream.flush();
+}
+virtual void begin_report() {
 m_abs_errs = 0;
 m_abs_fails = 0;
 m_abs_tests = 0;
 m_abs_time = 0.0;
-runner& runner = runner::instance();
-runner.run();
-begin_report();
-std::for_each(runner.testsuites().begin(), runner.testsuites().end(), [this](testsuite_ptr const& ts_) {
+};
+virtual void end_report() = 0;
+auto faults() const -> std::size_t { return m_abs_errs + m_abs_fails; }
+protected:
+struct enable {};
+explicit reporter(std::ostream& stream_) : m_out_stream(stream_) {
+if(!m_out_stream) { throw std::runtime_error("could not open stream for report"); }
+}
+explicit reporter(char const* fname_) : m_out_file(fname_), m_out_stream(m_out_file) {
+if(!m_out_stream) { throw std::runtime_error("could not open file for report"); }
+}
+virtual void report_testsuite(testsuite_ptr const& ts_) {
 m_abs_errs += ts_->statistics().errors();
 m_abs_fails += ts_->statistics().failures();
 m_abs_tests += ts_->statistics().tests();
 m_abs_time += ts_->execution_duration();
-report_testsuite(ts_);
-});
-end_report();
-return m_abs_errs + m_abs_fails;
-}
-protected:
-struct enable {};
-explicit reporter(std::ostream& stream_) : m_out_stream(stream_) {}
-explicit reporter(char const* fname_) : m_out_file(fname_), m_out_stream(m_out_file) {
-if(!m_out_stream) { throw std::runtime_error("Could not open file."); }
-}
-virtual void report_testsuite(testsuite_ptr const& ts_) {
-std::for_each(ts_->testcases().begin(), ts_->testcases().end(), [this](const testcase& tc) { report_testcase(tc); });
+std::for_each(ts_->testcases().begin(), ts_->testcases().end(), [this](testcase const& tc) { report_testcase(tc); });
 }
 virtual void report_testcase(testcase const& tc_) = 0;
-virtual void begin_report() = 0;
-virtual void end_report() = 0;
 template<typename T> auto operator<<(T const& t_) -> std::ostream& {
 m_out_stream << t_;
 return m_out_stream;
@@ -564,13 +534,14 @@ using reporter_ptr = std::shared_ptr<intern::reporter>;
 #ifndef SCTF_REPORTER_XML_REPORTER_HPP
 #define SCTF_REPORTER_XML_REPORTER_HPP
 namespace sctf {
-class xml_reporter : public intern::reporter {
+namespace intern {
+class xml_reporter : public reporter {
 public:
 xml_reporter(xml_reporter const&) = delete;
 xml_reporter(xml_reporter&&) noexcept = delete;
+~xml_reporter() noexcept override = default;
 auto operator=(xml_reporter const&) -> xml_reporter& = delete;
 auto operator=(xml_reporter&&) noexcept -> xml_reporter& = delete;
-~xml_reporter() noexcept override = default;
 static auto create(std::ostream& stream_ = std::cout) -> std::shared_ptr<xml_reporter> { return std::make_shared<xml_reporter>(enable{}, stream_); }
 static auto create(char const* fname_) -> std::shared_ptr<xml_reporter> { return std::make_shared<xml_reporter>(enable{}, fname_); }
 auto with_captured_output() -> std::shared_ptr<xml_reporter> {
@@ -580,69 +551,66 @@ return std::static_pointer_cast<xml_reporter>(shared_from_this());
 explicit xml_reporter(enable, std::ostream& stream_) : reporter(stream_) {}
 explicit xml_reporter(enable, char const* fname_) : reporter(fname_) {}
 private:
-void report_testsuite(intern::testsuite_ptr const& ts_) override {
+void report_testsuite(testsuite_ptr const& ts_) override {
 std::time_t stamp = std::chrono::system_clock::to_time_t(ts_->timestamp());
 std::array<char, 128> buff{};
 std::strftime(buff.data(), 127, "%FT%T", std::localtime(&stamp));
-*this << intern::fmt::SPACE << "<testsuite id=\"" << m_id++ << "\" name=\"" << ts_->name() << "\" errors=\"" << ts_->statistics().errors() << "\" tests=\"" << ts_->statistics().tests() << "\" failures=\"" << ts_->statistics().failures() << R"(" skipped="0" time=")" << ts_->execution_duration() << "\" timestamp=\"" << buff.data() << "\">" << intern::fmt::LF;
+*this << fmt::SPACE << "<testsuite id=\"" << m_id++ << "\" name=\"" << ts_->name() << "\" errors=\"" << ts_->statistics().errors() << "\" tests=\"" << ts_->statistics().tests() << "\" failures=\"" << ts_->statistics().failures() << R"(" skipped="0" time=")" << ts_->execution_duration() << "\" timestamp=\"" << buff.data() << "\">" << fmt::LF;
 reporter::report_testsuite(ts_);
-*this << intern::fmt::SPACE << "</testsuite>" << intern::fmt::LF;
+*this << fmt::SPACE << "</testsuite>" << fmt::LF;
 }
-void report_testcase(intern::testcase const& tc_) override {
-*this << intern::fmt::XSPACE << "<testcase name=\"" << tc_.name() << "\" classname=\"" << tc_.suite_name() << "\" time=\"" << tc_.duration() << "\"";
+void report_testcase(testcase const& tc_) override {
+*this << fmt::XSPACE << "<testcase name=\"" << tc_.name() << "\" classname=\"" << tc_.suite_name() << "\" time=\"" << tc_.duration() << "\"";
 switch(tc_.state()) {
-case intern::testcase::result::ERROR:
-*this << ">" << intern::fmt::LF << intern::fmt::XSPACE << intern::fmt::SPACE << "<error message=\"" << tc_.reason() << "\"></error>" << intern::fmt::LF;
+case testcase::result::ERROR:
+*this << ">" << fmt::LF << fmt::XSPACE << fmt::SPACE << "<error message=\"" << tc_.reason() << "\"></error>" << fmt::LF;
 if(m_capture) { print_system_out(tc_); }
-*this << intern::fmt::XSPACE << "</testcase>";
+*this << fmt::XSPACE << "</testcase>";
 break;
-case intern::testcase::result::FAILED:
-*this << ">" << intern::fmt::LF << intern::fmt::XSPACE << intern::fmt::SPACE << "<failure message=\"" << tc_.reason() << "\"></failure>" << intern::fmt::LF;
+case testcase::result::FAILED:
+*this << ">" << fmt::LF << fmt::XSPACE << fmt::SPACE << "<failure message=\"" << tc_.reason() << "\"></failure>" << fmt::LF;
 if(m_capture) { print_system_out(tc_); }
-*this << intern::fmt::XSPACE << "</testcase>";
+*this << fmt::XSPACE << "</testcase>";
 break;
 default:
 if(m_capture) {
-*this << ">" << intern::fmt::LF;
+*this << ">" << fmt::LF;
 print_system_out(tc_);
-*this << intern::fmt::XSPACE << "</testcase>";
+*this << fmt::XSPACE << "</testcase>";
 } else {
 *this << "/>";
 }
 break;
 }
-*this << intern::fmt::LF;
+*this << fmt::LF;
 }
-void begin_report() override { *this << R"(<?xml version="1.0" encoding="UTF-8" ?>)" << intern::fmt::LF << "<testsuites>" << intern::fmt::LF; }
-void end_report() override { *this << "</testsuites>" << intern::fmt::LF; }
-void print_system_out(intern::testcase const& tc_) {
-*this << intern::fmt::XSPACE << intern::fmt::SPACE << "<system-out>" << tc_.cout() << "</system-out>" << intern::fmt::LF;
-*this << intern::fmt::XSPACE << intern::fmt::SPACE << "<system-err>" << tc_.cerr() << "</system-err>" << intern::fmt::LF;
+void begin_report() override {
+reporter::begin_report();
+*this << R"(<?xml version="1.0" encoding="UTF-8" ?>)" << fmt::LF << "<testsuites>" << fmt::LF;
+}
+void end_report() override { *this << "</testsuites>" << fmt::LF; }
+void print_system_out(testcase const& tc_) {
+*this << fmt::XSPACE << fmt::SPACE << "<system-out>" << tc_.cout() << "</system-out>" << fmt::LF;
+*this << fmt::XSPACE << fmt::SPACE << "<system-err>" << tc_.cerr() << "</system-err>" << fmt::LF;
 }
 std::size_t mutable m_id = 0;
 bool m_capture = false;
 };
 }
+using xml_reporter = intern::xml_reporter;
+}
 #endif
 #ifndef SCTF_REPORTER_CONSOLE_REPORTER_HPP
 #define SCTF_REPORTER_CONSOLE_REPORTER_HPP
 namespace sctf {
-namespace intern { namespace fmt {
-static constexpr char const* const ANSI_RED = "\x1b[31m";
-static constexpr char const* const ANSI_GREEN = "\x1b[32m";
-static constexpr char const* const ANSI_YELLOW = "\x1b[33m";
-static constexpr char const* const ANSI_BLUE = "\x1b[34m";
-static constexpr char const* const ANSI_MAGENTA = "\x1b[35m";
-static constexpr char const* const ANSI_CYAN = "\x1b[36m";
-static constexpr char const* const ANSI_RESET = "\x1b[0m";
-}}
-class console_reporter : public intern::reporter {
+namespace intern {
+class console_reporter : public reporter {
 public:
 console_reporter(console_reporter const&) = delete;
 console_reporter(console_reporter&&) noexcept = delete;
+~console_reporter() noexcept override = default;
 auto operator=(console_reporter const&) -> console_reporter& = delete;
 auto operator=(console_reporter&&) noexcept -> console_reporter& = delete;
-~console_reporter() noexcept override = default;
 static auto create(std::ostream& stream_ = std::cout) -> std::shared_ptr<console_reporter> { return std::make_shared<console_reporter>(enable{}, stream_); }
 static auto create(char const* fname_) -> std::shared_ptr<console_reporter> { return std::make_shared<console_reporter>(enable{}, fname_); }
 auto with_color() -> std::shared_ptr<console_reporter> {
@@ -656,50 +624,64 @@ return std::static_pointer_cast<console_reporter>(shared_from_this());
 explicit console_reporter(enable, std::ostream& stream_) : reporter(stream_) {}
 explicit console_reporter(enable, char const* fname_) : reporter(fname_) {}
 private:
-void report_testsuite(intern::testsuite_ptr const& ts_) override {
-*this << "Run Testsuite [" << ts_->name() << "]; time = " << ts_->execution_duration() << "ms" << intern::fmt::LF;
+void report_testsuite(testsuite_ptr const& ts_) override {
+*this << "--- " << ts_->name() << " (" << ts_->execution_duration() << "ms) ---" << fmt::LF;
 reporter::report_testsuite(ts_);
 }
-void report_testcase(intern::testcase const& tc_) override {
-*this << intern::fmt::SPACE << "Run Testcase [" << tc_.name() << "](" << tc_.suite_name() << "); time = " << tc_.duration() << "ms" << intern::fmt::LF << intern::fmt::XSPACE;
+void report_testcase(testcase const& tc_) override {
+*this << fmt::SPACE << tc_.name() << " (" << tc_.duration() << "ms)" << fmt::LF << fmt::XSPACE;
 if(m_capture) {
-*this << "stdout = \"" << tc_.cout() << "\"" << intern::fmt::LF << intern::fmt::XSPACE;
-*this << "stderr = \"" << tc_.cerr() << "\"" << intern::fmt::LF << intern::fmt::XSPACE;
+*this << "stdout = \"" << tc_.cout() << "\"" << fmt::LF << fmt::XSPACE;
+*this << "stderr = \"" << tc_.cerr() << "\"" << fmt::LF << fmt::XSPACE;
 }
 switch(tc_.state()) {
-case intern::testcase::result::ERROR: *this << (m_color ? intern::fmt::ANSI_MAGENTA : "") << "ERROR! " << tc_.reason(); break;
-case intern::testcase::result::FAILED: *this << (m_color ? intern::fmt::ANSI_RED : "") << "FAILED! " << tc_.reason(); break;
-case intern::testcase::result::PASSED: *this << (m_color ? intern::fmt::ANSI_GREEN : "") << "PASSED!"; break;
+case testcase::result::ERROR: *this << colored(RED) << "ERROR! " << tc_.reason(); break;
+case testcase::result::FAILED: *this << colored(BLUE) << "FAILED! " << tc_.reason(); break;
+case testcase::result::PASSED: *this << colored(GREEN) << "PASSED!"; break;
 default: break;
 }
-*this << (m_color ? intern::fmt::ANSI_RESET : "") << intern::fmt::LF;
+*this << colored() << fmt::LF;
 }
-void begin_report() override {}
 void end_report() override {
 if(m_abs_errs > 0) {
-*this << (m_color ? intern::fmt::ANSI_YELLOW : "");
+*this << colored(YELLOW);
 } else if(m_abs_fails > 0) {
-*this << (m_color ? intern::fmt::ANSI_BLUE : "");
+*this << colored(BLUE);
 } else {
-*this << (m_color ? intern::fmt::ANSI_CYAN : "");
+*this << colored(CYAN);
 }
-*this << "Result:: passed: " << m_abs_tests - m_abs_fails - m_abs_errs << "/" << m_abs_tests << " ; failed: " << m_abs_fails << "/" << m_abs_tests << " ; errors: " << m_abs_errs << "/" << m_abs_tests << " ; time = " << m_abs_time << "ms" << (m_color ? intern::fmt::ANSI_RESET : "") << intern::fmt::LF;
+*this << "=== Result ===" << fmt::LF << "passes: " << m_abs_tests - m_abs_fails - m_abs_errs << "/" << m_abs_tests << " failures: " << m_abs_fails << "/" << m_abs_tests << " errors: " << m_abs_errs << "/" << m_abs_tests << " (" << m_abs_time << "ms)" << colored() << fmt::LF;
+}
+enum color : std::int_fast8_t { RED, GREEN, YELLOW, BLUE, CYAN, RESET };
+auto colored(color c_ = RESET) const -> char const* {
+if(!m_color) { return ""; }
+switch(c_) {
+case RED: return "\x1b[31m";
+case GREEN: return "\x1b[32m";
+case YELLOW: return "\x1b[33m";
+case BLUE: return "\x1b[34m";
+case CYAN: return "\x1b[36m";
+default: return "\x1b[0m";
+}
 }
 bool m_color = false;
 bool m_capture = false;
 };
 }
+using console_reporter = intern::console_reporter;
+}
 #endif
 #ifndef SCTF_REPORTER_MARKDOWN_REPORTER_HPP
 #define SCTF_REPORTER_MARKDOWN_REPORTER_HPP
 namespace sctf {
-class markdown_reporter : public intern::reporter {
+namespace intern {
+class markdown_reporter : public reporter {
 public:
 markdown_reporter(markdown_reporter const&) = delete;
 markdown_reporter(markdown_reporter&&) noexcept = delete;
+~markdown_reporter() noexcept override = default;
 auto operator=(markdown_reporter const&) -> markdown_reporter& = delete;
 auto operator=(markdown_reporter&&) noexcept -> markdown_reporter& = delete;
-~markdown_reporter() noexcept override = default;
 static auto create(std::ostream& stream_ = std::cout) -> std::shared_ptr<markdown_reporter> { return std::make_shared<markdown_reporter>(enable{}, stream_); }
 static auto create(char const* fname_) -> std::shared_ptr<markdown_reporter> { return std::make_shared<markdown_reporter>(enable{}, fname_); }
 auto with_captured_output() -> std::shared_ptr<markdown_reporter> {
@@ -709,17 +691,17 @@ return std::static_pointer_cast<markdown_reporter>(shared_from_this());
 explicit markdown_reporter(enable, std::ostream& stream_) : reporter(stream_) {}
 explicit markdown_reporter(enable, char const* fname_) : reporter(fname_) {}
 private:
-void report_testsuite(intern::testsuite_ptr const& ts_) override {
-*this << "## " << ts_->name() << intern::fmt::XLF << "|Tests|Successes|Failures|Errors|Time|" << intern::fmt::LF << "|-|-|-|-|-|" << intern::fmt::LF << "|" << ts_->statistics().tests() << "|" << ts_->statistics().successes() << "|" << ts_->statistics().failures() << "|" << ts_->statistics().errors() << "|" << ts_->execution_duration() << "ms|" << intern::fmt::XLF << "### Tests" << intern::fmt::XLF << "|Name|Context|Time|Status|" << (m_capture ? "System-Out|System-Err|" : "") << intern::fmt::LF << "|-|-|-|-|" << (m_capture ? "-|-|" : "") << intern::fmt::LF;
+void report_testsuite(testsuite_ptr const& ts_) override {
+*this << "## " << ts_->name() << fmt::XLF << "|Tests|Successes|Failures|Errors|Time|" << fmt::LF << "|-|-|-|-|-|" << fmt::LF << "|" << ts_->statistics().tests() << "|" << ts_->statistics().successes() << "|" << ts_->statistics().failures() << "|" << ts_->statistics().errors() << "|" << ts_->execution_duration() << "ms|" << fmt::XLF << "### Tests" << fmt::XLF << "|Name|Context|Time|Status|" << (m_capture ? "System-Out|System-Err|" : "") << fmt::LF << "|-|-|-|-|" << (m_capture ? "-|-|" : "") << fmt::LF;
 reporter::report_testsuite(ts_);
-*this << intern::fmt::XLF;
+*this << fmt::XLF;
 }
-void report_testcase(intern::testcase const& tc_) override {
+void report_testcase(testcase const& tc_) override {
 char const* status = "";
 switch(tc_.state()) {
-case intern::testcase::result::ERROR: status = "ERROR"; break;
-case intern::testcase::result::FAILED: status = "FAILED"; break;
-case intern::testcase::result::PASSED: status = "PASSED"; break;
+case testcase::result::ERROR: status = "ERROR"; break;
+case testcase::result::FAILED: status = "FAILED"; break;
+case testcase::result::PASSED: status = "PASSED"; break;
 default: break;
 }
 *this << "|" << tc_.name() << "|" << tc_.suite_name() << "|" << tc_.duration() << "ms|" << status << "|";
@@ -727,10 +709,13 @@ if(m_capture) {
 print_system_out(tc_.cout());
 print_system_out(tc_.cerr());
 }
-*this << intern::fmt::LF;
+*this << fmt::LF;
 }
-void begin_report() override { *this << "# Test Report" << intern::fmt::XLF; }
-void end_report() override { *this << "## Summary" << intern::fmt::XLF << "|Tests|Successes|Failures|Errors|Time|" << intern::fmt::LF << "|-|-|-|-|-|" << intern::fmt::LF << "|" << m_abs_tests << "|" << (m_abs_tests - m_abs_errs - m_abs_fails) << "|" << m_abs_fails << "|" << m_abs_errs << "|" << m_abs_time << "ms|" << intern::fmt::LF; }
+void begin_report() override {
+reporter::begin_report();
+*this << "# Test Report" << fmt::XLF;
+}
+void end_report() override { *this << "## Summary" << fmt::XLF << "|Tests|Successes|Failures|Errors|Time|" << fmt::LF << "|-|-|-|-|-|" << fmt::LF << "|" << m_abs_tests << "|" << (m_abs_tests - m_abs_errs - m_abs_fails) << "|" << m_abs_fails << "|" << m_abs_errs << "|" << m_abs_time << "ms|" << fmt::LF; }
 void print_system_out(std::string const& out_) {
 std::string line;
 std::istringstream io_;
@@ -743,6 +728,32 @@ first = false;
 *this << "|";
 }
 bool m_capture = false;
+};
+}
+using markdown_reporter = intern::markdown_reporter;
+}
+#endif
+#ifndef SCTF_RUNNER_HPP
+#define SCTF_RUNNER_HPP
+namespace sctf {
+class runner {
+public:
+void add_testsuite(intern::testsuite_ptr const& ts_) { m_testsuites.push_back(ts_); }
+auto run(reporter_ptr rep_) noexcept -> std::size_t {
+rep_->begin_report();
+std::for_each(m_testsuites.begin(), m_testsuites.end(), [&rep_](intern::testsuite_ptr& ts_) {
+ts_->run();
+rep_->report(ts_);
+});
+rep_->end_report();
+return rep_->faults();
+}
+static auto instance() -> runner& {
+static runner r;
+return r;
+}
+private:
+std::vector<intern::testsuite_ptr> m_testsuites;
 };
 }
 #endif
@@ -893,21 +904,21 @@ template<typename T, typename F> auto assert_throws(F&& fn_, char const* tname_,
 try {
 fn_();
 } catch(T const& e) { return e; } catch(std::exception const& e) {
-throw assertion_failure("Wrong exception thrown, caught " + to_string(e), loc_);
+throw assertion_failure("Wrong exception thrown, caught " + to_string(e) + "(\"" + escaped_string(e.what()) + "\")", loc_);
 } catch(...) { throw assertion_failure("Wrong exception thrown", loc_); }
 throw assertion_failure(std::string("No exception thrown, expected ") + tname_, loc_);
 }
 template<typename F, SCTF_INTERN_ENABLE_IF(!SCTF_INTERN_IS_TYPE(decltype(std::declval<F>()()), void))> auto assert_nothrow(F&& fn_, loc const& loc_) -> decltype(fn_()) {
 try {
 return fn_();
-} catch(std::exception const& e) { throw assertion_failure("Expected no exception, caught " + to_string(e) + " [cause: " + e.what() + "]", loc_); } catch(...) {
+} catch(std::exception const& e) { throw assertion_failure("Expected no exception, caught " + to_string(e) + "(\"" + escaped_string(e.what()) + "\")", loc_); } catch(...) {
 throw assertion_failure("Expected no exception", loc_);
 }
 }
 template<typename F, SCTF_INTERN_ENABLE_IF(SCTF_INTERN_IS_TYPE(decltype(std::declval<F>()()), void))> void assert_nothrow(F&& fn_, loc const& loc_) {
 try {
 fn_();
-} catch(std::exception const& e) { throw assertion_failure("Expected no exception, caught " + to_string(e) + " [cause: " + e.what() + "]", loc_); } catch(...) {
+} catch(std::exception const& e) { throw assertion_failure("Expected no exception, caught " + to_string(e) + "(\"" + escaped_string(e.what()) + "\")", loc_); } catch(...) {
 throw assertion_failure("Expected no exception", loc_);
 }
 }
@@ -949,11 +960,11 @@ sctf::intern::testsuite_ptr m_ts_; \
 public: \
 test_module(test_module const&) = delete; \
 test_module(test_module&&) noexcept = delete; \
+virtual ~test_module() noexcept = default; \
 auto operator=(test_module const&) -> test_module& = delete; \
 auto operator=(test_module&&) noexcept -> test_module& = delete; \
-virtual ~test_module() noexcept = default; \
 protected: \
-test_module() : m_ts_(sctf::intern::BASE::create(DESCR)) { sctf::intern::runner::instance().add_testsuite(m_ts_); } \
+test_module() : m_ts_(sctf::intern::BASE::create(DESCR)) { sctf::runner::instance().add_testsuite(m_ts_); } \
 auto sctf_intern_ts_() const -> sctf::intern::testsuite_ptr const& { return m_ts_; } \
 }; \
 class SCTF_INTERN_API_SUITE_NAME(__LINE__); \
@@ -990,8 +1001,8 @@ void sctf_intern_##FN##_fn_()
 #endif
 #ifndef SCTF_SCTF_HPP
 #define SCTF_SCTF_HPP
-#define SCFT_VERSION "2.0-rc9"
+#define SCFT_VERSION "2.1-rc1"
 #define SCTF_DEFAULT_MAIN(R) \
-auto main(int, char**)->int { return static_cast<int>(sctf::R->report()); }
+auto main(int, char**)->int { return static_cast<int>(sctf::runner::instance().run(R)); }
 #endif
 #endif

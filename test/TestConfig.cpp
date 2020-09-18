@@ -31,9 +31,7 @@
 #include "util/StringUtils.hpp"
 
 #include "Helper.hpp"
-#include "sctf.hpp"
 
-using namespace sctf;
 using namespace vfrb;
 using namespace str_util;
 using namespace config;

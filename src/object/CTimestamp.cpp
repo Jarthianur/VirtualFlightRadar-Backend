@@ -43,15 +43,15 @@ CTimestampParseError::Message() const noexcept -> str {
 
 auto
 parseTime(StringView::const_iterator& first_, StringView::const_iterator const& last_)
-  -> std::tuple<u32, u32, u32, u32> {
+    -> std::tuple<u32, u32, u32, u32> {
     namespace qi = boost::spirit::qi;
 
     static thread_local const qi::int_parser<u32, 10, 2, 2> _2digit = {};
     static thread_local const qi::int_parser<u32, 10, 3, 3> _3digit = {};
     static thread_local const qi::rule<StringView::const_iterator, std::tuple<u32, u32, u32, u32>(),
                                        qi::space_type>
-      time_r = (_2digit >> _2digit >> _2digit >> qi::attr(0)) |
-               (_2digit >> ":" >> _2digit >> ":" >> _2digit >> "." >> _3digit);
+        time_r = (_2digit >> _2digit >> _2digit >> qi::attr(0)) |
+                 (_2digit >> ":" >> _2digit >> ":" >> _2digit >> "." >> _3digit);
 
     std::tuple<u32, u32, u32, u32> time;
     if (qi::phrase_parse(first_, last_, time_r, qi::space, time) && (first_ == last_)) {

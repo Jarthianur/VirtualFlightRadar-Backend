@@ -67,5 +67,8 @@ public:
 
     virtual void
     Access() = 0;
+
+    [[nodiscard]] virtual auto
+    Size() const -> usize = 0;
 };
 }  // namespace vfrb::data

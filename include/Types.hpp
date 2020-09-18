@@ -22,6 +22,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -39,6 +40,21 @@ using s64   = std::int64_t;
 using usize = std::size_t;
 using f32   = float;
 using f64   = double;
+
+namespace limits
+{
+using u8    = std::numeric_limits<u8>;
+using s8    = std::numeric_limits<s8>;
+using u16   = std::numeric_limits<u16>;
+using s16   = std::numeric_limits<s16>;
+using u32   = std::numeric_limits<u32>;
+using s32   = std::numeric_limits<s32>;
+using u64   = std::numeric_limits<u64>;
+using s64   = std::numeric_limits<s64>;
+using usize = std::numeric_limits<usize>;
+using f32   = std::numeric_limits<f32>;
+using f64   = std::numeric_limits<f64>;
+}  // namespace limits
 
 using enum_type = std::uint_fast8_t;
 

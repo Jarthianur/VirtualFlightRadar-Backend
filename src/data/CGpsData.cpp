@@ -79,6 +79,11 @@ CGpsData::isPositionGood() const -> bool {
            pos.Dilution() <= GPS_HOR_DILUTION_GOOD;
 }
 
+auto
+CGpsData::Size() const -> usize {
+    return 1;
+}
+
 namespace error
 {
 auto

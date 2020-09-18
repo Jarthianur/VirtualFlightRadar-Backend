@@ -83,6 +83,9 @@ public:
      */
     auto
     Location() const -> decltype(std::get<0>(m_position).Location()) REQUIRES(!m_mutex);
+
+    auto
+    Size() const -> usize override;
 };
 
 namespace error

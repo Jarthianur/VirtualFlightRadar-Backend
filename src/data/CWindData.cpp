@@ -47,4 +47,10 @@ CWindData::Access() {
     m_accessFn({++m_wind, {m_wind.Nmea()}});
     m_wind.Clear();
 }
+
+auto
+CWindData::Size() const -> usize {
+    LockGuard lk(m_mutex);
+    return m_wind.Nmea().empty() ? 0 : 1;
+}
 }  // namespace vfrb::data

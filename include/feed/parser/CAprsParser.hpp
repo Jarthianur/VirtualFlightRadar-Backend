@@ -68,7 +68,7 @@ class CAprsParser : public IParser<object::CAircraft>
 
     /// @throw vfrb::str_util::error::CConversionError
     [[nodiscard]] auto static parseMovement(std::cmatch const& match_)
-      -> std::optional<object::CAircraft::SMovement>;
+        -> std::optional<object::CAircraft::SMovement>;
 
     /// @throw vfrb::object::error::CTimestampParseError
     [[nodiscard]] auto static parseTimeStamp(std::cmatch const& match_) -> object::CTimestamp;

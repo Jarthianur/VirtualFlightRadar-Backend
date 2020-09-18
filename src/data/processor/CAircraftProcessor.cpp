@@ -66,27 +66,27 @@ CAircraftProcessor::calculateRelPosition(CAircraft const& aircraft_) const {
     m_latDistance          = m_aircraftRadLatitude - m_refRadLatitude;
 
     f64 a = std::pow(std::sin(m_latDistance / 2.0), 2.0) + std::cos(m_refRadLatitude) *
-                                                             std::cos(m_aircraftRadLatitude) *
-                                                             std::pow(std::sin(m_lonDistance / 2.0), 2.0);
+                                                               std::cos(m_aircraftRadLatitude) *
+                                                               std::pow(std::sin(m_lonDistance / 2.0), 2.0);
     m_distance = math::DoubleToInt(6371000.0 * (2.0 * std::atan2(std::sqrt(a), std::sqrt(1.0 - a))));
 
     m_relBearing = math::Degree(
-      std::atan2(std::sin(m_aircraftRadLongitude - m_refRadLongitude) * std::cos(m_aircraftRadLatitude),
-                 std::cos(m_refRadLatitude) * std::sin(m_aircraftRadLatitude) -
-                   std::sin(m_refRadLatitude) * std::cos(m_aircraftRadLatitude) *
-                     std::cos(m_aircraftRadLongitude - m_refRadLongitude)));
+        std::atan2(std::sin(m_aircraftRadLongitude - m_refRadLongitude) * std::cos(m_aircraftRadLatitude),
+                   std::cos(m_refRadLatitude) * std::sin(m_aircraftRadLatitude) -
+                       std::sin(m_refRadLatitude) * std::cos(m_aircraftRadLatitude) *
+                           std::cos(m_aircraftRadLongitude - m_refRadLongitude)));
     m_absBearing = std::fmod((m_relBearing + 360.0), 360.0);
 
     m_relNorth    = math::DoubleToInt(std::cos(math::Radian(m_absBearing)) * m_distance);
     m_relEast     = math::DoubleToInt(std::sin(math::Radian(m_absBearing)) * m_distance);
     m_relVertical = aircraft_.TargetType() == CAircraft::ETargetType::TRANSPONDER ?
-                      aircraft_.Location().Altitude - math::IcaoHeight(m_refAtmPressure) :
-                      aircraft_.Location().Altitude - m_refLocation.Altitude;
+                        aircraft_.Location().Altitude - math::IcaoHeight(m_refAtmPressure) :
+                        aircraft_.Location().Altitude - m_refLocation.Altitude;
 }
 
 auto
 CAircraftProcessor::appendPflau(CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-  -> usize {
+    -> usize {
     int next = nmea_->Format(idx_, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::DoubleToInt(m_relBearing),
                              m_relVertical, m_distance, (*aircraft_.Id()).data());
     next += nmea_->Format(idx_, "%02x\r\n", Checksum(**nmea_, idx_));
@@ -95,20 +95,20 @@ CAircraftProcessor::appendPflau(CAircraft const& aircraft_, CStaticString<NMEA_S
 
 auto
 CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-  -> usize {
+    -> usize {
     int next = 0;
     if (aircraft_.HasFullInfo()) {
         next = nmea_->Format(
-          idx_, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast, m_relVertical,
-          util::AsUnderlyingType(aircraft_.IdType()), (*aircraft_.Id()).data(),
-          math::DoubleToInt(math::Saturate(aircraft_.Movement().Heading, CAircraft::SMovement::MIN_HEADING,
-                                           CAircraft::SMovement::MAX_HEADING)),
-          math::DoubleToInt(math::Saturate(aircraft_.Movement().GndSpeed * math::MS_2_KMH,
-                                           CAircraft::SMovement::MIN_GND_SPEED,
-                                           CAircraft::SMovement::MAX_GND_SPEED)),
-          math::Saturate(aircraft_.Movement().ClimbRate, CAircraft::SMovement::MIN_CLIMB_RATE,
-                         CAircraft::SMovement::MAX_CLIMB_RATE),
-          util::AsUnderlyingType(aircraft_.AircraftType()));
+            idx_, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast, m_relVertical,
+            util::AsUnderlyingType(aircraft_.IdType()), (*aircraft_.Id()).data(),
+            math::DoubleToInt(math::Saturate(aircraft_.Movement().Heading, CAircraft::SMovement::MIN_HEADING,
+                                             CAircraft::SMovement::MAX_HEADING)),
+            math::DoubleToInt(math::Saturate(aircraft_.Movement().GndSpeed * math::MS_2_KMH,
+                                             CAircraft::SMovement::MIN_GND_SPEED,
+                                             CAircraft::SMovement::MAX_GND_SPEED)),
+            math::Saturate(aircraft_.Movement().ClimbRate, CAircraft::SMovement::MIN_CLIMB_RATE,
+                           CAircraft::SMovement::MAX_CLIMB_RATE),
+            util::AsUnderlyingType(aircraft_.AircraftType()));
     } else {
         next = nmea_->Format(idx_, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
                              (*aircraft_.Id()).data(), util::AsUnderlyingType(aircraft_.AircraftType()));

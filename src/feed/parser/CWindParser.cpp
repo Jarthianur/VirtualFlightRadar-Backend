@@ -32,7 +32,7 @@ CWindParser::CWindParser() : IParser<CWind>() {}
 
 auto
 CWindParser::Parse(String&& str_, u32 prio_) const -> CWind {
-    if (MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MWV") != String::npos) {
+    if (str_.find("MWV") != String::npos && MatchChecksum({str_.c_str(), str_.length()})) {
         return {prio_, std::move(str_)};
     }
     throw error::CParseError();

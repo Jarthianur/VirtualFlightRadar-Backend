@@ -47,10 +47,11 @@ CGpsProcessor::appendGpgga(CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* n
     // support others.
     // "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"
     int next = nmea_->Format(
-      idx_, "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*",
-      utc_->tm_hour, utc_->tm_min, utc_->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude,
-      m_minLongitude, m_directionEW, /*pos.fixQa,*/ pos_.NrOfSatellites(), pos_.Location().Altitude,
-      math::Saturate(pos_.Geoid(), CGpsPosition::MIN_GEOID, CGpsPosition::MAX_GEOID));
+        idx_, "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*",
+        utc_->tm_hour, utc_->tm_min, utc_->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
+        m_degLongitude, m_minLongitude, m_directionEW, /*pos.fixQa,*/ pos_.NrOfSatellites(),
+        pos_.Location().Altitude,
+        math::Saturate(pos_.Geoid(), CGpsPosition::MIN_GEOID, CGpsPosition::MAX_GEOID));
     next += nmea_->Format(idx_, "%02x\r\n", Checksum(**nmea_, idx_));
     return idx_ + static_cast<usize>(next);
 }
@@ -58,9 +59,9 @@ CGpsProcessor::appendGpgga(CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* n
 auto
 CGpsProcessor::appendGprmc(CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_, usize idx_) const -> usize {
     int next = nmea_->Format(
-      idx_, "$GPRMC,%.2d%.2d%.2d,A,%02.0lf%06.3lf,%c,%03.0lf%06.3lf,%c,0,0,%.2d%.2d%.2d,001.0,W*",
-      utc_->tm_hour, utc_->tm_min, utc_->tm_sec, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude,
-      m_minLongitude, m_directionEW, utc_->tm_mday, utc_->tm_mon + 1, utc_->tm_year - 100);
+        idx_, "$GPRMC,%.2d%.2d%.2d,A,%02.0lf%06.3lf,%c,%03.0lf%06.3lf,%c,0,0,%.2d%.2d%.2d,001.0,W*",
+        utc_->tm_hour, utc_->tm_min, utc_->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
+        m_degLongitude, m_minLongitude, m_directionEW, utc_->tm_mday, utc_->tm_mon + 1, utc_->tm_year - 100);
     next += nmea_->Format(idx_, "%02x\r\n", Checksum(**nmea_, idx_));
     return idx_ + static_cast<usize>(next);
 }

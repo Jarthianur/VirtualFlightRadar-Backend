@@ -316,7 +316,7 @@ MatchChecksum(StringView const& sv_) -> bool {
         return false;
     }
     bool match = false;
-    if (auto [v, ec] = Convert<x32>(sv_.data() + cs_begin + 1, sv_.data() + sv_.length()); ec == EErrc::OK) {
+    if (auto [v, ec] = Convert<x32>(sv_.data() + cs_begin + 1, sv_.data() + cs_begin + 3); ec == EErrc::OK) {
         match = (v == Checksum(sv_, 0));
     }
     return match;

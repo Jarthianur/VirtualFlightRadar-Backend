@@ -20,288 +20,187 @@
 
 #include <string>
 
-#include <boost/regex.hpp>
+#include "data/CAircraftData.hpp"
+#include "data/CAtmosphereData.hpp"
+#include "data/CGpsData.hpp"
+#include "data/CWindData.hpp"
+#include "feed/parser/CAprsParser.hpp"
+#include "feed/parser/CSbsParser.hpp"
+#include "math/Math.hpp"
 
-#include "data/AircraftData.h"
-#include "data/AtmosphereData.h"
-#include "data/GpsData.h"
-#include "data/WindData.h"
-#include "feed/parser/AprsParser.h"
-#include "feed/parser/SbsParser.h"
-#include "object/impl/DateTimeImplBoost.h"
+#include "Helper.hpp"
 
-#include "helper.hpp"
+using sctf::LIKE;
+using sctf::FEQ;
 
+using namespace vfrb;
 using namespace data;
-using namespace sctf;
 using namespace object;
 
-void test_data(test::TestSuitesRunner& runner)
-{
-    suite<AircraftData>("Container functions", runner)
-        ->test(
-            "invalidate aircraft",
-            [] {
-                feed::parser::SbsParser sbsParser;
-                AircraftData            data;
-                Aircraft                ac;
-                Location                pos{49.0, 8.0, 0};
-                double                  press = 1013.25;
-                sbsParser.unpack(
-                    "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0",
-                    ac);
-                data.update(std::move(ac));
-                for (int i = 0; i < OBJ_OUTDATED; ++i)
-                {
-                    data.processAircrafts(pos, press);
-                }
-                std::string serial;
-                data.get_serialized(serial);
-                assertTrue(serial.empty());
-            })
-        ->test(
-            "delete aircraft",
-            [] {
-                feed::parser::SbsParser sbsParser;
-                AircraftData            data;
-                Aircraft                ac;
-                Location                pos{49.0, 8.0, 0};
-                double                  press = 1013.25;
-                sbsParser.unpack(
-                    "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0",
-                    ac);
-                data.update(std::move(ac));
-                for (int i = 0; i < AC_DELETE_THRESHOLD; ++i)
-                {
-                    data.processAircrafts(pos, press);
-                }
-            })
-        ->test(
-            "prefer FLARM, accept again if no input",
-            [] {
-                feed::parser::SbsParser  sbsParser;
-                feed::parser::AprsParser aprsParser;
-                AircraftData             data;
-                boost::smatch            match;
-                Aircraft                 ac;
-                Location                 pos{49.0, 8.0, 0};
-                double                   press = 1013.25;
-                std::string              serial;
+DESCRIBE("test_CAircraftData") {
+    SPtr<CAircraftData> uut = std::make_shared<CAircraftData>([this](SAccessor const& a_) {
+        nmea = a_.Nmea;
+        ac   = &static_cast<CAircraft const&>(a_.Obj);
+    });
+    StringView          nmea;
+    CAircraft const*    ac    = nullptr;
+    s32 const           M1000 = math::DoubleToInt(math::FEET_2_M * 3281);
 
-                sbsParser.unpack(
-                    "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,3281,,,49.000000,8.000000,,,,,,0",
-                    ac);
-                data.update(std::move(ac));
-                data.processAircrafts(pos, press);
-                aprsParser.unpack(
-                    "FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot",
-                    ac);
-                data.update(std::move(ac));
-                data.processAircrafts(pos, press);
-                sbsParser.unpack(
-                    "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:32.000,2017/02/16,20:11:32.000,,3281,,,49.000000,8.000000,,,,,,0",
-                    ac);
-                data.update(std::move(ac));
-                data.processAircrafts(pos, press);
-                data.get_serialized(serial);
-                bool matched = boost::regex_search(serial, match, helper::PflauRE);
-                assertTrue(matched);
-                assertEqStr(match.str(2), "610");
-                for (int i = 0; i < AC_NO_FLARM_THRESHOLD; ++i)
-                {
-                    data.processAircrafts(pos, press);
-                }
-                sbsParser.unpack(
-                    "MSG,3,0,0,BBBBBB,0,2017/02/16,20:11:33.000,2017/02/16,20:11:33.000,,3281,,,49.000000,8.000000,,,,,,0",
-                    ac);
-                data.update(std::move(ac));
-                data.processAircrafts(pos, press);
-                serial.clear();
-                data.get_serialized(serial);
-                matched = boost::regex_search(serial, match, helper::PflauRE);
-                assertTrue(matched);
-                assertEqStr(match.str(2), "1000");
-            })
-        ->test("write after outdated", [] {
-            feed::parser::AprsParser aprsParser;
-            Aircraft                 ac1(1);
-            Aircraft                 ac2(2);
-            AircraftData             data;
-            Location                 pos{49.0, 8.0, 0};
-            double                   press = 1013.25;
-            std::string              dest;
+    SETUP() {
+        uut->Environment({49., 8., 0}, 1013.25);
+    }
 
-            aprsParser.unpack(
-                "FLRBBBBBB>APRS,qAS,XXXX:/201131h4900.00N/00800.00E'180/090/A=002000 id0ABBBBBB +010fpm +0.3rot",
-                ac2);
-            aprsParser.unpack(
-                "FLRBBBBBB>APRS,qAS,XXXX:/201132h4900.00N/00800.00E'180/090/A=001000 id0ABBBBBB +010fpm +0.3rot",
-                ac1);
-            assertTrue(data.update(std::move(ac2)));
+    AFTER_EACH() {
+        nmea = StringView();
+        ac   = nullptr;
+    }
 
-            for (int i = 0; i < OBJ_OUTDATED; ++i)
-            {
-                assertFalse(data.update(std::move(ac1)));
-                data.processAircrafts(pos, press);
-            }
-            assertTrue(data.update(std::move(ac1)));
-            data.processAircrafts(pos, press);
-            data.get_serialized(dest);
-            boost::smatch match;
-            assertTrue(boost::regex_search(dest, match, helper::PflauRE));
-            assertEqStr(match.str(2), "305");
-        });
+    IT("should report an aircraft on access") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, CTimestamp());
+        ASSERT_TRUE(uut->Update(std::move(a)));
+        uut->Access();
+        ASSERT_FALSE(nmea.empty());
+        ASSERT_NOT_NULL(ac);
+        ASSERT(nmea, LIKE(), helper::PflauRE);
+        ASSERT(nmea, LIKE(), helper::PflaaRE);
+    }
+    IT("should not report an aircraft after outdate-interval, and set it as transponder target") {
+        ASSERT_EQ(CObject::OUTDATED, CAircraftData::NO_FLARM_THRESHOLD);
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::FLARM, {49., 8., M1000}, CTimestamp());
+        ASSERT_TRUE(uut->Update(std::move(a)));
+        for (auto i = 0; i < CAircraftData::NO_FLARM_THRESHOLD; ++i) {
+            nmea = StringView();
+            uut->Access();
+        }
+        ASSERT_TRUE(nmea.empty());
+        ASSERT_NOT_NULL(ac);
+        ASSERT_EQ(ac->TargetType(), CAircraft::ETargetType::TRANSPONDER);
+    }
+    IT("should delete an aircraft after certain interval") {
+        ASSERT_EQ(uut->Size(), 1);
+        for (auto i = 0; i < CAircraftData::DELETE_THRESHOLD; ++i) {
+            uut->Access();
+        }
+        ASSERT_EQ(uut->Size(), 0);
+    }
+    IT("should prefer FLARM, and accept TRANSPONDER again after certain interval") {
+        {
+            CAircraft a(1, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                        CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, CTimestamp());
+            ASSERT_TRUE(uut->Update(std::move(a)));
+        }
+        {
+            CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                        CAircraft::ETargetType::FLARM, {49., 8., M1000}, CTimestamp());
+            ASSERT_TRUE(uut->Update(std::move(a)));
+        }
+        {
+            CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                        CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, CTimestamp());
+            ASSERT_FALSE(uut->Update(std::move(a)));
+        }
+        for (auto i = 0; i < CAircraftData::NO_FLARM_THRESHOLD; ++i) {
+            uut->Access();
+        }
+        {
+            CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                        CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, CTimestamp());
+            ASSERT_TRUE(uut->Update(std::move(a)));
+        }
+    };
+};
 
-    describeParallel<GpsData>("gps string", runner)
-        ->test("correct gps position",
-               [] {
-                   GpsData     data;
-                   GpsPosition pos({10.0, 85.0, 100}, 40.0);
-                   std::string fix;
-                   pos.set_timeStamp(Timestamp<time::DateTimeImplBoost>(
-                       helper::timePlus(-1), time::Format::HHMMSS));
-                   data.update(std::move(pos));
-                   assertEquals(data.location().latitude, 10.0);
-                   assertEquals(data.location().longitude, 85.0);
-                   assertEquals(data.location().altitude, 100);
-                   data.get_serialized(fix);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(fix, match, helper::GpsRE);
-                   assertTrue(matched);
-               })
-        ->test("write higher priority",
-               [] {
-                   GpsData     data;
-                   GpsPosition pos0(0);
-                   GpsPosition pos1(1);
-                   pos0.set_position({0.0, 0.0, 1000});
-                   pos1.set_position({0.0, 0.0, 2000});
-                   pos1.set_timeStamp(Timestamp<time::DateTimeImplBoost>(
-                       helper::timePlus(0), time::Format::HHMMSS));
-                   assertTrue(data.update(std::move(pos1)));
-                   assertEquals(data.location().altitude, 2000);
-                   pos0.set_timeStamp(Timestamp<time::DateTimeImplBoost>(
-                       helper::timePlus(0), time::Format::HHMMSS));
-                   assertFalse(data.update(std::move(pos0)));
-                   assertEquals(data.location().altitude, 2000);
-               })
-        ->test("write after outdated", [] {
-            GpsData     data;
-            GpsPosition pos1(1);
-            GpsPosition pos2(2);
-            std::string dest;
-            pos1.set_position({0.0, 0.0, 1000});
-            pos2.set_position({0.0, 0.0, 2000});
-            pos2.set_timeStamp(Timestamp<time::DateTimeImplBoost>(helper::timePlus(10),
-                                                                       time::Format::HHMMSS));
-            assertTrue(data.update(std::move(pos2)));
-            assertEquals(data.location().altitude, 2000);
-            pos1.set_timeStamp(Timestamp<time::DateTimeImplBoost>(helper::timePlus(20),
-                                                                       time::Format::HHMMSS));
-            for (int i = 0; i < OBJ_OUTDATED; ++i)
-            {
-                assertFalse(data.update(std::move(pos1)));
-                assertEquals(data.location().altitude, 2000);
-                dest.clear();
-                data.get_serialized(dest);
-            }
-            assertTrue(data.update(std::move(pos1)));
-            assertEquals(data.location().altitude, 1000);
-        });
+DESCRIBE("test_CGpsData") {
+    SPtr<CGpsData> uut = std::make_shared<CGpsData>(
+        [this](SAccessor const& a_) {
+            nmea = a_.Nmea;
+            pos  = &static_cast<CGpsPosition const&>(a_.Obj);
+        },
+        CGpsPosition{0, {0., 0., 0}, 0.}, true);
+    StringView          nmea;
+    CGpsPosition const* pos = nullptr;
 
-    describeParallel<WindData>("wind data", runner)
-        ->test("extract WIMWV",
-               [] {
-                   WindData    data;
-                   Wind        wind;
-                   std::string dest;
-                   wind.set_serialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
-                   data.update(std::move(wind));
-                   data.get_serialized(dest);
-                   assertEqStr(dest, "$WIMWV,242.8,R,6.9,N,A*20\r\n");
-                   dest.clear();
-                   data.get_serialized(dest);
-                   assertEqStr(dest, "");
-               })
-        ->test("write higher priority",
-               [] {
-                   WindData    data;
-                   Wind        wind0(0);
-                   Wind        wind1(1);
-                   std::string dest;
-                   wind0.set_serialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
-                   wind1.set_serialized("updated");
-                   assertTrue(data.update(std::move(wind0)));
-                   assertTrue(data.update(std::move(wind1)));
-                   data.get_serialized(dest);
-                   assertEqStr(dest, "updated");
-                   wind0.set_serialized("$WIMWV,242.8,R,6.9,N,A*20\r\n");
-                   assertFalse(data.update(std::move(wind0)));
-               })
-        ->test("write after outdated", [] {
-            WindData    data;
-            Wind        wind1(1);
-            Wind        wind2(2);
-            std::string dest;
-            wind1.set_serialized("lower");
-            wind2.set_serialized("higher");
-            assertTrue(data.update(std::move(wind2)));
-            data.get_serialized(dest);
-            assertEqStr(dest, "higher");
-            for (int i = 0; i < OBJ_OUTDATED - 1; ++i)
-            {
-                assertFalse(data.update(std::move(wind1)));
-                dest.clear();
-                data.get_serialized(dest);
-            }
-            assertTrue(data.update(std::move(wind1)));
-            dest.clear();
-            data.get_serialized(dest);
-            assertEqStr(dest, "lower");
-        });
+    AFTER_EACH() {
+        nmea = StringView();
+        pos  = nullptr;
+    }
 
-    describeParallel<AtmosphereData>("atmosphere data", runner)
-        ->test("get WIMDA, pressure",
-               [] {
-                   AtmosphereData data;
-                   Atmosphere     atm;
-                   std::string    dest;
-                   atm.set_pressure(1009.1);
-                   atm.set_serialized("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
-                   data.update(std::move(atm));
-                   data.get_serialized(dest);
-                   assertEqStr(dest, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
-                   assertEquals(data.atmPressure(), 1009.1);
-               })
-        ->test("write higher priority",
-               [] {
-                   AtmosphereData data;
-                   Atmosphere     atm0(0);
-                   Atmosphere     atm1(1);
-                   atm0.set_pressure(1009.1);
-                   atm1.set_pressure(900.0);
-                   data.update(std::move(atm0));
-                   assertEquals(data.atmPressure(), 1009.1);
-                   data.update(std::move(atm1));
-                   assertEquals(data.atmPressure(), 900.0);
-               })
-        ->test("write after outdated", [] {
-            AtmosphereData data;
-            Atmosphere     atm1(1);
-            Atmosphere     atm2(2);
-            std::string    dest;
-            atm1.set_pressure(1009.1);
-            atm2.set_pressure(900.0);
-            assertTrue(data.update(std::move(atm2)));
-            assertEquals(data.atmPressure(), 900.0);
-            for (int i = 0; i < OBJ_OUTDATED; ++i)
-            {
-                assertFalse(data.update(std::move(atm1)));
-                assertEquals(data.atmPressure(), 900.0);
-                dest.clear();
-                data.get_serialized(dest);
-            }
-            assertTrue(data.update(std::move(atm1)));
-            assertEquals(data.atmPressure(), 1009.1);
-        });
-}
+    IT("should report a gps position on access") {
+        {
+            CGpsPosition p(0, {10., 85., 100}, 40.);
+            ASSERT_TRUE(uut->Update(std::move(p)));
+        }
+        uut->Access();
+        auto p = uut->Location();
+        ASSERT_EQ(p.Latitude, 10.);
+        ASSERT_EQ(p.Longitude, 85.);
+        ASSERT_EQ(p.Altitude, 100);
+        ASSERT_FALSE(nmea.empty());
+        ASSERT_NOT_NULL(pos);
+        ASSERT(nmea, LIKE(), helper::GpsRE);
+    }
+    IT("should throw if received position is good") {
+        CGpsPosition p(0, {10., 85., 100}, 40., 2., 7, 1, CTimestamp());
+        ASSERT_THROWS(uut->Update(std::move(p)), vfrb::data::error::CReceivedGoodPosition);
+    }
+    IT("should throw if position was already locked") {
+        CGpsPosition p(0, {10., 85., 100}, 40.);
+        ASSERT_THROWS(uut->Update(std::move(p)), vfrb::data::error::CPositionAlreadyLocked);
+    };
+};
+
+DESCRIBE("test_CWindData") {
+    SPtr<CWindData> uut = std::make_shared<CWindData>([this](SAccessor const& a_) {
+        nmea = a_.Nmea;
+        wind = &static_cast<CWind const&>(a_.Obj);
+    });
+    StringView      nmea;
+    CWind const*    wind;
+
+    AFTER_EACH() {
+        nmea = StringView();
+        wind = nullptr;
+    }
+
+    IT("should report the wind on access") {
+        CWind w(0, "$WIMWV,242.8,R,6.9,N,A*2");
+        ASSERT_TRUE(uut->Update(std::move(w)));
+        uut->Access();
+        ASSERT_FALSE(nmea.empty());
+        ASSERT(nmea, LIKE(), "$WIMWV,242.8,R,6.9,N,A*2");
+        ASSERT_NOT_NULL(wind);
+    }
+    IT("should clear wind after access without update") {
+        uut->Access();
+        ASSERT_EQ(uut->Size(), 0);
+        ASSERT_TRUE(nmea.empty());
+    };
+};
+
+DESCRIBE("test_CAtmosphereData") {
+    SPtr<CAtmosphereData> uut = std::make_shared<CAtmosphereData>(
+        [this](SAccessor const& a_) {
+            nmea = a_.Nmea;
+            atm  = &static_cast<CAtmosphere const&>(a_.Obj);
+        },
+        CAtmosphere{0, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E"});
+    StringView         nmea;
+    CAtmosphere const* atm;
+
+    AFTER_EACH() {
+        nmea = StringView();
+        atm  = nullptr;
+    }
+
+    IT("should report the atmosphere on access") {
+        CAtmosphere a(0, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E");
+        ASSERT_TRUE(uut->Update(std::move(a)));
+        uut->Access();
+        ASSERT_FALSE(nmea.empty());
+        ASSERT(nmea, LIKE(), "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E");
+        ASSERT_NOT_NULL(atm);
+        ASSERT(atm->Pressure(), FEQ(), 1009.1);
+    }
+};

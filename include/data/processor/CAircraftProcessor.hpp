@@ -68,7 +68,7 @@ private:
      */
     auto
     appendPflau(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-      -> usize;
+        -> usize;
 
     /**
      * @brief Append PFLAA sentence to processing string.
@@ -76,7 +76,7 @@ private:
      */
     auto
     appendPflaa(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-      -> usize;
+        -> usize;
 
 public:
     CAircraftProcessor();

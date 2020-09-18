@@ -33,7 +33,7 @@ using vfrb::object::SLocation;
 
 namespace vfrb::data
 {
-CAircraftData::CAircraftData(AccessFn&& fn_) : CAircraftData(std::move(fn_), 0) {}
+CAircraftData::CAircraftData(AccessFn&& fn_) : CAircraftData(std::move(fn_), limits::s32::max()) {}
 
 CAircraftData::CAircraftData(AccessFn&& fn_, s32 maxDist_) : IData(std::move(fn_)), m_processor(maxDist_) {}
 
@@ -73,5 +73,10 @@ CAircraftData::Access() {
         } catch ([[maybe_unused]] vfrb::error::IError const&) {
         }
     }
+}
+
+auto
+CAircraftData::Size() const -> usize {
+    return m_container.Size();
 }
 }  // namespace vfrb::data

@@ -69,6 +69,9 @@ public:
     void
     Erase(KeyType key_) REQUIRES(!m_modMutex);
 
+    usize
+    Size() const REQUIRES(!m_modMutex);
+
 private:
     Mutex mutable m_modMutex;
     ContainerType GUARDED_BY(m_modMutex) m_container;  ///< Underlying container
@@ -227,7 +230,7 @@ CObjectContainer<ObjectT, StringSize>::Insert(KeyType key_, ObjectT&& value_) RE
     CIterator iter(m_container.find(key_), *this);
     if (iter == End()) {
         return std::make_pair(
-          CIterator(m_container.emplace(key_, CValueType(std::move(value_))).first, *this), true);
+            CIterator(m_container.emplace(key_, CValueType(std::move(value_))).first, *this), true);
     }
     return std::make_pair(std::move(iter), false);
 }
@@ -241,5 +244,12 @@ CObjectContainer<ObjectT, StringSize>::Erase(KeyType key_) REQUIRES(!m_modMutex)
         CIterator iter(std::move(entry), *this);
         m_container.erase(key_);
     }
+}
+
+template<typename ObjectT, usize StringSize>
+usize
+CObjectContainer<ObjectT, StringSize>::Size() const REQUIRES(!m_modMutex) {
+    LockGuard lk(m_modMutex);
+    return m_container.size();
 }
 }  // namespace vfrb::concurrent

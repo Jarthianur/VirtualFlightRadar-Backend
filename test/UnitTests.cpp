@@ -21,4 +21,4 @@
 #include "Helper.hpp"
 
 SCTF_EPSILON(0.000001)
-SCTF_DEFAULT_MAIN(console_reporter::create(std::cout)->with_captured_output()->with_color())
+SCTF_DEFAULT_MAIN(sctf::console_reporter::create(std::cout)->with_captured_output()->with_color())

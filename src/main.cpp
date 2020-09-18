@@ -72,7 +72,7 @@ evalArgs(int argc_, char** argv_) {
     program_options::options_description cmdline_options("VirtualFlightRadar-Backend -- "s + VERSION);
     cmdline_options.add_options()("help,h", "show this message");
     cmdline_options.add_options()(
-      "ground-mode,g", "forcibly enable ground mode; GPS feeds will stop when a good position is received");
+        "ground-mode,g", "forcibly enable ground mode; GPS feeds will stop when a good position is received");
     cmdline_options.add_options()("config,c", program_options::value<std::string>(), "config file");
     cmdline_options.add_options()("output,o", program_options::value<std::string>(), "specify where to log");
     program_options::variables_map variables;

@@ -51,5 +51,8 @@ public:
 
     void
     Access() override REQUIRES(!m_mutex);
+
+    auto
+    Size() const -> usize override;
 };
 }  // namespace vfrb::data

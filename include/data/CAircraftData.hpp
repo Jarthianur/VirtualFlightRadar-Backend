@@ -34,15 +34,11 @@ namespace vfrb::data
  */
 class CAircraftData : public IData
 {
+public:
     CTCONST NO_FLARM_THRESHOLD = object::CObject::OUTDATED;  ///< Times until FLARM status is removed
     CTCONST DELETE_THRESHOLD   = 120;                        ///< Times until aircraft gets deleted
     CTCONST NMEA_SIZE          = processor::CAircraftProcessor::NMEA_SIZE;
 
-    concurrent::CObjectContainer<object::CAircraft, NMEA_SIZE>
-                                  m_container;  ///< Internal container for aircrafts
-    processor::CAircraftProcessor m_processor;  ///< Processor for aircrafts
-
-public:
     explicit CAircraftData(AccessFn&& fn_);
     CAircraftData(AccessFn&& fn_, s32 maxDist_);  ///< @param maxDist The max distance filter
 
@@ -66,5 +62,13 @@ public:
      */
     void
     Access() override;
+
+    auto
+    Size() const -> usize override;
+
+private:
+    concurrent::CObjectContainer<object::CAircraft, NMEA_SIZE>
+                                  m_container;  ///< Internal container for aircrafts
+    processor::CAircraftProcessor m_processor;  ///< Processor for aircrafts
 };
 }  // namespace vfrb::data

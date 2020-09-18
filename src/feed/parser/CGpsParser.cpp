@@ -34,15 +34,15 @@ namespace vfrb::feed::parser
 {
 CGpsParser::CGpsParser()
     : m_gpggaRe(
-        "^\\$[A-Z]{2}GGA,(\\d{6}),"    // time
-        "(\\d{4}\\.\\d{3,4}),([NS]),"  // latitude, direction
-        "(\\d{5}\\.\\d{3,4}),([EW]),"  // longitude, direction
-        "(\\d),(\\d{2}),"              // fix quality, number of satellites
-        "(\\d+(?:\\.\\d+)?),"          // dilution
-        "(\\d+(?:\\.\\d+)?),M,"        // altitude
-        "(\\d+(?:\\.\\d+)?)"           // geoid
-        ",M,,\\*[0-9A-F]{2}\\s*?$",
-        std::regex::optimize | std::regex::icase) {}
+          "^\\$[A-Z]{2}GGA,(\\d{6}),"    // time
+          "(\\d{4}\\.\\d{3,4}),([NS]),"  // latitude, direction
+          "(\\d{5}\\.\\d{3,4}),([EW]),"  // longitude, direction
+          "(\\d),(\\d{2}),"              // fix quality, number of satellites
+          "(\\d+(?:\\.\\d+)?),"          // dilution
+          "(\\d+(?:\\.\\d+)?),M,"        // altitude
+          "(\\d+(?:\\.\\d+)?)"           // geoid
+          ",M,,\\*[0-9A-F]{2}\\s*?$",
+          std::regex::optimize | std::regex::icase) {}
 
 auto
 CGpsParser::Parse(String&& str_, u32 prio_) const -> CGpsPosition {

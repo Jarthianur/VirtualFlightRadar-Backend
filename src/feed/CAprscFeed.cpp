@@ -44,7 +44,7 @@ CAprscFeed::CAprscFeed(String const& name_, CProperties const& prop_, SPtr<data:
         [[maybe_unused]] auto x = prop_.Property(CConfiguration::KV_KEY_LOGIN);
     } catch ([[maybe_unused]] config::error::CPropertyNotFoundError const&) {
         throw error::CInvalidPropertyError(
-          MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_LOGIN));
+            MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_LOGIN));
     }
 }
 
