@@ -26,21 +26,24 @@
 
 namespace vfrb::server::net
 {
-class CSocketImplTest
+class CSocketTest
 {
     SPtr<String> m_buffer;
     String       m_address;
     bool         m_failWrite = false;
 
 public:
-    MOVABLE(CSocketImplTest)
-    NOT_COPYABLE(CSocketImplTest)
+    MOVABLE(CSocketTest)
+    NOT_COPYABLE(CSocketTest)
 
-    CSocketImplTest(String const& addr_, SPtr<String> buf_, bool fail_);
-    ~CSocketImplTest() noexcept = default;
+    CSocketTest(String const& addr_, SPtr<String> buf_, bool fail_);
+    ~CSocketTest() noexcept = default;
 
-    [[nodiscard]] auto Address() const -> String;
-    auto               Write(StringView const& msg_) -> bool;
-    void               Close();
+    [[nodiscard]] auto
+    Address() const -> String;
+    auto
+    Write(StringView const& msg_) -> bool;
+    void
+    Close();
 };
 }  // namespace vfrb::server::net

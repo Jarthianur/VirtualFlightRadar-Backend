@@ -127,7 +127,9 @@ CConnectorBoost::handleResolve(error_code err_, tcp::resolver::results_type cons
                                Callback const& cb_) noexcept {
     EErrc const ec = evalErrorCode(err_);
     if (ec == EErrc::OK) {
-        async_connect(m_socket, res_, [this, &cb_](error_code err_) { handleConnect(err_, cb_); });
+        async_connect(m_socket, res_, [this, &cb_](error_code err_, [[maybe_unused]] tcp::endpoint const&) {
+            handleConnect(err_, cb_);
+        });
     } else {
         logger.Debug("(Client) failed to resolve host: ", err_.message());
         cb_(ec);
