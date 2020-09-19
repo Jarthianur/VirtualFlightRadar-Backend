@@ -41,26 +41,26 @@ extern void Day(u32);
 DESCRIBE_PAR("test_CWind") {
     IT("should age by one") {
         CWind w;
-        ASSERT_EQ(w.UpdateAge(), 0);
+        ASSERT_EQ(w.UpdateAge(), 0U);
         ++w;
-        ASSERT_EQ(w.UpdateAge(), 1);
+        ASSERT_EQ(w.UpdateAge(), 1U);
     }
     IT("should update with higher priority") {
         CWind w(0, "1");
         CWind w2(1, "2");
         ++w;
-        ASSERT_EQ(w.UpdateAge(), 1);
+        ASSERT_EQ(w.UpdateAge(), 1U);
         ASSERT_TRUE(w.TryUpdate(std::move(w2)));
-        ASSERT_EQ(w.UpdateAge(), 0);
+        ASSERT_EQ(w.UpdateAge(), 0U);
         ASSERT_EQ(w.Nmea(), "2");
     }
     IT("should update with equal priority") {
         CWind w(0, "1");
         CWind w2(0, "2");
         ++w;
-        ASSERT_EQ(w.UpdateAge(), 1);
+        ASSERT_EQ(w.UpdateAge(), 1U);
         ASSERT_TRUE(w.TryUpdate(std::move(w2)));
-        ASSERT_EQ(w.UpdateAge(), 0);
+        ASSERT_EQ(w.UpdateAge(), 0U);
         ASSERT_EQ(w.Nmea(), "2");
     }
     IT("should update outdated object with lower priority") {
@@ -70,16 +70,16 @@ DESCRIBE_PAR("test_CWind") {
         };
         ASSERT_EQ(w.UpdateAge(), CObject::OUTDATED);
         ASSERT_TRUE(w.TryUpdate(std::move(w2)));
-        ASSERT_EQ(w.UpdateAge(), 0);
+        ASSERT_EQ(w.UpdateAge(), 0U);
         ASSERT_EQ(w.Nmea(), "2");
     }
     IT("should refuse update with lower priority") {
         CWind w(1, "1");
         CWind w2(0, "2");
         ++w;
-        ASSERT_EQ(w.UpdateAge(), 1);
+        ASSERT_EQ(w.UpdateAge(), 1U);
         ASSERT_FALSE(w.TryUpdate(std::move(w2)));
-        ASSERT_EQ(w.UpdateAge(), 1);
+        ASSERT_EQ(w.UpdateAge(), 1U);
         ASSERT_EQ(w.Nmea(), "1");
     };
 };
@@ -87,17 +87,17 @@ DESCRIBE_PAR("test_CWind") {
 DESCRIBE_PAR("test_CAtmosphere") {
     IT("should age by one") {
         CAtmosphere a;
-        ASSERT_EQ(a.UpdateAge(), 0);
+        ASSERT_EQ(a.UpdateAge(), 0U);
         ++a;
-        ASSERT_EQ(a.UpdateAge(), 1);
+        ASSERT_EQ(a.UpdateAge(), 1U);
     }
     IT("should update with higher priority") {
         CAtmosphere a(0, "1");
         CAtmosphere a2(1, 1.0, "2");
         ++a;
-        ASSERT_EQ(a.UpdateAge(), 1);
+        ASSERT_EQ(a.UpdateAge(), 1U);
         ASSERT_TRUE(a.TryUpdate(std::move(a2)));
-        ASSERT_EQ(a.UpdateAge(), 0);
+        ASSERT_EQ(a.UpdateAge(), 0U);
         ASSERT_EQ(a.Nmea(), "2");
         ASSERT_EQ(a.Pressure(), 1.0);
     }
@@ -105,9 +105,9 @@ DESCRIBE_PAR("test_CAtmosphere") {
         CAtmosphere a(0, "1");
         CAtmosphere a2(0, 1.0, "2");
         ++a;
-        ASSERT_EQ(a.UpdateAge(), 1);
+        ASSERT_EQ(a.UpdateAge(), 1U);
         ASSERT_TRUE(a.TryUpdate(std::move(a2)));
-        ASSERT_EQ(a.UpdateAge(), 0);
+        ASSERT_EQ(a.UpdateAge(), 0U);
         ASSERT_EQ(a.Nmea(), "2");
         ASSERT_EQ(a.Pressure(), 1.0);
     }
@@ -118,7 +118,7 @@ DESCRIBE_PAR("test_CAtmosphere") {
         };
         ASSERT_EQ(a.UpdateAge(), CObject::OUTDATED);
         ASSERT_TRUE(a.TryUpdate(std::move(a2)));
-        ASSERT_EQ(a.UpdateAge(), 0);
+        ASSERT_EQ(a.UpdateAge(), 0U);
         ASSERT_EQ(a.Nmea(), "2");
         ASSERT_EQ(a.Pressure(), 1.0);
     }
@@ -126,9 +126,9 @@ DESCRIBE_PAR("test_CAtmosphere") {
         CAtmosphere a(1, 2.0, "1");
         CAtmosphere a2(0, 1.0, "2");
         ++a;
-        ASSERT_EQ(a.UpdateAge(), 1);
+        ASSERT_EQ(a.UpdateAge(), 1U);
         ASSERT_FALSE(a.TryUpdate(std::move(a2)));
-        ASSERT_EQ(a.UpdateAge(), 1);
+        ASSERT_EQ(a.UpdateAge(), 1U);
         ASSERT_EQ(a.Nmea(), "1");
         ASSERT_EQ(a.Pressure(), 2.0);
     }
@@ -146,17 +146,17 @@ DESCRIBE_PAR("test_CGpsPosition") {
 
     IT("should age by one") {
         CGpsPosition p(0, {1., 1., 1}, 1.);
-        ASSERT_EQ(p.UpdateAge(), 0);
+        ASSERT_EQ(p.UpdateAge(), 0U);
         ++p;
-        ASSERT_EQ(p.UpdateAge(), 1);
+        ASSERT_EQ(p.UpdateAge(), 1U);
     }
     IT("should update with higher priority") {
         CGpsPosition p(0, {1., 1., 1}, 1.);
         CGpsPosition p2(1, {2., 2., 2}, 2., 2., 4, 6, CTimestamp("115900"));
         ++p;
-        ASSERT_EQ(p.UpdateAge(), 1);
+        ASSERT_EQ(p.UpdateAge(), 1U);
         ASSERT_TRUE(p.TryUpdate(std::move(p2)));
-        ASSERT_EQ(p.UpdateAge(), 0);
+        ASSERT_EQ(p.UpdateAge(), 0U);
         ASSERT_EQ(p.Geoid(), 2.);
         ASSERT_EQ(p.Dilution(), 2.);
         ASSERT_EQ(p.FixQuality(), 6);
@@ -169,9 +169,9 @@ DESCRIBE_PAR("test_CGpsPosition") {
         CGpsPosition p(0, {1., 1., 1}, 1.);
         CGpsPosition p2(0, {2., 2., 2}, 2., 2., 4, 6, CTimestamp("115900"));
         ++p;
-        ASSERT_EQ(p.UpdateAge(), 1);
+        ASSERT_EQ(p.UpdateAge(), 1U);
         ASSERT_TRUE(p.TryUpdate(std::move(p2)));
-        ASSERT_EQ(p.UpdateAge(), 0);
+        ASSERT_EQ(p.UpdateAge(), 0U);
         ASSERT_EQ(p.Geoid(), 2.);
         ASSERT_EQ(p.Dilution(), 2.);
         ASSERT_EQ(p.FixQuality(), 6);
@@ -187,7 +187,7 @@ DESCRIBE_PAR("test_CGpsPosition") {
         };
         ASSERT_EQ(p.UpdateAge(), CObject::OUTDATED);
         ASSERT_TRUE(p.TryUpdate(std::move(p2)));
-        ASSERT_EQ(p.UpdateAge(), 0);
+        ASSERT_EQ(p.UpdateAge(), 0U);
         ASSERT_EQ(p.Geoid(), 2.);
         ASSERT_EQ(p.Dilution(), 2.);
         ASSERT_EQ(p.FixQuality(), 6);
@@ -200,9 +200,9 @@ DESCRIBE_PAR("test_CGpsPosition") {
         CGpsPosition p(1, {1., 1., 1}, 1., 1., 3, 5, CTimestamp("115800"));
         CGpsPosition p2(0, {2., 2., 2}, 2., 2., 4, 6, CTimestamp("115900"));
         ++p;
-        ASSERT_EQ(p.UpdateAge(), 1);
+        ASSERT_EQ(p.UpdateAge(), 1U);
         ASSERT_FALSE(p.TryUpdate(std::move(p2)));
-        ASSERT_EQ(p.UpdateAge(), 1);
+        ASSERT_EQ(p.UpdateAge(), 1U);
         ASSERT_EQ(p.Geoid(), 1.);
         ASSERT_EQ(p.Dilution(), 1.);
         ASSERT_EQ(p.FixQuality(), 5);
@@ -215,9 +215,9 @@ DESCRIBE_PAR("test_CGpsPosition") {
         CGpsPosition p(0, {1., 1., 1}, 1., 1., 3, 5, CTimestamp("115900"));
         CGpsPosition p2(1, {2., 2., 2}, 2., 2., 4, 6, CTimestamp("115800"));
         ++p;
-        ASSERT_EQ(p.UpdateAge(), 1);
+        ASSERT_EQ(p.UpdateAge(), 1U);
         ASSERT_FALSE(p.TryUpdate(std::move(p2)));
-        ASSERT_EQ(p.UpdateAge(), 1);
+        ASSERT_EQ(p.UpdateAge(), 1U);
         ASSERT_EQ(p.Geoid(), 1.);
         ASSERT_EQ(p.Dilution(), 1.);
         ASSERT_EQ(p.FixQuality(), 5);
@@ -249,24 +249,24 @@ DESCRIBE_PAR("test_CAircraft") {
     }
 
     IT("should age by one") {
-        CAircraft a(0, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN, {1., 1., 1},
-                    CTimestamp("115900"));
-        ASSERT_EQ(a.UpdateAge(), 0);
+        CAircraft a(0, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {1., 1., 1}, CTimestamp("115900"));
+        ASSERT_EQ(a.UpdateAge(), 0U);
         ++a;
-        ASSERT_EQ(a.UpdateAge(), 1);
+        ASSERT_EQ(a.UpdateAge(), 1U);
     }
     IT("should update with higher priority") {
         {
             CAircraft a(0, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                        {1., 1., 1}, CTimestamp("115800"));
-            CAircraft a2(1, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                         {1., 1., 1.}, CTimestamp("115900"));
-            a2.TargetType(CAircraft::ETargetType::TRANSPONDER);
+                        CAircraft::ETargetType::TRANSPONDER, {1., 1., 1}, CTimestamp("115800"));
+            CAircraft a2(1, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                         CAircraft::ETargetType::TRANSPONDER, {2., 2., 2}, {1., 1., 1.},
+                         CTimestamp("115900"));
             ++a;
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_TRUE(a.TryUpdate(std::move(a2)));
-            ASSERT_EQ(a.UpdateAge(), 0);
+            ASSERT_EQ(a.UpdateAge(), 0U);
             ASSERT_EQ(a.IdType(), CAircraft::EIdType::ICAO);
             ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UFO);
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
@@ -281,15 +281,14 @@ DESCRIBE_PAR("test_CAircraft") {
         }
         {
             CAircraft a(0, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                        {1., 1., 1}, CTimestamp("115800"));
-            CAircraft a2(1, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                         {1., 1., 1.}, CTimestamp("115900"));
-            a.TargetType(CAircraft::ETargetType::FLARM);
+                        CAircraft::ETargetType::FLARM, {1., 1., 1}, CTimestamp("115800"));
+            CAircraft a2(1, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                         CAircraft::ETargetType::FLARM, {2., 2., 2}, {1., 1., 1.}, CTimestamp("115900"));
             ++a;
             ASSERT_EQ(a2.TargetType(), CAircraft::ETargetType::FLARM);
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_TRUE(a.TryUpdate(std::move(a2)));
-            ASSERT_EQ(a.UpdateAge(), 0);
+            ASSERT_EQ(a.UpdateAge(), 0U);
             ASSERT_EQ(a.IdType(), CAircraft::EIdType::ICAO);
             ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UFO);
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::FLARM);
@@ -306,15 +305,15 @@ DESCRIBE_PAR("test_CAircraft") {
     IT("should update with equal priority") {
         {
             CAircraft a(0, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                        {1., 1., 1}, CTimestamp("115800"));
-            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                         {1., 1., 1.}, CTimestamp("115900"));
-            a2.TargetType(CAircraft::ETargetType::TRANSPONDER);
+                        CAircraft::ETargetType::TRANSPONDER, {1., 1., 1}, CTimestamp("115800"));
+            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                         CAircraft::ETargetType::TRANSPONDER, {2., 2., 2}, {1., 1., 1.},
+                         CTimestamp("115900"));
             ++a;
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_TRUE(a.TryUpdate(std::move(a2)));
-            ASSERT_EQ(a.UpdateAge(), 0);
+            ASSERT_EQ(a.UpdateAge(), 0U);
             ASSERT_EQ(a.IdType(), CAircraft::EIdType::ICAO);
             ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UFO);
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
@@ -329,15 +328,14 @@ DESCRIBE_PAR("test_CAircraft") {
         }
         {
             CAircraft a(0, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                        {1., 1., 1}, CTimestamp("115800"));
-            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                         {1., 1., 1.}, CTimestamp("115900"));
-            a.TargetType(CAircraft::ETargetType::FLARM);
+                        CAircraft::ETargetType::FLARM, {1., 1., 1}, CTimestamp("115800"));
+            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                         CAircraft::ETargetType::FLARM, {2., 2., 2}, {1., 1., 1.}, CTimestamp("115900"));
             ++a;
             ASSERT_EQ(a2.TargetType(), CAircraft::ETargetType::FLARM);
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_TRUE(a.TryUpdate(std::move(a2)));
-            ASSERT_EQ(a.UpdateAge(), 0);
+            ASSERT_EQ(a.UpdateAge(), 0U);
             ASSERT_EQ(a.IdType(), CAircraft::EIdType::ICAO);
             ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UFO);
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::FLARM);
@@ -354,16 +352,16 @@ DESCRIBE_PAR("test_CAircraft") {
     IT("should update outdated object with lower priority") {
         {
             CAircraft a(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                        {1., 1., 1}, CTimestamp("115800"));
-            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                         {1., 1., 1.}, CTimestamp("115900"));
-            a2.TargetType(CAircraft::ETargetType::TRANSPONDER);
+                        CAircraft::ETargetType::TRANSPONDER, {1., 1., 1}, CTimestamp("115800"));
+            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                         CAircraft::ETargetType::TRANSPONDER, {2., 2., 2}, {1., 1., 1.},
+                         CTimestamp("115900"));
             while ((++a).UpdateAge() < CObject::OUTDATED) {
             };
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
             ASSERT_EQ(a.UpdateAge(), CObject::OUTDATED);
             ASSERT_TRUE(a.TryUpdate(std::move(a2)));
-            ASSERT_EQ(a.UpdateAge(), 0);
+            ASSERT_EQ(a.UpdateAge(), 0U);
             ASSERT_EQ(a.IdType(), CAircraft::EIdType::ICAO);
             ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UFO);
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
@@ -378,16 +376,15 @@ DESCRIBE_PAR("test_CAircraft") {
         }
         {
             CAircraft a(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                        {1., 1., 1}, CTimestamp("115800"));
-            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                         {1., 1., 1.}, CTimestamp("115900"));
-            a.TargetType(CAircraft::ETargetType::FLARM);
+                        CAircraft::ETargetType::FLARM, {1., 1., 1}, CTimestamp("115800"));
+            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                         CAircraft::ETargetType::FLARM, {2., 2., 2}, {1., 1., 1.}, CTimestamp("115900"));
             while ((++a).UpdateAge() < CObject::OUTDATED) {
             };
             ASSERT_EQ(a2.TargetType(), CAircraft::ETargetType::FLARM);
             ASSERT_EQ(a.UpdateAge(), CObject::OUTDATED);
             ASSERT_TRUE(a.TryUpdate(std::move(a2)));
-            ASSERT_EQ(a.UpdateAge(), 0);
+            ASSERT_EQ(a.UpdateAge(), 0U);
             ASSERT_EQ(a.IdType(), CAircraft::EIdType::ICAO);
             ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UFO);
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::FLARM);
@@ -402,16 +399,16 @@ DESCRIBE_PAR("test_CAircraft") {
         }
     }
     IT("should prefer flarm for update") {
-        CAircraft a(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN, {1., 1., 1},
-                    CTimestamp("115800"));
-        CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                     {1., 1., 1.}, CTimestamp("115900"));
+        CAircraft a(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {1., 1., 1}, CTimestamp("115800"));
+        CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                     CAircraft::ETargetType::FLARM, {2., 2., 2}, {1., 1., 1.}, CTimestamp("115900"));
         ++a;
         ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
         ASSERT_EQ(a2.TargetType(), CAircraft::ETargetType::FLARM);
-        ASSERT_EQ(a.UpdateAge(), 1);
+        ASSERT_EQ(a.UpdateAge(), 1U);
         ASSERT_TRUE(a.TryUpdate(std::move(a2)));
-        ASSERT_EQ(a.UpdateAge(), 0);
+        ASSERT_EQ(a.UpdateAge(), 0U);
         ASSERT_EQ(a.IdType(), CAircraft::EIdType::ICAO);
         ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UFO);
         ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::FLARM);
@@ -427,15 +424,15 @@ DESCRIBE_PAR("test_CAircraft") {
     IT("should refuse update with lower priority") {
         {
             CAircraft a(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                        {1., 1., 1}, CTimestamp("115800"));
-            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                         {1., 1., 1.}, CTimestamp("115900"));
-            a2.TargetType(CAircraft::ETargetType::TRANSPONDER);
+                        CAircraft::ETargetType::TRANSPONDER, {1., 1., 1}, CTimestamp("115800"));
+            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                         CAircraft::ETargetType::TRANSPONDER, {2., 2., 2}, {1., 1., 1.},
+                         CTimestamp("115900"));
             ++a;
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_FALSE(a.TryUpdate(std::move(a2)));
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_EQ(a.IdType(), CAircraft::EIdType::RANDOM);
             ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UNKNOWN);
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
@@ -450,15 +447,14 @@ DESCRIBE_PAR("test_CAircraft") {
         }
         {
             CAircraft a(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                        {1., 1., 1}, CTimestamp("115800"));
-            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                         {1., 1., 1.}, CTimestamp("115900"));
-            a.TargetType(CAircraft::ETargetType::FLARM);
+                        CAircraft::ETargetType::FLARM, {1., 1., 1}, CTimestamp("115800"));
+            CAircraft a2(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                         CAircraft::ETargetType::FLARM, {2., 2., 2}, {1., 1., 1.}, CTimestamp("115900"));
             ++a;
             ASSERT_EQ(a2.TargetType(), CAircraft::ETargetType::FLARM);
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_FALSE(a.TryUpdate(std::move(a2)));
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_EQ(a.IdType(), CAircraft::EIdType::RANDOM);
             ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UNKNOWN);
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::FLARM);
@@ -475,15 +471,16 @@ DESCRIBE_PAR("test_CAircraft") {
     IT("should refuse update with older timestamp") {
         {
             CAircraft a(0, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                        {1., 1., 1}, CTimestamp("115900"));
-            CAircraft a2(1, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                         {1., 1., 1.}, CTimestamp("115800"));
+                        CAircraft::ETargetType::TRANSPONDER, {1., 1., 1}, CTimestamp("115900"));
+            CAircraft a2(1, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                         CAircraft::ETargetType::TRANSPONDER, {2., 2., 2}, {1., 1., 1.},
+                         CTimestamp("115800"));
             a2.TargetType(CAircraft::ETargetType::TRANSPONDER);
             ++a;
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_FALSE(a.TryUpdate(std::move(a2)));
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_EQ(a.IdType(), CAircraft::EIdType::RANDOM);
             ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UNKNOWN);
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::TRANSPONDER);
@@ -498,15 +495,14 @@ DESCRIBE_PAR("test_CAircraft") {
         }
         {
             CAircraft a(0, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                        {1., 1., 1}, CTimestamp("115900"));
-            CAircraft a2(1, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                         {1., 1., 1.}, CTimestamp("115800"));
-            a.TargetType(CAircraft::ETargetType::FLARM);
+                        CAircraft::ETargetType::FLARM, {1., 1., 1}, CTimestamp("115900"));
+            CAircraft a2(1, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                         CAircraft::ETargetType::FLARM, {2., 2., 2}, {1., 1., 1.}, CTimestamp("115800"));
             ++a;
             ASSERT_EQ(a2.TargetType(), CAircraft::ETargetType::FLARM);
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_FALSE(a.TryUpdate(std::move(a2)));
-            ASSERT_EQ(a.UpdateAge(), 1);
+            ASSERT_EQ(a.UpdateAge(), 1U);
             ASSERT_EQ(a.IdType(), CAircraft::EIdType::RANDOM);
             ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UNKNOWN);
             ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::FLARM);
@@ -521,16 +517,16 @@ DESCRIBE_PAR("test_CAircraft") {
         }
     }
     IT("should refuse update from transponder if is flarm") {
-        CAircraft a(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO, {2., 2., 2},
-                    {1., 1., 1.}, CTimestamp("115800"));
-        CAircraft a2(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN, {1., 1., 1},
-                     CTimestamp("115900"));
+        CAircraft a(0, "#00001", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UFO,
+                    CAircraft::ETargetType::FLARM, {2., 2., 2}, {1., 1., 1.}, CTimestamp("115800"));
+        CAircraft a2(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
+                     CAircraft::ETargetType::TRANSPONDER, {1., 1., 1}, CTimestamp("115900"));
         ++a;
         ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::FLARM);
         ASSERT_EQ(a2.TargetType(), CAircraft::ETargetType::TRANSPONDER);
-        ASSERT_EQ(a.UpdateAge(), 1);
+        ASSERT_EQ(a.UpdateAge(), 1U);
         ASSERT_FALSE(a.TryUpdate(std::move(a2)));
-        ASSERT_EQ(a.UpdateAge(), 1);
+        ASSERT_EQ(a.UpdateAge(), 1U);
         ASSERT_EQ(a.IdType(), CAircraft::EIdType::ICAO);
         ASSERT_EQ(a.AircraftType(), CAircraft::EAircraftType::UFO);
         ASSERT_EQ(a.TargetType(), CAircraft::ETargetType::FLARM);
@@ -545,16 +541,20 @@ DESCRIBE_PAR("test_CAircraft") {
     }
     IT("should throw if given values are outside acceptable range") {
         ASSERT_THROWS(CAircraft(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                                {SLocation::MIN_LATITUDE - 1., 1., 1}, CTimestamp("115900")),
+                                CAircraft::ETargetType::TRANSPONDER, {SLocation::MIN_LATITUDE - 1., 1., 1},
+                                CTimestamp("115900")),
                       util::error::CBoundsExceededError);
         ASSERT_THROWS(CAircraft(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                                {SLocation::MAX_LATITUDE + 1., 1., 1}, CTimestamp("115900")),
+                                CAircraft::ETargetType::TRANSPONDER, {SLocation::MAX_LATITUDE + 1., 1., 1},
+                                CTimestamp("115900")),
                       util::error::CBoundsExceededError);
         ASSERT_THROWS(CAircraft(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                                {1., SLocation::MIN_LONGITUDE - 1., 1}, CTimestamp("115900")),
+                                CAircraft::ETargetType::TRANSPONDER, {1., SLocation::MIN_LONGITUDE - 1., 1},
+                                CTimestamp("115900")),
                       util::error::CBoundsExceededError);
         ASSERT_THROWS(CAircraft(1, "#00001", CAircraft::EIdType::RANDOM, CAircraft::EAircraftType::UNKNOWN,
-                                {1., SLocation::MAX_LONGITUDE + 1., 1}, CTimestamp("115900")),
+                                CAircraft::ETargetType::TRANSPONDER, {1., SLocation::MAX_LONGITUDE + 1., 1},
+                                CTimestamp("115900")),
                       util::error::CBoundsExceededError);
     };
 };

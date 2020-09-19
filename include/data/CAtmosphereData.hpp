@@ -60,5 +60,8 @@ public:
      */
     auto
     Pressure() const -> decltype(m_atmosphere.Pressure()) REQUIRES(!m_mutex);
+
+    auto
+    Size() const -> usize override;
 };
 }  // namespace vfrb::data

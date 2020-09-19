@@ -38,7 +38,7 @@ CAtmosphereData::CAtmosphereData(AccessFn&& fn_, CAtmosphere&& atm_)
 void
 CAtmosphereData::Access() {
     LockGuard lk(m_mutex);
-    m_accessFn({++m_atmosphere, {m_atmosphere.Nmea()}});
+    m_accessFn(SAccessor{++m_atmosphere, StringView{m_atmosphere.Nmea()}});
 }
 
 auto
@@ -51,5 +51,10 @@ auto
 CAtmosphereData::Pressure() const -> decltype(m_atmosphere.Pressure()) {
     LockGuard lk(m_mutex);
     return m_atmosphere.Pressure();
+}
+
+auto
+CAtmosphereData::Size() const -> usize {
+    return 1;
 }
 }  // namespace vfrb::data

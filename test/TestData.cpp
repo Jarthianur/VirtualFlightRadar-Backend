@@ -62,28 +62,29 @@ DESCRIBE("test_CAircraftData") {
         uut->Access();
         ASSERT_FALSE(nmea.empty());
         ASSERT_NOT_NULL(ac);
-        ASSERT(nmea, LIKE(), helper::PflauRE);
-        ASSERT(nmea, LIKE(), helper::PflaaRE);
+        ASSERT(nmea.data(), LIKE(), helper::PflauRE);
+        ASSERT(nmea.data(), LIKE(), helper::PflaaRE);
     }
     IT("should not report an aircraft after outdate-interval, and set it as transponder target") {
         ASSERT_EQ(CObject::OUTDATED, CAircraftData::NO_FLARM_THRESHOLD);
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::FLARM, {49., 8., M1000}, CTimestamp());
         ASSERT_TRUE(uut->Update(std::move(a)));
-        for (auto i = 0; i < CAircraftData::NO_FLARM_THRESHOLD; ++i) {
+        for (auto i = 0U; i <= CAircraftData::NO_FLARM_THRESHOLD; ++i) {
             nmea = StringView();
             uut->Access();
         }
+        SYSO(nmea);
         ASSERT_TRUE(nmea.empty());
         ASSERT_NOT_NULL(ac);
         ASSERT_EQ(ac->TargetType(), CAircraft::ETargetType::TRANSPONDER);
     }
     IT("should delete an aircraft after certain interval") {
-        ASSERT_EQ(uut->Size(), 1);
+        ASSERT_EQ(uut->Size(), 1U);
         for (auto i = 0; i < CAircraftData::DELETE_THRESHOLD; ++i) {
             uut->Access();
         }
-        ASSERT_EQ(uut->Size(), 0);
+        ASSERT_EQ(uut->Size(), 0U);
     }
     IT("should prefer FLARM, and accept TRANSPONDER again after certain interval") {
         {
@@ -101,7 +102,7 @@ DESCRIBE("test_CAircraftData") {
                         CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, CTimestamp());
             ASSERT_FALSE(uut->Update(std::move(a)));
         }
-        for (auto i = 0; i < CAircraftData::NO_FLARM_THRESHOLD; ++i) {
+        for (auto i = 0U; i < CAircraftData::NO_FLARM_THRESHOLD; ++i) {
             uut->Access();
         }
         {
@@ -139,7 +140,7 @@ DESCRIBE("test_CGpsData") {
         ASSERT_EQ(p.Altitude, 100);
         ASSERT_FALSE(nmea.empty());
         ASSERT_NOT_NULL(pos);
-        ASSERT(nmea, LIKE(), helper::GpsRE);
+        ASSERT(nmea.data(), LIKE(), helper::GpsRE);
     }
     IT("should throw if received position is good") {
         CGpsPosition p(0, {10., 85., 100}, 40., 2., 7, 1, CTimestamp());
@@ -169,12 +170,12 @@ DESCRIBE("test_CWindData") {
         ASSERT_TRUE(uut->Update(std::move(w)));
         uut->Access();
         ASSERT_FALSE(nmea.empty());
-        ASSERT(nmea, LIKE(), "$WIMWV,242.8,R,6.9,N,A*2");
+        ASSERT(nmea.data(), LIKE(), "$WIMWV,242.8,R,6.9,N,A*2");
         ASSERT_NOT_NULL(wind);
     }
     IT("should clear wind after access without update") {
         uut->Access();
-        ASSERT_EQ(uut->Size(), 0);
+        ASSERT_EQ(uut->Size(), 0U);
         ASSERT_TRUE(nmea.empty());
     };
 };
@@ -199,7 +200,7 @@ DESCRIBE("test_CAtmosphereData") {
         ASSERT_TRUE(uut->Update(std::move(a)));
         uut->Access();
         ASSERT_FALSE(nmea.empty());
-        ASSERT(nmea, LIKE(), "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E");
+        ASSERT(nmea.data(), LIKE(), "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E");
         ASSERT_NOT_NULL(atm);
         ASSERT(atm->Pressure(), FEQ(), 1009.1);
     }

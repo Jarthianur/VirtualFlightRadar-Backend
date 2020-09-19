@@ -89,7 +89,7 @@ CAircraftProcessor::appendPflau(CAircraft const& aircraft_, CStaticString<NMEA_S
     -> usize {
     int next = nmea_->Format(idx_, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::DoubleToInt(m_relBearing),
                              m_relVertical, m_distance, (*aircraft_.Id()).data());
-    next += nmea_->Format(idx_, "%02x\r\n", Checksum(**nmea_, idx_));
+    next += nmea_->Format(idx_ + next, "%02x\r\n", Checksum(**nmea_, idx_));
     return idx_ + static_cast<usize>(next);
 }
 
@@ -113,7 +113,7 @@ CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, CStaticString<NMEA_S
         next = nmea_->Format(idx_, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
                              (*aircraft_.Id()).data(), util::AsUnderlyingType(aircraft_.AircraftType()));
     }
-    next += nmea_->Format(idx_, "%02x\r\n", Checksum(**nmea_, idx_));
+    next += nmea_->Format(idx_ + next, "%02x\r\n", Checksum(**nmea_, idx_));
     return idx_ + static_cast<usize>(next);
 }
 }  // namespace vfrb::data::processor

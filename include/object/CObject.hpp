@@ -57,7 +57,7 @@ public:
     DEFAULT_COPYABLE(CObject)
     COPY_ON_MOVE(CObject)
 
-    CTCONST OUTDATED = 4;  ///< Cycles until an object is considered outdated
+    CTCONST OUTDATED = 4U;  ///< Cycles until an object is considered outdated
 
     virtual ~CObject() noexcept = default;
 

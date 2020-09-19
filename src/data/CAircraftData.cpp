@@ -67,7 +67,7 @@ CAircraftData::Access() {
                 m_container.Erase(key);
             } else {
                 m_processor.Process(iter->Value, &iter->Nmea);
-                m_accessFn({iter->Value, {iter->Nmea}});
+                m_accessFn(SAccessor{iter->Value, StringView{iter->Nmea}});
                 ++iter;
             }
         } catch ([[maybe_unused]] vfrb::error::IError const&) {

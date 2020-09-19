@@ -44,7 +44,7 @@ CGpsData::Access() {
     try {
         auto& [pos, cstr] = m_position;
         m_processor.Process(pos, &cstr);
-        m_accessFn({++pos, {cstr}});
+        m_accessFn(SAccessor{++pos, StringView{cstr}});
     } catch ([[maybe_unused]] vfrb::error::IError const&) {
     }
 }

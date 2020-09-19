@@ -51,13 +51,13 @@ DESCRIBE_PAR("test_CStatisString") {
 
     IT("should return correct length") {
         CStaticString<4> a("abc");
-        ASSERT_EQ(a.Length(), 3);
+        ASSERT_EQ(a.Length(), 3U);
     }
     IT("should clear correctly") {
         CStaticString<4> a("abc");
-        ASSERT_EQ(a.Length(), 3);
+        ASSERT_EQ(a.Length(), 3U);
         a.Clear();
-        ASSERT_EQ(a.Length(), 0);
+        ASSERT_EQ(a.Length(), 0U);
         ASSERT_EQ(*a, "");
     }
     IT("should copy on assign") {
@@ -88,10 +88,10 @@ DESCRIBE_PAR("test_CStatisString") {
         CStaticString<8> a;
         ASSERT_NOTHROW(a.Format(0, "%s", "a"));
         ASSERT_EQ(*a, StringView{"a"});
-        ASSERT_EQ(a.Length(), 1);
+        ASSERT_EQ(a.Length(), 1U);
         ASSERT_NOTHROW(a.Format(0, "%d", 1234));
         ASSERT_EQ(*a, StringView{"1234"});
-        ASSERT_EQ(a.Length(), 4);
+        ASSERT_EQ(a.Length(), 4U);
     }
     IT("should throw if format overflows") {
         CStaticString<4> a;

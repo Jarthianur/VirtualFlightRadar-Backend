@@ -32,6 +32,8 @@
 
 #include "Helper.hpp"
 
+using sctf::FEQ;
+
 using namespace vfrb;
 using namespace str_util;
 using namespace config;
@@ -159,8 +161,8 @@ DESCRIBE_PAR("test_CConfiguration") {
         ASSERT_TRUE(uut->GroundMode);
     }
     IT("should hold correct values for server") {
-        ASSERT_EQ(std::get<0>(uut->ServerConfig), 1234);
-        ASSERT_EQ(std::get<1>(uut->ServerConfig), 1);
+        ASSERT_EQ(std::get<0>(uut->ServerConfig), 1234U);
+        ASSERT_EQ(std::get<1>(uut->ServerConfig), 1U);
     }
     IT("should hold correct values for fallback") {
         ASSERT(uut->GpsPosition.Location().Latitude, FEQ(), 77.777777);

@@ -22,8 +22,8 @@
 
 #include "server/CServer.hpp"
 
-#include "CAcceptorImplTest.hpp"
-#include "CSocketImplTest.hpp"
+#include "CAcceptorTest.hpp"
+#include "CSocketTest.hpp"
 #include "Helper.hpp"
 #include "Types.hpp"
 #include "sctf.hpp"
@@ -34,12 +34,12 @@ using namespace vfrb;
 using namespace server;
 
 DESCRIBE("test_CServer") {
-    SPtr<net::CAcceptorImplTest>        acceptor;
-    SPtr<CServer<net::CSocketImplTest>> uut;
+    SPtr<net::CAcceptorTest>        acceptor;
+    SPtr<CServer<net::CSocketTest>> uut;
 
     SETUP() {
-        acceptor = std::make_shared<net::CAcceptorImplTest>();
-        uut      = std::make_shared<CServer<net::CSocketImplTest>>(acceptor, 2);
+        acceptor = std::make_shared<net::CAcceptorTest>();
+        uut      = std::make_shared<CServer<net::CSocketTest>>(acceptor, 2);
     }
 
     BEFORE_EACH() {
@@ -55,30 +55,30 @@ DESCRIBE("test_CServer") {
         usize c1 = acceptor->Connect("#1", false, false);
         ASSERT_EQ(acceptor->Socket(c1).Address(), "#1");
         acceptor->Connect("#1", false, false);
-        ASSERT(acceptor->Sockets(), LT(), 2);
+        ASSERT(acceptor->Sockets(), LT(), 2U);
     }
     IT("should refuse any connection if maximum is reached") {
         acceptor->Connect("#1", false, false);
-        ASSERT_EQ(acceptor->Sockets(), 1);
+        ASSERT_EQ(acceptor->Sockets(), 1U);
         acceptor->Connect("#2", false, false);
-        ASSERT_EQ(acceptor->Sockets(), 2);
+        ASSERT_EQ(acceptor->Sockets(), 2U);
         acceptor->Connect("#3", false, false);
-        ASSERT_EQ(acceptor->Sockets(), 2);
+        ASSERT_EQ(acceptor->Sockets(), 2U);
     }
     IT("should not accept client if connection fails") {
         acceptor->FailOnConnect(true);
         acceptor->Connect("#1", false, false);
-        ASSERT_EQ(acceptor->Sockets(), 0);
+        ASSERT_EQ(acceptor->Sockets(), 0U);
     }
     IT("should not accept client if an error occurs in connection handler") {
         acceptor->Connect("#1", true, false);
-        ASSERT_EQ(acceptor->Sockets(), 0);
+        ASSERT_EQ(acceptor->Sockets(), 0U);
     }
 
     IT("should send a message to clients correctly") {
         usize c1 = acceptor->Connect("#1", false, false);
         usize c2 = acceptor->Connect("#2", false, false);
-        ASSERT_EQ(acceptor->Sockets(), 2);
+        ASSERT_EQ(acceptor->Sockets(), 2U);
         ASSERT_EQ(acceptor->Socket(c1).Address(), "#1");
         ASSERT_EQ(acceptor->Socket(c2).Address(), "#2");
         uut->Send("hello");

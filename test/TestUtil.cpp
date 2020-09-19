@@ -44,10 +44,10 @@ DESCRIBE_PAR("test_Bounds") {
 
 DESCRIBE_PAR("test_StringUtils") {
     IT("should compute correct checksum") {
-        ASSERT_EQ(Checksum("", 0), 0);
-        ASSERT_EQ(Checksum("\0", 0), 0);
-        ASSERT_EQ(Checksum("$abc*", 0), 96);
-        ASSERT_EQ(Checksum("$abc*", 6), 0);
+        ASSERT_EQ(Checksum("", 0), 0U);
+        ASSERT_EQ(Checksum("\0", 0), 0U);
+        ASSERT_EQ(Checksum("$abc*", 0), 96U);
+        ASSERT_EQ(Checksum("$abc*", 6), 0U);
     }
     IT("should match checksum correctly") {
         ASSERT_TRUE(MatchChecksum("$abc*60"));
@@ -192,7 +192,7 @@ DESCRIBE_PAR("test_StringUtils") {
         str nr      = "1234";
         auto [v, e] = Convert<u32>(nr, nr + 4);
         ASSERT_EQ(e, EErrc::OK);
-        ASSERT_EQ(v, 1234);
+        ASSERT_EQ(v, 1234U);
     }
     IT("should fail to convert bad u32") {
         {
@@ -218,9 +218,9 @@ DESCRIBE_PAR("test_StringUtils") {
         auto [v, e]   = Convert<x32>(nr, nr + 1);
         auto [v2, e2] = Convert<x32>(nr2, nr2 + 3);
         ASSERT_EQ(e, EErrc::OK);
-        ASSERT_EQ(v, 4);
+        ASSERT_EQ(v, 4U);
         ASSERT_EQ(e2, EErrc::OK);
-        ASSERT_EQ(v2, 2748);
+        ASSERT_EQ(v2, 2748U);
     }
     IT("should fail to convert bad x32") {
         {
@@ -244,7 +244,7 @@ DESCRIBE_PAR("test_StringUtils") {
         str nr      = "1234";
         auto [v, e] = Convert<u64>(nr, nr + 4);
         ASSERT_EQ(e, EErrc::OK);
-        ASSERT_EQ(v, 1234);
+        ASSERT_EQ(v, 1234U);
     }
     IT("should fail to convert bad u64") {
         {

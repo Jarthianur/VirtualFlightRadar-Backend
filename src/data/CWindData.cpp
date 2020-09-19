@@ -44,7 +44,7 @@ CWindData::Update(CObject&& wind_) -> bool {
 void
 CWindData::Access() {
     LockGuard lk(m_mutex);
-    m_accessFn({++m_wind, {m_wind.Nmea()}});
+    m_accessFn(SAccessor{++m_wind, StringView{m_wind.Nmea()}});
     m_wind.Clear();
 }
 
