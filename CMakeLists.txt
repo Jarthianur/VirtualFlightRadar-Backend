@@ -27,14 +27,21 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 file(GLOB_RECURSE vfrb_sources src/*.cpp)
-file(GLOB_RECURSE vfrb_test_sources test/*.cpp)
+file(GLOB vfrb_test_sources test/*.cpp)
+file(GLOB vfrb_test_impl_sources test/impl/*.cpp)
 file(GLOB_RECURSE vfrb_prof_sources profiling/*.cpp)
-list(APPEND vfrb_test_sources ${vfrb_sources})
-list(REMOVE_ITEM vfrb_test_sources ${PROJECT_SOURCE_DIR}/src/main.cpp)
-list(REMOVE_ITEM vfrb_test_sources ${PROJECT_SOURCE_DIR}/src/object/impl/DateTimeImplBoost.cpp)
+set(vfrb_sources_for_test "")
+list(APPEND vfrb_sources_for_test ${vfrb_sources})
+list(APPEND vfrb_sources_for_test ${vfrb_test_impl_sources})
+list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/main.cpp)
+list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/CVfrb.cpp)
+list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/object/impl/CDateTimeBoost.cpp)
+list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl/CAcceptorBoost.cpp)
+list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl/CSocketBoost.cpp)
+
 
 set(CMAKE_BUILD_TYPE staged)
-set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror -Wno-error=attributes")
+set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror -Wno-error=attributes -Wno-error=unused-result")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS_STAGED "${CMAKE_CXX_FLAGS_STAGED} -Wthread-safety -Wthread-safety-reference -Wthread-safety-negative")
@@ -72,13 +79,71 @@ target_include_directories(regression PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(regression PUBLIC ${VFRB_LINK_LIBS} gcov)
 
 #
-# target: test
+# target: unittest
 #
-add_executable(unittest ${vfrb_test_sources})
-target_compile_options(unittest PUBLIC -O0 -g --coverage -fopenmp -DLOG_ENABLE_DEBUG -DSCTF_CUSTOM_EPSILON=0.000001)
+add_executable(unittest ${vfrb_test_sources} ${vfrb_sources_for_test})
+target_compile_options(unittest PUBLIC -O0 -g --coverage -fopenmp -DLOG_ENABLE_DEBUG)
 set_target_properties(unittest PROPERTIES OUTPUT_NAME ${vfrb_test_bin})
 target_include_directories(unittest PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
 target_link_libraries(unittest PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+#
+# targets for single tests
+#
+add_executable(util.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestUtil.cpp ${vfrb_sources_for_test})
+target_compile_options(util.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(util.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(util.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+add_executable(string.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestString.cpp ${vfrb_sources_for_test})
+target_compile_options(string.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(string.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(string.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+add_executable(server.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestServer.cpp ${vfrb_sources_for_test})
+target_compile_options(server.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(server.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(server.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+add_executable(object.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestObject.cpp ${vfrb_sources_for_test})
+target_compile_options(object.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(object.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(object.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+add_executable(math.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestMath.cpp ${vfrb_sources_for_test})
+target_compile_options(math.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(math.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(math.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+add_executable(parser.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestFeedParser.cpp ${vfrb_sources_for_test})
+target_compile_options(parser.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(parser.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(parser.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+add_executable(feed.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestFeed.cpp ${vfrb_sources_for_test})
+target_compile_options(feed.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(feed.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(feed.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+add_executable(processor.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestDataProcessor.cpp ${vfrb_sources_for_test})
+target_compile_options(processor.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(processor.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(processor.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+add_executable(data.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestData.cpp ${vfrb_sources_for_test})
+target_compile_options(data.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(data.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(data.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+add_executable(config.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestConfig.cpp ${vfrb_sources_for_test})
+target_compile_options(config.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(config.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(config.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+
+add_executable(client.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestClient.cpp ${vfrb_sources_for_test})
+target_compile_options(client.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(client.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(client.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
 
 #
 # target: profiling
