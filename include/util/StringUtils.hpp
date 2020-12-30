@@ -178,7 +178,7 @@ Convert(str first_, str last_) -> Result<T> {
     s16   result = 0;
     EErrc ec     = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::short_, result) || first_ != last_ ||
-        result > std::numeric_limits<s8>::max() || result < std::numeric_limits<s8>::min()) {
+        result > limits::s8::max() || result < limits::s8::min()) {
         ec = EErrc::ERR;
     }
     return {static_cast<s8>(result), ec};
@@ -196,7 +196,7 @@ Convert(str first_, str last_) -> Result<T> {
     u16   result = 0;
     EErrc ec     = EErrc::OK;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_ ||
-        result > std::numeric_limits<u8>::max()) {
+        result > limits::u8::max()) {
         ec = EErrc::ERR;
     }
     return {static_cast<u8>(result), ec};
