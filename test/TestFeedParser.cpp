@@ -32,8 +32,6 @@
 
 #include "Helper.hpp"
 
-using sctf::FEQ;
-
 using namespace vfrb;
 using namespace feed::parser;
 
@@ -46,8 +44,8 @@ DESCRIBE_PAR("test_CSbsParser") {
         ASSERT_EQ(ac.Id(), CStaticString<8>("AAAAAA"));
         ASSERT_EQ(ac.TargetType(), object::CAircraft::ETargetType::TRANSPONDER);
         ASSERT_EQ(ac.Location().Altitude, math::DoubleToInt(math::FEET_2_M * 1000));
-        ASSERT(ac.Location().Latitude, FEQ(), 49.0);
-        ASSERT(ac.Location().Longitude, FEQ(), 8.0);
+        ASSERT(ac.Location().Latitude, EQ, 49.0);
+        ASSERT(ac.Location().Longitude, EQ, 8.0);
         ASSERT_FALSE(ac.HasFullInfo());
     }
     IT("should throw when parsing invalid sentence") {
@@ -101,8 +99,8 @@ DESCRIBE_PAR("test_CAprsParser") {
         ASSERT_EQ(ac.Id(), CStaticString<8>("AAAAAA"));
         ASSERT_EQ(ac.TargetType(), object::CAircraft::ETargetType::FLARM);
         ASSERT_EQ(ac.Location().Altitude, 0);
-        ASSERT(ac.Location().Latitude, FEQ(), 49.0);
-        ASSERT(ac.Location().Longitude, FEQ(), -8.0);
+        ASSERT(ac.Location().Latitude, EQ, 49.0);
+        ASSERT(ac.Location().Longitude, EQ, -8.0);
         ASSERT_TRUE(ac.HasFullInfo());
     }
     IT("should throw when parsing invalid sentence") {
@@ -150,7 +148,7 @@ DESCRIBE_PAR("test_CAtmosphereParser") {
     IT("should parse a valid sentence correctly") {
         auto atm =
             ASSERT_NOTHROW(return uut.Parse("$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n", 0));
-        ASSERT(atm.Pressure(), FEQ(), 1009.1);
+        ASSERT(atm.Pressure(), EQ, 1009.1);
         ASSERT_EQ(atm.Nmea(), "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E\r\n");
     }
     IT("should throw when parsing invalid sentence") {
@@ -172,12 +170,12 @@ DESCRIBE_PAR("test_CGpsParser") {
     IT("should parse a valid sentence correctly") {
         auto pos = ASSERT_NOTHROW(
             return uut.Parse("$GPGGA,183552,5000.0466,N,00815.7555,E,1,05,1,105,M,48.0,M,,*49\r\n", 0));
-        ASSERT(pos.Dilution(), FEQ(), 1.0);
+        ASSERT(pos.Dilution(), EQ, 1.0);
         ASSERT_EQ(pos.FixQuality(), 1);
         ASSERT_EQ(pos.NrOfSatellites(), 5);
-        ASSERT(pos.Geoid(), FEQ(), 48.0);
-        ASSERT(pos.Location().Latitude, FEQ(), math::DmToDeg(5000.0466));
-        ASSERT(pos.Location().Longitude, FEQ(), math::DmToDeg(815.7555));
+        ASSERT(pos.Geoid(), EQ, 48.0);
+        ASSERT(pos.Location().Latitude, EQ, math::DmToDeg(5000.0466));
+        ASSERT(pos.Location().Longitude, EQ, math::DmToDeg(815.7555));
         ASSERT_EQ(pos.Location().Altitude, 105);
     }
     IT("should throw when parsing invalid sentence") {

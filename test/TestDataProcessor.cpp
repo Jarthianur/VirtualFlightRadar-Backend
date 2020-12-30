@@ -24,8 +24,6 @@
 
 #include "Helper.hpp"
 
-using sctf::LIKE;
-
 using namespace vfrb;
 using namespace vfrb::data::processor;
 using namespace vfrb::object;
@@ -37,7 +35,7 @@ DESCRIBE("test_CGpsProcessor") {
     IT("should process GPS data correctly") {
         CGpsPosition pos(0, {0., 0., 0}, 48.);
         uut.Process(pos, &cstr);
-        ASSERT((*cstr).data(), LIKE(), helper::GpsRE);
+        ASSERT((*cstr).data(), LIKE, helper::GpsRE);
     };
 };
 
@@ -57,12 +55,12 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({49.0, 8.0, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "0");
         ASSERT_EQ(match.str(2), "1000");
         ASSERT_EQ(match.str(3), "0");
         ASSERT_EQ(match.str(4), "AAAAAA");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "0");
         ASSERT_EQ(match.str(2), "0");
         ASSERT_EQ(match.str(3), "1000");
@@ -85,10 +83,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({-0.1, .0, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "0");
         ASSERT_EQ(match.str(3), "22239");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "22239");
         ASSERT_EQ(match.str(2), "0");
         ASSERT_EQ(match.str(3), "1000");
@@ -99,10 +97,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({.1, .0, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "180");
         ASSERT_EQ(match.str(3), "22239");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "-22239");
         ASSERT_EQ(match.str(2), "0");
         ASSERT_EQ(match.str(3), "1000");
@@ -113,10 +111,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({89.9, 180., 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "0");
         ASSERT_EQ(match.str(3), "22239");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "22239");
         ASSERT_EQ(match.str(2), "0");
         ASSERT_EQ(match.str(3), "1000");
@@ -127,10 +125,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({-89.9, 180., 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "-180");
         ASSERT_EQ(match.str(3), "22239");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "-22239");
         ASSERT_EQ(match.str(2), "0");
         ASSERT_EQ(match.str(3), "1000");
@@ -141,10 +139,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({.0, .1, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "-90");
         ASSERT_EQ(match.str(3), "22239");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "0");
         ASSERT_EQ(match.str(2), "-22239");
         ASSERT_EQ(match.str(3), "1000");
@@ -155,10 +153,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({.0, -0.1, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "90");
         ASSERT_EQ(match.str(3), "22239");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "0");
         ASSERT_EQ(match.str(2), "22239");
         ASSERT_EQ(match.str(3), "1000");
@@ -169,10 +167,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({60., .1, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "-90");
         ASSERT_EQ(match.str(3), "11119");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "17");
         ASSERT_EQ(match.str(2), "-11119");
         ASSERT_EQ(match.str(3), "1000");
@@ -183,10 +181,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({-60., -0.1, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "90");
         ASSERT_EQ(match.str(3), "11119");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "-17");
         ASSERT_EQ(match.str(2), "11119");
         ASSERT_EQ(match.str(3), "1000");
@@ -197,10 +195,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({.0, 179.9, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "90");
         ASSERT_EQ(match.str(3), "22239");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "0");
         ASSERT_EQ(match.str(2), "22239");
         ASSERT_EQ(match.str(3), "1000");
@@ -211,10 +209,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({.0, -179.9, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "-90");
         ASSERT_EQ(match.str(3), "22239");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "0");
         ASSERT_EQ(match.str(2), "-22239");
         ASSERT_EQ(match.str(3), "1000");
@@ -225,10 +223,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({33.653124, -112.692253, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "66");
         ASSERT_EQ(match.str(3), "47768");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "19302");
         ASSERT_EQ(match.str(2), "43695");
         ASSERT_EQ(match.str(3), "1000");
@@ -239,10 +237,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({-34.680059, -58.818111, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "132");
         ASSERT_EQ(match.str(3), "3260");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "-2199");
         ASSERT_EQ(match.str(2), "2407");
         ASSERT_EQ(match.str(3), "1000");
@@ -253,10 +251,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({5.392435, -5.748392, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "-161");
         ASSERT_EQ(match.str(3), "674");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "-638");
         ASSERT_EQ(match.str(2), "-219");
         ASSERT_EQ(match.str(3), "1000");
@@ -267,10 +265,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({-26.069244, 15.484389, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "-8");
         ASSERT_EQ(match.str(3), "318804");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "315692");
         ASSERT_EQ(match.str(2), "-44437");
         ASSERT_EQ(match.str(3), "1000");
@@ -281,10 +279,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({-25.278208, 133.366885, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "179");
         ASSERT_EQ(match.str(3), "97188");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "-97183");
         ASSERT_EQ(match.str(2), "978");
         ASSERT_EQ(match.str(3), "1000");
@@ -295,10 +293,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({49.719521, 9.083279, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "92");
         ASSERT_EQ(match.str(3), "314");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "-8");
         ASSERT_EQ(match.str(2), "314");
         ASSERT_EQ(match.str(3), "1000");
@@ -309,10 +307,10 @@ DESCRIBE("test_CAircraftProcessor") {
         uut.ReferTo({65.900837, 101.570680, 0}, 1013.25);
         uut.Process(a, &cstr);
         std::cmatch match;
-        ASSERT((*cstr).data(), LIKE(match), helper::PflauRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
         ASSERT_EQ(match.str(1), "176");
         ASSERT_EQ(match.str(3), "3673118");
-        ASSERT((*cstr).data(), LIKE(match), helper::PflaaRE);
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
         ASSERT_EQ(match.str(1), "-3666184");
         ASSERT_EQ(match.str(2), "225589");
         ASSERT_EQ(match.str(3), "1000");

@@ -27,8 +27,6 @@
 
 #include "Helper.hpp"
 
-using sctf::GT;
-
 using namespace vfrb;
 using namespace object;
 
@@ -581,8 +579,8 @@ DESCRIBE_PAR("test_CTimestamp") {
         CTimestamp const t1("120000");
         CTimestamp const t2("120001");
 
-        ASSERT(t2, GT(), t1);
-        ASSERT(t1, !GT(), t2);
+        ASSERT(t2, GT, t1);
+        ASSERT_NOT(t1, GT, t2);
     }
     IT("should compare correctly from old day") {
         date_time::Day(1);
@@ -592,8 +590,8 @@ DESCRIBE_PAR("test_CTimestamp") {
         date_time::Now(0, 0, 0);
         CTimestamp const t2("235900");
 
-        ASSERT(t2, GT(), t1);
-        ASSERT(t1, !GT(), t2);
+        ASSERT(t2, GT, t1);
+        ASSERT_NOT(t1, GT, t2);
     }
     IT("should compare correctly from new day") {
         date_time::Day(1);
@@ -603,8 +601,8 @@ DESCRIBE_PAR("test_CTimestamp") {
         date_time::Now(0, 1, 0);
         CTimestamp const t2("000000");
 
-        ASSERT(t2, GT(), t1);
-        ASSERT(t1, !GT(), t2);
+        ASSERT(t2, GT, t1);
+        ASSERT_NOT(t1, GT, t2);
     }
     IT("should compare correctly from different days") {
         date_time::Day(1);
@@ -613,7 +611,7 @@ DESCRIBE_PAR("test_CTimestamp") {
         date_time::Day(2);
         CTimestamp const t2("110000");
 
-        ASSERT(t2, GT(), t1);
-        ASSERT(t1, !GT(), t2);
+        ASSERT(t2, GT, t1);
+        ASSERT_NOT(t1, GT, t2);
     };
 };

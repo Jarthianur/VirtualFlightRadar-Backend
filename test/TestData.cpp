@@ -30,9 +30,6 @@
 
 #include "Helper.hpp"
 
-using sctf::LIKE;
-using sctf::FEQ;
-
 using namespace vfrb;
 using namespace data;
 using namespace object;
@@ -62,8 +59,8 @@ DESCRIBE("test_CAircraftData") {
         uut->Access();
         ASSERT_FALSE(nmea.empty());
         ASSERT_NOT_NULL(ac);
-        ASSERT(nmea.data(), LIKE(), helper::PflauRE);
-        ASSERT(nmea.data(), LIKE(), helper::PflaaRE);
+        ASSERT(nmea.data(), LIKE, helper::PflauRE);
+        ASSERT(nmea.data(), LIKE, helper::PflaaRE);
     }
     IT("should not report an aircraft after outdate-interval, and set it as transponder target") {
         ASSERT_EQ(CObject::OUTDATED, CAircraftData::NO_FLARM_THRESHOLD);
@@ -140,7 +137,7 @@ DESCRIBE("test_CGpsData") {
         ASSERT_EQ(p.Altitude, 100);
         ASSERT_FALSE(nmea.empty());
         ASSERT_NOT_NULL(pos);
-        ASSERT(nmea.data(), LIKE(), helper::GpsRE);
+        ASSERT(nmea.data(), LIKE, helper::GpsRE);
     }
     IT("should throw if received position is good") {
         CGpsPosition p(0, {10., 85., 100}, 40., 2., 7, 1, CTimestamp());
@@ -170,7 +167,7 @@ DESCRIBE("test_CWindData") {
         ASSERT_TRUE(uut->Update(std::move(w)));
         uut->Access();
         ASSERT_FALSE(nmea.empty());
-        ASSERT(nmea.data(), LIKE(), "$WIMWV,242.8,R,6.9,N,A*2");
+        ASSERT(nmea.data(), LIKE, "$WIMWV,242.8,R,6.9,N,A*2");
         ASSERT_NOT_NULL(wind);
     }
     IT("should clear wind after access without update") {
@@ -200,8 +197,8 @@ DESCRIBE("test_CAtmosphereData") {
         ASSERT_TRUE(uut->Update(std::move(a)));
         uut->Access();
         ASSERT_FALSE(nmea.empty());
-        ASSERT(nmea.data(), LIKE(), "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E");
+        ASSERT(nmea.data(), LIKE, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E");
         ASSERT_NOT_NULL(atm);
-        ASSERT(atm->Pressure(), FEQ(), 1009.1);
+        ASSERT(atm->Pressure(), EQ, 1009.1);
     }
 };

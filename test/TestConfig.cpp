@@ -32,18 +32,18 @@
 
 #include "Helper.hpp"
 
-using sctf::FEQ;
-
 using namespace vfrb;
 using namespace str_util;
 using namespace config;
 
-DESCRIBE_PAR("test_CProperties") {
+DESCRIBE("test_CProperties") {
     SPtr<CProperties> uut;
 
     SETUP() {
         boost::property_tree::ptree tree;
-        boost::property_tree::read_ini("[main]\nkey=value\n", tree);
+        std::stringstream           iss;
+        iss << "[main]\nkey=value\n";
+        boost::property_tree::read_ini(iss, tree);
         uut = std::make_shared<CProperties>(std::move(tree));
     }
 
@@ -165,11 +165,11 @@ DESCRIBE_PAR("test_CConfiguration") {
         ASSERT_EQ(std::get<1>(uut->ServerConfig), 1U);
     }
     IT("should hold correct values for fallback") {
-        ASSERT(uut->GpsPosition.Location().Latitude, FEQ(), 77.777777);
-        ASSERT(uut->GpsPosition.Location().Longitude, FEQ(), -12.121212);
+        ASSERT(uut->GpsPosition.Location().Latitude, EQ, 77.777777);
+        ASSERT(uut->GpsPosition.Location().Longitude, EQ, -12.121212);
         ASSERT_EQ(uut->GpsPosition.Location().Altitude, 1234);
-        ASSERT(uut->GpsPosition.Geoid(), FEQ(), 40.4);
-        ASSERT(uut->AtmPressure, FEQ(), 999.9);
+        ASSERT(uut->GpsPosition.Geoid(), EQ, 40.4);
+        ASSERT(uut->AtmPressure, EQ, 999.9);
     }
     IT("should hold correct values for filter") {
         ASSERT_EQ(uut->MaxHeight, INT32_MAX);

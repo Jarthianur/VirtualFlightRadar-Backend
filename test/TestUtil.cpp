@@ -25,9 +25,6 @@
 #include "util/Utility.hpp"
 
 #include "Helper.hpp"
-#include "sctf.hpp"
-
-using sctf::FEQ;
 
 using namespace vfrb;
 using namespace util;
@@ -62,9 +59,9 @@ DESCRIBE_PAR("test_StringUtils") {
         auto [v, e]   = Convert<f64>(nr, nr + 6);
         auto [v2, e2] = Convert<f64>(nr2, nr2 + 7);
         ASSERT_EQ(e, EErrc::OK);
-        ASSERT(v, FEQ(), 1234.0);
+        ASSERT(v, EQ, 1234.0);
         ASSERT_EQ(e2, EErrc::OK);
-        ASSERT(v2, FEQ(), -1234.0);
+        ASSERT(v2, EQ, -1234.0);
     }
     IT("should fail to convert bad f64") {
         {

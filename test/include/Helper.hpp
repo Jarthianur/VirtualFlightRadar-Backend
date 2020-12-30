@@ -29,13 +29,13 @@
 #include "object/CAircraft.hpp"
 #include "util/Utility.hpp"
 
-#include "sctf.hpp"
+#include "tpp.hpp"
 
 #define SYSO(M) std::cout << M << std::flush
 
-using sctf::operator""_re;
+using tpp::operator""_re;
 
-namespace sctf::intern
+namespace tpp::intern
 {
 template<>
 inline auto
@@ -43,7 +43,7 @@ to_string<vfrb::object::CAircraft::ETargetType>(vfrb::object::CAircraft::ETarget
     -> std::string {
     return std::to_string(vfrb::util::AsUnderlyingType(arg_));
 }
-}  // namespace sctf::intern
+}  // namespace tpp::intern
 
 namespace helper
 {

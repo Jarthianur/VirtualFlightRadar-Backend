@@ -22,20 +22,18 @@
 
 #include "Helper.hpp"
 
-using sctf::FEQ;
-
 using namespace vfrb;
 
 SUITE_PAR("testMath") {
     TEST("Radian") {
-        ASSERT(math::Radian(45.0), FEQ(), 0.785398);
-        ASSERT(math::Radian(0.0), FEQ(), 0.0);
-        ASSERT(math::Radian(360.0), FEQ(), 6.28319);
+        ASSERT(math::Radian(45.0), EQ, 0.785398);
+        ASSERT(math::Radian(0.0), EQ, 0.0);
+        ASSERT(math::Radian(360.0), EQ, 6.28319);
     }
     TEST("Degree") {
-        ASSERT(math::Degree(0.785398), FEQ(), 45.0);
-        ASSERT(math::Degree(0.0), FEQ(), 0.0);
-        ASSERT(math::Degree(6.28319), FEQ(), 360.0);
+        ASSERT(math::Degree(0.785398), EQ, 45.0);
+        ASSERT(math::Degree(0.0), EQ, 0.0);
+        ASSERT(math::Degree(6.28319), EQ, 360.0);
     }
     TEST("DoubleToInt") {
         ASSERT_EQ(math::DoubleToInt(0.0), 0);
@@ -45,10 +43,10 @@ SUITE_PAR("testMath") {
         ASSERT_EQ(math::DoubleToInt(-1.5), -2);
     }
     TEST("DmToDeg") {
-        ASSERT(math::DmToDeg(0.0), FEQ(), 0.0);
-        ASSERT(math::DmToDeg(9030.50), FEQ(), 90.508333);
-        ASSERT(math::DmToDeg(18000.0), FEQ(), 180.0);
-        ASSERT(math::DmToDeg(-4512.3456), FEQ(), 45.205760);
+        ASSERT(math::DmToDeg(0.0), EQ, 0.0);
+        ASSERT(math::DmToDeg(9030.50), EQ, 90.508333);
+        ASSERT(math::DmToDeg(18000.0), EQ, 180.0);
+        ASSERT(math::DmToDeg(-4512.3456), EQ, 45.205760);
     }
     TEST("IcaoHeight") {
         ASSERT_EQ(math::IcaoHeight(0.0), 44331);

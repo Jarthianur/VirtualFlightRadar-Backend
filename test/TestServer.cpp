@@ -26,9 +26,6 @@
 #include "CSocketTest.hpp"
 #include "Helper.hpp"
 #include "Types.hpp"
-#include "sctf.hpp"
-
-using sctf::LT;
 
 using namespace vfrb;
 using namespace server;
@@ -55,7 +52,7 @@ DESCRIBE("test_CServer") {
         usize c1 = acceptor->Connect("#1", false, false);
         ASSERT_EQ(acceptor->Socket(c1).Address(), "#1");
         acceptor->Connect("#1", false, false);
-        ASSERT(acceptor->Sockets(), LT(), 2U);
+        ASSERT(acceptor->Sockets(), LT, 2U);
     }
     IT("should refuse any connection if maximum is reached") {
         acceptor->Connect("#1", false, false);
