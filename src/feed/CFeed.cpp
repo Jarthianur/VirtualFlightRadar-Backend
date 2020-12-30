@@ -53,7 +53,7 @@ IFeed::initPriority() const -> u32 {
     try {
         return static_cast<u32>(std::max<u64>(
             0, std::min<u64>(std::stoul(m_properties.Property(CConfiguration::KV_KEY_PRIORITY, "0")),
-                             std::numeric_limits<u32>::max())));
+                             limits::u32::max())));
     } catch ([[maybe_unused]] std::logic_error const&) {
     }
     throw error::CInvalidPropertyError("invalid priority given");

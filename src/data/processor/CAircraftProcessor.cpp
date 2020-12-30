@@ -36,7 +36,7 @@ using vfrb::str_util::Checksum;
 
 namespace vfrb::data::processor
 {
-CAircraftProcessor::CAircraftProcessor() : CAircraftProcessor(std::numeric_limits<s32>::max()) {}
+CAircraftProcessor::CAircraftProcessor() : CAircraftProcessor(limits::s32::max()) {}
 
 CAircraftProcessor::CAircraftProcessor(s32 maxDist_) : m_maxDistance(maxDist_) {}
 

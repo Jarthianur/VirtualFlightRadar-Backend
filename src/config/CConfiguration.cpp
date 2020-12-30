@@ -92,9 +92,9 @@ auto
 CConfiguration::resolveFilter(str key_) const -> s32 {
     try {
         s32 filter = parse<s32>(m_properties.Property(key_, "-1"), key_);
-        return filter < 0 ? std::numeric_limits<s32>::max() : filter;
+        return filter < 0 ? limits::s32::max() : filter;
     } catch ([[maybe_unused]] error::CConversionError const&) {
-        return std::numeric_limits<s32>::max();
+        return limits::s32::max();
     }
 }
 
