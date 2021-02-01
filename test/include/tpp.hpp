@@ -46,7 +46,7 @@
 #    define TPP_VERSION_HPP
 #    define TPP_VERSION_MAJOR "3"
 #    define TPP_VERSION_MINOR "0"
-#    define TPP_VERSION_REVISION "rc0"
+#    define TPP_VERSION_REVISION "rc1"
 #    define TPP_VERSION TPP_VERSION_MAJOR "." TPP_VERSION_MINOR "-" TPP_VERSION_REVISION
 #endif
 #ifndef TPP_CPP_META_HPP
