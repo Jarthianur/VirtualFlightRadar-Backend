@@ -77,10 +77,12 @@ DESCRIBE("test_CProperties") {
     };
 };
 
-DESCRIBE_PAR("test_CConfigReader") {
+DESCRIBE("test_CConfigReader") {
     std::stringstream validConf;
 
-    SETUP() {
+    BEFORE_EACH() {
+        validConf.str("");
+        validConf.clear();
         validConf << "[" << CConfiguration::SECT_KEY_FALLBACK << "]\n"
                   << CConfiguration::KV_KEY_LATITUDE << "   = 0.000000\n"
                   << CConfiguration::KV_KEY_LONGITUDE << " = \n"
@@ -176,17 +178,8 @@ DESCRIBE_PAR("test_CConfiguration") {
         ASSERT_EQ(uut->MaxDistance, 10000);
     }
     IT("should hold correct values for atm1") {
-        const auto feed_it = uut->FeedProperties.cbegin();
+        const auto feed_it = uut->FeedProperties.find(MakeStr(CConfiguration::SECT_KEY_ATMOS, "1"));
         ASSERT_EQ(feed_it->first, MakeStr(CConfiguration::SECT_KEY_ATMOS, "1"));
         ASSERT_EQ(feed_it->second.Property(CConfiguration::KV_KEY_PRIORITY), "1");
     }
-    IT("should hold only values for valid feeds") {
-        String      valid = MakeStr(CConfiguration::SECT_KEY_ATMOS, "1,", CConfiguration::SECT_KEY_WIND, ",",
-                               CConfiguration::SECT_KEY_SBS, "1,", CConfiguration::SECT_KEY_SBS, "2,,");
-        std::string result;
-        for (auto const& it : uut->FeedNames) {
-            result += it + ",";
-        }
-        ASSERT_EQ(result, valid);
-    };
 };
