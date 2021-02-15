@@ -1,438 +1,318 @@
 /*
- Copyright_License {
+    Copyright (C) 2016 Jarthianur
+    A detailed list of copyright holders can be found in the file "docs/AUTHORS.md".
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
- A detailed list of copyright holders can be found in the file "AUTHORS".
+    This file is part of VirtualFlightRadar-Backend.
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License version 3
- as published by the Free Software Foundation.
+    VirtualFlightRadar-Backend is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+    VirtualFlightRadar-Backend is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- }
- */
+    You should have received a copy of the GNU General Public License
+    along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
-#include "data/processor/AircraftProcessor.h"
-#include "data/processor/GpsProcessor.h"
-#include "util/math.hpp"
+#include "data/processor/CAircraftProcessor.hpp"
+#include "data/processor/CGpsProcessor.hpp"
+#include "math/Math.hpp"
 
-#include "helper.hpp"
+#include "Helper.hpp"
 
-using namespace data::processor;
-using namespace object;
-using namespace sctf;
+using namespace vfrb;
+using namespace vfrb::data::processor;
+using namespace vfrb::object;
 
-void test_data_processor(test::TestSuitesRunner& runner)
-{
-    describe<GpsProcessor>("Process GPS data", runner)->test("process", [] {
-        GpsProcessor  gpsp;
-        boost::smatch match;
-        GpsPosition   pos({0.0, 0.0, 0}, 48.0);
-        gpsp.process(pos);
-        bool matched = boost::regex_search(pos.get_serialized(), match, helper::gpsRe);
-        assertTrue(matched);
-    });
+DESCRIBE("test_CGpsProcessor") {
+    CGpsProcessor                           uut;
+    CStaticString<CGpsProcessor::NMEA_SIZE> cstr;
 
-    describe<AircraftProcessor>("Process Aircrafts", runner)
-        ->test("Aircraft at,above base pos",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({49.0, 8.0, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({49.0, 8.0, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "0");
-                   assertEqStr(match.str(2), "1000");
-                   assertEqStr(match.str(3), "0");
-                   assertEqStr(match.str(4), "BBBBBB");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "0");
-                   assertEqStr(match.str(2), "0");
-                   assertEqStr(match.str(3), "1000");
-                   assertEqStr(match.str(5), "BBBBBB");
-                   assertEqStr(match.str(9), "8");
-               })
-        ->test("filter distance", [] {
-            AircraftProcessor proc(0);
-            Aircraft          ac;
-            ac.set_id("BBBBBB");
-            ac.set_fullInfo(false);
-            ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-            ac.set_position({49.0, 8.0, math::doubleToInt(math::FEET_2_M * 3281)});
-            proc.referTo({49.1, 8.1, 0}, 1013.25);
-            proc.process(ac);
-            assertEqStr(ac.get_serialized(), "");
-        });
+    IT("should process GPS data correctly") {
+        CGpsPosition pos(0, {0., 0., 0}, 48.);
+        uut.Process(pos, &cstr);
+        ASSERT((*cstr).data(), LIKE, helper::GpsRE);
+    };
+};
 
-    describeParallel<AircraftProcessor>("process relative positions", runner)
-        ->test("Cross Equator S to N",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({0.1, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({-0.1, 0.0, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "0");
-                   assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "22239");
-                   assertEqStr(match.str(2), "0");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Cross Equator N to S",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({-0.1, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({0.1, 0.0, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "180");
-                   assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-22239");
-                   assertEqStr(match.str(2), "0");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Cross Northpole",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({89.9, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({89.9, 180.0, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "0");
-                   assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "22239");
-                   assertEqStr(match.str(2), "0");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Cross Southpole",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({-89.9, 0.0, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({-89.9, 180.0, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-180");
-                   assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-22239");
-                   assertEqStr(match.str(2), "0");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Cross 0-Meridian on Equator E to W",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({0.0, -0.1, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({0.0, 0.1, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-90");
-                   assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "0");
-                   assertEqStr(match.str(2), "-22239");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Cross 0-Meridian on Equator W to E",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({0.0, 0.1, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({0.0, -0.1, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "90");
-                   assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "0");
-                   assertEqStr(match.str(2), "22239");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Cross 0-Meridian on LAT(60) E to W",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({60.0, -0.1, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({60.0, 0.1, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-90");
-                   assertEqStr(match.str(3), "11119");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "17");
-                   assertEqStr(match.str(2), "-11119");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Cross 0-Meridian on LAT(-60) W to E",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({-60.0, 0.1, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({-60.0, -0.1, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "90");
-                   assertEqStr(match.str(3), "11119");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-17");
-                   assertEqStr(match.str(2), "11119");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Cross 180-Meridian on Equator E to W",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({0.0, -179.9, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({0.0, 179.9, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "90");
-                   assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "0");
-                   assertEqStr(match.str(2), "22239");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Cross 180-Meridian on Equator W to E",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({0.0, 179.9, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({0.0, -179.9, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-90");
-                   assertEqStr(match.str(3), "22239");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "0");
-                   assertEqStr(match.str(2), "-22239");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("North America",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({33.825808, -112.219232, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({33.653124, -112.692253, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "66");
-                   assertEqStr(match.str(3), "47768");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "19302");
-                   assertEqStr(match.str(2), "43695");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("South America",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({-34.699833, -58.791788, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({-34.680059, -58.818111, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "132");
-                   assertEqStr(match.str(3), "3260");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-2199");
-                   assertEqStr(match.str(2), "2407");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("North Africa",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({5.386705, -5.750365, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({5.392435, -5.748392, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-161");
-                   assertEqStr(match.str(3), "674");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-638");
-                   assertEqStr(match.str(2), "-219");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("South Africa",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({-23.229517, 15.049683, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({-26.069244, 15.484389, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-8");
-                   assertEqStr(match.str(3), "318804");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "315692");
-                   assertEqStr(match.str(2), "-44437");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Australia",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({-26.152199, 133.376684, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({-25.278208, 133.366885, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "179");
-                   assertEqStr(match.str(3), "97188");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-97183");
-                   assertEqStr(match.str(2), "978");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Central Europe",
-               [] {
-                   AircraftProcessor proc;
-                   Aircraft          ac;
-                   ac.set_id("BBBBBB");
-                   ac.set_fullInfo(false);
-                   ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-                   ac.set_position({49.719445, 9.087646, math::doubleToInt(math::FEET_2_M * 3281)});
-                   proc.referTo({49.719521, 9.083279, 0}, 1013.25);
-                   proc.process(ac);
-                   boost::smatch match;
-                   bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "92");
-                   assertEqStr(match.str(3), "314");
-                   matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-                   assertTrue(matched);
-                   assertEqStr(match.str(1), "-8");
-                   assertEqStr(match.str(2), "314");
-                   assertEqStr(match.str(3), "1000");
-               })
-        ->test("Asia", [] {
-            AircraftProcessor proc;
-            Aircraft          ac;
-            ac.set_id("BBBBBB");
-            ac.set_fullInfo(false);
-            ac.set_targetType(Aircraft::TargetType::TRANSPONDER);
-            ac.set_position({32.896360, 103.855837, math::doubleToInt(math::FEET_2_M * 3281)});
-            proc.referTo({65.900837, 101.570680, 0}, 1013.25);
-            proc.process(ac);
-            boost::smatch match;
-            bool          matched = boost::regex_search(ac.get_serialized(), match, helper::pflauRe);
-            assertTrue(matched);
-            assertEqStr(match.str(1), "176");
-            assertEqStr(match.str(3), "3673118");
-            matched = boost::regex_search(ac.get_serialized(), match, helper::pflaaRe);
-            assertTrue(matched);
-            assertEqStr(match.str(1), "-3666184");
-            assertEqStr(match.str(2), "225589");
-            assertEqStr(match.str(3), "1000");
-        });
-}
+DESCRIBE("test_CAircraftProcessor") {
+    CAircraftProcessor                           uut;
+    CStaticString<CAircraftProcessor::NMEA_SIZE> cstr;
+
+    s32 const M1000 = math::DoubleToInt(math::FEET_2_M * 3281);
+
+    AFTER_EACH() {
+        cstr.Clear();
+    }
+
+    IT("should process an aircraft above, at same position correctly") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::POWERED_AIRCRAFT,
+                    CAircraft::ETargetType::TRANSPONDER, {49.0, 8.0, M1000}, CTimestamp());
+        uut.ReferTo({49.0, 8.0, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "0");
+        ASSERT_EQ(match.str(2), "1000");
+        ASSERT_EQ(match.str(3), "0");
+        ASSERT_EQ(match.str(4), "AAAAAA");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "0");
+        ASSERT_EQ(match.str(2), "0");
+        ASSERT_EQ(match.str(3), "1000");
+        ASSERT_EQ(match.str(5), "AAAAAA");
+        ASSERT_EQ(match.str(9), "8");
+    }
+    IT("should filter an aircraft in distance over threshold") {
+        CAircraftProcessor uut(100);
+        CAircraft          a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {66., 66.0, M1000}, CTimestamp());
+        uut.ReferTo({49.1, 8.1, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        ASSERT_EQ(cstr.Length(), 0U);
+        ASSERT_EQ(*cstr, "");
+    }
+
+    IT("should correctly process when crossing equator from S to N") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {.1, .0, M1000}, CTimestamp());
+        uut.ReferTo({-0.1, .0, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "0");
+        ASSERT_EQ(match.str(3), "22239");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "22239");
+        ASSERT_EQ(match.str(2), "0");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process when crossing equator from N to S") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {-0.1, .0, M1000}, CTimestamp());
+        uut.ReferTo({.1, .0, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "180");
+        ASSERT_EQ(match.str(3), "22239");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "-22239");
+        ASSERT_EQ(match.str(2), "0");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process when crossing northpole") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {89.9, .0, M1000}, CTimestamp());
+        uut.ReferTo({89.9, 180., 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "0");
+        ASSERT_EQ(match.str(3), "22239");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "22239");
+        ASSERT_EQ(match.str(2), "0");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process when crossing southpole") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {-89.9, .0, M1000}, CTimestamp());
+        uut.ReferTo({-89.9, 180., 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "-180");
+        ASSERT_EQ(match.str(3), "22239");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "-22239");
+        ASSERT_EQ(match.str(2), "0");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process when crossing 0-Meridian from E to W") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {.0, -0.1, M1000}, CTimestamp());
+        uut.ReferTo({.0, .1, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "-90");
+        ASSERT_EQ(match.str(3), "22239");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "0");
+        ASSERT_EQ(match.str(2), "-22239");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process when crossing 0-Meridian from W to E") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {.0, .1, M1000}, CTimestamp());
+        uut.ReferTo({.0, -0.1, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "90");
+        ASSERT_EQ(match.str(3), "22239");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "0");
+        ASSERT_EQ(match.str(2), "22239");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process when crossing 0-Meridian at lat=60 from E to W") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {60., -0.1, M1000}, CTimestamp());
+        uut.ReferTo({60., .1, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "-90");
+        ASSERT_EQ(match.str(3), "11119");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "17");
+        ASSERT_EQ(match.str(2), "-11119");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process when crossing 0-Meridian at lat=-60 from W to E") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {-60., .1, M1000}, CTimestamp());
+        uut.ReferTo({-60., -0.1, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "90");
+        ASSERT_EQ(match.str(3), "11119");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "-17");
+        ASSERT_EQ(match.str(2), "11119");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process when crossing 180-Meridian at equator from E to W") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {.0, -179.9, M1000}, CTimestamp());
+        uut.ReferTo({.0, 179.9, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "90");
+        ASSERT_EQ(match.str(3), "22239");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "0");
+        ASSERT_EQ(match.str(2), "22239");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process when crossing 180-Meridian at equator from W to E") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {.0, 179.9, M1000}, CTimestamp());
+        uut.ReferTo({.0, -179.9, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "-90");
+        ASSERT_EQ(match.str(3), "22239");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "0");
+        ASSERT_EQ(match.str(2), "-22239");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process somewhere in North America") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {33.825808, -112.219232, M1000}, CTimestamp());
+        uut.ReferTo({33.653124, -112.692253, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "66");
+        ASSERT_EQ(match.str(3), "47768");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "19302");
+        ASSERT_EQ(match.str(2), "43695");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process somewhere in South America") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {-34.699833, -58.791788, M1000}, CTimestamp());
+        uut.ReferTo({-34.680059, -58.818111, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "132");
+        ASSERT_EQ(match.str(3), "3260");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "-2199");
+        ASSERT_EQ(match.str(2), "2407");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process somewhere in North Africa") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {5.386705, -5.750365, M1000}, CTimestamp());
+        uut.ReferTo({5.392435, -5.748392, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "-161");
+        ASSERT_EQ(match.str(3), "674");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "-638");
+        ASSERT_EQ(match.str(2), "-219");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process somewhere in South Africa") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {-23.229517, 15.049683, M1000}, CTimestamp());
+        uut.ReferTo({-26.069244, 15.484389, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "-8");
+        ASSERT_EQ(match.str(3), "318804");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "315692");
+        ASSERT_EQ(match.str(2), "-44437");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process somewhere in Australia") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {-26.152199, 133.376684, M1000}, CTimestamp());
+        uut.ReferTo({-25.278208, 133.366885, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "179");
+        ASSERT_EQ(match.str(3), "97188");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "-97183");
+        ASSERT_EQ(match.str(2), "978");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process somewhere in Central Europe") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {49.719445, 9.087646, M1000}, CTimestamp());
+        uut.ReferTo({49.719521, 9.083279, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "92");
+        ASSERT_EQ(match.str(3), "314");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "-8");
+        ASSERT_EQ(match.str(2), "314");
+        ASSERT_EQ(match.str(3), "1000");
+    }
+    IT("should correctly process somewhere in Asia") {
+        CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
+                    CAircraft::ETargetType::TRANSPONDER, {32.896360, 103.855837, M1000}, CTimestamp());
+        uut.ReferTo({65.900837, 101.570680, 0}, 1013.25);
+        uut.Process(a, &cstr);
+        std::cmatch match;
+        ASSERT((*cstr).data(), LIKE, helper::PflauRE, match);
+        ASSERT_EQ(match.str(1), "176");
+        ASSERT_EQ(match.str(3), "3673118");
+        ASSERT((*cstr).data(), LIKE, helper::PflaaRE, match);
+        ASSERT_EQ(match.str(1), "-3666184");
+        ASSERT_EQ(match.str(2), "225589");
+        ASSERT_EQ(match.str(3), "1000");
+    };
+};

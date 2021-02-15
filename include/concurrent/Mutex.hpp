@@ -1,23 +1,22 @@
 /*
- Copyright_License {
+    Copyright (C) 2016 Jarthianur
+    A detailed list of copyright holders can be found in the file "docs/AUTHORS.md".
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
- A detailed list of copyright holders can be found in the file "AUTHORS".
+    This file is part of VirtualFlightRadar-Backend.
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License version 3
- as published by the Free Software Foundation.
+    VirtualFlightRadar-Backend is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+    VirtualFlightRadar-Backend is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- }
- */
+    You should have received a copy of the GNU General Public License
+    along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 /// @see https://clang.llvm.org/docs/ThreadSafetyAnalysis.html#mutexheader
 
@@ -25,7 +24,7 @@
 
 #include <mutex>
 
-#include "util/class_utils.h"
+#include "util/ClassUtils.hpp"
 
 #if defined(__clang__) && (!defined(SWIG))
 #    define THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
@@ -71,6 +70,7 @@ namespace vfrb::concurrent
 class CAPABILITY("mutex") Mutex
 {
     NOT_COPYABLE(Mutex)
+    NOT_MOVABLE(Mutex)
 
     std::mutex m_mutex;
 
@@ -78,23 +78,23 @@ public:
     Mutex()           = default;
     ~Mutex() noexcept = default;
 
-    void lock() ACQUIRE()
-    {
+    void
+    lock() ACQUIRE() {
         m_mutex.lock();
     }
 
-    void unlock() RELEASE()
-    {
+    void
+    unlock() RELEASE() {
         m_mutex.unlock();
     }
 
-    bool try_lock() TRY_ACQUIRE(true)
-    {
+    auto
+    try_lock() -> bool TRY_ACQUIRE(true) {
         return m_mutex.try_lock();
     }
 
-    Mutex const& operator!() const
-    {
+    auto
+    operator!() const -> Mutex const& {
         return *this;
     }
 };
@@ -103,12 +103,13 @@ public:
 class SCOPED_CAPABILITY LockGuard
 {
     NOT_COPYABLE(LockGuard)
+    NOT_MOVABLE(LockGuard)
 
     std::lock_guard<Mutex> m_lock;
 
 public:
-    LockGuard(Mutex& mu_) ACQUIRE(mu_) : m_lock(mu_) {}
-    ~LockGuard() noexcept RELEASE() {}
+    explicit LockGuard(Mutex& mu_) ACQUIRE(mu_) : m_lock(mu_) {}
+    ~LockGuard() noexcept RELEASE() = default;
 };
 
 #else

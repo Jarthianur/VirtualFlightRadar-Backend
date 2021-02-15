@@ -1,72 +1,63 @@
 /*
- Copyright_License {
+    Copyright (C) 2016 Jarthianur
+    A detailed list of copyright holders can be found in the file "docs/AUTHORS.md".
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
- A detailed list of copyright holders can be found in the file "AUTHORS".
+    This file is part of VirtualFlightRadar-Backend.
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License version 3
- as published by the Free Software Foundation.
+    VirtualFlightRadar-Backend is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+    VirtualFlightRadar-Backend is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- }
- */
+    You should have received a copy of the GNU General Public License
+    along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
-#include "util/math.hpp"
+#include "math/Math.hpp"
 
-#include "helper.hpp"
+#include "Helper.hpp"
 
-using namespace sctf;
+using namespace vfrb;
 
-TEST_MODULE(test_math, {
-    test("radian", [] {
-        assertEquals(math::radian(45.0), 0.785398);
-        assertEquals(math::radian(0.0), 0.0);
-        assertEquals(math::radian(360.0), 6.28319);
-    });
-    test("degree", [] {
-        assertEquals(math::degree(0.785398), 45.0);
-        assertEquals(math::degree(0.0), 0.0);
-        assertEquals(math::degree(6.28319), 360.0);
-    });
-    test("doubleToInt", [] {
-        assertEquals(math::doubleToInt(0.0), 0);
-        assertEquals(math::doubleToInt(1.4), 1);
-        assertEquals(math::doubleToInt(1.5), 2);
-        assertEquals(math::doubleToInt(-1.4), -1);
-        assertEquals(math::doubleToInt(-1.5), -2);
-    });
-    test("dmToDeg", [] {
-        assertEquals(math::dmToDeg(0.0), 0.0);
-        assertEquals(math::dmToDeg(9030.50), 90.508333);
-        assertEquals(math::dmToDeg(18000.0), 180.0);
-        assertEquals(math::dmToDeg(-4512.3456), 45.205760);
-    });
-    test("calcIcaoHeight", [] {
-        assertEquals(math::icaoHeight(0.0), 44331);
-        assertEquals(math::icaoHeight(1013.25), 0);
-        assertEquals(math::icaoHeight(980.0), 281);
-    });
-    test("checksum", [] {
-        assertEquals(math::checksum("", sizeof("")), 0);
-        assertEquals(math::checksum("\0", sizeof("\0")), 0);
-        assertEquals(math::checksum("$abc*", sizeof("$abc*")), 96);
-    });
-    test("saturate", [] {
-        assertEquals(math::saturate(15, 0, 10), 10);
-        assertEquals(math::saturate(9, 0, 10), 9);
-        assertEquals(math::saturate(1, 3, 10), 3);
-        assertEquals(math::saturate(-5, -10, 10), -5);
-        assertEquals(math::saturate(-5, 0, 10), 0);
-    });
-    test("checkLimits", [] {
-
-    });
-})
+SUITE_PAR("testMath") {
+    TEST("Radian") {
+        ASSERT(math::Radian(45.0), EQ, 0.785398);
+        ASSERT(math::Radian(0.0), EQ, 0.0);
+        ASSERT(math::Radian(360.0), EQ, 6.28319);
+    }
+    TEST("Degree") {
+        ASSERT(math::Degree(0.785398), EQ, 45.0);
+        ASSERT(math::Degree(0.0), EQ, 0.0);
+        ASSERT(math::Degree(6.28319), EQ, 360.0);
+    }
+    TEST("DoubleToInt") {
+        ASSERT_EQ(math::DoubleToInt(0.0), 0);
+        ASSERT_EQ(math::DoubleToInt(1.4), 1);
+        ASSERT_EQ(math::DoubleToInt(1.5), 2);
+        ASSERT_EQ(math::DoubleToInt(-1.4), -1);
+        ASSERT_EQ(math::DoubleToInt(-1.5), -2);
+    }
+    TEST("DmToDeg") {
+        ASSERT(math::DmToDeg(0.0), EQ, 0.0);
+        ASSERT(math::DmToDeg(9030.50), EQ, 90.508333);
+        ASSERT(math::DmToDeg(18000.0), EQ, 180.0);
+        ASSERT(math::DmToDeg(-4512.3456), EQ, 45.205760);
+    }
+    TEST("IcaoHeight") {
+        ASSERT_EQ(math::IcaoHeight(0.0), 44331);
+        ASSERT_EQ(math::IcaoHeight(1013.25), 0);
+        ASSERT_EQ(math::IcaoHeight(980.0), 281);
+    }
+    TEST("Saturate") {
+        ASSERT_EQ(math::Saturate(15, 0, 10), 10);
+        ASSERT_EQ(math::Saturate(9, 0, 10), 9);
+        ASSERT_EQ(math::Saturate(1, 3, 10), 3);
+        ASSERT_EQ(math::Saturate(-5, -10, 10), -5);
+        ASSERT_EQ(math::Saturate(-5, 0, 10), 0);
+    };
+};

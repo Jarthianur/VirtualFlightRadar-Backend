@@ -1,105 +1,185 @@
 /*
- Copyright_License {
+    Copyright (C) 2016 Jarthianur
+    A detailed list of copyright holders can be found in the file "docs/AUTHORS.md".
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
- A detailed list of copyright holders can be found in the file "AUTHORS".
+    This file is part of VirtualFlightRadar-Backend.
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License version 3
- as published by the Free Software Foundation.
+    VirtualFlightRadar-Backend is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+    VirtualFlightRadar-Backend is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- }
- */
+    You should have received a copy of the GNU General Public License
+    along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <iterator>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 
-#include "config/ConfigReader.h"
-#include "config/Configuration.h"
-#include "config/Properties.h"
+#include <boost/property_tree/ini_parser.hpp>
 
-#include "helper.hpp"
+#include "config/CConfigReader.hpp"
+#include "config/CConfiguration.hpp"
+#include "config/CProperties.hpp"
+#include "util/StringUtils.hpp"
 
+#include "Helper.hpp"
+
+using namespace vfrb;
+using namespace str_util;
 using namespace config;
-using namespace sctf;
 
-TEST_MODULE(test_config_reader, {
-    test("read config", [] {
-        std::stringstream conf_in;
-        conf_in << "[" << Configuration::SECT_KEY_FALLBACK << "]\n"
-                << Configuration::KV_KEY_LATITUDE << "   = 0.000000\n";
-        conf_in << Configuration::KV_KEY_LONGITUDE << " = \n"
-                << Configuration::KV_KEY_ALTITUDE << "=1000 \n;ghsgd";
-        Properties prop = ConfigReader(conf_in).read();
-        assertEqStr(prop.get_property(Configuration::PATH_LATITUDE, "invalid"), "0.000000");
-        assertEqStr(prop.get_property(Configuration::PATH_LONGITUDE, "invalid"), "invalid");
-        assertEqStr(prop.get_property(Configuration::PATH_ALTITUDE, "invalid"), "1000");
-        assertEqStr(prop.get_property(Configuration::PATH_GEOID, "invalid"), "invalid");
-        assertTrue(prop.get_property("nothing", "").empty());
-    });
-})
+DESCRIBE("test_CProperties") {
+    SPtr<CProperties> uut;
 
-TEST_MODULE_PARALLEL(test_configuration, {
-    test("valid config - full, one feed", [] {
+    SETUP() {
+        boost::property_tree::ptree tree;
+        std::stringstream           iss;
+        iss << "[main]\nkey=value\n";
+        boost::property_tree::read_ini(iss, tree);
+        uut = std::make_shared<CProperties>(std::move(tree));
+    }
+
+    // Property
+    IT("should return the correct value") {
+        ASSERT_EQ(uut->Property("main.key"), "value");
+    }
+    IT("should return the default value if key does not exist") {
+        ASSERT_EQ(uut->Property("main.nokey", "default"), "default");
+    }
+    IT("should return the default value if section does not exist") {
+        ASSERT_EQ(uut->Property("nosect.nokey", "default"), "default");
+    }
+    IT("should not throw if key exists") {
+        ASSERT_NOTHROW(uut->Property("main.key"));
+    }
+    IT("should throw if key does not exist") {
+        ASSERT_THROWS(uut->Property("main.nokey"), config::error::CPropertyNotFoundError);
+        ASSERT_THROWS(uut->Property("nosect.nokey"), config::error::CPropertyNotFoundError);
+    }
+
+    // Section
+    IT("should return nested properties as section") {
+        ASSERT_EQ(uut->Section("main").Property("key"), "value");
+    }
+    IT("should not throw if section exists") {
+        ASSERT_NOTHROW(uut->Section("main"));
+    }
+    IT("should throw if section does not exist") {
+        ASSERT_THROWS(uut->Section("nosect"), config::error::CPropertyNotFoundError);
+    };
+};
+
+DESCRIBE("test_CConfigReader") {
+    std::stringstream validConf;
+
+    BEFORE_EACH() {
+        validConf.str("");
+        validConf.clear();
+        validConf << "[" << CConfiguration::SECT_KEY_FALLBACK << "]\n"
+                  << CConfiguration::KV_KEY_LATITUDE << "   = 0.000000\n"
+                  << CConfiguration::KV_KEY_LONGITUDE << " = \n"
+                  << CConfiguration::KV_KEY_ALTITUDE << "=1000 \n;ghsgd";
+    }
+
+    // valid
+    IT("should not throw with valid config") {
+        ASSERT_NOTHROW(CConfigReader(validConf).Read());
+    }
+    IT("should read existing values correctly") {
+        CProperties p(CConfigReader(validConf).Read());
+        ASSERT_EQ(p.Property(CConfiguration::PATH_LATITUDE, "invalid"), "0.000000");
+        ASSERT_EQ(p.Property(CConfiguration::PATH_ALTITUDE, "invalid"), "1000");
+    }
+    IT("should return default value if key does not exist, or is empty") {
+        CProperties p(CConfigReader(validConf).Read());
+        ASSERT_EQ(p.Property(CConfiguration::PATH_LONGITUDE, "invalid"), "invalid");
+        ASSERT_EQ(p.Property(CConfiguration::PATH_GEOID, "invalid"), "invalid");
+        ASSERT_TRUE(p.Property("nothing", "").empty());
+    }
+
+    // invalid
+    IT("should throw if config is invalid") {
         std::stringstream conf_in;
-        conf_in << "[" << Configuration::SECT_KEY_GENERAL << "]\n"
-                << Configuration::KV_KEY_FEEDS << "=" << Configuration::SECT_KEY_ATMOS << "1\n";
-        conf_in << Configuration::KV_KEY_SERVER_PORT << "=1234\n" << Configuration::KV_KEY_GND_MODE << "=y\n";
-        conf_in << "[" << Configuration::SECT_KEY_FALLBACK << "]\n"
-                << Configuration::KV_KEY_LATITUDE << "=77.777777\n";
-        conf_in << Configuration::KV_KEY_LONGITUDE << "=-12.121212\n"
-                << Configuration::KV_KEY_ALTITUDE << "=1234\n";
-        conf_in << Configuration::KV_KEY_GEOID << "=40.4\n" << Configuration::KV_KEY_PRESSURE << "=999.9\n";
-        conf_in << "[" << Configuration::SECT_KEY_FILTER << "]\n"
-                << Configuration::KV_KEY_MAX_HEIGHT << "=-1\n";
-        conf_in << Configuration::KV_KEY_MAX_DIST << "=10000\n";
-        conf_in << "[" << Configuration::SECT_KEY_ATMOS << "1]\n"
-                << Configuration::KV_KEY_HOST << "=localhost\n";
-        conf_in << Configuration::KV_KEY_PORT << "=3456\n" << Configuration::KV_KEY_PRIORITY << "=1\n";
-        Configuration config(conf_in);
-        const auto    feed_it = config.feedProperties.cbegin();
-        assertEqStr(feed_it->first, std::string(Configuration::SECT_KEY_ATMOS) + "1");
-        assertEqStr(feed_it->second.get_property(Configuration::KV_KEY_PRIORITY), "1");
-        assertT(config.serverPort, EQUALS, 1234, int);
-        assertTrue(config.groundMode);
-        assertEquals(config.gpsPosition.getLocation().latitude, 77.777777);
-        assertEquals(config.gpsPosition.getLocation().longitude, -12.121212);
-        assertEquals(config.gpsPosition.getLocation().altitude, 1234);
-        assertEquals(config.gpsPosition.getGeoid(), 40.4);
-        assertEquals(config.atmPressure, 999.9);
-        assertEquals(config.maxHeight, INT32_MAX);
-        assertEquals(config.maxDistance, 10000);
-    });
-    test("only valid feeds", [] {
+        conf_in << CConfiguration::SECT_KEY_FALLBACK << "\n"
+                << CConfiguration::KV_KEY_LATITUDE << "    0.000000\n";
+        ASSERT_THROWS(CConfigReader(conf_in).Read(), config::error::CReadFileError);
+    };
+};
+
+DESCRIBE_PAR("test_CConfiguration") {
+    SPtr<CConfiguration> uut;
+
+    SETUP() {
         std::stringstream conf_in;
-        conf_in << "[" << Configuration::SECT_KEY_GENERAL << "]\n"
-                << Configuration::KV_KEY_FEEDS << "=" << Configuration::SECT_KEY_WIND << ","
-                << Configuration::SECT_KEY_SBS << "1 , " << Configuration::SECT_KEY_SBS << "2, else,,\n";
-        conf_in << "[" << Configuration::SECT_KEY_WIND << "]\n"
-                << Configuration::KV_KEY_HOST << "=127.0.0.1\n"
-                << Configuration::KV_KEY_PORT << "=3333\n"
-                << Configuration::KV_KEY_PRIORITY << "=0\n";
-        conf_in << "[" << Configuration::SECT_KEY_SBS << "1]\n"
-                << Configuration::KV_KEY_HOST << "=127.0.0.1\n"
-                << Configuration::KV_KEY_PORT << "=3334\n"
-                << Configuration::KV_KEY_PRIORITY << "=1\n";
-        Configuration config(conf_in);
-        std::string   valid(Configuration::SECT_KEY_WIND);
-        valid.append(",").append(Configuration::SECT_KEY_SBS).append(+"1,,");
-        std::string result;
-        for (const auto& it : config.feedNames)
-        {
-            result += it + ",";
-        }
-        assertEquals(result, valid);
-    });
-})
+        // general
+        conf_in << "[" << CConfiguration::SECT_KEY_GENERAL << "]\n"
+                << CConfiguration::KV_KEY_FEEDS << "=" << CConfiguration::SECT_KEY_ATMOS << "1,"
+                << CConfiguration::SECT_KEY_WIND << "," << CConfiguration::SECT_KEY_SBS << "1 , "
+                << CConfiguration::SECT_KEY_SBS << "2, else,,\n"
+                << CConfiguration::KV_KEY_GND_MODE << "=y\n";
+        // server
+        conf_in << "[" << CConfiguration::SECT_KEY_SERVER << "]\n"
+                << CConfiguration::KV_KEY_PORT << "=1234\n"
+                << CConfiguration::KV_KEY_MAX_CON << "=1\n";
+        // fallback
+        conf_in << "[" << CConfiguration::SECT_KEY_FALLBACK << "]\n"
+                << CConfiguration::KV_KEY_LATITUDE << "=77.777777\n"
+                << CConfiguration::KV_KEY_LONGITUDE << "=-12.121212\n"
+                << CConfiguration::KV_KEY_ALTITUDE << "=1234\n"
+                << CConfiguration::KV_KEY_GEOID << "=40.4\n"
+                << CConfiguration::KV_KEY_PRESSURE << "=999.9\n";
+        // filter
+        conf_in << "[" << CConfiguration::SECT_KEY_FILTER << "]\n"
+                << CConfiguration::KV_KEY_MAX_HEIGHT << "=-1\n"
+                << CConfiguration::KV_KEY_MAX_DIST << "=10000\n";
+        // atm1
+        conf_in << "[" << CConfiguration::SECT_KEY_ATMOS << "1]\n"
+                << CConfiguration::KV_KEY_HOST << "=localhost\n"
+                << CConfiguration::KV_KEY_PORT << "=3456\n"
+                << CConfiguration::KV_KEY_PRIORITY << "=1\n";
+        // wind
+        conf_in << "[" << CConfiguration::SECT_KEY_WIND << "]\n"
+                << CConfiguration::KV_KEY_HOST << "=127.0.0.1\n"
+                << CConfiguration::KV_KEY_PORT << "=3333\n"
+                << CConfiguration::KV_KEY_PRIORITY << "=0\n";
+        // sbs1
+        conf_in << "[" << CConfiguration::SECT_KEY_SBS << "1]\n"
+                << CConfiguration::KV_KEY_HOST << "=127.0.0.1\n"
+                << CConfiguration::KV_KEY_PORT << "=3334\n"
+                << CConfiguration::KV_KEY_PRIORITY << "=1\n";
+
+        uut = std::make_shared<CConfiguration>(conf_in);
+    }
+
+    IT("should hold correct values for general") {
+        ASSERT_TRUE(uut->GroundMode);
+    }
+    IT("should hold correct values for server") {
+        ASSERT_EQ(std::get<0>(uut->ServerConfig), 1234U);
+        ASSERT_EQ(std::get<1>(uut->ServerConfig), 1U);
+    }
+    IT("should hold correct values for fallback") {
+        ASSERT(uut->GpsPosition.Location().Latitude, EQ, 77.777777);
+        ASSERT(uut->GpsPosition.Location().Longitude, EQ, -12.121212);
+        ASSERT_EQ(uut->GpsPosition.Location().Altitude, 1234);
+        ASSERT(uut->GpsPosition.Geoid(), EQ, 40.4);
+        ASSERT(uut->AtmPressure, EQ, 999.9);
+    }
+    IT("should hold correct values for filter") {
+        ASSERT_EQ(uut->MaxHeight, INT32_MAX);
+        ASSERT_EQ(uut->MaxDistance, 10000);
+    }
+    IT("should hold correct values for atm1") {
+        const auto feed_it = uut->FeedProperties.find(MakeStr(CConfiguration::SECT_KEY_ATMOS, "1"));
+        ASSERT_EQ(feed_it->first, MakeStr(CConfiguration::SECT_KEY_ATMOS, "1"));
+        ASSERT_EQ(feed_it->second.Property(CConfiguration::KV_KEY_PRIORITY), "1");
+    }
+};
