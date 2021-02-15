@@ -60,6 +60,7 @@ CGpsData::Update(CObject&& pos_) -> bool {
     if (updated) {
         m_processor.Process(pos, &cstr);
         if (m_groundMode && isPositionGood()) {
+            m_positionLocked = true;
             throw error::CReceivedGoodPosition();
         }
     }

@@ -42,7 +42,7 @@ CAircraftData::Update(CObject&& aircraft_) -> bool {
     auto&& aircraft = static_cast<CAircraft&&>(aircraft_);
     auto   result   = m_container.Insert(std::hash<StringView>()(*aircraft.Id()), std::move(aircraft));
     if (!result.second) {
-        result.first->Value.TryUpdate(std::move(aircraft));
+        return result.first->Value.TryUpdate(std::move(aircraft));
     }
     return true;
 }
@@ -65,11 +65,13 @@ CAircraftData::Access() {
                 auto key = iter.Key();
                 ++iter;
                 m_container.Erase(key);
-            } else {
+                continue;
+            }
+            if (iter->Value.UpdateAge() <= CObject::OUTDATED) {
                 m_processor.Process(iter->Value, &iter->Nmea);
                 m_accessFn(SAccessor{iter->Value, StringView{iter->Nmea}});
-                ++iter;
             }
+            ++iter;
         } catch ([[maybe_unused]] vfrb::error::IError const&) {
         }
     }
