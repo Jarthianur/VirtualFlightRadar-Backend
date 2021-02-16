@@ -24,7 +24,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
 
 file(GLOB_RECURSE vfrb_sources src/*.cpp)
 file(GLOB vfrb_test_sources test/*.cpp)
@@ -39,7 +39,6 @@ list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/object/impl/CDa
 list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl/CAcceptorBoost.cpp)
 list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl/CSocketBoost.cpp)
 
-
 set(CMAKE_BUILD_TYPE staged)
 set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror -Wno-error=attributes -Wno-error=unused-result -DBOOST_SPIRIT_THREADSAFE")
 
@@ -53,15 +52,16 @@ if(DEFINED BOOST_STATIC)
 endif()
 
 set(VFRB_LINK_LIBS Boost::system Boost::program_options Threads::Threads fmt::fmt-header-only)
+set(VFRB_TEST_LINK_LIBS gcov gomp tpp)
 
 #
 # dependencies
 #
 add_subdirectory(vendor/fmt EXCLUDE_FROM_ALL)
+add_subdirectory(vendor/TestPlusPlus EXCLUDE_FROM_ALL)
 
 find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(Threads REQUIRED)
-find_package(fmt REQUIRED)
 
 #
 # target: release
@@ -88,7 +88,7 @@ add_executable(unittest ${vfrb_test_sources} ${vfrb_sources_for_test})
 target_compile_options(unittest PUBLIC -O0 -g --coverage -fopenmp -DLOG_ENABLE_DEBUG)
 set_target_properties(unittest PROPERTIES OUTPUT_NAME ${vfrb_test_bin})
 target_include_directories(unittest PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(unittest PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(unittest PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 #
 # targets for single tests
@@ -96,57 +96,57 @@ target_link_libraries(unittest PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
 add_executable(util.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestUtil.cpp ${vfrb_sources_for_test})
 target_compile_options(util.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(util.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(util.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(util.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 add_executable(string.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestString.cpp ${vfrb_sources_for_test})
 target_compile_options(string.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(string.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(string.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(string.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 add_executable(server.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestServer.cpp ${vfrb_sources_for_test})
 target_compile_options(server.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(server.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(server.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(server.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 add_executable(object.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestObject.cpp ${vfrb_sources_for_test})
 target_compile_options(object.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(object.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(object.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(object.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 add_executable(math.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestMath.cpp ${vfrb_sources_for_test})
 target_compile_options(math.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(math.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(math.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(math.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 add_executable(parser.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestFeedParser.cpp ${vfrb_sources_for_test})
 target_compile_options(parser.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(parser.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(parser.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(parser.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 add_executable(feed.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestFeed.cpp ${vfrb_sources_for_test})
 target_compile_options(feed.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(feed.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(feed.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(feed.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 add_executable(processor.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestDataProcessor.cpp ${vfrb_sources_for_test})
 target_compile_options(processor.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(processor.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(processor.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(processor.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 add_executable(data.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestData.cpp ${vfrb_sources_for_test})
 target_compile_options(data.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(data.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(data.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(data.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 add_executable(config.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestConfig.cpp ${vfrb_sources_for_test})
 target_compile_options(config.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(config.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(config.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(config.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 add_executable(client.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestClient.cpp ${vfrb_sources_for_test})
 target_compile_options(client.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(client.test PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
-target_link_libraries(client.test PUBLIC ${VFRB_LINK_LIBS} gcov gomp)
+target_link_libraries(client.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
 #
 # target: profiling
@@ -165,3 +165,20 @@ install(CODE "file(READ ${PROJECT_SOURCE_DIR}/vfrb.service.in service_file_data)
   string(REPLACE \"%VFRB_EXEC_PATH%\" \"${PROJECT_BINARY_DIR}/${vfrb_release_bin}\" service_file_data \"\${service_file_data}\")\n
   string(REPLACE \"%VFRB_INI_PATH%\" \"${PROJECT_BINARY_DIR}/$ENV{VFRB_INI}\" service_file_data \"\${service_file_data}\")\n
   file(WRITE /etc/systemd/system/vfrb.service \"\${service_file_data}\")")
+
+#
+# compiledb dummy target
+#
+add_executable(compiledb_dummy EXCLUDE_FROM_ALL ${vfrb_test_sources} ${vfrb_sources_for_test})
+target_compile_options(compiledb_dummy PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(compiledb_dummy PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
+target_link_libraries(compiledb_dummy PUBLIC ${VFRB_LINK_LIBS} gomp tpp)
+
+if("${GENERATE_COMPILEDB}")
+  if(NOT "${COMPILEDB_TARGET}")
+    set(COMPILEDB_TARGET compiledb_dummy)
+  endif()
+  message(STATUS "compiledb --command-style -n make -C ${CMAKE_BINARY_DIR} ${COMPILEDB_TARGET}")
+  execute_process(COMMAND pwd)
+  execute_process(COMMAND compiledb --command-style -n make -C ${CMAKE_BINARY_DIR} ${COMPILEDB_TARGET})
+endif()

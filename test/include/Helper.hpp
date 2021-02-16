@@ -23,13 +23,12 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
+#include <tpp.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "object/CAircraft.hpp"
 #include "util/Utility.hpp"
-
-#include "tpp.hpp"
 
 #define SYSO(M) std::cout << M << std::flush
 
