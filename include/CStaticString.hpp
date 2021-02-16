@@ -23,6 +23,9 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
+#include <fmt/chrono.h>
+#include <fmt/core.h>
+#include <fmt/format.h>
 #include <utility>
 
 #include "error/IError.hpp"
@@ -167,20 +170,20 @@ public:
      */
     template<typename... Args>
     auto
-    Format(usize pos_, str fmt_, Args... args_) -> s32 {
+    Format(usize pos_, str fmt_, Args&&... args_) -> usize {
         if (pos_ >= N) {
             throw error::COverflowError();
         }
-        usize max = N - pos_;
-        s32   b   = 0;
-        if ((b = std::snprintf(m_data.data() + pos_, max, fmt_, std::forward<Args>(args_)...)) >= 0 &&
-            static_cast<usize>(b) < max) {
-            m_view = StringView{m_data.data(), pos_ + b};  // like append
+        usize max   = N - pos_;
+        auto  start = m_data.data() + pos_;
+        if (auto [end, s] = fmt::format_to_n(start, max, fmt_, std::forward<Args>(args_)...);
+            start != end && s < max) {
+            m_view = StringView{m_data.data(), pos_ + s};  // like append
+            return s;
         } else {
             Clear();
             throw error::COverflowError();
         }
-        return b;
     }
 
     /// Get the length of seen characters.

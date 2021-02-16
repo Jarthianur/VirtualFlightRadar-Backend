@@ -52,13 +52,16 @@ if(DEFINED BOOST_STATIC)
     set(Boost_USE_STATIC_LIBS ON)
 endif()
 
-set(VFRB_LINK_LIBS Boost::system Boost::program_options Threads::Threads)
+set(VFRB_LINK_LIBS Boost::system Boost::program_options Threads::Threads fmt::fmt-header-only)
 
 #
 # dependencies
 #
+add_subdirectory(vendor/fmt EXCLUDE_FROM_ALL)
+
 find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(Threads REQUIRED)
+find_package(fmt REQUIRED)
 
 #
 # target: release
