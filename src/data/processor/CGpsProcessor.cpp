@@ -43,27 +43,23 @@ CGpsProcessor::Process(object::CGpsPosition const& pos_, CStaticString<NMEA_SIZE
 auto
 CGpsProcessor::appendGpgga(CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_,
                            usize idx_) const -> usize {
-    // As we use XCSoar as frontend, we need to set the fix quality to 1. It doesn't
-    // support others.
-    // "$GPGGA,%02d%02d%02d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,%1d,%02d,1,%d,M,%.1lf,M,,*"
-    int next = nmea_->Format(
-        idx_, "$GPGGA,%.2d%.2d%.2d,%02.0lf%07.4lf,%c,%03.0lf%07.4lf,%c,1,%.2hhu,1,%d,M,%.1lf,M,,*",
-        utc_->tm_hour, utc_->tm_min, utc_->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
-        m_degLongitude, m_minLongitude, m_directionEW, /*pos.fixQa,*/ pos_.NrOfSatellites(),
-        pos_.Location().Altitude,
+    // XCSoar requires a fix quality of 1
+    usize next = nmea_->Format(
+        idx_, "$GPGGA,{:%H%M%S},{:02.0f}{:07.4f},{:c},{:03.0f}{:07.4f},{:c},1,{:2d},1,{:d},M,{:.1f},M,,*",
+        *utc_, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude, m_directionEW,
+        pos_.NrOfSatellites(), pos_.Location().Altitude,
         math::Saturate(pos_.Geoid(), CGpsPosition::MIN_GEOID, CGpsPosition::MAX_GEOID));
-    next += nmea_->Format(idx_ + next, "%02x\r\n", Checksum(**nmea_, idx_));
-    return idx_ + static_cast<usize>(next);
+    next += nmea_->Format(idx_ + next, "{:02X}\r\n", Checksum(**nmea_, idx_));
+    return idx_ + next;
 }
 
 auto
 CGpsProcessor::appendGprmc(CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_, usize idx_) const -> usize {
-    int next = nmea_->Format(
-        idx_, "$GPRMC,%.2d%.2d%.2d,A,%02.0lf%06.3lf,%c,%03.0lf%06.3lf,%c,0,0,%.2d%.2d%.2d,001.0,W*",
-        utc_->tm_hour, utc_->tm_min, utc_->tm_sec, m_degLatitude, m_minLatitude, m_directionSN,
-        m_degLongitude, m_minLongitude, m_directionEW, utc_->tm_mday, utc_->tm_mon + 1, utc_->tm_year - 100);
-    next += nmea_->Format(idx_ + next, "%02x\r\n", Checksum(**nmea_, idx_));
-    return idx_ + static_cast<usize>(next);
+    usize next = nmea_->Format(
+        idx_, "$GPRMC,{0:%H%M%S},A,{1:02.0f}{2:06.3f},{3:c},{4:03.0f}{5:06.3f},{6:c},0,0,{0:%d%m%y},001.0,W*",
+        *utc_, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude, m_directionEW);
+    next += nmea_->Format(idx_ + next, "{:02X}\r\n", Checksum(**nmea_, idx_));
+    return idx_ + next;
 }
 
 void
