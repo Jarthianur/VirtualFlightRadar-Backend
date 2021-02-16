@@ -1,4 +1,4 @@
-FROM alpine:3.8 AS build
+FROM alpine AS build
 
 ENV VFRB_LINK_STATIC="yes" \
     VFRB_BIN_TAG="dock"
@@ -13,7 +13,7 @@ RUN mkdir /opt && \
     mv build/vfrb-dock healthcheck.sh /opt/ && \
     mv vfrb.ini.in /opt/vfrb.ini
 
-FROM alpine:3.8
+FROM alpine
 
 LABEL maintainer="Jarthianur <jarthianur.github@gmail.com>" \
     app="VirtualFlightRadar-Backend" \
