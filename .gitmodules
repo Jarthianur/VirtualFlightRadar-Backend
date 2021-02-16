@@ -1,0 +1,6 @@
+[submodule "vendor/fmt"]
+	path = vendor/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "vendor/TestPlusPlus"]
+	path = vendor/TestPlusPlus
+	url = https://github.com/Jarthianur/TestPlusPlus.git

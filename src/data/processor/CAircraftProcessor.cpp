@@ -87,20 +87,20 @@ CAircraftProcessor::calculateRelPosition(CAircraft const& aircraft_) const {
 auto
 CAircraftProcessor::appendPflau(CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
     -> usize {
-    int next = nmea_->Format(idx_, "$PFLAU,,,,1,0,%d,0,%d,%d,%s*", math::DoubleToInt(m_relBearing),
-                             m_relVertical, m_distance, (*aircraft_.Id()).data());
-    next += nmea_->Format(idx_ + next, "%02x\r\n", Checksum(**nmea_, idx_));
-    return idx_ + static_cast<usize>(next);
+    usize next = nmea_->Format(idx_, "$PFLAU,,,,1,0,{:d},0,{:d},{:d},{:s}*", math::DoubleToInt(m_relBearing),
+                               m_relVertical, m_distance, *aircraft_.Id());
+    next += nmea_->Format(idx_ + next, "{:02X}\r\n", Checksum(**nmea_, idx_));
+    return idx_ + next;
 }
 
 auto
 CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
     -> usize {
-    int next = 0;
+    usize next = 0;
     if (aircraft_.HasFullInfo()) {
         next = nmea_->Format(
-            idx_, "$PFLAA,0,%d,%d,%d,%hhu,%s,%.3d,,%d,%3.1lf,%.1hhX*", m_relNorth, m_relEast, m_relVertical,
-            util::AsUnderlyingType(aircraft_.IdType()), (*aircraft_.Id()).data(),
+            idx_, "$PFLAA,0,{:d},{:d},{:d},{:d},{:s},{:03d},,{:d},{:3.1f},{:1X}*", m_relNorth, m_relEast,
+            m_relVertical, util::AsUnderlyingType(aircraft_.IdType()), *aircraft_.Id(),
             math::DoubleToInt(math::Saturate(aircraft_.Movement().Heading, CAircraft::SMovement::MIN_HEADING,
                                              CAircraft::SMovement::MAX_HEADING)),
             math::DoubleToInt(math::Saturate(aircraft_.Movement().GndSpeed * math::MS_2_KMH,
@@ -110,10 +110,11 @@ CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, CStaticString<NMEA_S
                            CAircraft::SMovement::MAX_CLIMB_RATE),
             util::AsUnderlyingType(aircraft_.AircraftType()));
     } else {
-        next = nmea_->Format(idx_, "$PFLAA,0,%d,%d,%d,1,%s,,,,,%1hhX*", m_relNorth, m_relEast, m_relVertical,
-                             (*aircraft_.Id()).data(), util::AsUnderlyingType(aircraft_.AircraftType()));
+        next =
+            nmea_->Format(idx_, "$PFLAA,0,{:d},{:d},{:d},1,{:s},,,,,{:1X}*", m_relNorth, m_relEast,
+                          m_relVertical, *aircraft_.Id(), util::AsUnderlyingType(aircraft_.AircraftType()));
     }
-    next += nmea_->Format(idx_ + next, "%02x\r\n", Checksum(**nmea_, idx_));
-    return idx_ + static_cast<usize>(next);
+    next += nmea_->Format(idx_ + next, "{:02X}\r\n", Checksum(**nmea_, idx_));
+    return idx_ + next;
 }
 }  // namespace vfrb::data::processor

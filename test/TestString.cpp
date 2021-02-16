@@ -86,17 +86,17 @@ DESCRIBE_PAR("test_CStatisString") {
     }
     IT("should correctly format string") {
         CStaticString<8> a;
-        ASSERT_NOTHROW(a.Format(0, "%s", "a"));
+        ASSERT_NOTHROW(a.Format(0, "{}", "a"));
         ASSERT_EQ(*a, StringView{"a"});
         ASSERT_EQ(a.Length(), 1U);
-        ASSERT_NOTHROW(a.Format(0, "%d", 1234));
+        ASSERT_NOTHROW(a.Format(0, "{}", 1234));
         ASSERT_EQ(*a, StringView{"1234"});
         ASSERT_EQ(a.Length(), 4U);
     }
     IT("should throw if format overflows") {
         CStaticString<4> a;
-        ASSERT_THROWS(a.Format(0, "%s", "abcdefg"), error::COverflowError);
-        ASSERT_THROWS(a.Format(0, "%s", "abcd"), error::COverflowError);
-        ASSERT_THROWS(a.Format(2, "%s", "aaa"), error::COverflowError);
+        ASSERT_THROWS(a.Format(0, "{}", "abcdefg"), error::COverflowError);
+        ASSERT_THROWS(a.Format(0, "{}", "abcd"), error::COverflowError);
+        ASSERT_THROWS(a.Format(2, "{}", "aaa"), error::COverflowError);
     };
 };

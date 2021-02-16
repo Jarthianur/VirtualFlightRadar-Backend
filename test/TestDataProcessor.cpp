@@ -35,6 +35,7 @@ DESCRIBE("test_CGpsProcessor") {
     IT("should process GPS data correctly") {
         CGpsPosition pos(0, {0., 0., 0}, 48.);
         uut.Process(pos, &cstr);
+        SYSO(*cstr);
         ASSERT((*cstr).data(), LIKE, helper::GpsRE);
     };
 };

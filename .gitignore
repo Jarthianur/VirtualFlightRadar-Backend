@@ -7,6 +7,8 @@
 !/include/
 !/profiling/
 !/docs/
+!/vendor/
+!/vendor/**
 !.github/**
 !/docs/_includes/**
 !/docs/assets/**
