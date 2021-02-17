@@ -21,7 +21,6 @@
 #
 
 set -e
-set -o xtrace
 
 # set env vars
 VFRB_ROOT=${BUILD_DIR:-$PWD}
