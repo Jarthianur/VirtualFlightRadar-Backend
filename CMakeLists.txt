@@ -40,7 +40,9 @@ list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl
 list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl/CSocketBoost.cpp)
 
 set(CMAKE_BUILD_TYPE staged)
-set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror -Wno-error=attributes -Wno-error=unused-result -Wno-error=unused-value -DBOOST_SPIRIT_THREADSAFE")
+set(VFRB_CXX_W_FLAGS "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror")
+set(VFRB_CXX_WNOERR_FLAGS "-Wno-error=attributes -Wno-error=unused-result -Wno-error=unused-value")
+set(CMAKE_CXX_FLAGS_STAGED "${VFRB_CXX_W_FLAG} ${VFRB_CXX_WNOERR_FLAGS} -DBOOST_SPIRIT_THREADSAFE -pipe")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS_STAGED "${CMAKE_CXX_FLAGS_STAGED} -Wthread-safety -Wthread-safety-reference -Wthread-safety-negative")

@@ -45,7 +45,8 @@ class IFeed
     /**
      * @brief Initialize the priority from the given properties.
      */
-    [[nodiscard]] auto initPriority() const -> u32;
+    [[nodiscard]] auto
+    initPriority() const -> u32;
 
 protected:
     config::CProperties const m_properties;  ///< Properties
