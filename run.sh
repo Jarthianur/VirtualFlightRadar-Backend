@@ -21,6 +21,7 @@
 #
 
 set -e
+set -o xtrace
 
 # set env vars
 VFRB_ROOT=${BUILD_DIR:-$PWD}
@@ -102,7 +103,7 @@ done
 # task "docker"
 if [ -n "$DO_DOCKER" ]; then
     docker_image
-    log -i Run e.g. "'sudo docker run --name vfrb -p 4353:4353 -dit user/vfrb:latest -g'"
+    log -i Run e.g. "'sudo docker run --name vfrb -p 4353:4353 -dit vfrb:latest -g'"
     exit 0
 fi
 

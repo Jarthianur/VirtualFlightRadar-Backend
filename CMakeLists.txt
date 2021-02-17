@@ -40,7 +40,7 @@ list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl
 list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl/CSocketBoost.cpp)
 
 set(CMAKE_BUILD_TYPE staged)
-set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror -Wno-error=attributes -Wno-error=unused-result -DBOOST_SPIRIT_THREADSAFE")
+set(CMAKE_CXX_FLAGS_STAGED "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror -Wno-error=attributes -Wno-error=unused-result -Wno-error=unused-value -DBOOST_SPIRIT_THREADSAFE")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS_STAGED "${CMAKE_CXX_FLAGS_STAGED} -Wthread-safety -Wthread-safety-reference -Wthread-safety-negative")
@@ -170,7 +170,7 @@ install(CODE "file(READ ${PROJECT_SOURCE_DIR}/vfrb.service.in service_file_data)
 # compiledb dummy target
 #
 add_executable(compiledb_dummy EXCLUDE_FROM_ALL ${vfrb_test_sources} ${vfrb_sources_for_test})
-target_compile_options(compiledb_dummy PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_compile_options(compiledb_dummy PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG -Wthread-safety -Wthread-safety-reference -Wthread-safety-negative)
 target_include_directories(compiledb_dummy PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
 target_link_libraries(compiledb_dummy PUBLIC ${VFRB_LINK_LIBS} gomp tpp)
 
@@ -178,7 +178,6 @@ if("${GENERATE_COMPILEDB}")
   if(NOT "${COMPILEDB_TARGET}")
     set(COMPILEDB_TARGET compiledb_dummy)
   endif()
-  message(STATUS "compiledb --command-style -n make -C ${CMAKE_BINARY_DIR} ${COMPILEDB_TARGET}")
-  execute_process(COMMAND pwd)
+  message(STATUS "Run cmake twice to generate/update compile_commands.json (workaround).")
   execute_process(COMMAND compiledb --command-style -n make -C ${CMAKE_BINARY_DIR} ${COMPILEDB_TARGET})
 endif()

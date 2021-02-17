@@ -1,40 +1,42 @@
 sudo: required
 
 services:
-    - docker
+  - docker
 
 language: minimal
 
 git:
-    submodules: true
+  submodules: true
 
 before_install:
-    - docker pull debian:buster-slim
+  - docker pull debian:buster-slim
 
 before_script:
-    - docker run -e "BUILD_DIR=$TRAVIS_BUILD_DIR" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:buster-slim bash
-    - docker ps -a
-    - docker exec -it vfrb sh -c "echo 'deb http://ftp.debian.org/debian buster-backports main' >> /etc/apt/sources.list"
+  - docker run -e "BUILD_DIR=$TRAVIS_BUILD_DIR" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:buster-slim bash
+  - docker ps -a
+  - docker exec -it vfrb sh -c "echo 'deb http://ftp.debian.org/debian buster-backports main' >> /etc/apt/sources.list"
+  - docker exec -it vfrb sh -c "echo 'deb http://apt.llvm.org/buster llvm-toolchain-buster main' >> /etc/apt/sources.list"
+  - docker exec -it vfrb sh -c "apt update && apt install -y wget && wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -"
 
 script:
-    # build production docker image
-    - ./run.sh docker
-    # prepare cicd docker image
-    - docker exec -it vfrb sh -c "mkdir -p $TRAVIS_BUILD_DIR"
-    - docker exec -it vfrb sh -c "cp -r /travis/. $TRAVIS_BUILD_DIR"
-    # run build and tests
-    - docker exec -it vfrb sh -c "$TRAVIS_BUILD_DIR/run.sh build test -y"
-    # copy reports back
-    - docker exec -it vfrb sh -c "cp -r $TRAVIS_BUILD_DIR/reports /travis/"
-    - docker exec -it vfrb sh -c "chown $(id -u):$(id -g) -R /travis/reports"
-    - docker stop vfrb
+  # build production docker image
+  - ./run.sh docker
+  # prepare cicd docker image
+  - docker exec -it vfrb sh -c "mkdir -p $TRAVIS_BUILD_DIR"
+  - docker exec -it vfrb sh -c "cp -r /travis/. $TRAVIS_BUILD_DIR"
+  # run build and tests
+  - docker exec -it vfrb sh -c "$TRAVIS_BUILD_DIR/run.sh build test -y"
+  # copy reports back
+  - docker exec -it vfrb sh -c "cp -r $TRAVIS_BUILD_DIR/reports /travis/"
+  - docker exec -it vfrb sh -c "chown $(id -u):$(id -g) -R /travis/reports"
+  - docker stop vfrb
 
 after_success:
-    - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash)
 
 notifications:
-    email:
-        recipients:
-           - jarthianur.github@gmail.com
-        on_success: change
-        on_failure: change
+  email:
+    recipients:
+      - jarthianur.github@gmail.com
+    on_success: change
+    on_failure: change

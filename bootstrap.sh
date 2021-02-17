@@ -107,91 +107,13 @@ function confirm() {
     return 0
 }
 
-# set PKG_MANAGER to the distributions package manager
-function resolve_pkg_manager() {
-    local error=0
-    if [ "$(which 2>&1)" == "" ]; then
-        APT="$(which apt-get || true)"
-        YUM="$(which yum || true)"
-        DNF="$(which dnf || true)"
-        APK="$(which apk || true)"
-    else
-        RELEASE="$(cat /etc/*-release)"
-        if [ "$(echo $RELEASE | grep -oiE '(ubuntu|debian)')" != "" ]; then
-            APT="apt-get"
-        elif [ "$(echo $RELEASE | grep -oiE '(centos)')" != "" ]; then
-            YUM="yum"
-        elif [ "$(echo $RELEASE | grep -oiE '(fedora)')" != "" ]; then
-            DNF="dnf"
-        elif [ "$(echo $RELEASE | grep -oiE 'alpine')" != "" ]; then
-            APK="apk"
-        fi
-    fi
-    if [ -n "$APT" ]; then
-        export PKG_MANAGER="$APT"
-        log -i Using apt as package manager.
-    elif [ -n "$YUM" ]; then
-        export PKG_MANAGER="$YUM"
-        log -i Using yum as package manager.
-    elif [ -n "$DNF" ]; then
-        export PKG_MANAGER="$DNF"
-        log -i Using dnf as package manager.
-    elif [ -n "$APK" ]; then
-        export PKG_MANAGER="$APK"
-        log -i Using apk as package manager.
-    else
-        log -e Could not determine package manager!
-        error=1
-    fi
-    return $error
-}
-
 # install all build dependencies
 function install_deps() {
     set -eE
     log -i INSTALL DEPENDENCIES
     trap "fail Failed to install dependencies!" ERR
-    resolve_pkg_manager
-    require PKG_MANAGER
-    case $PKG_MANAGER in
-    *apt-get)
-        local UPDATE='apt-get update'
-        local SETUP=''
-        local INSTALL='install -y'
-        local BOOST='libboost-dev libboost-system-dev libboost-program-options-dev'
-        local GCC="g++ make cmake"
-        ;;
-    *yum)
-        local UPDATE=''
-        local SETUP='yum -y install epel-release'
-        local INSTALL='install -y'
-        local BOOST='boost boost-devel'
-        local GCC="gcc-c++ make cmake"
-        ;;
-    *dnf)
-        local UPDATE=''
-        local SETUP=''
-        local INSTALL='install -y'
-        local BOOST='boost boost-devel'
-        local GCC="gcc-c++ make cmake"
-        ;;
-    *apk)
-        local UPDATE='apk update'
-        local SETUP=''
-        local INSTALL='add'
-        local BOOST='boost-dev boost-system boost-program_options'
-        local GCC='g++ make cmake'
-        ;;
-    esac
-    require GCC BOOST INSTALL
-    ALL="$GCC"
-    if [ -z "$CUSTOM_BOOST" ]; then
-        ALL="$ALL $BOOST"
-    fi
-    if [ -n "$UPDATE" ]; then $SUDO $UPDATE; fi
-    if [ -n "$SETUP" ]; then $SUDO $SETUP; fi
-    log -i "$SUDO" "$PKG_MANAGER" "$INSTALL" "$ALL"
-    $SUDO $PKG_MANAGER $INSTALL $ALL
+    $SUDO apt update
+    $SUDO apt install build-essential g++ make cmake libboost-dev libboost-system-dev libboost-program-options-dev
     trap - ERR
 }
 
@@ -223,7 +145,7 @@ function install() {
     trap "fail -e popd Service installation has failed!" ERR
     pushd $VFRB_ROOT/build/
     $SUDO make install
-    $SUDO systemctl enable vfrb.service
+    $SUDO systemctl enable --now vfrb.service
     log -i VFRB service created.
     popd
     trap - ERR
@@ -234,21 +156,7 @@ function install_test_deps() {
     set -eE
     log -i INSTALL TEST DEPENDENCIES
     trap "fail Failed to install test dependencies!" ERR
-    resolve_pkg_manager
-    require PKG_MANAGER
-    case $PKG_MANAGER in
-    *apt-get)
-        local TOOLS='cppcheck clang-format-6.0 wget netcat procps perl lcov lua5.3 lua-argparse lua-socket lua-posix'
-        ;;
-    *)
-        log -e Tests currently only run under ubuntu/debian systems.
-        return 1
-        ;;
-    esac
-    require TOOLS
-    ALL="$TOOLS"
-    log -i "$SUDO" "$PKG_MANAGER" -y install "$ALL"
-    $SUDO $PKG_MANAGER -y install $ALL
+    $SUDO apt -y install clang-format wget netcat procps perl lcov lua5.3 lua-argparse lua-socket lua-posix
     trap - ERR
 }
 
@@ -272,14 +180,8 @@ function static_analysis() {
     require VFRB_ROOT
     trap "fail -e popd Static code analysis failed!" ERR
     pushd $VFRB_ROOT
-    cppcheck --enable=warning,style,performance,unusedFunction,missingInclude -q -I include/ src/
-    local FORMAT="clang-format-6.0"
-    ! $FORMAT --version >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        FORMAT="clang-format"
-    fi
     for f in $(find src/ include/ -type f); do
-        diff -u <(cat $f) <($FORMAT -style=file $f) || true
+        diff -u <(cat $f) <(clang-format -style=file $f) || true
     done &>/tmp/format.diff
     if [ "$(wc -l /tmp/format.diff | cut -d' ' -f1)" -gt 0 ]; then
         log -e Code format does not comply to the specification.
@@ -302,7 +204,7 @@ function run_unit_test() {
     trap "fail -e popd Unit tests failed!" ERR
     pushd $VFRB_ROOT
     lcov -i -d build/CMakeFiles/unittest.dir -c -o reports/test_base.info
-    ! $VFRB_UUT &>reports/unittests.xml
+    ! $VFRB_UUT -c --xml &>reports/unittests.xml
     if [ $? -eq 1 ]; then
         error=0
     fi
@@ -392,7 +294,7 @@ function docker_image() {
     fi
     trap "fail -e popd Docker image creation failed!" ERR
     pushd $VFRB_ROOT
-    $SUDO docker build . -t user/vfrb:latest -t user/vfrb:${VFRB_VERSION}
+    $SUDO docker build . -t vfrb:latest -t vfrb:${VFRB_VERSION}
     popd
     trap - ERR
 }

@@ -22,7 +22,7 @@ But to handle Your request as effective as possible, there are some guidelines w
 
 ## I just have a question
 
-You don't have to read this whole document, if You just have a question. There is even not always the need to open an issue for it. Just consider the following: *Is my question relevant to others?* If so, please open an [issue](ISSUE_TEMPLATE/question.md) and read the [Opening Issues](#opening-issues) section of this document. If not, we would recommend to send an email to the [authors](AUTHORS.md) (at least to the repo owner). We can than decide to make an issue out of it anyway. Either way, not to skimp on details about the subject may decrease the communication overhead and prevent questions from our side back to You. We give our best to respond ASAP.
+You don't have to read this whole document, if You just have a question. There is even not always the need to open an issue for it. Just consider the following: _Is my question relevant to others?_ If so, please open an [issue](ISSUE_TEMPLATE/question.md) and read the [Opening Issues](#opening-issues) section of this document. If not, we would recommend to send an email to the [authors](AUTHORS.md) (at least to the repo owner). We can than decide to make an issue out of it anyway. Either way, not to skimp on details about the subject may decrease the communication overhead and prevent questions from our side back to You. We give our best to respond ASAP.
 
 ## Opening Issues
 
@@ -49,66 +49,60 @@ We have some simple, but effective guidelines, on how the code should look like.
 
 ### General guidelines
 
-+ Code is written purely in C++17, using [boost](http://www.boost.org/) and the standard library.
-+ Code design is preferably object oriented.
-+ Namings are short, but expressive.
-+ Try to achieve high coherence and low coupling.
-+ Think of single responsibility designs for objects.
+- Code is written purely in C++17
+- Code design is preferably object oriented
+- Namings are short, but expressive
 
 ### Files and directories
 
-+ Source files have `.cpp` extension.
-+ Header files have `.h` extension.
-+ Header files with inlined code have `.hpp` extension.
-+ Source files are placed in the `src/` directory.
-+ Header files are placed in the `include/` directory.
-+ Test files are placed in the `test/` directory.
-+ All files follow a package structure, with according namespaces.
-+ Files mainly containing a class declaration/definition are named like the class itself.
-+ Files mainly containing function declarations/definitions are named in a meaningful way in `snake_case`.
-+ Source and include directories are named in a meaningful way in `snake_case`.
+- Source files have `.cpp` extension
+- Header files have `.hpp` extension
+- Source files are placed in the `src/` directory
+- Header files are placed in the `include/` directory
+- Test files are placed in the `test/` directory
+- All files follow a package structure, with according namespaces
+- Directories are named in a meaningful way in `snake_case`
 
 ### Naming rules
 
-+ If not further specified, everything that is publicly exposed is named in `PascalCase`.
-+ If not further specified, everything that is private/protected is named in `camelCase`.
-+ All naming rules may be ignored, if required for compatibility.
-+ Constants, macros and enum entries are named in all `UPPER_CASE`.
-+ Namespaces are named in `snake_case`.
-+ Primitive types and their aliases are named in `snake_case`.
-+ Objects and their aliases are named in `PascalCase`.
-+ Member fields are prefixed by `m_`.
-+ Static fields are prefixed by `s_`.
-+ Function arguments are suffixed by `_`.
-+ Classes are prefixed by `C`.
-+ Pure virtual (interface) classes are prefixed by `I`.
-+ Structs are prefixed by `S`.
-+ Enums are prefixed by `E`.
+- If not further specified, everything that is publicly exposed is named in `PascalCase`
+- If not further specified, everything that is private/protected is named in `camelCase`
+- All naming rules may be ignored, if required for compatibility
+- Constants, macros and enum entries are named in all `UPPER_CASE`
+- Namespaces are named in `snake_case`
+- Primitive types and their aliases are named in `snake_case`
+- Objects and their aliases are named in `PascalCase`
+- Member fields are prefixed by `m_`
+- Function arguments are suffixed by `_`
+- Classes are prefixed by `C`
+- Pure virtual (interface) classes are prefixed by `I`
+- Structs are prefixed by `S`
+- Enums are prefixed by `E`
 
 ### Code guidelines
 
-+ Use the primitive types provided in `include/types.h`.
-+ Prefer classes over structs.
-+ Member fields are generally not public and accessed by getter/setter functions.
-+ Avoid setters where possible, rather use constructors and interfaces.
-+ Use structs only for plain recordtypes, otherwise use classes.
-+ Recordtype structs are allowed with all public members.
-+ Use `const` wherever applicable.
-+ Do not use plain mutexes for locking, always wrap them in RAII guards.
-+ Do not use unsafe functions, like buffer accessing without range checks.
-+ Prefer smart pointers over raw pointers.
-+ Avoid static fields, unless there is a good reason. Where applicable, combine with `thread_local`.
-+ Use `#pragma once` instead of include guards.
-+ Variable attributes, like `const`, are placed on the righthand side.
+- Use the primitive types provided in `include/Types.hpp`.
+- Member fields are in general not public and accessed by getter/setter functions
+- Avoid setters where possible, rather use constructors and interfaces
+- Use structs only for plain recordtypes, otherwise use classes
+- Recordtype structs are allowed with all public members
+- Use `const` wherever applicable
+- Do not use plain mutexes for locking, always wrap them in RAII guards
+- Do not use unsafe functions, like buffer accessing without range checks
+- Prefer smart pointers over raw pointers when handling heap allocations
+- Avoid static fields, unless there is a good reason; where applicable, combine with `thread_local`
+- Use `#pragma once` instead of include guards
+- Variable attributes, like `const`, are placed on the righthand side
+- Use pointers instead of non-const references
 
 ## Documentation
 
 The project documentation should be easy to understand, sometimes less words mean more.
 The code documentation should follow some guidelines listed here.
 
-+ Every code containing file begins with the copyright license.
-+ Descriptions are short, but expressive.
-+ The code documentation is based on Doxygen.
-+ Class and function descriptions should not contain implementation details, unless it is of use.
-+ Do not play *Captain Obvious*, only document what is not clear by the code itself.
-+ See [Doxygen](http://www.stack.nl/~dimitri/doxygen/manual/commands.html) for a command list.
+- Every code containing file begins with the copyright license
+- Descriptions are short, but expressive
+- The code documentation is based on Doxygen
+- Class and function descriptions should not contain implementation details, unless it is of use
+- Do not play _Captain Obvious_, only document what is not clear by the code itself
+- See [Doxygen](http://www.stack.nl/~dimitri/doxygen/manual/commands.html) for a command list

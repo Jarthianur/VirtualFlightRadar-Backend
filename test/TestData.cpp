@@ -60,8 +60,8 @@ DESCRIBE("test_CAircraftData") {
         uut->Access();
         ASSERT_FALSE(nmea.empty());
         ASSERT_NOT_NULL(ac);
-        ASSERT(nmea.data(), LIKE, helper::PflauRE);
-        ASSERT(nmea.data(), LIKE, helper::PflaaRE);
+        ASSERT(String{nmea}, LIKE, helper::PflauRE);
+        ASSERT(String{nmea}, LIKE, helper::PflaaRE);
     }
     IT("should not report an aircraft after outdate-interval, and set it as transponder target") {
         ASSERT_EQ(CObject::OUTDATED, CAircraftData::NO_FLARM_THRESHOLD);
@@ -145,7 +145,7 @@ DESCRIBE("test_CGpsData") {
         ASSERT_EQ(p.Altitude, 100);
         ASSERT_FALSE(nmea.empty());
         ASSERT_NOT_NULL(pos);
-        ASSERT(nmea.data(), LIKE, helper::GpsRE);
+        ASSERT(String{nmea}, LIKE, helper::GpsRE);
     }
     IT("should throw if received position is good") {
         CGpsPosition p(0, {10., 85., 100}, 40., 2., 7, 1, CTimestamp("120000"));
