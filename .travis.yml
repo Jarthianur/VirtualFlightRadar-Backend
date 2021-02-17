@@ -15,9 +15,9 @@ before_script:
   - docker run -e "BUILD_DIR=$TRAVIS_BUILD_DIR" -v $TRAVIS_BUILD_DIR:/travis --name vfrb -dit debian:buster-slim bash
   - docker ps -a
   - docker exec -it vfrb sh -c "echo 'deb http://ftp.debian.org/debian buster-backports main' >> /etc/apt/sources.list"
-  - docker exec -it vfrb sh -c "echo 'deb http://apt.llvm.org/buster llvm-toolchain-buster main' >> /etc/apt/sources.list"
   - docker exec -it vfrb sh -c "apt update && apt install -y wget"
   - docker exec -it vfrb sh -c "wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -"
+  - docker exec -it vfrb sh -c "echo 'deb http://apt.llvm.org/buster llvm-toolchain-buster main' >> /etc/apt/sources.list"
 
 script:
   # build production docker image

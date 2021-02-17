@@ -113,7 +113,7 @@ function install_deps() {
     log -i INSTALL DEPENDENCIES
     trap "fail Failed to install dependencies!" ERR
     $SUDO apt update
-    $SUDO apt install build-essential g++ make cmake libboost-dev libboost-system-dev libboost-program-options-dev
+    $SUDO apt install -y build-essential g++ make cmake libboost-dev libboost-system-dev libboost-program-options-dev
     trap - ERR
 }
 
