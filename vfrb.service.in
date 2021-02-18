@@ -3,7 +3,7 @@ Description=VirtualFlightRadar-Backend
 
 [Service]
 Type=simple
-ExecStart=%VFRB_EXEC_PATH% -c %VFRB_INI_PATH%
+ExecStart=%VFRB_EXEC_PATH% -c %VFRB_CONF_PATH%
 
 [Install]
 WantedBy=multi-user.target

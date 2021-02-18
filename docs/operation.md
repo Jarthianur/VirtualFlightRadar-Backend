@@ -9,7 +9,7 @@
 ### Example
 
 ```bash
-./vfrb -c vfrb.ini -o vfrb.log &
+./vfrb -c vfrb.conf -o vfrb.log &
 ```
 
 The log will be in the specified file.
@@ -28,13 +28,13 @@ journalctl -u {servicename}.service
 
 VFRB supports a few commandline arguments to control its behavior.
 
-| Argument | Explanation |
-| -- | -- |
-|-h / --help| Show an overview of all arguments and their usage.|
-|-c / --config | Set the configuration file to use.|
-|-v / --verbose| Enable debug logging |
-|-g / --ground-mode| Forcibly enable ground mode. |
-|-o / --output| Set a file where to pu all the logs. |
+| Argument           | Explanation                                        |
+| ------------------ | -------------------------------------------------- |
+| -h / --help        | Show an overview of all arguments and their usage. |
+| -c / --config      | Set the configuration file to use.                 |
+| -v / --verbose     | Enable debug logging                               |
+| -g / --ground-mode | Forcibly enable ground mode.                       |
+| -o / --output      | Set a file where to pu all the logs.               |
 
 ## Run as docker container
 
@@ -42,4 +42,4 @@ Assuming the docker image was built correctly as described [here](installation.m
 you can run the VFRB inside a minimal container without messing up your host with dependencies or whatever.
 Also you can run the VFRB on any platform you like, wherever docker is available.
 To run a docker container execute like `docker run --name VFRB -p <PORT>:4353 -dit user/vfrb:latest [OPTIONS]`.
-Where *PORT* can be any port you like and *OPTIONS* can be any VFRB commandline argument, except for *-c*.
+Where _PORT_ can be any port you like and _OPTIONS_ can be any VFRB commandline argument, except for _-c_.

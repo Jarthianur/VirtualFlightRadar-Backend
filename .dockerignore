@@ -6,4 +6,4 @@
 !profiling/
 !*.sh
 !CMakeLists.txt
-!vfrb.ini.in
+!vfrb.conf.in

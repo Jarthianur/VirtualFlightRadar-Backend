@@ -141,7 +141,7 @@ function build() {
 function install() {
     set -eE
     log -i INSTALL VFRB SERVICE
-    require VFRB_ROOT VFRB_INI
+    require VFRB_ROOT VFRB_CONF
     trap "fail -e popd Service installation has failed!" ERR
     pushd $VFRB_ROOT/build/
     $SUDO make install
@@ -229,7 +229,7 @@ function run_regression() {
     ./regression.sh serve
     sleep 2
     log -i Start vfrb
-    $VFRB_UUT -c test.ini &
+    $VFRB_UUT -c test.conf &
     sleep 2
     log -i Connect to vfrb
     ./regression.sh receive
@@ -240,7 +240,7 @@ function run_regression() {
     sleep 4
     ./regression.sh check
     log -i "Test for reconnects"
-    $VFRB_UUT -c test.ini >vfrb.log 2>&1 &
+    $VFRB_UUT -c test.conf >vfrb.log 2>&1 &
     sleep 5
     ./regression.sh serve
     sleep 5
@@ -254,7 +254,7 @@ function run_regression() {
     log -i Test windclient timeout
     lua server.lua 44403 nil >serv.log 2>&1 &
     local S_PID=$!
-    $VFRB_UUT -c test.ini >/dev/null 2>&1 &
+    $VFRB_UUT -c test.conf >/dev/null 2>&1 &
     sleep 10
     $SUDO pkill -2 -f $VFRB_UUT || true
     kill -9 $S_PID

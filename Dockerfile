@@ -9,7 +9,7 @@ WORKDIR /vfrb
 RUN ./run.sh build -y
 RUN mkdir -p /opt && \
     mv build/vfrb-docker healthcheck.sh /opt/ && \
-    mv vfrb.ini.in /opt/vfrb.ini
+    mv vfrb.conf.in /opt/vfrb.conf
 
 FROM debian:buster-slim
 
@@ -39,4 +39,4 @@ HEALTHCHECK --interval=5m \
     --retries=1 \
     CMD [ "/opt/vfrb/healthcheck.sh" ]
 
-ENTRYPOINT [ "/opt/vfrb/vfrb-docker", "-c", "/opt/vfrb/vfrb.ini" ]
+ENTRYPOINT [ "/opt/vfrb/vfrb-docker", "-c", "/opt/vfrb/vfrb.conf" ]

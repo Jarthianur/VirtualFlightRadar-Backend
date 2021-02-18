@@ -165,7 +165,7 @@ target_link_libraries(profiling PUBLIC ${VFRB_LINK_LIBS})
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY true)
 install(CODE "file(READ ${PROJECT_SOURCE_DIR}/vfrb.service.in service_file_data)\n
   string(REPLACE \"%VFRB_EXEC_PATH%\" \"${PROJECT_BINARY_DIR}/${vfrb_release_bin}\" service_file_data \"\${service_file_data}\")\n
-  string(REPLACE \"%VFRB_INI_PATH%\" \"${PROJECT_BINARY_DIR}/$ENV{VFRB_INI}\" service_file_data \"\${service_file_data}\")\n
+  string(REPLACE \"%VFRB_CONF_PATH%\" \"${PROJECT_BINARY_DIR}/$ENV{VFRB_CONF}\" service_file_data \"\${service_file_data}\")\n
   file(WRITE /etc/systemd/system/vfrb.service \"\${service_file_data}\")")
 
 #

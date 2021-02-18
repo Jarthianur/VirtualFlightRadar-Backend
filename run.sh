@@ -25,7 +25,7 @@ set -e
 # set env vars
 VFRB_ROOT=${BUILD_DIR:-$PWD}
 export VFRB_VERSION=$(cat "$VFRB_ROOT/version.txt" | tr -d '\n')
-export VFRB_INI="vfrb.ini"
+export VFRB_CONF="vfrb.conf"
 
 source "$VFRB_ROOT/bootstrap.sh"
 
@@ -36,7 +36,7 @@ function print_help() {
     echo 'Usage: ./run.sh [OPTIONS] <TASKS>'
     echo ''
     echo 'OPTIONS:'
-    echo '  --ini=<NAME>           : Set a custom name for the config file.'
+    echo '  --conf=<NAME>           : Set a custom name for the config file.'
     echo '  -y | --confirm-yes     : Automatically confirm all decisions. (dangerous)'
     echo '  -n | --no-update       : Disable package installation and updates'
     echo '  -h | --help            : Display this message'
@@ -47,7 +47,7 @@ function print_help() {
     echo '  test    : Build and run the unit, regression tests and code analysis.'
     echo '            Also generate test/coverage report.'
     echo '  docker  : Build a minimal docker image. Cannot be combined with other tasks.'
-    echo '            The vfrb.ini.in will be copied, so edit it before running this command.'
+    echo '            The vfrb.conf.in will be copied, so edit it before running this command.'
     echo ''
     echo 'ENVIRONMENT:'
     echo 'Following adjustments can be made with environment variables.'
@@ -64,8 +64,8 @@ fi
 # resolve given args
 for arg in $@; do
     case $arg in
-    --ini=*)
-        VFRB_INI="${arg#*=}"
+    --conf=*)
+        VFRB_CONF="${arg#*=}"
         ;;
     -y | --confirm-yes)
         export AUTO_CONFIRM=1
@@ -135,12 +135,12 @@ fi
 
 # task "install"
 if [ -n "$DO_INSTALL" ]; then
-    if [ -f "$VFRB_ROOT/build/$VFRB_INI" ]; then
-        log -w "\"$VFRB_ROOT/build/$VFRB_INI\"" already exists.
+    if [ -f "$VFRB_ROOT/build/$VFRB_CONF" ]; then
+        log -w "\"$VFRB_ROOT/build/$VFRB_CONF\"" already exists.
         ! confirm Replace the existing one\?
         if [ $? -eq 0 ]; then
-            sed "s|%VERSION%|${VFRB_VERSION}|" <"$VFRB_ROOT/vfrb.ini.in" >"$VFRB_ROOT/build/$VFRB_INI"
-            log -i "$VFRB_INI" created.
+            sed "s|%VERSION%|${VFRB_VERSION}|" <"$VFRB_ROOT/vfrb.conf.in" >"$VFRB_ROOT/build/$VFRB_CONF"
+            log -i "$VFRB_CONF" created.
         fi
     fi
     install
