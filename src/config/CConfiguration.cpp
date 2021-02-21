@@ -67,9 +67,9 @@ CConfiguration::CConfiguration(std::istream& stream_) try
       AtmPressure(parse<f64>(m_properties.Property(PATH_PRESSURE, "1013.25"), PATH_PRESSURE)),
       MaxHeight(resolveFilter(PATH_MAX_HEIGHT)),
       MaxDistance(resolveFilter(PATH_MAX_DIST)),
-      ServerConfig(
-          std::make_tuple(parse<u16>(m_properties.Property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT),
-                          parse<u64>(m_properties.Property(PATH_SERVER_MAX_CON, "5"), PATH_SERVER_MAX_CON))),
+      ServerConfig(std::make_tuple(
+          parse<u16>(m_properties.Property(PATH_SERVER_PORT, "4353"), PATH_SERVER_PORT),
+          parse<u64>(m_properties.Property(PATH_SERVER_MAX_CON, "1024"), PATH_SERVER_MAX_CON))),
       FeedNames(resolveFeedNames()),
       FeedProperties(resolveFeeds()) {
     dumpInfo();

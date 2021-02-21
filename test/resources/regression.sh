@@ -27,7 +27,6 @@ case "$1" in
     nc localhost $REGR_PORT_VFRB >recv.log &
     ;;
 "check")
-    trap cleanup ERR
     LOG=$(cat aprs.log | grep -o "regression")
     if [ "$LOG" == "" ]; then
         echo "APRS login regression failed"

@@ -76,8 +76,14 @@ evalArgs(int argc_, char** argv_) {
     cmdline_options.add_options()("config,c", program_options::value<std::string>(), "config file");
     cmdline_options.add_options()("output,o", program_options::value<std::string>(), "specify where to log");
     program_options::variables_map variables;
-    program_options::store(program_options::parse_command_line(argc_, argv_, cmdline_options), variables);
-    program_options::notify(variables);
+
+    try {
+        program_options::store(program_options::parse_command_line(argc_, argv_, cmdline_options), variables);
+        program_options::notify(variables);
+    } catch ([[maybe_unused]] boost::exception const&) {
+        std::cout << cmdline_options << std::endl;
+        throw ::error::CArgumentError();
+    }
 
     if (argc_ < 3 || variables.count("help")) {
         std::cout << cmdline_options << std::endl;

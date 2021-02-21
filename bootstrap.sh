@@ -223,7 +223,7 @@ function run_regression() {
     lcov -i -d $VFRB_ROOT/build/CMakeFiles/regression.dir -c -o $VFRB_ROOT/reports/vfrb_base.info
     if ! $VFRB_UUT; then $(exit 0); fi
     if ! $VFRB_UUT -v -g -c bla.txt; then $(exit 0); fi
-    trap "fail -e popd -e '$SUDO pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
+    trap "fail -e popd -e 'pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
     pushd $VFRB_ROOT/test/resources
     log -i Start mocking servers
     ./regression.sh serve
@@ -232,11 +232,12 @@ function run_regression() {
     $VFRB_UUT -c test.conf &
     sleep 2
     log -i Connect to vfrb
+    bash
     ./regression.sh receive
     ./regression.sh receive
     sleep 5
     log -i Stop vfrb and run check
-    $SUDO pkill -2 -f $VFRB_UUT || true
+    pkill -2 -f $VFRB_UUT || true
     sleep 4
     ./regression.sh check
     log -i "Test for reconnects"
@@ -244,7 +245,7 @@ function run_regression() {
     sleep 5
     ./regression.sh serve
     sleep 5
-    $SUDO pkill -2 -f $VFRB_UUT || true
+    pkill -2 -f $VFRB_UUT || true
     # just to cleanup servers
     ./regression.sh check >/dev/null 2>&1 || true
     if [ $(cat vfrb.log | grep -o 'connected to' | wc -l) -lt 4 ]; then
@@ -256,7 +257,7 @@ function run_regression() {
     local S_PID=$!
     $VFRB_UUT -c test.conf >/dev/null 2>&1 &
     sleep 10
-    $SUDO pkill -2 -f $VFRB_UUT || true
+    pkill -2 -f $VFRB_UUT || true
     kill -9 $S_PID
     if [ $(cat serv.log | grep -o 'Connection from' | wc -l) -lt 2 ]; then
         log -e "timeout test failed"

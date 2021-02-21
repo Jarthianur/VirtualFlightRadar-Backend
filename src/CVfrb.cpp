@@ -59,7 +59,7 @@ static auto const& logger = CLogger::Instance();
 CVfrb::CVfrb(SPtr<CConfiguration> conf_)
     : m_aircraftData(std::make_shared<CAircraftData>(
           [this](SAccessor const& it) {
-              if (it.Obj.UpdateAge() < CObject::OUTDATED) {
+              if (it.Obj.UpdateAge() <= CObject::OUTDATED) {
                   m_server.Send(it.Nmea);
               }
           },
