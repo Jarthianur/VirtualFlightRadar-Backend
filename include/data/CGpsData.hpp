@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <tuple>
-
 #include "concurrent/Mutex.hpp"
 #include "error/IError.hpp"
 #include "object/CGpsPosition.hpp"
@@ -40,11 +38,9 @@ class CGpsData : public IData
     CTCONST GPS_NR_SATS_GOOD      = 7;    ///< Good number of satellites
     CTCONST GPS_FIX_GOOD          = 1;    ///< Good fix quality
     CTCONST GPS_HOR_DILUTION_GOOD = 2.0;  ///< Good horizontal dilution
-    CTCONST NMEA_SIZE             = processor::CGpsProcessor::NMEA_SIZE;
 
     concurrent::Mutex mutable m_mutex;
-    std::tuple<object::CGpsPosition, CStaticString<NMEA_SIZE>>
-                             GUARDED_BY(m_mutex) m_position;   ///< The position
+    object::CGpsPosition     GUARDED_BY(m_mutex) m_position;   ///< The position
     processor::CGpsProcessor GUARDED_BY(m_mutex) m_processor;  ///< Processor for GPS information
     bool GUARDED_BY(m_mutex) m_positionLocked = false;         ///< Locking state of the current position
     bool GUARDED_BY(m_mutex) m_groundMode     = false;         ///< Ground mode state
@@ -60,7 +56,7 @@ public:
     /**
      * @param crPosition The initial info
      */
-    CGpsData(AccessFn&& fn_, object::CGpsPosition const& pos_, bool gnd_);
+    CGpsData(object::CGpsPosition const& pos_, bool gnd_);
 
     /**
      * @brief Update the position.
@@ -74,7 +70,7 @@ public:
     Update(object::CObject&& pos_) -> bool override REQUIRES(!m_mutex);
 
     void
-    Access() override REQUIRES(!m_mutex);
+    CollectInto(str_util::StringInserter si_) override REQUIRES(!m_mutex);
 
     /**
      * @brief Get the position.
@@ -82,10 +78,10 @@ public:
      * @threadsafe
      */
     auto
-    Location() const -> decltype(std::get<0>(m_position).Location()) REQUIRES(!m_mutex);
+    Location() const -> decltype(m_position.Location()) REQUIRES(!m_mutex);
 
     auto
-    Size() const -> usize override;
+    Size() const -> usize override REQUIRES(!m_mutex);
 };
 
 namespace error

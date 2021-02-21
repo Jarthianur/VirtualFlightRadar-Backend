@@ -24,27 +24,21 @@
 #include "object/CGpsPosition.hpp"
 #include "object/CObject.hpp"
 
-#include "CStaticString.hpp"
-
 using vfrb::object::CObject;
 using vfrb::object::CGpsPosition;
 using vfrb::concurrent::LockGuard;
+using vfrb::str_util::StringInserter;
 
 namespace vfrb::data
 {
-CGpsData::CGpsData(AccessFn&& fn_, CGpsPosition const& pos_, bool gnd_)
-    : IData(std::move(fn_)), m_position(std::make_tuple(pos_, "")), m_groundMode(gnd_) {
-    auto& [pos, cstr] = m_position;
-    m_processor.Process(pos, &cstr);
-}
+CGpsData::CGpsData(CGpsPosition const& pos_, bool gnd_) : m_position(pos_), m_groundMode(gnd_) {}
 
 void
-CGpsData::Access() {
+CGpsData::CollectInto(StringInserter si_) {
     LockGuard lk(m_mutex);
     try {
-        auto& [pos, cstr] = m_position;
-        m_processor.Process(pos, &cstr);
-        m_accessFn(SAccessor{++pos, StringView{cstr}});
+        m_processor.Process(m_position, si_);
+        ++m_position;
     } catch ([[maybe_unused]] vfrb::error::IError const&) {
     }
 }
@@ -55,10 +49,8 @@ CGpsData::Update(CObject&& pos_) -> bool {
     if (m_positionLocked) {
         throw error::CPositionAlreadyLocked();
     }
-    auto& [pos, cstr] = m_position;
-    bool updated      = pos.TryUpdate(std::move(pos_));
+    bool updated = m_position.TryUpdate(std::move(pos_));
     if (updated) {
-        m_processor.Process(pos, &cstr);
         if (m_groundMode && isPositionGood()) {
             m_positionLocked = true;
             throw error::CReceivedGoodPosition();
@@ -68,16 +60,15 @@ CGpsData::Update(CObject&& pos_) -> bool {
 }
 
 auto
-CGpsData::Location() const -> decltype(std::get<0>(m_position).Location()) {
+CGpsData::Location() const -> decltype(m_position.Location()) {
     LockGuard lk(m_mutex);
-    return std::get<0>(m_position).Location();
+    return m_position.Location();
 }
 
 auto
 CGpsData::isPositionGood() const -> bool {
-    auto const& pos = std::get<0>(m_position);
-    return pos.NrOfSatellites() >= GPS_NR_SATS_GOOD && pos.FixQuality() >= GPS_FIX_GOOD &&
-           pos.Dilution() <= GPS_HOR_DILUTION_GOOD;
+    return m_position.NrOfSatellites() >= GPS_NR_SATS_GOOD && m_position.FixQuality() >= GPS_FIX_GOOD &&
+           m_position.Dilution() <= GPS_HOR_DILUTION_GOOD;
 }
 
 auto

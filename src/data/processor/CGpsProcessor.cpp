@@ -20,46 +20,41 @@
 
 #include "data/processor/CGpsProcessor.hpp"
 
-#include <cmath>
-#include <cstdio>
-
 #include "math/Math.hpp"
 #include "object/CGpsPosition.hpp"
-#include "util/StringUtils.hpp"
 
 using vfrb::object::CGpsPosition;
 using vfrb::str_util::Checksum;
+using vfrb::str_util::StringInserter;
 
 namespace vfrb::data::processor
 {
 void
-CGpsProcessor::Process(object::CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* nmea_) const {
+CGpsProcessor::Process(object::CGpsPosition const& pos_, StringInserter& nmea_) const {
     std::time_t now = std::time(nullptr);
     std::tm*    utc = std::gmtime(&now);
     evalPosition(pos_.Location().Latitude, pos_.Location().Longitude);
-    appendGpgga(pos_, nmea_, utc, appendGprmc(nmea_, utc, 0));
+    appendGprmc(utc, nmea_);
+    appendGpgga(pos_, utc, nmea_);
 }
 
-auto
-CGpsProcessor::appendGpgga(CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_,
-                           usize idx_) const -> usize {
+void
+CGpsProcessor::appendGpgga(CGpsPosition const& pos_, std::tm const* utc_, StringInserter& nmea_) const {
     // XCSoar requires a fix quality of 1
-    usize next = nmea_->Format(
-        idx_, "$GPGGA,{:%H%M%S},{:02.0f}{:07.4f},{:c},{:03.0f}{:07.4f},{:c},1,{:2d},1,{:d},M,{:.1f},M,,*",
-        *utc_, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude, m_directionEW,
+    auto begin = nmea_.Format(
+        "$GPGGA,{:%H%M%S},{:02.0f}{:07.4f},{:c},{:03.0f}{:07.4f},{:c},1,{:2d},1,{:d},M,{:.1f},M,,*", *utc_,
+        m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude, m_directionEW,
         pos_.NrOfSatellites(), pos_.Location().Altitude,
         math::Saturate(pos_.Geoid(), CGpsPosition::MIN_GEOID, CGpsPosition::MAX_GEOID));
-    next += nmea_->Format(idx_ + next, "{:02X}\r\n", Checksum(**nmea_, idx_));
-    return idx_ + next;
+    nmea_.Format("{:02X}\r\n", Checksum(begin, nmea_.End()));
 }
 
-auto
-CGpsProcessor::appendGprmc(CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_, usize idx_) const -> usize {
-    usize next = nmea_->Format(
-        idx_, "$GPRMC,{0:%H%M%S},A,{1:02.0f}{2:06.3f},{3:c},{4:03.0f}{5:06.3f},{6:c},0,0,{0:%d%m%y},001.0,W*",
+void
+CGpsProcessor::appendGprmc(std::tm const* utc_, StringInserter& nmea_) const {
+    auto begin = nmea_.Format(
+        "$GPRMC,{0:%H%M%S},A,{1:02.0f}{2:06.3f},{3:c},{4:03.0f}{5:06.3f},{6:c},0,0,{0:%d%m%y},001.0,W*",
         *utc_, m_degLatitude, m_minLatitude, m_directionSN, m_degLongitude, m_minLongitude, m_directionEW);
-    next += nmea_->Format(idx_ + next, "{:02X}\r\n", Checksum(**nmea_, idx_));
-    return idx_ + next;
+    nmea_.Format("{:02X}\r\n", Checksum(begin, nmea_.End()));
 }
 
 void

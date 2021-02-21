@@ -52,7 +52,7 @@ public:
      * @throw vfrb::server::net::error::CSocketError
      */
     auto
-    Write(StringView const& sv_) -> bool;
+    Write(String const& str_) -> bool;
     void
     Close();
 

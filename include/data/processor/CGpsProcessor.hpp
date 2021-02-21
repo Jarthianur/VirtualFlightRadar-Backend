@@ -23,8 +23,8 @@
 #include <ctime>
 
 #include "object/CGpsPosition.hpp"
+#include "util/StringUtils.hpp"
 
-#include "CStaticString.hpp"
 #include "Types.hpp"
 
 namespace vfrb::data::processor
@@ -34,9 +34,6 @@ namespace vfrb::data::processor
  */
 class CGpsProcessor
 {
-public:
-    CTCONST NMEA_SIZE = 192;
-
 private:
     char mutable m_directionSN = 'x';  ///< Orientation of the latitude (S,N)
     char mutable m_directionEW = 'x';  ///< Orientation of the longitude (E,W)
@@ -50,16 +47,15 @@ private:
      * @param position The position
      * @param utc      The current utc time
      */
-    auto
-    appendGpgga(object::CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_,
-                usize idx_) const -> usize;
+    void
+    appendGpgga(object::CGpsPosition const& pos_, std::tm const* utc_, str_util::StringInserter& nmea_) const;
 
     /**
      * @brief Append GPRMC sentence to processing string.
      * @param utc The current utc time
      */
-    auto
-    appendGprmc(CStaticString<NMEA_SIZE>* nmea_, std::tm const* utc_, usize idx_) const -> usize;
+    void
+    appendGprmc(std::tm const* utc_, str_util::StringInserter& nmea_) const;
 
     /**
      * @brief Evaluate position for given latitude and longitude.
@@ -75,6 +71,6 @@ public:
      * @param rPosition The position
      */
     void
-    Process(object::CGpsPosition const& pos_, CStaticString<NMEA_SIZE>* nmea_) const;
+    Process(object::CGpsPosition const& pos_, str_util::StringInserter& nmea_) const;
 };
 }  // namespace vfrb::data::processor

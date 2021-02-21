@@ -20,19 +20,15 @@
 
 #include "data/processor/CAircraftProcessor.hpp"
 
-#include <cmath>
-#include <cstdio>
-#include <limits>
-
 #include "math/Math.hpp"
 #include "object/CAircraft.hpp"
 #include "object/CGpsPosition.hpp"
-#include "util/StringUtils.hpp"
 #include "util/Utility.hpp"
 
 using vfrb::object::CAircraft;
 using vfrb::object::SLocation;
 using vfrb::str_util::Checksum;
+using vfrb::str_util::StringInserter;
 
 namespace vfrb::data::processor
 {
@@ -41,12 +37,11 @@ CAircraftProcessor::CAircraftProcessor() : CAircraftProcessor(limits::s32::max()
 CAircraftProcessor::CAircraftProcessor(s32 maxDist_) : m_maxDistance(maxDist_) {}
 
 void
-CAircraftProcessor::Process(CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_) const {
+CAircraftProcessor::Process(CAircraft const& aircraft_, StringInserter& nmea_) const {
     calculateRelPosition(aircraft_);
     if (m_distance <= m_maxDistance) {
-        appendPflaa(aircraft_, nmea_, appendPflau(aircraft_, nmea_, 0));
-    } else {
-        nmea_->Clear();
+        appendPflau(aircraft_, nmea_);
+        appendPflaa(aircraft_, nmea_);
     }
 }
 
@@ -84,22 +79,19 @@ CAircraftProcessor::calculateRelPosition(CAircraft const& aircraft_) const {
                         aircraft_.Location().Altitude - m_refLocation.Altitude;
 }
 
-auto
-CAircraftProcessor::appendPflau(CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-    -> usize {
-    usize next = nmea_->Format(idx_, "$PFLAU,,,,1,0,{:d},0,{:d},{:d},{:s}*", math::DoubleToInt(m_relBearing),
-                               m_relVertical, m_distance, *aircraft_.Id());
-    next += nmea_->Format(idx_ + next, "{:02X}\r\n", Checksum(**nmea_, idx_));
-    return idx_ + next;
+void
+CAircraftProcessor::appendPflau(CAircraft const& aircraft_, StringInserter& nmea_) const {
+    auto begin = nmea_.Format("$PFLAU,,,,1,0,{:d},0,{:d},{:d},{:s}*", math::DoubleToInt(m_relBearing),
+                              m_relVertical, m_distance, *aircraft_.Id());
+    nmea_.Format("{:02X}\r\n", Checksum(begin, nmea_.End()));
 }
 
-auto
-CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-    -> usize {
-    usize next = 0;
+void
+CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, StringInserter& nmea_) const {
+    String::const_iterator begin;
     if (aircraft_.HasFullInfo()) {
-        next = nmea_->Format(
-            idx_, "$PFLAA,0,{:d},{:d},{:d},{:d},{:s},{:03d},,{:d},{:3.1f},{:1X}*", m_relNorth, m_relEast,
+        begin = nmea_.Format(
+            "$PFLAA,0,{:d},{:d},{:d},{:d},{:s},{:03d},,{:d},{:3.1f},{:1X}*", m_relNorth, m_relEast,
             m_relVertical, util::AsUnderlyingType(aircraft_.IdType()), *aircraft_.Id(),
             math::DoubleToInt(math::Saturate(aircraft_.Movement().Heading, CAircraft::SMovement::MIN_HEADING,
                                              CAircraft::SMovement::MAX_HEADING)),
@@ -110,11 +102,10 @@ CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, CStaticString<NMEA_S
                            CAircraft::SMovement::MAX_CLIMB_RATE),
             util::AsUnderlyingType(aircraft_.AircraftType()));
     } else {
-        next =
-            nmea_->Format(idx_, "$PFLAA,0,{:d},{:d},{:d},1,{:s},,,,,{:1X}*", m_relNorth, m_relEast,
-                          m_relVertical, *aircraft_.Id(), util::AsUnderlyingType(aircraft_.AircraftType()));
+        begin =
+            nmea_.Format("$PFLAA,0,{:d},{:d},{:d},1,{:s},,,,,{:1X}*", m_relNorth, m_relEast, m_relVertical,
+                         *aircraft_.Id(), util::AsUnderlyingType(aircraft_.AircraftType()));
     }
-    next += nmea_->Format(idx_ + next, "{:02X}\r\n", Checksum(**nmea_, idx_));
-    return idx_ + next;
+    nmea_.Format("{:02X}\r\n", Checksum(begin, nmea_.End()));
 }
 }  // namespace vfrb::data::processor

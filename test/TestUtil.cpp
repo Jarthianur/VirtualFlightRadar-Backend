@@ -41,10 +41,12 @@ DESCRIBE_PAR("test_Bounds") {
 
 DESCRIBE_PAR("test_StringUtils") {
     IT("should compute correct checksum") {
-        ASSERT_EQ(Checksum("", 0), 0U);
-        ASSERT_EQ(Checksum("\0", 0), 0U);
-        ASSERT_EQ(Checksum("$abc*", 0), 96U);
-        ASSERT_EQ(Checksum("$abc*", 6), 0U);
+        String s1{};
+        String s2{"\0"};
+        String s3{"$abc*"};
+        ASSERT_EQ(Checksum(s1.begin(), s1.end()), 0U);
+        ASSERT_EQ(Checksum(s2.begin(), s2.end()), 0U);
+        ASSERT_EQ(Checksum(s3.begin(), s3.end()), 96U);
     }
     IT("should match checksum correctly") {
         ASSERT_TRUE(MatchChecksum("$abc*60"));

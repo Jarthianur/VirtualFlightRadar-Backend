@@ -37,10 +37,9 @@ class CAircraftData : public IData
 public:
     CTCONST NO_FLARM_THRESHOLD = object::CObject::OUTDATED;  ///< Times until FLARM status is removed
     CTCONST DELETE_THRESHOLD   = 120;                        ///< Times until aircraft gets deleted
-    CTCONST NMEA_SIZE          = processor::CAircraftProcessor::NMEA_SIZE;
 
-    explicit CAircraftData(AccessFn&& fn_);
-    CAircraftData(AccessFn&& fn_, s32 maxDist_);  ///< @param maxDist The max distance filter
+    CAircraftData();
+    explicit CAircraftData(s32 maxDist_);  ///< @param maxDist The max distance filter
 
     /**
      * @brief Insert or update an Aircraft.
@@ -61,14 +60,22 @@ public:
      * @threadsafe
      */
     void
-    Access() override;
+    CollectInto(str_util::StringInserter si_) override;
 
     auto
     Size() const -> usize override;
 
 private:
-    concurrent::CObjectContainer<object::CAircraft, NMEA_SIZE>
-                                  m_container;  ///< Internal container for aircrafts
-    processor::CAircraftProcessor m_processor;  ///< Processor for aircrafts
+    concurrent::CObjectContainer<object::CAircraft> m_container;  ///< Internal container for aircrafts
+    processor::CAircraftProcessor                   m_processor;  ///< Processor for aircrafts
+
+    // allow access to underlying container when testing
+#ifdef VFRB_TEST_MODE
+public:
+    auto
+    Container() -> decltype(m_container)& {
+        return m_container;
+    }
+#endif
 };
 }  // namespace vfrb::data

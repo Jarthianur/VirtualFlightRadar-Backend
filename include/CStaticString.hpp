@@ -23,9 +23,6 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
-#include <fmt/chrono.h>
-#include <fmt/core.h>
-#include <fmt/format.h>
 #include <utility>
 
 #include "error/IError.hpp"
@@ -159,31 +156,6 @@ public:
     void
     Clear() {
         m_view = StringView{m_data.data(), 0};
-    }
-
-    /**
-     * Write a formatted string into this.
-     * @param pos_ The index to start writing
-     * @param fmt_ The format string
-     * @return the amount of bytes written
-     * @throw vfrb::error::COverflowError
-     */
-    template<typename... Args>
-    auto
-    Format(usize pos_, str fmt_, Args&&... args_) -> usize {
-        if (pos_ >= N) {
-            throw error::COverflowError();
-        }
-        usize max   = N - pos_;
-        auto  start = m_data.data() + pos_;
-        if (auto [end, s] = fmt::format_to_n(start, max, fmt_, std::forward<Args>(args_)...);
-            start != end && s < max) {
-            m_view = StringView{m_data.data(), pos_ + s};  // like append
-            return s;
-        } else {
-            Clear();
-            throw error::COverflowError();
-        }
     }
 
     /// Get the length of seen characters.

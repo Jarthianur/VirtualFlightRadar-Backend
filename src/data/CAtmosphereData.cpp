@@ -27,18 +27,17 @@
 using vfrb::object::CAtmosphere;
 using vfrb::object::CObject;
 using vfrb::concurrent::LockGuard;
+using vfrb::str_util::StringInserter;
 
 namespace vfrb::data
 {
-CAtmosphereData::CAtmosphereData(AccessFn&& fn_) : IData(std::move(fn_)) {}
-
-CAtmosphereData::CAtmosphereData(AccessFn&& fn_, CAtmosphere&& atm_)
-    : IData(std::move(fn_)), m_atmosphere(std::move(atm_)) {}
+CAtmosphereData::CAtmosphereData(CAtmosphere&& atm_) : m_atmosphere(std::move(atm_)) {}
 
 void
-CAtmosphereData::Access() {
+CAtmosphereData::CollectInto(StringInserter si_) {
     LockGuard lk(m_mutex);
-    m_accessFn(SAccessor{++m_atmosphere, StringView{m_atmosphere.Nmea()}});
+    ++m_atmosphere;
+    si_.Copy(m_atmosphere.Nmea());
 }
 
 auto

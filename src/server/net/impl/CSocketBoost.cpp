@@ -55,12 +55,12 @@ CSocketBoost::Address() const -> String {
 }
 
 auto
-CSocketBoost::Write(StringView const& sv_) -> bool {
+CSocketBoost::Write(String const& str_) -> bool {
     if (!m_socket.is_open()) {
         throw error::CSocketError("cannot write on closed socket");
     }
     boost::system::error_code ec;
-    boost::asio::write(m_socket, boost::asio::buffer(sv_.data(), sv_.length()), ec);
+    boost::asio::write(m_socket, boost::asio::buffer(str_), ec);
     return !ec;
 }
 

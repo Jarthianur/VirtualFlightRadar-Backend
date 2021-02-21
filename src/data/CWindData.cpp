@@ -27,13 +27,11 @@
 using vfrb::object::CObject;
 using vfrb::object::CWind;
 using vfrb::concurrent::LockGuard;
+using vfrb::str_util::StringInserter;
 
 namespace vfrb::data
 {
-CWindData::CWindData(AccessFn&& fn_) : IData(std::move(fn_)) {}
-
-CWindData::CWindData(AccessFn&& fn_, object::CWind&& wind_)
-    : IData(std::move(fn_)), m_wind(std::move(wind_)) {}
+CWindData::CWindData(object::CWind&& wind_) : m_wind(std::move(wind_)) {}
 
 auto
 CWindData::Update(CObject&& wind_) -> bool {
@@ -42,9 +40,10 @@ CWindData::Update(CObject&& wind_) -> bool {
 }
 
 void
-CWindData::Access() {
+CWindData::CollectInto(StringInserter si_) {
     LockGuard lk(m_mutex);
-    m_accessFn(SAccessor{++m_wind, StringView{m_wind.Nmea()}});
+    ++m_wind;
+    si_.Copy(m_wind.Nmea());
     m_wind.Clear();
 }
 

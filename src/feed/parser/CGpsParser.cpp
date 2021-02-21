@@ -47,8 +47,7 @@ CGpsParser::CGpsParser()
 auto
 CGpsParser::Parse(String&& str_, u32 prio_) const -> CGpsPosition {
     try {
-        if (std::cmatch match; str_util::MatchChecksum({str_.c_str(), str_.length()}) &&
-                               std::regex_match(str_.c_str(), match, m_gpggaRe)) {
+        if (std::cmatch match; MatchChecksum(str_) && std::regex_match(str_.c_str(), match, m_gpggaRe)) {
             return parsePosition(match, prio_);
         }
     } catch ([[maybe_unused]] str_util::error::CConversionError const&) {

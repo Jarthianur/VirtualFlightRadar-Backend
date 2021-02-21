@@ -23,6 +23,7 @@
 #include "object/CAircraft.hpp"
 #include "object/CGpsPosition.hpp"
 #include "util/ClassUtils.hpp"
+#include "util/StringUtils.hpp"
 
 #include "Types.hpp"
 
@@ -33,9 +34,6 @@ namespace vfrb::data::processor
  */
 class CAircraftProcessor
 {
-public:
-    CTCONST NMEA_SIZE = 192;
-
 private:
     CTCONST ICAO_STD_ATMOSPHERE = 1013.25;
 
@@ -66,17 +64,15 @@ private:
      * @brief Append PFLAU sentence to processing string.
      * @param aircraft The Aircaft
      */
-    auto
-    appendPflau(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-        -> usize;
+    void
+    appendPflau(object::CAircraft const& aircraft_, str_util::StringInserter& nmea_) const;
 
     /**
      * @brief Append PFLAA sentence to processing string.
      * @param aircraft The Aircaft
      */
-    auto
-    appendPflaa(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-        -> usize;
+    void
+    appendPflaa(object::CAircraft const& aircraft_, str_util::StringInserter& nmea_) const;
 
 public:
     CAircraftProcessor();
@@ -87,7 +83,7 @@ public:
      * @param aircraft The Aircraft to process
      */
     void
-    Process(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_) const;
+    Process(object::CAircraft const& aircraft_, str_util::StringInserter& nmea_) const;
 
     /**
      * @brief Set the refered position and atmospheric pressure.

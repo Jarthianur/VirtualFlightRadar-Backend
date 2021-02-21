@@ -20,6 +20,10 @@
 
 #pragma once
 
+#include <fmt/chrono.h>
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <iterator>
 #include <limits>
 #include <regex>
 #include <tuple>
@@ -295,11 +299,14 @@ operator==(std::csub_match const& sub_, str cstr_) -> bool {
  * @return the checksum
  */
 inline auto
-Checksum(StringView const& sv_, usize pos_) -> u32 {
-    u32   csum = 0;
-    usize i    = 1 + pos_;  // $ in nmea str not included
-    while (i < sv_.length() && sv_[i] != '*') {
-        csum ^= static_cast<u32>(sv_[i++]);
+Checksum(String::const_iterator it_, String::const_iterator end_) -> u32 {
+    u32 csum = 0;
+    if (it_ != end_) {
+        ++it_;  // $ in nmea str not included
+    }
+    while (it_ != end_ && *it_ != '*') {
+        csum ^= static_cast<u32>(*it_);
+        ++it_;
     }
     return csum;
 }
@@ -310,15 +317,43 @@ Checksum(StringView const& sv_, usize pos_) -> u32 {
  * @return true if equal, else false
  */
 inline auto
-MatchChecksum(StringView const& sv_) -> bool {
-    auto const cs_begin = sv_.rfind('*');
-    if (cs_begin == StringView::npos || cs_begin + 3 > sv_.length()) {
+MatchChecksum(String const& str_) -> bool {
+    auto const cs_begin = str_.rfind('*');
+    if (cs_begin == String::npos || cs_begin + 3 > str_.length()) {
         return false;
     }
     bool match = false;
-    if (auto [v, ec] = Convert<x32>(sv_.data() + cs_begin + 1, sv_.data() + cs_begin + 3); ec == EErrc::OK) {
-        match = (v == Checksum(sv_, 0));
+    if (auto [v, ec] = Convert<x32>(str_.data() + cs_begin + 1, str_.data() + cs_begin + 3);
+        ec == EErrc::OK) {
+        match = (v == Checksum(str_.begin(), str_.end()));
     }
     return match;
 }
+
+class StringInserter
+{
+    std::back_insert_iterator<String> m_iter;
+    String*                           m_string;
+
+public:
+    explicit StringInserter(String* str_) : m_iter(std::back_inserter(*str_)), m_string(str_) {}
+
+    void
+    Copy(String const& str_) {
+        std::copy(str_.cbegin(), str_.cend(), m_iter);
+    }
+
+    template<typename... Args>
+    auto
+    Format(str fmt_, Args&&... args_) noexcept -> String::const_iterator {
+        auto oldLen = m_string->length();
+        fmt::format_to(m_iter, fmt_, std::forward<Args>(args_)...);
+        return m_string->cbegin() + oldLen;
+    }
+
+    auto
+    End() -> String::const_iterator {
+        return m_string->cend();
+    }
+};
 }  // namespace vfrb::str_util

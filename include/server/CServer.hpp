@@ -87,7 +87,7 @@ public:
      * @param sv_ The message
      */
     void
-    Send(StringView const& sv_) REQUIRES(!m_mutex);
+    Send(String const& str_) REQUIRES(!m_mutex);
 };
 
 template<typename SocketT>
@@ -138,13 +138,13 @@ CServer<SocketT>::Stop() REQUIRES(!m_mutex) {
 
 template<typename SocketT>
 void
-CServer<SocketT>::Send(StringView const& sv_) REQUIRES(!m_mutex) {
+CServer<SocketT>::Send(String const& str_) REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
-    if (sv_.empty() || m_connections.empty()) {
+    if (str_.empty() || m_connections.empty()) {
         return;
     }
     for (auto it = m_connections.begin(); it != m_connections.end();) {
-        if (!it->Write(sv_)) {
+        if (!it->Write(str_)) {
             s_logger.Warn(LOG_PREFIX, "lost connection to: ", it->Address());
             it = m_connections.erase(it);
         } else {

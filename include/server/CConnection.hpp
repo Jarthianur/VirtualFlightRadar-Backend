@@ -54,7 +54,7 @@ public:
      * @return true on success, else false
      */
     auto
-    Write(StringView const& sv_) -> bool;
+    Write(String const& str_) -> bool;
 
     GETTER_REF(Address, m_address)
 };
@@ -77,9 +77,9 @@ CConnection<SocketT>::operator=(CConnection&& other_) noexcept -> CConnection<So
 
 template<typename SocketT>
 auto
-CConnection<SocketT>::Write(StringView const& sv_) -> bool {
+CConnection<SocketT>::Write(String const& str_) -> bool {
     try {
-        return m_socket.Write(sv_);
+        return m_socket.Write(str_);
     } catch (net::error::CSocketError const& e) {
         CLogger::Instance().Debug("(Connection) write: ", e.Message());
     }
