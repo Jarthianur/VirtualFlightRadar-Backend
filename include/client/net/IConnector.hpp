@@ -78,14 +78,14 @@ public:
      * @param callback The callback to execute when done
      */
     virtual void
-    OnConnect(SEndpoint const& ep_, Callback const& cb_) = 0;
+    OnConnect(SEndpoint const& ep_, Callback cb_) = 0;
 
     /**
      * @brief Attempt to read from current connection.
      * @param callback The callback to execute when done
      */
     virtual void
-    OnRead(ReadCallback const& cb_) = 0;
+    OnRead(ReadCallback cb_) = 0;
 
     /**
      * @brief Attempt to write to current connection.
@@ -93,7 +93,7 @@ public:
      * @param callback The callback to execute when done
      */
     virtual void
-    OnWrite(String const& str_, Callback const& cb_) = 0;
+    OnWrite(String const& str_, Callback cb_) = 0;
 
     /**
      * @brief Execute function after timeout.
@@ -101,7 +101,7 @@ public:
      * @param timeout  The timeout (default: 0)
      */
     virtual void
-    OnTimeout(Callback const& cb_, u32 to_) = 0;
+    OnTimeout(Callback cb_, u32 to_) = 0;
 
     /**
      * @brief Reset the timeout.

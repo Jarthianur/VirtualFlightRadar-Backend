@@ -22,9 +22,6 @@
 
 #include <functional>
 
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
-
 #include "server/net/IAcceptor.hpp"
 #include "server/net/impl/CSocketBoost.hpp"
 #include "util/ClassUtils.hpp"
@@ -41,13 +38,13 @@ class CAcceptorBoost : public IAcceptor<CSocketBoost>
     NOT_COPYABLE(CAcceptorBoost)
     NOT_MOVABLE(CAcceptorBoost)
 
-    boost::asio::io_service        m_ioService;  ///< Internal IO-service
-    boost::asio::ip::tcp::acceptor m_acceptor;   ///< Internal acceptor
-    CSocketBoost                   m_socket;     ///< Staging socket
+    asio::io_context        m_ioCtx;     ///< Internal IO-service
+    asio::ip::tcp::acceptor m_acceptor;  ///< Internal acceptor
+    CSocketBoost            m_socket;    ///< Staging socket
 
     /// Intermediate handler for accept event
     void
-    handleAccept(boost::system::error_code err_, Callback const& cb_);
+    handleAccept(asio::error_code err_, Callback const& cb_);
 
 public:
     explicit CAcceptorBoost(u16 port_);
@@ -55,16 +52,20 @@ public:
 
     void
     Run() override;
+
     void
     Stop() override;
+
     void
     OnAccept(Callback&& cb_) override;
+
     void
     Close() override;
 
     /// @throw vfrb::server::net::error::CSocketError
     auto
     StartConnection() -> CConnection<CSocketBoost> override;
+
     [[nodiscard]] auto
     StagedAddress() const -> String override;
 };

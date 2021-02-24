@@ -20,25 +20,23 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/move/move.hpp>
-
 #include "util/ClassUtils.hpp"
 
 #include "Types.hpp"
+#include "asio.hpp"
 
 namespace vfrb::server::net
 {
 /// Socket implementation using boost
 class CSocketBoost
 {
-    boost::asio::ip::tcp::socket m_socket;  ///< Underlying socket
+    asio::ip::tcp::socket m_socket;  ///< Underlying socket
 
 public:
     MOVABLE(CSocketBoost)
     NOT_COPYABLE(CSocketBoost)
 
-    explicit CSocketBoost(BOOST_RV_REF(boost::asio::ip::tcp::socket) sock_);
+    explicit CSocketBoost(asio::ip::tcp::socket&& sock_);
     ~CSocketBoost() noexcept;
 
     /// @throw vfrb::server::net::error::CSocketError
@@ -53,11 +51,12 @@ public:
      */
     auto
     Write(String const& str_) -> bool;
+
     void
     Close();
 
     /// Get the underlying socket.
     auto
-    Get() -> boost::asio::ip::tcp::socket&;
+    Get() -> asio::ip::tcp::socket&;
 };
 }  // namespace vfrb::server::net

@@ -75,7 +75,7 @@ IClient::Run() NO_THREAD_SAFETY_ANALYSIS {
     if (m_state == EState::NONE) {
         connect();
         lk.unlock();
-        m_connector->Run();  // blocking
+        m_connector->Run();
         m_state = EState::NONE;
     }
 }

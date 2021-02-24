@@ -22,17 +22,15 @@
 
 #include <functional>
 
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
-
 #include "util/ClassUtils.hpp"
 
 #include "CGuardedThread.hpp"
 #include "Types.hpp"
+#include "asio.hpp"
 
 namespace vfrb::concurrent
 {
-using SignalHandler = std::function<void(boost::system::error_code const&, int const)>;
+using SignalHandler = std::function<void(asio::error_code const&, int const)>;
 
 /// Catch and handle system signals.
 class CSignalListener
@@ -40,9 +38,9 @@ class CSignalListener
     NOT_COPYABLE(CSignalListener)
     NOT_MOVABLE(CSignalListener)
 
-    boost::asio::io_service m_ioService;  ///< Internal IO-service
-    boost::asio::signal_set m_sigSet;     ///< Internal signal set
-    CGuardedThread          m_thread;     ///< The underlying thread
+    asio::io_service m_ioCtx;   ///< Internal IO-service
+    asio::signal_set m_sigSet;  ///< Internal signal set
+    CGuardedThread   m_thread;  ///< The underlying thread
 
 public:
     CSignalListener();
@@ -50,6 +48,7 @@ public:
 
     void
     Run();
+
     void
     Stop();
 

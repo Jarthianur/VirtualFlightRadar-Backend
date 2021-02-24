@@ -22,10 +22,9 @@
 
 #include <istream>
 
-#include <boost/asio.hpp>
-#include <boost/system/error_code.hpp>
-
 #include "client/net/IConnector.hpp"
+
+#include "asio.hpp"
 
 namespace vfrb::client::net
 {
@@ -34,16 +33,16 @@ namespace vfrb::client::net
  */
 class CConnectorBoost : public IConnector
 {
-    boost::asio::io_context        m_ioCtx;     ///< Internal IO-service
-    boost::asio::ip::tcp::socket   m_socket;    ///< Connection socket
-    boost::asio::ip::tcp::resolver m_resolver;  ///< Host resolver
-    boost::asio::deadline_timer    m_timer;     ///< Timer
-    boost::asio::streambuf         m_buffer;    ///< Read buffer
-    String                         m_response;  ///< Read message
-    std::istream                   m_istream;   ///< Message stream for conversion
+    asio::io_context        m_ioCtx;     ///< Internal IO-service
+    asio::ip::tcp::socket   m_socket;    ///< Connection socket
+    asio::ip::tcp::resolver m_resolver;  ///< Host resolver
+    asio::deadline_timer    m_timer;     ///< Timer
+    asio::streambuf         m_buffer;    ///< Read buffer
+    String                  m_response;  ///< Read message
+    std::istream            m_istream;   ///< Message stream for conversion
 
     static auto
-    evalErrorCode(boost::system::error_code err_) -> EErrc;
+    evalErrorCode(asio::error_code err_) -> EErrc;
 
     /**
      * @brief Handler for resolving endpoint
@@ -52,8 +51,7 @@ class CConnectorBoost : public IConnector
      * @param callback   The callback to invoke
      */
     void
-    handleResolve(boost::system::error_code err_, boost::asio::ip::tcp::resolver::results_type const& res_,
-                  Callback const& cb_) noexcept;
+    handleResolve(asio::error_code err_, asio::ip::tcp::resolver::results_type res_, Callback cb_) noexcept;
 
     /**
      * @brief Handler for connecting to endpoint
@@ -62,7 +60,7 @@ class CConnectorBoost : public IConnector
      * @param callback   The callback to invoke
      */
     void
-    handleConnect(boost::system::error_code err_, Callback const& cb_) noexcept;
+    handleConnect(asio::error_code err_, Callback cb_) noexcept;
 
     /**
      * @brief Handler for timed out timer
@@ -70,7 +68,7 @@ class CConnectorBoost : public IConnector
      * @param callback The callback to invoke
      */
     void
-    handleTimeout(boost::system::error_code err_, Callback const& cb_) noexcept;
+    handleTimeout(asio::error_code err_, Callback cb_) noexcept;
 
     /**
      * @brief Handler for reading from endpoint
@@ -79,16 +77,7 @@ class CConnectorBoost : public IConnector
      * @param callback The callback to invoke
      */
     void
-    handleRead(boost::system::error_code err_, usize bytes_, ReadCallback const& cb_) noexcept;
-
-    /**
-     * @brief Handler for writing to endpoint
-     * @param error    The error code
-     * @param bytes    The amount of sent bytes
-     * @param callback The callback to invoke
-     */
-    void
-    handleWrite(boost::system::error_code err_, usize bytes_, Callback const& cb_) noexcept;
+    handleRead(asio::error_code err_, usize bytes_, ReadCallback cb_) noexcept;
 
 public:
     CConnectorBoost();
@@ -118,14 +107,14 @@ public:
      * @param callback The callback to invoke when done
      */
     void
-    OnConnect(SEndpoint const& ep_, Callback const& cb_) override;
+    OnConnect(SEndpoint const& ep_, Callback cb_) override;
 
     /**
      * @brief Schedule to read from endpoint.
      * @param callback The callback to invoke when done
      */
     void
-    OnRead(ReadCallback const& cb_) override;
+    OnRead(ReadCallback cb_) override;
 
     /**
      * @brief Schedule to write to endpoint.
@@ -133,7 +122,7 @@ public:
      * @param callback The callback to invoke when done
      */
     void
-    OnWrite(String const& str_, Callback const& cb_) override;
+    OnWrite(String const& str_, Callback cb_) override;
 
     /**
      * @brief Schedule an action after a timeout.
@@ -142,7 +131,7 @@ public:
      * @param timeout  The timeout in seconds (default: 0)
      */
     void
-    OnTimeout(Callback const& cb_, u32 to_) override;
+    OnTimeout(Callback cb_, u32 to_) override;
 
     /**
      * @brief Reset the timer to this value.

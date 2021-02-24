@@ -73,7 +73,7 @@ CVfrb::Run() noexcept {
     concurrent::CSignalListener           signals;
     client::CClientManager                clientManager;
 
-    signals.AddHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {
+    signals.AddHandler([this](asio::error_code const&, [[maybe_unused]] const int) {
         logger.Info(LOG_PREFIX, "caught signal to shutdown...");
         m_running = false;
     });

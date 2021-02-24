@@ -20,16 +20,12 @@
 
 #include "server/net/impl/CAcceptorBoost.hpp"
 
-#include <boost/bind.hpp>
-#include <boost/move/move.hpp>
-#include <boost/system/error_code.hpp>
-
 #include "server/CConnection.hpp"
 
 #include "CLogger.hpp"
 
-using boost::asio::ip::tcp;
-using boost::system::error_code;
+using asio::ip::tcp;
+using asio::error_code;
 
 namespace vfrb::server::net
 {
@@ -38,9 +34,9 @@ static auto const& logger     = CLogger::Instance();
 
 CAcceptorBoost::CAcceptorBoost(u16 port_)
     : IAcceptor<CSocketBoost>(),
-      m_ioService(),
-      m_acceptor(m_ioService, tcp::endpoint(tcp::v4(), port_), tcp::acceptor::reuse_address(true)),
-      m_socket(boost::move(tcp::socket(m_ioService))) {}
+      m_ioCtx(),
+      m_acceptor(m_ioCtx, tcp::endpoint(tcp::v4(), port_), tcp::acceptor::reuse_address(true)),
+      m_socket(std::move(tcp::socket(m_ioCtx))) {}
 
 CAcceptorBoost::~CAcceptorBoost() noexcept {
     Stop();
@@ -50,7 +46,7 @@ void
 CAcceptorBoost::Run() {
     try {
         if (m_acceptor.is_open()) {
-            m_ioService.run();
+            m_ioCtx.run();
         }
     } catch (std::exception const& e) {
         logger.Error(LOG_PREFIX, ": ", e.what());
@@ -64,8 +60,8 @@ CAcceptorBoost::Stop() {
     if (m_acceptor.is_open()) {
         m_acceptor.close();
     }
-    if (!m_ioService.stopped()) {
-        m_ioService.stop();
+    if (!m_ioCtx.stopped()) {
+        m_ioCtx.stop();
     }
     m_socket.Close();
 }

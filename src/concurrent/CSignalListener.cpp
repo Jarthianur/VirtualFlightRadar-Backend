@@ -22,7 +22,7 @@
 
 namespace vfrb::concurrent
 {
-CSignalListener::CSignalListener() : m_ioService(), m_sigSet(m_ioService) {
+CSignalListener::CSignalListener() : m_ioCtx(), m_sigSet(m_ioCtx) {
     m_sigSet.add(SIGINT);
     m_sigSet.add(SIGTERM);
 #ifdef SIGQUIT
@@ -36,13 +36,13 @@ CSignalListener::~CSignalListener() noexcept {
 
 void
 CSignalListener::Run() {
-    m_thread.Spawn([this]() { m_ioService.run(); });
+    m_thread.Spawn([this]() { m_ioCtx.run(); });
 }
 
 void
 CSignalListener::Stop() {
-    if (!m_ioService.stopped()) {
-        m_ioService.stop();
+    if (!m_ioCtx.stopped()) {
+        m_ioCtx.stop();
     }
 }
 
