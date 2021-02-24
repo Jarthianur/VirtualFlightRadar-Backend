@@ -151,9 +151,9 @@ auto
 CVfrb::duration(std::chrono::steady_clock::time_point start_) -> String {
     std::chrono::minutes runtime =
         std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start_);
-    s64               d = runtime.count() / 60 / 24;
-    s64               h = runtime.count() / 60 - d * 24;
-    s64               m = runtime.count() % 60;
+    i64               d = runtime.count() / 60 / 24;
+    i64               h = runtime.count() / 60 - d * 24;
+    i64               m = runtime.count() % 60;
     std::stringstream ss;
     ss << d << "d " << (h < 10 ? "0" : "") << h << ":" << (m < 10 ? "0" : "") << m;
     return ss.str();

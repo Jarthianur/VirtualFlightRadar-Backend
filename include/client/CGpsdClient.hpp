@@ -40,7 +40,7 @@ class CGpsdClient : public IClient
      * @threadsafe
      */
     void
-    handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
+    handleConnect(Result<void> res_) override REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for watch-request sending
@@ -48,7 +48,7 @@ class CGpsdClient : public IClient
      * @threadsafe
      */
     void
-    handleWatch(net::EErrc err_) REQUIRES(!m_mutex);
+    handleWatch(Result<void> res_) REQUIRES(!m_mutex);
 
     auto
     logPrefix() const -> str override;

@@ -30,14 +30,8 @@ namespace vfrb::client::net
 {
 struct SEndpoint;
 
-enum class EErrc : enum_type
-{
-    OK,
-    Err
-};
-
-using Callback     = std::function<void(EErrc)>;                 ///< Common callback function
-using ReadCallback = std::function<void(EErrc, String const&)>;  ///< Callback function for read
+using Callback     = std::function<void(Result<void>&&)>;    ///< Common callback function
+using ReadCallback = std::function<void(Result<String>&&)>;  ///< Callback function for read
 
 /**
  * @brief The async TCP interface for clients

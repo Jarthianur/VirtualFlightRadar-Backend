@@ -86,8 +86,8 @@ DESCRIBE_PAR("test_StringUtils") {
     IT("should convert s8 correctly") {
         str nr        = "100";
         str nr2       = "-100";
-        auto [v, e]   = Convert<s8>(nr, nr + 3);
-        auto [v2, e2] = Convert<s8>(nr2, nr2 + 4);
+        auto [v, e]   = Convert<i8>(nr, nr + 3);
+        auto [v2, e2] = Convert<i8>(nr2, nr2 + 4);
         ASSERT_EQ(e, EErrc::OK);
         ASSERT_EQ(v, 100);
         ASSERT_EQ(e2, EErrc::OK);
@@ -96,17 +96,17 @@ DESCRIBE_PAR("test_StringUtils") {
     IT("should fail to convert bad s8") {
         {
             str noNr    = "abc";
-            auto [v, e] = Convert<s8>(noNr, noNr + 3);
+            auto [v, e] = Convert<i8>(noNr, noNr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
             str noNr    = "";
-            auto [v, e] = Convert<s8>(noNr, noNr + 1);
+            auto [v, e] = Convert<i8>(noNr, noNr + 1);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
             str nr      = "1";
-            auto [v, e] = Convert<s8>(nr, nr + 3);
+            auto [v, e] = Convert<i8>(nr, nr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
     }
@@ -162,8 +162,8 @@ DESCRIBE_PAR("test_StringUtils") {
     IT("should convert s32 correctly") {
         str nr        = "1234";
         str nr2       = "-1234";
-        auto [v, e]   = Convert<s32>(nr, nr + 4);
-        auto [v2, e2] = Convert<s32>(nr2, nr2 + 5);
+        auto [v, e]   = Convert<i32>(nr, nr + 4);
+        auto [v2, e2] = Convert<i32>(nr2, nr2 + 5);
         ASSERT_EQ(e, EErrc::OK);
         ASSERT_EQ(v, 1234);
         ASSERT_EQ(e2, EErrc::OK);
@@ -172,17 +172,17 @@ DESCRIBE_PAR("test_StringUtils") {
     IT("should fail to convert bad s32") {
         {
             str noNr    = "abc";
-            auto [v, e] = Convert<s32>(noNr, noNr + 3);
+            auto [v, e] = Convert<i32>(noNr, noNr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
             str noNr    = "";
-            auto [v, e] = Convert<s32>(noNr, noNr + 1);
+            auto [v, e] = Convert<i32>(noNr, noNr + 1);
             ASSERT_EQ(e, EErrc::ERR);
         }
         {
             str nr      = "1";
-            auto [v, e] = Convert<s32>(nr, nr + 3);
+            auto [v, e] = Convert<i32>(nr, nr + 3);
             ASSERT_EQ(e, EErrc::ERR);
         }
     }
@@ -268,6 +268,6 @@ DESCRIBE_PAR("test_StringUtils") {
         ASSERT_EQ(r, 1234);
     }
     IT("should throw on parse failure") {
-        ASSERT_THROWS(Parse<s32>(""), str_util::error::CConversionError);
+        ASSERT_THROWS(Parse<i32>(""), str_util::error::CConversionError);
     };
 };

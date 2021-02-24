@@ -23,7 +23,6 @@
 #include "math/Math.hpp"
 #include "object/CAircraft.hpp"
 #include "object/CGpsPosition.hpp"
-#include "util/Utility.hpp"
 
 using vfrb::object::CAircraft;
 using vfrb::object::SLocation;
@@ -32,9 +31,9 @@ using vfrb::str_util::StringInserter;
 
 namespace vfrb::data::processor
 {
-CAircraftProcessor::CAircraftProcessor() : CAircraftProcessor(limits::s32::max()) {}
+CAircraftProcessor::CAircraftProcessor() : CAircraftProcessor(limits::i32::max()) {}
 
-CAircraftProcessor::CAircraftProcessor(s32 maxDist_) : m_maxDistance(maxDist_) {}
+CAircraftProcessor::CAircraftProcessor(i32 maxDist_) : m_maxDistance(maxDist_) {}
 
 void
 CAircraftProcessor::Process(CAircraft const& aircraft_, StringInserter& nmea_) const {
@@ -92,7 +91,7 @@ CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, StringInserter& nmea
     if (aircraft_.HasFullInfo()) {
         begin = nmea_.Format(
             "$PFLAA,0,{:d},{:d},{:d},{:d},{:s},{:03d},,{:d},{:3.1f},{:1X}*", m_relNorth, m_relEast,
-            m_relVertical, util::AsUnderlyingType(aircraft_.IdType()), *aircraft_.Id(),
+            m_relVertical, AsUnderlyingType(aircraft_.IdType()), *aircraft_.Id(),
             math::DoubleToInt(math::Saturate(aircraft_.Movement().Heading, CAircraft::SMovement::MIN_HEADING,
                                              CAircraft::SMovement::MAX_HEADING)),
             math::DoubleToInt(math::Saturate(aircraft_.Movement().GndSpeed * math::MS_2_KMH,
@@ -100,11 +99,10 @@ CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, StringInserter& nmea
                                              CAircraft::SMovement::MAX_GND_SPEED)),
             math::Saturate(aircraft_.Movement().ClimbRate, CAircraft::SMovement::MIN_CLIMB_RATE,
                            CAircraft::SMovement::MAX_CLIMB_RATE),
-            util::AsUnderlyingType(aircraft_.AircraftType()));
+            AsUnderlyingType(aircraft_.AircraftType()));
     } else {
-        begin =
-            nmea_.Format("$PFLAA,0,{:d},{:d},{:d},1,{:s},,,,,{:1X}*", m_relNorth, m_relEast, m_relVertical,
-                         *aircraft_.Id(), util::AsUnderlyingType(aircraft_.AircraftType()));
+        begin = nmea_.Format("$PFLAA,0,{:d},{:d},{:d},1,{:s},,,,,{:1X}*", m_relNorth, m_relEast,
+                             m_relVertical, *aircraft_.Id(), AsUnderlyingType(aircraft_.AircraftType()));
     }
     nmea_.Format("{:02X}\r\n", Checksum(begin, nmea_.End()));
 }

@@ -49,7 +49,7 @@ public:
      * @throw std::logic_error from parent constructor
      */
     CSbsFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
-             s32 maxHeight_);
+             i32 maxHeight_);
 
     /**
      * @brief Get this feeds Protocol.
@@ -62,6 +62,6 @@ public:
      * @brief Feed::process.
      */
     auto
-    Process(String str_) -> bool override;
+    Process(String&& str_) -> bool override;
 };
 }  // namespace vfrb::feed

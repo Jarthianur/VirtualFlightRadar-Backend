@@ -55,13 +55,13 @@ class CAprsParser : public IParser<object::CAircraft>
     CTCONST AIRCRAFT_TYPE_BITS = 0x7CU;
 
     std::regex const m_aprsRe;     ///< Regular expression for APRS protocol
-    s32 const        m_maxHeight;  ///< The max height filter
+    i32 const        m_maxHeight;  ///< The max height filter
 
     /**
      * @throw vfrb::feed::parser::error::CParseError
      * @throw vfrb::str_util::error::CConversionError
      */
-    [[nodiscard]] auto static parseLocation(std::cmatch const& match_, s32 maxHeight_) -> object::SLocation;
+    [[nodiscard]] auto static parseLocation(std::cmatch const& match_, i32 maxHeight_) -> object::SLocation;
 
     /// @throw vfrb::str_util::error::CConversionError
     [[nodiscard]] auto static parseComment(std::cmatch const& match_) -> AircraftInfo;
@@ -75,7 +75,7 @@ class CAprsParser : public IParser<object::CAircraft>
 
 public:
     /// @param maxHeight_ The filter for max height
-    explicit CAprsParser(s32 maxHeight_);
+    explicit CAprsParser(i32 maxHeight_);
 
     auto
     Parse(String&& str_, u32 prio_) const -> object::CAircraft override;

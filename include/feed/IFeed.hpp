@@ -95,7 +95,7 @@ public:
      * @param response The response
      */
     virtual auto
-    Process(String str_) -> bool = 0;
+    Process(String&& str_) -> bool = 0;
 
     [[nodiscard]] auto
     Priority() const -> std::remove_const<decltype(m_priority)>::type;

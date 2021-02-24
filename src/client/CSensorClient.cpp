@@ -28,7 +28,6 @@
 
 using vfrb::client::net::SEndpoint;
 using vfrb::client::net::IConnector;
-using vfrb::client::net::EErrc;
 using vfrb::concurrent::LockGuard;
 
 namespace vfrb::client
@@ -45,27 +44,27 @@ CSensorClient::read() {
 }
 
 void
-CSensorClient::checkDeadline(EErrc err_) {
+CSensorClient::checkDeadline(Result<void> res_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::RUNNING) {
-        if (err_ == EErrc::OK) {
+        if (res_) {
             logger.Debug(LOG_PREFIX, "timed out, reconnect ...");
             reconnect();
         } else {
-            m_connector->OnTimeout([this](EErrc err_) { checkDeadline(err_); }, 0);
+            m_connector->OnTimeout([this](Result<void> res_) { checkDeadline(res_); }, 0);
         }
     }
 }
 
 void
-CSensorClient::handleConnect(EErrc err_) {
+CSensorClient::handleConnect(Result<void> res_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
-        if (err_ == EErrc::OK) {
+        if (res_) {
             m_state = EState::RUNNING;
             m_backoff.Reset();
             logger.Info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
-            m_connector->OnTimeout([this](EErrc err_) { checkDeadline(err_); }, RECEIVE_TIMEOUT);
+            m_connector->OnTimeout([this](Result<void> res_) { checkDeadline(res_); }, RECEIVE_TIMEOUT);
             read();
         } else {
             logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);

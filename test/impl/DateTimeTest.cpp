@@ -25,7 +25,7 @@ namespace vfrb::object::date_time
 namespace
 {
 thread_local u32 s_Day = 0;
-thread_local s64 s_Now = 0;
+thread_local i64 s_Now = 0;
 }  // namespace
 
 void
@@ -39,7 +39,7 @@ Now(u32 h_, u32 m_, u32 s_) {
 }
 
 auto
-Now() -> s64 {
+Now() -> i64 {
     return s_Now;
 }
 

@@ -30,7 +30,6 @@
 
 using vfrb::client::net::SEndpoint;
 using vfrb::client::net::IConnector;
-using vfrb::client::net::EErrc;
 using vfrb::concurrent::LockGuard;
 
 namespace vfrb::client
@@ -59,11 +58,11 @@ CAprscClient::Hash() const -> usize {
 }
 
 void
-CAprscClient::handleConnect(EErrc err_) {
+CAprscClient::handleConnect(Result<void> res_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
-        if (err_ == EErrc::OK) {
-            m_connector->OnWrite(m_login, [this](EErrc err_) { handleLogin(err_); });
+        if (res_) {
+            m_connector->OnWrite(m_login, [this](Result<void> res_) { handleLogin(res_); });
         } else {
             logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
@@ -73,14 +72,14 @@ CAprscClient::handleConnect(EErrc err_) {
 
 void
 CAprscClient::sendKeepAlive() {
-    m_connector->OnTimeout([this](EErrc err_) { handleSendKeepAlive(err_); }, KEEPALIVE_INTERVAL);
+    m_connector->OnTimeout([this](Result<void> res_) { handleSendKeepAlive(res_); }, KEEPALIVE_INTERVAL);
 }
 
 void
-CAprscClient::handleLogin(EErrc err_) {
+CAprscClient::handleLogin(Result<void> res_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
-        if (err_ == EErrc::OK) {
+        if (res_) {
             m_state = EState::RUNNING;
             m_backoff.Reset();
             logger.Info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
@@ -94,14 +93,14 @@ CAprscClient::handleLogin(EErrc err_) {
 }
 
 void
-CAprscClient::handleSendKeepAlive(EErrc err_) {
+CAprscClient::handleSendKeepAlive(Result<void> res_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::RUNNING) {
-        if (err_ == EErrc::OK) {
-            m_connector->OnWrite("#keep-alive beacon\r\n", [this](EErrc err_) {
+        if (res_) {
+            m_connector->OnWrite("#keep-alive beacon\r\n", [this](Result<void> res_) {
                 LockGuard lk(m_mutex);
                 if (m_state == EState::RUNNING) {
-                    if (err_ != EErrc::OK) {
+                    if (!res_) {
                         logger.Error(LOG_PREFIX, "send keep-alive beacon failed");
                         reconnect();
                     }

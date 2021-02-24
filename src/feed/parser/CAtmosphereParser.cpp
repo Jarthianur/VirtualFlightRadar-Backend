@@ -26,7 +26,6 @@
 using vfrb::object::CAtmosphere;
 using vfrb::str_util::MatchChecksum;
 using vfrb::str_util::Convert;
-using vfrb::str_util::EErrc;
 
 namespace vfrb::feed::parser
 {

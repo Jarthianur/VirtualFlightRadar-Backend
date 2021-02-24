@@ -38,7 +38,7 @@ using namespace str_util;
 DESCRIBE("test_CAircraftData") {
     SPtr<CAircraftData> uut;
     String              nmea;
-    s32 const           M1000 = math::DoubleToInt(math::FEET_2_M * 3281);
+    i32 const           M1000 = math::DoubleToInt(math::FEET_2_M * 3281);
 
     BEFORE_EACH() {
         uut = std::make_shared<CAircraftData>();

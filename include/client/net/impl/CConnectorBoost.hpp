@@ -41,18 +41,6 @@ class CConnectorBoost : public IConnector
     String                  m_response;  ///< Read message
     std::istream            m_istream;   ///< Message stream for conversion
 
-    static auto
-    evalErrorCode(asio::error_code err_) -> EErrc;
-
-    /**
-     * @brief Handler for resolving endpoint
-     * @param error      The error code
-     * @param resolverIt The resolved host
-     * @param callback   The callback to invoke
-     */
-    void
-    handleResolve(asio::error_code err_, asio::ip::tcp::resolver::results_type res_, Callback cb_) noexcept;
-
     /**
      * @brief Handler for connecting to endpoint
      * @param error      The error code

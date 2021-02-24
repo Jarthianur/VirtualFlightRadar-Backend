@@ -28,7 +28,7 @@ namespace vfrb::object
 namespace date_time
 {
 extern auto
-Now() -> s64;
+Now() -> i64;
 extern auto
 Day() -> u32;
 }  // namespace date_time
@@ -66,7 +66,7 @@ CTimestamp::CTimestamp(StringView const& sv_) : m_day(date_time::Day()) {
     if (h > 23 || m > 59 || s > 59 || f > 999) {
         throw error::CTimestampParseError();
     }
-    m_value = static_cast<s64>(h * 3600000 + m * 60000 + s * 1000 + f);
+    m_value = static_cast<i64>(h * 3600000 + m * 60000 + s * 1000 + f);
     if (m_value >= date_time::Now()) {
         --m_day;
     }

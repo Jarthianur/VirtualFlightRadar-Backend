@@ -34,9 +34,9 @@ using vfrb::str_util::StringInserter;
 
 namespace vfrb::data
 {
-CAircraftData::CAircraftData() : CAircraftData(limits::s32::max()) {}
+CAircraftData::CAircraftData() : CAircraftData(limits::i32::max()) {}
 
-CAircraftData::CAircraftData(s32 maxDist_) : m_processor(maxDist_) {}
+CAircraftData::CAircraftData(i32 maxDist_) : m_processor(maxDist_) {}
 
 auto
 CAircraftData::Update(CObject&& aircraft_) -> bool {

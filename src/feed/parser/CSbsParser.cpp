@@ -30,7 +30,7 @@ using vfrb::object::CAircraft;
 using vfrb::object::SLocation;
 using vfrb::object::CTimestamp;
 using vfrb::str_util::Convert;
-using vfrb::str_util::EErrc;
+using vfrb::str_util::ConvertInto;
 
 namespace vfrb::feed::parser
 {
@@ -40,7 +40,7 @@ constexpr auto PROTO_START_INDEX = 6;
 constexpr auto PROTO_ITER_COUNT  = 16;
 }  // namespace
 
-CSbsParser::CSbsParser(s32 maxHeight_) : IParser<CAircraft>(), m_maxHeight(maxHeight_) {}
+CSbsParser::CSbsParser(i32 maxHeight_) : IParser<CAircraft>(), m_maxHeight(maxHeight_) {}
 
 auto
 CSbsParser::Parse(String&& str_, u32 prio_) const -> CAircraft {
@@ -70,13 +70,13 @@ CSbsParser::Parse(String&& str_, u32 prio_) const -> CAircraft {
                         }
                         break;
                     case SBS_FIELD_LAT:
-                        if (auto ec = Convert<f64>(str_.c_str() + p, str_.c_str() + delim, loc.Latitude);
+                        if (auto ec = ConvertInto<f64>(str_.c_str() + p, str_.c_str() + delim, loc.Latitude);
                             ec == EErrc::ERR) {
                             throw error::CParseError();
                         }
                         break;
                     case SBS_FIELD_LON:
-                        if (auto ec = Convert<f64>(str_.c_str() + p, str_.c_str() + delim, loc.Longitude);
+                        if (auto ec = ConvertInto<f64>(str_.c_str() + p, str_.c_str() + delim, loc.Longitude);
                             ec == EErrc::ERR) {
                             throw error::CParseError();
                         }

@@ -48,7 +48,7 @@ class CConfiguration
 
     /// @param key_ The filters property name
     auto
-    resolveFilter(str key_) const -> s32;
+    resolveFilter(str key_) const -> i32;
 
     /// Dump the configuration to INFO log.
     void
@@ -100,8 +100,8 @@ public:
     bool                                          GroundMode;    ///< Ground mode enabled?
     object::CGpsPosition const                    GpsPosition;   ///< Fallback position
     f64 const                                     AtmPressure;   ///< Atmospheric fallback pressure
-    s32 const                                     MaxHeight;     ///< Maximum height for reported aircrafts
-    s32 const                                     MaxDistance;   ///< Maximum distance for reported aircrafts
+    i32 const                                     MaxHeight;     ///< Maximum height for reported aircrafts
+    i32 const                                     MaxDistance;   ///< Maximum distance for reported aircrafts
     std::tuple<u16, usize> const                  ServerConfig;  ///< Port where to serve reports
     std::list<String> const                       FeedNames;     ///< List of feed names
     std::unordered_map<String, CProperties> const FeedProperties;  ///< Map feed names to their properties

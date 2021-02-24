@@ -27,7 +27,6 @@
 #include "concurrent/Mutex.hpp"
 #include "error/IError.hpp"
 #include "util/ClassUtils.hpp"
-#include "util/Utility.hpp"
 
 namespace vfrb
 {
@@ -52,7 +51,7 @@ class CLogger
     static constexpr auto
     prefix(std::ostream& stream_, ELevel l_) {
         constexpr std::array<str, 4> levels = {"[INFO ]  ", "[WARN ]  ", "[ERROR]  ", "[DEBUG]  "};
-        return [&, l = levels[util::AsUnderlyingType(l_)]] { stream_ << l << time() << ":: "; };
+        return [&, l = levels[AsUnderlyingType(l_)]] { stream_ << l << time() << ":: "; };
     }
 
     concurrent::Mutex mutable m_mutex;

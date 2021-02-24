@@ -83,18 +83,18 @@ CConfiguration::resolvePosition() const -> object::CGpsPosition {
     object::SLocation loc{};
     loc.Latitude  = parse<f64>(m_properties.Property(PATH_LATITUDE, "0.0"), PATH_LATITUDE);
     loc.Longitude = parse<f64>(m_properties.Property(PATH_LONGITUDE, "0.0"), PATH_LONGITUDE);
-    loc.Altitude  = parse<s32>(m_properties.Property(PATH_ALTITUDE, "0"), PATH_ALTITUDE);
+    loc.Altitude  = parse<i32>(m_properties.Property(PATH_ALTITUDE, "0"), PATH_ALTITUDE);
     f64 geoid     = parse<f64>(m_properties.Property(PATH_GEOID, "0.0"), PATH_GEOID);
     return object::CGpsPosition(0, loc, geoid);
 }
 
 auto
-CConfiguration::resolveFilter(str key_) const -> s32 {
+CConfiguration::resolveFilter(str key_) const -> i32 {
     try {
-        s32 filter = parse<s32>(m_properties.Property(key_, "-1"), key_);
-        return filter < 0 ? limits::s32::max() : filter;
+        i32 filter = parse<i32>(m_properties.Property(key_, "-1"), key_);
+        return filter < 0 ? limits::i32::max() : filter;
     } catch ([[maybe_unused]] error::CConversionError const&) {
-        return limits::s32::max();
+        return limits::i32::max();
     }
 }
 

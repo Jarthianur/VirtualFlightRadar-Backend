@@ -33,7 +33,6 @@
 
 using vfrb::client::net::SEndpoint;
 using vfrb::client::net::IConnector;
-using vfrb::client::net::EErrc;
 using vfrb::concurrent::LockGuard;
 using vfrb::concurrent::UniqueLock;
 using vfrb::concurrent::Mutex;
@@ -51,12 +50,12 @@ static auto const& logger     = CLogger::Instance();
 CGpsdClient::CGpsdClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
 
 void
-CGpsdClient::handleConnect(EErrc err_) {
+CGpsdClient::handleConnect(Result<void> res_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
-        if (err_ == EErrc::OK) {
+        if (res_) {
             m_connector->OnWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
-                                 [this](EErrc err_) { handleWatch(err_); });
+                                 [this](Result<void> res_) { handleWatch(res_); });
         } else {
             logger.Warn(LOG_PREFIX, "failed to connect to ", m_endpoint.Host, ":", m_endpoint.Port);
             reconnect();
@@ -71,7 +70,7 @@ CGpsdClient::stop() {
         UniqueLock                  lk(sync);
         std::condition_variable_any cv;
         bool                        sent = false;
-        m_connector->OnWrite("?WATCH={\"enable\":false}\r\n", [&sent, &cv]([[maybe_unused]] EErrc) {
+        m_connector->OnWrite("?WATCH={\"enable\":false}\r\n", [&sent, &cv]([[maybe_unused]] Result<void>) {
             logger.Info(LOG_PREFIX, "stopped watch");
             sent = true;
             cv.notify_one();
@@ -82,10 +81,10 @@ CGpsdClient::stop() {
 }
 
 void
-CGpsdClient::handleWatch(EErrc err_) {
+CGpsdClient::handleWatch(Result<void> res_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
-        if (err_ == EErrc::OK) {
+        if (res_) {
             m_state = EState::RUNNING;
             m_backoff.Reset();
             logger.Info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);

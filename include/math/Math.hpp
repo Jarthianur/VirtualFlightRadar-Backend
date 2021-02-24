@@ -54,8 +54,8 @@ Degree(f64 rad_) -> f64 {
  * @return the rounded integer
  */
 inline auto
-DoubleToInt(f64 val_) -> s32 {
-    return static_cast<s32>(std::lround(val_));
+DoubleToInt(f64 val_) -> i32 {
+    return static_cast<i32>(std::lround(val_));
 }
 
 /**
@@ -90,7 +90,7 @@ Saturate(T val_, T min_, T max_) -> T {
  * @return the height difference to QNE
  */
 inline auto
-IcaoHeight(f64 press_) -> s32 {
+IcaoHeight(f64 press_) -> i32 {
     return DoubleToInt(288.15 * (1.0 - std::pow((press_ / 1013.25), 0.190295)) / 0.0065);
 }
 }  // namespace vfrb::math

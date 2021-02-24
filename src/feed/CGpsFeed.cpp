@@ -44,7 +44,7 @@ CGpsFeed::Protocol() const -> IFeed::EProtocol {
 }
 
 auto
-CGpsFeed::Process(String str_) -> bool {
+CGpsFeed::Process(String&& str_) -> bool {
     try {
         m_data->Update(m_parser.Parse(std::move(str_), m_priority));
     } catch ([[maybe_unused]] parser::error::CParseError const&) {

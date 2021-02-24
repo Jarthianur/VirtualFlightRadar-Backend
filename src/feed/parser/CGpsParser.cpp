@@ -72,7 +72,7 @@ CGpsParser::parsePosition(std::cmatch const& match_, u32 prio_) -> CGpsPosition 
             str_util::Parse<f64>(match_[RE_GGA_GEOID]),
             str_util::Parse<f64>(match_[RE_GGA_DIL]),
             str_util::Parse<u8>(match_[RE_GGA_SAT]),
-            str_util::Parse<s8>(match_[RE_GGA_FIX]),
+            str_util::Parse<i8>(match_[RE_GGA_FIX]),
             CTimestamp(AsStringView(match_[RE_GGA_TIME]))};
 }
 }  // namespace vfrb::feed::parser

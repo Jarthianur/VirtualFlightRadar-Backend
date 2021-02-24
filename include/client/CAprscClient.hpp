@@ -45,7 +45,7 @@ class CAprscClient : public IClient
      * @threadsafe
      */
     void
-    handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
+    handleConnect(Result<void> res_) override REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for sending of the login string.
@@ -53,7 +53,7 @@ class CAprscClient : public IClient
      * @threadsafe
      */
     void
-    handleLogin(net::EErrc err_) REQUIRES(!m_mutex);
+    handleLogin(Result<void> res_) REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for sending a keep-alive beacon.
@@ -61,7 +61,7 @@ class CAprscClient : public IClient
      * @threadsafe
      */
     void
-    handleSendKeepAlive(net::EErrc err_) REQUIRES(!m_mutex);
+    handleSendKeepAlive(Result<void> res_) REQUIRES(!m_mutex);
 
     auto
     logPrefix() const -> str override;

@@ -41,7 +41,7 @@ public:
 /// A self parsing Timestamp
 class CTimestamp
 {
-    s64 m_value = 0;  ///< Time in milliseconds
+    i64 m_value = 0;  ///< Time in milliseconds
     u32 m_day   = 0;  ///< Incremental day number
 
 public:

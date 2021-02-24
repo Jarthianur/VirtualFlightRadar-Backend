@@ -39,7 +39,7 @@ public:
     CTCONST DELETE_THRESHOLD   = 120;                        ///< Times until aircraft gets deleted
 
     CAircraftData();
-    explicit CAircraftData(s32 maxDist_);  ///< @param maxDist The max distance filter
+    explicit CAircraftData(i32 maxDist_);  ///< @param maxDist The max distance filter
 
     /**
      * @brief Insert or update an Aircraft.

@@ -49,7 +49,7 @@ DESCRIBE("test_CAircraftProcessor") {
     CAircraftProcessor uut;
     String             nmea;
 
-    s32 const M1000 = math::DoubleToInt(math::FEET_2_M * 3281);
+    i32 const M1000 = math::DoubleToInt(math::FEET_2_M * 3281);
 
     AFTER_EACH() {
         nmea.clear();

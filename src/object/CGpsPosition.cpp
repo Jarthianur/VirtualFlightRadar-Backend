@@ -32,7 +32,7 @@ namespace vfrb::object
 CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_)
     : CGpsPosition(prio_, loc_, geo_, 1.0, 3, 5, CTimestamp()) {}
 
-CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_, u8 sat_, s8 qual_,
+CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_, u8 sat_, i8 qual_,
                            CTimestamp const& ts_)
     : CObject(prio_),
       m_location(loc_),
