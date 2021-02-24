@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <functional>
-
 #include "server/net/IAcceptor.hpp"
 #include "server/net/impl/CSocketBoost.hpp"
 #include "util/ClassUtils.hpp"
@@ -44,7 +42,7 @@ class CAcceptorBoost : public IAcceptor<CSocketBoost>
 
     /// Intermediate handler for accept event
     void
-    handleAccept(asio::error_code err_, Callback const& cb_);
+    handleAccept(asio::error_code err_, Callback cb_);
 
 public:
     explicit CAcceptorBoost(u16 port_);
@@ -57,7 +55,7 @@ public:
     Stop() override;
 
     void
-    OnAccept(Callback&& cb_) override;
+    OnAccept(Callback cb_) override;
 
     void
     Close() override;

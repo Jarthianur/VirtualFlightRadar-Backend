@@ -67,9 +67,10 @@ CAcceptorBoost::Stop() {
 }
 
 void
-CAcceptorBoost::OnAccept(Callback&& cb_) {
+CAcceptorBoost::OnAccept(Callback cb_) {
     if (m_acceptor.is_open()) {
-        m_acceptor.async_accept(m_socket.Get(), [this, &cb_](error_code err_) { handleAccept(err_, cb_); });
+        m_acceptor.async_accept(m_socket.Get(),
+                                [this, cb{std::move(cb_)}](error_code err_) { handleAccept(err_, cb); });
     }
 }
 
@@ -79,11 +80,13 @@ CAcceptorBoost::Close() {
 }
 
 void
-CAcceptorBoost::handleAccept(error_code err_, Callback const& cb_) {
+CAcceptorBoost::handleAccept(error_code err_, Callback cb_) {
     if (err_) {
         logger.Debug(LOG_PREFIX, "accept: ", err_.message());
+        cb_(Err());
+    } else {
+        cb_(Ok());
     }
-    cb_(bool(err_));
 }
 
 auto
