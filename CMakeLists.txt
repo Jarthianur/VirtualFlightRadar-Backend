@@ -16,7 +16,6 @@ if(NOT DEFINED VFRB_BIN_TAG)
 endif()
 
 set(vfrb_release_bin vfrb-${VFRB_BIN_TAG})
-set(vfrb_regression_bin vfrb_regression-${VFRB_BIN_TAG})
 set(vfrb_test_bin vfrb_test-${VFRB_BIN_TAG})
 set(vfrb_prof_bin profiling-${VFRB_BIN_TAG})
 
@@ -76,15 +75,6 @@ target_compile_options(release PUBLIC -O2 -DNDEBUG -DVERSION=\"${CMAKE_PROJECT_V
 set_target_properties(release PROPERTIES OUTPUT_NAME ${vfrb_release_bin})
 target_include_directories(release PUBLIC ${VFRB_INCLUDE_DIRS})
 target_link_libraries(release PUBLIC ${VFRB_LINK_LIBS})
-
-#
-# target: regression
-#
-add_executable(regression ${vfrb_sources})
-target_compile_options(regression PUBLIC -O0 -g --coverage -DLOG_ENABLE_DEBUG -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
-set_target_properties(regression PROPERTIES OUTPUT_NAME ${vfrb_regression_bin})
-target_include_directories(regression PUBLIC ${VFRB_INCLUDE_DIRS})
-target_link_libraries(regression PUBLIC ${VFRB_LINK_LIBS} gcov)
 
 #
 # target: unittest

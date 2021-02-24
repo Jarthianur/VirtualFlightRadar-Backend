@@ -156,7 +156,7 @@ function install_test_deps() {
     set -eE
     log -i INSTALL TEST DEPENDENCIES
     trap "fail Failed to install test dependencies!" ERR
-    $SUDO apt -y install clang-format
+    $SUDO apt -y install clang-format lcov
     trap - ERR
 }
 
