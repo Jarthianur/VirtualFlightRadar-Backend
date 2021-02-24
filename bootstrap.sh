@@ -232,7 +232,6 @@ function run_regression() {
     $VFRB_UUT -c test.conf &
     sleep 2
     log -i Connect to vfrb
-    bash
     ./regression.sh receive
     ./regression.sh receive
     sleep 5

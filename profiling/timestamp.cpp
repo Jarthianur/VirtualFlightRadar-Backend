@@ -32,8 +32,8 @@
 namespace vfrb::profiling
 {
 template<typename Iter>
-std::tuple<u32, u32, u32, u32> parseTime(Iter& first, Iter last)
-{
+std::tuple<u32, u32, u32, u32>
+parseTime(Iter& first, Iter last) {
     namespace qi = boost::spirit::qi;
 
     static const qi::int_parser<u32, 10, 2, 2>                                    _2digit = {};
@@ -43,113 +43,95 @@ std::tuple<u32, u32, u32, u32> parseTime(Iter& first, Iter last)
         (_2digit >> ":" >> _2digit >> ":" >> _2digit >> "." >> _3digit);
 
     std::tuple<u32, u32, u32, u32> time;
-    if (qi::phrase_parse(first, last, time_r, qi::space, time) && (first == last))
-    {
+    if (qi::phrase_parse(first, last, time_r, qi::space, time) && (first == last)) {
         return time;
     }
     throw std::logic_error("");
 }
 
-std::string generateTS(bool format)
-{
+std::string
+generateTS(bool format) {
     static int        h = 0, m = 0, s = 0;
     std::stringstream ts;
 
-    if (format)
-    {
+    if (format) {
         ts << (h < 10 ? "0" : "") << h << (m < 10 ? "0" : "") << m << (s < 10 ? "0" : "") << s;
-    }
-    else
-    {
+    } else {
         auto f = ((h + m + s) * 10) % 1000;
         ts << (h < 10 ? "0" : "") << h << ":" << (m < 10 ? "0" : "") << m << ":" << (s < 10 ? "0" : "") << s
-           << "." << (f < 10 ? "00" : f < 100 ? "0" : "") << f;
+           << "."
+           << (f < 10  ? "00" :
+               f < 100 ? "0" :
+                         "")
+           << f;
     }
     ++s;
-    if (s >= 60)
-    {
+    if (s >= 60) {
         ++m;
         s = 0;
     }
-    if (m >= 60)
-    {
+    if (m >= 60) {
         ++h;
         m = 0;
     }
-    if (h >= 24)
-    {
+    if (h >= 24) {
         s = m = h = 0;
     }
     return ts.str();
 }
 
-s64 parseTimeStoI(std::string const& value)
-{
-    s32 h = 99, m = 99, s = 99, f = 9999;
-    if (value.length() > 3 && value[2] == ':')
-    {
+i64
+parseTimeStoI(std::string const& value) {
+    i32 h = 99, m = 99, s = 99, f = 9999;
+    if (value.length() > 3 && value[2] == ':') {
         h = std::stoi(value.substr(0, 2));
         m = std::stoi(value.substr(3, 2));
         s = std::stoi(value.substr(6, 2));
         f = std::stoi(value.substr(9, 3));
-    }
-    else
-    {
+    } else {
         h = std::stoi(value.substr(0, 2));
         m = std::stoi(value.substr(2, 2));
         s = std::stoi(value.substr(4, 2));
         f = 0;
     }
-    if (h > 23 || m > 59 || s > 59 || f > 999)
-    {
+    if (h > 23 || m > 59 || s > 59 || f > 999) {
         throw std::logic_error("");
     }
-    return static_cast<s64>(h * 3600000 + m * 60000 + s * 1000 + f);
+    return static_cast<i64>(h * 3600000 + m * 60000 + s * 1000 + f);
 }
 
-s64 parseTimeCharconv(std::string const& value)
-{
-    s32 h = 99, m = 99, s = 99, f = 9999;
-    if (value.length() > 3 && value[2] == ':')
-    {
-        if (auto [p, e] = std::from_chars(value.c_str(), value.c_str() + 2, h); e != std::errc())
-        {
+i64
+parseTimeCharconv(std::string const& value) {
+    i32 h = 99, m = 99, s = 99, f = 9999;
+    if (value.length() > 3 && value[2] == ':') {
+        if (auto [p, e] = std::from_chars(value.c_str(), value.c_str() + 2, h); e != std::errc()) {
             throw std::logic_error("");
         }
-        if (auto [p, e] = std::from_chars(value.c_str() + 3, value.c_str() + 5, m); e != std::errc())
-        {
+        if (auto [p, e] = std::from_chars(value.c_str() + 3, value.c_str() + 5, m); e != std::errc()) {
             throw std::logic_error("");
         }
-        if (auto [p, e] = std::from_chars(value.c_str() + 6, value.c_str() + 8, s); e != std::errc())
-        {
+        if (auto [p, e] = std::from_chars(value.c_str() + 6, value.c_str() + 8, s); e != std::errc()) {
             throw std::logic_error("");
         }
-        if (auto [p, e] = std::from_chars(value.c_str() + 9, value.c_str() + 12, f); e != std::errc())
-        {
+        if (auto [p, e] = std::from_chars(value.c_str() + 9, value.c_str() + 12, f); e != std::errc()) {
             throw std::logic_error("");
         }
-    }
-    else
-    {
-        if (auto [p, e] = std::from_chars(value.c_str(), value.c_str() + 2, h); e != std::errc())
-        {
+    } else {
+        if (auto [p, e] = std::from_chars(value.c_str(), value.c_str() + 2, h); e != std::errc()) {
             throw std::logic_error("");
         }
-        if (auto [p, e] = std::from_chars(value.c_str() + 2, value.c_str() + 4, m); e != std::errc())
-        {
+        if (auto [p, e] = std::from_chars(value.c_str() + 2, value.c_str() + 4, m); e != std::errc()) {
             throw std::logic_error("");
         }
-        if (auto [p, e] = std::from_chars(value.c_str() + 4, value.c_str() + 6, s); e != std::errc())
-        {
+        if (auto [p, e] = std::from_chars(value.c_str() + 4, value.c_str() + 6, s); e != std::errc()) {
             throw std::logic_error("");
         }
         f = 0;
     }
-    if (h > 23 || m > 59 || s > 59 || f > 999)
-    {
+    if (h > 23 || m > 59 || s > 59 || f > 999) {
         throw std::logic_error("");
     }
-    return static_cast<s64>(h * 3600000 + m * 60000 + s * 1000 + f);
+    return static_cast<i64>(h * 3600000 + m * 60000 + s * 1000 + f);
 }
 
 constexpr auto TEST_SIZE = 100000;

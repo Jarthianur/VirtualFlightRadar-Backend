@@ -22,7 +22,6 @@
 
 #include "util/Bounds.hpp"
 #include "util/StringUtils.hpp"
-#include "util/Utility.hpp"
 
 #include "Helper.hpp"
 
@@ -264,7 +263,7 @@ DESCRIBE_PAR("test_StringUtils") {
     }
 
     IT("should parse a number correctly") {
-        auto r = ASSERT_NOTHROW(return Parse<s32>("1234"));
+        auto r = ASSERT_NOTHROW(return Parse<i32>("1234"));
         ASSERT_EQ(r, 1234);
     }
     IT("should throw on parse failure") {
