@@ -156,7 +156,7 @@ function install_test_deps() {
     set -eE
     log -i INSTALL TEST DEPENDENCIES
     trap "fail Failed to install test dependencies!" ERR
-    $SUDO apt -y install clang-format wget netcat procps perl lcov lua5.3 lua-argparse lua-socket lua-posix
+    $SUDO apt -y install clang-format
     trap - ERR
 }
 
@@ -214,58 +214,6 @@ function run_unit_test() {
     trap - ERR
 }
 
-# execute regression tests
-function run_regression() {
-    set -eE
-    log -i RUN REGRESSION TESTS
-    require VFRB_ROOT
-    local VFRB_UUT="$(find $VFRB_ROOT/build/ -name '*vfrb_regression-*' -executable | head -n1)"
-    lcov -i -d $VFRB_ROOT/build/CMakeFiles/regression.dir -c -o $VFRB_ROOT/reports/vfrb_base.info
-    if ! $VFRB_UUT; then $(exit 0); fi
-    if ! $VFRB_UUT -v -g -c bla.txt; then $(exit 0); fi
-    trap "fail -e popd -e 'pkill -2 -f $VFRB_UUT' Regression tests have failed!" ERR
-    pushd $VFRB_ROOT/test/resources
-    log -i Start mocking servers
-    ./regression.sh serve
-    sleep 2
-    log -i Start vfrb
-    $VFRB_UUT -c test.conf &
-    sleep 2
-    log -i Connect to vfrb
-    ./regression.sh receive
-    ./regression.sh receive
-    sleep 5
-    log -i Stop vfrb and run check
-    pkill -2 -f $VFRB_UUT || true
-    sleep 4
-    ./regression.sh check
-    log -i "Test for reconnects"
-    $VFRB_UUT -c test.conf >vfrb.log 2>&1 &
-    sleep 5
-    ./regression.sh serve
-    sleep 5
-    pkill -2 -f $VFRB_UUT || true
-    # just to cleanup servers
-    ./regression.sh check >/dev/null 2>&1 || true
-    if [ $(cat vfrb.log | grep -o 'connected to' | wc -l) -lt 4 ]; then
-        log -e "reconnect test failed"
-        $(exit 1)
-    fi
-    log -i Test windclient timeout
-    lua server.lua 44403 nil >serv.log 2>&1 &
-    local S_PID=$!
-    $VFRB_UUT -c test.conf >/dev/null 2>&1 &
-    sleep 10
-    pkill -2 -f $VFRB_UUT || true
-    kill -9 $S_PID
-    if [ $(cat serv.log | grep -o 'Connection from' | wc -l) -lt 2 ]; then
-        log -e "timeout test failed"
-        $(exit 1)
-    fi
-    popd
-    trap - ERR
-}
-
 # generate coverage report for unit and regression tests
 function gen_coverage() {
     set -eE
@@ -274,10 +222,8 @@ function gen_coverage() {
     trap "fail -e popd Coverage report generation failed!" ERR
     pushd $VFRB_ROOT
     lcov -d build/CMakeFiles/unittest.dir -c -o reports/test.info
-    lcov -d build/CMakeFiles/regression.dir -c -o reports/vfrb.info
-    lcov -a reports/test_base.info -a reports/test.info -a reports/vfrb_base.info -a reports/vfrb.info \
-        -o reports/all.info
-    lcov --remove reports/all.info '*test/*' '/usr/*' -o reports/lcov.info
+    lcov -a reports/test_base.info -a reports/test.info -o reports/all.info
+    lcov --remove reports/all.info '*test/*' '/usr/*' '*vendor/*' -o reports/lcov.info
     lcov --list reports/lcov.info
     popd
     trap - ERR

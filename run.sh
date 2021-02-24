@@ -44,8 +44,8 @@ function print_help() {
     echo 'TASKS:'
     echo '  build   : Build the VFRB executable.'
     echo '  install : Build and install the VFRB executable, config file and service.'
-    echo '  test    : Build and run the unit, regression tests and code analysis.'
-    echo '            Also generate test/coverage report.'
+    echo '  test    : Build and run the unit tests and code analysis.'
+    echo '            Also generate coverage report.'
     echo '  docker  : Build a minimal docker image. Cannot be combined with other tasks.'
     echo '            The vfrb.conf.in will be copied, so edit it before running this command.'
     echo ''
@@ -118,7 +118,6 @@ if [ -n "$DO_TEST" ]; then
     static_analysis
     build_test
     run_unit_test
-    run_regression
     gen_coverage
 fi
 

@@ -30,7 +30,7 @@ namespace vfrb::client
  */
 class CAprscClient : public IClient
 {
-    CTCONST KEEPALIVE_INTERVAL = 600;
+    CTCONST KEEPALIVE_INTERVAL = 300;
 
     String const m_login;  ///< Login string
 
