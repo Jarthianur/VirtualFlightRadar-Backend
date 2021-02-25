@@ -51,7 +51,7 @@ public:
      * @throw std::logic_error if login is not given, or from parent constructor
      */
     CAprscFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
-               s32 maxHeight_);
+               i32 maxHeight_);
 
     /**
      * @brief Get this feeds Protocol.
@@ -64,7 +64,7 @@ public:
      * @brief Implement Feed::process.
      */
     auto
-    Process(String str_) -> bool override;
+    Process(String&& str_) -> bool override;
 
     /**
      * @brief Get the login string.

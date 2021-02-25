@@ -34,7 +34,7 @@ class CAcceptorTest : public IAcceptor<CSocketTest>
     NOT_COPYABLE(CAcceptorTest)
 
     vfrb::concurrent::Mutex                           m_mutex;
-    std::function<void(bool)>                         m_onAcceptFn;
+    std::function<void(Result<void>&&)>               m_onAcceptFn;
     String                                            m_stagedAddress;
     bool                                              m_running = false;
     bool                                              m_fail    = false;
@@ -49,7 +49,7 @@ public:
     void
     Stop() override;
     void
-    OnAccept(Callback&& cb_) override;
+    OnAccept(Callback cb_) override;
     void
     Close() override;
     auto

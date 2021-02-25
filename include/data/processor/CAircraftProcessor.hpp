@@ -23,6 +23,7 @@
 #include "object/CAircraft.hpp"
 #include "object/CGpsPosition.hpp"
 #include "util/ClassUtils.hpp"
+#include "util/StringUtils.hpp"
 
 #include "Types.hpp"
 
@@ -33,13 +34,10 @@ namespace vfrb::data::processor
  */
 class CAircraftProcessor
 {
-public:
-    CTCONST NMEA_SIZE = 192;
-
 private:
     CTCONST ICAO_STD_ATMOSPHERE = 1013.25;
 
-    s32 const         m_maxDistance;                           ///< Max distance to process an aircraft
+    i32 const         m_maxDistance;                           ///< Max distance to process an aircraft
     object::SLocation m_refLocation{0.0, 0.0, 0};              ///< Refered position
     f64               m_refAtmPressure = ICAO_STD_ATMOSPHERE;  ///< Refered pressure; hPa
     f64 mutable m_refRadLatitude       = 0.0;                  ///< Refered latitude as radian
@@ -50,10 +48,10 @@ private:
     f64 mutable m_lonDistance = 0.0;  ///< Distance/Difference between Aircraft's and refered longitude
     f64 mutable m_relBearing  = 0.0;  ///< Relative bearing
     f64 mutable m_absBearing  = 0.0;  ///< Absolute bearing
-    s32 mutable m_relNorth    = 0;    ///< Relative distance in northern direction; m
-    s32 mutable m_relEast     = 0;    ///< Relative distance in eastern direction; m
-    s32 mutable m_relVertical = 0;    ///< Relative vertical distance; m
-    s32 mutable m_distance    = 0;    ///< Distance between Aircraft and refered position; m
+    i32 mutable m_relNorth    = 0;    ///< Relative distance in northern direction; m
+    i32 mutable m_relEast     = 0;    ///< Relative distance in eastern direction; m
+    i32 mutable m_relVertical = 0;    ///< Relative vertical distance; m
+    i32 mutable m_distance    = 0;    ///< Distance between Aircraft and refered position; m
 
     /**
      * @brief Calcutale an aircrafts position relative to the refered one.
@@ -66,28 +64,26 @@ private:
      * @brief Append PFLAU sentence to processing string.
      * @param aircraft The Aircaft
      */
-    auto
-    appendPflau(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-        -> usize;
+    void
+    appendPflau(object::CAircraft const& aircraft_, str_util::StringInserter& nmea_) const;
 
     /**
      * @brief Append PFLAA sentence to processing string.
      * @param aircraft The Aircaft
      */
-    auto
-    appendPflaa(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_, usize idx_) const
-        -> usize;
+    void
+    appendPflaa(object::CAircraft const& aircraft_, str_util::StringInserter& nmea_) const;
 
 public:
     CAircraftProcessor();
-    explicit CAircraftProcessor(s32 maxDist_);  ///< @param maxDist The max distance filter
+    explicit CAircraftProcessor(i32 maxDist_);  ///< @param maxDist The max distance filter
 
     /**
      * @brief Process an aircraft.
      * @param aircraft The Aircraft to process
      */
     void
-    Process(object::CAircraft const& aircraft_, CStaticString<NMEA_SIZE>* nmea_) const;
+    Process(object::CAircraft const& aircraft_, str_util::StringInserter& nmea_) const;
 
     /**
      * @brief Set the refered position and atmospheric pressure.

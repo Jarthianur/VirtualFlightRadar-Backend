@@ -37,8 +37,8 @@ class CWindData : public IData
     object::CWind GUARDED_BY(m_mutex) m_wind;  ///< The Wind information
 
 public:
-    explicit CWindData(AccessFn&& fn_);
-    CWindData(AccessFn&& fn_, object::CWind&& wind_);  ///< @param wind The initial wind information
+    CWindData() = default;
+    explicit CWindData(object::CWind&& wind_);  ///< @param wind The initial wind information
 
     /**
      * @brief Update the wind information.
@@ -50,9 +50,9 @@ public:
     Update(object::CObject&& wind_) -> bool override REQUIRES(!m_mutex);
 
     void
-    Access() override REQUIRES(!m_mutex);
+    CollectInto(str_util::StringInserter si_) override REQUIRES(!m_mutex);
 
     auto
-    Size() const -> usize override;
+    Size() const -> usize override REQUIRES(!m_mutex);
 };
 }  // namespace vfrb::data

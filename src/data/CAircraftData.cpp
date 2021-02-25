@@ -30,12 +30,13 @@
 using vfrb::object::CAircraft;
 using vfrb::object::CObject;
 using vfrb::object::SLocation;
+using vfrb::str_util::StringInserter;
 
 namespace vfrb::data
 {
-CAircraftData::CAircraftData(AccessFn&& fn_) : CAircraftData(std::move(fn_), limits::s32::max()) {}
+CAircraftData::CAircraftData() : CAircraftData(limits::i32::max()) {}
 
-CAircraftData::CAircraftData(AccessFn&& fn_, s32 maxDist_) : IData(std::move(fn_)), m_processor(maxDist_) {}
+CAircraftData::CAircraftData(i32 maxDist_) : m_processor(maxDist_) {}
 
 auto
 CAircraftData::Update(CObject&& aircraft_) -> bool {
@@ -53,7 +54,7 @@ CAircraftData::Environment(SLocation const& loc_, f64 press_) {
 }
 
 void
-CAircraftData::Access() {
+CAircraftData::CollectInto(StringInserter si_) {
     auto iter = m_container.Begin();
     while (iter != m_container.End()) {
         ++(iter->Value);
@@ -68,8 +69,7 @@ CAircraftData::Access() {
                 continue;
             }
             if (iter->Value.UpdateAge() <= CObject::OUTDATED) {
-                m_processor.Process(iter->Value, &iter->Nmea);
-                m_accessFn(SAccessor{iter->Value, StringView{iter->Nmea}});
+                m_processor.Process(iter->Value, si_);
             }
             ++iter;
         } catch ([[maybe_unused]] vfrb::error::IError const&) {

@@ -39,7 +39,7 @@ using vfrb::str_util::AsStringView;
 
 namespace vfrb::feed::parser
 {
-CAprsParser::CAprsParser(s32 maxHeight_)
+CAprsParser::CAprsParser(i32 maxHeight_)
     : IParser<CAircraft>(),
       m_aprsRe(
           "^(?:\\S+?)>APRS,\\S+?(?:,\\S+?)?:/"
@@ -87,7 +87,7 @@ CAprsParser::Parse(String&& str_, u32 prio_) const -> CAircraft {
 }
 
 auto
-CAprsParser::parseLocation(std::cmatch const& match_, s32 maxHeight_) -> SLocation {
+CAprsParser::parseLocation(std::cmatch const& match_, i32 maxHeight_) -> SLocation {
     SLocation pos{};
     pos.Latitude = math::DmToDeg(str_util::Parse<f64>(match_[RE_APRS_LAT]));
     if (AsStringView(match_[RE_APRS_LAT_DIR]) == "S") {

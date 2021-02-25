@@ -20,23 +20,21 @@
 
 #include "server/net/impl/CSocketBoost.hpp"
 
-#include <boost/system/error_code.hpp>
-
 #include "server/net/error/CSocketError.hpp"
 
-using boost::asio::ip::tcp;
+using asio::ip::tcp;
 
 namespace vfrb::server::net
 {
-CSocketBoost::CSocketBoost(CSocketBoost&& other_) noexcept : m_socket(boost::move(other_.m_socket)) {}
+CSocketBoost::CSocketBoost(CSocketBoost&& other_) noexcept : m_socket(std::move(other_.m_socket)) {}
 
 auto
 CSocketBoost::operator=(CSocketBoost&& other_) noexcept -> CSocketBoost& {
-    m_socket = boost::move(other_.m_socket);
+    m_socket = std::move(other_.m_socket);
     return *this;
 }
 
-CSocketBoost::CSocketBoost(BOOST_RV_REF(tcp::socket) sock_) : m_socket(boost::move(sock_)) {
+CSocketBoost::CSocketBoost(tcp::socket&& sock_) : m_socket(std::move(sock_)) {
     if (m_socket.is_open()) {
         m_socket.non_blocking(true);
     }
@@ -55,20 +53,20 @@ CSocketBoost::Address() const -> String {
 }
 
 auto
-CSocketBoost::Write(StringView const& sv_) -> bool {
+CSocketBoost::Write(String const& str_) -> bool {
     if (!m_socket.is_open()) {
         throw error::CSocketError("cannot write on closed socket");
     }
-    boost::system::error_code ec;
-    boost::asio::write(m_socket, boost::asio::buffer(sv_.data(), sv_.length()), ec);
+    asio::error_code ec;
+    asio::write(m_socket, asio::buffer(str_), ec);
     return !ec;
 }
 
 void
 CSocketBoost::Close() {
     if (m_socket.is_open()) {
-        boost::system::error_code ignored_ec;
-        m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ignored_ec);
+        asio::error_code ignored_ec;
+        m_socket.shutdown(asio::ip::tcp::socket::shutdown_send, ignored_ec);
         m_socket.close();
     }
 }

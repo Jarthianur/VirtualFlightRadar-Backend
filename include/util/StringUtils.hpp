@@ -20,9 +20,12 @@
 
 #pragma once
 
+#include <fmt/chrono.h>
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <iterator>
 #include <limits>
 #include <regex>
-#include <tuple>
 
 #include <boost/spirit/include/qi.hpp>
 
@@ -39,17 +42,6 @@ struct x32
 
 namespace vfrb::str_util
 {
-/// Error code
-enum class EErrc : enum_type
-{
-    OK,
-    ERR
-};
-
-/// Result type
-template<typename T>
-using Result = std::tuple<T, EErrc>;
-
 namespace error
 {
 /// Error to indicate failed conversion.
@@ -88,12 +80,11 @@ MakeStr(Args&&... args_) -> String {
 template<typename T, ENABLE_IF(IS_TYPE(T, f64))>
 auto
 Convert(str first_, str last_) -> Result<T> {
-    T     result;
-    EErrc ec = EErrc::OK;
+    T result;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::double_, result) || first_ != last_) {
-        ec = EErrc::ERR;
+        return Err(result);
     }
-    return {result, ec};
+    return Ok(result);
 }
 
 /**
@@ -102,15 +93,14 @@ Convert(str first_, str last_) -> Result<T> {
  * @param last_  Pointer to one past the last character
  * @return the conversion result
  */
-template<typename T, ENABLE_IF(IS_TYPE(T, s32))>
+template<typename T, ENABLE_IF(IS_TYPE(T, i32))>
 auto
 Convert(str first_, str last_) -> Result<T> {
-    T     result;
-    EErrc ec = EErrc::OK;
+    T result;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::int_, result) || first_ != last_) {
-        ec = EErrc::ERR;
+        return Err(result);
     }
-    return {result, ec};
+    return Ok(result);
 }
 
 /**
@@ -122,12 +112,11 @@ Convert(str first_, str last_) -> Result<T> {
 template<typename T, ENABLE_IF(IS_TYPE(T, u32))>
 auto
 Convert(str first_, str last_) -> Result<T> {
-    T     result;
-    EErrc ec = EErrc::OK;
+    T result;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::uint_, result) || first_ != last_) {
-        ec = EErrc::ERR;
+        return Err(result);
     }
-    return {result, ec};
+    return Ok(result);
 }
 
 /**
@@ -139,12 +128,11 @@ Convert(str first_, str last_) -> Result<T> {
 template<typename T, ENABLE_IF(IS_TYPE(T, u64))>
 auto
 Convert(str first_, str last_) -> Result<T> {
-    T     result;
-    EErrc ec = EErrc::OK;
+    T result;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ulong_, result) || first_ != last_) {
-        ec = EErrc::ERR;
+        return Err(result);
     }
-    return {result, ec};
+    return Ok(result);
 }
 
 /**
@@ -156,14 +144,12 @@ Convert(str first_, str last_) -> Result<T> {
 template<typename T, ENABLE_IF(IS_TYPE(T, x32))>
 auto
 Convert(str first_, str last_) -> Result<u32> {
-    static thread_local const boost::spirit::qi::int_parser<u32, 16> hex = {};
-
-    u32   result = 0;
-    EErrc ec     = EErrc::OK;
+    static thread_local const boost::spirit::qi::int_parser<u32, 16> hex    = {};
+    u32                                                              result = 0;
     if (!boost::spirit::qi::parse(first_, last_, hex, result) || first_ != last_) {
-        ec = EErrc::ERR;
+        return Err(result);
     }
-    return {result, ec};
+    return Ok(result);
 }
 
 /**
@@ -172,16 +158,15 @@ Convert(str first_, str last_) -> Result<u32> {
  * @param last_  Pointer to one past the last character
  * @return the conversion result
  */
-template<typename T, ENABLE_IF(IS_TYPE(T, s8))>
+template<typename T, ENABLE_IF(IS_TYPE(T, i8))>
 auto
 Convert(str first_, str last_) -> Result<T> {
-    s16   result = 0;
-    EErrc ec     = EErrc::OK;
+    i16 result = 0;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::short_, result) || first_ != last_ ||
-        result > limits::s8::max() || result < limits::s8::min()) {
-        ec = EErrc::ERR;
+        result > limits::i8::max() || result < limits::i8::min()) {
+        return Err(static_cast<i8>(result));
     }
-    return {static_cast<s8>(result), ec};
+    return Ok(static_cast<i8>(result));
 }
 
 /**
@@ -193,13 +178,12 @@ Convert(str first_, str last_) -> Result<T> {
 template<typename T, ENABLE_IF(IS_TYPE(T, u8))>
 auto
 Convert(str first_, str last_) -> Result<T> {
-    u16   result = 0;
-    EErrc ec     = EErrc::OK;
+    u16 result = 0;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_ ||
         result > limits::u8::max()) {
-        ec = EErrc::ERR;
+        return Err(static_cast<u8>(result));
     }
-    return {static_cast<u8>(result), ec};
+    return Ok(static_cast<u8>(result));
 }
 
 /**
@@ -211,12 +195,11 @@ Convert(str first_, str last_) -> Result<T> {
 template<typename T, ENABLE_IF(IS_TYPE(T, u16))>
 auto
 Convert(str first_, str last_) -> Result<T> {
-    T     result;
-    EErrc ec = EErrc::OK;
+    T result;
     if (!boost::spirit::qi::parse(first_, last_, boost::spirit::qi::ushort_, result) || first_ != last_) {
-        ec = EErrc::ERR;
+        return Err(result);
     }
-    return {result, ec};
+    return Ok(result);
 }
 
 /**
@@ -229,7 +212,7 @@ Convert(str first_, str last_) -> Result<T> {
  */
 template<typename T>
 auto
-Convert(str first_, str last_, T& dest_) -> EErrc {
+ConvertInto(str first_, str last_, T& dest_) -> EErrc {
     auto [v, ec] = Convert<T>(first_, last_);
     dest_        = v;
     return ec;
@@ -295,11 +278,14 @@ operator==(std::csub_match const& sub_, str cstr_) -> bool {
  * @return the checksum
  */
 inline auto
-Checksum(StringView const& sv_, usize pos_) -> u32 {
-    u32   csum = 0;
-    usize i    = 1 + pos_;  // $ in nmea str not included
-    while (i < sv_.length() && sv_[i] != '*') {
-        csum ^= static_cast<u32>(sv_[i++]);
+Checksum(String::const_iterator it_, String::const_iterator end_) -> u32 {
+    u32 csum = 0;
+    if (it_ != end_) {
+        ++it_;  // $ in nmea str not included
+    }
+    while (it_ != end_ && *it_ != '*') {
+        csum ^= static_cast<u32>(*it_);
+        ++it_;
     }
     return csum;
 }
@@ -310,15 +296,43 @@ Checksum(StringView const& sv_, usize pos_) -> u32 {
  * @return true if equal, else false
  */
 inline auto
-MatchChecksum(StringView const& sv_) -> bool {
-    auto const cs_begin = sv_.rfind('*');
-    if (cs_begin == StringView::npos || cs_begin + 3 > sv_.length()) {
+MatchChecksum(String const& str_) -> bool {
+    auto const cs_begin = str_.rfind('*');
+    if (cs_begin == String::npos || cs_begin + 3 > str_.length()) {
         return false;
     }
     bool match = false;
-    if (auto [v, ec] = Convert<x32>(sv_.data() + cs_begin + 1, sv_.data() + cs_begin + 3); ec == EErrc::OK) {
-        match = (v == Checksum(sv_, 0));
+    if (auto [v, ec] = Convert<x32>(str_.data() + cs_begin + 1, str_.data() + cs_begin + 3);
+        ec == EErrc::OK) {
+        match = (v == Checksum(str_.begin(), str_.end()));
     }
     return match;
 }
+
+class StringInserter
+{
+    std::back_insert_iterator<String> m_iter;
+    String*                           m_string;
+
+public:
+    explicit StringInserter(String* str_) : m_iter(std::back_inserter(*str_)), m_string(str_) {}
+
+    void
+    Copy(String const& str_) {
+        std::copy(str_.cbegin(), str_.cend(), m_iter);
+    }
+
+    template<typename... Args>
+    auto
+    Format(str fmt_, Args&&... args_) noexcept -> String::const_iterator {
+        auto oldLen = m_string->length();
+        fmt::format_to(m_iter, fmt_, std::forward<Args>(args_)...);
+        return m_string->cbegin() + oldLen;
+    }
+
+    auto
+    End() -> String::const_iterator {
+        return m_string->cend();
+    }
+};
 }  // namespace vfrb::str_util

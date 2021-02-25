@@ -37,9 +37,7 @@ class CAtmosphereData : public IData
     object::CAtmosphere GUARDED_BY(m_mutex) m_atmosphere;  ///< Atmospheric information
 
 public:
-    explicit CAtmosphereData(AccessFn&& fn_);
-    CAtmosphereData(AccessFn&&            fn_,
-                    object::CAtmosphere&& atm_);  ///< @param atmosphere The initial atm info
+    explicit CAtmosphereData(object::CAtmosphere&& atm_);  ///< @param atmosphere The initial atm info
 
     /**
      * @brief Update he athmosphere data.
@@ -51,7 +49,7 @@ public:
     Update(object::CObject&& atm_) -> bool override REQUIRES(!m_mutex);
 
     void
-    Access() override REQUIRES(!m_mutex);
+    CollectInto(str_util::StringInserter si_) override REQUIRES(!m_mutex);
 
     /**
      * @brief Get the atmospheric pressure.

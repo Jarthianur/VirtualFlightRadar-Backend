@@ -44,7 +44,7 @@ public:
     NOT_COPYABLE(IAcceptor)
     NOT_MOVABLE(IAcceptor)
 
-    using Callback = std::function<void(bool)>;
+    using Callback = std::function<void(Result<void>&&)>;
 
     IAcceptor()                   = default;
     virtual ~IAcceptor() noexcept = default;
@@ -62,7 +62,7 @@ public:
      * @param cb_ The callback to invoke
      */
     virtual void
-    OnAccept(Callback&& cb_) = 0;
+    OnAccept(Callback cb_) = 0;
 
     /// Close the staged connection
     virtual void

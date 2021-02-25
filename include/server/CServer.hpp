@@ -70,7 +70,7 @@ class CServer
      * @param err_ The error indicator, if false connection can not be accepted
      */
     void
-    handleStagedConnection(bool err_) noexcept REQUIRES(!m_mutex);
+    handleStagedConnection(Result<void> res_) noexcept REQUIRES(!m_mutex);
 
 public:
     CServer(u16 port_, usize maxCon_);
@@ -87,7 +87,7 @@ public:
      * @param sv_ The message
      */
     void
-    Send(StringView const& sv_) REQUIRES(!m_mutex);
+    Send(String const& str_) REQUIRES(!m_mutex);
 };
 
 template<typename SocketT>
@@ -138,13 +138,13 @@ CServer<SocketT>::Stop() REQUIRES(!m_mutex) {
 
 template<typename SocketT>
 void
-CServer<SocketT>::Send(StringView const& sv_) REQUIRES(!m_mutex) {
+CServer<SocketT>::Send(String const& str_) REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
-    if (sv_.empty() || m_connections.empty()) {
+    if (str_.empty() || m_connections.empty()) {
         return;
     }
     for (auto it = m_connections.begin(); it != m_connections.end();) {
-        if (!it->Write(sv_)) {
+        if (!it->Write(str_)) {
             s_logger.Warn(LOG_PREFIX, "lost connection to: ", it->Address());
             it = m_connections.erase(it);
         } else {
@@ -157,7 +157,7 @@ template<typename SocketT>
 void
 CServer<SocketT>::accept() REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
-    m_acceptor->OnAccept([this](bool err_) { handleStagedConnection(err_); });
+    m_acceptor->OnAccept([this](Result<void>&& res_) { handleStagedConnection(res_); });
 }
 
 template<typename SocketT>
@@ -169,8 +169,8 @@ CServer<SocketT>::isConnected(String const& addr_) -> bool REQUIRES(m_mutex) {
 
 template<typename SocketT>
 void
-CServer<SocketT>::handleStagedConnection(bool err_) noexcept REQUIRES(!m_mutex) {
-    if (!err_) {
+CServer<SocketT>::handleStagedConnection(Result<void> res_) noexcept REQUIRES(!m_mutex) {
+    if (res_) {
         concurrent::LockGuard lk(m_mutex);
         try {
             if (m_connections.size() < m_maxConnections && !isConnected(m_acceptor->StagedAddress())) {

@@ -24,6 +24,7 @@
 #include <utility>
 
 #include "util/ClassUtils.hpp"
+#include "util/StringUtils.hpp"
 
 #include "Types.hpp"
 
@@ -34,27 +35,16 @@ class CObject;
 
 namespace vfrb::data
 {
-struct SAccessor
-{
-    object::CObject const& Obj;
-    StringView             Nmea;
-};
-
-using AccessFn = std::function<void(SAccessor const&)>;
-
 /**
  * @brief The Data interface
  */
 class IData
 {
-protected:
-    AccessFn m_accessFn;
-
 public:
     NOT_COPYABLE(IData)
     NOT_MOVABLE(IData)
 
-    explicit IData(AccessFn&& fn_) : m_accessFn(std::move(fn_)) {}
+    IData()                   = default;
     virtual ~IData() noexcept = default;
 
     /**
@@ -65,8 +55,7 @@ public:
     virtual auto
     Update(object::CObject&& obj_) -> bool = 0;
 
-    virtual void
-    Access() = 0;
+    virtual void CollectInto(str_util::StringInserter) = 0;
 
     [[nodiscard]] virtual auto
     Size() const -> usize = 0;

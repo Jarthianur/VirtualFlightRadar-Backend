@@ -28,7 +28,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "object/CAircraft.hpp"
-#include "util/Utility.hpp"
 
 #define SYSO(M) std::cout << M << std::flush
 
@@ -40,7 +39,7 @@ template<>
 inline auto
 to_string<vfrb::object::CAircraft::ETargetType>(vfrb::object::CAircraft::ETargetType const& arg_)
     -> std::string {
-    return std::to_string(vfrb::util::AsUnderlyingType(arg_));
+    return std::to_string(vfrb::AsUnderlyingType(arg_));
 }
 }  // namespace tpp::intern
 

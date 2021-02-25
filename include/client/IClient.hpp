@@ -72,7 +72,7 @@ protected:
      * @param error The error indicator
      */
     virtual void
-    handleConnect(net::EErrc err_) = 0;
+    handleConnect(Result<void> res_) = 0;
 
     virtual auto
     logPrefix() const -> str = 0;
@@ -113,7 +113,7 @@ protected:
      * @param error The error indicator
      */
     void
-    handleTimedConnect(net::EErrc err_) REQUIRES(!m_mutex);
+    handleTimedConnect(Result<void> res_) REQUIRES(!m_mutex);
 
     /**
      * @brief Handler for read
@@ -121,7 +121,7 @@ protected:
      * @param response The received string
      */
     void
-    handleRead(net::EErrc, String const& str_) REQUIRES(!m_mutex);
+    handleRead(Result<String>&& res_) REQUIRES(!m_mutex);
 
 public:
     virtual ~IClient() noexcept = default;

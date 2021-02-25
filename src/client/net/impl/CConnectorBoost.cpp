@@ -21,17 +21,17 @@
 #include "client/net/impl/CConnectorBoost.hpp"
 
 #include <boost/date_time.hpp>
-#include <boost/move/move.hpp>
 
 #include "client/net/SEndpoint.hpp"
 
 #include "CLogger.hpp"
 
-using boost::system::error_code;
-using boost::asio::ip::tcp;
-using boost::asio::buffer;
-using boost::asio::deadline_timer;
-using boost::asio::socket_base;
+using asio::error_code;
+using asio::ip::tcp;
+using asio::buffer;
+using asio::deadline_timer;
+using asio::socket_base;
+using std::literals::operator""s;
 
 namespace vfrb::client::net
 {
@@ -39,11 +39,6 @@ static auto const& logger = CLogger::Instance();
 
 CConnectorBoost::CConnectorBoost()
     : m_ioCtx(), m_socket(m_ioCtx), m_resolver(m_ioCtx), m_timer(m_ioCtx), m_istream(&m_buffer) {}
-
-auto
-CConnectorBoost::evalErrorCode(error_code err_) -> EErrc {
-    return !err_ ? EErrc::OK : EErrc::Err;
-}
 
 void
 CConnectorBoost::Run() {
@@ -70,37 +65,50 @@ CConnectorBoost::Close() {
 }
 
 void
-CConnectorBoost::OnConnect(SEndpoint const& ep_, Callback const& cb_) {
-    m_resolver.async_resolve(ep_.Host, ep_.Port, tcp::resolver::query::canonical_name,
-                             [this, &cb_](error_code err_, tcp::resolver::results_type const& res_) {
-                                 handleResolve(err_, res_, cb_);
-                             });
+CConnectorBoost::OnConnect(SEndpoint const& ep_, Callback cb_) {
+    m_resolver.async_resolve(
+        ep_.Host, ep_.Port, tcp::resolver::query::canonical_name,
+        [this, cb{std::move(cb_)}](error_code err_, tcp::resolver::results_type res_) {
+            if (!err_) {
+                async_connect(m_socket, res_,
+                              [this, cb{std::move(cb)}](error_code err_, [[maybe_unused]] tcp::endpoint) {
+                                  handleConnect(err_, cb);
+                              });
+            } else {
+                logger.Debug("(Client) failed to resolve host: ", err_.message());
+                cb(Err());
+            }
+        });
 }
 
 void
-CConnectorBoost::OnRead(ReadCallback const& cb_) {
+CConnectorBoost::OnRead(ReadCallback cb_) {
     if (m_socket.is_open()) {
         async_read_until(m_socket, m_buffer, "\r\n",
-                         [this, &cb_](error_code err_, usize b_) { handleRead(err_, b_, cb_); });
+                         [this, cb{std::move(cb_)}](error_code err_, usize b_) { handleRead(err_, b_, cb); });
     }
 }
 
 void
-CConnectorBoost::OnWrite(String const& str_, Callback const& cb_) {
+CConnectorBoost::OnWrite(String const& str_, Callback cb_) {
     if (m_socket.is_open()) {
-        async_write(m_socket, buffer(str_),
-                    [this, &cb_](error_code err_, usize b_) { handleWrite(err_, b_, cb_); }
-
-        );
+        error_code err;
+        asio::write(m_socket, buffer(str_), err);
+        if (err) {
+            logger.Debug("(Client) failed to write: ", err.message());
+            cb_(Err());
+        } else {
+            cb_(Ok());
+        }
     }
 }
 
 void
-CConnectorBoost::OnTimeout(Callback const& cb_, u32 to_) {
+CConnectorBoost::OnTimeout(Callback cb_, u32 to_) {
     if (to_ > 0) {
         ResetTimer(to_);
     }
-    m_timer.async_wait([this, &cb_](error_code err_) { handleTimeout(err_, cb_); });
+    m_timer.async_wait([this, cb{std::move(cb_)}](error_code err_) { handleTimeout(err_, cb); });
 }
 
 void
@@ -114,57 +122,35 @@ CConnectorBoost::TimerExpired() -> bool {
 }
 
 void
-CConnectorBoost::handleWrite(error_code err_, [[maybe_unused]] usize, Callback const& cb_) noexcept {
-    EErrc const ec = evalErrorCode(err_);
-    if (ec != EErrc::OK) {
-        logger.Debug("(Client) failed to write: ", err_.message());
-    }
-    cb_(ec);
-}
-
-void
-CConnectorBoost::handleResolve(error_code err_, tcp::resolver::results_type const& res_,
-                               Callback const& cb_) noexcept {
-    EErrc const ec = evalErrorCode(err_);
-    if (ec == EErrc::OK) {
-        async_connect(m_socket, res_, [this, &cb_](error_code err_, [[maybe_unused]] tcp::endpoint const&) {
-            handleConnect(err_, cb_);
-        });
-    } else {
-        logger.Debug("(Client) failed to resolve host: ", err_.message());
-        cb_(ec);
-    }
-}
-
-void
-CConnectorBoost::handleConnect(error_code err_, Callback const& cb_) noexcept {
-    EErrc const ec = evalErrorCode(err_);
-    if (ec == EErrc::OK) {
+CConnectorBoost::handleConnect(error_code err_, Callback cb_) noexcept {
+    if (!err_) {
         m_socket.set_option(socket_base::keep_alive(true));
+        cb_(Ok());
     } else {
         logger.Debug("(Client) failed to connect: ", err_.message());
+        cb_(Err());
     }
-    cb_(ec);
 }
 
 void
-CConnectorBoost::handleTimeout(error_code err_, Callback const& cb_) noexcept {
-    EErrc const ec = evalErrorCode(err_);
-    if (ec != EErrc::OK) {
+CConnectorBoost::handleTimeout(error_code err_, Callback cb_) noexcept {
+    if (err_) {
         logger.Debug("(Client) timeout: ", err_.message());
+        cb_(Err());
+    } else {
+        cb_(Ok());
     }
-    cb_(ec);
 }
 
 void
-CConnectorBoost::handleRead(error_code err_, [[maybe_unused]] usize, ReadCallback const& cb_) noexcept {
-    EErrc const ec = evalErrorCode(err_);
-    if (ec == EErrc::OK) {
+CConnectorBoost::handleRead(error_code err_, [[maybe_unused]] usize, ReadCallback cb_) noexcept {
+    if (!err_) {
         std::getline(m_istream, m_response);
         m_response.append("\n");
+        cb_(Ok(std::move(m_response)));
     } else {
         logger.Debug("(Client) read: ", err_.message());
+        cb_(Err(""s));
     }
-    cb_(ec, m_response);
 }
 }  // namespace vfrb::client::net

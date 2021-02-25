@@ -45,31 +45,21 @@ using vfrb::data::CAircraftData;
 using vfrb::data::CAtmosphereData;
 using vfrb::data::CWindData;
 using vfrb::data::CGpsData;
-using vfrb::data::SAccessor;
-using vfrb::object::CObject;
 using vfrb::config::CConfiguration;
+using vfrb::str_util::StringInserter;
 
 namespace vfrb
 {
-CTCONST PROCESS_INTERVAL = 1;
+CTCONST PROCESS_INTERVAL = 1000;
 CTCONST LOG_PREFIX       = "(VFRB) ";
 
 static auto const& logger = CLogger::Instance();
 
 CVfrb::CVfrb(SPtr<CConfiguration> conf_)
-    : m_aircraftData(std::make_shared<CAircraftData>(
-          [this](SAccessor const& it) {
-              if (it.Obj.UpdateAge() < CObject::OUTDATED) {
-                  m_server.Send(it.Nmea);
-              }
-          },
-          conf_->MaxDistance)),
-      m_atmosphereData(
-          std::make_shared<CAtmosphereData>([this](SAccessor const& it) { m_server.Send(it.Nmea); },
-                                            object::CAtmosphere{0, conf_->AtmPressure, ""})),
-      m_gpsData(std::make_shared<CGpsData>([this](SAccessor const& it) { m_server.Send(it.Nmea); },
-                                           conf_->GpsPosition, conf_->GroundMode)),
-      m_windData(std::make_shared<CWindData>([this](SAccessor const& it) { m_server.Send(it.Nmea); })),
+    : m_aircraftData(std::make_shared<CAircraftData>(conf_->MaxDistance)),
+      m_atmosphereData(std::make_shared<CAtmosphereData>(object::CAtmosphere{0, conf_->AtmPressure, ""})),
+      m_gpsData(std::make_shared<CGpsData>(conf_->GpsPosition, conf_->GroundMode)),
+      m_windData(std::make_shared<CWindData>()),
       m_server(std::get<0>(conf_->ServerConfig), std::get<1>(conf_->ServerConfig)),
       m_running(false) {
     createFeeds(conf_);
@@ -83,7 +73,7 @@ CVfrb::Run() noexcept {
     concurrent::CSignalListener           signals;
     client::CClientManager                clientManager;
 
-    signals.AddHandler([this](boost::system::error_code const&, [[maybe_unused]] const int) {
+    signals.AddHandler([this](asio::error_code const&, [[maybe_unused]] const int) {
         logger.Info(LOG_PREFIX, "caught signal to shutdown...");
         m_running = false;
     });
@@ -109,15 +99,35 @@ CVfrb::Run() noexcept {
 
 void
 CVfrb::serve() {
-    std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
+    std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_INTERVAL));
+    String data;
+    data.reserve(2048);  // initially allocate 2 KiB
+    usize priorAircraftCount{0};
     while (m_running) {
         try {
+            // process, gather and send all data
+            auto before = std::chrono::steady_clock::now();
             m_aircraftData->Environment(m_gpsData->Location(), m_atmosphereData->Pressure());
-            m_aircraftData->Access();
-            m_gpsData->Access();
-            m_atmosphereData->Access();
-            m_windData->Access();
-            std::this_thread::sleep_for(std::chrono::seconds(PROCESS_INTERVAL));
+            m_gpsData->CollectInto(StringInserter(&data));
+            m_atmosphereData->CollectInto(StringInserter(&data));
+            m_windData->CollectInto(StringInserter(&data));
+            m_aircraftData->CollectInto(StringInserter(&data));
+            m_server.Send(data);
+            // free unused memory for data at some point
+            auto newAircraftCount = m_aircraftData->Size();
+            if (newAircraftCount < priorAircraftCount * .8) {
+                data.shrink_to_fit();
+                priorAircraftCount = newAircraftCount;
+            } else if (newAircraftCount > priorAircraftCount) {
+                priorAircraftCount = newAircraftCount;
+            }
+            data.clear();
+            // wait remaining time of interval
+            auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - before);
+            if (diff.count() < PROCESS_INTERVAL) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_INTERVAL) - diff);
+            }
         } catch (error::IError const& e) {
             logger.Error(LOG_PREFIX, "fatal: ", e.Message());
             m_running = false;
@@ -141,9 +151,9 @@ auto
 CVfrb::duration(std::chrono::steady_clock::time_point start_) -> String {
     std::chrono::minutes runtime =
         std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - start_);
-    s64               d = runtime.count() / 60 / 24;
-    s64               h = runtime.count() / 60 - d * 24;
-    s64               m = runtime.count() % 60;
+    i64               d = runtime.count() / 60 / 24;
+    i64               h = runtime.count() / 60 - d * 24;
+    i64               m = runtime.count() % 60;
     std::stringstream ss;
     ss << d << "d " << (h < 10 ? "0" : "") << h << ":" << (m < 10 ? "0" : "") << m;
     return ss.str();

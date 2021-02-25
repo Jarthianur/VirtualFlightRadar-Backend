@@ -26,14 +26,13 @@
 using vfrb::object::CAtmosphere;
 using vfrb::str_util::MatchChecksum;
 using vfrb::str_util::Convert;
-using vfrb::str_util::EErrc;
 
 namespace vfrb::feed::parser
 {
 auto
 CAtmosphereParser::Parse(String&& str_, u32 prio_) const -> CAtmosphere {
     try {
-        if (MatchChecksum({str_.c_str(), str_.length()}) && str_.find("MDA") != String::npos) {
+        if (MatchChecksum(str_) && str_.find("MDA") != String::npos) {
             usize tmpB = 0;
             if ((tmpB = str_.find('B')) != String::npos) {
                 --tmpB;
@@ -41,7 +40,7 @@ CAtmosphereParser::Parse(String&& str_, u32 prio_) const -> CAtmosphere {
                 throw error::CParseError();
             }
             usize tmpS = 0;
-            if ((tmpS = StringView(str_.c_str(), tmpB).find_last_of(',')) != String::npos) {
+            if ((tmpS = StringView(str_.c_str(), tmpB).find_last_of(',')) != StringView::npos) {
                 ++tmpS;
             } else {
                 throw error::CParseError();

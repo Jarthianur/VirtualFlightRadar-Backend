@@ -35,10 +35,10 @@ class CSbsParser : public IParser<object::CAircraft>
     CTCONST SBS_FIELD_LAT  = 14;  ///< Field number of latitude
     CTCONST SBS_FIELD_LON  = 15;  ///< Field number of longitude
 
-    s32 const m_maxHeight;  ///< The max height filter
+    i32 const m_maxHeight;  ///< The max height filter
 
 public:
-    explicit CSbsParser(s32 maxHeight_);
+    explicit CSbsParser(i32 maxHeight_);
 
     auto
     Parse(String&& str_, u32 prio_) const -> object::CAircraft override;

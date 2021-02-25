@@ -4,3 +4,6 @@
 [submodule "vendor/TestPlusPlus"]
 	path = vendor/TestPlusPlus
 	url = https://github.com/Jarthianur/TestPlusPlus.git
+[submodule "vendor/boost/asio"]
+	path = vendor/boost/asio
+	url = https://github.com/chriskohlhoff/asio.git

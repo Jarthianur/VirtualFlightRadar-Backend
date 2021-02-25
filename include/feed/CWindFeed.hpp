@@ -58,6 +58,6 @@ public:
      * @brief Feed::process.
      */
     auto
-    Process(String str_) -> bool override;
+    Process(String&& str_) -> bool override;
 };
 }  // namespace vfrb::feed

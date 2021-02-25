@@ -26,17 +26,18 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 namespace vfrb
 {
 using u8    = std::uint8_t;
-using s8    = std::int8_t;
+using i8    = std::int8_t;
 using u16   = std::uint16_t;
-using s16   = std::int16_t;
+using i16   = std::int16_t;
 using u32   = std::uint32_t;
-using s32   = std::int32_t;
+using i32   = std::int32_t;
 using u64   = std::uint64_t;
-using s64   = std::int64_t;
+using i64   = std::int64_t;
 using usize = std::size_t;
 using f32   = float;
 using f64   = double;
@@ -44,13 +45,13 @@ using f64   = double;
 namespace limits
 {
 using u8    = std::numeric_limits<u8>;
-using s8    = std::numeric_limits<s8>;
+using i8    = std::numeric_limits<i8>;
 using u16   = std::numeric_limits<u16>;
-using s16   = std::numeric_limits<s16>;
+using i16   = std::numeric_limits<i16>;
 using u32   = std::numeric_limits<u32>;
-using s32   = std::numeric_limits<s32>;
+using i32   = std::numeric_limits<i32>;
 using u64   = std::numeric_limits<u64>;
-using s64   = std::numeric_limits<s64>;
+using i64   = std::numeric_limits<i64>;
 using usize = std::numeric_limits<usize>;
 using f32   = std::numeric_limits<f32>;
 using f64   = std::numeric_limits<f64>;
@@ -67,4 +68,65 @@ using SPtr = std::shared_ptr<T>;
 
 template<typename T>
 using UPtr = std::unique_ptr<T>;
+
+/**
+ * Get an enum value as the underlying type.
+ * @tparam T The enum type
+ * @param value The enum value
+ * @return the value as its underlyig type
+ */
+template<typename T>
+constexpr auto
+AsUnderlyingType(T val_) -> typename std::underlying_type<T>::type {
+    return static_cast<typename std::underlying_type<T>::type>(val_);
+}
+
+enum class EErrc : enum_type
+{
+    OK,
+    ERR
+};
+
+template<typename T>
+struct Result
+{
+    T           Value;
+    EErrc const Ec;
+
+    operator bool() const {
+        return Ec == EErrc::OK;
+    }
+};
+
+template<>
+struct Result<void>
+{
+    EErrc Ec;
+
+    operator bool() const {
+        return Ec == EErrc::OK;
+    }
+};
+
+template<typename T>
+auto
+Ok(T t_) -> Result<T> {
+    return {std::move(t_), EErrc::OK};
+}
+
+inline auto
+Ok() -> Result<void> {
+    return {EErrc::OK};
+}
+
+template<typename T>
+auto
+Err(T t_) -> Result<T> {
+    return {std::move(t_), EErrc::ERR};
+}
+
+inline auto
+Err() -> Result<void> {
+    return {EErrc::ERR};
+}
 }  // namespace vfrb

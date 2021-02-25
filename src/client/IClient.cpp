@@ -18,13 +18,14 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "client/IClient.hpp"
+
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
 
 #include <boost/functional/hash.hpp>
 
-#include "client/IClient.hpp"
 #include "client/net/IConnector.hpp"
 #include "feed/IFeed.hpp"
 
@@ -32,7 +33,6 @@
 
 using vfrb::client::net::SEndpoint;
 using vfrb::client::net::IConnector;
-using vfrb::client::net::EErrc;
 using vfrb::concurrent::LockGuard;
 using vfrb::concurrent::UniqueLock;
 
@@ -83,7 +83,7 @@ IClient::Run() NO_THREAD_SAFETY_ANALYSIS {
 void
 IClient::connect() {
     m_state = EState::CONNECTING;
-    m_connector->OnConnect(m_endpoint, [this](EErrc err_) { handleConnect(err_); });
+    m_connector->OnConnect(m_endpoint, [this](Result<void>&& res_) { handleConnect(res_); });
 }
 
 void
@@ -98,7 +98,7 @@ IClient::reconnect() {
 
 void
 IClient::timedConnect() {
-    m_connector->OnTimeout([this](EErrc err_) { handleTimedConnect(err_); }, m_backoff.Next());
+    m_connector->OnTimeout([this](Result<void>&& res_) { handleTimedConnect(res_); }, m_backoff.Next());
 }
 
 void
@@ -121,12 +121,12 @@ IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS {
 
 void
 IClient::read() {
-    m_connector->OnRead([this](EErrc err_, String const& str_) { handleRead(err_, str_); });
+    m_connector->OnRead([this](Result<String>&& res_) { handleRead(std::move(res_)); });
 }
 
 void
-IClient::handleTimedConnect(EErrc err_) {
-    if (err_ == EErrc::OK) {
+IClient::handleTimedConnect(Result<void> res_) {
+    if (res_) {
         LockGuard lk(m_mutex);
         logger.Info(logPrefix(), "try connect to ", m_endpoint.Host, ":", m_endpoint.Port);
         connect();
@@ -137,12 +137,12 @@ IClient::handleTimedConnect(EErrc err_) {
 }
 
 void
-IClient::handleRead(EErrc err_, String const& str_) {
+IClient::handleRead(Result<String>&& res_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::RUNNING) {
-        if (err_ == EErrc::OK) {
+        if (res_) {
             for (auto& it : m_feeds) {
-                if (!it->Process(str_)) {
+                if (!it->Process(std::move(res_.Value))) {
                     stop();
                 }
             }

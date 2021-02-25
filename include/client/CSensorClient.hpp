@@ -42,14 +42,14 @@ class CSensorClient : public IClient
      * @threadsafe
      */
     void
-    checkDeadline(net::EErrc err_) REQUIRES(!m_mutex);
+    checkDeadline(Result<void> res_) REQUIRES(!m_mutex);
 
     /**
      * @brief Implement Client::handleConnect
      * @threadsafe
      */
     void
-    handleConnect(net::EErrc err_) override REQUIRES(!m_mutex);
+    handleConnect(Result<void> res_) override REQUIRES(!m_mutex);
 
     auto
     logPrefix() const -> str override;

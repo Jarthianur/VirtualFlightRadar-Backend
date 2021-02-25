@@ -40,7 +40,7 @@ struct SLocation
 
     f64 Latitude;   ///< Latitude; deg
     f64 Longitude;  ///< Longitude; deg
-    s32 Altitude;   ///< Altitude; m
+    i32 Altitude;   ///< Altitude; m
 };
 
 /// GPS position object
@@ -50,7 +50,7 @@ class CGpsPosition : public CObject
     f64        m_geoid;           ///< The geoid separation
     f64        m_dilution;        ///< The position dilution
     u8         m_nrOfSatellites;  ///< The number of satellites
-    s8         m_fixQuality;      ///< The GPS fix quality
+    i8         m_fixQuality;      ///< The GPS fix quality
     CTimestamp m_timestamp;       ///< The timestamp of this position
 
     void
@@ -69,7 +69,7 @@ public:
     CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_);
 
     /// @param prio_ The initial priority
-    CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_, u8 sat_, s8 qual_,
+    CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_, u8 sat_, i8 qual_,
                  CTimestamp const& ts_);
     ~CGpsPosition() noexcept override = default;
 

@@ -54,7 +54,7 @@ CAcceptorTest::Stop() {
 }
 
 void
-CAcceptorTest::OnAccept(Callback&& cb_) {
+CAcceptorTest::OnAccept(Callback cb_) {
     m_onAcceptFn = std::move(cb_);
 }
 
@@ -89,7 +89,7 @@ CAcceptorTest::Connect(String const& addr_, bool failAccept_, bool failWrite_) -
     m_stagedAddress = addr_;
     auto buf        = std::make_shared<String>("");
     m_sockets.emplace_back(CSocketTest(addr_, buf, failWrite_), buf);
-    m_onAcceptFn(failAccept_);  // false => no error
+    m_onAcceptFn(failAccept_ ? Err() : Ok());  // false => no error
     return m_sockets.size() - 1;
 }
 

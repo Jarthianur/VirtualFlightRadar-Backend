@@ -31,7 +31,7 @@ using vfrb::config::CProperties;
 namespace vfrb::feed
 {
 CSbsFeed::CSbsFeed(String const& name_, CProperties const& prop_, SPtr<data::CAircraftData> data_,
-                   s32 maxHeight_)
+                   i32 maxHeight_)
     : IFeed(name_, prop_, data_), m_parser(maxHeight_), m_worker([this](String&& work_) {
           try {
               m_data->Update(m_parser.Parse(std::move(work_), m_priority));
@@ -45,7 +45,7 @@ CSbsFeed::Protocol() const -> IFeed::EProtocol {
 }
 
 auto
-CSbsFeed::Process(String str_) -> bool {
+CSbsFeed::Process(String&& str_) -> bool {
     m_worker.Push(std::move(str_));
     return true;
 }

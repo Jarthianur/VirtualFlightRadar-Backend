@@ -45,7 +45,8 @@ class IFeed
     /**
      * @brief Initialize the priority from the given properties.
      */
-    [[nodiscard]] auto initPriority() const -> u32;
+    [[nodiscard]] auto
+    initPriority() const -> u32;
 
 protected:
     config::CProperties const m_properties;  ///< Properties
@@ -94,7 +95,7 @@ public:
      * @param response The response
      */
     virtual auto
-    Process(String str_) -> bool = 0;
+    Process(String&& str_) -> bool = 0;
 
     [[nodiscard]] auto
     Priority() const -> std::remove_const<decltype(m_priority)>::type;

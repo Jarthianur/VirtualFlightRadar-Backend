@@ -28,7 +28,6 @@
 
 using vfrb::client::net::SEndpoint;
 using vfrb::client::net::IConnector;
-using vfrb::client::net::EErrc;
 using vfrb::concurrent::LockGuard;
 
 namespace vfrb::client
@@ -39,10 +38,10 @@ static auto const& logger     = CLogger::Instance();
 CSbsClient::CSbsClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
 
 void
-CSbsClient::handleConnect(EErrc err_) {
+CSbsClient::handleConnect(Result<void> res_) {
     LockGuard lk(m_mutex);
     if (m_state == EState::CONNECTING) {
-        if (err_ == EErrc::OK) {
+        if (res_) {
             m_state = EState::RUNNING;
             m_backoff.Reset();
             logger.Info(LOG_PREFIX, "connected to ", m_endpoint.Host, ":", m_endpoint.Port);
