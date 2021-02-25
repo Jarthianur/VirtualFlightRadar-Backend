@@ -5,9 +5,8 @@ message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
 message(STATUS "The host processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
 #
-#definitions
+# definitions
 #
-
 file(READ ${PROJECT_SOURCE_DIR}/version.txt TMP_VERSION)
 string(STRIP "${TMP_VERSION}" CMAKE_PROJECT_VERSION)
 
@@ -60,12 +59,8 @@ add_subdirectory(vendor/TestPlusPlus EXCLUDE_FROM_ALL)
 
 find_package(Threads REQUIRED)
 
+set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost)
 set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/asio/asio/include)
-set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/property_tree/include)
-set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/spirit/include)
-set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/fusion/include)
-set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/container_hash/include)
-set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/date_time/include)
 
 #
 # target: release
