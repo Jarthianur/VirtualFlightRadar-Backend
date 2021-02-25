@@ -20,8 +20,8 @@
 
 #include "config/CProperties.hpp"
 
-#include <boost/property_tree/exceptions.hpp>
-#include <boost/property_tree/ptree_fwd.hpp>
+#include "boost/property_tree/exceptions.hpp"
+#include "boost/property_tree/ptree_fwd.hpp"
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_bad_path;

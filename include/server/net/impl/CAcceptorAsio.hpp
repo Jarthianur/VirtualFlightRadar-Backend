@@ -20,43 +20,51 @@
 
 #pragma once
 
+#include "server/net/IAcceptor.hpp"
+#include "server/net/impl/CSocketAsio.hpp"
 #include "util/ClassUtils.hpp"
 
 #include "Types.hpp"
-#include "asio.hpp"
 
 namespace vfrb::server::net
 {
-/// Socket implementation using boost
-class CSocketBoost
+/**
+ * @brief Implement NetworkInterface using boost.
+ */
+class CAcceptorAsio : public IAcceptor<CSocketAsio>
 {
-    asio::ip::tcp::socket m_socket;  ///< Underlying socket
+    NOT_COPYABLE(CAcceptorAsio)
+    NOT_MOVABLE(CAcceptorAsio)
+
+    asio::io_context        m_ioCtx;     ///< Internal IO-service
+    asio::ip::tcp::acceptor m_acceptor;  ///< Internal acceptor
+    CSocketAsio             m_socket;    ///< Staging socket
+
+    /// Intermediate handler for accept event
+    void
+    handleAccept(asio::error_code err_, Callback cb_);
 
 public:
-    MOVABLE(CSocketBoost)
-    NOT_COPYABLE(CSocketBoost)
-
-    explicit CSocketBoost(asio::ip::tcp::socket&& sock_);
-    ~CSocketBoost() noexcept;
-
-    /// @throw vfrb::server::net::error::CSocketError
-    [[nodiscard]] auto
-    Address() const -> String;
-
-    /**
-     * Write a message on the socket to the endpoint.
-     * @param sv_ The message
-     * @return true on success, else false
-     * @throw vfrb::server::net::error::CSocketError
-     */
-    auto
-    Write(String const& str_) -> bool;
+    explicit CAcceptorAsio(u16 port_);
+    ~CAcceptorAsio() noexcept override;
 
     void
-    Close();
+    Run() override;
 
-    /// Get the underlying socket.
+    void
+    Stop() override;
+
+    void
+    OnAccept(Callback cb_) override;
+
+    void
+    Close() override;
+
+    /// @throw vfrb::server::net::error::CSocketError
     auto
-    Get() -> asio::ip::tcp::socket&;
+    StartConnection() -> CConnection<CSocketAsio> override;
+
+    [[nodiscard]] auto
+    StagedAddress() const -> String override;
 };
 }  // namespace vfrb::server::net

@@ -97,7 +97,7 @@ getConfig(program_options::variables_map const& vars_) {
     if (vars_.count("output")) {
         logger.LogFile(vars_["output"].as<std::string>());
     }
-    logger.Info("VirtualFlightRadar-Backend -- " VERSION);
+    logger.Info("VirtualFlightRadar-Backend -- ", VERSION);
     if (vars_.count("config")) {
         std::ifstream file(vars_["config"].as<std::string>());
         if (!file) {

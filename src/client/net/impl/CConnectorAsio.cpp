@@ -18,10 +18,9 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "client/net/impl/CConnectorBoost.hpp"
+#include "client/net/impl/CConnectorAsio.hpp"
 
-#include <boost/date_time.hpp>
-
+#include "boost/date_time.hpp"
 #include "client/net/SEndpoint.hpp"
 
 #include "CLogger.hpp"
@@ -37,16 +36,16 @@ namespace vfrb::client::net
 {
 static auto const& logger = CLogger::Instance();
 
-CConnectorBoost::CConnectorBoost()
+CConnectorAsio::CConnectorAsio()
     : m_ioCtx(), m_socket(m_ioCtx), m_resolver(m_ioCtx), m_timer(m_ioCtx), m_istream(&m_buffer) {}
 
 void
-CConnectorBoost::Run() {
+CConnectorAsio::Run() {
     m_ioCtx.run();
 }
 
 void
-CConnectorBoost::Stop() {
+CConnectorAsio::Stop() {
     Close();
     if (!m_ioCtx.stopped()) {
         m_ioCtx.stop();
@@ -54,7 +53,7 @@ CConnectorBoost::Stop() {
 }
 
 void
-CConnectorBoost::Close() {
+CConnectorAsio::Close() {
     m_timer.expires_at(boost::posix_time::pos_infin);
     m_timer.cancel();
     if (m_socket.is_open()) {
@@ -65,7 +64,7 @@ CConnectorBoost::Close() {
 }
 
 void
-CConnectorBoost::OnConnect(SEndpoint const& ep_, Callback cb_) {
+CConnectorAsio::OnConnect(SEndpoint const& ep_, Callback cb_) {
     m_resolver.async_resolve(
         ep_.Host, ep_.Port, tcp::resolver::query::canonical_name,
         [this, cb{std::move(cb_)}](error_code err_, tcp::resolver::results_type res_) {
@@ -82,7 +81,7 @@ CConnectorBoost::OnConnect(SEndpoint const& ep_, Callback cb_) {
 }
 
 void
-CConnectorBoost::OnRead(ReadCallback cb_) {
+CConnectorAsio::OnRead(ReadCallback cb_) {
     if (m_socket.is_open()) {
         async_read_until(m_socket, m_buffer, "\r\n",
                          [this, cb{std::move(cb_)}](error_code err_, usize b_) { handleRead(err_, b_, cb); });
@@ -90,7 +89,7 @@ CConnectorBoost::OnRead(ReadCallback cb_) {
 }
 
 void
-CConnectorBoost::OnWrite(String const& str_, Callback cb_) {
+CConnectorAsio::OnWrite(String const& str_, Callback cb_) {
     if (m_socket.is_open()) {
         error_code err;
         asio::write(m_socket, buffer(str_), err);
@@ -104,7 +103,7 @@ CConnectorBoost::OnWrite(String const& str_, Callback cb_) {
 }
 
 void
-CConnectorBoost::OnTimeout(Callback cb_, u32 to_) {
+CConnectorAsio::OnTimeout(Callback cb_, u32 to_) {
     if (to_ > 0) {
         ResetTimer(to_);
     }
@@ -112,17 +111,17 @@ CConnectorBoost::OnTimeout(Callback cb_, u32 to_) {
 }
 
 void
-CConnectorBoost::ResetTimer(u32 to_) {
+CConnectorAsio::ResetTimer(u32 to_) {
     m_timer.expires_from_now(boost::posix_time::seconds(to_));
 }
 
 auto
-CConnectorBoost::TimerExpired() -> bool {
+CConnectorAsio::TimerExpired() -> bool {
     return m_timer.expires_at() <= deadline_timer::traits_type::now();
 }
 
 void
-CConnectorBoost::handleConnect(error_code err_, Callback cb_) noexcept {
+CConnectorAsio::handleConnect(error_code err_, Callback cb_) noexcept {
     if (!err_) {
         m_socket.set_option(socket_base::keep_alive(true));
         cb_(Ok());
@@ -133,7 +132,7 @@ CConnectorBoost::handleConnect(error_code err_, Callback cb_) noexcept {
 }
 
 void
-CConnectorBoost::handleTimeout(error_code err_, Callback cb_) noexcept {
+CConnectorAsio::handleTimeout(error_code err_, Callback cb_) noexcept {
     if (err_) {
         logger.Debug("(Client) timeout: ", err_.message());
         cb_(Err());
@@ -143,7 +142,7 @@ CConnectorBoost::handleTimeout(error_code err_, Callback cb_) noexcept {
 }
 
 void
-CConnectorBoost::handleRead(error_code err_, [[maybe_unused]] usize, ReadCallback cb_) noexcept {
+CConnectorAsio::handleRead(error_code err_, [[maybe_unused]] usize, ReadCallback cb_) noexcept {
     if (!err_) {
         std::getline(m_istream, m_response);
         m_response.append("\n");

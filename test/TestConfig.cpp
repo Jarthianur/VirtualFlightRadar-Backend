@@ -23,8 +23,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <boost/property_tree/ini_parser.hpp>
-
+#include "boost/property_tree/ini_parser.hpp"
 #include "config/CConfigReader.hpp"
 #include "config/CConfiguration.hpp"
 #include "config/CProperties.hpp"

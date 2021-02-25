@@ -24,8 +24,7 @@
 #include <chrono>
 #include <condition_variable>
 
-#include <boost/functional/hash.hpp>
-
+#include "boost/functional/hash.hpp"
 #include "client/net/IConnector.hpp"
 #include "feed/IFeed.hpp"
 

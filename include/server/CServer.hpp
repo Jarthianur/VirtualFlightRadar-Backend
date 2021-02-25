@@ -25,7 +25,7 @@
 
 #include "concurrent/CGuardedThread.hpp"
 #include "concurrent/Mutex.hpp"
-#include "net/impl/CAcceptorBoost.hpp"
+#include "net/impl/CAcceptorAsio.hpp"
 #include "util/ClassUtils.hpp"
 
 #include "CConnection.hpp"
@@ -98,7 +98,7 @@ CLogger const& CServer<SocketT>::s_logger = CLogger::Instance();
 
 template<typename SocketT>
 CServer<SocketT>::CServer(u16 port_, usize maxCon_)
-    : CServer(std::make_shared<net::CAcceptorBoost>(port_), maxCon_) {}
+    : CServer(std::make_shared<net::CAcceptorAsio>(port_), maxCon_) {}
 
 template<typename SocketT>
 CServer<SocketT>::CServer(SPtr<net::IAcceptor<SocketT>> acceptor_, usize maxCon_)

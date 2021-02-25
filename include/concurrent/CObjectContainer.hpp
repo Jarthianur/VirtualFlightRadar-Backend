@@ -42,7 +42,7 @@ public:
     class CValueType;
 
     using KeyType       = usize;
-    using ContainerType = std::map<KeyType, CValueType>;
+    using ContainerType = std::map<KeyType, CValueType>;  // implemented as tree, thus iteration is faster
 
     /**
      * Get an iterator to the first element in container.

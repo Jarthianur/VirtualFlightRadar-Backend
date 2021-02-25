@@ -25,8 +25,8 @@
 #include <list>
 
 #include "server/CServer.hpp"
-#include "server/net/impl/CAcceptorBoost.hpp"
-#include "server/net/impl/CSocketBoost.hpp"
+#include "server/net/impl/CAcceptorAsio.hpp"
+#include "server/net/impl/CSocketAsio.hpp"
 #include "util/ClassUtils.hpp"
 
 #include "Types.hpp"
@@ -54,13 +54,13 @@ namespace vfrb
  */
 class CVfrb
 {
-    SPtr<data::CAircraftData>                  m_aircraftData;    ///< Aircraft container
-    SPtr<data::CAtmosphereData>                m_atmosphereData;  ///< Atmospheric data container
-    SPtr<data::CGpsData>                       m_gpsData;         ///< GPS data container
-    SPtr<data::CWindData>                      m_windData;        ///< Wind data container
-    server::CServer<server::net::CSocketBoost> m_server;          ///< Manage clients and sending of data
-    std::list<SPtr<feed::IFeed>>               m_feeds;           ///< List of all active feeds
-    std::atomic<bool>                          m_running;         ///< Atomic run-status
+    SPtr<data::CAircraftData>                 m_aircraftData;    ///< Aircraft container
+    SPtr<data::CAtmosphereData>               m_atmosphereData;  ///< Atmospheric data container
+    SPtr<data::CGpsData>                      m_gpsData;         ///< GPS data container
+    SPtr<data::CWindData>                     m_windData;        ///< Wind data container
+    server::CServer<server::net::CSocketAsio> m_server;          ///< Manage clients and sending of data
+    List<SPtr<feed::IFeed>>                   m_feeds;           ///< List of all active feeds
+    std::atomic<bool>                         m_running;         ///< Atomic run-status
 
     /**
      * @brief Create all input feeds.

@@ -24,7 +24,7 @@
 #include <sstream>
 
 #include "client/CClientManager.hpp"
-#include "client/net/impl/CConnectorBoost.hpp"
+#include "client/net/impl/CConnectorAsio.hpp"
 #include "concurrent/CSignalListener.hpp"
 #include "config/CConfiguration.hpp"
 #include "data/CAircraftData.hpp"

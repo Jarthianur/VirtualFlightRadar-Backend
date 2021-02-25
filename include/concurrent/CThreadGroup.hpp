@@ -25,6 +25,7 @@
 #include "util/ClassUtils.hpp"
 
 #include "CGuardedThread.hpp"
+#include "Types.hpp"
 
 namespace vfrb::concurrent
 {
@@ -34,7 +35,7 @@ class CThreadGroup
     NOT_COPYABLE(CThreadGroup)
     NOT_MOVABLE(CThreadGroup)
 
-    std::list<CGuardedThread> m_threads;  ///< The grouped threads
+    List<CGuardedThread> m_threads;  ///< The grouped threads
 
 public:
     CThreadGroup() = default;

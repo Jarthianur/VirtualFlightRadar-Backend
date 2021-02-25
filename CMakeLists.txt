@@ -34,9 +34,9 @@ list(APPEND vfrb_sources_for_test ${vfrb_sources})
 list(APPEND vfrb_sources_for_test ${vfrb_test_impl_sources})
 list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/main.cpp)
 list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/CVfrb.cpp)
-list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/object/impl/CDateTimeBoost.cpp)
-list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl/CAcceptorBoost.cpp)
-list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl/CSocketBoost.cpp)
+list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/object/impl/CDateTimeAsio.cpp)
+list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl/CAcceptorAsio.cpp)
+list(REMOVE_ITEM vfrb_sources_for_test ${PROJECT_SOURCE_DIR}/src/server/net/impl/CSocketAsio.cpp)
 
 set(CMAKE_BUILD_TYPE staged)
 set(VFRB_CXX_W_FLAGS "-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Werror")
@@ -48,12 +48,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS_STAGED "${CMAKE_CXX_FLAGS_STAGED} -Wthread-safety -Wthread-safety-reference -Wthread-safety-negative")
 endif()
 
-if(DEFINED BOOST_STATIC)
-    message(STATUS "Linking boost statically")
-    set(Boost_USE_STATIC_LIBS ON)
-endif()
-
-set(VFRB_LINK_LIBS Boost::system Boost::program_options Threads::Threads fmt::fmt-header-only)
+set(Boost_USE_STATIC_LIBS ON)
+set(VFRB_LINK_LIBS Threads::Threads fmt::fmt-header-only)
 set(VFRB_TEST_LINK_LIBS gcov gomp tpp)
 
 #
@@ -62,10 +58,14 @@ set(VFRB_TEST_LINK_LIBS gcov gomp tpp)
 add_subdirectory(vendor/fmt EXCLUDE_FROM_ALL)
 add_subdirectory(vendor/TestPlusPlus EXCLUDE_FROM_ALL)
 
-find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(Threads REQUIRED)
 
-set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/asio/asio/include)
+set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/asio/asio/include)
+set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/property_tree/include)
+set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/spirit/include)
+set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/fusion/include)
+set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/container_hash/include)
+set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/boost/date_time/include)
 
 #
 # target: release

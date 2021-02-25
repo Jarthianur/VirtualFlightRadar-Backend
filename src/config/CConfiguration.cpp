@@ -99,8 +99,8 @@ CConfiguration::resolveFilter(str key_) const -> i32 {
 }
 
 auto
-CConfiguration::resolveFeeds() const -> std::unordered_map<String, CProperties> {
-    std::unordered_map<String, CProperties> map;
+CConfiguration::resolveFeeds() const -> HashMap<String, CProperties> {
+    HashMap<String, CProperties> map;
     for (auto const& it : FeedNames) {
         try {
             map.emplace(it, m_properties.Section(it));
@@ -112,8 +112,8 @@ CConfiguration::resolveFeeds() const -> std::unordered_map<String, CProperties> 
 }
 
 auto
-CConfiguration::resolveFeedNames() const -> std::list<String> {
-    std::list<String> list;
+CConfiguration::resolveFeedNames() const -> List<String> {
+    List<String>      list;
     std::stringstream ss;
     ss.str(m_properties.Property(PATH_FEEDS, ""));
     String item;
