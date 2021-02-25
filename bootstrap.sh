@@ -168,7 +168,7 @@ function build_test() {
     trap "fail -e popd Build has failed!" ERR
     pushd "$VFRB_ROOT/build/"
     cmake ..
-    make unittest regression -j$(nproc)
+    make unittest -j$(nproc)
     popd
     trap - ERR
 }
