@@ -24,13 +24,13 @@
 #include "client/CGpsdClient.hpp"
 #include "client/CSbsClient.hpp"
 #include "client/CSensorClient.hpp"
-#include "client/net/impl/CConnectorBoost.hpp"
+#include "client/net/impl/CConnectorAsio.hpp"
 #include "feed/CAprscFeed.hpp"
 #include "feed/IFeed.hpp"
 
 using vfrb::feed::IFeed;
 using vfrb::feed::CAprscFeed;
-using vfrb::client::net::CConnectorBoost;
+using vfrb::client::net::CConnectorAsio;
 
 namespace vfrb::client
 {
@@ -39,25 +39,25 @@ auto
 CClientFactory::makeClient<CAprscClient>(SPtr<IFeed> feed_) -> SPtr<CAprscClient> {
     return std::make_shared<CAprscClient>(feed_->Endpoint(),
                                           std::static_pointer_cast<CAprscFeed>(feed_)->Login(),
-                                          std::make_shared<CConnectorBoost>());
+                                          std::make_shared<CConnectorAsio>());
 }
 
 template<>
 auto
 CClientFactory::makeClient<CSbsClient>(SPtr<IFeed> feed_) -> SPtr<CSbsClient> {
-    return std::make_shared<CSbsClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
+    return std::make_shared<CSbsClient>(feed_->Endpoint(), std::make_shared<CConnectorAsio>());
 }
 
 template<>
 auto
 CClientFactory::makeClient<CSensorClient>(SPtr<IFeed> feed_) -> SPtr<CSensorClient> {
-    return std::make_shared<CSensorClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
+    return std::make_shared<CSensorClient>(feed_->Endpoint(), std::make_shared<CConnectorAsio>());
 }
 
 template<>
 auto
 CClientFactory::makeClient<CGpsdClient>(SPtr<IFeed> feed_) -> SPtr<CGpsdClient> {
-    return std::make_shared<CGpsdClient>(feed_->Endpoint(), std::make_shared<CConnectorBoost>());
+    return std::make_shared<CGpsdClient>(feed_->Endpoint(), std::make_shared<CConnectorAsio>());
 }
 
 auto

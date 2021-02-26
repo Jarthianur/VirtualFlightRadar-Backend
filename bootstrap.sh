@@ -111,9 +111,15 @@ function confirm() {
 function install_deps() {
     set -eE
     log -i INSTALL DEPENDENCIES
+    require VFRB_ROOT
     trap "fail Failed to install dependencies!" ERR
     $SUDO apt update
-    $SUDO apt install -y build-essential g++ make cmake libboost-dev libboost-system-dev libboost-program-options-dev
+    $SUDO apt install -y build-essential g++ make cmake
+    trap "fail -e popd Failed to install dependencies!" ERR
+    pushd $VFRB_ROOT/vendor/boost
+    ./bootstrap.sh
+    ./b2 headers
+    popd
     trap - ERR
 }
 
@@ -123,9 +129,6 @@ function build() {
     log -i BUILD VFRB
     require VFRB_ROOT
     local LS=""
-    if [ -n "${VFRB_LINK_STATIC}" ]; then
-        LS="-DBOOST_STATIC=1 --no-warn-unused-cli"
-    fi
     if [ -n "${VFRB_BIN_TAG}" ]; then
         LS="$LS -DVFRB_BIN_TAG=$VFRB_BIN_TAG"
     fi

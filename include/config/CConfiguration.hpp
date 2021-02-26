@@ -42,9 +42,9 @@ class CConfiguration
     resolvePosition() const -> object::CGpsPosition;
 
     auto
-    resolveFeeds() const -> std::unordered_map<String, CProperties>;
+    resolveFeeds() const -> HashMap<String, CProperties>;
     auto
-    resolveFeedNames() const -> std::list<String>;
+    resolveFeedNames() const -> List<String>;
 
     /// @param key_ The filters property name
     auto
@@ -97,14 +97,14 @@ public:
     CTCONST PATH_MAX_DIST       = "filter.maxDistance";
     CTCONST PATH_MAX_HEIGHT     = "filter.maxHeight";
 
-    bool                                          GroundMode;    ///< Ground mode enabled?
-    object::CGpsPosition const                    GpsPosition;   ///< Fallback position
-    f64 const                                     AtmPressure;   ///< Atmospheric fallback pressure
-    i32 const                                     MaxHeight;     ///< Maximum height for reported aircrafts
-    i32 const                                     MaxDistance;   ///< Maximum distance for reported aircrafts
-    std::tuple<u16, usize> const                  ServerConfig;  ///< Port where to serve reports
-    std::list<String> const                       FeedNames;     ///< List of feed names
-    std::unordered_map<String, CProperties> const FeedProperties;  ///< Map feed names to their properties
+    bool                               GroundMode;      ///< Ground mode enabled?
+    object::CGpsPosition const         GpsPosition;     ///< Fallback position
+    f64 const                          AtmPressure;     ///< Atmospheric fallback pressure
+    i32 const                          MaxHeight;       ///< Maximum height for reported aircrafts
+    i32 const                          MaxDistance;     ///< Maximum distance for reported aircrafts
+    Tuple<u16, usize> const            ServerConfig;    ///< Port where to serve reports
+    List<String> const                 FeedNames;       ///< List of feed names
+    HashMap<String, CProperties> const FeedProperties;  ///< Map feed names to their properties
 
     /**
      * @param stream The input stream

@@ -31,7 +31,7 @@ namespace vfrb::client::net
 /**
  * @brief Implement the Connector interface using boost::asio.
  */
-class CConnectorBoost : public IConnector
+class CConnectorAsio : public IConnector
 {
     asio::io_context        m_ioCtx;     ///< Internal IO-service
     asio::ip::tcp::socket   m_socket;    ///< Connection socket
@@ -68,7 +68,7 @@ class CConnectorBoost : public IConnector
     handleRead(asio::error_code err_, usize bytes_, ReadCallback cb_) noexcept;
 
 public:
-    CConnectorBoost();
+    CConnectorAsio();
 
     /**
      * @brief Run the internal event handler queue.

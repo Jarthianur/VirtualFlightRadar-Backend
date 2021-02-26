@@ -49,10 +49,6 @@ function print_help() {
     echo '  docker  : Build a minimal docker image. Cannot be combined with other tasks.'
     echo '            The vfrb.conf.in will be copied, so edit it before running this command.'
     echo ''
-    echo 'ENVIRONMENT:'
-    echo 'Following adjustments can be made with environment variables.'
-    echo '  VFRB_LINK_STATIC : Link libraries static where possible.'
-    echo ''
 }
 
 # print help if no args given

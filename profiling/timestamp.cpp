@@ -21,28 +21,26 @@
 #include <charconv>
 #include <sstream>
 #include <stdexcept>
-#include <string>
-#include <tuple>
 
-#include <boost/fusion/adapted/std_tuple.hpp>
-#include <boost/spirit/include/qi.hpp>
+#include "boost/fusion/adapted/std_tuple.hpp"
+#include "boost/spirit/include/qi.hpp"
 
 #include "profiler.hpp"
 
 namespace vfrb::profiling
 {
 template<typename Iter>
-std::tuple<u32, u32, u32, u32>
+Tuple<u32, u32, u32, u32>
 parseTime(Iter& first, Iter last) {
     namespace qi = boost::spirit::qi;
 
-    static const qi::int_parser<u32, 10, 2, 2>                                    _2digit = {};
-    static const qi::int_parser<u32, 10, 3, 3>                                    _3digit = {};
-    static const qi::rule<Iter, std::tuple<u32, u32, u32, u32>(), qi::space_type> time_r =
+    static const qi::int_parser<u32, 10, 2, 2>                               _2digit = {};
+    static const qi::int_parser<u32, 10, 3, 3>                               _3digit = {};
+    static const qi::rule<Iter, Tuple<u32, u32, u32, u32>(), qi::space_type> time_r =
         (_2digit >> _2digit >> _2digit >> qi::attr(0)) |
         (_2digit >> ":" >> _2digit >> ":" >> _2digit >> "." >> _3digit);
 
-    std::tuple<u32, u32, u32, u32> time;
+    Tuple<u32, u32, u32, u32> time;
     if (qi::phrase_parse(first, last, time_r, qi::space, time) && (first == last)) {
         return time;
     }

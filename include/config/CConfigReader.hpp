@@ -47,10 +47,10 @@ namespace error
 /// Error to indicate that file read failed
 class CReadFileError : public vfrb::error::IError
 {
-    String const m_fname;  ///< The name of file tried to read
+    String const m_msg;  ///< The name of file tried to read
 
 public:
-    explicit CReadFileError(String const& file_);
+    explicit CReadFileError(String const& msg_);
 
     [[nodiscard]] auto
     Message() const noexcept -> str override;

@@ -18,7 +18,7 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "server/net/impl/CAcceptorBoost.hpp"
+#include "server/net/impl/CAcceptorAsio.hpp"
 
 #include "server/CConnection.hpp"
 
@@ -29,21 +29,21 @@ using asio::error_code;
 
 namespace vfrb::server::net
 {
-CTCONST            LOG_PREFIX = "(NetworkInterfaceImplBoost) ";
+CTCONST            LOG_PREFIX = "(NetworkInterfaceImplAsio) ";
 static auto const& logger     = CLogger::Instance();
 
-CAcceptorBoost::CAcceptorBoost(u16 port_)
-    : IAcceptor<CSocketBoost>(),
+CAcceptorAsio::CAcceptorAsio(u16 port_)
+    : IAcceptor<CSocketAsio>(),
       m_ioCtx(),
       m_acceptor(m_ioCtx, tcp::endpoint(tcp::v4(), port_), tcp::acceptor::reuse_address(true)),
       m_socket(std::move(tcp::socket(m_ioCtx))) {}
 
-CAcceptorBoost::~CAcceptorBoost() noexcept {
+CAcceptorAsio::~CAcceptorAsio() noexcept {
     Stop();
 }
 
 void
-CAcceptorBoost::Run() {
+CAcceptorAsio::Run() {
     try {
         if (m_acceptor.is_open()) {
             m_ioCtx.run();
@@ -56,7 +56,7 @@ CAcceptorBoost::Run() {
 }
 
 void
-CAcceptorBoost::Stop() {
+CAcceptorAsio::Stop() {
     if (m_acceptor.is_open()) {
         m_acceptor.close();
     }
@@ -67,7 +67,7 @@ CAcceptorBoost::Stop() {
 }
 
 void
-CAcceptorBoost::OnAccept(Callback cb_) {
+CAcceptorAsio::OnAccept(Callback cb_) {
     if (m_acceptor.is_open()) {
         m_acceptor.async_accept(m_socket.Get(),
                                 [this, cb{std::move(cb_)}](error_code err_) { handleAccept(err_, cb); });
@@ -75,12 +75,12 @@ CAcceptorBoost::OnAccept(Callback cb_) {
 }
 
 void
-CAcceptorBoost::Close() {
+CAcceptorAsio::Close() {
     m_socket.Close();
 }
 
 void
-CAcceptorBoost::handleAccept(error_code err_, Callback cb_) {
+CAcceptorAsio::handleAccept(error_code err_, Callback cb_) {
     if (err_) {
         logger.Debug(LOG_PREFIX, "accept: ", err_.message());
         cb_(Err());
@@ -90,15 +90,15 @@ CAcceptorBoost::handleAccept(error_code err_, Callback cb_) {
 }
 
 auto
-CAcceptorBoost::StartConnection() -> CConnection<CSocketBoost> {
+CAcceptorAsio::StartConnection() -> CConnection<CSocketAsio> {
     if (!m_socket.Get().is_open()) {
         throw error::CSocketError("cannot start connection on closed socket");
     }
-    return CConnection<CSocketBoost>(std::move(m_socket));
+    return CConnection<CSocketAsio>(std::move(m_socket));
 }
 
 auto
-CAcceptorBoost::StagedAddress() const -> String {
+CAcceptorAsio::StagedAddress() const -> String {
     return m_socket.Address();
 }
 }  // namespace vfrb::server::net

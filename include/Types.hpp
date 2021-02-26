@@ -23,10 +23,14 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <list>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <type_traits>
+#include <unordered_map>
+#include <vector>
 
 namespace vfrb
 {
@@ -62,6 +66,18 @@ using enum_type = std::uint_fast8_t;
 using str        = char const*;
 using String     = std::string;
 using StringView = std::string_view;
+
+template<typename T>
+using Vector = std::vector<T>;
+
+template<typename T>
+using List = std::list<T>;
+
+template<typename K, typename V>
+using HashMap = std::unordered_map<K, V>;
+
+template<typename... T>
+using Tuple = std::tuple<T...>;
 
 template<typename T>
 using SPtr = std::shared_ptr<T>;

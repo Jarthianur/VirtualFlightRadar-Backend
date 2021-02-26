@@ -24,8 +24,6 @@
 #include <functional>
 #include <iomanip>
 #include <iostream>
-#include <list>
-#include <map>
 #include <utility>
 
 #include "Types.hpp"
@@ -100,8 +98,8 @@ public:
 
 class ProfilerGroup
 {
-    std::list<Profiler> m_profilers;
-    char const*         m_name;
+    List<Profiler> m_profilers;
+    char const*    m_name;
 
     friend class ProfilerBuilder;
 
@@ -135,9 +133,9 @@ class ProfilerBuilder
 public:
     ProfilerBuilder() = default;
 
-    static std::map<char const*, ProfilerGroup>&
+    static HashMap<char const*, ProfilerGroup>&
     profilers() {
-        static std::map<char const*, ProfilerGroup> profiler_list;
+        static HashMap<char const*, ProfilerGroup> profiler_list;
         return profiler_list;
     }
 

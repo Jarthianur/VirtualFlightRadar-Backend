@@ -22,16 +22,20 @@
 
 #include <utility>
 
-#include <boost/property_tree/exceptions.hpp>
-#include <boost/property_tree/ini_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+#include "boost/property_tree/exceptions.hpp"
+#include "boost/property_tree/ini_parser.hpp"
+#include "boost/property_tree/ptree.hpp"
 
 using boost::property_tree::ptree;
 using boost::property_tree::ini_parser_error;
 
 namespace vfrb::config
 {
-CConfigReader::CConfigReader(std::istream& stream_) : m_stream(stream_) {}
+CConfigReader::CConfigReader(std::istream& stream_) : m_stream(stream_) {
+    if (!m_stream) {
+        throw error::CReadFileError("Unable to read file");
+    }
+}
 
 auto
 CConfigReader::Read() -> CProperties {
@@ -39,18 +43,18 @@ CConfigReader::Read() -> CProperties {
     try {
         read_ini(m_stream, tree);
     } catch (ini_parser_error const& e) {
-        throw error::CReadFileError(e.filename());
+        throw error::CReadFileError("Not a valid INI file");
     }
     return CProperties(std::move(tree));
 }
 
 namespace error
 {
-CReadFileError::CReadFileError(String const& file_) : m_fname(file_ + " is not a valid INI file") {}
+CReadFileError::CReadFileError(String const& msg_) : m_msg(msg_) {}
 
 auto
 CReadFileError::Message() const noexcept -> str {
-    return m_fname.c_str();
+    return m_msg.c_str();
 }
 }  // namespace error
 }  // namespace vfrb::config

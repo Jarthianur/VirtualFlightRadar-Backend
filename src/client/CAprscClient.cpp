@@ -22,8 +22,7 @@
 
 #include <stdexcept>
 
-#include <boost/functional/hash.hpp>
-
+#include "boost/functional/hash.hpp"
 #include "client/net/IConnector.hpp"
 
 #include "CLogger.hpp"

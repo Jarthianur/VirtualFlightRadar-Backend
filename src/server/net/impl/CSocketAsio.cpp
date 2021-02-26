@@ -18,7 +18,7 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "server/net/impl/CSocketBoost.hpp"
+#include "server/net/impl/CSocketAsio.hpp"
 
 #include "server/net/error/CSocketError.hpp"
 
@@ -26,26 +26,26 @@ using asio::ip::tcp;
 
 namespace vfrb::server::net
 {
-CSocketBoost::CSocketBoost(CSocketBoost&& other_) noexcept : m_socket(std::move(other_.m_socket)) {}
+CSocketAsio::CSocketAsio(CSocketAsio&& other_) noexcept : m_socket(std::move(other_.m_socket)) {}
 
 auto
-CSocketBoost::operator=(CSocketBoost&& other_) noexcept -> CSocketBoost& {
+CSocketAsio::operator=(CSocketAsio&& other_) noexcept -> CSocketAsio& {
     m_socket = std::move(other_.m_socket);
     return *this;
 }
 
-CSocketBoost::CSocketBoost(tcp::socket&& sock_) : m_socket(std::move(sock_)) {
+CSocketAsio::CSocketAsio(tcp::socket&& sock_) : m_socket(std::move(sock_)) {
     if (m_socket.is_open()) {
         m_socket.non_blocking(true);
     }
 }
 
-CSocketBoost::~CSocketBoost() noexcept {
+CSocketAsio::~CSocketAsio() noexcept {
     Close();
 }
 
 auto
-CSocketBoost::Address() const -> String {
+CSocketAsio::Address() const -> String {
     if (!m_socket.is_open()) {
         throw error::CSocketError("cannot get address from closed socket");
     }
@@ -53,7 +53,7 @@ CSocketBoost::Address() const -> String {
 }
 
 auto
-CSocketBoost::Write(String const& str_) -> bool {
+CSocketAsio::Write(String const& str_) -> bool {
     if (!m_socket.is_open()) {
         throw error::CSocketError("cannot write on closed socket");
     }
@@ -63,7 +63,7 @@ CSocketBoost::Write(String const& str_) -> bool {
 }
 
 void
-CSocketBoost::Close() {
+CSocketAsio::Close() {
     if (m_socket.is_open()) {
         asio::error_code ignored_ec;
         m_socket.shutdown(asio::ip::tcp::socket::shutdown_send, ignored_ec);
@@ -72,7 +72,7 @@ CSocketBoost::Close() {
 }
 
 auto
-CSocketBoost::Get() -> tcp::socket& {
+CSocketAsio::Get() -> tcp::socket& {
     return m_socket;
 }
 }  // namespace vfrb::server::net
