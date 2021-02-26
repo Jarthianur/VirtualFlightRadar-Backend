@@ -20,10 +20,10 @@
 
 #pragma once
 
-#include <algorithm>
-#include <iostream>
+#include <optional>
 
 #include "error/IError.hpp"
+#include "util/ClassUtils.hpp"
 
 #include "Types.hpp"
 
@@ -41,67 +41,53 @@ public:
     [[nodiscard]] auto
     Message() const noexcept -> str override;
 };
+
+class CMissingOptionError : public IError
+{
+public:
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
+};
+
+class COptsCalledForHelp : public IError
+{
+public:
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
+};
 }  // namespace error
 
 class CProgramOptions
 {
 public:
-    struct SHelpCalled
-    {};
+    CTCONST OPT_KEY_CONF = "CONF";
+    CTCONST OPT_KEY_GNDM = "GNDM";
+    CTCONST OPT_KEY_LOGF = "LOGF";
 
     void
-    parse(usize argc_, str* argv_) {
-        auto const args{tokenize_args(argc_, argv_)};
-        m_progname = argv_[0];
-        for (auto i{1UL}; i < args.size(); ++i) {
-            eval_arg(args[i], [&](String const& arg_) -> String const& {
-                try {
-                    return args.at(++i);
-                } catch ([[maybe_unused]] std::out_of_range const&) {
-                    throw std::runtime_error(arg_ + " requires an argument!");
-                }
-            });
-        }
-    }
+    Parse(usize argc_, str* argv_);
 
-    inline auto
-    config() const -> config const& {
-        return m_cfg;
-    }
+    auto
+    GetOpt(str key_) const -> std::optional<String>;
+
+    auto
+    RequireOpt(str key_) const -> std::optional<String>;
 
 private:
-    struct matched
+    struct SMatched
     {};
 
-    template<typename T>
-    struct option
+    struct SOption
     {
-        T m_flag;
+        str m_flagLong;
+        str m_flagShort;
 
-        template<typename Arg, typename Fn>
-        auto
-        operator()(Arg&& arg_, Fn&& fn_) const -> decltype(*this)& {
-            if (arg_ == m_flag) {
-                fn_();
-                throw matched{};
-            }
-            return *this;
-        }
-    };
-
-    struct combined_option
-    {
         template<typename Fn>
         auto
-        operator()(std::string const& arg_, Fn&& fn_) const -> decltype(*this)& {
-            if (arg_[0] == '-') {
-                std::for_each(arg_.cbegin() + 1, arg_.cend(), [&](char c_) {
-                    try {
-                        fn_(c_);
-                    } catch (matched) {
-                    }
-                });
-                throw matched{};
+        operator()(String const& arg_, Fn&& fn_) const -> decltype(*this)& {
+            if (arg_ == m_flagLong || arg_ == m_flagShort) {
+                fn_();
+                throw SMatched{};
             }
             return *this;
         }
@@ -109,77 +95,24 @@ private:
 
     template<typename Fn>
     void
-    eval_arg(std::string const& arg_, Fn&& getval_fn_) {
+    evalArg(String const& arg_, Fn&& getvalFn_) {
         try {
-            make_option(+"--help")(arg_, [&] { print_help(); });
-            make_option(+"--xml")(arg_, [&] { m_cfg.report_fmt = config::report_format::XML; });
-            make_option(+"--md")(arg_, [&] { m_cfg.report_fmt = config::report_format::MD; });
-            make_option(+"--json")(arg_, [&] { m_cfg.report_fmt = config::report_format::JSON; });
-            combined_option{}(arg_, [&](char c_) {
-                make_option('c')(c_, [&] { m_cfg.report_cfg.color = true; });
-                make_option('o')(c_, [&] { m_cfg.report_cfg.capture_out = true; });
-                make_option('s')(c_, [&] { m_cfg.report_cfg.strip = true; });
-                make_option('e')(c_, [&] {
-                    set_filter_mode(config::filter_mode::EXCLUDE);
-                    m_cfg.f_patterns.push_back(to_regex(getval_fn_(arg_)));
-                });
-                make_option('i')(c_, [&] {
-                    set_filter_mode(config::filter_mode::INCLUDE);
-                    m_cfg.f_patterns.push_back(to_regex(getval_fn_(arg_)));
-                });
-            });
-        } catch (matched) {
+            SOption{"--help", "-h"}(arg_, [&] { printHelp(); });
+            SOption{"--config", "-c"}(arg_, [&] { m_opts.emplace(OPT_KEY_CONF, getvalFn_(arg_)); });
+            SOption{"--ground", "-g"}(arg_, [&] { m_opts.emplace(OPT_KEY_GNDM, "true"); });
+            SOption{"--log-file", "-l"}(arg_, [&] { m_opts.emplace(OPT_KEY_LOGF, getvalFn_(arg_)); });
+        } catch ([[maybe_unused]] SMatched) {
             return;
         }
-        m_cfg.report_cfg.outfile = arg_;
-    }
-
-    template<typename T>
-    static auto
-    make_option(T&& t_) -> option<T> {
-        return option<T>{std::forward<T>(t_)};
     }
 
     void
-    print_help() {
-        std::cout
-            << "Unit testing binary built with Test++ (" TPP_VERSION ").\n"
-            << "GitHub: https://github.com/Jarthianur/TestPlusPlus\n\n"
-            << "Usage: " << m_progname << " [OPTIONS] [filename]\n"
-            << "Default is to report to standard-out in an informative text format (using console-reporter).\n\n"
-               "OPTIONS:\n"
-               "  --help: Print this message and exit.\n"
-               "  --xml : Report in JUnit-like XML format.\n"
-               "  --md  : Report in markdown format.\n"
-               "  --json: Report in json format.\n"
-               "  -c    : Use ANSI colors in report, if supported by reporter.\n"
-               "  -s    : Strip unnecessary whitespaces from report.\n"
-               "  -o    : Report captured output from tests, if supported by reporter.\n\n"
-               "  Multiple filters are possible, but includes and excludes are mutually exclusive.\n"
-               "  Patterns may contain * as wildcard.\n\n"
-               "  -e <pattern> : Exclude testsuites with names matching pattern.\n"
-               "  -i <pattern> : Include only testsuites with names matching pattern."
-            << std::endl;
-        throw SHelpCalled{};
-    }
+    printHelp();
 
     static auto
-    tokenize_args(std::size_t argc_, char const** argv_) -> std::vector<std::string> {
-        if (argc_ == 0) {
-            throw std::runtime_error("Too few arguments!");
-        }
-        std::vector<std::string> a;
-        a.reserve(argc_);
-        for (auto i{0UL}; i < argc_; ++i) {
-            std::string arg(argv_[i]);
-            if (!arg.empty()) {
-                a.push_back(std::move(arg));
-            }
-        }
-        return a;
-    }
+    tokenizeArgs(usize argc_, str* argv_) -> Vector<String>;
 
-    struct config m_cfg;
-    char const*   m_progname{nullptr};
+    HashMap<str, std::optional<String>> m_opts;
+    str                                 m_progname{nullptr};
 };
 }  // namespace vfrb

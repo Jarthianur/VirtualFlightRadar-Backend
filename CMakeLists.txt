@@ -66,7 +66,7 @@ set(VFRB_INCLUDE_DIRS ${VFRB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/vendor/asio/asi
 # target: release
 #
 add_executable(release ${vfrb_sources})
-target_compile_options(release PUBLIC -O2 -DNDEBUG -DVERSION=\"${CMAKE_PROJECT_VERSION}\")
+target_compile_options(release PUBLIC -O2 -DNDEBUG -DVFRB_VERSION=\"${CMAKE_PROJECT_VERSION}\")
 set_target_properties(release PROPERTIES OUTPUT_NAME ${vfrb_release_bin})
 target_include_directories(release PUBLIC ${VFRB_INCLUDE_DIRS})
 target_link_libraries(release PUBLIC ${VFRB_LINK_LIBS})
