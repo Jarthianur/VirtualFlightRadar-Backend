@@ -34,7 +34,7 @@ CClientManager::~CClientManager() noexcept {
 }
 
 void
-CClientManager::Subscribe(SPtr<feed::IFeed> feed_) {
+CClientManager::Subscribe(Shared<feed::IFeed> feed_) {
     LockGuard lk(m_mutex);
     auto      it = m_clients.end();
     it           = m_clients.insert(CClientFactory::CreateClientFor(feed_)).first;

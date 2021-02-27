@@ -32,12 +32,10 @@
 
 namespace vfrb::config
 {
-/// Extractor for configuration file
 class CConfiguration
 {
-    CProperties const m_properties;  ///< The properties from file
+    CProperties const m_properties;
 
-    /// @throw vfrb::config::error::CConversionError
     auto
     resolvePosition() const -> object::CGpsPosition;
 
@@ -46,11 +44,9 @@ class CConfiguration
     auto
     resolveFeedNames() const -> List<String>;
 
-    /// @param key_ The filters property name
     auto
     resolveFilter(str key_) const -> i32;
 
-    /// Dump the configuration to INFO log.
     void
     dumpInfo() const;
 
@@ -97,25 +93,20 @@ public:
     CTCONST PATH_MAX_DIST       = "filter.maxDistance";
     CTCONST PATH_MAX_HEIGHT     = "filter.maxHeight";
 
-    bool                               GroundMode;      ///< Ground mode enabled?
-    object::CGpsPosition const         GpsPosition;     ///< Fallback position
-    f64 const                          AtmPressure;     ///< Atmospheric fallback pressure
-    i32 const                          MaxHeight;       ///< Maximum height for reported aircrafts
-    i32 const                          MaxDistance;     ///< Maximum distance for reported aircrafts
-    Tuple<u16, usize> const            ServerConfig;    ///< Port where to serve reports
-    List<String> const                 FeedNames;       ///< List of feed names
-    HashMap<String, CProperties> const FeedProperties;  ///< Map feed names to their properties
+    bool                               GroundMode;
+    object::CGpsPosition const         GpsPosition;
+    f64 const                          AtmPressure;
+    i32 const                          MaxHeight;
+    i32 const                          MaxDistance;
+    Tuple<u16, usize> const            ServerConfig;
+    List<String> const                 FeedNames;
+    HashMap<String, CProperties> const FeedProperties;
 
-    /**
-     * @param stream The input stream
-     * @throw vfrb::config::error::CConfigurationError
-     */
     explicit CConfiguration(std::istream& stream_);
 };
 
 namespace error
 {
-/// Error indicating that the configuration is not valid
 class CConfigurationError : public vfrb::error::IError
 {
 public:
@@ -123,16 +114,11 @@ public:
     Message() const noexcept -> str override;
 };
 
-/// Error indicating that a string to number conversion failed
 class CConversionError : public vfrb::error::IError
 {
     String const m_msg;
 
 public:
-    /**
-     * @param str_  The value found at path
-     * @param path_ The property path
-     */
     CConversionError(String const& str_, str path_);
 
     [[nodiscard]] auto

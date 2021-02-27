@@ -35,7 +35,7 @@ namespace vfrb::feed
 CTCONST            LOG_PREFIX = "(GpsFeed) ";
 static auto const& logger     = CLogger::Instance();
 
-CGpsFeed::CGpsFeed(String const& name_, CProperties const& prop_, SPtr<data::CGpsData> data_)
+CGpsFeed::CGpsFeed(String const& name_, CProperties const& prop_, Shared<data::CGpsData> data_)
     : IFeed(name_, prop_, data_) {}
 
 auto

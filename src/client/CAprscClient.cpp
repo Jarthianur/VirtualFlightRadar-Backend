@@ -36,7 +36,7 @@ namespace vfrb::client
 CTCONST            LOG_PREFIX = "(AprscClient) ";
 static auto const& logger     = CLogger::Instance();
 
-CAprscClient::CAprscClient(SEndpoint const& ep_, String const& login_, SPtr<IConnector> con_)
+CAprscClient::CAprscClient(SEndpoint const& ep_, String const& login_, Shared<IConnector> con_)
     : IClient(ep_, con_), m_login(login_ + "\r\n") {}
 
 auto

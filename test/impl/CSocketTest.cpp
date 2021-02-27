@@ -35,7 +35,7 @@ CSocketTest::operator=(CSocketTest&& other_) noexcept -> CSocketTest& {
     return *this;
 }
 
-CSocketTest::CSocketTest(String const& addr_, SPtr<String> buf_, bool fail_)
+CSocketTest::CSocketTest(String const& addr_, Shared<String> buf_, bool fail_)
     : m_buffer(buf_), m_address(addr_), m_failWrite(fail_) {}
 
 auto

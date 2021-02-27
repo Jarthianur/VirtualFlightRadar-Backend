@@ -29,47 +29,26 @@
 
 namespace vfrb::data::processor
 {
-/**
- * @brief Process GPS positions to NMEA GGA and RMC sentences.
- */
 class CGpsProcessor
 {
 private:
-    char mutable m_directionSN = 'x';  ///< Orientation of the latitude (S,N)
-    char mutable m_directionEW = 'x';  ///< Orientation of the longitude (E,W)
-    f64 mutable m_degLatitude  = 0.0;  ///< Degrees of latitude
-    f64 mutable m_degLongitude = 0.0;  ///< Degrees of longitude
-    f64 mutable m_minLatitude  = 0.0;  ///< Minutes of latitude
-    f64 mutable m_minLongitude = 0.0;  ///< Minutes of longitude
+    char mutable m_directionSN = 'x';
+    char mutable m_directionEW = 'x';
+    f64 mutable m_degLatitude  = 0.0;
+    f64 mutable m_degLongitude = 0.0;
+    f64 mutable m_minLatitude  = 0.0;
+    f64 mutable m_minLongitude = 0.0;
 
-    /**
-     * @brief Append GPGGA sentence to processing string.
-     * @param position The position
-     * @param utc      The current utc time
-     */
     void
     appendGpgga(object::CGpsPosition const& pos_, std::tm const* utc_, str_util::StringInserter& nmea_) const;
 
-    /**
-     * @brief Append GPRMC sentence to processing string.
-     * @param utc The current utc time
-     */
     void
     appendGprmc(std::tm const* utc_, str_util::StringInserter& nmea_) const;
 
-    /**
-     * @brief Evaluate position for given latitude and longitude.
-     * @param latitude  The latitude
-     * @param longitude The longitude
-     */
     void
     evalPosition(f64 lat_, f64 lon_) const;
 
 public:
-    /**
-     * @brief Process a GPS position.
-     * @param rPosition The position
-     */
     void
     Process(object::CGpsPosition const& pos_, str_util::StringInserter& nmea_) const;
 };

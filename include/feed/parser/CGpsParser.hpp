@@ -28,28 +28,21 @@
 
 namespace vfrb::feed::parser
 {
-/**
- * @brief Implement Parser for GPS NMEA sentences.
- */
 class CGpsParser : public IParser<object::CGpsPosition>
 {
-    CTCONST RE_GGA_TIME    = 1;   ///< GGA regex capture group of time
-    CTCONST RE_GGA_LAT     = 2;   ///< GGA regex capture group of latitude
-    CTCONST RE_GGA_LAT_DIR = 3;   ///< GGA regex capture group of latitude orientation
-    CTCONST RE_GGA_LON     = 4;   ///< GGA regex capture group of longitude
-    CTCONST RE_GGA_LON_DIR = 5;   ///< GGA regex capture group of longitude orientation
-    CTCONST RE_GGA_FIX     = 6;   ///< GGA regex capture group of fix quality
-    CTCONST RE_GGA_SAT     = 7;   ///< GGA regex capture group of sitallite count
-    CTCONST RE_GGA_DIL     = 8;   ///< GGA regex capture group of dilution
-    CTCONST RE_GGA_ALT     = 9;   ///< GGA regex capture group of altitude
-    CTCONST RE_GGA_GEOID   = 10;  ///< GGA regex capture group of geoid separation
+    CTCONST RE_GGA_TIME    = 1;
+    CTCONST RE_GGA_LAT     = 2;
+    CTCONST RE_GGA_LAT_DIR = 3;
+    CTCONST RE_GGA_LON     = 4;
+    CTCONST RE_GGA_LON_DIR = 5;
+    CTCONST RE_GGA_FIX     = 6;
+    CTCONST RE_GGA_SAT     = 7;
+    CTCONST RE_GGA_DIL     = 8;
+    CTCONST RE_GGA_ALT     = 9;
+    CTCONST RE_GGA_GEOID   = 10;
 
-    std::regex const m_gpggaRe;  ///< Regular expression to parse GGA
+    std::regex const m_gpggaRe;
 
-    /**
-     * @throw vfrb::str_util::error::CConversionError
-     * @throw vfrb::object::error::CTimestampParseError
-     */
     [[nodiscard]] auto static parsePosition(std::cmatch const& match_, u32 prio_) -> object::CGpsPosition;
 
 public:

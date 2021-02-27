@@ -28,19 +28,15 @@
 
 namespace vfrb::server::net
 {
-/**
- * @brief Implement NetworkInterface using boost.
- */
 class CAcceptorAsio : public IAcceptor<CSocketAsio>
 {
     NOT_COPYABLE(CAcceptorAsio)
     NOT_MOVABLE(CAcceptorAsio)
 
-    asio::io_context        m_ioCtx;     ///< Internal IO-service
-    asio::ip::tcp::acceptor m_acceptor;  ///< Internal acceptor
-    CSocketAsio             m_socket;    ///< Staging socket
+    asio::io_context        m_ioCtx;
+    asio::ip::tcp::acceptor m_acceptor;
+    CSocketAsio             m_socket;
 
-    /// Intermediate handler for accept event
     void
     handleAccept(asio::error_code err_, Callback cb_);
 
@@ -60,7 +56,6 @@ public:
     void
     Close() override;
 
-    /// @throw vfrb::server::net::error::CSocketError
     auto
     StartConnection() -> CConnection<CSocketAsio> override;
 

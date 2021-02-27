@@ -35,7 +35,7 @@ namespace vfrb::client
 CTCONST            LOG_PREFIX = "(SbsClient) ";
 static auto const& logger     = CLogger::Instance();
 
-CSbsClient::CSbsClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
+CSbsClient::CSbsClient(SEndpoint const& ep_, Shared<IConnector> con_) : IClient(ep_, con_) {}
 
 void
 CSbsClient::handleConnect(Result<void> res_) {

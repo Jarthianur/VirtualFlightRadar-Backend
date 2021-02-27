@@ -20,9 +20,7 @@
 
 #pragma once
 
-#include <optional>
 #include <regex>
-#include <tuple>
 
 #include "object/CAircraft.hpp"
 #include "util/ClassUtils.hpp"
@@ -31,50 +29,41 @@
 
 namespace vfrb::feed::parser
 {
-/// A parser for APRS sentences.
 class CAprsParser : public IParser<object::CAircraft>
 {
     using AircraftInfo = Tuple<StringView, object::CAircraft::EIdType, object::CAircraft::EAircraftType>;
 
-    CTCONST RE_APRS_TIME    = 1;   ///< APRS regex match group of time
-    CTCONST RE_APRS_LAT     = 2;   ///< APRS regex match group of latitude
-    CTCONST RE_APRS_LAT_DIR = 3;   ///< APRS regex match group of latitude orientation
-    CTCONST RE_APRS_LON     = 4;   ///< APRS regex match group of longitude
-    CTCONST RE_APRS_LON_DIR = 5;   ///< APRS regex match group of longitude orientation
-    CTCONST RE_APRS_HEAD    = 6;   ///< APRS regex match group of heading
-    CTCONST RE_APRS_GND_SPD = 7;   ///< APRS regex match group of ground speed
-    CTCONST RE_APRS_ALT     = 8;   ///< APRS regex match group of altitude
-    CTCONST RE_APRS_TYPE    = 9;   ///< APRS regex match group of id and aircraft type
-    CTCONST RE_APRS_ID      = 10;  ///< APRS regex match group of aircraft id
-    CTCONST RE_APRS_CR      = 11;  ///< APRS regex match group of climb rate
-    CTCONST RE_APRS_TR      = 12;  ///< APRS regex match group of turn rate
+    CTCONST RE_APRS_TIME    = 1;
+    CTCONST RE_APRS_LAT     = 2;
+    CTCONST RE_APRS_LAT_DIR = 3;
+    CTCONST RE_APRS_LON     = 4;
+    CTCONST RE_APRS_LON_DIR = 5;
+    CTCONST RE_APRS_HEAD    = 6;
+    CTCONST RE_APRS_GND_SPD = 7;
+    CTCONST RE_APRS_ALT     = 8;
+    CTCONST RE_APRS_TYPE    = 9;
+    CTCONST RE_APRS_ID      = 10;
+    CTCONST RE_APRS_CR      = 11;
+    CTCONST RE_APRS_TR      = 12;
 
     CTCONST CLIMB_RATE_MIN     = -10000.0;
     CTCONST CLIMB_RATE_MAX     = 10000.0;
     CTCONST ID_TYPE_BITS       = 0x03U;
     CTCONST AIRCRAFT_TYPE_BITS = 0x7CU;
 
-    std::regex const m_aprsRe;     ///< Regular expression for APRS protocol
-    i32 const        m_maxHeight;  ///< The max height filter
+    std::regex const m_aprsRe;
+    i32 const        m_maxHeight;
 
-    /**
-     * @throw vfrb::feed::parser::error::CParseError
-     * @throw vfrb::str_util::error::CConversionError
-     */
     [[nodiscard]] auto static parseLocation(std::cmatch const& match_, i32 maxHeight_) -> object::SLocation;
 
-    /// @throw vfrb::str_util::error::CConversionError
     [[nodiscard]] auto static parseComment(std::cmatch const& match_) -> AircraftInfo;
 
-    /// @throw vfrb::str_util::error::CConversionError
     [[nodiscard]] auto static parseMovement(std::cmatch const& match_)
-        -> std::optional<object::CAircraft::SMovement>;
+        -> Optional<object::CAircraft::SMovement>;
 
-    /// @throw vfrb::object::error::CTimestampParseError
     [[nodiscard]] auto static parseTimeStamp(std::cmatch const& match_) -> object::CTimestamp;
 
 public:
-    /// @param maxHeight_ The filter for max height
     explicit CAprsParser(i32 maxHeight_);
 
     auto

@@ -72,16 +72,16 @@ CProgramOptions::Parse(usize argc_, str* argv_) {
 }
 
 auto
-CProgramOptions::GetOpt(str key_) const -> std::optional<String> {
+CProgramOptions::GetOpt(str key_) const -> Optional<String> {
     try {
         return m_opts.at(key_);
     } catch ([[maybe_unused]] std::out_of_range const&) {
-        return std::nullopt;
+        return None;
     }
 }
 
 auto
-CProgramOptions::RequireOpt(str key_) const -> std::optional<String> {
+CProgramOptions::RequireOpt(str key_) const -> Optional<String> {
     try {
         return m_opts.at(key_);
     } catch ([[maybe_unused]] std::out_of_range const&) {

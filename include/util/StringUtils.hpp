@@ -34,7 +34,6 @@
 
 namespace vfrb
 {
-/// Helper type to use for hex conversion.
 struct x32
 {};
 }  // namespace vfrb
@@ -43,7 +42,6 @@ namespace vfrb::str_util
 {
 namespace error
 {
-/// Error to indicate failed conversion.
 class CConversionError : public vfrb::error::IError
 {
 public:
@@ -70,12 +68,6 @@ MakeStr(Args&&... args_) -> String {
     return (s + ... + args_);
 }
 
-/**
- * Parse a charcter sequence as 64 bit floating point.
- * @param first_ Pointer to first character
- * @param last_  Pointer to one past the last character
- * @return the conversion result
- */
 template<typename T, ENABLE_IF(IS_TYPE(T, f64))>
 auto
 Convert(str first_, str last_) -> Result<T> {
@@ -86,12 +78,6 @@ Convert(str first_, str last_) -> Result<T> {
     return Ok(result);
 }
 
-/**
- * Parse a charcter sequence as signed 32 bit integer.
- * @param first_ Pointer to first character
- * @param last_  Pointer to one past the last character
- * @return the conversion result
- */
 template<typename T, ENABLE_IF(IS_TYPE(T, i32))>
 auto
 Convert(str first_, str last_) -> Result<T> {
@@ -102,12 +88,6 @@ Convert(str first_, str last_) -> Result<T> {
     return Ok(result);
 }
 
-/**
- * Parse a charcter sequence as unsigned 32 bit integer.
- * @param first_ Pointer to first character
- * @param last_  Pointer to one past the last character
- * @return the conversion result
- */
 template<typename T, ENABLE_IF(IS_TYPE(T, u32))>
 auto
 Convert(str first_, str last_) -> Result<T> {
@@ -118,12 +98,6 @@ Convert(str first_, str last_) -> Result<T> {
     return Ok(result);
 }
 
-/**
- * Parse a charcter sequence as unsigned 64 bit integer.
- * @param first_ Pointer to first character
- * @param last_  Pointer to one past the last character
- * @return the conversion result
- */
 template<typename T, ENABLE_IF(IS_TYPE(T, u64))>
 auto
 Convert(str first_, str last_) -> Result<T> {
@@ -134,12 +108,6 @@ Convert(str first_, str last_) -> Result<T> {
     return Ok(result);
 }
 
-/**
- * Parse a charcter sequence as signed 32 bit integer from hex.
- * @param first_ Pointer to first character
- * @param last_  Pointer to one past the last character
- * @return the conversion result
- */
 template<typename T, ENABLE_IF(IS_TYPE(T, x32))>
 auto
 Convert(str first_, str last_) -> Result<u32> {
@@ -151,12 +119,6 @@ Convert(str first_, str last_) -> Result<u32> {
     return Ok(result);
 }
 
-/**
- * Parse a charcter sequence as signed 8 bit integer.
- * @param first_ Pointer to first character
- * @param last_  Pointer to one past the last character
- * @return the conversion result
- */
 template<typename T, ENABLE_IF(IS_TYPE(T, i8))>
 auto
 Convert(str first_, str last_) -> Result<T> {
@@ -168,12 +130,6 @@ Convert(str first_, str last_) -> Result<T> {
     return Ok(static_cast<i8>(result));
 }
 
-/**
- * Parse a charcter sequence as unsigned 8 bit integer.
- * @param first_ Pointer to first character
- * @param last_  Pointer to one past the last character
- * @return the conversion result
- */
 template<typename T, ENABLE_IF(IS_TYPE(T, u8))>
 auto
 Convert(str first_, str last_) -> Result<T> {
@@ -185,12 +141,6 @@ Convert(str first_, str last_) -> Result<T> {
     return Ok(static_cast<u8>(result));
 }
 
-/**
- * Parse a charcter sequence as unsigned 16 bit integer.
- * @param first_ Pointer to first character
- * @param last_  Pointer to one past the last character
- * @return the conversion result
- */
 template<typename T, ENABLE_IF(IS_TYPE(T, u16))>
 auto
 Convert(str first_, str last_) -> Result<T> {
@@ -201,14 +151,6 @@ Convert(str first_, str last_) -> Result<T> {
     return Ok(result);
 }
 
-/**
- * Parse a charcter sequence into destination.
- * @tparam The type to parse
- * @param first_ Pointer to first character
- * @param last_  Pointer to one past the last character
- * @param dest_  The destination variable
- * @return the resulting error code
- */
 template<typename T>
 auto
 ConvertInto(str first_, str last_, T& dest_) -> EErrc {
@@ -217,13 +159,6 @@ ConvertInto(str first_, str last_, T& dest_) -> EErrc {
     return ec;
 }
 
-/**
- * Parse and convert from a regex sub match.
- * @tparam The resulting type
- * @param sub_ The sub match
- * @return the conversion result
- * @throw vfrb::str_util::error::CConversionError
- */
 template<typename T>
 auto
 Parse(std::csub_match const& sub_) {
@@ -233,13 +168,6 @@ Parse(std::csub_match const& sub_) {
     throw error::CConversionError();
 }
 
-/**
- * Parse and convert from a string.
- * @tparam The resulting type
- * @param str_ The string
- * @return the conversion result
- * @throw vfrb::str_util::error::CConversionError
- */
 template<typename T>
 auto
 Parse(String const& str_) {
@@ -249,33 +177,16 @@ Parse(String const& str_) {
     throw error::CConversionError();
 }
 
-/**
- * Get a string view on a regex sub match.
- * @param sub_ The sub match
- * @return the string view
- */
 inline auto
 AsStringView(std::csub_match const& sub_) -> StringView {
     return StringView(sub_.first, static_cast<usize>(sub_.second - sub_.first));
 }
 
-/**
- * Compare a regex sub match and a character sequence for equality.
- * @param sub_ The regex sub match
- * @param s_   The character sequence
- * @return true if equal, else false
- */
 inline auto
 operator==(std::csub_match const& sub_, str cstr_) -> bool {
     return AsStringView(sub_) == cstr_;
 }
 
-/**
- * Compute checksum of nmea string.
- * @param sv_  The string
- * @param pos_ The index to start from
- * @return the checksum
- */
 inline auto
 Checksum(String::const_iterator it_, String::const_iterator end_) -> u32 {
     u32 csum = 0;
@@ -289,11 +200,6 @@ Checksum(String::const_iterator it_, String::const_iterator end_) -> u32 {
     return csum;
 }
 
-/**
- * Find the checksum in a nmea string and compare it against the computed one.
- * @param sv_ The string
- * @return true if equal, else false
- */
 inline auto
 MatchChecksum(String const& str_) -> bool {
     auto const cs_begin = str_.rfind('*');

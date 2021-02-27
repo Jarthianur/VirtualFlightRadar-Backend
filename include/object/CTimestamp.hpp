@@ -29,7 +29,6 @@ namespace vfrb::object
 {
 namespace error
 {
-/// Error to indicate timestamp parsing failure.
 class CTimestampParseError : public vfrb::error::IError
 {
 public:
@@ -38,11 +37,10 @@ public:
 };
 }  // namespace error
 
-/// A self parsing Timestamp
 class CTimestamp
 {
-    i64 m_value = 0;  ///< Time in milliseconds
-    u32 m_day   = 0;  ///< Incremental day number
+    i64 m_value = 0;
+    u32 m_day   = 0;
 
 public:
     DEFAULT_COPYABLE(CTimestamp)
@@ -50,10 +48,6 @@ public:
 
     CTimestamp() = default;
 
-    /**
-     * @param sv_ The time string
-     * @throw vfrb::object::error::CTimestampParseError
-     */
     explicit CTimestamp(StringView const& sv_);
     ~CTimestamp() noexcept = default;
 

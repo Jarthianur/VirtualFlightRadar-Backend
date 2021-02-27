@@ -35,9 +35,6 @@ class CObject;
 
 namespace vfrb::data
 {
-/**
- * @brief The Data interface
- */
 class IData
 {
 public:
@@ -47,11 +44,6 @@ public:
     IData()                   = default;
     virtual ~IData() noexcept = default;
 
-    /**
-     * @brief Attempt to update this data.
-     * @param _1 The new Object
-     * @return true on success, else false
-     */
     virtual auto
     Update(object::CObject&& obj_) -> bool = 0;
 

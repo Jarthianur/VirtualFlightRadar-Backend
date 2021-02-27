@@ -28,15 +28,15 @@ namespace vfrb::server::net
 {
 class CSocketTest
 {
-    SPtr<String> m_buffer;
-    String       m_address;
-    bool         m_failWrite = false;
+    Shared<String> m_buffer;
+    String         m_address;
+    bool           m_failWrite = false;
 
 public:
     MOVABLE(CSocketTest)
     NOT_COPYABLE(CSocketTest)
 
-    CSocketTest(String const& addr_, SPtr<String> buf_, bool fail_);
+    CSocketTest(String const& addr_, Shared<String> buf_, bool fail_);
     ~CSocketTest() noexcept = default;
 
     [[nodiscard]] auto

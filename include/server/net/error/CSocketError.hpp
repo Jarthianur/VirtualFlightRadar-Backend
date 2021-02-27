@@ -26,10 +26,9 @@
 
 namespace vfrb::server::net::error
 {
-/// Error to indicate that an operation on a socket failed
 class CSocketError : public vfrb::error::IError
 {
-    String const m_msg;  ///< Error message
+    String const m_msg;
 
 public:
     explicit CSocketError(String msg_);

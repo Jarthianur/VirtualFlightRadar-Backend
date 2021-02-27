@@ -35,7 +35,7 @@ namespace vfrb::client
 CTCONST            LOG_PREFIX = "(SensorClient) ";
 static auto const& logger     = CLogger::Instance();
 
-CSensorClient::CSensorClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
+CSensorClient::CSensorClient(SEndpoint const& ep_, Shared<IConnector> con_) : IClient(ep_, con_) {}
 
 void
 CSensorClient::read() {

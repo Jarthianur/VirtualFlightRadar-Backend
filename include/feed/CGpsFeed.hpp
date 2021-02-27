@@ -31,32 +31,16 @@ class CGpsData;
 
 namespace vfrb::feed
 {
-/**
- * @brief Extend Feed for GPS input.
- */
 class CGpsFeed : public IFeed
 {
-    parser::CGpsParser const m_parser;  ///< Parser to unpack response from Client
+    parser::CGpsParser const m_parser;
 
 public:
-    /**
-     * @param name       The unique name
-     * @param properties The Properties
-     * @param data       The GpsData container
-     * @throw std::logic_error from parent constructor
-     */
-    CGpsFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CGpsData> data_);
+    CGpsFeed(String const& name_, config::CProperties const& prop_, Shared<data::CGpsData> data_);
 
-    /**
-     * @brief Get this feeds Protocol.
-     * @return Protocol::GPS
-     */
     [[nodiscard]] auto
     Protocol() const -> EProtocol override;
 
-    /**
-     * @brief Implement Feed::process.
-     */
     auto
     Process(String&& str_) -> bool override;
 };

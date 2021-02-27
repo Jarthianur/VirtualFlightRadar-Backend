@@ -28,7 +28,6 @@
 
 namespace vfrb::object
 {
-/// A 3D position on earth
 struct SLocation
 {
     CTCONST MAX_LATITUDE  = 90.0;
@@ -38,20 +37,19 @@ struct SLocation
     CTCONST MAX_ALTITUDE  = 100000;
     CTCONST MIN_ALTITUDE  = -11000;
 
-    f64 Latitude;   ///< Latitude; deg
-    f64 Longitude;  ///< Longitude; deg
-    i32 Altitude;   ///< Altitude; m
+    f64 Latitude;
+    f64 Longitude;
+    i32 Altitude;
 };
 
-/// GPS position object
 class CGpsPosition : public CObject
 {
-    SLocation  m_location;        ///< The location
-    f64        m_geoid;           ///< The geoid separation
-    f64        m_dilution;        ///< The position dilution
-    u8         m_nrOfSatellites;  ///< The number of satellites
-    i8         m_fixQuality;      ///< The GPS fix quality
-    CTimestamp m_timestamp;       ///< The timestamp of this position
+    SLocation  m_location;
+    f64        m_geoid;
+    f64        m_dilution;
+    u8         m_nrOfSatellites;
+    i8         m_fixQuality;
+    CTimestamp m_timestamp;
 
     void
     assign(CObject&& other_) override;
@@ -65,10 +63,8 @@ public:
     CTCONST MAX_GEOID = 86.0;
     CTCONST MIN_GEOID = -108.0;
 
-    /// @param prio_ The initial priority
     CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_);
 
-    /// @param prio_ The initial priority
     CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_, u8 sat_, i8 qual_,
                  CTimestamp const& ts_);
     ~CGpsPosition() noexcept override = default;

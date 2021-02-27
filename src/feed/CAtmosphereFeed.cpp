@@ -30,7 +30,7 @@ using vfrb::config::CProperties;
 namespace vfrb::feed
 {
 CAtmosphereFeed::CAtmosphereFeed(String const& name_, CProperties const& prop_,
-                                 SPtr<data::CAtmosphereData> data_)
+                                 Shared<data::CAtmosphereData> data_)
     : IFeed(name_, prop_, data_) {}
 
 auto

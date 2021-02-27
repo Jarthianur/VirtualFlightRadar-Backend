@@ -21,9 +21,7 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
 #include <cstdio>
-#include <utility>
 
 #include "error/IError.hpp"
 
@@ -31,7 +29,6 @@ namespace vfrb
 {
 namespace error
 {
-/// Error to indicate an overflow would occur.
 class COverflowError : public vfrb::error::IError
 {
 public:
@@ -42,21 +39,12 @@ public:
 };
 }  // namespace error
 
-/**
- * A fixed size, stack located string.
- * @tparam N The size
- */
 template<usize N>
 class CStaticString final
 {
-    std::array<char, N> m_data;  ///< The underlying array
-    StringView          m_view;  ///< A view on the data
+    Array<char, N> m_data;
+    StringView     m_view;
 
-    /**
-     * Copy into own data.
-     * @param sv_ The string to copy
-     * @throw vfrb::error::COverflowError
-     */
     void
     copy(StringView const& sv_) {
         usize len = sv_.length();
@@ -67,10 +55,6 @@ class CStaticString final
         m_view = StringView{m_data.data(), len};
     }
 
-    /**
-     * Copy into own data.
-     * @param other_ The string to copy
-     */
     void
     copy(CStaticString<N> const& other_) {
         std::copy(other_.m_data.cbegin(), other_.m_data.cend(), m_data.begin());
@@ -152,13 +136,11 @@ public:
         return m_view == other_.m_view;
     }
 
-    /// Clear this string, thus making it to look empty.
     void
     Clear() {
         m_view = StringView{m_data.data(), 0};
     }
 
-    /// Get the length of seen characters.
     [[nodiscard]] inline auto
     Length() const -> usize {
         return m_view.length();

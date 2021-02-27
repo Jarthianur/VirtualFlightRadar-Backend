@@ -31,12 +31,12 @@ using namespace vfrb;
 using namespace server;
 
 DESCRIBE("test_CServer") {
-    SPtr<net::CAcceptorTest>        acceptor;
-    SPtr<CServer<net::CSocketTest>> uut;
+    Shared<net::CAcceptorTest>        acceptor;
+    Shared<CServer<net::CSocketTest>> uut;
 
     SETUP() {
-        acceptor = std::make_shared<net::CAcceptorTest>();
-        uut      = std::make_shared<CServer<net::CSocketTest>>(acceptor, 2);
+        acceptor = Share<net::CAcceptorTest>();
+        uut      = Share<CServer<net::CSocketTest>>(acceptor, 2);
     }
 
     BEFORE_EACH() {

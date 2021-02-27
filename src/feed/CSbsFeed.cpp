@@ -30,7 +30,7 @@ using vfrb::config::CProperties;
 
 namespace vfrb::feed
 {
-CSbsFeed::CSbsFeed(String const& name_, CProperties const& prop_, SPtr<data::CAircraftData> data_,
+CSbsFeed::CSbsFeed(String const& name_, CProperties const& prop_, Shared<data::CAircraftData> data_,
                    i32 maxHeight_)
     : IFeed(name_, prop_, data_), m_parser(maxHeight_), m_worker([this](String&& work_) {
           try {

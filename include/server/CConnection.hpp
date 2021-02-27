@@ -30,15 +30,11 @@
 
 namespace vfrb::server
 {
-/**
- * @brief TCP connection opened by the Server.
- * @tparam SocketT The type of socket implementation
- */
 template<typename SocketT>
 class CConnection
 {
-    SocketT m_socket;   ///< Socket
-    String  m_address;  ///< IP address
+    SocketT m_socket;
+    String  m_address;
 
 public:
     MOVABLE(CConnection)
@@ -48,11 +44,6 @@ public:
 
     ~CConnection() noexcept = default;
 
-    /**
-     * Write a message to the endpoint.
-     * @param sv_ The message
-     * @return true on success, else false
-     */
     auto
     Write(String const& str_) -> bool;
 

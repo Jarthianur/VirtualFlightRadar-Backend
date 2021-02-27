@@ -33,7 +33,7 @@ using namespace std::literals;
 static auto& logger = CLogger::Instance();
 
 auto
-getConfig(usize argc_, str* argv_) -> SPtr<CConfiguration> {
+getConfig(usize argc_, str* argv_) -> Shared<CConfiguration> {
     CProgramOptions opts;
     opts.Parse(argc_, argv_);
     auto confFile = opts.RequireOpt(CProgramOptions::OPT_KEY_CONF);
@@ -43,7 +43,7 @@ getConfig(usize argc_, str* argv_) -> SPtr<CConfiguration> {
         logger.LogFile(*logFile);
     }
     std::ifstream confStream(*confFile);
-    auto          conf = std::make_shared<CConfiguration>(confStream);
+    auto          conf = Share<CConfiguration>(confStream);
     if (gndMode) {
         conf->GroundMode = true;
         logger.Info("(VFRB) Force ground mode");

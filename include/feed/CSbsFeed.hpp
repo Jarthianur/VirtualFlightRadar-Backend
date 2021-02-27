@@ -32,35 +32,18 @@ class CAircraftData;
 
 namespace vfrb::feed
 {
-/**
- * @brief Extend Feed for SBS protocol.
- */
 class CSbsFeed : public IFeed
 {
-    parser::CSbsParser const          m_parser;  ///< Parser to unpack response from Client
+    parser::CSbsParser const          m_parser;
     concurrent::CWorkerThread<String> m_worker;
 
 public:
-    /**
-     * @param name       The unique name
-     * @param properties The Properties
-     * @param data       The AircraftData container
-     * @param maxHeight  The max height filter
-     * @throw std::logic_error from parent constructor
-     */
-    CSbsFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
+    CSbsFeed(String const& name_, config::CProperties const& prop_, Shared<data::CAircraftData> data_,
              i32 maxHeight_);
 
-    /**
-     * @brief Get this feeds Protocol.
-     * @return Protocol::SBS
-     */
     auto
     Protocol() const -> EProtocol override;
 
-    /**
-     * @brief Feed::process.
-     */
     auto
     Process(String&& str_) -> bool override;
 };

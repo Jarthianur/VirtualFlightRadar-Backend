@@ -24,15 +24,8 @@
 
 namespace vfrb::client
 {
-/**
- * @brief Client for SBS servers
- */
 class CSbsClient : public IClient
 {
-    /**
-     * @brief Implement Client::handleConnect
-     * @threadsafe
-     */
     void
     handleConnect(Result<void> res_) override REQUIRES(!m_mutex);
 
@@ -40,10 +33,6 @@ class CSbsClient : public IClient
     logPrefix() const -> str override;
 
 public:
-    /**
-     * @param endpoint  The remote endpoint
-     * @param connector The Connector interface
-     */
-    CSbsClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
+    CSbsClient(net::SEndpoint const& ep_, Shared<net::IConnector> con_);
 };
 }  // namespace vfrb::client

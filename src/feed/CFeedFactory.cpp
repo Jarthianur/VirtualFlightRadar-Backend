@@ -41,9 +41,9 @@ using vfrb::str_util::MakeStr;
 
 namespace vfrb::feed
 {
-CFeedFactory::CFeedFactory(SPtr<config::CConfiguration> config_, SPtr<CAircraftData> aircraftData_,
-                           SPtr<CAtmosphereData> atmosData_, SPtr<CGpsData> gpsData_,
-                           SPtr<CWindData> windData_)
+CFeedFactory::CFeedFactory(Shared<config::CConfiguration> config_, Shared<CAircraftData> aircraftData_,
+                           Shared<CAtmosphereData> atmosData_, Shared<CGpsData> gpsData_,
+                           Shared<CWindData> windData_)
     : m_config(config_),
       m_aircraftData(aircraftData_),
       m_atmosData(atmosData_),
@@ -52,38 +52,36 @@ CFeedFactory::CFeedFactory(SPtr<config::CConfiguration> config_, SPtr<CAircraftD
 
 template<>
 auto
-CFeedFactory::makeFeed<CAprscFeed>(String const& name_) -> SPtr<CAprscFeed> {
-    return std::make_shared<CAprscFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData,
-                                        m_config->MaxHeight);
+CFeedFactory::makeFeed<CAprscFeed>(String const& name_) -> Shared<CAprscFeed> {
+    return Share<CAprscFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData, m_config->MaxHeight);
 }
 
 template<>
 auto
-CFeedFactory::makeFeed<CGpsFeed>(String const& name_) -> SPtr<CGpsFeed> {
-    return std::make_shared<CGpsFeed>(name_, m_config->FeedProperties.at(name_), m_gpsData);
+CFeedFactory::makeFeed<CGpsFeed>(String const& name_) -> Shared<CGpsFeed> {
+    return Share<CGpsFeed>(name_, m_config->FeedProperties.at(name_), m_gpsData);
 }
 
 template<>
 auto
-CFeedFactory::makeFeed<CSbsFeed>(String const& name_) -> SPtr<CSbsFeed> {
-    return std::make_shared<CSbsFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData,
-                                      m_config->MaxHeight);
+CFeedFactory::makeFeed<CSbsFeed>(String const& name_) -> Shared<CSbsFeed> {
+    return Share<CSbsFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData, m_config->MaxHeight);
 }
 
 template<>
 auto
-CFeedFactory::makeFeed<CWindFeed>(String const& name_) -> SPtr<CWindFeed> {
-    return std::make_shared<CWindFeed>(name_, m_config->FeedProperties.at(name_), m_windData);
+CFeedFactory::makeFeed<CWindFeed>(String const& name_) -> Shared<CWindFeed> {
+    return Share<CWindFeed>(name_, m_config->FeedProperties.at(name_), m_windData);
 }
 
 template<>
 auto
-CFeedFactory::makeFeed<CAtmosphereFeed>(String const& name_) -> SPtr<CAtmosphereFeed> {
-    return std::make_shared<CAtmosphereFeed>(name_, m_config->FeedProperties.at(name_), m_atmosData);
+CFeedFactory::makeFeed<CAtmosphereFeed>(String const& name_) -> Shared<CAtmosphereFeed> {
+    return Share<CAtmosphereFeed>(name_, m_config->FeedProperties.at(name_), m_atmosData);
 }
 
 auto
-CFeedFactory::createFeed(String const& name_) -> SPtr<IFeed> {
+CFeedFactory::createFeed(String const& name_) -> Shared<IFeed> {
     if (name_.find(CConfiguration::SECT_KEY_APRSC) != String::npos) {
         return makeFeed<CAprscFeed>(name_);
     }

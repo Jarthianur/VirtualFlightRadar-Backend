@@ -21,12 +21,12 @@
 #pragma once
 
 #include <exception>
+#include <stdexcept>
 
 #include "Types.hpp"
 
 namespace vfrb::error
 {
-/// Interface for a generic exception type.
 class IError : public std::exception
 {
     [[nodiscard]] auto
@@ -35,10 +35,6 @@ class IError : public std::exception
     }
 
 public:
-    /**
-     * Get the message for this error.
-     * @return the error message
-     */
     [[nodiscard]] virtual auto
     Message() const noexcept -> str = 0;
 };

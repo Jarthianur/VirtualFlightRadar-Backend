@@ -32,44 +32,23 @@ class CAircraftData;
 
 namespace vfrb::feed
 {
-/**
- * @brief Extend Feed for APRSC protocol.
- */
 class CAprscFeed : public IFeed
 {
     CTCONST LOG_PREFIX = "(AprscFeed) ";
 
-    parser::CAprsParser const         m_parser;  ///< Parser to unpack response from Client
+    parser::CAprsParser const         m_parser;
     concurrent::CWorkerThread<String> m_worker;
 
 public:
-    /**
-     * @param name       The unique name
-     * @param properties The Properties
-     * @param data       The AircraftData container
-     * @param maxHeight  The max height filter
-     * @throw std::logic_error if login is not given, or from parent constructor
-     */
-    CAprscFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAircraftData> data_,
+    CAprscFeed(String const& name_, config::CProperties const& prop_, Shared<data::CAircraftData> data_,
                i32 maxHeight_);
 
-    /**
-     * @brief Get this feeds Protocol.
-     * @return Protocol::APRS
-     */
     auto
     Protocol() const -> EProtocol override;
 
-    /**
-     * @brief Implement Feed::process.
-     */
     auto
     Process(String&& str_) -> bool override;
 
-    /**
-     * @brief Get the login string.
-     * @return the login
-     */
     auto
     Login() const -> String;
 };

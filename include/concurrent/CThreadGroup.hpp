@@ -20,36 +20,26 @@
 
 #pragma once
 
-#include <list>
-
-#include "util/ClassUtils.hpp"
-
 #include "CGuardedThread.hpp"
 #include "Types.hpp"
 
 namespace vfrb::concurrent
 {
-/// A self joining thread group
 class CThreadGroup
 {
     NOT_COPYABLE(CThreadGroup)
     NOT_MOVABLE(CThreadGroup)
 
-    List<CGuardedThread> m_threads;  ///< The grouped threads
+    List<CGuardedThread> m_threads;
 
 public:
     CThreadGroup() = default;
     ~CThreadGroup() noexcept;
 
-    /**
-     * Create and put a thread into this group.
-     * @param fn_ The function for the thread to run
-     */
     template<typename FnT>
     void
     CreateThread(FnT&& fn_);
 
-    /// Clear the thread group and join all threads.
     void
     JoinAll();
 };

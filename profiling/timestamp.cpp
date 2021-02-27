@@ -30,8 +30,8 @@
 namespace vfrb::profiling
 {
 template<typename Iter>
-Tuple<u32, u32, u32, u32>
-parseTime(Iter& first, Iter last) {
+auto
+parseTime(Iter& first, Iter last) -> Tuple<u32, u32, u32, u32> {
     namespace qi = boost::spirit::qi;
 
     static const qi::int_parser<u32, 10, 2, 2>                               _2digit = {};
@@ -47,8 +47,8 @@ parseTime(Iter& first, Iter last) {
     throw std::logic_error("");
 }
 
-std::string
-generateTS(bool format) {
+auto
+generateTS(bool format) -> String {
     static int        h = 0, m = 0, s = 0;
     std::stringstream ts;
 
@@ -78,8 +78,8 @@ generateTS(bool format) {
     return ts.str();
 }
 
-i64
-parseTimeStoI(std::string const& value) {
+auto
+parseTimeStoI(String const& value) -> i64 {
     i32 h = 99, m = 99, s = 99, f = 9999;
     if (value.length() > 3 && value[2] == ':') {
         h = std::stoi(value.substr(0, 2));
@@ -98,8 +98,8 @@ parseTimeStoI(std::string const& value) {
     return static_cast<i64>(h * 3600000 + m * 60000 + s * 1000 + f);
 }
 
-i64
-parseTimeCharconv(std::string const& value) {
+auto
+parseTimeCharconv(std::string const& value) -> i64 {
     i32 h = 99, m = 99, s = 99, f = 9999;
     if (value.length() > 3 && value[2] == ':') {
         if (auto [p, e] = std::from_chars(value.c_str(), value.c_str() + 2, h); e != std::errc()) {
@@ -140,8 +140,8 @@ static auto const& p_ts1 = ProfilerBuilder()
                                .withTestSize(TEST_SIZE)
                                .withTestFn([](Profiler& self) {
                                    self.profile([&self] {
-                                       std::string s  = generateTS(true);
-                                       auto        it = s.begin();
+                                       String s  = generateTS(true);
+                                       auto   it = s.begin();
                                        self.measure([&] { parseTime(it, s.end()); });
                                    });
                                })
@@ -153,8 +153,8 @@ static auto const& p_ts2 = ProfilerBuilder()
                                .withTestSize(TEST_SIZE)
                                .withTestFn([](Profiler& self) {
                                    self.profile([&self] {
-                                       std::string s  = generateTS(false);
-                                       auto        it = s.begin();
+                                       String s  = generateTS(false);
+                                       auto   it = s.begin();
                                        self.measure([&] { parseTime(it, s.end()); });
                                    });
                                })

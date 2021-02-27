@@ -36,7 +36,7 @@ using vfrb::str_util::MakeStr;
 
 namespace vfrb::feed
 {
-IFeed::IFeed(String const& name_, CProperties const& prop_, SPtr<data::IData> data_)
+IFeed::IFeed(String const& name_, CProperties const& prop_, Shared<data::IData> data_)
     : m_properties(prop_), m_name(name_), m_priority(initPriority()), m_data(data_) {
     if (prop_.Property(CConfiguration::KV_KEY_HOST, "").empty()) {
         throw error::CInvalidPropertyError(

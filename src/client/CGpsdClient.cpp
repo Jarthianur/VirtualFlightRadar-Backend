@@ -47,7 +47,7 @@ constexpr auto STOP_COND_WAIT_TIME = 500;
 CTCONST            LOG_PREFIX = "(GpsdClient) ";
 static auto const& logger     = CLogger::Instance();
 
-CGpsdClient::CGpsdClient(SEndpoint const& ep_, SPtr<IConnector> con_) : IClient(ep_, con_) {}
+CGpsdClient::CGpsdClient(SEndpoint const& ep_, Shared<IConnector> con_) : IClient(ep_, con_) {}
 
 void
 CGpsdClient::handleConnect(Result<void> res_) {

@@ -70,21 +70,21 @@ DESCRIBE_PAR("test_CProgramOptions") {
             str testArgs[]{"prog", "-c", "test.conf"};
             ASSERT_NOTHROW(uut.Parse(3, testArgs));
             auto opt = uut.GetOpt(CProgramOptions::OPT_KEY_CONF);
-            ASSERT_NOT(opt, EQ, std::nullopt);
+            ASSERT_NOT(opt, EQ, None);
             ASSERT(*opt, EQ, "test.conf");
         }
         {
             str testArgs[]{"prog", "-g"};
             ASSERT_NOTHROW(uut.Parse(2, testArgs));
             auto opt = uut.GetOpt(CProgramOptions::OPT_KEY_GNDM);
-            ASSERT_NOT(opt, EQ, std::nullopt);
+            ASSERT_NOT(opt, EQ, None);
             ASSERT(*opt, EQ, "true");
         }
         {
             str testArgs[]{"prog", "-g"};
             ASSERT_NOTHROW(uut.Parse(2, testArgs));
             auto opt = uut.GetOpt(CProgramOptions::OPT_KEY_CONF);
-            ASSERT(opt, EQ, std::nullopt);
+            ASSERT(opt, EQ, None);
         }
     }
     IT("should throw if required option is missing") {
@@ -98,7 +98,7 @@ DESCRIBE_PAR("test_CProgramOptions") {
         str             testArgs[]{"prog", "-c", "test.conf"};
         ASSERT_NOTHROW(uut.Parse(3, testArgs));
         auto opt = ASSERT_NOTHROW(return uut.RequireOpt(CProgramOptions::OPT_KEY_CONF));
-        ASSERT_NOT(opt, EQ, std::nullopt);
+        ASSERT_NOT(opt, EQ, None);
         ASSERT(*opt, EQ, "test.conf");
     };
 };

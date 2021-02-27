@@ -31,32 +31,17 @@ class CAtmosphereData;
 
 namespace vfrb::feed
 {
-/**
- * @brief Extend Feed for sensor input.
- */
 class CAtmosphereFeed : public IFeed
 {
-    parser::CAtmosphereParser const m_parser;  ///< Parser to unpack response from Client
+    parser::CAtmosphereParser const m_parser;
 
 public:
-    /**
-     * @param name       The unique name
-     * @param properties The Properties
-     * @param data       The WindData container
-     * @throw std::logic_error from parent constructor
-     */
-    CAtmosphereFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CAtmosphereData> data_);
+    CAtmosphereFeed(String const& name_, config::CProperties const& prop_,
+                    Shared<data::CAtmosphereData> data_);
 
-    /**
-     * @brief Get this feeds Protocol.
-     * @return Protocol::SENSOR
-     */
     [[nodiscard]] auto
     Protocol() const -> EProtocol override;
 
-    /**
-     * @brief Implement Feed::process.
-     */
     auto
     Process(String&& str_) -> bool override;
 };

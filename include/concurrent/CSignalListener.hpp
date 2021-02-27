@@ -32,15 +32,14 @@ namespace vfrb::concurrent
 {
 using SignalHandler = std::function<void(asio::error_code const&, int const)>;
 
-/// Catch and handle system signals.
 class CSignalListener
 {
     NOT_COPYABLE(CSignalListener)
     NOT_MOVABLE(CSignalListener)
 
-    asio::io_service m_ioCtx;   ///< Internal IO-service
-    asio::signal_set m_sigSet;  ///< Internal signal set
-    CGuardedThread   m_thread;  ///< The underlying thread
+    asio::io_service m_ioCtx;
+    asio::signal_set m_sigSet;
+    CGuardedThread   m_thread;
 
 public:
     CSignalListener();
@@ -52,10 +51,6 @@ public:
     void
     Stop();
 
-    /**
-     * Add a handler function to be executed when a signal is caught.
-     * @param handler_ The handler to invoke
-     */
     void
     AddHandler(SignalHandler&& handler_);
 };

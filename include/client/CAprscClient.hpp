@@ -25,41 +25,21 @@
 
 namespace vfrb::client
 {
-/**
- * @brief Client for APRSC servers
- */
 class CAprscClient : public IClient
 {
     CTCONST KEEPALIVE_INTERVAL = 300;
 
-    String const m_login;  ///< Login string
+    String const m_login;
 
-    /**
-     * @brief Schedule sending of a keep-alive beacon.
-     */
     void
     sendKeepAlive() REQUIRES(m_mutex);
 
-    /**
-     * @brief Implement Client::handleConnect
-     * @threadsafe
-     */
     void
     handleConnect(Result<void> res_) override REQUIRES(!m_mutex);
 
-    /**
-     * @brief Handler for sending of the login string.
-     * @param error The error indicator
-     * @threadsafe
-     */
     void
     handleLogin(Result<void> res_) REQUIRES(!m_mutex);
 
-    /**
-     * @brief Handler for sending a keep-alive beacon.
-     * @param error The error indicator
-     * @threadsafe
-     */
     void
     handleSendKeepAlive(Result<void> res_) REQUIRES(!m_mutex);
 
@@ -67,12 +47,7 @@ class CAprscClient : public IClient
     logPrefix() const -> str override;
 
 public:
-    /**
-     * @param endpoint  The remote endpoint
-     * @param login     The login string
-     * @param connector The Connector interface
-     */
-    CAprscClient(net::SEndpoint const& ep_, String const& login_, SPtr<net::IConnector> con_);
+    CAprscClient(net::SEndpoint const& ep_, String const& login_, Shared<net::IConnector> con_);
 
     auto
     Equals(IClient const& other_) const -> bool override;

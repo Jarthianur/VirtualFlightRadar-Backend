@@ -34,38 +34,23 @@ class IData;
 
 namespace vfrb::feed
 {
-/**
- * @brief Base class for input feeds.
- */
 class IFeed
 {
     NOT_COPYABLE(IFeed)
     NOT_MOVABLE(IFeed)
 
-    /**
-     * @brief Initialize the priority from the given properties.
-     */
     [[nodiscard]] auto
     initPriority() const -> u32;
 
 protected:
-    config::CProperties const m_properties;  ///< Properties
-    String const              m_name;        ///< Unique name
-    u32 const                 m_priority;    ///< Priority
-    SPtr<data::IData>         m_data;        ///< Respective Data container
+    config::CProperties const m_properties;
+    String const              m_name;
+    u32 const                 m_priority;
+    Shared<data::IData>       m_data;
 
-    /**
-     * @param name       The Feeds unique name
-     * @param component  The component string
-     * @param properties The Properties
-     * @throw std::logic_error if host or port are not given in properties
-     */
-    IFeed(String const& name_, config::CProperties const& prop_, SPtr<data::IData> data_);
+    IFeed(String const& name_, config::CProperties const& prop_, Shared<data::IData> data_);
 
 public:
-    /**
-     * @brief The protocol that the Feed supports.
-     */
     enum class EProtocol : enum_type
     {
         APRS,
@@ -76,24 +61,12 @@ public:
 
     virtual ~IFeed() noexcept = default;
 
-    /**
-     * @brief Get the supported Protocol.
-     * @return the protocol
-     */
     [[nodiscard]] virtual auto
     Protocol() const -> EProtocol = 0;
 
-    /**
-     * @brief Get the feeds required Endpoint.
-     * @return the endpoint
-     */
     [[nodiscard]] auto
     Endpoint() const -> client::net::SEndpoint;
 
-    /**
-     * @brief Handle client's response.
-     * @param response The response
-     */
     virtual auto
     Process(String&& str_) -> bool = 0;
 

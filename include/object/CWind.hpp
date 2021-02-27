@@ -28,10 +28,9 @@ namespace vfrb::object
 {
 struct SClimate;
 
-/// Wind information object
 class CWind : public CObject
 {
-    String m_nmea;  ///< The NMEA string
+    String m_nmea;
 
 public:
     MOVABLE(CWind)
@@ -39,7 +38,6 @@ public:
 
     CWind() = default;
 
-    /// @param prio_ The initial priority
     CWind(u32 prio_, String&& nmea_);
     ~CWind() noexcept override = default;
 

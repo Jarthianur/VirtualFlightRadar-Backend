@@ -29,36 +29,21 @@
 
 namespace vfrb::data
 {
-/**
- * @brief Store aircrafts.
- */
 class CAircraftData : public IData
 {
 public:
-    CTCONST NO_FLARM_THRESHOLD = object::CObject::OUTDATED;  ///< Times until FLARM status is removed
-    CTCONST DELETE_THRESHOLD   = 120;                        ///< Times until aircraft gets deleted
+    CTCONST NO_FLARM_THRESHOLD = object::CObject::OUTDATED;
+    CTCONST DELETE_THRESHOLD   = 120;
 
     CAircraftData();
-    explicit CAircraftData(i32 maxDist_);  ///< @param maxDist The max distance filter
+    explicit CAircraftData(i32 maxDist_);
 
-    /**
-     * @brief Insert or update an Aircraft.
-     * @param aircraft The update
-     * @return true on success, else false
-     * @threadsafe
-     */
     auto
     Update(object::CObject&& aircraft_) -> bool override;
 
     void
     Environment(object::SLocation const& loc_, f64 press_);
 
-    /**
-     * @brief Process all aircrafts.
-     * @param position The refered position
-     * @param atmPress The atmospheric pressure
-     * @threadsafe
-     */
     void
     CollectInto(str_util::StringInserter si_) override;
 
@@ -66,10 +51,10 @@ public:
     Size() const -> usize override;
 
 private:
-    concurrent::CObjectContainer<object::CAircraft> m_container;  ///< Internal container for aircrafts
-    processor::CAircraftProcessor                   m_processor;  ///< Processor for aircrafts
+    concurrent::CObjectContainer<object::CAircraft> m_container;
+    processor::CAircraftProcessor                   m_processor;
 
-    // allow access to underlying container when testing
+// allow access to underlying container when testing
 #ifdef VFRB_TEST_MODE
 public:
     auto

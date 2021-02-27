@@ -21,8 +21,6 @@
 #include "feed/parser/CAprsParser.hpp"
 
 #include <algorithm>
-#include <limits>
-#include <optional>
 #include <stdexcept>
 #include <utility>
 
@@ -112,7 +110,7 @@ CAprsParser::parseComment(std::cmatch const& match_) -> CAprsParser::AircraftInf
 }
 
 auto
-CAprsParser::parseMovement(std::cmatch const& match_) -> std::optional<CAircraft::SMovement> {
+CAprsParser::parseMovement(std::cmatch const& match_) -> Optional<CAircraft::SMovement> {
     try {
         return CAircraft::SMovement{
             str_util::Parse<f64>(match_[RE_APRS_HEAD]),
@@ -120,7 +118,7 @@ CAprsParser::parseMovement(std::cmatch const& match_) -> std::optional<CAircraft
             std::max(CLIMB_RATE_MIN,
                      std::min(CLIMB_RATE_MAX, str_util::Parse<f64>(match_[RE_APRS_CR]) * math::FPM_2_MS))};
     } catch ([[maybe_unused]] str_util::error::CConversionError const&) {
-        return std::nullopt;
+        return None;
     }
 }
 

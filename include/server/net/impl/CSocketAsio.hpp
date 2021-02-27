@@ -27,10 +27,9 @@
 
 namespace vfrb::server::net
 {
-/// Socket implementation using boost
 class CSocketAsio
 {
-    asio::ip::tcp::socket m_socket;  ///< Underlying socket
+    asio::ip::tcp::socket m_socket;
 
 public:
     MOVABLE(CSocketAsio)
@@ -39,23 +38,15 @@ public:
     explicit CSocketAsio(asio::ip::tcp::socket&& sock_);
     ~CSocketAsio() noexcept;
 
-    /// @throw vfrb::server::net::error::CSocketError
     [[nodiscard]] auto
     Address() const -> String;
 
-    /**
-     * Write a message on the socket to the endpoint.
-     * @param sv_ The message
-     * @return true on success, else false
-     * @throw vfrb::server::net::error::CSocketError
-     */
     auto
     Write(String const& str_) -> bool;
 
     void
     Close();
 
-    /// Get the underlying socket.
     auto
     Get() -> asio::ip::tcp::socket&;
 };

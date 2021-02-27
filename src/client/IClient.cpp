@@ -44,7 +44,7 @@ namespace
 constexpr auto STOP_COND_WAIT_TIME = 100;
 }  // namespace
 
-IClient::IClient(SEndpoint const& ep_, SPtr<IConnector> con_) : m_connector(con_), m_endpoint(ep_) {}
+IClient::IClient(SEndpoint const& ep_, Shared<IConnector> con_) : m_connector(con_), m_endpoint(ep_) {}
 
 auto
 IClient::Equals(IClient const& other_) const -> bool {
@@ -60,12 +60,13 @@ IClient::Hash() const -> usize {
 }
 
 void
-IClient::Subscribe(SPtr<feed::IFeed> feed_) {
+IClient::Subscribe(Shared<feed::IFeed> feed_) {
     LockGuard lk(m_mutex);
     m_feeds.push_back(feed_);
-    std::sort(m_feeds.begin(), m_feeds.end(), [](SPtr<feed::IFeed> const& f1_, SPtr<feed::IFeed> const& f2_) {
-        return f1_->Priority() > f2_->Priority();
-    });
+    std::sort(m_feeds.begin(), m_feeds.end(),
+              [](Shared<feed::IFeed> const& f1_, Shared<feed::IFeed> const& f2_) {
+                  return f1_->Priority() > f2_->Priority();
+              });
 }
 
 void

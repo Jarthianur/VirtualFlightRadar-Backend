@@ -36,32 +36,31 @@ namespace vfrb::client
 {
 template<>
 auto
-CClientFactory::makeClient<CAprscClient>(SPtr<IFeed> feed_) -> SPtr<CAprscClient> {
-    return std::make_shared<CAprscClient>(feed_->Endpoint(),
-                                          std::static_pointer_cast<CAprscFeed>(feed_)->Login(),
-                                          std::make_shared<CConnectorAsio>());
+CClientFactory::makeClient<CAprscClient>(Shared<IFeed> feed_) -> Shared<CAprscClient> {
+    return Share<CAprscClient>(feed_->Endpoint(), std::static_pointer_cast<CAprscFeed>(feed_)->Login(),
+                               Share<CConnectorAsio>());
 }
 
 template<>
 auto
-CClientFactory::makeClient<CSbsClient>(SPtr<IFeed> feed_) -> SPtr<CSbsClient> {
-    return std::make_shared<CSbsClient>(feed_->Endpoint(), std::make_shared<CConnectorAsio>());
+CClientFactory::makeClient<CSbsClient>(Shared<IFeed> feed_) -> Shared<CSbsClient> {
+    return Share<CSbsClient>(feed_->Endpoint(), Share<CConnectorAsio>());
 }
 
 template<>
 auto
-CClientFactory::makeClient<CSensorClient>(SPtr<IFeed> feed_) -> SPtr<CSensorClient> {
-    return std::make_shared<CSensorClient>(feed_->Endpoint(), std::make_shared<CConnectorAsio>());
+CClientFactory::makeClient<CSensorClient>(Shared<IFeed> feed_) -> Shared<CSensorClient> {
+    return Share<CSensorClient>(feed_->Endpoint(), Share<CConnectorAsio>());
 }
 
 template<>
 auto
-CClientFactory::makeClient<CGpsdClient>(SPtr<IFeed> feed_) -> SPtr<CGpsdClient> {
-    return std::make_shared<CGpsdClient>(feed_->Endpoint(), std::make_shared<CConnectorAsio>());
+CClientFactory::makeClient<CGpsdClient>(Shared<IFeed> feed_) -> Shared<CGpsdClient> {
+    return Share<CGpsdClient>(feed_->Endpoint(), Share<CConnectorAsio>());
 }
 
 auto
-CClientFactory::CreateClientFor(SPtr<IFeed> feed_) -> SPtr<IClient> {
+CClientFactory::CreateClientFor(Shared<IFeed> feed_) -> Shared<IClient> {
     switch (feed_->Protocol()) {
         case IFeed::EProtocol::APRS: return makeClient<CAprscClient>(feed_);
         case IFeed::EProtocol::SBS: return makeClient<CSbsClient>(feed_);

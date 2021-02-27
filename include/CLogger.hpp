@@ -20,99 +20,48 @@
 
 #pragma once
 
-#include <array>
 #include <fstream>
 #include <iostream>
 
 #include "concurrent/Mutex.hpp"
 #include "error/IError.hpp"
-#include "util/ClassUtils.hpp"
+
+#include "Types.hpp"
 
 namespace vfrb
 {
-/// Application wide logger
 class CLogger
 {
-    /// Log levels
-    enum class ELevel : enum_type
-    {
-        INFO  = 0,
-        WARN  = 1,
-        ERROR = 2,
-        DEBUG = 3
-    };
-
-    /**
-     * Get the log line prefix.
-     * @param stream_ The stream to log to
-     * @param l_      The log level
-     * @return an expression to log the prefix
-     */
-    static constexpr auto
-    prefix(std::ostream& stream_, ELevel l_) {
-        constexpr std::array<str, 4> levels = {"[INFO ]  ", "[WARN ]  ", "[ERROR]  ", "[DEBUG]  "};
-        return [&, l = levels[AsUnderlyingType(l_)]] { stream_ << l << time() << ":: "; };
-    }
-
     concurrent::Mutex mutable m_mutex;
-    std::ofstream GUARDED_BY(m_mutex) m_logFile;                    ///< The logfile stream
-    std::ostream* PT_GUARDED_BY(m_mutex) m_outStream = &std::cout;  ///< Stream to log INFO,DEBUG,WARN
-    std::ostream* PT_GUARDED_BY(m_mutex) m_errStream = &std::cerr;  ///< Stream to log ERROR
+    std::ofstream GUARDED_BY(m_mutex) m_logFile;
+    std::ostream* PT_GUARDED_BY(m_mutex) m_outStream = &std::cout;
+    std::ostream* PT_GUARDED_BY(m_mutex) m_errStream = &std::cerr;
 
-    /**
-     * Get current date and time.
-     * @return the date-time
-     */
     static auto
     time() -> String;
 
     CLogger() = default;
 
 public:
-    /**
-     * Get the logger instance.
-     * @return the logger
-     */
     static auto
     Instance() noexcept -> CLogger&;
 
-    /**
-     * Log with INFO level.
-     * @tparam args_ The arguments to log
-     */
     template<typename... Args>
     void
     Info(Args&&... args_) const REQUIRES(!m_mutex);
 
-    /**
-     * Log with DEBUG level.
-     * @note Requires LOG_ENABLE_DEBUG to be defined, else does nothing.
-     * @tparam args_ The arguments to log
-     */
     template<typename... Args>
     void
     Debug(Args&&... args_) const REQUIRES(!m_mutex);
 
-    /**
-     * Log with WARN level.
-     * @tparam args_ The arguments to log
-     */
     template<typename... Args>
     void
     Warn(Args&&... args_) const REQUIRES(!m_mutex);
 
-    /**
-     * Log with ERROR level.
-     * @tparam args_ The arguments to log
-     */
     template<typename... Args>
     void
     Error(Args&&... args_) const REQUIRES(!m_mutex);
 
-    /**
-     * Set a logfile instead of stdout/stderr.
-     * @param file_ The filename
-     */
     void
     LogFile(String const& file_) REQUIRES(!m_mutex);
 };
@@ -121,7 +70,7 @@ template<typename... Args>
 void
 CLogger::Info(Args&&... args_) const REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
-    prefix(*m_outStream, ELevel::INFO)();
+    *m_outStream << "[INFO ]  " << time() << ":: ";
     (*m_outStream << ... << args_) << std::endl;
 }
 
@@ -130,7 +79,7 @@ void
 CLogger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex) {
 #ifdef LOG_ENABLE_DEBUG
     concurrent::LockGuard lk(m_mutex);
-    prefix(*m_outStream, ELevel::DEBUG)();
+    *m_outStream << "[DEBUG]  " << time() << ":: ";
     (*m_outStream << ... << args_) << std::endl;
 #endif
 }
@@ -139,7 +88,7 @@ template<typename... Args>
 void
 CLogger::Warn(Args&&... args_) const REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
-    prefix(*m_outStream, ELevel::WARN)();
+    *m_outStream << "[WARN ]  " << time() << ":: ";
     (*m_outStream << ... << args_) << std::endl;
 }
 
@@ -147,13 +96,12 @@ template<typename... Args>
 void
 CLogger::Error(Args&&... args_) const REQUIRES(!m_mutex) {
     concurrent::LockGuard lk(m_mutex);
-    prefix(*m_errStream, ELevel::ERROR)();
+    *m_errStream << "[ERROR]  " << time() << ":: ";
     (*m_errStream << ... << args_) << std::endl;
 }
 
 namespace error
 {
-/// Error to indicate, that the logfile could not be opened.
 class COpenLogfileError : public vfrb::error::IError
 {
 public:

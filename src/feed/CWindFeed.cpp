@@ -30,7 +30,7 @@ using vfrb::config::CProperties;
 
 namespace vfrb::feed
 {
-CWindFeed::CWindFeed(String const& name_, CProperties const& prop_, SPtr<data::CWindData> data_)
+CWindFeed::CWindFeed(String const& name_, CProperties const& prop_, Shared<data::CWindData> data_)
     : IFeed(name_, prop_, data_) {}
 
 auto

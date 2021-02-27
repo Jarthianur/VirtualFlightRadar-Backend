@@ -26,15 +26,15 @@
 
 namespace vfrb::math
 {
-CTCONST           KTS_2_KMH = 1.852;            ///< Convert knots to km/h
-CTCONST           KMH_2_KTS = 0.539957;         ///< Convert km/h to knots
-CTCONST           KTS_2_MS  = 0.514444;         ///< Convert knots to m/s
-CTCONST           MS_2_KTS  = 1.94384;          ///< Convert m/s to knots
-CTCONST           KMH_2_MS  = 0.277778;         ///< Convert km/h to m/s
-CTCONST           MS_2_KMH  = 3.6;              ///< Convert m/s to km/h
-CTCONST           MS_2_FPM  = 196.85;           ///< Convert m/s to fpm
-CTCONST           FPM_2_MS  = 0.00508;          ///< Convert fpm to m/s
-CTCONST           FEET_2_M  = 0.3048;           ///< Convert feet to m
-CTCONST           M_2_FEET  = 3.28084;          ///< Convert m to feet
-static auto const PI        = std::acos(-1.0);  ///< The circular number
+CTCONST           KTS_2_KMH = 1.852;
+CTCONST           KMH_2_KTS = 0.539957;
+CTCONST           KTS_2_MS  = 0.514444;
+CTCONST           MS_2_KTS  = 1.94384;
+CTCONST           KMH_2_MS  = 0.277778;
+CTCONST           MS_2_KMH  = 3.6;
+CTCONST           MS_2_FPM  = 196.85;
+CTCONST           FPM_2_MS  = 0.00508;
+CTCONST           FEET_2_M  = 0.3048;
+CTCONST           M_2_FEET  = 3.28084;
+static auto const PI        = std::acos(-1.0);
 }  // namespace vfrb::math

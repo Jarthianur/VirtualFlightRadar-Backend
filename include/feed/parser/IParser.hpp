@@ -27,10 +27,6 @@
 
 namespace vfrb::feed::parser
 {
-/**
- * Parser interface
- * @tparam ObjectT The object type to parse
- */
 template<typename ObjectT>
 class IParser
 {
@@ -41,20 +37,12 @@ public:
     IParser()                   = default;
     virtual ~IParser() noexcept = default;
 
-    /**
-     * Parse an object from string.
-     * @param str_  The string to parse
-     * @param prio_ The priority to pass
-     * @return the parsed object
-     * @throw vfrb::feed::parser::error::CParseError
-     */
     virtual auto
     Parse(String&& str_, u32 prio_) const -> ObjectT = 0;
 };
 
 namespace error
 {
-/// Error to indicate that unpacking failed
 class CParseError : public vfrb::error::IError
 {
 public:

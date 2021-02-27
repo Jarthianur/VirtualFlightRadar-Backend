@@ -33,10 +33,6 @@
 
 namespace vfrb::concurrent
 {
-/**
- * A thread that executes a function on elements in a work queue.
- * @tparam DataT The element type of the work queue
- */
 template<typename DataT>
 class CWorkerThread
 {
@@ -46,21 +42,16 @@ class CWorkerThread
     CTCONST POLL_TIME = 200;
 
     Mutex mutable m_mutex;
-    std::condition_variable_any GUARDED_BY(m_mutex) m_cv;       ///< Wait and notify for work
-    bool                        GUARDED_BY(m_mutex) m_running;  ///< Is thread running?
-    std::queue<DataT>           GUARDED_BY(m_mutex) m_workQ;    ///< The work queue
-    CGuardedThread              m_worker;                       ///< The underlying worker thread
+    std::condition_variable_any GUARDED_BY(m_mutex) m_cv;
+    bool                        GUARDED_BY(m_mutex) m_running;
+    std::queue<DataT>           GUARDED_BY(m_mutex) m_workQ;
+    CGuardedThread              m_worker;
 
 public:
-    /// @param fn_ The function to execute for each element
     template<typename FnT>
     explicit CWorkerThread(FnT&& fn_);
     ~CWorkerThread() noexcept;
 
-    /**
-     * Push an element into the work queue.
-     * @param data_ The element to push
-     */
     void
     Push(DataT&& data_) REQUIRES(!m_mutex);
 };

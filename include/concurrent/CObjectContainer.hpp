@@ -20,51 +20,30 @@
 
 #pragma once
 
-#include <map>
-#include <utility>
-
-#include "util/ClassUtils.hpp"
-
 #include "Mutex.hpp"
 #include "Types.hpp"
 
 namespace vfrb::concurrent
 {
-/// An container for objects bundled with NMEA string, that allows concurrent access.
 template<typename ObjectT>
 class CObjectContainer
 {
 public:
-    /// A threadsafe iterator to access elements in the container.
     class CIterator;
-
-    /// Value type stored in the container
     class CValueType;
 
     using KeyType       = usize;
-    using ContainerType = std::map<KeyType, CValueType>;  // implemented as tree, thus iteration is faster
+    using ContainerType = TreeMap<KeyType, CValueType>;
 
-    /**
-     * Get an iterator to the first element in container.
-     * @return a valid iterator, or the end-iterator
-     */
     CIterator
     Begin() REQUIRES(!m_modMutex);
 
-    /// Get an iterator to the end of the container, thus pointing nowhere.
     auto
     End() -> CIterator;
 
-    /**
-     * Insert an object at the given key, if not existing yet.
-     * @param key_ The key where to insert
-     * @param val_ The object to insert
-     * @return an iterator to the element at key and true if it was inserted, or false if not
-     */
-    std::pair<CIterator, bool>
+    Pair<CIterator, bool>
     Insert(KeyType key_, ObjectT&& value_) REQUIRES(!m_modMutex);
 
-    /// Erase the element at key.
     void
     Erase(KeyType key_) REQUIRES(!m_modMutex);
 
@@ -73,14 +52,14 @@ public:
 
 private:
     Mutex mutable m_modMutex;
-    ContainerType GUARDED_BY(m_modMutex) m_container;  ///< Underlying container
+    ContainerType GUARDED_BY(m_modMutex) m_container;
 };
 
 template<typename ObjectT>
 class CObjectContainer<ObjectT>::CValueType
 {
     friend class CObjectContainer::CIterator;
-    Mutex mutable m_mutex;  ///< Locked when this element is accessed
+    Mutex mutable m_mutex;
 
 public:
     MOVABLE(CValueType)
@@ -95,9 +74,9 @@ public:
 template<typename ObjectT>
 class CObjectContainer<ObjectT>::CIterator
 {
-    typename ContainerType::iterator m_iterator;   ///< The underlying iterator
-    UniqueLock                       m_valueLock;  ///< The lock that is hold while iterator is valid
-    CObjectContainer const&          m_container;  ///< The container where elements belong to
+    typename ContainerType::iterator m_iterator;
+    UniqueLock                       m_valueLock;
+    CObjectContainer const&          m_container;
 
 public:
     MOVABLE(CIterator)
@@ -221,15 +200,14 @@ CObjectContainer<ObjectT>::End() -> CIterator {
 }
 
 template<typename ObjectT>
-std::pair<typename CObjectContainer<ObjectT>::CIterator, bool>
+Pair<typename CObjectContainer<ObjectT>::CIterator, bool>
 CObjectContainer<ObjectT>::Insert(KeyType key_, ObjectT&& value_) REQUIRES(!m_modMutex) {
     LockGuard lk(m_modMutex);
     CIterator iter(m_container.find(key_), *this);
     if (iter == End()) {
-        return std::make_pair(
-            CIterator(m_container.emplace(key_, CValueType(std::move(value_))).first, *this), true);
+        return {CIterator(m_container.emplace(key_, CValueType(std::move(value_))).first, *this), true};
     }
-    return std::make_pair(std::move(iter), false);
+    return {std::move(iter), false};
 }
 
 template<typename ObjectT>

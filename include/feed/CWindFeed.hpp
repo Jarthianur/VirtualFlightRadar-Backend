@@ -31,32 +31,16 @@ class CWindData;
 
 namespace vfrb::feed
 {
-/**
- * @brief Extend Feed for windsensor input.
- */
 class CWindFeed : public IFeed
 {
-    parser::CWindParser const m_parser;  ///< Parser to unpack response from Client
+    parser::CWindParser const m_parser;
 
 public:
-    /**
-     * @param name       The SensorFeeds unique name
-     * @param properties The Properties
-     * @param data       The WindData contianer
-     * @throw std::logic_error from parent constructor
-     */
-    CWindFeed(String const& name_, config::CProperties const& prop_, SPtr<data::CWindData> data_);
+    CWindFeed(String const& name_, config::CProperties const& prop_, Shared<data::CWindData> data_);
 
-    /**
-     * @brief Get this feeds Protocol.
-     * @return Protocol::SENSOR
-     */
     [[nodiscard]] auto
     Protocol() const -> EProtocol override;
 
-    /**
-     * @brief Feed::process.
-     */
     auto
     Process(String&& str_) -> bool override;
 };

@@ -28,15 +28,14 @@ namespace vfrb::object
 {
 struct SClimate;
 
-/// Atmospheric information object
 class CAtmosphere : public CObject
 {
-    CTCONST ICAO_STD     = 1013.25;  ///< ICAO standard atmospheric pressure at MSL
+    CTCONST ICAO_STD     = 1013.25;
     CTCONST MAX_PRESSURE = 2000.0;
     CTCONST MIN_PRESSURE = 0.0;
 
-    f64    m_pressure = ICAO_STD;  ///< The atmospheric pressure
-    String m_nmea;                 ///< The NMEA string
+    f64    m_pressure = ICAO_STD;
+    String m_nmea;
 
     void
     assign(CObject&& other_) override;
@@ -47,10 +46,8 @@ public:
 
     CAtmosphere() = default;
 
-    /// @param prio_ The initial priority
     CAtmosphere(u32 prio_, String&& nmea_);
 
-    /// @param prio_ The initial priority
     CAtmosphere(u32 prio_, f64 press_, String&& nmea_);
     ~CAtmosphere() noexcept override = default;
 

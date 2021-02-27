@@ -33,29 +33,15 @@ class IFeed;
 
 namespace vfrb::client
 {
-/**
- * @brief A factory for clients.
- */
 class CClientFactory
 {
-    /**
-     * @brief Factory method for Client creation.
-     * @tparam T The type of client
-     * @param feed The feed to create for
-     * @return the client as pointer
-     */
     template<typename T, ENABLE_IF(EXTENDS(T, IClient))>
     static auto
-    makeClient(SPtr<feed::IFeed> feed_) -> SPtr<T>;
+    makeClient(Shared<feed::IFeed> feed_) -> Shared<T>;
 
 public:
-    /**
-     * @brief Create a Client needed by a Feed.
-     * @param feed The feed to create for
-     * @return the client as pointer
-     */
     static auto
-    CreateClientFor(SPtr<feed::IFeed> feed_) -> SPtr<IClient>;
+    CreateClientFor(Shared<feed::IFeed> feed_) -> Shared<IClient>;
 };
 
 namespace error

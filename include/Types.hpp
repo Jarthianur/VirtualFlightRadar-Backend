@@ -20,17 +20,23 @@
 
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <list>
+#include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <type_traits>
 #include <unordered_map>
+#include <unordered_set>
+#include <utility>
 #include <vector>
+
+#include "util/ClassUtils.hpp"
 
 namespace vfrb
 {
@@ -68,29 +74,43 @@ using String     = std::string;
 using StringView = std::string_view;
 
 template<typename T>
-using Vector = std::vector<T>;
+using Optional = std::optional<T>;
 
-template<typename T>
-using List = std::list<T>;
+constexpr inline auto None = std::nullopt;
+
+template<typename... T>
+using Vector = std::vector<T...>;
+
+template<typename... T>
+using List = std::list<T...>;
 
 template<typename K, typename V>
 using HashMap = std::unordered_map<K, V>;
 
+template<typename K, typename V>
+using TreeMap = std::map<K, V>;
+
 template<typename... T>
 using Tuple = std::tuple<T...>;
 
-template<typename T>
-using SPtr = std::shared_ptr<T>;
+template<typename... T>
+using Set = std::unordered_set<T...>;
+
+template<typename T, usize S>
+using Array = std::array<T, S>;
+
+template<typename T1, typename T2>
+using Pair = std::pair<T1, T2>;
 
 template<typename T>
-using UPtr = std::unique_ptr<T>;
+using Shared = std::shared_ptr<T>;
 
-/**
- * Get an enum value as the underlying type.
- * @tparam T The enum type
- * @param value The enum value
- * @return the value as its underlyig type
- */
+template<typename T>
+using Owned = std::unique_ptr<T>;
+
+FUNCTION_ALIAS(Share, std::make_shared)
+FUNCTION_ALIAS(Own, std::make_unique)
+
 template<typename T>
 constexpr auto
 AsUnderlyingType(T val_) -> typename std::underlying_type<T>::type {

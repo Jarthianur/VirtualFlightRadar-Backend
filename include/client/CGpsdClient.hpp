@@ -24,29 +24,14 @@
 
 namespace vfrb::client
 {
-/**
- * @brief Client for GPSD servers
- */
 class CGpsdClient : public IClient
 {
-    /**
-     * @brief Send unwatch-request and stop this client.
-     */
     void
     stop() override REQUIRES(m_mutex);
 
-    /**
-     * @brief Implement Client::handleConnect
-     * @threadsafe
-     */
     void
     handleConnect(Result<void> res_) override REQUIRES(!m_mutex);
 
-    /**
-     * @brief Handler for watch-request sending
-     * @param error The error indicator
-     * @threadsafe
-     */
     void
     handleWatch(Result<void> res_) REQUIRES(!m_mutex);
 
@@ -54,10 +39,6 @@ class CGpsdClient : public IClient
     logPrefix() const -> str override;
 
 public:
-    /**
-     * @param endpoint  The remote endpoint
-     * @param connector The Connector interface
-     */
-    CGpsdClient(net::SEndpoint const& ep_, SPtr<net::IConnector> con_);
+    CGpsdClient(net::SEndpoint const& ep_, Shared<net::IConnector> con_);
 };
 }  // namespace vfrb::client

@@ -43,49 +43,25 @@ namespace vfrb::feed
 {
 class IFeed;
 
-/**
- * @brief Factory for Feed creation.
- */
 class CFeedFactory
 {
-    SPtr<config::CConfiguration> m_config;        ///< Pointer to the Configuration
-    SPtr<data::CAircraftData>    m_aircraftData;  ///< Pointer to the AircraftData
-    SPtr<data::CAtmosphereData>  m_atmosData;     ///< Pointer to the AtmosphereData
-    SPtr<data::CGpsData>         m_gpsData;       ///< Pointer to the GpsData
-    SPtr<data::CWindData>        m_windData;      ///< Pointer to the WindData
+    Shared<config::CConfiguration> m_config;
+    Shared<data::CAircraftData>    m_aircraftData;
+    Shared<data::CAtmosphereData>  m_atmosData;
+    Shared<data::CGpsData>         m_gpsData;
+    Shared<data::CWindData>        m_windData;
 
-    /**
-     * @brief Make a new Feed.
-     * @tparam T The Feed type
-     * @note Must be fully specialized for every concrete Feed type T.
-     * @param name  The feed name
-     * @return a pointer to the concrete Feed
-     * @throw std::logic_error from invoked constructors
-     */
     template<typename T, ENABLE_IF(EXTENDS(T, IFeed))>
     auto
-    makeFeed(String const& name_) -> SPtr<T>;
+    makeFeed(String const& name_) -> Shared<T>;
 
 public:
-    /**
-     * @param config       The Configuration
-     * @param aircraftData The AircraftData pointer
-     * @param atmosData    The AtmosphereData pointer
-     * @param gpsData      The GpsData pointer
-     * @param windData     The WindData pointer
-     */
-    CFeedFactory(SPtr<config::CConfiguration> config_, SPtr<data::CAircraftData> aircraftData_,
-                 SPtr<data::CAtmosphereData> atmosData_, SPtr<data::CGpsData> gpsData_,
-                 SPtr<data::CWindData> windData_);
+    CFeedFactory(Shared<config::CConfiguration> config_, Shared<data::CAircraftData> aircraftData_,
+                 Shared<data::CAtmosphereData> atmosData_, Shared<data::CGpsData> gpsData_,
+                 Shared<data::CWindData> windData_);
 
-    /**
-     * @brief Create a Feed.
-     * @param name  The feed name
-     * @return an optional unique pointer to the feed
-     * @throw std::logic_error from invoked methods
-     */
     auto
-    createFeed(String const& name_) -> SPtr<IFeed>;
+    createFeed(String const& name_) -> Shared<IFeed>;
 };
 
 namespace error

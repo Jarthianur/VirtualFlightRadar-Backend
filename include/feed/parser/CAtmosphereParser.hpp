@@ -26,7 +26,6 @@
 
 namespace vfrb::feed::parser
 {
-/// A parser for NMEA atmosphere sentences
 class CAtmosphereParser : public IParser<object::CAtmosphere>
 {
 public:

@@ -26,16 +26,15 @@
 
 namespace vfrb::feed::parser
 {
-/// A parser for SBS sentences
 class CSbsParser : public IParser<object::CAircraft>
 {
-    CTCONST SBS_FIELD_ID   = 4;   ///< Field number of aircraft id
-    CTCONST SBS_FIELD_TIME = 7;   ///< Field number of time
-    CTCONST SBS_FIELD_ALT  = 11;  ///< Field number of altitude
-    CTCONST SBS_FIELD_LAT  = 14;  ///< Field number of latitude
-    CTCONST SBS_FIELD_LON  = 15;  ///< Field number of longitude
+    CTCONST SBS_FIELD_ID   = 4;
+    CTCONST SBS_FIELD_TIME = 7;
+    CTCONST SBS_FIELD_ALT  = 11;
+    CTCONST SBS_FIELD_LAT  = 14;
+    CTCONST SBS_FIELD_LON  = 15;
 
-    i32 const m_maxHeight;  ///< The max height filter
+    i32 const m_maxHeight;
 
 public:
     explicit CSbsParser(i32 maxHeight_);

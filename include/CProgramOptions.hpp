@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <optional>
-
 #include "error/IError.hpp"
 #include "util/ClassUtils.hpp"
 
@@ -79,10 +77,10 @@ public:
     Parse(usize argc_, str* argv_);
 
     auto
-    GetOpt(str key_) const -> std::optional<String>;
+    GetOpt(str key_) const -> Optional<String>;
 
     auto
-    RequireOpt(str key_) const -> std::optional<String>;
+    RequireOpt(str key_) const -> Optional<String>;
 
 private:
     struct SMatched
@@ -124,7 +122,7 @@ private:
     static auto
     tokenizeArgs(usize argc_, str* argv_) -> Vector<String>;
 
-    HashMap<String, std::optional<String>> m_opts;
-    str                                    m_progname{nullptr};
+    HashMap<String, Optional<String>> m_opts;
+    str                               m_progname{nullptr};
 };
 }  // namespace vfrb

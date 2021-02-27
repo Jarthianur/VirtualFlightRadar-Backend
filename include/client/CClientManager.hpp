@@ -20,15 +20,11 @@
 
 #pragma once
 
-#include <unordered_set>
-
 #include "concurrent/CThreadGroup.hpp"
 #include "concurrent/Mutex.hpp"
 #include "error/IError.hpp"
-#include "util/ClassUtils.hpp"
 
 #include "IClient.hpp"
-#include "Types.hpp"
 
 namespace vfrb::feed
 {
@@ -37,69 +33,44 @@ class IFeed;
 
 namespace vfrb::client
 {
-/**
- * @brief Functor for hashing clients.
- */
 struct SClientHasher
 {
     auto
-    operator()(SPtr<IClient> const& c_) const -> usize {
+    operator()(Shared<IClient> const& c_) const -> usize {
         return c_->Hash();
     }
 };
 
-/**
- * @brief Functor for comparing clients.
- */
 struct SClientComparator
 {
     auto
-    operator()(SPtr<IClient> const& c1_, SPtr<IClient> const& c2_) const -> bool {
+    operator()(Shared<IClient> const& c1_, Shared<IClient> const& c2_) const -> bool {
         return c1_->Equals(*c2_);
     }
 };
 
-/// Set of clients with custom hasher and comparator
-using ClientSet = std::unordered_set<SPtr<IClient>, SClientHasher, SClientComparator>;
-/// Iterator in ClientSet
+using ClientSet  = Set<Shared<IClient>, SClientHasher, SClientComparator>;
 using ClientIter = ClientSet::iterator;
 
-/**
- * @brief Managing multi-threaded clients.
- */
 class CClientManager
 {
     NOT_COPYABLE(CClientManager)
     NOT_MOVABLE(CClientManager)
 
     concurrent::Mutex mutable m_mutex;
-    ClientSet                GUARDED_BY(m_mutex) m_clients;   ///< Set of clients
-    concurrent::CThreadGroup GUARDED_BY(m_mutex) m_thdGroup;  ///< Thread group for client threads
+    ClientSet                GUARDED_BY(m_mutex) m_clients;
+    concurrent::CThreadGroup GUARDED_BY(m_mutex) m_thdGroup;
 
 public:
     CClientManager() = default;
     ~CClientManager() noexcept;
 
-    /**
-     * @brief Subscribe a Feed to the respective Client.
-     * @param feed The feed to subscribe
-     * @threadsafe
-     */
     void
-    Subscribe(SPtr<feed::IFeed> feed_) REQUIRES(!m_mutex);
+    Subscribe(Shared<feed::IFeed> feed_) REQUIRES(!m_mutex);
 
-    /**
-     * @brief Run all clients in their own thread.
-     * @threadsafe
-     */
     void
     Run() REQUIRES(!m_mutex);
 
-    /**
-     * @brief Stop all clients.
-     * @note Blocks until all clients have stopped.
-     * @threadsafe
-     */
     void
     Stop() REQUIRES(!m_mutex);
 };

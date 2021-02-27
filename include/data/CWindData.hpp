@@ -28,24 +28,15 @@
 
 namespace vfrb::data
 {
-/**
- * @brief Store wind information.
- */
 class CWindData : public IData
 {
     concurrent::Mutex mutable m_mutex;
-    object::CWind GUARDED_BY(m_mutex) m_wind;  ///< The Wind information
+    object::CWind GUARDED_BY(m_mutex) m_wind;
 
 public:
     CWindData() = default;
-    explicit CWindData(object::CWind&& wind_);  ///< @param wind The initial wind information
+    explicit CWindData(object::CWind&& wind_);
 
-    /**
-     * @brief Update the wind information.
-     * @param wind The new wind information.
-     * @return true on success, else false
-     * @threadsafe
-     */
     auto
     Update(object::CObject&& wind_) -> bool override REQUIRES(!m_mutex);
 

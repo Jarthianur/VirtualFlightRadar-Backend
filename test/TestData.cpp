@@ -36,12 +36,12 @@ using namespace object;
 using namespace str_util;
 
 DESCRIBE("test_CAircraftData") {
-    SPtr<CAircraftData> uut;
-    String              nmea;
-    i32 const           M1000 = math::DoubleToInt(math::FEET_2_M * 3281);
+    Shared<CAircraftData> uut;
+    String                nmea;
+    i32 const             M1000 = math::DoubleToInt(math::FEET_2_M * 3281);
 
     BEFORE_EACH() {
-        uut = std::make_shared<CAircraftData>();
+        uut = Share<CAircraftData>();
         uut->Environment({49., 8., 0}, 1013.25);
     }
 
@@ -108,11 +108,11 @@ DESCRIBE("test_CAircraftData") {
 };
 
 DESCRIBE("test_CGpsData") {
-    SPtr<CGpsData> uut;
-    String         nmea;
+    Shared<CGpsData> uut;
+    String           nmea;
 
     BEFORE_EACH() {
-        uut = std::make_shared<CGpsData>(
+        uut = Share<CGpsData>(
 
             CGpsPosition{0, {0., 0., 0}, 0.}, true);
     }
@@ -149,11 +149,11 @@ DESCRIBE("test_CGpsData") {
 };
 
 DESCRIBE("test_CWindData") {
-    SPtr<CWindData> uut;
-    String          nmea;
+    Shared<CWindData> uut;
+    String            nmea;
 
     BEFORE_EACH() {
-        uut = std::make_shared<CWindData>();
+        uut = Share<CWindData>();
     }
 
     AFTER_EACH() {
@@ -179,13 +179,11 @@ DESCRIBE("test_CWindData") {
 };
 
 DESCRIBE("test_CAtmosphereData") {
-    SPtr<CAtmosphereData> uut;
-    String                nmea;
+    Shared<CAtmosphereData> uut;
+    String                  nmea;
 
     BEFORE_EACH() {
-        uut = std::make_shared<CAtmosphereData>(
-
-            CAtmosphere{0, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E"});
+        uut = Share<CAtmosphereData>(CAtmosphere{0, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E"});
     }
 
     AFTER_EACH() {

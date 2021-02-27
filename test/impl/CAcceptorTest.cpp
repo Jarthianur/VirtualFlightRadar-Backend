@@ -87,7 +87,7 @@ CAcceptorTest::Connect(String const& addr_, bool failAccept_, bool failWrite_) -
         }
     }
     m_stagedAddress = addr_;
-    auto buf        = std::make_shared<String>("");
+    auto buf        = Share<String>("");
     m_sockets.emplace_back(CSocketTest(addr_, buf, failWrite_), buf);
     m_onAcceptFn(failAccept_ ? Err() : Ok());  // false => no error
     return m_sockets.size() - 1;

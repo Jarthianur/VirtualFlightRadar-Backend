@@ -36,14 +36,14 @@ using namespace str_util;
 using namespace config;
 
 DESCRIBE("test_CProperties") {
-    SPtr<CProperties> uut;
+    Shared<CProperties> uut;
 
     SETUP() {
         boost::property_tree::ptree tree;
         std::stringstream           iss;
         iss << "[main]\nkey=value\n";
         boost::property_tree::read_ini(iss, tree);
-        uut = std::make_shared<CProperties>(std::move(tree));
+        uut = Share<CProperties>(std::move(tree));
     }
 
     // Property
@@ -110,11 +110,16 @@ DESCRIBE("test_CConfigReader") {
         conf_in << CConfiguration::SECT_KEY_FALLBACK << "\n"
                 << CConfiguration::KV_KEY_LATITUDE << "    0.000000\n";
         ASSERT_THROWS(CConfigReader(conf_in).Read(), config::error::CReadFileError);
+    }
+    IT("should throw if file cannot be read") {
+        std::ifstream file("/i/do/not/exist.conf");
+        auto          e = ASSERT_THROWS(CConfigReader cr(file), config::error::CReadFileError);
+        ASSERT_LIKE(e.Message(), "read"_re_i);
     };
 };
 
 DESCRIBE_PAR("test_CConfiguration") {
-    SPtr<CConfiguration> uut;
+    Shared<CConfiguration> uut;
 
     SETUP() {
         std::stringstream conf_in;
@@ -155,7 +160,7 @@ DESCRIBE_PAR("test_CConfiguration") {
                 << CConfiguration::KV_KEY_PORT << "=3334\n"
                 << CConfiguration::KV_KEY_PRIORITY << "=1\n";
 
-        uut = std::make_shared<CConfiguration>(conf_in);
+        uut = Share<CConfiguration>(conf_in);
     }
 
     IT("should hold correct values for general") {

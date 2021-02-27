@@ -26,17 +26,11 @@ namespace vfrb::util
 {
 namespace error
 {
-/// Error to indicate a value was not between required limits.
 class CBoundsExceededError : public vfrb::error::IError
 {
-    String const m_msg;  ///< The error message
+    String const m_msg;
 
 public:
-    /**
-     * @tparam T The value type
-     * @param min_ The lower limit
-     * @param max_ The upper limit
-     */
     template<typename T>
     CBoundsExceededError(T val_, T min_, T max_)
         : m_msg(std::to_string(val_) + " not in [" + std::to_string(min_) + "," + std::to_string(max_) +
@@ -49,14 +43,6 @@ public:
 };
 }  // namespace error
 
-/**
- * Check a value to be between given limits.
- * @tparam T The value type
- * @param val_ The value
- * @param min_ The lower limit
- * @param max_ The upper limit
- * @throw vfrb::util::error::CBoundsExceededError
- */
 template<typename T>
 void
 FailOutsideBounds(T val_, T min_, T max_) {

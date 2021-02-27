@@ -55,11 +55,11 @@ CTCONST LOG_PREFIX       = "(VFRB) ";
 
 static auto const& logger = CLogger::Instance();
 
-CVfrb::CVfrb(SPtr<CConfiguration> conf_)
-    : m_aircraftData(std::make_shared<CAircraftData>(conf_->MaxDistance)),
-      m_atmosphereData(std::make_shared<CAtmosphereData>(object::CAtmosphere{0, conf_->AtmPressure, ""})),
-      m_gpsData(std::make_shared<CGpsData>(conf_->GpsPosition, conf_->GroundMode)),
-      m_windData(std::make_shared<CWindData>()),
+CVfrb::CVfrb(Shared<CConfiguration> conf_)
+    : m_aircraftData(Share<CAircraftData>(conf_->MaxDistance)),
+      m_atmosphereData(Share<CAtmosphereData>(object::CAtmosphere{0, conf_->AtmPressure, ""})),
+      m_gpsData(Share<CGpsData>(conf_->GpsPosition, conf_->GroundMode)),
+      m_windData(Share<CWindData>()),
       m_server(std::get<0>(conf_->ServerConfig), std::get<1>(conf_->ServerConfig)),
       m_running(false) {
     createFeeds(conf_);
@@ -136,7 +136,7 @@ CVfrb::serve() {
 }
 
 void
-CVfrb::createFeeds(SPtr<CConfiguration> conf_) {
+CVfrb::createFeeds(Shared<CConfiguration> conf_) {
     feed::CFeedFactory factory(conf_, m_aircraftData, m_atmosphereData, m_gpsData, m_windData);
     for (auto const& name : conf_->FeedNames) {
         try {

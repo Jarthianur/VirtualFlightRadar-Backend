@@ -24,19 +24,11 @@
 
 namespace vfrb::client::net
 {
-/**
- * @brief A remote endpoint
- */
 struct SEndpoint
 {
-    String const Host;  ///< Hostname
-    String const Port;  ///< Port number
+    String const Host;
+    String const Port;
 
-    /**
-     * @brief Equality comparison by value
-     * @param other The other endpoint
-     * @return true if both are equal, else false
-     */
     auto
     operator==(SEndpoint const& other_) const -> bool {
         return Host == other_.Host && Port == other_.Port;

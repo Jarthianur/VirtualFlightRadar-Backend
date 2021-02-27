@@ -22,12 +22,10 @@
 
 #include <atomic>
 #include <chrono>
-#include <list>
 
 #include "server/CServer.hpp"
 #include "server/net/impl/CAcceptorAsio.hpp"
 #include "server/net/impl/CSocketAsio.hpp"
-#include "util/ClassUtils.hpp"
 
 #include "Types.hpp"
 
@@ -49,45 +47,27 @@ class IFeed;
 
 namespace vfrb
 {
-/**
- * @brief Combine all features and is the main entry point for the actual VFR-B.
- */
 class CVfrb
 {
-    SPtr<data::CAircraftData>                 m_aircraftData;    ///< Aircraft container
-    SPtr<data::CAtmosphereData>               m_atmosphereData;  ///< Atmospheric data container
-    SPtr<data::CGpsData>                      m_gpsData;         ///< GPS data container
-    SPtr<data::CWindData>                     m_windData;        ///< Wind data container
-    server::CServer<server::net::CSocketAsio> m_server;          ///< Manage clients and sending of data
-    List<SPtr<feed::IFeed>>                   m_feeds;           ///< List of all active feeds
-    std::atomic<bool>                         m_running;         ///< Atomic run-status
+    Shared<data::CAircraftData>               m_aircraftData;
+    Shared<data::CAtmosphereData>             m_atmosphereData;
+    Shared<data::CGpsData>                    m_gpsData;
+    Shared<data::CWindData>                   m_windData;
+    server::CServer<server::net::CSocketAsio> m_server;
+    List<Shared<feed::IFeed>>                 m_feeds;
+    std::atomic<bool>                         m_running;
 
-    /**
-     * @brief Create all input feeds.
-     * @param config The Configuration
-     */
     void
-    createFeeds(SPtr<config::CConfiguration> conf_);
+    createFeeds(Shared<config::CConfiguration> conf_);
 
-    /**
-     * @brief Serve the data frequently every second.
-     */
     void
     serve();
 
-    /**
-     * @brief Get the duration from given start value as formatted string.
-     * @param start The start value
-     * @return the duration string
-     */
     auto static duration(std::chrono::steady_clock::time_point start_) -> String;
 
 public:
-    explicit CVfrb(SPtr<config::CConfiguration> conf_);  ///< @param config The Configuration
+    explicit CVfrb(Shared<config::CConfiguration> conf_);
 
-    /**
-     * @brief The VFRB's main method, runs the VFR-B.
-     */
     void
     Run() noexcept;
 };

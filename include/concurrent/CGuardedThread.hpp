@@ -28,16 +28,11 @@
 
 namespace vfrb::concurrent
 {
-/// RAII style, self joining thread
 class CGuardedThread
 {
-    std::thread       m_thread;  ///< The underlying thread
-    std::future<void> m_state;   ///< The run state, if valid then is thread running
+    std::thread       m_thread;
+    std::future<void> m_state;
 
-    /**
-     * Initialize this thread with a function.
-     * @param fn_ The function to run
-     */
     template<typename FnT>
     void
     init(FnT&& fn_);
@@ -48,7 +43,6 @@ public:
 
     CGuardedThread() = default;
 
-    /// @param fn_ The function to run
     template<typename FnT, ENABLE_IF(NOT IS_TYPE(FnT, CGuardedThread))>
     explicit CGuardedThread(FnT&& fn_) {
         init<FnT>(std::forward<FnT>(fn_));
@@ -56,10 +50,6 @@ public:
 
     ~CGuardedThread() noexcept;
 
-    /**
-     * Spawn this thread with given function if not done on construction yet.
-     * @param fn_ The function to run
-     */
     template<typename FnT>
     void
     Spawn(FnT&& fn_);

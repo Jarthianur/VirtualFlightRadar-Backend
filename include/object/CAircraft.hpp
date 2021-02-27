@@ -30,25 +30,22 @@
 
 namespace vfrb::object
 {
-/// An aircraft object
 class CAircraft : public CObject
 {
-    CTCONST ID_SIZE = 8;  ///< Size allocated for ID
+    CTCONST ID_SIZE = 8;
 
 public:
     DEFAULT_COPYABLE(CAircraft)
     COPY_ON_MOVE(CAircraft)
 
-    CTCONST ID_LEN = 6;  ///< Length of the ID
+    CTCONST ID_LEN = 6;
 
-    /// Device type from which the information is received
     enum class ETargetType : enum_type
     {
         FLARM,
         TRANSPONDER
     };
 
-    /// Aircraft types with their protocol codes
     enum class EAircraftType : enum_type
     {
         UNKNOWN               = 0,
@@ -59,7 +56,7 @@ public:
         DROP_PLANE            = 5,
         HANG_GLIDER           = 6,
         PARA_GLIDER           = 7,
-        POWERED_AIRCRAFT      = 8,  ///< Default for TRANSPONDER targets
+        POWERED_AIRCRAFT      = 8,
         JET_AIRCRAFT          = 9,
         UFO                   = 10,
         BALLOON               = 11,
@@ -68,7 +65,6 @@ public:
         STATIC_OBJECT         = 15
     };
 
-    /// Id (address) types with their protocol codes
     enum class EIdType : enum_type
     {
         RANDOM = 0,
@@ -77,7 +73,6 @@ public:
         OGN    = 3
     };
 
-    /// Information about an Aircrafts movement
     struct SMovement
     {
         CTCONST MAX_GND_SPEED  = 10000.0;
@@ -87,20 +82,20 @@ public:
         CTCONST MAX_CLIMB_RATE = 10000.0;
         CTCONST MIN_CLIMB_RATE = -10000.0;
 
-        f64 GndSpeed;   ///< Speed over ground; m/s
-        f64 Heading;    ///< Heading; deg [0-359]
-        f64 ClimbRate;  ///< Climb rate; m/s
+        f64 GndSpeed;
+        f64 Heading;
+        f64 ClimbRate;
     };
 
 private:
-    CStaticString<ID_SIZE> m_id;                ///< Aircraft identifier
-    EIdType                m_idType;            ///< Id type
-    EAircraftType          m_aircraftType;      ///< Aircraft type
-    ETargetType            m_targetType;        ///< Target type
-    SLocation              m_location;          ///< Currently known position
-    SMovement              m_movement;          ///< Currently known movement
-    CTimestamp             m_timestamp;         ///< The timestamp of the last report
-    bool                   m_fullInfo = false;  ///< Is full set of information available?
+    CStaticString<ID_SIZE> m_id;
+    EIdType                m_idType;
+    EAircraftType          m_aircraftType;
+    ETargetType            m_targetType;
+    SLocation              m_location;
+    SMovement              m_movement;
+    CTimestamp             m_timestamp;
+    bool                   m_fullInfo = false;
 
     void
     assign(CObject&& other_) override;
@@ -108,17 +103,9 @@ private:
     canUpdate(CObject const& other_) const -> bool override;
 
 public:
-    /**
-     * Initialize as FLARM starget.
-     * @param prio_ The initial priority
-     */
     CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, ETargetType tt_,
               SLocation const& loc_, SMovement const& move_, CTimestamp const& ts_);
 
-    /**
-     * Initialize as TRANSPONDER target.
-     * @param prio_ The initial priority
-     */
     CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, ETargetType tt_,
               SLocation const& loc_, CTimestamp const& ts_);
 

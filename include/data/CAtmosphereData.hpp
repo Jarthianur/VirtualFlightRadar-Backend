@@ -28,34 +28,20 @@
 
 namespace vfrb::data
 {
-/**
- * @brief Store atmospheric information.
- */
 class CAtmosphereData : public IData
 {
     concurrent::Mutex mutable m_mutex;
-    object::CAtmosphere GUARDED_BY(m_mutex) m_atmosphere;  ///< Atmospheric information
+    object::CAtmosphere GUARDED_BY(m_mutex) m_atmosphere;
 
 public:
-    explicit CAtmosphereData(object::CAtmosphere&& atm_);  ///< @param atmosphere The initial atm info
+    explicit CAtmosphereData(object::CAtmosphere&& atm_);
 
-    /**
-     * @brief Update he athmosphere data.
-     * @param atmosphere The new atm info
-     * @return true on success, else false
-     * @threadsafe
-     */
     auto
     Update(object::CObject&& atm_) -> bool override REQUIRES(!m_mutex);
 
     void
     CollectInto(str_util::StringInserter si_) override REQUIRES(!m_mutex);
 
-    /**
-     * @brief Get the atmospheric pressure.
-     * @return the pressure
-     * @threadsafe
-     */
     auto
     Pressure() const -> decltype(m_atmosphere.Pressure()) REQUIRES(!m_mutex);
 

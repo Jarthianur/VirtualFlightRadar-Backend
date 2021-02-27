@@ -22,7 +22,8 @@
 
 #include "concurrent/Mutex.hpp"
 #include "server/net/IAcceptor.hpp"
-#include "util/ClassUtils.hpp"
+
+#include "Types.hpp"
 
 namespace vfrb::server::net
 {
@@ -33,12 +34,12 @@ class CAcceptorTest : public IAcceptor<CSocketTest>
     NOT_MOVABLE(CAcceptorTest)
     NOT_COPYABLE(CAcceptorTest)
 
-    vfrb::concurrent::Mutex                           m_mutex;
-    std::function<void(Result<void>&&)>               m_onAcceptFn;
-    String                                            m_stagedAddress;
-    bool                                              m_running = false;
-    bool                                              m_fail    = false;
-    std::vector<std::pair<CSocketTest, SPtr<String>>> m_sockets;
+    vfrb::concurrent::Mutex                   m_mutex;
+    std::function<void(Result<void>&&)>       m_onAcceptFn;
+    String                                    m_stagedAddress;
+    bool                                      m_running = false;
+    bool                                      m_fail    = false;
+    Vector<Pair<CSocketTest, Shared<String>>> m_sockets;
 
 public:
     explicit CAcceptorTest();

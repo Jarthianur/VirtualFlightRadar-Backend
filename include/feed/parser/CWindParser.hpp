@@ -26,7 +26,6 @@
 
 namespace vfrb::feed::parser
 {
-/// A parser for NMEA wind sentences
 class CWindParser : public IParser<object::CWind>
 {
 public:
