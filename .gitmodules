@@ -8,6 +8,7 @@
 	path = vendor/boost
 	url = https://github.com/boostorg/boost.git
 	branch = master
+    depth = 1
 [submodule "vendor/asio"]
 	path = vendor/asio
 	url = https://github.com/chriskohlhoff/asio.git

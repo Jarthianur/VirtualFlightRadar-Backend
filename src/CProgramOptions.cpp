@@ -37,6 +37,13 @@ CMissingArgumentError::Message() const noexcept -> str {
     return m_msg.c_str();
 }
 
+CUnknownOptionError::CUnknownOptionError(String const& arg_) : m_msg("Unknown option " + arg_) {}
+
+auto
+CUnknownOptionError::Message() const noexcept -> str {
+    return m_msg.c_str();
+}
+
 auto
 CMissingOptionError::Message() const noexcept -> str {
     return "Required option missing";
@@ -50,14 +57,15 @@ COptsCalledForHelp::Message() const noexcept -> str {
 
 void
 CProgramOptions::Parse(usize argc_, str* argv_) {
+    m_opts.clear();
     auto const args{tokenizeArgs(argc_, argv_)};
     m_progname = argv_[0];
     for (auto i{1UL}; i < args.size(); ++i) {
-        evalArg(args[i], [&](String const& arg_) -> String const& {
+        evalArg(args[i], [&]() -> String const& {
             try {
                 return args.at(++i);
             } catch ([[maybe_unused]] std::out_of_range const&) {
-                throw error::CMissingArgumentError(arg_);
+                throw error::CMissingArgumentError(args[i - 1]);
             }
         });
     }

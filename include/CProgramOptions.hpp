@@ -55,6 +55,17 @@ public:
     [[nodiscard]] auto
     Message() const noexcept -> str override;
 };
+
+class CUnknownOptionError : public IError
+{
+    String const m_msg;
+
+public:
+    explicit CUnknownOptionError(String const& arg_);
+
+    [[nodiscard]] auto
+    Message() const noexcept -> str override;
+};
 }  // namespace error
 
 class CProgramOptions
@@ -98,12 +109,13 @@ private:
     evalArg(String const& arg_, Fn&& getvalFn_) {
         try {
             SOption{"--help", "-h"}(arg_, [&] { printHelp(); });
-            SOption{"--config", "-c"}(arg_, [&] { m_opts.emplace(OPT_KEY_CONF, getvalFn_(arg_)); });
+            SOption{"--config", "-c"}(arg_, [&] { m_opts.emplace(OPT_KEY_CONF, getvalFn_()); });
             SOption{"--ground", "-g"}(arg_, [&] { m_opts.emplace(OPT_KEY_GNDM, "true"); });
-            SOption{"--log-file", "-l"}(arg_, [&] { m_opts.emplace(OPT_KEY_LOGF, getvalFn_(arg_)); });
+            SOption{"--log-file", "-l"}(arg_, [&] { m_opts.emplace(OPT_KEY_LOGF, getvalFn_()); });
         } catch ([[maybe_unused]] SMatched) {
             return;
         }
+        throw error::CUnknownOptionError(arg_);
     }
 
     void
@@ -112,7 +124,7 @@ private:
     static auto
     tokenizeArgs(usize argc_, str* argv_) -> Vector<String>;
 
-    HashMap<str, std::optional<String>> m_opts;
-    str                                 m_progname{nullptr};
+    HashMap<String, std::optional<String>> m_opts;
+    str                                    m_progname{nullptr};
 };
 }  // namespace vfrb

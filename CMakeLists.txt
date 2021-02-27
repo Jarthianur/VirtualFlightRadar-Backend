@@ -138,6 +138,11 @@ target_compile_options(client.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
 target_include_directories(client.test PUBLIC ${VFRB_INCLUDE_DIRS})
 target_link_libraries(client.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
 
+add_executable(generic.test ${PROJECT_SOURCE_DIR}/test/UnitTests.cpp ${PROJECT_SOURCE_DIR}/test/TestGeneric.cpp ${vfrb_sources_for_test})
+target_compile_options(generic.test PUBLIC -O0 -g -fopenmp -DLOG_ENABLE_DEBUG)
+target_include_directories(generic.test PUBLIC ${VFRB_INCLUDE_DIRS})
+target_link_libraries(generic.test PUBLIC ${VFRB_LINK_LIBS} ${VFRB_TEST_LINK_LIBS})
+
 #
 # target: profiling
 #
