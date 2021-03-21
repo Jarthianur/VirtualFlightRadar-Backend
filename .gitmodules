@@ -1,3 +1,14 @@
-[submodule "test/framework"]
-	path = test/framework
-	url = https://github.com/Jarthianur/simple-cpp-test-framework.git
+[submodule "vendor/fmt"]
+	path = vendor/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "vendor/TestPlusPlus"]
+	path = vendor/TestPlusPlus
+	url = https://github.com/Jarthianur/TestPlusPlus.git
+[submodule "vendor/boost"]
+	path = vendor/boost
+	url = https://github.com/boostorg/boost.git
+	branch = master
+    depth = 1
+[submodule "vendor/asio"]
+	path = vendor/asio
+	url = https://github.com/chriskohlhoff/asio.git

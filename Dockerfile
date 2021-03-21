@@ -1,19 +1,17 @@
-FROM alpine:3.8 AS build
+FROM debian:buster-slim AS build
 
 ENV VFRB_LINK_STATIC="yes" \
-    VFRB_BIN_TAG="dock"
+    VFRB_BIN_TAG="docker"
 
-RUN apk add --no-cache bash
-
-COPY . /tmp/vfrb/
-RUN echo -en "$VFRB_BIN_TAG" > /tmp/vfrb/version.txt
-WORKDIR /tmp/vfrb
+COPY . /vfrb/
+RUN echo -en "$VFRB_BIN_TAG" > /vfrb/version.txt
+WORKDIR /vfrb
 RUN ./run.sh build -y
-RUN mkdir /opt && \
-    mv build/vfrb-dock healthcheck.sh /opt/ && \
-    mv vfrb.ini.in /opt/vfrb.ini
+RUN mkdir -p /opt && \
+    mv build/vfrb-docker healthcheck.sh /opt/ && \
+    mv vfrb.conf.in /opt/vfrb.conf
 
-FROM alpine:3.8
+FROM debian:buster-slim
 
 LABEL maintainer="Jarthianur <jarthianur.github@gmail.com>" \
     app="VirtualFlightRadar-Backend" \
@@ -22,14 +20,23 @@ LABEL maintainer="Jarthianur <jarthianur.github@gmail.com>" \
 
 EXPOSE 4353
 
-RUN apk add --no-cache libstdc++ curl
+RUN apt update -qq && apt dist-upgrade -y -qq && \
+    apt install -y -qq \
+      curl && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /opt/* /opt/
+RUN useradd -s /bin/bash -m -d /opt/vfrb -U -c '' vfrb
+
+COPY --from=build /opt/* /opt/vfrb/
+
+RUN chown -R vfrb. /opt/vfrb
+
+USER vfrb
 
 HEALTHCHECK --interval=5m \
     --timeout=10s \
     --start-period=10s \
     --retries=1 \
-    CMD [ "/opt/healthcheck.sh" ]
+    CMD [ "/opt/vfrb/healthcheck.sh" ]
 
-ENTRYPOINT [ "/opt/vfrb-dock", "-c", "/opt/vfrb.ini" ]
+ENTRYPOINT [ "/opt/vfrb/vfrb-docker", "-c", "/opt/vfrb/vfrb.conf" ]

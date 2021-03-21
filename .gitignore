@@ -5,7 +5,10 @@
 !/test/
 !/src/
 !/include/
+!/profiling/
 !/docs/
+!/vendor/
+!/vendor/**
 !.github/**
 !/docs/_includes/**
 !/docs/assets/**
@@ -15,6 +18,7 @@
 !.gitignore
 !.gitmodules
 !.clang-format
+!.clang-tidy
 !Dockerfile
 !.dockerignore
 !*.sh

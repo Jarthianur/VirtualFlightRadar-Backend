@@ -2,7 +2,7 @@
 
 ## Note
 
-The configuration file must be a valid `.ini` file. Thus there are sections, key-value parameters and comments.
+The configuration file must be a valid `.conf` file. Thus there are sections, key-value parameters and comments.
 Comments start with `;`. Parameters are of kind `key = value`,
 where several spaces between the key, value and the equal-sign are allowed.
 The first non-whitespace character after the equal-sign determines the beginning of the value,
@@ -11,25 +11,26 @@ Sections start with `[section]`. Until the next section all following parameters
 
 ## What To Configure
 
-The *ini* file looks like this
->[general]
-feeds      = sbs1,gps  
-serverPort = 4353  
-gndMode    =  
-[fallback]  
-latitude  = 50.000000  
-longitude = 10.000000  
-altitude  = 100  
-geoid     = 48.0  
-pressure  = 1013.25  
-[filter]  
-maxHeight = -1  
-maxDist   = 40000  
-[sbs1]  
-host     = localhost  
-port     = 1234  
-priority = 0  
-...
+The _conf_ file looks like this
+
+> [general]
+> feeds = sbs1,gps  
+> serverPort = 4353  
+> gndMode =  
+> [fallback]  
+> latitude = 50.000000  
+> longitude = 10.000000  
+> altitude = 100  
+> geoid = 48.0  
+> pressure = 1013.25  
+> [filter]  
+> maxHeight = -1  
+> maxDist = 40000  
+> [sbs1]  
+> host = localhost  
+> port = 1234  
+> priority = 0  
+> ...
 
 All the parameters and sections should be self explanatory.
 
@@ -39,11 +40,11 @@ The `feeds` parameter is one of the most important, because here are the input f
 It is a comma-separated list, spaces are allowed. The feed type is determined by keywords in its name.
 Therefore the entries must contain one of the following keywords
 
-+ aprs
-+ sbs
-+ wind
-+ atm
-+ gps
+- aprs
+- sbs
+- wind
+- atm
+- gps
 
 To enable the [Ground-Mode](#ground-mode), just assign any value to `gndMode`, to disable leave it empty.
 `serverPort` defines the port where to serve the NMEA reports.
@@ -65,10 +66,10 @@ Every entry in the `feeds` list needs its own section, with exactly the same nam
 If a feed has not all required parameters defined, or the section can not be found or evaluated, that feed will not be run.
 The parameters for a feed section are
 
-+ host
-+ port
-+ priority
-+ login
+- host
+- port
+- priority
+- login
 
 Where `login` is only required for APRS feeds. `host` and `port` define the hostname /-address and port to connect to.
 `priority` defines the priority relative to all other feeds of the same type, therefor is only required if multiple feeds of same type exist.

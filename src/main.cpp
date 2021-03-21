@@ -1,125 +1,66 @@
 /*
- Copyright_License {
+    Copyright (C) 2016 Jarthianur
+    A detailed list of copyright holders can be found in the file "docs/AUTHORS.md".
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
- A detailed list of copyright holders can be found in the file "AUTHORS".
+    This file is part of VirtualFlightRadar-Backend.
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License version 3
- as published by the Free Software Foundation.
+    VirtualFlightRadar-Backend is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+    VirtualFlightRadar-Backend is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- }
- */
+    You should have received a copy of the GNU General Public License
+    along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <fstream>
-#include <iostream>
-#include <memory>
-#include <stdexcept>
 
-#include <boost/program_options.hpp>
+#include "config/CConfiguration.hpp"
 
-#include "config/Configuration.h"
-#include "util/Logger.hpp"
+#include "CLogger.hpp"
+#include "CProgramOptions.hpp"
+#include "CVfrb.hpp"
 
-#include "VFRB.h"
+using namespace vfrb;
+using namespace vfrb::config;
+using namespace std::literals;
 
-#ifndef VERSION
-#    define VERSION "DEMO"
-#endif
+static auto& logger = CLogger::Instance();
 
-using namespace config;
-using namespace boost;
-
-program_options::variables_map evalArgs(int argc, char** argv);
-
-std::shared_ptr<Configuration> get_config(const program_options::variables_map& variables);
-
-/**
- * @fn main
- * @brief The application start point.
- * @param argc The argument count
- * @param argv The arguments
- * @return 0 on success, else -1
- */
-int main(int argc, char** argv)
-{
-    try
-    {
-        VFRB vfrb(get_config(evalArgs(argc, argv)));
-        vfrb.run();
+auto
+getConfig(usize argc_, str* argv_) -> Shared<CConfiguration> {
+    CProgramOptions opts;
+    opts.Parse(argc_, argv_);
+    auto confFile = opts.RequireOpt(CProgramOptions::OPT_KEY_CONF);
+    auto logFile  = opts.GetOpt(CProgramOptions::OPT_KEY_LOGF);
+    auto gndMode  = opts.GetOpt(CProgramOptions::OPT_KEY_GNDM);
+    if (logFile) {
+        logger.LogFile(*logFile);
     }
-    catch (const std::exception& e)
-    {
-        logger.error("(VFRB) fatal: ", e.what());
+    std::ifstream confStream(*confFile);
+    auto          conf = AllocShared<CConfiguration>(confStream);
+    if (gndMode) {
+        conf->GroundMode = true;
+        logger.Info("(VFRB) Force ground mode");
+    }
+    return conf;
+}
+
+auto
+main(i32 argc_, str* argv_) -> i32 {
+    try {
+        CVfrb vfrb(getConfig(static_cast<usize>(argc_), argv_));
+        vfrb.Run();
+    } catch ([[maybe_unused]] vfrb::error::COptsCalledForHelp const&) {
         return 1;
-    }
-    catch (...)
-    {
+    } catch (vfrb::error::IError const& e) {
+        logger.Error("(VFRB) fatal: ", e.Message());
         return 1;
     }
     return 0;
-}
-
-program_options::variables_map evalArgs(int argc, char** argv)
-{
-    program_options::options_description cmdline_options("VirtualFlightRadar-Backend -- " VERSION);
-    cmdline_options.add_options()("help,h", "show this message");
-    cmdline_options.add_options()("verbose,v", "enable debug logging");
-    cmdline_options.add_options()(
-        "ground-mode,g",
-        "forcibly enable ground mode; GPS feeds will stop when a good position is received");
-    cmdline_options.add_options()("config,c", program_options::value<std::string>(), "config file");
-    cmdline_options.add_options()("output,o", program_options::value<std::string>(),
-                                  "specify where to log");
-    program_options::variables_map variables;
-    program_options::store(program_options::parse_command_line(argc, argv, cmdline_options),
-                           variables);
-    program_options::notify(variables);
-
-    if (argc < 3 || variables.count("help"))
-    {
-        std::cout << cmdline_options << std::endl;
-        throw 1;
-    }
-    return variables;
-}
-
-std::shared_ptr<Configuration> get_config(const program_options::variables_map& variables)
-{
-    if (variables.count("verbose"))
-    {
-        logger.set_debug();
-    }
-    if (variables.count("output"))
-    {
-        logger.set_logFile(variables["output"].as<std::string>());
-    }
-    logger.info("VirtualFlightRadar-Backend -- " VERSION);
-    if (variables.count("config"))
-    {
-        std::ifstream file(variables["config"].as<std::string>());
-        if (!file)
-        {
-            throw std::logic_error(variables["config"].as<std::string>() + " is not accessible");
-        }
-        auto conf = std::make_shared<Configuration>(file);
-        if (variables.count("ground-mode"))
-        {
-            conf->set_groundMode(true);
-            logger.info("(VFRB) Override ground mode: Yes");
-        }
-        return conf;
-    }
-    else
-    {
-        throw std::logic_error("No config file given.");
-    }
 }

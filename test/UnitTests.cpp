@@ -1,56 +1,24 @@
 /*
- Copyright_License {
+    Copyright (C) 2016 Jarthianur
+    A detailed list of copyright holders can be found in the file "docs/AUTHORS.md".
 
- Copyright (C) 2016 VirtualFlightRadar-Backend
- A detailed list of copyright holders can be found in the file "AUTHORS".
+    This file is part of VirtualFlightRadar-Backend.
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License version 3
- as published by the Free Software Foundation.
+    VirtualFlightRadar-Backend is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+    VirtualFlightRadar-Backend is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- }
- */
+    You should have received a copy of the GNU General Public License
+    along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
-#include "util/Logger.hpp"
+#include "Helper.hpp"
 
-#include "helper.hpp"
-
-using namespace sctf;
-
-TEST_FUNCTION(test_config)
-TEST_FUNCTION(test_data)
-TEST_FUNCTION(test_data_processor)
-TEST_FUNCTION(test_feed_parser)
-TEST_FUNCTION(test_object)
-TEST_FUNCTION(test_math)
-TEST_FUNCTION(test_client)
-TEST_FUNCTION(test_server)
-TEST_FUNCTION(test_feed)
-
-int main(int, char**)
-{
-    logger.set_logFile("/dev/null");
-    // auto rep = createXmlReporter();
-    auto                   rep = createPlainTextReporter(true);
-    test::TestSuitesRunner runner;
-
-    test_config(runner);
-    test_data(runner);
-    test_data_processor(runner);
-    test_feed_parser(runner);
-    test_object(runner);
-    test_math(runner);
-    test_feed(runner);
-    test_client(runner);
-    test_server(runner);
-
-    return rep->report(runner) > 0 ? 1 : 0;
-}
+TPP_EPSILON(0.000001)
+TPP_DEFAULT_MAIN
