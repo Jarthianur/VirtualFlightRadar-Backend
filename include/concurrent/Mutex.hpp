@@ -92,8 +92,8 @@ public:
 
 #else
 
-using Mutex     = std::mutex;
-using LockGuard = std::lock_guard<std::mutex>;
+using Mutex         = std::mutex;
+using ImmutableLock = std::lock_guard<std::mutex>;
 
 #endif
 
