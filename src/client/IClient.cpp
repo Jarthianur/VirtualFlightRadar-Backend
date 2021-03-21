@@ -32,8 +32,8 @@
 
 using vfrb::client::net::SEndpoint;
 using vfrb::client::net::IConnector;
-using vfrb::concurrent::LockGuard;
-using vfrb::concurrent::UniqueLock;
+using vfrb::concurrent::ImmutableLock;
+using vfrb::concurrent::MutableLock;
 
 static auto const& logger = vfrb::CLogger::Instance();
 
@@ -61,7 +61,7 @@ IClient::Hash() const -> usize {
 
 void
 IClient::Subscribe(Shared<feed::IFeed> feed_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     m_feeds.push_back(feed_);
     std::sort(m_feeds.begin(), m_feeds.end(),
               [](Shared<feed::IFeed> const& f1_, Shared<feed::IFeed> const& f2_) {
@@ -71,7 +71,7 @@ IClient::Subscribe(Shared<feed::IFeed> feed_) {
 
 void
 IClient::Run() NO_THREAD_SAFETY_ANALYSIS {
-    UniqueLock lk(m_mutex);
+    MutableLock lk(m_mutex);
     if (m_state == EState::NONE) {
         connect();
         lk.unlock();
@@ -113,7 +113,7 @@ IClient::stop() {
 void
 IClient::ScheduleStop() NO_THREAD_SAFETY_ANALYSIS {
     std::condition_variable_any cond_ready;
-    UniqueLock                  lk(m_mutex);
+    MutableLock                 lk(m_mutex);
     cond_ready.wait_for(lk, std::chrono::milliseconds(STOP_COND_WAIT_TIME),
                         [this]() NO_THREAD_SAFETY_ANALYSIS { return m_state != EState::NONE; });
     stop();
@@ -127,7 +127,7 @@ IClient::read() {
 void
 IClient::handleTimedConnect(Result<void> res_) {
     if (res_) {
-        LockGuard lk(m_mutex);
+        ImmutableLock lk(m_mutex);
         logger.Info(logPrefix(), "try connect to ", m_endpoint.Host, ":", m_endpoint.Port);
         connect();
     } else {
@@ -138,7 +138,7 @@ IClient::handleTimedConnect(Result<void> res_) {
 
 void
 IClient::handleRead(Result<String>&& res_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     if (m_state == EState::RUNNING) {
         if (res_) {
             for (auto& it : m_feeds) {

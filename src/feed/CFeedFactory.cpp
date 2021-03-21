@@ -53,31 +53,33 @@ CFeedFactory::CFeedFactory(Shared<config::CConfiguration> config_, Shared<CAircr
 template<>
 auto
 CFeedFactory::makeFeed<CAprscFeed>(String const& name_) -> Shared<CAprscFeed> {
-    return Share<CAprscFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData, m_config->MaxHeight);
+    return AllocShared<CAprscFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData,
+                                   m_config->MaxHeight);
 }
 
 template<>
 auto
 CFeedFactory::makeFeed<CGpsFeed>(String const& name_) -> Shared<CGpsFeed> {
-    return Share<CGpsFeed>(name_, m_config->FeedProperties.at(name_), m_gpsData);
+    return AllocShared<CGpsFeed>(name_, m_config->FeedProperties.at(name_), m_gpsData);
 }
 
 template<>
 auto
 CFeedFactory::makeFeed<CSbsFeed>(String const& name_) -> Shared<CSbsFeed> {
-    return Share<CSbsFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData, m_config->MaxHeight);
+    return AllocShared<CSbsFeed>(name_, m_config->FeedProperties.at(name_), m_aircraftData,
+                                 m_config->MaxHeight);
 }
 
 template<>
 auto
 CFeedFactory::makeFeed<CWindFeed>(String const& name_) -> Shared<CWindFeed> {
-    return Share<CWindFeed>(name_, m_config->FeedProperties.at(name_), m_windData);
+    return AllocShared<CWindFeed>(name_, m_config->FeedProperties.at(name_), m_windData);
 }
 
 template<>
 auto
 CFeedFactory::makeFeed<CAtmosphereFeed>(String const& name_) -> Shared<CAtmosphereFeed> {
-    return Share<CAtmosphereFeed>(name_, m_config->FeedProperties.at(name_), m_atmosData);
+    return AllocShared<CAtmosphereFeed>(name_, m_config->FeedProperties.at(name_), m_atmosData);
 }
 
 auto

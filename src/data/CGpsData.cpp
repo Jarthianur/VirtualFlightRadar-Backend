@@ -26,7 +26,7 @@
 
 using vfrb::object::CObject;
 using vfrb::object::CGpsPosition;
-using vfrb::concurrent::LockGuard;
+using vfrb::concurrent::ImmutableLock;
 using vfrb::str_util::StringInserter;
 
 namespace vfrb::data
@@ -35,7 +35,7 @@ CGpsData::CGpsData(CGpsPosition const& pos_, bool gnd_) : m_position(pos_), m_gr
 
 void
 CGpsData::CollectInto(StringInserter si_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     try {
         m_processor.Process(m_position, si_);
         ++m_position;
@@ -45,7 +45,7 @@ CGpsData::CollectInto(StringInserter si_) {
 
 auto
 CGpsData::Update(CObject&& pos_) -> bool {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     if (m_positionLocked) {
         throw error::CPositionAlreadyLocked();
     }
@@ -61,7 +61,7 @@ CGpsData::Update(CObject&& pos_) -> bool {
 
 auto
 CGpsData::Location() const -> decltype(m_position.Location()) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     return m_position.Location();
 }
 

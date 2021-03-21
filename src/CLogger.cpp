@@ -29,7 +29,7 @@ namespace vfrb
 {
 void
 CLogger::LogFile(String const& file_) {
-    concurrent::LockGuard lk(m_mutex);
+    concurrent::ImmutableLock lk(m_mutex);
     m_logFile = std::ofstream(file_);
     if (!m_logFile) {
         throw error::COpenLogfileError();

@@ -43,7 +43,7 @@ getConfig(usize argc_, str* argv_) -> Shared<CConfiguration> {
         logger.LogFile(*logFile);
     }
     std::ifstream confStream(*confFile);
-    auto          conf = Share<CConfiguration>(confStream);
+    auto          conf = AllocShared<CConfiguration>(confStream);
     if (gndMode) {
         conf->GroundMode = true;
         logger.Info("(VFRB) Force ground mode");

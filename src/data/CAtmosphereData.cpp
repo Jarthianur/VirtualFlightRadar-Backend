@@ -26,7 +26,7 @@
 
 using vfrb::object::CAtmosphere;
 using vfrb::object::CObject;
-using vfrb::concurrent::LockGuard;
+using vfrb::concurrent::ImmutableLock;
 using vfrb::str_util::StringInserter;
 
 namespace vfrb::data
@@ -35,20 +35,20 @@ CAtmosphereData::CAtmosphereData(CAtmosphere&& atm_) : m_atmosphere(std::move(at
 
 void
 CAtmosphereData::CollectInto(StringInserter si_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     ++m_atmosphere;
     si_.Copy(m_atmosphere.Nmea());
 }
 
 auto
 CAtmosphereData::Update(CObject&& atm_) -> bool {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     return m_atmosphere.TryUpdate(std::move(atm_));
 }
 
 auto
 CAtmosphereData::Pressure() const -> decltype(m_atmosphere.Pressure()) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     return m_atmosphere.Pressure();
 }
 

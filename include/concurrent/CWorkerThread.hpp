@@ -60,7 +60,7 @@ template<typename DataT>
 template<typename FnT>
 CWorkerThread<DataT>::CWorkerThread(FnT&& fn_)
     : m_running(false), m_worker([this, fn = std::forward<FnT>(fn_)]() EXCLUDES(m_mutex) {
-          UniqueLock lk(m_mutex);
+          MutableLock lk(m_mutex);
           m_running = true;
           while (m_running) {
               m_cv.wait_for(lk, std::chrono::milliseconds(POLL_TIME));
@@ -79,7 +79,7 @@ CWorkerThread<DataT>::CWorkerThread(FnT&& fn_)
 
 template<typename DataT>
 CWorkerThread<DataT>::~CWorkerThread() noexcept {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     while (!m_workQ.empty()) {
         m_workQ.pop();
     }
@@ -90,7 +90,7 @@ CWorkerThread<DataT>::~CWorkerThread() noexcept {
 template<typename DataT>
 void
 CWorkerThread<DataT>::Push(DataT&& data_) REQUIRES(!m_mutex) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     m_workQ.push(std::move(data_));
     m_cv.notify_one();
 }

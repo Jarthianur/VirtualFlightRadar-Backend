@@ -33,8 +33,8 @@
 
 using vfrb::client::net::SEndpoint;
 using vfrb::client::net::IConnector;
-using vfrb::concurrent::LockGuard;
-using vfrb::concurrent::UniqueLock;
+using vfrb::concurrent::ImmutableLock;
+using vfrb::concurrent::MutableLock;
 using vfrb::concurrent::Mutex;
 
 namespace vfrb::client
@@ -51,7 +51,7 @@ CGpsdClient::CGpsdClient(SEndpoint const& ep_, Shared<IConnector> con_) : IClien
 
 void
 CGpsdClient::handleConnect(Result<void> res_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (res_) {
             m_connector->OnWrite("?WATCH={\"enable\":true,\"nmea\":true}\r\n",
@@ -67,7 +67,7 @@ void
 CGpsdClient::stop() {
     if (m_state == EState::RUNNING) {
         Mutex                       sync;
-        UniqueLock                  lk(sync);
+        MutableLock                 lk(sync);
         std::condition_variable_any cv;
         bool                        sent = false;
         m_connector->OnWrite("?WATCH={\"enable\":false}\r\n", [&sent, &cv]([[maybe_unused]] Result<void>) {
@@ -82,7 +82,7 @@ CGpsdClient::stop() {
 
 void
 CGpsdClient::handleWatch(Result<void> res_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (res_) {
             m_state = EState::RUNNING;

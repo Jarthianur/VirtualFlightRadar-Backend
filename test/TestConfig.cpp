@@ -43,7 +43,7 @@ DESCRIBE("test_CProperties") {
         std::stringstream           iss;
         iss << "[main]\nkey=value\n";
         boost::property_tree::read_ini(iss, tree);
-        uut = Share<CProperties>(std::move(tree));
+        uut = AllocShared<CProperties>(std::move(tree));
     }
 
     // Property
@@ -160,7 +160,7 @@ DESCRIBE_PAR("test_CConfiguration") {
                 << CConfiguration::KV_KEY_PORT << "=3334\n"
                 << CConfiguration::KV_KEY_PRIORITY << "=1\n";
 
-        uut = Share<CConfiguration>(conf_in);
+        uut = AllocShared<CConfiguration>(conf_in);
     }
 
     IT("should hold correct values for general") {

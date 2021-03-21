@@ -108,8 +108,8 @@ using Shared = std::shared_ptr<T>;
 template<typename T>
 using Owned = std::unique_ptr<T>;
 
-FUNCTION_ALIAS(Share, std::make_shared)
-FUNCTION_ALIAS(Own, std::make_unique)
+FUNCTION_ALIAS(AllocShared, std::make_shared)
+FUNCTION_ALIAS(AllocOwned, std::make_unique)
 
 template<typename T>
 constexpr auto

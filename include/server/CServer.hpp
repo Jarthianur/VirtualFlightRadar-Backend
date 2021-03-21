@@ -71,7 +71,8 @@ public:
 };
 
 template<typename SocketT>
-CServer<SocketT>::CServer(u16 port_, usize maxCon_) : CServer(Share<net::CAcceptorAsio>(port_), maxCon_) {}
+CServer<SocketT>::CServer(u16 port_, usize maxCon_)
+    : CServer(AllocShared<net::CAcceptorAsio>(port_), maxCon_) {}
 
 template<typename SocketT>
 CServer<SocketT>::CServer(Shared<net::IAcceptor<SocketT>> acceptor_, usize maxCon_)
@@ -87,7 +88,7 @@ CServer<SocketT>::~CServer() noexcept {
 template<typename SocketT>
 void
 CServer<SocketT>::Run() REQUIRES(!m_mutex) {
-    concurrent::LockGuard lk(m_mutex);
+    concurrent::ImmutableLock lk(m_mutex);
     CLogger::Instance().Info(LOG_PREFIX, "starting...");
     m_running = true;
     m_thread.Spawn([this]() {
@@ -100,7 +101,7 @@ CServer<SocketT>::Run() REQUIRES(!m_mutex) {
 template<typename SocketT>
 void
 CServer<SocketT>::Stop() REQUIRES(!m_mutex) {
-    concurrent::LockGuard lk(m_mutex);
+    concurrent::ImmutableLock lk(m_mutex);
     if (m_running) {
         m_running = false;
         CLogger::Instance().Info(LOG_PREFIX, "stopping all connections...");
@@ -112,7 +113,7 @@ CServer<SocketT>::Stop() REQUIRES(!m_mutex) {
 template<typename SocketT>
 void
 CServer<SocketT>::Send(String const& str_) REQUIRES(!m_mutex) {
-    concurrent::LockGuard lk(m_mutex);
+    concurrent::ImmutableLock lk(m_mutex);
     if (str_.empty() || m_connections.empty()) {
         return;
     }
@@ -129,7 +130,7 @@ CServer<SocketT>::Send(String const& str_) REQUIRES(!m_mutex) {
 template<typename SocketT>
 void
 CServer<SocketT>::accept() REQUIRES(!m_mutex) {
-    concurrent::LockGuard lk(m_mutex);
+    concurrent::ImmutableLock lk(m_mutex);
     m_acceptor->OnAccept([this](Result<void>&& res_) { handleStagedConnection(res_); });
 }
 
@@ -144,7 +145,7 @@ template<typename SocketT>
 void
 CServer<SocketT>::handleStagedConnection(Result<void> res_) noexcept REQUIRES(!m_mutex) {
     if (res_) {
-        concurrent::LockGuard lk(m_mutex);
+        concurrent::ImmutableLock lk(m_mutex);
         try {
             if (m_connections.size() < m_maxConnections && !isConnected(m_acceptor->StagedAddress())) {
                 m_connections.push_back(m_acceptor->StartConnection());

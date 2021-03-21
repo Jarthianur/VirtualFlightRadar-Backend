@@ -56,10 +56,10 @@ CTCONST LOG_PREFIX       = "(VFRB) ";
 static auto const& logger = CLogger::Instance();
 
 CVfrb::CVfrb(Shared<CConfiguration> conf_)
-    : m_aircraftData(Share<CAircraftData>(conf_->MaxDistance)),
-      m_atmosphereData(Share<CAtmosphereData>(object::CAtmosphere{0, conf_->AtmPressure, ""})),
-      m_gpsData(Share<CGpsData>(conf_->GpsPosition, conf_->GroundMode)),
-      m_windData(Share<CWindData>()),
+    : m_aircraftData(AllocShared<CAircraftData>(conf_->MaxDistance)),
+      m_atmosphereData(AllocShared<CAtmosphereData>(object::CAtmosphere{0, conf_->AtmPressure, ""})),
+      m_gpsData(AllocShared<CGpsData>(conf_->GpsPosition, conf_->GroundMode)),
+      m_windData(AllocShared<CWindData>()),
       m_server(std::get<0>(conf_->ServerConfig), std::get<1>(conf_->ServerConfig)),
       m_running(false) {
     createFeeds(conf_);
@@ -127,6 +127,8 @@ CVfrb::serve() {
                 std::chrono::steady_clock::now() - before);
             if (diff.count() < PROCESS_INTERVAL) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_INTERVAL) - diff);
+            } else {
+                logger.Warn(LOG_PREFIX, "Could not keep up, processing takes longer than 1 second");
             }
         } catch (error::IError const& e) {
             logger.Error(LOG_PREFIX, "fatal: ", e.Message());

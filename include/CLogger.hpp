@@ -69,7 +69,7 @@ public:
 template<typename... Args>
 void
 CLogger::Info(Args&&... args_) const REQUIRES(!m_mutex) {
-    concurrent::LockGuard lk(m_mutex);
+    concurrent::ImmutableLock lk(m_mutex);
     *m_outStream << "[INFO ]  " << time() << ":: ";
     (*m_outStream << ... << args_) << std::endl;
 }
@@ -78,7 +78,7 @@ template<typename... Args>
 void
 CLogger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex) {
 #ifdef LOG_ENABLE_DEBUG
-    concurrent::LockGuard lk(m_mutex);
+    concurrent::ImmutableLock lk(m_mutex);
     *m_outStream << "[DEBUG]  " << time() << ":: ";
     (*m_outStream << ... << args_) << std::endl;
 #endif
@@ -87,7 +87,7 @@ CLogger::Debug([[maybe_unused]] Args&&... args_) const REQUIRES(!m_mutex) {
 template<typename... Args>
 void
 CLogger::Warn(Args&&... args_) const REQUIRES(!m_mutex) {
-    concurrent::LockGuard lk(m_mutex);
+    concurrent::ImmutableLock lk(m_mutex);
     *m_outStream << "[WARN ]  " << time() << ":: ";
     (*m_outStream << ... << args_) << std::endl;
 }
@@ -95,7 +95,7 @@ CLogger::Warn(Args&&... args_) const REQUIRES(!m_mutex) {
 template<typename... Args>
 void
 CLogger::Error(Args&&... args_) const REQUIRES(!m_mutex) {
-    concurrent::LockGuard lk(m_mutex);
+    concurrent::ImmutableLock lk(m_mutex);
     *m_errStream << "[ERROR]  " << time() << ":: ";
     (*m_errStream << ... << args_) << std::endl;
 }

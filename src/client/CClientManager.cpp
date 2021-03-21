@@ -25,7 +25,7 @@
 #include "feed/IFeed.hpp"
 #include "util/StringUtils.hpp"
 
-using vfrb::concurrent::LockGuard;
+using vfrb::concurrent::ImmutableLock;
 
 namespace vfrb::client
 {
@@ -35,9 +35,9 @@ CClientManager::~CClientManager() noexcept {
 
 void
 CClientManager::Subscribe(Shared<feed::IFeed> feed_) {
-    LockGuard lk(m_mutex);
-    auto      it = m_clients.end();
-    it           = m_clients.insert(CClientFactory::CreateClientFor(feed_)).first;
+    ImmutableLock lk(m_mutex);
+    auto          it = m_clients.end();
+    it               = m_clients.insert(CClientFactory::CreateClientFor(feed_)).first;
     if (it != m_clients.end()) {
         (*it)->Subscribe(feed_);
     } else {
@@ -47,11 +47,11 @@ CClientManager::Subscribe(Shared<feed::IFeed> feed_) {
 
 void
 CClientManager::Run() {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     for (auto it : m_clients) {
         m_thdGroup.CreateThread([this, it] {
             it->Run();
-            LockGuard lk(m_mutex);
+            ImmutableLock lk(m_mutex);
             m_clients.erase(it);
         });
     }
@@ -59,7 +59,7 @@ CClientManager::Run() {
 
 void
 CClientManager::Stop() {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     for (auto it : m_clients) {
         it->ScheduleStop();
     }

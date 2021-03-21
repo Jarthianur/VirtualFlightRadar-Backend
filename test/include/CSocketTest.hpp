@@ -41,8 +41,10 @@ public:
 
     [[nodiscard]] auto
     Address() const -> String;
+
     auto
     Write(StringView const& msg_) -> bool;
+
     void
     Close();
 };

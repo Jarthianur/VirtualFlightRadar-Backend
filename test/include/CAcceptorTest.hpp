@@ -47,25 +47,34 @@ public:
 
     void
     Run() override;
+
     void
-    Stop() override;
+    Stop() override REQUIRES(!m_mutex);
+
     void
     OnAccept(Callback cb_) override;
+
     void
     Close() override;
+
     auto
     StartConnection() -> CConnection<CSocketTest> override;
+
     [[nodiscard]] auto
     StagedAddress() const -> String override;
 
     auto
     Connect(String const& addr_, bool failAccept_, bool failWrite_) -> usize;
+
     [[nodiscard]] auto
     Socket(usize i_) const -> CSocketTest const&;
+
     [[nodiscard]] auto
     Buffer(usize i_) const -> String const&;
+
     [[nodiscard]] auto
     Sockets() const -> usize;
+
     void
     FailOnConnect(bool fail_);
 };

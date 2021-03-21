@@ -75,7 +75,7 @@ template<typename ObjectT>
 class CObjectContainer<ObjectT>::CIterator
 {
     typename ContainerType::iterator m_iterator;
-    UniqueLock                       m_valueLock;
+    MutableLock                      m_valueLock;
     CObjectContainer const&          m_container;
 
 public:
@@ -131,7 +131,7 @@ CObjectContainer<ObjectT>::CIterator::CIterator(typename ContainerType::iterator
                                                 CObjectContainer const&          c_)
     : m_iterator(iter_), m_container(c_) {
     if (m_iterator != m_container.m_container.end()) {
-        m_valueLock = UniqueLock(m_iterator->second.m_mutex);
+        m_valueLock = MutableLock(m_iterator->second.m_mutex);
     }
 }
 
@@ -148,9 +148,9 @@ auto
 CObjectContainer<ObjectT>::CIterator::operator++() -> CIterator& {
     if (m_iterator != m_container.m_container.end()) {
         m_valueLock.unlock();
-        LockGuard lk(m_container.m_modMutex);
+        ImmutableLock lk(m_container.m_modMutex);
         if (++m_iterator != m_container.m_container.end()) {
-            m_valueLock = UniqueLock(m_iterator->second.m_mutex);
+            m_valueLock = MutableLock(m_iterator->second.m_mutex);
         }
     }
     return *this;
@@ -189,7 +189,7 @@ CObjectContainer<ObjectT>::CIterator::operator!=(CIterator const& other_) const 
 template<typename ObjectT>
 typename CObjectContainer<ObjectT>::CIterator
 CObjectContainer<ObjectT>::Begin() REQUIRES(!m_modMutex) {
-    LockGuard lk(m_modMutex);
+    ImmutableLock lk(m_modMutex);
     return CIterator(m_container.begin(), *this);
 }
 
@@ -202,8 +202,8 @@ CObjectContainer<ObjectT>::End() -> CIterator {
 template<typename ObjectT>
 Pair<typename CObjectContainer<ObjectT>::CIterator, bool>
 CObjectContainer<ObjectT>::Insert(KeyType key_, ObjectT&& value_) REQUIRES(!m_modMutex) {
-    LockGuard lk(m_modMutex);
-    CIterator iter(m_container.find(key_), *this);
+    ImmutableLock lk(m_modMutex);
+    CIterator     iter(m_container.find(key_), *this);
     if (iter == End()) {
         return {CIterator(m_container.emplace(key_, CValueType(std::move(value_))).first, *this), true};
     }
@@ -213,8 +213,8 @@ CObjectContainer<ObjectT>::Insert(KeyType key_, ObjectT&& value_) REQUIRES(!m_mo
 template<typename ObjectT>
 void
 CObjectContainer<ObjectT>::Erase(KeyType key_) REQUIRES(!m_modMutex) {
-    LockGuard lk(m_modMutex);
-    auto      entry = m_container.find(key_);
+    ImmutableLock lk(m_modMutex);
+    auto          entry = m_container.find(key_);
     if (entry != m_container.end()) {
         CIterator iter(std::move(entry), *this);
         m_container.erase(key_);
@@ -224,7 +224,7 @@ CObjectContainer<ObjectT>::Erase(KeyType key_) REQUIRES(!m_modMutex) {
 template<typename ObjectT>
 usize
 CObjectContainer<ObjectT>::Size() const REQUIRES(!m_modMutex) {
-    LockGuard lk(m_modMutex);
+    ImmutableLock lk(m_modMutex);
     return m_container.size();
 }
 }  // namespace vfrb::concurrent

@@ -28,7 +28,7 @@
 
 using vfrb::client::net::SEndpoint;
 using vfrb::client::net::IConnector;
-using vfrb::concurrent::LockGuard;
+using vfrb::concurrent::ImmutableLock;
 
 namespace vfrb::client
 {
@@ -39,7 +39,7 @@ CSbsClient::CSbsClient(SEndpoint const& ep_, Shared<IConnector> con_) : IClient(
 
 void
 CSbsClient::handleConnect(Result<void> res_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (res_) {
             m_state = EState::RUNNING;

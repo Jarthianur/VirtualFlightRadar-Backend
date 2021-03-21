@@ -20,15 +20,14 @@
 
 #pragma once
 
-#include <cstdint>
 #include <iostream>
-#include <string>
 #include <tpp.hpp>
 
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include "object/CAircraft.hpp"
 
-#define SYSO(M) std::cout << M << std::flush
+#define PRINT(M) std::cout << M << std::flush
+#define PRINTLN(M) std::cout << M << std::endl
 
 using tpp::operator""_re;
 using tpp::operator""_re_i;

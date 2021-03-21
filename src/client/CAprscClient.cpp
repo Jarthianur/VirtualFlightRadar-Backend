@@ -29,7 +29,7 @@
 
 using vfrb::client::net::SEndpoint;
 using vfrb::client::net::IConnector;
-using vfrb::concurrent::LockGuard;
+using vfrb::concurrent::ImmutableLock;
 
 namespace vfrb::client
 {
@@ -58,7 +58,7 @@ CAprscClient::Hash() const -> usize {
 
 void
 CAprscClient::handleConnect(Result<void> res_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (res_) {
             m_connector->OnWrite(m_login, [this](Result<void> res_) { handleLogin(res_); });
@@ -76,7 +76,7 @@ CAprscClient::sendKeepAlive() {
 
 void
 CAprscClient::handleLogin(Result<void> res_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     if (m_state == EState::CONNECTING) {
         if (res_) {
             m_state = EState::RUNNING;
@@ -93,11 +93,11 @@ CAprscClient::handleLogin(Result<void> res_) {
 
 void
 CAprscClient::handleSendKeepAlive(Result<void> res_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     if (m_state == EState::RUNNING) {
         if (res_) {
             m_connector->OnWrite("#keep-alive beacon\r\n", [this](Result<void> res_) {
-                LockGuard lk(m_mutex);
+                ImmutableLock lk(m_mutex);
                 if (m_state == EState::RUNNING) {
                     if (!res_) {
                         logger.Error(LOG_PREFIX, "send keep-alive beacon failed");

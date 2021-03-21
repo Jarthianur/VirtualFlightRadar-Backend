@@ -41,7 +41,7 @@ DESCRIBE("test_CAircraftData") {
     i32 const             M1000 = math::DoubleToInt(math::FEET_2_M * 3281);
 
     BEFORE_EACH() {
-        uut = Share<CAircraftData>();
+        uut = AllocShared<CAircraftData>();
         uut->Environment({49., 8., 0}, 1013.25);
     }
 
@@ -112,7 +112,7 @@ DESCRIBE("test_CGpsData") {
     String           nmea;
 
     BEFORE_EACH() {
-        uut = Share<CGpsData>(
+        uut = AllocShared<CGpsData>(
 
             CGpsPosition{0, {0., 0., 0}, 0.}, true);
     }
@@ -153,7 +153,7 @@ DESCRIBE("test_CWindData") {
     String            nmea;
 
     BEFORE_EACH() {
-        uut = Share<CWindData>();
+        uut = AllocShared<CWindData>();
     }
 
     AFTER_EACH() {
@@ -183,7 +183,8 @@ DESCRIBE("test_CAtmosphereData") {
     String                  nmea;
 
     BEFORE_EACH() {
-        uut = Share<CAtmosphereData>(CAtmosphere{0, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E"});
+        uut =
+            AllocShared<CAtmosphereData>(CAtmosphere{0, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E"});
     }
 
     AFTER_EACH() {

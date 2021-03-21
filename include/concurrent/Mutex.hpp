@@ -78,16 +78,16 @@ public:
     }
 };
 
-class SCOPED_CAPABILITY LockGuard
+class SCOPED_CAPABILITY ImmutableLock
 {
-    NOT_COPYABLE(LockGuard)
-    NOT_MOVABLE(LockGuard)
+    NOT_COPYABLE(ImmutableLock)
+    NOT_MOVABLE(ImmutableLock)
 
     std::lock_guard<Mutex> m_lock;
 
 public:
-    explicit LockGuard(Mutex& mu_) ACQUIRE(mu_) : m_lock(mu_) {}
-    ~LockGuard() noexcept RELEASE() = default;
+    explicit ImmutableLock(Mutex& mu_) ACQUIRE(mu_) : m_lock(mu_) {}
+    ~ImmutableLock() noexcept RELEASE() = default;
 };
 
 #else
@@ -97,5 +97,5 @@ using LockGuard = std::lock_guard<std::mutex>;
 
 #endif
 
-using UniqueLock = std::unique_lock<Mutex>;
+using MutableLock = std::unique_lock<Mutex>;
 }  // namespace vfrb::concurrent

@@ -27,8 +27,8 @@
 
 #include "CSocketTest.hpp"
 
-using vfrb::concurrent::UniqueLock;
-using vfrb::concurrent::LockGuard;
+using vfrb::concurrent::MutableLock;
+using vfrb::concurrent::ImmutableLock;
 
 namespace vfrb::server::net
 {
@@ -36,7 +36,7 @@ CAcceptorTest::CAcceptorTest() : m_sockets() {}
 
 void
 CAcceptorTest::Run() {
-    UniqueLock lk(m_mutex);
+    MutableLock lk(m_mutex);
     m_running = true;
     while (m_running) {
         lk.unlock();
@@ -47,7 +47,7 @@ CAcceptorTest::Run() {
 
 void
 CAcceptorTest::Stop() {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     m_running = false;
     m_sockets.clear();
     m_stagedAddress.clear();
@@ -79,7 +79,7 @@ CAcceptorTest::StagedAddress() const -> String {
 auto
 CAcceptorTest::Connect(String const& addr_, bool failAccept_, bool failWrite_) -> usize {
     {
-        UniqueLock lk(m_mutex);
+        MutableLock lk(m_mutex);
         while (!m_running) {
             lk.unlock();
             std::this_thread::yield();
@@ -87,7 +87,7 @@ CAcceptorTest::Connect(String const& addr_, bool failAccept_, bool failWrite_) -
         }
     }
     m_stagedAddress = addr_;
-    auto buf        = Share<String>("");
+    auto buf        = AllocShared<String>("");
     m_sockets.emplace_back(CSocketTest(addr_, buf, failWrite_), buf);
     m_onAcceptFn(failAccept_ ? Err() : Ok());  // false => no error
     return m_sockets.size() - 1;

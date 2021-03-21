@@ -26,7 +26,7 @@
 
 using vfrb::object::CObject;
 using vfrb::object::CWind;
-using vfrb::concurrent::LockGuard;
+using vfrb::concurrent::ImmutableLock;
 using vfrb::str_util::StringInserter;
 
 namespace vfrb::data
@@ -35,13 +35,13 @@ CWindData::CWindData(object::CWind&& wind_) : m_wind(std::move(wind_)) {}
 
 auto
 CWindData::Update(CObject&& wind_) -> bool {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     return m_wind.TryUpdate(std::move(wind_));
 }
 
 void
 CWindData::CollectInto(StringInserter si_) {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     ++m_wind;
     si_.Copy(m_wind.Nmea());
     m_wind.Clear();
@@ -49,7 +49,7 @@ CWindData::CollectInto(StringInserter si_) {
 
 auto
 CWindData::Size() const -> usize {
-    LockGuard lk(m_mutex);
+    ImmutableLock lk(m_mutex);
     return m_wind.Nmea().empty() ? 0 : 1;
 }
 }  // namespace vfrb::data

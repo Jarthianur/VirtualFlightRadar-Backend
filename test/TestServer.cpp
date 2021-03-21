@@ -35,8 +35,8 @@ DESCRIBE("test_CServer") {
     Shared<CServer<net::CSocketTest>> uut;
 
     SETUP() {
-        acceptor = Share<net::CAcceptorTest>();
-        uut      = Share<CServer<net::CSocketTest>>(acceptor, 2);
+        acceptor = AllocShared<net::CAcceptorTest>();
+        uut      = AllocShared<CServer<net::CSocketTest>>(acceptor, 2);
     }
 
     BEFORE_EACH() {

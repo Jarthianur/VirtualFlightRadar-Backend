@@ -37,26 +37,26 @@ namespace vfrb::client
 template<>
 auto
 CClientFactory::makeClient<CAprscClient>(Shared<IFeed> feed_) -> Shared<CAprscClient> {
-    return Share<CAprscClient>(feed_->Endpoint(), std::static_pointer_cast<CAprscFeed>(feed_)->Login(),
-                               Share<CConnectorAsio>());
+    return AllocShared<CAprscClient>(feed_->Endpoint(), std::static_pointer_cast<CAprscFeed>(feed_)->Login(),
+                                     AllocShared<CConnectorAsio>());
 }
 
 template<>
 auto
 CClientFactory::makeClient<CSbsClient>(Shared<IFeed> feed_) -> Shared<CSbsClient> {
-    return Share<CSbsClient>(feed_->Endpoint(), Share<CConnectorAsio>());
+    return AllocShared<CSbsClient>(feed_->Endpoint(), AllocShared<CConnectorAsio>());
 }
 
 template<>
 auto
 CClientFactory::makeClient<CSensorClient>(Shared<IFeed> feed_) -> Shared<CSensorClient> {
-    return Share<CSensorClient>(feed_->Endpoint(), Share<CConnectorAsio>());
+    return AllocShared<CSensorClient>(feed_->Endpoint(), AllocShared<CConnectorAsio>());
 }
 
 template<>
 auto
 CClientFactory::makeClient<CGpsdClient>(Shared<IFeed> feed_) -> Shared<CGpsdClient> {
-    return Share<CGpsdClient>(feed_->Endpoint(), Share<CConnectorAsio>());
+    return AllocShared<CGpsdClient>(feed_->Endpoint(), AllocShared<CConnectorAsio>());
 }
 
 auto
