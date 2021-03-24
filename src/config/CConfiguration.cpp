@@ -83,7 +83,7 @@ CConfiguration::resolvePosition() const -> object::CGpsPosition {
     loc.Longitude = parse<f64>(m_properties.Property(PATH_LONGITUDE, "0.0"), PATH_LONGITUDE);
     loc.Altitude  = parse<i32>(m_properties.Property(PATH_ALTITUDE, "0"), PATH_ALTITUDE);
     f64 geoid     = parse<f64>(m_properties.Property(PATH_GEOID, "0.0"), PATH_GEOID);
-    return object::CGpsPosition(0, loc, geoid);
+    return object::CGpsPosition(0, loc, geoid, 1.0, 3, 5, object::CTimestamp());
 }
 
 auto

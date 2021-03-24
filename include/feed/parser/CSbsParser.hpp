@@ -26,20 +26,43 @@
 
 namespace vfrb::feed::parser
 {
-class CSbsParser : public IParser<object::CAircraft>
+struct SPositionUpdate
 {
-    CTCONST SBS_FIELD_ID   = 4;
-    CTCONST SBS_FIELD_TIME = 7;
-    CTCONST SBS_FIELD_ALT  = 11;
-    CTCONST SBS_FIELD_LAT  = 14;
-    CTCONST SBS_FIELD_LON  = 15;
+    object::SLocation  Location;
+    object::CTimestamp Timestamp;
+};
+
+struct SMovementUpdate
+{
+    object::CAircraft::SMovement Movement;
+    object::CTimestamp           Timestamp;
+};
+
+using SbsResult = Pair<object::CAircraft::IdString, Variant<SPositionUpdate, SMovementUpdate>>;
+
+class CSbsParser : public IParser<SbsResult>
+{
+    CTCONST SBS_FIELD_ID       = 4;
+    CTCONST SBS_FIELD_TIME     = 7;
+    CTCONST SBS_FIELD_ALT      = 11;
+    CTCONST SBS_FIELD_GNDSPD   = 12;
+    CTCONST SBS_FIELD_TRACK    = 13;
+    CTCONST SBS_FIELD_LAT      = 14;
+    CTCONST SBS_FIELD_LON      = 15;
+    CTCONST SBS_FIELD_VERTRATE = 16;
 
     i32 const m_maxHeight;
+
+    auto
+    parsePositionReport(String&& str_) const -> Pair<object::CAircraft::IdString, SPositionUpdate>;
+
+    auto
+    parseVelocityReport(String&& str_) const -> Pair<object::CAircraft::IdString, SMovementUpdate>;
 
 public:
     explicit CSbsParser(i32 maxHeight_);
 
     auto
-    Parse(String&& str_, u32 prio_) const -> object::CAircraft override;
+    Parse(String&& str_, [[maybe_unused]] u32) const -> SbsResult override;
 };
 }  // namespace vfrb::feed::parser

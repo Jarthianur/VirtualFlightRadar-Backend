@@ -46,9 +46,9 @@ CAprsParser::CAprsParser(i32 maxHeight_)
           "(\\d{5}\\.\\d{2})([EW])[\\S\\s]+?"       // lon, lon-dir
           "(?:(\\d{3})/(\\d{3}))?/A=(\\d{6})\\s+?"  // head, gnd-spd, alt
           "(?:[\\S\\s]+?)?"
-          "id([0-9A-F]{2})([0-9A-F]{6})\\s?"                // type, id
-          "(?:([\\+-]\\d{3})fpm\\s+?)?"                     // climb
-          "(?:([\\+-]\\d+?\\.\\d+?)rot)?(?:[\\S\\s]+?)?$",  // turn
+          "id([0-9A-F]{2})([0-9A-F]{6})\\s?"               // type, id
+          "(?:([\\+-]\\d{3})fpm\\s+?)"                     // climb
+          "(?:([\\+-]\\d+?\\.\\d+?)rot)(?:[\\S\\s]+?)?$",  // turn
           std::regex::optimize | std::regex::icase),
       m_maxHeight(maxHeight_) {}
 
@@ -60,23 +60,13 @@ CAprsParser::Parse(String&& str_, u32 prio_) const -> CAircraft {
     }
     try {
         auto [id, idT, aT] = parseComment(match);
-        auto mov           = parseMovement(match);
-        if (mov) {
-            return {prio_,
-                    id,
-                    idT,
-                    aT,
-                    CAircraft::ETargetType::FLARM,
-                    parseLocation(match, m_maxHeight),
-                    *mov,
-                    parseTimeStamp(match)};
-        }
         return {prio_,
                 id,
                 idT,
                 aT,
                 CAircraft::ETargetType::FLARM,
                 parseLocation(match, m_maxHeight),
+                parseMovement(match),
                 parseTimeStamp(match)};
     } catch ([[maybe_unused]] str_util::error::CConversionError const&) {
     } catch ([[maybe_unused]] object::error::CTimestampParseError const&) {
@@ -110,16 +100,12 @@ CAprsParser::parseComment(std::cmatch const& match_) -> CAprsParser::AircraftInf
 }
 
 auto
-CAprsParser::parseMovement(std::cmatch const& match_) -> Optional<CAircraft::SMovement> {
-    try {
-        return CAircraft::SMovement{
-            str_util::Parse<f64>(match_[RE_APRS_HEAD]),
-            str_util::Parse<f64>(match_[RE_APRS_GND_SPD]) * math::KTS_2_MS,
-            std::max(CLIMB_RATE_MIN,
-                     std::min(CLIMB_RATE_MAX, str_util::Parse<f64>(match_[RE_APRS_CR]) * math::FPM_2_MS))};
-    } catch ([[maybe_unused]] str_util::error::CConversionError const&) {
-        return None;
-    }
+CAprsParser::parseMovement(std::cmatch const& match_) -> CAircraft::SMovement {
+    return CAircraft::SMovement{
+        str_util::Parse<f64>(match_[RE_APRS_HEAD]),
+        str_util::Parse<f64>(match_[RE_APRS_GND_SPD]) * math::KTS_2_MS,
+        std::max(CLIMB_RATE_MIN,
+                 std::min(CLIMB_RATE_MAX, str_util::Parse<f64>(match_[RE_APRS_CR]) * math::FPM_2_MS))};
 }
 
 auto

@@ -34,6 +34,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include "util/ClassUtils.hpp"
@@ -77,6 +78,9 @@ template<typename T>
 using Optional = std::optional<T>;
 
 constexpr inline auto None = std::nullopt;
+
+template<typename... T>
+using Variant = std::variant<T...>;
 
 template<typename... T>
 using Vector = std::vector<T...>;

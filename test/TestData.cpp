@@ -51,7 +51,7 @@ DESCRIBE("test_CAircraftData") {
 
     IT("should report an aircraft on access") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
-                    CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, CTimestamp());
+                    CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, {.0, .0, .0}, CTimestamp());
         ASSERT_TRUE(uut->Update(std::move(a)));
         uut->CollectInto(StringInserter(&nmea));
         ASSERT_FALSE(nmea.empty());
@@ -61,7 +61,7 @@ DESCRIBE("test_CAircraftData") {
     IT("should not report an aircraft after outdate-interval, and set it as transponder target") {
         ASSERT_EQ(CObject::OUTDATED, CAircraftData::NO_FLARM_THRESHOLD);
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
-                    CAircraft::ETargetType::FLARM, {49., 8., M1000}, CTimestamp());
+                    CAircraft::ETargetType::FLARM, {49., 8., M1000}, {.0, .0, .0}, CTimestamp());
         ASSERT_TRUE(uut->Update(std::move(a)));
         for (auto i = 0U; i <= CAircraftData::NO_FLARM_THRESHOLD; ++i) {
             nmea.clear();
@@ -72,7 +72,7 @@ DESCRIBE("test_CAircraftData") {
     }
     IT("should delete an aircraft after certain interval") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
-                    CAircraft::ETargetType::FLARM, {49., 8., M1000}, CTimestamp());
+                    CAircraft::ETargetType::FLARM, {49., 8., M1000}, {.0, .0, .0}, CTimestamp());
         ASSERT_TRUE(uut->Update(std::move(a)));
         ASSERT_EQ(uut->Size(), 1U);
         for (auto i = 0; i < CAircraftData::DELETE_THRESHOLD; ++i) {
@@ -83,17 +83,19 @@ DESCRIBE("test_CAircraftData") {
     IT("should prefer FLARM, and accept TRANSPONDER again after certain interval") {
         {
             CAircraft a(1, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
-                        CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, CTimestamp("120000"));
+                        CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, {.0, .0, .0},
+                        CTimestamp("120000"));
             ASSERT_TRUE(uut->Update(std::move(a)));
         }
         {
             CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
-                        CAircraft::ETargetType::FLARM, {49., 8., M1000}, CTimestamp("120001"));
+                        CAircraft::ETargetType::FLARM, {49., 8., M1000}, {.0, .0, .0}, CTimestamp("120001"));
             ASSERT_TRUE(uut->Update(std::move(a)));
         }
         {
             CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
-                        CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, CTimestamp("120002"));
+                        CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, {.0, .0, .0},
+                        CTimestamp("120002"));
             ASSERT_FALSE(uut->Update(std::move(a)));
         }
         for (auto i = 0U; i < CAircraftData::NO_FLARM_THRESHOLD; ++i) {
@@ -101,7 +103,8 @@ DESCRIBE("test_CAircraftData") {
         }
         {
             CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
-                        CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, CTimestamp("120003"));
+                        CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, {.0, .0, .0},
+                        CTimestamp("120003"));
             ASSERT_TRUE(uut->Update(std::move(a)));
         }
     };
@@ -112,9 +115,7 @@ DESCRIBE("test_CGpsData") {
     String           nmea;
 
     BEFORE_EACH() {
-        uut = AllocShared<CGpsData>(
-
-            CGpsPosition{0, {0., 0., 0}, 0.}, true);
+        uut = AllocShared<CGpsData>(CGpsPosition{0, {0., 0., 0}, 0., 1., 3, 5, CTimestamp("115800")}, true);
     }
 
     AFTER_EACH() {

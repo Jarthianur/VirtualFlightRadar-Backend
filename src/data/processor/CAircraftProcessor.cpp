@@ -88,22 +88,17 @@ CAircraftProcessor::appendPflau(CAircraft const& aircraft_, StringInserter& nmea
 void
 CAircraftProcessor::appendPflaa(CAircraft const& aircraft_, StringInserter& nmea_) const {
     String::const_iterator begin;
-    if (aircraft_.HasFullInfo()) {
-        begin = nmea_.Format(
-            "$PFLAA,0,{:d},{:d},{:d},{:d},{:s},{:03d},,{:d},{:3.1f},{:1X}*", m_relNorth, m_relEast,
-            m_relVertical, AsUnderlyingType(aircraft_.IdType()), *aircraft_.Id(),
-            math::DoubleToInt(math::Saturate(aircraft_.Movement().Heading, CAircraft::SMovement::MIN_HEADING,
-                                             CAircraft::SMovement::MAX_HEADING)),
-            math::DoubleToInt(math::Saturate(aircraft_.Movement().GndSpeed * math::MS_2_KMH,
-                                             CAircraft::SMovement::MIN_GND_SPEED,
-                                             CAircraft::SMovement::MAX_GND_SPEED)),
-            math::Saturate(aircraft_.Movement().ClimbRate, CAircraft::SMovement::MIN_CLIMB_RATE,
-                           CAircraft::SMovement::MAX_CLIMB_RATE),
-            AsUnderlyingType(aircraft_.AircraftType()));
-    } else {
-        begin = nmea_.Format("$PFLAA,0,{:d},{:d},{:d},1,{:s},,,,,{:1X}*", m_relNorth, m_relEast,
-                             m_relVertical, *aircraft_.Id(), AsUnderlyingType(aircraft_.AircraftType()));
-    }
+    begin = nmea_.Format(
+        "$PFLAA,0,{:d},{:d},{:d},{:d},{:s},{:03d},,{:d},{:3.1f},{:1X}*", m_relNorth, m_relEast, m_relVertical,
+        AsUnderlyingType(aircraft_.IdType()), *aircraft_.Id(),
+        math::DoubleToInt(math::Saturate(aircraft_.Movement().Heading, CAircraft::SMovement::MIN_HEADING,
+                                         CAircraft::SMovement::MAX_HEADING)),
+        math::DoubleToInt(math::Saturate(aircraft_.Movement().GndSpeed * math::MS_2_KMH,
+                                         CAircraft::SMovement::MIN_GND_SPEED,
+                                         CAircraft::SMovement::MAX_GND_SPEED)),
+        math::Saturate(aircraft_.Movement().ClimbRate, CAircraft::SMovement::MIN_CLIMB_RATE,
+                       CAircraft::SMovement::MAX_CLIMB_RATE),
+        AsUnderlyingType(aircraft_.AircraftType()));
     nmea_.Format("{:02X}\r\n", Checksum(begin, nmea_.End()));
 }
 }  // namespace vfrb::data::processor

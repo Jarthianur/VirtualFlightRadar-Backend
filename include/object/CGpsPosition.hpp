@@ -63,8 +63,6 @@ public:
     CTCONST MAX_GEOID = 86.0;
     CTCONST MIN_GEOID = -108.0;
 
-    CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_);
-
     CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_, u8 sat_, i8 qual_,
                  CTimestamp const& ts_);
     ~CGpsPosition() noexcept override = default;

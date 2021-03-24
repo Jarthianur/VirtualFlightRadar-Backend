@@ -39,21 +39,30 @@ public:
 
 class CTimestamp
 {
-    i64 m_value = 0;
-    u32 m_day   = 0;
+    i64 m_value;
+    u32 m_day;
+
+    static auto
+    parseTime(StringView::const_iterator& first_, StringView::const_iterator const& last_)
+        -> Tuple<u32, u32, u32, u32>;
 
 public:
     DEFAULT_COPYABLE(CTimestamp)
     COPY_ON_MOVE(CTimestamp)
 
-    CTimestamp() = default;
-
+    CTimestamp();
     explicit CTimestamp(StringView const& sv_);
     ~CTimestamp() noexcept = default;
 
     auto
     operator>(CTimestamp const& other_) const -> bool;
+
     auto
     operator==(CTimestamp const& other_) const -> bool;
+
+    auto
+    ToString() const -> String {
+        return std::to_string(m_value) + "@" + std::to_string(m_day);
+    }
 };
 }  // namespace vfrb::object

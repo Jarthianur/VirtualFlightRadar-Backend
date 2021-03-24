@@ -29,6 +29,7 @@ namespace date_time
 {
 extern auto
 Now() -> i64;
+
 extern auto
 Day() -> u32;
 }  // namespace date_time
@@ -42,16 +43,15 @@ CTimestampParseError::Message() const noexcept -> str {
 }  // namespace error
 
 auto
-parseTime(StringView::const_iterator& first_, StringView::const_iterator const& last_)
+CTimestamp::parseTime(StringView::const_iterator& first_, StringView::const_iterator const& last_)
     -> Tuple<u32, u32, u32, u32> {
     namespace qi = boost::spirit::qi;
 
-    static thread_local const qi::int_parser<u32, 10, 2, 2> _2digit = {};
-    static thread_local const qi::int_parser<u32, 10, 3, 3> _3digit = {};
-    static thread_local const qi::rule<StringView::const_iterator, Tuple<u32, u32, u32, u32>(),
-                                       qi::space_type>
-        time_r = (_2digit >> _2digit >> _2digit >> qi::attr(0)) |
-                 (_2digit >> ":" >> _2digit >> ":" >> _2digit >> "." >> _3digit);
+    const qi::int_parser<u32, 10, 2, 2>                                                     _2digit = {};
+    const qi::int_parser<u32, 10, 3, 3>                                                     _3digit = {};
+    const qi::rule<StringView::const_iterator, Tuple<u32, u32, u32, u32>(), qi::space_type> time_r =
+        (_2digit >> _2digit >> _2digit >> qi::attr(0)) |
+        (_2digit >> ":" >> _2digit >> ":" >> _2digit >> "." >> _3digit);
 
     Tuple<u32, u32, u32, u32> time;
     if (qi::phrase_parse(first_, last_, time_r, qi::space, time) && (first_ == last_)) {
@@ -59,6 +59,8 @@ parseTime(StringView::const_iterator& first_, StringView::const_iterator const& 
     }
     throw error::CTimestampParseError();
 }
+
+CTimestamp::CTimestamp() : m_day(date_time::Day()), m_value(date_time::Now()) {}
 
 CTimestamp::CTimestamp(StringView const& sv_) : m_day(date_time::Day()) {
     auto const* it    = sv_.begin();

@@ -58,8 +58,7 @@ class CAprsParser : public IParser<object::CAircraft>
 
     [[nodiscard]] auto static parseComment(std::cmatch const& match_) -> AircraftInfo;
 
-    [[nodiscard]] auto static parseMovement(std::cmatch const& match_)
-        -> Optional<object::CAircraft::SMovement>;
+    [[nodiscard]] auto static parseMovement(std::cmatch const& match_) -> object::CAircraft::SMovement;
 
     [[nodiscard]] auto static parseTimeStamp(std::cmatch const& match_) -> object::CTimestamp;
 

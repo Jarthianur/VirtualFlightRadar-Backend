@@ -20,6 +20,7 @@
 
 #include "object/CGpsPosition.hpp"
 
+#include <iostream>
 #include <typeinfo>
 #include <utility>
 
@@ -29,9 +30,6 @@ using vfrb::util::FailOutsideBounds;
 
 namespace vfrb::object
 {
-CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_)
-    : CGpsPosition(prio_, loc_, geo_, 1.0, 3, 5, CTimestamp()) {}
-
 CGpsPosition::CGpsPosition(u32 prio_, SLocation const& loc_, f64 geo_, f64 dil_, u8 sat_, i8 qual_,
                            CTimestamp const& ts_)
     : CObject(prio_),
@@ -65,8 +63,13 @@ auto
 CGpsPosition::canUpdate(CObject const& other_) const -> bool {
     try {
         auto const& other = dynamic_cast<const CGpsPosition&>(other_);
+        if (!((this->m_timestamp > other.m_timestamp) && CObject::canUpdate(other_))) {
+            std::cout << "returned false: " << m_timestamp.ToString() << " / " << other.m_timestamp.ToString()
+                      << std::flush;
+        }
         return (this->m_timestamp > other.m_timestamp) && CObject::canUpdate(other_);
     } catch ([[maybe_unused]] std::bad_cast const&) {
+        std::cout << "got cast error" << std::flush;
         return false;
     }
 }

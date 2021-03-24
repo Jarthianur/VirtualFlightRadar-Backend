@@ -40,6 +40,8 @@ public:
 
     CTCONST ID_LEN = 6;
 
+    using IdString = CStaticString<ID_SIZE>;
+
     enum class ETargetType : enum_type
     {
         FLARM,
@@ -88,14 +90,13 @@ public:
     };
 
 private:
-    CStaticString<ID_SIZE> m_id;
-    EIdType                m_idType;
-    EAircraftType          m_aircraftType;
-    ETargetType            m_targetType;
-    SLocation              m_location;
-    SMovement              m_movement;
-    CTimestamp             m_timestamp;
-    bool                   m_fullInfo = false;
+    IdString      m_id;
+    EIdType       m_idType;
+    EAircraftType m_aircraftType;
+    ETargetType   m_targetType;
+    SLocation     m_location;
+    SMovement     m_movement;
+    CTimestamp    m_timestamp;
 
     void
     assign(CObject&& other_) override;
@@ -105,9 +106,6 @@ private:
 public:
     CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, ETargetType tt_,
               SLocation const& loc_, SMovement const& move_, CTimestamp const& ts_);
-
-    CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, ETargetType tt_,
-              SLocation const& loc_, CTimestamp const& ts_);
 
     ~CAircraft() noexcept override = default;
 
@@ -121,6 +119,5 @@ public:
     GETTER(IdType, m_idType)
     GETTER(AircraftType, m_aircraftType)
     GETTER(TargetType, m_targetType)
-    GETTER(HasFullInfo, m_fullInfo)
 };
 }  // namespace vfrb::object

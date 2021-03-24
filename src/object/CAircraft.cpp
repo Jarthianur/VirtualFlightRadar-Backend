@@ -20,8 +20,6 @@
 
 #include "object/CAircraft.hpp"
 
-#include <typeinfo>
-
 #include "util/Bounds.hpp"
 
 using vfrb::util::FailOutsideBounds;
@@ -37,16 +35,9 @@ CAircraft::CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftTy
       m_targetType(tt_),
       m_location(loc_),
       m_movement(move_),
-      m_timestamp(ts_),
-      m_fullInfo(true) {
+      m_timestamp(ts_) {
     FailOutsideBounds(m_location.Latitude, SLocation::MIN_LATITUDE, SLocation::MAX_LATITUDE);
     FailOutsideBounds(m_location.Longitude, SLocation::MIN_LONGITUDE, SLocation::MAX_LONGITUDE);
-}
-
-CAircraft::CAircraft(u32 prio_, StringView const& id_, EIdType idT_, EAircraftType aT_, ETargetType tt_,
-                     SLocation const& loc_, CTimestamp const& ts_)
-    : CAircraft(prio_, id_, idT_, aT_, tt_, loc_, {.0, .0, .0}, ts_) {
-    m_fullInfo = false;
 }
 
 void
@@ -60,7 +51,6 @@ CAircraft::assign(CObject&& other_) {
         this->m_location     = other.m_location;
         this->m_movement     = other.m_movement;
         this->m_timestamp    = other.m_timestamp;
-        this->m_fullInfo     = other.m_fullInfo;
     } catch ([[maybe_unused]] std::bad_cast const&) {
     }
 }

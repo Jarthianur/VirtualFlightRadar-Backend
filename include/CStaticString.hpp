@@ -147,3 +147,15 @@ public:
     }
 };
 }  // namespace vfrb
+
+namespace std
+{
+template<vfrb::usize N>
+struct hash<typename vfrb::CStaticString<N>>
+{
+    std::size_t
+    operator()(typename vfrb::CStaticString<N> const& s) const noexcept {
+        return std::hash<vfrb::StringView>()(*s);
+    }
+};
+}  // namespace std

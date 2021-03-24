@@ -38,15 +38,14 @@ using namespace feed::parser;
 DESCRIBE_PAR("test_CSbsParser") {
     IT("should parse a valid sentence correctly") {
         CSbsParser p(100000);
-        auto       ac = ASSERT_NOTHROW(return p.Parse(
+        auto       res = ASSERT_NOTHROW(return p.Parse(
             "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
             0));
-        ASSERT_EQ(ac.Id(), CStaticString<8>("AAAAAA"));
-        ASSERT_EQ(ac.TargetType(), object::CAircraft::ETargetType::TRANSPONDER);
-        ASSERT_EQ(ac.Location().Altitude, math::DoubleToInt(math::FEET_2_M * 1000));
-        ASSERT(ac.Location().Latitude, EQ, 49.0);
-        ASSERT(ac.Location().Longitude, EQ, 8.0);
-        ASSERT_FALSE(ac.HasFullInfo());
+        auto       pos = std::get<SPositionUpdate>(res.second);
+        ASSERT_EQ(res.first, CStaticString<8>("AAAAAA"));
+        ASSERT_EQ(pos.Location.Altitude, math::DoubleToInt(math::FEET_2_M * 1000));
+        ASSERT(pos.Location.Latitude, EQ, 49.0);
+        ASSERT(pos.Location.Longitude, EQ, 8.0);
     }
     IT("should throw when parsing invalid sentence") {
         CSbsParser p(100000);
@@ -85,8 +84,6 @@ DESCRIBE_PAR("test_CSbsParser") {
 DESCRIBE_PAR("test_CAprsParser") {
     IT("should parse a valid sentence correctly") {
         CAprsParser p(10000);
-        ASSERT_NOTHROW(
-            p.Parse("FLRAAAAAA>APRS,qAS,XXXX:/100715h4900.00N/00800.00E'/A=000000 !W19! id06AAAAAA", 0));
         ASSERT_NOTHROW(p.Parse(
             "ICAAAAAAA>APRS,qAR:/081733h4900.00N/00800.00EX180/003/A=000000 !W38! id0DAAAAAA -138fpm +0.0rot 6.2dB 0e +4.2kHz gps4x4",
             0));
@@ -101,7 +98,6 @@ DESCRIBE_PAR("test_CAprsParser") {
         ASSERT_EQ(ac.Location().Altitude, 0);
         ASSERT(ac.Location().Latitude, EQ, 49.0);
         ASSERT(ac.Location().Longitude, EQ, -8.0);
-        ASSERT_TRUE(ac.HasFullInfo());
     }
     IT("should throw when parsing invalid sentence") {
         CAprsParser p(10000);

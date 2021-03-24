@@ -27,14 +27,123 @@
 #include "object/CAircraft.hpp"
 
 using vfrb::config::CProperties;
+using vfrb::concurrent::ImmutableLock;
+using vfrb::concurrent::MutableLock;
+using vfrb::object::CTimestamp;
+using vfrb::object::CAircraft;
+using vfrb::feed::parser::SPositionUpdate;
+using vfrb::feed::parser::SMovementUpdate;
 
 namespace vfrb::feed
 {
+auto
+CSbsFeed::CAssocQueue::SCombinedUpdate::ToAircraft(u32 prio_, object::CAircraft::IdString const& id_) const
+    -> object::CAircraft {
+    return {prio_,
+            *id_,
+            CAircraft::EIdType::ICAO,
+            CAircraft::EAircraftType::POWERED_AIRCRAFT,
+            CAircraft::ETargetType::TRANSPONDER,
+            PosUpdate.Location,
+            MovUpdate.Movement,
+            PosUpdate.Timestamp};
+}
+
+void
+CSbsFeed::CAssocQueue::SCombinedUpdate::Position(SPositionUpdate const& pos_) {
+    PosUpdate = pos_;
+    DataState = HAS_POSITION;
+}
+
+void
+CSbsFeed::CAssocQueue::SCombinedUpdate::Movement(SMovementUpdate const& mov_) {
+    MovUpdate = mov_;
+    DataState = HAS_MOVEMENT;
+}
+
+template<>
+auto
+CSbsFeed::CAssocQueue::SCombinedUpdate::From<parser::SPositionUpdate>(parser::SbsResult const& item_)
+    -> SCombinedUpdate {
+    return {std::get<parser::SPositionUpdate>(item_.second), {}, SCombinedUpdate::HAS_POSITION};
+}
+
+template<>
+auto
+CSbsFeed::CAssocQueue::SCombinedUpdate::From<parser::SMovementUpdate>(parser::SbsResult const& item_)
+    -> SCombinedUpdate {
+    return {{}, std::get<parser::SMovementUpdate>(item_.second), SCombinedUpdate::HAS_MOVEMENT};
+}
+
+void
+CSbsFeed::CAssocQueue::clean() {
+    CTimestamp ts;
+    std::this_thread::sleep_for(std::chrono::seconds(2));  // let it age a bit
+    ImmutableLock lk(m_mutex);
+    for (auto it = m_data.begin(); it != m_data.end();) {
+        if ((it->second.DataState == SCombinedUpdate::HAS_POSITION && ts > it->second.PosUpdate.Timestamp) ||
+            (it->second.DataState == SCombinedUpdate::HAS_MOVEMENT && ts > it->second.MovUpdate.Timestamp)) {
+            it = m_data.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void
+CSbsFeed::CAssocQueue::Push(parser::SbsResult const& item_, u32 prio_) {
+    bool          holdsPos{std::holds_alternative<SPositionUpdate>(item_.second)};
+    ImmutableLock lk(m_mutex);
+    Iterator      it{m_data.find(item_.first)};
+    if (it != m_data.end()) {
+        if (holdsPos) {
+            it->second.Position(std::get<SPositionUpdate>(item_.second));
+            if (it->second.DataState == SCombinedUpdate::HAS_MOVEMENT) {
+                m_targetData->Update(it->second.ToAircraft(prio_, item_.first));
+                m_data.erase(it);
+            }
+        } else {
+            it->second.Movement(std::get<SMovementUpdate>(item_.second));
+            if (it->second.DataState == SCombinedUpdate::HAS_POSITION) {
+                m_targetData->Update(it->second.ToAircraft(prio_, item_.first));
+                m_data.erase(it);
+            }
+        }
+    } else {
+        if (holdsPos) {
+            m_data.emplace(item_.first, SCombinedUpdate::From<SPositionUpdate>(item_));
+        } else {
+            m_data.emplace(item_.first, SCombinedUpdate::From<SMovementUpdate>(item_));
+        }
+    }
+}
+
+CSbsFeed::CAssocQueue::CAssocQueue(Shared<data::CAircraftData> data_)
+    : m_targetData(data_), m_running(true), m_thd([this]() NO_THREAD_SAFETY_ANALYSIS {
+          MutableLock lk(m_mutex);
+          while (m_running) {
+              m_cond.wait_for(lk, std::chrono::seconds(58),
+                              [this]() NO_THREAD_SAFETY_ANALYSIS { return !m_running; });
+              if (!m_running) {
+                  break;
+              }
+              lk.unlock();
+              clean();
+              lk.lock();
+          }
+      }) {}
+
+CSbsFeed::CAssocQueue::~CAssocQueue() noexcept {
+    ImmutableLock lk(m_mutex);
+    m_running = false;
+    m_cond.notify_all();
+}
+
 CSbsFeed::CSbsFeed(String const& name_, CProperties const& prop_, Shared<data::CAircraftData> data_,
                    i32 maxHeight_)
-    : IFeed(name_, prop_, data_), m_parser(maxHeight_), m_worker([this](String&& work_) {
+    : IFeed(name_, prop_, data_), m_queue(data_), m_parser(maxHeight_), m_worker([this](String&& work_) {
           try {
-              m_data->Update(m_parser.Parse(std::move(work_), m_priority));
+              m_queue.Push(m_parser.Parse(std::move(work_), 0), m_priority);
           } catch ([[maybe_unused]] parser::error::CParseError const&) {
           }
       }) {}
