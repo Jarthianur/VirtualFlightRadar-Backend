@@ -47,6 +47,7 @@
 #define SECT_KEY_GPS "gps"
 #define SECT_KEY_WIND "wind"
 #define SECT_KEY_ATMOS "atm"
+#define SECT_KEY_FLARM "fla"
 
 /**
  * Property keys for section "general"

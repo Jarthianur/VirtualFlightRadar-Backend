@@ -22,6 +22,7 @@
 #include "client/ClientFactory.h"
 
 #include "client/AprscClient.h"
+#include "client/FlarmClient.h"
 #include "client/GpsdClient.h"
 #include "client/SbsClient.h"
 #include "client/SensorClient.h"
@@ -64,6 +65,14 @@ std::shared_ptr<GpsdClient> ClientFactory::makeClient<GpsdClient>(std::shared_pt
                                         std::make_shared<ConnectorImplBoost>());
 }
 
+template<>
+std::shared_ptr<FlarmClient>
+    ClientFactory::makeClient<FlarmClient>(std::shared_ptr<feed::Feed> feed)
+{
+    return std::make_shared<FlarmClient>(feed->get_endpoint(),
+                                         std::make_shared<ConnectorImplBoost>());
+}
+
 std::shared_ptr<Client> ClientFactory::createClientFor(std::shared_ptr<feed::Feed> feed)
 {
     switch (feed->get_protocol())
@@ -72,6 +81,7 @@ std::shared_ptr<Client> ClientFactory::createClientFor(std::shared_ptr<feed::Fee
         case feed::Feed::Protocol::SBS: return makeClient<SbsClient>(feed);
         case feed::Feed::Protocol::GPS: return makeClient<GpsdClient>(feed);
         case feed::Feed::Protocol::SENSOR: return makeClient<SensorClient>(feed);
+        case feed::Feed::Protocol::FLARM: return makeClient<FlarmClient>(feed);
     }
     throw std::logic_error("unknown protocol");  // can never happen
 }

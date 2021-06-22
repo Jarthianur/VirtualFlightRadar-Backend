@@ -42,7 +42,7 @@ Configuration::Configuration(std::istream& stream)
         Properties properties = ConfigReader(stream).read();
         m_atmPressure         = boost::get<double>(
             checkNumber(stringToNumber<double>(properties.get_property(PATH_PRESSURE, "1013.25")),
-                        PATH_PRESSURE));
+                                PATH_PRESSURE));
         m_position    = resolvePosition(properties);
         m_maxDistance = resolveFilter(properties, KV_KEY_MAX_DIST);
         m_maxHeight   = resolveFilter(properties, KV_KEY_MAX_HEIGHT);
@@ -62,13 +62,13 @@ object::GpsPosition Configuration::resolvePosition(const Properties& properties)
 {
     object::Position pos;
     pos.latitude  = boost::get<double>(checkNumber(
-        stringToNumber<double>(properties.get_property(PATH_LATITUDE, "0.0")), PATH_LATITUDE));
+         stringToNumber<double>(properties.get_property(PATH_LATITUDE, "0.0")), PATH_LATITUDE));
     pos.longitude = boost::get<double>(checkNumber(
         stringToNumber<double>(properties.get_property(PATH_LONGITUDE, "0.0")), PATH_LONGITUDE));
     pos.altitude  = boost::get<std::int32_t>(checkNumber(
-        stringToNumber<std::int32_t>(properties.get_property(PATH_ALTITUDE, "0")), PATH_ALTITUDE));
+         stringToNumber<std::int32_t>(properties.get_property(PATH_ALTITUDE, "0")), PATH_ALTITUDE));
     double geoid  = boost::get<double>(checkNumber(
-        stringToNumber<double>(properties.get_property(PATH_GEOID, "0.0")), PATH_GEOID));
+         stringToNumber<double>(properties.get_property(PATH_GEOID, "0.0")), PATH_GEOID));
     return object::GpsPosition(pos, geoid);
 }
 

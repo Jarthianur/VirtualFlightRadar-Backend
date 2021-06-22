@@ -28,6 +28,7 @@
 #include "data/WindData.h"
 #include "feed/AprscFeed.h"
 #include "feed/AtmosphereFeed.h"
+#include "feed/FlarmFeed.h"
 #include "feed/GpsFeed.h"
 #include "feed/SbsFeed.h"
 #include "feed/WindFeed.h"
@@ -81,6 +82,13 @@ std::shared_ptr<AtmosphereFeed> FeedFactory::makeFeed<AtmosphereFeed>(const std:
                                             m_atmosData);
 }
 
+template<>
+std::shared_ptr<FlarmFeed> FeedFactory::makeFeed<FlarmFeed>(const std::string& name)
+{
+    return std::make_shared<FlarmFeed>(name, m_config->get_feedProperties().at(name),
+                                       m_aircraftData, m_config->get_maxHeight());
+}
+
 boost::optional<std::shared_ptr<Feed>> FeedFactory::createFeed(const std::string& name)
 {
     if (name.find(SECT_KEY_APRSC) != std::string::npos)
@@ -102,6 +110,10 @@ boost::optional<std::shared_ptr<Feed>> FeedFactory::createFeed(const std::string
     else if (name.find(SECT_KEY_ATMOS) != std::string::npos)
     {
         return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<AtmosphereFeed>(name));
+    }
+    else if (name.find(SECT_KEY_FLARM) != std::string::npos)
+    {
+        return boost::make_optional<std::shared_ptr<Feed>>(makeFeed<FlarmFeed>(name));
     }
     return boost::none;
 }

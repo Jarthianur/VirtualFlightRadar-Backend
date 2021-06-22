@@ -53,7 +53,8 @@ public:
         APRS,
         SBS,
         GPS,
-        SENSOR
+        SENSOR,
+        FLARM
     };
 
     /**

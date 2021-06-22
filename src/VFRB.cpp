@@ -135,7 +135,7 @@ void VFRB::createFeeds(std::shared_ptr<config::Configuration> config)
                 logger.warn("(VFRB) create feed ", name,
                             ": No keywords found; be sure feed names contain one of " SECT_KEY_APRSC
                             ", " SECT_KEY_SBS ", " SECT_KEY_WIND ", " SECT_KEY_ATMOS
-                            ", " SECT_KEY_GPS);
+                            ", " SECT_KEY_GPS ", " SECT_KEY_FLARM);
             }
         }
         catch (const std::exception& e)
