@@ -26,13 +26,12 @@ namespace vfrb::object::date_time
 {
 auto
 Now() -> i64 {
-    return static_cast<i64>(
-        boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
-            .total_milliseconds());
+    return boost::posix_time::time_duration(boost::posix_time::microsec_clock::universal_time().time_of_day())
+        .total_milliseconds();
 }
 
 auto
-Day() -> u32 {
-    return static_cast<u32>(boost::posix_time::microsec_clock::universal_time().date().modjulian_day());
+Day() -> i64 {
+    return boost::posix_time::microsec_clock::universal_time().date().modjulian_day();
 }
 }  // namespace vfrb::object::date_time

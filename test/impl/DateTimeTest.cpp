@@ -24,12 +24,12 @@ namespace vfrb::object::date_time
 {
 namespace
 {
-thread_local u32 s_Day = 0;
+thread_local i64 s_Day = 0;
 thread_local i64 s_Now = 0;
 }  // namespace
 
 void
-Day(u32 d_) {
+Day(i64 d_) {
     s_Day = d_;
 }
 
@@ -44,7 +44,7 @@ Now() -> i64 {
 }
 
 auto
-Day() -> u32 {
+Day() -> i64 {
     return s_Day;
 }
 }  // namespace vfrb::object::date_time

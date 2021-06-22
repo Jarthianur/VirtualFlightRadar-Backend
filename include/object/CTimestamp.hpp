@@ -40,7 +40,7 @@ public:
 class CTimestamp
 {
     i64 m_value;
-    u32 m_day;
+    i64 m_day;
 
     static auto
     parseTime(StringView::const_iterator& first_, StringView::const_iterator const& last_)
@@ -59,6 +59,9 @@ public:
 
     auto
     operator==(CTimestamp const& other_) const -> bool;
+
+    auto
+    Diff(CTimestamp const& other_) const -> i64;
 
     auto
     ToString() const -> String {

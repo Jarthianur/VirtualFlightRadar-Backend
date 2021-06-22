@@ -31,7 +31,7 @@ extern auto
 Now() -> i64;
 
 extern auto
-Day() -> u32;
+Day() -> i64;
 }  // namespace date_time
 
 namespace error
@@ -77,6 +77,11 @@ CTimestamp::CTimestamp(StringView const& sv_) : m_day(date_time::Day()) {
 auto
 CTimestamp::operator>(CTimestamp const& other_) const -> bool {
     return (this->m_day > other_.m_day) || ((this->m_day == other_.m_day) && this->m_value > other_.m_value);
+}
+
+auto
+CTimestamp::Diff(CTimestamp const& other_) const -> i64 {
+    return std::abs(std::abs(other_.m_value - m_value) - std::abs(other_.m_day - m_day) * 24 * 3600000);
 }
 
 auto

@@ -98,13 +98,15 @@ CSbsFeed::CAssocQueue::Push(parser::SbsResult const& item_, u32 prio_) {
     if (it != m_data.end()) {
         if (holdsPos) {
             it->second.Position(std::get<SPositionUpdate>(item_.second));
-            if (it->second.DataState == SCombinedUpdate::HAS_MOVEMENT) {
+            if (it->second.DataState == SCombinedUpdate::HAS_MOVEMENT &&
+                it->second.MovUpdate.Timestamp.Diff(it->second.PosUpdate.Timestamp) < 3) {
                 m_targetData->Update(it->second.ToAircraft(prio_, item_.first));
                 m_data.erase(it);
             }
         } else {
             it->second.Movement(std::get<SMovementUpdate>(item_.second));
-            if (it->second.DataState == SCombinedUpdate::HAS_POSITION) {
+            if (it->second.DataState == SCombinedUpdate::HAS_POSITION &&
+                it->second.PosUpdate.Timestamp.Diff(it->second.MovUpdate.Timestamp) < 3) {
                 m_targetData->Update(it->second.ToAircraft(prio_, item_.first));
                 m_data.erase(it);
             }
