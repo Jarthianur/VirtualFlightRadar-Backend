@@ -33,7 +33,7 @@ using namespace object;
 namespace vfrb::object::date_time
 {
 extern void Now(u32, u32, u32);
-extern void Day(u32);
+extern void Day(i64);
 }  // namespace vfrb::object::date_time
 
 DESCRIBE_PAR("test_CWind") {
