@@ -62,7 +62,7 @@ auto inline len(String const& s_) -> usize {
 
 template<typename... Args>
 auto
-MakeStr(Args&&... args_) -> String {
+MakeString(Args&&... args_) -> String {
     String s;
     s.reserve((0 + ... + len(args_)));
     return (s + ... + args_);
@@ -217,10 +217,10 @@ MatchChecksum(String const& str_) -> bool {
 class StringInserter
 {
     std::back_insert_iterator<String> m_iter;
-    String*                           m_string;
+    String&                           m_string;
 
 public:
-    explicit StringInserter(String* str_) : m_iter(std::back_inserter(*str_)), m_string(str_) {}
+    explicit StringInserter(String& str_) : m_iter(std::back_inserter(str_)), m_string(str_) {}
 
     void
     Copy(String const& str_) {
@@ -230,14 +230,14 @@ public:
     template<typename... Args>
     auto
     Format(str fmt_, Args&&... args_) noexcept -> String::const_iterator {
-        auto oldLen = m_string->length();
+        auto oldLen = m_string.length();
         fmt::format_to(m_iter, fmt_, std::forward<Args>(args_)...);
-        return m_string->cbegin() + oldLen;
+        return m_string.cbegin() + oldLen;
     }
 
     auto
     End() -> String::const_iterator {
-        return m_string->cend();
+        return m_string.cend();
     }
 };
 }  // namespace vfrb::str_util

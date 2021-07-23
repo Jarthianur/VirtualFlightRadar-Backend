@@ -68,7 +68,7 @@ CClientManager::Stop() {
 namespace error
 {
 CFeedSubscriptionError::CFeedSubscriptionError(String const& name_)
-    : m_msg(str_util::MakeStr("failed to subscribe ", name_, " to client")) {}
+    : m_msg(str_util::MakeString("failed to subscribe ", name_, " to client")) {}
 
 auto
 CFeedSubscriptionError::Message() const noexcept -> str {

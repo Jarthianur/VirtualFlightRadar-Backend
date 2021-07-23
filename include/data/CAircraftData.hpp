@@ -61,6 +61,17 @@ public:
     Container() -> decltype(m_container)& {
         return m_container;
     }
+    auto
+    Get(char const* id_) -> object::CAircraft const& {
+        auto it = m_container.Begin();
+        while (it != m_container.End()) {
+            if (it->Value.Id() == CStaticString<8>(id_)) {
+                return it->Value;
+            }
+            ++it;
+        }
+        throw std::out_of_range(id_);
+    }
 #endif
 };
 }  // namespace vfrb::data

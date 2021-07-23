@@ -28,7 +28,7 @@
 
 using vfrb::config::CProperties;
 using vfrb::config::CConfiguration;
-using vfrb::str_util::MakeStr;
+using vfrb::str_util::MakeString;
 
 namespace vfrb::feed
 {
@@ -44,7 +44,7 @@ CAprscFeed::CAprscFeed(String const& name_, CProperties const& prop_, Shared<dat
         [[maybe_unused]] auto x = prop_.Property(CConfiguration::KV_KEY_LOGIN);
     } catch ([[maybe_unused]] config::error::CPropertyNotFoundError const&) {
         throw error::CInvalidPropertyError(
-            MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_LOGIN));
+            MakeString("could not find: ", name_, ".", CConfiguration::KV_KEY_LOGIN));
     }
 }
 
@@ -54,8 +54,8 @@ CAprscFeed::Protocol() const -> IFeed::EProtocol {
 }
 
 auto
-CAprscFeed::Process(String&& str_) -> bool {
-    m_worker.Push(std::move(str_));
+CAprscFeed::Consume(String&& str_) -> bool {
+    m_worker.Put(std::move(str_));
     return true;
 }
 

@@ -68,7 +68,7 @@ public:
     Endpoint() const -> client::net::SEndpoint;
 
     virtual auto
-    Process(String&& str_) -> bool = 0;
+    Consume(String&& str_) -> bool = 0;
 
     [[nodiscard]] auto
     Priority() const -> std::remove_const<decltype(m_priority)>::type;

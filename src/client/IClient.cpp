@@ -142,7 +142,7 @@ IClient::handleRead(Result<String>&& res_) {
     if (m_state == EState::RUNNING) {
         if (res_) {
             for (auto& it : m_feeds) {
-                if (!it->Process(std::move(res_.Value))) {
+                if (!it->Consume(std::move(res_.Value))) {
                     stop();
                 }
             }

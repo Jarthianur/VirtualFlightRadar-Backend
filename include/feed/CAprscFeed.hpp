@@ -47,7 +47,7 @@ public:
     Protocol() const -> EProtocol override;
 
     auto
-    Process(String&& str_) -> bool override;
+    Consume(String&& str_) -> bool override;
 
     auto
     Login() const -> String;

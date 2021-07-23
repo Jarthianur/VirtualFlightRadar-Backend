@@ -43,6 +43,7 @@ class CWorkerThread
 
     Mutex mutable m_mutex;
     std::condition_variable_any GUARDED_BY(m_mutex) m_cv;
+    bool                        GUARDED_BY(m_mutex) m_idle;
     bool                        GUARDED_BY(m_mutex) m_running;
     std::queue<DataT>           GUARDED_BY(m_mutex) m_workQ;
     CGuardedThread              m_worker;
@@ -53,17 +54,19 @@ public:
     ~CWorkerThread() noexcept;
 
     void
-    Push(DataT&& data_) REQUIRES(!m_mutex);
+    Put(DataT&& data_) REQUIRES(!m_mutex);
+
+    auto REQUIRES(!m_mutex) Idle() const -> bool;
 };
 
 template<typename DataT>
 template<typename FnT>
 CWorkerThread<DataT>::CWorkerThread(FnT&& fn_)
-    : m_running(false), m_worker([this, fn = std::forward<FnT>(fn_)]() EXCLUDES(m_mutex) {
+    : m_idle(true), m_running(true), m_worker([this, fn = std::forward<FnT>(fn_)]() EXCLUDES(m_mutex) {
           MutableLock lk(m_mutex);
-          m_running = true;
           while (m_running) {
-              m_cv.wait_for(lk, std::chrono::milliseconds(POLL_TIME));
+              m_cv.wait_for(lk, std::chrono::milliseconds(POLL_TIME),
+                            [this]() NO_THREAD_SAFETY_ANALYSIS { return !m_running; });
               if (!m_running) {
                   break;
               }
@@ -74,6 +77,7 @@ CWorkerThread<DataT>::CWorkerThread(FnT&& fn_)
                   std::invoke(fn, std::move(work));
                   lk.lock();
               }
+              m_idle = true;
           }
       }) {}
 
@@ -84,14 +88,22 @@ CWorkerThread<DataT>::~CWorkerThread() noexcept {
         m_workQ.pop();
     }
     m_running = false;
-    m_cv.notify_one();
+    m_cv.notify_all();
 }
 
 template<typename DataT>
 void
-CWorkerThread<DataT>::Push(DataT&& data_) REQUIRES(!m_mutex) {
+CWorkerThread<DataT>::Put(DataT&& data_) REQUIRES(!m_mutex) {
     ImmutableLock lk(m_mutex);
     m_workQ.push(std::move(data_));
-    m_cv.notify_one();
+    m_idle = false;
+    m_cv.notify_all();
+}
+
+template<typename DataT>
+auto
+CWorkerThread<DataT>::Idle() const -> bool {
+    ImmutableLock lk(m_mutex);
+    return m_idle;
 }
 }  // namespace vfrb::concurrent

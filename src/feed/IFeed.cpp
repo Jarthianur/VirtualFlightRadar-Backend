@@ -18,6 +18,8 @@
     along with VirtualFlightRadar-Backend.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "feed/IFeed.hpp"
+
 #include <algorithm>
 #include <limits>
 #include <stdexcept>
@@ -26,13 +28,12 @@
 #include "config/CConfiguration.hpp"
 #include "config/CProperties.hpp"
 #include "data/IData.hpp"
-#include "feed/IFeed.hpp"
 #include "util/StringUtils.hpp"
 
 using vfrb::config::CProperties;
 using vfrb::config::CConfiguration;
 
-using vfrb::str_util::MakeStr;
+using vfrb::str_util::MakeString;
 
 namespace vfrb::feed
 {
@@ -40,11 +41,11 @@ IFeed::IFeed(String const& name_, CProperties const& prop_, Shared<data::IData> 
     : m_properties(prop_), m_name(name_), m_priority(initPriority()), m_data(data_) {
     if (prop_.Property(CConfiguration::KV_KEY_HOST, "").empty()) {
         throw error::CInvalidPropertyError(
-            MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_HOST));
+            MakeString("could not find: ", name_, ".", CConfiguration::KV_KEY_HOST));
     }
     if (prop_.Property(CConfiguration::KV_KEY_PORT, "").empty()) {
         throw error::CInvalidPropertyError(
-            MakeStr("could not find: ", name_, ".", CConfiguration::KV_KEY_PORT));
+            MakeString("could not find: ", name_, ".", CConfiguration::KV_KEY_PORT));
     }
 }
 

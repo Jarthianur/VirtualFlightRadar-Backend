@@ -106,7 +106,7 @@ CSbsParser::parseVelocityReport(String&& str_) const -> Pair<CAircraft::IdString
             case SBS_FIELD_TIME: mov.Timestamp = CTimestamp(StringView(str_.c_str() + p, delim - p)); break;
             case SBS_FIELD_GNDSPD:
                 if (auto [v, ec] = Convert<f64>(str_.c_str() + p, str_.c_str() + delim); ec == EErrc::OK) {
-                    mov.Movement.GndSpeed = math::DoubleToInt(v);  // What unit is reported from SBS?
+                    mov.Movement.GndSpeed = math::DoubleToInt(v * math::KTS_2_KMH);
                 } else {
                     throw error::CParseError();
                 }
@@ -119,7 +119,7 @@ CSbsParser::parseVelocityReport(String&& str_) const -> Pair<CAircraft::IdString
                 break;
             case SBS_FIELD_VERTRATE:
                 if (auto [v, ec] = Convert<i32>(str_.c_str() + p, str_.c_str() + delim); ec == EErrc::OK) {
-                    mov.Movement.ClimbRate = v;  // What unit is reported from SBS? ft per what?
+                    mov.Movement.ClimbRate = v * math::FPM_2_MS;
                 } else {
                     throw error::CParseError();
                 }

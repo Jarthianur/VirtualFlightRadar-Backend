@@ -21,6 +21,7 @@
 #include <ostream>
 
 #include "util/Bounds.hpp"
+#include "util/CHashQueue.hpp"
 #include "util/StringUtils.hpp"
 
 #include "Helper.hpp"
@@ -268,5 +269,58 @@ DESCRIBE_PAR("test_StringUtils") {
     }
     IT("should throw on parse failure") {
         ASSERT_THROWS(Parse<i32>(""), str_util::error::CConversionError);
+    };
+};
+
+DESCRIBE("test_CHashQueue") {
+    Shared<CHashQueue<String, i32>> uut;
+    u64                             cleanCount = 0;
+
+    SETUP() {
+        uut = AllocShared<CHashQueue<String, i32>>(1, [this] { cleanCount += 1; });
+    }
+
+    IT("should call not-found-callback when key is not in queue") {
+        i32 o = 0;
+        ASSERT_NOTHROW(uut->Push(
+            std::make_pair("", 1), [](auto&, auto&) { throw std::runtime_error("wrong callback"); },
+            [&o](auto& i_) {
+                o = i_.second;
+                return i_.second;
+            }));
+        ASSERT_EQ(o, 1);
+    }
+
+    IT("should call found-callback when key is in queue") {
+        i32 o = 0;
+        ASSERT_NOTHROW(uut->Push(
+            std::make_pair("", 2),
+            [&o](auto& it_, auto& i_) {
+                ASSERT_EQ(it_->first, i_.first);
+                ASSERT_EQ(it_->second, 1);
+                ASSERT_EQ(i_.second, 2);
+                it_->second = i_.second;
+                o           = i_.second;
+            },
+            [](auto&) {
+                throw std::runtime_error("wrong callback");
+                return 0;
+            }));
+        ASSERT_EQ(o, 2);
+    }
+
+    IT("should clean itself frequently") {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        ASSERT_GT(cleanCount, 0);
+        u64 c = cleanCount;
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        ASSERT_GT(cleanCount, c);
+    }
+
+    IT("should remove an element") {
+        uut->RemoveIf([](auto& it_) { return it_->first == ""; });
+        ASSERT_NOTHROW(uut->Push(
+            std::make_pair("", 1), [](auto&, auto&) { throw std::runtime_error("wrong callback"); },
+            [](auto&) { return 1; }));
     };
 };

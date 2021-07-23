@@ -22,8 +22,8 @@
 
 #include "concurrent/CWorkerThread.hpp"
 #include "parser/CSbsParser.hpp"
-#include "util/CHashQueue.hpp"
 
+#include "CHashQueue.hpp"
 #include "IFeed.hpp"
 
 namespace vfrb::data
@@ -60,9 +60,9 @@ class CSbsFeed : public IFeed
         From(parser::SbsResult const& item_) -> SCombinedUpdate;
     };
 
-    util::CHashQueue<object::CAircraft::IdString, SCombinedUpdate> m_queue;
-    parser::CSbsParser const                                       m_parser;
-    concurrent::CWorkerThread<String>                              m_worker;
+    parser::CSbsParser const                                 m_parser;
+    CHashQueue<object::CAircraft::IdString, SCombinedUpdate> m_queue;
+    concurrent::CWorkerThread<String>                        m_worker;
 
 public:
     CSbsFeed(String const& name_, config::CProperties const& prop_, Shared<data::CAircraftData> data_,
@@ -72,6 +72,15 @@ public:
     Protocol() const -> EProtocol override;
 
     auto
-    Process(String&& str_) -> bool override;
+    Consume(String&& str_) -> bool override;
+
+#ifdef VFRB_TEST_MODE
+    void
+    Await() const {
+        while (!m_worker.Idle()) {
+            std::this_thread::yield();
+        }
+    }
+#endif
 };
 }  // namespace vfrb::feed

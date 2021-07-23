@@ -38,7 +38,7 @@ CConfigurationError::Message() const noexcept -> str {
 }
 
 CConversionError::CConversionError(String const& str_, str path_)
-    : m_msg(str_util::MakeStr("invalid value at ", path_, " [", str_, "]")) {}
+    : m_msg(str_util::MakeString("invalid value at ", path_, " [", str_, "]")) {}
 
 auto
 CConversionError::Message() const noexcept -> str {

@@ -182,8 +182,8 @@ DESCRIBE_PAR("test_CConfiguration") {
         ASSERT_EQ(uut->MaxDistance, 10000);
     }
     IT("should hold correct values for atm1") {
-        const auto feed_it = uut->FeedProperties.find(MakeStr(CConfiguration::SECT_KEY_ATMOS, "1"));
-        ASSERT_EQ(feed_it->first, MakeStr(CConfiguration::SECT_KEY_ATMOS, "1"));
+        const auto feed_it = uut->FeedProperties.find(MakeString(CConfiguration::SECT_KEY_ATMOS, "1"));
+        ASSERT_EQ(feed_it->first, MakeString(CConfiguration::SECT_KEY_ATMOS, "1"));
         ASSERT_EQ(feed_it->second.Property(CConfiguration::KV_KEY_PRIORITY), "1");
     }
 };

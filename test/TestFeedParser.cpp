@@ -39,8 +39,8 @@ DESCRIBE_PAR("test_CSbsParser") {
     IT("should parse a valid sentence correctly") {
         CSbsParser p(100000);
         auto       res = ASSERT_NOTHROW(return p.Parse(
-            "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
-            0));
+                  "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
+                  0));
         auto       pos = std::get<SPositionUpdate>(res.second);
         ASSERT_EQ(res.first, CStaticString<8>("AAAAAA"));
         ASSERT_EQ(pos.Location.Altitude, math::DoubleToInt(math::FEET_2_M * 1000));
@@ -78,6 +78,15 @@ DESCRIBE_PAR("test_CSbsParser") {
                 "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
                 0),
             feed::parser::error::CParseError);
+    }
+    IT("should return correct update type") {
+        CSbsParser p(100000);
+        auto       res  = ASSERT_NOTHROW(return p.Parse(
+                   "MSG,3,0,0,AAAAAA,0,2017/02/16,20:11:30.772,2017/02/16,20:11:30.772,,1000,,,49.000000,8.000000,,,,,,0",
+                   0));
+        auto       pos  = std::get<SPositionUpdate>(res.second);
+        auto       res2 = ASSERT_NOTHROW(return p.Parse("MSG,4,", 0));
+        auto       mov  = std::get<SMovementUpdate>(res2.second);
     };
 };
 

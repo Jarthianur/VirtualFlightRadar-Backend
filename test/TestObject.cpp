@@ -567,7 +567,7 @@ DESCRIBE_PAR("test_CTimestamp") {
         ASSERT_THROWS(CTimestamp("36:60:11.11111"), vfrb::object::error::CTimestampParseError);
         ASSERT_THROWS(CTimestamp("366022"), vfrb::object::error::CTimestampParseError);
     }
-    IT("shoudl compare correctly on same day") {
+    IT("should compare correctly on same day") {
         date_time::Day(1);
         date_time::Now(13, 0, 0);
         CTimestamp const t1("120000");
@@ -575,6 +575,7 @@ DESCRIBE_PAR("test_CTimestamp") {
 
         ASSERT(t2, GT, t1);
         ASSERT_NOT(t1, GT, t2);
+        ASSERT_EQ(t1.Diff(t2), 1000);
     }
     IT("should compare correctly from old day") {
         date_time::Day(1);
@@ -586,6 +587,7 @@ DESCRIBE_PAR("test_CTimestamp") {
 
         ASSERT(t2, GT, t1);
         ASSERT_NOT(t1, GT, t2);
+        ASSERT_EQ(t1.Diff(t2), 60000);
     }
     IT("should compare correctly from new day") {
         date_time::Day(1);
@@ -597,6 +599,7 @@ DESCRIBE_PAR("test_CTimestamp") {
 
         ASSERT(t2, GT, t1);
         ASSERT_NOT(t1, GT, t2);
+        ASSERT_EQ(t1.Diff(t2), 120000);
     }
     IT("should compare correctly from different days") {
         date_time::Day(1);
@@ -607,5 +610,6 @@ DESCRIBE_PAR("test_CTimestamp") {
 
         ASSERT(t2, GT, t1);
         ASSERT_NOT(t1, GT, t2);
+        ASSERT_EQ(t1.Diff(t2), 23 * 60 * 60 * 1000);
     };
 };

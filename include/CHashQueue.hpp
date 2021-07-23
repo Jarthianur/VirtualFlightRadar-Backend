@@ -22,11 +22,10 @@
 
 #include "concurrent/CGuardedThread.hpp"
 #include "concurrent/Mutex.hpp"
-#include "util/ClassUtils.hpp"
 
 #include "Types.hpp"
 
-namespace vfrb::util
+namespace vfrb
 {
 template<typename KeyT, typename ValT>
 class CHashQueue
@@ -49,8 +48,12 @@ public:
     void Push(InT const& item_, FoundFnT&& foundFn_, NotFoundFnT&& notFoundFn_);
 
     template<typename FnT>
-    void
-    RemoveIf(FnT&& pred_);
+    REQUIRES(!m_mutex)
+    void RemoveIf(FnT&& pred_);
+
+    REQUIRES(!m_mutex)
+    auto
+    Size() const -> usize;
 };
 
 template<typename KeyT, typename ValT>
@@ -69,7 +72,7 @@ CHashQueue<KeyT, ValT>::Push(InT const& item_, FoundFnT&& foundFn_, NotFoundFnT&
 template<typename KeyT, typename ValT>
 template<typename FnT>
 CHashQueue<KeyT, ValT>::CHashQueue(u32 sec_, FnT&& clean_)
-    : m_running(true), m_thd([this, &clean_, sec_]() NO_THREAD_SAFETY_ANALYSIS {
+    : m_running(true), m_thd([this, clean = std::forward<FnT>(clean_), sec_]() NO_THREAD_SAFETY_ANALYSIS {
           concurrent::MutableLock lk(m_mutex);
           while (m_running) {
               m_cond.wait_for(lk, std::chrono::seconds(sec_),
@@ -78,7 +81,7 @@ CHashQueue<KeyT, ValT>::CHashQueue(u32 sec_, FnT&& clean_)
                   break;
               }
               lk.unlock();
-              clean_();
+              clean();
               lk.lock();
           }
       }) {}
@@ -103,4 +106,11 @@ CHashQueue<KeyT, ValT>::RemoveIf(FnT&& pred_) {
         }
     }
 }
-}  // namespace vfrb::util
+
+template<typename KeyT, typename ValT>
+auto
+CHashQueue<KeyT, ValT>::Size() const -> usize {
+    concurrent::ImmutableLock lk(m_mutex);
+    return m_data.size();
+}
+}  // namespace vfrb

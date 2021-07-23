@@ -118,8 +118,8 @@ CSbsFeed::Protocol() const -> IFeed::EProtocol {
 }
 
 auto
-CSbsFeed::Process(String&& str_) -> bool {
-    m_worker.Push(std::move(str_));
+CSbsFeed::Consume(String&& str_) -> bool {
+    m_worker.Put(std::move(str_));
     return true;
 }
 }  // namespace vfrb::feed

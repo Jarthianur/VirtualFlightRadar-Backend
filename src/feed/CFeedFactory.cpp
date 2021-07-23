@@ -37,7 +37,7 @@ using vfrb::data::CAircraftData;
 using vfrb::data::CAtmosphereData;
 using vfrb::data::CWindData;
 using vfrb::data::CGpsData;
-using vfrb::str_util::MakeStr;
+using vfrb::str_util::MakeString;
 
 namespace vfrb::feed
 {
@@ -105,9 +105,10 @@ CFeedFactory::createFeed(String const& name_) -> Shared<IFeed> {
 namespace error
 {
 CFeedCreationError::CFeedCreationError()
-    : m_msg(MakeStr("no keywords found; be sure feed names contain one of ", CConfiguration::SECT_KEY_APRSC,
-                    ", ", CConfiguration::SECT_KEY_SBS, ", ", CConfiguration::SECT_KEY_WIND, ", ",
-                    CConfiguration::SECT_KEY_ATMOS, ", ", CConfiguration::SECT_KEY_GPS)) {}
+    : m_msg(MakeString("no keywords found; be sure feed names contain one of ",
+                       CConfiguration::SECT_KEY_APRSC, ", ", CConfiguration::SECT_KEY_SBS, ", ",
+                       CConfiguration::SECT_KEY_WIND, ", ", CConfiguration::SECT_KEY_ATMOS, ", ",
+                       CConfiguration::SECT_KEY_GPS)) {}
 
 auto
 CFeedCreationError::Message() const noexcept -> str {
