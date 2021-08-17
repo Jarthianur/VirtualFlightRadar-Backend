@@ -108,10 +108,10 @@ CVfrb::serve() {
             // process, gather and send all data
             auto before = std::chrono::steady_clock::now();
             m_aircraftData->Environment(m_gpsData->Location(), m_atmosphereData->Pressure());
-            m_gpsData->CollectInto(StringInserter(&data));
-            m_atmosphereData->CollectInto(StringInserter(&data));
-            m_windData->CollectInto(StringInserter(&data));
-            m_aircraftData->CollectInto(StringInserter(&data));
+            m_gpsData->CollectInto(StringInserter(data));
+            m_atmosphereData->CollectInto(StringInserter(data));
+            m_windData->CollectInto(StringInserter(data));
+            m_aircraftData->CollectInto(StringInserter(data));
             m_server.Send(data);
             // free unused memory for data at some point
             auto newAircraftCount = m_aircraftData->Size();

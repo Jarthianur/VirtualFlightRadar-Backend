@@ -114,6 +114,6 @@ DESCRIBE("test_CSbsFeed") {
         uut->Await();
         ASSERT_EQ(data->Size(), 1);
         auto res = data->Get("AAAAAA");
-        ASSERT_EQ(res.Location().Altitude, 2000);
+        ASSERT_EQ(res.Location().Altitude, 610);
     };
 };

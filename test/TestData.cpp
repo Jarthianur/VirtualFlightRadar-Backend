@@ -53,7 +53,7 @@ DESCRIBE("test_CAircraftData") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {49., 8., M1000}, {.0, .0, .0}, CTimestamp());
         ASSERT_TRUE(uut->Update(std::move(a)));
-        uut->CollectInto(StringInserter(&nmea));
+        uut->CollectInto(StringInserter(nmea));
         ASSERT_FALSE(nmea.empty());
         ASSERT(nmea, LIKE, helper::PflauRE);
         ASSERT(nmea, LIKE, helper::PflaaRE);
@@ -65,7 +65,7 @@ DESCRIBE("test_CAircraftData") {
         ASSERT_TRUE(uut->Update(std::move(a)));
         for (auto i = 0U; i <= CAircraftData::NO_FLARM_THRESHOLD; ++i) {
             nmea.clear();
-            uut->CollectInto(StringInserter(&nmea));
+            uut->CollectInto(StringInserter(nmea));
         }
         ASSERT_TRUE(nmea.empty());
         ASSERT_EQ(uut->Container().Begin()->Value.TargetType(), CAircraft::ETargetType::TRANSPONDER);
@@ -76,7 +76,7 @@ DESCRIBE("test_CAircraftData") {
         ASSERT_TRUE(uut->Update(std::move(a)));
         ASSERT_EQ(uut->Size(), 1U);
         for (auto i = 0; i < CAircraftData::DELETE_THRESHOLD; ++i) {
-            uut->CollectInto(StringInserter(&nmea));
+            uut->CollectInto(StringInserter(nmea));
         }
         ASSERT_EQ(uut->Size(), 0U);
     }
@@ -99,7 +99,7 @@ DESCRIBE("test_CAircraftData") {
             ASSERT_FALSE(uut->Update(std::move(a)));
         }
         for (auto i = 0U; i < CAircraftData::NO_FLARM_THRESHOLD; ++i) {
-            uut->CollectInto(StringInserter(&nmea));
+            uut->CollectInto(StringInserter(nmea));
         }
         {
             CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
@@ -127,7 +127,7 @@ DESCRIBE("test_CGpsData") {
             CGpsPosition p(0, {10., 85., 100}, 40., .0, 5, 1, CTimestamp("120000"));
             ASSERT_TRUE(uut->Update(std::move(p)));
         }
-        uut->CollectInto(StringInserter(&nmea));
+        uut->CollectInto(StringInserter(nmea));
         auto p = uut->Location();
         ASSERT_EQ(p.Latitude, 10.);
         ASSERT_EQ(p.Longitude, 85.);
@@ -164,16 +164,16 @@ DESCRIBE("test_CWindData") {
     IT("should report the wind on access") {
         CWind w(0, "$WIMWV,242.8,R,6.9,N,A*2");
         ASSERT_TRUE(uut->Update(std::move(w)));
-        uut->CollectInto(StringInserter(&nmea));
+        uut->CollectInto(StringInserter(nmea));
         ASSERT_FALSE(nmea.empty());
         ASSERT_EQ(nmea, "$WIMWV,242.8,R,6.9,N,A*2");
     }
     IT("should clear wind after access without update") {
         CWind w(0, "$WIMWV,242.8,R,6.9,N,A*2");
         ASSERT_TRUE(uut->Update(std::move(w)));
-        uut->CollectInto(StringInserter(&nmea));
+        uut->CollectInto(StringInserter(nmea));
         nmea.clear();
-        uut->CollectInto(StringInserter(&nmea));
+        uut->CollectInto(StringInserter(nmea));
         ASSERT_EQ(uut->Size(), 0U);
         ASSERT_TRUE(nmea.empty());
     };
@@ -195,7 +195,7 @@ DESCRIBE("test_CAtmosphereData") {
     IT("should report the atmosphere on access") {
         CAtmosphere a(0, 1009.1, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E");
         ASSERT_TRUE(uut->Update(std::move(a)));
-        uut->CollectInto(StringInserter(&nmea));
+        uut->CollectInto(StringInserter(nmea));
         ASSERT_FALSE(nmea.empty());
         ASSERT_EQ(nmea, "$WIMDA,29.7987,I,1.0091,B,14.8,C,,,,,,,,,,,,,,*3E");
         ASSERT(uut->Pressure(), EQ, 1009.1);

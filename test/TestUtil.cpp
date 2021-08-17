@@ -21,9 +21,9 @@
 #include <ostream>
 
 #include "util/Bounds.hpp"
-#include "util/CHashQueue.hpp"
 #include "util/StringUtils.hpp"
 
+#include "CHashQueue.hpp"
 #include "Helper.hpp"
 
 using namespace vfrb;

@@ -39,7 +39,7 @@ DESCRIBE("test_CGpsProcessor") {
 
     IT("should process GPS data correctly") {
         CGpsPosition   pos(0, {0., 0., 0}, 48., 1., 3, 5, CTimestamp("115800"));
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(pos, ins);
         ASSERT(nmea, LIKE, helper::GpsRE);
     };
@@ -59,7 +59,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::POWERED_AIRCRAFT,
                     CAircraft::ETargetType::TRANSPONDER, {49.0, 8.0, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({49.0, 8.0, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -77,9 +77,9 @@ DESCRIBE("test_CAircraftProcessor") {
     IT("should filter an aircraft in distance over threshold") {
         CAircraftProcessor uut(100);
         CAircraft          a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
-                    CAircraft::ETargetType::TRANSPONDER, {66., 66.0, M1000}, {.0, .0, .0}, CTimestamp());
+                             CAircraft::ETargetType::TRANSPONDER, {66., 66.0, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({49.1, 8.1, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         ASSERT_EQ(nmea.length(), 0U);
         ASSERT_EQ(nmea, "");
@@ -89,7 +89,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {.1, .0, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({-0.1, .0, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -104,7 +104,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {-0.1, .0, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({.1, .0, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -119,7 +119,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {89.9, .0, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({89.9, 180., 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -134,7 +134,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {-89.9, .0, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({-89.9, 180., 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -149,7 +149,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {.0, -0.1, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({.0, .1, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -164,7 +164,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {.0, .1, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({.0, -0.1, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -179,7 +179,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {60., -0.1, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({60., .1, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -194,7 +194,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {-60., .1, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({-60., -0.1, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -209,7 +209,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {.0, -179.9, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({.0, 179.9, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -224,7 +224,7 @@ DESCRIBE("test_CAircraftProcessor") {
         CAircraft a(0, "AAAAAA", CAircraft::EIdType::ICAO, CAircraft::EAircraftType::UNKNOWN,
                     CAircraft::ETargetType::TRANSPONDER, {.0, 179.9, M1000}, {.0, .0, .0}, CTimestamp());
         uut.ReferTo({.0, -179.9, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -240,7 +240,7 @@ DESCRIBE("test_CAircraftProcessor") {
                     CAircraft::ETargetType::TRANSPONDER, {33.825808, -112.219232, M1000}, {.0, .0, .0},
                     CTimestamp());
         uut.ReferTo({33.653124, -112.692253, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -256,7 +256,7 @@ DESCRIBE("test_CAircraftProcessor") {
                     CAircraft::ETargetType::TRANSPONDER, {-34.699833, -58.791788, M1000}, {.0, .0, .0},
                     CTimestamp());
         uut.ReferTo({-34.680059, -58.818111, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -272,7 +272,7 @@ DESCRIBE("test_CAircraftProcessor") {
                     CAircraft::ETargetType::TRANSPONDER, {5.386705, -5.750365, M1000}, {.0, .0, .0},
                     CTimestamp());
         uut.ReferTo({5.392435, -5.748392, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -288,7 +288,7 @@ DESCRIBE("test_CAircraftProcessor") {
                     CAircraft::ETargetType::TRANSPONDER, {-23.229517, 15.049683, M1000}, {.0, .0, .0},
                     CTimestamp());
         uut.ReferTo({-26.069244, 15.484389, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -304,7 +304,7 @@ DESCRIBE("test_CAircraftProcessor") {
                     CAircraft::ETargetType::TRANSPONDER, {-26.152199, 133.376684, M1000}, {.0, .0, .0},
                     CTimestamp());
         uut.ReferTo({-25.278208, 133.366885, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -320,7 +320,7 @@ DESCRIBE("test_CAircraftProcessor") {
                     CAircraft::ETargetType::TRANSPONDER, {49.719445, 9.087646, M1000}, {.0, .0, .0},
                     CTimestamp());
         uut.ReferTo({49.719521, 9.083279, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
@@ -336,7 +336,7 @@ DESCRIBE("test_CAircraftProcessor") {
                     CAircraft::ETargetType::TRANSPONDER, {32.896360, 103.855837, M1000}, {.0, .0, .0},
                     CTimestamp());
         uut.ReferTo({65.900837, 101.570680, 0}, 1013.25);
-        StringInserter ins(&nmea);
+        StringInserter ins(nmea);
         uut.Process(a, ins);
         std::smatch match;
         ASSERT(nmea, LIKE, helper::PflauRE, match);
