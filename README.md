@@ -1,8 +1,6 @@
 # VirtualFlightRadar-Backend (VFR-B)
 
 [![Build Status](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend.svg?branch=master)](https://travis-ci.org/Jarthianur/VirtualFlightRadar-Backend)
-[![codecov](https://codecov.io/gh/Jarthianur/VirtualFlightRadar-Backend/branch/master/graph/badge.svg)](https://codecov.io/gh/Jarthianur/VirtualFlightRadar-Backend)
-[![BCH compliance](https://bettercodehub.com/edge/badge/Jarthianur/VirtualFlightRadar-Backend?branch=master)](https://bettercodehub.com/)
 
 This project is intended to be an interface between APRS-/ADS-B-receivers, weather-sensors and XCSoar and the airfield manager respectively.
 
@@ -15,25 +13,25 @@ Have a look at the [code of conduct](.github/CODE_OF_CONDUCT.md), or the officia
 
 ## Content
 
-+ [Features](#features)
-+ [Benefits](#what-are-the-benefits)
-+ [VirtualFlightRadar](#virtualflightradar---the-whole-system)
-+ [Privacy](#what-about-privacy)
-+ [Installation](docs/installation.md)
-+ [Configuration](docs/configuration.md)
-+ [Operation](docs/operation.md)
+- [Features](#features)
+- [Benefits](#what-are-the-benefits)
+- [VirtualFlightRadar](#virtualflightradar---the-whole-system)
+- [Privacy](#what-about-privacy)
+- [Installation](docs/installation.md)
+- [Configuration](docs/configuration.md)
+- [Operation](docs/operation.md)
 
 ## Features
 
-+ receive and parse APRS messages from APRSC (FLARM reports)
-+ receive and parse ADS-B messages, transcoded into SBS, from any SDR (e.g. [Dump1090mutability](https://github.com/mutability/dump1090))
-+ receive and parse NMEA messages from any sensor, integrated in the network (WIMWV, WIMDA)
-+ receive and parse NMEA messages from GPSD
-+ *Ground-Mode*; the GPS feed stops as soon as a good position is received
-+ generic configuration of input feeds, even of same type, handled with priorities
-+ keep track of and manage detected aircrafts, normalizing measuring units
-+ filter aircrafts by their height and distance
-+ serve these information as NMEA sentences on the network
+- receive and parse APRS messages from APRSC (FLARM reports)
+- receive and parse ADS-B messages, transcoded into SBS, from any SDR (e.g. [Dump1090mutability](https://github.com/mutability/dump1090))
+- receive and parse NMEA messages from any sensor, integrated in the network (WIMWV, WIMDA)
+- receive and parse NMEA messages from GPSD
+- _Ground-Mode_; the GPS feed stops as soon as a good position is received
+- generic configuration of input feeds, even of same type, handled with priorities
+- keep track of and manage detected aircrafts, normalizing measuring units
+- filter aircrafts by their height and distance
+- serve these information as NMEA sentences on the network
 
 APRSC := APRS server coupled with a SDR, e.g. utilized by [OGN](http://wiki.glidernet.org/ "Open Glider Network")  
 SDR := Software Defined Radio
@@ -62,7 +60,7 @@ That means no aircraft-, wind reports, or whatever is going to be sent to the In
 **But this depends on how one will use this service.**
 Of course, one can configure it to receive APRS from public OGN servers,
 but to keep track of local traffic, the traffic information must be sent to OGN first.
-Also the internal NMEA server will serve its data from *localhost*, which means, everybody, inside the local network,
+Also the internal NMEA server will serve its data from _localhost_, which means, everybody, inside the local network,
 is able to fetch it.
 It is also possible to make the machine, which runs the VFR-B, accessible to the public.
 

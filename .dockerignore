@@ -1,9 +1,0 @@
-*
-!include/
-!src/
-!vendor/
-!test/
-!profiling/
-!*.sh
-!CMakeLists.txt
-!vfrb.conf.in

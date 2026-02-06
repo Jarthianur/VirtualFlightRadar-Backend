@@ -46,8 +46,6 @@ function print_help() {
     echo '  install : Build and install the VFRB executable, config file and service.'
     echo '  test    : Build and run the unit tests and code analysis.'
     echo '            Also generate coverage report.'
-    echo '  docker  : Build a minimal docker image. Cannot be combined with other tasks.'
-    echo '            The vfrb.conf.in will be copied, so edit it before running this command.'
     echo ''
 }
 
@@ -76,9 +74,6 @@ for arg in $@; do
     test)
         DO_TEST=1
         ;;
-    docker)
-        DO_DOCKER=1
-        ;;
     format)
         for f in $(find "$VFRB_ROOT/src" "$VFRB_ROOT/include" -type f); do
             echo $f
@@ -94,13 +89,6 @@ for arg in $@; do
         ;;
     esac
 done
-
-# task "docker"
-if [ -n "$DO_DOCKER" ]; then
-    docker_image
-    log -i Run e.g. "'sudo docker run --name vfrb -p 4353:4353 -dit vfrb:latest -g'"
-    exit 0
-fi
 
 # task "test"
 if [ -n "$DO_TEST" ]; then
